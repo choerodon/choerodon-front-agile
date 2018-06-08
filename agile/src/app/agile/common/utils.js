@@ -49,7 +49,7 @@ export function replaceBase64ToUrl(imgUrlList, imgBase, text) {
   const deltaOps = text;
   const imgMap = {};
   imgUrlList.forEach((imgUrl, index) => {
-    imgMap[imgBase[index]] = `${progress.env.AGILE_HOST} + imgUrl`;
+    imgMap[imgBase[index]] = `${process.env.AGILE_HOST} + imgUrl`;
   });
   deltaOps.forEach((item, index) => {
     if (item.insert && item.insert.image && imgBase.indexOf(item.insert.image) !== -1) {
