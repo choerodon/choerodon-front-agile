@@ -68,6 +68,8 @@ class EditRelease extends Component {
         visible={this.props.visible}
         onCancel={this.props.onCancel.bind(this)}
         destroyOnClose
+        okText="确定"
+        cancelText="取消"
         onOk={this.handleOk.bind(this)}
         confirmLoading={this.state.loading}
       >

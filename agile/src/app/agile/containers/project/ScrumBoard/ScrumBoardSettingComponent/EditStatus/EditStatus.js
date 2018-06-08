@@ -71,16 +71,24 @@ class EditStatus extends Component {
   }
   render() {
     const { getFieldDecorator } = this.props.form;
+    let name;
+    _.forEach(ScrumBoardStore.getBoardList, (item) => {
+      if (item.boardId === ScrumBoardStore.getSelectedBoard) {
+        name = item.name;
+      }
+    });
     return (
       <Sidebar
         title="修改状态"
         visible={this.props.visible}
         onCancel={this.props.onChangeVisible.bind(this, false)}
         onOk={this.handleEditStatus.bind(this)}
+        okText="修改"
+        cancelText="取消"
       >
         <Content
           style={{ padding: 0 }}
-          title="修改看板“敏捷看板”的状态"
+          title={`修改看板“${name}”的状态`}
           description="请在下面输入状态名称，选择状态的类别。可以添加、删除、重新排序和重命名一个状态，配置完成后，您可以通过board对问题拖拽进行状态的流转。"
           // link="#"
         >

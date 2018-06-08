@@ -58,6 +58,7 @@ class AddRelease extends Component {
         onCancel={this.props.onCancel.bind(this)}
         onOk={this.handleOk.bind(this)}
         okText="创建"
+        cancelText="取消"
         confirmLoading={this.state.loading}
       >
         <Content

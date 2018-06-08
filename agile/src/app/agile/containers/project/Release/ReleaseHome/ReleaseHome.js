@@ -270,6 +270,7 @@ class ReleaseHome extends Component {
             closable={false}
             visible={JSON.stringify(this.state.versionDelInfo) !== '{}'}
             okText="删除"
+            cancelText="取消"
             onCancel={() => {
               this.setState({
                 versionDelInfo: {},
