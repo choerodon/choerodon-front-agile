@@ -1,0 +1,74 @@
+.c7n-scrumboard {
+
+
+  .c7n-scrumboard-header {
+    display: flex;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.04);
+    padding: 0 24px;
+  }
+
+  .c7n-scrumboard-content {
+    overflow: auto;
+
+    .c7n-scrumboard-others {
+      padding: 0 24px;
+
+      .c7n-scrumboard-otherHeader {
+        padding: 12px 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .c7n-scrumboard-otherContent {
+        display: flex;
+      }
+    }
+  }
+}
+
+.c7n-scrumTools {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 15px 24px;
+
+  .c7n-scrumTools-left {
+    display: flex;
+    align-items: center;
+
+    .c7n-scrumTools-filter {
+      cursor: pointer;
+      padding: 3px 8px;
+      margin-right: 18px;
+    }
+  }
+
+  .c7n-scrumTools-right {
+    span {
+      margin-left: 30px;
+    }
+  }
+}
+
+.c7n-scrumboard-page {
+  .ant-select-arrow {
+    right: unset;
+  }
+
+  .ant-select-underline {
+    display: none;
+  }
+
+  .ant-select-selection-selected-value {
+    color: #3f51b5;
+  }
+}
+
+.textDisplayOneColumn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}

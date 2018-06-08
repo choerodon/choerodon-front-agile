@@ -1,0 +1,20 @@
+.c7n-scrumsetting {
+  display: flex;
+  overflow: auto;
+}
+
+.wrapSpin {
+  height: 100%;
+}
+
+.ant-tabs-content {
+  flex-grow: 1;
+}
+
+.textDisplayOneColumn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}

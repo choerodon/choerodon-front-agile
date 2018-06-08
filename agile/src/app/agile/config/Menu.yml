@@ -1,0 +1,34 @@
+"agile":
+  icon: today
+  sort: 1
+  project: 
+    - "backlog":
+        icon: directions_run
+        Routes: /agile/backlog
+        sort: 1
+        permission:
+          - 'agile-service.issue.queryIssue'
+    - "scrumboard":
+        icon: web
+        Routes: /agile/scrumboard
+        sort: 2
+        permission:
+          - 'agile-service.issue.queryIssue'
+    - "issue":
+        icon: assignment
+        Routes: /agile/issue
+        sort: 3
+        permission:
+          - 'agile-service.issue.queryIssue'
+    - "release":
+        icon: version
+        Routes: /agile/release
+        sort: 4
+        permission:
+          - 'agile-service.issue.queryIssue'
+    - "component":
+        icon: extension
+        Routes: /agile/component
+        sort: 5
+        permisson:
+          - 'agile-service.issue.queryIssue'

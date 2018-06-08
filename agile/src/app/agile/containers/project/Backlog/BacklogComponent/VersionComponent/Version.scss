@@ -1,0 +1,76 @@
+.c7n-backlog-version {
+  flex: 1;
+  border-right: 1px solid #d3d3d3;
+  overflow: auto;
+
+  .c7n-backlog-versionContent {
+    padding: 8px 0;
+
+    .c7n-backlog-versionTitle {
+      display: flex;
+      font-size: 13px;
+      line-height: 20px;
+      padding: 0 12px;
+
+      .c7n-backlog-versionRight {
+        align-items: center;
+        flex: 2;
+        justify-content: space-between;
+      }
+    }
+
+    .c7n-backlog-versionChoice {
+      margin-top: 20px;
+      font-size: 13px;
+      line-height: 20px;
+
+      .c7n-backlog-dragToVersion:hover {
+        border: 2px dashed green;
+      }
+
+      .c7n-backlog-versionItems {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .c7n-backlog-versionItems:hover {
+        background: rgba(140, 158, 255, 0.08);
+      }
+
+      .c7n-backlog-versionItemTitle {
+        display: flex;
+        align-items: center;
+
+        span {
+          font-size: 16px;
+        }
+
+        .c7n-backlog-versionItemTitleName {
+          flex-grow: 1;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+      }
+
+      .c7n-backlog-versionItemDes {
+        color: rgba(0, 0, 0, 0.65);
+      }
+
+      .c7n-backlog-versionItemDetail {
+        margin-top: 8px;
+        color: #3f51b5;
+        padding-bottom: 2px;
+        border-bottom: 1px solid #d3d3d3;
+      }
+
+      .c7n-backlog-versionItemParams {
+        .c7n-backlog-versionItemParam {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 12px;
+        }
+      }
+    }
+  }
+}

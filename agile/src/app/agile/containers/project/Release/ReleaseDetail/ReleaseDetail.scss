@@ -1,0 +1,46 @@
+.c7n-release-issueClassify {
+  display: flex;
+  margin-top: 18px;
+
+  div {
+    height: 16px;
+  }
+}
+
+.c7n-release-tabTitle {
+  display: flex;
+
+  .c7n-release-titleNum {
+    font-size: 26px;
+    margin-right: 12px;
+  }
+}
+
+.c7n-versionTime {
+  display: flex;
+  align-items: center;
+
+  .c7n-version-timemoment {
+    margin-left: 16px;
+  }
+}
+
+.c7n-release-icon {
+  width: 13.3px;
+  height: 13.3px;
+  background: #d50000;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 6px;
+}
+
+.textDisplayOneColumn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}

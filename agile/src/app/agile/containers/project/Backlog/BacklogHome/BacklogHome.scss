@@ -1,0 +1,46 @@
+.c7n-backlogTools {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 15px 24px;
+  border-bottom: 1px solid #d3d3d3;
+  flex-shrink: 0;
+
+  .c7n-backlogTools-left {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.c7n-backlog {
+  display: flex;
+  flex-grow: 1;
+
+  .c7n-backlog-side {
+    width: 24px;
+    border-right: 1px solid #d3d3d3;
+
+    p {
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.08);
+      text-align: center;
+      color: rgba(0, 0, 0, 0.65);
+    }
+  }
+
+  .c7n-backlog-content {
+    display: flex;
+    flex-grow: 1;
+  }
+}
+
+.wrapSpin {
+  width: 100%;
+  display: flex;
+}
+
+.c7n-backlog-filter {
+  cursor: pointer;
+  padding: 3px 8px;
+  margin-right: 18px;
+}

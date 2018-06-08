@@ -1,0 +1,108 @@
+.choerodon-modal-createSprint {
+  .dataPicker {
+    .ant-calendar-picker {
+      width: 220px;
+
+      .ant-calendar-picker-icon {
+        position: absolute;
+        right: 0;
+        top: 6px;
+        color: rgba(0, 0, 0, 0.65);
+      }
+
+      .ant-calendar-picker-clear {
+        right: 20px;
+        top: 6px;
+        width: 20px;
+        height: 20px;
+        background: #eee;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 20px;
+      }
+
+      .ant-calendar-picker-clear::before {
+        content: "\E5CD";
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.65);
+        line-height: 1;
+      }
+    }
+  }
+
+  .select-noBorder {
+    .ant-select-underline {
+      display: none;
+    }
+
+    .ant-select-selection__rendered {
+      margin-left: 0 !important;
+    }
+  }
+
+  .ant-input-length-info {
+    position: absolute;
+  }
+
+  .radius {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #3f51b5;
+    margin-right: 12px;
+    display: inline-block;
+    text-align: center;
+    color: #fff;
+    font-size: 18px;
+    line-height: 30px;
+  }
+
+  .ml-38 {
+    margin-left: 38px;
+  }
+
+  .w150 {
+    width: 150px;
+  }
+
+  .info {
+    // margin: 24px;
+    display: flex;
+    flex-direction: column;
+
+    .line-info {
+      display: flex;
+      margin-bottom: 32px;
+      align-items: flex-end;
+
+      .name {
+        width: 438px;
+        margin-left: 20px;
+      }
+    }
+  }
+
+  .tab-basic {
+    display: flex;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+
+    .column-basic {
+      display: flex;
+      flex-direction: column;
+      width: 150px;
+      margin-right: 60px;
+
+      .title-column {
+        font-weight: bold;
+      }
+    }
+  }
+
+  .c7n-sidebar-rollup {
+    font-size: 13px;
+    color: #3f51b5;
+    line-height: 15px;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+}

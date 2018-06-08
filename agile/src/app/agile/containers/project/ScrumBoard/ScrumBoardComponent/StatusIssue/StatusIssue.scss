@@ -1,0 +1,32 @@
+.c7n-scrumboard-issue {
+  padding: 10px;
+  position: relative;
+  z-index: 1;
+
+  .c7n-scrumboard-issueSide {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(140, 158, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .c7n-scrumboard-issueTop {
+    div.c7n-scrumboard-issueIcon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+    }
+  }
+
+  .c7n-scrumboard-issueBottom {
+    margin-top: 6px;
+    display: flex;
+  }
+}
