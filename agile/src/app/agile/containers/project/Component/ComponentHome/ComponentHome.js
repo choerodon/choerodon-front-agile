@@ -156,7 +156,7 @@ class ComponentHome extends Component {
         width: '10%',
         render: issueCount => (
           <div style={{ width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-            <span style={{ display: 'inline-block', width: 25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{issueCount}</span>
+            <span style={{ display: 'inline-block', width: 25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }}>{issueCount}</span>
             <span>issues</span>
           </div>
         ),

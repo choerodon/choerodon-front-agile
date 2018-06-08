@@ -138,7 +138,7 @@ class ScrumBoardHome extends Component {
             });
             if (ori.maxNum <= totalIssues) {
               flag = 1;
-              message.info(`多于列${ori.name}的最大长度，无法更新`);
+              message.info(`多于列${ori.name}的最大长度，无法更新`);
             }
           }
         });
@@ -177,7 +177,7 @@ class ScrumBoardHome extends Component {
             });
             if (ori.maxNum <= totalIssues) {
               flag = 1;
-              message.info(`多于列${ori.name}的最大长度，无法更新`);
+              message.info(`多于列${ori.name}的最大长度，无法更新`);
             }
           }
         });
@@ -708,6 +708,8 @@ class ScrumBoardHome extends Component {
                   addBoard: false,
                 });
               }}
+              okText="创建"
+              cancelText="取消"
               onOk={this.handleCreateBoard.bind(this)}
             >
               <Content

@@ -38,6 +38,7 @@ class CloseSprint extends Component {
         title="结束冲刺"
         visible={this.props.visible}
         okText="结束"
+        cancelText="取消"
         onCancel={this.props.onCancel.bind(this)}
         onOk={this.handleCloseSprint.bind(this)}
       >

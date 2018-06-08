@@ -96,6 +96,7 @@ class EditComponent extends Component {
         onCancel={this.props.onCancel.bind(this)}
         onOk={this.handleOk.bind(this)}
         onText="修改"
+        cancelText="取消"
         confirmLoading={this.state.createLoading}
       >
         <Content
