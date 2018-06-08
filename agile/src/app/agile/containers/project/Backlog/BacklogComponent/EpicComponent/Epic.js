@@ -205,6 +205,7 @@ class Epic extends Component {
               title="创建史诗"
               visible={this.state.addEpic}
               okText="新建"
+              cancelText="取消"
               onCancel={() => {
                 this.setState({
                   addEpic: false,

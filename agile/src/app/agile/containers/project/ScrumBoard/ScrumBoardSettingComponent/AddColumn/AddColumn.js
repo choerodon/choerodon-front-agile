@@ -128,10 +128,12 @@ class AddColumn extends Component {
         onCancel={this.props.onChangeVisible.bind(this, false)}
         confirmLoading={this.state.loading}
         onOk={this.handleAddColumn.bind(this)}
+        okText="创建"
+        cancelText="取消"
       >
         <Content
           style={{ padding: 0 }}
-          title={`添加看板“${name}”的列`}
+          title={`添加看板“${name}”的列`}
           description="请在下面输入列名，选择列的类别。可以添加、删除、重新排序和重命名一个列，同时可以通过设置最大最小值来控制每列中的问题数量。"
           // link="#"
         >

@@ -46,6 +46,8 @@ class PublicRelease extends Component {
         visible={this.props.visible}
         onCancel={this.props.onCancel.bind(this)}
         onOk={this.handlePublic.bind(this)}
+        okText="确定"
+        cancelText="取消"
       >
         <Content
           title={`发布版本"${ReleaseStore.getVersionDetail.name}"`}

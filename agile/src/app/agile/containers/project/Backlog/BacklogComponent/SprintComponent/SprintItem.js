@@ -389,6 +389,8 @@ class SprintItem extends Component {
                   visibleAssign: false,
                 });
               }}
+              okText="确定"
+              cancelText="取消"
               onCancel={() => {
                 this.setState({
                   visibleAssign: false,

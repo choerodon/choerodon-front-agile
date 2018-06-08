@@ -199,6 +199,7 @@ class Version extends Component {
                 title="创建版本"
                 visible={this.state.addVersion}
                 okText="新建"
+                cancelText="取消"
                 onCancel={() => {
                   this.setState({
                     addVersion: false,

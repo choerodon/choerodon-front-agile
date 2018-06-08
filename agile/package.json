@@ -48,7 +48,7 @@
     "case-sensitive-paths-webpack-plugin": "^2.1.2",
     "chalk": "^2.4.1",
     "change-case": "^3.0.1",
-    "choerodon-front-boot": "0.0.1",
+    "choerodon-front-boot": "0.6.0",
     "choerodon-ui": "^0.2.7",
     "classnames": "^2.2.5",
     "commander": "^2.9.0",

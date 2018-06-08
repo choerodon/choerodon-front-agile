@@ -52,6 +52,7 @@ class StartSprint extends Component {
         title="开启冲刺"
         visible={this.props.visible}
         okText="开启"
+        cancelText="取消"
         onCancel={this.props.onCancel.bind(this)}
         onOk={this.handleStartSprint.bind(this)}
       >

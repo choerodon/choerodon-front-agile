@@ -2372,6 +2372,9 @@ class CreateSprint extends Component {
                     worklogs: res,
                   });
                 });
+                loadIssue(this.state.issueId).then((res) => {
+                  this.setAnIssueToState(res);
+                });
                 this.setState({ dailyLogShow: false });
               }}
             />
