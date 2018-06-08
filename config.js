@@ -6,7 +6,7 @@ const config = {
     entryName: 'index',
     root: '/',
     routes: null, //by default, routes use main in package.json
-    server: 'http://api.staging.saas.hand-china.com', //api server
+    server: '', //api server
     clientid: 'localhost',
     titlename: 'Choerodon', //html title
     favicon: 'favicon.ico', //page favicon

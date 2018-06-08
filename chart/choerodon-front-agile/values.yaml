@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: registry.saas.hand-china.com/choerdon-agile/agile-front
+  repository: registry.choerodon.com.cn/choerodon/choerodon-front-agile
   pullPolicy: Always
 
 preJob:
@@ -21,7 +21,7 @@ service:
   enable: false
   type: ClusterIP
   port: 80
-  name: agile-front
+  name: choerodon-front-agile
 
 ingress:
   enable: false
