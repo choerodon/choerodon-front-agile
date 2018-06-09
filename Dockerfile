@@ -8,17 +8,16 @@ ENV PRO_TITLE_NAME Choerodon
 ENV PRO_HEADER_TITLE_NAME Choerodon
 ENV PRO_COOKIE_SERVER choerodon.com.cn
 ENV PRO_HTTP http
-
+ENV PRO_AGILE_HOST localhost:8060
 
 RUN echo "Asia/shanghai" > /etc/timezone;
 ADD dist /usr/share/nginx/html
-COPY structure/enterpoint.sh /usr/share/nginx/html
 COPY config.yml /usr/share/nginx/html
 COPY structure/sql.py /usr/share/nginx/html
-COPY ../../structure/enterpoint2.sh /usr/share/nginx/html
-RUN chmod 777 /usr/share/nginx/html/enterpoint.sh
+COPY structure2/enterpoint2.sh /usr/share/nginx/html
 RUN chmod 777 /usr/share/nginx/html/enterpoint2.sh
-ENTRYPOINT ["/usr/share/nginx/html/enterpoint.sh && /usr/share/nginx/html/enterpoint2.sh"]
+ENTRYPOINT ["/usr/share/nginx/html/enterpoint2.sh"]
 CMD ["nginx", "-g", "daemon off;"]
+
 
 EXPOSE 80
