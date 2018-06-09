@@ -43,4 +43,4 @@ export const TYPE_NAME = {
   sub_task: '子任务',
 };
 
-export const SERVICES_URL = 'example.com';
+export const SERVICES_URL = 'SERVICES_URL_EXAMPLE';

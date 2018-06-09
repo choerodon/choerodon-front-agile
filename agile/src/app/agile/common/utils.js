@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { DeltaOperation } from 'react-quill';
 import { uploadImage, uploadFile } from '../api/FileApi';
-// import { SERVICES_URL } from '../common/Constant';
+import { SERVICES_URL } from '../common/Constant';
 
 const QuillDeltaToHtmlConverter = require('quill-delta-to-html');
 
@@ -49,7 +49,7 @@ export function replaceBase64ToUrl(imgUrlList, imgBase, text) {
   const deltaOps = text;
   const imgMap = {};
   imgUrlList.forEach((imgUrl, index) => {
-    imgMap[imgBase[index]] = `${process.env.AGILE_HOST}${imgUrl}`;
+    imgMap[imgBase[index]] = `${SERVICES_URL}${imgUrl}`;
   });
   deltaOps.forEach((item, index) => {
     if (item.insert && item.insert.image && imgBase.indexOf(item.insert.image) !== -1) {
