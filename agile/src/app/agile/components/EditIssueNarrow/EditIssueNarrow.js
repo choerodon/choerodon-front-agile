@@ -203,7 +203,7 @@ class CreateSprint extends Component {
     const fileList = _.map(issue.issueAttachmentDTOList, issueAttachment => ({
       uid: issueAttachment.attachmentId,
       name: issueAttachment.fileName,
-      url: `${SERVICES_URL}${issueAttachment.url}`,
+      url: issueAttachment.url,
     }));
     const fixVersions = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
     const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
