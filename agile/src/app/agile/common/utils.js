@@ -32,7 +32,7 @@ export function getImgInDelta(deltaOps) {
     if (item.insert && item.insert.image) {
       if (item.insert.image.split(':').length && item.insert.image.split(':')[0] === 'data') {
         imgBase.push(item.insert.image);
-        formData.append('file', convertBase64UrlToBlob(item.insert.image));
+        formData.append('file', convertBase64UrlToBlob(item.insert.image), 'blob.png');
       }
     }
   });
