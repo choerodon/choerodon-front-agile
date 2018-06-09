@@ -3,12 +3,12 @@ let env;
 switch (process.env.NODE_ENV) {
     case ('development'):
         env = {
-            'process.env.AGILE_HOST': JSON.stringify('http://minio.staging.saas.hand-china.com/agile-service/')
+            'process.env.AGILE_HOST': JSON.stringify(process.env.AGILE_HOST || 'http://minio.staging.saas.hand-china.com/agile-service/')
         };
         break;
     case ('production'):
         env = {
-            'process.env.AGILE_HOST': JSON.stringify('http://minio.staging.saas.hand-china.com/agile-service/')
+            'process.env.AGILE_HOST': JSON.stringify(process.env.AGILE_HOST || 'http://minio.staging.saas.hand-china.com/agile-service/')
         };
         break;
     default:
