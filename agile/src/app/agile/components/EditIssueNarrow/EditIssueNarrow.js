@@ -22,6 +22,7 @@ import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import DailyLog from '../DailyLog';
 import CreateSubTask from '../CreateSubTask';
+import { SERVICES_URL } from '../../common/Constant';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
@@ -260,9 +261,17 @@ class CreateSprint extends Component {
   }
 
   addFileToFileList = (data) => {
-    const originFileList = _.slice(this.state.fileList);
-    this.setState({
-      fileList: _.concat(originFileList, data),
+    // const originFileList = _.slice(this.state.fileList);
+    // this.setState({
+    //   fileList: _.concat(originFileList, data),
+    // });
+    loadIssue(this.state.origin.issueId).then((res) => {
+      this.setAnIssueToState(res);
+    });
+    loadWorklogs(this.state.origin.issueId).then((res) => {
+      this.setState({
+        worklogs: res,
+      });
     });
   }
 

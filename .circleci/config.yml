@@ -33,7 +33,8 @@ jobs:
           at: .
       - run: |
           mv agile/dist ./dist 
-          cp -r agile/node_modules/choerodon-front-boot/structure structure
+          mv agile/node_modules/choerodon-front-boot/structure structure
+          mv agile/agile-structure agile-structure
           sed -i "s/registry.cn-hangzhou.aliyuncs.com\/choerodon-tools/choerodon/g" Dockerfile
           export CI_COMMIT_TAG=$CIRCLE_TAG
           docker login -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}

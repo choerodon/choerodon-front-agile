@@ -4,7 +4,7 @@ import {
   Switch,
 } from 'react-router-dom';
 import { inject } from 'mobx-react';
-import { asyncRouter, asyncLocaleProvider, stores } from 'choerodon-front-boot';
+import { asyncRouter, asyncLocaleProvider, stores, nomatch } from 'choerodon-front-boot';
 
 const Home = asyncRouter(() => import('./Home'));
 const RELEASEINDEX = asyncRouter(() => import('./project/Release'));
@@ -28,6 +28,7 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/scrumboard`} component={SCRUMBOARDINDEX} /> 
           <Route path={`${match.url}/issue`} component={ISSUEIndex} />
           <Route path={`${match.url}/component`} component={COMPONENTIndex} />
+          <Route path={'*'} component={nomatch} />
         </Switch>
       </IntlProviderAsync>
     );

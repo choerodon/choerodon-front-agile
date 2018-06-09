@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { DeltaOperation } from 'react-quill';
 import { uploadImage, uploadFile } from '../api/FileApi';
-// import { SERVICES_URL } from '../common/Constant';
+import { SERVICES_URL } from '../common/Constant';
 
 const QuillDeltaToHtmlConverter = require('quill-delta-to-html');
 
@@ -32,7 +32,7 @@ export function getImgInDelta(deltaOps) {
     if (item.insert && item.insert.image) {
       if (item.insert.image.split(':').length && item.insert.image.split(':')[0] === 'data') {
         imgBase.push(item.insert.image);
-        formData.append('file', convertBase64UrlToBlob(item.insert.image));
+        formData.append('file', convertBase64UrlToBlob(item.insert.image), 'blob.png');
       }
     }
   });
@@ -49,7 +49,7 @@ export function replaceBase64ToUrl(imgUrlList, imgBase, text) {
   const deltaOps = text;
   const imgMap = {};
   imgUrlList.forEach((imgUrl, index) => {
-    imgMap[imgBase[index]] = `${process.env.AGILE_HOST}${imgUrl}`;
+    imgMap[imgBase[index]] = `${SERVICES_URL}${imgUrl}`;
   });
   deltaOps.forEach((item, index) => {
     if (item.insert && item.insert.image && imgBase.indexOf(item.insert.image) !== -1) {
