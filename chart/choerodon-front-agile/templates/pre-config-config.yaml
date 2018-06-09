@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: {{ .Release.Name }}-init-config
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}:{{ .Chart.Version }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: DB_HOST
@@ -34,7 +34,6 @@ spec:
         - -c
         - '
           cd /usr/share/nginx/html;
-          python configAuto.py scrum;
           python sql.py;
           '
       restartPolicy: Never
