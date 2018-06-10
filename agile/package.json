@@ -1,8 +1,8 @@
 {
   "name": "agile",
-  "description": "kanban",
-  "author": "chenzaolong",
-  "license": "MIT",
+  "description": "agile",
+  "author": "isaac",
+  "license": "Apache 2.0",
   "version": "0.0.1",
   "main": "src/app/agile/containers/AGILEIndex.js",
   "scripts": {
