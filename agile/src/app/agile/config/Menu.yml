@@ -30,5 +30,5 @@
         icon: extension
         Routes: /agile/component
         sort: 5
-        permisson:
+        permission:
           - 'agile-service.issue.queryIssue'
