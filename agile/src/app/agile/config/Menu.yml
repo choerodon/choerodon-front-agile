@@ -3,13 +3,13 @@
   sort: 1
   project: 
     - "backlog":
-        icon: directions_run
+        icon: baseline-list_alt
         Routes: /agile/backlog
         sort: 1
         permission:
           - 'agile-service.issue.queryIssue'
     - "scrumboard":
-        icon: web
+        icon: directions_run
         Routes: /agile/scrumboard
         sort: 2
         permission:
@@ -21,7 +21,7 @@
         permission:
           - 'agile-service.issue.queryIssue'
     - "release":
-        icon: version
+        icon: publish2
         Routes: /agile/release
         sort: 4
         permission:

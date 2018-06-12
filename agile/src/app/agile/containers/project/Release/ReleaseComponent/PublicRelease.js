@@ -113,7 +113,8 @@ class PublicRelease extends Component {
                               ReleaseStore.getPublicVersionDetail.versionNames[0].versionId 
                               : undefined,
                             rules: [{
-                              required: true, message: '移动版本是必须的',
+                              required: this.props.form.getFieldValue('chose') === 2,
+                              message: '移动版本是必须的',
                             }],
                           })(
                             <Select
