@@ -533,6 +533,41 @@ class ScrumBoardHome extends Component {
                   }}
                   type="av_timer"
                 />
+                <span style={{ marginLeft: 0 }}>{`${ScrumBoardStore.getCurrentSprint ? ScrumBoardStore.getCurrentSprint.dayRemain : ''}days剩余`}</span>
+                <Button
+                  funcTyp="flat"
+                  onClick={() => {
+                    BacklogStore.axiosGetSprintCompleteMessage(
+                      ScrumBoardStore.getCurrentSprint.sprintId).then((res) => {
+                      BacklogStore.setSprintCompleteMessage(res);
+                      let flag = 0;
+                      if (res.parentsDoneUnfinishedSubtasks) {
+                        if (res.parentsDoneUnfinishedSubtasks.length > 0) {
+                          flag = 1;
+                          let issueNums = '';
+                          _.forEach(res.parentsDoneUnfinishedSubtasks, (items) => {
+                            issueNums += `${items.issueNum} `;
+                          });
+                          confirm({
+                            title: 'warnning',
+                            content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
+                            onCancel() {
+                              window.console.log('Cancel');
+                            },
+                          });
+                        }
+                      }
+                      if (flag === 0) {
+                        this.setState({
+                          closeSprintVisible: true,
+                        });
+                      }
+                    }).catch((error) => {
+                      window.console.log(error);
+                    });
+                  }}
+                  type="av_timer"
+                />
                 <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
                 <Button
                   funcTyp="flat"
