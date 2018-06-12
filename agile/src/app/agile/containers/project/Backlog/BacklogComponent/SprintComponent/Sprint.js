@@ -65,7 +65,15 @@ class Sprint extends Component {
   getCurrentState(data) {
     return this.state[data];
   }
-
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
+  }
   handleBlurCreateIssue() {
     this.setState({
       loading: true,
@@ -398,7 +406,7 @@ class Sprint extends Component {
                               src={item.imageUrl ? item.imageUrl : undefined}
                             >
                               {
-                                !item.imageUrl && item.assigneeName ? item.assigneeName.substring(0, 1).toUpperCase() : ''
+                                !item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''
                               }
                             </Avatar>
                             <span style={{ color: 'rgba(0,0,0,0.65)' }} label="sprintIssue">{item.assigneeName}</span>
