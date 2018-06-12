@@ -11,6 +11,9 @@ class IssueDetail extends Component {
     super(props);
     this.state = {};
   }
+  componentDidMount() {
+    this.props.onRef(this);
+  }
   handleIssueUpdate() {
     // const issueId = BacklogStore.getClickIssueDetail.issueId;
     // BacklogStore.axiosGetIssueDetail(issueId).then((res) => {
@@ -47,6 +50,9 @@ class IssueDetail extends Component {
       window.console.log(error);
     });
   }
+  refreshIssueDetail() {
+    this.editIssue.refresh();
+  }
   render() {
     return (
       <div
@@ -54,6 +60,9 @@ class IssueDetail extends Component {
       >
         {this.props.visible ? (
           <EditIssue
+            onRef={(ref) => {
+              this.editIssue = ref;
+            }}
             issueId={BacklogStore.getClickIssueDetail.issueId}
             onCancel={() => {
               BacklogStore.setClickIssueDetail({});

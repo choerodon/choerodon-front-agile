@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Collapse, Button, Select, Input, Icon, Tooltip } from 'choerodon-ui';
+import { Collapse, Button, Select, Input, Icon, Tooltip, Avatar } from 'choerodon-ui';
 import _ from 'lodash';
 import { axios, stores } from 'choerodon-front-boot';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -65,7 +65,15 @@ class Sprint extends Component {
   getCurrentState(data) {
     return this.state[data];
   }
-
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
+  }
   handleBlurCreateIssue() {
     this.setState({
       loading: true,
@@ -251,7 +259,7 @@ class Sprint extends Component {
                   style={{
                     userSelect: 'none',
                     // background: snapshot1.isDragging ? 'lightgreen' : 'white',  
-                    background: this.state.selected.issueIds.indexOf(item.issueId) !== -1 ? 'lightgreen' : this.renderIssueBackground(item),
+                    background: this.state.selected.issueIds.indexOf(item.issueId) !== -1 ? 'rgba(140,158,255,0.16)' : this.renderIssueBackground(item),
                     padding: '10px 36px 10px 20px',
                     borderBottom: '1px solid rgba(0,0,0,0.12)',
                     paddingLeft: 43,
@@ -309,7 +317,7 @@ class Sprint extends Component {
                         overflow: 'hidden',
                         height: 20,
                       }}
-                    >{`#${item.issueNum} ${item.summary}`}</p>
+                    >{`${item.issueNum} ${item.summary}`}</p>
                   </div>
                   <div 
                     style={{ 
@@ -391,7 +399,16 @@ class Sprint extends Component {
                       >
                         {!_.isNull(item.assigneeName) ? (
                           <div style={{ display: 'inline-block' }} label="sprintIssue">
-                            <div label="sprintIssue" className="c7n-backlog-sprintPeople">M</div>
+                            {/* <div label="sprintIssue" className
+                          // ="c7n-backlog-sprintPeople">M</div> */}
+                            <Avatar
+                              size="small"
+                              src={item.imageUrl ? item.imageUrl : undefined}
+                            >
+                              {
+                                !item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''
+                              }
+                            </Avatar>
                             <span style={{ color: 'rgba(0,0,0,0.65)' }} label="sprintIssue">{item.assigneeName}</span>
                           </div>
                         ) : ''}
@@ -490,7 +507,11 @@ class Sprint extends Component {
                     {/* <Icon style={{ fontSize: 20 }} type="keyboard_arrow_down" /> */}
                     <span style={{ marginLeft: 8 }}>待办事项</span>
                   </p>
-                  <p className="c7n-backlog-sprintQuestion">{!_.isNull(data.backlogIssueCount) ? `${data.backlogIssueCount} 问题` : '0 问题'}</p>
+                  <p className="c7n-backlog-sprintQuestion">
+                    {data.backLogIssue && data.backLogIssue.length > 0 ? `${data.backLogIssue.length}个问题可见` : '0个问题可见'}
+                    {/* {!_.isNull(data.backlogIssueCount) ? ` 
+                  共${data.backlogIssueCount}个问题` : ' 共0个问题'} */}
+                  </p>
                 </div>
               </div>
             </div>
@@ -499,7 +520,7 @@ class Sprint extends Component {
                 <div
                   ref={provided.innerRef}
                   style={{
-                    background: snapshot.isDraggingOver ? 'lightblue' : 'white',
+                    background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
                     // background: 'white',
                     padding: 'grid',
                     borderBottom: '1px solid rgba(0,0,0,0.12)',

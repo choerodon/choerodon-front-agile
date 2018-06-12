@@ -67,7 +67,15 @@ class SwimLaneContext extends Component {
             >
               {this.renderTypeCode('icon')}
             </div>
-          #{item.issueNum}
+            <span
+              style={{ cursor: 'pointer' }}
+              role="none"
+              onClick={() => {
+                ScrumBoardStore.setClickIssueDetail(item);
+              }}
+            >
+            #{item.issueNum}
+            </span>
             <div className="c7n-parentIssue-status">{item.status}</div>
             {item.summary}
           </div>

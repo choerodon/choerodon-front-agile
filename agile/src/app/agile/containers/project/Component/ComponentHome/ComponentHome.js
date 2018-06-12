@@ -83,6 +83,16 @@ class ComponentHome extends Component {
     this.setState({ relatedComponentId: value });
   }
 
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
+  }
+
   loadComponents() {
     this.setState({
       loading: true,
@@ -186,7 +196,7 @@ class ComponentHome extends Component {
                         flexShrink: 0,
                       }}
                     >
-                      {record.managerId && record.managerName ? record.managerName.slice(0, 1) : ''}
+                      {record.managerId && record.managerName ? this.getFirst(record.managerName) : ''}
                     </span>
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {record.managerId ? `${record.managerName}` : ''}
