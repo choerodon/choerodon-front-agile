@@ -106,6 +106,7 @@ class CreateSprint extends Component {
   }
 
   componentDidMount() {
+    this.props.onRef(this);
     loadIssue(this.props.issueId).then((res) => {
       this.setAnIssueToState(res);
     });
@@ -338,6 +339,17 @@ class CreateSprint extends Component {
     const worklogs = this.state.worklogs.slice();
     const workTimeArr = _.reduce(worklogs, (sum, v) => sum + (v.workTime || 0), 0);
     return workTimeArr;
+  }
+
+  refresh = () => {
+    loadIssue(this.state.origin.issueId).then((res) => {
+      this.setAnIssueToState(res);
+    });
+    loadWorklogs(this.state.origin.issueId).then((res) => {
+      this.setState({
+        worklogs: res,
+      });
+    });
   }
 
   updateIssue = (pro) => {
@@ -658,6 +670,9 @@ class CreateSprint extends Component {
       subIssueDTOList: subIssues,
       createSubTaskShow: false,
     });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
   }
 
   handleClickMenu(e) {
@@ -2400,7 +2415,7 @@ class CreateSprint extends Component {
         {
           this.state.createSubTaskShow ? (
             <CreateSubTask
-              issueId={this.props.issueId}
+              issueId={this.state.origin.issueId}
               visible={this.state.createSubTaskShow}
               onCancel={() => this.setState({ createSubTaskShow: false })}
               onOk={this.handleCreateSubIssue.bind(this)}
