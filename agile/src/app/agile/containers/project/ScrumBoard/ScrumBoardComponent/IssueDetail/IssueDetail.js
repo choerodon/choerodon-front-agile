@@ -32,6 +32,13 @@ class IssueDetail extends Component {
             onCancel={() => {
               ScrumBoardStore.setClickIssueDetail({});
             }}
+            onDeleteIssue={() => {
+              ScrumBoardStore.setClickIssueDetail({});
+              this.props.refresh();              
+            }}
+            onUpdate={() => {
+              this.props.refresh();     
+            }}
           />
         ) : ''}
       </div>

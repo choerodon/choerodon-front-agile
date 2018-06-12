@@ -309,7 +309,7 @@ class Sprint extends Component {
                         overflow: 'hidden',
                         height: 20,
                       }}
-                    >{`#${item.issueNum} ${item.summary}`}</p>
+                    >{`${item.issueNum} ${item.summary}`}</p>
                   </div>
                   <div 
                     style={{ 

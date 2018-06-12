@@ -645,6 +645,7 @@ class ScrumBoardHome extends Component {
             </div>
             <IssueDetail
               visible={JSON.stringify(ScrumBoardStore.getClickIssueDetail) !== '{}'}
+              refresh={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}
             />
             <Modal
               closable={false}
