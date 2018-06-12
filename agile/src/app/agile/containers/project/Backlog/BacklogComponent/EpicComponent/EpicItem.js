@@ -94,9 +94,11 @@ class EpicItem extends Component {
           if (BacklogStore.getIsDragging) {
             BacklogStore.axiosUpdateIssuesToEpic(
               item.issueId, this.props.draggableIds).then((res) => {
+              this.props.issueRefresh();
               this.props.refresh();
             }).catch((error) => {
               window.console.log(error);
+              this.props.issueRefresh();
               this.props.refresh();
             });
           }

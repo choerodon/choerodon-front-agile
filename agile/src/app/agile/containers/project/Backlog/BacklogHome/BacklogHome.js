@@ -421,6 +421,9 @@ class BacklogHome extends Component {
                     refresh={this.refresh.bind(this)}
                     visible={this.state.versionVisible}
                     changeVisible={this.changeState.bind(this)}
+                    issueRefresh={() => {
+                      this.IssueDetail.refreshIssueDetail();
+                    }}
                   />
                   <Epic
                     onRef={(ref) => {
@@ -429,6 +432,9 @@ class BacklogHome extends Component {
                     refresh={this.refresh.bind(this)}
                     visible={this.state.epicVisible}
                     changeVisible={this.changeState.bind(this)}
+                    issueRefresh={() => {
+                      this.IssueDetail.refreshIssueDetail();
+                    }}
                   />
                   <Sprint
                     onRef={(ref) => {
@@ -442,6 +448,9 @@ class BacklogHome extends Component {
                 <IssueDetail
                   visible={JSON.stringify(BacklogStore.getClickIssueDetail) !== '{}'}
                   refresh={this.refresh.bind(this)}
+                  onRef={(ref) => {
+                    this.IssueDetail = ref;
+                  }}
                 />
               </DragDropContext>
             </div>

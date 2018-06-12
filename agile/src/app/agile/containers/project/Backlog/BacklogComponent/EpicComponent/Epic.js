@@ -62,6 +62,7 @@ class Epic extends Component {
             draggableIds={this.state.draggableIds}
             refresh={this.props.refresh.bind(this)}
             index={index}
+            issueRefresh={this.props.issueRefresh.bind(this)}
           />
           ,
         );
@@ -142,9 +143,11 @@ class Epic extends Component {
                   if (BacklogStore.getIsDragging) {
                     BacklogStore.axiosUpdateIssuesToEpic(
                       0, this.state.draggableIds).then((res) => {
+                      this.props.issueRefresh();
                       this.props.refresh();
                     }).catch((error) => {
                       window.console.log(error);
+                      this.props.issueRefresh();
                       this.props.refresh();
                     });
                   }

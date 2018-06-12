@@ -54,6 +54,7 @@ class Version extends Component {
             handelClickVersion={this.handelClickVersion.bind(this)}
             draggableIds={this.state.draggableIds}
             refresh={this.props.refresh.bind(this)}
+            issueRefresh={this.props.issueRefresh.bind(this)}
           />,
         );
       });
@@ -132,6 +133,7 @@ class Version extends Component {
                     if (BacklogStore.getIsDragging) {
                       BacklogStore.axiosUpdateIssuesToVersion(
                         0, this.state.draggableIds).then((res) => {
+                        this.props.issueRefresh();
                         this.props.refresh();
                       }).catch((error) => {
                         window.console.log(error);

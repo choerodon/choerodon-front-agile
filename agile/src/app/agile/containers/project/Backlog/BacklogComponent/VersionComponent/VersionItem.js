@@ -121,9 +121,11 @@ class VersionItem extends Component {
           if (BacklogStore.getIsDragging) {
             BacklogStore.axiosUpdateIssuesToVersion(
               item.versionId, this.props.draggableIds).then((res) => {
+              this.props.issueRefresh();
               this.props.refresh();
             }).catch((error) => {
               window.console.log(error);
+              this.props.issueRefresh();
               this.props.refresh();
             });
           }
