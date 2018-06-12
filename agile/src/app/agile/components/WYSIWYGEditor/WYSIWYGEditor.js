@@ -23,7 +23,7 @@ class WYSIWYGEditor extends Component {
     toolbar: [
       ['bold', 'italic', 'underline', 'strike', 'blockquote'],
       [{ list: 'ordered' }, { list: 'bullet' }],
-      ['link', 'image'],
+      ['image'],
       // ['clean'],
     ],
     imageDrop: true,
@@ -37,7 +37,6 @@ class WYSIWYGEditor extends Component {
     'blockquote',
     'list',
     'bullet',
-    'link',
     'image',
   ];
 

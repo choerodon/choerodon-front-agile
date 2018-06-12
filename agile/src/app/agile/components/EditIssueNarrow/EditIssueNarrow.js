@@ -841,7 +841,7 @@ class CreateSprint extends Component {
                   commit.commentId === this.state.editCommentId ? (
                     <WYSIWYGEditor
                       bottomBar
-                      toolbarHeight={66}
+                      // toolbarHeight={66}
                       value={deltaEdit}
                       style={{ height: 200, width: '100%' }}
                       onChange={(value) => {
@@ -919,7 +919,7 @@ class CreateSprint extends Component {
                 worklog.logId === this.state.editLogId ? (
                   <WYSIWYGEditor
                     bottomBar
-                    toolbarHeight={66}
+                    // toolbarHeight={66}
                     value={deltaEdit}
                     style={{ height: 200, width: '100%' }}
                     onChange={(value) => {
