@@ -50,11 +50,19 @@ class StatusIssue extends Component {
           <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
         );
       }
+    } else if (typeCode === 'task') {
+      if (type === 'background') {
+        return '#4D90FE';
+      } else {
+        return (
+          <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
+        );
+      }
     } else if (type === 'background') {
       return '#4D90FE';
     } else {
       return (
-        <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
+        <Icon style={{ color: 'white', fontSize: '14px' }} type="sutask" />
       );
     }
   }
