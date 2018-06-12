@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Collapse, Button, Select, Input, Icon, Tooltip } from 'choerodon-ui';
+import { Collapse, Button, Select, Input, Icon, Tooltip, Avatar } from 'choerodon-ui';
 import _ from 'lodash';
 import { axios, stores } from 'choerodon-front-boot';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -391,7 +391,16 @@ class Sprint extends Component {
                       >
                         {!_.isNull(item.assigneeName) ? (
                           <div style={{ display: 'inline-block' }} label="sprintIssue">
-                            <div label="sprintIssue" className="c7n-backlog-sprintPeople">M</div>
+                            {/* <div label="sprintIssue" className
+                          // ="c7n-backlog-sprintPeople">M</div> */}
+                            <Avatar
+                              size="small"
+                              src={item.imageUrl ? item.imageUrl : undefined}
+                            >
+                              {
+                                !item.imageUrl && item.assigneeName ? item.assigneeName.substring(0, 1).toUpperCase() : ''
+                              }
+                            </Avatar>
                             <span style={{ color: 'rgba(0,0,0,0.65)' }} label="sprintIssue">{item.assigneeName}</span>
                           </div>
                         ) : ''}
