@@ -106,7 +106,9 @@ class CreateSprint extends Component {
   }
 
   componentDidMount() {
-    this.props.onRef(this);
+    if (this.props.onRef) {
+      this.props.onRef(this);
+    }
     loadIssue(this.props.issueId).then((res) => {
       this.setAnIssueToState(res);
     });
