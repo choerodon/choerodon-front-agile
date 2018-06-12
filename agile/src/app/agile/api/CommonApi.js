@@ -18,3 +18,8 @@ export function getUsers(param) {
   }
   return axios.get(`/iam/v1/projects/${projectId}/users`);
 }
+
+export function getUser(userId) {
+  const organizationId = AppState.currentMenuType.organizationId;
+  return axios.get(`/iam/v1/organizations/${organizationId}/users/${userId}`);
+}
