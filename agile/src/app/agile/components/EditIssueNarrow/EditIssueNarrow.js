@@ -355,6 +355,17 @@ class CreateSprint extends Component {
     return workTimeArr;
   }
 
+  refresh = () => {
+    loadIssue(this.state.origin.issueId).then((res) => {
+      this.setAnIssueToState(res);
+    });
+    loadWorklogs(this.state.origin.issueId).then((res) => {
+      this.setState({
+        worklogs: res,
+      });
+    });
+  }
+
   updateIssue = (pro) => {
     const obj = {
       issueId: this.state.issueId,
