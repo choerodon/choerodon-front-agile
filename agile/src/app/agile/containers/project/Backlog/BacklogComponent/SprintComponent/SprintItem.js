@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
-import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table } from 'choerodon-ui';
+import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table, Avatar } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
@@ -64,6 +64,15 @@ class SprintItem extends Component {
         totalTime,
       },
     });
+  }
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
   }
   updateDate(type, date2) {
     let date = date2;
@@ -133,6 +142,7 @@ class SprintItem extends Component {
       window.console.log(error);
     });
   }
+
   handleBlurGoal(value) {
     const data = {
       objectVersionNumber: this.props.item.objectVersionNumber,
@@ -298,6 +308,7 @@ class SprintItem extends Component {
     }
     return '';
   }
+
   render() {
     const item = this.props.item;
     return (
@@ -363,7 +374,16 @@ class SprintItem extends Component {
                         </div>
                       )}
                     >
-                      <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ? ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div>
+                      {/* <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ? 
+                      ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div> */}
+                      <Avatar
+                        src={ass2.imageUrl ? ass2.imageUrl : undefined}
+                        size="small"
+                      >
+                        {
+                          !ass2.imageUrl && ass2.assigneeName ? this.getFirst(ass2.assigneeName) : ''
+                        }
+                      </Avatar>
                     </Tooltip>
                   ))) : ''
             }
