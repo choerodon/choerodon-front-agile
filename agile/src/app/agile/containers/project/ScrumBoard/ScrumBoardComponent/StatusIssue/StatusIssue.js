@@ -6,7 +6,6 @@ import { Icon } from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import './StatusIssue.scss';
 
-@inject('AppState')
 @observer
 class StatusIssue extends Component {
   constructor(props) {
@@ -97,6 +96,7 @@ class StatusIssue extends Component {
   render() {
     const item = this.props.data;
     const index = this.props.index;
+    const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
     return (
       <div>
         <Draggable 
@@ -141,7 +141,7 @@ class StatusIssue extends Component {
                       label={ScrumBoardStore.getClickIssueDetail.issueId}
                       className="c7n-scrumboard-issueTop"
                       style={{
-                        display: ScrumBoardStore.getClickIssueDetail.issueId ? 'block' : 'flex',
+                        display: issueId ? 'block' : 'flex',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center' }}>
