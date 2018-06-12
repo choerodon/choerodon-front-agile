@@ -12,36 +12,8 @@ class IssueDetail extends Component {
     this.state = {};
   }
   handleIssueUpdate() {
-    // const issueId = BacklogStore.getClickIssueDetail.issueId;
-    // BacklogStore.axiosGetIssueDetail(issueId).then((res) => {
-    //   window.console.log(res);
-    //   window.console.log(BacklogStore.getSprintData);
-    // }).catch((error) => {
-    //   window.console.log(error);
-    // });
-    // this.props.refresh();
     const chosenEpic = BacklogStore.getChosenEpic;
-    const type = BacklogStore.getChosenVersion;    
-    const data = {
-      advancedSearchArgs: {},
-    };
-    if (type === 'unset') {
-      data.advancedSearchArgs.noVersion = 'true';
-    } else if (type !== 'all') {
-      data.advancedSearchArgs.versionId = type;
-    }
-    if (chosenEpic === 'unset') {
-      data.advancedSearchArgs.noEpic = 'true';
-    } else if (chosenEpic !== 'all') {
-      data.advancedSearchArgs.epicId = chosenEpic;
-    }
-    if (BacklogStore.getOnlyMe) {
-      data.advancedSearchArgs.ownIssue = 'true';
-    }
-    if (BacklogStore.getRecent) {
-      data.advancedSearchArgs.onlyStory = 'true';
-    }
-    BacklogStore.axiosGetSprint(data).then((res) => {
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
       window.console.log(error);

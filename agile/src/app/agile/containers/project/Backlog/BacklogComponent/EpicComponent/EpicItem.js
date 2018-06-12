@@ -58,6 +58,25 @@ class EpicItem extends Component {
       BacklogStore.setClickIssueDetail(this.props.data);
     }
   }
+  handleSave(e) {
+    e.stopPropagation();
+    this.setState({
+      editName: false,
+    });
+    const dataP = {
+      objectVersionNumber: this.props.data.objectVersionNumber,
+      issueId: this.props.data.issueId,
+      epicName: e.target.value,
+    };
+    BacklogStore.axiosUpdateIssue(dataP).then((res) => {
+      const originEpic = _.clone(BacklogStore.getEpicData);
+      originEpic[this.props.index].epicName = res.epicName;
+      originEpic[this.props.index].objectVersionNumber = res.objectVersionNumber;
+      BacklogStore.setEpicData(originEpic);
+    }).catch((error) => {
+      window.console.log(error);
+    });
+  }
   render() {
     const item = this.props.data;
     const data = BacklogStore.getEpicData;
@@ -98,45 +117,9 @@ class EpicItem extends Component {
               <Input
                 autoFocus
                 defaultValue={item.epicName}
-                onPressEnter={(e) => {
-                  e.stopPropagation();
-                  this.setState({
-                    editName: false,
-                  });
-                  const dataP = {
-                    objectVersionNumber: this.props.data.objectVersionNumber,
-                    issueId: this.props.data.issueId,
-                    epicName: e.target.value,
-                  };
-                  BacklogStore.axiosUpdateIssue(dataP).then((res) => {
-                    const originEpic = _.clone(BacklogStore.getEpicData);
-                    originEpic[this.props.index].epicName = res.epicName;
-                    originEpic[this.props.index].objectVersionNumber = res.objectVersionNumber;
-                    BacklogStore.setEpicData(originEpic);
-                  }).catch((error) => {
-                    window.console.log(error);
-                  });
-                }}
+                onPressEnter={this.handleSave.bind(this)}
                 onClick={e => e.stopPropagation()}
-                onBlur={(e) => {
-                  e.stopPropagation();
-                  this.setState({
-                    editName: false,
-                  });
-                  const dataP = {
-                    objectVersionNumber: this.props.data.objectVersionNumber,
-                    issueId: this.props.data.issueId,
-                    epicName: e.target.value,
-                  };
-                  BacklogStore.axiosUpdateIssue(dataP).then((res) => {
-                    const originEpic = _.clone(BacklogStore.getEpicData);
-                    originEpic[this.props.index].epicName = res.epicName;
-                    originEpic[this.props.index].objectVersionNumber = res.objectVersionNumber;
-                    BacklogStore.setEpicData(originEpic);
-                  }).catch((error) => {
-                    window.console.log(error);
-                  });
-                }}
+                onBlur={this.handleSave.bind(this)}
               />
             ) : (
               <p>{item.epicName}</p>
@@ -166,20 +149,20 @@ class EpicItem extends Component {
             <p className="c7n-backlog-epicItemDetail">详情</p>
             <div className="c7n-backlog-epicItemParams">
               <div className="c7n-backlog-epicItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>问题</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.issueCount}</p>
+                <p className="c7n-backlog-epicItemParamKey">问题</p>
+                <p className="c7n-backlog-epicItemParamValue">{item.issueCount}</p>
               </div>
               <div className="c7n-backlog-epicItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>已完成</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.doneIssueCount}</p>
+                <p className="c7n-backlog-epicItemParamKey">已完成</p>
+                <p className="c7n-backlog-epicItemParamValue">{item.doneIssueCount}</p>
               </div>
               <div className="c7n-backlog-epicItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>未预估</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.notEstimate}</p>
+                <p className="c7n-backlog-epicItemParamKey">未预估</p>
+                <p className="c7n-backlog-epicItemParamValue">{item.notEstimate}</p>
               </div>
               <div className="c7n-backlog-epicItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>预估</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.totalEstimate}p</p>
+                <p className="c7n-backlog-epicItemParamKey">预估</p>
+                <p className="c7n-backlog-epicItemParamValue">{item.totalEstimate}p</p>
               </div>
             </div>
           </div>

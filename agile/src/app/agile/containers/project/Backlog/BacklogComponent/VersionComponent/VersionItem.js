@@ -56,12 +56,12 @@ class VersionItem extends Component {
       window.console.log(error);
     });
   }
-  handleBlurName(e) {
+  handleBlurName(value) {
     const data = {
       objectVersionNumber: this.props.data.objectVersionNumber,
       projectId: parseInt(AppState.currentMenuType.id, 10),
       versionId: this.props.data.versionId,
-      name: e.target.value,
+      name: value,
     };
     BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
       this.setState({
@@ -140,28 +140,18 @@ class VersionItem extends Component {
               BacklogStore.setVersionData(data);
             }}
           />
-          {this.state.editName ? (
-            <Input 
-              maxLength={30} 
-              defaultValue={item.name} 
-              autoFocus 
-              onPressEnter={this.handleBlurName.bind(this)}
-              onBlur={this.handleBlurName.bind(this)}
-            />
-          ) : (
+          <EasyEdit
+            type="input"
+            defaultValue={item.name}
+            enterOrBlur={this.handleBlurName.bind(this)}
+            style={{
+              flexGrow: 1,
+            }}
+          >
             <div className="c7n-backlog-versionItemTitleName">
               <p>{item.name}</p>
-              <Icon
-                style={{ 
-                  fontSize: 13,
-                  display: this.state.hoverBlockEditName ? 'block' : 'none',
-                }}
-                role="none"
-                onClick={this.handleClickName.bind(this)} 
-                type="mode_edit"
-              />
             </div>
-          )}
+          </EasyEdit>
         </div>
         {item.expand ? (
           <div style={{ paddingLeft: 12 }}>
@@ -219,20 +209,20 @@ class VersionItem extends Component {
                 </EasyEdit>
               </div>
               <div className="c7n-backlog-versionItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>问题</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.issueCount}</p>
+                <p className="c7n-backlog-versionItemParamKey">问题</p>
+                <p className="c7n-backlog-versionItemParamValue">{item.issueCount}</p>
               </div>
               <div className="c7n-backlog-versionItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>已完成</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.doneIssueCount}</p>
+                <p className="c7n-backlog-versionItemParamKey">已完成</p>
+                <p className="c7n-backlog-versionItemParamValue">{item.doneIssueCount}</p>
               </div>
               <div className="c7n-backlog-versionItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>未预估</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.notEstimate}</p>
+                <p className="c7n-backlog-versionItemParamKey">未预估</p>
+                <p className="c7n-backlog-versionItemParamValue">{item.notEstimate}</p>
               </div>
               <div className="c7n-backlog-versionItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>预估</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.totalEstimate}p</p>
+                <p className="c7n-backlog-versionItemParamKey">预估</p>
+                <p className="c7n-backlog-versionItemParamValue">{item.totalEstimate}p</p>
               </div>
             </div>
           </div>

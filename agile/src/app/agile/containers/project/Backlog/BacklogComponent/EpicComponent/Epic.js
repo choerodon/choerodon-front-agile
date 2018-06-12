@@ -7,6 +7,7 @@ import { Content, stores } from 'choerodon-front-boot';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EpicItem from './EpicItem';
 import './Epic.scss';
+import CreateEpic from './CreateEpic';
 
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
@@ -43,59 +44,10 @@ class Epic extends Component {
   }
   handleClickEpic(type) {
     BacklogStore.setChosenEpic(type);
-    const chosenVersion = BacklogStore.getChosenVersion;
-    const data = {
-      advancedSearchArgs: {},
-    };
-    if (type === 'unset') {
-      data.advancedSearchArgs.noEpic = 'true';
-    } else if (type !== 'all') {
-      data.advancedSearchArgs.epicId = type;
-    }
-    if (chosenVersion === 'unset') {
-      data.advancedSearchArgs.noVersion = 'true';
-    } else if (chosenVersion !== 'all') {
-      data.advancedSearchArgs.versionId = chosenVersion;
-    }
-    if (BacklogStore.getOnlyMe) {
-      data.advancedSearchArgs.ownIssue = 'true';
-    }
-    if (BacklogStore.getRecent) {
-      data.advancedSearchArgs.onlyStory = 'true';
-    }
-    BacklogStore.axiosGetSprint(data).then((res) => {
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
       window.console.log(error);
-    });
-  }
-  handleCreateEpic(e) {
-    this.setState({
-      loading: true,
-    });
-    e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, value) => {
-      if (!err) {
-        const data = {
-          priorityCode: 'medium',
-          projectId: AppState.currentMenuType.id,
-          epicName: value.name,
-          summary: value.summary,
-          typeCode: 'issue_epic',
-        };
-        BacklogStore.axiosEasyCreateIssue(data).then((res) => {
-          this.setState({
-            addEpic: false,
-            loading: false,
-          });
-          this.props.refresh();
-        }).catch((error) => {
-          this.setState({
-            loading: false,
-          });
-          window.console.log(error);
-        });
-      }
     });
   }
   renderEpic() {
@@ -118,7 +70,6 @@ class Epic extends Component {
     return result;
   }
   render() {
-    const { getFieldDecorator } = this.props.form;
     return (
       <div 
         className={this.props.visible ? 'c7n-backlog-epic' : ''}
@@ -138,7 +89,7 @@ class Epic extends Component {
             className="c7n-backlog-epicContent"
           >
             <div className="c7n-backlog-epicTitle">
-              <p style={{ flex: 1, fontWeight: 'bold' }}>史诗</p>
+              <p style={{ fontWeight: 'bold' }}>史诗</p>
               <div
                 className="c7n-backlog-epicRight"
                 style={{
@@ -146,7 +97,7 @@ class Epic extends Component {
                 }}
               >
                 <p
-                  style={{ color: '#3F51B5', cursor: 'pointer' }}
+                  style={{ color: '#3F51B5', cursor: 'pointer', whiteSpace: 'nowrap' }}
                   role="none"
                   onClick={() => {
                     this.setState({
@@ -162,6 +113,7 @@ class Epic extends Component {
                   }}
                   style={{
                     cursor: 'pointer',
+                    marginLeft: 6,
                   }}
                 />
               </div>
@@ -201,81 +153,15 @@ class Epic extends Component {
                   未指定史诗的问题
               </div>
             </div>
-            <Sidebar
-              title="创建史诗"
+            <CreateEpic
               visible={this.state.addEpic}
-              okText="新建"
-              cancelText="取消"
               onCancel={() => {
                 this.setState({
                   addEpic: false,
                 });
               }}
-              confirmLoading={this.state.loading}
-              onOk={this.handleCreateEpic.bind(this)}
-            >
-              <Content
-                style={{
-                  padding: 0,
-                }}
-                title={`创建项目“${AppState.currentMenuType.name}”的史诗`}
-                description="请在下面输入史诗名称、概要，创建新史诗。"
-                // link="#"
-              >
-                <Form style={{ width: 512 }}>
-                  <FormItem>
-                    {getFieldDecorator('type', {
-                      initialValue: 'epic',
-                      rules: [{
-                        required: true,
-                        message: '',
-                      }],
-                    })(
-                      <Select size="small" disabled label="问题类型">
-                        <Option value="epic">
-                          <div style={{ display: 'inline-flex', alignItems: 'center', margin: '5px 0' }}>
-                            <div
-                              style={{
-                                width: 20,
-                                height: 20,
-                                borderRadius: '50%',
-                                background: '#743BE7',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <Icon style={{ color: 'white' }} type="priority" />
-                            </div>
-                            <p style={{ marginLeft: 8 }}>史诗</p>
-                          </div>
-                        </Option>
-                      </Select>,
-                    )}
-                  </FormItem>
-                  <FormItem>
-                    {getFieldDecorator('name', {
-                      rules: [{
-                        required: true,
-                        message: '史诗名称不能为空',
-                      }],
-                    })(
-                      <Input label="史诗名称" maxLength={30} />,
-                    )}
-                  </FormItem>
-                  <FormItem>
-                    {getFieldDecorator('summary', {
-                      rules: [{
-                        required: true,
-                        message: '概要不能为空',
-                      }],
-                    })(
-                      <TextArea autoSize label="概要" maxLength={30} />,
-                    )}
-                  </FormItem>
-                </Form>
-              </Content>
-            </Sidebar>
+              refresh={this.props.refresh.bind(this)}
+            />
           </div>
         ) : ''}
       </div>

@@ -139,19 +139,7 @@ class BacklogHome extends Component {
             }
             axiosParam.before = endIndex === 0;
             axiosParam.issueIds = this.sprintRef.getCurrentState('selected').issueIds;
-            // if (endIndex === 0) {
-            //   if (newData.sprintData[index].issueSearchDTOList.length === 
-            // this.sprintRef.getCurrentState('selected').issueIds.length) {
-            //     axiosParam.outsetIssueId = 0;
-            //   } else {
-            //     axiosParam.outsetIssueId = 
-            //     newData.sprintData[index].issueSearchDTOList[endIndex + this.sprintRef
-            //       .getCurrentState('selected').issueIds.length].issueId; 
-            //   }
-            // } else {
-            axiosParam.outsetIssueId = 
-              destinationData.issueId; 
-            // }
+            axiosParam.outsetIssueId = destinationData.issueId; 
             BacklogStore.setSprintData(newData);
           }
         });
@@ -268,33 +256,10 @@ class BacklogHome extends Component {
     }
   }
   refresh() {
-    const data4 = {
-      advancedSearchArgs: {},
-    };
-    if (BacklogStore.getChosenEpic !== 'all') {
-      if (BacklogStore.getChosenEpic === 'unset') {
-        data4.advancedSearchArgs.noEpic = 'true';
-      } else {
-        data4.advancedSearchArgs.epicId = BacklogStore.getChosenEpic;
-      }
-    }
-    if (BacklogStore.getChosenVersion !== 'all') {
-      if (BacklogStore.getChosenVersion === 'unset') {
-        data4.advancedSearchArgs.noVersion = 'true';
-      } else {
-        data4.advancedSearchArgs.versionId = BacklogStore.getChosenVersion;
-      }
-    }
-    if (BacklogStore.getOnlyMe) {
-      data4.advancedSearchArgs.ownIssue = 'true';
-    }
-    if (BacklogStore.getRecent) {
-      data4.advancedSearchArgs.onlyStory = 'true';
-    }
     this.setState({
       spinIf: true,
     });
-    BacklogStore.axiosGetSprint(data4).then((data) => {
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
       BacklogStore.setSprintData(data);
       BacklogStore.axiosGetVersion().then((data2) => {
         const newVersion = [...data2];
@@ -326,7 +291,6 @@ class BacklogHome extends Component {
       [state]: value,
     });
   }
-
   handleCreateSprint() {
     this.setState({
       loading: true,
@@ -348,6 +312,24 @@ class BacklogHome extends Component {
       window.console.log(error);
     });
   }
+
+  filterOnlyMe() {
+    BacklogStore.setOnlyMe(!BacklogStore.getOnlyMe);
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
+      BacklogStore.setSprintData(res);
+    }).catch((error) => {
+      window.console.log(error);
+    });
+  }
+
+  filterOnlyStory() {
+    BacklogStore.setRecent(!BacklogStore.getRecent);
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
+      BacklogStore.setSprintData(res);
+    }).catch((error) => {
+      window.console.log(error);
+    });
+  }
   
   render() {
     return (
@@ -356,7 +338,7 @@ class BacklogHome extends Component {
           <Button loading={this.state.loading} className="leftBtn" funcTyp="flat" onClick={this.handleCreateSprint.bind(this)}>
             <Icon type="playlist_add" />创建冲刺
           </Button>
-          <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this)}>
+          <Button loading={this.state.spinIf} className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this)}>
             <Icon type="refresh" />刷新
           </Button>
         </Header>
@@ -371,37 +353,7 @@ class BacklogHome extends Component {
                   color: BacklogStore.getOnlyMe ? '#3f51b5' : '',
                 }}
                 role="none"
-                onClick={() => {
-                  BacklogStore.setOnlyMe(!BacklogStore.getOnlyMe);
-                  const data = {
-                    advancedSearchArgs: {},
-                  };
-                  if (BacklogStore.getChosenEpic !== 'all') {
-                    if (BacklogStore.getChosenEpic === 'unset') {
-                      data.advancedSearchArgs.noEpic = 'true';
-                    } else {
-                      data.advancedSearchArgs.epicId = BacklogStore.getChosenEpic;
-                    }
-                  }
-                  if (BacklogStore.getChosenVersion !== 'all') {
-                    if (BacklogStore.getChosenVersion === 'unset') {
-                      data.advancedSearchArgs.noVersion = 'true';
-                    } else {
-                      data.advancedSearchArgs.versionId = BacklogStore.getChosenVersion;
-                    }
-                  }
-                  if (BacklogStore.getOnlyMe) {
-                    data.advancedSearchArgs.ownIssue = 'true';
-                  }
-                  if (BacklogStore.getRecent) {
-                    data.advancedSearchArgs.onlyStory = 'true';
-                  }
-                  BacklogStore.axiosGetSprint(data).then((res) => {
-                    BacklogStore.setSprintData(res);
-                  }).catch((error) => {
-                    window.console.log(error);
-                  });
-                }}
+                onClick={this.filterOnlyMe.bind(this)}
               >仅我的问题</p>
               <p
                 className="c7n-backlog-filter"
@@ -410,37 +362,7 @@ class BacklogHome extends Component {
                   color: BacklogStore.getRecent ? '#3f51b5' : '',
                 }}
                 role="none"
-                onClick={() => {
-                  BacklogStore.setRecent(!BacklogStore.getRecent);
-                  const data = {
-                    advancedSearchArgs: {},
-                  };
-                  if (BacklogStore.getChosenEpic !== 'all') {
-                    if (BacklogStore.getChosenEpic === 'unset') {
-                      data.advancedSearchArgs.noEpic = 'true';
-                    } else {
-                      data.advancedSearchArgs.epicId = BacklogStore.getChosenEpic;
-                    }
-                  }
-                  if (BacklogStore.getChosenVersion !== 'all') {
-                    if (BacklogStore.getChosenVersion === 'unset') {
-                      data.advancedSearchArgs.noVersion = 'true';
-                    } else {
-                      data.advancedSearchArgs.versionId = BacklogStore.getChosenVersion;
-                    }
-                  }
-                  if (BacklogStore.getOnlyMe) {
-                    data.advancedSearchArgs.ownIssue = 'true';
-                  }
-                  if (BacklogStore.getRecent) {
-                    data.advancedSearchArgs.onlyStory = 'true';
-                  }
-                  BacklogStore.axiosGetSprint(data).then((res) => {
-                    BacklogStore.setSprintData(res);
-                  }).catch((error) => {
-                    window.console.log(error);
-                  });
-                }}
+                onClick={this.filterOnlyStory.bind(this)}
               >仅故事</p>
             </div>
           </div>

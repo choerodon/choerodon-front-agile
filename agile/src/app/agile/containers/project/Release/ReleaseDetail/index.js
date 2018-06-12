@@ -313,6 +313,9 @@ class ReleaseDetail extends Component {
         >
           <Button 
             funcTyp="flat" 
+            style={{
+              marginLeft: 80,
+            }}
             onClick={() => { 
               if (ReleaseStore.getVersionDetail.statusCode === 'version_planning') {
                 ReleaseStore.axiosGetPublicVersionDetail(ReleaseStore.getVersionDetail.versionId)
@@ -332,7 +335,7 @@ class ReleaseDetail extends Component {
               }
             }}
           >
-            <Icon type="public icon" />
+            <Icon type="publish2" />
             <span>{ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? '发布' : '撤销发布'}</span>
           </Button>
         </Header>
@@ -341,12 +344,12 @@ class ReleaseDetail extends Component {
             <div className="c7n-versionTime">
               <Icon style={{ fontSize: 20 }} type="date_range" />
               创建日期:
-              <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.startDate ? ReleaseStore.getVersionDetail.startDate : ''}</span>
+              <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.startDate ? ReleaseStore.getVersionDetail.startDate : '无'}</span>
             </div>
             <div className="c7n-versionTime" style={{ marginLeft: 80 }}>
               <Icon style={{ fontSize: 20 }} type="date_range" />
               更新日期:
-              <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.releaseDate ? ReleaseStore.getVersionDetail.releaseDate : ''}</span>
+              <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.releaseDate ? ReleaseStore.getVersionDetail.releaseDate : '无'}</span>
             </div>
           </div>
           <div className="c7n-release-issueClassify">

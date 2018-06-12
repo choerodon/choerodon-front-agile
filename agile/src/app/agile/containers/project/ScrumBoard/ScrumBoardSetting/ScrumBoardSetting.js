@@ -262,6 +262,8 @@ class ScrumBoardSetting extends Component {
     confirm({
       title: `删除看板${name}`,
       content: '确定要删除该看板吗?',
+      okText: '删除',
+      cancelText: '取消',
       onOk() {
         ScrumBoardStore.axiosDeleteBoard().then((res) => {
           history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);

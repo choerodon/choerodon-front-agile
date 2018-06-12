@@ -38,6 +38,7 @@
           color: rgba(0, 0, 0, 0.65);
           line-height: 20px;
           margin-left: 38px;
+          white-space: nowrap;
         }
 
         .c7n-backlog-sprintStatus {
@@ -46,6 +47,7 @@
           margin-left: 22px;
           background: rgba(0, 191, 165, 0.08);
           padding: 1px 10px;
+          white-space: nowrap;
         }
 
         .c7n-backlog-sprintStatus2 {
@@ -54,6 +56,7 @@
           margin-left: 22px;
           background: #d3d3d3;
           padding: 1px 10px;
+          white-space: nowrap;
         }
 
         .c7n-backlog-closeSprint {
@@ -61,11 +64,13 @@
           color: #3f51b5;
           line-height: 20px;
           cursor: pointer;
+          white-space: nowrap;
         }
 
         .c7n-backlog-openSprint {
           font-size: 13px;
           line-height: 20px;
+          white-space: nowrap;
         }
       }
     }

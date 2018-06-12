@@ -113,7 +113,7 @@ class AddStatus extends Component {
                   validator: this.checkStatusName.bind(this),
                 }],
               })(
-                <Input label="状态名称" placeholder="请输入状态名称" />,
+                <Input label="状态名称" placeholder="请输入状态名称" maxLength={30} />,
               )}
             </FormItem>
             <FormItem>

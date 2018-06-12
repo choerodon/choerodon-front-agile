@@ -11,10 +11,11 @@
       font-size: 13px;
       line-height: 20px;
       padding: 0 12px;
+      justify-content: space-between;
+      flex-wrap: wrap;
 
       .c7n-backlog-versionRight {
         align-items: center;
-        flex: 2;
         justify-content: space-between;
       }
     }
@@ -69,6 +70,17 @@
           display: flex;
           justify-content: space-between;
           margin-top: 12px;
+
+          .c7n-backlog-versionItemParamKey {
+            color: rgba(0, 0, 0, 0.65);
+          }
+          
+          .c7n-backlog-versionItemParamValue {
+            padding: 0px 8px; 
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.26); 
+            color: white;
+          }
         }
       }
     }
