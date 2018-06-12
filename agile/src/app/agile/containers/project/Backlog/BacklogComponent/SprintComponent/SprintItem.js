@@ -250,7 +250,10 @@ class SprintItem extends Component {
                   >{item.sprintName}</span>
                 </EasyEdit>
               </p>
-              <p className="c7n-backlog-sprintQuestion">{!_.isNull(item.issueSearchDTOList) ? `${item.issueSearchDTOList.length} 问题` : '0 问题'}</p>
+              <p className="c7n-backlog-sprintQuestion">
+                {item.issueSearchDTOList && item.issueSearchDTOList.length > 0 ? `${item.issueSearchDTOList.length}个问题可见` : '0个问题可见'}
+                {/* {!_.isNull(item.issueCount) ? ` 共${item.issueCount}个问题` : ' 共0个问题'} */}
+              </p>
             </div>
             <div style={{ flexGrow: 1 }} className="c7n-backlog-sprintTitleSide">
               {item.statusCode === 'started' ? (

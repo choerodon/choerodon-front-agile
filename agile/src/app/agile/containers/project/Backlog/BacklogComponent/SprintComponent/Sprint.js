@@ -499,7 +499,11 @@ class Sprint extends Component {
                     {/* <Icon style={{ fontSize: 20 }} type="keyboard_arrow_down" /> */}
                     <span style={{ marginLeft: 8 }}>待办事项</span>
                   </p>
-                  <p className="c7n-backlog-sprintQuestion">{!_.isNull(data.backlogIssueCount) ? `${data.backlogIssueCount} 问题` : '0 问题'}</p>
+                  <p className="c7n-backlog-sprintQuestion">
+                    {data.backLogIssue && data.backLogIssue.length > 0 ? `${data.backLogIssue.length}个问题可见` : '0个问题可见'}
+                    {/* {!_.isNull(data.backlogIssueCount) ? ` 
+                  共${data.backlogIssueCount}个问题` : ' 共0个问题'} */}
+                  </p>
                 </div>
               </div>
             </div>
