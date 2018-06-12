@@ -533,7 +533,7 @@ class ScrumBoardHome extends Component {
                   }}
                   type="av_timer"
                 />
-                <span style={{ marginLeft: 0 }}>{`${ScrumBoardStore.getCurrentSprint ? ScrumBoardStore.getCurrentSprint.dayRemain : ''}days剩余`}</span>
+                <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
                 <Button
                   funcTyp="flat"
                   onClick={() => {
