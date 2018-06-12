@@ -420,3 +420,11 @@ table {
     padding-left: 16px;
   }
 }
+
+.input:-webkit-autofill {
+  background: transparent !important;
+}
+
+input,button,select,textarea{outline:none}
+
+textarea{resize:none}

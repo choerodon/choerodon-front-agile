@@ -311,9 +311,17 @@ class CreateIssue extends Component {
                   loading={this.state.selectLoading}
                   filter
                   allowClear
-                  filterOption={(input, option) =>
-                    option.props.children.props.children[1].props.children.toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0}
+                  onFilterChange={(input) => {
+                    this.setState({
+                      selectLoading: true,
+                    });
+                    getUsers(input).then((res) => {
+                      this.setState({
+                        originUsers: res.content,
+                        selectLoading: false,
+                      });
+                    });
+                  }}
                   onFocus={() => {
                     this.setState({
                       selectLoading: true,
