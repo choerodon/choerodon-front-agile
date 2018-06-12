@@ -39,6 +39,16 @@ class Issue extends Component {
     IssueStore.init();
   }
 
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
+  }
+
   handleCreateIssue(issueObj) {
     this.setState({ create: false });
     IssueStore.init();
@@ -209,10 +219,10 @@ class Issue extends Component {
                       marginLeft: 12,
                     }}
                   >
-                    {issue.assigneeName ? issue.assigneeName.slice(0, 1) : ''}
+                    {issue.assigneeName ? this.getFirst(issue.assigneeName) : ''}
                   </span>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {`${issue.assigneeId} ${issue.assigneeName}`}
+                    {`${issue.assigneeName}`}
                   </span>
                 </div>
               </Tooltip>
@@ -292,10 +302,10 @@ class Issue extends Component {
                         className="c7n-avator"
                         style={{ flexShrink: 0 }}
                       >
-                        {issue.assigneeName ? issue.assigneeName.slice(0, 1) : ''}
+                        {issue.assigneeName ? this.getFirst(issue.assigneeName) : ''}
                       </span>
                       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {`${issue.assigneeId} ${issue.assigneeName}`}
+                        {`${issue.assigneeName}`}
                       </span>
                     </div>
                   </Tooltip>
