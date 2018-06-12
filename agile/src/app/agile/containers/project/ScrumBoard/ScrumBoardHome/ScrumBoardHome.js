@@ -392,8 +392,8 @@ class ScrumBoardHome extends Component {
             <span>刷新</span>
           </Button>
         </Header>
-        <Content style={{ padding: 0, display: 'flex' }}>
-          <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Content style={{ padding: 0, display: 'flex', overflow: 'hidden' }}>
+          <div style={{ flexGrow: 1 }}>
             <div className="c7n-scrumTools">
               <div className="c7n-scrumTools-left">
                 <p style={{ marginRight: 24 }}>快速搜索:</p>
@@ -580,10 +580,10 @@ class ScrumBoardHome extends Component {
               </div>
               <div
                 className="c7n-scrumboard-content"
-                // style={{
-                //   height: this.renderHeight(),
-                //   paddingBottom: 83,
-                // }}
+                style={{
+                  height: this.renderHeight(),
+                  paddingBottom: 83,
+                }}
               >
                 {this.renderSwimlane()}
                 {ScrumBoardStore.getCurrentSprint ? (
@@ -644,6 +644,7 @@ class ScrumBoardHome extends Component {
           </div>
           <IssueDetail
             visible={JSON.stringify(ScrumBoardStore.getClickIssueDetail) !== '{}'}
+            refresh={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}
           />
           <Modal
             closable={false}

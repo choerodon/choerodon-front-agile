@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import { Draggable } from 'react-beautiful-dnd';
-import { Icon } from 'choerodon-ui';
+import { Icon, Avatar, Tooltip } from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import './StatusIssue.scss';
 
@@ -11,6 +11,15 @@ class StatusIssue extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+  }
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
   }
   renderIssueDisplay() {
     const dragStartData = ScrumBoardStore.getDragStartItem;
@@ -93,6 +102,7 @@ class StatusIssue extends Component {
       return 'rgba(0, 0, 0, 0.08)';
     }
   }
+
   render() {
     const item = this.props.data;
     const index = this.props.index;
@@ -196,7 +206,19 @@ class StatusIssue extends Component {
                       >{item.summary}</p>
                     </div>
                   </div>
-                  <div style={{ flexShrink: 0 }} className="c7n-scrumboard-issueSide">M</div>
+                  {/* <div style={{ flexShrink: 0 }} cla
+                ssName="c7n-scrumboard-issueSide">M</div> */}
+                  {
+                    item.assigneeName ? (
+                      <Tooltip title={`经办人: ${item.assigneeName}`}>
+                        <Avatar
+                          src={item.imageUrl ? item.imageUrl : undefined}
+                        >
+                          {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
+                        </Avatar>
+                      </Tooltip>
+                    ) : ''
+                  }
                 </div>
                 {provided.placeholder}
               </div>
