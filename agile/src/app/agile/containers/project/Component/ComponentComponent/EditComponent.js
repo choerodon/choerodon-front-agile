@@ -33,6 +33,16 @@ class EditComponent extends Component {
     this.loadUsers();
   }
 
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
+  }
+
   loadComponent(componentId) {
     loadComponent(componentId)
       .then((res) => {
@@ -131,7 +141,6 @@ class EditComponent extends Component {
                     option.props.children.props.children[1].props.children.toLowerCase()
                       .indexOf(input.toLowerCase()) >= 0}
                   loading={this.state.selectLoading}
-                  getPopupContainer={triggerNode => triggerNode.parentNode}
                   onFocus={() => {
                     this.setState({
                       selectLoading: true,
@@ -145,7 +154,7 @@ class EditComponent extends Component {
                         <span
                           style={{ background: '#c5cbe8', color: '#6473c3', width: '20px', height: '20px', textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: '8px' }}
                         >
-                          {user.loginName ? user.loginName.slice(0, 1) : ''}
+                          {user.loginName ? this.getFirst(user.realName) : ''}
                         </span>
                         <span>{`${user.loginName} ${user.realName}`}</span>
                       </div>
@@ -169,10 +178,7 @@ class EditComponent extends Component {
                   message: '默认经办人必须',
                 }],
               })(
-                <Select
-                  label="默认经办人"
-                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                >
+                <Select label="默认经办人">
                   {['模块负责人', '无'].map(defaultAssigneeRole =>
                     (<Option key={defaultAssigneeRole} value={defaultAssigneeRole}>
                       {defaultAssigneeRole}

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
-import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table } from 'choerodon-ui';
+import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table, Avatar } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
@@ -63,6 +63,15 @@ class SprintItem extends Component {
         totalTime,
       },
     });
+  }
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
   }
   updateDate(type, date2) {
     let date = date2;
@@ -132,6 +141,7 @@ class SprintItem extends Component {
       window.console.log(error);
     });
   }
+
   handleBlurGoal(value) {
     const data = {
       objectVersionNumber: this.props.item.objectVersionNumber,
@@ -198,6 +208,7 @@ class SprintItem extends Component {
       );
     }
   }
+
   render() {
     const item = this.props.item;
     const columns = [{
@@ -250,7 +261,10 @@ class SprintItem extends Component {
                   >{item.sprintName}</span>
                 </EasyEdit>
               </p>
-              <p className="c7n-backlog-sprintQuestion">{!_.isNull(item.issueSearchDTOList) ? `${item.issueSearchDTOList.length} 问题` : '0 问题'}</p>
+              <p className="c7n-backlog-sprintQuestion">
+                {item.issueSearchDTOList && item.issueSearchDTOList.length > 0 ? `${item.issueSearchDTOList.length}个问题可见` : '0个问题可见'}
+                {/* {!_.isNull(item.issueCount) ? ` 共${item.issueCount}个问题` : ' 共0个问题'} */}
+              </p>
             </div>
             <div style={{ flexGrow: 1 }} className="c7n-backlog-sprintTitleSide">
               {item.statusCode === 'started' ? (
@@ -362,7 +376,16 @@ class SprintItem extends Component {
                         </div>
                       )}
                     >
-                      <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ? ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div>
+                      {/* <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ? 
+                      ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div> */}
+                      <Avatar
+                        src={ass2.imageUrl ? ass2.imageUrl : undefined}
+                        size="small"
+                      >
+                        {
+                          !ass2.imageUrl && ass2.assigneeName ? this.getFirst(ass2.assigneeName) : ''
+                        }
+                      </Avatar>
                     </Tooltip>
                   ))) : ''
             }
@@ -519,7 +542,7 @@ class SprintItem extends Component {
               <div
                 ref={provided.innerRef}
                 style={{
-                  background: snapshot.isDraggingOver ? 'lightblue' : 'white',
+                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
                   // background: 'white',
                   padding: 'grid',
                   borderBottom: '1px solid rgba(0,0,0,0.12)',

@@ -106,6 +106,9 @@ class CreateSprint extends Component {
   }
 
   componentDidMount() {
+    if (this.props.onRef) {
+      this.props.onRef(this);
+    }
     loadIssue(this.props.issueId).then((res) => {
       this.setAnIssueToState(res);
     });
@@ -338,6 +341,17 @@ class CreateSprint extends Component {
     const worklogs = this.state.worklogs.slice();
     const workTimeArr = _.reduce(worklogs, (sum, v) => sum + (v.workTime || 0), 0);
     return workTimeArr;
+  }
+
+  refresh = () => {
+    loadIssue(this.state.origin.issueId).then((res) => {
+      this.setAnIssueToState(res);
+    });
+    loadWorklogs(this.state.origin.issueId).then((res) => {
+      this.setState({
+        worklogs: res,
+      });
+    });
   }
 
   updateIssue = (pro) => {
@@ -651,6 +665,28 @@ class CreateSprint extends Component {
     }
   }
 
+  transformPriorityCode(originpriorityCode) {
+    if (!originpriorityCode.length) {
+      return [];
+    } else {
+      const arr = [];
+      arr[0] = _.find(originpriorityCode, { valueCode: 'high' });
+      arr[1] = _.find(originpriorityCode, { valueCode: 'medium' });
+      arr[2] = _.find(originpriorityCode, { valueCode: 'low' });
+      return arr;
+    }
+  }
+
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
+  }
+
   handleCreateSubIssue(subIssue) {
     const subIssues = this.state.subIssueDTOList;
     subIssues.push(subIssue);
@@ -658,6 +694,9 @@ class CreateSprint extends Component {
       subIssueDTOList: subIssues,
       createSubTaskShow: false,
     });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
   }
 
   handleClickMenu(e) {
@@ -1603,7 +1642,7 @@ class CreateSprint extends Component {
                               }}
                             >
                               {
-                                this.state.originpriorities.map(type => (
+                                this.transformPriorityCode(this.state.originpriorities).map(type => (
                                   <Option key={type.valueCode} value={type.valueCode}>
                                     <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                       <div
@@ -2112,7 +2151,7 @@ class CreateSprint extends Component {
                                 <span
                                   className="c7n-avatar"
                                 >
-                                  {this.state.reporterName.slice(0, 1)}
+                                  {this.getFirst(this.state.reporterName)}
                                 </span>
                                 <span>
                                   {`${this.state.reporterName}`}
@@ -2156,7 +2195,7 @@ class CreateSprint extends Component {
                                     <span
                                       className="c7n-avatar"
                                     >
-                                      {this.state.assigneeName ? this.state.assigneeName.slice(0, 1) : ''}
+                                      {this.state.assigneeName ? this.getFirst(this.state.assigneeName) : ''}
                                     </span>
                                     <span>
                                       {`${this.state.assigneeName}`}
@@ -2203,7 +2242,7 @@ class CreateSprint extends Component {
                                     <div
                                       style={{ background: '#c5cbe8', color: '#6473c3', width: '20px', height: '20px', textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: '8px' }}
                                     >
-                                      {user.loginName ? user.loginName.slice(0, 1) : ''}
+                                      {user.loginName ? this.getFirst(user.realName) : ''}
                                     </div>
                                     <span>{`${user.loginName} ${user.realName}`}</span>
                                   </div>
@@ -2400,7 +2439,7 @@ class CreateSprint extends Component {
         {
           this.state.createSubTaskShow ? (
             <CreateSubTask
-              issueId={this.props.issueId}
+              issueId={this.state.origin.issueId}
               visible={this.state.createSubTaskShow}
               onCancel={() => this.setState({ createSubTaskShow: false })}
               onOk={this.handleCreateSubIssue.bind(this)}

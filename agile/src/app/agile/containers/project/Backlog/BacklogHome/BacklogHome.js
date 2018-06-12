@@ -187,6 +187,7 @@ class BacklogHome extends Component {
       });
       BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
         ? 0 : endId, axiosParam).then((res) => {
+        this.IssueDetail.refreshIssueDetail();
         this.refresh();
       }).catch((error) => {
         BacklogStore.setSprintData(originData);
@@ -230,6 +231,7 @@ class BacklogHome extends Component {
             BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
               ? 0 : endId, axiosParam).then((res) => {
               newData.sprintData[index].issueSearchDTOList[endIndex] = res[0];
+              this.IssueDetail.refreshIssueDetail();
               BacklogStore.setSprintData(newData);
             }).catch((error) => {
               BacklogStore.setSprintData(originData);
@@ -259,6 +261,7 @@ class BacklogHome extends Component {
         BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
           ? 0 : endId, axiosParam).then((res) => {
           newData.backlogData.backLogIssue[endIndex] = res[0];
+          this.IssueDetail.refreshIssueDetail();
           BacklogStore.setSprintData(newData);
         }).catch((error) => {
           BacklogStore.setSprintData(originData);
@@ -499,6 +502,9 @@ class BacklogHome extends Component {
                     refresh={this.refresh.bind(this)}
                     visible={this.state.versionVisible}
                     changeVisible={this.changeState.bind(this)}
+                    issueRefresh={() => {
+                      this.IssueDetail.refreshIssueDetail();
+                    }}
                   />
                   <Epic
                     onRef={(ref) => {
@@ -507,6 +513,9 @@ class BacklogHome extends Component {
                     refresh={this.refresh.bind(this)}
                     visible={this.state.epicVisible}
                     changeVisible={this.changeState.bind(this)}
+                    issueRefresh={() => {
+                      this.IssueDetail.refreshIssueDetail();
+                    }}
                   />
                   <Sprint
                     onRef={(ref) => {
@@ -520,6 +529,9 @@ class BacklogHome extends Component {
                 <IssueDetail
                   visible={JSON.stringify(BacklogStore.getClickIssueDetail) !== '{}'}
                   refresh={this.refresh.bind(this)}
+                  onRef={(ref) => {
+                    this.IssueDetail = ref;
+                  }}
                 />
               </DragDropContext>
             </div>

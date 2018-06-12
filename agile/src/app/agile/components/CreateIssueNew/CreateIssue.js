@@ -114,6 +114,18 @@ class CreateIssue extends Component {
     }
   }
 
+  transformPriorityCode(originpriorityCode) {
+    if (!originpriorityCode.length) {
+      return [];
+    } else {
+      const arr = [];
+      arr[0] = _.find(originpriorityCode, { valueCode: 'high' });
+      arr[1] = _.find(originpriorityCode, { valueCode: 'medium' });
+      arr[2] = _.find(originpriorityCode, { valueCode: 'low' });
+      return arr;
+    }
+  }
+
   handleCreateIssue = () => {
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -375,16 +387,7 @@ class CreateIssue extends Component {
                     });
                   }}
                 >
-                  {
-                    this.state.selectLoading && (
-                      <Option key={'loading'} value={'loading'}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px' }}>
-                          <Spin />
-                        </div>
-                      </Option>
-                    )
-                  }
-                  {!this.state.selectLoading && this.state.originpriorities.map(type =>
+                  {this.transformPriorityCode(this.state.originpriorities).map(type =>
                     (<Option key={`${type.valueCode}`} value={`${type.valueCode}`}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                         <div
@@ -424,16 +427,7 @@ class CreateIssue extends Component {
                         });
                       }}
                     >
-                      {
-                        this.state.selectLoading && (
-                          <Option key={'loading'} value={'loading'}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px' }}>
-                              <Spin />
-                            </div>
-                          </Option>
-                        )
-                      }
-                      {!this.state.selectLoading && this.state.originEpics.map(epic =>
+                      {this.state.originEpics.map(epic =>
                         <Option key={`${epic.issueId}`} value={`${epic.issueId}`}>{epic.epicName}</Option>,
                       )}
                     </Select>,
@@ -461,16 +455,7 @@ class CreateIssue extends Component {
                     });
                   }}
                 >
-                  {
-                    this.state.selectLoading && (
-                      <Option key={'loading'} value={'loading'}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px' }}>
-                          <Spin />
-                        </div>
-                      </Option>
-                    )
-                  }
-                  {!this.state.selectLoading && this.state.originSprints.map(sprint =>
+                  {this.state.originSprints.map(sprint =>
                     <Option key={`${sprint.sprintId}`} value={`${sprint.sprintId}`}>{sprint.sprintName}</Option>,
                   )}
                 </Select>,
