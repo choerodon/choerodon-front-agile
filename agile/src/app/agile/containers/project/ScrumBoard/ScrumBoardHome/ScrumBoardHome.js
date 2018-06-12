@@ -580,10 +580,10 @@ class ScrumBoardHome extends Component {
               </div>
               <div
                 className="c7n-scrumboard-content"
-                style={{
-                  height: this.renderHeight(),
-                  paddingBottom: 83,
-                }}
+                // style={{
+                //   height: this.renderHeight(),
+                //   paddingBottom: 83,
+                // }}
               >
                 {this.renderSwimlane()}
                 {ScrumBoardStore.getCurrentSprint ? (
