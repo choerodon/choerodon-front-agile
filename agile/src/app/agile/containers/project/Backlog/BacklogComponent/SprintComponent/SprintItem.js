@@ -542,7 +542,7 @@ class SprintItem extends Component {
               <div
                 ref={provided.innerRef}
                 style={{
-                  background: snapshot.isDraggingOver ? 'lightblue' : 'white',
+                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
                   // background: 'white',
                   padding: 'grid',
                   borderBottom: '1px solid rgba(0,0,0,0.12)',

@@ -187,6 +187,7 @@ class BacklogHome extends Component {
       });
       BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
         ? 0 : endId, axiosParam).then((res) => {
+        this.IssueDetail.refreshIssueDetail();
         this.refresh();
       }).catch((error) => {
         BacklogStore.setSprintData(originData);
@@ -230,6 +231,7 @@ class BacklogHome extends Component {
             BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
               ? 0 : endId, axiosParam).then((res) => {
               newData.sprintData[index].issueSearchDTOList[endIndex] = res[0];
+              this.IssueDetail.refreshIssueDetail();
               BacklogStore.setSprintData(newData);
             }).catch((error) => {
               BacklogStore.setSprintData(originData);
@@ -259,6 +261,7 @@ class BacklogHome extends Component {
         BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
           ? 0 : endId, axiosParam).then((res) => {
           newData.backlogData.backLogIssue[endIndex] = res[0];
+          this.IssueDetail.refreshIssueDetail();
           BacklogStore.setSprintData(newData);
         }).catch((error) => {
           BacklogStore.setSprintData(originData);

@@ -259,7 +259,7 @@ class Sprint extends Component {
                   style={{
                     userSelect: 'none',
                     // background: snapshot1.isDragging ? 'lightgreen' : 'white',  
-                    background: this.state.selected.issueIds.indexOf(item.issueId) !== -1 ? 'lightgreen' : this.renderIssueBackground(item),
+                    background: this.state.selected.issueIds.indexOf(item.issueId) !== -1 ? 'rgba(140,158,255,0.16)' : this.renderIssueBackground(item),
                     padding: '10px 36px 10px 20px',
                     borderBottom: '1px solid rgba(0,0,0,0.12)',
                     paddingLeft: 43,
@@ -520,7 +520,7 @@ class Sprint extends Component {
                 <div
                   ref={provided.innerRef}
                   style={{
-                    background: snapshot.isDraggingOver ? 'lightblue' : 'white',
+                    background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
                     // background: 'white',
                     padding: 'grid',
                     borderBottom: '1px solid rgba(0,0,0,0.12)',

@@ -13,18 +13,18 @@ class IssueDetail extends Component {
     this.state = {};
   }
   render() {
-    let height = '';
-    if (document.getElementsByClassName('page-content').length > 0) {
-      if (document.getElementsByClassName('page-content')[0].offsetHeight) {
-        height = document.getElementsByClassName('page-content')[0].offsetHeight;
-      }
-    }
+    // let height = '';
+    // if (document.getElementsByClassName('page-content').length > 0) {
+    //   if (document.getElementsByClassName('page-content')[0].offsetHeight) {
+    //     height = document.getElementsByClassName('page-content')[0].offsetHeight;
+    //   }
+    // }
     return (
       <div
         className={this.props.visible ? 'c7n-issueDetail-container' : ''}
-        style={{
-          height,
-        }}
+        // style={{
+        //   height,
+        // }}
       >
         {this.props.visible ? (
           <EditIssue

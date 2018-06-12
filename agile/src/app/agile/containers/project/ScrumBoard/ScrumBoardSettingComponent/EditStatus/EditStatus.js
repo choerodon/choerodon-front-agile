@@ -21,12 +21,13 @@ class EditStatus extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const params = {
+          id: this.props.data.id,
+          objectVersionNumber: this.props.data.objectVersionNumber,
           name: values.name,
           projectId: AppState.currentMenuType.id,
-          enable: true,
           categoryCode: values.categoryCode,
         };
-        ScrumBoardStore.axiosAddStatus(params).then((data) => {
+        ScrumBoardStore.axiosUpdateIssueStatus(this.props.data.i, params).then((data) => {
           this.props.onChangeVisible(false);
           this.props.refresh();
         }).catch((error) => {
