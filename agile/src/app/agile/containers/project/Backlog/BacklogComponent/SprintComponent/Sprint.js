@@ -109,7 +109,8 @@ class Sprint extends Component {
   }
 
   handleClickIssue(sprintId, item) {
-    if (this.state.keydown === 91 || this.state.keydown === 16) {
+    // command ctrl shift
+    if (this.state.keydown === 91 || this.state.keydown === 17 || this.state.keydown === 16) {
       // 如果没点击
       if (this.state.selected.droppableId === '') {
         this.setState({
@@ -124,12 +125,44 @@ class Sprint extends Component {
         const originIssueIds = _.clone(this.state.selected.issueIds);
         // 如果不存在
         if (originIssueIds.indexOf(item.issueId) === -1) {
-          this.setState({
-            selected: {
-              droppableId: sprintId,
-              issueIds: [...originIssueIds, item.issueId],
-            },
-          });
+          // 如果不是shift 则加一条issueid
+          if (this.state.keydown !== 16) {
+            this.setState({
+              selected: {
+                droppableId: sprintId,
+                issueIds: [...originIssueIds, item.issueId],
+              },
+            });
+          } else {
+            let clickSprintDatas = [];
+            const firstClick = originIssueIds[0];
+            if (item.sprintId) {
+              // 如果是shift 并且点击的是冲刺里的issue
+              clickSprintDatas = BacklogStore.getSprintData.sprintData
+                .filter(s => s.sprintId === item.sprintId)[0].issueSearchDTOList;
+            } else {
+              // 如果是shift 并且点击的是backlog里的issue
+              clickSprintDatas = BacklogStore.getSprintData.backlogData.backLogIssue;
+            }
+            const indexs = [];
+            _.forEach(clickSprintDatas, (cs, index) => {
+              if (cs.issueId === firstClick || cs.issueId === item.issueId) {
+                indexs.push(index);
+              }
+            });
+            const issueIds = [];
+            _.forEach(clickSprintDatas, (cs2, index2) => {
+              if (index2 >= indexs[0] && index2 <= indexs[1]) {
+                issueIds.push(cs2.issueId);
+              }
+            });
+            this.setState({
+              selected: {
+                droppableId: sprintId,
+                issueIds,
+              },
+            });
+          } 
         } else if (originIssueIds.length > 1) {
           // 如果存在 并且不是最后一个
           originIssueIds.splice(originIssueIds.indexOf(item.issueId), 1);
