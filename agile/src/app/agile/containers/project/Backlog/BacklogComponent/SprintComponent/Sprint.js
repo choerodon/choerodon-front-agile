@@ -393,6 +393,8 @@ class Sprint extends Component {
                         style={{ 
                           maxWidth: 105,
                           marginLeft: !_.isNull(item.assigneeName) ? '12px' : 0,
+                          flexGrow: 0,
+                          flexShrink: 0,
                         }} 
                         label="sprintIssue" 
                         className="c7n-backlog-sprintIssueRight"

@@ -51,7 +51,9 @@ class IssueDetail extends Component {
     });
   }
   refreshIssueDetail() {
-    this.editIssue.refresh();
+    if (this.editIssue) {
+      this.editIssue.refresh();
+    }
   }
   render() {
     return (
