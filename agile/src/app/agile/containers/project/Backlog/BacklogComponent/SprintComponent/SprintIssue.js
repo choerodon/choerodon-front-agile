@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Draggable } from 'react-beautiful-dnd';
-import { Icon } from 'choerodon-ui';
+import { Icon, Avatar, Tooltip } from 'choerodon-ui';
 import _ from 'lodash';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
@@ -10,6 +10,15 @@ class SprintIssue extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+  }
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
   }
   renderPriorityStyle(type, item) {
     if (type === 'color') {
@@ -80,6 +89,7 @@ class SprintIssue extends Component {
     }
     return '';
   }
+
   render() {
     const item = this.props.data;
     const index = this.props.index;
@@ -161,7 +171,11 @@ class SprintIssue extends Component {
                       overflow: 'hidden',
                       height: 20,
                     }}
-                  >{`#${item.issueNum} ${item.summary}`}</p>
+                  >{`#${item.issueNum} `}
+                    <Tooltip title={item.summary} placement="topLeft">
+                      {item.summary}
+                    </Tooltip>
+                  </p>
                 </div>
                 <div 
                   style={{ 
@@ -237,15 +251,25 @@ class SprintIssue extends Component {
                       style={{ 
                         maxWidth: 105,
                         marginLeft: !_.isNull(item.assigneeName) ? '12px' : 0,
+                        flexGrow: 0,
+                        flexShrink: 0,
                       }} 
                       label="sprintIssue" 
                       className="c7n-backlog-sprintIssueRight"
                     >
                       {!_.isNull(item.assigneeName) ? (
                         <div style={{ display: 'inline-block' }} label="sprintIssue">
-                          <div label="sprintIssue" className="c7n-backlog-sprintPeople">M</div>
+                          <Avatar
+                            size="small"
+                            src={item.imageUrl ? item.imageUrl : undefined}
+                          >
+                            {
+                              !item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''
+                            }
+                          </Avatar>
                           <span style={{ color: 'rgba(0,0,0,0.65)' }} label="sprintIssue">{item.assigneeName}</span>
                         </div>
+
                       ) : ''}
                     </div>
                     <div 

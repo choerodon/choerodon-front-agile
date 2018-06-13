@@ -29,7 +29,7 @@ class ScrumBoardSetting extends Component {
     this.refresh();
   }
   refresh() {
-    ScrumBoardStore.axiosGetBoardData(ScrumBoardStore.getSelectedBoard).then((data) => {
+    ScrumBoardStore.axiosGetBoardDataBySetting(ScrumBoardStore.getSelectedBoard).then((data) => {
       ScrumBoardStore.axiosGetUnsetData(ScrumBoardStore.getSelectedBoard).then((data2) => {
         const unsetColumn = {
           columnId: 'unset',
@@ -95,7 +95,7 @@ class ScrumBoardSetting extends Component {
           </Button>
         </Header>
         <Content style={{ height: '100%', paddingTop: 0 }}>
-          <Tabs style={{ display: 'flex', flexDirection: 'column' }} defaultActiveKey="1">
+          <Tabs style={{ display: 'flex', flexDirection: 'column', height: '100%' }} defaultActiveKey="1">
             <TabPane tab="列配置" key="1">
               <ColumnPage
                 refresh={this.refresh.bind(this)}

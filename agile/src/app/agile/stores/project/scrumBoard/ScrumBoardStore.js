@@ -21,6 +21,24 @@ class ScrumBoardStore {
   @observable currentSprint = {};
   @observable clickIssueDetail = {};
   @observable IssueNumberCount = {};
+  @observable assigneer = [];
+  @observable swimlaneBasedCode = '';
+
+  @computed get getSwimLaneCode() {
+    return this.swimlaneBasedCode;
+  }
+
+  @action setSwimLaneCode(data) {
+    this.swimlaneBasedCode = data;
+  }
+
+  @computed get getAssigneer() {
+    return toJS(this.assigneer);
+  }
+
+  @action setAssigneer(data) {
+    this.assigneer = data;
+  }
 
   judgeMoveParentToDone(parentCategoryCode, parentId) {
     if (parentCategoryCode !== 'done') {
@@ -194,8 +212,16 @@ class ScrumBoardStore {
     return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status`, data);
   }
 
-  axiosGetBoardData(boardId) {
+  axiosGetBoardDataBySetting(boardId) {
     return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data`);
+  }
+
+  axiosGetBoardData(boardId, assign, recent) {
+    if (assign === 0) {
+      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data?onlyStory=${recent}`);
+    } else {
+      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data?assigneeId=${assign}&onlyStory=${recent}`);
+    }
   }
 
   axiosFilterBoardData(boardId, assign, recent) {

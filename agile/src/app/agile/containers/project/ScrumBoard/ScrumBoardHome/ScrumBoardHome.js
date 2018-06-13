@@ -48,6 +48,7 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.setBoardList(data);
       ScrumBoardStore.setCurrentConstraint(data[0].columnConstraint);
       if (!ScrumBoardStore.getSelectedBoard) {
+        ScrumBoardStore.setSwimLaneCode(data[0].swimlaneBasedCode);
         ScrumBoardStore.setSelectedBoard(data[0].boardId);
         this.refresh(data[0].boardId);
       } else {
@@ -61,6 +62,7 @@ class ScrumBoardHome extends Component {
           this.refresh(ScrumBoardStore.getSelectedBoard);
         } else {
           ScrumBoardStore.setSelectedBoard(data[0].boardId);
+          ScrumBoardStore.setSwimLaneCode(data[0].swimlaneBasedCode);
           this.refresh(data[0].boardId);
         }
       }
@@ -72,9 +74,14 @@ class ScrumBoardHome extends Component {
     this.setState({
       spinIf: true,
     });
-    ScrumBoardStore.axiosGetBoardData(boardId).then((data) => {
+    ScrumBoardStore.axiosGetBoardData(boardId,
+      this.state.onlyMe ? AppState.getUserId : 0,
+      this.state.recent,
+    ).then((data) => {
       const parentIds = [];
+      const assigneeIds = [];
       const storeParentIds = [];
+      const storeAssignee = [];
       _.forEach(data.columnsData.columns, (col) => {
         _.forEach(col.subStatuses, (sub) => {
           _.forEach(sub.issues, (iss) => {
@@ -88,9 +95,22 @@ class ScrumBoardHome extends Component {
                 });
               }
             }
+            if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
+              if (assigneeIds.indexOf(iss.assigneeId) === -1) {
+                if (iss.assigneeId) {
+                  assigneeIds.push(iss.assigneeId);
+                  storeAssignee.push({
+                    assigneeId: iss.assigneeId,
+                    assigneeName: iss.assigneeName,
+                    imageUrl: iss.imageUrl,
+                  });
+                }
+              }
+            }
           });
         });
       });
+      ScrumBoardStore.setAssigneer(storeAssignee);
       ScrumBoardStore.setCurrentSprint(data.currentSprint);
       ScrumBoardStore.setParentIds(storeParentIds);
       ScrumBoardStore.setBoardData(data.columnsData.columns);
@@ -232,29 +252,31 @@ class ScrumBoardHome extends Component {
           }
         });
         ScrumBoardStore.setBoardData(newState);
-        if (draggableData.parentIssueId) {
-          if (destinationStatus === 'done') {
-            let parentIdCode;
-            let parentIdNum;
-            let parentObjectVersionNumber;
-            _.forEach(ScrumBoardStore.getParentIds, (pi) => {
-              if (pi.issueId === draggableData.parentIssueId) {
-                parentIdCode = pi.categoryCode;
-                parentIdNum = pi.issueNum;
-                parentObjectVersionNumber = pi.objectVersionNumber;
-              }
-            });
-            const judge = ScrumBoardStore.judgeMoveParentToDone(
-              parentIdCode, draggableData.parentIssueId);
-            if (judge) {
-              this.setState({
-                judgeUpdateParent: {
-                  id: draggableData.parentIssueId,
-                  issueNumber: parentIdNum,
-                  code: parentIdCode,
-                  objectVersionNumber: parentObjectVersionNumber,
-                },
+        if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+          if (draggableData.parentIssueId) {
+            if (destinationStatus === 'done') {
+              let parentIdCode;
+              let parentIdNum;
+              let parentObjectVersionNumber;
+              _.forEach(ScrumBoardStore.getParentIds, (pi) => {
+                if (pi.issueId === draggableData.parentIssueId) {
+                  parentIdCode = pi.categoryCode;
+                  parentIdNum = pi.issueNum;
+                  parentObjectVersionNumber = pi.objectVersionNumber;
+                }
               });
+              const judge = ScrumBoardStore.judgeMoveParentToDone(
+                parentIdCode, draggableData.parentIssueId);
+              if (judge) {
+                this.setState({
+                  judgeUpdateParent: {
+                    id: draggableData.parentIssueId,
+                    issueNumber: parentIdNum,
+                    code: parentIdCode,
+                    objectVersionNumber: parentObjectVersionNumber,
+                  },
+                });
+              }
             }
           }
         }
@@ -282,86 +304,15 @@ class ScrumBoardHome extends Component {
   filterOnlyStory() {
     this.setState({
       recent: !this.state.recent,
-      spinIf: true,
     }, () => {
-      ScrumBoardStore.axiosFilterBoardData(
-        ScrumBoardStore.getSelectedBoard, 
-        this.state.onlyMe ? AppState.getUserId : 0, 
-        this.state.recent).then((data) => {
-        const parentIds = [];
-        const storeParentIds = [];
-        _.forEach(data.columnsData.columns, (col) => {
-          _.forEach(col.subStatuses, (sub) => {
-            _.forEach(sub.issues, (iss) => {
-              if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
-                if (parentIds.indexOf(iss.issueId) === -1) {
-                  parentIds.push(iss.issueId);
-                  storeParentIds.push({
-                    status: sub.name,
-                    categoryCode: sub.categoryCode,
-                    subIssues: [],
-                    ...iss,
-                  });
-                }
-              }
-            });
-          });
-        });      
-        ScrumBoardStore.setUnParentIds([]);
-        ScrumBoardStore.setParentIds(storeParentIds);
-        ScrumBoardStore.setBoardData(data.columnsData.columns);
-        this.setState({
-          spinIf: false,
-        });
-      }).catch((error) => {
-        window.console.log(error);
-        this.setState({
-          spinIf: false,
-        });
-      });
+      this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
   filterOnlyMe() {
     this.setState({
       onlyMe: !this.state.onlyMe,
-      spinIf: true,
     }, () => {
-      ScrumBoardStore.axiosFilterBoardData(
-        ScrumBoardStore.getSelectedBoard, 
-        this.state.onlyMe ? AppState.getUserId : 0, 
-        this.state.recent).then((data) => {
-        const parentIds = [];
-        const storeParentIds = [];
-        _.forEach(data.columnsData.columns, (col) => {
-          _.forEach(col.subStatuses, (sub) => {
-            _.forEach(sub.issues, (iss) => {
-              if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
-                if (parentIds.indexOf(iss.issueId) === -1) {
-                  parentIds.push(iss.issueId);
-                  storeParentIds.push({
-                    status: sub.name,
-                    categoryCode: sub.categoryCode,
-                    subIssues: [],
-                    ...iss,
-                  });
-                }
-              }
-            });
-          });
-        });
-        ScrumBoardStore.setUnParentIds([]);
-        ScrumBoardStore.setCurrentSprint(data.currentSprint);
-        ScrumBoardStore.setParentIds(storeParentIds);
-        ScrumBoardStore.setBoardData(data.columnsData.columns);
-        this.setState({
-          spinIf: false,
-        });
-      }).catch((error) => {
-        window.console.log(error);
-        this.setState({
-          spinIf: false,
-        });
-      });
+      this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
   handleFinishSprint() {
@@ -410,26 +361,45 @@ class ScrumBoardHome extends Component {
     return result;
   }
   // 渲染issue列
-  renderIssueColumns(parentId) {
-    const data = ScrumBoardStore.getBoardData;
+  renderIssueColumns(id) {
     const result = [];
-    _.forEach(data, (item) => {
-      if (item.subStatuses.length > 0) {
-        result.push(
-          <StatusBodyColumn
-            data={item}
-            parentId={parentId}
-            source={_.isUndefined(parentId) ? 'other' : parentId}
-          />,
-        );
-      }
-    });
+    const data = ScrumBoardStore.getBoardData;
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      _.forEach(data, (item) => {
+        if (item.subStatuses.length > 0) {
+          result.push(
+            <StatusBodyColumn
+              data={item}
+              parentId={id}
+              source={_.isUndefined(id) ? 'other' : id}
+            />,
+          );
+        }
+      });
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      _.forEach(data, (item) => {
+        if (item.subStatuses.length > 0) {
+          result.push(
+            <StatusBodyColumn
+              data={item}
+              assigneeId={id}
+            />,
+          );
+        }
+      });
+    }
     return result;
   }
   renderSwimlane() {
-    const parentIds = ScrumBoardStore.getParentIds;
+    let ids = [];
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      ids = ScrumBoardStore.getParentIds;
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      ids = ScrumBoardStore.getAssigneer;
+    }
+    window.console.log(ids);
     const result = [];
-    _.forEach(parentIds, (item) => {
+    _.forEach(ids, (item) => {
       result.push(
         <SwimLaneContext
           data={item}
@@ -463,6 +433,15 @@ class ScrumBoardHome extends Component {
     }
     return undefined;
   }
+  renderOthersTitle() {
+    let result = '';
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      result = '其他问题';
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      result = '未分配的问题';
+    }
+    return result;
+  }
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -487,12 +466,15 @@ class ScrumBoardHome extends Component {
               color: '#3F51B5',
             }}
             onChange={(value) => {
+              let newCode;
               _.forEach(ScrumBoardStore.getBoardList, (item) => {
                 if (item.boardId === value) {
                   ScrumBoardStore.setCurrentConstraint(item.columnConstraint);
+                  newCode = item.swimlaneBasedCode;
                 }
               });
               ScrumBoardStore.setSelectedBoard(value);
+              ScrumBoardStore.setSwimLaneCode(newCode);
               this.refresh(value);
             }}
           >
@@ -583,6 +565,10 @@ class ScrumBoardHome extends Component {
               </div>
               <div
                 className="c7n-scrumboard-content"
+                style={{
+                  height: this.renderHeight(),
+                  paddingBottom: 83,
+                }}
               >
                 {this.renderSwimlane()}
                 {ScrumBoardStore.getCurrentSprint ? (
@@ -598,7 +584,7 @@ class ScrumBoardHome extends Component {
                           });
                         }}
                       />
-                  其他问题
+                      {this.renderOthersTitle()}
                     </div>
                     <div
                       className="c7n-scrumboard-otherContent"

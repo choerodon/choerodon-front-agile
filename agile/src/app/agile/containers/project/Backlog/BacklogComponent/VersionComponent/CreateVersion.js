@@ -47,6 +47,10 @@ class CreateVersion extends Component {
           this.props.onCancel();
           window.console.log(error);
         });
+      } else {
+        this.setState({
+          loading: false,
+        });
       }
     });
   }

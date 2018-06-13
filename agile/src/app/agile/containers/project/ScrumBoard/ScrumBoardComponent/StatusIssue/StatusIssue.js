@@ -194,16 +194,18 @@ class StatusIssue extends Component {
                           textAlign: 'center',
                         }}
                       >{item.priorityName}</p>
-                      <p
-                        className="textDisplayOneColumn" 
-                        style={{ 
-                          flexBasis: '90%',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          lineHeight: '20px',
-                          paddingLeft: 10,
-                        }}
-                      >{item.summary}</p>
+                      <Tooltip title={item.summary} placement="topLeft">
+                        <p
+                          className="textDisplayOneColumn" 
+                          style={{ 
+                            flexBasis: '90%',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            lineHeight: '20px',
+                            paddingLeft: 10,
+                          }}
+                        >{item.summary}</p>
+                      </Tooltip>
                     </div>
                   </div>
                   {/* <div style={{ flexShrink: 0 }} cla
@@ -213,6 +215,9 @@ class StatusIssue extends Component {
                       <Tooltip title={`经办人: ${item.assigneeName}`}>
                         <Avatar
                           src={item.imageUrl ? item.imageUrl : undefined}
+                          style={{
+                            flexShrink: 0,
+                          }}
                         >
                           {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
                         </Avatar>
