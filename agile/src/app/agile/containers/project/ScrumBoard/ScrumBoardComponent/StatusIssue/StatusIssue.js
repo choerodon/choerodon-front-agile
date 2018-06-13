@@ -213,6 +213,9 @@ class StatusIssue extends Component {
                       <Tooltip title={`经办人: ${item.assigneeName}`}>
                         <Avatar
                           src={item.imageUrl ? item.imageUrl : undefined}
+                          style={{
+                            flexShrink: 0,
+                          }}
                         >
                           {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
                         </Avatar>
