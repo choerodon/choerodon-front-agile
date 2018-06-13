@@ -359,8 +359,10 @@ class CreateSprint extends Component {
       issueId: this.state.issueId,
       objectVersionNumber: this.state.origin.objectVersionNumber,
     };
-    if ((pro === 'description' && this.state[pro]) || (pro === 'editDes' && this.state[pro])) {
-      beforeTextUpload(this.state[pro], obj, updateIssue, 'description');
+    if ((pro === 'description') || (pro === 'editDes')) {
+      if (this.state[pro]) {
+        beforeTextUpload(this.state[pro], obj, updateIssue, 'description');
+      }
     } else {
       obj[pro] = this.state[pro] || 0;
       updateIssue(obj)
