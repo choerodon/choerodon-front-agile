@@ -42,6 +42,7 @@ class UserHead extends Component {
           padding: '0 6px',
           lineHeight: '20px',
           fontSize: '12px',
+          ...this.props.style,
         }}
       >
         { status.statusName }
