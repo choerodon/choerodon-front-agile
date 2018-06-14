@@ -294,7 +294,15 @@ class CreateSprint extends Component {
 
             <div className="c7n-sidebar-info">
               <div>
-                <div style={{ marginBottom: '16px', fontWeight: 'bold' }}>工作说明</div>
+                <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
+                  <div style={{ fontWeight: 'bold' }}>工作说明</div>
+                  <div style={{ marginLeft: '80px' }}>
+                    <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
+                      <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: '12px' }} />
+                      <span style={{ color: '#3f51b5' }}>全屏编辑</span>
+                    </Button>
+                  </div>
+                </div>
                 {
                   !this.state.edit && (
                     <div className="clear-p-mw">
@@ -308,11 +316,6 @@ class CreateSprint extends Component {
                     </div>
                   )
                 }
-                <div style={{ marginTop: '23px', marginBottom: '16px' }}>
-                  <Button type="primary" funcType="flat" onClick={() => this.setState({ edit: true })}>
-                    全屏编辑
-                  </Button>
-                </div>
               </div>
             </div> 
           </section>

@@ -1,21 +1,13 @@
 import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
-import moment from 'moment';
 import _ from 'lodash';
 import { Select, Form, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon } from 'choerodon-ui';
-
 import { STATUS, COLOR, TYPE, ICON, TYPE_NAME } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
-import {
-  delta2Html,
-  escape,
-  handleFileUpload,
-  text2Delta,
-  beforeTextUpload,
-} from '../../common/utils';
+import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate } from '../../common/utils';
 import { loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints } from '../../api/NewIssueApi';
 import { getCurrentOrg, getSelf, getUsers } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
@@ -25,11 +17,8 @@ import CreateSubTask from '../CreateSubTask';
 import { SERVICES_URL } from '../../common/Constant';
 
 const { AppState } = stores;
-const { Sidebar } = Modal;
 const { Option } = Select;
-const TabPane = Tabs.TabPane;
 const { TextArea } = Input;
-const FormItem = Form.Item;
 const confirm = Modal.confirm;
 let sign = true;
 
@@ -1093,7 +1082,7 @@ class CreateSprint extends Component {
             handleSave={() => {
               this.setState({
                 editDesShow: false,
-                description: this.state.editDes,
+                description: this.state.editDes || '',
               });
               this.updateIssue('editDes');
             }}
@@ -2286,7 +2275,7 @@ class CreateSprint extends Component {
                           </span>
                         </div>
                         <div className="c7n-value-wrapper">
-                          {this.state.creationDate || '无'}
+                          {formatDate(this.state.creationDate)}
                         </div>
                       </div>
                       <div className="line-start mt-10">
@@ -2296,7 +2285,7 @@ class CreateSprint extends Component {
                           </span>
                         </div>
                         <div className="c7n-value-wrapper">
-                          {this.state.lastUpdateDate || '无'}
+                          {formatDate(this.state.lastUpdateDate)}
                         </div>
                       </div>
                     </div>
@@ -2397,8 +2386,6 @@ class CreateSprint extends Component {
             </section>
           </div>
         </div>
-        
-        
         {
           this.state.edit ? (
             <FullEditor
@@ -2412,7 +2399,7 @@ class CreateSprint extends Component {
         {
           this.state.dailyLogShow ? (
             <DailyLog
-              issueId={this.state.issueId}
+              issueId={this.state.origin.issueId}
               issueNum={this.state.issueNum}
               visible={this.state.dailyLogShow}
               onCancel={() => this.setState({ dailyLogShow: false })}

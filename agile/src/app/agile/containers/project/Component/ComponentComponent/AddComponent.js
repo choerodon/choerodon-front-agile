@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, Form, Input, Select, message } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
+import UserHead from '../../../../components/UserHead';
 import { getUsers } from '../../../../api/CommonApi';
 import { createComponent } from '../../../../api/ComponentApi';
 import './component.scss';
@@ -39,7 +40,7 @@ class AddComponent extends Component {
         const component = {
           defaultAssigneeRole,
           description,
-          managerId: JSON.parse(managerId).id,
+          managerId: managerId ? JSON.parse(managerId).id || 0 : 0,
           name,
         };
         this.setState({ createLoading: true });
@@ -115,12 +116,14 @@ class AddComponent extends Component {
                   {this.state.originUsers.map(user =>
                     (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                        <span
-                          style={{ background: '#c5cbe8', color: '#6473c3', width: '20px', height: '20px', textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: '8px' }}
-                        >
-                          {user.loginName ? this.getFirst(user.realName) : ''}
-                        </span>
-                        <span>{`${user.loginName} ${user.realName}`}</span>
+                        <UserHead
+                          user={{
+                            id: user.id,
+                            loginName: user.loginName,
+                            realName: user.realName,
+                            avatar: user.imageUrl,
+                          }}
+                        />
                       </div>
                     </Option>),
                   )}
