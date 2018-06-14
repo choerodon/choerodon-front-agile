@@ -15,6 +15,8 @@ import FullEditor from '../FullEditor';
 import DailyLog from '../DailyLog';
 import CreateSubTask from '../CreateSubTask';
 import { SERVICES_URL } from '../../common/Constant';
+import UserHead from '../UserHead';
+import Comment from './Component/Comment';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -131,18 +133,44 @@ class CreateSprint extends Component {
     }
   }
 
+  reloadIssue(issueId = this.state.origin.issueId) {
+    loadIssue(issueId).then((res) => {
+      this.setAnIssueToState(res);
+    });
+    loadWorklogs(issueId).then((res) => {
+      this.setState({
+        worklogs: res,
+      });
+    });
+  }
+
+  /**
+   * Attachment
+   */
   onChangeFileList = (arr) => {
-    if (arr.length > 0) {
+    if (arr.length > 0 && arr.some(one => !one.url)) {
       const config = {
         issueType: this.state.origin.typeCode,
         issueId: this.state.origin.issueId,
-        fileName: arr[0].name || 'name',
+        fileName: arr[0].name || 'AG_ATTACHMENT',
         projectId: AppState.currentMenuType.id,
       };
-      if (arr.some(one => !one.url)) {
-        handleFileUpload(arr, this.addFileToFileList, config);
-      }
+      handleFileUpload(arr, this.addFileToFileList, config);
     }
+  }
+
+  /**
+   * Attachment
+   */
+  addFileToFileList = (data) => {
+    this.reloadIssue();
+  }
+
+  /**
+   * Attachment
+   */
+  setFileList = (data) => {
+    this.setState({ fileList: data });
   }
 
   getCurrentNav(e) {
@@ -165,7 +193,6 @@ class CreateSprint extends Component {
       epicId,
       epicName,
       estimateTime,
-      // issueAttachmentDTOList,
       issueCommentDTOList,
       issueId,
       issueLinkDTOList,
@@ -211,7 +238,6 @@ class CreateSprint extends Component {
       epicName,
       estimateTime,
       fileList,
-      // issueAttachmentDTOList,
       issueCommentDTOList,
       issueId,
       issueLinkDTOList,
@@ -242,29 +268,10 @@ class CreateSprint extends Component {
     });
   }
 
-  setFileList = (data) => {
-    this.setState({ fileList: data });
-  }
-
   isInLook(ele) {
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
     return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
-  }
-
-  addFileToFileList = (data) => {
-    // const originFileList = _.slice(this.state.fileList);
-    // this.setState({
-    //   fileList: _.concat(originFileList, data),
-    // });
-    loadIssue(this.state.origin.issueId).then((res) => {
-      this.setAnIssueToState(res);
-    });
-    loadWorklogs(this.state.origin.issueId).then((res) => {
-      this.setState({
-        worklogs: res,
-      });
-    });
   }
 
   handleFullEdit = (delta) => {
@@ -539,6 +546,9 @@ class CreateSprint extends Component {
       });
   }
 
+  /**
+   * Comment
+   */
   handleCreateCommit() {
     const extra = {
       issueId: this.state.origin.issueId,
@@ -549,20 +559,6 @@ class CreateSprint extends Component {
     } else {
       extra.commentText = '';
       this.createCommit(extra);
-    }
-  }
-
-  handleUpdateCommit(comment) {
-    const extra = {
-      commentId: comment.commentId,
-      objectVersionNumber: comment.objectVersionNumber,
-    };
-    const updateCommitDes = this.state.editComment;
-    if (updateCommitDes) {
-      beforeTextUpload(updateCommitDes, extra, this.updateCommit, 'commentText');
-    } else {
-      extra.commentText = '';
-      this.updateCommit(extra);
     }
   }
 
@@ -580,29 +576,15 @@ class CreateSprint extends Component {
     }
   }
 
+  /**
+   * Comment
+   */
   createCommit = (commit) => {
     createCommit(commit).then((res) => {
-      const currentCommit = this.state.issueCommentDTOList.slice();
-      currentCommit.push(res);
+      this.reloadIssue();
       this.setState({
-        issueCommentDTOList: currentCommit,
         addCommit: false,
         addCommitDes: '',
-      });
-    });
-  }
-
-  updateCommit = (commit) => {
-    updateCommit(commit).then((res) => {
-      const originComments = _.slice(this.state.issueCommentDTOList);
-      const index = _.findIndex(originComments, { commentId: commit.commentId });
-      originComments[index] = res;
-      // const currentCommit = this.state.issueCommentDTOList.slice();
-      // currentCommit.push(res);
-      this.setState({
-        issueCommentDTOList: originComments,
-        editCommentId: undefined,
-        editComment: undefined,
       });
     });
   }
@@ -770,10 +752,11 @@ class CreateSprint extends Component {
     }
   }
 
+  /**
+   * Comment
+   */
   renderCommits() {
     const delta = text2Delta(this.state.addCommitDes);
-    const deltaEdit = text2Delta(this.state.editComment);
-
     return (
       <div>
         {
@@ -798,60 +781,12 @@ class CreateSprint extends Component {
           )
         }
         {
-          this.state.issueCommentDTOList.map(commit => (
-            <div className="c7n-commit">
-              <div className="line-justify">
-                <div className="c7n-title-commit">
-                  <div className="c7n-avatar-commit">{commit.userName.slice(0, 1)}</div>
-                  <span className="c7n-user-commit">{commit.userId}{commit.userName}</span>
-                  <span style={{ color: 'rgba(0, 0, 0, 0.65)' }}>添加了评论</span>
-                </div>
-                <div className="c7n-action">
-                  <Icon
-                    role="none"
-                    type="mode_edit mlr-3 pointer"
-                    onClick={() => {
-                      this.setState({
-                        editCommentId: commit.commentId,
-                        editComment: commit.commentText,
-                      });
-                    }}
-                  />
-                  <Icon
-                    role="none"
-                    type="delete_forever mlr-3 pointer"
-                    onClick={() => this.handleDeleteCommit(commit.commentId)}
-                  />
-                </div>
-              </div>
-              <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: '10px', marginBottom: '10px' }}>
-                - {commit.lastUpdateDate}
-              </div>
-              <div className="c7n-conent-commit">
-                {
-                  commit.commentId === this.state.editCommentId ? (
-                    <WYSIWYGEditor
-                      bottomBar
-                      // toolbarHeight={66}
-                      value={deltaEdit}
-                      style={{ height: 200, width: '100%' }}
-                      onChange={(value) => {
-                        this.setState({ editComment: value });
-                      }}
-                      handleDelete={() => {
-                        this.setState({
-                          editCommentId: undefined,
-                          editComment: undefined,
-                        });
-                      }}
-                      handleSave={this.handleUpdateCommit.bind(this, commit)}
-                    />
-                  ) : (
-                    <IssueDescription data={delta2Html(commit.commentText)} />
-                  )
-                }
-              </div>
-            </div>
+          this.state.issueCommentDTOList.map(comment => (
+            <Comment
+              comment={comment}
+              onDeleteComment={() => this.reloadIssue()}
+              onUpdateComment={() => this.reloadIssue()}
+            />
           ))
         }
       </div>

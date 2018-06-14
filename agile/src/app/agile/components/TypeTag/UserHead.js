@@ -18,6 +18,14 @@ const TYPE = {
   sub_task: '#4d90fe',
 };
 
+const NAME = {
+  story: '故事',
+  bug: '故障',
+  task: '任务',
+  issue_epic: '史诗',
+  sub_task: '子任务',
+};
+
 class UserHead extends Component {
   constructor(props) {
     super(props);
@@ -31,23 +39,30 @@ class UserHead extends Component {
   render() {
     const { type } = this.props; 
     return (
-      <div
-        className=""
-        style={{
-          backgroundColor: TYPE[type.typeCode],
-          display: 'flex',
-          width: 20,
-          height: 20,
-          borderRadius: '50%',
-          color: '#fff',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Icon
-          style={{ fontSize: '14px' }}
-          type={ICON[type.typeCode]}
-        />
+      <div style={{ display: 'flex' }}>
+        <div
+          className=""
+          style={{
+            backgroundColor: TYPE[type.typeCode],
+            display: 'flex',
+            width: 20,
+            height: 20,
+            borderRadius: '50%',
+            color: '#fff',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Icon
+            style={{ fontSize: '14px' }}
+            type={ICON[type.typeCode]}
+          />
+        </div>
+        {
+          this.props.showName && (
+            <span style={{ marginLeft: 8 }}>{NAME[type.typeCode]}</span>
+          )
+        }
       </div>
     );
   }

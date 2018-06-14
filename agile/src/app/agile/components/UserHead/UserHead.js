@@ -26,7 +26,7 @@ class UserHead extends Component {
   }
 
   render() {
-    const { user } = this.props; 
+    const { user, color } = this.props; 
     return (
       <div
         className="c7n-emptyBlock"
@@ -59,7 +59,7 @@ class UserHead extends Component {
             whiteSpace: 'nowrap',
             fontSize: '13px',
             lineHeight: '20px',
-            color: 'rgba(0, 0, 0, 0.65)',
+            color: color || 'rgba(0, 0, 0, 0.65)',
           }}
         >
           {`${user.loginName}${user.realName}`}
