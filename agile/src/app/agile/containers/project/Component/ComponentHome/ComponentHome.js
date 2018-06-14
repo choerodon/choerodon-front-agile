@@ -10,6 +10,7 @@ import CreateComponent from '../ComponentComponent/AddComponent';
 import EditComponent from '../ComponentComponent/EditComponent';
 import DeleteComponent from '../ComponentComponent/DeleteComponent';
 import EmptyBlock from '../../../../components/EmptyBlock';
+import UserHead from '../../../../components/UserHead';
 
 const { AppState } = stores;
 
@@ -32,6 +33,16 @@ class ComponentHome extends Component {
     this.loadComponents();
   }
 
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
+  }
+
   showComponent(record) {
     this.setState({
       editComponentShow: true,
@@ -51,16 +62,6 @@ class ComponentHome extends Component {
       confirmShow: false,
     });
     this.loadComponents();
-  }
-
-  getFirst(str) {
-    const re = /[\u4E00-\u9FA5]/g;
-    for (let i = 0, len = str.length; i < len; i += 1) {
-      if (re.test(str[i])) {
-        return str[i];
-      }
-    }
-    return '';
   }
 
   loadComponents() {
@@ -113,32 +114,16 @@ class ComponentHome extends Component {
         render: (managerId, record) => (
           <div style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={record.managerName}>
-              {
-                managerId && (
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        width: 18,
-                        height: 18,
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        marginRight: 5,
-                        textAlign: 'center',
-                        lineHeight: '18px',
-                        background: '#c5cbe8',
-                        color: '#6473c3',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {record.managerId && record.managerName ? this.getFirst(record.managerName) : ''}
-                    </span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {record.managerId ? `${record.managerName}` : ''}
-                    </span>
-                  </div>
-                )
-              }
+              <div>
+                <UserHead
+                  user={{
+                    id: record.managerId,
+                    loginName: '',
+                    realName: record.managerName,
+                    avatar: record.imageUrl,
+                  }}
+                />
+              </div>
             </Tooltip>
           </div>
         ),

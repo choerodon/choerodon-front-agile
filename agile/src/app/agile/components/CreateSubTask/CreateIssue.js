@@ -19,6 +19,8 @@ import { getUsers } from '../../api/CommonApi';
 import { COLOR } from '../../common/Constant';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
+import UserHead from '../UserHead';
+import TypeTag from '../TypeTag';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
@@ -159,7 +161,7 @@ class CreateSprint extends Component {
         const extra = {
           summary: values.summary,
           priorityCode: values.priorityCode,
-          assigneeId: values.assigneedId || 0,
+          assigneeId: values.assigneedId ? JSON.parse(values.assigneedId).id || 0 : 0,
           projectId: AppState.currentMenuType.id,
           parentIssueId: this.props.issueId,
           versionIssueRelDTOList: fixVersionIssueRelDTOList,
@@ -254,15 +256,12 @@ class CreateSprint extends Component {
                   {['sub_task'].map(type => (
                     <Option key={`${type}`} value={`${type}`}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                        <div
-                          style={{ background: TYPE[type], color: '#fff', width: '20px', height: '20px', fontSize: '14px', textAlign: 'center', borderRadius: '50%', marginRight: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                        >
-                          <Icon
-                            type={ICON[type]}
-                            style={{ fontSize: '14px' }}
-                          />
-                        </div>
-                        <span>{NAME[type]}</span>
+                        <TypeTag
+                          type={{
+                            typeCode: type,
+                          }}
+                        />
+                        <span style={{ marginLeft: 8 }}>{NAME[type]}</span>
                       </div>
                     </Option>),
                   )}
@@ -293,18 +292,15 @@ class CreateSprint extends Component {
               })(
                 <Select
                   label="经办人"
-                  allowClear
-                  loading={this.state.selectLoading}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
+                  loading={this.state.selectLoading}
                   filter
-                  filterOption={(input, option) =>
-                    option.props.children.props.children[1].props.children.toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0}
-                  onFocus={() => {
+                  allowClear
+                  onFilterChange={(input) => {
                     this.setState({
                       selectLoading: true,
                     });
-                    getUsers().then((res) => {
+                    getUsers(input).then((res) => {
                       this.setState({
                         originUsers: res.content,
                         selectLoading: false,
@@ -313,14 +309,16 @@ class CreateSprint extends Component {
                   }}
                 >
                   {this.state.originUsers.map(user =>
-                    (<Option key={`${user.id}`} value={`${user.id}`}>
+                    (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                        <div
-                          style={{ background: '#c5cbe8', color: '#6473c3', width: '20px', height: '20px', textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: '8px' }}
-                        >
-                          {user.loginName ? user.loginName.slice(0, 1) : ''}
-                        </div>
-                        <span>{`${user.loginName} ${user.realName}`}</span>
+                        <UserHead
+                          user={{
+                            id: user.id,
+                            loginName: user.loginName,
+                            realName: user.realName,
+                            avatar: user.imageUrl,
+                          }}
+                        />
                       </div>
                     </Option>),
                   )}

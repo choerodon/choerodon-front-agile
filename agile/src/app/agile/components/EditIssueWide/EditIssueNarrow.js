@@ -15,6 +15,7 @@ import {
   handleFileUpload,
   text2Delta,
   beforeTextUpload,
+  formatDate,
 } from '../../common/utils';
 import { loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints } from '../../api/NewIssueApi';
 import { getCurrentOrg, getSelf, getUsers } from '../../api/CommonApi';
@@ -2294,7 +2295,7 @@ class CreateSprint extends Component {
                           </span>
                         </div>
                         <div className="c7n-value-wrapper">
-                          {this.state.creationDate || '无'}
+                          {formatDate(this.state.creationDate)}
                         </div>
                       </div>
                       <div className="line-start mt-10">
@@ -2304,7 +2305,7 @@ class CreateSprint extends Component {
                           </span>
                         </div>
                         <div className="c7n-value-wrapper">
-                          {this.state.lastUpdateDate || '无'}
+                          {formatDate(this.state.lastUpdateDate)}
                         </div>
                       </div>
                     </div>
