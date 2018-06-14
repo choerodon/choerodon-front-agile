@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
 import { Modal, Form, Input, Select, message } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
+import UserHead from '../../../../components/UserHead';
 import { getUsers } from '../../../../api/CommonApi';
 import { createComponent } from '../../../../api/ComponentApi';
+import './component.scss';
 
 const { Sidebar } = Modal;
 const { TextArea } = Input;
-const FormItem = Form.Item;
 const { Option } = Select;
 const { AppState } = stores;
+const FormItem = Form.Item;
 
-@observer
 class AddComponent extends Component {
   constructor(props) {
     super(props);
@@ -40,7 +40,7 @@ class AddComponent extends Component {
         const component = {
           defaultAssigneeRole,
           description,
-          managerId,
+          managerId: managerId ? JSON.parse(managerId).id || 0 : 0,
           name,
         };
         this.setState({ createLoading: true });
@@ -65,13 +65,14 @@ class AddComponent extends Component {
     const { getFieldDecorator } = this.props.form;
     return (
       <Sidebar
+        className="c7n-component-component"
         title="创建模块"
-        visible={this.props.visible || false}
-        onCancel={this.props.onCancel.bind(this)}
-        onOk={this.handleOk.bind(this)}
         okText="创建"
         cancelText="取消"
+        visible={this.props.visible || false}
         confirmLoading={this.state.createLoading}
+        onOk={this.handleOk.bind(this)}
+        onCancel={this.props.onCancel.bind(this)}
       >
         <Content
           style={{
@@ -96,33 +97,33 @@ class AddComponent extends Component {
               {getFieldDecorator('managerId', {})(
                 <Select
                   label="负责人"
+                  loading={this.state.selectLoading}
                   allowClear
                   filter
-                  filterOption={(input, option) =>
-                    option.props.children.props.children[1].props.children.toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0}
-                  loading={this.state.selectLoading}
-                  onFocus={() => {
+                  onFilterChange={(input) => {
                     this.setState({
                       selectLoading: true,
                     });
-                    getUsers().then((res) => {
+                    getUsers(input).then((res) => {
                       this.setState({
                         originUsers: res.content,
                         selectLoading: false,
                       });
                     });
                   }}
+                  
                 >
                   {this.state.originUsers.map(user =>
-                    (<Option key={user.id} value={user.id}>
+                    (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                        <span
-                          style={{ background: '#c5cbe8', color: '#6473c3', width: '20px', height: '20px', textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: '8px' }}
-                        >
-                          {user.loginName ? this.getFirst(user.realName) : ''}
-                        </span>
-                        <span>{`${user.loginName} ${user.realName}`}</span>
+                        <UserHead
+                          user={{
+                            id: user.id,
+                            loginName: user.loginName,
+                            realName: user.realName,
+                            avatar: user.imageUrl,
+                          }}
+                        />
                       </div>
                     </Option>),
                   )}

@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Table, Spin, Popover, Modal, Radio, Select, Tooltip, message, Icon } from 'choerodon-ui';
+import { Button, Table, Spin, Popover, Tooltip, Icon } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import _ from 'lodash';
 import './ComponentHome.scss';
 import '../../../main.scss';
 import pic from '../../../../assets/image/模块管理－空.png';
-import { loadComponents, deleteComponent } from '../../../../api/ComponentApi';
+import { loadComponents } from '../../../../api/ComponentApi';
 import CreateComponent from '../ComponentComponent/AddComponent';
 import EditComponent from '../ComponentComponent/EditComponent';
+import DeleteComponent from '../ComponentComponent/DeleteComponent';
 import EmptyBlock from '../../../../components/EmptyBlock';
+import UserHead from '../../../../components/UserHead';
 
-const confirm = Modal.confirm;
-const RadioGroup = Radio.Group;
-const { Option } = Select;
 const { AppState } = stores;
 
 @observer
@@ -24,9 +22,6 @@ class ComponentHome extends Component {
       components: [],
       component: {},
       currentComponentId: undefined,
-      radio: 1,
-      relatedComponentId: undefined,
-      originComponents: [],
       loading: false,
       confirmShow: false,
       editComponentShow: false,
@@ -38,10 +33,14 @@ class ComponentHome extends Component {
     this.loadComponents();
   }
 
-  onRadioChange = (e) => {
-    this.setState({
-      radio: e.target.value,
-    });
+  getFirst(str) {
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return '';
   }
 
   showComponent(record) {
@@ -55,42 +54,14 @@ class ComponentHome extends Component {
     this.setState({
       component: record,
       confirmShow: true,
-      relatedComponentId: undefined,
-      radio: 1,
     });
   }
 
   deleteComponent() {
-    let relatedComponentId;
-    if (this.state.radio === 1) {
-      relatedComponentId = 0;
-    } else if (!this.state.relatedComponentId) {
-      message.warning('请选择关联的模块');
-      return;
-    } else {
-      relatedComponentId = this.state.relatedComponentId;
-    }
-    deleteComponent(this.state.component.componentId, relatedComponentId)
-      .then((res) => {
-        this.setState({
-          confirmShow: false,
-        });
-        this.loadComponents();
-      });
-  }
-
-  handleRelatedComponentChange = (value) => {
-    this.setState({ relatedComponentId: value });
-  }
-
-  getFirst(str) {
-    const re = /[\u4E00-\u9FA5]/g;
-    for (let i = 0, len = str.length; i < len; i += 1) {
-      if (re.test(str[i])) {
-        return str[i];
-      }
-    }
-    return '';
+    this.setState({
+      confirmShow: false,
+    });
+    this.loadComponents();
   }
 
   loadComponents() {
@@ -103,45 +74,10 @@ class ComponentHome extends Component {
           components: res,
           loading: false,
         });
+      })
+      .catch((error) => {
+        window.console.warn('load components failed, check your organization and project are correct, or please try again later');
       });
-  }
-
-  renderDelete() {
-    const radioStyle = {
-      display: 'block',
-      height: '20px',
-      lineHeight: '20px',
-      fontSize: '12px',
-    };
-    return (
-      <div style={{ margin: '0 0 32px 20px' }}>
-        <RadioGroup label="" onChange={this.onRadioChange} value={this.state.radio}>
-          <Radio style={radioStyle} value={1}>不关联到别的模块</Radio>
-          <Radio style={radioStyle} value={2}>
-            <span>关联到其他模块</span>
-            <Select
-              disabled={this.state.radio !== 2}
-              style={{ width: 300, marginLeft: 18 }}
-              value={this.state.relatedComponentId}
-              onChange={this.handleRelatedComponentChange.bind(this)}
-              onFocus={() => {
-                loadComponents(this.state.component.componentId).then((res) => {
-                  this.setState({
-                    originComponents: res,
-                  });
-                });
-              }}
-            >
-              {this.state.originComponents.map(component => (
-                <Option key={component.componentId} value={component.componentId}>
-                  {component.name}
-                </Option>),
-              )}
-            </Select>
-          </Radio>
-        </RadioGroup>
-      </div>
-    );
   }
 
   render() {
@@ -178,32 +114,16 @@ class ComponentHome extends Component {
         render: (managerId, record) => (
           <div style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={record.managerName}>
-              {
-                managerId && (
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        width: 18,
-                        height: 18,
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        marginRight: 5,
-                        textAlign: 'center',
-                        lineHeight: '18px',
-                        background: '#c5cbe8',
-                        color: '#6473c3',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {record.managerId && record.managerName ? this.getFirst(record.managerName) : ''}
-                    </span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {record.managerId ? `${record.managerName}` : ''}
-                    </span>
-                  </div>
-                )
-              }
+              <div>
+                <UserHead
+                  user={{
+                    id: record.managerId,
+                    loginName: '',
+                    realName: record.managerName,
+                    avatar: record.imageUrl,
+                  }}
+                />
+              </div>
             </Tooltip>
           </div>
         ),
@@ -248,9 +168,7 @@ class ComponentHome extends Component {
       },
     ];
     return (
-      <Page
-        className="c7n-component"
-      >
+      <Page className="c7n-component">
         <Header title="模块管理">
           <Button funcTyp="flat" onClick={() => this.setState({ createComponentShow: true })}>
             <Icon type="playlist_add icon" />
@@ -314,36 +232,14 @@ class ComponentHome extends Component {
             ) : null
           }
           {
-            this.state.confirmShow && (
-              <Modal
-                width={600}
-                title={`删除模块：${this.state.component.name}`}
+            this.state.confirmShow ? (
+              <DeleteComponent
                 visible={this.state.confirmShow}
-                onOk={this.deleteComponent.bind(this)}
+                component={this.state.component}
                 onCancel={() => this.setState({ confirmShow: false })}
-                okText="删除"
-                okType="danger"
-              >
-                <div style={{ margin: '20px 0', position: 'relative' }}>
-                  <Icon style={{ color: '#d50000', position: 'absolute', fontSize: '16px' }} type="error" />
-                  <div style={{ marginLeft: 20, width: 400 }}>
-                    有问题关联到这个模块，而且这个项目中已经没有其他模块可供关联 这个模块将会从所有问题中移除。
-                  </div>
-                </div>
-                <ul style={{ margin: '20px 0 20px 20px', paddingLeft: '20px' }}>
-                  <li>
-                    <span style={{ color: '#303f9f' }}>相关的问题（{this.state.component.issueCount}）</span>
-                  </li>
-                </ul>
-                {
-                  this.state.component.issueCount ? (
-                    <div>
-                      {this.renderDelete()}
-                    </div>
-                  ) : null
-                }
-              </Modal>
-            )
+                onOk={this.deleteComponent.bind(this)}
+              />
+            ) : null
           }
         </Content>
       </Page>

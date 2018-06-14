@@ -15,6 +15,10 @@ import { loadIssue, createIssue } from '../../../../api/NewIssueApi';
 import EditIssue from '../../../../components/EditIssueWide';
 import CreateIssue from '../../../../components/CreateIssueNew';
 import DailyLog from '../../../../components/DailyLog';
+import UserHead from '../../../../components/UserHead';
+import PriorityTag from '../../../../components/PriorityTag';
+import StatusTag from '../../../../components/StatusTag';
+import TypeTag from '../../../../components/TypeTag';
 import EmptyBlock from '../../../../components/EmptyBlock';
 import { ReadAndEdit } from '../../../../components/CommonComponent';
 
@@ -33,6 +37,7 @@ class Issue extends Component {
       createIssue: false,
       selectIssueType: 'task',
       createIssueValue: '',
+      createLoading: false,
     };
   }
   componentDidMount() {
@@ -102,12 +107,16 @@ class Issue extends Component {
         epicId: 0,
         parentIssueId: 0,
       };
+      this.setState({
+        createLoading: true,
+      });
       createIssue(data)
         .then((res) => {
           IssueStore.init();
           this.setState({
             // createIssue: false,
             createIssueValue: '',
+            createLoading: false,
           });
         })
         .catch((error) => {
@@ -169,15 +178,11 @@ class Issue extends Component {
     return (
       <div style={{ display: 'flex', flex: 1, marginTop: '3px', marginBottom: '3px', cursor: 'pointer' }}>
         <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[issue.typeCode]}`}>
-          <div
-            className="c7n-sign"
-            style={{
-              backgroundColor: TYPE[issue.typeCode],
-            }}
-          >
-            <Icon
-              style={{ fontSize: '14px' }}
-              type={ICON[issue.typeCode]}
+          <div>
+            <TypeTag
+              type={{
+                typeCode: issue.typeCode,
+              }}
             />
           </div>
         </Tooltip>
@@ -196,14 +201,13 @@ class Issue extends Component {
 
         <div style={{ flexShrink: '0' }}>
           <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityName}`}>
-            <div
-              className="c7n-level"
-              style={{
-                backgroundColor: COLOR[issue.priorityCode].bgColor,
-                color: COLOR[issue.priorityCode].color,
-              }}
-            >
-              { issue.priorityName }
+            <div style={{ marginRight: 12 }}>
+              <PriorityTag
+                priority={{
+                  priorityCode: issue.priorityCode,
+                  priorityName: issue.priorityName,
+                }}
+              />
             </div>
           </Tooltip>
         </div>
@@ -211,19 +215,15 @@ class Issue extends Component {
           {
             issue.assigneeId ? (
               <Tooltip mouseEnterDelay={0.5} title={`任务经办人： ${issue.assigneeName}`}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span
-                    className="c7n-avator"
-                    style={{
-                      flexShrink: 0,
-                      marginLeft: 12,
+                <div style={{ marginRight: 12 }}>
+                  <UserHead
+                    user={{
+                      id: issue.assigneeId,
+                      loginName: '',
+                      realName: issue.assigneeName,
+                      avatar: issue.imageUrl,
                     }}
-                  >
-                    {issue.assigneeName ? this.getFirst(issue.assigneeName) : ''}
-                  </span>
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {`${issue.assigneeName}`}
-                  </span>
+                  />
                 </div>
               </Tooltip>
             ) : null
@@ -231,18 +231,13 @@ class Issue extends Component {
         </div>
         <div style={{ flexShrink: '0', display: 'flex', justifyContent: 'flex-end' }}>
           <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusName}`}>
-            <div
-              className="c7n-status"
-              style={{
-                background: issue.statusColor,
-                color: '#fff',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                marginLeft: 12,
-              }}
-            >
-              { issue.statusName }
+            <div>
+              <StatusTag
+                status={{
+                  statusColor: issue.statusColor,
+                  statusName: issue.statusName,
+                }}
+              />
             </div>
           </Tooltip>
         </div>
@@ -255,25 +250,22 @@ class Issue extends Component {
       <div style={{ marginTop: '5px', marginBottom: '5px', cursor: 'pointer' }}>
         <div style={{ display: 'flex', marginBottom: '5px', width: '100%', flex: 1 }}>
           <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[issue.typeCode]}`}>
-            <div
-              className="c7n-sign"
-              style={{
-                backgroundColor: TYPE[issue.typeCode],
-                marginRight: '5px',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Icon
-                style={{ fontSize: '14px' }}
-                type={ICON[issue.typeCode]}
+            <div>
+              <TypeTag
+                type={{
+                  typeCode: issue.typeCode,
+                }}
               />
             </div>
           </Tooltip>
-          <div style={{ flex: 1, overflow: 'hidden' }}>
+          <Tooltip mouseEnterDelay={0.5} title={`任务编号： ${issue.issueNum}`}>
+            <a style={{ paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {issue.issueNum}
+            </a>
+          </Tooltip>
+          <div style={{ overflow: 'hidden', flex: 1 }}>
             <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务概要： ${issue.summary}`}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p style={{ paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset' }}>
                 {issue.summary}
               </p>
             </Tooltip>
@@ -281,32 +273,29 @@ class Issue extends Component {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex' }}>
-            <Tooltip mouseEnterDelay={0.5} title={`任务优先级： ${issue.priorityName}`}>
-              <div
-                className="c7n-level"
-                style={{
-                  backgroundColor: COLOR[issue.priorityCode].bgColor,
-                  color: COLOR[issue.priorityCode].color,
-                  marginRight: '12px',
-                }}
-              >
-                { issue.priorityName }
+            <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityName}`}>
+              <div style={{ marginRight: 12 }}>
+                <PriorityTag
+                  priority={{
+                    priorityCode: issue.priorityCode,
+                    priorityName: issue.priorityName,
+                  }}
+                />
               </div>
             </Tooltip>
             <div style={{ width: '140px', flexShrink: '0' }}>
               {
                 issue.assigneeId ? (
                   <Tooltip mouseEnterDelay={0.5} title={`任务经办人： ${issue.assigneeName}`}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <span
-                        className="c7n-avator"
-                        style={{ flexShrink: 0 }}
-                      >
-                        {issue.assigneeName ? this.getFirst(issue.assigneeName) : ''}
-                      </span>
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {`${issue.assigneeName}`}
-                      </span>
+                    <div style={{ marginRight: 12 }}>
+                      <UserHead
+                        user={{
+                          id: issue.assigneeId,
+                          loginName: '',
+                          realName: issue.assigneeName,
+                          avatar: issue.imageUrl,
+                        }}
+                      />
                     </div>
                   </Tooltip>
                 ) : null
@@ -314,18 +303,14 @@ class Issue extends Component {
             </div>
           </div>
           <div style={{ overflow: 'hidden' }}>
-            <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务类型： ${issue.statusName}`}>
-              <div
-                className="c7n-status"
-                style={{
-                  background: issue.statusColor,
-                  color: '#fff',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                { issue.statusName }
+            <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusName}`}>
+              <div>
+                <StatusTag
+                  status={{
+                    statusColor: issue.statusColor,
+                    statusName: issue.statusName,
+                  }}
+                />
               </div>
             </Tooltip>
           </div>
@@ -461,20 +446,20 @@ class Issue extends Component {
                   {v.showName}
                 </span>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <Icon
-                    type="arrow_drop_up"
-                    style={{
-                      lineHeight: 0.5,
-                      color: IssueStore.order.orderField === v.code && IssueStore.order.orderType === 'asc' ? 'blue' : '#000',
-                    }}
-                  />
-                  <Icon
-                    type="arrow_drop_down"
-                    style={{
-                      lineHeight: 0.5,
-                      color: IssueStore.order.orderField === v.code && IssueStore.order.orderType === 'desc' ? 'blue' : '#000',
-                    }}
-                  />
+                  {
+                    IssueStore.order.orderField === v.code && IssueStore.order.orderType === 'asc' && (
+                      <Icon
+                        type="arrow_upward"
+                      />
+                    )
+                  }
+                  {
+                    IssueStore.order.orderField === v.code && IssueStore.order.orderType === 'desc' && (
+                      <Icon
+                        type="arrow_downward"
+                      />
+                    )
+                  }
                 </div>
               </div>
             </Menu.Item>
@@ -496,25 +481,12 @@ class Issue extends Component {
           ['story', 'task', 'bug', 'issue_epic'].map(type => (
             <Menu.Item key={type}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div
-                  style={{
-                    backgroundColor: TYPE[type],
-                    marginRight: 8,
-                    display: 'inline-block',
-                    width: 20,
-                    height: 20,
-                    borderRadius: '50%',
-                    textAlign: 'center',
-                    color: '#fff',
-                    lineHeight: '16px',
+                <TypeTag
+                  type={{
+                    typeCode: type,
                   }}
-                >
-                  <Icon
-                    style={{ fontSize: '14px' }}
-                    type={ICON[type]}
-                  />
-                </div>
-                <span>
+                />
+                <span style={{ marginLeft: 8 }}>
                   {TYPE_NAME[type]}
                 </span>
               </div>
@@ -606,12 +578,8 @@ class Issue extends Component {
                     onRow={record => ({
                       onClick: () => {
                         this.setState({
-                          expand: false,
-                        }, () => {
-                          this.setState({
-                            selectedIssue: record,
-                            expand: true,
-                          });
+                          selectedIssue: record,
+                          expand: true,
                         });
                       },
                     })
@@ -685,6 +653,7 @@ class Issue extends Component {
                         >取消</Button>
                         <Button
                           type="primary"
+                          loading={this.state.createLoading}
                           onClick={this.handleBlurCreateIssue.bind(this)}
                         >确定</Button>
                       </div>

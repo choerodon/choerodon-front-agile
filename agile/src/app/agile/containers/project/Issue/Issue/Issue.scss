@@ -299,6 +299,14 @@
   .ant-spin-nested-loading {
     width: 100% !important;
   }
+
+  .ant-table-thead > tr > th:focus, .ant-table-tbody > tr > td:focus {
+    background-color: transparent;
+  }
+
+  .ant-table-filter-bar {
+    padding-right: 90px;
+  }
 }
 
 .c7n-backlog-sprintType {
