@@ -24,7 +24,7 @@ class UserHead extends Component {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
   }
 
   getFirst(str) {

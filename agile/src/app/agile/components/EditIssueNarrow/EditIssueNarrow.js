@@ -2,21 +2,22 @@ import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Select, Form, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon } from 'choerodon-ui';
+import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon } from 'choerodon-ui';
 import { STATUS, COLOR, TYPE, ICON, TYPE_NAME } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
 import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate } from '../../common/utils';
 import { loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints } from '../../api/NewIssueApi';
-import { getCurrentOrg, getSelf, getUsers } from '../../api/CommonApi';
+import { getCurrentOrg, getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import DailyLog from '../DailyLog';
 import CreateSubTask from '../CreateSubTask';
-import { SERVICES_URL } from '../../common/Constant';
 import UserHead from '../UserHead';
 import Comment from './Component/Comment';
+import Log from './Component/Log';
+import IssueList from './Component/IssueList';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -100,14 +101,7 @@ class CreateSprint extends Component {
     if (this.props.onRef) {
       this.props.onRef(this);
     }
-    loadIssue(this.props.issueId).then((res) => {
-      this.setAnIssueToState(res);
-    });
-    loadWorklogs(this.props.issueId).then((res) => {
-      this.setState({
-        worklogs: res,
-      });
-    });
+    this.reloadIssue(this.props.issueId);
     document.getElementById('scroll-area').addEventListener('scroll', (e) => {
       if (sign) {
         const currentNav = this.getCurrentNav(e);
@@ -122,14 +116,7 @@ class CreateSprint extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.issueId !== this.props.issueId) {
-      loadIssue(nextProps.issueId).then((res) => {
-        this.setAnIssueToState(res);
-      });
-      loadWorklogs(nextProps.issueId).then((res) => {
-        this.setState({
-          worklogs: res,
-        });
-      });
+      this.reloadIssue(nextProps.issueId);
     }
   }
 
@@ -172,17 +159,7 @@ class CreateSprint extends Component {
   setFileList = (data) => {
     this.setState({ fileList: data });
   }
-
-  getCurrentNav(e) {
-    let eles;
-    if (this.state.typeCode !== 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'sub_task'];
-    } else {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log'];
-    }
-    return _.find(eles, i => this.isInLook(document.getElementById(i)));
-  }
-
+  
   setAnIssueToState = (issue = this.state.origin) => {
     const { 
       assigneeId,
@@ -268,21 +245,37 @@ class CreateSprint extends Component {
     });
   }
 
+  getCurrentNav(e) {
+    let eles;
+    if (this.state.typeCode !== 'sub_task') {
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'sub_task'];
+    } else {
+      eles = ['detail', 'des', 'attachment', 'commit', 'log'];
+    }
+    return _.find(eles, i => this.isInLook(document.getElementById(i)));
+  }
+
   isInLook(ele) {
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
     return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
   }
 
-  handleFullEdit = (delta) => {
-    this.setState({
-      delta,
-      edit: false,
-    });
-  }
-
-  handleTypeChange = (value) => {
-    this.setState({ type: value });
+  scrollToAnchor = (anchorName) => {
+    if (anchorName) {
+      const anchorElement = document.getElementById(anchorName);
+      if (anchorElement) {
+        sign = false;
+        anchorElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          // inline: "nearest",
+        });
+        setTimeout(() => {
+          sign = true;
+        }, 2000);
+      }
+    }
   }
 
   handleTitleChange = (e) => {
@@ -291,6 +284,30 @@ class CreateSprint extends Component {
 
   handleEpicNameChange = (e) => {
     this.setState({ epicName: e.target.value });
+  }
+
+  handleStoryPointsChange = (e) => {
+    this.setState({ storyPoints: e });
+  }
+
+  handleRemainingTimeChange = (e) => {
+    this.setState({ remainingTime: e });
+  }
+
+  resetStoryPoints(value) {
+    this.setState({ storyPoints: value });
+  }
+
+  resetRemainingTime(value) {
+    this.setState({ remainingTime: value });
+  }
+
+  resetAssigneeId(value) {
+    this.setState({ assigneeId: value });
+  }
+
+  resetReporterId(value) {
+    this.setState({ reporterId: value });
   }
 
   resetSummary(value) {
@@ -317,10 +334,6 @@ class CreateSprint extends Component {
     this.setState({ componentIssueRelDTOList: value });
   }
 
-  resetVersionIssueRelDTOList(value) {
-    this.setState({ versionIssueRelDTOList: value });
-  }
-
   resetInfluenceVersions(value) {
     this.setState({ influenceVersions: value });
   }
@@ -334,20 +347,12 @@ class CreateSprint extends Component {
   }
 
   getWorkloads = () => {
-    const worklogs = this.state.worklogs.slice();
+    const worklogs = this.state.worklogs;
+    if (!Array.isArray(worklogs)) {
+      return 0;
+    }
     const workTimeArr = _.reduce(worklogs, (sum, v) => sum + (v.workTime || 0), 0);
     return workTimeArr;
-  }
-
-  refresh = () => {
-    loadIssue(this.state.origin.issueId).then((res) => {
-      this.setAnIssueToState(res);
-    });
-    loadWorklogs(this.state.origin.issueId).then((res) => {
-      this.setState({
-        worklogs: res,
-      });
-    });
   }
 
   updateIssue = (pro) => {
@@ -359,6 +364,15 @@ class CreateSprint extends Component {
       if (this.state[pro]) {
         beforeTextUpload(this.state[pro], obj, updateIssue, 'description');
       }
+    } else if (pro === 'assigneeId' || pro === 'reporterId') {
+      obj[pro] = this.state[pro] ? JSON.parse(this.state[pro]).id || 0 : 0;
+      updateIssue(obj)
+        .then((res) => {
+          this.setAnIssueToState(res);
+          if (this.props.onUpdate) {
+            this.props.onUpdate();
+          }
+        });
     } else {
       obj[pro] = this.state[pro] || 0;
       updateIssue(obj)
@@ -469,83 +483,6 @@ class CreateSprint extends Component {
       });
   }
 
-  handleStoryPointsChange = (e) => {
-    this.setState({ storyPoints: e });
-  }
-
-  handleRemainingTimeChange = (e) => {
-    this.setState({ remainingTime: e });
-  }
-
-  resetStoryPoints(value) {
-    this.setState({ storyPoints: value });
-  }
-
-  resetRemainingTime(value) {
-    this.setState({ remainingTime: value });
-  }
-
-  resetAssigneeId(value) {
-    this.setState({ assigneeId: value });
-  }
-
-  handleCreateIssue = () => {
-    this.setState({ createLoading: true });
-    const exitLabels = this.state.originLabels;
-    const labelIssueRelDTOList = _.map(this.state.labels, (label) => {
-      const target = _.find(exitLabels, { labelName: label });
-      if (target) {
-        return target;
-      } else {
-        return ({
-          labelName: label,
-          // created: true,
-          projectId: AppState.currentMenuType.id,
-        });
-      }
-    });
-    const extra = {
-      priorityCode: this.state.priorityCode,
-      reporterId: 1001,
-      statusCode: this.state.statusCode,
-      summary: this.state.title,
-      typeCode: this.state.type,
-      workTime: this.state.workTime !== '' ? this.state.workTime : undefined,
-      storyPoint: this.state.storyPoint !== '' ? this.state.storyPoint : undefined,
-      labelIssueRelDTOList,
-      parentIssueId: 0,
-    };
-    const deltaOps = this.state.delta;
-    if (deltaOps) {
-      beforeTextUpload(deltaOps, extra, this.handleSave);
-    } else {
-      extra.description = '';
-      this.handleSave(extra);
-    }
-  };
-
-  handleDeleteCommit(commentId) {
-    deleteCommit(commentId)
-      .then((res) => {
-        const originComments = _.slice(this.state.issueCommentDTOList);
-        _.remove(originComments, i => i.commentId === commentId);
-        this.setState({
-          issueCommentDTOList: originComments,
-        });
-      });
-  }
-
-  handleDeleteLog(logId) {
-    deleteWorklog(logId)
-      .then((res) => {
-        const originLogs = _.slice(this.state.worklogs);
-        _.remove(originLogs, i => i.logId === logId);
-        this.setState({
-          worklogs: originLogs,
-        });
-      });
-  }
-
   /**
    * Comment
    */
@@ -562,20 +499,6 @@ class CreateSprint extends Component {
     }
   }
 
-  handleUpdateLog(log) {
-    const extra = {
-      logId: log.logId,
-      objectVersionNumber: log.objectVersionNumber,
-    };
-    const updateLogDes = this.state.editLog;
-    if (updateLogDes) {
-      beforeTextUpload(updateLogDes, extra, this.updateLog, 'description');
-    } else {
-      extra.description = '';
-      this.updateLog(extra);
-    }
-  }
-
   /**
    * Comment
    */
@@ -588,45 +511,6 @@ class CreateSprint extends Component {
       });
     });
   }
-
-  updateLog = (log) => {
-    updateWorklog(log.logId, log).then((res) => {
-      const originLogs = _.slice(this.state.worklogs);
-      const index = _.findIndex(originLogs, { logId: log.logId });
-      originLogs[index] = res;
-      // const currentCommit = this.state.issueCommentDTOList.slice();
-      // currentCommit.push(res);
-      this.setState({
-        worklogs: originLogs,
-        editLog: undefined,
-        editLogId: undefined,
-      });
-    });
-  }
-
-  handleSave = (data) => {
-    const fileList = this.state.fileList;
-    const callback = (newFileList) => {
-      this.setState({ fileList: newFileList });
-    };
-    createIssue(data)
-      .then((res) => {
-        if (fileList.length > 0) {
-          const config = {
-            issueType: res.statusCode,
-            issueId: res.issueId,
-            fileName: fileList[0].name,
-            projectId: AppState.currentMenuType.id,
-          };
-          if (fileList.some(one => !one.url)) {
-            handleFileUpload(this.state.fileList, callback, config);
-          }
-        }
-        this.props.onOk();
-      })
-      .catch((error) => {
-      });
-  };
 
   transToArr(arr, pro, type = 'string') {
     if (!arr.length) {
@@ -650,21 +534,9 @@ class CreateSprint extends Component {
     }
   }
 
-  getFirst(str) {
-    const re = /[\u4E00-\u9FA5]/g;
-    for (let i = 0, len = str.length; i < len; i += 1) {
-      if (re.test(str[i])) {
-        return str[i];
-      }
-    }
-    return '';
-  }
-
   handleCreateSubIssue(subIssue) {
-    const subIssues = this.state.subIssueDTOList;
-    subIssues.push(subIssue);
+    this.reloadIssue();
     this.setState({
-      subIssueDTOList: subIssues,
       createSubTaskShow: false,
     });
     if (this.props.onUpdate) {
@@ -674,20 +546,11 @@ class CreateSprint extends Component {
 
   handleClickMenu(e) {
     if (e.key === '0') {
-      this.setState({
-        dailyLogShow: true,
-      });
+      this.setState({ dailyLogShow: true });
     } else if (e.key === '1') {
-      // delete
       this.handleDeleteIssue(this.props.issueId);
-      // deleteIssue(this.props.issueId)
-      //   .then((res) => {
-      //     this.props.onDeleteIssue();
-      //   });
     } else if (e.key === '2') {
-      this.setState({
-        createSubTaskShow: true,
-      });
+      this.setState({ createSubTaskShow: true });
     }
   }
 
@@ -735,23 +598,6 @@ class CreateSprint extends Component {
     });
   }
 
-  scrollToAnchor = (anchorName) => {
-    if (anchorName) {
-      const anchorElement = document.getElementById(anchorName);
-      if (anchorElement) {
-        sign = false;
-        anchorElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-          // inline: "nearest",
-        });
-        setTimeout(() => {
-          sign = true;
-        }, 2000);
-      }
-    }
-  }
-
   /**
    * Comment
    */
@@ -793,208 +639,60 @@ class CreateSprint extends Component {
     );
   }
 
+  /**
+   * Log
+   */
   renderLogs() {
-    const deltaEdit = text2Delta(this.state.editLog);
     return (
       <div>
         {
           this.state.worklogs.map(worklog => (
-            <div className="c7n-commit">
-              <div className="line-justify">
-                <div className="c7n-title-commit">
-                  <div className="c7n-avatar-commit">{worklog.userName.slice(0, 1)}</div>
-                  <span className="c7n-user-commit">{worklog.userId}{worklog.userName}</span>
-                  <span style={{ color: 'rgba(0, 0, 0, 0.65)' }}>记录了工作日志</span>
-                </div>
-                <div className="c7n-action">
-                  <Icon
-                    role="none"
-                    type="mode_edit mlr-3 pointer"
-                    onClick={() => {
-                      this.setState({
-                        editLogId: worklog.logId,
-                        editLog: worklog.description,
-                      });
-                    }}
-                  />
-                  <Icon
-                    role="none"
-                    type="delete_forever mlr-3 pointer"
-                    onClick={() => this.handleDeleteLog(worklog.logId)}
-                  />
-                </div>
-              </div>
-              <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: '10px', marginBottom: '10px' }}>
-                - {worklog.lastUpdateDate}
-              </div>
-              <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: '10px', marginBottom: '10px' }}>
-                <span style={{ width: 70 }}>耗费时间:</span>
-                <span style={{ color: '#000', fontWeight: '500' }}>{`${worklog.workTime}h` || '无'}</span>
-              </div>
-              <div className="c7n-conent-commit" style={{ display: 'flex' }}>
-                <span style={{ width: 70, flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>备注:</span>
-                <span style={{ flex: 1 }}>
-                  {
-                    worklog.logId !== this.state.editLogId ? (
-                      <IssueDescription data={delta2Html(worklog.description)} />
-                    ) : null
-                  }
-                </span>
-              </div>
-              {
-                worklog.logId === this.state.editLogId ? (
-                  <WYSIWYGEditor
-                    bottomBar
-                    // toolbarHeight={66}
-                    value={deltaEdit}
-                    style={{ height: 200, width: '100%' }}
-                    onChange={(value) => {
-                      this.setState({ editLog: value });
-                    }}
-                    handleDelete={() => {
-                      this.setState({
-                        editLogId: undefined,
-                        editLog: undefined,
-                      });
-                    }}
-                    handleSave={this.handleUpdateLog.bind(this, worklog)}
-                  />
-                ) : null
-              }
-            </div>
+            <Log
+              worklog={worklog}
+              onDeleteLog={() => this.reloadIssue()}
+              onUpdateLog={() => this.reloadIssue()}
+            />
           ))
         }
       </div>
     );
   }
 
-  renderRelatedIssues() {
+  /**
+   * SubIssue
+   */
+  renderSubIssues() {
     return (
       <div className="c7n-tasks">
         {
-          this.state.subIssueDTOList.length ? 
-            this.state.subIssueDTOList.map((subIssue, i) => this.renderSub(subIssue, i)) : (
-              <div style={{ width: '100%', height: 350 }} />
-            )
+          this.state.subIssueDTOList.map((subIssue, i) => this.renderIssueList(subIssue, i))
         }
       </div>
     );
   }
 
-  renderSub(issue, i) {
+  /**
+   * IssueList
+   * @param {*} issue 
+   * @param {*} i 
+   */
+  renderIssueList(issue, i) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '8px 10px',
-          cursor: 'pointer',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-          borderTop: !i ? '1px solid rgba(0, 0, 0, 0.12)' : '',
+      <IssueList
+        issue={{
+          ...issue,
+          typeCode: issue.typeCode || 'sub_task',
         }}
-      >
-        <Tooltip title={`任务类型： ${TYPE_NAME.sub_task}`}>
-          <div
-            className="c7n-sign"
-            style={{
-              backgroundColor: TYPE.sub_task,
-              // display: 'inline-block',
-              width: 20,
-              height: 20,
-              borderRadius: '50%',
-              marginRight: '11px',
-              textAlign: 'center',
-              color: '#fff',
-              flexShrink: 0,
-              display: 'inline-flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Icon
-              style={{ fontSize: '14px' }}
-              type={ICON.sub_task}
-            />
-          </div>
-        </Tooltip>
-        <Tooltip title={`子任务编号概要： ${issue.issueNum} ${issue.summary}`}>
-          <div style={{ marginRight: '8px', flex: 1, overflow: 'hidden' }}>
-            <p
-              style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}
-              role="none"
-              onClick={() => {
-                // if (this.props.changeIssueId) {
-                //  this.props.changeIssueId(issue.issueId);
-                // } else {
-                loadIssue(issue.issueId).then((res) => {
-                  this.setAnIssueToState(res);
-                });
-                loadWorklogs(issue.issueId).then((res) => {
-                  this.setState({
-                    worklogs: res,
-                  });
-                });
-                // }
-              }}
-            >
-              {`${issue.issueNum} ${issue.summary}`}
-            </p>
-          </div>
-        </Tooltip>
-        <div style={{ width: '34px', marginRight: '15px', overflow: 'hidden' }}>
-          <Tooltip title={`优先级： ${issue.priorityName}`}>
-            <div
-              className="c7n-level"
-              style={{
-                backgroundColor: COLOR[issue.priorityCode].bgColor,
-                color: COLOR[issue.priorityCode].color,
-                borderRadius: '2px',
-                padding: '0 8px',
-                display: 'inline-block',
-              }}
-            >
-              { issue.priorityName }
-            </div>
-          </Tooltip>
-        </div>
-        <div style={{ width: '48px', marginRight: '15px', display: 'flex', justifyContent: 'flex-end' }}>
-          <div
-            className="c7n-status"
-            style={{
-              background: issue.statusColor || STATUS[issue.statusCode],
-              color: '#fff',
-              padding: '0 4px',
-              borderRadius: '2px',
-            }}
-          >
-            { issue.statusName }
-          </div>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: '16px',
-          }}
-        >
-          <Icon
-            role="none"
-            type="delete_forever mlr-3"
-            onClick={() => {
-              deleteIssue(issue.issueId).then((res) => {
-                const originSubIssues = _.slice(this.state.subIssueDTOList);
-                _.remove(originSubIssues, i => i.issueId === issue.issueId);
-                this.setState({
-                  subIssueDTOList: originSubIssues,
-                });
-              });
-            }}
-          />
-        </div>
-      </div>
+        i={i}
+        onRefresh={this.reloadIssue.bind(this)}
+      />
+      
     );
   }
 
+  /**
+   * Des
+   */
   renderDes() {
     let delta;
     if (!this.state.description || this.state.editDesShow) {
@@ -1033,8 +731,8 @@ class CreateSprint extends Component {
             role="none"
             onClick={() => {
               this.setState({
-                editDesShow: true,
-                editDes: this.state.description,
+                // editDesShow: true,
+                // editDes: this.state.description,
               });
             }}
           >
@@ -1046,7 +744,6 @@ class CreateSprint extends Component {
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
     const { initValue, visible, onCancel, onOk } = this.props;
     const getMenu = () => (
       <Menu onClick={this.handleClickMenu.bind(this)}>
@@ -1144,94 +841,76 @@ class CreateSprint extends Component {
           <ul className="c7n-nav-ul">
             <Tooltip placement="right" title="详情">
               <li id="DETAILS-nav" className={`c7n-li ${this.state.nav === 'detail' ? 'c7n-li-active' : ''}`}>
-                <a
+                <Icon
+                  type="error_outline c7n-icon-li"
                   role="none"
                   onClick={() => {
-                    this.setState({
-                      nav: 'detail',
-                    });
+                    this.setState({ nav: 'detail' });
                     this.scrollToAnchor('detail');
                   }}
-                >
-                  <Icon type="error_outline c7n-icon-li" />
-                </a>
+                />
               </li>
             </Tooltip>
             <Tooltip placement="right" title="描述">
               <li id="DESCRIPTION-nav" className={`c7n-li ${this.state.nav === 'des' ? 'c7n-li-active' : ''}`}>
-                <a
+                <Icon
+                  type="subject c7n-icon-li"
                   role="none"
                   onClick={() => {
-                    this.setState({
-                      nav: 'des',
-                    });
+                    this.setState({ nav: 'des' });
                     this.scrollToAnchor('des');
                   }}
-                >
-                  <Icon type="subject c7n-icon-li" />
-                </a>
+                />
               </li>
             </Tooltip>
             <Tooltip placement="right" title="附件">
               <li id="COMMENT-nav" className={`c7n-li ${this.state.nav === 'attachment' ? 'c7n-li-active' : ''}`}>
-                <a
+                <Icon
+                  type="attach_file c7n-icon-li"
                   role="none"
                   onClick={() => {
-                    this.setState({
-                      nav: 'attachment',
-                    });
+                    this.setState({ nav: 'attachment' });
                     this.scrollToAnchor('attachment');
                   }}
-                >
-                  <Icon type="attach_file c7n-icon-li" />
-                </a>
+                />
               </li>
             </Tooltip>
             <Tooltip placement="right" title="评论">
               <li id="ATTACHMENT-nav" className={`c7n-li ${this.state.nav === 'commit' ? 'c7n-li-active' : ''}`}>
-                <a
+                <Icon
+                  type="sms_outline c7n-icon-li"
                   role="none"
                   onClick={() => {
-                    this.setState({
-                      nav: 'commit',
-                    });
+                    this.setState({ nav: 'commit' });
                     this.scrollToAnchor('commit');
                   }}
-                >
-                  <Icon type="sms_outline c7n-icon-li" />
-                </a>
+                />
               </li>
             </Tooltip>
             <Tooltip placement="right" title="工作日志">
               <li id="LOG-nav" className={`c7n-li ${this.state.nav === 'log' ? 'c7n-li-active' : ''}`}>
-                <a
+                <Icon
+                  type="content_paste c7n-icon-li"
                   role="none"
                   onClick={() => {
-                    this.setState({
-                      nav: 'log',
-                    });
+                    this.setState({ nav: 'log' });
                     this.scrollToAnchor('log');
                   }}
-                >
-                  <Icon type="content_paste c7n-icon-li" />
-                </a>
+                />
               </li>
             </Tooltip>
             {
               this.state.typeCode !== 'sub_task' && (
                 <Tooltip placement="right" title="子任务">
                   <li id="SUB_TASKS-nav" className={`c7n-li ${this.state.nav === 'sub_task' ? 'c7n-li-active' : ''}`}>
-                    <a
+                    <Icon
+                      type="filter_none c7n-icon-li"
                       role="none"
                       onClick={() => {
-                        this.setState({
-                          nav: 'sub_task',
-                        });
+                        this.setState({ nav: 'sub_task' });
                         this.scrollToAnchor('sub_task');
                       }}
-                    >
-                      <Icon type="filter_none c7n-icon-li" />
-                    </a>
+                    />
                   </li>
                 </Tooltip>
               )
@@ -2050,40 +1729,115 @@ class CreateSprint extends Component {
                           </span>
                         </div>
                       </div>
-                      <div className="line-start mt-10">
+                      <div className="line-start mt-10 assignee">
                         <div className="c7n-property-wrapper">
-                          <span className="c7n-property">
-                            报告人：
-                          </span>
+                          <span className="c7n-property">报告人：</span>
                         </div>
-                        <div className="c7n-value-wrapper">
-                          {
-                            this.state.reporterId ? (
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  margin: '2px auto 2px 0',
-                                }}
-                              >
-                                <span
-                                  className="c7n-avatar"
-                                >
-                                  {this.getFirst(this.state.reporterName)}
-                                </span>
-                                <span>
-                                  {`${this.state.reporterName}`}
-                                </span>
-                              </div>
-                            ) : '无'
-                          }
+                        <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center' }}>
+                          <ReadAndEdit
+                            callback={this.changeRae.bind(this)}
+                            thisType="reporterId"
+                            current={this.state.currentRae}
+                            origin={this.state.reporterId}
+                            onOk={this.updateIssue.bind(this, 'reporterId')}
+                            onCancel={this.resetReporterId.bind(this)}
+                            onInit={() => {
+                              this.setAnIssueToState(this.state.origin);
+                              if (this.state.reporterId) {
+                                getUser(this.state.reporterId).then((res) => {
+                                  this.setState({
+                                    reporterId: JSON.stringify(res),
+                                    originUsers: [res],
+                                  });
+                                });
+                              } else {
+                                this.setState({
+                                  reporterId: undefined,
+                                  originUsers: [],
+                                });
+                              }
+                            }}
+                            readModeContent={<div>
+                              {
+                                this.state.reporterId ? (
+                                  <UserHead
+                                    user={{
+                                      id: this.state.reporterId,
+                                      loginName: '',
+                                      realName: this.state.reporterName,
+                                      avatar: this.state.reporterImageUrl,
+                                    }}
+                                  />
+                                ) : '无'
+                              }
+                            </div>}
+                          >
+                            <Select
+                              value={this.state.reporterId || undefined}
+                              style={{ width: 150 }}
+                              loading={this.state.selectLoading}
+                              allowClear
+                              autoFocus
+                              filter
+                              onFilterChange={(input) => {
+                                this.setState({
+                                  selectLoading: true,
+                                });
+                                getUsers(input).then((res) => {
+                                  this.setState({
+                                    originUsers: res.content,
+                                    selectLoading: false,
+                                  });
+                                });
+                              }}
+                              getPopupContainer={triggerNode => triggerNode.parentNode}
+                              onChange={(value) => {
+                                this.setState({ reporterId: value });
+                              }}
+                            >
+                              {this.state.originUsers.map(user =>
+                                (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
+                                  <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                                    <UserHead
+                                      user={{
+                                        id: user.id,
+                                        loginName: user.loginName,
+                                        realName: user.realName,
+                                        avatar: user.imageUrl,
+                                      }}
+                                    />
+                                  </div>
+                                </Option>),
+                              )}
+                            </Select>
+                          </ReadAndEdit>
+                          <span
+                            role="none"
+                            style={{
+                              color: '#3f51b5',
+                              cursor: 'pointer',
+                              marginTop: '-5px',
+                              display: 'inline-block',
+                            }}
+                            onClick={() => {
+                              getSelf().then((res) => {
+                                if (res.id !== this.state.reporterId) {
+                                  this.setState({
+                                    reporterId: JSON.stringify(res),
+                                  }, () => {
+                                    this.updateIssue('reporterId');
+                                  });
+                                }
+                              });
+                            }}
+                          >
+                            指派给我
+                          </span>
                         </div>
                       </div>
                       <div className="line-start mt-10 assignee">
                         <div className="c7n-property-wrapper">
-                          <span className="c7n-property">
-                            经办人：
-                          </span>
+                          <span className="c7n-property">经办人：</span>
                         </div>
                         <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center' }}>
                           <ReadAndEdit
@@ -2095,74 +1849,69 @@ class CreateSprint extends Component {
                             onCancel={this.resetAssigneeId.bind(this)}
                             onInit={() => {
                               this.setAnIssueToState(this.state.origin);
-                              getUsers().then((res) => {
-                                this.setState({
-                                  originUsers: res.content,
+                              if (this.state.assigneeId) {
+                                getUser(this.state.assigneeId).then((res) => {
+                                  this.setState({
+                                    assigneeId: JSON.stringify(res),
+                                    originUsers: [res],
+                                  });
                                 });
-                              });
+                              } else {
+                                this.setState({
+                                  assigneeId: undefined,
+                                  originUsers: [],
+                                });
+                              }
                             }}
                             readModeContent={<div>
                               {
                                 this.state.assigneeId ? (
-                                  <div
-                                    style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
+                                  <UserHead
+                                    user={{
+                                      id: this.state.assigneeId,
+                                      loginName: '',
+                                      realName: this.state.assigneeName,
+                                      avatar: this.state.assigneeImageUrl,
                                     }}
-                                  >
-                                    <span
-                                      className="c7n-avatar"
-                                    >
-                                      {this.state.assigneeName ? this.getFirst(this.state.assigneeName) : ''}
-                                    </span>
-                                    <span>
-                                      {`${this.state.assigneeName}`}
-                                    </span>
-                                  </div>
+                                  />
                                 ) : '无'
                               }
                             </div>}
                           >
                             <Select
                               value={this.state.assigneeId || undefined}
-                              style={{ width: '150px' }}
+                              style={{ width: 150 }}
                               loading={this.state.selectLoading}
                               allowClear
                               autoFocus
                               filter
-                              filterOption={(input, option) =>
-                                option.props.children.props.children[1].props.children.toLowerCase()
-                                  .indexOf(input.toLowerCase()) >= 0}
-                              getPopupContainer={triggerNode => triggerNode.parentNode}
-                              onFocus={() => {
+                              onFilterChange={(input) => {
                                 this.setState({
                                   selectLoading: true,
                                 });
-                                getUsers().then((res) => {
+                                getUsers(input).then((res) => {
                                   this.setState({
                                     originUsers: res.content,
                                     selectLoading: false,
                                   });
                                 });
                               }}
+                              getPopupContainer={triggerNode => triggerNode.parentNode}
                               onChange={(value) => {
-                                const user = _.find(this.state.originUsers,
-                                  { id: value * 1 });
-                                this.setState({
-                                  assigneeId: value,
-                                  // assigneeName: user ? `${user.loginName} ${user.realName}` : '',
-                                });
+                                this.setState({ assigneeId: value });
                               }}
                             >
                               {this.state.originUsers.map(user =>
-                                (<Option key={user.id} value={user.id}>
+                                (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                                    <div
-                                      style={{ background: '#c5cbe8', color: '#6473c3', width: '20px', height: '20px', textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: '8px' }}
-                                    >
-                                      {user.loginName ? this.getFirst(user.realName) : ''}
-                                    </div>
-                                    <span>{`${user.loginName} ${user.realName}`}</span>
+                                    <UserHead
+                                      user={{
+                                        id: user.id,
+                                        loginName: user.loginName,
+                                        realName: user.realName,
+                                        avatar: user.imageUrl,
+                                      }}
+                                    />
                                   </div>
                                 </Option>),
                               )}
@@ -2171,7 +1920,6 @@ class CreateSprint extends Component {
                           <span
                             role="none"
                             style={{
-                              // marginLeft: '50px',
                               color: '#3f51b5',
                               cursor: 'pointer',
                               marginTop: '-5px',
@@ -2181,8 +1929,7 @@ class CreateSprint extends Component {
                               getSelf().then((res) => {
                                 if (res.id !== this.state.assigneeId) {
                                   this.setState({
-                                    assigneeId: res.id,
-                                    assigneeName: `${res.loginName}-${res.realName}`,
+                                    assigneeId: JSON.stringify(res),
                                   }, () => {
                                     this.updateIssue('assigneeId');
                                   });
@@ -2197,17 +1944,13 @@ class CreateSprint extends Component {
 
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
-                          <span className="c7n-subtitle">
-                            日期
-                          </span>
+                          <span className="c7n-subtitle">日期</span>
                         </div>
                       </div>
                       
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
-                          <span className="c7n-property">
-                            创建时间：
-                          </span>
+                          <span className="c7n-property">创建时间：</span>
                         </div>
                         <div className="c7n-value-wrapper">
                           {formatDate(this.state.creationDate)}
@@ -2215,9 +1958,7 @@ class CreateSprint extends Component {
                       </div>
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
-                          <span className="c7n-property">
-                            更新时间：
-                          </span>
+                          <span className="c7n-property">更新时间：</span>
                         </div>
                         <div className="c7n-value-wrapper">
                           {formatDate(this.state.lastUpdateDate)}
@@ -2233,11 +1974,23 @@ class CreateSprint extends Component {
                         <span>描述</span>
                       </div>
                       <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
-                      <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                      <div className="c7n-title-right" style={{ marginLeft: '14px', position: 'relative' }}>
                         <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ edit: true })}>
                           <Icon type="zoom_out_map icon" style={{ marginRight: 2 }} />
                           <span>全屏编辑</span>
                         </Button>
+                        <Icon
+                          className="c7n-des-edit"
+                          style={{ position: 'absolute', top: 5, right: -15 }}
+                          role="none"
+                          type="mode_edit mlr-3 pointer"
+                          onClick={() => {
+                            this.setState({
+                              editDesShow: true,
+                              editDes: this.state.description,
+                            });
+                          }}
+                        />
                       </div>
                     </div>
                     {this.renderDes()}
@@ -2313,7 +2066,7 @@ class CreateSprint extends Component {
                           </Button>
                         </div>
                       </div>
-                      {this.renderRelatedIssues()}
+                      {this.renderSubIssues()}
                     </div>
                   )
                 }
@@ -2366,4 +2119,4 @@ class CreateSprint extends Component {
     );
   }
 }
-export default Form.create({})(withRouter(CreateSprint));
+export default withRouter(CreateSprint);

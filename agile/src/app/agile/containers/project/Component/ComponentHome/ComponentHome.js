@@ -12,6 +12,8 @@ import DeleteComponent from '../ComponentComponent/DeleteComponent';
 import EmptyBlock from '../../../../components/EmptyBlock';
 import UserHead from '../../../../components/UserHead';
 
+import Filter from '../ComponentComponent/Filter';
+
 const { AppState } = stores;
 
 @observer
@@ -240,6 +242,9 @@ class ComponentHome extends Component {
                 onOk={this.deleteComponent.bind(this)}
               />
             ) : null
+          }
+          {
+            <Filter />
           }
         </Content>
       </Page>
