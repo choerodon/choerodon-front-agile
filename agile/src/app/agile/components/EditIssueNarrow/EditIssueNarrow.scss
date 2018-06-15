@@ -279,7 +279,9 @@
     padding-right: 20px;
     padding-bottom: 5px;
     flex: 1;
-    overflow-y: auto;
+    // overflow-y: auto;
+    box-sizing: border-box;
+    width: 100%;
   }
 
   .select-noBorder {
@@ -390,6 +392,16 @@
     line-height: 18px;
   }
 
+  .c7n-des-edit {
+    opacity: 0;
+  }
+
+  #des:hover {
+    .c7n-des-edit {
+      opacity: 1;
+    }
+  }
+
   .ant-progress-inner {
     background: rgba(0, 0, 0, 0.08);
   }
@@ -408,6 +420,7 @@
 
   .ant-upload-list-item {
     display: inline-block;
+    max-width: 100%;
   }
 
   .ant-upload-list-item-info {

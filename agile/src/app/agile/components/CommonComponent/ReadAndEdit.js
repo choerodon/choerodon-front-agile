@@ -144,6 +144,7 @@ class ReadAndEdit extends Component {
                   // outline: 'none',
                   // padding: '3px', 
                   // boxShadow: '0 3px 6px rgba(111,111,111,0.2)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.08)',
                 }}
               >
                 <span
