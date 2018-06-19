@@ -114,33 +114,49 @@ class EpicItem extends Component {
               BacklogStore.setEpicData(data);
             }}
           />
-          <div>
-            {this.state.editName ? (
-              <Input
-                autoFocus
-                defaultValue={item.epicName}
-                onPressEnter={this.handleSave.bind(this)}
-                onClick={e => e.stopPropagation()}
-                onBlur={this.handleSave.bind(this)}
-              />
-            ) : (
-              <p>{item.epicName}</p>
-            )}
-            <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
-              <Icon
+          <div style={{ width: '100%' }}>
+            <div className="c7n-backlog-epicItemsHead">
+              {this.state.editName ? (
+                <Input
+                  autoFocus
+                  defaultValue={item.epicName}
+                  onPressEnter={this.handleSave.bind(this)}
+                  onClick={e => e.stopPropagation()}
+                  onBlur={this.handleSave.bind(this)}
+                />
+              ) : (
+                <p>{item.epicName}</p>
+              )}
+              <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
+                <Icon
+                  style={{
+                    width: 12,
+                    height: 12,
+                    background: item.color,
+                    color: 'white',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 2,
+                  }}
+                  type="arrow_drop_down"
+                />
+              </Dropdown>
+            </div>
+            <div className="c7n-backlog-epicItemProgress">
+              <div
+                className="c7n-backlog-epicItemDone"
                 style={{
-                  width: 12,
-                  height: 12,
-                  background: item.color,
-                  color: 'white',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 2,
+                  flex: item.doneIssueCount,
                 }}
-                type="arrow_drop_down"
               />
-            </Dropdown>
+              <div 
+                className="c7n-backlog-epicItemTodo"
+                style={{ 
+                  flex: item.issueCount ? item.issueCount - item.doneIssueCount : 1,
+                }}
+              />
+            </div>
           </div>
         </div>
         {item.expand ? (

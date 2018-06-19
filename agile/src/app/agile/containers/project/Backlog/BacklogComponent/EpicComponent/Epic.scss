@@ -46,7 +46,7 @@
           font-size: 16px;
         }
 
-        div {
+        div.c7n-backlog-epicItemsHead {
           flex-grow: 1;
           display: flex;
           justify-content: space-between;
@@ -101,5 +101,21 @@
 
   .c7n-backlog-epicColorItem:not(:first-child) {
     margin-left: 9px;
+  }
+}
+
+.c7n-backlog-epicItemProgress {
+  width: 100%;
+  height: 5px;
+  display: flex;
+
+  .c7n-backlog-epicItemDone {
+    background: rgb(77, 144, 254);
+    height: 100%;
+  }
+
+  .c7n-backlog-epicItemTodo {
+    background: #e5e5e5;
+    height: 100%;
   }
 }
