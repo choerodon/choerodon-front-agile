@@ -110,8 +110,8 @@ class PublicRelease extends Component {
                           {getFieldDecorator('moveVersion', {
                             initialValue: 
                             ReleaseStore.getPublicVersionDetail.versionNames.length > 0 ?
-                              ReleaseStore.getPublicVersionDetail.versionNames[0].versionId : 
-                              undefined,
+                              ReleaseStore.getPublicVersionDetail.versionNames[0].versionId 
+                              : undefined,
                             rules: [{
                               required: this.props.form.getFieldValue('chose') === 2,
                               message: '移动版本是必须的',
