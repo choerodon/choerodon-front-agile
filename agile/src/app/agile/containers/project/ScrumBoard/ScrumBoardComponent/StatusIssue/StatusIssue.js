@@ -128,7 +128,7 @@ class StatusIssue extends Component {
                   style={{
                     userSelect: 'none',
                     // background: snapshot.isDragging ? 'lightgreen' : 'white',  
-                    background: 'white',  
+                    background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',  
                     minHeight: 83,
                     border: '1px solid rgba(0,0,0,0.20)',
                     // borderLeft: '1px solid rgba(0,0,0,0.20)',

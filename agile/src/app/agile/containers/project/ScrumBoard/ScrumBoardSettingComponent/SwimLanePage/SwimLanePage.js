@@ -60,7 +60,7 @@ class SwimLanePage extends Component {
         >
           <Option value="parent_child">故事</Option>
           <Option value="assignee">经办人</Option>
-          {/* <Option value="swimlane_none">无</Option> */}
+          <Option value="swimlane_none">无</Option>
         </Select>
         <div style={{ marginTop: 12 }}>
           <Button

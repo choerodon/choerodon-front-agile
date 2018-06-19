@@ -38,6 +38,7 @@ class CreateVersion extends Component {
           this.setState({
             loading: false,
           });
+          this.props.form.resetFields();
           this.props.onCancel();
           this.props.refresh();
         }).catch((error) => {
@@ -62,7 +63,10 @@ class CreateVersion extends Component {
         visible={this.props.visible}
         okText="新建"
         cancelText="取消"
-        onCancel={this.props.onCancel.bind(this)}
+        onCancel={() => {
+          this.props.form.resetFields();
+          this.props.onCancel();
+        }}
         confirmLoading={this.state.loading}
         onOk={this.handleCreateVersion.bind(this)}
       >

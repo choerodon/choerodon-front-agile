@@ -387,6 +387,16 @@ class ScrumBoardHome extends Component {
           );
         }
       });
+    } else {
+      _.forEach(data, (item) => {
+        if (item.subStatuses.length > 0) {
+          result.push(
+            <StatusBodyColumn
+              data={item}
+            />,
+          );
+        }
+      });
     }
     return result;
   }
@@ -439,6 +449,8 @@ class ScrumBoardHome extends Component {
       result = '其他问题';
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       result = '未分配的问题';
+    } else {
+      result = '所有问题';
     }
     return result;
   }

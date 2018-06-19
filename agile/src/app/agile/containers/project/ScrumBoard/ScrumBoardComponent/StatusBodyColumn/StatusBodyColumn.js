@@ -102,6 +102,18 @@ class StatusBodyColumn extends Component {
           }
         });
       }
+    } else {
+      _.forEach(data, (item, index) => {
+        result.push(
+          <StatusIssue
+            data={item}
+            index={index}
+            droppableId={droppableId}
+            statusName={statusName}
+            categoryCode={categoryCode}
+          />,
+        );
+      });
     }
     return result;
   }
