@@ -25,14 +25,11 @@ class IssueDescription extends Component {
     //   });
     //   e.stopPropagation();
     // });
+    const that = this;
     window.addEventListener('click', (e) => {
-      if (e.target.nodeName === 'IMG') {
-        window.console.info(e.target.nodeName);
-        this.setState({
-          open: true,
-          src: e.target.src,
-        });
+      if (e.target.nodeName === 'IMG' && this.props.data && this.props.data.search(e.target.src) > -1) {
         e.stopPropagation();
+        this.open(e.target.src);
       }
     });
   }
@@ -85,6 +82,13 @@ class IssueDescription extends Component {
     }
     return replyContents;
   };
+
+  open = (src) => {
+    this.setState({
+      open: true,
+      src,
+    });
+  }
 
   escape = str => str.replace(/<\/script/g, '<\\/script').replace(/<!--/g, '<\\!--');
 
