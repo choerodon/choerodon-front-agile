@@ -128,7 +128,7 @@ class StatusIssue extends Component {
                   style={{
                     userSelect: 'none',
                     // background: snapshot.isDragging ? 'lightgreen' : 'white',  
-                    background: 'white',  
+                    background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',  
                     minHeight: 83,
                     border: '1px solid rgba(0,0,0,0.20)',
                     // borderLeft: '1px solid rgba(0,0,0,0.20)',
@@ -194,16 +194,18 @@ class StatusIssue extends Component {
                           textAlign: 'center',
                         }}
                       >{item.priorityName}</p>
-                      <p
-                        className="textDisplayOneColumn" 
-                        style={{ 
-                          flexBasis: '90%',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          lineHeight: '20px',
-                          paddingLeft: 10,
-                        }}
-                      >{item.summary}</p>
+                      <Tooltip title={item.summary} placement="topLeft">
+                        <p
+                          className="textDisplayOneColumn" 
+                          style={{ 
+                            flexBasis: '90%',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            lineHeight: '20px',
+                            paddingLeft: 10,
+                          }}
+                        >{item.summary}</p>
+                      </Tooltip>
                     </div>
                   </div>
                   {/* <div style={{ flexShrink: 0 }} cla

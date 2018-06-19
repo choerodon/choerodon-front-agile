@@ -11,6 +11,7 @@ import './ReleaseHome.scss';
 import EditRelease from '../ReleaseComponent/EditRelease';
 import PublicRelease from '../ReleaseComponent/PublicRelease';
 import emptyVersion from '../../../../assets/image/emptyVersion.png';
+import DeleteReleaseWithIssues from '../ReleaseComponent/DeleteReleaseWithIssues';
 
 const confirm = Modal.confirm;
 const RadioGroup = Radio.Group;
@@ -80,23 +81,30 @@ class ReleaseHome extends Component {
       }
     }
     if (e.key === '4') {
-      ReleaseStore.axiosVersionIssueStatistics(record.versionId).then((res) => {
-        if (res.issueCount > 0) {
-          this.setState({
-            versionDelInfo: {
-              versionName: record.name,
-              versionId: record.versionId,
-              ...res,
-            },
-          });
-        } else {
-          this.setState({
-            versionDelete: record,
-          });
-        }
-      }).catch((error) => {
-        window.console.log(error);
-      });
+      window.console.log(ReleaseStore.getVersionList);
+      if (ReleaseStore.getVersionList.length > 1) {
+        ReleaseStore.axiosVersionIssueStatistics(record.versionId).then((res) => {
+          if (res.issueCount > 0) {
+            this.setState({
+              versionDelInfo: {
+                versionName: record.name,
+                versionId: record.versionId,
+                ...res,
+              },
+            });
+          } else {
+            this.setState({
+              versionDelete: record,
+            });
+          }
+        }).catch((error) => {
+          window.console.log(error);
+        });
+      } else {
+        this.setState({
+          versionDelete: record,
+        });
+      }
     }
     if (e.key === '5') {
       ReleaseStore.axiosGetVersionDetail(record.versionId).then((res) => {
@@ -219,7 +227,7 @@ class ReleaseHome extends Component {
                   }}
                 >
                   <img style={{ width: 237, height: 200 }} src={emptyVersion} alt="emptyVersion" />
-                  <div>
+                  <div style={{ marginLeft: 50 }}>
                     <p style={{ color: 'rgba(0,0,0,0.65)' }}>您还没有为此项目添加任何版本</p>
                     <p style={{ fontSize: '20px', lineHeight: '34px' }}>版本是一个项目的时间点，并帮助<br />您组织和安排工作</p>
                   </div>
@@ -265,99 +273,25 @@ class ReleaseHome extends Component {
               {`确定要删除 V${this.state.versionDelete.name}?`}
             </div>
           </Modal>
-          <Sidebar
-            title={`删除版本 V${this.state.versionDelInfo.versionName}`}
-            closable={false}
-            visible={JSON.stringify(this.state.versionDelInfo) !== '{}'}
-            okText="删除"
-            cancelText="取消"
+          <DeleteReleaseWithIssues
+            versionDelInfo={this.state.versionDelInfo}
+            radioChose={this.state.radioChose}
+            selectChose={this.state.selectChose}
             onCancel={() => {
               this.setState({
                 versionDelInfo: {},
                 radioChose: null,
                 selectChose: null,
+                versionDelete: {},
               });
             }}
-            onOk={() => {
-              const data2 = {
-                projectId: AppState.currentMenuType.id,
-                versionId: this.state.versionDelInfo.versionId,
-              };
-              if (this.state.radioChose) {
-                if (this.state.radioChose === 1) {
-                  data2.targetVersionId = this.state.selectChose ? 
-                    this.state.selectChose : this.state.versionDelInfo.versionNames[0].versionId;
-                }
-              } else {
-                data2.targetVersionId = this.state.selectChose ? 
-                  this.state.selectChose : this.state.versionDelInfo.versionNames[0].versionId;
-              }
-              ReleaseStore.axiosDeleteVersion(data2).then((data) => {
-                this.refresh(this.state.pagination);
-                this.setState({
-                  versionDelete: {},
-                  radioChose: null,
-                  selectChose: null,
-                });
-              }).catch((error) => {
-                window.console.log(error);
+            refresh={this.refresh.bind(this, this.state.pagination)}
+            changeState={(k, v) => {
+              this.setState({
+                [k]: v,
               });
             }}
-          >
-            <p>您想对分配给此版本的任何问题做什么?</p>
-            <div style={{ display: 'flex', marginTop: 25 }}>
-              <p>此版本有{this.state.versionDelInfo.issueCount}个问题</p>
-              <RadioGroup
-                style={{ marginLeft: 25 }}
-                defaultValue={1}
-                onChange={(e) => {
-                  this.setState({
-                    radioChose: e.target.value,
-                  });
-                }}
-              >
-                <Radio
-                  style={{
-                    display: 'block',
-                    height: '30px',
-                    lineHeight: '30px',
-                  }}
-                  value={1}
-                >
-                  将它们分配给此版本
-                  <Select
-                    style={{
-                      width: 250,
-                      marginLeft: 10,
-                    }}
-                    onChange={(value) => {
-                      this.setState({
-                        selectChose: value,
-                      });
-                    }}
-                    defaultValue={this.state.versionDelInfo.versionNames ? 
-                      this.state.versionDelInfo.versionNames[0].versionId : undefined}
-                  >
-                    {this.state.versionDelInfo.versionNames ? (
-                      this.state.versionDelInfo.versionNames.map(item => (
-                        <Option value={item.versionId}>{item.name}</Option>
-                      ))
-                    ) : ''}
-                  </Select>
-                </Radio>
-                <Radio
-                  style={{ 
-                    display: 'block',
-                    height: '30px',
-                    lineHeight: '30px',
-                  }}
-                  value={2}
-                >
-                  删除版本
-                </Radio>
-              </RadioGroup>
-            </div>
-          </Sidebar>
+          />
           {this.state.editRelease ? (
             <EditRelease
               visible={this.state.editRelease}

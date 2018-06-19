@@ -32,3 +32,9 @@
         sort: 5
         permission:
           - 'agile-service.issue.queryIssue'
+    - "burndownchart":
+        icon: trending_down
+        Routes: /agile/burndownchart
+        sort: 6
+        permission:
+          - 'agile-service.issue.queryIssue'

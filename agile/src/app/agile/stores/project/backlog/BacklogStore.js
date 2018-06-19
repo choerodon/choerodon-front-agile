@@ -21,6 +21,33 @@ class BacklogStore {
   @observable sprintWidth;
   @observable colorLookupValue = [];
 
+  getSprintFilter() {
+    const data = {
+      advancedSearchArgs: {},
+    };
+    if (this.chosenEpic !== 'all') {
+      if (this.chosenEpic === 'unset') {
+        data.advancedSearchArgs.noEpic = 'true';
+      } else {
+        data.advancedSearchArgs.epicId = this.chosenEpic;
+      }
+    }
+    if (this.chosenVersion !== 'all') {
+      if (this.chosenVersion === 'unset') {
+        data.advancedSearchArgs.noVersion = 'true';
+      } else {
+        data.advancedSearchArgs.versionId = this.chosenVersion;
+      }
+    }
+    if (this.onlyMe) {
+      data.advancedSearchArgs.ownIssue = 'true';
+    }
+    if (this.recent) {
+      data.advancedSearchArgs.onlyStory = 'true';
+    }
+    return data;
+  }
+
   axiosGetColorLookupValue() {
     return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/epic_color`);
   }

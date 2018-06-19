@@ -12,7 +12,7 @@ const BACKLOGINDEX = asyncRouter(() => import('./project/Backlog'));
 const SCRUMBOARDINDEX = asyncRouter(() => import('./project/ScrumBoard'));
 const ISSUEIndex = asyncRouter(() => import('./project/Issue'));
 const COMPONENTIndex = asyncRouter(() => import('./project/Component'));
-const REPORTIndex = asyncRouter(() => import('./project/Report'));
+const BURNDOWNCHART = asyncRouter(() => import('./project/BurndownChart'));
 
 class AGILEIndex extends React.Component {
   render() {
@@ -29,7 +29,7 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/scrumboard`} component={SCRUMBOARDINDEX} /> 
           <Route path={`${match.url}/issue`} component={ISSUEIndex} />
           <Route path={`${match.url}/component`} component={COMPONENTIndex} />
-          <Route path={`${match.url}/report`} component={REPORTIndex} />
+          <Route path={`${match.url}/burndownchart`} component={BURNDOWNCHART} />
           <Route path={'*'} component={nomatch} />
         </Switch>
       </IntlProviderAsync>

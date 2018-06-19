@@ -25,10 +25,12 @@ class PublicRelease extends Component {
           projectId: AppState.currentMenuType.id,
           versionId: ReleaseStore.getVersionDetail.versionId,
           releaseDate: values.startDate ? `${moment(values.startDate).format('YYYY-MM-DD')} 00:00:00` : null,
-          ...values.chose === 2 ? {
-            targetVersionId: values.moveVersion,
-          } : {},
         };
+        if (values.chose) {
+          if (values.chose === 2) {
+            data.targetVersionId = values.moveVersion;
+          }
+        }
         ReleaseStore.axiosPublicRelease(data).then((res) => {
           this.props.onCancel();
           this.props.refresh();
@@ -37,6 +39,14 @@ class PublicRelease extends Component {
         });
       }
     });
+  }
+  renderRadioDisabled() {
+    if (ReleaseStore.getPublicVersionDetail.versionNames) {
+      if (ReleaseStore.getPublicVersionDetail.versionNames.length > 0) {
+        return false;
+      }
+    }
+    return true;
   }
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -60,52 +70,68 @@ class PublicRelease extends Component {
           {
             JSON.stringify(ReleaseStore.getPublicVersionDetail) !== '{}' ? (
               <div>
-                <p style={{ display: 'flex', alignItems: 'center' }}>
-                  <div className="c7n-release-icon" />
+                {
+                  ReleaseStore.getPublicVersionDetail.issueCount ? (
+                    <p style={{ display: 'flex', alignItems: 'center' }}>
+                      <div className="c7n-release-icon">!</div>
                     还有{ReleaseStore.getPublicVersionDetail.issueCount}个
-                  <span style={{ color: '#3F51B5' }}>这个版本仍然没有解决的问题。</span>
-                </p>
+                      <span style={{ color: '#3F51B5' }}>这个版本仍然没有解决的问题。</span>
+                    </p>
+                  ) : ''
+                }
                 <Form style={{ width: 512, marginTop: 24 }}>
-                  <FormItem>
-                    {getFieldDecorator('chose', {
-                      initialValue: 1,
-                      rules: [{
-                        required: true, message: '该选型时必须的',
-                      }],
-                    })(
-                      <RadioGroup  
-                        label="未解决的问题"
-                      >
-                        <Radio style={{ display: 'block', height: 20, marginTop: 10 }} value={1}>
+                  {
+                    ReleaseStore.getPublicVersionDetail.issueCount ? (
+                      <div>
+                        <FormItem>
+                          {getFieldDecorator('chose', {
+                            initialValue: 1,
+                            rules: [{
+                              required: true, message: '该选型时必须的',
+                            }],
+                          })(
+                            <RadioGroup  
+                              label="未解决的问题"
+                            >
+                              <Radio style={{ display: 'block', height: 20, marginTop: 10 }} value={1}>
                     忽略并继续发布
-                        </Radio>
-                        <Radio style={{ display: 'block', height: 20, marginTop: 10 }} value={2}>
+                              </Radio>
+                              <Radio
+                                style={{ display: 'block', height: 20, marginTop: 10 }} 
+                                value={2}
+                                disabled={this.renderRadioDisabled()}
+                              >
                     移动问题到版本
-                        </Radio>
-                      </RadioGroup>,
-                    )}
-                  </FormItem>
-                  <FormItem>
-                    {getFieldDecorator('moveVersion', {
-                      initialValue: ReleaseStore.getPublicVersionDetail.versionNames.length > 0 ?
-                        ReleaseStore.getPublicVersionDetail.versionNames[0].versionId : undefined,
-                      rules: [{
-                        required: this.props.form.getFieldValue('chose') === 2,
-                        message: '移动版本是必须的',
-                      }],
-                    })(
-                      <Select
-                        label="选择要移动到的版本"
-                        disabled={this.props.form.getFieldValue('chose') === 1}
-                      >
-                        {
-                          ReleaseStore.getPublicVersionDetail.versionNames.map(item => (
-                            <Option value={item.versionId}>{item.name}</Option>
-                          ))
-                        }
-                      </Select>,
-                    )}
-                  </FormItem>
+                              </Radio>
+                            </RadioGroup>,
+                          )}
+                        </FormItem>
+                        <FormItem>
+                          {getFieldDecorator('moveVersion', {
+                            initialValue: 
+                            ReleaseStore.getPublicVersionDetail.versionNames.length > 0 ?
+                              ReleaseStore.getPublicVersionDetail.versionNames[0].versionId 
+                              : undefined,
+                            rules: [{
+                              required: this.props.form.getFieldValue('chose') === 2,
+                              message: '移动版本是必须的',
+                            }],
+                          })(
+                            <Select
+                              label="选择要移动到的版本"
+                              disabled={this.props.form.getFieldValue('chose') === 1}
+                            >
+                              {
+                                ReleaseStore.getPublicVersionDetail.versionNames.map(item => (
+                                  <Option value={item.versionId}>{item.name}</Option>
+                                ))
+                              }
+                            </Select>,
+                          )}
+                        </FormItem>
+                      </div>
+                    ) : ''
+                  }
                   <FormItem>
                     {getFieldDecorator('startDate', {})(
                       <DatePicker label="开始日期" />,

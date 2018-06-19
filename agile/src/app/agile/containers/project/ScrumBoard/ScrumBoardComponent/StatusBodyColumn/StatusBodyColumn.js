@@ -13,35 +13,51 @@ class StatusBodyColumn extends Component {
     super(props);
     this.state = {};
   }
-  judgeMinHeight(dragStartData, issues) {
-    if (JSON.stringify(dragStartData) === '{}') {
-      return true;
-    } else {
-      let flag = 0;
-      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
-        String(this.props.source)) {
-        if (issues.length === 0) {
-          flag = 1;
-        }
-      }
-      if (flag === 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
+  // judgeMinHeight(dragStartData, issues) {
+  //   if (JSON.stringify(dragStartData) === '{}') {
+  //     return true;
+  //   } else {
+  //     let flag = 0;
+  //     if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
+  //       String(this.props.source)) {
+  //       if (issues.length === 0) {
+  //         flag = 1;
+  //       }
+  //     }
+  //     if (flag === 1) {
+  //       return false;
+  //     } else {
+  //       return true;
+  //     }
+  //   }
+  // }
   renderIssues(issues, droppableId, statusName, categoryCode) {
     const data = issues;
     const result = [];
     const parentIds = [];
-    _.forEach(ScrumBoardStore.getParentIds, (pi) => {
-      parentIds.push(pi.issueId);
-    });
-    if (!this.props.parentId) {
-      _.forEach(data, (item, index) => {
-        if (!item.parentIssueId) {
-          if (_.indexOf(parentIds, item.issueId) === -1) {
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      _.forEach(ScrumBoardStore.getParentIds, (pi) => {
+        parentIds.push(pi.issueId);
+      });
+      if (!this.props.parentId) {
+        _.forEach(data, (item, index) => {
+          if (!item.parentIssueId) {
+            if (_.indexOf(parentIds, item.issueId) === -1) {
+              result.push(
+                <StatusIssue
+                  data={item}
+                  index={index}
+                  droppableId={droppableId}
+                  statusName={statusName}
+                  categoryCode={categoryCode}
+                />,
+              );
+            }
+          }
+        });
+      } else {
+        _.forEach(data, (item, index) => {
+          if (item.parentIssueId === this.props.parentId) {
             result.push(
               <StatusIssue
                 data={item}
@@ -52,21 +68,51 @@ class StatusBodyColumn extends Component {
               />,
             );
           }
-        }
-      });
+        });
+      }
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      if (this.props.assigneeId) {
+        _.forEach(data, (item, index) => {
+          if (item.assigneeId) {
+            if (item.assigneeId === this.props.assigneeId) {
+              result.push(
+                <StatusIssue
+                  data={item}
+                  index={index}
+                  droppableId={droppableId}
+                  statusName={statusName}
+                  categoryCode={categoryCode}
+                />,
+              );
+            }
+          }
+        });
+      } else {
+        _.forEach(data, (item, index) => {
+          if (!item.assigneeId) {
+            result.push(
+              <StatusIssue
+                data={item}
+                index={index}
+                droppableId={droppableId}
+                statusName={statusName}
+                categoryCode={categoryCode}
+              />,
+            );
+          }
+        });
+      }
     } else {
       _.forEach(data, (item, index) => {
-        if (item.parentIssueId === this.props.parentId) {
-          result.push(
-            <StatusIssue
-              data={item}
-              index={index}
-              droppableId={droppableId}
-              statusName={statusName}
-              categoryCode={categoryCode}
-            />,
-          );
-        }
+        result.push(
+          <StatusIssue
+            data={item}
+            index={index}
+            droppableId={droppableId}
+            statusName={statusName}
+            categoryCode={categoryCode}
+          />,
+        );
       });
     }
     return result;
@@ -78,12 +124,24 @@ class StatusBodyColumn extends Component {
     } else if (
       JSON.stringify(ScrumBoardStore.getDragStartItem) !== '{}') {
       // 如果开始拖动 并且拖动的issue在当前source里
-      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
+      if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
         String(this.props.source)
-      ) {
-        return 'rgba(140,158,255,0.12)';
+        ) {
+          return 'rgba(140,158,255,0.12)';
+        } else {
+          return 'rgba(0, 0, 0, 0.04)';
+        }
+      } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) === 
+        String(this.props.assigneeId)
+        ) {
+          return 'rgba(140,158,255,0.12)';
+        } else {
+          return 'rgba(0, 0, 0, 0.04)';
+        }
       } else {
-        return 'rgba(0, 0, 0, 0.04)';
+        return '';
       }
     } else {
       return 'rgba(0, 0, 0, 0.04)';
@@ -127,44 +185,86 @@ class StatusBodyColumn extends Component {
     }
   }
   renderBorder(data, index, position, drag) {
-    if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
-    String(this.props.source)) {
-      // 如果在同一个泳道
-      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) !== 
-      String(this.props.data.columnId)) {
-        let flag = 0;
-        // 如果不在同一列
-        if (data.length === 1) {
-          // 如果只有一个状态
-          if (drag) {
-            return '2px dashed #1AB16F';
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
+      String(this.props.source)) {
+        // 如果在同一个泳道
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) !== 
+        String(this.props.data.columnId)) {
+          let flag = 0;
+          // 如果不在同一列
+          if (data.length === 1) {
+            // 如果只有一个状态
+            if (drag) {
+              return '2px dashed #1AB16F';
+            } else {
+              return '2px dashed #26348B';
+            }
           } else {
-            return '2px dashed #26348B';
-          }
-        } else {
-          // 如果有多个状态
-          if (index > 0) {
-            if (position === 'top') {
-              // 如果当前状态不是第一个 并且是top border
-              flag = 1;
+            // 如果有多个状态
+            if (index > 0) {
+              if (position === 'top') {
+                // 如果当前状态不是第一个 并且是top border
+                flag = 1;
+              }
+            }
+            if (flag === 1) {
+              return 'unset';
+            } else if (drag) {
+              return '2px dashed #1AB16F';
+            } else {
+              return '2px dashed #26348B';
             }
           }
-          if (flag === 1) {
-            return 'unset';
-          } else if (drag) {
-            return '2px dashed #1AB16F';
-          } else {
-            return '2px dashed #26348B';
-          }
+        } else if (drag) {
+          return '2px dashed #1AB16F';
+        } else {
+          return '2px dashed #26348B';
         }
-      } else if (drag) {
-        return '2px dashed #1AB16F';
       } else {
-        return '2px dashed #26348B';
+        return 'unset';
       }
-    } else {
-      return 'unset';
-    }
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) === 
+      String(this.props.assigneeId)) {
+        // 如果在同一个泳道
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) !== 
+        String(this.props.data.columnId)) {
+          let flag = 0;
+          // 如果不在同一列
+          if (data.length === 1) {
+            // 如果只有一个状态
+            if (drag) {
+              return '2px dashed #1AB16F';
+            } else {
+              return '2px dashed #26348B';
+            }
+          } else {
+            // 如果有多个状态
+            if (index > 0) {
+              if (position === 'top') {
+                // 如果当前状态不是第一个 并且是top border
+                flag = 1;
+              }
+            }
+            if (flag === 1) {
+              return 'unset';
+            } else if (drag) {
+              return '2px dashed #1AB16F';
+            } else {
+              return '2px dashed #26348B';
+            }
+          }
+        } else if (drag) {
+          return '2px dashed #1AB16F';
+        } else {
+          return '2px dashed #26348B';
+        }
+      } else {
+        return 'unset';
+      }
+    } 
+    return '';
   }
   renderStatusDisplay(dragStartData, data) {
     if (JSON.stringify(dragStartData) !== '{}') {
@@ -188,7 +288,6 @@ class StatusBodyColumn extends Component {
     const dragStartData = ScrumBoardStore.getDragStartItem;
     const data = this.props.data.subStatuses;
     const result = [];
-    // `${this.props.data.columnId},${item.code}`
     _.forEach(data, (item, index) => {
       result.push(
         <Droppable 
@@ -197,6 +296,7 @@ class StatusBodyColumn extends Component {
               columnId: this.props.data.columnId,
               code: item.id,
               parentId: this.props.source,
+              assigneeId: this.props.assigneeId,
             })
           }
         >
@@ -217,12 +317,7 @@ class StatusBodyColumn extends Component {
                   'unset' : this.renderBorder(data, index, 'bottom', snapshot.isDraggingOver),
                 visibility: this.renderDisplay(item, 'visibility'),
                 height: this.renderDisplay(item, 'height'),
-                // display: 'block',
                 position: 'relative',
-                // ...this.judgeMinHeight(dragStartData, item.issues) ? {
-                // } : {
-                //   minHeight: 83,
-                // },
               }}
             >
               <p
@@ -231,12 +326,6 @@ class StatusBodyColumn extends Component {
                   fontSize: '18px',
                   color: 'rgb(38, 52, 139)',
                   lineHeight: '26px',
-                  // position: 'absolute',
-                  // width: '100%',
-                  // height: '100%',
-                  // justifyContent: 'center',
-                  // alignItems: 'center',
-                  // zIndex: 10,
                 }}
               >
                 {item.name}
