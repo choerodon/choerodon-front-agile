@@ -65,7 +65,9 @@ class SprintIssue extends Component {
         return '#00BFA5';
       } else {
         return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="class" />
+          <Tooltip title="类型： 故事">
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="class" />
+          </Tooltip>
         );
       }
     }
@@ -74,7 +76,9 @@ class SprintIssue extends Component {
         return '#4D90FE';
       } else {
         return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
+          <Tooltip title="类型： 任务">
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
+          </Tooltip>
         );
       }
     }
@@ -83,7 +87,9 @@ class SprintIssue extends Component {
         return '#F44336';
       } else {
         return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
+          <Tooltip title="类型： 缺陷">
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
+          </Tooltip>
         );
       }
     }
@@ -113,7 +119,7 @@ class SprintIssue extends Component {
                 style={{
                   userSelect: 'none',
                   // background: snapshot1.isDragging ? 'lightgreen' : 'white',  
-                  background: this.props.selected.issueIds.indexOf(item.issueId) !== -1 ? 'lightgreen' : this.renderIssueBackground(item),
+                  background: this.props.selected.issueIds.indexOf(item.issueId) !== -1 ? 'rgba(140, 158, 255, 0.08)' : this.renderIssueBackground(item),
                   padding: '10px 36px 10px 20px',
                   borderBottom: '1px solid rgba(0,0,0,0.12)',
                   paddingLeft: 43,
@@ -166,12 +172,12 @@ class SprintIssue extends Component {
                     label="sprintIssue" 
                     style={{ 
                       marginLeft: 8,
-                      // whiteSpace: 'nowrap',
+                      whiteSpace: 'nowrap',
                       textOverflow: 'ellipsis',
                       overflow: 'hidden',
                       height: 20,
                     }}
-                  >{`#${item.issueNum} `}
+                  >{`${item.issueNum} `}
                     <Tooltip title={item.summary} placement="topLeft">
                       {item.summary}
                     </Tooltip>
@@ -197,14 +203,16 @@ class SprintIssue extends Component {
                       className="c7n-backlog-sprintIssueRight"
                     >
                       {!_.isNull(item.priorityName) ? (
-                        <span 
-                          label="sprintIssue" 
-                          className="c7n-backlog-sprintIssuePriority"
-                          style={{
-                            color: this.renderPriorityStyle('color', item),
-                            background: this.renderPriorityStyle('background', item),
-                          }}
-                        >{item.priorityName}</span>
+                        <Tooltip title={`优先级: ${item.priorityName}`}>
+                          <span 
+                            label="sprintIssue" 
+                            className="c7n-backlog-sprintIssuePriority"
+                            style={{
+                              color: this.renderPriorityStyle('color', item),
+                              background: this.renderPriorityStyle('background', item),
+                            }}
+                          >{item.priorityName}</span>
+                        </Tooltip>
                       ) : ''}
                     </div>
                     <div
@@ -219,9 +227,11 @@ class SprintIssue extends Component {
                       className="c7n-backlog-sprintIssueRight"
                     >
                       {item.versionNames.length > 0 ? (
-                        <span label="sprintIssue" className="c7n-backlog-sprintIssueVersion">
-                          <span>{item.versionNames.join(', ')}</span>
-                        </span>
+                        <Tooltip title={`版本: ${item.versionNames.join(', ')}`}>
+                          <span label="sprintIssue" className="c7n-backlog-sprintIssueVersion">
+                            <span>{item.versionNames.join(', ')}</span>
+                          </span>
+                        </Tooltip>
                       ) : ''}
                     </div>
                     <div 
@@ -235,14 +245,16 @@ class SprintIssue extends Component {
                       className="c7n-backlog-sprintIssueRight"
                     >
                       {!_.isNull(item.epicName) ? (
-                        <span 
-                          label="sprintIssue" 
-                          className="c7n-backlog-sprintIssueEpic"
-                          style={{
+                        <Tooltip title={`史诗: ${item.epicName}`}>
+                          <span 
+                            label="sprintIssue" 
+                            className="c7n-backlog-sprintIssueEpic"
+                            style={{
                             // border: `1px solid ${item.color}`,
-                            color: item.color,
-                          }}
-                        >{item.epicName}</span>
+                              color: item.color,
+                            }}
+                          >{item.epicName}</span>
+                        </Tooltip>
                       ) : ''}
                     </div>
                   </div>
@@ -258,18 +270,19 @@ class SprintIssue extends Component {
                       className="c7n-backlog-sprintIssueRight"
                     >
                       {!_.isNull(item.assigneeName) ? (
-                        <div style={{ display: 'inline-block' }} label="sprintIssue">
-                          <Avatar
-                            size="small"
-                            src={item.imageUrl ? item.imageUrl : undefined}
-                          >
-                            {
-                              !item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''
-                            }
-                          </Avatar>
-                          <span style={{ color: 'rgba(0,0,0,0.65)' }} label="sprintIssue">{item.assigneeName}</span>
-                        </div>
-
+                        <Tooltip title={`经办人: ${item.assigneeName}`}>
+                          <div style={{ display: 'inline-block' }} label="sprintIssue">
+                            <Avatar
+                              size="small"
+                              src={item.imageUrl ? item.imageUrl : undefined}
+                            >
+                              {
+                                !item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''
+                              }
+                            </Avatar>
+                            <span style={{ color: 'rgba(0,0,0,0.65)' }} label="sprintIssue">{item.assigneeName}</span>
+                          </div>
+                        </Tooltip>
                       ) : ''}
                     </div>
                     <div 
@@ -281,13 +294,15 @@ class SprintIssue extends Component {
                       className="c7n-backlog-sprintIssueRight"
                     >
                       {!_.isNull(item.statusName) ? (
-                        <span 
-                          label="sprintIssue" 
-                          className="c7n-backlog-sprintIssueStatus"
-                          style={{
-                            background: item.statusColor ? item.statusColor : '#4d90fe',
-                          }}
-                        >{item.statusName}</span>
+                        <Tooltip title={`状态: ${item.statusName}`}>
+                          <span 
+                            label="sprintIssue" 
+                            className="c7n-backlog-sprintIssueStatus"
+                            style={{
+                              background: item.statusColor ? item.statusColor : '#4d90fe',
+                            }}
+                          >{item.statusName}</span>
+                        </Tooltip>
                       ) : ''}
                     </div>
                     <div 
@@ -298,8 +313,10 @@ class SprintIssue extends Component {
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {!_.isNull(item.storyPoints) ? (
-                        <div label="sprintIssue" className="c7n-backlog-sprintIssueStoryPoint">{item.storyPoints}</div>
+                      {item.storyPoints ? (
+                        <Tooltip title={`故事点: ${item.storyPoints}`}>
+                          <div label="sprintIssue" className="c7n-backlog-sprintIssueStoryPoint">{item.storyPoints}</div>
+                        </Tooltip>
                       ) : ''}
                     </div>
                   </div>

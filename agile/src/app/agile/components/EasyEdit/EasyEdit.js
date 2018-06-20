@@ -7,6 +7,8 @@
  * onChange
  * style
  * disabled
+ * byHand
+ * editIf
  */
 
 import React, { Component } from 'react';
@@ -83,28 +85,34 @@ class EasyEdit extends Component {
         role="none"
         onClick={() => {
           if (!this.props.disabled) {
-            this.setState({
-              edit: true,
-            });
+            if (!this.props.byHand) {
+              this.setState({
+                edit: true,
+              });
+            }
           }
         }}
         onMouseEnter={() => {
           if (!this.props.disabled) {
-            this.setState({
-              hoverIf: true,
-            });
+            if (!this.props.byHand) {
+              this.setState({
+                hoverIf: true,
+              });
+            }
           }
         }}
         onMouseLeave={() => {
           if (!this.props.disabled) {
-            this.setState({
-              hoverIf: false,
-            });
+            if (!this.props.byHand) {
+              this.setState({
+                hoverIf: false,
+              });
+            }
           }
         }}
       >
         {
-          this.state.edit ? this.renderEdit() : (
+          this.state.edit || this.props.editIf ? this.renderEdit() : (
             <div>
               {this.props.children}
               <div

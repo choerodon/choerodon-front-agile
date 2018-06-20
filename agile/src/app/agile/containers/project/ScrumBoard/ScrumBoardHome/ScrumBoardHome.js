@@ -230,6 +230,18 @@ class ScrumBoardHome extends Component {
           });
         }
       });
+      _.forEach(newState, (item, index) => {
+        if (String(item.columnId) === 
+        String(JSON.parse(result.destination.droppableId).columnId)) {
+          _.forEach(newState[index].subStatuses, (item2, index2) => {
+            if (String(item2.id) === 
+            String(JSON.parse(result.destination.droppableId).code)) {
+              newState[index].subStatuses[index2].issues.splice(
+                result.destination.index, 0, draggableData);
+            }
+          });
+        }
+      });
       ScrumBoardStore.setBoardData(newState);
       let destinationStatus;
       ScrumBoardStore.updateIssue(
@@ -246,7 +258,7 @@ class ScrumBoardHome extends Component {
               String(JSON.parse(result.destination.droppableId).code)) {
                 destinationStatus = item2.categoryCode;
                 newState[index].subStatuses[index2].issues.splice(
-                  result.destination.index, 0, draggableData);
+                  result.destination.index, 1, draggableData);
               }
             });
           }
@@ -526,14 +538,6 @@ class ScrumBoardHome extends Component {
                 >仅故事</p>
               </div>
               <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
-                <Icon
-                  style={{
-                    // display: ScrumBoardStore.getCurrentSprint ? 'inline-block' : 'none', 
-                    color: 'rgba(0,0,0,0.54)',
-                  }}
-                  type="av_timer"
-                />
-                <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
                 <Button
                   funcTyp="flat"
                   onClick={() => {

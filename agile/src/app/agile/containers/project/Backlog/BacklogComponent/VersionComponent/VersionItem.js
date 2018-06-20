@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import moment from 'moment';
 import { stores } from 'choerodon-front-boot';
-import { Input, DatePicker, Icon } from 'choerodon-ui';
+import { Input, DatePicker, Icon, Dropdown, Menu } from 'choerodon-ui';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 
@@ -21,6 +21,21 @@ class VersionItem extends Component {
       hoverBlockEditName: false,
       hoverBlockEditDes: false,
     };
+  }
+  getmenu() {
+    return (
+      <Menu onClick={this.clickMenu.bind(this)}>
+        <Menu.Item key="0">编辑名称</Menu.Item>
+      </Menu>
+    );
+  }
+  clickMenu(e) {
+    e.domEvent.stopPropagation();
+    if (e.key === '0') {
+      this.setState({
+        editName: true,
+      });
+    }
   }
   handleClickName(e) {
     e.stopPropagation();
@@ -95,6 +110,7 @@ class VersionItem extends Component {
       window.console.log(error);
     });
   }
+
   render() {
     const item = this.props.data;
     const index = this.props.index;
@@ -149,9 +165,26 @@ class VersionItem extends Component {
             style={{
               flexGrow: 1,
             }}
+            byHand
+            editIf={this.state.editName}
           >
             <div className="c7n-backlog-versionItemTitleName">
               <p>{item.name}</p>
+              <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
+                <Icon
+                  style={{
+                    width: 12,
+                    height: 12,
+                    background: '#f5f5f5',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    border: '1px solid #ccc',
+                    borderRadius: 2,
+                  }}
+                  type="arrow_drop_down"
+                />
+              </Dropdown>
             </div>
           </EasyEdit>
         </div>
