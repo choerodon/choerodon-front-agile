@@ -48,6 +48,10 @@ class BacklogStore {
     return data;
   }
 
+  axiosDeleteSprint(id) {
+    return axios.delete(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/${id}`);
+  }
+
   axiosGetColorLookupValue() {
     return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/epic_color`);
   }

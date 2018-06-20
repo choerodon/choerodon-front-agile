@@ -22,6 +22,7 @@ class BacklogHome extends Component {
       spinIf: false,
       versionVisible: false,
       epicVisible: false,
+      scrollIf: false,
     };
   }
   componentWillMount() {
@@ -307,6 +308,7 @@ class BacklogHome extends Component {
       });
       this.refresh();
       message.success('创建成功');
+      document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_last').offsetTop - 100;
     }).catch((error) => {
       this.setState({
         loading: false,
@@ -352,8 +354,8 @@ class BacklogHome extends Component {
               <p
                 className="c7n-backlog-filter"
                 style={{
-                  background: BacklogStore.getOnlyMe ? 'rgba(140, 158, 255, 0.2)' : '',
-                  color: BacklogStore.getOnlyMe ? '#3f51b5' : '',
+                  background: BacklogStore.getOnlyMe ? '#303F9F' : '',
+                  color: BacklogStore.getOnlyMe ? 'white' : '#303F9F',
                 }}
                 role="none"
                 onClick={this.filterOnlyMe.bind(this)}
@@ -361,8 +363,8 @@ class BacklogHome extends Component {
               <p
                 className="c7n-backlog-filter"
                 style={{
-                  background: BacklogStore.getRecent ? 'rgba(140, 158, 255, 0.2)' : '',
-                  color: BacklogStore.getRecent ? '#3f51b5' : '',
+                  background: BacklogStore.getRecent ? '#303F9F' : '',
+                  color: BacklogStore.getRecent ? 'white' : '#303F9F',
                 }}
                 role="none"
                 onClick={this.filterOnlyStory.bind(this)}

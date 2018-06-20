@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
-import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table, Avatar } from 'choerodon-ui';
+import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table, Avatar, Dropdown, Menu } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
@@ -204,6 +204,25 @@ class SprintItem extends Component {
       }
     }
   }
+  handleDeleteSprint(e) {
+    if (e.key === '0') {
+      BacklogStore.axiosDeleteSprint(this.props.item.sprintId).then((res) => {
+        this.props.refresh();
+      }).catch((error) => {
+        window.console.log(error);
+      });
+    }
+  }
+
+  clearFilter() {
+    BacklogStore.setChosenEpic('all');
+    BacklogStore.setChosenVersion('all');
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
+      BacklogStore.setSprintData(res);
+    }).catch((error) => {
+      window.console.log(error);
+    });
+  }
   renderIssueOrIntro(issues, sprintId) {
     if (issues) {
       if (issues.length > 0) {
@@ -220,6 +239,10 @@ class SprintItem extends Component {
               <p>这是一个Sprint。将问题拖拽至此来计划一个Sprint。</p>
             </div>
           </div>
+        );
+      } else if (BacklogStore.getChosenEpic !== 'all' || BacklogStore.getChosenVersion !== 'all') {
+        return (
+          <div className="c7n-noissue-notzero">在sprint中所有问题已筛选</div>
         );
       } else {
         return (
@@ -257,7 +280,18 @@ class SprintItem extends Component {
     }
     return result;
   }
+
+
   renderStatusCodeDom(item) {
+    const menu = (
+      <Menu
+        onClick={this.handleDeleteSprint.bind(this)}
+      >
+        <Menu.Item key="0">
+          删除sprint
+        </Menu.Item>
+      </Menu>
+    );
     if (item.statusCode) {
       return (
         <div className="c7n-backlog-sprintTitleSide">
@@ -267,21 +301,31 @@ class SprintItem extends Component {
             <p className="c7n-backlog-sprintStatus2">未开始</p>
           )}
           {item.statusCode === 'started' ? (
-            <p
-              className="c7n-backlog-closeSprint"
-              role="none"
-              onClick={this.handleFinishSprint.bind(this)}
-            >完成冲刺</p>
+            <div style={{ display: 'flex' }}>
+              <p
+                className="c7n-backlog-closeSprint"
+                role="none"
+                onClick={this.handleFinishSprint.bind(this)}
+              >完成冲刺</p>
+              {/* <Dropdown overlay={menu} trigger={['click']}>
+                <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
+              </Dropdown> */}
+            </div>
           ) : (
-            <p
-              className="c7n-backlog-openSprint"
-              style={{
-                color: this.renderOpenColor('color'),
-                cursor: this.renderOpenColor('cursor'),
-              }}
-              role="none"
-              onClick={this.handleStartSprint.bind(this)}
-            >开启冲刺</p>
+            <div style={{ display: 'flex' }}>
+              <p
+                className="c7n-backlog-openSprint"
+                style={{
+                  color: this.renderOpenColor('color'),
+                  cursor: this.renderOpenColor('cursor'),
+                }}
+                role="none"
+                onClick={this.handleStartSprint.bind(this)}
+              >开启冲刺</p>
+              <Dropdown overlay={menu} trigger={['click']}>
+                <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
+              </Dropdown>
+            </div>
           )}
           <StartSprint
             visible={this.state.startSprintVisible}
@@ -311,8 +355,9 @@ class SprintItem extends Component {
 
   render() {
     const item = this.props.item;
+    const data = BacklogStore.getSprintData.sprintData;
     return (
-      <div>
+      <div id={this.props.index === data.length - 1 ? 'sprint_last' : undefined}>
         <div className="c7n-backlog-sprintTop">
           <div className="c7n-backlog-springTitle">
             <div className="c7n-backlog-sprintTitleSide">
@@ -347,6 +392,14 @@ class SprintItem extends Component {
                 {item.issueSearchDTOList && item.issueSearchDTOList.length > 0 ? `${item.issueSearchDTOList.length}个问题可见` : '0个问题可见'}
                 {/* {!_.isNull(item.issueCount) ? ` 共${item.issueCount}个问题` : ' 共0个问题'} */}
               </p>
+              <p 
+                className="c7n-backlog-clearFilter"
+                style={{
+                  display: BacklogStore.getChosenVersion !== 'all' || BacklogStore.getChosenEpic !== 'all' ? 'block' : 'none',
+                }}
+                role="none"
+                onClick={this.clearFilter.bind(this)}
+              >清空所有筛选器</p>
             </div>
             <div style={{ flexGrow: 1 }}>
               {this.renderStatusCodeDom(item)}
