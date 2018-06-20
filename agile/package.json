@@ -17,6 +17,7 @@
     "deep-diff": "^1.0.0",
     "diff2html": "^2.3.3",
     "echarts": "^4.1.0",
+    "echarts-for-react": "^2.0.12",
     "json-beautify": "^1.0.1",
     "markdown-react-js": "^1.0.0",
     "quill-delta-to-html": "^0.8.2",

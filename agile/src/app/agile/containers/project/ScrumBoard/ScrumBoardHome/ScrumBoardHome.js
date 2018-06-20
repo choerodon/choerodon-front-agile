@@ -509,8 +509,8 @@ class ScrumBoardHome extends Component {
                 <p
                   className="c7n-scrumTools-filter"
                   style={{
-                    background: this.state.onlyMe ? 'rgba(140, 158, 255, 0.2)' : '',
-                    color: this.state.onlyMe ? '#3f51b5' : '',
+                    background: this.state.onlyMe ? '#303F9F' : '',
+                    color: this.state.onlyMe ? 'white' : '#303F9F',
                   }}
                   role="none"
                   onClick={this.filterOnlyMe.bind(this)}
@@ -518,8 +518,8 @@ class ScrumBoardHome extends Component {
                 <p
                   className="c7n-scrumTools-filter"
                   style={{
-                    background: this.state.recent ? 'rgba(140, 158, 255, 0.2)' : '',
-                    color: this.state.recent ? '#3f51b5' : '',
+                    background: this.state.recent ? '#303F9F' : '',
+                    color: this.state.recent ? 'white' : '#303F9F',
                   }}
                   role="none"
                   onClick={this.filterOnlyStory.bind(this)}
