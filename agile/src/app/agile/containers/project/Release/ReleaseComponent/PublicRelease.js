@@ -71,17 +71,17 @@ class PublicRelease extends Component {
             JSON.stringify(ReleaseStore.getPublicVersionDetail) !== '{}' ? (
               <div>
                 {
-                  ReleaseStore.getPublicVersionDetail.issueCount ? (
+                  ReleaseStore.getPublicVersionDetail.fixIssueCount ? (
                     <p style={{ display: 'flex', alignItems: 'center' }}>
                       <div className="c7n-release-icon">!</div>
-                    还有{ReleaseStore.getPublicVersionDetail.issueCount}个
+                    还有{ReleaseStore.getPublicVersionDetail.fixIssueCount}个
                       <span style={{ color: '#3F51B5' }}>这个版本仍然没有解决的问题。</span>
                     </p>
                   ) : ''
                 }
                 <Form style={{ width: 512, marginTop: 24 }}>
                   {
-                    ReleaseStore.getPublicVersionDetail.issueCount ? (
+                    ReleaseStore.getPublicVersionDetail.fixIssueCount ? (
                       <div>
                         <FormItem>
                           {getFieldDecorator('chose', {

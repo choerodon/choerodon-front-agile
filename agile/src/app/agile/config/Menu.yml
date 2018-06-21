@@ -44,3 +44,9 @@
         sort: 7
         permission:
           - 'agile-service.issue.queryIssue'
+    - "setting":
+        icon: settings
+        Routes: /agile/setting
+        sort: 8
+        permission:
+          - 'agile-service.issue.queryIssue'

@@ -12,6 +12,7 @@ import EditRelease from '../ReleaseComponent/EditRelease';
 import PublicRelease from '../ReleaseComponent/PublicRelease';
 import emptyVersion from '../../../../assets/image/emptyVersion.png';
 import DeleteReleaseWithIssues from '../ReleaseComponent/DeleteReleaseWithIssues';
+import CombineRelease from '../ReleaseComponent/CombineRelease';
 
 const confirm = Modal.confirm;
 const RadioGroup = Radio.Group;
@@ -37,6 +38,7 @@ class ReleaseHome extends Component {
       publicVersion: false,
       radioChose: null,
       selectChose: null,
+      combineVisible: false,
     };
   }
   componentWillMount() {
@@ -84,7 +86,7 @@ class ReleaseHome extends Component {
       window.console.log(ReleaseStore.getVersionList);
       if (ReleaseStore.getVersionList.length > 1) {
         ReleaseStore.axiosVersionIssueStatistics(record.versionId).then((res) => {
-          if (res.issueCount > 0) {
+          if (res.fixIssueCount > 0 || res.influenceIssueCount > 0) {
             this.setState({
               versionDelInfo: {
                 versionName: record.name,
@@ -197,6 +199,17 @@ class ReleaseHome extends Component {
           >
             <Icon type="playlist_add" />创建发布版本
           </Button>
+          <Button 
+            className="leftBtn2" 
+            funcTyp="flat"
+            onClick={() => {
+              this.setState({
+                combineVisible: true,
+              });
+            }}
+          >
+            <Icon type="device_hub" />版本合并
+          </Button>
           <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this, this.state.pagination)}>
             <Icon type="refresh" />刷新
           </Button>
@@ -273,15 +286,19 @@ class ReleaseHome extends Component {
               {`确定要删除 V${this.state.versionDelete.name}?`}
             </div>
           </Modal>
+          <CombineRelease
+            visible={this.state.combineVisible}
+            onCancel={() => {
+              this.setState({
+                combineVisible: false,
+              });
+            }}
+          />
           <DeleteReleaseWithIssues
             versionDelInfo={this.state.versionDelInfo}
-            radioChose={this.state.radioChose}
-            selectChose={this.state.selectChose}
             onCancel={() => {
               this.setState({
                 versionDelInfo: {},
-                radioChose: null,
-                selectChose: null,
                 versionDelete: {},
               });
             }}
