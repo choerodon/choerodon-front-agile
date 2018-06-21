@@ -279,7 +279,9 @@
     padding-right: 20px;
     padding-bottom: 5px;
     flex: 1;
-    overflow-y: auto;
+    overflow-y: hidden;
+    box-sizing: border-box;
+    width: 100%;
   }
 
   .select-noBorder {
@@ -388,6 +390,16 @@
     margin-right: 5px;
     text-align: center;
     line-height: 18px;
+  }
+
+  .c7n-des-edit {
+    opacity: 0;
+  }
+
+  #des:hover {
+    .c7n-des-edit {
+      opacity: 1;
+    }
   }
 
   .ant-progress-inner {

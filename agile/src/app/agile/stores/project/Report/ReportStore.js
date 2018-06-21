@@ -23,40 +23,10 @@ class ReportStore {
   @observable activeKey = 'done';
 
   @observable doneIssues = [];
-  @observable doneLoading = false;
-  @observable donePagination = {};
-  @observable doneFilter = {
-    advancedSearchArgs: {},
-    searchArgs: {},
-  };
-  @observable doneOrder = {
-    order: '',
-    columnKey: '',
-  };
 
   @observable todoIssues = [];
-  @observable todoLoading = false;
-  @observable todoPagination = {};
-  @observable todoFilter = {
-    advancedSearchArgs: {},
-    searchArgs: {},
-  };
-  @observable todoOrder = {
-    order: '',
-    columnKey: '',
-  };
 
   @observable removeIssues = [];
-  @observable removeLoading = false;
-  @observable removePagination = {};
-  @observable removeFilter = {
-    advancedSearchArgs: {},
-    searchArgs: {},
-  };
-  @observable removeOrder = {
-    order: '',
-    columnKey: '',
-  };
 
   init() {
     this.setOrder({
@@ -70,9 +40,8 @@ class ReportStore {
     this.loadIssues();
   }
 
-  loadDoneIssues(page = 0, size = 10) {
+  loadDoneIssues() {
     this.setLoading(true);
-    const { orderField, orderType } = this.doneOrder;
     // loadIssues(page, size, this.filter, orderField, orderType)
     //   .then((res) => {
     this.setDoneIssues([
@@ -88,19 +57,13 @@ class ReportStore {
         statusName: '已完成',
       },
     ]);
-    this.setDonePagination({
-      current: 0,
-      pageSize: 10,
-      total: 1,
-    });
     this.setLoading(false);
     this.setDone(false);
     // });
   }
 
-  loadTodoIssues(page = 0, size = 10) {
+  loadTodoIssues() {
     this.setLoading(true);
-    const { orderField, orderType } = this.todoOrder;
     // loadIssues(page, size, this.filter, orderField, orderType)
     //   .then((res) => {
     this.setTodoIssues([
@@ -138,19 +101,13 @@ class ReportStore {
         statusName: '未开始',
       },
     ]);
-    this.setTodoPagination({
-      current: 0,
-      pageSize: 10,
-      total: 3,
-    });
     this.setLoading(false);
     this.setTodo(false);
     // });
   }
 
-  loadRemoveIssues(page = 0, size = 10) {
+  loadRemoveIssues() {
     this.setLoading(true);
-    const { orderField, orderType } = this.removeOrder;
     // loadIssues(page, size, this.filter, orderField, orderType)
     //   .then((res) => {
     this.setRemoveIssues([
@@ -177,22 +134,9 @@ class ReportStore {
         statusName: '已完成',
       },
     ]);
-    this.setRemovePagination({
-      current: 0,
-      pageSize: 10,
-      total: 2,
-    });
     this.setLoading(false);
     this.setTodo(false);
     // });
-  }
-
-  createIssue(issueObj, projectId = AppState.currentMenuType.id) {
-    const issue = {
-      projectId: AppState.currentMenuType.id,
-      ...issueObj,
-    };
-    return axios.post(`/agile/v1/project/${projectId}/issue`, issue);
   }
 
   @action setSprints(data) {

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, DatePicker, Tabs, Table, Popover, Modal, Radio, Form, Select, Icon, Tooltip } from 'choerodon-ui';
-import moment from 'moment';
+import { Button, Tabs, Table, Select, Icon, Tooltip } from 'choerodon-ui';
 import ReportStore from '../../../../stores/project/Report';
 import './ReleaseDetail.scss';
 import EchartsTheme from './EchartsTheme';
@@ -13,9 +12,6 @@ import TypeTag from '../../../../components/TypeTag';
 const echarts = require('echarts');
 
 const TabPane = Tabs.TabPane;
-const { Sidebar } = Modal;
-const RadioGroup = Radio.Group;
-const FormItem = Form.Item;
 const Option = Select.Option;
 const { AppState } = stores;
 
@@ -24,8 +20,6 @@ class ReleaseDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedIssue: {},
-      publicVersion: false,
     };
   }
   componentDidMount() {
@@ -44,65 +38,6 @@ class ReleaseDetail extends Component {
       // load key
       ReportStore[ARRAY[key]]();
     }
-  }
-
-  handleDoneIssueChange(pagination, filters, sorter, param) {
-    const obj = {
-      advancedSearchArgs: {},
-      searchArgs: {},
-    };
-    const { statusCode, priorityCode, typeCode } = filters;
-    const { issueNum, summary } = filters;
-    obj.advancedSearchArgs.statusCode = statusCode || [];
-    obj.advancedSearchArgs.priorityCode = priorityCode || [];
-    obj.advancedSearchArgs.typeCode = typeCode || [];
-    obj.searchArgs.issueNum = issueNum || [];
-    obj.searchArgs.summary = summary || [];
-    ReportStore.setDoneFilter(obj);
-    ReportStore.setDoneOrder({
-      order: sorter.order,
-      columnKey: sorter.columnKey,
-    });
-    // const { current, pageSize } = IssueStore.pagination;
-    // IssueStore.loadIssues(current - 1, pageSize);
-  }
-
-  handleTodoIssueChange(pagination, filters, sorter, param) {
-    const obj = {
-      advancedSearchArgs: {},
-      searchArgs: {},
-    };
-    const { statusCode, priorityCode, typeCode } = filters;
-    const { issueNum, summary } = filters;
-    obj.advancedSearchArgs.statusCode = statusCode || [];
-    obj.advancedSearchArgs.priorityCode = priorityCode || [];
-    obj.advancedSearchArgs.typeCode = typeCode || [];
-    obj.searchArgs.issueNum = issueNum || [];
-    obj.searchArgs.summary = summary || [];
-    ReportStore.setTodoFilter(obj);
-    ReportStore.setTodoOrder({
-      order: sorter.order,
-      columnKey: sorter.columnKey,
-    });
-  }
-
-  handleRemoveIssueChange(pagination, filters, sorter, param) {
-    const obj = {
-      advancedSearchArgs: {},
-      searchArgs: {},
-    };
-    const { statusCode, priorityCode, typeCode } = filters;
-    const { issueNum, summary } = filters;
-    obj.advancedSearchArgs.statusCode = statusCode || [];
-    obj.advancedSearchArgs.priorityCode = priorityCode || [];
-    obj.advancedSearchArgs.typeCode = typeCode || [];
-    obj.searchArgs.issueNum = issueNum || [];
-    obj.searchArgs.summary = summary || [];
-    ReportStore.setRemoveFilter(obj);
-    ReportStore.setRemoveOrder({
-      order: sorter.order,
-      columnKey: sorter.columnKey,
-    });
   }
 
   renderBurnDown() {
@@ -202,10 +137,10 @@ class ReleaseDetail extends Component {
           rowKey={record => record.id}
           dataSource={ReportStore.doneIssues}
           columns={column}
-          pagination={ReportStore.donePagination}
+          filterBar={false}
+          pagination={false}
           scroll={{ x: true }}
-          loading={ReportStore.loading || false}
-          onChange={this.handleDoneIssueChange}
+          loading={ReportStore.loading}
         />
       </div>
     );
@@ -218,10 +153,10 @@ class ReleaseDetail extends Component {
           rowKey={record => record.id}
           dataSource={ReportStore.todoIssues}
           columns={column}
-          pagination={ReportStore.todoPagination}
+          filterBar={false}
+          pagination={false}
           scroll={{ x: true }}
-          loading={ReportStore.loading || false}
-          onChange={this.handleTodoIssueChange}
+          loading={ReportStore.loading}
         />
       </div>
     );
@@ -234,10 +169,10 @@ class ReleaseDetail extends Component {
           rowKey={record => record.id}
           dataSource={ReportStore.removeIssues}
           columns={column}
-          pagination={ReportStore.removePagination}
+          filterBar={false}
+          pagination={false}
           scroll={{ x: true }}
-          loading={ReportStore.loading || false}
-          onChange={this.handleRemoveIssueChange}
+          loading={ReportStore.loading}
         />
       </div>
     );
@@ -249,10 +184,6 @@ class ReleaseDetail extends Component {
         width: '15%',
         title: '关键字',
         dataIndex: 'issueNum',
-        filters: [],
-        filteredValue: ReportStore[`${ReportStore.activeKey}Filter`].searchArgs.issueNum || null,
-        sorter: true,
-        sortOrder: ReportStore[`${ReportStore.activeKey}Order`].columnKey === 'issueNum' && ReportStore[`${ReportStore.activeKey}Order`].order,
         render: (issueNum, record) => (
           <span style={{ color: '#3f51b5' }}>{issueNum}</span>
         ),
@@ -260,35 +191,10 @@ class ReleaseDetail extends Component {
         width: '30%',
         title: '概要',
         dataIndex: 'summary',
-        filters: [],
-        filteredValue: ReportStore[`${ReportStore.activeKey}Filter`].searchArgs.summary || null,
-        sorter: true,
-        sortOrder: ReportStore[`${ReportStore.activeKey}Order`].columnKey === 'summary' && ReportStore[`${ReportStore.activeKey}Order`].order,
       }, {
         width: '15%',
         title: '问题类型',
         dataIndex: 'typeCode',
-        sorter: true,
-        filters: [
-          {
-            text: '故事',
-            value: 'story',
-          },
-          {
-            text: '任务',
-            value: 'task',
-          },
-          {
-            text: '故障',
-            value: 'bug',
-          },
-          {
-            text: '史诗',
-            value: 'issue_epic',
-          },
-        ],
-        filterMultiple: true,
-        filteredValue: ReportStore[`${ReportStore.activeKey}Filter`].advancedSearchArgs.typeCode || null,
         render: (typeCode, record) => (
           <div>
             <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.typeCode}`}>
@@ -307,24 +213,6 @@ class ReleaseDetail extends Component {
         width: '15%',
         title: '优先级',
         dataIndex: 'priorityCode',
-        filters: [
-          {
-            text: '高',
-            value: 'high',
-          },
-          {
-            text: '中',
-            value: 'medium',
-          },
-          {
-            text: '低',
-            value: 'low',
-          },
-        ],
-        filterMultiple: true,
-        filteredValue: ReportStore[`${ReportStore.activeKey}Filter`].advancedSearchArgs.priorityCode || null,
-        sorter: true,
-        sortOrder: ReportStore[`${ReportStore.activeKey}Order`].columnKey === 'priorityCode' && ReportStore[`${ReportStore.activeKey}Order`].order,
         render: (priorityCode, record) => (
           <div>
             <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityName}`}>
@@ -343,24 +231,6 @@ class ReleaseDetail extends Component {
         width: '15%',
         title: '状态',
         dataIndex: 'statusCode',
-        filters: [
-          {
-            text: '待处理',
-            value: 'todo',
-          },
-          {
-            text: '进行中',
-            value: 'doing',
-          },
-          {
-            text: '已完成',
-            value: 'done',
-          },
-        ],
-        filterMultiple: true,
-        filteredValue: ReportStore[`${ReportStore.activeKey}Filter`].advancedSearchArgs.statusCode || null,
-        sorter: true,
-        sortOrder: ReportStore[`${ReportStore.activeKey}Order`].columnKey === 'statusCode' && ReportStore[`${ReportStore.activeKey}Order`].order,
         render: (statusCode, record) => (
           <div>
             <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusName}`}>
@@ -380,8 +250,6 @@ class ReleaseDetail extends Component {
         width: '10%',
         title: '故事点',
         dataIndex: 'storyPoints',
-        sorter: true,
-        sortOrder: ReportStore[`${ReportStore.activeKey}Order`].columnKey === 'storyPoints' && ReportStore[`${ReportStore.activeKey}Order`].order,
       },
     ];
     return (
@@ -438,5 +306,5 @@ class ReleaseDetail extends Component {
   }
 }
 
-export default Form.create()(ReleaseDetail);
+export default ReleaseDetail;
 
