@@ -8,7 +8,7 @@ import './EditIssueNarrow.scss';
 import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
 import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate } from '../../common/utils';
-import { loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints } from '../../api/NewIssueApi';
+import { loadStatus, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints } from '../../api/NewIssueApi';
 import { getCurrentOrg, getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
@@ -89,6 +89,7 @@ class CreateSprint extends Component {
       fixVersions: [],
       influenceVersions: [],
 
+      originStatus: [],
       originpriorities: [],
       originComponents: [],
       originVersions: [],
@@ -338,6 +339,10 @@ class CreateSprint extends Component {
 
   resetPriorityCode(value) {
     this.setState({ priorityCode: value });
+  }
+
+  resetStatusId(value) {
+    this.setState({ statusId: value });
   }
 
   resetEpicId(value) {
@@ -694,9 +699,7 @@ class CreateSprint extends Component {
       <div>
         {
           [1, 2].map(worklog => (
-            <DataLog
-              // worklog={worklog}
-            />
+            <DataLog />
           ))
         }
       </div>
@@ -1126,25 +1129,73 @@ class CreateSprint extends Component {
                         状态
                       </div>
                       <div>
-                        {
-                          this.state.statusId ? (
-                            <div
-                              style={{
-                                // background: this.state.origin.statusColor || STATUS[this.state.statusCode],
-                                // color: '#fff',
-                                color: this.state.origin.statusColor || STATUS[this.state.statusCode],
-                                // borderRadius: '2px',
-                                // padding: '0 8px',
-                                // display: 'inline-block',
-                                // margin: '2px auto 2px 0',
-                                fontSize: '16px',
-                                lineHeight: '18px',
-                              }}
-                            >
-                              { this.state.statusName }
-                            </div>
-                          ) : '无'
-                        }
+                        <ReadAndEdit
+                          callback={this.changeRae.bind(this)}
+                          thisType="statusId"
+                          current={this.state.currentRae}
+                          origin={this.state.statusId}
+                          onOk={this.updateIssue.bind(this, 'statusId')}
+                          onCancel={this.resetStatusId.bind(this)}
+                          onInit={() => {
+                            this.setAnIssueToState();
+                            loadStatus().then((res) => {
+                              this.setState({
+                                originStatus: res,
+                              });
+                            });
+                          }}
+                          readModeContent={<div>
+                            {
+                              this.state.statusId ? (
+                                <div
+                                  style={{
+                                    background: this.state.origin.statusColor || STATUS[this.state.statusCode],
+                                    color: '#fff',
+                                    borderRadius: '2px',
+                                    padding: '0 8px',
+                                    display: 'inline-block',
+                                    margin: '2px auto 2px 0',
+                                  }}
+                                >
+                                  { this.state.statusName }
+                                </div>
+                              ) : '无'
+                            }
+                          </div>}
+                        >
+                          <Select
+                            value={this.state.statusId}
+                            style={{ width: '150px' }}
+                            loading={this.state.selectLoading}
+                            autoFocus
+                            getPopupContainer={triggerNode => triggerNode.parentNode}
+                            onFocus={() => {
+                              this.setState({
+                                selectLoading: true,
+                              });
+                              loadStatus().then((res) => {
+                                this.setState({
+                                  originStatus: res,
+                                  selectLoading: false,
+                                });
+                              });
+                            }}
+                            onChange={(value) => {
+                              this.setState({
+                                statusId: value,
+                              });
+                            }}
+                          >
+                            {
+                              this.state.originStatus.map(status => (
+                                <Option key={status.id} value={status.id}>
+                                  { status.name }
+                                </Option>
+                              ),
+                              )
+                            }
+                          </Select>
+                        </ReadAndEdit>
                       </div>
                     </div>
                   </div>
