@@ -48,6 +48,7 @@ export function loadEpics() {
   );
 }
 
+// change621
 export function loadSprints() {
   const projectId = AppState.currentMenuType.id;
   return axios.get(
@@ -127,4 +128,14 @@ export function loadIssues(page = 0, size = 10, searchDTO, orderField, orderType
       sort: `${orderField && orderType ? `${orderField},${orderType}` : ''}`,
     },
   });
+}
+
+export function createLink(issueId, issueLinkCreateDTOList) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.post(`/agile/v1/project/${projectId}/issue_links/${issueId}`, issueLinkCreateDTOList);
+}
+
+export function loadLinkIssues(issueId) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/project/${projectId}/issue_links/${issueId}`);
 }

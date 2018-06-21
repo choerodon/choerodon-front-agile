@@ -8,15 +8,17 @@ import './EditIssueNarrow.scss';
 import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
 import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate } from '../../common/utils';
-import { loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints } from '../../api/NewIssueApi';
+import { loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints } from '../../api/NewIssueApi';
 import { getCurrentOrg, getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import DailyLog from '../DailyLog';
 import CreateSubTask from '../CreateSubTask';
+import CreateLinkTask from '../CreateLinkTask';
 import UserHead from '../UserHead';
 import Comment from './Component/Comment';
 import Log from './Component/Log';
+import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
 
 const { AppState } = stores;
@@ -38,6 +40,7 @@ class CreateSprint extends Component {
       dailyLogShow: false,
       createLoading: false,
       createSubTaskShow: false,
+      createLinkTaskShow: false,
       editDesShow: false,
       origin: {},
       loading: true,
@@ -82,6 +85,7 @@ class CreateSprint extends Component {
       issueLinkDTOList: [],
       labelIssueRelDTOList: [],
       subIssueDTOList: [],
+      linkIssues: [],
       fixVersions: [],
       influenceVersions: [],
 
@@ -127,6 +131,11 @@ class CreateSprint extends Component {
     loadWorklogs(issueId).then((res) => {
       this.setState({
         worklogs: res,
+      });
+    });
+    loadLinkIssues(issueId).then((res) => {
+      this.setState({
+        linkIssues: res,
       });
     });
   }
@@ -555,6 +564,17 @@ class CreateSprint extends Component {
     }
   }
 
+  handleCreateLinkIssue() {
+    this.reloadIssue();
+    this.setState({
+      createSubTaskShow: false,
+    });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
+  }
+
+
   handleClickMenu(e) {
     if (e.key === '0') {
       this.setState({ dailyLogShow: true });
@@ -670,6 +690,23 @@ class CreateSprint extends Component {
   }
 
   /**
+   * DataLog
+   */
+  renderDataLogs() {
+    return (
+      <div>
+        {
+          [1, 2].map(worklog => (
+            <DataLog
+              // worklog={worklog}
+            />
+          ))
+        }
+      </div>
+    );
+  }
+
+  /**
    * SubIssue
    */
   renderSubIssues() {
@@ -677,6 +714,24 @@ class CreateSprint extends Component {
       <div className="c7n-tasks">
         {
           this.state.subIssueDTOList.map((subIssue, i) => this.renderIssueList(subIssue, i))
+        }
+      </div>
+    );
+  }
+
+  renderLinkIssues() {
+    const group = _.groupBy(this.state.linkIssues, 'ward');
+    return (
+      <div className="c7n-tasks">
+        {
+          _.map(group, (v, k) => (
+            <div>
+              <div style={{ margin: '7px auto' }}>{k}</div>
+              {
+                _.map(v, (linkIssue, i) => this.renderIssueList(linkIssue, i))
+              }
+            </div>
+          ))
         }
       </div>
     );
@@ -2060,6 +2115,17 @@ class CreateSprint extends Component {
                   </div>
                   {this.renderLogs()}
                 </div>
+
+                <div id="data_log">
+                  <div className="c7n-title-wrapper">
+                    <div className="c7n-title-left">
+                      <Icon type="content_paste c7n-icon-title" />
+                      <span>活动日志</span>
+                    </div>
+                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                  </div>
+                  {this.renderDataLogs()}
+                </div>
                 
                 {
                   this.state.origin.typeCode !== 'sub_task' && (
@@ -2078,6 +2144,27 @@ class CreateSprint extends Component {
                         </div>
                       </div>
                       {this.renderSubIssues()}
+                    </div>
+                  )
+                }
+
+                {
+                  this.state.origin.typeCode !== 'sub_task' && (
+                    <div id="link_task">
+                      <div className="c7n-title-wrapper">
+                        <div className="c7n-title-left">
+                          <Icon type="filter_none c7n-icon-title" />
+                          <span>问题链接</span>
+                        </div>
+                        <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                        <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                          <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
+                            <Icon type="playlist_add icon" />
+                            <span>创建链接</span>
+                          </Button>
+                        </div>
+                      </div>
+                      {this.renderLinkIssues()}
                     </div>
                   )
                 }
@@ -2123,6 +2210,16 @@ class CreateSprint extends Component {
               visible={this.state.createSubTaskShow}
               onCancel={() => this.setState({ createSubTaskShow: false })}
               onOk={this.handleCreateSubIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.createLinkTaskShow ? (
+            <CreateLinkTask
+              issueId={this.state.origin.issueId}
+              visible={this.state.createLinkTaskShow}
+              onCancel={() => this.setState({ createLinkTaskShow: false })}
+              onOk={this.handleCreateLinkIssue.bind(this)}
             />
           ) : null
         }

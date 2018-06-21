@@ -38,3 +38,9 @@
         sort: 6
         permission:
           - 'agile-service.issue.queryIssue'
+    - "report":
+        icon: application_model
+        Routes: /agile/report
+        sort: 7
+        permission:
+          - 'agile-service.issue.queryIssue'
