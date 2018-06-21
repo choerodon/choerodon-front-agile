@@ -55,6 +55,8 @@ class SwimLanePage extends Component {
           onChange={(value) => {
             this.setState({
               selectValue: value,
+            }, () => {
+              this.handleSave(defaultSelect);
             });
           }}
         >
@@ -62,14 +64,14 @@ class SwimLanePage extends Component {
           <Option value="assignee">经办人</Option>
           <Option value="swimlane_none">无</Option>
         </Select>
-        <div style={{ marginTop: 12 }}>
+        {/* <div style={{ marginTop: 12 }}>
           <Button
             type="primary" 
             funcType="raised"
             onClick={this.handleSave.bind(this, defaultSelect)}
           >保存</Button>
           <Button style={{ marginLeft: 12 }} funcType="raised">取消</Button>
-        </div>
+        </div> */}
       </Content>
     );
   }

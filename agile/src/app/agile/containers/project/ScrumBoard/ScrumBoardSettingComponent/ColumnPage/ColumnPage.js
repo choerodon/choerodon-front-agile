@@ -101,6 +101,11 @@ class ColumnPage extends Component {
             }
           }
         }
+        _.forEach(newState, (item, index) => {
+          if (String(item.columnId) === String(result.destination.droppableId.split(',')[1])) {
+            newState[index].subStatuses.splice(result.destination.index, 0, draggableData);
+          }
+        });
         ScrumBoardStore.setBoardData(newState);
         ScrumBoardStore.moveStatusToUnset(code, {
           columnId,
@@ -109,7 +114,7 @@ class ColumnPage extends Component {
           newData.issues = draggableData.issues;
           _.forEach(newState, (item, index) => {
             if (String(item.columnId) === String(result.destination.droppableId.split(',')[1])) {
-              newState[index].subStatuses.splice(result.destination.index, 0, newData);
+              newState[index].subStatuses.splice(result.destination.index, 1, newData);
             }
           });
           ScrumBoardStore.setBoardData(newState);
@@ -173,6 +178,11 @@ class ColumnPage extends Component {
             return;
           }
         }
+        _.forEach(newState, (item, index) => {
+          if (String(item.columnId) === String(result.destination.droppableId.split(',')[1])) {
+            newState[index].subStatuses.splice(result.destination.index, 0, draggableData);
+          }
+        });
         ScrumBoardStore.setBoardData(newState);
         ScrumBoardStore.moveStatusToColumn(code, {
           // categorycode,
@@ -185,7 +195,7 @@ class ColumnPage extends Component {
           newData.issues = draggableData.issues;
           _.forEach(newState, (item, index) => {
             if (String(item.columnId) === String(result.destination.droppableId.split(',')[1])) {
-              newState[index].subStatuses.splice(result.destination.index, 0, newData);
+              newState[index].subStatuses.splice(result.destination.index, 1, newData);
             }
           });
           ScrumBoardStore.setBoardData(newState);

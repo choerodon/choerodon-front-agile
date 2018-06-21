@@ -86,6 +86,9 @@ class ReleaseStore {
   axiosDeleteVersion(data) {
     return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/product_version/version`, data);
   }
+  axiosGetVersionListWithoutPage() {
+    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/product_version/names`, []);
+  }
 }
 
 const releaseStore = new ReleaseStore();

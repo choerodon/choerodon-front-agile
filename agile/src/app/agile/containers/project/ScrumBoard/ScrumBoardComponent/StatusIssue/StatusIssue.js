@@ -47,7 +47,9 @@ class StatusIssue extends Component {
         return '#00BFA5';
       } else {
         return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="class" />
+          <Tooltip title="类型： 故事">
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="class" />
+          </Tooltip>
         );
       }
     } else if (typeCode === 'bug') {
@@ -55,7 +57,9 @@ class StatusIssue extends Component {
         return '#F44336';
       } else {
         return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
+          <Tooltip title="类型： 缺陷"> 
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
+          </Tooltip>
         );
       }
     } else if (typeCode === 'task') {
@@ -63,14 +67,18 @@ class StatusIssue extends Component {
         return '#4D90FE';
       } else {
         return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
+          <Tooltip title="类型： 任务">
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
+          </Tooltip>
         );
       }
     } else if (type === 'background') {
       return '#4D90FE';
     } else {
       return (
-        <Icon style={{ color: 'white', fontSize: '14px' }} type="sutask" />
+        <Tooltip title="类型： 子任务">
+          <Icon style={{ color: 'white', fontSize: '14px' }} type="sutask" />
+        </Tooltip>
       );
     }
   }
@@ -170,30 +178,34 @@ class StatusIssue extends Component {
                           margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
                         }}
                       >
-                        <span
-                          style={{ 
-                            borderRadius: 2, 
-                            padding: '2px 8px', 
-                            background: this.renderStatusBackground(),
-                            // background: '#4D90FE', 
-                            color: 'white',
-                            maxWidth: 56,
-                          }}
-                          className="textDisplayOneColumn"
-                        >
-                          {this.props.statusName}
-                        </span>
+                        <Tooltip title={`状态: ${this.props.statusName}`}>
+                          <span
+                            style={{ 
+                              borderRadius: 2, 
+                              padding: '2px 8px', 
+                              background: this.renderStatusBackground(),
+                              // background: '#4D90FE', 
+                              color: 'white',
+                              maxWidth: 56,
+                            }}
+                            className="textDisplayOneColumn"
+                          >
+                            {this.props.statusName}
+                          </span>
+                        </Tooltip>
                       </p>
                     </div>
                     <div className="c7n-scrumboard-issueBottom">
-                      <p
-                        style={{ 
-                          flexBasis: '20px',
-                          background: this.renderPriorityStyle('background', item),
-                          color: this.renderPriorityStyle('color', item),
-                          textAlign: 'center',
-                        }}
-                      >{item.priorityName}</p>
+                      <Tooltip title={`优先级: ${item.priorityName}`}>
+                        <p
+                          style={{ 
+                            flexBasis: '20px',
+                            background: this.renderPriorityStyle('background', item),
+                            color: this.renderPriorityStyle('color', item),
+                            textAlign: 'center',
+                          }}
+                        >{item.priorityName}</p>
+                      </Tooltip>
                       <Tooltip title={item.summary} placement="topLeft">
                         <p
                           className="textDisplayOneColumn" 
