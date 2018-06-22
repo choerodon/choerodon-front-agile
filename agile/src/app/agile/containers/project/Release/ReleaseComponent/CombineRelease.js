@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Modal, Form, Select } from 'choerodon-ui';
+import { Modal, Form, Select, message } from 'choerodon-ui';
 import { stores, Content } from 'choerodon-front-boot';
+import _ from 'lodash';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 
 const { AppState } = stores;
@@ -27,6 +28,42 @@ class CombineRelease extends Component {
       window.console.log(error);
     });
   }
+  handleCombine(e) {
+    e.preventDefault();
+    this.props.form.validateFieldsAndScroll((err, value) => {
+      if (!err) {
+        window.console.log(value);
+        if (value.source.length === 1) {
+          if (value.source[0] === value.destination) {
+            message.error('合并版本不能一样');
+            return;
+          }
+        }
+        const data = {
+          sourceVersionIds: _.clone(value.source).map(Number),
+          targetVersionId: parseInt(_.clone(value.destination), 10),
+        };
+        if (data.sourceVersionIds.indexOf(data.targetVersionId) !== -1) {
+          data.sourceVersionIds.splice(data.sourceVersionIds.indexOf(data.targetVersionId), 1);
+        }
+        ReleaseStore.axiosMergeVersion(data).then((res) => {
+          window.console.log(res);
+          this.props.onCancel();
+          this.props.refresh();
+        }).catch((error) => {
+          window.console.log(error);
+        });
+      }
+    });
+  }
+  judgeSelectDisabled(item) {
+    if (this.props.form.getFieldValue('source')) {
+      if (this.props.form.getFieldValue('source').length === 1 && this.props.form.getFieldValue('source')[0] === item.versionId) {
+        return true;
+      }
+    }
+    return false;
+  }
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -36,6 +73,7 @@ class CombineRelease extends Component {
         cancelText="取消"
         visible={this.props.visible}
         onCancel={this.props.onCancel.bind(this)}
+        onOk={this.handleCombine.bind(this)}
       >
         <Content
           style={{
@@ -75,7 +113,9 @@ class CombineRelease extends Component {
                   label="合并至版本"
                 >
                   {this.state.sourceList.length > 0 ? this.state.sourceList.map(item => (
-                    <Option value={String(item.versionId)}>{item.name}</Option>
+                    <Option
+                      value={String(item.versionId)}
+                    >{item.name}</Option>
                   )) : ''}
                 </Select>,
               )}

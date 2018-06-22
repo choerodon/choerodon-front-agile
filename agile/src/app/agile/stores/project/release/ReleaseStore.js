@@ -11,6 +11,18 @@ class ReleaseStore {
   @observable versionStatusIssues = [];
   @observable publicVersionDetail = {};
 
+  axiosFileVersion(id) {
+    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/product_version/${id}/archived`);
+  }
+
+  axiosUnFileVersion(id) {
+    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/product_version/${id}/revoke_archived`);
+  }
+
+  axiosMergeVersion(data) {
+    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/product_version/merge`, data);
+  }
+
   axiosPublicRelease(data) {
     return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/product_version/release`, data);
   }

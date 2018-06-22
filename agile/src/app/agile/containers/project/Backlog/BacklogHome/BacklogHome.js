@@ -343,7 +343,7 @@ class BacklogHome extends Component {
           <Button loading={this.state.loading} className="leftBtn" funcTyp="flat" onClick={this.handleCreateSprint.bind(this)}>
             <Icon type="playlist_add" />创建冲刺
           </Button>
-          <Button loading={this.state.spinIf} className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this)}>
+          <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this)}>
             <Icon type="refresh" />刷新
           </Button>
         </Header>
@@ -448,6 +448,7 @@ class BacklogHome extends Component {
                     refresh={this.refresh.bind(this)}
                     epicVisible={this.state.epicVisible}
                     versionVisible={this.state.versionVisible}
+                    spinIf={this.state.spinIf}
                   />
                 </div>
                 <IssueDetail
