@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Collapse, Button, Select, Input, Icon, Tooltip, Avatar } from 'choerodon-ui';
+import { Collapse, Button, Select, Input, Icon, Tooltip, Avatar, Spin } from 'choerodon-ui';
 import _ from 'lodash';
 import { axios, stores } from 'choerodon-front-boot';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -282,8 +282,10 @@ class Sprint extends Component {
           BacklogStore.setIsLeaveSprint(true);
         }}
       >
-        {this.renderSprint()}
-        {this.renderBacklog()}
+        <Spin spinning={this.props.spinIf}>
+          {this.renderSprint()}
+          {this.renderBacklog()}
+        </Spin>
       </div>
     );
   }
