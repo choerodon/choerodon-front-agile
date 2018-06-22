@@ -6,3 +6,4 @@
 'agile.component': component
 'agile.burndownchart': burndownchart
 'agile.report': report
+'agile.setting': setting

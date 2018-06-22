@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import { Button, Icon, Tabs } from 'choerodon-ui';
+import ProjectSetting from '../SettingComponent/ProjectSetting';
+import Search from '../SettingComponent/Search';
+import Link from '../SettingComponent/Link';
 
 const { AppState } = stores;
 const TabPane = Tabs.TabPane;
@@ -28,10 +31,16 @@ class SettingHome extends Component {
           link="#"
         >
           <Tabs defaultActiveKey="1">
-            <TabPane tab="项目设置" key="1" />
-            <TabPane tab="快速搜索" key="2" />
+            <TabPane tab="项目设置" key="1">
+              <ProjectSetting />
+            </TabPane>
+            <TabPane tab="快速搜索" key="2">
+              <Search />
+            </TabPane>
             <TabPane tab="状态" key="3" />
-            <TabPane tab="问题链接" key="4" />
+            <TabPane tab="问题链接" key="4">
+              <Link />
+            </TabPane>
           </Tabs>
         </Content>
       </Page>
