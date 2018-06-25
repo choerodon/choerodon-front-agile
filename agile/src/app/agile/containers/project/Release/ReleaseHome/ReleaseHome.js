@@ -88,7 +88,6 @@ class ReleaseHome extends Component {
       }
     }
     if (e.key === '4') {
-      window.console.log(ReleaseStore.getVersionList);
       if (ReleaseStore.getVersionList.length > 1) {
         ReleaseStore.axiosVersionIssueStatistics(record.versionId).then((res) => {
           if (res.fixIssueCount > 0 || res.influenceIssueCount > 0) {
@@ -128,7 +127,6 @@ class ReleaseHome extends Component {
       if (record.statusCode === 'archived') {
         // 撤销归档
         ReleaseStore.axiosUnFileVersion(record.versionId).then((res) => {
-          window.console.log(res);
           this.refresh(this.state.pagination);
         }).catch((error) => {
           window.console.log(error);
@@ -136,7 +134,6 @@ class ReleaseHome extends Component {
       } else {
         // 归档
         ReleaseStore.axiosFileVersion(record.versionId).then((res) => {
-          window.console.log(res);
           this.refresh(this.state.pagination);
         }).catch((error) => {
           window.console.log(error);

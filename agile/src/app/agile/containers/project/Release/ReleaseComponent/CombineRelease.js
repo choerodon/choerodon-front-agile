@@ -20,7 +20,6 @@ class CombineRelease extends Component {
   }
   componentWillMount() {
     ReleaseStore.axiosGetVersionListWithoutPage().then((res) => {
-      window.console.log(res);
       this.setState({
         sourceList: res,
       });
@@ -32,7 +31,6 @@ class CombineRelease extends Component {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, value) => {
       if (!err) {
-        window.console.log(value);
         if (value.source.length === 1) {
           if (value.source[0] === value.destination) {
             message.error('合并版本不能一样');
@@ -47,7 +45,6 @@ class CombineRelease extends Component {
           data.sourceVersionIds.splice(data.sourceVersionIds.indexOf(data.targetVersionId), 1);
         }
         ReleaseStore.axiosMergeVersion(data).then((res) => {
-          window.console.log(res);
           this.props.onCancel();
           this.props.refresh();
         }).catch((error) => {

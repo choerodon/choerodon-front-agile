@@ -275,13 +275,9 @@ class CreateSprint extends Component {
     debugger;
     // 距离顶部高度
     const a = ele.offsetTop;
-    window.console.log(a);
     const target = document.getElementById('scroll-area');
     // 滚的越多越大
-    window.console.log(target.scrollTop);
     // 定的高，外部容器的高度
-    window.console.log(target.offsetHeight);
-    window.console.log('------');
     // return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
     return (a < (target.scrollTop + target.offsetHeight)) && ((a + ele.offsetHeight) > target.scrollTop);
   }

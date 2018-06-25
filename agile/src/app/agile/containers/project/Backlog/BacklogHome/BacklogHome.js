@@ -265,7 +265,6 @@ class BacklogHome extends Component {
       spinIf: true,
     });
     ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
-      window.console.log(res);
       ScrumBoardStore.setQuickSearchList(res);
       BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
         BacklogStore.setSprintData(data);
@@ -360,7 +359,7 @@ class BacklogHome extends Component {
     return (
       <Page>
         <Header title="待办事项">
-          <Button loading={this.state.loading} className="leftBtn" funcTyp="flat" onClick={this.handleCreateSprint.bind(this)}>
+          <Button className="leftBtn" funcTyp="flat" onClick={this.handleCreateSprint.bind(this)}>
             <Icon type="playlist_add" />创建冲刺
           </Button>
           <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this)}>

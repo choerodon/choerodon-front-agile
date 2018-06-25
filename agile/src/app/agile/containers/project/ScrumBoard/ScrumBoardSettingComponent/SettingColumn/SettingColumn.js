@@ -91,7 +91,6 @@ class SettingColumn extends Component {
     };
     ScrumBoardStore.axiosUpdateColumn(
       this.props.data.columnId, data, ScrumBoardStore.getSelectedBoard).then((res) => {
-      window.console.log(res);
       const originData = ScrumBoardStore.getBoardData;
       originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
       originData[this.props.index].name = res.name;

@@ -29,7 +29,6 @@ class BurndownChartHome extends Component {
   }
   getSprintData() {
     BurndownChartStore.axiosGetSprintList().then((res) => {
-      window.console.log(res);
       BurndownChartStore.setSprintList(res);
       this.setState({
         defaultSprint: res[0].sprintId,
@@ -46,7 +45,6 @@ class BurndownChartHome extends Component {
     });
     BurndownChartStore
       .axiosGetBurndownChartReport(this.state.defaultSprint, this.state.select).then((res) => {
-        window.console.log(res);
         const data = res;
         const newData = [];
         _.forEach(data, (item) => {
@@ -92,7 +90,6 @@ class BurndownChartHome extends Component {
           });
           newData[index].rest = rest;
         });
-        window.console.log(newData);
         BurndownChartStore.setBurndownList(newData);
         this.setState({
           xAxis: _.map(newData, 'date'),
