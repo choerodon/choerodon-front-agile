@@ -4,6 +4,8 @@
 'agile.backlog':  backlog
 'agile.scrumboard':  scrumboard
 'agile.component': component
-'agile.burndownchart': burndownchart
-'agile.report': report
-'agile.setting': setting
+'agile.reporthost': reportHost
+'agile.projectSetting': projectSetting
+'fastSearch': fastSearch
+'issueLink': issueLink
+'status': status

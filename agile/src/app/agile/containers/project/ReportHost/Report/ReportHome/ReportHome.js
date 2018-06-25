@@ -3,12 +3,12 @@ import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import { Button, Tabs, Table, Select, Icon, Tooltip } from 'choerodon-ui';
-import ReportStore from '../../../../stores/project/Report';
+import ReportStore from '../../../../../stores/project/Report';
 import './ReleaseDetail.scss';
-import StatusTag from '../../../../components/StatusTag';
-import PriorityTag from '../../../../components/PriorityTag';
-import TypeTag from '../../../../components/TypeTag';
-import { formatDate } from '../../../../common/utils'; 
+import StatusTag from '../../../../../components/StatusTag';
+import PriorityTag from '../../../../../components/PriorityTag';
+import TypeTag from '../../../../../components/TypeTag';
+import { formatDate } from '../../../../../common/utils'; 
 
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
@@ -52,7 +52,7 @@ class ReleaseDetail extends Component {
           type: 'line',
           data: [
             [0, ReportStore.chartData.yAxis.slice()[0]],
-            [ReportStore.chartData.yAxis.slice().length - 1, 0]
+            [ReportStore.chartData.yAxis.slice().length - 1, 0],
           ],
           itemStyle: {
             color: 'grey',
@@ -208,10 +208,13 @@ class ReleaseDetail extends Component {
         dataIndex: 'storyPoints',
       },
     ];
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-report">
         <Header 
           title="冲刺报告"
+          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`}
         >
           <Button 
             funcTyp="flat" 
