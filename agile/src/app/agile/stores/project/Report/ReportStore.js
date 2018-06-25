@@ -1,6 +1,7 @@
 import { observable, action, computed } from 'mobx';
 import { store, stores, axios } from 'choerodon-front-boot';
-import { loadSprints, loadSprint, loadSprintIssues } from '../../../api/NewIssueApi';
+import _ from 'lodash';
+import { loadSprints, loadSprint, loadSprintIssues, loadChartData } from '../../../api/NewIssueApi';
 
 const { AppState } = stores;
 
@@ -19,6 +20,11 @@ class ReportStore {
   @observable todoIssues = [];
 
   @observable removeIssues = [];
+
+  @observable chartData = {
+    xAxis: [],
+    yAxis: [],
+  };
 
   init() {
     loadSprints(['started', 'closed'])
@@ -42,6 +48,7 @@ class ReportStore {
         this.setTodo(false);
         this.setDone(false);
         this.setRemove(false);
+        this.getChartData();
         this.loadCurrentTab();
       })
       .catch((error) => {
@@ -56,6 +63,62 @@ class ReportStore {
       remove: 'loadRemoveIssues',
     };
     this[ARRAY[this.activeKey]]();
+  }
+
+  getChartData() {
+    loadChartData(this.currentSprint.sprintId, 'storyPoints').then((res) => {
+      const data = res;
+      const newData = [];
+      _.forEach(data, (item) => {
+        if (!_.some(newData, { date: item.date })) {
+          newData.push({
+            date: item.date,
+            issues: [{
+              issueId: item.issueId,
+              issueNum: item.issueNum,
+              newValue: item.newValue,
+              oldValue: item.oldValue,
+              statistical: item.statistical,
+            }],
+            type: item.type,
+          });
+        } else {
+          let index;
+          _.forEach(newData, (item2, i) => {
+            if (item2.date === item.date) {
+              index = i;
+            }
+          });
+          newData[index].issues = [...newData[index].issues, {
+            issueId: item.issueId,
+            issueNum: item.issueNum,
+            newValue: item.newValue,
+            oldValue: item.oldValue,
+            statistical: item.statistical,
+          }];
+        }
+      });
+      _.forEach(newData, (item, index) => {
+        let rest = 0;
+        if (item.type !== 'endSprint') {
+          if (index > 0) {
+            rest = newData[index - 1].rest;
+          }
+        }
+        _.forEach(item.issues, (is) => {
+          if (is.statistical) {
+            rest += is.newValue - is.oldValue;
+          }
+        });
+        newData[index].rest = rest;
+      });
+      this.setChartData({
+        xAxis: _.map(newData, 'date'),
+        yAxis: _.map(newData, 'rest'),
+      });
+    }).catch((error) => {
+      window.console.error(error);
+    });
   }
 
   loadDoneIssues() {
@@ -174,6 +237,10 @@ class ReportStore {
 
   @action setRemoveOrder(data) {
     this.removeOrder = data;
+  }
+
+  @action setChartData(data) {
+    this.chartData = data;
   }
 
   @computed get getCurrentSprintStatus() {

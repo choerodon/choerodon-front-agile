@@ -16,6 +16,9 @@ const REPORTIndex = asyncRouter(() => import('./project/Report'));
 const BURNDOWNCHART = asyncRouter(() => import('./project/BurndownChart'));
 const SETTINGINDEX = asyncRouter(() => import('./project/Setting'));
 const REPORTINDEX = asyncRouter(() => import('./project/Report'));
+const PROJECTSETTINGINDEX = asyncRouter(() => import('./project/ProjectSetting'));
+const FASTSEARCHINDEX = asyncRouter(() => import('./project/FastSearch'));
+const ISSUELINKINDEX = asyncRouter(() => import('./project/IssueLink'));
 
 class AGILEIndex extends React.Component {
   render() {
@@ -36,6 +39,9 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/burndownchart`} component={BURNDOWNCHART} />
           <Route path={`${match.url}/report`} component={REPORTINDEX} />
           <Route path={`${match.url}/setting`} component={SETTINGINDEX} />
+          <Route path={`${match.url}/projectSetting`} component={PROJECTSETTINGINDEX} />
+          <Route path={`${match.url}/fastSearch`} component={FASTSEARCHINDEX} />
+          <Route path={`${match.url}/issueLink`} component={ISSUELINKINDEX} />
           <Route path={'*'} component={nomatch} />
         </Switch>
       </IntlProviderAsync>

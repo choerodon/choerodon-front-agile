@@ -67,6 +67,11 @@ export function loadSprintIssues(sprintId, status, page = 0, size = 99999) {
   return axios.get(`/agile/v1/project/${projectId}/sprint/${sprintId}/issues?status=${status}&page=${page}&size=${size}`);
 }
 
+export function loadChartData(id, type) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/project/${projectId}/reports/${id}/burn_down_report?type=${type}`);
+}
+
 export function loadStatus() {
   const projectId = AppState.currentMenuType.id;
   return axios.get(
@@ -114,6 +119,10 @@ export function createWorklog(data, projectId = AppState.currentMenuType.id) {
 
 export function loadWorklogs(issueId, projectId = AppState.currentMenuType.id) {
   return axios.get(`agile/v1/project/${projectId}/work_log/issue/${issueId}`);
+}
+
+export function loadDatalogs(issueId, projectId = AppState.currentMenuType.id) {
+  return axios.get(`agile/v1/project/${projectId}/data_log?issueId=${issueId}`);
 }
 
 export function updateWorklog(logId, worklog, projectId = AppState.currentMenuType.id) {
