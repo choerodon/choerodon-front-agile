@@ -36,7 +36,7 @@ class DeleteLink extends Component {
       radio: 1,
       relatedComponentId: undefined,
     });
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issue_link_types?linkTypeId=${this.props.link.linkTypeId}`)
+    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issue_link_types?issueLinkTypeId=${this.props.link.linkTypeId}`)
       .then((res) => {
         this.setState({
           originComponents: res,

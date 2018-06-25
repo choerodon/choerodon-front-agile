@@ -20,6 +20,7 @@ import Comment from './Component/Comment';
 import Log from './Component/Log';
 import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
+import LinkList from './Component/LinkList';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -55,6 +56,7 @@ class CreateSprint extends Component {
       issueId: undefined,
       assigneeId: undefined,
       assigneeName: '',
+      assigneeImageUrl: undefined,
       epicId: undefined,
       estimateTime: undefined,
       remainingTime: undefined,
@@ -64,6 +66,7 @@ class CreateSprint extends Component {
       parentIssueId: undefined,
       priorityCode: undefined,
       reporterId: undefined,
+      reporterImageUrl: undefined,
       sprintId: undefined,
       sprintName: '',
       statusId: undefined,
@@ -128,27 +131,6 @@ class CreateSprint extends Component {
     }
   }
 
-  reloadIssue(issueId = this.state.origin.issueId) {
-    loadIssue(issueId).then((res) => {
-      this.setAnIssueToState(res);
-    });
-    loadWorklogs(issueId).then((res) => {
-      this.setState({
-        worklogs: res,
-      });
-    });
-    loadLinkIssues(issueId).then((res) => {
-      this.setState({
-        linkIssues: res,
-      });
-    });
-    loadDatalogs(issueId).then((res) => {
-      this.setState({
-        datalogs: res,
-      });
-    })
-  }
-
   /**
    * Attachment
    */
@@ -183,6 +165,7 @@ class CreateSprint extends Component {
       activeSprint,
       assigneeId,
       assigneeName,
+      assigneeImageUrl,
       closeSprint,
       componentIssueRelDTOList,
       creationDate,
@@ -205,6 +188,7 @@ class CreateSprint extends Component {
       remainingTime,
       reporterId,
       reporterName,
+      reporterImageUrl,
       sprintId,
       sprintName,
       statusId,
@@ -228,6 +212,7 @@ class CreateSprint extends Component {
       activeSprint: activeSprint || {},
       assigneeId,
       assigneeName,
+      assigneeImageUrl,
       closeSprint,
       componentIssueRelDTOList,
       creationDate,
@@ -252,6 +237,7 @@ class CreateSprint extends Component {
       remainingTime,
       reporterId,
       reporterName,
+      reporterImageUrl,
       sprintId,
       sprintName,
       statusId,
@@ -379,6 +365,38 @@ class CreateSprint extends Component {
     }
     const workTimeArr = _.reduce(worklogs, (sum, v) => sum + (v.workTime || 0), 0);
     return workTimeArr;
+  }
+
+  reloadIssue(issueId = this.state.origin.issueId) {
+    this.setState({
+      addCommit: false,
+      addCommitDes: '',
+      editDesShow: false,
+      editDes: undefined,
+      editCommentId: undefined,
+      editComment: undefined,
+      editLogId: undefined,
+      editLog: undefined,
+    }, () => {
+      loadIssue(issueId).then((res) => {
+        this.setAnIssueToState(res);
+      });
+      loadWorklogs(issueId).then((res) => {
+        this.setState({
+          worklogs: res,
+        });
+      });
+      loadLinkIssues(issueId).then((res) => {
+        this.setState({
+          linkIssues: res,
+        });
+      });
+      loadDatalogs(issueId).then((res) => {
+        this.setState({
+          datalogs: res,
+        });
+      });
+    });
   }
 
   refresh = () => {
@@ -747,7 +765,7 @@ class CreateSprint extends Component {
             <div>
               <div style={{ margin: '7px auto' }}>{k}</div>
               {
-                _.map(v, (linkIssue, i) => this.renderIssueList(linkIssue, i))
+                _.map(v, (linkIssue, i) => this.renderLinkList(linkIssue, i))
               }
             </div>
           ))
@@ -770,12 +788,27 @@ class CreateSprint extends Component {
         }}
         i={i}
         onRefresh={() => {
-          if (issue.issueId && !issue.linkedIssueId) {
-            this.reloadIssue(issue.issueId);
-          } else if (issue.issueId === this.state.origin.issueId && issue.linkedIssueId) {
-            this.reloadIssue(issue.linkedIssueId);
-          } else if (issue.issueId !== this.state.origin.issueId) {
-            this.reloadIssue(issue.issueId);
+          this.reloadIssue();
+        }}
+      />
+    );
+  }
+
+  renderLinkList(link, i) {
+    return (
+      <LinkList
+        issue={{
+          ...link,
+          typeCode: link.typeCode,
+        }}
+        i={i}
+        onRefresh={() => {
+          if (link.issueId && !link.linkedIssueId) {
+            this.reloadIssue(link.issueId);
+          } else if (link.issueId === this.state.origin.issueId && link.linkedIssueId) {
+            this.reloadIssue(link.linkedIssueId);
+          } else if (link.issueId !== this.state.origin.issueId) {
+            this.reloadIssue(link.issueId);
           }
         }}
       />
@@ -794,7 +827,7 @@ class CreateSprint extends Component {
         <div className="line-start mt-10">
           <WYSIWYGEditor
             bottomBar
-            value={delta}
+            value={text2Delta(this.state.editDes)}
             style={{ height: 200, width: '100%' }}
             onChange={(value) => {
               this.setState({ editDes: value });
@@ -1274,8 +1307,8 @@ class CreateSprint extends Component {
                             </div>}
                           >
                             <Select
-                              value={this.state.statusId}
-                              style={{ width: '150px' }}
+                              value={this.state.originStatus.length ? this.state.statusId : this.state.statusName}
+                              style={{ width: 150 }}
                               loading={this.state.selectLoading}
                               autoFocus
                               getPopupContainer={triggerNode => triggerNode.parentNode}
@@ -1350,7 +1383,7 @@ class CreateSprint extends Component {
                             </div>}
                           >
                             <Select
-                              value={this.state.priorityCode}
+                              value={this.state.originpriorities.length ? this.state.priorityCode : this.state.priorityName}
                               style={{ width: '150px' }}
                               loading={this.state.selectLoading}
                               autoFocus
@@ -1686,7 +1719,7 @@ class CreateSprint extends Component {
                                 </div>}
                               >
                                 <Select
-                                  value={this.state.epicId || undefined}
+                                  value={this.state.originEpics.length ? this.state.epicId || undefined : this.state.epicName || undefined}
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '150px' }}
                                   autoFocus

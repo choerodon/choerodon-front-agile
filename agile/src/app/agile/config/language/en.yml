@@ -5,7 +5,7 @@
 'agile.scrumboard':  scrumboard
 'agile.component': component
 'agile.reporthost': reportHost
-'agile.projectSetting': projectSetting
-'fastSearch': fastSearch
-'issueLink': issueLink
-'status': status
+'agile.projectsetting': projectSetting
+'agile.fastsearch': fastSearch
+'agile.issuelink': issueLink
+'agile.status': status
