@@ -1,5 +1,6 @@
 import { observable, action, computed } from 'mobx';
 import { store, stores, axios } from 'choerodon-front-boot';
+import { loadSprints, loadSprint, loadSprintIssues } from '../../../api/NewIssueApi';
 
 const { AppState } = stores;
 
@@ -9,17 +10,8 @@ class ReportStore {
   @observable todo = false;
   @observable done = false;
   @observable remove = false;
-  @observable sprints = [
-    {
-      id: 1,
-      name: 'sprint1',
-    },
-    {
-      id: 2,
-      name: 'sprint2',
-    },
-  ];
-  @observable currentSprintId = undefined;
+  @observable sprints = [];
+  @observable currentSprint = {};
   @observable activeKey = 'done';
 
   @observable doneIssues = [];
@@ -29,122 +21,79 @@ class ReportStore {
   @observable removeIssues = [];
 
   init() {
-    this.setOrder({
-      orderField: '',
-      orderType: '',
-    });
-    this.setFilter({
-      advancedSearchArgs: {},
-      searchArgs: {},
-    });
-    this.loadIssues();
+    loadSprints(['started', 'closed'])
+      .then((res) => {
+        this.setSprints(res || []);
+        if (res && res.length) {
+          this.changeCurrentSprint(res[0].sprintId);
+        }
+      })
+      .catch((error) => {
+        this.setSprints([]);
+        window.console.error('some thing wrong, get sprints failed');
+      });
+  }
+
+  changeCurrentSprint(sprintId) {
+    loadSprint(sprintId)
+      .then((res) => {
+        this.setCurrentSprint(res || {});
+        // ready to load when activeKey change
+        this.setTodo(false);
+        this.setDone(false);
+        this.setRemove(false);
+        this.loadCurrentTab();
+      })
+      .catch((error) => {
+        window.console.error('some thing wrong, get currentSprint failed');
+      });
+  }
+
+  loadCurrentTab() {
+    const ARRAY = {
+      done: 'loadDoneIssues',
+      todo: 'loadTodoIssues',
+      remove: 'loadRemoveIssues',
+    };
+    this[ARRAY[this.activeKey]]();
   }
 
   loadDoneIssues() {
     this.setLoading(true);
-    // loadIssues(page, size, this.filter, orderField, orderType)
-    //   .then((res) => {
-    this.setDoneIssues([
-      {
-        issueNum: 'AG-101',
-        summary: '模拟数据模拟数据模拟数据',
-        typeCode: 'story',
-        priorityCode: 'medium',
-        priorityName: '中',
-        statusCode: 'done',
-        storyPoints: '3',
-        statusColor: '#fab614',
-        statusName: '已完成',
-      },
-    ]);
-    this.setLoading(false);
-    this.setDone(false);
-    // });
+    loadSprintIssues(this.currentSprint.sprintId, 'done')
+      .then((res) => {
+        this.setDoneIssues(res.content);
+        this.setLoading(false);
+        this.setDone(true);
+      });
   }
 
   loadTodoIssues() {
     this.setLoading(true);
-    // loadIssues(page, size, this.filter, orderField, orderType)
-    //   .then((res) => {
-    this.setTodoIssues([
-      {
-        issueNum: 'AG-101',
-        summary: '模拟数据模拟数据模拟数据',
-        typeCode: 'story',
-        priorityCode: 'high',
-        priorityName: '高',
-        statusCode: 'todo',
-        storyPoints: '3',
-        statusColor: '#fab614',
-        statusName: '未开始',
-      },
-      {
-        issueNum: 'AG-101',
-        summary: '模拟数据模拟数据模拟数据',
-        typeCode: 'story',
-        priorityCode: 'high',
-        priorityName: '高',
-        statusCode: 'todo',
-        storyPoints: '3',
-        statusColor: '#fab614',
-        statusName: '未开始',
-      },
-      {
-        issueNum: 'AG-101',
-        summary: '模拟数据模拟数据模拟数据',
-        typeCode: 'story',
-        priorityCode: 'high',
-        priorityName: '高',
-        statusCode: 'todo',
-        storyPoints: '3',
-        statusColor: '#fab614',
-        statusName: '未开始',
-      },
-    ]);
-    this.setLoading(false);
-    this.setTodo(false);
-    // });
+    loadSprintIssues(this.currentSprint.sprintId, 'unfinished')
+      .then((res) => {
+        this.setTodoIssues(res.content);
+        this.setLoading(false);
+        this.setTodo(true);
+      });
   }
 
   loadRemoveIssues() {
     this.setLoading(true);
-    // loadIssues(page, size, this.filter, orderField, orderType)
-    //   .then((res) => {
-    this.setRemoveIssues([
-      {
-        issueNum: 'AG-101',
-        summary: '模拟数据模拟数据模拟数据',
-        typeCode: 'story',
-        priorityCode: 'low',
-        priorityName: '低',
-        statusCode: 'done',
-        storyPoints: '3',
-        statusColor: '#fab614',
-        statusName: '已完成',
-      },
-      {
-        issueNum: 'AG-101',
-        summary: '模拟数据模拟数据模拟数据',
-        typeCode: 'story',
-        priorityCode: 'low',
-        priorityName: '低',
-        statusCode: 'done',
-        storyPoints: '3',
-        statusColor: '#fab614',
-        statusName: '已完成',
-      },
-    ]);
-    this.setLoading(false);
-    this.setTodo(false);
-    // });
+    loadSprintIssues(this.currentSprint.sprintId, 'remove')
+      .then((res) => {
+        this.setRemoveIssues(res.content);
+        this.setLoading(false);
+        this.setRemove(true);
+      });
   }
 
   @action setSprints(data) {
     this.sprints = data;
   }
 
-  @action setCurrentSprintId(data) {
-    this.currentSprintId = data;
+  @action setCurrentSprint(data) {
+    this.currentSprint = data;
   }
 
   @action setActiveKey(data) {
@@ -225,7 +174,28 @@ class ReportStore {
 
   @action setRemoveOrder(data) {
     this.removeOrder = data;
-  } 
+  }
+
+  @computed get getCurrentSprintStatus() {
+    const STATUS_TIP = {
+      closed: {
+        status: '已关闭',
+        action: '结束',
+      },
+      started: {
+        status: '进行中',
+        action: '开启',
+      },
+    };
+    if (!this.currentSprint.statusCode) {
+      return ({
+        status: '',
+        action: '',
+      });
+    } else {
+      return STATUS_TIP[this.currentSprint.statusCode]; 
+    }
+  }
 }
 const reportStore = new ReportStore();
 export default reportStore;

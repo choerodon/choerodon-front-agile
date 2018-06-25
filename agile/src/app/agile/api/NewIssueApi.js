@@ -17,9 +17,9 @@ export function loadLabels() {
   );
 }
 
-export function loadVersions() {
+export function loadVersions(arr = []) {
   const projectId = AppState.currentMenuType.id;
-  return axios.get(`/agile/v1/project/${projectId}/product_version/names`);
+  return axios.post(`/agile/v1/project/${projectId}/product_version/names`, arr);
 }
 
 export function createCommit(commitObj, projectId = AppState.currentMenuType.id) {
@@ -48,12 +48,23 @@ export function loadEpics() {
   );
 }
 
-// change621
-export function loadSprints() {
+/**
+ * 根据冲刺状态获取冲刺，["started", "sprint_planning", "closed"]
+ * @param {*} arr 
+ */
+export function loadSprints(arr = []) {
   const projectId = AppState.currentMenuType.id;
-  return axios.get(
-    `/agile/v1/project/${projectId}/sprint/names `,
-  );
+  return axios.post(`/agile/v1/project/${projectId}/sprint/names`, arr);
+}
+
+export function loadSprint(sprintId) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/project/${projectId}/sprint/${sprintId}`);
+}
+
+export function loadSprintIssues(sprintId, status, page = 0, size = 99999) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/project/${projectId}/sprint/${sprintId}/issues?status=${status}&page=${page}&size=${size}`);
 }
 
 export function loadStatus() {

@@ -13,6 +13,12 @@ class AddComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      origin: {},
+      arr: [],
+      o: [],
+      originUsers: [],
+      originStatus: [],
+      originPriorities: [],
       loading: false,
       filters: [
         {
@@ -22,14 +28,26 @@ class AddComponent extends Component {
         },
       ],
       quickFilterFiled: [],
-      origin: [],
       delete: [],
-      originUsers: [],
     };
   }
 
   componentDidMount() {
     this.loadQuickFilterFiled();
+    this.loadFilter(this.props.filterId);
+    this.loadQuickFilter();
+  }
+
+  loadFilter(filterId = this.props.filterId) {
+    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/${filterId}`)
+      .then((res) => {
+        const obj = JSON.parse(res.description);
+        this.setState({
+          arr: obj.arr || [],
+          o: obj.o || [],
+          origin: res,
+        });
+      });
   }
 
   loadQuickFilterFiled() {
@@ -41,30 +59,25 @@ class AddComponent extends Component {
       });
   }
 
-  loadQuickFilter(filterId) {
-    if (filterId === 2) {
-      axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`)
-        .then((res) => {
-          this.setState({
-            origin: res.lookupValues,
-          });
+  loadQuickFilter() {
+    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`)
+      .then((res) => {
+        this.setState({
+          originPriorities: res.lookupValues,
         });
-    } else if (filterId === 1) {
-      axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`)
-        .then((res) => {
-          this.setState({
-            origin: res.content,
-            originUsers: res.content,
-          });
+      });
+    axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`)
+      .then((res) => {
+        this.setState({
+          originUsers: res.content,
         });
-    } else if (filterId === 3) {
-      axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/status_category`)
-        .then((res) => {
-          this.setState({
-            origin: res.lookupValues,
-          });
+      });
+    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/status_category`)
+      .then((res) => {
+        this.setState({
+          originStatus: res.lookupValues,
         });
-    }
+      });
   }
 
   handleOk(e) {
@@ -75,7 +88,7 @@ class AddComponent extends Component {
         const arr = [];
         const expressQueryArr = [];
         const o = [];
-        const f = this.state.filters.slice();
+        const f = this.state.arr.slice();
         f.forEach((v, i) => {
           if (this.state.delete.indexOf(i) !== -1) {
             return;
@@ -96,6 +109,7 @@ class AddComponent extends Component {
         });
         const d = new Date();
         const obj = {
+          objectVersionNumber: this.state.origin.objectVersionNumber,
           expressQuery: expressQueryArr.join(' '),
           name: values.name,
           description: JSON.stringify({
@@ -109,7 +123,7 @@ class AddComponent extends Component {
         this.setState({
           loading: true,
         });
-        axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter`, obj)
+        axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/${this.props.filterId}`, obj)
           .then((res) => {
             this.setState({
               loading: false,
@@ -125,8 +139,8 @@ class AddComponent extends Component {
     return (
       <Sidebar
         className="c7n-component-component"
-        title="创建快速搜索"
-        okText="创建"
+        title="修改快速搜索"
+        okText="修改"
         cancelText="取消"
         visible
         confirmLoading={this.state.loading}
@@ -138,7 +152,7 @@ class AddComponent extends Component {
             padding: 0,
             width: 512,
           }}
-          title={`在项目"${AppState.currentMenuType.name}"中创建快速搜索`}
+          title={`在项目"${AppState.currentMenuType.name}"中修改快速搜索`}
           description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，创建新模版。"
         >
           <Form layout="vertical">
@@ -147,6 +161,7 @@ class AddComponent extends Component {
                 rules: [{
                   required: true,
                 }],
+                initialValue: this.state.origin.name,
               })(
                 <Input
                   label="名称"
@@ -155,7 +170,7 @@ class AddComponent extends Component {
               )}
             </FormItem>
             {
-              this.state.filters.map((filter, index) => (
+              this.state.arr.map((filter, index) => (
                 <div>
                   {
                     this.state.delete.indexOf(index) === -1 && (
@@ -167,6 +182,7 @@ class AddComponent extends Component {
                                 rules: [{
                                   required: true,
                                 }],
+                                initialValue: this.state.o[index - 1],
                               })(
                                 <Select label="关系">
                                   <Option key="and" value="and">AND</Option>
@@ -181,6 +197,7 @@ class AddComponent extends Component {
                             rules: [{
                               required: true,
                             }],
+                            initialValue: this.state.arr[index].fieldId,
                           })(
                             <Select label="属性">
                               {
@@ -196,6 +213,7 @@ class AddComponent extends Component {
                             rules: [{
                               required: true,
                             }],
+                            initialValue: this.state.arr[index].operation,
                           })(
                             <Select label="关系">
                               <Option key="=" value="=">=</Option>
@@ -216,20 +234,36 @@ class AddComponent extends Component {
                             rules: [{
                               required: true,
                             }],
+                            initialValue: this.state.arr[index].value,
                           })(
-                            <Select
-                              label="值"
-                              onFocus={() => {
-                                this.loadQuickFilter(this.props.form.getFieldValue(`filter-${index}-prop`));
-                              }}
-                            >
+                            <Select label="值">
                               {
-                                this.state.origin.map(v => (
+                                this.props.form.getFieldValue(`filter-${index}-prop`) === 1 && this.state.originUsers.map(v => (
                                   <Option
-                                    key={v.valueCode || v.id}
-                                    value={v.valueCode || v.id}
+                                    key={v.id}
+                                    value={v.id}
                                   >
-                                    {v.realName || v.name}
+                                    {v.realName}
+                                  </Option>
+                                ))
+                              }
+                              {
+                                this.props.form.getFieldValue(`filter-${index}-prop`) === 2 && this.state.originPriorities.map(v => (
+                                  <Option
+                                    key={v.valueCode}
+                                    value={v.valueCode}
+                                  >
+                                    {v.name}
+                                  </Option>
+                                ))
+                              }
+                              {
+                                this.props.form.getFieldValue(`filter-${index}-prop`) === 3 && this.state.originStatus.map(v => (
+                                  <Option
+                                    key={v.valueCode}
+                                    value={v.valueCode}
+                                  >
+                                    {v.name}
                                   </Option>
                                 ))
                               }
@@ -260,14 +294,14 @@ class AddComponent extends Component {
               type="primary"
               funcTyp="flat"
               onClick={() => {
-                const arr = this.state.filters.slice();
+                const arr = this.state.arr.slice();
                 arr.push({
                   prop: undefined,
                   rule: undefined,
                   value: undefined,
                 });
                 this.setState({
-                  filters: arr,
+                  arr,
                 });
               }}
             >

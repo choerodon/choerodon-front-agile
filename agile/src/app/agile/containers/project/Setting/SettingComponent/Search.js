@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Table, Spin, Popover, Tooltip, Icon } from 'choerodon-ui';
+import { Button, Table, Spin, Popover, Tooltip, Icon, Modal } from 'choerodon-ui';
 import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import Filter from './Filter';
+import EditFilter from './EditFilter';
 
 const { AppState } = stores;
+const confirm = Modal.confirm;
 
 @observer
 class Search extends Component {
@@ -13,11 +15,11 @@ class Search extends Component {
     this.state = {
       filters: [],
       createFileterShow: false,
-
-      component: {},
-      currentComponentId: undefined,
-      loading: false,
+      currentFilterId: undefined,
+      filter: {},
       confirmShow: false,
+
+      loading: false,
       editComponentShow: false,
       createComponentShow: false,
     };
@@ -27,17 +29,23 @@ class Search extends Component {
     this.loadFilters();
   }
 
-  showComponent(record) {
+  showFilter(record) {
     this.setState({
-      editComponentShow: true,
-      currentComponentId: record.componentId,
+      editFilterShow: true,
+      currentFilterId: record.filterId,
     });
   }
 
-  clickDeleteComponent(record) {
-    this.setState({
-      component: record,
-      confirmShow: true,
+  clickDeleteFilter(record) {
+    confirm({
+      title: `是否删除快速搜索：${record.name}`,
+      content: '删除后将无法使用该快速搜索，如果只是想要改变某些条件可以修改快速搜索。',
+      onOk() {
+        return axios.delete(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/${record.filterId}`);
+      },
+      onCancel() {},
+      onText: '删除',
+      okType: 'danger',
     });
   }
 
@@ -85,22 +93,24 @@ class Search extends Component {
         dataIndex: 'expressQuery',
         width: '50%',
         render: expressQuery => (
-          <div style={{ width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-            <span style={{ display: 'inline-block', width: 25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }}>
-              {expressQuery}
-            </span>
+          <div style={{ width: '100%', overflow: 'hidden' }}>
+            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={expressQuery}>
+              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+                {expressQuery}
+              </p>
+            </Tooltip>
           </div>
         ),
       },
       {
         title: '描述',
-        dataIndex: 'des',
+        dataIndex: 'description',
         width: '25%',
-        render: des => (
+        render: description => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
-            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={des}>
+            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={description}>
               <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
-                {des}
+                {description}
               </p>
             </Tooltip>
           </div>
@@ -113,12 +123,12 @@ class Search extends Component {
         render: (filterId, record) => (
           <div>
             <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>详情</span></div>}>
-              <Button shape="circle" onClick={this.showComponent.bind(this, record)}>
+              <Button shape="circle" onClick={this.showFilter.bind(this, record)}>
                 <Icon type="mode_edit" />
               </Button>
             </Popover>
             <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>删除</span></div>}>
-              <Button shape="circle" onClick={this.clickDeleteComponent.bind(this, record)}>
+              <Button shape="circle" onClick={this.clickDeleteFilter.bind(this, record)}>
                 <Icon type="delete_forever" />
               </Button>
             </Popover>
@@ -147,6 +157,15 @@ class Search extends Component {
             <Filter
               onOk={() => this.setState({ createFileterShow: false })}
               onCancel={() => this.setState({ createFileterShow: false })}
+            />
+          ) : null
+        }
+        {
+          this.state.editFilterShow ? (
+            <EditFilter
+              filterId={this.state.currentFilterId}
+              onOk={() => this.setState({ editFilterShow: false })}
+              onCancel={() => this.setState({ editFilterShow: false })}
             />
           ) : null
         }

@@ -6,7 +6,7 @@ import { Select, Form, Input, Button, Modal, Icon } from 'choerodon-ui';
 
 import './CreateIssue.scss';
 import '../../containers/main.scss';
-import { UploadButton, NumericInput } from '../CommonComponent';
+import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
 import { createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
@@ -48,11 +48,6 @@ class CreateIssue extends Component {
       originFixVersions: [],
       originSprints: [],
       originUsers: [],
-
-      storyPoints: '',
-      storyPointsUnit: 'h',
-      time: '',
-      timeUnit: 'h',
     };
   }
 
@@ -68,35 +63,6 @@ class CreateIssue extends Component {
       delta,
       edit: false,
     });
-  }
-
-  handleChangeStoryPoints = (e) => {
-    this.setState({ storyPoints: e });
-  }
-
-  handleChangeStoryPointsUnit = (value) => {
-    this.setState({ storyPointsUnit: value });
-  }
-
-  handleChangeTime = (e) => {
-    this.setState({ time: e });
-  }
-
-  handleChangeTimeUnit = (value) => {
-    this.setState({ timeUnit: value });
-  }
-
-  transformTime(pro, unit) {
-    const TIME = {
-      h: 1,
-      d: 8,
-      w: 40,
-    };
-    if (!this.state[pro]) {
-      return 0;
-    } else {
-      return this.state[pro] * TIME[this.state[unit]];
-    }
   }
 
   transformPriorityCode(originpriorityCode) {
@@ -159,8 +125,6 @@ class CreateIssue extends Component {
           summary: values.summary,
           priorityCode: values.priorityCode,
           sprintId: values.sprintId || 0,
-          storyPoints: this.transformTime('storyPoints', 'storyPointsUnit'),
-          remainingTime: this.transformTime('time', 'timeUnit'),
           epicId: values.epicId || 0,
           epicName: values.epicName,
           parentIssueId: 0,
@@ -432,7 +396,7 @@ class CreateIssue extends Component {
                     this.setState({
                       selectLoading: true,
                     });
-                    loadSprints().then((res) => {
+                    loadSprints(['sprint_planning', 'started']).then((res) => {
                       this.setState({
                         originSprints: res,
                         selectLoading: false,
@@ -461,7 +425,7 @@ class CreateIssue extends Component {
                     this.setState({
                       selectLoading: true,
                     });
-                    loadVersions().then((res) => {
+                    loadVersions(['version_planning']).then((res) => {
                       this.setState({
                         originFixVersions: res,
                         selectLoading: false,
@@ -548,40 +512,6 @@ class CreateIssue extends Component {
                 </Select>,
               )}
             </FormItem>
-
-            <div style={{ marginBottom: '24px' }}>
-              {
-                this.props.form.getFieldValue('typeCode') === 'story' && (
-                  <span>
-                    <NumericInput
-                      label="故事点"
-                      style={{ lineHeight: '22px', marginBottom: 0, width: 100, marginRight: 194 }}
-                      value={this.state.storyPoints}
-                      onChange={this.handleChangeStoryPoints.bind(this)}
-                    />
-                  </span>
-                )
-              }
-              
-              <NumericInput
-                label="预计剩余时间"
-                style={{ lineHeight: '22px', marginBottom: 0, width: 100 }}
-                value={this.state.time}
-                onChange={this.handleChangeTime.bind(this)}
-              />
-              <Select
-                style={{ width: 100, marginLeft: 18 }}
-                value={this.state.timeUnit}
-                getPopupContainer={triggerNode => triggerNode.parentNode}
-                onChange={this.handleChangeTimeUnit.bind(this)}
-              >
-                {['h', 'd', 'w'].map(type => (
-                  <Option key={`${type}`} value={`${type}`}>
-                    {type}
-                  </Option>),
-                )}
-              </Select>
-            </div>
           </Form>
           
           <div className="sign-upload" style={{ marginTop: '38px' }}>

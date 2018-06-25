@@ -78,6 +78,8 @@ class CreateSprint extends Component {
       description: '',
       versionIssueRelDTOList: [],
       componentIssueRelDTOList: [],
+      activeSprint: {},
+      closeSprint: [],
 
       worklogs: [],
       fileList: [],
@@ -172,8 +174,10 @@ class CreateSprint extends Component {
   
   setAnIssueToState = (issue = this.state.origin) => {
     const { 
+      activeSprint,
       assigneeId,
       assigneeName,
+      closeSprint,
       componentIssueRelDTOList,
       creationDate,
       description,
@@ -215,8 +219,10 @@ class CreateSprint extends Component {
     const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
     this.setState({
       origin: issue,
+      activeSprint: activeSprint || {},
       assigneeId,
       assigneeName,
+      closeSprint,
       componentIssueRelDTOList,
       creationDate,
       editDes: description,
@@ -570,7 +576,7 @@ class CreateSprint extends Component {
   handleCreateLinkIssue() {
     this.reloadIssue();
     this.setState({
-      createSubTaskShow: false,
+      createLinkTaskShow: false,
     });
     if (this.props.onUpdate) {
       this.props.onUpdate();
@@ -751,7 +757,15 @@ class CreateSprint extends Component {
           typeCode: issue.typeCode || 'sub_task',
         }}
         i={i}
-        onRefresh={this.reloadIssue.bind(this)}
+        onRefresh={() => {
+          if (issue.issueId && !issue.linkedIssueId) {
+            this.reloadIssue(issue.issueId);
+          } else if (issue.issueId === this.state.origin.issueId && issue.linkedIssueId) {
+            this.reloadIssue(issue.linkedIssueId);
+          } else if (issue.issueId !== this.state.origin.issueId) {
+            this.reloadIssue(issue.issueId);
+          }
+        }}
       />
       
     );
@@ -1008,14 +1022,7 @@ class CreateSprint extends Component {
                             role="none"
                             style={{ color: 'rgb(63, 81, 181)', cursor: 'pointer' }}
                             onClick={() => {
-                              loadIssue(this.state.parentIssueId).then((res) => {
-                                this.setAnIssueToState(res);
-                              });
-                              loadWorklogs(this.props.issueId).then((res) => {
-                                this.setState({
-                                  worklogs: res,
-                                });
-                              });
+                              this.reloadIssue(this.state.parentIssueId);
                             }}
                           >
                             {this.state.parentIssueNum}
@@ -1298,7 +1305,7 @@ class CreateSprint extends Component {
                       </div>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flex: 1.5 }}>
+                  <div style={{ display: 'flex', flex: 1.2 }}>
                     <span
                       style={{ width: 30, height: 30, borderRadius: '50%', background: '#d8d8d8', marginRight: 12, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                     >
@@ -1315,38 +1322,91 @@ class CreateSprint extends Component {
                               callback={this.changeRae.bind(this)}
                               thisType="sprintId"
                               current={this.state.currentRae}
-                              origin={this.state.sprintId}
+                              origin={this.state.activeSprint.sprintId}
                               onOk={this.updateIssue.bind(this, 'sprintId')}
                               onCancel={this.resetSprintId.bind(this)}
                               onInit={() => {
                                 this.setAnIssueToState(this.state.origin);
-                                loadSprints().then((res) => {
+                                loadSprints(['sprint_planning', 'started']).then((res) => {
                                   this.setState({
                                     originSprints: res,
+                                    sprintId: this.state.activeSprint.sprintId,
                                   });
                                 });
                               }}
                               readModeContent={<div>
                                 {
-                                  this.state.sprintId ? (
-                                    <div 
-                                      style={{
-                                        // color: '#4d90fe',
-                                        // border: '1px solid #4d90fe',
-                                        // borderRadius: '2px',
-                                        fontSize: '16px',
-                                        lineHeight: '18px',
-                                        // padding: '0 8px',
-                                        // display: 'inline-block',
-                                      }}
-                                    >
-                                      {this.state.sprintName}
+                                  !this.state.closeSprint.length && !this.state.activeSprint.sprintId ? '无' : (
+                                    <div>
+                                      {
+                                        this.state.closeSprint.map(v => (
+                                          <div 
+                                            style={{
+                                              color: 'rgba(0, 0, 0, 0.5)',
+                                              border: '1px solid rgba(0, 0, 0, 0.5)',
+                                              borderRadius: '2px',
+                                              fontSize: '13px',
+                                              lineHeight: '20px',
+                                              padding: '0 8px',
+                                              display: 'inline-block',
+                                              marginRight: 5,
+                                              marginTop: 5,
+                                            }}
+                                          >
+                                            {v.sprintName}
+                                          </div>
+                                        ))
+                                      }
+                                      {
+                                        this.state.activeSprint.sprintId && (
+                                          <div 
+                                            style={{
+                                              color: '#4d90fe',
+                                              border: '1px solid #4d90fe',
+                                              borderRadius: '2px',
+                                              fontSize: '13px',
+                                              lineHeight: '20px',
+                                              padding: '0 8px',
+                                              display: 'inline-block',
+                                              marginTop: 5,
+                                            }}
+                                          >
+                                            {this.state.activeSprint.sprintName}
+                                          </div>
+                                        )
+                                      }
                                     </div>
-                                  ) : '无'
+                                  )
                                 }
                               </div>}
                             >
+                              {
+                                this.state.closeSprint.length ? (
+                                  <div>
+                                    <span>已结束冲刺：</span>
+                                    {
+                                      this.state.closeSprint.map(v => (
+                                        <div 
+                                          style={{
+                                            color: 'rgba(0, 0, 0, 0.5)',
+                                            border: '1px solid rgba(0, 0, 0, 0.5)',
+                                            borderRadius: '2px',
+                                            fontSize: '13px',
+                                            lineHeight: '20px',
+                                            padding: '0 8px',
+                                            display: 'inline-block',
+                                            marginRight: 5,
+                                          }}
+                                        >
+                                          {v.sprintName}
+                                        </div>
+                                      ))
+                                    }
+                                  </div>
+                                ) : null
+                              }
                               <Select
+                                label="活跃冲刺"
                                 value={this.state.sprintId || undefined}
                                 getPopupContainer={triggerNode => triggerNode.parentNode}
                                 style={{ width: '150px' }}
@@ -1357,7 +1417,7 @@ class CreateSprint extends Component {
                                   this.setState({
                                     selectLoading: true,
                                   });
-                                  loadSprints().then((res) => {
+                                  loadSprints(['sprint_planning', 'started']).then((res) => {
                                     this.setState({
                                       originSprints: res,
                                       selectLoading: false,

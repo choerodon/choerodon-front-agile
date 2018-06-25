@@ -8,6 +8,7 @@ import EchartsTheme from './EchartsTheme';
 import StatusTag from '../../../../components/StatusTag';
 import PriorityTag from '../../../../components/PriorityTag';
 import TypeTag from '../../../../components/TypeTag';
+import { formatDate } from '../../../../common/utils'; 
 
 const echarts = require('echarts');
 
@@ -23,8 +24,9 @@ class ReleaseDetail extends Component {
     };
   }
   componentDidMount() {
+    ReportStore.init();
     this.renderBurnDown();
-    ReportStore.loadDoneIssues();
+    // ReportStore.loadDoneIssues();
   }
 
   callback(key) {
@@ -259,16 +261,21 @@ class ReleaseDetail extends Component {
         >
           <Button 
             funcTyp="flat" 
+            onClick={() => ReportStore.changeCurrentSprint(ReportStore.currentSprint.sprintId)}
           >
             <Icon type="autorenew icon" />
             <span>刷新</span>
           </Button>
         </Header>
         <Content
-          title="迭代冲刺“6/10 迭代冲刺 ”的燃尽图"
+          title={`迭代冲刺“${ReportStore.currentSprint.sprintName || ''}”的燃尽图`}
           description="了解每个sprint中完成的工作或者退回后备的工作。这有助于您确定您的团队是过量使用或如果有过多的范围扩大。"
         >
           <Select
+            value={ReportStore.currentSprint.sprintId}
+            onChange={(value) => {
+              ReportStore.changeCurrentSprint(value);
+            }}
             style={{ width: 520 }}
             label="迭代冲刺"
             loading={this.state.selectLoading}
@@ -276,15 +283,16 @@ class ReleaseDetail extends Component {
             filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
           >
             {ReportStore.sprints.map(sprint =>
-              (<Option key={sprint.id} value={sprint.id}>{sprint.name}</Option>),
+              (<Option key={sprint.sprintId} value={sprint.sprintId}>{sprint.sprintName}</Option>),
             )}
           </Select>
           <div className="c7n-sprintMessage">
             <span>
-              已关闭 Sprint, 由 12462李洪 结束
+              {ReportStore.getCurrentSprintStatus.status}冲刺, 由 12462李洪 {ReportStore.getCurrentSprintStatus.action}
             </span>
             <span>
-              04/六月/18 1:24 下午 - 11/六月/18 9:33 上午
+              {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.startDate)}`}
+              {/* 04/六月/18 1:24 下午 - 11/六月/18 9:33 上午 */}
             </span>
           </div>
           <div className="c7n-chart" />

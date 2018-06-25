@@ -7,7 +7,7 @@ const { TextArea } = Input;
 const { AppState } = stores;
 const FormItem = Form.Item;
 
-class CreateLink extends Component {
+class EditLink extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,6 +16,10 @@ class CreateLink extends Component {
   }
 
   componentDidMount() {
+    this.loadLink(this.props.linkId);
+  }
+
+  loadLink(linkId) {
   }
 
   handleOk(e) {
@@ -65,17 +69,17 @@ class CreateLink extends Component {
         >
           <Form layout="vertical">
             <FormItem>
-              {getFieldDecorator('name', { rules: [{ required: true }] })(
+              {getFieldDecorator('name', { rules: [{ required: true }], initialValue: this.state.arr[index].value })(
                 <Input label="名称" maxLength={30} />,
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('outWard', {})(
+              {getFieldDecorator('outWard', { initialValue: this.state.arr[index].value })(
                 <TextArea label="链出描述" autosize maxLength={30} />,
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('inWard', {})(
+              {getFieldDecorator('inWard', { initialValue: this.state.arr[index].value })(
                 <TextArea label="链入描述" autosize maxLength={30} />,
               )}
             </FormItem>
@@ -87,4 +91,4 @@ class CreateLink extends Component {
   }
 }
 
-export default Form.create()(CreateLink);
+export default Form.create()(EditLink);
