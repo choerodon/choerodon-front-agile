@@ -25,7 +25,6 @@ class SwimLanePage extends Component {
     };
     ScrumBoardStore.axiosUpdateBoard(data).then((res) => {
       message.success('保存成功');
-      window.console.log(res);
     }).catch((error) => {
       message.success('保存失败');
       window.console.log(error);
@@ -42,7 +41,7 @@ class SwimLanePage extends Component {
     });
     return (
       <Content
-        description="Swimlane一横排是一行的主板。可以用于组的问题。Swimlane类型可以更改如下，并将被自动保存。注意:查询将不会丢失的更改为另一种Swimlane类型。"
+        description="泳道是指看板中一横排的主板，基于横排对问题进行状态的流转。泳道类型可以在下面进行修改，并将自动保存。注意：修改泳道会修改看板的分组维度，同事修改看板样式。"
         style={{
           padding: 0,
           height: '100%',

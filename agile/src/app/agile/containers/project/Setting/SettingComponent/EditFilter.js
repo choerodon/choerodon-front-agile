@@ -84,7 +84,6 @@ class AddComponent extends Component {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        window.console.log(values);
         const arr = [];
         const expressQueryArr = [];
         const o = [];

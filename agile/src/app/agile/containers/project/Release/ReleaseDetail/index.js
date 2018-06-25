@@ -320,33 +320,39 @@ class ReleaseDetail extends Component {
           )} 
           backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`}
         >
-          <Button 
-            funcTyp="flat" 
-            style={{
-              marginLeft: 80,
-            }}
-            onClick={() => { 
-              if (ReleaseStore.getVersionDetail.statusCode === 'version_planning') {
-                ReleaseStore.axiosGetPublicVersionDetail(ReleaseStore.getVersionDetail.versionId)
-                  .then((res) => {
-                    ReleaseStore.setPublicVersionDetail(res);
-                    this.setState({ publicVersion: true }); 
-                  }).catch((error) => {
-                    window.console.log(error);
-                  });
-              } else {
-                ReleaseStore.axiosUnPublicRelease(
-                  ReleaseStore.getVersionDetail.versionId).then((res2) => {
-                  this.refresh();
-                }).catch((error) => {
-                  window.console.log(error);
-                });
-              }
-            }}
-          >
-            <Icon type="publish2" />
-            <span>{ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? '发布' : '撤销发布'}</span>
-          </Button>
+          {
+            ReleaseStore.getVersionDetail.statusCode === 'archived' ? '' : (
+              <Button 
+                funcTyp="flat" 
+                style={{
+                  marginLeft: 80,
+                }}
+                onClick={() => { 
+                  if (ReleaseStore.getVersionDetail.statusCode === 'version_planning') {
+                    ReleaseStore.axiosGetPublicVersionDetail(
+                      ReleaseStore.getVersionDetail.versionId)
+                      .then((res) => {
+                        ReleaseStore.setPublicVersionDetail(res);
+                        this.setState({ publicVersion: true }); 
+                      }).catch((error) => {
+                        window.console.log(error);
+                      });
+                  } else {
+                    ReleaseStore.axiosUnPublicRelease(
+                      ReleaseStore.getVersionDetail.versionId).then((res2) => {
+                      this.refresh();
+                    }).catch((error) => {
+                      window.console.log(error);
+                    });
+                  }
+                }}
+              >
+                <Icon type="publish2" />
+                <span>{ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? '发布' : '撤销发布'}</span>
+              </Button>
+            )
+          }
+          
         </Header>
         <Content className="c7n-versionDetail">
           <Spin spinning={this.state.loading}>

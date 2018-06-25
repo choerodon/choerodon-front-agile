@@ -12,12 +12,10 @@ const BACKLOGINDEX = asyncRouter(() => import('./project/Backlog'));
 const SCRUMBOARDINDEX = asyncRouter(() => import('./project/ScrumBoard'));
 const ISSUEIndex = asyncRouter(() => import('./project/Issue'));
 const COMPONENTIndex = asyncRouter(() => import('./project/Component'));
-const REPORTIndex = asyncRouter(() => import('./project/Report'));
-const BURNDOWNCHART = asyncRouter(() => import('./project/BurndownChart'));
 const SETTINGINDEX = asyncRouter(() => import('./project/Setting'));
-const REPORTINDEX = asyncRouter(() => import('./project/Report'));
 const PROJECTSETTINGINDEX = asyncRouter(() => import('./project/ProjectSetting'));
 const FASTSEARCHINDEX = asyncRouter(() => import('./project/FastSearch'));
+const REPORTHOSTINDEX = asyncRouter(() => import('./project/ReportHost'));
 const ISSUELINKINDEX = asyncRouter(() => import('./project/IssueLink'));
 
 class AGILEIndex extends React.Component {
@@ -30,18 +28,28 @@ class AGILEIndex extends React.Component {
       <IntlProviderAsync>
         <Switch>
           <Route exact path={match.url} component={Home} />
+          {/* 发布版本 */}
           <Route path={`${match.url}/release`} component={RELEASEINDEX} />
+          {/* 待办事项 */}
           <Route path={`${match.url}/backlog`} component={BACKLOGINDEX} />
+          {/* 活跃冲刺 */}
           <Route path={`${match.url}/scrumboard`} component={SCRUMBOARDINDEX} /> 
+          {/* 问题管理 */}
           <Route path={`${match.url}/issue`} component={ISSUEIndex} />
+          {/* 模块管理 */}
           <Route path={`${match.url}/component`} component={COMPONENTIndex} />
-          <Route path={`${match.url}/report`} component={REPORTIndex} />
-          <Route path={`${match.url}/burndownchart`} component={BURNDOWNCHART} />
-          <Route path={`${match.url}/report`} component={REPORTINDEX} />
-          <Route path={`${match.url}/setting`} component={SETTINGINDEX} />
+          {/* 报告 */}
+          <Route path={`${match.url}/reporthost`} component={REPORTHOSTINDEX} />
+          {/* <Route path={`${match.url}/burndownchart`} component={BURNDOWNCHART} /> */}
+          {/* <Route path={`${match.url}/setting`} component={SETTINGINDEX} /> */}
+          {/* 项目设置 */}
           <Route path={`${match.url}/projectSetting`} component={PROJECTSETTINGINDEX} />
+          {/* 快速搜索 */}
           <Route path={`${match.url}/fastSearch`} component={FASTSEARCHINDEX} />
+          {/* 问题链接 */}
           <Route path={`${match.url}/issueLink`} component={ISSUELINKINDEX} />
+          {/* 状态 */}
+          <Route path={`${match.url}/status`} component={ISSUELINKINDEX} />
           <Route path={'*'} component={nomatch} />
         </Switch>
       </IntlProviderAsync>

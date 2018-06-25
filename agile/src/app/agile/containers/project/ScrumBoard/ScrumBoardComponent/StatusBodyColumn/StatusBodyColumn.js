@@ -141,7 +141,8 @@ class StatusBodyColumn extends Component {
           return 'rgba(0, 0, 0, 0.04)';
         }
       } else {
-        return '';
+        // if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId)
+        return 'rgba(140,158,255,0.12)';
       }
     } else {
       return 'rgba(0, 0, 0, 0.04)';
@@ -263,8 +264,12 @@ class StatusBodyColumn extends Component {
       } else {
         return 'unset';
       }
-    } 
-    return '';
+    }
+    if (drag) {
+      return '2px dashed #1AB16F';
+    } else {
+      return '2px dashed #26348B';
+    }
   }
   renderStatusDisplay(dragStartData, data) {
     if (JSON.stringify(dragStartData) !== '{}') {

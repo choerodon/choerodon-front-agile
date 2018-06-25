@@ -4,9 +4,8 @@ import { Button, Spin, message, Icon, Select, Table } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
-import '../../../main.scss';
-import BurndownChartStore from '../../../../stores/project/burndownChart/BurndownChartStore';
-import burndownChartStore from '../../../../stores/project/burndownChart/BurndownChartStore';
+import '../../../../main.scss';
+import BurndownChartStore from '../../../../../stores/project/burndownChart/BurndownChartStore';
 import './BurndownChartHome.scss';
 
 const { AppState } = stores;
@@ -29,7 +28,6 @@ class BurndownChartHome extends Component {
   }
   getSprintData() {
     BurndownChartStore.axiosGetSprintList().then((res) => {
-      window.console.log(res);
       BurndownChartStore.setSprintList(res);
       this.setState({
         defaultSprint: res[0].sprintId,
@@ -46,7 +44,6 @@ class BurndownChartHome extends Component {
     });
     BurndownChartStore
       .axiosGetBurndownChartReport(this.state.defaultSprint, this.state.select).then((res) => {
-        window.console.log(res);
         const data = res;
         const newData = [];
         _.forEach(data, (item) => {
@@ -92,7 +89,6 @@ class BurndownChartHome extends Component {
           });
           newData[index].rest = rest;
         });
-        window.console.log(newData);
         BurndownChartStore.setBurndownList(newData);
         this.setState({
           xAxis: _.map(newData, 'date'),
@@ -294,9 +290,14 @@ class BurndownChartHome extends Component {
         sprintName = item.sprintName;
       }
     });
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
     return (
       <Page>
-        <Header title="燃尽图">
+        <Header
+          title="燃尽图"
+          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`}
+        >
           <Button funcTyp="flat" onClick={this.getChartData.bind(this)}>
             <Icon type="refresh" />刷新
           </Button>
@@ -308,7 +309,7 @@ class BurndownChartHome extends Component {
         >
           <Spin spinning={this.state.loading}>
             {
-              burndownChartStore.getSprintList.length > 0 ? (
+              BurndownChartStore.getSprintList.length > 0 ? (
                 <div>
                   <div>
                     <Select 

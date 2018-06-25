@@ -4,6 +4,8 @@
 'agile.backlog':  待办事项
 'agile.scrumboard':  活跃冲刺
 'agile.component': 模块管理
-'agile.burndownchart': 燃尽图
-'agile.report': 冲刺报告
-'agile.setting': 设置
+'agile.reporthost': 报告
+'agile.projectSetting': 项目设置
+'fastSearch': 快速搜索
+'issueLink': 问题链接
+'status': 状态

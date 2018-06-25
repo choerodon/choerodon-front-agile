@@ -28,35 +28,47 @@ class ScrumBoardSetting extends Component {
   componentWillMount() {
     this.refresh();
   }
+  // getQueryVariable(variable) {
+  //   const data = window.location.hash.split('?')[1].split('&');
+  //   const result = _.find(data, o => o.indexOf(variable) !== -1).replace(/[^0-9]/ig, '');
+  //   return parseInt(result, 10);
+  // }
   refresh() {
     this.setState({
       loading: true,
     });
-    ScrumBoardStore.axiosGetBoardDataBySetting(ScrumBoardStore.getSelectedBoard).then((data) => {
-      ScrumBoardStore.axiosGetUnsetData(ScrumBoardStore.getSelectedBoard).then((data2) => {
-        const unsetColumn = {
-          columnId: 'unset',
-          name: '未对应的状态',
-          subStatuses: data2,
-        };
-        data.columnsData.columns.push(unsetColumn);
-        ScrumBoardStore.setBoardData(data.columnsData.columns);
-        this.setState({
-          loading: false,
+    const boardId = ScrumBoardStore.getSelectedBoard;
+    if (!boardId) {
+      const { history } = this.props;
+      const urlParams = AppState.currentMenuType;
+      history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
+    } else {
+      ScrumBoardStore.axiosGetBoardDataBySetting(boardId).then((data) => {
+        ScrumBoardStore.axiosGetUnsetData(boardId).then((data2) => {
+          const unsetColumn = {
+            columnId: 'unset',
+            name: '未对应的状态',
+            subStatuses: data2,
+          };
+          data.columnsData.columns.push(unsetColumn);
+          ScrumBoardStore.setBoardData(data.columnsData.columns);
+          this.setState({
+            loading: false,
+          });
+        }).catch((error2) => {
+          window.console.log(error2);
         });
-      }).catch((error2) => {
-        window.console.log(error2);
+      }).catch((error) => {
+        window.console.log(error);
       });
-    }).catch((error) => {
-      window.console.log(error);
-    });
-    ScrumBoardStore.axiosGetLookupValue('constraint').then((res) => {
-      const oldLookup = ScrumBoardStore.getLookupValue;
-      oldLookup.constraint = res.lookupValues;
-      ScrumBoardStore.setLookupValue(oldLookup);
-    }).catch((error) => {
-      window.console.log(error);
-    });
+      ScrumBoardStore.axiosGetLookupValue('constraint').then((res) => {
+        const oldLookup = ScrumBoardStore.getLookupValue;
+        oldLookup.constraint = res.lookupValues;
+        ScrumBoardStore.setLookupValue(oldLookup);
+      }).catch((error) => {
+        window.console.log(error);
+      });
+    }
   }
   
   handleDeleteBoard() {

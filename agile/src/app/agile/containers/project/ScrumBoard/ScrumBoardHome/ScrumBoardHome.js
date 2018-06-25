@@ -76,7 +76,6 @@ class ScrumBoardHome extends Component {
       spinIf: true,
     });
     ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
-      window.console.log(res);
       ScrumBoardStore.setQuickSearchList(res);
       ScrumBoardStore.axiosGetBoardData(boardId,
         this.state.onlyMe ? AppState.getUserId : 0,
@@ -440,7 +439,6 @@ class ScrumBoardHome extends Component {
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       ids = ScrumBoardStore.getAssigneer;
     }
-    window.console.log(ids);
     const result = [];
     _.forEach(ids, (item) => {
       result.push(
@@ -590,7 +588,7 @@ class ScrumBoardHome extends Component {
                     onClick={() => {
                       const { history } = this.props;
                       const urlParams = AppState.currentMenuType;
-                      history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
+                      history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&boardId=${ScrumBoardStore.getSelectedBoard}`);
                     }}
                   >
                     <Icon type="settings icon" />
