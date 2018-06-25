@@ -113,6 +113,10 @@ export function deleteIssue(issueId, projectId = AppState.currentMenuType.id) {
   return axios.delete(`/agile/v1/project/${projectId}/issues/${issueId}`);
 }
 
+export function deleteLink(issueLinkId, projectId = AppState.currentMenuType.id) {
+  return axios.delete(`/agile/v1/project/${projectId}/issue_links/${issueLinkId}`);
+}
+
 export function createWorklog(data, projectId = AppState.currentMenuType.id) {
   return axios.post(`/agile/v1/project/${projectId}/work_log`, data);
 }

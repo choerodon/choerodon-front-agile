@@ -162,7 +162,7 @@ class CreateSprint extends Component {
               {getFieldDecorator('issues', {})(
                 <Select
                   label="问题"
-                  mode="tags"
+                  mode="multiple"
                   loading={this.state.selectLoading}
                   optionLabelProp="value"
                   filter
