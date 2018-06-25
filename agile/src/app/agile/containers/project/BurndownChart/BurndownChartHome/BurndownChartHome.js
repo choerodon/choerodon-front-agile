@@ -6,6 +6,8 @@ import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import '../../../main.scss';
 import BurndownChartStore from '../../../../stores/project/burndownChart/BurndownChartStore';
+import burndownChartStore from '../../../../stores/project/burndownChart/BurndownChartStore';
+import './BurndownChartHome.scss';
 
 const { AppState } = stores;
 const Option = Select.Option;
@@ -237,7 +239,7 @@ class BurndownChartHome extends Component {
         <div>
           {
             text.map(item => (
-              <p style={{ whiteSpace: 'nowrap' }}>{item.issueNum}</p>
+              <p style={{ whiteSpace: 'nowrap', color: '#3F51B5' }}>{item.issueNum}</p>
             ))
           }
         </div>
@@ -300,47 +302,59 @@ class BurndownChartHome extends Component {
           </Button>
         </Header>
         <Content
-          title={`迭代冲刺“${sprintName}”的燃尽图`}
+          title={sprintName ? `迭代冲刺“${sprintName}”的燃尽图` : '无冲刺迭代的燃尽图'}
           description="了解每个sprint中完成的工作或者退回后备的工作。这有助于您确定您的团队是过量使用或如果有过多的范围扩大。"
           link="#"
         >
           <Spin spinning={this.state.loading}>
-            <div>
-              <Select 
-                style={{ width: 244 }} 
-                label="迭代冲刺" 
-                value={this.state.defaultSprint}
-                onChange={(value) => {
-                  this.setState({
-                    defaultSprint: value,
-                  }, () => {
-                    this.getChartData();
-                  });
-                }}
-              >
-                {BurndownChartStore.getSprintList.length > 0 ? 
-                  BurndownChartStore.getSprintList.map(item => (
-                    <Option value={item.sprintId}>{item.sprintName}</Option>
-                  )) : ''}
-              </Select>
-              <Select 
-                style={{ width: 244, marginLeft: 24 }} 
-                label="单位" 
-                defaultValue={this.state.select}
-                onChange={this.handleChangeSelect.bind(this)}
-              >
-                <Option value="remainingEstimatedTime">剩余预估时间</Option>
-                <Option value="storyPoints">故事点</Option>
-                <Option value="issueCount">问题计数</Option>
-              </Select>
-            </div>
-            <ReactEcharts option={this.getOption()} />
-            <Table
-              dataSource={BurndownChartStore.getBurndownList}
-              columns={columns}
-            />
+            {
+              burndownChartStore.getSprintList.length > 0 ? (
+                <div>
+                  <div>
+                    <Select 
+                      style={{ width: 244 }} 
+                      label="迭代冲刺" 
+                      value={this.state.defaultSprint}
+                      onChange={(value) => {
+                        this.setState({
+                          defaultSprint: value,
+                        }, () => {
+                          this.getChartData();
+                        });
+                      }}
+                    >
+                      {BurndownChartStore.getSprintList.length > 0 ? 
+                        BurndownChartStore.getSprintList.map(item => (
+                          <Option value={item.sprintId}>{item.sprintName}</Option>
+                        )) : ''}
+                    </Select>
+                    <Select 
+                      style={{ width: 244, marginLeft: 24 }} 
+                      label="单位" 
+                      defaultValue={this.state.select}
+                      onChange={this.handleChangeSelect.bind(this)}
+                    >
+                      <Option value="remainingEstimatedTime">剩余预估时间</Option>
+                      <Option value="storyPoints">故事点</Option>
+                      <Option value="issueCount">问题计数</Option>
+                    </Select>
+                  </div>
+                  <ReactEcharts option={this.getOption()} />
+                  <Table
+                    dataSource={BurndownChartStore.getBurndownList}
+                    columns={columns}
+                  />
+                </div>
+              ) : (
+                <div className="c7n-chart-noSprint">
+                  <div className="c7n-chart-icon">
+                    <Icon type="info_outline" />
+                  </div>
+                  <p style={{ marginLeft: 20 }}>该面板无可用冲刺</p>
+                </div>
+              )
+            }
           </Spin>
-          
         </Content>
       </Page>
     );

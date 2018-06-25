@@ -32,7 +32,6 @@
   justify-content: space-between;
   font-size: 14px;
   padding: 15px 24px;
-  flex-wrap: wrap;
 
   .c7n-scrumTools-left {
     display: flex;
@@ -46,6 +45,7 @@
       cursor: pointer;
       padding: 3px 8px;
       margin-right: 18px;
+      margin-top: 5px;
     }
   }
 

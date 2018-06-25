@@ -26,7 +26,7 @@ class BurndownChartStore {
   }
 
   axiosGetSprintList() {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/names`, []);
+    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/names`, ['started', 'closed']);
   }
 
   axiosGetBurndownChartData(id, type) {

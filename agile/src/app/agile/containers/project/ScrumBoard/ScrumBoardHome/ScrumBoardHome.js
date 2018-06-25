@@ -38,6 +38,7 @@ class ScrumBoardHome extends Component {
       closeSprintVisible: false,
       judgeUpdateParent: {},
       updateParentStatus: null,
+      quickFilter: [],
     };
   }
   componentWillMount() {
@@ -74,49 +75,56 @@ class ScrumBoardHome extends Component {
     this.setState({
       spinIf: true,
     });
-    ScrumBoardStore.axiosGetBoardData(boardId,
-      this.state.onlyMe ? AppState.getUserId : 0,
-      this.state.recent,
-    ).then((data) => {
-      const parentIds = [];
-      const assigneeIds = [];
-      const storeParentIds = [];
-      const storeAssignee = [];
-      _.forEach(data.columnsData.columns, (col) => {
-        _.forEach(col.subStatuses, (sub) => {
-          _.forEach(sub.issues, (iss) => {
-            if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
-              if (parentIds.indexOf(iss.issueId) === -1) {
-                parentIds.push(iss.issueId);
-                storeParentIds.push({
-                  status: sub.name,
-                  categoryCode: sub.categoryCode,
-                  ...iss,
-                });
-              }
-            }
-            if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
-              if (assigneeIds.indexOf(iss.assigneeId) === -1) {
-                if (iss.assigneeId) {
-                  assigneeIds.push(iss.assigneeId);
-                  storeAssignee.push({
-                    assigneeId: iss.assigneeId,
-                    assigneeName: iss.assigneeName,
-                    imageUrl: iss.imageUrl,
+    ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
+      window.console.log(res);
+      ScrumBoardStore.setQuickSearchList(res);
+      ScrumBoardStore.axiosGetBoardData(boardId,
+        this.state.onlyMe ? AppState.getUserId : 0,
+        this.state.recent,
+        this.state.quickFilter,
+      ).then((data) => {
+        const parentIds = [];
+        const assigneeIds = [];
+        const storeParentIds = [];
+        const storeAssignee = [];
+        _.forEach(data.columnsData.columns, (col) => {
+          _.forEach(col.subStatuses, (sub) => {
+            _.forEach(sub.issues, (iss) => {
+              if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
+                if (parentIds.indexOf(iss.issueId) === -1) {
+                  parentIds.push(iss.issueId);
+                  storeParentIds.push({
+                    status: sub.name,
+                    categoryCode: sub.categoryCode,
+                    ...iss,
                   });
                 }
               }
-            }
+              if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
+                if (assigneeIds.indexOf(iss.assigneeId) === -1) {
+                  if (iss.assigneeId) {
+                    assigneeIds.push(iss.assigneeId);
+                    storeAssignee.push({
+                      assigneeId: iss.assigneeId,
+                      assigneeName: iss.assigneeName,
+                      imageUrl: iss.imageUrl,
+                    });
+                  }
+                }
+              }
+            });
           });
         });
-      });
-      ScrumBoardStore.setAssigneer(storeAssignee);
-      ScrumBoardStore.setCurrentSprint(data.currentSprint);
-      ScrumBoardStore.setParentIds(storeParentIds);
-      ScrumBoardStore.setBoardData(data.columnsData.columns);
-      // this.storeIssueNumberCount(storeParentIds, )
-      this.setState({
-        spinIf: false,
+        ScrumBoardStore.setAssigneer(storeAssignee);
+        ScrumBoardStore.setCurrentSprint(data.currentSprint);
+        ScrumBoardStore.setParentIds(storeParentIds);
+        ScrumBoardStore.setBoardData(data.columnsData.columns);
+        // this.storeIssueNumberCount(storeParentIds, )
+        this.setState({
+          spinIf: false,
+        });
+      }).catch((error) => {
+        window.console.log(error);
       });
     }).catch((error) => {
       window.console.log(error);
@@ -357,6 +365,19 @@ class ScrumBoardHome extends Component {
       window.console.log(error);
     });
   }
+  filterQuick(item) {
+    const newState = [...this.state.quickFilter];
+    if (newState.indexOf(item.filterId) === -1) {
+      newState.push(item.filterId);
+    } else {
+      newState.splice(newState.indexOf(item.filterId), 1);
+    }
+    this.setState({
+      quickFilter: newState,
+    }, () => {
+      this.refresh(ScrumBoardStore.getSelectedBoard);
+    });
+  }
   // 渲染第三方状态列
   renderStatusColumns() {
     const data = ScrumBoardStore.getBoardData;
@@ -466,6 +487,7 @@ class ScrumBoardHome extends Component {
     }
     return result;
   }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -517,7 +539,7 @@ class ScrumBoardHome extends Component {
           <div style={{ flexGrow: 1 }}>
             <Spin spinning={this.state.spinIf}>
               <div className="c7n-scrumTools">
-                <div className="c7n-scrumTools-left">
+                <div style={{ flexWrap: 'wrap' }} className="c7n-scrumTools-left">
                   <p style={{ marginRight: 24 }}>快速搜索:</p>
                   <p
                     className="c7n-scrumTools-filter"
@@ -537,6 +559,22 @@ class ScrumBoardHome extends Component {
                     role="none"
                     onClick={this.filterOnlyStory.bind(this)}
                   >仅故事</p>
+                  {
+                    ScrumBoardStore.getQuickSearchList.length > 0 ? 
+                      ScrumBoardStore.getQuickSearchList.map(item => (
+                        <p
+                          className="c7n-scrumTools-filter"
+                          style={{
+                            color: this.state.quickFilter.indexOf(item.filterId) !== -1 ? 'white' : '#303F9F',
+                            background: this.state.quickFilter.indexOf(item.filterId) !== -1 ? '#303F9F' : '',
+                          }}
+                          role="none"
+                          onClick={this.filterQuick.bind(this, item)}
+                        >
+                          {item.name}
+                        </p>
+                      )) : ''
+                  }
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
                   <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
