@@ -45,6 +45,7 @@ class ProjectSetting extends Component {
         axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/project_info`, projectInfoDTO)
           .then((res) => {
             this.setState({
+              origin: res,
               loading: false,
             });
           })
@@ -83,6 +84,7 @@ class ProjectSetting extends Component {
           <Button
             type="primary"
             funcType="raised"
+            disabled={this.state.origin.projectCode === this.props.form.getFieldValue('code')}
             loading={this.state.loading}
             onClick={() => this.handleUpdateProjectCode()}
           >
@@ -90,6 +92,7 @@ class ProjectSetting extends Component {
           </Button>
           <Button
             funcType="raised"
+            disabled={this.state.origin.projectCode === this.props.form.getFieldValue('code')}
             style={{ marginLeft: 12 }}
             onClick={() => this.getProjectCode()}
           >
