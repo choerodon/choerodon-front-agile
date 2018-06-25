@@ -56,7 +56,7 @@
         sort: 9
         permission:
           - 'agile-service.issue.queryIssue'
-    - "status"
+    - "status":
         icon: directions_run
         Routes: /agile/status
         sort: 10
