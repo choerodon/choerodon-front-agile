@@ -20,6 +20,15 @@ class BacklogStore {
   @observable openSprintDetail = {};
   @observable sprintWidth;
   @observable colorLookupValue = [];
+  @observable quickFilters = [];
+
+  @computed get getQuickFilters() {
+    return toJS(this.quickFilters);
+  }
+
+  @action setQuickFilters(data) {
+    this.quickFilters = data;
+  }
 
   getSprintFilter() {
     const data = {
@@ -229,7 +238,7 @@ class BacklogStore {
   }
 
   axiosGetSprint(data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/issues`, data);
+    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/issues?quickFilterIds=${this.quickFilters}`, data);
   }
 }
 
