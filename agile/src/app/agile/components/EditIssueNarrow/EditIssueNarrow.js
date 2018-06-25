@@ -8,7 +8,7 @@ import './EditIssueNarrow.scss';
 import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
 import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate } from '../../common/utils';
-import { loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
+import { loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
 import { getCurrentOrg, getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
@@ -82,6 +82,7 @@ class CreateSprint extends Component {
       closeSprint: [],
 
       worklogs: [],
+      datalogs: [],
       fileList: [],
       issueCommentDTOList: [],
       issueLinkDTOList: [],
@@ -141,6 +142,11 @@ class CreateSprint extends Component {
         linkIssues: res,
       });
     });
+    loadDatalogs(issueId).then((res) => {
+      this.setState({
+        datalogs: res,
+      });
+    })
   }
 
   /**
@@ -707,9 +713,11 @@ class CreateSprint extends Component {
     return (
       <div>
         {
-          [1, 2].map(worklog => (
+          this.state.datalogs.map((datalog, i) => (
             <DataLog
-              // worklog={worklog}
+              i={i}
+              datalog={datalog}
+              origin={this.state.datalogs}
             />
           ))
         }
