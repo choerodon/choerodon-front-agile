@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { Button, Table, Spin, Popover, Tooltip, Icon } from 'choerodon-ui';
 import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import CreateLink from './CreateLink';
+import DeleteLink from './DeleteLink';
 
 const { AppState } = stores;
 
@@ -14,7 +15,7 @@ class Link extends Component {
       links: [],
       createLinkShow: false,
 
-      component: {},
+      link: {},
       currentComponentId: undefined,
       loading: false,
       confirmShow: false,
@@ -34,18 +35,18 @@ class Link extends Component {
     });
   }
 
-  clickDeleteComponent(record) {
+  clickDeleteLink(record) {
     this.setState({
-      component: record,
+      link: record,
       confirmShow: true,
     });
   }
 
-  deleteComponent() {
+  deleteLink() {
     this.setState({
       confirmShow: false,
     });
-    this.loadComponents();
+    // this.loadComponents();
   }
 
   loadLinks() {
@@ -120,7 +121,7 @@ class Link extends Component {
               </Button>
             </Popover>
             <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>删除</span></div>}>
-              <Button shape="circle" onClick={this.clickDeleteComponent.bind(this, record)}>
+              <Button shape="circle" onClick={this.clickDeleteLink.bind(this, record)}>
                 <Icon type="delete_forever" />
               </Button>
             </Popover>
@@ -149,6 +150,16 @@ class Link extends Component {
             <CreateLink
               onOk={() => this.setState({ createLinkShow: false })}
               onCancel={() => this.setState({ createLinkShow: false })}
+            />
+          ) : null
+        }
+        {
+          this.state.confirmShow ? (
+            <DeleteLink
+              visible={this.state.confirmShow}
+              link={this.state.link}
+              onCancel={() => this.setState({ confirmShow: false })}
+              onOk={this.deleteLink.bind(this)}
             />
           ) : null
         }

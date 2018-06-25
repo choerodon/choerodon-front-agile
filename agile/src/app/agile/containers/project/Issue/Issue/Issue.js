@@ -521,7 +521,7 @@ class Issue extends Component {
           <div 
             className="c7n-content-issue" 
             style={{
-              width: this.state.expand ? '33%' : '100%',
+              width: this.state.expand ? '28%' : '100%',
               display: 'block',
               overflowY: 'scroll',
               overflowX: 'hidden',
@@ -713,7 +713,7 @@ class Issue extends Component {
           <div
             className="c7n-sidebar"
             style={{
-              width: this.state.expand ? '67%' : 0,
+              width: this.state.expand ? '72%' : 0,
               display: this.state.expand ? 'block' : 'none',
               overflowY: 'hidden',
               overflowX: 'hidden',

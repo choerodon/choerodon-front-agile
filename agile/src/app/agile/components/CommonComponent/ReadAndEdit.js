@@ -100,6 +100,7 @@ class ReadAndEdit extends Component {
                 style={{
                   display: 'none',
                   lineHeight: '20px',
+                  alignItems: 'center',
                 }}
               >
                 <Icon type="mode_edit" />
