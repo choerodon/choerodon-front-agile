@@ -38,6 +38,7 @@ class ScrumBoardHome extends Component {
       closeSprintVisible: false,
       judgeUpdateParent: {},
       updateParentStatus: null,
+      quickFilter: [],
     };
   }
   componentWillMount() {
@@ -74,49 +75,56 @@ class ScrumBoardHome extends Component {
     this.setState({
       spinIf: true,
     });
-    ScrumBoardStore.axiosGetBoardData(boardId,
-      this.state.onlyMe ? AppState.getUserId : 0,
-      this.state.recent,
-    ).then((data) => {
-      const parentIds = [];
-      const assigneeIds = [];
-      const storeParentIds = [];
-      const storeAssignee = [];
-      _.forEach(data.columnsData.columns, (col) => {
-        _.forEach(col.subStatuses, (sub) => {
-          _.forEach(sub.issues, (iss) => {
-            if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
-              if (parentIds.indexOf(iss.issueId) === -1) {
-                parentIds.push(iss.issueId);
-                storeParentIds.push({
-                  status: sub.name,
-                  categoryCode: sub.categoryCode,
-                  ...iss,
-                });
-              }
-            }
-            if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
-              if (assigneeIds.indexOf(iss.assigneeId) === -1) {
-                if (iss.assigneeId) {
-                  assigneeIds.push(iss.assigneeId);
-                  storeAssignee.push({
-                    assigneeId: iss.assigneeId,
-                    assigneeName: iss.assigneeName,
-                    imageUrl: iss.imageUrl,
+    ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
+      window.console.log(res);
+      ScrumBoardStore.setQuickSearchList(res);
+      ScrumBoardStore.axiosGetBoardData(boardId,
+        this.state.onlyMe ? AppState.getUserId : 0,
+        this.state.recent,
+        this.state.quickFilter,
+      ).then((data) => {
+        const parentIds = [];
+        const assigneeIds = [];
+        const storeParentIds = [];
+        const storeAssignee = [];
+        _.forEach(data.columnsData.columns, (col) => {
+          _.forEach(col.subStatuses, (sub) => {
+            _.forEach(sub.issues, (iss) => {
+              if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
+                if (parentIds.indexOf(iss.issueId) === -1) {
+                  parentIds.push(iss.issueId);
+                  storeParentIds.push({
+                    status: sub.name,
+                    categoryCode: sub.categoryCode,
+                    ...iss,
                   });
                 }
               }
-            }
+              if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
+                if (assigneeIds.indexOf(iss.assigneeId) === -1) {
+                  if (iss.assigneeId) {
+                    assigneeIds.push(iss.assigneeId);
+                    storeAssignee.push({
+                      assigneeId: iss.assigneeId,
+                      assigneeName: iss.assigneeName,
+                      imageUrl: iss.imageUrl,
+                    });
+                  }
+                }
+              }
+            });
           });
         });
-      });
-      ScrumBoardStore.setAssigneer(storeAssignee);
-      ScrumBoardStore.setCurrentSprint(data.currentSprint);
-      ScrumBoardStore.setParentIds(storeParentIds);
-      ScrumBoardStore.setBoardData(data.columnsData.columns);
-      // this.storeIssueNumberCount(storeParentIds, )
-      this.setState({
-        spinIf: false,
+        ScrumBoardStore.setAssigneer(storeAssignee);
+        ScrumBoardStore.setCurrentSprint(data.currentSprint);
+        ScrumBoardStore.setParentIds(storeParentIds);
+        ScrumBoardStore.setBoardData(data.columnsData.columns);
+        // this.storeIssueNumberCount(storeParentIds, )
+        this.setState({
+          spinIf: false,
+        });
+      }).catch((error) => {
+        window.console.log(error);
       });
     }).catch((error) => {
       window.console.log(error);
@@ -357,6 +365,19 @@ class ScrumBoardHome extends Component {
       window.console.log(error);
     });
   }
+  filterQuick(item) {
+    const newState = [...this.state.quickFilter];
+    if (newState.indexOf(item.filterId) === -1) {
+      newState.push(item.filterId);
+    } else {
+      newState.splice(newState.indexOf(item.filterId), 1);
+    }
+    this.setState({
+      quickFilter: newState,
+    }, () => {
+      this.refresh(ScrumBoardStore.getSelectedBoard);
+    });
+  }
   // 渲染第三方状态列
   renderStatusColumns() {
     const data = ScrumBoardStore.getBoardData;
@@ -466,6 +487,7 @@ class ScrumBoardHome extends Component {
     }
     return result;
   }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -515,166 +537,150 @@ class ScrumBoardHome extends Component {
         </Header>
         <Content style={{ padding: 0, display: 'flex', overflow: 'hidden' }}>
           <div style={{ flexGrow: 1 }}>
-            <div className="c7n-scrumTools">
-              <div className="c7n-scrumTools-left">
-                <p style={{ marginRight: 24 }}>快速搜索:</p>
-                <p
-                  className="c7n-scrumTools-filter"
-                  style={{
-                    background: this.state.onlyMe ? '#303F9F' : '',
-                    color: this.state.onlyMe ? 'white' : '#303F9F',
-                  }}
-                  role="none"
-                  onClick={this.filterOnlyMe.bind(this)}
-                >仅我的问题</p>
-                <p
-                  className="c7n-scrumTools-filter"
-                  style={{
-                    background: this.state.recent ? '#303F9F' : '',
-                    color: this.state.recent ? 'white' : '#303F9F',
-                  }}
-                  role="none"
-                  onClick={this.filterOnlyStory.bind(this)}
-                >仅故事</p>
-              </div>
-              <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
-                <Button
-                  funcTyp="flat"
-                  onClick={() => {
-                    BacklogStore.axiosGetSprintCompleteMessage(
-                      ScrumBoardStore.getCurrentSprint.sprintId).then((res) => {
-                      BacklogStore.setSprintCompleteMessage(res);
-                      let flag = 0;
-                      if (res.parentsDoneUnfinishedSubtasks) {
-                        if (res.parentsDoneUnfinishedSubtasks.length > 0) {
-                          flag = 1;
-                          let issueNums = '';
-                          _.forEach(res.parentsDoneUnfinishedSubtasks, (items) => {
-                            issueNums += `${items.issueNum} `;
-                          });
-                          confirm({
-                            title: 'warnning',
-                            content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
-                            onCancel() {
-                              window.console.log('Cancel');
-                            },
-                          });
-                        }
-                      }
-                      if (flag === 0) {
-                        this.setState({
-                          closeSprintVisible: true,
-                        });
-                      }
-                    }).catch((error) => {
-                      window.console.log(error);
-                    });
-                  }}
-                  type="av_timer"
-                />
-                <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
-                <Button
-                  funcTyp="flat"
-                  onClick={this.handleFinishSprint.bind(this)}
-                >
-                  <Icon type="power_settings_new icon" />
-                  <span style={{ marginLeft: 0 }}>完成Sprint</span>
-                </Button>
-                <Button
-                  funcTyp="flat"
-                  onClick={() => {
-                    const { history } = this.props;
-                    const urlParams = AppState.currentMenuType;
-                    history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
-                  }}
-                >
-                  <Icon type="settings icon" />
-                  <span style={{ marginLeft: 0 }}>配置</span>
-                </Button>
-              </div>
-            </div>
-            {
-              this.state.closeSprintVisible ? (
-                <CloseSprint
-                  visible={this.state.closeSprintVisible}
-                  onCancel={() => {
-                    this.setState({
-                      closeSprintVisible: false,
-                    });
-                  }}
-                  data={{
-                    sprintId: ScrumBoardStore.getCurrentSprint.sprintId,
-                    sprintName: ScrumBoardStore.getCurrentSprint.sprintName,
-                  }}
-                  refresh={this.getBoard.bind(this)}
-                />
-              ) : ''
-            }
-            <div className="c7n-scrumboard">
-              <div className="c7n-scrumboard-header">
-                {this.renderStatusColumns()}
-              </div>
-              <div
-                className="c7n-scrumboard-content"
-                style={{
-                  height: this.renderHeight(),
-                  paddingBottom: 83,
-                }}
-              >
-                {this.renderSwimlane()}
-                {ScrumBoardStore.getCurrentSprint ? (
-                  <div className="c7n-scrumboard-others">
-                    <div className="c7n-scrumboard-otherHeader">
-                      <Icon 
-                        style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
-                        type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
-                        role="none"
-                        onClick={() => {
-                          this.setState({
-                            expand: !this.state.expand,
-                          });
-                        }}
-                      />
-                      {this.renderOthersTitle()}
-                    </div>
-                    <div
-                      className="c7n-scrumboard-otherContent"
-                      style={{
-                        display: this.state.expand ? 'flex' : 'none',
-                      }}
-                    >
-                      <DragDropContext 
-                        onDragEnd={this.handleDragEnd.bind(this)}
-                        onDragStart={(start) => {
-                          ScrumBoardStore.setDragStartItem(start);
-                        }}
-                      >
-                        {this.renderIssueColumns()}
-                      </DragDropContext>
-                    </div>
-                  </div>
-                ) : (
-                  <div
+            <Spin spinning={this.state.spinIf}>
+              <div className="c7n-scrumTools">
+                <div style={{ flexWrap: 'wrap' }} className="c7n-scrumTools-left">
+                  <p style={{ marginRight: 24 }}>快速搜索:</p>
+                  <p
+                    className="c7n-scrumTools-filter"
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginTop: '80px',
+                      background: this.state.onlyMe ? '#303F9F' : '',
+                      color: this.state.onlyMe ? 'white' : '#303F9F',
+                    }}
+                    role="none"
+                    onClick={this.filterOnlyMe.bind(this)}
+                  >仅我的问题</p>
+                  <p
+                    className="c7n-scrumTools-filter"
+                    style={{
+                      background: this.state.recent ? '#303F9F' : '',
+                      color: this.state.recent ? 'white' : '#303F9F',
+                    }}
+                    role="none"
+                    onClick={this.filterOnlyStory.bind(this)}
+                  >仅故事</p>
+                  {
+                    ScrumBoardStore.getQuickSearchList.length > 0 ? 
+                      ScrumBoardStore.getQuickSearchList.map(item => (
+                        <p
+                          className="c7n-scrumTools-filter"
+                          style={{
+                            color: this.state.quickFilter.indexOf(item.filterId) !== -1 ? 'white' : '#303F9F',
+                            background: this.state.quickFilter.indexOf(item.filterId) !== -1 ? '#303F9F' : '',
+                          }}
+                          role="none"
+                          onClick={this.filterQuick.bind(this, item)}
+                        >
+                          {item.name}
+                        </p>
+                      )) : ''
+                  }
+                </div>
+                <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
+                  <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
+                  <Button
+                    funcTyp="flat"
+                    onClick={this.handleFinishSprint.bind(this)}
+                  >
+                    <Icon type="power_settings_new icon" />
+                    <span style={{ marginLeft: 0 }}>完成Sprint</span>
+                  </Button>
+                  <Button
+                    funcTyp="flat"
+                    onClick={() => {
+                      const { history } = this.props;
+                      const urlParams = AppState.currentMenuType;
+                      history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
                     }}
                   >
-                    <img style={{ width: 170 }} src={EmptyScrumboard} alt="emptyscrumboard" />
+                    <Icon type="settings icon" />
+                    <span style={{ marginLeft: 0 }}>配置</span>
+                  </Button>
+                </div>
+              </div>
+              {
+                this.state.closeSprintVisible ? (
+                  <CloseSprint
+                    visible={this.state.closeSprintVisible}
+                    onCancel={() => {
+                      this.setState({
+                        closeSprintVisible: false,
+                      });
+                    }}
+                    data={{
+                      sprintId: ScrumBoardStore.getCurrentSprint.sprintId,
+                      sprintName: ScrumBoardStore.getCurrentSprint.sprintName,
+                    }}
+                    refresh={this.getBoard.bind(this)}
+                  />
+                ) : ''
+              }
+              <div className="c7n-scrumboard">
+                <div className="c7n-scrumboard-header">
+                  {this.renderStatusColumns()}
+                </div>
+                <div
+                  className="c7n-scrumboard-content"
+                  style={{
+                    height: this.renderHeight(),
+                    paddingBottom: 83,
+                  }}
+                >
+                  {this.renderSwimlane()}
+                  {ScrumBoardStore.getCurrentSprint ? (
+                    <div className="c7n-scrumboard-others">
+                      <div className="c7n-scrumboard-otherHeader">
+                        <Icon 
+                          style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
+                          type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+                          role="none"
+                          onClick={() => {
+                            this.setState({
+                              expand: !this.state.expand,
+                            });
+                          }}
+                        />
+                        {this.renderOthersTitle()}
+                      </div>
+                      <div
+                        className="c7n-scrumboard-otherContent"
+                        style={{
+                          display: this.state.expand ? 'flex' : 'none',
+                        }}
+                      >
+                        <DragDropContext 
+                          onDragEnd={this.handleDragEnd.bind(this)}
+                          onDragStart={(start) => {
+                            ScrumBoardStore.setDragStartItem(start);
+                          }}
+                        >
+                          {this.renderIssueColumns()}
+                        </DragDropContext>
+                      </div>
+                    </div>
+                  ) : (
                     <div
                       style={{
-                        marginLeft: 40,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: '80px',
                       }}
                     >
-                      <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
-                      <p style={{ fontSize: 20, lineHeight: '34px' }}>在<span style={{ color: '#3f51b5' }}>待办事项</span>中开始Sprint</p>
+                      <img style={{ width: 170 }} src={EmptyScrumboard} alt="emptyscrumboard" />
+                      <div
+                        style={{
+                          marginLeft: 40,
+                        }}
+                      >
+                        <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
+                        <p style={{ fontSize: 20, lineHeight: '34px' }}>在<span style={{ color: '#3f51b5' }}>待办事项</span>中开始Sprint</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            </Spin>
           </div>
           <IssueDetail
             visible={JSON.stringify(ScrumBoardStore.getClickIssueDetail) !== '{}'}

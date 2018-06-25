@@ -11,6 +11,7 @@ import IssueDetail from '../BacklogComponent/IssueDetailComponent/IssueDetail';
 import './BacklogHome.scss';
 import '../../../main.scss';
 import BacklogStore from '../../../../stores/project/backlog/BacklogStore';
+import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
 
 const { AppState } = stores;
 
@@ -263,31 +264,37 @@ class BacklogHome extends Component {
     this.setState({
       spinIf: true,
     });
-    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
-      BacklogStore.setSprintData(data);
-      BacklogStore.axiosGetVersion().then((data2) => {
-        const newVersion = [...data2];
-        _.forEach(newVersion, (item, index) => {
-          newVersion[index].expand = false;
+    ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
+      window.console.log(res);
+      ScrumBoardStore.setQuickSearchList(res);
+      BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
+        BacklogStore.setSprintData(data);
+        BacklogStore.axiosGetVersion().then((data2) => {
+          const newVersion = [...data2];
+          _.forEach(newVersion, (item, index) => {
+            newVersion[index].expand = false;
+          });
+          BacklogStore.setVersionData(newVersion);
+          this.setState({
+            spinIf: false,
+          });
+        }).catch((error) => {
+          window.console.log(error);
         });
-        BacklogStore.setVersionData(newVersion);
-        this.setState({
-          spinIf: false,
+        BacklogStore.axiosGetEpic().then((data3) => {
+          const newEpic = [...data3];
+          _.forEach(newEpic, (item, index) => {
+            newEpic[index].expand = false;
+          });
+          BacklogStore.setEpicData(newEpic);
+        }).catch((error3) => {
+          window.console.log(error3);
         });
-      }).catch((error) => {
-        window.console.log(error);
+      }).catch((error2) => {
+        window.console.log(error2);
       });
-      BacklogStore.axiosGetEpic().then((data3) => {
-        const newEpic = [...data3];
-        _.forEach(newEpic, (item, index) => {
-          newEpic[index].expand = false;
-        });
-        BacklogStore.setEpicData(newEpic);
-      }).catch((error3) => {
-        window.console.log(error3);
-      });
-    }).catch((error2) => {
-      window.console.log(error2);
+    }).catch((error) => {
+      window.console.log(error);
     });
   }
   changeState(state, value) {
@@ -308,7 +315,9 @@ class BacklogHome extends Component {
       });
       this.refresh();
       message.success('创建成功');
-      document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_last').offsetTop - 100;
+      if (document.getElementById('sprint_last')) {
+        document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_last').offsetTop - 100;
+      }
     }).catch((error) => {
       this.setState({
         loading: false,
@@ -335,6 +344,17 @@ class BacklogHome extends Component {
       window.console.log(error);
     });
   }
+
+  filterQuick(item) {
+    const newState = [...BacklogStore.getQuickFilters];
+    if (newState.indexOf(item.filterId) === -1) {
+      newState.push(item.filterId);
+    } else {
+      newState.splice(newState.indexOf(item.filterId), 1);
+    }
+    BacklogStore.setQuickFilters(newState);
+    this.refresh();
+  }
   
   render() {
     return (
@@ -343,7 +363,7 @@ class BacklogHome extends Component {
           <Button loading={this.state.loading} className="leftBtn" funcTyp="flat" onClick={this.handleCreateSprint.bind(this)}>
             <Icon type="playlist_add" />创建冲刺
           </Button>
-          <Button loading={this.state.spinIf} className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this)}>
+          <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this)}>
             <Icon type="refresh" />刷新
           </Button>
         </Header>
@@ -369,6 +389,22 @@ class BacklogHome extends Component {
                 role="none"
                 onClick={this.filterOnlyStory.bind(this)}
               >仅故事</p>
+              {
+                ScrumBoardStore.getQuickSearchList.length > 0 ?
+                  ScrumBoardStore.getQuickSearchList.map(item => (
+                    <p
+                      className="c7n-backlog-filter"
+                      style={{
+                        background: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? '#303F9F' : '',
+                        color: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? 'white' : '#303F9F',
+                      }}
+                      role="none"
+                      onClick={this.filterQuick.bind(this, item)}
+                    >
+                      {item.name}
+                    </p>
+                  )) : ''
+              }
             </div>
           </div>
           <div className="c7n-backlog">
@@ -448,6 +484,7 @@ class BacklogHome extends Component {
                     refresh={this.refresh.bind(this)}
                     epicVisible={this.state.epicVisible}
                     versionVisible={this.state.versionVisible}
+                    spinIf={this.state.spinIf}
                   />
                 </div>
                 <IssueDetail

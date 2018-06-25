@@ -23,6 +23,19 @@ class ScrumBoardStore {
   @observable IssueNumberCount = {};
   @observable assigneer = [];
   @observable swimlaneBasedCode = '';
+  @observable quickSearchList = [];
+
+  @computed get getQuickSearchList() {
+    return toJS(this.quickSearchList);
+  }
+
+  @action setQuickSearchList(data) {
+    this.quickSearchList = data;
+  }
+
+  axiosGetQuickSearchList() {
+    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter`);
+  }
 
   @computed get getSwimLaneCode() {
     return this.swimlaneBasedCode;
@@ -216,11 +229,11 @@ class ScrumBoardStore {
     return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data`);
   }
 
-  axiosGetBoardData(boardId, assign, recent) {
+  axiosGetBoardData(boardId, assign, recent, filter) {
     if (assign === 0) {
-      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data?onlyStory=${recent}`);
+      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data?onlyStory=${recent}&quickFilterIds=${filter}`);
     } else {
-      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data?assigneeId=${assign}&onlyStory=${recent}`);
+      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data?assigneeId=${assign}&onlyStory=${recent}&quickFilterIds=${filter}`);
     }
   }
 

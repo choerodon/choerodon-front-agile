@@ -217,6 +217,9 @@ class SprintItem extends Component {
   clearFilter() {
     BacklogStore.setChosenEpic('all');
     BacklogStore.setChosenVersion('all');
+    BacklogStore.setOnlyMe(false);
+    BacklogStore.setRecent(false);
+    BacklogStore.setQuickFilters([]);
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
@@ -395,7 +398,12 @@ class SprintItem extends Component {
               <p 
                 className="c7n-backlog-clearFilter"
                 style={{
-                  display: BacklogStore.getChosenVersion !== 'all' || BacklogStore.getChosenEpic !== 'all' ? 'block' : 'none',
+                  display: 
+                    BacklogStore.getChosenVersion !== 'all' 
+                    || BacklogStore.getChosenEpic !== 'all'
+                    || BacklogStore.getOnlyMe
+                    || BacklogStore.getRecent
+                    || BacklogStore.getQuickFilters.length > 0 ? 'block' : 'none',
                 }}
                 role="none"
                 onClick={this.clearFilter.bind(this)}

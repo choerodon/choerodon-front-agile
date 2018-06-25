@@ -22,13 +22,16 @@ class ScrumBoardSetting extends Component {
   constructor(props) {
     super(props);
     this.state = {
-
+      loading: false,
     };
   }
   componentWillMount() {
     this.refresh();
   }
   refresh() {
+    this.setState({
+      loading: true,
+    });
     ScrumBoardStore.axiosGetBoardDataBySetting(ScrumBoardStore.getSelectedBoard).then((data) => {
       ScrumBoardStore.axiosGetUnsetData(ScrumBoardStore.getSelectedBoard).then((data2) => {
         const unsetColumn = {
@@ -38,6 +41,9 @@ class ScrumBoardSetting extends Component {
         };
         data.columnsData.columns.push(unsetColumn);
         ScrumBoardStore.setBoardData(data.columnsData.columns);
+        this.setState({
+          loading: false,
+        });
       }).catch((error2) => {
         window.console.log(error2);
       });
@@ -97,9 +103,11 @@ class ScrumBoardSetting extends Component {
         <Content style={{ height: '100%', paddingTop: 0 }}>
           <Tabs style={{ display: 'flex', flexDirection: 'column', height: '100%' }} defaultActiveKey="1">
             <TabPane tab="列配置" key="1">
-              <ColumnPage
-                refresh={this.refresh.bind(this)}
-              />
+              <Spin spinning={this.state.loading}>
+                <ColumnPage
+                  refresh={this.refresh.bind(this)}
+                />
+              </Spin>
             </TabPane>
             <TabPane tab="泳道" key="2">
               <SwimLanePage />

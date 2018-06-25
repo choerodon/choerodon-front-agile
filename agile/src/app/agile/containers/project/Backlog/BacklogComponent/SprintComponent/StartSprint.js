@@ -129,7 +129,8 @@ class StartSprint extends Component {
                 <DatePicker
                   style={{ width: '100%' }}
                   label="开始日期"
-                  disabledDate={this.state.endDate ? current => current > moment(this.state.endDate) : ''}
+                  disabledDate={this.state.endDate ? 
+                    current => current > moment(this.state.endDate) || current < moment().subtract(1, 'days') : current => current < moment().subtract(1, 'days')}
                   onChange={(date, dateString) => {
                     this.props.form.setFieldsValue({
                       startDate: date,
@@ -165,7 +166,9 @@ class StartSprint extends Component {
                       endDate: date,
                     });
                   }}
-                  disabledDate={this.state.startDate ? current => current < moment(this.state.startDate) : ''}
+                  disabledDate={this.state.startDate ? 
+                    current => current < moment(this.state.startDate) || current < moment().subtract(1, 'days') : 
+                    current => current < moment().subtract(1, 'days')}
                 />,
               )}
             </FormItem>
