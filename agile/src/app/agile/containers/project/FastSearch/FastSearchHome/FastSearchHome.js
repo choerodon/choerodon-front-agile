@@ -113,7 +113,7 @@ class Search extends Component {
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={description.split('+++')[0]}>
               <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
-                {description.split('+++')[0]}
+                {description.split('+++')[0] || ''}
               </p>
             </Tooltip>
           </div>

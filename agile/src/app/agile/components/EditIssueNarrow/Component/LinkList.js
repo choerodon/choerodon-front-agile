@@ -31,8 +31,8 @@ class IssueList extends Component {
     window.console.log('cancle');
   }
 
-  handleDeleteIssue(linkTypeId) {
-    deleteLink(linkTypeId)
+  handleDeleteIssue(linkId) {
+    deleteLink(linkId)
       .then((res) => {
         this.props.onRefresh();
       });
@@ -107,7 +107,7 @@ class IssueList extends Component {
           <Popconfirm
             title="确认要删除该问题链接吗?"
             placement="left"
-            onConfirm={this.confirm.bind(this, issue.linkTypeId)}
+            onConfirm={this.confirm.bind(this, issue.linkId)}
             onCancel={this.cancel}
             okText="删除"
             cancelText="取消"

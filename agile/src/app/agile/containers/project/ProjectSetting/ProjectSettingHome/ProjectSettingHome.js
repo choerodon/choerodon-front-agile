@@ -13,6 +13,7 @@ class ProjectSetting extends Component {
     this.state = {
       origin: {},
       loading: false,
+      couldUpdate: false,
     };
   }
 
@@ -33,6 +34,35 @@ class ProjectSetting extends Component {
       });
   }
 
+  handleCheckSameName = (rule, value, callback) => {
+    if (!value) {
+      this.setState({
+        couldUpdate: false,
+      });
+      callback('项目code不能为空');
+    } else if (value === this.state.origin.projectCode) {
+      this.setState({
+        couldUpdate: false,
+      });
+      callback();
+    } else {
+      axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/project_info/check?projectName=${value}`)
+        .then((res) => {
+          if (res) {
+            this.setState({
+              couldUpdate: false,
+            });
+            callback('存在同名code，请选择其他项目code');
+          } else {
+            this.setState({
+              couldUpdate: true,
+            });
+            callback();
+          }
+        });
+    }
+  }
+
   handleUpdateProjectCode = () => {
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -48,6 +78,7 @@ class ProjectSetting extends Component {
             this.setState({
               origin: res,
               loading: false,
+              couldUpdate: false,
             });
           })
           .catch((error) => {
@@ -82,8 +113,7 @@ class ProjectSetting extends Component {
               <FormItem label="项目Code" style={{ width: 512 }}>
                 {getFieldDecorator('code', {
                   rules: [{
-                    required: true,
-                    message: '项目Code必填且不为空',
+                    validator: this.handleCheckSameName,
                   }],
                 })(
                   <Input
@@ -97,7 +127,7 @@ class ProjectSetting extends Component {
               <Button
                 type="primary"
                 funcType="raised"
-                disabled={this.state.origin.projectCode === this.props.form.getFieldValue('code')}
+                disabled={!this.state.couldUpdate}
                 loading={this.state.loading}
                 onClick={() => this.handleUpdateProjectCode()}
               >

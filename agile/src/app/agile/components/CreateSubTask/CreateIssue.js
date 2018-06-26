@@ -68,8 +68,8 @@ class CreateSprint extends Component {
     loadIssue(this.props.issueId).then((res) => {
       this.setState({
         sprint: {
-          sprintId: res.sprintId,
-          sprintName: res.sprintName || '',
+          sprintId: res.activeSprint.sprintId,
+          sprintName: res.activeSprint.sprintName || '',
         },
       });
     });
@@ -164,9 +164,9 @@ class CreateSprint extends Component {
           assigneeId: values.assigneedId ? JSON.parse(values.assigneedId).id || 0 : 0,
           projectId: AppState.currentMenuType.id,
           parentIssueId: this.props.issueId,
-          versionIssueRelDTOList: fixVersionIssueRelDTOList,
+          // versionIssueRelDTOList: fixVersionIssueRelDTOList,
           labelIssueRelDTOList,
-          remainingTime: this.transformTime('time', 'timeUnit'),
+          // remainingTime: this.transformTime('time', 'timeUnit'),
           sprintId: this.state.sprint.sprintId || 0,
         };
         this.setState({ createLoading: true });
@@ -407,7 +407,7 @@ class CreateSprint extends Component {
               )}
             </FormItem>
 
-            <FormItem label="修复版本" style={{ width: '512px' }}>
+            {/* <FormItem label="修复版本" style={{ width: '512px' }}>
               {getFieldDecorator('fixVersionIssueRel', {
                 rules: [
                   {
@@ -443,7 +443,7 @@ class CreateSprint extends Component {
                   )}
                 </Select>,
               )}
-            </FormItem>
+            </FormItem> */}
 
             <FormItem label="标签" style={{ width: '512px' }}>
               {getFieldDecorator('issueLink', {
@@ -483,7 +483,7 @@ class CreateSprint extends Component {
               )}
             </FormItem>
 
-            <div style={{ marginBottom: '24px' }}>
+            {/* <div style={{ marginBottom: '24px' }}>
               <NumericInput
                 label="预计剩余时间"
                 style={{ lineHeight: '22px', marginBottom: 0, width: 100 }}
@@ -501,7 +501,7 @@ class CreateSprint extends Component {
                   </Option>),
                 )}
               </Select>
-            </div>
+            </div> */}
           </Form>
           
           <div className="sign-upload" style={{ marginTop: '38px' }}>
