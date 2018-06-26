@@ -26,12 +26,26 @@ class DataLog extends Component {
   }
 
   componentDidMount() {
-    const { datalog, i, origin } = this.props;
-    getUser(datalog.lastUpdatedBy).then(res => this.setState({ user: res }));
+    // this.loadUser();
+  }
+
+  loadUser() {
+    const { datalog, i, origin, user, callback } = this.props;
+    if (i && origin[i].lastUpdatedBy === origin[i - 1].lastUpdatedBy) {
+      this.setState({
+        user,
+      });
+    } else {
+      getUser(datalog.lastUpdatedBy)
+        .then((res) => {
+          this.setState({ user: res });
+          callback(res);
+        });
+    }
   }
 
   render() {
-    const { datalog, i, origin } = this.props;
+    const { datalog, i, origin, user, callback } = this.props;
     return (
       <div className="c7n-datalog">
         <div className="line-justify">
@@ -47,10 +61,10 @@ class DataLog extends Component {
                 i && origin[i].lastUpdatedBy === origin[i - 1].lastUpdatedBy ? null : (
                   <UserHead
                     user={{
-                      id: this.state.user.id,
-                      loginName: this.state.user.loginName,
-                      realName: this.state.user.realName,
-                      avatar: this.state.user.imageUrl,
+                      id: datalog.lastUpdatedBy,
+                      loginName: '',
+                      realName: datalog.name,
+                      avatar: datalog.imageUrl,
                     }}
                     hiddenText
                     type={'datalog'}
@@ -63,7 +77,7 @@ class DataLog extends Component {
           <div style={{ flex: 1, borderBottom: '1px solid rgba(0, 0, 0, 0.12)', padding: '8.5px 0' }}>
             <div>
               <span style={{ color: '#303f9f' }}>
-                {`${this.state.user.loginName} ${this.state.user.realName} `}
+                {datalog.name}
               </span>
               将
               <span style={{ fontWeight: 'bold' }}>

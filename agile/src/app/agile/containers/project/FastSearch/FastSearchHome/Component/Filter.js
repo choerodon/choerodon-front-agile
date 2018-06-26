@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Select, message, Icon, Button } from 'choerodon-ui';
+import { Modal, Form, Input, Select, message, Icon, Button, DatePicker } from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
+import { NumericInput } from '../../../../../components/CommonComponent';
 
 const { Sidebar } = Modal;
 const { TextArea } = Input;
@@ -25,6 +26,7 @@ class AddComponent extends Component {
       origin: [],
       delete: [],
       originUsers: [],
+      temp: [],
     };
   }
 
@@ -41,32 +43,6 @@ class AddComponent extends Component {
       });
   }
 
-  loadQuickFilter(filterId) {
-    if (filterId === 2) {
-      axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`)
-        .then((res) => {
-          this.setState({
-            origin: res.lookupValues,
-          });
-        });
-    } else if (filterId === 1) {
-      axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`)
-        .then((res) => {
-          this.setState({
-            origin: res.content,
-            originUsers: res.content,
-          });
-        });
-    } else if (filterId === 3) {
-      axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/status_category`)
-        .then((res) => {
-          this.setState({
-            origin: res.lookupValues,
-          });
-        });
-    }
-  }
-
   handleOk(e) {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
@@ -81,25 +57,26 @@ class AddComponent extends Component {
             return;
           }
           const a = {
-            fieldId: values[`filter-${i}-prop`],
-            operation: values[`filter-${i}-rule`],
-            value: values[`filter-${i}-prop`] === 1 ? values[`filter-${i}-value`] : `'${values[`filter-${i}-value`]}'`,
+            fieldCode: values[`filter-${i}-prop`],
+            operation: this.transformOperation(values[`filter-${i}-rule`]),
+            value: this.getValue(values[`filter-${i}-value`]),
           };
           if (i) {
             o.push(values[`filter-${i}-ao`]);
             expressQueryArr.push(values[`filter-${i}-ao`].toUpperCase());
           }
           arr.push(a);
-          expressQueryArr.push(_.find(this.state.quickFilterFiled, { fieldId: a.fieldId }).name);
+          expressQueryArr.push(_.find(this.state.quickFilterFiled, { fieldCode: a.fieldCode }).name);
           expressQueryArr.push(a.operation);
-          expressQueryArr.push(values[`filter-${i}-prop`] === 1 ? `${_.find(this.state.originUsers, { id: values[`filter-${i}-value`] }).loginName} ${_.find(this.state.originUsers, { id: values[`filter-${i}-value`] }).realName}` : values[`filter-${i}-value`]);
+          // expressQueryArr.push(this.transformValue(values[`filter-${i}-value`]));
+          expressQueryArr.push(this.getLabel(values[`filter-${i}-value`]));
         });
-        const d = new Date();
         const json = JSON.stringify({
           arr,
           o,
         });
         const obj = {
+          childIncluded: true,
           expressQuery: expressQueryArr.join(' '),
           name: values.name,
           description: `${values.description}+++${json}`,
@@ -107,6 +84,7 @@ class AddComponent extends Component {
           quickFilterValueDTOList: arr,
           relationOperations: o,
         };
+        window.console.log(obj);
         this.setState({
           loading: true,
         });
@@ -119,6 +97,393 @@ class AddComponent extends Component {
           });
       }
     });
+  }
+
+  transformOperation(value) {
+    const OPERATION = {
+      '=': '=',
+      '!=': '!=',
+      in: 'in',
+      notIn: 'not in',
+      is: 'is',
+      isNot: 'is not',
+      '<': '<',
+      '<=': '<=',
+      '>': '>',
+      '>=': '>=',
+    };
+    return OPERATION[value];
+  }
+
+  getValue(value) {
+    if (Object.prototype.toString.call(value) === '[object Array]') {
+      const v = _.map(value, 'key');
+      return `(${  v.join(',')  })`;
+      // return {
+      //   key: _.filter(value, 'key'),
+      //   value: _.filter(value, 'label'),
+      // };
+    } else if (Object.prototype.toString.call(value) === '[object Object]') {
+      if (value.key) {
+        const v = value.key;
+        if (Object.prototype.toString.call(v) === '[object Number]') {
+          return v;
+        } else if (Object.prototype.toString.call(v) === '[object String]') {
+          return `'${v}'`;
+        }
+        // return {
+        //   key: value.key,
+        //   value: value.label,
+        // };
+      } else {
+        return value.format('YYYY-MM-DD HH:mm:ss');
+      }
+    } else {
+      return value;
+    }
+  }
+
+  getLabel(value) {
+    if (Object.prototype.toString.call(value) === '[object Array]') {
+      const v = _.map(value, 'label');
+      return `(${  v.join(',')  })`;
+      // return {
+      //   key: _.filter(value, 'key'),
+      //   value: _.filter(value, 'label'),
+      // };
+    } else if (Object.prototype.toString.call(value) === '[object Object]') {
+      if (value.key) {
+        const v = value.label;
+        if (Object.prototype.toString.call(v) === '[object Number]') {
+          return v;
+        } else if (Object.prototype.toString.call(v) === '[object String]') {
+          return `'${v}'`;
+        }
+        // return {
+        //   key: value.key,
+        //   value: value.label,
+        // };
+      } else {
+        return value.format('YYYY-MM-DD HH:mm:ss');
+      }
+    } else {
+      return value;
+    }
+  }
+
+  splitValue(value) {
+    if (Object.prototype.toString.call(value) === '[object Array]') {
+      return {
+        key: _.filter(value, 'key'),
+        value: _.filter(value, 'label'),
+      };
+    } else if (Object.prototype.toString.call(value) === '[object Object]') {
+      if (value.key) {
+        return {
+          key: value.key,
+          value: value.label,
+        };
+      } else {
+        return value;
+      }
+    } else {
+      return '';
+    }
+  }
+
+  transformValue(value) {
+    if (Object.prototype.toString.call(value) === '[object Array]') {
+      return `(${  value.join(',')  })`;
+    } else if (Object.prototype.toString.call(value) === '[object Number]') {
+      return value;
+    } else if (Object.prototype.toString.call(value) === '[object String]') {
+      return `'${value}'`;
+    } else if (Object.prototype.toString.call(value) === '[object Object]') {
+      return value.format('YYYY-MM-DD HH:mm:ss');
+    } else {
+      return '';
+    }
+  }
+
+  getOperation(filter) {
+    const OPERATION_FILTER = {
+      assignee: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      priority: ['=', '!=', 'in', 'notIn'],
+      status: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      reporter: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      created_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      last_updated_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      epic: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      sprint: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      label: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      component: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      summary: [],
+      creation_date: ['>', '>=', '<', '<='],
+      last_update_date: ['>', '>=', '<', '<='],
+      story_point: ['<', '<=', '=', '>=', '>'],
+      remain_time: ['<', '<=', '=', '>=', '>'],
+    };
+    return OPERATION_FILTER[filter] || [];
+  }
+
+  getOption(filter, addEmpty) {
+    const projectId = AppState.currentMenuType.id;
+    const OPTION_FILTER = {
+      assignee: {
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        prop: 'content',
+        id: 'id',
+        name: 'realName',
+      },
+      priority: {
+        url: `/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`,
+        prop: 'lookupValues',
+        id: 'valueCode',
+        name: 'name',
+      },
+      status: {
+        url: `/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list`,
+        prop: '',
+        id: 'id',
+        name: 'name',
+      },
+      reporter: {
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        prop: 'content',
+        id: 'id',
+        name: 'realName',
+      },
+      created_user: {
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        prop: 'content',
+        id: 'id',
+        name: 'realName',
+      },
+      last_updated_user: {
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        prop: 'content',
+        id: 'id',
+        name: 'realName',
+      },
+      epic: {
+        url: `/agile/v1/project/${projectId}/issues/epics/select_data`,
+        prop: '',
+        id: 'issueId',
+        name: 'epicName',
+      },
+      sprint: {
+        // post
+        url: `/agile/v1/project/${projectId}/sprint/names`,
+        prop: '',
+        id: 'sprintId',
+        name: 'sprintName',
+      },
+      label: {
+        url: `/agile/v1/project/${projectId}/issue_labels`,
+        prop: '',
+        id: 'labelId',
+        name: 'labelName',
+      },
+      component: {
+        url: `/agile/v1/project/${projectId}/component`,
+        prop: '',
+        id: 'componentId',
+        name: 'name',
+      },
+      version: {
+        // post
+        url: `/agile/v1/project/${projectId}/product_version/names`,
+        prop: '',
+        id: 'versionId',
+        name: 'name',
+      },
+    };
+    axios[filter === 'sprint' || filter === 'version' ? 'post' : 'get'](OPTION_FILTER[filter].url)
+      .then((res) => {
+        this.setState({
+          temp: OPTION_FILTER[filter].prop === '' ? res : res[OPTION_FILTER[filter].prop],
+        });
+      });
+  }
+
+  tempOption = (filter, addEmpty) => {
+    const projectId = AppState.currentMenuType.id;
+    const OPTION_FILTER = {
+      assignee: {
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        prop: 'content',
+        id: 'id',
+        name: 'realName',
+      },
+      priority: {
+        url: `/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`,
+        prop: 'lookupValues',
+        id: 'valueCode',
+        name: 'name',
+      },
+      status: {
+        url: `/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list`,
+        prop: '',
+        id: 'id',
+        name: 'name',
+      },
+      reporter: {
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        prop: 'content',
+        id: 'id',
+        name: 'realName',
+      },
+      created_user: {
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        prop: 'content',
+        id: 'id',
+        name: 'realName',
+      },
+      last_updated_user: {
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        prop: 'content',
+        id: 'id',
+        name: 'realName',
+      },
+      epic: {
+        url: `/agile/v1/project/${projectId}/issues/epics/select_data`,
+        prop: '',
+        id: 'issueId',
+        name: 'epicName',
+      },
+      sprint: {
+        // post
+        url: `/agile/v1/project/${projectId}/sprint/names`,
+        prop: '',
+        id: 'sprintId',
+        name: 'sprintName',
+      },
+      label: {
+        url: `/agile/v1/project/${projectId}/issue_labels`,
+        prop: '',
+        id: 'labelId',
+        name: 'labelName',
+      },
+      component: {
+        url: `/agile/v1/project/${projectId}/component`,
+        prop: '',
+        id: 'componentId',
+        name: 'name',
+      },
+      version: {
+        // post
+        url: `/agile/v1/project/${projectId}/product_version/names`,
+        prop: '',
+        id: 'versionId',
+        name: 'name',
+      },
+    };
+    const arr = this.state.temp.map(v => (
+      <Option key={v[OPTION_FILTER[filter].id]} value={v[OPTION_FILTER[filter].id]}>
+        {v[OPTION_FILTER[filter].name]}
+      </Option>
+    ));
+    if (addEmpty) {
+      arr.unshift(<Option key="null" value="null">
+        无
+      </Option>);
+    }
+    return arr;
+  }
+
+  renderOperation(filter, index) {
+    if (!filter) {
+      return (
+        <Select label="关系" />
+      );
+    } else {
+      return (
+        <Select
+          label="关系"
+          onChange={() => {
+            const str = `filter-${index}-value`;
+            this.props.form.setFieldsValue({
+              str: undefined,
+            });
+          }}
+        >
+          {
+            this.getOperation(filter).map(v => (
+              <Option key={v} value={v}>{v}</Option>
+            ))
+          }
+        </Select>
+      );
+    }
+  }
+
+  renderValue(filter, operation) {
+    if (!filter || !operation) {
+      return (
+        <Select label="值" />
+      );
+    } else if (['assignee', 'priority', 'status', 'reporter', 'created_user', 'last_update_user', 'epic', 'sprint', 'label', 'component', 'version'].indexOf(filter) > -1) {
+      // select
+      if (['=', '!='].indexOf(operation) > -1) {
+        // return normal value
+        return (
+          <Select
+            label="值"
+            labelInValue
+            onFocus={() => {
+              this.getOption(filter, false);
+            }}
+          >
+            {this.tempOption(filter, false)}
+          </Select>
+        );
+      } else if (['is', 'isNot'].indexOf(operation) > -1) {
+        // return value add empty
+        return (
+          <Select
+            label="值"
+            labelInValue
+            onFocus={() => {
+              this.getOption(filter, true);
+            }}
+          >
+            {this.tempOption(filter, true)}
+          </Select>
+        );
+      } else {
+        // return multiple value
+        return (
+          <Select
+            label="值"
+            labelInValue
+            mode="multiple"
+            onFocus={() => {
+              this.getOption(filter, false);
+            }}
+          >
+            {this.tempOption(filter, false)}
+          </Select>
+        );
+      }
+    } else if (['creation_date', 'last_update_date'].indexOf(filter) > -1) {
+      // time
+      // return data picker
+      return (
+        <DatePicker
+          format={'YYYY-MM-DD HH:mm:ss'}
+        />
+      );
+    } else {
+      // story points && remainning time
+      // return number input
+      return (
+        <NumericInput
+          label="值"
+          style={{ lineHeight: '22px', marginBottom: 0, width: 100 }}
+        />
+      );
+    }
   }
 
   render() {
@@ -137,7 +502,7 @@ class AddComponent extends Component {
         <Content
           style={{
             padding: 0,
-            width: 512,
+            width: 700,
           }}
           title={`在项目"${AppState.currentMenuType.name}"中创建快速搜索`}
           description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，创建新模版。"
@@ -163,7 +528,7 @@ class AddComponent extends Component {
                       <div>
                         {
                           index !== 0 && (
-                            <FormItem style={{ width: 75, display: 'inline-block', marginRight: 10 }}>
+                            <FormItem style={{ width: 80, display: 'inline-block', marginRight: 10 }}>
                               {getFieldDecorator(`filter-${index}-ao`, {
                                 rules: [{
                                   required: true,
@@ -178,7 +543,7 @@ class AddComponent extends Component {
                             </FormItem>
                           )
                         }
-                        <FormItem style={{ width: 100, display: 'inline-block', marginRight: 10 }}>
+                        <FormItem style={{ width: 120, display: 'inline-block', marginRight: 10 }}>
                           {getFieldDecorator(`filter-${index}-prop`, {
                             rules: [{
                               required: true,
@@ -188,52 +553,29 @@ class AddComponent extends Component {
                             <Select label="属性">
                               {
                                 this.state.quickFilterFiled.map(v => (
-                                  <Option key={v.fieldId} value={v.fieldId}>{v.name}</Option>
+                                  <Option key={v.fieldCode} value={v.fieldCode}>{v.name}</Option>
                                 ))
                               }
                             </Select>,
                           )}
                         </FormItem>
-                        <FormItem style={{ width: 100, display: 'inline-block', marginRight: 10 }}>
+                        <FormItem style={{ width: 80, display: 'inline-block', marginRight: 10 }}>
                           {getFieldDecorator(`filter-${index}-rule`, {
                             rules: [{
                               required: true,
                               message: '关系为必选字段',
                             }],
                           })(
-                            <Select label="关系">
-                              <Option key="=" value="=">=</Option>
-                              <Option key="!=" value="!=">!=</Option>  
-                              <Option key="isNot" value="isNot">is not</Option>
-                              <Option key="is" value="is">is</Option>  
-                              <Option key="notIn" value="notIn">notIn</Option>
-                              <Option key="in" value="in">in</Option>
-                            </Select>,
+                            this.renderOperation(this.props.form.getFieldValue(`filter-${index}-prop`), index),
                           )}
                         </FormItem>
-                        <FormItem style={{ width: 100, display: 'inline-block' }}>
+                        <FormItem style={{ width: 300, display: 'inline-block' }}>
                           {getFieldDecorator(`filter-${index}-value`, {
                             rules: [{
                               required: true,
                             }],
                           })(
-                            <Select
-                              label="值"
-                              onFocus={() => {
-                                this.loadQuickFilter(this.props.form.getFieldValue(`filter-${index}-prop`));
-                              }}
-                            >
-                              {
-                                this.state.origin.map(v => (
-                                  <Option
-                                    key={v.valueCode || v.id}
-                                    value={v.valueCode || v.id}
-                                  >
-                                    {v.realName || v.name}
-                                  </Option>
-                                ))
-                              }
-                            </Select>,
+                            this.renderValue(this.props.form.getFieldValue(`filter-${index}-prop`), this.props.form.getFieldValue(`filter-${index}-rule`)),
                           )}
                         </FormItem>
                         {

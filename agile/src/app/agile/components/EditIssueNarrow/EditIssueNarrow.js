@@ -18,6 +18,7 @@ import CreateLinkTask from '../CreateLinkTask';
 import UserHead from '../UserHead';
 import Comment from './Component/Comment';
 import Log from './Component/Log';
+import DataLogs from './Component/DataLogs';
 import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
 import LinkList from './Component/LinkList';
@@ -729,18 +730,23 @@ class CreateSprint extends Component {
    */
   renderDataLogs() {
     return (
-      <div>
-        {
-          this.state.datalogs.map((datalog, i) => (
-            <DataLog
-              i={i}
-              datalog={datalog}
-              origin={this.state.datalogs}
-            />
-          ))
-        }
-      </div>
+      <DataLogs
+        datalogs={this.state.datalogs}
+      />
     );
+    // return (
+    //   <div>
+    //     {
+    //       this.state.datalogs.map((datalog, i) => (
+    //         <DataLog
+    //           i={i}
+    //           datalog={datalog}
+    //           origin={this.state.datalogs}
+    //         />
+    //       ))
+    //     }
+    //   </div>
+    // );
   }
 
   /**
@@ -788,7 +794,7 @@ class CreateSprint extends Component {
         }}
         i={i}
         onRefresh={() => {
-          this.reloadIssue();
+          this.reloadIssue(issue.issueId);
         }}
       />
     );
@@ -803,13 +809,7 @@ class CreateSprint extends Component {
         }}
         i={i}
         onRefresh={() => {
-          if (link.issueId && !link.linkedIssueId) {
-            this.reloadIssue(link.issueId);
-          } else if (link.issueId === this.state.origin.issueId && link.linkedIssueId) {
-            this.reloadIssue(link.linkedIssueId);
-          } else if (link.issueId !== this.state.origin.issueId) {
-            this.reloadIssue(link.issueId);
-          }
+          this.reloadIssue(this.state.origin.issueId);
         }}
       />
       
