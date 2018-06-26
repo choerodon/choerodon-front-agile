@@ -21,6 +21,38 @@ class StatusIssue extends Component {
     }
     return '';
   }
+  getParent(id) {
+    const data = ScrumBoardStore.getBoardData;
+    let parent;
+    _.forEach(data, (item) => {
+      _.forEach(item.subStatuses, (ss) => {
+        _.forEach(ss.issues, (iss) => {
+          if (iss.issueId === id) {
+            parent = iss;
+          }
+        });
+      });
+    });
+    return (
+      <div
+        className="textDisplayOneColumn"
+        style={{
+          padding: '10px',
+          border: '1px solid rgba(0,0,0,0.20)',
+          borderRadius: '2px',
+          background: '#F3F3F3',
+          lineHeight: '24px',
+        }}
+      >
+        <span>
+          {parent.issueNum}
+        </span>
+        <span style={{ marginLeft: 10 }}>
+          {parent.summary}
+        </span>
+      </div>
+    );
+  }
   renderIssueDisplay() {
     const dragStartData = ScrumBoardStore.getDragStartItem;
     // 没有开始拖
@@ -111,6 +143,7 @@ class StatusIssue extends Component {
     }
   }
 
+
   render() {
     const item = this.props.data;
     const index = this.props.index;
@@ -128,23 +161,21 @@ class StatusIssue extends Component {
           {(provided, snapshot) => 
             (
               <div>
+
                 <div
                   ref={provided.innerRef}
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
-                  className="c7n-scrumboard-issue"
                   style={{
                     userSelect: 'none',
                     // background: snapshot.isDragging ? 'lightgreen' : 'white',  
-                    background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',  
                     minHeight: 83,
-                    border: '1px solid rgba(0,0,0,0.20)',
                     // borderLeft: '1px solid rgba(0,0,0,0.20)',
                     // borderRight: '1px solid rgba(0,0,0,0.20)',
                     cursor: 'move',
                     // visibility: this.renderIssueDisplay(),
                     ...provided.draggableProps.style,
-                    display: 'flex',
+                    // display: 'flex',
                     overflow: 'hidden',
                     marginBottom: 1,
                   }}
@@ -153,89 +184,101 @@ class StatusIssue extends Component {
                     ScrumBoardStore.setClickIssueDetail(item);
                   }}
                 >
-                  {/* {item.summary} */}
-                  <div style={{ flexGrow: 1 }}>
-                    <div
-                      label={ScrumBoardStore.getClickIssueDetail.issueId}
-                      className="c7n-scrumboard-issueTop"
-                      style={{
-                        display: issueId ? 'block' : 'flex',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <div
-                          className="c7n-scrumboard-issueIcon"
-                          style={{
-                            background: this.renderTypeCode('background'),
-                          }}
-                        >
-                          {this.renderTypeCode('icon')}
-                        </div>
-                        <p style={{ marginLeft: 5 }} className="textDisplayOneColumn">{item.issueNum}</p>
-                      </div>
-                      <p
+                  {
+                    item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' ? 
+                      this.getParent(item.parentIssueId)
+                      : ''
+                  }
+                  <div 
+                    className="c7n-scrumboard-issue"
+                    style={{
+                      marginLeft: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' ? 16 : 0,
+                      background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',  
+                    }}
+                  >
+                    <div style={{ flexGrow: 1 }}>
+                      <div
+                        label={ScrumBoardStore.getClickIssueDetail.issueId}
+                        className="c7n-scrumboard-issueTop"
                         style={{
-                          margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
+                          display: issueId ? 'block' : 'flex',
                         }}
                       >
-                        <Tooltip title={`状态: ${this.props.statusName}`}>
-                          <span
-                            style={{ 
-                              borderRadius: 2, 
-                              padding: '2px 8px', 
-                              background: this.renderStatusBackground(),
-                              // background: '#4D90FE', 
-                              color: 'white',
-                              maxWidth: 56,
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div
+                            className="c7n-scrumboard-issueIcon"
+                            style={{
+                              background: this.renderTypeCode('background'),
                             }}
-                            className="textDisplayOneColumn"
                           >
-                            {this.props.statusName}
-                          </span>
-                        </Tooltip>
-                      </p>
-                    </div>
-                    <div className="c7n-scrumboard-issueBottom">
-                      <Tooltip title={`优先级: ${item.priorityName}`}>
+                            {this.renderTypeCode('icon')}
+                          </div>
+                          <p style={{ marginLeft: 5 }} className="textDisplayOneColumn">{item.issueNum}</p>
+                        </div>
                         <p
-                          style={{ 
-                            flexBasis: '20px',
-                            background: this.renderPriorityStyle('background', item),
-                            color: this.renderPriorityStyle('color', item),
-                            textAlign: 'center',
-                          }}
-                        >{item.priorityName}</p>
-                      </Tooltip>
-                      <Tooltip title={item.summary} placement="topLeft">
-                        <p
-                          className="textDisplayOneColumn" 
-                          style={{ 
-                            flexBasis: '90%',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            lineHeight: '20px',
-                            paddingLeft: 10,
-                          }}
-                        >{item.summary}</p>
-                      </Tooltip>
-                    </div>
-                  </div>
-                  {/* <div style={{ flexShrink: 0 }} cla
-                ssName="c7n-scrumboard-issueSide">M</div> */}
-                  {
-                    item.assigneeName ? (
-                      <Tooltip title={`经办人: ${item.assigneeName}`}>
-                        <Avatar
-                          src={item.imageUrl ? item.imageUrl : undefined}
                           style={{
-                            flexShrink: 0,
+                            margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
                           }}
                         >
-                          {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
-                        </Avatar>
-                      </Tooltip>
-                    ) : ''
-                  }
+                          <Tooltip title={`状态: ${this.props.statusName}`}>
+                            <span
+                              style={{ 
+                                borderRadius: 2, 
+                                padding: '2px 8px', 
+                                background: this.renderStatusBackground(),
+                                // background: '#4D90FE', 
+                                color: 'white',
+                                maxWidth: 56,
+                              }}
+                              className="textDisplayOneColumn"
+                            >
+                              {this.props.statusName}
+                            </span>
+                          </Tooltip>
+                        </p>
+                      </div>
+                      <div className="c7n-scrumboard-issueBottom">
+                        <Tooltip title={`优先级: ${item.priorityName}`}>
+                          <p
+                            style={{ 
+                              flexBasis: '20px',
+                              background: this.renderPriorityStyle('background', item),
+                              color: this.renderPriorityStyle('color', item),
+                              textAlign: 'center',
+                            }}
+                          >{item.priorityName}</p>
+                        </Tooltip>
+                        <Tooltip title={item.summary} placement="topLeft">
+                          <p
+                            className="textDisplayOneColumn" 
+                            style={{ 
+                              flexBasis: '90%',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              lineHeight: '20px',
+                              paddingLeft: 10,
+                            }}
+                          >{item.summary}</p>
+                        </Tooltip>
+                      </div>
+                    </div>
+                    {/* <div style={{ flexShrink: 0 }} cla
+                ssName="c7n-scrumboard-issueSide">M</div> */}
+                    {
+                      item.assigneeName ? (
+                        <Tooltip title={`经办人: ${item.assigneeName}`}>
+                          <Avatar
+                            src={item.imageUrl ? item.imageUrl : undefined}
+                            style={{
+                              flexShrink: 0,
+                            }}
+                          >
+                            {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
+                          </Avatar>
+                        </Tooltip>
+                      ) : ''
+                    }
+                  </div>
                 </div>
                 {provided.placeholder}
               </div>

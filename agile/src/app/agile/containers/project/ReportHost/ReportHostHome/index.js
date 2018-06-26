@@ -3,6 +3,8 @@ import { observer } from 'mobx-react';
 import { Menu, Dropdown, Icon } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import './ReportHostHome.scss';
+import burndownPic from '../../../../assets/image/burndowchart.svg';
+import sprintPic from '../../../../assets/image/sprint.svg';
 
 const { AppState } = stores;
 
@@ -33,11 +35,13 @@ class ReportHostHome extends Component {
       title: '燃尽图',
       des: '跟踪全部剩余工作并且计划完成sprint目标的可能性。这有助于您的团队管理方面取得的进展和作出相应的反应。',
       link: '/agile/reporthost/burndownchart',
+      pic: burndownPic,
     }, {
       id: 2,
       title: 'Sprint报告',
       des: '了解每个sprint中完成的工作或者退回后备的工作。这有助于您确定您的团队是过量使用或如果有过多的范围扩大。',
       link: '/agile/reporthost/sprintReport',
+      pic: sprintPic,
     }];
     return (
       <Page>
@@ -67,7 +71,12 @@ class ReportHostHome extends Component {
                   role="none"
                   onClick={this.handleClickItem.bind(this, item)}
                 >
-                  <div className="c7n-reporthost-itempic" />
+                  <div
+                    className="c7n-reporthost-itempic"
+                    style={{
+                      backgroundImage: `url(${item.pic})`,
+                    }}
+                  />
                   <div className="c7n-reporthost-itembottom">
                     <p className="c7n-reporthost-itemtitle">{item.title}</p>
                     <p className="c7n-reporthost-itemdes">{item.des}</p>

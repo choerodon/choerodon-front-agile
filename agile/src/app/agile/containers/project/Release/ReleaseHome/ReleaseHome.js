@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
 import { Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin } from 'choerodon-ui';
 import { Action } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
@@ -249,7 +249,7 @@ class ReleaseHome extends Component {
         <Content
           title={`项目"${AppState.currentMenuType.name}"的发布版本`}
           description="根据项目周期，可以对软件项目追踪不同的版本，同时可以将对应的问题分配到版本中。例如：v1.0.0、v0.5.0等。"
-          // link="#"
+          link="http://choerodon.io/zh/docs/user-guide/agile/release/"
         >
           <Spin spinning={this.state.loading}>
             {

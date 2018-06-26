@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Tabs, Table, Select, Icon, Tooltip } from 'choerodon-ui';
+import { Button, Tabs, Table, Select, Icon, Tooltip, Dropdown, Menu } from 'choerodon-ui';
 import ReportStore from '../../../../../stores/project/Report';
 import './ReleaseDetail.scss';
 import StatusTag from '../../../../../components/StatusTag';
@@ -85,7 +85,13 @@ class ReleaseDetail extends Component {
       ReportStore[ARRAY[key]]();
     }
   }
-
+  handleClick(e) {
+    if (e.key === '0') {
+      const { history } = this.props;
+      const urlParams = AppState.currentMenuType;
+      history.push(`/agile/reporthost/burndownchart?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
+    }
+  }
   renderDoneIssue(column) {
     return (
       <div>
@@ -210,6 +216,13 @@ class ReleaseDetail extends Component {
     ];
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
+    const menu = (
+      <Menu onClick={this.handleClick.bind(this)}>
+        <Menu.Item key="0">
+          燃尽图
+        </Menu.Item>
+      </Menu>
+    );
     return (
       <Page className="c7n-report">
         <Header 
@@ -223,6 +236,11 @@ class ReleaseDetail extends Component {
             <Icon type="autorenew icon" />
             <span>刷新</span>
           </Button>
+          <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
+            <Button icon="arrow_drop_down" funcTyp="flat">
+              切换报表
+            </Button>
+          </Dropdown>
         </Header>
         <Content
           title={`迭代冲刺 "${ReportStore.currentSprint.sprintName || ''}" 的冲刺报告`}

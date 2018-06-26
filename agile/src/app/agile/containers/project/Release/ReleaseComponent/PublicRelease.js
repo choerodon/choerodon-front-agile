@@ -62,7 +62,7 @@ class PublicRelease extends Component {
         <Content
           title={`发布版本"${ReleaseStore.getVersionDetail.name}"`}
           description="根据项目周期，可以对软件项目追踪不同的版本，同时可以将对应的问题分配到版本中。例如：v1.0.0、v0.5.0等。"
-          // link="#"
+          link="http://choerodon.io/zh/docs/user-guide/agile/release/release-version/"
           style={{
             padding: 0,
           }}

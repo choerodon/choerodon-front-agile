@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Spin, message, Icon, Select, Table } from 'choerodon-ui';
+import { Button, Spin, message, Icon, Select, Table, Menu, Dropdown } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
@@ -175,6 +175,13 @@ class BurndownChartHome extends Component {
       this.getChartData();
     });
   }
+  handleClick(e) {
+    if (e.key === '0') {
+      const { history } = this.props;
+      const urlParams = AppState.currentMenuType;
+      history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
+    }
+  }
   renderChartTitle() {
     let result = '';
     if (this.state.select === 'remainingEstimatedTime') {
@@ -222,6 +229,7 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
+
   render() {
     const columns = [{
       title: '日期',
@@ -292,6 +300,13 @@ class BurndownChartHome extends Component {
     });
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
+    const menu = (
+      <Menu onClick={this.handleClick.bind(this)}>
+        <Menu.Item key="0">
+          Sprint报告
+        </Menu.Item>
+      </Menu>
+    );
     return (
       <Page>
         <Header
@@ -301,6 +316,11 @@ class BurndownChartHome extends Component {
           <Button funcTyp="flat" onClick={this.getChartData.bind(this)}>
             <Icon type="refresh" />刷新
           </Button>
+          <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
+            <Button icon="arrow_drop_down" funcTyp="flat">
+              切换报表
+            </Button>
+          </Dropdown>
         </Header>
         <Content
           title={sprintName ? `迭代冲刺“${sprintName}”的燃尽图` : '无冲刺迭代的燃尽图'}

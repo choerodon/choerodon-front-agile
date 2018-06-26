@@ -158,35 +158,51 @@ class VersionItem extends Component {
               BacklogStore.setVersionData(data);
             }}
           />
-          <EasyEdit
-            type="input"
-            defaultValue={item.name}
-            enterOrBlur={this.handleBlurName.bind(this)}
-            style={{
-              flexGrow: 1,
-            }}
-            byHand
-            editIf={this.state.editName}
-          >
-            <div className="c7n-backlog-versionItemTitleName">
-              <p>{item.name}</p>
-              <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
-                <Icon
-                  style={{
-                    width: 12,
-                    height: 12,
-                    background: '#f5f5f5',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    border: '1px solid #ccc',
-                    borderRadius: 2,
-                  }}
-                  type="arrow_drop_down"
-                />
-              </Dropdown>
+          <div style={{ width: '100%' }}>
+            <EasyEdit
+              type="input"
+              defaultValue={item.name}
+              enterOrBlur={this.handleBlurName.bind(this)}
+              style={{
+                flexGrow: 1,
+              }}
+              byHand
+              editIf={this.state.editName}
+            >
+              <div className="c7n-backlog-versionItemTitleName">
+                <p>{item.name}</p>
+                <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
+                  <Icon
+                    style={{
+                      width: 12,
+                      height: 12,
+                      background: '#f5f5f5',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      border: '1px solid #ccc',
+                      borderRadius: 2,
+                    }}
+                    type="arrow_drop_down"
+                  />
+                </Dropdown>
+              </div>
+            </EasyEdit>
+            <div className="c7n-backlog-versionItemProgress">
+              <div
+                className="c7n-backlog-versionItemDone"
+                style={{
+                  flex: item.doneIssueCount,
+                }}
+              />
+              <div 
+                className="c7n-backlog-versionItemTodo"
+                style={{ 
+                  flex: item.issueCount ? item.issueCount - item.doneIssueCount : 1,
+                }}
+              />
             </div>
-          </EasyEdit>
+          </div>
         </div>
         {item.expand ? (
           <div style={{ paddingLeft: 12 }}>

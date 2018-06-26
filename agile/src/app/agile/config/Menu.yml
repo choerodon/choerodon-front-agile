@@ -39,19 +39,19 @@
         permission:
           - 'agile-service.issue.queryIssue'
     - "projectsetting":
-        icon: publish2
+        icon: folder_shared
         Routes: /agile/projectSetting
         sort: 7
         permission:
           - 'agile-service.issue.queryIssue'
     - "fastsearch":
-        icon: baseline-list_alt
+        icon: youtube_searched_for
         Routes: /agile/fastSearch
         sort: 8
         permission:
           - 'agile-service.issue.queryIssue'
     - "issuelink":
-        icon: extension
+        icon: link
         Routes: /agile/issueLink
         sort: 9
         permission:
