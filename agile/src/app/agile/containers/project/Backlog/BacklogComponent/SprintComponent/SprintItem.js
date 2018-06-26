@@ -359,6 +359,7 @@ class SprintItem extends Component {
   render() {
     const item = this.props.item;
     const data = BacklogStore.getSprintData.sprintData;
+    const ifBacklog = this.props.backlog;
     return (
       <div id={this.props.index === data.length - 1 ? 'sprint_last' : undefined}>
         <div className="c7n-backlog-sprintTop">
@@ -561,6 +562,7 @@ class SprintItem extends Component {
                   // background: 'white',
                   padding: 'grid',
                   borderBottom: '1px solid rgba(0,0,0,0.12)',
+                  marginBottom: ifBacklog ? 30 : 0,
                 }}
               >
                 {this.renderIssueOrIntro(item.issueSearchDTOList, item.sprintId)}

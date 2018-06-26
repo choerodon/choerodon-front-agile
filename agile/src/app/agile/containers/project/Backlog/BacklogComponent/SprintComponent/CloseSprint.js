@@ -49,7 +49,7 @@ class CloseSprint extends Component {
           }}
           title={`结束冲刺“${data.sprintName}”`}
           description="请在下面选择未完成问题的去向，以结束一个冲刺计划。"
-          // link="#"
+          link="http://choerodon.io/zh/docs/user-guide/agile/sprint/close-sprint/"
         >
           <p className="c7n-closeSprint-message">
             <span>{!_.isNull(completeMessage) ? completeMessage.partiallyCompleteIssues : ''}</span> 个问题 已经完成

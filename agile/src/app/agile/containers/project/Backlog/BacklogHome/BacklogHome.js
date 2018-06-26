@@ -373,8 +373,8 @@ class BacklogHome extends Component {
               <p
                 className="c7n-backlog-filter"
                 style={{
-                  background: BacklogStore.getOnlyMe ? '#303F9F' : '',
-                  color: BacklogStore.getOnlyMe ? 'white' : '#303F9F',
+                  background: BacklogStore.getOnlyMe ? '#3F51B5' : '',
+                  color: BacklogStore.getOnlyMe ? 'white' : '#3F51B5',
                 }}
                 role="none"
                 onClick={this.filterOnlyMe.bind(this)}
@@ -382,8 +382,8 @@ class BacklogHome extends Component {
               <p
                 className="c7n-backlog-filter"
                 style={{
-                  background: BacklogStore.getRecent ? '#303F9F' : '',
-                  color: BacklogStore.getRecent ? 'white' : '#303F9F',
+                  background: BacklogStore.getRecent ? '#3F51B5' : '',
+                  color: BacklogStore.getRecent ? 'white' : '#3F51B5',
                 }}
                 role="none"
                 onClick={this.filterOnlyStory.bind(this)}
@@ -394,8 +394,8 @@ class BacklogHome extends Component {
                     <p
                       className="c7n-backlog-filter"
                       style={{
-                        background: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? '#303F9F' : '',
-                        color: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? 'white' : '#303F9F',
+                        background: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',
+                        color: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? 'white' : '#3F51B5',
                       }}
                       role="none"
                       onClick={this.filterQuick.bind(this, item)}
@@ -432,7 +432,7 @@ class BacklogHome extends Component {
                 >史诗</p>
               )}
             </div>
-            <div className="c7n-backlog-content" style={{ paddingBottom: 20 }}>
+            <div className="c7n-backlog-content">
               <DragDropContext
                 onDragEnd={this.onDragEnd.bind(this)}
                 onDragStart={(result) => {

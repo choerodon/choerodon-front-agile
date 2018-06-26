@@ -183,6 +183,7 @@ class ComponentHome extends Component {
         <Content
           title={`项目"${AppState.currentMenuType.name}"的模块管理`}
           description="根据项目需求，可以分拆为多个模块，每个模块可以进行负责人划分，配置后可以将项目中的问题归类到对应的模块中。例如“后端任务”，“基础架构”等等。"
+          link="http://choerodon.io/zh/docs/user-guide/agile/component/"
         >
           <Spin spinning={this.state.loading}>
             {

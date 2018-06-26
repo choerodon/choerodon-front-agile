@@ -252,12 +252,6 @@ class ColumnPage extends Component {
     return '';
   }
   render() {
-    const contentDes = (
-      <div>
-          分栏可以添加、删除、重新排序和重命名。列是基于全局状态和可移动的列与列之间。最小和最大限制可设置为每个已映射的列中。
-        <span>了解详情</span>
-      </div>
-    );
     const BoardData = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
     if (BoardData.length > 0) {
       if (BoardData[BoardData.length - 1].columnId === 'unset') {
@@ -266,8 +260,7 @@ class ColumnPage extends Component {
     }
     return (
       <Content 
-        // title={`项目“${AppState.currentMenuType.name}”的应用部署`}
-        description={contentDes}
+        description="分栏可以添加、删除、重新排序和重命名。列是基于全局状态和可移动的列与列之间。最小和最大限制可设置为每个已映射的列中。"
         style={{
           padding: 0,
           overflow: 'unset',
@@ -275,6 +268,7 @@ class ColumnPage extends Component {
           display: 'flex',
           flexDirection: 'column',
         }}
+        link="http://choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
       >
         <div
           style={{
