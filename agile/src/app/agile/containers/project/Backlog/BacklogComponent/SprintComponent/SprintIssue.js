@@ -119,7 +119,7 @@ class SprintIssue extends Component {
                 style={{
                   userSelect: 'none',
                   // background: snapshot1.isDragging ? 'lightgreen' : 'white',  
-                  background: this.props.selected.issueIds.indexOf(item.issueId) !== -1 ? 'rgba(140, 158, 255, 0.08)' : this.renderIssueBackground(item),
+                  background: this.props.selected.issueIds.indexOf(item.issueId) !== -1 ? '#ebf2f9' : this.renderIssueBackground(item),
                   padding: '10px 36px 10px 20px',
                   borderBottom: '1px solid rgba(0,0,0,0.12)',
                   paddingLeft: 43,
