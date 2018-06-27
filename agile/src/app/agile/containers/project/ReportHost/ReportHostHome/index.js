@@ -33,13 +33,13 @@ class ReportHostHome extends Component {
     const data = [{
       id: 1,
       title: '燃尽图',
-      des: '跟踪全部剩余工作并且计划完成sprint目标的可能性。这有助于您的团队管理方面取得的进展和作出相应的反应。',
+      des: '跟踪记录所有问题的剩余工作工作时间，预估完成冲刺任务的可能性，回顾总结迭代过程中的经验与不足。这有助于在团队管理方面取得更进一步的掌控与把握。',
       link: '/agile/reporthost/burndownchart',
       pic: burndownPic,
     }, {
       id: 2,
       title: 'Sprint报告',
-      des: '了解每个sprint中完成的工作或者退回后备的工作。这有助于您确定您的团队是过量使用或如果有过多的范围扩大。',
+      des: '了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。',
       link: '/agile/reporthost/sprintReport',
       pic: sprintPic,
     }];
