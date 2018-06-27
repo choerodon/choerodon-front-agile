@@ -160,7 +160,7 @@ class StatusIssue extends Component {
     const index = this.props.index;
     const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
     return (
-      <div>
+      <div className="c7n-boardIssue">
         <Draggable 
           key={item.issueId} 
           draggableId={JSON.stringify({
@@ -172,7 +172,6 @@ class StatusIssue extends Component {
           {(provided, snapshot) => 
             (
               <div>
-
                 <div
                   ref={provided.innerRef}
                   {...provided.draggableProps}
@@ -188,7 +187,6 @@ class StatusIssue extends Component {
                     ...provided.draggableProps.style,
                     // display: 'flex',
                     overflow: 'hidden',
-                    marginBottom: 1,
                   }}
                   role="none"
                   onClick={() => {
@@ -205,20 +203,30 @@ class StatusIssue extends Component {
                     style={{
                       marginLeft: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, 'boolean') ? 16 : 0,
                       background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',  
+                      borderTop: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, 'boolean') ? 'unset' : '1px solid rgba(0, 0, 0, 0.20)',
                     }}
                   >
+                    <div 
+                      className="c7n-scrumboard-issueBorder" 
+                      style={{
+                        background: this.renderTypeCode('background'),
+                        display: ScrumBoardStore.getSwimLaneCode === 'assignee' ? 'block' : 'none',
+                      }}
+                    />
                     <div style={{ flexGrow: 1 }}>
                       <div
                         label={ScrumBoardStore.getClickIssueDetail.issueId}
                         className="c7n-scrumboard-issueTop"
                         style={{
                           display: issueId ? 'block' : 'flex',
+                          flexWrap: 'wrap',
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           <div
                             className="c7n-scrumboard-issueIcon"
                             style={{
+                              display: ScrumBoardStore.getSwimLaneCode === 'assignee' ? 'block' : 'none',
                               background: this.renderTypeCode('background'),
                             }}
                           >

@@ -35,7 +35,7 @@ class CloseSprint extends Component {
     const completeMessage = JSON.stringify(BacklogStore.getSprintCompleteMessage) === '{}' ? null : BacklogStore.getSprintCompleteMessage;
     return (
       <Sidebar
-        title="结束冲刺"
+        title="完成冲刺"
         visible={this.props.visible}
         okText="结束"
         cancelText="取消"
@@ -47,8 +47,8 @@ class CloseSprint extends Component {
             padding: 0,
             paddingBottom: 20,
           }}
-          title={`结束冲刺“${data.sprintName}”`}
-          description="请在下面选择未完成问题的去向，以结束一个冲刺计划。"
+          title={`完成冲刺“${data.sprintName}”`}
+          description="请在下面选择未完成问题的去向，以完成一个冲刺计划。"
           link="http://choerodon.io/zh/docs/user-guide/agile/sprint/close-sprint/"
         >
           <p className="c7n-closeSprint-message">
