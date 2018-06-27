@@ -181,6 +181,7 @@ class SettingColumn extends Component {
                     style={{
                       background: snapshot.isDraggingOver ? 'rgba(26,177,111,0.08)' : 'unset',
                       height: '100%',
+                      minHeight: '84px',
                     }}
                   >
                     {this.renderStatus()}

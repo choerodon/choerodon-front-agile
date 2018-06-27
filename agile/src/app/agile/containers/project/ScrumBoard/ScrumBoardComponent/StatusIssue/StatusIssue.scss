@@ -3,7 +3,8 @@
   position: relative;
   z-index: 1;
   display: flex;
-  border: 1px solid rgba(0, 0, 0, 0.20);
+  border-left: 1px solid rgba(0, 0, 0, 0.20);
+  border-right: 1px solid rgba(0, 0, 0, 0.20);
   min-height: 83px;
 
   .c7n-scrumboard-issueSide {
@@ -32,4 +33,17 @@
     margin-top: 6px;
     display: flex;
   }
+
+  .c7n-scrumboard-issueBorder {
+    width: 3px;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    z-index: 20;
+    left: 0;
+  }
+}
+
+.c7n-itemBodyColumn .c7n-boardIssue:last-child .c7n-scrumboard-issue {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.20);
 }

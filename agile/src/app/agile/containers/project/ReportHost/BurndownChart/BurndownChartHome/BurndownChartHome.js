@@ -129,8 +129,8 @@ class BurndownChartHome extends Component {
         }],
       },
       grid: {
-        left: '0%',
-        right: '0%',
+        left: '3%',
+        right: '3%',
         // bottom: '3%',
         containLabel: true,
         show: true,
@@ -144,6 +144,12 @@ class BurndownChartHome extends Component {
         type: 'category',
         boundaryGap: false,
         data: this.state.xAxis,
+        axisLabel: {
+          formatter(value, index) {
+            window.console.log();
+            return `${value.split(' ')[0]}\n${value.split(' ')[1]}`;
+          },
+        },
       },
       yAxis: {
         type: 'value',
@@ -200,6 +206,18 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
+  renderDetail(item, record) {
+    window.console.log(record);
+    let result = '-';
+    if (record.type !== 'startSprint' && record.type !== 'endSprint') {
+      if (item.statistical) {
+        if (item.oldValue !== item.newValue) {
+          result = `由${item.oldValue}到${item.newValue}`;
+        }
+      }
+    }
+    return result;
+  }
   renderUp(item) {
     let result = '-';
     if (item.newValue > item.oldValue) {
@@ -244,6 +262,9 @@ class BurndownChartHome extends Component {
     if (text === 'timeestimate') {
       result = '用户修改剩余估计时间';
     }
+    if (text === 'valueChange') {
+      result = '用户修改故事点';
+    }
     return result;
   }
 
@@ -274,6 +295,19 @@ class BurndownChartHome extends Component {
       ),
     }, {
       title: '事件详情',
+      dataIndex: 'detail',
+      key: 'detail',
+      render: (text, record) => (
+        <div>
+          {
+            record.issues.map(item => (
+              <p>
+                {this.renderDetail(item, record)}
+              </p>
+            ))
+          }
+        </div>
+      ),
     }, {
       title: '升',
       dataIndex: 'up',

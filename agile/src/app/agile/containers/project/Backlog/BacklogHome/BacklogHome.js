@@ -369,7 +369,7 @@ class BacklogHome extends Component {
         <Content style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div className="c7n-backlogTools">
             <div className="c7n-backlogTools-left">
-              <p style={{ marginRight: 32 }}>快速搜索:</p>
+              <p style={{ marginRight: 32, whiteSpace: 'nowrap' }}>快速搜索:</p>
               <p
                 className="c7n-backlog-filter"
                 style={{
