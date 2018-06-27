@@ -7,7 +7,7 @@ import { STATUS, COLOR, TYPE, ICON, TYPE_NAME } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
-import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate } from '../../common/utils';
+import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload } from '../../common/utils';
 import { loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
 import { getCurrentOrg, getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
@@ -28,11 +28,13 @@ const { Option } = Select;
 const { TextArea } = Input;
 const confirm = Modal.confirm;
 let sign = true;
+let flag;
 
 class CreateSprint extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      flag: undefined,
       selectLoading: true,
       saveLoading: false,
       rollup: false,
@@ -257,9 +259,9 @@ class CreateSprint extends Component {
   getCurrentNav(e) {
     let eles;
     if (this.state.typeCode !== 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'sub_task'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'sub_task', 'link_task' ];
     } else {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log'];
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
@@ -372,7 +374,7 @@ class CreateSprint extends Component {
     this.setState({
       addCommit: false,
       addCommitDes: '',
-      editDesShow: false,
+      editDesShow: undefined,
       editDes: undefined,
       editCommentId: undefined,
       editComment: undefined,
@@ -397,6 +399,9 @@ class CreateSprint extends Component {
           datalogs: res,
         });
       });
+      this.setState({
+        editDesShow: false,
+      });
     });
   }
 
@@ -418,7 +423,10 @@ class CreateSprint extends Component {
     };
     if ((pro === 'description') || (pro === 'editDes')) {
       if (this.state[pro]) {
-        beforeTextUpload(this.state[pro], obj, updateIssue, 'description');
+        returnBeforeTextUpload(this.state[pro], obj, updateIssue, 'description')
+          .then((res) => {
+            this.reloadIssue(this.state.origin.issueId);
+          });
       }
     } else if (pro === 'assigneeId' || pro === 'reporterId') {
       obj[pro] = this.state[pro] ? JSON.parse(this.state[pro]).id || 0 : 0;
@@ -824,6 +832,9 @@ class CreateSprint extends Component {
    */
   renderDes() {
     let delta;
+    if (this.state.editDesShow === undefined) {
+      return null;
+    }
     if (!this.state.description || this.state.editDesShow) {
       delta = text2Delta(this.state.editDes);
       return (
@@ -1032,6 +1043,18 @@ class CreateSprint extends Component {
                 />
               </li>
             </Tooltip>
+            <Tooltip placement="right" title="活动日志">
+              <li id="DATA_LOG-nav" className={`c7n-li ${this.state.nav === 'data_log' ? 'c7n-li-active' : ''}`}>
+                <Icon
+                  type="insert_invitation c7n-icon-li"
+                  role="none"
+                  onClick={() => {
+                    this.setState({ nav: 'data_log' });
+                    this.scrollToAnchor('data_log');
+                  }}
+                />
+              </li>
+            </Tooltip>
             {
               this.state.typeCode !== 'sub_task' && (
                 <Tooltip placement="right" title="子任务">
@@ -1042,6 +1065,22 @@ class CreateSprint extends Component {
                       onClick={() => {
                         this.setState({ nav: 'sub_task' });
                         this.scrollToAnchor('sub_task');
+                      }}
+                    />
+                  </li>
+                </Tooltip>
+              )
+            }
+            {
+              this.state.typeCode !== 'sub_task' && (
+                <Tooltip placement="right" title="相关任务">
+                  <li id="LINK_TASKS-nav" className={`c7n-li ${this.state.nav === 'link_task' ? 'c7n-li-active' : ''}`}>
+                    <Icon
+                      type="link c7n-icon-li"
+                      role="none"
+                      onClick={() => {
+                        this.setState({ nav: 'link_task' });
+                        this.scrollToAnchor('link_task');
                       }}
                     />
                   </li>
@@ -1961,10 +2000,14 @@ class CreateSprint extends Component {
                             onInit={() => {
                               this.setAnIssueToState(this.state.origin);
                               if (this.state.reporterId) {
+                                this.setState({
+                                  flag: 'loading',
+                                });
                                 getUser(this.state.reporterId).then((res) => {
                                   this.setState({
                                     reporterId: JSON.stringify(res),
                                     originUsers: [res],
+                                    flag: 'finish',
                                   });
                                 });
                               } else {
@@ -1990,7 +2033,7 @@ class CreateSprint extends Component {
                             </div>}
                           >
                             <Select
-                              value={this.state.reporterId || undefined}
+                              value={this.state.flag === 'loading' ? undefined : this.state.reporterId || undefined}
                               style={{ width: 150 }}
                               loading={this.state.selectLoading}
                               allowClear
@@ -2041,6 +2084,8 @@ class CreateSprint extends Component {
                                 if (res.id !== this.state.reporterId) {
                                   this.setState({
                                     reporterId: JSON.stringify(res),
+                                    reporterName: `${res.loginName}${res.realName}`,
+                                    reporterImageUrl: res.imageUrl,
                                   }, () => {
                                     this.updateIssue('reporterId');
                                   });
@@ -2067,10 +2112,14 @@ class CreateSprint extends Component {
                             onInit={() => {
                               this.setAnIssueToState(this.state.origin);
                               if (this.state.assigneeId) {
+                                this.setState({
+                                  flag: 'loading',
+                                });
                                 getUser(this.state.assigneeId).then((res) => {
                                   this.setState({
                                     assigneeId: JSON.stringify(res),
                                     originUsers: [res],
+                                    flag: 'finish',
                                   });
                                 });
                               } else {
@@ -2096,7 +2145,7 @@ class CreateSprint extends Component {
                             </div>}
                           >
                             <Select
-                              value={this.state.assigneeId || undefined}
+                              value={this.state.flag === 'loading' ? undefined : this.state.assigneeId || undefined}
                               style={{ width: 150 }}
                               loading={this.state.selectLoading}
                               allowClear
@@ -2147,6 +2196,8 @@ class CreateSprint extends Component {
                                 if (res.id !== this.state.assigneeId) {
                                   this.setState({
                                     assigneeId: JSON.stringify(res),
+                                    assigneeName: `${res.loginName}${res.realName}`,
+                                    assigneeImageUrl: res.imageUrl,
                                   }, () => {
                                     this.updateIssue('assigneeId');
                                   });
@@ -2198,7 +2249,7 @@ class CreateSprint extends Component {
                         </Button>
                         <Icon
                           className="c7n-des-edit"
-                          style={{ position: 'absolute', top: 5, right: -15 }}
+                          style={{ position: 'absolute', top: 8, right: -20 }}
                           role="none"
                           type="mode_edit mlr-3 pointer"
                           onClick={() => {
@@ -2270,7 +2321,7 @@ class CreateSprint extends Component {
                 <div id="data_log">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
-                      <Icon type="content_paste c7n-icon-title" />
+                      <Icon type="insert_invitation c7n-icon-title" />
                       <span>活动日志</span>
                     </div>
                     <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
@@ -2304,14 +2355,14 @@ class CreateSprint extends Component {
                     <div id="link_task">
                       <div className="c7n-title-wrapper">
                         <div className="c7n-title-left">
-                          <Icon type="filter_none c7n-icon-title" />
-                          <span>问题链接</span>
+                          <Icon type="link c7n-icon-title" />
+                          <span>相关任务</span>
                         </div>
                         <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                           <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
                             <Icon type="playlist_add icon" />
-                            <span>创建链接</span>
+                            <span>关联已有任务</span>
                           </Button>
                         </div>
                       </div>
@@ -2341,14 +2392,7 @@ class CreateSprint extends Component {
               visible={this.state.dailyLogShow}
               onCancel={() => this.setState({ dailyLogShow: false })}
               onOk={() => {
-                loadWorklogs(this.state.issueId).then((res) => {
-                  this.setState({
-                    worklogs: res,
-                  });
-                });
-                loadIssue(this.state.issueId).then((res) => {
-                  this.setAnIssueToState(res);
-                });
+                this.reloadIssue(this.state.origin.issueId);
                 this.setState({ dailyLogShow: false });
               }}
             />

@@ -153,7 +153,7 @@ class ReleaseDetail extends Component {
         title: '关键字',
         dataIndex: 'issueNum',
         render: (issueNum, record) => (
-          <span style={{ color: '#3f51b5' }}>{issueNum}</span>
+          <span style={{ color: '#3f51b5' }}>{issueNum} {record.addIssue ? '*' : ''}</span>
         ),
       }, {
         width: '30%',
