@@ -59,7 +59,7 @@ class AddComponent extends Component {
           const a = {
             fieldCode: values[`filter-${i}-prop`],
             operation: this.transformOperation(values[`filter-${i}-rule`]),
-            value: this.getValue(values[`filter-${i}-value`]),
+            value: this.getValue(values[`filter-${i}-value`], values[`filter-${i}-prop`]),
           };
           if (i) {
             o.push(values[`filter-${i}-ao`]);
@@ -68,7 +68,6 @@ class AddComponent extends Component {
           arr.push(a);
           expressQueryArr.push(_.find(this.state.quickFilterFiled, { fieldCode: a.fieldCode }).name);
           expressQueryArr.push(a.operation);
-          // expressQueryArr.push(this.transformValue(values[`filter-${i}-value`]));
           expressQueryArr.push(this.getLabel(values[`filter-${i}-value`]));
         });
         const json = JSON.stringify({
@@ -115,93 +114,53 @@ class AddComponent extends Component {
     return OPERATION[value];
   }
 
-  getValue(value) {
-    if (Object.prototype.toString.call(value) === '[object Array]') {
-      const v = _.map(value, 'key');
-      return `(${  v.join(',')  })`;
-      // return {
-      //   key: _.filter(value, 'key'),
-      //   value: _.filter(value, 'label'),
-      // };
-    } else if (Object.prototype.toString.call(value) === '[object Object]') {
-      if (value.key) {
-        const v = value.key;
-        if (Object.prototype.toString.call(v) === '[object Number]') {
-          return v;
-        } else if (Object.prototype.toString.call(v) === '[object String]') {
-          return `'${v}'`;
-        }
-        // return {
-        //   key: value.key,
-        //   value: value.label,
-        // };
+  getValue(value, filter) {
+    const type = Object.prototype.toString.call(value);
+    if (filter === 'priority') {
+      if (type === '[object Array]') {
+        const v = _.map(value, 'key');
+        const vv = v.map(e => `'${e}'`);
+        return `(${vv.join(',')})`;
       } else {
-        return value.format('YYYY-MM-DD HH:mm:ss');
+        const v = value.key;
+        return `'${v}'`;
       }
-    } else {
-      return value;
-    }
+    } else if (type === '[object Array]') {
+        const v = _.map(value, 'key');
+        return `(${  v.join(',')  })`;
+      } else if (type === '[object Object]') {
+        if (value.key) {
+          const v = value.key;
+          if (Object.prototype.toString.call(v) === '[object Number]') {
+            return v;
+          } else if (Object.prototype.toString.call(v) === '[object String]') {
+            return v;
+          }
+        } else {
+          return value.format('YYYY-MM-DD HH:mm:ss');
+        }
+      } else {
+        return value;
+      }
   }
 
   getLabel(value) {
     if (Object.prototype.toString.call(value) === '[object Array]') {
       const v = _.map(value, 'label');
-      return `(${  v.join(',')  })`;
-      // return {
-      //   key: _.filter(value, 'key'),
-      //   value: _.filter(value, 'label'),
-      // };
+      return `[${v.join(',')}]`;
     } else if (Object.prototype.toString.call(value) === '[object Object]') {
       if (value.key) {
         const v = value.label;
         if (Object.prototype.toString.call(v) === '[object Number]') {
           return v;
         } else if (Object.prototype.toString.call(v) === '[object String]') {
-          return `'${v}'`;
+          return v;
         }
-        // return {
-        //   key: value.key,
-        //   value: value.label,
-        // };
       } else {
         return value.format('YYYY-MM-DD HH:mm:ss');
       }
     } else {
       return value;
-    }
-  }
-
-  splitValue(value) {
-    if (Object.prototype.toString.call(value) === '[object Array]') {
-      return {
-        key: _.filter(value, 'key'),
-        value: _.filter(value, 'label'),
-      };
-    } else if (Object.prototype.toString.call(value) === '[object Object]') {
-      if (value.key) {
-        return {
-          key: value.key,
-          value: value.label,
-        };
-      } else {
-        return value;
-      }
-    } else {
-      return '';
-    }
-  }
-
-  transformValue(value) {
-    if (Object.prototype.toString.call(value) === '[object Array]') {
-      return `(${  value.join(',')  })`;
-    } else if (Object.prototype.toString.call(value) === '[object Number]') {
-      return value;
-    } else if (Object.prototype.toString.call(value) === '[object String]') {
-      return `'${value}'`;
-    } else if (Object.prototype.toString.call(value) === '[object Object]') {
-      return value.format('YYYY-MM-DD HH:mm:ss');
-    } else {
-      return '';
     }
   }
 
@@ -217,12 +176,12 @@ class AddComponent extends Component {
       sprint: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       label: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       component: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      summary: [],
+      influence_version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      fix_version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       creation_date: ['>', '>=', '<', '<='],
       last_update_date: ['>', '>=', '<', '<='],
-      story_point: ['<', '<=', '=', '>=', '>'],
-      remain_time: ['<', '<=', '=', '>=', '>'],
+      story_point: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
+      remain_time: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
     };
     return OPERATION_FILTER[filter] || [];
   }
@@ -291,7 +250,14 @@ class AddComponent extends Component {
         id: 'componentId',
         name: 'name',
       },
-      version: {
+      influence_version: {
+        // post
+        url: `/agile/v1/project/${projectId}/product_version/names`,
+        prop: '',
+        id: 'versionId',
+        name: 'name',
+      },
+      fix_version: {
         // post
         url: `/agile/v1/project/${projectId}/product_version/names`,
         prop: '',
@@ -299,7 +265,7 @@ class AddComponent extends Component {
         name: 'name',
       },
     };
-    axios[filter === 'sprint' || filter === 'version' ? 'post' : 'get'](OPTION_FILTER[filter].url)
+    axios[filter === 'sprint' || filter === 'influence_version' || filter === 'fix_version' ? 'post' : 'get'](OPTION_FILTER[filter].url)
       .then((res) => {
         this.setState({
           temp: OPTION_FILTER[filter].prop === '' ? res : res[OPTION_FILTER[filter].prop],
@@ -371,7 +337,14 @@ class AddComponent extends Component {
         id: 'componentId',
         name: 'name',
       },
-      version: {
+      influence_version: {
+        // post
+        url: `/agile/v1/project/${projectId}/product_version/names`,
+        prop: '',
+        id: 'versionId',
+        name: 'name',
+      },
+      fix_version: {
         // post
         url: `/agile/v1/project/${projectId}/product_version/names`,
         prop: '',
@@ -404,7 +377,7 @@ class AddComponent extends Component {
           onChange={() => {
             const str = `filter-${index}-value`;
             this.props.form.setFieldsValue({
-              str: undefined,
+              [str]: undefined,
             });
           }}
         >
@@ -423,7 +396,7 @@ class AddComponent extends Component {
       return (
         <Select label="值" />
       );
-    } else if (['assignee', 'priority', 'status', 'reporter', 'created_user', 'last_update_user', 'epic', 'sprint', 'label', 'component', 'version'].indexOf(filter) > -1) {
+    } else if (['assignee', 'priority', 'status', 'reporter', 'created_user', 'last_updated_user', 'epic', 'sprint', 'label', 'component', 'influence_version', 'fix_version'].indexOf(filter) > -1) {
       // select
       if (['=', '!='].indexOf(operation) > -1) {
         // return normal value
@@ -444,11 +417,10 @@ class AddComponent extends Component {
           <Select
             label="值"
             labelInValue
-            onFocus={() => {
-              this.getOption(filter, true);
-            }}
           >
-            {this.tempOption(filter, true)}
+            <Option key="'null'" value="'null'">
+              空
+            </Option>
           </Select>
         );
       } else {
@@ -472,17 +444,31 @@ class AddComponent extends Component {
       return (
         <DatePicker
           format={'YYYY-MM-DD HH:mm:ss'}
+          showTime
         />
       );
     } else {
       // story points && remainning time
       // return number input
-      return (
-        <NumericInput
-          label="值"
-          style={{ lineHeight: '22px', marginBottom: 0, width: 100 }}
-        />
-      );
+      if (operation === 'is' || operation ==='isNot') {
+        return (
+          <Select
+            label="值"
+            labelInValue
+          >
+            <Option key="'null'" value="'null'">
+              空
+            </Option>
+          </Select>
+        );
+      } else {
+        return (
+          <NumericInput
+            label="值"
+            style={{ lineHeight: '22px', marginBottom: 0, width: 100 }}
+          />
+        );
+      }
     }
   }
 

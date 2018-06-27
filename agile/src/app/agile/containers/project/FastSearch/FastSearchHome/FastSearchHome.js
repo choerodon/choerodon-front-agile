@@ -4,6 +4,7 @@ import { Button, Table, Spin, Popover, Tooltip, Icon, Modal } from 'choerodon-ui
 import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import Filter from './Component/Filter';
 import EditFilter from './Component/EditFilter';
+import DeleteFilter from './Component/DeleteFilter';
 
 const { AppState } = stores;
 const confirm = Modal.confirm;
@@ -38,17 +39,9 @@ class Search extends Component {
   }
 
   clickDeleteFilter(record) {
-    confirm({
-      title: `是否删除快速搜索：${record.name}`,
-      content: '删除后将无法使用该快速搜索，如果只是想要改变某些条件可以修改快速搜索。',
-      onOk() {
-        return axios.delete(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/${record.filterId}`).then((res) => {
-          this.loadFilters();
-        });
-      },
-      onCancel() {},
-      onText: '删除',
-      okType: 'danger',
+    this.setState({
+      filter: record,
+      deleteFilterShow: true,
     });
   }
 
@@ -186,6 +179,18 @@ class Search extends Component {
                     this.loadFilters();
                   }}
                   onCancel={() => this.setState({ editFilterShow: false })}
+                />
+              ) : null
+            }
+            {
+              this.state.deleteFilterShow ? (
+                <DeleteFilter
+                  filter={this.state.filter}
+                  onOk={() => {
+                    this.setState({ deleteFilterShow: false });
+                    this.loadFilters();
+                  }}
+                  onCancel={() => this.setState({ deleteFilterShow: false })}
                 />
               ) : null
             }
