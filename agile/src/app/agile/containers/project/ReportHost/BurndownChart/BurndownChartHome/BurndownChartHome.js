@@ -415,6 +415,7 @@ class BurndownChartHome extends Component {
                   <Table
                     dataSource={BurndownChartStore.getBurndownList}
                     columns={columns}
+                    pagination={false}
                   />
                 </div>
               ) : (
