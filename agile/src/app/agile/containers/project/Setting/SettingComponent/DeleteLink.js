@@ -56,9 +56,9 @@ class DeleteLink extends Component {
     });
     let url;
     if (relatedComponentId) {
-      url = `/agile/v1/project/${AppState.currentMenuType.id}/issue_link_types/${this.state.link.linkTypeId}?toIssueLinkTypeId=${relatedComponentId}`;
+      url = `/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types/${this.state.link.linkTypeId}?toIssueLinkTypeId=${relatedComponentId}`;
     } else {
-      url = `/agile/v1/project/${AppState.currentMenuType.id}/issue_link_types/${this.state.link.linkTypeId}`;
+      url = `/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types/${this.state.link.linkTypeId}`;
     }
     axios.delete(url)
       .then((res) => {
@@ -98,7 +98,7 @@ class DeleteLink extends Component {
               value={this.state.relatedComponentId}
               onChange={this.handleRelatedComponentChange.bind(this)}
               onFocus={() => {
-                axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issue_link_types`)
+                axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types`)
                   .then((res) => {
                     this.setState({
                       originComponents: res,

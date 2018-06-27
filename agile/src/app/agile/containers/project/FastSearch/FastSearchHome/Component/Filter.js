@@ -35,7 +35,7 @@ class AddComponent extends Component {
   }
 
   loadQuickFilterFiled() {
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/fields`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/fields`)
       .then((res) => {
         this.setState({
           quickFilterFiled: res,
@@ -87,7 +87,7 @@ class AddComponent extends Component {
         this.setState({
           loading: true,
         });
-        axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter`, obj)
+        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`, obj)
           .then((res) => {
             this.setState({
               loading: false,
@@ -196,13 +196,13 @@ class AddComponent extends Component {
         name: 'realName',
       },
       priority: {
-        url: `/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`,
+        url: `/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`,
         prop: 'lookupValues',
         id: 'valueCode',
         name: 'name',
       },
       status: {
-        url: `/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list`,
+        url: `/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`,
         prop: '',
         id: 'id',
         name: 'name',
@@ -226,40 +226,40 @@ class AddComponent extends Component {
         name: 'realName',
       },
       epic: {
-        url: `/agile/v1/project/${projectId}/issues/epics/select_data`,
+        url: `/agile/v1/projects/${projectId}/issues/epics/select_data`,
         prop: '',
         id: 'issueId',
         name: 'epicName',
       },
       sprint: {
         // post
-        url: `/agile/v1/project/${projectId}/sprint/names`,
+        url: `/agile/v1/projects/${projectId}/sprint/names`,
         prop: '',
         id: 'sprintId',
         name: 'sprintName',
       },
       label: {
-        url: `/agile/v1/project/${projectId}/issue_labels`,
+        url: `/agile/v1/projects/${projectId}/issue_labels`,
         prop: '',
         id: 'labelId',
         name: 'labelName',
       },
       component: {
-        url: `/agile/v1/project/${projectId}/component`,
+        url: `/agile/v1/projects/${projectId}/component`,
         prop: '',
         id: 'componentId',
         name: 'name',
       },
       influence_version: {
         // post
-        url: `/agile/v1/project/${projectId}/product_version/names`,
+        url: `/agile/v1/projects/${projectId}/product_version/names`,
         prop: '',
         id: 'versionId',
         name: 'name',
       },
       fix_version: {
         // post
-        url: `/agile/v1/project/${projectId}/product_version/names`,
+        url: `/agile/v1/projects/${projectId}/product_version/names`,
         prop: '',
         id: 'versionId',
         name: 'name',
@@ -283,13 +283,13 @@ class AddComponent extends Component {
         name: 'realName',
       },
       priority: {
-        url: `/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`,
+        url: `/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`,
         prop: 'lookupValues',
         id: 'valueCode',
         name: 'name',
       },
       status: {
-        url: `/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list`,
+        url: `/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`,
         prop: '',
         id: 'id',
         name: 'name',
@@ -313,40 +313,40 @@ class AddComponent extends Component {
         name: 'realName',
       },
       epic: {
-        url: `/agile/v1/project/${projectId}/issues/epics/select_data`,
+        url: `/agile/v1/projects/${projectId}/issues/epics/select_data`,
         prop: '',
         id: 'issueId',
         name: 'epicName',
       },
       sprint: {
         // post
-        url: `/agile/v1/project/${projectId}/sprint/names`,
+        url: `/agile/v1/projects/${projectId}/sprint/names`,
         prop: '',
         id: 'sprintId',
         name: 'sprintName',
       },
       label: {
-        url: `/agile/v1/project/${projectId}/issue_labels`,
+        url: `/agile/v1/projects/${projectId}/issue_labels`,
         prop: '',
         id: 'labelId',
         name: 'labelName',
       },
       component: {
-        url: `/agile/v1/project/${projectId}/component`,
+        url: `/agile/v1/projects/${projectId}/component`,
         prop: '',
         id: 'componentId',
         name: 'name',
       },
       influence_version: {
         // post
-        url: `/agile/v1/project/${projectId}/product_version/names`,
+        url: `/agile/v1/projects/${projectId}/product_version/names`,
         prop: '',
         id: 'versionId',
         name: 'name',
       },
       fix_version: {
         // post
-        url: `/agile/v1/project/${projectId}/product_version/names`,
+        url: `/agile/v1/projects/${projectId}/product_version/names`,
         prop: '',
         id: 'versionId',
         name: 'name',

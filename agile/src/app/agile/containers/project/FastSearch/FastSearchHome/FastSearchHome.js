@@ -56,7 +56,7 @@ class Search extends Component {
     this.setState({
       loading: true,
     });
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
       .then((res) => {
         this.setState({
           filters: res,

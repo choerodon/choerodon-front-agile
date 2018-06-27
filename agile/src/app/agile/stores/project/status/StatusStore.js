@@ -16,7 +16,7 @@ class StatusStore {
     }
 
     axiosGetStatusList(data) {
-      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status/statuses?page=${data.current - 1}&size=${data.pageSize}`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/statuses?page=${data.current - 1}&size=${data.pageSize}`);
     }
 }
 

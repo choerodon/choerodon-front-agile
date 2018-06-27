@@ -4,9 +4,9 @@ const { AppState } = stores;
 
 export function loadComponents(componentId) {
   if (componentId) {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/component?componentId=${componentId}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component?componentId=${componentId}`);
   }
-  return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/component`);
+  return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component`);
 }
 
 export function createComponent(obj) {
@@ -16,7 +16,7 @@ export function createComponent(obj) {
     ...obj,
   };
   return axios.post(
-    `/agile/v1/project/${projectId}/component`,
+    `/agile/v1/projects/${projectId}/component`,
     component,
   );
 }
@@ -33,20 +33,20 @@ export function updateComponent(componentId, obj) {
     ...obj,
   };
   return axios.put(
-    `/agile/v1/project/${projectId}/component/${componentId}`,
+    `/agile/v1/projects/${projectId}/component/${componentId}`,
     component,
   );
 }
 
 export function loadComponent(componentId) {
   const projectId = AppState.currentMenuType.id;
-  return axios.get(`agile/v1/project/${projectId}/component/${componentId}`);
+  return axios.get(`agile/v1/projects/${projectId}/component/${componentId}`);
 }
 
 export function deleteComponent(componentId, relateComponentId) {
   const projectId = AppState.currentMenuType.id;
   if (relateComponentId === 0) {
-    return axios.delete(`/agile/v1/project/${projectId}/component/${componentId}`);
+    return axios.delete(`/agile/v1/projects/${projectId}/component/${componentId}`);
   }
-  return axios.delete(`/agile/v1/project/${projectId}/component/${componentId}?relateComponentId=${relateComponentId}`);
+  return axios.delete(`/agile/v1/projects/${projectId}/component/${componentId}?relateComponentId=${relateComponentId}`);
 }

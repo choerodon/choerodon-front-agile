@@ -48,7 +48,7 @@ class AddComponent extends Component {
   }
 
   loadFilter(filterId = this.props.filterId) {
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/${filterId}`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/${filterId}`)
       .then((res) => {
         const description = res.description.split('+++')[0];
         const obj = JSON.parse(res.description.split('+++')[1]);
@@ -64,7 +64,7 @@ class AddComponent extends Component {
   }
 
   loadQuickFilterFiled() {
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/fields`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/fields`)
       .then((res) => {
         this.setState({
           quickFilterFiled: res,
@@ -82,46 +82,46 @@ class AddComponent extends Component {
         name: 'realName',
       },
       priority: {
-        url: `/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`,
+        url: `/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`,
         prop: 'lookupValues',
         id: 'valueCode',
         name: 'name',
       },
       status: {
-        url: `/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list`,
+        url: `/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`,
         prop: '',
         id: 'id',
         name: 'name',
       },
       epic: {
-        url: `/agile/v1/project/${projectId}/issues/epics/select_data`,
+        url: `/agile/v1/projects/${projectId}/issues/epics/select_data`,
         prop: '',
         id: 'issueId',
         name: 'epicName',
       },
       sprint: {
         // post
-        url: `/agile/v1/project/${projectId}/sprint/names`,
+        url: `/agile/v1/projects/${projectId}/sprint/names`,
         method: 'post',
         prop: '',
         id: 'sprintId',
         name: 'sprintName',
       },
       label: {
-        url: `/agile/v1/project/${projectId}/issue_labels`,
+        url: `/agile/v1/projects/${projectId}/issue_labels`,
         prop: '',
         id: 'labelId',
         name: 'labelName',
       },
       component: {
-        url: `/agile/v1/project/${projectId}/component`,
+        url: `/agile/v1/projects/${projectId}/component`,
         prop: '',
         id: 'componentId',
         name: 'name',
       },
       version: {
         // post
-        url: `/agile/v1/project/${projectId}/product_version/names`,
+        url: `/agile/v1/projects/${projectId}/product_version/names`,
         method: 'post',
         prop: '',
         id: 'versionId',
@@ -129,13 +129,13 @@ class AddComponent extends Component {
       },
     };
     axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`).then(res => this.setState({ originUsers: res.content }));
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`).then(res => this.setState({ originPriorities: res.lookupValues }));
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list`).then(res => this.setState({ originStatus: res }));
-    axios.get(`/agile/v1/project/${projectId}/issues/epics/select_data`).then(res => this.setState({ originEpics: res }));
-    axios.post(`/agile/v1/project/${projectId}/sprint/names`).then(res => this.setState({ originSprints: res }));
-    axios.get(`/agile/v1/project/${projectId}/issue_labels`).then(res => this.setState({ originLabels: res }));
-    axios.get(`/agile/v1/project/${projectId}/component`).then(res => this.setState({ originComponents: res }));
-    axios.post(`/agile/v1/project/${projectId}/product_version/names`).then(res => this.setState({ originVersions: res }));
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`).then(res => this.setState({ originPriorities: res.lookupValues }));
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`).then(res => this.setState({ originStatus: res }));
+    axios.get(`/agile/v1/projects/${projectId}/issues/epics/select_data`).then(res => this.setState({ originEpics: res }));
+    axios.post(`/agile/v1/projects/${projectId}/sprint/names`).then(res => this.setState({ originSprints: res }));
+    axios.get(`/agile/v1/projects/${projectId}/issue_labels`).then(res => this.setState({ originLabels: res }));
+    axios.get(`/agile/v1/projects/${projectId}/component`).then(res => this.setState({ originComponents: res }));
+    axios.post(`/agile/v1/projects/${projectId}/product_version/names`).then(res => this.setState({ originVersions: res }));
   }
 
   getOperation(filter) {
@@ -179,14 +179,14 @@ class AddComponent extends Component {
         state: 'originUsers',
       },
       priority: {
-        url: `/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`,
+        url: `/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`,
         prop: 'lookupValues',
         id: 'valueCode',
         name: 'name',
         state: 'originPriorities',
       },
       status: {
-        url: `/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list`,
+        url: `/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`,
         prop: '',
         id: 'id',
         name: 'name',
@@ -214,7 +214,7 @@ class AddComponent extends Component {
         state: 'originStatus',
       },
       epic: {
-        url: `/agile/v1/project/${projectId}/issues/epics/select_data`,
+        url: `/agile/v1/projects/${projectId}/issues/epics/select_data`,
         prop: '',
         id: 'issueId',
         name: 'epicName',
@@ -222,21 +222,21 @@ class AddComponent extends Component {
       },
       sprint: {
         // post
-        url: `/agile/v1/project/${projectId}/sprint/names`,
+        url: `/agile/v1/projects/${projectId}/sprint/names`,
         prop: '',
         id: 'sprintId',
         name: 'sprintName',
         state: 'originSprints',
       },
       label: {
-        url: `/agile/v1/project/${projectId}/issue_labels`,
+        url: `/agile/v1/projects/${projectId}/issue_labels`,
         prop: '',
         id: 'labelId',
         name: 'labelName',
         state: 'originLabels',
       },
       component: {
-        url: `/agile/v1/project/${projectId}/component`,
+        url: `/agile/v1/projects/${projectId}/component`,
         prop: '',
         id: 'componentId',
         name: 'name',
@@ -244,7 +244,7 @@ class AddComponent extends Component {
       },
       influence_version: {
         // post
-        url: `/agile/v1/project/${projectId}/product_version/names`,
+        url: `/agile/v1/projects/${projectId}/product_version/names`,
         prop: '',
         id: 'versionId',
         name: 'name',
@@ -252,7 +252,7 @@ class AddComponent extends Component {
       },
       fix_version: {
         // post
-        url: `/agile/v1/project/${projectId}/product_version/names`,
+        url: `/agile/v1/projects/${projectId}/product_version/names`,
         prop: '',
         id: 'versionId',
         name: 'name',
@@ -389,7 +389,7 @@ class AddComponent extends Component {
         this.setState({
           loading: true,
         });
-        axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/${this.props.filterId}`, obj)
+        axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/${this.props.filterId}`, obj)
           .then((res) => {
             this.setState({
               loading: false,
@@ -461,14 +461,14 @@ class AddComponent extends Component {
         state: 'originUsers',
       },
       priority: {
-        url: `/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`,
+        url: `/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`,
         prop: 'lookupValues',
         id: 'valueCode',
         name: 'name',
         state: 'originPriorities',
       },
       status: {
-        url: `/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list`,
+        url: `/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`,
         prop: '',
         id: 'id',
         name: 'name',
@@ -496,7 +496,7 @@ class AddComponent extends Component {
         state: 'originStatus',
       },
       epic: {
-        url: `/agile/v1/project/${projectId}/issues/epics/select_data`,
+        url: `/agile/v1/projects/${projectId}/issues/epics/select_data`,
         prop: '',
         id: 'issueId',
         name: 'epicName',
@@ -504,21 +504,21 @@ class AddComponent extends Component {
       },
       sprint: {
         // post
-        url: `/agile/v1/project/${projectId}/sprint/names`,
+        url: `/agile/v1/projects/${projectId}/sprint/names`,
         prop: '',
         id: 'sprintId',
         name: 'sprintName',
         state: 'originSprints',
       },
       label: {
-        url: `/agile/v1/project/${projectId}/issue_labels`,
+        url: `/agile/v1/projects/${projectId}/issue_labels`,
         prop: '',
         id: 'labelId',
         name: 'labelName',
         state: 'originLabels',
       },
       component: {
-        url: `/agile/v1/project/${projectId}/component`,
+        url: `/agile/v1/projects/${projectId}/component`,
         prop: '',
         id: 'componentId',
         name: 'name',
@@ -526,14 +526,14 @@ class AddComponent extends Component {
       },
       influence_version: {
         // post
-        url: `/agile/v1/project/${projectId}/product_version/names`,
+        url: `/agile/v1/projects/${projectId}/product_version/names`,
         prop: '',
         id: 'versionId',
         name: 'name',
       },
       fix_version: {
         // post
-        url: `/agile/v1/project/${projectId}/product_version/names`,
+        url: `/agile/v1/projects/${projectId}/product_version/names`,
         prop: '',
         id: 'versionId',
         name: 'name',

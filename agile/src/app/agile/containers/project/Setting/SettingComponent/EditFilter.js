@@ -39,7 +39,7 @@ class AddComponent extends Component {
   }
 
   loadFilter(filterId = this.props.filterId) {
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/${filterId}`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/${filterId}`)
       .then((res) => {
         const obj = JSON.parse(res.description);
         this.setState({
@@ -51,7 +51,7 @@ class AddComponent extends Component {
   }
 
   loadQuickFilterFiled() {
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/fields`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/fields`)
       .then((res) => {
         this.setState({
           quickFilterFiled: res,
@@ -60,7 +60,7 @@ class AddComponent extends Component {
   }
 
   loadQuickFilter() {
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`)
       .then((res) => {
         this.setState({
           originPriorities: res.lookupValues,
@@ -72,7 +72,7 @@ class AddComponent extends Component {
           originUsers: res.content,
         });
       });
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/status_category`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/status_category`)
       .then((res) => {
         this.setState({
           originStatus: res.lookupValues,
@@ -122,7 +122,7 @@ class AddComponent extends Component {
         this.setState({
           loading: true,
         });
-        axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/${this.props.filterId}`, obj)
+        axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/${this.props.filterId}`, obj)
           .then((res) => {
             this.setState({
               loading: false,

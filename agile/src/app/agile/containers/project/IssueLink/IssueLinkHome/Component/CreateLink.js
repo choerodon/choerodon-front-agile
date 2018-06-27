@@ -31,7 +31,7 @@ class CreateLink extends Component {
         this.setState({
           loading: true,
         });
-        axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/issue_link_types`, obj)
+        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types`, obj)
           .then((res) => {
             this.setState({
               loading: false,

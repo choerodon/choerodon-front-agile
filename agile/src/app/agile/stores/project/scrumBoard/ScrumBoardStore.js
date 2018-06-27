@@ -34,7 +34,7 @@ class ScrumBoardStore {
   }
 
   axiosGetQuickSearchList() {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`);
   }
 
   @computed get getSwimLaneCode() {
@@ -82,15 +82,15 @@ class ScrumBoardStore {
   }
 
   axiosUpdateIssueStatus(id, data) {
-    return axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status/${id}`, data);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${id}`, data);
   }
 
   axiosCheckRepeatName(name) {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board_column/check?statusName=${name}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column/check?statusName=${name}`);
   }
 
   axiosUpdateMaxMinNum(columnId, data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/board_column/${columnId}/column_contraint`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column/${columnId}/column_contraint`, data);
   }
 
   @computed get getIssueNumberCount() {
@@ -118,15 +118,15 @@ class ScrumBoardStore {
   }
 
   axiosCreateBoard(name) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/board?boardName=${name}`);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board?boardName=${name}`);
   }
 
   axiosDeleteBoard() {
-    return axios.delete(`/agile/v1/project/${AppState.currentMenuType.id}/board/${this.selectedBoard}`);
+    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${this.selectedBoard}`);
   }
 
   axiosUpdateBoard(data) {
-    return axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/board/${this.selectedBoard}`, data);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${this.selectedBoard}`, data);
   }
 
   @computed get getCurrentConstraint() {
@@ -138,7 +138,7 @@ class ScrumBoardStore {
   }
 
   axiosGetLookupValue(code) {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/${code}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/${code}`);
   }
 
   @computed get getLookupValue() {
@@ -158,7 +158,7 @@ class ScrumBoardStore {
   }
 
   axiosUpdateColumn(columnId, data, boardId) {
-    return axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/board_column/${columnId}?boardId=${boardId}`, data);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column/${columnId}?boardId=${boardId}`, data);
   }
 
   @computed get getSelectedBoard() {
@@ -178,7 +178,7 @@ class ScrumBoardStore {
   }
 
   axiosGetBoardList() {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board`);
   }
 
   @computed get getStatusCategory() {
@@ -190,7 +190,7 @@ class ScrumBoardStore {
   }
 
   axiosGetStatusCategory() {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/status_category`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/status_category`);
   }
 
   @computed get getParentIds() {
@@ -210,47 +210,47 @@ class ScrumBoardStore {
   }
 
   axiosUpdateColumnSequence(boardId, data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/board_column/column_sort`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column/column_sort`, data);
   }
 
   axiosDeleteColumn(columnId) {
-    return axios.delete(`/agile/v1/project/${AppState.currentMenuType.id}/board_column/${columnId}`);
+    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column/${columnId}`);
   }
 
   axiosAddColumn(categoryCode, data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/board_column?categoryCode=${categoryCode}`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column?categoryCode=${categoryCode}`, data);
   }
 
   axiosAddStatus(data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status`, data);
   }
 
   axiosGetBoardDataBySetting(boardId) {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data`);
   }
 
   axiosGetBoardData(boardId, assign, recent, filter) {
     if (assign === 0) {
-      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data?onlyStory=${recent}&quickFilterIds=${filter}`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data?onlyStory=${recent}&quickFilterIds=${filter}`);
     } else {
-      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data?assigneeId=${assign}&onlyStory=${recent}&quickFilterIds=${filter}`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data?assigneeId=${assign}&onlyStory=${recent}&quickFilterIds=${filter}`);
     }
   }
 
   axiosFilterBoardData(boardId, assign, recent) {
     if (assign === 0) {
-      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data?onlyStory=${recent}`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data?onlyStory=${recent}`);
     } else {
-      return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/board/${boardId}/all_data?assigneeId=${assign}&onlyStory=${recent}`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data?assigneeId=${assign}&onlyStory=${recent}`);
     }
   }
   
   axiosGetUnsetData(boardId) {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list_by_options?boardId=${boardId}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list_by_options?boardId=${boardId}`);
   }
 
   axiosDeleteStatus(code) {
-    return axios.delete(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status/${code}`);
+    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}`);
   }
 
   updateIssue(issueIdP, objP, codeP, boardIdP, originColumnIdP, columnIdP) {
@@ -262,15 +262,15 @@ class ScrumBoardStore {
       originColumnId: originColumnIdP,
       columnId: columnIdP,
     };
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/board/issue/${issueIdP}/move`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board/issue/${issueIdP}/move`, data);
   }
 
   moveStatusToUnset(code, data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status/${code}/move_to_uncorrespond`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}/move_to_uncorrespond`, data);
   }
 
   moveStatusToColumn(code, data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status/${code}/move_to_column`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}/move_to_column`, data);
   }
 
   @computed get getDragStartItem() {
