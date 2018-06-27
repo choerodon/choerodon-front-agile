@@ -19,7 +19,7 @@ class EditLink extends Component {
   componentDidMount() {
     window.console.log('edit link');
     const linkTypeId = this.props.linkTypeId;
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issue_link_types/${linkTypeId}`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types/${linkTypeId}`)
       .then((res) => {
         this.setState({
           linkType: res,
@@ -41,7 +41,7 @@ class EditLink extends Component {
         this.setState({
           loading: true,
         });
-        axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/issue_link_types`, obj)
+        axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types`, obj)
           .then((res) => {
             this.setState({
               loading: false,

@@ -26,14 +26,14 @@ class BurndownChartStore {
   }
 
   axiosGetSprintList() {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/names`, ['started', 'closed']);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, ['started', 'closed']);
   }
 
   axiosGetBurndownChartData(id, type) {
-    return axios.get(`/agile/v1/project/29/reports/${id}/burn_down_coordinate?type=${type}`);
+    return axios.get(`/agile/v1/projects/29/reports/${id}/burn_down_coordinate?type=${type}`);
   }
   axiosGetBurndownChartReport(id, type) {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/reports/${id}/burn_down_report?type=${type}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${id}/burn_down_report?type=${type}`);
   }
 }
 

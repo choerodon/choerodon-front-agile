@@ -53,7 +53,7 @@ class Link extends Component {
     this.setState({
       loading: true,
     });
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issue_link_types`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types`)
       .then((res) => {
         this.setState({
           links: res,

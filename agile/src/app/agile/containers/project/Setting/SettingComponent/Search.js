@@ -41,7 +41,7 @@ class Search extends Component {
       title: `是否删除快速搜索：${record.name}`,
       content: '删除后将无法使用该快速搜索，如果只是想要改变某些条件可以修改快速搜索。',
       onOk() {
-        return axios.delete(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/${record.filterId}`);
+        return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/${record.filterId}`);
       },
       onCancel() {},
       onText: '删除',
@@ -60,7 +60,7 @@ class Search extends Component {
     this.setState({
       loading: true,
     });
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
       .then((res) => {
         this.setState({
           filters: res,

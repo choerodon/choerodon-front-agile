@@ -29,7 +29,7 @@ class DeleteComponent extends Component {
     this.setState({
       loading: true,
     });
-    axios.delete(`/agile/v1/project/${AppState.currentMenuType.id}/quick_filter/${this.state.filter.filterId}`)
+    axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/${this.state.filter.filterId}`)
       .then((res) => {
         this.setState({
           loading: false,

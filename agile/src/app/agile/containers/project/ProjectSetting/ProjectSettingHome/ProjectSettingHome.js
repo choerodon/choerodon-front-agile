@@ -23,7 +23,7 @@ class ProjectSetting extends Component {
   }
 
   getProjectCode() {
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/project_info`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
       .then((res) => {
         this.setState({
           origin: res,
@@ -46,7 +46,7 @@ class ProjectSetting extends Component {
       });
       callback();
     } else {
-      axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/project_info/check?projectName=${value}`)
+      axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info/check?projectName=${value}`)
         .then((res) => {
           if (res) {
             this.setState({
@@ -73,7 +73,7 @@ class ProjectSetting extends Component {
         this.setState({
           loading: true,
         });
-        axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/project_info`, projectInfoDTO)
+        axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`, projectInfoDTO)
           .then((res) => {
             this.setState({
               origin: res,

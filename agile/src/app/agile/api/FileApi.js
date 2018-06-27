@@ -8,7 +8,7 @@ const { AppState } = stores;
  */
 export function deleteFile(id) {
   const projectId = AppState.currentMenuType.id;
-  return axios.delete(`/agile/v1/project/${projectId}/issue_attachment/${id}`);
+  return axios.delete(`/agile/v1/projects/${projectId}/issue_attachment/${id}`);
 }
 
 /**
@@ -21,7 +21,7 @@ export function uploadImage(data) {
   };
   const projectId = AppState.currentMenuType.id;
   return axios.post(
-    `/agile/v1/project/${projectId}/issue_attachment/upload_for_address`,
+    `/agile/v1/projects/${projectId}/issue_attachment/upload_for_address`,
     data,
     axiosConfig,
   );
@@ -38,7 +38,7 @@ export function uploadFile(data, config) {
     headers: { 'content-type': 'multipart/form-datal' },
   };
   return axios.post(
-    `/zuul/agile/v1/project/${projectId}/issue_attachment?projectId=${projectId}&issueId=${issueId}`,
+    `/zuul/agile/v1/projects/${projectId}/issue_attachment?projectId=${projectId}&issueId=${issueId}`,
     data,
     axiosConfig,
   );
