@@ -21,48 +21,70 @@ class StatusIssue extends Component {
     }
     return '';
   }
-  getParent(id, type) {
-    const data = ScrumBoardStore.getBoardData;
-    let parent;
-    _.forEach(data, (item) => {
-      _.forEach(item.subStatuses, (ss) => {
-        _.forEach(ss.issues, (iss) => {
-          if (iss.issueId === id) {
-            parent = iss;
+  getParent(parentId, items) {
+    let result = false;
+    if (parentId) {
+      const data = this.props.statusData;
+      _.forEach(data, (item) => {
+        _.forEach(item.issues, (item2) => {
+          if (item2.issueId === parentId) {
+            // 如果同一列有父卡
+            if (item2.assigneeId) {
+              if (item2.assigneeId === items.assigneeId) {
+                result = true;
+              }
+            } else if (!items.assigneeId) {
+              result = true;
+            }
           }
         });
       });
-    });
-    if (parent) {
-      if (type) {
-        return true;
-      } else {
-        return (
-          <div
-            className="textDisplayOneColumn"
-            style={{
-              padding: '10px',
-              border: '1px solid rgba(0,0,0,0.20)',
-              borderRadius: '2px',
-              background: '#F3F3F3',
-              lineHeight: '24px',
-            }}
-          >
-            <span>
-              {parent.issueNum}
-            </span>
-            <span style={{ marginLeft: 10 }}>
-              {parent.summary}
-            </span>
-          </div>
-        );
-      }
     }
-    if (type) {
-      return false;
-    } else {
-      return '';
+    return result;
+  }
+  getChildren() {
+    const parentsIds = ScrumBoardStore.getParentIds;
+    const itemIssueId = this.props.data.issueId;
+    const itemAssigneeId = this.props.data.assigneeId;
+    const allStatus = this.props.statusData;
+    let flag = 0;
+    if (parentsIds.length > 0) {
+      _.forEach(parentsIds, (item) => {
+        if (item.issueId === itemIssueId) {
+          // 该任务是父卡
+          flag = 1;
+        }
+      });
     }
+    if (flag === 1) {
+      const childrenList = [];
+      _.forEach(allStatus, (item) => {
+        _.forEach(item.issues, (is) => {
+          if (is.assigneeId) {
+            if (is.assigneeId === itemAssigneeId) {
+              if (is.parentIssueId === itemIssueId) {
+                childrenList.push(is);
+              }
+            }
+          } else if (!itemAssigneeId) {
+            if (is.parentIssueId === itemIssueId) {
+              childrenList.push(is);
+            }
+          }
+        });
+      });
+
+      window.console.log(this.props.data, childrenList);
+      const result = [];
+      if (childrenList.length > 0) {
+        const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
+        _.forEach(childrenList, (child, index) => {
+          result.push(this.renderReturn(child, `sub-${index}`, issueId, 'child'));
+        });
+        return result;
+      } 
+    }
+    return '';
   }
   renderIssueDisplay() {
     const dragStartData = ScrumBoardStore.getDragStartItem;
@@ -83,8 +105,8 @@ class StatusIssue extends Component {
       }
     }
   }
-  renderTypeCode(type) {
-    const typeCode = this.props.data.typeCode;
+  renderTypeCode(type, item) {
+    const typeCode = item.typeCode;
     if (typeCode === 'story') {
       if (type === 'background') {
         return '#00BFA5';
@@ -154,159 +176,205 @@ class StatusIssue extends Component {
     }
   }
 
+  renderSubDisplay(item, type, border) {
+    let result = 'block';
+    if (item.parentIssueId) {
+      const columnData = this.props.statusData;
+      _.forEach(columnData, (items) => {
+        _.forEach(items.issues, (is) => {
+          if (is.issueId === item.parentIssueId) {
+            if (is.assigneeId) {
+              if (is.assigneeId === item.assigneeId) {
+                if (!type) {
+                  result = 'none';
+                }
+              }
+            } else if (!item.assigneeId) {
+              if (!type) {
+                result = 'none';
+              }
+            }
+          }
+        });
+      });
+      if (border) {
+        return true;
+      } else {
+        return result;
+      }
+    }
+    if (border) {
+      return false;
+    } else {
+      return result;
+    }
+  }
 
+  renderReturn(item, index, issueId, type) {
+    if (this.renderSubDisplay(item, type) === 'block') {
+      return (
+        <div
+          className="c7n-boardIssue"
+          style={{
+            borderTop: this.renderSubDisplay(item, type, 'border') ? '1px solid rgba(0, 0, 0, 0.20)' : 'unset',
+            display: this.renderSubDisplay(item, type),
+          }}
+        >
+          <Draggable 
+            key={item.issueId} 
+            draggableId={JSON.stringify({
+              objectVersionNumber: item.objectVersionNumber,
+              issueId: item.issueId,
+            })} 
+            index={index}
+          >
+            {(provided, snapshot) => 
+              (
+                <div>
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={{
+                      userSelect: 'none',
+                      // background: snapshot.isDragging ? 'lightgreen' : 'white',  
+                      minHeight: 83,
+                      // borderLeft: '1px solid rgba(0,0,0,0.20)',
+                      // borderRight: '1px solid rgba(0,0,0,0.20)',
+                      cursor: 'move',
+                      // visibility: this.renderIssueDisplay(),
+                      ...provided.draggableProps.style,
+                      // display: 'flex',
+                      overflow: 'hidden',
+                    }}
+                    role="none"
+                    onClick={() => {
+                      ScrumBoardStore.setClickIssueDetail(item);
+                    }}
+                  >
+                    {/* {
+                      item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' ? 
+                        this.getParent(item.parentIssueId)
+                        : ''
+                    } */}
+                    <div 
+                      className="c7n-scrumboard-issue"
+                      style={{
+                        marginLeft: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 16 : 0,
+                        background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',  
+                        borderTop: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 'unset' : '1px solid rgba(0, 0, 0, 0.20)',
+                      }}
+                    >
+                      <div 
+                        className="c7n-scrumboard-issueBorder" 
+                        style={{
+                          background: this.renderTypeCode('background', item),
+                          display: ScrumBoardStore.getSwimLaneCode === 'assignee' ? 'block' : 'none',
+                        }}
+                      />
+                      <div style={{ flexGrow: 1 }}>
+                        <div
+                          label={ScrumBoardStore.getClickIssueDetail.issueId}
+                          className="c7n-scrumboard-issueTop"
+                          style={{
+                            display: issueId ? 'block' : 'flex',
+                            flexWrap: 'wrap',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <div
+                              className="c7n-scrumboard-issueIcon"
+                              style={{
+                                background: this.renderTypeCode('background', item),
+                              }}
+                            >
+                              {this.renderTypeCode('icon', item)}
+                            </div>
+                            <p style={{ marginLeft: 5 }} className="textDisplayOneColumn">{item.issueNum}</p>
+                          </div>
+                          <p
+                            style={{
+                              margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
+                            }}
+                          >
+                            <Tooltip title={`状态: ${this.props.statusName}`}>
+                              <span
+                                style={{ 
+                                  borderRadius: 2, 
+                                  padding: '2px 8px', 
+                                  background: this.renderStatusBackground(),
+                                  // background: '#4D90FE', 
+                                  color: 'white',
+                                  maxWidth: 56,
+                                }}
+                                className="textDisplayOneColumn"
+                              >
+                                {this.props.statusName}
+                              </span>
+                            </Tooltip>
+                          </p>
+                        </div>
+                        <div className="c7n-scrumboard-issueBottom">
+                          <Tooltip title={`优先级: ${item.priorityName}`}>
+                            <p
+                              style={{ 
+                                flexBasis: '20px',
+                                background: this.renderPriorityStyle('background', item),
+                                color: this.renderPriorityStyle('color', item),
+                                textAlign: 'center',
+                              }}
+                            >{item.priorityName}</p>
+                          </Tooltip>
+                          <Tooltip title={item.summary} placement="topLeft">
+                            <p
+                              className="textDisplayOneColumn" 
+                              style={{ 
+                                flexBasis: '90%',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                lineHeight: '20px',
+                                paddingLeft: 10,
+                              }}
+                            >{item.summary}</p>
+                          </Tooltip>
+                        </div>
+                      </div>
+                      {/* <div style={{ flexShrink: 0 }} cla
+                  ssName="c7n-scrumboard-issueSide">M</div> */}
+                      {
+                        item.assigneeName ? (
+                          <Tooltip title={`经办人: ${item.assigneeName}`}>
+                            <Avatar
+                              src={item.imageUrl ? item.imageUrl : undefined}
+                              style={{
+                                flexShrink: 0,
+                              }}
+                            >
+                              {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
+                            </Avatar>
+                          </Tooltip>
+                        ) : ''
+                      }
+                    </div>
+                  </div>
+                  {provided.placeholder}
+                </div>
+              )
+            }
+          </Draggable>
+          <div>
+            {!type ? this.getChildren() : ''}
+          </div>
+        </div>
+      );
+    }
+    return '';
+  }
   render() {
     const item = this.props.data;
     const index = this.props.index;
     const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
-    return (
-      <div className="c7n-boardIssue">
-        <Draggable 
-          key={item.issueId} 
-          draggableId={JSON.stringify({
-            objectVersionNumber: item.objectVersionNumber,
-            issueId: item.issueId,
-          })} 
-          index={index}
-        >
-          {(provided, snapshot) => 
-            (
-              <div>
-                <div
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                  style={{
-                    userSelect: 'none',
-                    // background: snapshot.isDragging ? 'lightgreen' : 'white',  
-                    minHeight: 83,
-                    // borderLeft: '1px solid rgba(0,0,0,0.20)',
-                    // borderRight: '1px solid rgba(0,0,0,0.20)',
-                    cursor: 'move',
-                    // visibility: this.renderIssueDisplay(),
-                    ...provided.draggableProps.style,
-                    // display: 'flex',
-                    overflow: 'hidden',
-                  }}
-                  role="none"
-                  onClick={() => {
-                    ScrumBoardStore.setClickIssueDetail(item);
-                  }}
-                >
-                  {
-                    item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' ? 
-                      this.getParent(item.parentIssueId)
-                      : ''
-                  }
-                  <div 
-                    className="c7n-scrumboard-issue"
-                    style={{
-                      marginLeft: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, 'boolean') ? 16 : 0,
-                      background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',  
-                      borderTop: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, 'boolean') ? 'unset' : '1px solid rgba(0, 0, 0, 0.20)',
-                    }}
-                  >
-                    <div 
-                      className="c7n-scrumboard-issueBorder" 
-                      style={{
-                        background: this.renderTypeCode('background'),
-                        display: ScrumBoardStore.getSwimLaneCode === 'assignee' ? 'block' : 'none',
-                      }}
-                    />
-                    <div style={{ flexGrow: 1 }}>
-                      <div
-                        label={ScrumBoardStore.getClickIssueDetail.issueId}
-                        className="c7n-scrumboard-issueTop"
-                        style={{
-                          display: issueId ? 'block' : 'flex',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <div
-                            className="c7n-scrumboard-issueIcon"
-                            style={{
-                              display: ScrumBoardStore.getSwimLaneCode === 'assignee' ? 'block' : 'none',
-                              background: this.renderTypeCode('background'),
-                            }}
-                          >
-                            {this.renderTypeCode('icon')}
-                          </div>
-                          <p style={{ marginLeft: 5 }} className="textDisplayOneColumn">{item.issueNum}</p>
-                        </div>
-                        <p
-                          style={{
-                            margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
-                          }}
-                        >
-                          <Tooltip title={`状态: ${this.props.statusName}`}>
-                            <span
-                              style={{ 
-                                borderRadius: 2, 
-                                padding: '2px 8px', 
-                                background: this.renderStatusBackground(),
-                                // background: '#4D90FE', 
-                                color: 'white',
-                                maxWidth: 56,
-                              }}
-                              className="textDisplayOneColumn"
-                            >
-                              {this.props.statusName}
-                            </span>
-                          </Tooltip>
-                        </p>
-                      </div>
-                      <div className="c7n-scrumboard-issueBottom">
-                        <Tooltip title={`优先级: ${item.priorityName}`}>
-                          <p
-                            style={{ 
-                              flexBasis: '20px',
-                              background: this.renderPriorityStyle('background', item),
-                              color: this.renderPriorityStyle('color', item),
-                              textAlign: 'center',
-                            }}
-                          >{item.priorityName}</p>
-                        </Tooltip>
-                        <Tooltip title={item.summary} placement="topLeft">
-                          <p
-                            className="textDisplayOneColumn" 
-                            style={{ 
-                              flexBasis: '90%',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              lineHeight: '20px',
-                              paddingLeft: 10,
-                            }}
-                          >{item.summary}</p>
-                        </Tooltip>
-                      </div>
-                    </div>
-                    {/* <div style={{ flexShrink: 0 }} cla
-                ssName="c7n-scrumboard-issueSide">M</div> */}
-                    {
-                      item.assigneeName ? (
-                        <Tooltip title={`经办人: ${item.assigneeName}`}>
-                          <Avatar
-                            src={item.imageUrl ? item.imageUrl : undefined}
-                            style={{
-                              flexShrink: 0,
-                            }}
-                          >
-                            {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
-                          </Avatar>
-                        </Tooltip>
-                      ) : ''
-                    }
-                  </div>
-                </div>
-                {provided.placeholder}
-              </div>
-            )
-          }
-        </Draggable>
-      </div>
-      
-    );
+    return this.renderReturn(item, index, issueId);
   }
 }
 
