@@ -96,7 +96,14 @@ class ReleaseStore {
   }
 
   axiosDeleteVersion(data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/product_version/version`, data);
+    let stringData = '';
+    if (data.fixTargetVersionId) {
+      stringData += `fixTargetVersionId=${data.fixTargetVersionId}&`;
+    }
+    if (data.influenceTargetVersionId) {
+      stringData += `influenceTargetVersionId=${data.influenceTargetVersionId}`;
+    }
+    return axios.delete(`/agile/v1/project/${AppState.currentMenuType.id}/product_version/${data.versionId}?${stringData}`);
   }
   axiosGetVersionListWithoutPage() {
     return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/product_version/names`, []);

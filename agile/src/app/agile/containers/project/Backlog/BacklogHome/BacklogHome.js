@@ -28,18 +28,18 @@ class BacklogHome extends Component {
   }
   componentWillMount() {
     this.refresh();
-    window.addEventListener('click', (e) => {
-      if (!e.target.getAttribute('label')) {
-        if (this.sprintRef.getCurrentState('selected').issueIds.length > 0) {
-          if (!BacklogStore.getIsDragging) {
-            this.sprintRef.onChangeState('selected', {
-              droppableId: '',
-              issueIds: [],
-            });
-          }
-        }
-      }
-    });
+    // window.addEventListener('click', (e) => {
+    //   if (!e.target.getAttribute('label')) {
+    //     if (this.sprintRef.getCurrentState('selected').issueIds.length > 0) {
+    //       if (!BacklogStore.getIsDragging) {
+    //         this.sprintRef.onChangeState('selected', {
+    //           droppableId: '',
+    //           issueIds: [],
+    //         });
+    //       }
+    //     }
+    //   }
+    // });
   }
   //  拖动结束事件
   onDragEnd(result) {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { stores, axios, Page, Header, Content } from 'choerodon-front-boot';
+import { stores, axios, Page, Header, Content, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import { Select, Form, Input, Button, Modal, Spin, Icon } from 'choerodon-ui';
 
@@ -94,7 +94,8 @@ class ProjectSetting extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const { initValue, visible, onCancel, onOk } = this.props;
-
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <Page>
         <Header title="项目设置">
@@ -105,7 +106,7 @@ class ProjectSetting extends Component {
         </Header>
         <Content
           title="项目设置"
-          description="可配置的项目编码。"
+          description="项目编码用于问题编号的前缀，如无特殊需求，不建议频繁修改。"
           link="#"
         >
           <div style={{ marginTop: 8 }}>
@@ -124,15 +125,17 @@ class ProjectSetting extends Component {
               </FormItem>
             </Form>
             <div style={{ padding: '12px 0', borderTop: '1px solid rgba(0, 0, 0, 0.12)' }}>
-              <Button
-                type="primary"
-                funcType="raised"
-                disabled={!this.state.couldUpdate}
-                loading={this.state.loading}
-                onClick={() => this.handleUpdateProjectCode()}
-              >
+              <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.project-info.updateProjectInfo']}>
+                <Button
+                  type="primary"
+                  funcType="raised"
+                  disabled={!this.state.couldUpdate}
+                  loading={this.state.loading}
+                  onClick={() => this.handleUpdateProjectCode()}
+                >
             保存
-              </Button>
+                </Button>
+              </Permission>
               <Button
                 funcType="raised"
                 disabled={this.state.origin.projectCode === this.props.form.getFieldValue('code')}

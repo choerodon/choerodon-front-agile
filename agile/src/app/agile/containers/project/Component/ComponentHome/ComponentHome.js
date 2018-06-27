@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Button, Table, Spin, Popover, Tooltip, Icon } from 'choerodon-ui';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
 import './ComponentHome.scss';
 import '../../../main.scss';
 import pic from '../../../../assets/image/模块管理－空.png';
@@ -82,6 +82,8 @@ class ComponentHome extends Component {
   }
 
   render() {
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     const column = [
       {
         title: '模块',
@@ -154,16 +156,20 @@ class ComponentHome extends Component {
         width: '10%',
         render: (componentId, record) => (
           <div>
-            <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>详情</span></div>}>
-              <Button shape="circle" onClick={this.showComponent.bind(this, record)}>
-                <Icon type="mode_edit" />
-              </Button>
-            </Popover>
-            <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>删除</span></div>}>
-              <Button shape="circle" onClick={this.clickDeleteComponent.bind(this, record)}>
-                <Icon type="delete_forever" />
-              </Button>
-            </Popover>
+            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-component.updateComponent']}>
+              <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>详情</span></div>}>
+                <Button shape="circle" onClick={this.showComponent.bind(this, record)}>
+                  <Icon type="mode_edit" />
+                </Button>
+              </Popover>
+            </Permission>
+            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-component.deleteComponent']}>
+              <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>删除</span></div>}>
+                <Button shape="circle" onClick={this.clickDeleteComponent.bind(this, record)}>
+                  <Icon type="delete_forever" />
+                </Button>
+              </Popover>
+            </Permission>
           </div>
         ),
       },
@@ -171,10 +177,12 @@ class ComponentHome extends Component {
     return (
       <Page className="c7n-component">
         <Header title="模块管理">
-          <Button funcTyp="flat" onClick={() => this.setState({ createComponentShow: true })}>
-            <Icon type="playlist_add icon" />
-            <span>创建模块</span>
-          </Button>
+          <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-component.createComponent']}>
+            <Button funcTyp="flat" onClick={() => this.setState({ createComponentShow: true })}>
+              <Icon type="playlist_add icon" />
+              <span>创建模块</span>
+            </Button>
+          </Permission>
           <Button funcTyp="flat" onClick={() => this.loadComponents()}>
             <Icon type="autorenew icon" />
             <span>刷新</span>

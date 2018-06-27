@@ -148,29 +148,39 @@ class ReleaseHome extends Component {
     });
   }
   render() {
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     const versionData = ReleaseStore.getVersionList.length > 0 ? ReleaseStore.getVersionList : [];
     const getMenu = record => (
       <Menu onClick={this.handleClickMenu.bind(this, record)}>
         {
           record.statusCode === 'archived' ? '' : (
-            <Menu.Item key="0">
-              {record.statusCode === 'version_planning' ? '发布' : '撤销发布'}
-            </Menu.Item>
+            <Permission type={type} projectId={projectId} organizationId={orgId} service={record.statusCode === 'version_planning' ? ['agile-service.product-version.releaseVersion'] : ['agile-service.product-version.revokeReleaseVersion']}>
+              <Menu.Item key="0">
+                {record.statusCode === 'version_planning' ? '发布' : '撤销发布'}
+              </Menu.Item>
+            </Permission>
           )
         }
-        <Menu.Item key="3">
-          {record.statusCode === 'archived' ? '撤销归档' : '归档'}
-        </Menu.Item>
+        <Permission type={type} projectId={projectId} organizationId={orgId} service={record.statusCode === 'archived' ? ['agile-service.product-version.revokeArchivedVersion'] : ['agile-service.product-version.archivedVersion']}>
+          <Menu.Item key="3">
+            {record.statusCode === 'archived' ? '撤销归档' : '归档'}
+          </Menu.Item>
+        </Permission>
         {
           record.statusCode === 'archived' ? '' : (
-            <Menu.Item key="4">
+            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.deleteVersion']}>
+              <Menu.Item key="4">
           删除
-            </Menu.Item>
+              </Menu.Item>
+            </Permission>
           )
         }
-        <Menu.Item key="5">
+        <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.updateVersion']}>
+          <Menu.Item key="5">
           编辑
-        </Menu.Item>
+          </Menu.Item>
+        </Permission>
       </Menu>
     );
     const versionColumn = [{
@@ -220,28 +230,32 @@ class ReleaseHome extends Component {
     return (
       <Page>
         <Header title="发布版本">
-          <Button
-            onClick={() => {
-              this.setState({
-                addRelease: true,
-              });
-            }}
-            className="leftBtn"
-            funcTyp="flat"
-          >
-            <Icon type="playlist_add" />创建发布版本
-          </Button>
-          <Button 
-            className="leftBtn2" 
-            funcTyp="flat"
-            onClick={() => {
-              this.setState({
-                combineVisible: true,
-              });
-            }}
-          >
-            <Icon type="device_hub" />版本合并
-          </Button>
+          <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
+            <Button
+              onClick={() => {
+                this.setState({
+                  addRelease: true,
+                });
+              }}
+              className="leftBtn"
+              funcTyp="flat"
+            >
+              <Icon type="playlist_add" />创建发布版本
+            </Button>
+          </Permission>
+          <Permission service={['agile-service.product-version.mergeVersion']} type={type} projectId={projectId} organizationId={orgId}>
+            <Button 
+              className="leftBtn2" 
+              funcTyp="flat"
+              onClick={() => {
+                this.setState({
+                  combineVisible: true,
+                });
+              }}
+            >
+              <Icon type="device_hub" />版本合并
+            </Button>
+          </Permission>
           <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this, this.state.pagination)}>
             <Icon type="refresh" />刷新
           </Button>

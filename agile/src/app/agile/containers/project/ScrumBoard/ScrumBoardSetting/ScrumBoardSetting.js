@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
+import { Page, Header, Content, stores, axios, Permission } from 'choerodon-front-boot';
 import _ from 'lodash';
 import { Button, Spin, Modal, Form, Input, Select, Tabs, message, Icon } from 'choerodon-ui';
 import { withRouter } from 'react-router-dom';
@@ -100,13 +100,17 @@ class ScrumBoardSetting extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const urlParams = AppState.currentMenuType;
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <Page>
         <Header title="配置看板" backPath={`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`}>
-          <Button funcTyp="flat" onClick={this.handleDeleteBoard.bind(this)} disabled={ScrumBoardStore.getBoardList.length === 1}>
-            <Icon type="delete_forever icon" />
-            <span>删除看板</span>
-          </Button>
+          <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.board.deleteScrumBoard']}>
+            <Button funcTyp="flat" onClick={this.handleDeleteBoard.bind(this)} disabled={ScrumBoardStore.getBoardList.length === 1}>
+              <Icon type="delete_forever icon" />
+              <span>删除看板</span>
+            </Button>
+          </Permission>
           <Button funcTyp="flat" onClick={this.refresh.bind(this)}>
             <Icon type="refresh icon" />
             <span>刷新</span>

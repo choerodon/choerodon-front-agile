@@ -18,3 +18,8 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
+
+.ant-tabs {
+  overflow-y: auto;
+  overflow-x: hidden;
+}

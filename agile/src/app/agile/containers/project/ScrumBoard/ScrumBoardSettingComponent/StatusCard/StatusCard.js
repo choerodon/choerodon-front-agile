@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Draggable } from 'react-beautiful-dnd';
 import { Radio, Icon } from 'choerodon-ui';
-import { stores } from 'choerodon-front-boot';
+import { stores, Permission } from 'choerodon-front-boot';
 import _ from 'lodash';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import EditStatus from '../EditStatus/EditStatus';
@@ -69,6 +69,8 @@ class StatusCard extends Component {
   }
   render() {
     this.getStatusNumber();
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <Draggable 
         key={this.props.data.code}
@@ -90,44 +92,48 @@ class StatusCard extends Component {
                 }}
                 className="c7n-scrumsetting-card"
               >
-                <Icon 
-                  style={{ 
-                    position: 'absolute', 
-                    right: 12,
-                    display: this.renderCloseDisplay(),
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                  }} 
-                  role="none"
-                  onClick={this.handleDeleteStatus.bind(this)}
-                  type="close"
-                />
-                <Icon
-                  style={{ 
-                    position: 'absolute', 
-                    right: 30,
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                  }} 
-                  type="settings"
-                  role="none"
-                  onClick={() => {
-                    if (JSON.stringify(ScrumBoardStore.getStatusCategory) === '{}') {
-                      ScrumBoardStore.axiosGetStatusCategory().then((data) => {
-                        ScrumBoardStore.setStatusCategory(data);
+                <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.deleteStatus']}>
+                  <Icon 
+                    style={{ 
+                      position: 'absolute', 
+                      right: 12,
+                      display: this.renderCloseDisplay(),
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                    }} 
+                    role="none"
+                    onClick={this.handleDeleteStatus.bind(this)}
+                    type="close"
+                  />
+                </Permission>
+                <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.updateStatus']}>
+                  <Icon
+                    style={{ 
+                      position: 'absolute', 
+                      right: 30,
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                    }} 
+                    type="settings"
+                    role="none"
+                    onClick={() => {
+                      if (JSON.stringify(ScrumBoardStore.getStatusCategory) === '{}') {
+                        ScrumBoardStore.axiosGetStatusCategory().then((data) => {
+                          ScrumBoardStore.setStatusCategory(data);
+                          this.setState({
+                            visible: true,
+                          });
+                        }).catch((error) => {
+                          window.console.log(error);
+                        });
+                      } else {
                         this.setState({
                           visible: true,
                         });
-                      }).catch((error) => {
-                        window.console.log(error);
-                      });
-                    } else {
-                      this.setState({
-                        visible: true,
-                      });
-                    }
-                  }}
-                />
+                      }
+                    }}
+                  />
+                </Permission>
                 <EditStatus
                   visible={this.state.visible}
                   onChangeVisible={(data) => {
@@ -151,23 +157,25 @@ class StatusCard extends Component {
                   <p className="textDisplayOneColumn">
                     {this.props.data.issues ? `${this.props.data.issues.length} issues` : ''}
                   </p>
-                  <Radio
-                    checked={this.props.data.completed ? this.props.data.completed : false}
-                    onClick={() => {
-                      const data = {
-                        id: this.props.data.id,
-                        objectVersionNumber: this.props.data.objectVersionNumber,
-                        completed: !this.props.data.completed,
-                        projectId: AppState.currentMenuType.id,
-                      };
-                      ScrumBoardStore.axiosUpdateIssueStatus(
-                        this.props.data.id, data).then((res) => {
-                        this.props.refresh();
-                      }).catch((error) => {
-                        window.console.log(error);
-                      });
-                    }}
-                  >设置已完成</Radio>
+                  <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.updateStatus']}>
+                    <Radio
+                      checked={this.props.data.completed ? this.props.data.completed : false}
+                      onClick={() => {
+                        const data = {
+                          id: this.props.data.id,
+                          objectVersionNumber: this.props.data.objectVersionNumber,
+                          completed: !this.props.data.completed,
+                          projectId: AppState.currentMenuType.id,
+                        };
+                        ScrumBoardStore.axiosUpdateIssueStatus(
+                          this.props.data.id, data).then((res) => {
+                          this.props.refresh();
+                        }).catch((error) => {
+                          window.console.log(error);
+                        });
+                      }}
+                    >设置已完成</Radio>
+                  </Permission>
                 </div>
               </div>
               {provided.placeholder}

@@ -122,7 +122,7 @@ class StatusHome extends Component {
         </Header>
         <Content
           title="状态"
-          description="根据项目需求，可以分拆为多个模块，每个模块可以进行负责人划分，配置后可以将项目中的问题归类到对应的模块中。例如“后端任务”，“基础架构”等等。"
+          description="这里可以对项目的状态进行修改、配置，但是不建议您频繁的修改、删除项目状态。警告：对状态的配置的修改可能会对关联的issue、报告等造成不可逆的影响，操作需谨慎！"
           link="#"
         >
           <Spin spinning={this.state.loading}>

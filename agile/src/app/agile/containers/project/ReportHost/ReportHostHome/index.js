@@ -45,7 +45,7 @@ class ReportHostHome extends Component {
     }];
     return (
       <Page>
-        <Header title="所有报表">
+        <Header title="所有报告">
           {/* <div>
             <Dropdown overlay={menu} trigger="click" placement="bottomCenter">
               <div style={{ cursor: 'pointer' }}>
@@ -57,7 +57,7 @@ class ReportHostHome extends Component {
         </Header>
         <Content
           title="所有报告"
-          description="根据项目需求，可以分拆为多个模块，每个模块可以进行负责人划分，配置后可以将项目中的问题归类到对应的模块中。例如“后端任务”，“基础架构”等等。"
+          description="这里会根据您项目的进展情况以多个维度直观地记录和展示您项目、迭代、版本、进度等汇总情况。点击您需要查看的报告类型可以查看具体的详细内容。"
           link="#"
         >
           <div style={{ display: 'flex', alignItems: 'center' }}>
