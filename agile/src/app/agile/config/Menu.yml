@@ -7,58 +7,59 @@
         Routes: /agile/backlog
         sort: 1
         permission:
-          - 'agile-service.issue.queryIssue'
+          - 'agile-service.sprint.queryByProjectId'
     - "scrumboard":
         icon: directions_run
         Routes: /agile/scrumboard
         sort: 2
         permission:
-          - 'agile-service.issue.queryIssue'
+          - 'agile-service.board.queryByProjectId'
+          - 'agile-service.board.queryByOptions'
     - "issue":
         icon: assignment
         Routes: /agile/issue
         sort: 3
         permission:
-          - 'agile-service.issue.queryIssue'
+          - 'agile-service.issue.listIssueWithoutSub'
     - "release":
         icon: publish2
         Routes: /agile/release
         sort: 4
         permission:
-          - 'agile-service.issue.queryIssue'
+          - 'agile-service.product-version.listByProjectId'
     - "component":
         icon: extension
         Routes: /agile/component
         sort: 5
         permission:
-          - 'agile-service.issue.queryIssue'
+          - 'agile-service.issue-component.listByProjectId'
     - "reporthost":
         icon: application_model
         Routes: /agile/reporthost
         sort: 6
         permission:
-          - 'agile-service.issue.queryIssue'
+          - 'agile-service.sprint.queryNameByOptions'
     - "projectsetting":
         icon: folder_shared
         Routes: /agile/projectSetting
         sort: 7
         permission:
-          - 'agile-service.issue.queryIssue'
+          - 'agile-service.project-info.queryProjectInfoByProjectId'
     - "fastsearch":
         icon: youtube_searched_for
         Routes: /agile/fastSearch
         sort: 8
         permission:
-          - 'agile-service.issue.queryIssue'
+          - 'agile-service.quick-filter.listByProjectId'
     - "issuelink":
         icon: link
         Routes: /agile/issueLink
         sort: 9
         permission:
-          - 'agile-service.issue.queryIssue'
+          - 'agile-service.issue-link-type.listIssueLinkType'
     - "status":
         icon: directions_run
         Routes: /agile/status
         sort: 10
         permission:
-          - 'agile-service.issue.queryIssue'
+          - 'agile-service.issue-status.listByProjectId'

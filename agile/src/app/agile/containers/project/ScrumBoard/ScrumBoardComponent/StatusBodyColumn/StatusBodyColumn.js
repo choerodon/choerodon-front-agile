@@ -335,7 +335,7 @@ class StatusBodyColumn extends Component {
               >
                 {item.name}
               </p>
-              <div style={{ minHeight: 83 }}>
+              <div className="c7n-itemBodyColumn" style={{ minHeight: 83 }}>
                 {this.renderIssues(item.issues, item.id, item.name, item.categoryCode)}
               </div>
             </div>

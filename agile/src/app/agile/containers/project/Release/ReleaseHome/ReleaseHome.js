@@ -68,7 +68,7 @@ class ReleaseHome extends Component {
   }
   handleClickMenu(record, e) {
     const that = this;
-    if (e.key === '0') {
+    if (e.key.indexOf('0') !== -1) {
       if (record.statusCode === 'version_planning') {
         ReleaseStore.axiosGetPublicVersionDetail(record.versionId)
           .then((res) => {
@@ -87,7 +87,7 @@ class ReleaseHome extends Component {
         });
       }
     }
-    if (e.key === '4') {
+    if (e.key.indexOf('2') !== -1) {
       if (ReleaseStore.getVersionList.length > 1) {
         ReleaseStore.axiosVersionIssueStatistics(record.versionId).then((res) => {
           if (res.fixIssueCount > 0 || res.influenceIssueCount > 0) {
@@ -112,7 +112,7 @@ class ReleaseHome extends Component {
         });
       }
     }
-    if (e.key === '5') {
+    if (e.key.indexOf('3') !== -1) {
       ReleaseStore.axiosGetVersionDetail(record.versionId).then((res) => {
         ReleaseStore.setVersionDetail(res);
         this.setState({
@@ -123,7 +123,7 @@ class ReleaseHome extends Component {
         window.console.log(error);
       });
     }
-    if (e.key === '3') {
+    if (e.key.indexOf('1') !== -1) {
       if (record.statusCode === 'archived') {
         // 撤销归档
         ReleaseStore.axiosUnFileVersion(record.versionId).then((res) => {
