@@ -31,8 +31,8 @@ class ReleaseDetail extends Component {
         trigger: 'axis',
       },
       grid: {
-        left: 0,
-        right: 10,
+        left: '3%',
+        right: '3%',
         top: 10,
         bottom: 20,
         containLabel: true,
@@ -42,6 +42,12 @@ class ReleaseDetail extends Component {
         type: 'category',
         boundaryGap: false,
         data: ReportStore.chartData.xAxis.slice(),
+        axisLabel: {
+          formatter(value, index) {
+            window.console.log();
+            return `${value.split(' ')[0]}\n${value.split(' ')[1]}`;
+          },
+        },
       },
       yAxis: {
         type: 'value',
