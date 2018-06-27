@@ -56,6 +56,8 @@ class BurndownChartHome extends Component {
                 newValue: item.newValue,
                 oldValue: item.oldValue,
                 statistical: item.statistical,
+                parentIssueId: item.parentIssueId,
+                parentIssueNum: item.parentIssueNum,
               }],
               type: item.type,
             });
@@ -72,6 +74,8 @@ class BurndownChartHome extends Component {
               newValue: item.newValue,
               oldValue: item.oldValue,
               statistical: item.statistical,
+              parentIssueId: item.parentIssueId,
+              parentIssueNum: item.parentIssueNum,
             }];
           }
         });
@@ -89,6 +93,7 @@ class BurndownChartHome extends Component {
           });
           newData[index].rest = rest;
         });
+        window.console.log(newData);
         BurndownChartStore.setBurndownList(newData);
         this.setState({
           xAxis: _.map(newData, 'date'),
@@ -218,6 +223,15 @@ class BurndownChartHome extends Component {
     if (text === 'startSprint') {
       result = '开启冲刺';
     }
+    if (text === 'addDuringSprint') {
+      result = '在冲刺期间添加';
+    }
+    if (text === 'removeDoneDuringSprint') {
+      result = '在冲刺期间从已完成到一个其他状态';
+    }
+    if (text === 'timespent') {
+      result = '用户登记工作日志';
+    }
     if (text === 'removeDuringSprint') {
       result = '冲刺中移除';
     }
@@ -225,7 +239,10 @@ class BurndownChartHome extends Component {
       result = '关闭冲刺';
     }
     if (text === 'addDoneDuringSprint') {
-      result = '冲刺中移动到已完成';
+      result = '在冲刺期间移动到已完成';
+    }
+    if (text === 'timeestimate') {
+      result = '用户修改剩余估计时间';
     }
     return result;
   }
@@ -243,7 +260,7 @@ class BurndownChartHome extends Component {
         <div>
           {
             text.map(item => (
-              <p style={{ whiteSpace: 'nowrap', color: '#3F51B5' }}>{item.issueNum}</p>
+              <p style={{ whiteSpace: 'nowrap', color: '#3F51B5' }}>{item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}</p>
             ))
           }
         </div>
@@ -324,7 +341,7 @@ class BurndownChartHome extends Component {
         </Header>
         <Content
           title={sprintName ? `迭代冲刺“${sprintName}”的燃尽图` : '无冲刺迭代的燃尽图'}
-          description="了解每个sprint中完成的工作或者退回后备的工作。这有助于您确定您的团队是过量使用或如果有过多的范围扩大。"
+          description="跟踪记录所有问题的剩余工作工作时间，预估完成冲刺任务的可能性，回顾总结迭代过程中的经验与不足。这有助于在团队管理方面取得更进一步的掌控与把握。"
           link="#"
         >
           <Spin spinning={this.state.loading}>

@@ -41,7 +41,7 @@ class SwimLanePage extends Component {
     });
     return (
       <Content
-        description="泳道是指看板中一横排的主板，基于横排对问题进行状态的流转。泳道类型可以在下面进行修改，并将自动保存。注意：修改泳道会修改看板的分组维度，同事修改看板样式。"
+        description="泳道是指看板中一横排的主板，基于横排对问题进行状态的流转。泳道类型可以在下面进行修改，并将自动保存。注意：修改泳道会修改看板的分组维度，同时修改看板样式。"
         style={{
           padding: 0,
           height: '100%',

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Button, Table, Spin, Popover, Tooltip, Icon } from 'choerodon-ui';
-import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
+import { Page, Header, Content, stores, axios, Permission } from 'choerodon-front-boot';
 import CreateLink from './Component/CreateLink';
 import EditLink from './Component/EditLink';
 import DeleteLink from './Component/DeleteLink';
@@ -70,6 +70,8 @@ class Link extends Component {
   }
 
   render() {
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     const column = [
       {
         title: '名称',
@@ -119,16 +121,20 @@ class Link extends Component {
         width: '15%',
         render: (linkTypeId, record) => (
           <div>
-            <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>详情</span></div>}>
-              <Button shape="circle" onClick={this.showLinkType.bind(this, record)}>
-                <Icon type="mode_edit" />
-              </Button>
-            </Popover>
-            <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>删除</span></div>}>
-              <Button shape="circle" onClick={this.clickDeleteLink.bind(this, record)}>
-                <Icon type="delete_forever" />
-              </Button>
-            </Popover>
+            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-link-type.updateIssueLinkType']}>
+              <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>详情</span></div>}>
+                <Button shape="circle" onClick={this.showLinkType.bind(this, record)}>
+                  <Icon type="mode_edit" />
+                </Button>
+              </Popover>
+            </Permission>
+            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-link-type.deleteIssueLinkType']}>
+              <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>删除</span></div>}>
+                <Button shape="circle" onClick={this.clickDeleteLink.bind(this, record)}>
+                  <Icon type="delete_forever" />
+                </Button>
+              </Popover>
+            </Permission>
           </div>
         ),
       },
@@ -136,10 +142,12 @@ class Link extends Component {
     return (
       <Page>
         <Header title="快速搜索">
-          <Button funcTyp="flat" onClick={() => this.setState({ createLinkShow: true })}>
-            <Icon type="playlist_add icon" />
-            <span>创建链接</span>
-          </Button>
+          <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-link-type.createIssueLinkType']}>
+            <Button funcTyp="flat" onClick={() => this.setState({ createLinkShow: true })}>
+              <Icon type="playlist_add icon" />
+              <span>创建链接</span>
+            </Button>
+          </Permission>
           <Button funcTyp="flat" onClick={() => this.loadLinks()}>
             <Icon type="refresh icon" />
             <span>刷新</span>
@@ -147,7 +155,7 @@ class Link extends Component {
         </Header>
         <Content
           title="问题链接"
-          description="可以自定义搜索并且在页面中使用，也可以修改和删除搜索。"
+          description="通过自定义问题链接，可以帮助您更好的对多个问题进行关联，不再局限于父子任务。"
           link="#"
         >
           <div>

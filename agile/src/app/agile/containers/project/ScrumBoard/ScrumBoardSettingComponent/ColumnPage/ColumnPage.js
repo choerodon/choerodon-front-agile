@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Content, stores } from 'choerodon-front-boot';
+import { Content, stores, Permission } from 'choerodon-front-boot';
 import { Button, Select, Icon, message } from 'choerodon-ui';
 import _ from 'lodash';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -258,6 +258,8 @@ class ColumnPage extends Component {
         BoardData.splice(BoardData.length - 1, 1);
       }
     }
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <Content 
         description="分栏可以添加、删除、重新排序和重命名。列是基于全局状态和可移动的列与列之间。最小和最大限制可设置为每个已映射的列中。"
@@ -318,22 +320,26 @@ class ColumnPage extends Component {
             }
           </Select>
           <div>
-            <Button 
-              funcTyp="flat"
-              type="primary"
-              onClick={this.handleAddStatus.bind(this)}
-            >
-              <Icon type="playlist_add" />
-              <span>添加状态</span>
-            </Button>
-            <Button 
-              funcTyp="flat"
-              type="primary"
-              onClick={this.handleAddColumn.bind(this)}
-            >
-              <Icon type="playlist_add" />
-              <span>添加列</span>
-            </Button>
+            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.createStatus']}>
+              <Button 
+                funcTyp="flat"
+                type="primary"
+                onClick={this.handleAddStatus.bind(this)}
+              >
+                <Icon type="playlist_add" />
+                <span>添加状态</span>
+              </Button>
+            </Permission>
+            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.board-column.createBoardColumn']}>
+              <Button 
+                funcTyp="flat"
+                type="primary"
+                onClick={this.handleAddColumn.bind(this)}
+              >
+                <Icon type="playlist_add" />
+                <span>添加列</span>
+              </Button>
+            </Permission>
           </div>
         </div>
         <div

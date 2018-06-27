@@ -21,7 +21,7 @@ class StatusIssue extends Component {
     }
     return '';
   }
-  getParent(id) {
+  getParent(id, type) {
     const data = ScrumBoardStore.getBoardData;
     let parent;
     _.forEach(data, (item) => {
@@ -33,25 +33,36 @@ class StatusIssue extends Component {
         });
       });
     });
-    return (
-      <div
-        className="textDisplayOneColumn"
-        style={{
-          padding: '10px',
-          border: '1px solid rgba(0,0,0,0.20)',
-          borderRadius: '2px',
-          background: '#F3F3F3',
-          lineHeight: '24px',
-        }}
-      >
-        <span>
-          {parent.issueNum}
-        </span>
-        <span style={{ marginLeft: 10 }}>
-          {parent.summary}
-        </span>
-      </div>
-    );
+    if (parent) {
+      if (type) {
+        return true;
+      } else {
+        return (
+          <div
+            className="textDisplayOneColumn"
+            style={{
+              padding: '10px',
+              border: '1px solid rgba(0,0,0,0.20)',
+              borderRadius: '2px',
+              background: '#F3F3F3',
+              lineHeight: '24px',
+            }}
+          >
+            <span>
+              {parent.issueNum}
+            </span>
+            <span style={{ marginLeft: 10 }}>
+              {parent.summary}
+            </span>
+          </div>
+        );
+      }
+    }
+    if (type) {
+      return false;
+    } else {
+      return '';
+    }
   }
   renderIssueDisplay() {
     const dragStartData = ScrumBoardStore.getDragStartItem;
@@ -192,7 +203,7 @@ class StatusIssue extends Component {
                   <div 
                     className="c7n-scrumboard-issue"
                     style={{
-                      marginLeft: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' ? 16 : 0,
+                      marginLeft: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, 'boolean') ? 16 : 0,
                       background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',  
                     }}
                   >

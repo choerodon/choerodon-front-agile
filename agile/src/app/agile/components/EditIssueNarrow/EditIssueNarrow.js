@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { stores, axios } from 'choerodon-front-boot';
+import { stores, axios, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon } from 'choerodon-ui';
@@ -870,15 +870,19 @@ class CreateSprint extends Component {
   }
 
   render() {
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     const { initValue, visible, onCancel, onOk } = this.props;
     const getMenu = () => (
       <Menu onClick={this.handleClickMenu.bind(this)}>
         <Menu.Item key="0">
           登记工作日志
         </Menu.Item>
-        <Menu.Item key="1">
-          删除
-        </Menu.Item>
+        <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue.deleteIssue']}>
+          <Menu.Item key="1">
+            删除
+          </Menu.Item>
+        </Permission>
         {
           this.state.typeCode !== 'sub_task' && (
             <Menu.Item key="2">

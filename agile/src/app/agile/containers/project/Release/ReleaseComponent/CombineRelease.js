@@ -77,7 +77,7 @@ class CombineRelease extends Component {
             padding: 0,
           }}
           title={`在项目“${AppState.currentMenuType.name}”中合并版本`}
-          description="请在下面输入应用模板编码、名称、描述，创建默认最简模板。您也可以通过复制于现有模板，以便节省部分共同操作，提升效率。"
+          description="您可以通过合并版本的功能将多个版本的issue合并到一个版本中，被合并的版本将被删除。"
           link="#"
         >
           <p style={{ display: 'flex', alignItems: 'center' }}><span className="c7n-release-icon">!</span>一旦版本合并后，您就无法还原。</p>
