@@ -50,6 +50,8 @@ class StatusBodyColumn extends Component {
                   droppableId={droppableId}
                   statusName={statusName}
                   categoryCode={categoryCode}
+                  statusData={this.props.data.subStatuses}
+                  renderIssues={this.renderIssues.bind(this)}
                 />,
               );
             }
@@ -65,6 +67,8 @@ class StatusBodyColumn extends Component {
                 droppableId={droppableId}
                 statusName={statusName}
                 categoryCode={categoryCode}
+                statusData={this.props.data.subStatuses}
+                renderIssues={this.renderIssues.bind(this)}
               />,
             );
           }
@@ -82,6 +86,8 @@ class StatusBodyColumn extends Component {
                   droppableId={droppableId}
                   statusName={statusName}
                   categoryCode={categoryCode}
+                  statusData={this.props.data.subStatuses}
+                  renderIssues={this.renderIssues.bind(this)}
                 />,
               );
             }
@@ -97,6 +103,8 @@ class StatusBodyColumn extends Component {
                 droppableId={droppableId}
                 statusName={statusName}
                 categoryCode={categoryCode}
+                statusData={this.props.data.subStatuses}
+                renderIssues={this.renderIssues.bind(this)}
               />,
             );
           }
@@ -111,6 +119,8 @@ class StatusBodyColumn extends Component {
             droppableId={droppableId}
             statusName={statusName}
             categoryCode={categoryCode}
+            statusData={this.props.data.subStatuses}
+            renderIssues={this.renderIssues.bind(this)}
           />,
         );
       });
