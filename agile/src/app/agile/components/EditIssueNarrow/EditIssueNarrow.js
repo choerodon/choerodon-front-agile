@@ -614,8 +614,8 @@ class CreateSprint extends Component {
   handleClickMenu(e) {
     if (e.key === '0') {
       this.setState({ dailyLogShow: true });
-    } else if (e.key === '1') {
-      this.handleDeleteIssue(this.props.issueId);
+    } else if (e.key === 'item_1') {
+      this.handleDeleteIssue(this.state.origin.issueId);
     } else if (e.key === '2') {
       this.setState({ createSubTaskShow: true });
     }
