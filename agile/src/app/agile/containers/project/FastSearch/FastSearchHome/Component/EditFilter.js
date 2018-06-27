@@ -28,6 +28,7 @@ class AddComponent extends Component {
       originLabels: [],
       originComponents: [],
       originVersions: [],
+      originTypes: [],
       loading: false,
       filters: [
         {
@@ -50,7 +51,7 @@ class AddComponent extends Component {
   loadFilter(filterId = this.props.filterId) {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/${filterId}`)
       .then((res) => {
-        const description = res.description.split('+++')[0];
+        const description = res.description.split('+++')[0] || '';
         const obj = JSON.parse(res.description.split('+++')[1]);
         this.setState({
           arr: this.transformInit(obj.arr || []),
@@ -129,19 +130,40 @@ class AddComponent extends Component {
       },
     };
     axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`).then(res => this.setState({ originUsers: res.content }));
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`).then(res => this.setState({ originPriorities: res.lookupValues }));
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`).then(res => this.setState({ originStatus: res }));
-    axios.get(`/agile/v1/projects/${projectId}/issues/epics/select_data`).then(res => this.setState({ originEpics: res }));
-    axios.post(`/agile/v1/projects/${projectId}/sprint/names`).then(res => this.setState({ originSprints: res }));
-    axios.get(`/agile/v1/projects/${projectId}/issue_labels`).then(res => this.setState({ originLabels: res }));
-    axios.get(`/agile/v1/projects/${projectId}/component`).then(res => this.setState({ originComponents: res }));
-    axios.post(`/agile/v1/projects/${projectId}/product_version/names`).then(res => this.setState({ originVersions: res }));
+    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`).then(res => this.setState({ originPriorities: res.lookupValues }));
+    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list`).then(res => this.setState({ originStatus: res }));
+    axios.get(`/agile/v1/project/${projectId}/issues/epics/select_data`).then(res => this.setState({ originEpics: res }));
+    axios.post(`/agile/v1/project/${projectId}/sprint/names`).then(res => this.setState({ originSprints: res }));
+    axios.get(`/agile/v1/project/${projectId}/issue_labels`).then(res => this.setState({ originLabels: res }));
+    axios.get(`/agile/v1/project/${projectId}/component`).then(res => this.setState({ originComponents: res }));
+    axios.post(`/agile/v1/project/${projectId}/product_version/names`).then(res => this.setState({ originVersions: res }));
+    this.setState({
+      originTypes: [
+        {
+          valueCode: 'story',
+          name: '故事',
+        },
+        {
+          valueCode: 'task',
+          name: '任务',
+        },
+        {
+          valueCode: 'bug',
+          name: '故障',
+        },
+        {
+          valueCode: 'issue_epic',
+          name: '史诗',
+        },
+      ],
+    });
   }
 
   getOperation(filter) {
     const OPERATION_FILTER = {
       assignee: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       priority: ['=', '!=', 'in', 'notIn'],
+      issue_type: ['=', '!=', 'in', 'notIn'],
       status: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       reporter: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       created_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
@@ -258,6 +280,13 @@ class AddComponent extends Component {
         name: 'name',
         state: 'originVersions',
       },
+      issue_type: {
+        url: '',
+        prop: '',
+        id: 'valueCode',
+        name: 'name',
+        state: 'originTypes',
+      },
     };
     if (sign === index) {
       if (operation === 'in' || operation === 'notIn') {
@@ -272,7 +301,7 @@ class AddComponent extends Component {
       // return moment
       return moment(value, 'YYYY-MM-DD HH:mm:ss');
     } 
-    if (operation === 'is' || operation === 'isNot') {
+    if (operation === 'is' || operation === 'isNot' || operation === 'is not') {
       return ({
         key: "'null'",
         label: '空',
@@ -281,18 +310,18 @@ class AddComponent extends Component {
     if (filter === 'story_point' || filter === 'remain_time') {
       return value;
     }
-    if (filter === 'priority') {
-      if (operation === 'in' || operation === 'notIn') {
+    if (filter === 'priority' || filter === 'issue_type') {
+      if (operation === 'in' || operation === 'notIn' || operation === 'not in') {
         const arr = value.slice(1, -1).split(',');
         return arr.map(v => ({
           key: v.slice(1, -1),
-          label: _.find(this.state.originPriorities, { valueCode: v.slice(1, -1) }).name,
+          label: _.find(this.state[OPTION_FILTER[filter].state], { valueCode: v.slice(1, -1) }).name,
         }));
       } else {
         const k = value.slice(1, -1);
         return ({
           key: k,
-          label: _.find(this.state.originPriorities, { valueCode: k }).name,
+          label: _.find(this.state[OPTION_FILTER[filter].state], { valueCode: k }).name,
         });
       }
     } else {
@@ -381,7 +410,7 @@ class AddComponent extends Component {
           objectVersionNumber: this.state.origin.objectVersionNumber,
           expressQuery: expressQueryArr.join(' '),
           name: values.name,
-          description: `${values.description}+++${json}`,
+          description: `${values.description || ''}+++${json}`,
           projectId: AppState.currentMenuType.id,
           quickFilterValueDTOList: arr,
           relationOperations: o,
@@ -402,7 +431,7 @@ class AddComponent extends Component {
 
   getValue(value, filter) {
     const type = Object.prototype.toString.call(value);
-    if (filter === 'priority') {
+    if (filter === 'priority' || filter === 'issue_type') {
       if (type === '[object Array]') {
         const v = _.map(value, 'key');
         const vv = v.map(e => `'${e}'`);
@@ -530,6 +559,7 @@ class AddComponent extends Component {
         prop: '',
         id: 'versionId',
         name: 'name',
+        state: 'originVersions',
       },
       fix_version: {
         // post
@@ -537,6 +567,14 @@ class AddComponent extends Component {
         prop: '',
         id: 'versionId',
         name: 'name',
+        state: 'originVersions',
+      },
+      issue_type: {
+        url: '',
+        prop: '',
+        id: 'valueCode',
+        name: 'name',
+        state: 'originTypes',
       },
     };
     const arr = this.state[[OPTION_FILTER[filter].state]].map(v => (
@@ -598,7 +636,7 @@ class AddComponent extends Component {
       return (
         <Select label="值" />
       );
-    } else if (['assignee', 'priority', 'status', 'reporter', 'created_user', 'last_update_user', 'epic', 'sprint', 'label', 'component', 'influence_version', 'fix_version'].indexOf(filter) > -1) {
+    } else if (['assignee', 'priority', 'status', 'reporter', 'created_user', 'last_update_user', 'epic', 'sprint', 'label', 'component', 'influence_version', 'fix_version', 'issue_type'].indexOf(filter) > -1) {
       // select
       if (['=', '!='].indexOf(operation) > -1) {
         // return normal value
@@ -687,7 +725,8 @@ class AddComponent extends Component {
             width: 700,
           }}
           title={`在项目"${AppState.currentMenuType.name}"中修改快速搜索`}
-          description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，创建新模版。"
+          description="通过定义快速搜索，可以在待办事项和活跃冲刺的快速搜索工具栏生效，帮助您更好的筛选过滤问题面板。"
+          link="#"
         >
           <Form layout="vertical">
             <FormItem>

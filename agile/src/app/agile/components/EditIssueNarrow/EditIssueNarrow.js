@@ -424,7 +424,7 @@ class CreateSprint extends Component {
       obj[pro] = this.state[pro] ? JSON.parse(this.state[pro]).id || 0 : 0;
       updateIssue(obj)
         .then((res) => {
-          this.setAnIssueToState(res);
+          this.reloadIssue();
           if (this.props.onUpdate) {
             this.props.onUpdate();
           }
@@ -433,7 +433,7 @@ class CreateSprint extends Component {
       obj[pro] = this.state[pro] || 0;
       updateIssue(obj)
         .then((res) => {
-          this.setAnIssueToState(res);
+          this.reloadIssue();
           if (this.props.onUpdate) {
             this.props.onUpdate();
           }
@@ -490,7 +490,7 @@ class CreateSprint extends Component {
     obj[pros] = out;
     updateIssue(obj)
       .then((res) => {
-        this.setAnIssueToState(res);
+        this.reloadIssue();
         if (this.props.onUpdate) {
           this.props.onUpdate();
         }
@@ -532,7 +532,7 @@ class CreateSprint extends Component {
     obj.versionIssueRelDTOList = out.concat(this.state[pros === 'fixVersions' ? 'influenceVersions' : 'fixVersions']);
     updateIssue(obj)
       .then((res) => {
-        this.setAnIssueToState(res);
+        this.reloadIssue();
         if (this.props.onUpdate) {
           this.props.onUpdate();
         }
@@ -793,8 +793,11 @@ class CreateSprint extends Component {
           typeCode: issue.typeCode || 'sub_task',
         }}
         i={i}
-        onRefresh={() => {
+        onOpen={() => {
           this.reloadIssue(issue.issueId);
+        }}
+        onRefresh={() => {
+          this.reloadIssue(this.state.origin.issueId);
         }}
       />
     );
@@ -1788,7 +1791,7 @@ class CreateSprint extends Component {
                                   {
                                     !this.state.closeSprint.length && !this.state.activeSprint.sprintId ? '无' : (
                                       <div>
-                                        {
+                                        {/* {
                                           this.state.closeSprint.map(v => (
                                             <div 
                                               style={{
@@ -1805,7 +1808,10 @@ class CreateSprint extends Component {
                                               {v.sprintName}
                                             </div>
                                           ))
-                                        }
+                                        } */}
+                                        <div>
+                                          {_.map(this.state.closeSprint, 'sprintName').join(' , ')}
+                                        </div>
                                         {
                                           this.state.activeSprint.sprintId && (
                                             <div 
@@ -1817,6 +1823,7 @@ class CreateSprint extends Component {
                                                 lineHeight: '20px',
                                                 padding: '0 8px',
                                                 display: 'inline-block',
+                                                marginTop: 5,
                                               }}
                                             >
                                               {this.state.activeSprint.sprintName}
@@ -1832,24 +1839,9 @@ class CreateSprint extends Component {
                                   this.state.closeSprint.length ? (
                                     <div>
                                       <span>已结束冲刺：</span>
-                                      {
-                                        this.state.closeSprint.map(v => (
-                                          <div 
-                                            style={{
-                                              color: 'rgba(0, 0, 0, 0.5)',
-                                              border: '1px solid rgba(0, 0, 0, 0.5)',
-                                              borderRadius: '2px',
-                                              fontSize: '13px',
-                                              lineHeight: '20px',
-                                              padding: '0 8px',
-                                              display: 'inline-block',
-                                              marginRight: 5,
-                                            }}
-                                          >
-                                            {v.sprintName}
-                                          </div>
-                                        ))
-                                      }
+                                      <span>
+                                        {_.map(this.state.closeSprint, 'sprintName').join(' , ')}
+                                      </span>
                                     </div>
                                   ) : null
                                 }

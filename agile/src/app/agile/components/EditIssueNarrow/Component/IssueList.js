@@ -66,7 +66,7 @@ class IssueList extends Component {
               style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, color: 'rgb(63, 81, 181)' }}
               role="none"
               onClick={() => {
-                this.props.onRefresh(issue);
+                this.props.onOpen(issue);
               }}
             >
               {`${issue.issueNum} ${issue.summary}`}
