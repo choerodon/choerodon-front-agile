@@ -25,7 +25,6 @@ class AddComponent extends Component {
       quickFilterFiled: [],
       origin: [],
       delete: [],
-      originUsers: [],
       temp: [],
     };
   }
@@ -78,7 +77,7 @@ class AddComponent extends Component {
           childIncluded: true,
           expressQuery: expressQueryArr.join(' '),
           name: values.name,
-          description: `${values.description}+++${json}`,
+          description: `${values.description || ''}+++${json}`,
           projectId: AppState.currentMenuType.id,
           quickFilterValueDTOList: arr,
           relationOperations: o,
@@ -116,7 +115,7 @@ class AddComponent extends Component {
 
   getValue(value, filter) {
     const type = Object.prototype.toString.call(value);
-    if (filter === 'priority') {
+    if (filter === 'priority' || filter === 'issue_type') {
       if (type === '[object Array]') {
         const v = _.map(value, 'key');
         const vv = v.map(e => `'${e}'`);
@@ -168,6 +167,7 @@ class AddComponent extends Component {
     const OPERATION_FILTER = {
       assignee: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       priority: ['=', '!=', 'in', 'notIn'],
+      issue_type: ['=', '!=', 'in', 'notIn'],
       status: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       reporter: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       created_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
@@ -264,13 +264,42 @@ class AddComponent extends Component {
         id: 'versionId',
         name: 'name',
       },
+      issue_type: {
+        url: '',
+        prop: '',
+        id: 'valueCode',
+        name: 'name',
+      },
     };
-    axios[filter === 'sprint' || filter === 'influence_version' || filter === 'fix_version' ? 'post' : 'get'](OPTION_FILTER[filter].url)
-      .then((res) => {
-        this.setState({
-          temp: OPTION_FILTER[filter].prop === '' ? res : res[OPTION_FILTER[filter].prop],
+    if (filter !== 'issue_type') {
+      axios[filter === 'sprint' || filter === 'influence_version' || filter === 'fix_version' ? 'post' : 'get'](OPTION_FILTER[filter].url)
+        .then((res) => {
+          this.setState({
+            temp: OPTION_FILTER[filter].prop === '' ? res : res[OPTION_FILTER[filter].prop],
+          });
         });
+    } else {
+      this.setState({
+        temp: [
+          {
+            valueCode: 'story',
+            name: '故事',
+          },
+          {
+            valueCode: 'task',
+            name: '任务',
+          },
+          {
+            valueCode: 'bug',
+            name: '故障',
+          },
+          {
+            valueCode: 'issue_epic',
+            name: '史诗',
+          },
+        ],
       });
+    }
   }
 
   tempOption = (filter, addEmpty) => {
@@ -351,17 +380,18 @@ class AddComponent extends Component {
         id: 'versionId',
         name: 'name',
       },
+      issue_type: {
+        url: '',
+        prop: '',
+        id: 'valueCode',
+        name: 'name',
+      },
     };
     const arr = this.state.temp.map(v => (
       <Option key={v[OPTION_FILTER[filter].id]} value={v[OPTION_FILTER[filter].id]}>
         {v[OPTION_FILTER[filter].name]}
       </Option>
     ));
-    if (addEmpty) {
-      arr.unshift(<Option key="null" value="null">
-        无
-      </Option>);
-    }
     return arr;
   }
 
@@ -396,7 +426,7 @@ class AddComponent extends Component {
       return (
         <Select label="值" />
       );
-    } else if (['assignee', 'priority', 'status', 'reporter', 'created_user', 'last_updated_user', 'epic', 'sprint', 'label', 'component', 'influence_version', 'fix_version'].indexOf(filter) > -1) {
+    } else if (['assignee', 'priority', 'status', 'reporter', 'created_user', 'last_updated_user', 'epic', 'sprint', 'label', 'component', 'influence_version', 'fix_version', 'issue_type'].indexOf(filter) > -1) {
       // select
       if (['=', '!='].indexOf(operation) > -1) {
         // return normal value
@@ -491,18 +521,20 @@ class AddComponent extends Component {
             width: 700,
           }}
           title={`在项目"${AppState.currentMenuType.name}"中创建快速搜索`}
-          description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，创建新模版。"
+          description="通过定义快速搜索，可以在待办事项和活跃冲刺的快速搜索工具栏生效，帮助您更好的筛选过滤问题面板。"
+          link="#"
         >
           <Form layout="vertical">
-            <FormItem>
+            <FormItem style={{ width: 520 }}>
               {getFieldDecorator('name', {
                 rules: [{
                   required: true,
+                  message: '名称必填',
                 }],
               })(
                 <Input
                   label="名称"
-                  maxLength={30}
+                  maxLength={10}
                 />,
               )}
             </FormItem>
@@ -518,7 +550,7 @@ class AddComponent extends Component {
                               {getFieldDecorator(`filter-${index}-ao`, {
                                 rules: [{
                                   required: true,
-                                  message: '关系为必选字段',
+                                  message: '关系不可为空',
                                 }],
                               })(
                                 <Select label="关系">
@@ -533,7 +565,7 @@ class AddComponent extends Component {
                           {getFieldDecorator(`filter-${index}-prop`, {
                             rules: [{
                               required: true,
-                              message: '属性为必选字段',
+                              message: '属性不可为空',
                             }],
                           })(
                             <Select label="属性">
@@ -549,7 +581,7 @@ class AddComponent extends Component {
                           {getFieldDecorator(`filter-${index}-rule`, {
                             rules: [{
                               required: true,
-                              message: '关系为必选字段',
+                              message: '关系不可为空',
                             }],
                           })(
                             this.renderOperation(this.props.form.getFieldValue(`filter-${index}-prop`), index),
@@ -559,6 +591,7 @@ class AddComponent extends Component {
                           {getFieldDecorator(`filter-${index}-value`, {
                             rules: [{
                               required: true,
+                              message: '值不可为空',
                             }],
                           })(
                             this.renderValue(this.props.form.getFieldValue(`filter-${index}-prop`), this.props.form.getFieldValue(`filter-${index}-rule`)),
@@ -605,7 +638,7 @@ class AddComponent extends Component {
               <Icon type="add icon" />
               <span>添加属性</span>
             </Button>
-            <FormItem>
+            <FormItem style={{ width: 520 }}>
               {getFieldDecorator('description', {})(
                 <TextArea label="描述" autosize maxLength={30} />,
               )}

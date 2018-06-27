@@ -424,7 +424,7 @@ class CreateSprint extends Component {
       obj[pro] = this.state[pro] ? JSON.parse(this.state[pro]).id || 0 : 0;
       updateIssue(obj)
         .then((res) => {
-          this.setAnIssueToState(res);
+          this.reloadIssue();
           if (this.props.onUpdate) {
             this.props.onUpdate();
           }
@@ -433,7 +433,7 @@ class CreateSprint extends Component {
       obj[pro] = this.state[pro] || 0;
       updateIssue(obj)
         .then((res) => {
-          this.setAnIssueToState(res);
+          this.reloadIssue();
           if (this.props.onUpdate) {
             this.props.onUpdate();
           }
@@ -490,7 +490,7 @@ class CreateSprint extends Component {
     obj[pros] = out;
     updateIssue(obj)
       .then((res) => {
-        this.setAnIssueToState(res);
+        this.reloadIssue();
         if (this.props.onUpdate) {
           this.props.onUpdate();
         }
@@ -532,7 +532,7 @@ class CreateSprint extends Component {
     obj.versionIssueRelDTOList = out.concat(this.state[pros === 'fixVersions' ? 'influenceVersions' : 'fixVersions']);
     updateIssue(obj)
       .then((res) => {
-        this.setAnIssueToState(res);
+        this.reloadIssue();
         if (this.props.onUpdate) {
           this.props.onUpdate();
         }
@@ -794,7 +794,7 @@ class CreateSprint extends Component {
         }}
         i={i}
         onRefresh={() => {
-          this.reloadIssue(issue.issueId);
+          this.reloadIssue(this.state.origin.issueId);
         }}
       />
     );
