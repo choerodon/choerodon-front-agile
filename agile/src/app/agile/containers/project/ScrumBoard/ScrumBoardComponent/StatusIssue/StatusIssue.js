@@ -189,12 +189,16 @@ class StatusIssue extends Component {
             if (is.assigneeId) {
               if (is.assigneeId === item.assigneeId) {
                 if (!type) {
-                  result = 'none';
+                  if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+                    result = 'none';
+                  }
                 }
               }
             } else if (!item.assigneeId) {
               if (!type) {
-                result = 'none';
+                if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+                  result = 'none';
+                }
               }
             }
           }

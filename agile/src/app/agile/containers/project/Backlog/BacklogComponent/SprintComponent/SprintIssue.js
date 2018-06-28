@@ -316,7 +316,7 @@ class SprintIssue extends Component {
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {item.storyPoints ? (
+                      {item.storyPoints && item.typeCode === 'story' ? (
                         <Tooltip title={`故事点: ${item.storyPoints}`}>
                           <div label="sprintIssue" className="c7n-backlog-sprintIssueStoryPoint">{item.storyPoints}</div>
                         </Tooltip>
