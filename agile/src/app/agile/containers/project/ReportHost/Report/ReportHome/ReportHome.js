@@ -218,6 +218,11 @@ class ReleaseDetail extends Component {
         width: '10%',
         title: '故事点',
         dataIndex: 'storyPoints',
+        render: (storyPoints, record) => (
+          <div>
+            {record.typeCode === 'story' ? storyPoints || '0' : ''}
+          </div>
+        ),
       },
     ];
     const { history } = this.props;
