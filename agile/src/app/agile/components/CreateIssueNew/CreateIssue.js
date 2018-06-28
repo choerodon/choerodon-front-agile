@@ -1,41 +1,26 @@
 import React, { Component } from 'react';
-import { stores, axios, Content } from 'choerodon-front-boot';
+import { stores } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Select, Form, Input, Button, Modal, Spin, Icon } from 'choerodon-ui';
+import { Select, Form, Input, Button, Modal, Icon } from 'choerodon-ui';
 
 import './CreateIssue.scss';
 import '../../containers/main.scss';
-import { UploadButton, NumericInput } from '../CommonComponent';
-import {
-  delta2Html,
-  escape,
-  handleFileUpload,
-  text2Delta,
-  beforeTextUpload,
-} from '../../common/utils';
-import { createIssue, loadLabels, loadStatus, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics } from '../../api/NewIssueApi';
+import { UploadButton } from '../CommonComponent';
+import { handleFileUpload, beforeTextUpload } from '../../common/utils';
+import { createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
 import { COLOR } from '../../common/Constant';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
+import UserHead from '../UserHead';
+import TypeTag from '../TypeTag';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
 const { Option } = Select;
 const FormItem = Form.Item;
-const TYPE = {
-  story: '#00bfa5',
-  bug: '#f44336',
-  task: '#4d90fe',
-  issue_epic: '#743be7',
-};
-const ICON = {
-  story: 'turned_in',
-  bug: 'bug_report',
-  task: 'assignment',
-  issue_epic: 'priority',
-};
+
 const NAME = {
   story: '故事',
   bug: '故障',
@@ -63,11 +48,6 @@ class CreateIssue extends Component {
       originFixVersions: [],
       originSprints: [],
       originUsers: [],
-
-      storyPoints: '',
-      storyPointsUnit: 'h',
-      time: '',
-      timeUnit: 'h',
     };
   }
 
@@ -83,35 +63,6 @@ class CreateIssue extends Component {
       delta,
       edit: false,
     });
-  }
-
-  handleChangeStoryPoints = (e) => {
-    this.setState({ storyPoints: e });
-  }
-
-  handleChangeStoryPointsUnit = (value) => {
-    this.setState({ storyPointsUnit: value });
-  }
-
-  handleChangeTime = (e) => {
-    this.setState({ time: e });
-  }
-
-  handleChangeTimeUnit = (value) => {
-    this.setState({ timeUnit: value });
-  }
-
-  transformTime(pro, unit) {
-    const TIME = {
-      h: 1,
-      d: 8,
-      w: 40,
-    };
-    if (!this.state[pro]) {
-      return 0;
-    } else {
-      return this.state[pro] * TIME[this.state[unit]];
-    }
   }
 
   transformPriorityCode(originpriorityCode) {
@@ -174,12 +125,10 @@ class CreateIssue extends Component {
           summary: values.summary,
           priorityCode: values.priorityCode,
           sprintId: values.sprintId || 0,
-          storyPoints: this.transformTime('storyPoints', 'storyPointsUnit'),
-          remainingTime: this.transformTime('time', 'timeUnit'),
           epicId: values.epicId || 0,
           epicName: values.epicName,
           parentIssueId: 0,
-          assigneeId: values.assigneedId || 0,
+          assigneeId: values.assigneedId ? JSON.parse(values.assigneedId).id || 0 : 0,
           labelIssueRelDTOList,
           versionIssueRelDTOList: fixVersionIssueRelDTOList,
           componentIssueRelDTOList,
@@ -234,7 +183,7 @@ class CreateIssue extends Component {
 
     return (
       <Sidebar
-        className="choerodon-modal-createSprint"
+        className="c7n-createIssue"
         title="创建问题"
         visible={visible || false}
         onOk={this.handleCreateIssue}
@@ -247,12 +196,12 @@ class CreateIssue extends Component {
           <h2 className="c7n-space-first">在项目“{AppState.currentMenuType.name}”中创建问题</h2>
           <p>
             请在下面输入问题的详细信息，包含详细描述、人员信息、版本信息、进度预估、优先级等等。您可以通过丰富的任务描述帮助相关人员更快更全面的理解任务，同时更好的把控问题进度。
-            {/* <a href="http://c7n.saas.hand-china.com/docs/devops/develop/" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
+            <a href="http://choerodon.io/zh/docs/user-guide/agile/issue/create-issue/" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
               <span className="c7n-external-link-content">
               了解详情
               </span>
               <Icon type="open_in_new" />
-            </a> */}
+            </a>
           </p>
           <Form layout="vertical">
             <FormItem label="问题类型" style={{ width: '512px' }}>
@@ -267,15 +216,12 @@ class CreateIssue extends Component {
                   {['story', 'task', 'bug', 'issue_epic'].map(type => (
                     <Option key={`${type}`} value={`${type}`}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                        <div
-                          style={{ background: TYPE[type], color: '#fff', width: '20px', height: '20px', textAlign: 'center', fontSize: '14px', borderRadius: '50%', marginRight: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                        >
-                          <Icon
-                            type={ICON[type]}
-                            style={{ fontSize: '13px' }}
-                          />
-                        </div>
-                        <span>{NAME[type]}</span>
+                        <TypeTag
+                          type={{
+                            typeCode: type,
+                          }}
+                        />
+                        <span style={{ marginLeft: 8 }}>{NAME[type]}</span>
                       </div>
                     </Option>),
                   )}
@@ -311,14 +257,11 @@ class CreateIssue extends Component {
                   loading={this.state.selectLoading}
                   filter
                   allowClear
-                  filterOption={(input, option) =>
-                    option.props.children.props.children[1].props.children.toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0}
-                  onFocus={() => {
+                  onFilterChange={(input) => {
                     this.setState({
                       selectLoading: true,
                     });
-                    getUsers().then((res) => {
+                    getUsers(input).then((res) => {
                       this.setState({
                         originUsers: res.content,
                         selectLoading: false,
@@ -327,14 +270,16 @@ class CreateIssue extends Component {
                   }}
                 >
                   {this.state.originUsers.map(user =>
-                    (<Option key={`${user.id}`} value={`${user.id}`}>
+                    (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                        <div
-                          style={{ background: '#c5cbe8', color: '#6473c3', width: '20px', height: '20px', textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: '8px' }}
-                        >
-                          {user.loginName ? user.loginName.slice(0, 1) : ''}
-                        </div>
-                        <span>{`${user.loginName} ${user.realName}`}</span>
+                        <UserHead
+                          user={{
+                            id: user.id,
+                            loginName: user.loginName,
+                            realName: user.realName,
+                            avatar: user.imageUrl,
+                          }}
+                        />
                       </div>
                     </Option>),
                   )}
@@ -413,6 +358,8 @@ class CreateIssue extends Component {
                     <Select
                       label="史诗"
                       allowClear
+                      filter
+                      filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                       getPopupContainer={triggerNode => triggerNode.parentNode}
                       loading={this.state.selectLoading}
                       onFocus={() => {
@@ -441,13 +388,15 @@ class CreateIssue extends Component {
                 <Select
                   label="冲刺"
                   allowClear
+                  filter
+                  filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                   loading={this.state.selectLoading}
                   onFocus={() => {
                     this.setState({
                       selectLoading: true,
                     });
-                    loadSprints().then((res) => {
+                    loadSprints(['sprint_planning', 'started']).then((res) => {
                       this.setState({
                         originSprints: res,
                         selectLoading: false,
@@ -476,7 +425,7 @@ class CreateIssue extends Component {
                     this.setState({
                       selectLoading: true,
                     });
-                    loadVersions().then((res) => {
+                    loadVersions(['version_planning']).then((res) => {
                       this.setState({
                         originFixVersions: res,
                         selectLoading: false,
@@ -563,40 +512,6 @@ class CreateIssue extends Component {
                 </Select>,
               )}
             </FormItem>
-
-            <div style={{ marginBottom: '24px' }}>
-              {
-                this.props.form.getFieldValue('typeCode') === 'story' && (
-                  <span>
-                    <NumericInput
-                      label="故事点"
-                      style={{ lineHeight: '22px', marginBottom: 0, width: 100, marginRight: 194 }}
-                      value={this.state.storyPoints}
-                      onChange={this.handleChangeStoryPoints.bind(this)}
-                    />
-                  </span>
-                )
-              }
-              
-              <NumericInput
-                label="预计剩余时间"
-                style={{ lineHeight: '22px', marginBottom: 0, width: 100 }}
-                value={this.state.time}
-                onChange={this.handleChangeTime.bind(this)}
-              />
-              <Select
-                style={{ width: 100, marginLeft: 18 }}
-                value={this.state.timeUnit}
-                getPopupContainer={triggerNode => triggerNode.parentNode}
-                onChange={this.handleChangeTimeUnit.bind(this)}
-              >
-                {['h', 'd', 'w'].map(type => (
-                  <Option key={`${type}`} value={`${type}`}>
-                    {type}
-                  </Option>),
-                )}
-              </Select>
-            </div>
           </Form>
           
           <div className="sign-upload" style={{ marginTop: '38px' }}>

@@ -1,4 +1,8 @@
-.choerodon-modal-createSprint {
+.c7n-createIssue {
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  }
+
   .clear-p-mw {
     margin-bottom: 24px;
 
@@ -11,7 +15,6 @@
     .ant-upload {
       display: flex !important;
       margin-left: 40px;
-      // justify-content: flex-end !important;
     }
 
     .ant-btn {
@@ -19,75 +22,12 @@
     }
   }
 
-  .select-noBorder {
-    .ant-select-underline {
-      display: none;
-    }
-
-    .ant-select-selection__rendered {
-      margin-left: 0 !important;
-    }
-  }
-
-  .radius {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #3f51b5;
-    margin-right: 12px;
+  .ant-upload-list-item {
     display: inline-block;
-    text-align: center;
-    color: #fff;
-    font-size: 13px;
-    line-height: 18px;
   }
 
-  .ml-38 {
-    margin-left: 38px;
-  }
-
-  .w150 {
-    width: 150px;
-  }
-
-  .info {
-    // margin: 24px;
-    display: flex;
-    flex-direction: column;
-
-    .line-info {
-      display: flex;
-      margin-bottom: 32px;
-      align-items: flex-end;
-
-      .name {
-        width: 438px;
-        margin-left: 20px;
-      }
-    }
-  }
-
-  .tab-basic {
-    display: flex;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-
-    .column-basic {
-      display: flex;
-      flex-direction: column;
-      width: 150px;
-      margin-right: 60px;
-
-      .title-column {
-        font-weight: bold;
-      }
-    }
-  }
-
-  .c7n-sidebar-rollup {
-    font-size: 13px;
-    color: #3f51b5;
-    line-height: 15px;
-    cursor: pointer;
-    margin-top: 12px;
+  .ant-upload-list-item-info {
+    padding-right: 20px;
+    max-width: 100%;
   }
 }

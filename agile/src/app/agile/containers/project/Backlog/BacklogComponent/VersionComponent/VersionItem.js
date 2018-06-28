@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import moment from 'moment';
 import { stores } from 'choerodon-front-boot';
-import { Input, DatePicker, Icon } from 'choerodon-ui';
+import { Input, DatePicker, Icon, Dropdown, Menu } from 'choerodon-ui';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 
@@ -21,6 +21,21 @@ class VersionItem extends Component {
       hoverBlockEditName: false,
       hoverBlockEditDes: false,
     };
+  }
+  getmenu() {
+    return (
+      <Menu onClick={this.clickMenu.bind(this)}>
+        <Menu.Item key="0">编辑名称</Menu.Item>
+      </Menu>
+    );
+  }
+  clickMenu(e) {
+    e.domEvent.stopPropagation();
+    if (e.key === '0') {
+      this.setState({
+        editName: true,
+      });
+    }
   }
   handleClickName(e) {
     e.stopPropagation();
@@ -56,12 +71,12 @@ class VersionItem extends Component {
       window.console.log(error);
     });
   }
-  handleBlurName(e) {
+  handleBlurName(value) {
     const data = {
       objectVersionNumber: this.props.data.objectVersionNumber,
       projectId: parseInt(AppState.currentMenuType.id, 10),
       versionId: this.props.data.versionId,
-      name: e.target.value,
+      name: value,
     };
     BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
       this.setState({
@@ -95,6 +110,7 @@ class VersionItem extends Component {
       window.console.log(error);
     });
   }
+
   render() {
     const item = this.props.data;
     const index = this.props.index;
@@ -142,28 +158,51 @@ class VersionItem extends Component {
               BacklogStore.setVersionData(data);
             }}
           />
-          {this.state.editName ? (
-            <Input 
-              maxLength={30} 
-              defaultValue={item.name} 
-              autoFocus 
-              onPressEnter={this.handleBlurName.bind(this)}
-              onBlur={this.handleBlurName.bind(this)}
-            />
-          ) : (
-            <div className="c7n-backlog-versionItemTitleName">
-              <p>{item.name}</p>
-              <Icon
-                style={{ 
-                  fontSize: 13,
-                  display: this.state.hoverBlockEditName ? 'block' : 'none',
+          <div style={{ width: '100%' }}>
+            <EasyEdit
+              type="input"
+              defaultValue={item.name}
+              enterOrBlur={this.handleBlurName.bind(this)}
+              style={{
+                flexGrow: 1,
+              }}
+              byHand
+              editIf={this.state.editName}
+            >
+              <div className="c7n-backlog-versionItemTitleName">
+                <p>{item.name}</p>
+                <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
+                  <Icon
+                    style={{
+                      width: 12,
+                      height: 12,
+                      background: '#f5f5f5',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      border: '1px solid #ccc',
+                      borderRadius: 2,
+                    }}
+                    type="arrow_drop_down"
+                  />
+                </Dropdown>
+              </div>
+            </EasyEdit>
+            <div className="c7n-backlog-versionItemProgress">
+              <div
+                className="c7n-backlog-versionItemDone"
+                style={{
+                  flex: item.doneIssueCount,
                 }}
-                role="none"
-                onClick={this.handleClickName.bind(this)} 
-                type="mode_edit"
+              />
+              <div 
+                className="c7n-backlog-versionItemTodo"
+                style={{ 
+                  flex: item.issueCount ? item.issueCount - item.doneIssueCount : 1,
+                }}
               />
             </div>
-          )}
+          </div>
         </div>
         {item.expand ? (
           <div style={{ paddingLeft: 12 }}>
@@ -221,20 +260,20 @@ class VersionItem extends Component {
                 </EasyEdit>
               </div>
               <div className="c7n-backlog-versionItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>问题</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.issueCount}</p>
+                <p className="c7n-backlog-versionItemParamKey">问题</p>
+                <p className="c7n-backlog-versionItemParamValue">{item.issueCount}</p>
               </div>
               <div className="c7n-backlog-versionItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>已完成</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.doneIssueCount}</p>
+                <p className="c7n-backlog-versionItemParamKey">已完成</p>
+                <p className="c7n-backlog-versionItemParamValue">{item.doneIssueCount}</p>
               </div>
               <div className="c7n-backlog-versionItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>未预估</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.notEstimate}</p>
+                <p className="c7n-backlog-versionItemParamKey">未预估</p>
+                <p className="c7n-backlog-versionItemParamValue">{item.notEstimate}</p>
               </div>
               <div className="c7n-backlog-versionItemParam">
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>预估</p>
-                <p style={{ padding: '0px 8px', borderRadius: '50%', background: 'rgba(0,0,0,0.26)', color: 'white' }}>{item.totalEstimate}p</p>
+                <p className="c7n-backlog-versionItemParamKey">预估</p>
+                <p className="c7n-backlog-versionItemParamValue">{item.totalEstimate}p</p>
               </div>
             </div>
           </div>

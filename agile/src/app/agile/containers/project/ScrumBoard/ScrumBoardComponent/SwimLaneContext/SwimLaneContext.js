@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { Icon, Button } from 'choerodon-ui';
+import { Icon, Button, Avatar } from 'choerodon-ui';
 import _ from 'lodash';
 import './SwimLaneContext.scss';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
@@ -14,6 +14,18 @@ class SwimLaneContext extends Component {
     this.state = {
       expand: true,
     };
+  }
+  getFirst(str) {
+    if (!str) {
+      return '';
+    }
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return str[0];
   }
   renderTypeCode(type) {
     const typeCode = this.props.data.typeCode;
@@ -41,11 +53,11 @@ class SwimLaneContext extends Component {
       );
     }
   }
-  render() {
-    const item = this.props.data;
-    return (
-      <div className="c7n-scrumboard-others">
-        <div style={{ justifyContent: 'space-between' }} className="c7n-scrumboard-otherHeader">
+  renderSwimLaneTitle(item) {
+    let result;
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      result = (
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Icon 
               style={{ fontSize: 17, cursor: 'pointer' }}
@@ -93,8 +105,50 @@ class SwimLaneContext extends Component {
               });
             }}
           >
-            移动到done
+        移动到done
           </Button>
+        </div>
+      );
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      result = (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Icon 
+            style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
+            type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+            role="none"
+            onClick={() => {
+              this.setState({
+                expand: !this.state.expand,
+              });
+            }}
+          />
+          <Avatar
+            src={item.imageUrl ? item.imageUrl : undefined}
+            size="small"
+          >
+            {
+              !item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''
+            }
+          </Avatar>
+          {item.assigneeName}
+        </div>
+      );
+    }
+    return result;
+  }
+  render() {
+    const item = this.props.data;
+    let id;
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      id = item.issueId;
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      id = item.assigneeId;
+    }
+    return (
+      <div className="c7n-scrumboard-others">
+        <div style={{ justifyContent: 'space-between' }} className="c7n-scrumboard-otherHeader">
+          {this.renderSwimLaneTitle(item)}
+          
         </div>
         <div 
           className="c7n-scrumboard-otherContent"
@@ -108,7 +162,7 @@ class SwimLaneContext extends Component {
               ScrumBoardStore.setDragStartItem(start);
             }}
           >
-            {this.props.renderIssueColumns(item.issueId)}
+            {this.props.renderIssueColumns(id)}
           </DragDropContext>
         </div>
       </div>

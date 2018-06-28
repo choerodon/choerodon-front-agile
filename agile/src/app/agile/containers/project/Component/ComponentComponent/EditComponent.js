@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
 import { Modal, Form, Input, Select, message } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
-import { getUsers } from '../../../../api/CommonApi';
+import UserHead from '../../../../components/UserHead';
+import { getUsers, getUser } from '../../../../api/CommonApi';
 import { loadComponent, updateComponent } from '../../../../api/ComponentApi';
+import './component.scss';
 
 const { Sidebar } = Modal;
 const { TextArea } = Input;
-const FormItem = Form.Item;
 const { Option } = Select;
 const { AppState } = stores;
+const FormItem = Form.Item;
 
-@observer
 class EditComponent extends Component {
   constructor(props) {
     super(props);
@@ -30,17 +30,19 @@ class EditComponent extends Component {
 
   componentDidMount() {
     this.loadComponent(this.props.componentId);
-    this.loadUsers();
   }
 
   getFirst(str) {
+    if (!str) {
+      return '';
+    }
     const re = /[\u4E00-\u9FA5]/g;
     for (let i = 0, len = str.length; i < len; i += 1) {
       if (re.test(str[i])) {
         return str[i];
       }
     }
-    return '';
+    return str[0];
   }
 
   loadComponent(componentId) {
@@ -50,18 +52,21 @@ class EditComponent extends Component {
         this.setState({
           defaultAssigneeRole,
           description,
-          managerId,
+          managerId: managerId || undefined,
           name,
           component: res,
         });
+        if (managerId) {
+          this.loadUser(managerId);
+        }
       });
   }
 
-  loadUsers() {
-    getUsers().then((res) => {
+  loadUser(managerId) {
+    getUser(managerId).then((res) => {
       this.setState({
-        originUsers: res.content,
-        selectLoading: false,
+        managerId: JSON.stringify(res.content[0]),
+        originUsers: [res.content[0]],
       });
     });
   }
@@ -76,7 +81,7 @@ class EditComponent extends Component {
           componentId: this.state.component.componentId,
           defaultAssigneeRole,
           description,
-          managerId,
+          managerId: managerId ? JSON.parse(managerId).id || 0 : 0,
           name,
         };
         this.setState({ createLoading: true });
@@ -102,12 +107,12 @@ class EditComponent extends Component {
     return (
       <Sidebar
         title="查看模块"
-        visible={this.props.visible || false}
-        onCancel={this.props.onCancel.bind(this)}
-        onOk={this.handleOk.bind(this)}
         onText="修改"
         cancelText="取消"
+        visible={this.props.visible || false}
         confirmLoading={this.state.createLoading}
+        onOk={this.handleOk.bind(this)}
+        onCancel={this.props.onCancel.bind(this)}
       >
         <Content
           style={{
@@ -135,28 +140,32 @@ class EditComponent extends Component {
               })(
                 <Select
                   label="负责人"
+                  loading={this.state.selectLoading}
                   allowClear
                   filter
-                  filterOption={(input, option) =>
-                    option.props.children.props.children[1].props.children.toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0}
-                  loading={this.state.selectLoading}
-                  onFocus={() => {
+                  onFilterChange={(input) => {
                     this.setState({
                       selectLoading: true,
                     });
-                    this.loadUsers();
+                    getUsers(input).then((res) => {
+                      this.setState({
+                        originUsers: res.content,
+                        selectLoading: false,
+                      });
+                    });
                   }}
                 >
                   {this.state.originUsers.map(user =>
-                    (<Option key={user.id} value={user.id}>
+                    (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                        <span
-                          style={{ background: '#c5cbe8', color: '#6473c3', width: '20px', height: '20px', textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: '8px' }}
-                        >
-                          {user.loginName ? this.getFirst(user.realName) : ''}
-                        </span>
-                        <span>{`${user.loginName} ${user.realName}`}</span>
+                        <UserHead
+                          user={{
+                            id: user.id,
+                            loginName: user.loginName,
+                            realName: user.realName,
+                            avatar: user.imageUrl,
+                          }}
+                        />
                       </div>
                     </Option>),
                   )}

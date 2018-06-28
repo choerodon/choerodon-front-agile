@@ -19,17 +19,6 @@ class ReadAndEdit extends Component {
 
   componentDidMount() {
     window.addEventListener('keyup', this.handleEnter, false);
-    window.addEventListener('click', (e) => {
-      // window.console.log(e.target.className);
-      // if (this.state.type === 'edit') {
-      //   e.stopPropagation();
-      //   this.props.onCancel(this.state.origin);
-      //   this.setState({
-      //     type: 'read',
-      //     origin: this.props.origin,
-      //   });
-      // }
-    });
   }
 
   componentWillUnmount() {
@@ -62,6 +51,7 @@ class ReadAndEdit extends Component {
         role="none"
         className={`rae ${this.props.current !== this.props.thisType ? 'c7n-readAndEdit' : ''}`}
         style={{
+          ...this.props.style,
           position: 'relative',
           width: this.props.line ? '100%' : 'auto',
         }}
@@ -100,6 +90,7 @@ class ReadAndEdit extends Component {
                 style={{
                   display: 'none',
                   lineHeight: '20px',
+                  alignItems: 'center',
                 }}
               >
                 <Icon type="mode_edit" />
@@ -144,6 +135,7 @@ class ReadAndEdit extends Component {
                   // outline: 'none',
                   // padding: '3px', 
                   // boxShadow: '0 3px 6px rgba(111,111,111,0.2)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.08)',
                 }}
               >
                 <span

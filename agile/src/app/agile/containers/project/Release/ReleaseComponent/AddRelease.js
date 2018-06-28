@@ -46,6 +46,10 @@ class AddRelease extends Component {
           });
           window.console.log(error);
         });
+      } else {
+        this.setState({
+          loading: false,
+        });
       }
     });
   }

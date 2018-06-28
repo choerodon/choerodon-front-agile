@@ -31,6 +31,7 @@ class IssueDetail extends Component {
             issueId={ScrumBoardStore.getClickIssueDetail.issueId}
             onCancel={() => {
               ScrumBoardStore.setClickIssueDetail({});
+              this.props.refresh();
             }}
             onDeleteIssue={() => {
               ScrumBoardStore.setClickIssueDetail({});

@@ -11,6 +11,7 @@ import IssueDetail from '../BacklogComponent/IssueDetailComponent/IssueDetail';
 import './BacklogHome.scss';
 import '../../../main.scss';
 import BacklogStore from '../../../../stores/project/backlog/BacklogStore';
+import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
 
 const { AppState } = stores;
 
@@ -22,22 +23,23 @@ class BacklogHome extends Component {
       spinIf: false,
       versionVisible: false,
       epicVisible: false,
+      scrollIf: false,
     };
   }
   componentWillMount() {
     this.refresh();
-    window.addEventListener('click', (e) => {
-      if (!e.target.getAttribute('label')) {
-        if (this.sprintRef.getCurrentState('selected').issueIds.length > 0) {
-          if (!BacklogStore.getIsDragging) {
-            this.sprintRef.onChangeState('selected', {
-              droppableId: '',
-              issueIds: [],
-            });
-          }
-        }
-      }
-    });
+    // window.addEventListener('click', (e) => {
+    //   if (!e.target.getAttribute('label')) {
+    //     if (this.sprintRef.getCurrentState('selected').issueIds.length > 0) {
+    //       if (!BacklogStore.getIsDragging) {
+    //         this.sprintRef.onChangeState('selected', {
+    //           droppableId: '',
+    //           issueIds: [],
+    //         });
+    //       }
+    //     }
+    //   }
+    // });
   }
   //  拖动结束事件
   onDragEnd(result) {
@@ -139,19 +141,7 @@ class BacklogHome extends Component {
             }
             axiosParam.before = endIndex === 0;
             axiosParam.issueIds = this.sprintRef.getCurrentState('selected').issueIds;
-            // if (endIndex === 0) {
-            //   if (newData.sprintData[index].issueSearchDTOList.length === 
-            // this.sprintRef.getCurrentState('selected').issueIds.length) {
-            //     axiosParam.outsetIssueId = 0;
-            //   } else {
-            //     axiosParam.outsetIssueId = 
-            //     newData.sprintData[index].issueSearchDTOList[endIndex + this.sprintRef
-            //       .getCurrentState('selected').issueIds.length].issueId; 
-            //   }
-            // } else {
-            axiosParam.outsetIssueId = 
-              destinationData.issueId; 
-            // }
+            axiosParam.outsetIssueId = destinationData.issueId; 
             BacklogStore.setSprintData(newData);
           }
         });
@@ -271,57 +261,39 @@ class BacklogHome extends Component {
     }
   }
   refresh() {
-    const data4 = {
-      advancedSearchArgs: {},
-    };
-    if (BacklogStore.getChosenEpic !== 'all') {
-      if (BacklogStore.getChosenEpic === 'unset') {
-        data4.advancedSearchArgs.noEpic = 'true';
-      } else {
-        data4.advancedSearchArgs.epicId = BacklogStore.getChosenEpic;
-      }
-    }
-    if (BacklogStore.getChosenVersion !== 'all') {
-      if (BacklogStore.getChosenVersion === 'unset') {
-        data4.advancedSearchArgs.noVersion = 'true';
-      } else {
-        data4.advancedSearchArgs.versionId = BacklogStore.getChosenVersion;
-      }
-    }
-    if (BacklogStore.getOnlyMe) {
-      data4.advancedSearchArgs.ownIssue = 'true';
-    }
-    if (BacklogStore.getRecent) {
-      data4.advancedSearchArgs.onlyStory = 'true';
-    }
     this.setState({
       spinIf: true,
     });
-    BacklogStore.axiosGetSprint(data4).then((data) => {
-      BacklogStore.setSprintData(data);
-      BacklogStore.axiosGetVersion().then((data2) => {
-        const newVersion = [...data2];
-        _.forEach(newVersion, (item, index) => {
-          newVersion[index].expand = false;
+    ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
+      ScrumBoardStore.setQuickSearchList(res);
+      BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
+        BacklogStore.setSprintData(data);
+        BacklogStore.axiosGetVersion().then((data2) => {
+          const newVersion = [...data2];
+          _.forEach(newVersion, (item, index) => {
+            newVersion[index].expand = false;
+          });
+          BacklogStore.setVersionData(newVersion);
+          this.setState({
+            spinIf: false,
+          });
+        }).catch((error) => {
+          window.console.log(error);
         });
-        BacklogStore.setVersionData(newVersion);
-        this.setState({
-          spinIf: false,
+        BacklogStore.axiosGetEpic().then((data3) => {
+          const newEpic = [...data3];
+          _.forEach(newEpic, (item, index) => {
+            newEpic[index].expand = false;
+          });
+          BacklogStore.setEpicData(newEpic);
+        }).catch((error3) => {
+          window.console.log(error3);
         });
-      }).catch((error) => {
-        window.console.log(error);
+      }).catch((error2) => {
+        window.console.log(error2);
       });
-      BacklogStore.axiosGetEpic().then((data3) => {
-        const newEpic = [...data3];
-        _.forEach(newEpic, (item, index) => {
-          newEpic[index].expand = false;
-        });
-        BacklogStore.setEpicData(newEpic);
-      }).catch((error3) => {
-        window.console.log(error3);
-      });
-    }).catch((error2) => {
-      window.console.log(error2);
+    }).catch((error) => {
+      window.console.log(error);
     });
   }
   changeState(state, value) {
@@ -329,7 +301,6 @@ class BacklogHome extends Component {
       [state]: value,
     });
   }
-
   handleCreateSprint() {
     this.setState({
       loading: true,
@@ -343,6 +314,9 @@ class BacklogHome extends Component {
       });
       this.refresh();
       message.success('创建成功');
+      if (document.getElementById('sprint_last')) {
+        document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_last').offsetTop - 100;
+      }
     }).catch((error) => {
       this.setState({
         loading: false,
@@ -351,100 +325,85 @@ class BacklogHome extends Component {
       window.console.log(error);
     });
   }
+
+  filterOnlyMe() {
+    BacklogStore.setOnlyMe(!BacklogStore.getOnlyMe);
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
+      BacklogStore.setSprintData(res);
+    }).catch((error) => {
+      window.console.log(error);
+    });
+  }
+
+  filterOnlyStory() {
+    BacklogStore.setRecent(!BacklogStore.getRecent);
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
+      BacklogStore.setSprintData(res);
+    }).catch((error) => {
+      window.console.log(error);
+    });
+  }
+
+  filterQuick(item) {
+    const newState = [...BacklogStore.getQuickFilters];
+    if (newState.indexOf(item.filterId) === -1) {
+      newState.push(item.filterId);
+    } else {
+      newState.splice(newState.indexOf(item.filterId), 1);
+    }
+    BacklogStore.setQuickFilters(newState);
+    this.refresh();
+  }
   
   render() {
     return (
       <Page>
         <Header title="待办事项">
-          <Button loading={this.state.loading} className="leftBtn" funcTyp="flat" onClick={this.handleCreateSprint.bind(this)}>
+          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint.bind(this)}>
             <Icon type="playlist_add" />创建冲刺
           </Button>
-          <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this)}>
+          <Button className="leftBtn2" functyp="flat" onClick={this.refresh.bind(this)}>
             <Icon type="refresh" />刷新
           </Button>
         </Header>
         <Content style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div className="c7n-backlogTools">
             <div className="c7n-backlogTools-left">
-              <p style={{ marginRight: 32 }}>快速搜索:</p>
+              <p style={{ marginRight: 32, whiteSpace: 'nowrap' }}>快速搜索:</p>
               <p
                 className="c7n-backlog-filter"
                 style={{
-                  background: BacklogStore.getOnlyMe ? 'rgba(140, 158, 255, 0.2)' : '',
-                  color: BacklogStore.getOnlyMe ? '#3f51b5' : '',
+                  background: BacklogStore.getOnlyMe ? '#3F51B5' : '',
+                  color: BacklogStore.getOnlyMe ? 'white' : '#3F51B5',
                 }}
                 role="none"
-                onClick={() => {
-                  BacklogStore.setOnlyMe(!BacklogStore.getOnlyMe);
-                  const data = {
-                    advancedSearchArgs: {},
-                  };
-                  if (BacklogStore.getChosenEpic !== 'all') {
-                    if (BacklogStore.getChosenEpic === 'unset') {
-                      data.advancedSearchArgs.noEpic = 'true';
-                    } else {
-                      data.advancedSearchArgs.epicId = BacklogStore.getChosenEpic;
-                    }
-                  }
-                  if (BacklogStore.getChosenVersion !== 'all') {
-                    if (BacklogStore.getChosenVersion === 'unset') {
-                      data.advancedSearchArgs.noVersion = 'true';
-                    } else {
-                      data.advancedSearchArgs.versionId = BacklogStore.getChosenVersion;
-                    }
-                  }
-                  if (BacklogStore.getOnlyMe) {
-                    data.advancedSearchArgs.ownIssue = 'true';
-                  }
-                  if (BacklogStore.getRecent) {
-                    data.advancedSearchArgs.onlyStory = 'true';
-                  }
-                  BacklogStore.axiosGetSprint(data).then((res) => {
-                    BacklogStore.setSprintData(res);
-                  }).catch((error) => {
-                    window.console.log(error);
-                  });
-                }}
+                onClick={this.filterOnlyMe.bind(this)}
               >仅我的问题</p>
               <p
                 className="c7n-backlog-filter"
                 style={{
-                  background: BacklogStore.getRecent ? 'rgba(140, 158, 255, 0.2)' : '',
-                  color: BacklogStore.getRecent ? '#3f51b5' : '',
+                  background: BacklogStore.getRecent ? '#3F51B5' : '',
+                  color: BacklogStore.getRecent ? 'white' : '#3F51B5',
                 }}
                 role="none"
-                onClick={() => {
-                  BacklogStore.setRecent(!BacklogStore.getRecent);
-                  const data = {
-                    advancedSearchArgs: {},
-                  };
-                  if (BacklogStore.getChosenEpic !== 'all') {
-                    if (BacklogStore.getChosenEpic === 'unset') {
-                      data.advancedSearchArgs.noEpic = 'true';
-                    } else {
-                      data.advancedSearchArgs.epicId = BacklogStore.getChosenEpic;
-                    }
-                  }
-                  if (BacklogStore.getChosenVersion !== 'all') {
-                    if (BacklogStore.getChosenVersion === 'unset') {
-                      data.advancedSearchArgs.noVersion = 'true';
-                    } else {
-                      data.advancedSearchArgs.versionId = BacklogStore.getChosenVersion;
-                    }
-                  }
-                  if (BacklogStore.getOnlyMe) {
-                    data.advancedSearchArgs.ownIssue = 'true';
-                  }
-                  if (BacklogStore.getRecent) {
-                    data.advancedSearchArgs.onlyStory = 'true';
-                  }
-                  BacklogStore.axiosGetSprint(data).then((res) => {
-                    BacklogStore.setSprintData(res);
-                  }).catch((error) => {
-                    window.console.log(error);
-                  });
-                }}
+                onClick={this.filterOnlyStory.bind(this)}
               >仅故事</p>
+              {
+                ScrumBoardStore.getQuickSearchList.length > 0 ?
+                  ScrumBoardStore.getQuickSearchList.map(item => (
+                    <p
+                      className="c7n-backlog-filter"
+                      style={{
+                        background: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',
+                        color: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? 'white' : '#3F51B5',
+                      }}
+                      role="none"
+                      onClick={this.filterQuick.bind(this, item)}
+                    >
+                      {item.name}
+                    </p>
+                  )) : ''
+              }
             </div>
           </div>
           <div className="c7n-backlog">
@@ -473,7 +432,7 @@ class BacklogHome extends Component {
                 >史诗</p>
               )}
             </div>
-            <div className="c7n-backlog-content" style={{ paddingBottom: 20 }}>
+            <div className="c7n-backlog-content">
               <DragDropContext
                 onDragEnd={this.onDragEnd.bind(this)}
                 onDragStart={(result) => {
@@ -524,6 +483,7 @@ class BacklogHome extends Component {
                     refresh={this.refresh.bind(this)}
                     epicVisible={this.state.epicVisible}
                     versionVisible={this.state.versionVisible}
+                    spinIf={this.state.spinIf}
                   />
                 </div>
                 <IssueDetail

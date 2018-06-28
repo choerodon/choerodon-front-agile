@@ -26,8 +26,8 @@ class StartSprint extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const data = {
-          endDate: values.endDate ? `${moment(values.endDate).format('YYYY-MM-DD')} 00:00:00` : null,
-          startDate: values.startDate ? `${moment(values.startDate).format('YYYY-MM-DD')} 00:00:00` : null,
+          endDate: values.endDate ? `${moment(values.endDate).format('YYYY-MM-DD HH:mm:ss')}` : null,
+          startDate: values.startDate ? `${moment(values.startDate).format('YYYY-MM-DD HH:mm:ss')}` : null,
           projectId: AppState.currentMenuType.id,
           sprintGoal: values.goal,
           sprintId: this.props.data.sprintId,
@@ -129,7 +129,10 @@ class StartSprint extends Component {
                 <DatePicker
                   style={{ width: '100%' }}
                   label="开始日期"
-                  disabledDate={this.state.endDate ? current => current > moment(this.state.endDate) : ''}
+                  showTime
+                  format="YYYY-MM-DD HH:mm:ss"
+                  disabledDate={this.state.endDate ? 
+                    current => current > moment(this.state.endDate) || current < moment().subtract(1, 'days') : current => current < moment().subtract(1, 'days')}
                   onChange={(date, dateString) => {
                     this.props.form.setFieldsValue({
                       startDate: date,
@@ -159,13 +162,17 @@ class StartSprint extends Component {
                 <DatePicker
                   style={{ width: '100%' }}
                   label="结束日期"
+                  format="YYYY-MM-DD HH:mm:ss"
                   disabled={parseInt(this.props.form.getFieldValue('duration'), 10) > 0}
+                  showTime
                   onChange={(date) => {
                     this.setState({
                       endDate: date,
                     });
                   }}
-                  disabledDate={this.state.startDate ? current => current < moment(this.state.startDate) : ''}
+                  disabledDate={this.state.startDate ? 
+                    current => current < moment(this.state.startDate) || current < moment().subtract(1, 'days') : 
+                    current => current < moment().subtract(1, 'days')}
                 />,
               )}
             </FormItem>

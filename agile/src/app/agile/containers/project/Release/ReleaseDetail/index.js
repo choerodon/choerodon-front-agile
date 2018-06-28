@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, DatePicker, Tabs, Table, Popover, Modal, Radio, Form, Select, Icon } from 'choerodon-ui';
+import { Button, DatePicker, Tabs, Table, Popover, Modal, Radio, Form, Select, Icon, Spin } from 'choerodon-ui';
 import moment from 'moment';
 import EditIssue from '../../../../components/EditIssueNarrow';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -32,13 +32,22 @@ class ReleaseDetail extends Component {
     document.getElementById('autoRouter').style.overflow = 'unset';
   }
   refresh() {
+    this.setState({
+      loading: true,
+    });
     ReleaseStore.axiosGetVersionDetail(this.props.match.params.id).then((res) => {
       ReleaseStore.setVersionDetail(res);
+      this.setState({
+        loading: false,
+      });
     }).catch((error) => {
       window.console.log(error);
     });
     ReleaseStore.axiosGetVersionStatusIssues(this.props.match.params.id).then((res2) => {
       ReleaseStore.setVersionStatusIssues(res2);
+      this.setState({
+        loading: false,
+      });
     }).catch((error2) => {
       window.console.log(error2);
     });
@@ -311,150 +320,162 @@ class ReleaseDetail extends Component {
           )} 
           backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`}
         >
-          <Button 
-            funcTyp="flat" 
-            onClick={() => { 
-              if (ReleaseStore.getVersionDetail.statusCode === 'version_planning') {
-                ReleaseStore.axiosGetPublicVersionDetail(ReleaseStore.getVersionDetail.versionId)
-                  .then((res) => {
-                    ReleaseStore.setPublicVersionDetail(res);
-                    this.setState({ publicVersion: true }); 
-                  }).catch((error) => {
-                    window.console.log(error);
-                  });
-              } else {
-                ReleaseStore.axiosUnPublicRelease(
-                  ReleaseStore.getVersionDetail.versionId).then((res2) => {
-                  this.refresh();
-                }).catch((error) => {
-                  window.console.log(error);
-                });
-              }
-            }}
-          >
-            <Icon type="public icon" />
-            <span>{ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? '发布' : '撤销发布'}</span>
-          </Button>
+          {
+            ReleaseStore.getVersionDetail.statusCode === 'archived' ? '' : (
+              <Button 
+                funcTyp="flat" 
+                style={{
+                  marginLeft: 80,
+                }}
+                onClick={() => { 
+                  if (ReleaseStore.getVersionDetail.statusCode === 'version_planning') {
+                    ReleaseStore.axiosGetPublicVersionDetail(
+                      ReleaseStore.getVersionDetail.versionId)
+                      .then((res) => {
+                        ReleaseStore.setPublicVersionDetail(res);
+                        this.setState({ publicVersion: true }); 
+                      }).catch((error) => {
+                        window.console.log(error);
+                      });
+                  } else {
+                    ReleaseStore.axiosUnPublicRelease(
+                      ReleaseStore.getVersionDetail.versionId).then((res2) => {
+                      this.refresh();
+                    }).catch((error) => {
+                      window.console.log(error);
+                    });
+                  }
+                }}
+              >
+                <Icon type="publish2" />
+                <span>{ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? '发布' : '撤销发布'}</span>
+              </Button>
+            )
+          }
+          
         </Header>
         <Content className="c7n-versionDetail">
-          <div style={{ display: 'flex', color: 'rgba(0,0,0,0.54)' }}>
-            <div className="c7n-versionTime">
-              <Icon style={{ fontSize: 20 }} type="date_range" />
+          <Spin spinning={this.state.loading}>
+            <div style={{ display: 'flex', color: 'rgba(0,0,0,0.54)' }}>
+              <div className="c7n-versionTime">
+                <Icon style={{ fontSize: 20 }} type="date_range" />
               创建日期:
-              <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.startDate ? ReleaseStore.getVersionDetail.startDate : ''}</span>
-            </div>
-            <div className="c7n-versionTime" style={{ marginLeft: 80 }}>
-              <Icon style={{ fontSize: 20 }} type="date_range" />
+                <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.startDate ? ReleaseStore.getVersionDetail.startDate : '无'}</span>
+              </div>
+              <div className="c7n-versionTime" style={{ marginLeft: 80 }}>
+                <Icon style={{ fontSize: 20 }} type="date_range" />
               更新日期:
-              <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.releaseDate ? ReleaseStore.getVersionDetail.releaseDate : ''}</span>
+                <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.releaseDate ? ReleaseStore.getVersionDetail.releaseDate : '无'}</span>
+              </div>
             </div>
-          </div>
-          <div className="c7n-release-issueClassify">
-            <Popover
-              placement="bottom"
-              content={this.renderPopContent('done')}
-            >
-              <div 
-                style={{ 
-                  flex: ReleaseStore.getVersionDetail.doneIssueCount, 
-                  background: '#00BFA5',
-                  ...this.renderBorderRadius('done'),
-                }} 
-                className="c7n-release-issueDone"
-              />
-            </Popover>
-            <Popover 
-              placement="bottom"
-              content={this.renderPopContent('doing')}
-            >
-              <div 
-                style={{ 
-                  flex: ReleaseStore.getVersionDetail.doingIssueCount, 
-                  background: '#4D90FE',
-                  ...this.renderBorderRadius('doing'),
-                }} 
-                className="c7n-release-issueDoing"
-              />
-            </Popover>
-            <Popover 
-              placement="bottom"
-              content={this.renderPopContent('todo')}
-            >
-              <div 
-                style={{ 
-                  flex: ReleaseStore.getVersionDetail.todoIssueCount,
-                  background: '#FFB100',
-                  ...this.renderBorderRadius('todo'),
-                }} 
-                className="c7n-release-issueTodo"
-              />
-            </Popover>
-          </div>
-          <div>
-            <Tabs 
-              animated={false} 
-              onChange={this.handleChangeTab.bind(this)} 
-              style={{ marginTop: 38 }}
-            >
-              <TabPane 
-                tab={
-                  <div className="c7n-release-tabTitle">
-                    <span className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.issueCount}</span>
-                    <span>当前版本<br />个问题</span>
-                  </div>
-                }
-                key="0"
+            <div className="c7n-release-issueClassify">
+              <Popover
+                placement="bottom"
+                content={this.renderPopContent('done')}
               >
-                {this.renderTabTables(columns)}
-              </TabPane>
-              <TabPane
-                tab={
-                  <div className="c7n-release-tabTitle">
-                    <span style={{ color: 'rgb(0, 191, 165)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.doneIssueCount}</span>
-                    <span>问题<br />已完成</span>
-                  </div>
-                }
-                key="done"
+                <div 
+                  style={{ 
+                    flex: ReleaseStore.getVersionDetail.doneIssueCount, 
+                    background: '#00BFA5',
+                    ...this.renderBorderRadius('done'),
+                  }} 
+                  className="c7n-release-issueDone"
+                />
+              </Popover>
+              <Popover 
+                placement="bottom"
+                content={this.renderPopContent('doing')}
               >
-                {this.renderTabTables(columns)}
+                <div 
+                  style={{ 
+                    flex: ReleaseStore.getVersionDetail.doingIssueCount, 
+                    background: '#4D90FE',
+                    ...this.renderBorderRadius('doing'),
+                  }} 
+                  className="c7n-release-issueDoing"
+                />
+              </Popover>
+              <Popover 
+                placement="bottom"
+                content={this.renderPopContent('todo')}
+              >
+                <div 
+                  style={{ 
+                    flex: ReleaseStore.getVersionDetail.todoIssueCount,
+                    background: '#FFB100',
+                    ...this.renderBorderRadius('todo'),
+                  }} 
+                  className="c7n-release-issueTodo"
+                />
+              </Popover>
+            </div>
+            <div>
+              <Tabs 
+                animated={false} 
+                onChange={this.handleChangeTab.bind(this)} 
+                style={{ marginTop: 38 }}
+              >
+                <TabPane 
+                  tab={
+                    <div className="c7n-release-tabTitle">
+                      <span className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.issueCount}</span>
+                      <span>当前版本<br />个问题</span>
+                    </div>
+                  }
+                  key="0"
+                >
+                  {this.renderTabTables(columns)}
+                </TabPane>
+                <TabPane
+                  tab={
+                    <div className="c7n-release-tabTitle">
+                      <span style={{ color: 'rgb(0, 191, 165)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.doneIssueCount}</span>
+                      <span>问题<br />已完成</span>
+                    </div>
+                  }
+                  key="done"
+                >
+                  {this.renderTabTables(columns)}
 
-              </TabPane>
-              <TabPane
-                tab={
-                  <div className="c7n-release-tabTitle">
-                    <span style={{ color: 'rgb(77, 144, 254)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.doingIssueCount}</span>
-                    <span>问题<br />正在处理</span>
-                  </div>
-                }
-                key="doing"
-              >
-                {this.renderTabTables(columns)}
+                </TabPane>
+                <TabPane
+                  tab={
+                    <div className="c7n-release-tabTitle">
+                      <span style={{ color: 'rgb(77, 144, 254)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.doingIssueCount}</span>
+                      <span>问题<br />正在处理</span>
+                    </div>
+                  }
+                  key="doing"
+                >
+                  {this.renderTabTables(columns)}
 
-              </TabPane>
-              <TabPane
-                tab={
-                  <div className="c7n-release-tabTitle">
-                    <span style={{ color: 'rgb(255, 177, 0)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.todoIssueCount}</span>
-                    <span>问题<br />待处理</span>
-                  </div>
-                }
-                key="todo"
-              >
-                {this.renderTabTables(columns)}
+                </TabPane>
+                <TabPane
+                  tab={
+                    <div className="c7n-release-tabTitle">
+                      <span style={{ color: 'rgb(255, 177, 0)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.todoIssueCount}</span>
+                      <span>问题<br />待处理</span>
+                    </div>
+                  }
+                  key="todo"
+                >
+                  {this.renderTabTables(columns)}
 
-              </TabPane>
-            </Tabs>
-          </div>
+                </TabPane>
+              </Tabs>
+            </div>
           
-          <PublicRelease
-            visible={this.state.publicVersion}
-            onCancel={() => {
-              this.setState({
-                publicVersion: false,
-              });
-            }}
-            refresh={this.refresh.bind(this)}
-          />
+            <PublicRelease
+              visible={this.state.publicVersion}
+              onCancel={() => {
+                this.setState({
+                  publicVersion: false,
+                });
+              }}
+              refresh={this.refresh.bind(this)}
+            />
+          </Spin>
+          
         </Content>
       </page>
     );

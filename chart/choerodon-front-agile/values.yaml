@@ -30,7 +30,7 @@ ingress:
 env:
   open:
     PRO_API_HOST: gateway.choerodon.com.cn
-    PRO_AGILE_HOST: minio.staging.saas.hand-china.com/agile-service/
+    PRO_AGILE_HOST: http://minio.staging.saas.hand-china.com/agile-service/
     PRO_CLIENT_ID: agile
     PRO_LOCAL: true
     PRO_TITLE_NAME: Choerodon

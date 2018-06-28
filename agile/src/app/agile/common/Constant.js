@@ -32,7 +32,7 @@ export const ICON = {
   bug: 'bug_report',
   task: 'assignment',
   issue_epic: 'priority',
-  sub_task: 'sutask',
+  sub_task: 'relation',
 };
 
 export const TYPE_NAME = {
@@ -43,5 +43,4 @@ export const TYPE_NAME = {
   sub_task: '子任务',
 };
 
-// export const SERVICES_URL = 'http://minio.staging.saas.hand-china.com/agile-service/';
 export const SERVICES_URL = 'SERVICES_URL_EXAMPLE';

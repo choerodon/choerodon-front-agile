@@ -20,9 +20,49 @@ class BacklogStore {
   @observable openSprintDetail = {};
   @observable sprintWidth;
   @observable colorLookupValue = [];
+  @observable quickFilters = [];
+
+  @computed get getQuickFilters() {
+    return toJS(this.quickFilters);
+  }
+
+  @action setQuickFilters(data) {
+    this.quickFilters = data;
+  }
+
+  getSprintFilter() {
+    const data = {
+      advancedSearchArgs: {},
+    };
+    if (this.chosenEpic !== 'all') {
+      if (this.chosenEpic === 'unset') {
+        data.advancedSearchArgs.noEpic = 'true';
+      } else {
+        data.advancedSearchArgs.epicId = this.chosenEpic;
+      }
+    }
+    if (this.chosenVersion !== 'all') {
+      if (this.chosenVersion === 'unset') {
+        data.advancedSearchArgs.noVersion = 'true';
+      } else {
+        data.advancedSearchArgs.versionId = this.chosenVersion;
+      }
+    }
+    if (this.onlyMe) {
+      data.advancedSearchArgs.ownIssue = 'true';
+    }
+    if (this.recent) {
+      data.advancedSearchArgs.onlyStory = 'true';
+    }
+    return data;
+  }
+
+  axiosDeleteSprint(id) {
+    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/${id}`);
+  }
 
   axiosGetColorLookupValue() {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/epic_color`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/epic_color`);
   }
 
   @computed get getColorLookupValue() {
@@ -42,7 +82,7 @@ class BacklogStore {
   }
 
   axiosGetIssueDetail(issueId) {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issues/${issueId}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/${issueId}`);
   }
 
   @computed get getOpenSprintDetail() {
@@ -54,15 +94,15 @@ class BacklogStore {
   }
 
   axiosGetOpenSprintDetail(sprintId) {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/${sprintId}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/${sprintId}`);
   }
 
   axiosStartSprint(data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/start`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/start`, data);
   }
 
   axiosCloseSprint(data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/complete`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/complete`, data);
   }
 
   @computed get getSprintCompleteMessage() {
@@ -74,11 +114,11 @@ class BacklogStore {
   }
 
   axiosGetSprintCompleteMessage(sprintId) {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/${sprintId}/names`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/${sprintId}/names`);
   }
 
   axiosEasyCreateIssue(data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/issues`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues`, data);
   }
 
   @computed get getOnlyMe() {
@@ -98,11 +138,11 @@ class BacklogStore {
   }
 
   axiosUpdateSprint(data) {
-    return axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/sprint`, data);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint`, data);
   }
 
   axiosUpdateVerison(versionId, data) {
-    return axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/product_version/${versionId}`, data);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}`, data);
   }
 
   @computed get getClickIssueDetail() {
@@ -114,11 +154,11 @@ class BacklogStore {
   }
 
   axiosUpdateIssuesToVersion(versionId, ids) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/issues/to_version/${versionId}`, ids);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/to_version/${versionId}`, ids);
   }
 
   axiosUpdateIssuesToEpic(epicId, ids) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/issues/to_epic/${epicId}`, ids);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/to_epic/${epicId}`, ids);
   }
 
   @computed get getIsLeaveSprint() {
@@ -138,15 +178,15 @@ class BacklogStore {
   }
 
   axiosCreateSprint(data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/sprint`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint`, data);
   }
 
   axiosUpdateIssuesToSprint(sprintId, data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/issues/to_sprint/${sprintId}`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/to_sprint/${sprintId}`, data);
   }
 
   axiosUpdateIssue(data) {
-    return axios.put(`/agile/v1/project/${AppState.currentMenuType.id}/issues`, data);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues`, data);
   }
 
   @computed get getChosenVersion() {
@@ -174,7 +214,7 @@ class BacklogStore {
   }
 
   axiosGetEpic() {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issues/epics`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`);
   }
 
   @computed get getVersionData() {
@@ -186,7 +226,7 @@ class BacklogStore {
   }
 
   axiosGetVersion() {
-    return axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/product_version`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version`);
   }
 
   @computed get getSprintData() {
@@ -198,7 +238,7 @@ class BacklogStore {
   }
 
   axiosGetSprint(data) {
-    return axios.post(`/agile/v1/project/${AppState.currentMenuType.id}/sprint/issues`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?quickFilterIds=${this.quickFilters}`, data);
   }
 }
 

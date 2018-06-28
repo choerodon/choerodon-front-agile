@@ -50,7 +50,7 @@ class SprintCommonStore {
       projectId: AppState.currentMenuType.id,
       ...issueObj,
     };
-    return axios.post(`/agile/v1/project/${projectId}/issue`, issue);
+    return axios.post(`/agile/v1/projects/${projectId}/issue`, issue);
   }
 
   @action setIssues(data) {

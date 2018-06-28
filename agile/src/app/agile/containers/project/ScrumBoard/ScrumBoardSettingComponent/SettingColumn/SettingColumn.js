@@ -81,6 +81,24 @@ class SettingColumn extends Component {
       window.console.log(error);
     });
   }
+  handleSaveColumnName(name) {
+    const data = {
+      columnId: this.props.data.columnId,
+      objectVersionNumber: this.props.data.objectVersionNumber,
+      name,
+      projectId: AppState.currentMenuType.id,
+      boardId: ScrumBoardStore.getSelectedBoard,
+    };
+    ScrumBoardStore.axiosUpdateColumn(
+      this.props.data.columnId, data, ScrumBoardStore.getSelectedBoard).then((res) => {
+      const originData = ScrumBoardStore.getBoardData;
+      originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
+      originData[this.props.index].name = res.name;
+      ScrumBoardStore.setBoardData(originData);
+    }).catch((error) => {
+      window.console.log(error);
+    });
+  }
   renderStatus() {
     const list = this.props.data.subStatuses;
     const result = [];
@@ -163,6 +181,7 @@ class SettingColumn extends Component {
                     style={{
                       background: snapshot.isDraggingOver ? 'rgba(26,177,111,0.08)' : 'unset',
                       height: '100%',
+                      minHeight: '84px',
                     }}
                   >
                     {this.renderStatus()}
@@ -221,7 +240,13 @@ class SettingColumn extends Component {
                     />
                   </div>
                   <div className="c7n-scrumsetting-columnStatus">
-                    {this.props.data.name}
+                    <EasyEdit
+                      type="input"
+                      defaultValue={this.props.data.name}
+                      enterOrBlur={this.handleSaveColumnName.bind(this)}
+                    >
+                      {this.props.data.name}
+                    </EasyEdit>
                   </div>
                   <div
                     className="c7n-scrumsetting-columnBottom"
@@ -286,7 +311,7 @@ class SettingColumn extends Component {
                         }}
                       >
                         {this.renderStatus()}
-                        {/* {provided.placeholder} */}
+                        {provided.placeholder}
                       </div>
                     )}
                   </Droppable>

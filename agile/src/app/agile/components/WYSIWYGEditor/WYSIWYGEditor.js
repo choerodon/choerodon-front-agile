@@ -65,6 +65,10 @@ class WYSIWYGEditor extends Component {
     }
   };
 
+  empty = () => {
+    this.props.onChange(undefined);
+  }
+
   render() {
     const { placeholder, value } = this.props;
     const style = { ...this.defaultStyle, ...this.props.style };
@@ -87,7 +91,10 @@ class WYSIWYGEditor extends Component {
             <div style={{ padding: '0 8px', border: '1px solid #ccc', borderTop: 'none', display: 'flex', justifyContent: 'flex-end' }}>
               <Button 
                 type="primary"
-                onClick={() => this.props.handleDelete()}
+                onClick={() => {
+                  this.empty();
+                  this.props.handleDelete();
+                }}
               >
                 取消
               </Button>

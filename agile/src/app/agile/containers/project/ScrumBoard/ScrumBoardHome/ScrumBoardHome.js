@@ -38,6 +38,7 @@ class ScrumBoardHome extends Component {
       closeSprintVisible: false,
       judgeUpdateParent: {},
       updateParentStatus: null,
+      quickFilter: [],
     };
   }
   componentWillMount() {
@@ -48,6 +49,7 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.setBoardList(data);
       ScrumBoardStore.setCurrentConstraint(data[0].columnConstraint);
       if (!ScrumBoardStore.getSelectedBoard) {
+        ScrumBoardStore.setSwimLaneCode(data[0].swimlaneBasedCode);
         ScrumBoardStore.setSelectedBoard(data[0].boardId);
         this.refresh(data[0].boardId);
       } else {
@@ -61,6 +63,7 @@ class ScrumBoardHome extends Component {
           this.refresh(ScrumBoardStore.getSelectedBoard);
         } else {
           ScrumBoardStore.setSelectedBoard(data[0].boardId);
+          ScrumBoardStore.setSwimLaneCode(data[0].swimlaneBasedCode);
           this.refresh(data[0].boardId);
         }
       }
@@ -72,31 +75,55 @@ class ScrumBoardHome extends Component {
     this.setState({
       spinIf: true,
     });
-    ScrumBoardStore.axiosGetBoardData(boardId).then((data) => {
-      const parentIds = [];
-      const storeParentIds = [];
-      _.forEach(data.columnsData.columns, (col) => {
-        _.forEach(col.subStatuses, (sub) => {
-          _.forEach(sub.issues, (iss) => {
-            if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
-              if (parentIds.indexOf(iss.issueId) === -1) {
-                parentIds.push(iss.issueId);
-                storeParentIds.push({
-                  status: sub.name,
-                  categoryCode: sub.categoryCode,
-                  ...iss,
-                });
+    ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
+      ScrumBoardStore.setQuickSearchList(res);
+      ScrumBoardStore.axiosGetBoardData(boardId,
+        this.state.onlyMe ? AppState.getUserId : 0,
+        this.state.recent,
+        this.state.quickFilter,
+      ).then((data) => {
+        const parentIds = [];
+        const assigneeIds = [];
+        const storeParentIds = [];
+        const storeAssignee = [];
+        _.forEach(data.columnsData.columns, (col) => {
+          _.forEach(col.subStatuses, (sub) => {
+            _.forEach(sub.issues, (iss) => {
+              if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
+                if (parentIds.indexOf(iss.issueId) === -1) {
+                  parentIds.push(iss.issueId);
+                  storeParentIds.push({
+                    status: sub.name,
+                    categoryCode: sub.categoryCode,
+                    ...iss,
+                  });
+                }
               }
-            }
+              if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
+                if (assigneeIds.indexOf(iss.assigneeId) === -1) {
+                  if (iss.assigneeId) {
+                    assigneeIds.push(iss.assigneeId);
+                    storeAssignee.push({
+                      assigneeId: iss.assigneeId,
+                      assigneeName: iss.assigneeName,
+                      imageUrl: iss.imageUrl,
+                    });
+                  }
+                }
+              }
+            });
           });
         });
-      });
-      ScrumBoardStore.setCurrentSprint(data.currentSprint);
-      ScrumBoardStore.setParentIds(storeParentIds);
-      ScrumBoardStore.setBoardData(data.columnsData.columns);
-      // this.storeIssueNumberCount(storeParentIds, )
-      this.setState({
-        spinIf: false,
+        ScrumBoardStore.setAssigneer(storeAssignee);
+        ScrumBoardStore.setCurrentSprint(data.currentSprint);
+        ScrumBoardStore.setParentIds(storeParentIds);
+        ScrumBoardStore.setBoardData(data.columnsData.columns);
+        // this.storeIssueNumberCount(storeParentIds, )
+        this.setState({
+          spinIf: false,
+        });
+      }).catch((error) => {
+        window.console.log(error);
       });
     }).catch((error) => {
       window.console.log(error);
@@ -210,6 +237,18 @@ class ScrumBoardHome extends Component {
           });
         }
       });
+      _.forEach(newState, (item, index) => {
+        if (String(item.columnId) === 
+        String(JSON.parse(result.destination.droppableId).columnId)) {
+          _.forEach(newState[index].subStatuses, (item2, index2) => {
+            if (String(item2.id) === 
+            String(JSON.parse(result.destination.droppableId).code)) {
+              newState[index].subStatuses[index2].issues.splice(
+                result.destination.index, 0, draggableData);
+            }
+          });
+        }
+      });
       ScrumBoardStore.setBoardData(newState);
       let destinationStatus;
       ScrumBoardStore.updateIssue(
@@ -226,7 +265,7 @@ class ScrumBoardHome extends Component {
               String(JSON.parse(result.destination.droppableId).code)) {
                 destinationStatus = item2.categoryCode;
                 newState[index].subStatuses[index2].issues.splice(
-                  result.destination.index, 0, draggableData);
+                  result.destination.index, 1, draggableData);
               }
             });
           }
@@ -279,6 +318,63 @@ class ScrumBoardHome extends Component {
       }
     });
   }
+  filterOnlyStory() {
+    this.setState({
+      recent: !this.state.recent,
+    }, () => {
+      this.refresh(ScrumBoardStore.getSelectedBoard);
+    });
+  }
+  filterOnlyMe() {
+    this.setState({
+      onlyMe: !this.state.onlyMe,
+    }, () => {
+      this.refresh(ScrumBoardStore.getSelectedBoard);
+    });
+  }
+  handleFinishSprint() {
+    BacklogStore.axiosGetSprintCompleteMessage(
+      ScrumBoardStore.getCurrentSprint.sprintId).then((res) => {
+      BacklogStore.setSprintCompleteMessage(res);
+      let flag = 0;
+      if (res.parentsDoneUnfinishedSubtasks) {
+        if (res.parentsDoneUnfinishedSubtasks.length > 0) {
+          flag = 1;
+          let issueNums = '';
+          _.forEach(res.parentsDoneUnfinishedSubtasks, (items) => {
+            issueNums += `${items.issueNum} `;
+          });
+          confirm({
+            title: 'warnning',
+            content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
+            onCancel() {
+              window.console.log('Cancel');
+            },
+          });
+        }
+      }
+      if (flag === 0) {
+        this.setState({
+          closeSprintVisible: true,
+        });
+      }
+    }).catch((error) => {
+      window.console.log(error);
+    });
+  }
+  filterQuick(item) {
+    const newState = [...this.state.quickFilter];
+    if (newState.indexOf(item.filterId) === -1) {
+      newState.push(item.filterId);
+    } else {
+      newState.splice(newState.indexOf(item.filterId), 1);
+    }
+    this.setState({
+      quickFilter: newState,
+    }, () => {
+      this.refresh(ScrumBoardStore.getSelectedBoard);
+    });
+  }
   // 渲染第三方状态列
   renderStatusColumns() {
     const data = ScrumBoardStore.getBoardData;
@@ -295,26 +391,54 @@ class ScrumBoardHome extends Component {
     return result;
   }
   // 渲染issue列
-  renderIssueColumns(parentId) {
-    const data = ScrumBoardStore.getBoardData;
+  renderIssueColumns(id) {
     const result = [];
-    _.forEach(data, (item) => {
-      if (item.subStatuses.length > 0) {
-        result.push(
-          <StatusBodyColumn
-            data={item}
-            parentId={parentId}
-            source={_.isUndefined(parentId) ? 'other' : parentId}
-          />,
-        );
-      }
-    });
+    const data = ScrumBoardStore.getBoardData;
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      _.forEach(data, (item) => {
+        if (item.subStatuses.length > 0) {
+          result.push(
+            <StatusBodyColumn
+              data={item}
+              parentId={id}
+              source={_.isUndefined(id) ? 'other' : id}
+            />,
+          );
+        }
+      });
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      _.forEach(data, (item) => {
+        if (item.subStatuses.length > 0) {
+          result.push(
+            <StatusBodyColumn
+              data={item}
+              assigneeId={id}
+            />,
+          );
+        }
+      });
+    } else {
+      _.forEach(data, (item) => {
+        if (item.subStatuses.length > 0) {
+          result.push(
+            <StatusBodyColumn
+              data={item}
+            />,
+          );
+        }
+      });
+    }
     return result;
   }
   renderSwimlane() {
-    const parentIds = ScrumBoardStore.getParentIds;
+    let ids = [];
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      ids = ScrumBoardStore.getParentIds;
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      ids = ScrumBoardStore.getAssigneer;
+    }
     const result = [];
-    _.forEach(parentIds, (item) => {
+    _.forEach(ids, (item) => {
       result.push(
         <SwimLaneContext
           data={item}
@@ -348,6 +472,18 @@ class ScrumBoardHome extends Component {
     }
     return undefined;
   }
+  renderOthersTitle() {
+    let result = '';
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      result = '其他问题';
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      result = '未分配的问题';
+    } else {
+      result = '所有问题';
+    }
+    return result;
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -365,19 +501,22 @@ class ScrumBoardHome extends Component {
             <span>创建看板</span>
           </Button>
           <Select 
-            className="leftBtn2" 
+            className="leftBtn2 select-without-underline" 
             value={ScrumBoardStore.getSelectedBoard}
-            style={{ width: 100, color: '#3F51B5', margin: '0 30px' }}
+            style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500 }}
             dropdownStyle={{
               color: '#3F51B5',
             }}
             onChange={(value) => {
+              let newCode;
               _.forEach(ScrumBoardStore.getBoardList, (item) => {
                 if (item.boardId === value) {
                   ScrumBoardStore.setCurrentConstraint(item.columnConstraint);
+                  newCode = item.swimlaneBasedCode;
                 }
               });
               ScrumBoardStore.setSelectedBoard(value);
+              ScrumBoardStore.setSwimLaneCode(newCode);
               this.refresh(value);
             }}
           >
@@ -394,253 +533,150 @@ class ScrumBoardHome extends Component {
         </Header>
         <Content style={{ padding: 0, display: 'flex', overflow: 'hidden' }}>
           <div style={{ flexGrow: 1 }}>
-            <div className="c7n-scrumTools">
-              <div className="c7n-scrumTools-left">
-                <p style={{ marginRight: 24 }}>快速搜索:</p>
-                <p
-                  className="c7n-scrumTools-filter"
-                  style={{
-                    background: this.state.onlyMe ? 'rgba(140, 158, 255, 0.2)' : '',
-                    color: this.state.onlyMe ? '#3f51b5' : '',
-                  }}
-                  role="none"
-                  onClick={() => {
-                    this.setState({
-                      onlyMe: !this.state.onlyMe,
-                      spinIf: true,
-                    }, () => {
-                      ScrumBoardStore.axiosFilterBoardData(
-                        ScrumBoardStore.getSelectedBoard, 
-                        this.state.onlyMe ? AppState.getUserId : 0, 
-                        this.state.recent).then((data) => {
-                        const parentIds = [];
-                        const storeParentIds = [];
-                        _.forEach(data.columnsData.columns, (col) => {
-                          _.forEach(col.subStatuses, (sub) => {
-                            _.forEach(sub.issues, (iss) => {
-                              if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
-                                if (parentIds.indexOf(iss.issueId) === -1) {
-                                  parentIds.push(iss.issueId);
-                                  storeParentIds.push({
-                                    status: sub.name,
-                                    categoryCode: sub.categoryCode,
-                                    subIssues: [],
-                                    ...iss,
-                                  });
-                                }
-                              }
-                            });
-                          });
-                        });
-                        ScrumBoardStore.setUnParentIds([]);
-                        ScrumBoardStore.setCurrentSprint(data.currentSprint);
-                        ScrumBoardStore.setParentIds(storeParentIds);
-                        ScrumBoardStore.setBoardData(data.columnsData.columns);
-                        this.setState({
-                          spinIf: false,
-                        });
-                      }).catch((error) => {
-                        window.console.log(error);
-                        this.setState({
-                          spinIf: false,
-                        });
-                      });
-                    });
-                  }}
-                >仅我的问题</p>
-                <p
-                  className="c7n-scrumTools-filter"
-                  style={{
-                    background: this.state.recent ? 'rgba(140, 158, 255, 0.2)' : '',
-                    color: this.state.recent ? '#3f51b5' : '',
-                  }}
-                  role="none"
-                  onClick={() => {
-                    this.setState({
-                      recent: !this.state.recent,
-                      spinIf: true,
-                    }, () => {
-                      ScrumBoardStore.axiosFilterBoardData(
-                        ScrumBoardStore.getSelectedBoard, 
-                        this.state.onlyMe ? AppState.getUserId : 0, 
-                        this.state.recent).then((data) => {
-                        const parentIds = [];
-                        const storeParentIds = [];
-                        _.forEach(data.columnsData.columns, (col) => {
-                          _.forEach(col.subStatuses, (sub) => {
-                            _.forEach(sub.issues, (iss) => {
-                              if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
-                                if (parentIds.indexOf(iss.issueId) === -1) {
-                                  parentIds.push(iss.issueId);
-                                  storeParentIds.push({
-                                    status: sub.name,
-                                    categoryCode: sub.categoryCode,
-                                    subIssues: [],
-                                    ...iss,
-                                  });
-                                }
-                              }
-                            });
-                          });
-                        });      
-                        ScrumBoardStore.setUnParentIds([]);
-                        ScrumBoardStore.setParentIds(storeParentIds);
-                        ScrumBoardStore.setBoardData(data.columnsData.columns);
-                        this.setState({
-                          spinIf: false,
-                        });
-                      }).catch((error) => {
-                        window.console.log(error);
-                        this.setState({
-                          spinIf: false,
-                        });
-                      });
-                    });
-                  }}
-                >仅故事</p>
-              </div>
-              <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
-                <Icon
-                  style={{
-                    display: ScrumBoardStore.getCurrentSprint ? 'inline-block' : 'none', 
-                    color: 'rgba(0,0,0,0.54)',
-                  }}
-                  type="av_timer"
-                />
-                <span style={{ marginLeft: 0 }}>{`${ScrumBoardStore.getCurrentSprint ? ScrumBoardStore.getCurrentSprint.dayRemain : ''}days剩余`}</span>
-                <Button
-                  funcTyp="flat"
-                  onClick={() => {
-                    BacklogStore.axiosGetSprintCompleteMessage(
-                      ScrumBoardStore.getCurrentSprint.sprintId).then((res) => {
-                      BacklogStore.setSprintCompleteMessage(res);
-                      let flag = 0;
-                      if (res.parentsDoneUnfinishedSubtasks) {
-                        if (res.parentsDoneUnfinishedSubtasks.length > 0) {
-                          flag = 1;
-                          let issueNums = '';
-                          _.forEach(res.parentsDoneUnfinishedSubtasks, (items) => {
-                            issueNums += `${items.issueNum} `;
-                          });
-                          confirm({
-                            title: 'warnning',
-                            content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
-                            onCancel() {
-                              window.console.log('Cancel');
-                            },
-                          });
-                        }
-                      }
-                      if (flag === 0) {
-                        this.setState({
-                          closeSprintVisible: true,
-                        });
-                      }
-                    }).catch((error) => {
-                      window.console.log(error);
-                    });
-                  }}
-                >
-                  <Icon type="power_settings_new icon" />
-                  <span style={{ marginLeft: 0 }}>完成Sprint</span>
-                </Button>
-                <Button
-                  funcTyp="flat"
-                  onClick={() => {
-                    const { history } = this.props;
-                    const urlParams = AppState.currentMenuType;
-                    history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
-                  }}
-                >
-                  <Icon type="settings icon" />
-                  <span style={{ marginLeft: 0 }}>配置</span>
-                </Button>
-              </div>
-            </div>
-            {
-              this.state.closeSprintVisible ? (
-                <CloseSprint
-                  visible={this.state.closeSprintVisible}
-                  onCancel={() => {
-                    this.setState({
-                      closeSprintVisible: false,
-                    });
-                  }}
-                  data={{
-                    sprintId: ScrumBoardStore.getCurrentSprint.sprintId,
-                    sprintName: ScrumBoardStore.getCurrentSprint.sprintName,
-                  }}
-                  refresh={this.getBoard.bind(this)}
-                />
-              ) : ''
-            }
-            <div className="c7n-scrumboard">
-              <div className="c7n-scrumboard-header">
-                {this.renderStatusColumns()}
-              </div>
-              <div
-                className="c7n-scrumboard-content"
-                style={{
-                  height: this.renderHeight(),
-                  paddingBottom: 83,
-                }}
-              >
-                {this.renderSwimlane()}
-                {ScrumBoardStore.getCurrentSprint ? (
-                  <div className="c7n-scrumboard-others">
-                    <div className="c7n-scrumboard-otherHeader">
-                      <Icon 
-                        style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
-                        type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
-                        role="none"
-                        onClick={() => {
-                          this.setState({
-                            expand: !this.state.expand,
-                          });
-                        }}
-                      />
-                  其他问题
-                      {/* <p style={{ marginLeft: 12, color: '
-                    rgba(0,0,0,0.54)' }}>{`(${ScrumBoardStore.getUnParentIds.length} 问题)`}</p> */}
-                    </div>
-                    <div
-                      className="c7n-scrumboard-otherContent"
-                      style={{
-                        display: this.state.expand ? 'flex' : 'none',
-                      }}
-                    >
-                      <DragDropContext 
-                        onDragEnd={this.handleDragEnd.bind(this)}
-                        onDragStart={(start) => {
-                          ScrumBoardStore.setDragStartItem(start);
-                        }}
-                      >
-                        {this.renderIssueColumns()}
-                      </DragDropContext>
-                    </div>
-                  </div>
-                ) : (
-                  <div
+            <Spin spinning={this.state.spinIf}>
+              <div className="c7n-scrumTools">
+                <div style={{ flexWrap: 'wrap' }} className="c7n-scrumTools-left">
+                  <p style={{ marginRight: 24 }}>快速搜索:</p>
+                  <p
+                    className="c7n-scrumTools-filter"
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginTop: '80px',
+                      background: this.state.onlyMe ? '#3F51B5' : '',
+                      color: this.state.onlyMe ? 'white' : '#3F51B5',
+                    }}
+                    role="none"
+                    onClick={this.filterOnlyMe.bind(this)}
+                  >仅我的问题</p>
+                  <p
+                    className="c7n-scrumTools-filter"
+                    style={{
+                      background: this.state.recent ? '#3F51B5' : '',
+                      color: this.state.recent ? 'white' : '#3F51B5',
+                    }}
+                    role="none"
+                    onClick={this.filterOnlyStory.bind(this)}
+                  >仅故事</p>
+                  {
+                    ScrumBoardStore.getQuickSearchList.length > 0 ? 
+                      ScrumBoardStore.getQuickSearchList.map(item => (
+                        <p
+                          className="c7n-scrumTools-filter"
+                          style={{
+                            color: this.state.quickFilter.indexOf(item.filterId) !== -1 ? 'white' : '#3F51B5',
+                            background: this.state.quickFilter.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',
+                          }}
+                          role="none"
+                          onClick={this.filterQuick.bind(this, item)}
+                        >
+                          {item.name}
+                        </p>
+                      )) : ''
+                  }
+                </div>
+                <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
+                  <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
+                  <Button
+                    funcTyp="flat"
+                    onClick={this.handleFinishSprint.bind(this)}
+                  >
+                    <Icon type="power_settings_new icon" />
+                    <span style={{ marginLeft: 0 }}>完成Sprint</span>
+                  </Button>
+                  <Button
+                    funcTyp="flat"
+                    onClick={() => {
+                      const { history } = this.props;
+                      const urlParams = AppState.currentMenuType;
+                      history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&boardId=${ScrumBoardStore.getSelectedBoard}`);
                     }}
                   >
-                    <img style={{ width: 170 }} src={EmptyScrumboard} alt="emptyscrumboard" />
+                    <Icon type="settings icon" />
+                    <span style={{ marginLeft: 0 }}>配置</span>
+                  </Button>
+                </div>
+              </div>
+              {
+                this.state.closeSprintVisible ? (
+                  <CloseSprint
+                    visible={this.state.closeSprintVisible}
+                    onCancel={() => {
+                      this.setState({
+                        closeSprintVisible: false,
+                      });
+                    }}
+                    data={{
+                      sprintId: ScrumBoardStore.getCurrentSprint.sprintId,
+                      sprintName: ScrumBoardStore.getCurrentSprint.sprintName,
+                    }}
+                    refresh={this.getBoard.bind(this)}
+                  />
+                ) : ''
+              }
+              <div className="c7n-scrumboard">
+                <div className="c7n-scrumboard-header">
+                  {this.renderStatusColumns()}
+                </div>
+                <div
+                  className="c7n-scrumboard-content"
+                  style={{
+                    height: this.renderHeight(),
+                    paddingBottom: 83,
+                  }}
+                >
+                  {this.renderSwimlane()}
+                  {ScrumBoardStore.getCurrentSprint ? (
+                    <div className="c7n-scrumboard-others">
+                      <div className="c7n-scrumboard-otherHeader">
+                        <Icon 
+                          style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
+                          type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+                          role="none"
+                          onClick={() => {
+                            this.setState({
+                              expand: !this.state.expand,
+                            });
+                          }}
+                        />
+                        {this.renderOthersTitle()}
+                      </div>
+                      <div
+                        className="c7n-scrumboard-otherContent"
+                        style={{
+                          display: this.state.expand ? 'flex' : 'none',
+                        }}
+                      >
+                        <DragDropContext 
+                          onDragEnd={this.handleDragEnd.bind(this)}
+                          onDragStart={(start) => {
+                            ScrumBoardStore.setDragStartItem(start);
+                          }}
+                        >
+                          {this.renderIssueColumns()}
+                        </DragDropContext>
+                      </div>
+                    </div>
+                  ) : (
                     <div
                       style={{
-                        marginLeft: 40,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: '80px',
                       }}
                     >
-                      <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
-                      <p style={{ fontSize: 20, lineHeight: '34px' }}>在<span style={{ color: '#3f51b5' }}>待办事项</span>中开始Sprint</p>
+                      <img style={{ width: 170 }} src={EmptyScrumboard} alt="emptyscrumboard" />
+                      <div
+                        style={{
+                          marginLeft: 40,
+                        }}
+                      >
+                        <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
+                        <p style={{ fontSize: 20, lineHeight: '34px' }}>在<span style={{ color: '#3f51b5' }}>待办事项</span>中开始Sprint</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            </Spin>
           </div>
           <IssueDetail
             visible={JSON.stringify(ScrumBoardStore.getClickIssueDetail) !== '{}'}
@@ -716,6 +752,7 @@ class ScrumBoardHome extends Component {
               style={{ padding: 0 }}
               title={`创建项目“${AppState.currentMenuType.name}”的看板`}
               description="请在下面输入看板名称，创建一个新的board。新的board会默认为您创建'待处理'、'处理中'、'已完成'三个列，同时将todo、doing、done三个类别的状态自动关联入三个列中。"
+              link="http://choerodon.io/zh/docs/user-guide/agile/sprint/create-kanban/"
             >
               <Form>
                 <FormItem>
@@ -729,6 +766,7 @@ class ScrumBoardHome extends Component {
                         width: 512,
                       }}
                       label="看板名称"
+                      maxLength={30}
                     />,
                   )}
                 </FormItem>

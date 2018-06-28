@@ -18,3 +18,10 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
+
+.c7n-scrumboard {
+  .ant-tabs {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}

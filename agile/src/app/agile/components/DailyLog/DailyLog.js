@@ -81,7 +81,7 @@ class CreateSprint extends Component {
   handleCreateDailyLog = () => {
     const { dissipate, startTime } = this.state;
     if (typeof dissipate === 'undefined' || dissipate === '' || startTime == null) {
-      message.warning('请输入预计时间和耗费时间');
+      message.warning('请输入耗费时间和工作日期');
       return;
     }
     this.setState({ createLoading: true });
@@ -115,7 +115,7 @@ class CreateSprint extends Component {
         this.props.onOk();
       })
       .catch((error) => {
-        window.console.log('创建工作日志失败');
+        window.console.error('创建工作日志失败');
       });
   };
 
@@ -204,7 +204,7 @@ class CreateSprint extends Component {
           <h2 className="c7n-space-first">{`登记"${this.props.issueNum}"的工作日志`}</h2>
           <p>
             您可以在这里记录您的工作，花费的时间会在关联问题中预估时间进行扣减，以便更精确地计算问题进度和提升工作效率。
-            {/* <a href="http://c7n.saas.hand-china.com/docs/devops/develop/" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
+            {/* <a href="#" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
               <span className="c7n-external-link-content">
               了解详情
               </span>
@@ -231,9 +231,9 @@ class CreateSprint extends Component {
                 )}
               </Select>
             </div>
-            <div className="dataPicker" style={{ marginBottom: 32, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-              <p style={{ fontSize: '12px', transform: 'scale(0.8)', color: 'rgba(0, 0, 0, 0.54)', position: 'absolute', left: -5 }}>开始时间*</p>
-              <div style={{ marginTop: 20, width: 220, borderBottom: '1px solid rgba(0, 0, 0, 0.54)', paddingBottom: 3 }}>
+            <div className="dataPicker" style={{ width: 218, marginBottom: 32, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+              <p style={{ fontSize: '12px', transform: 'scale(0.8)', color: 'rgba(0, 0, 0, 0.54)', position: 'absolute', left: -5 }}>工作日期*</p>
+              <div style={{ marginTop: 20, width: 220, paddingBottom: 3 }}>
                 <DatePicker
                   value={this.state.startTime}
                   // value={this.transTime(this.state.startTime)}
@@ -294,7 +294,15 @@ class CreateSprint extends Component {
 
             <div className="c7n-sidebar-info">
               <div>
-                <div style={{ marginBottom: '16px', fontWeight: 'bold' }}>工作说明</div>
+                <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
+                  <div style={{ fontWeight: 'bold' }}>工作说明</div>
+                  <div style={{ marginLeft: '80px' }}>
+                    <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
+                      <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: '12px' }} />
+                      <span style={{ color: '#3f51b5' }}>全屏编辑</span>
+                    </Button>
+                  </div>
+                </div>
                 {
                   !this.state.edit && (
                     <div className="clear-p-mw">
@@ -308,11 +316,6 @@ class CreateSprint extends Component {
                     </div>
                   )
                 }
-                <div style={{ marginTop: '23px', marginBottom: '16px' }}>
-                  <Button type="primary" funcType="flat" onClick={() => this.setState({ edit: true })}>
-                    全屏编辑
-                  </Button>
-                </div>
               </div>
             </div> 
           </section>

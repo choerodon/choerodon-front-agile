@@ -1,33 +1,9 @@
 .choerodon-modal-createSprint {
   .dataPicker {
     .ant-calendar-picker {
-      width: 220px;
-
-      .ant-calendar-picker-icon {
-        position: absolute;
-        right: 0;
-        top: 6px;
-        color: rgba(0, 0, 0, 0.65);
-      }
-
-      .ant-calendar-picker-clear {
-        right: 20px;
-        top: 6px;
-        width: 20px;
-        height: 20px;
-        background: #eee;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 20px;
-      }
-
-      .ant-calendar-picker-clear::before {
-        content: "\E5CD";
-        font-size: 12px;
-        color: rgba(0, 0, 0, 0.65);
-        line-height: 1;
-      }
+      width: 100%;
     }
+
   }
 
   .select-noBorder {
