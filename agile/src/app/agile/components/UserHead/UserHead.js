@@ -22,7 +22,7 @@ class UserHead extends Component {
         return str[i];
       }
     }
-    return '';
+    return str[0];
   }
 
   render() {

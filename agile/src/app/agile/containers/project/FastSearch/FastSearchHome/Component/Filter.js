@@ -472,13 +472,10 @@ class AddComponent extends Component {
       // time
       // return data picker
       return (
-        <div style={{ width: 300 }}>
-          <div style={{ height: 16, color: 'rgba(0, 0, 0, 0.6)', transform: 'scale(0.75)translateX(-50px)translateY(-3px) ' }}>值<span style={{ color: 'red' }}>*</span></div>
-          <DatePicker
-            format={'YYYY-MM-DD HH:mm:ss'}
-            showTime
-          />
-        </div>
+        <DatePicker
+          format={'YYYY-MM-DD HH:mm:ss'}
+          showTime
+        />
       );
     } else {
       // story points && remainning time
@@ -571,7 +568,15 @@ class AddComponent extends Component {
                               message: '属性不可为空',
                             }],
                           })(
-                            <Select label="属性">
+                            <Select
+                              label="属性"
+                              onChange={() => {
+                                this.props.form.setFieldsValue({
+                                  [`filter-${index}-rule`]: undefined,
+                                  [`filter-${index}-value`]: undefined,
+                                });
+                              }}
+                            >
                               {
                                 this.state.quickFilterFiled.map(v => (
                                   <Option key={v.fieldCode} value={v.fieldCode}>{v.name}</Option>

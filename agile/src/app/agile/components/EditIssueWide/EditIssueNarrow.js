@@ -823,7 +823,7 @@ class CreateSprint extends Component {
         }}
         i={i}
         onOpen={(issueId, linkedIssueId) => {
-          this.reloadIssue(issueId === this.state.origin.issueId ? linkedIssueId : issueId);
+          this.reloadIssue(issue.issueId);
         }}
         onRefresh={() => {
           this.reloadIssue(this.state.origin.issueId);
@@ -840,6 +840,9 @@ class CreateSprint extends Component {
           typeCode: link.typeCode,
         }}
         i={i}
+        onOpen={(issueId, linkedIssueId) => {
+          this.reloadIssue(issueId === this.state.origin.issueId ? linkedIssueId : issueId);
+        }}
         onRefresh={() => {
           this.reloadIssue(this.state.origin.issueId);
         }}
@@ -2028,8 +2031,9 @@ class CreateSprint extends Component {
                           <div className="c7n-property-wrapper">
                             <span className="c7n-property">报告人：</span>
                           </div>
-                          <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center' }}>
+                          <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                             <ReadAndEdit
+                              style={{ marginBottom: 5 }}
                               callback={this.changeRae.bind(this)}
                               thisType="reporterId"
                               current={this.state.currentRae}
@@ -2117,6 +2121,7 @@ class CreateSprint extends Component {
                                 cursor: 'pointer',
                                 marginTop: '-5px',
                                 display: 'inline-block',
+                                marginBottom: 5,
                               }}
                               onClick={() => {
                                 getSelf().then((res) => {
@@ -2140,8 +2145,9 @@ class CreateSprint extends Component {
                           <div className="c7n-property-wrapper">
                             <span className="c7n-property">经办人：</span>
                           </div>
-                          <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center' }}>
+                          <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                             <ReadAndEdit
+                              style={{ marginBottom: 5 }}
                               callback={this.changeRae.bind(this)}
                               thisType="assigneeId"
                               current={this.state.currentRae}
@@ -2229,6 +2235,7 @@ class CreateSprint extends Component {
                                 cursor: 'pointer',
                                 marginTop: '-5px',
                                 display: 'inline-block',
+                                marginBottom: 5,
                               }}
                               onClick={() => {
                                 getSelf().then((res) => {

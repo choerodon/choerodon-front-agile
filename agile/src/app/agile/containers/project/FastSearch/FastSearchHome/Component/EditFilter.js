@@ -774,7 +774,15 @@ class AddComponent extends Component {
                             }],
                             initialValue: this.state.arr[index].fieldCode,
                           })(
-                            <Select label="属性">
+                            <Select
+                              label="属性"
+                              onChange={() => {
+                                this.props.form.setFieldsValue({
+                                  [`filter-${index}-rule`]: undefined,
+                                  [`filter-${index}-value`]: undefined,
+                                });
+                              }}
+                            >
                               {
                                 this.state.quickFilterFiled.map(v => (
                                   <Option key={v.fieldCode} value={v.fieldCode}>{v.name}</Option>
