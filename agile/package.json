@@ -3,7 +3,7 @@
   "description": "agile",
   "author": "isaac&&Qyellow",
   "license": "Apache 2.0",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "main": "src/app/agile/containers/AGILEIndex.js",
   "scripts": {
     "start": "choerodon-front-boot start --config ../config.js",
