@@ -37,8 +37,7 @@ class UserHead extends Component {
       >
         {
           this.props.type === 'datalog' ? (
-            <Avatar
-              shape="square"
+            <div
               style={{
                 width: 40,
                 height: 40,
@@ -51,12 +50,19 @@ class UserHead extends Component {
                 textAlign: 'center',
                 borderRadius: 4,
               }}
-              src={user.avatar}
             >
-              {this.getFirst(user.realName)}
-            </Avatar>
+              {
+                user.avatar ? (
+                  <img src={user.avatar} alt="" style={{ width: '100%' }} />
+                ) : (
+                  <span style={{ width: 40, height: 40, lineHeight: '40px', textAlign: 'center', color: '#fff', fontSize: '12px' }}>
+                    {this.getFirst(user.realName)}
+                  </span>
+                )
+              }
+            </div>
           ) : (
-            <Avatar
+            <div
               style={{
                 width: 18,
                 height: 18,
@@ -68,11 +74,19 @@ class UserHead extends Component {
                 alignItems: 'center',
                 marginRight: 5,
                 textAlign: 'center',
+                borderRadius: '50%',
               }}
-              src={user.avatar}
             >
-              {this.getFirst(user.realName)}
-            </Avatar>
+              {
+                user.avatar ? (
+                  <img src={user.avatar} alt="" style={{ width: '100%' }} />
+                ) : (
+                  <span style={{ width: 18, height: 18, lineHeight: '18px', textAlign: 'center', color: '#6473c3' }}>
+                    {this.getFirst(user.realName)}
+                  </span>
+                )
+              }
+            </div>
           )
         }
         {

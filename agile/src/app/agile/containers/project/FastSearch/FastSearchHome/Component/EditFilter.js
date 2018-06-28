@@ -4,6 +4,7 @@ import { Content, stores, axios } from 'choerodon-front-boot';
 import moment from 'moment';
 import _ from 'lodash';
 import { NumericInput } from '../../../../../components/CommonComponent';
+import './Filter.scss';
 
 const { Sidebar } = Modal;
 const { TextArea } = Input;
@@ -130,13 +131,13 @@ class AddComponent extends Component {
       },
     };
     axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`).then(res => this.setState({ originUsers: res.content }));
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/lookup_values/priority`).then(res => this.setState({ originPriorities: res.lookupValues }));
-    axios.get(`/agile/v1/project/${AppState.currentMenuType.id}/issue_status/list`).then(res => this.setState({ originStatus: res }));
-    axios.get(`/agile/v1/project/${projectId}/issues/epics/select_data`).then(res => this.setState({ originEpics: res }));
-    axios.post(`/agile/v1/project/${projectId}/sprint/names`).then(res => this.setState({ originSprints: res }));
-    axios.get(`/agile/v1/project/${projectId}/issue_labels`).then(res => this.setState({ originLabels: res }));
-    axios.get(`/agile/v1/project/${projectId}/component`).then(res => this.setState({ originComponents: res }));
-    axios.post(`/agile/v1/project/${projectId}/product_version/names`).then(res => this.setState({ originVersions: res }));
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`).then(res => this.setState({ originPriorities: res.lookupValues }));
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`).then(res => this.setState({ originStatus: res }));
+    axios.get(`/agile/v1/projects/${projectId}/issues/epics/select_data`).then(res => this.setState({ originEpics: res }));
+    axios.post(`/agile/v1/projects/${projectId}/sprint/names`).then(res => this.setState({ originSprints: res }));
+    axios.get(`/agile/v1/projects/${projectId}/issue_labels`).then(res => this.setState({ originLabels: res }));
+    axios.get(`/agile/v1/projects/${projectId}/component`).then(res => this.setState({ originComponents: res }));
+    axios.post(`/agile/v1/projects/${projectId}/product_version/names`).then(res => this.setState({ originVersions: res }));
     this.setState({
       originTypes: [
         {
@@ -710,7 +711,7 @@ class AddComponent extends Component {
     const { getFieldDecorator } = this.props.form;
     return (
       <Sidebar
-        className="c7n-component-component"
+        className="c7n-filter"
         title="修改快速搜索"
         okText="修改"
         cancelText="取消"

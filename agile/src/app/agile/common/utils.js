@@ -87,6 +87,28 @@ export function beforeTextUpload(text, data, func, pro = 'description') {
   }
 }
 
+export function returnBeforeTextUpload(text, data, func, pro = 'description') {
+  const deltaOps = text;
+  const send = data;
+  const { imgBase, formData } = getImgInDelta(deltaOps);
+  if (imgBase.length) {
+    uploadImage(formData).then((imgUrlList) => {
+      replaceBase64ToUrl(imgUrlList, imgBase, deltaOps);
+      const converter = new QuillDeltaToHtmlConverter(deltaOps, {});
+      const html = converter.convert();
+      // send.gitlabDescription = html;
+      send[pro] = JSON.stringify(deltaOps);
+      return func(send);
+    });
+  } else {
+    const converter = new QuillDeltaToHtmlConverter(deltaOps, {});
+    const html = converter.convert();
+    // send.gitlabDescription = html;
+    send[pro] = JSON.stringify(deltaOps);
+    return func(send);
+  }
+}
+
 /**
  * 适用于富文本附件上传以及回调
  * @param {any []} propFileList 文件列表

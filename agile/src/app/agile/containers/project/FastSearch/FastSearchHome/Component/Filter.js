@@ -3,6 +3,7 @@ import { Modal, Form, Input, Select, message, Icon, Button, DatePicker } from 'c
 import { Content, stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
 import { NumericInput } from '../../../../../components/CommonComponent';
+import './Filter.scss';
 
 const { Sidebar } = Modal;
 const { TextArea } = Input;
@@ -404,6 +405,7 @@ class AddComponent extends Component {
       return (
         <Select
           label="关系"
+          style={['in', 'notIn'].indexOf(this.props.form.getFieldValue(`filter-${index}-prop`)) > -1 ? { marginTop: 8 } : {}}
           onChange={() => {
             const str = `filter-${index}-value`;
             this.props.form.setFieldsValue({
@@ -472,10 +474,13 @@ class AddComponent extends Component {
       // time
       // return data picker
       return (
-        <DatePicker
-          format={'YYYY-MM-DD HH:mm:ss'}
-          showTime
-        />
+        <div style={{ width: 300 }}>
+          <div style={{ height: 16, color: 'rgba(0, 0, 0, 0.6)', transform: 'scale(0.75)translateX(-50px)translateY(-3px) ' }}>值<span style={{ color: 'red' }}>*</span></div>
+          <DatePicker
+            format={'YYYY-MM-DD HH:mm:ss'}
+            showTime
+          />
+        </div>
       );
     } else {
       // story points && remainning time
@@ -495,7 +500,7 @@ class AddComponent extends Component {
         return (
           <NumericInput
             label="值"
-            style={{ lineHeight: '22px', marginBottom: 0, width: 100 }}
+            style={{ lineHeight: '22px', marginBottom: 0, width: 300 }}
           />
         );
       }
@@ -506,7 +511,7 @@ class AddComponent extends Component {
     const { getFieldDecorator } = this.props.form;
     return (
       <Sidebar
-        className="c7n-component-component"
+        className="c7n-filter"
         title="创建快速搜索"
         okText="创建"
         cancelText="取消"

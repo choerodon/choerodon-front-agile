@@ -6,62 +6,27 @@ import { Select, Form, Input, Button, Modal, Spin, Icon } from 'choerodon-ui';
 
 import './CreateIssue.scss';
 import '../../containers/main.scss';
-import { UploadButton, NumericInput } from '../CommonComponent';
-import {
-  delta2Html,
-  escape,
-  handleFileUpload,
-  text2Delta,
-  beforeTextUpload,
-} from '../../common/utils';
-import { createLink, loadIssues, createIssue, loadLabels, loadStatus, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics, createSubIssue } from '../../api/NewIssueApi';
-import { getUsers } from '../../api/CommonApi';
-import { COLOR } from '../../common/Constant';
-import WYSIWYGEditor from '../WYSIWYGEditor';
-import FullEditor from '../FullEditor';
-import UserHead from '../UserHead';
+import { createLink, loadIssues } from '../../api/NewIssueApi';
 import TypeTag from '../TypeTag';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
 const { Option } = Select;
 const FormItem = Form.Item;
-const TYPE = {
-  sub_task: '#4d90fe',
-};
-const ICON = {
-  sub_task: 'assignment',
-};
-const NAME = {
-  sub_task: '子任务',
-};
+
 class CreateSprint extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      delta: '',
-      edit: false,
       createLoading: false,
-      fileList: [],
-      sprint: {},
       selectLoading: true,
 
       originIssues: [],
       originLinks: [],
-      originVersions: [],
-      originComponents: [],
-      originEpics: [],
-      originStatus: [],
-      originpriorities: [],
-      originInfluenceVersions: [],
-      originFixVersions: [],
-      originSprints: [],
-      originUsers: [],
 
-      storyPoints: '',
-      storyPointsUnit: 'h',
-      time: '',
-      timeUnit: 'h',
+      active: [],
+      passive: [],
+      show: [],
     };
   }
 
@@ -79,18 +44,38 @@ class CreateSprint extends Component {
           selectLoading: false,
           originLinks: res,
         });
+        this.transform(res);
       });
+  }
+
+  transform(links) {
+    // split active and passive
+    const active = links.map(link => ({
+      name: link.outWard,
+      linkTypeId: link.linkTypeId,
+    }));
+    const passive = links.map(link => ({
+      name: link.inWard,
+      linkTypeId: link.linkTypeId,
+    }));
+    this.setState({
+      active,
+      passive,
+      show: active.concat(passive),
+    });
   }
 
   handleCreateIssue = () => {
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        window.console.log(values);
         const { linkTypeId, issues } = values;
+        const l = linkTypeId;
         const labelIssueRelDTOList = _.map(issues, (issue) => {
           const target = _.find(this.state.originIssues, { issueNum: issue });
           if (target) {
             return ({
-              linkTypeId,
+              linkTypeId: l,
               linkedIssueId: target.issueId,
             });
           } else {
@@ -98,12 +83,12 @@ class CreateSprint extends Component {
           }
         });
 
-        this.setState({ createLoading: true });
-        createLink(this.props.issueId, labelIssueRelDTOList)
-          .then((res) => {
-            this.setState({ createLoading: false });
-            this.props.onOk();
-          });
+        // this.setState({ createLoading: true });
+        // createLink(this.props.issueId, labelIssueRelDTOList)
+        //   .then((res) => {
+        //     this.setState({ createLoading: false });
+        //     this.props.onOk();
+        //   });
         
         // this.props.onOk(extra);
       }
@@ -113,12 +98,6 @@ class CreateSprint extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const { initValue, visible, onCancel, onOk } = this.props;
-    const callback = (value) => {
-      this.setState({
-        delta: value,
-        edit: false,
-      });
-    };
 
     return (
       <Sidebar
@@ -143,22 +122,23 @@ class CreateSprint extends Component {
             </a> */}
           </p>
           <Form layout="vertical">
-            <FormItem label="关系" style={{ width: '512px' }}>
+            <FormItem label="关系" style={{ width: 520 }}>
               {getFieldDecorator('linkTypeId', {})(
                 <Select
                   label="关系"
+                  labelInValue
                   loading={this.state.selectLoading}
                 >
-                  {this.state.originLinks.map(link =>
+                  {this.state.show.map(link =>
                     (<Option key={link.linkTypeId} value={link.linkTypeId}>
-                      {link.inWard}
+                      {link.name}
                     </Option>),
                   )}
                 </Select>,
               )}
             </FormItem>
 
-            <FormItem label="问题" style={{ width: '512px' }}>
+            <FormItem label="问题" style={{ width: 520 }}>
               {getFieldDecorator('issues', {})(
                 <Select
                   label="问题"

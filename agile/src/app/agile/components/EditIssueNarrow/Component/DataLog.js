@@ -114,7 +114,14 @@ class DataLog extends Component {
                           <span style={{ fontWeight: 'bold' }}>
                             {` ${PROP[datalog.field] || datalog.field} `}
                           </span>
-                    由 {datalog.oldString || '无'} 改为 {datalog.newString || '无'}
+                    由 
+                          <span style={{ fontWeight: 'bold', paddingLeft: 5, paddingRight: 5 }}>
+                            {datalog.oldString || '无'}
+                          </span>
+                    改为
+                          <span style={{ fontWeight: 'bold', paddingLeft: 5, paddingRight: 5 }}>
+                            {datalog.newString || '无'}
+                          </span>
                         </div>
                       ) : (
                         <div style={{ display: 'inline' }}>
