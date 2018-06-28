@@ -46,7 +46,7 @@ choerodon.io/logs-parser: {{ .Values.logs.parser | quote }}
 --- | --- 
 preJob.preConfig.mysql{}|初始化配置所需manager_service数据库信息
 env.open.PRO_API_HOST|api地址
-env.open.PRO_DEVOPS_HOST|devops service地址
+env.open.PRO_AGILE_HOST|agile file service地址
 env.open.PRO_CLIENT_ID|client id
 env.open.PRO_TITLE_NAME|页面显示标题
 env.open.PRO_HEADER_TITLE_NAME|页面header标题
