@@ -18,13 +18,21 @@ class CombineRelease extends Component {
       sourceList: [],
     };
   }
-  componentWillMount() {
-    ReleaseStore.axiosGetVersionListWithoutPage().then((res) => {
-      this.setState({
-        sourceList: res,
-      });
-    }).catch((error) => {
-      window.console.log(error);
+  // componentWillMount() {
+  //   ReleaseStore.axiosGetVersionListWithoutPage().then((res) => {
+  //     this.setState({
+  //       sourceList: res,
+  //     });
+  //   }).catch((error) => {
+  //     window.console.log(error);
+  //   });
+  // }
+  componentDidMount() {
+    this.props.onRef();
+  }
+  changeState(data) {
+    this.setState({
+      sourceList: data,
     });
   }
   handleCombine(e) {
@@ -93,7 +101,7 @@ class CombineRelease extends Component {
                   mode="tags"
                   label="合并版本"
                 >
-                  {this.state.sourceList.length > 0 ? this.state.sourceList.map(item => (
+                  {this.props.sourceList.length > 0 ? this.props.sourceList.map(item => (
                     <Option value={String(item.versionId)}>{item.name}</Option>
                   )) : ''}
                 </Select>,
@@ -109,7 +117,7 @@ class CombineRelease extends Component {
                 <Select
                   label="合并至版本"
                 >
-                  {this.state.sourceList.length > 0 ? this.state.sourceList.map(item => (
+                  {this.props.sourceList.length > 0 ? this.props.sourceList.map(item => (
                     <Option
                       value={String(item.versionId)}
                     >{item.name}</Option>

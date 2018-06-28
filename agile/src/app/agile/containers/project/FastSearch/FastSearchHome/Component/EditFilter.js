@@ -165,7 +165,7 @@ class AddComponent extends Component {
       assignee: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       priority: ['=', '!=', 'in', 'notIn'],
       issue_type: ['=', '!=', 'in', 'notIn'],
-      status: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      status: ['=', '!=', 'in', 'notIn'],
       reporter: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       created_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       last_updated_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
@@ -220,21 +220,21 @@ class AddComponent extends Component {
         prop: 'content',
         id: 'id',
         name: 'realName',
-        state: 'originStatus',
+        state: 'originUsers',
       },
       created_user: {
         url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
         prop: 'content',
         id: 'id',
         name: 'realName',
-        state: 'originStatus',
+        state: 'originUsers',
       },
       last_updated_user: {
         url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
         prop: 'content',
         id: 'id',
         name: 'realName',
-        state: 'originStatus',
+        state: 'originUsers',
       },
       epic: {
         url: `/agile/v1/projects/${projectId}/issues/epics/select_data`,
@@ -326,7 +326,7 @@ class AddComponent extends Component {
         });
       }
     } else {
-      if (operation === 'in' || operation === 'notIn') {
+      if (operation === 'in' || operation === 'notIn' || operation === 'not in') {
         const arr = value.slice(1, -1).split(',');
         return arr.map(v => ({
           key: v * 1,
@@ -508,21 +508,21 @@ class AddComponent extends Component {
         prop: 'content',
         id: 'id',
         name: 'realName',
-        state: 'originStatus',
+        state: 'originUsers',
       },
       created_user: {
         url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
         prop: 'content',
         id: 'id',
         name: 'realName',
-        state: 'originStatus',
+        state: 'originUsers',
       },
       last_updated_user: {
         url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
         prop: 'content',
         id: 'id',
         name: 'realName',
-        state: 'originStatus',
+        state: 'originUsers',
       },
       epic: {
         url: `/agile/v1/projects/${projectId}/issues/epics/select_data`,
@@ -774,7 +774,15 @@ class AddComponent extends Component {
                             }],
                             initialValue: this.state.arr[index].fieldCode,
                           })(
-                            <Select label="属性">
+                            <Select
+                              label="属性"
+                              onChange={() => {
+                                this.props.form.setFieldsValue({
+                                  [`filter-${index}-rule`]: undefined,
+                                  [`filter-${index}-value`]: undefined,
+                                });
+                              }}
+                            >
                               {
                                 this.state.quickFilterFiled.map(v => (
                                   <Option key={v.fieldCode} value={v.fieldCode}>{v.name}</Option>

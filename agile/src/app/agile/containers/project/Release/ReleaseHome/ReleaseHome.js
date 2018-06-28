@@ -40,6 +40,7 @@ class ReleaseHome extends Component {
       selectChose: null,
       combineVisible: false,
       loading: false,
+      sourceList: [],
     };
   }
   componentWillMount() {
@@ -147,6 +148,16 @@ class ReleaseHome extends Component {
       pageSize: pagination.pageSize,
     });
   }
+  handleCombineRelease() {
+    ReleaseStore.axiosGetVersionListWithoutPage().then((res) => {
+      this.setState({
+        combineVisible: true,
+        sourceList: res,
+      });
+    }).catch((error) => {
+      window.console.log(error);
+    });
+  }
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -247,11 +258,7 @@ class ReleaseHome extends Component {
             <Button 
               className="leftBtn2" 
               funcTyp="flat"
-              onClick={() => {
-                this.setState({
-                  combineVisible: true,
-                });
-              }}
+              onClick={this.handleCombineRelease.bind(this)}
             >
               <Icon type="device_hub" />版本合并
             </Button>
@@ -335,6 +342,10 @@ class ReleaseHome extends Component {
             </div>
           </Modal>
           <CombineRelease
+            onRef={(ref) => {
+              this.combineRelease = ref;
+            }}
+            sourceList={this.state.sourceList}
             visible={this.state.combineVisible}
             onCancel={() => {
               this.setState({

@@ -44,16 +44,6 @@ class Issue extends Component {
     IssueStore.init();
   }
 
-  getFirst(str) {
-    const re = /[\u4E00-\u9FA5]/g;
-    for (let i = 0, len = str.length; i < len; i += 1) {
-      if (re.test(str[i])) {
-        return str[i];
-      }
-    }
-    return '';
-  }
-
   handleCreateIssue(issueObj) {
     this.setState({ create: false });
     IssueStore.init();

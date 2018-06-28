@@ -12,13 +12,16 @@ class SprintIssue extends Component {
     this.state = {};
   }
   getFirst(str) {
+    if (!str) {
+      return '';
+    }
     const re = /[\u4E00-\u9FA5]/g;
     for (let i = 0, len = str.length; i < len; i += 1) {
       if (re.test(str[i])) {
         return str[i];
       }
     }
-    return '';
+    return str[0];
   }
   renderPriorityStyle(type, item) {
     if (type === 'color') {
@@ -313,7 +316,7 @@ class SprintIssue extends Component {
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {item.storyPoints ? (
+                      {item.storyPoints && item.typeCode === 'story' ? (
                         <Tooltip title={`故事点: ${item.storyPoints}`}>
                           <div label="sprintIssue" className="c7n-backlog-sprintIssueStoryPoint">{item.storyPoints}</div>
                         </Tooltip>

@@ -1994,8 +1994,9 @@ class CreateSprint extends Component {
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">报告人：</span>
                         </div>
-                        <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center' }}>
+                        <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                           <ReadAndEdit
+                            style={{ marginBottom: 5 }}
                             callback={this.changeRae.bind(this)}
                             thisType="reporterId"
                             current={this.state.currentRae}
@@ -2083,6 +2084,7 @@ class CreateSprint extends Component {
                               cursor: 'pointer',
                               marginTop: '-5px',
                               display: 'inline-block',
+                              marginBottom: 5,
                             }}
                             onClick={() => {
                               getSelf().then((res) => {
@@ -2106,8 +2108,9 @@ class CreateSprint extends Component {
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">经办人：</span>
                         </div>
-                        <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center' }}>
+                        <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                           <ReadAndEdit
+                            style={{ marginBottom: 5 }}
                             callback={this.changeRae.bind(this)}
                             thisType="assigneeId"
                             current={this.state.currentRae}
@@ -2195,6 +2198,7 @@ class CreateSprint extends Component {
                               cursor: 'pointer',
                               marginTop: '-5px',
                               display: 'inline-block',
+                              marginBottom: 5,
                             }}
                             onClick={() => {
                               getSelf().then((res) => {

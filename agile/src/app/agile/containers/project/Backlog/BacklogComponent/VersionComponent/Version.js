@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import { Modal, Form, Input, DatePicker, Icon } from 'choerodon-ui';
-import { Content, stores } from 'choerodon-front-boot';
+import { Content, stores, Permission } from 'choerodon-front-boot';
 import moment from 'moment';
 import ReleaseStore from '../../../../../stores/project/release/ReleaseStore';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
@@ -62,6 +62,8 @@ class Version extends Component {
     return result;
   }
   render() {
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <div 
         className={this.props.visible ? 'c7n-backlog-version' : ''}
@@ -87,15 +89,17 @@ class Version extends Component {
                     display: this.state.hoverBlockButton ? 'flex' : 'none',
                   }}
                 >
-                  <p
-                    style={{ color: '#3F51B5', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                    role="none"
-                    onClick={() => {
-                      this.setState({
-                        addVersion: true,
-                      });
-                    }}
-                  >创建版本</p>
+                  <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
+                    <p
+                      style={{ color: '#3F51B5', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                      role="none"
+                      onClick={() => {
+                        this.setState({
+                          addVersion: true,
+                        });
+                      }}
+                    >创建版本</p>
+                  </Permission>
                   <Icon 
                     type="close"
                     role="none"

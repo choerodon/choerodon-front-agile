@@ -124,7 +124,7 @@ class CreateSprint extends Component {
           <h2 className="c7n-space-first">对问题创建链接</h2>
           <p>
             请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。
-            {/* <a href="http://c7n.saas.hand-china.com/docs/devops/develop/" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
+            {/* <a href="#" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
               <span className="c7n-external-link-content">
               了解详情
               </span>

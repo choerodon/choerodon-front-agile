@@ -359,10 +359,10 @@ class BacklogHome extends Component {
     return (
       <Page>
         <Header title="待办事项">
-          <Button className="leftBtn" funcTyp="flat" onClick={this.handleCreateSprint.bind(this)}>
+          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint.bind(this)}>
             <Icon type="playlist_add" />创建冲刺
           </Button>
-          <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this)}>
+          <Button className="leftBtn2" functyp="flat" onClick={this.refresh.bind(this)}>
             <Icon type="refresh" />刷新
           </Button>
         </Header>

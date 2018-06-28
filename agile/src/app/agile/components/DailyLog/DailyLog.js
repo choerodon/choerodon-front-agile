@@ -204,7 +204,7 @@ class CreateSprint extends Component {
           <h2 className="c7n-space-first">{`登记"${this.props.issueNum}"的工作日志`}</h2>
           <p>
             您可以在这里记录您的工作，花费的时间会在关联问题中预估时间进行扣减，以便更精确地计算问题进度和提升工作效率。
-            {/* <a href="http://c7n.saas.hand-china.com/docs/devops/develop/" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
+            {/* <a href="#" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
               <span className="c7n-external-link-content">
               了解详情
               </span>
