@@ -361,7 +361,7 @@ class SprintItem extends Component {
     const data = BacklogStore.getSprintData.sprintData;
     const ifBacklog = this.props.backlog;
     return (
-      <div id={this.props.index === data.length - 1 ? 'sprint_last' : undefined}>
+      <div key={Math.random()} id={this.props.index === data.length - 1 ? 'sprint_last' : undefined}>
         <div className="c7n-backlog-sprintTop">
           <div className="c7n-backlog-springTitle">
             <div className="c7n-backlog-sprintTitleSide">
@@ -435,6 +435,7 @@ class SprintItem extends Component {
                           <p>{ass2.issueCount} 问题</p>
                         </div>
                       )}
+                      key={Math.random()}
                     >
                       {/* <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ? 
                       ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div> */}

@@ -359,10 +359,10 @@ class BacklogHome extends Component {
     return (
       <Page>
         <Header title="待办事项">
-          <Button className="leftBtn" funcTyp="flat" onClick={this.handleCreateSprint.bind(this)}>
+          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint.bind(this)}>
             <Icon type="playlist_add" />创建冲刺
           </Button>
-          <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this)}>
+          <Button className="leftBtn2" functyp="flat" onClick={this.refresh.bind(this)}>
             <Icon type="refresh" />刷新
           </Button>
         </Header>
@@ -392,6 +392,7 @@ class BacklogHome extends Component {
                 ScrumBoardStore.getQuickSearchList.length > 0 ?
                   ScrumBoardStore.getQuickSearchList.map(item => (
                     <p
+                      key={Math.random()}
                       className="c7n-backlog-filter"
                       style={{
                         background: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',

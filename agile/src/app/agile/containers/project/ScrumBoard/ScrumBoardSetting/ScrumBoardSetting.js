@@ -116,7 +116,7 @@ class ScrumBoardSetting extends Component {
             <span>刷新</span>
           </Button>
         </Header>
-        <Content style={{ height: '100%', paddingTop: 0 }}>
+        <Content className="c7n-scrumboard" style={{ height: '100%', paddingTop: 0 }}>
           <Tabs style={{ display: 'flex', flexDirection: 'column', height: '100%' }} defaultActiveKey="1">
             <TabPane tab="列配置" key="1">
               <Spin spinning={this.state.loading}>
