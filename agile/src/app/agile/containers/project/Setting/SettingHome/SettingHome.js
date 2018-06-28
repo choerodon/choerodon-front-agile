@@ -28,7 +28,7 @@ class SettingHome extends Component {
         <Content
           title="设置"
           description="根据项目需求，可以分拆为多个模块，每个模块可以进行负责人划分。配置后可以将项目中的问题归类到对应的模块中。例如“后端任务”，“基础框架”等等。"
-          link="#"
+          // link="#"
         >
           <Tabs defaultActiveKey="1">
             <TabPane tab="项目设置" key="1">

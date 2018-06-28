@@ -115,15 +115,6 @@ class UploadButton extends React.Component {
           this.props.onRemove(newFileList);
         }
       },
-      // onChange: (file) => {
-      //   const newFileList = fileList.slice();
-      //   newFileList.push(file);
-      //   window.console.log(file);
-      //   this.props.onChange(newFileList);
-      // },
-      // onPreview: (file) => {
-      //   this.props.onPreview(file);
-      // },
     };
     return (
       <Upload {...props} fileList={fileList} className="upload-button">

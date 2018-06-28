@@ -57,9 +57,3 @@
         sort: 9
         permission:
           - 'agile-service.issue-link-type.updateIssueLinkType'
-    - "status":
-        icon: directions_run
-        Routes: /agile/status
-        sort: 10
-        permission:
-          - 'agile-service.issue-status.deleteStatus'

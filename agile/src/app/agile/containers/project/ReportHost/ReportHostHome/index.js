@@ -58,7 +58,7 @@ class ReportHostHome extends Component {
         <Content
           title="所有报告"
           description="这里会根据您项目的进展情况以多个维度直观地记录和展示您项目、迭代、版本、进度等汇总情况。点击您需要查看的报告类型可以查看具体的详细内容。"
-          link="#"
+          // link="#"
         >
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {

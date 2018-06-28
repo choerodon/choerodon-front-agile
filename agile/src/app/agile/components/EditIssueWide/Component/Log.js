@@ -28,7 +28,6 @@ class Log extends Component {
   }
 
   cancel(e) {
-    window.console.log('cancle');
   }
 
   handleDeleteLog(logId) {

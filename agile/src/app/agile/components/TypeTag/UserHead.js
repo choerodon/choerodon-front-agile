@@ -7,7 +7,7 @@ const ICON = {
   bug: 'bug_report',
   task: 'assignment',
   issue_epic: 'priority',
-  sub_task: 'sutask',
+  sub_task: 'relation',
 };
 
 const TYPE = {

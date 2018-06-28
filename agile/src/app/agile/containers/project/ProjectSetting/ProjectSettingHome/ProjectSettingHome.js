@@ -107,7 +107,7 @@ class ProjectSetting extends Component {
         <Content
           title="项目设置"
           description="项目编码用于问题编号的前缀，如无特殊需求，不建议频繁修改。"
-          link="#"
+          // link="#"
         >
           <div style={{ marginTop: 8 }}>
             <Form layout="vertical">

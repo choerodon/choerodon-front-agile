@@ -44,7 +44,6 @@ class ReleaseDetail extends Component {
         data: ReportStore.chartData.xAxis.slice(),
         axisLabel: {
           formatter(value, index) {
-            window.console.log();
             return `${value.split(' ')[0]}\n${value.split(' ')[1]}`;
           },
         },
@@ -256,7 +255,7 @@ class ReleaseDetail extends Component {
         <Content
           title={`迭代冲刺 "${ReportStore.currentSprint.sprintName || ''}" 的冲刺报告`}
           description="了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。"
-          link="#"
+          // link="#"
         >
           <Select
             value={ReportStore.currentSprint.sprintId}

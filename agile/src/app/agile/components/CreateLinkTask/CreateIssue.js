@@ -6,7 +6,7 @@ import { Select, Form, Input, Button, Modal, Spin, Icon } from 'choerodon-ui';
 
 import './CreateIssue.scss';
 import '../../containers/main.scss';
-import { createLink, loadIssues } from '../../api/NewIssueApi';
+import { createLink, loadIssuesInLink } from '../../api/NewIssueApi';
 import TypeTag from '../TypeTag';
 
 const { AppState } = stores;
@@ -54,10 +54,15 @@ class CreateSprint extends Component {
       name: link.outWard,
       linkTypeId: link.linkTypeId,
     }));
-    const passive = links.map(link => ({
-      name: link.inWard,
-      linkTypeId: link.linkTypeId,
-    }));
+    const passive = [];
+    links.forEach((link) => {
+      if (link.inWard !== link.outWard) {
+        passive.push({
+          name: link.inWard,
+          linkTypeId: link.linkTypeId,
+        });
+      }
+    });
     this.setState({
       active,
       passive,
@@ -68,29 +73,34 @@ class CreateSprint extends Component {
   handleCreateIssue = () => {
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        window.console.log(values);
         const { linkTypeId, issues } = values;
-        const l = linkTypeId;
         const labelIssueRelDTOList = _.map(issues, (issue) => {
           const target = _.find(this.state.originIssues, { issueNum: issue });
           if (target) {
-            return ({
-              linkTypeId: l,
-              linkedIssueId: target.issueId,
-            });
+            const currentLinkType = _.find(this.state.originLinks, { linkTypeId: linkTypeId.split('+')[0] * 1 });
+            if (currentLinkType.outWard === linkTypeId.split('+')[1]) {
+              return ({
+                linkTypeId: linkTypeId.split('+')[0] * 1,
+                linkedIssueId: target.issueId,
+                issueId: this.props.issueId,
+              });
+            } else {
+              return ({
+                linkTypeId: linkTypeId.split('+')[0] * 1,
+                issueId: target.issueId,
+                linkedIssueId: this.props.issueId,
+              });
+            }
           } else {
             return {};
           }
         });
-
-        // this.setState({ createLoading: true });
-        // createLink(this.props.issueId, labelIssueRelDTOList)
-        //   .then((res) => {
-        //     this.setState({ createLoading: false });
-        //     this.props.onOk();
-        //   });
-        
-        // this.props.onOk(extra);
+        this.setState({ createLoading: true });
+        createLink(this.props.issueId, labelIssueRelDTOList)
+          .then((res) => {
+            this.setState({ createLoading: false });
+            this.props.onOk();
+          });
       }
     });
   };
@@ -126,11 +136,11 @@ class CreateSprint extends Component {
               {getFieldDecorator('linkTypeId', {})(
                 <Select
                   label="关系"
-                  labelInValue
+                  // labelInValue
                   loading={this.state.selectLoading}
                 >
                   {this.state.show.map(link =>
-                    (<Option key={link.linkTypeId} value={link.linkTypeId}>
+                    (<Option key={`${link.linkTypeId}+${link.name}`} value={`${link.linkTypeId}+${link.name}`}>
                       {link.name}
                     </Option>),
                   )}
@@ -146,15 +156,12 @@ class CreateSprint extends Component {
                   loading={this.state.selectLoading}
                   optionLabelProp="value"
                   filter
+                  filterOption={false}
                   onFilterChange={(input) => {
                     this.setState({
                       selectLoading: true,
                     });
-                    const obj = {
-                      advancedSearchArgs: {},
-                      searchArgs: {},
-                    };
-                    loadIssues(0, 20, obj).then((res) => {
+                    loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
                       this.setState({
                         originIssues: res.content,
                         selectLoading: false,

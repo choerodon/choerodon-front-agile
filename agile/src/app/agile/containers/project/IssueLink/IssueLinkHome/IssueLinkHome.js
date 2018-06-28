@@ -156,7 +156,7 @@ class Link extends Component {
         <Content
           title="问题链接"
           description="通过自定义问题链接，可以帮助您更好的对多个问题进行关联，不再局限于父子任务。"
-          link="#"
+          // link="#"
         >
           <div>
             <Spin spinning={this.state.loading}>

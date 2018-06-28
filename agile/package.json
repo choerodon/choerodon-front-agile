@@ -1,7 +1,7 @@
 {
   "name": "agile",
   "description": "agile",
-  "author": "isaac",
+  "author": "isaac&&Qyellow",
   "license": "Apache 2.0",
   "version": "0.5.2",
   "main": "src/app/agile/containers/AGILEIndex.js",

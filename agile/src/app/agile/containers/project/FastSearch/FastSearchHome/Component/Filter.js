@@ -47,7 +47,6 @@ class AddComponent extends Component {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        window.console.log(values);
         const arr = [];
         const expressQueryArr = [];
         const o = [];
@@ -83,7 +82,6 @@ class AddComponent extends Component {
           quickFilterValueDTOList: arr,
           relationOperations: o,
         };
-        window.console.log(obj);
         this.setState({
           loading: true,
         });
@@ -527,7 +525,7 @@ class AddComponent extends Component {
           }}
           title={`在项目"${AppState.currentMenuType.name}"中创建快速搜索`}
           description="通过定义快速搜索，可以在待办事项和活跃冲刺的快速搜索工具栏生效，帮助您更好的筛选过滤问题面板。"
-          link="#"
+          // link="#"
         >
           <Form layout="vertical">
             <FormItem style={{ width: 520 }}>

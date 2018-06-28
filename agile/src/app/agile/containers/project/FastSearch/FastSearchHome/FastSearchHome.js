@@ -147,7 +147,7 @@ class Search extends Component {
         <Content
           title="快速搜索"
           description="通过定义快速搜索，可以在待办事项和活跃冲刺的快速搜索工具栏生效，帮助您更好的筛选过滤问题面板。"
-          link="#"
+          // link="#"
         >
           <div>
             <Spin spinning={this.state.loading}>

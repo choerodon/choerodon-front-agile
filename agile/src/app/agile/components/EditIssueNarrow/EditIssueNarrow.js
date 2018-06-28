@@ -9,7 +9,7 @@ import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
 import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload } from '../../common/utils';
 import { loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
-import { getCurrentOrg, getSelf, getUsers, getUser } from '../../api/CommonApi';
+import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import DailyLog from '../DailyLog';
@@ -509,6 +509,7 @@ class CreateSprint extends Component {
     const obj = {
       issueId: this.state.issueId,
       objectVersionNumber: this.state.origin.objectVersionNumber,
+      versionType: pros === 'fixVersions' ? 'fix' : 'influence',
     };
     const origin = this.state[originPros];
     let target;
@@ -537,7 +538,8 @@ class CreateSprint extends Component {
         });
       }
     });
-    obj.versionIssueRelDTOList = out.concat(this.state[pros === 'fixVersions' ? 'influenceVersions' : 'fixVersions']);
+    // obj.versionIssueRelDTOList = out.concat(this.state[pros === 'fixVersions' ? 'influenceVersions' : 'fixVersions']);
+    obj.versionIssueRelDTOList = out;
     updateIssue(obj)
       .then((res) => {
         this.reloadIssue();
@@ -819,6 +821,9 @@ class CreateSprint extends Component {
           typeCode: link.typeCode,
         }}
         i={i}
+        onOpen={(issueId, linkedIssueId) => {
+          this.reloadIssue(issueId === this.state.origin.issueId ? linkedIssueId : issueId);
+        }}
         onRefresh={() => {
           this.reloadIssue(this.state.origin.issueId);
         }}
@@ -1034,7 +1039,7 @@ class CreateSprint extends Component {
             <Tooltip placement="right" title="工作日志">
               <li id="LOG-nav" className={`c7n-li ${this.state.nav === 'log' ? 'c7n-li-active' : ''}`}>
                 <Icon
-                  type="content_paste c7n-icon-li"
+                  type="work_log c7n-icon-li"
                   role="none"
                   onClick={() => {
                     this.setState({ nav: 'log' });
@@ -2005,8 +2010,8 @@ class CreateSprint extends Component {
                                 });
                                 getUser(this.state.reporterId).then((res) => {
                                   this.setState({
-                                    reporterId: JSON.stringify(res),
-                                    originUsers: [res],
+                                    reporterId: JSON.stringify(res.content[0]),
+                                    originUsers: [res.content[0]],
                                     flag: 'finish',
                                   });
                                 });
@@ -2117,8 +2122,8 @@ class CreateSprint extends Component {
                                 });
                                 getUser(this.state.assigneeId).then((res) => {
                                   this.setState({
-                                    assigneeId: JSON.stringify(res),
-                                    originUsers: [res],
+                                    assigneeId: JSON.stringify(res.content[0]),
+                                    originUsers: [res.content[0]],
                                     flag: 'finish',
                                   });
                                 });
@@ -2304,7 +2309,7 @@ class CreateSprint extends Component {
                 <div id="log">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
-                      <Icon type="content_paste c7n-icon-title" />
+                      <Icon type="work_log c7n-icon-title" />
                       <span>工作日志</span>
                     </div>
                     <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
@@ -2321,7 +2326,7 @@ class CreateSprint extends Component {
                 <div id="data_log">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
-                      <Icon type="content_paste c7n-icon-title" />
+                      <Icon type="work_log c7n-icon-title" />
                       <span>活动日志</span>
                     </div>
                     <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
@@ -2355,14 +2360,14 @@ class CreateSprint extends Component {
                     <div id="link_task">
                       <div className="c7n-title-wrapper">
                         <div className="c7n-title-left">
-                          <Icon type="filter_none c7n-icon-title" />
-                          <span>问题链接</span>
+                          <Icon type="link c7n-icon-title" />
+                          <span>相关任务</span>
                         </div>
                         <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                           <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
                             <Icon type="playlist_add icon" />
-                            <span>创建链接</span>
+                            <span>创建相关任务</span>
                           </Button>
                         </div>
                       </div>

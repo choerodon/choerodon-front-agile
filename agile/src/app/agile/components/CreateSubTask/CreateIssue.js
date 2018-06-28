@@ -68,8 +68,8 @@ class CreateSprint extends Component {
     loadIssue(this.props.issueId).then((res) => {
       this.setState({
         sprint: {
-          sprintId: res.activeSprint.sprintId,
-          sprintName: res.activeSprint.sprintName || '',
+          sprintId: res.activeSprint ? res.activeSprint.sprintId : undefined,
+          sprintName: res.activeSprint ? res.activeSprint.sprintName || '' : undefined,
         },
       });
     });

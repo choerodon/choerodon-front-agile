@@ -142,7 +142,7 @@ class StatusIssue extends Component {
     } else {
       return (
         <Tooltip title="类型： 子任务">
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="sutask" />
+          <Icon style={{ color: 'white', fontSize: '14px' }} type="relation" />
         </Tooltip>
       );
     }

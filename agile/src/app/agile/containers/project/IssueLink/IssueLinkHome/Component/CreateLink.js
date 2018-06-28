@@ -61,7 +61,7 @@ class CreateLink extends Component {
             width: 512,
           }}
           title={`在项目"${AppState.currentMenuType.name}"中创建问题链接`}
-          description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，创建新模版。"
+          description="通过自定义问题链接，可以帮助您更好的对多个问题进行关联，不再局限于父子任务。"
         >
           <Form layout="vertical">
             <FormItem>
