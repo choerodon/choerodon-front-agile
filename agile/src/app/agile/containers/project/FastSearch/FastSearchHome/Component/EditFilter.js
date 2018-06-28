@@ -165,7 +165,7 @@ class AddComponent extends Component {
       assignee: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       priority: ['=', '!=', 'in', 'notIn'],
       issue_type: ['=', '!=', 'in', 'notIn'],
-      status: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+      status: ['=', '!=', 'in', 'notIn'],
       reporter: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       created_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       last_updated_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
