@@ -22,10 +22,17 @@ class DeleteReleaseWithIssue extends Component {
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps.versionDelInfo.versionNames) {
-      this.setState({
-        influenceTargetVersionId: nextProps.versionDelInfo.versionNames[0].versionId,
-        fixTargetVersionId: nextProps.versionDelInfo.versionNames[0].versionId,
-      });
+      if (nextProps.versionDelInfo.versionNames.length > 0) {
+        this.setState({
+          influenceTargetVersionId: nextProps.versionDelInfo.versionNames[0].versionId,
+          fixTargetVersionId: nextProps.versionDelInfo.versionNames[0].versionId,
+        });
+      } else {
+        this.setState({
+          influenceRadio: 1,
+          fixTargetRadio: 1,
+        });
+      }
     }
   }
   handleOk() {
@@ -67,57 +74,65 @@ class DeleteReleaseWithIssue extends Component {
             this.props.versionDelInfo.influenceIssueCount ? (
               <div style={{ display: 'flex' }}>
                 <p style={{ flex: 1 }}>问题影响({this.props.versionDelInfo.influenceIssueCount})</p>
-                <div style={{ flex: 4 }}>
-                  <RadioGroup
-                    style={{ marginLeft: 25 }}
-                    defaultValue={0}
-                    onChange={(e) => {
-                      this.setState({
-                        influenceRadio: e.target.value,
-                      });
-                    }}
-                  >
-                    <Radio
-                      style={{
-                        display: 'block',
-                        height: '30px',
-                        lineHeight: '30px',
+                {
+                  this.props.versionDelInfo.versionNames.length > 0 ? (
+                    <div
+                      style={{ 
+                        flex: 4, 
                       }}
-                      value={0}
                     >
-              将它们分配给此版本
-                      <Select
-                        style={{
-                          width: 250,
-                          marginLeft: 10,
-                        }}
-                        onChange={(value) => {
+                      <RadioGroup
+                        style={{ marginLeft: 25 }}
+                        defaultValue={0}
+                        onChange={(e) => {
                           this.setState({
-                            influenceTargetVersionId: value,
+                            influenceRadio: e.target.value,
                           });
                         }}
-                        defaultValue={this.props.versionDelInfo.versionNames ? 
-                          this.props.versionDelInfo.versionNames[0].versionId : undefined}
                       >
-                        {this.props.versionDelInfo.versionNames ? (
-                          this.props.versionDelInfo.versionNames.map(item => (
-                            <Option value={item.versionId}>{item.name}</Option>
-                          ))
-                        ) : ''}
-                      </Select>
-                    </Radio>
-                    <Radio
-                      style={{ 
-                        display: 'block',
-                        height: '30px',
-                        lineHeight: '30px',
-                      }}
-                      value={1}
-                    >
-              删除版本
-                    </Radio>
-                  </RadioGroup>
-                </div>
+                        <Radio
+                          style={{
+                            display: 'block',
+                            height: '30px',
+                            lineHeight: '30px',
+                          }}
+                          value={0}
+                        >
+                将它们分配给此版本
+                          <Select
+                            style={{
+                              width: 250,
+                              marginLeft: 10,
+                            }}
+                            onChange={(value) => {
+                              this.setState({
+                                influenceTargetVersionId: value,
+                              });
+                            }}
+                            defaultValue={this.props.versionDelInfo.versionNames ? 
+                              this.props.versionDelInfo.versionNames[0].versionId : undefined}
+                          >
+                            {this.props.versionDelInfo.versionNames ? (
+                              this.props.versionDelInfo.versionNames.map(item => (
+                                <Option value={item.versionId}>{item.name}</Option>
+                              ))
+                            ) : ''}
+                          </Select>
+                        </Radio>
+                        <Radio
+                          style={{ 
+                            display: 'block',
+                            height: '30px',
+                            lineHeight: '30px',
+                          }}
+                          value={1}
+                        >
+                删除版本
+                        </Radio>
+                      </RadioGroup>
+                    </div>
+                  ) : ''
+                }
               </div>
             ) : ''
           }
@@ -125,57 +140,61 @@ class DeleteReleaseWithIssue extends Component {
             this.props.versionDelInfo.fixIssueCount ? (
               <div style={{ display: 'flex' }}>
                 <p style={{ flex: 1 }}>问题修复于({this.props.versionDelInfo.fixIssueCount})</p>
-                <div style={{ flex: 4 }}>
-                  <RadioGroup
-                    style={{ marginLeft: 25 }}
-                    defaultValue={0}
-                    onChange={(e) => {
-                      this.setState({
-                        fixTargetRadio: e.target.value,
-                      });
-                    }}
-                  >
-                    <Radio
-                      style={{
-                        display: 'block',
-                        height: '30px',
-                        lineHeight: '30px',
-                      }}
-                      value={0}
-                    >
-              将它们分配给此版本
-                      <Select
-                        style={{
-                          width: 250,
-                          marginLeft: 10,
-                        }}
-                        onChange={(value) => {
+                {
+                  this.props.versionDelInfo.versionNames.length > 0 ? (
+                    <div style={{ flex: 4 }}>
+                      <RadioGroup
+                        style={{ marginLeft: 25 }}
+                        defaultValue={0}
+                        onChange={(e) => {
                           this.setState({
-                            fixTargetVersionId: value,
+                            fixTargetRadio: e.target.value,
                           });
                         }}
-                        defaultValue={this.props.versionDelInfo.versionNames ? 
-                          this.props.versionDelInfo.versionNames[0].versionId : undefined}
                       >
-                        {this.props.versionDelInfo.versionNames ? (
-                          this.props.versionDelInfo.versionNames.map(item => (
-                            <Option value={item.versionId}>{item.name}</Option>
-                          ))
-                        ) : ''}
-                      </Select>
-                    </Radio>
-                    <Radio
-                      style={{ 
-                        display: 'block',
-                        height: '30px',
-                        lineHeight: '30px',
-                      }}
-                      value={1}
-                    >
-              删除版本
-                    </Radio>
-                  </RadioGroup>
-                </div>
+                        <Radio
+                          style={{
+                            display: 'block',
+                            height: '30px',
+                            lineHeight: '30px',
+                          }}
+                          value={0}
+                        >
+                将它们分配给此版本
+                          <Select
+                            style={{
+                              width: 250,
+                              marginLeft: 10,
+                            }}
+                            onChange={(value) => {
+                              this.setState({
+                                fixTargetVersionId: value,
+                              });
+                            }}
+                            defaultValue={this.props.versionDelInfo.versionNames ? 
+                              this.props.versionDelInfo.versionNames[0].versionId : undefined}
+                          >
+                            {this.props.versionDelInfo.versionNames ? (
+                              this.props.versionDelInfo.versionNames.map(item => (
+                                <Option value={item.versionId}>{item.name}</Option>
+                              ))
+                            ) : ''}
+                          </Select>
+                        </Radio>
+                        <Radio
+                          style={{ 
+                            display: 'block',
+                            height: '30px',
+                            lineHeight: '30px',
+                          }}
+                          value={1}
+                        >
+                删除版本
+                        </Radio>
+                      </RadioGroup>
+                    </div>
+                  ) : ''
+                }
               </div>
             ) : ''
           }
