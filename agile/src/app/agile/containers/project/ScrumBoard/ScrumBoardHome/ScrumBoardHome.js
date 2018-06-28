@@ -501,7 +501,7 @@ class ScrumBoardHome extends Component {
             <span>创建看板</span>
           </Button>
           <Select 
-            className="leftBtn2" 
+            className="leftBtn2 select-without-underline" 
             value={ScrumBoardStore.getSelectedBoard}
             style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500 }}
             dropdownStyle={{

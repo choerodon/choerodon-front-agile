@@ -27,6 +27,12 @@
   }
 }
 
+.select-without-underline {
+  .ant-select-underline {
+    display: none;
+  }
+}
+
 .c7n-scrumTools {
   display: flex;
   justify-content: space-between;
@@ -60,10 +66,6 @@
 .c7n-scrumboard-page {
   .ant-select-arrow {
     right: unset;
-  }
-
-  .ant-select-underline {
-    display: none;
   }
 
   .ant-select-selection-selected-value {

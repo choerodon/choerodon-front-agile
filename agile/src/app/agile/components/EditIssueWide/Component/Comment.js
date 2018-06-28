@@ -28,7 +28,6 @@ class Comment extends Component {
   }
 
   cancel(e) {
-    window.console.log('cancle');
   }
 
   handleDeleteCommit(commentId) {

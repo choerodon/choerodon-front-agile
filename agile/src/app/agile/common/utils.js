@@ -92,7 +92,7 @@ export function returnBeforeTextUpload(text, data, func, pro = 'description') {
   const send = data;
   const { imgBase, formData } = getImgInDelta(deltaOps);
   if (imgBase.length) {
-    uploadImage(formData).then((imgUrlList) => {
+    return uploadImage(formData).then((imgUrlList) => {
       replaceBase64ToUrl(imgUrlList, imgBase, deltaOps);
       const converter = new QuillDeltaToHtmlConverter(deltaOps, {});
       const html = converter.convert();

@@ -81,7 +81,7 @@ class CreateSprint extends Component {
   handleCreateDailyLog = () => {
     const { dissipate, startTime } = this.state;
     if (typeof dissipate === 'undefined' || dissipate === '' || startTime == null) {
-      message.warning('请输入预计时间和耗费时间');
+      message.warning('请输入耗费时间和工作日期');
       return;
     }
     this.setState({ createLoading: true });
@@ -115,7 +115,7 @@ class CreateSprint extends Component {
         this.props.onOk();
       })
       .catch((error) => {
-        window.console.log('创建工作日志失败');
+        window.console.error('创建工作日志失败');
       });
   };
 

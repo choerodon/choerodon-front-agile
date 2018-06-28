@@ -19,17 +19,6 @@ class ReadAndEdit extends Component {
 
   componentDidMount() {
     window.addEventListener('keyup', this.handleEnter, false);
-    window.addEventListener('click', (e) => {
-      // window.console.log(e.target.className);
-      // if (this.state.type === 'edit') {
-      //   e.stopPropagation();
-      //   this.props.onCancel(this.state.origin);
-      //   this.setState({
-      //     type: 'read',
-      //     origin: this.props.origin,
-      //   });
-      // }
-    });
   }
 
   componentWillUnmount() {

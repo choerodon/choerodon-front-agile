@@ -28,7 +28,6 @@ class IssueList extends Component {
   }
 
   cancel(e) {
-    window.console.log('cancle');
   }
 
   handleDeleteIssue(issueId) {

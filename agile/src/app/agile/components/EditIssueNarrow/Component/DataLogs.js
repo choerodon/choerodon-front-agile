@@ -7,7 +7,6 @@ import WYSIWYGEditor from '../../WYSIWYGEditor';
 import { IssueDescription } from '../../CommonComponent';
 import { delta2Html, text2Delta, beforeTextUpload, formatDate } from '../../../common/utils';
 import { deleteWorklog, updateWorklog } from '../../../api/NewIssueApi';
-import { getUser } from '../../../api/CommonApi';
 import DataLog from './DataLog';
 
 const PROP = {

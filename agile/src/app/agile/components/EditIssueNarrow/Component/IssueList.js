@@ -28,7 +28,6 @@ class IssueList extends Component {
   }
 
   cancel(e) {
-    window.console.log('cancle');
   }
 
   handleDeleteIssue(issueId) {
@@ -51,7 +50,7 @@ class IssueList extends Component {
           borderTop: !i ? '1px solid rgba(0, 0, 0, 0.12)' : '',
         }}
       >
-        <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${issue.typeCode}`}>
+        <Tooltip mouseEnterDelay={0.5} title="任务类型: 子任务">
           <div>
             <TypeTag
               type={{

@@ -1,6 +1,11 @@
 .c7n-scrumsetting {
   display: flex;
   overflow: auto;
+
+  .ant-tabs {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }
 
 .wrapSpin {
@@ -17,9 +22,4 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
-}
-
-.ant-tabs {
-  overflow-y: auto;
-  overflow-x: hidden;
 }

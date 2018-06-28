@@ -63,7 +63,7 @@ class DataLog extends Component {
     } else {
       getUser(datalog.lastUpdatedBy)
         .then((res) => {
-          this.setState({ user: res });
+          this.setState({ user: res.content[0] });
           callback(res);
         });
     }
