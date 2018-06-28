@@ -263,7 +263,13 @@ class BurndownChartHome extends Component {
       result = '用户修改剩余估计时间';
     }
     if (text === 'valueChange') {
-      result = '用户修改故事点';
+      if (this.state.select === 'remainingEstimatedTime') {
+        result = '用户修改预估时间';
+      } else if (this.state.select === 'storyPoints') {
+        result = '用户修改故事点';
+      } else {
+        result = '用户修改问题计数';
+      }
     }
     return result;
   }
