@@ -392,7 +392,6 @@ class BacklogHome extends Component {
                 ScrumBoardStore.getQuickSearchList.length > 0 ?
                   ScrumBoardStore.getQuickSearchList.map(item => (
                     <p
-                      key={Math.random()}
                       className="c7n-backlog-filter"
                       style={{
                         background: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',
