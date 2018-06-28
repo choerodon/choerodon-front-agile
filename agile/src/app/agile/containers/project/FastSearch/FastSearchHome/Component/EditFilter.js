@@ -326,7 +326,7 @@ class AddComponent extends Component {
         });
       }
     } else {
-      if (operation === 'in' || operation === 'notIn') {
+      if (operation === 'in' || operation === 'notIn' || operation === 'not in') {
         const arr = value.slice(1, -1).split(',');
         return arr.map(v => ({
           key: v * 1,
