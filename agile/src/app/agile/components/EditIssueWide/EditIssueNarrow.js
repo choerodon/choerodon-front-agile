@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { stores, axios } from 'choerodon-front-boot';
+import { stores, axios, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon } from 'choerodon-ui';
@@ -7,8 +7,8 @@ import { STATUS, COLOR, TYPE, ICON, TYPE_NAME } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
-import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate } from '../../common/utils';
-import { loadStatus, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints } from '../../api/NewIssueApi';
+import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload } from '../../common/utils';
+import { loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
 import { getCurrentOrg, getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
@@ -16,21 +16,42 @@ import DailyLog from '../DailyLog';
 import CreateSubTask from '../CreateSubTask';
 import CreateLinkTask from '../CreateLinkTask';
 import UserHead from '../UserHead';
-import Comment from './Component/Comment';
-import Log from './Component/Log';
-import DataLog from './Component/DataLog';
-import IssueList from './Component/IssueList';
+import Comment from '../EditIssueNarrow/Component/Comment';
+import Log from '../EditIssueNarrow/Component/Log';
+import DataLogs from '../EditIssueNarrow/Component/DataLogs';
+import DataLog from '../EditIssueNarrow/Component/DataLog';
+import IssueList from '../EditIssueNarrow/Component/IssueList';
+import LinkList from '../EditIssueNarrow/Component/LinkList';
 
 const { AppState } = stores;
 const { Option } = Select;
 const { TextArea } = Input;
 const confirm = Modal.confirm;
 let sign = true;
+let flag;
+const STATUS_ICON = {
+  done: {
+    icon: 'check_circle',
+    color: '#1bb06e',
+    bgColor: '',
+  },
+  todo: {
+    icon: 'watch_later',
+    color: '#4a93fc',
+    bgColor: '',
+  },
+  doing: {
+    icon: 'timelapse',
+    color: '#ffae02',
+    bgColor: '',
+  },
+};
 
 class CreateSprint extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      flag: undefined,
       selectLoading: true,
       saveLoading: false,
       rollup: false,
@@ -55,6 +76,7 @@ class CreateSprint extends Component {
       issueId: undefined,
       assigneeId: undefined,
       assigneeName: '',
+      assigneeImageUrl: undefined,
       epicId: undefined,
       estimateTime: undefined,
       remainingTime: undefined,
@@ -64,6 +86,7 @@ class CreateSprint extends Component {
       parentIssueId: undefined,
       priorityCode: undefined,
       reporterId: undefined,
+      reporterImageUrl: undefined,
       sprintId: undefined,
       sprintName: '',
       statusId: undefined,
@@ -82,6 +105,7 @@ class CreateSprint extends Component {
       closeSprint: [],
 
       worklogs: [],
+      datalogs: [],
       fileList: [],
       issueCommentDTOList: [],
       issueLinkDTOList: [],
@@ -127,22 +151,6 @@ class CreateSprint extends Component {
     }
   }
 
-  reloadIssue(issueId = this.state.origin.issueId) {
-    loadIssue(issueId).then((res) => {
-      this.setAnIssueToState(res);
-    });
-    loadWorklogs(issueId).then((res) => {
-      this.setState({
-        worklogs: res,
-      });
-    });
-    loadLinkIssues(issueId).then((res) => {
-      this.setState({
-        linkIssues: res,
-      });
-    });
-  }
-
   /**
    * Attachment
    */
@@ -173,10 +181,11 @@ class CreateSprint extends Component {
   }
   
   setAnIssueToState = (issue = this.state.origin) => {
-    const { 
+    const {
       activeSprint,
       assigneeId,
       assigneeName,
+      assigneeImageUrl,
       closeSprint,
       componentIssueRelDTOList,
       creationDate,
@@ -199,11 +208,13 @@ class CreateSprint extends Component {
       remainingTime,
       reporterId,
       reporterName,
+      reporterImageUrl,
       sprintId,
       sprintName,
       statusId,
       statusCode,
       statusName,
+      statusColor,
       storyPoints,
       summary,
       typeCode,
@@ -222,6 +233,7 @@ class CreateSprint extends Component {
       activeSprint: activeSprint || {},
       assigneeId,
       assigneeName,
+      assigneeImageUrl,
       closeSprint,
       componentIssueRelDTOList,
       creationDate,
@@ -246,11 +258,13 @@ class CreateSprint extends Component {
       remainingTime,
       reporterId,
       reporterName,
+      reporterImageUrl,
       sprintId,
       sprintName,
       statusId,
       statusCode,
       statusName,
+      statusColor,
       storyPoints,
       summary,
       typeCode,
@@ -264,22 +278,17 @@ class CreateSprint extends Component {
   getCurrentNav(e) {
     let eles;
     if (this.state.typeCode !== 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'sub_task'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'sub_task', 'link_task' ];
     } else {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log'];
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
 
   isInLook(ele) {
-    debugger;
-    // 距离顶部高度
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
-    // 滚的越多越大
-    // 定的高，外部容器的高度
-    // return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
-    return (a < (target.scrollTop + target.offsetHeight)) && ((a + ele.offsetHeight) > target.scrollTop);
+    return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
   }
 
   scrollToAnchor = (anchorName) => {
@@ -380,6 +389,52 @@ class CreateSprint extends Component {
     return workTimeArr;
   }
 
+  reloadIssue(issueId = this.state.origin.issueId) {
+    this.setState({
+      addCommit: false,
+      addCommitDes: '',
+      editDesShow: undefined,
+      editDes: undefined,
+      editCommentId: undefined,
+      editComment: undefined,
+      editLogId: undefined,
+      editLog: undefined,
+    }, () => {
+      loadIssue(issueId).then((res) => {
+        this.setAnIssueToState(res);
+      });
+      loadWorklogs(issueId).then((res) => {
+        this.setState({
+          worklogs: res,
+        });
+      });
+      loadLinkIssues(issueId).then((res) => {
+        this.setState({
+          linkIssues: res,
+        });
+      });
+      loadDatalogs(issueId).then((res) => {
+        this.setState({
+          datalogs: res,
+        });
+      });
+      this.setState({
+        editDesShow: false,
+      });
+    });
+  }
+
+  refresh = () => {
+    loadIssue(this.state.origin.issueId).then((res) => {
+      this.setAnIssueToState(res);
+    });
+    loadWorklogs(this.state.origin.issueId).then((res) => {
+      this.setState({
+        worklogs: res,
+      });
+    });
+  }
+
   updateIssue = (pro) => {
     const obj = {
       issueId: this.state.issueId,
@@ -387,13 +442,16 @@ class CreateSprint extends Component {
     };
     if ((pro === 'description') || (pro === 'editDes')) {
       if (this.state[pro]) {
-        beforeTextUpload(this.state[pro], obj, updateIssue, 'description');
+        returnBeforeTextUpload(this.state[pro], obj, updateIssue, 'description')
+          .then((res) => {
+            this.reloadIssue(this.state.origin.issueId);
+          });
       }
     } else if (pro === 'assigneeId' || pro === 'reporterId') {
       obj[pro] = this.state[pro] ? JSON.parse(this.state[pro]).id || 0 : 0;
       updateIssue(obj)
         .then((res) => {
-          this.setAnIssueToState(res);
+          this.reloadIssue();
           if (this.props.onUpdate) {
             this.props.onUpdate();
           }
@@ -402,7 +460,7 @@ class CreateSprint extends Component {
       obj[pro] = this.state[pro] || 0;
       updateIssue(obj)
         .then((res) => {
-          this.setAnIssueToState(res);
+          this.reloadIssue();
           if (this.props.onUpdate) {
             this.props.onUpdate();
           }
@@ -459,7 +517,7 @@ class CreateSprint extends Component {
     obj[pros] = out;
     updateIssue(obj)
       .then((res) => {
-        this.setAnIssueToState(res);
+        this.reloadIssue();
         if (this.props.onUpdate) {
           this.props.onUpdate();
         }
@@ -501,7 +559,7 @@ class CreateSprint extends Component {
     obj.versionIssueRelDTOList = out.concat(this.state[pros === 'fixVersions' ? 'influenceVersions' : 'fixVersions']);
     updateIssue(obj)
       .then((res) => {
-        this.setAnIssueToState(res);
+        this.reloadIssue();
         if (this.props.onUpdate) {
           this.props.onUpdate();
         }
@@ -579,11 +637,12 @@ class CreateSprint extends Component {
     }
   }
 
+
   handleClickMenu(e) {
     if (e.key === '0') {
       this.setState({ dailyLogShow: true });
-    } else if (e.key === '1') {
-      this.handleDeleteIssue(this.props.issueId);
+    } else if (e.key === 'item_1') {
+      this.handleDeleteIssue(this.state.origin.issueId);
     } else if (e.key === '2') {
       this.setState({ createSubTaskShow: true });
     }
@@ -599,7 +658,7 @@ class CreateSprint extends Component {
     updateIssueType(issueupdateTypeDTO)
       .then((res) => {
         loadIssue(this.props.issueId).then((response) => {
-          this.setAnIssueToState(response);
+          this.reloadIssue(this.state.origin.issueId);
           this.props.onUpdate();
         });
       });
@@ -698,14 +757,23 @@ class CreateSprint extends Component {
    */
   renderDataLogs() {
     return (
-      <div>
-        {
-          [1, 2].map(worklog => (
-            <DataLog />
-          ))
-        }
-      </div>
+      <DataLogs
+        datalogs={this.state.datalogs}
+      />
     );
+    // return (
+    //   <div>
+    //     {
+    //       this.state.datalogs.map((datalog, i) => (
+    //         <DataLog
+    //           i={i}
+    //           datalog={datalog}
+    //           origin={this.state.datalogs}
+    //         />
+    //       ))
+    //     }
+    //   </div>
+    // );
   }
 
   /**
@@ -730,7 +798,7 @@ class CreateSprint extends Component {
             <div>
               <div style={{ margin: '7px auto' }}>{k}</div>
               {
-                _.map(v, (linkIssue, i) => this.renderIssueList(linkIssue, i))
+                _.map(v, (linkIssue, i) => this.renderLinkList(linkIssue, i))
               }
             </div>
           ))
@@ -738,7 +806,6 @@ class CreateSprint extends Component {
       </div>
     );
   }
-
 
   /**
    * IssueList
@@ -753,14 +820,26 @@ class CreateSprint extends Component {
           typeCode: issue.typeCode || 'sub_task',
         }}
         i={i}
+        onOpen={() => {
+          this.reloadIssue(issue.issueId);
+        }}
         onRefresh={() => {
-          if (issue.issueId && !issue.linkedIssueId) {
-            this.reloadIssue(issue.issueId);
-          } else if (issue.issueId === this.state.origin.issueId && issue.linkedIssueId) {
-            this.reloadIssue(issue.linkedIssueId);
-          } else if (issue.issueId !== this.state.origin.issueId) {
-            this.reloadIssue(issue.issueId);
-          }
+          this.reloadIssue(this.state.origin.issueId);
+        }}
+      />
+    );
+  }
+
+  renderLinkList(link, i) {
+    return (
+      <LinkList
+        issue={{
+          ...link,
+          typeCode: link.typeCode,
+        }}
+        i={i}
+        onRefresh={() => {
+          this.reloadIssue(this.state.origin.issueId);
         }}
       />
       
@@ -772,13 +851,16 @@ class CreateSprint extends Component {
    */
   renderDes() {
     let delta;
+    if (this.state.editDesShow === undefined) {
+      return null;
+    }
     if (!this.state.description || this.state.editDesShow) {
       delta = text2Delta(this.state.editDes);
       return (
         <div className="line-start mt-10">
           <WYSIWYGEditor
             bottomBar
-            value={delta}
+            value={text2Delta(this.state.editDes)}
             style={{ height: 200, width: '100%' }}
             onChange={(value) => {
               this.setState({ editDes: value });
@@ -821,15 +903,19 @@ class CreateSprint extends Component {
   }
 
   render() {
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     const { initValue, visible, onCancel, onOk } = this.props;
     const getMenu = () => (
       <Menu onClick={this.handleClickMenu.bind(this)}>
         <Menu.Item key="0">
           登记工作日志
         </Menu.Item>
-        <Menu.Item key="1">
-          删除
-        </Menu.Item>
+        <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue.deleteIssue']}>
+          <Menu.Item key="1">
+            删除
+          </Menu.Item>
+        </Permission>
         {
           this.state.typeCode !== 'sub_task' && (
             <Menu.Item key="2">
@@ -976,6 +1062,18 @@ class CreateSprint extends Component {
                 />
               </li>
             </Tooltip>
+            <Tooltip placement="right" title="活动日志">
+              <li id="DATA_LOG-nav" className={`c7n-li ${this.state.nav === 'data_log' ? 'c7n-li-active' : ''}`}>
+                <Icon
+                  type="insert_invitation c7n-icon-li"
+                  role="none"
+                  onClick={() => {
+                    this.setState({ nav: 'data_log' });
+                    this.scrollToAnchor('data_log');
+                  }}
+                />
+              </li>
+            </Tooltip>
             {
               this.state.typeCode !== 'sub_task' && (
                 <Tooltip placement="right" title="子任务">
@@ -986,6 +1084,22 @@ class CreateSprint extends Component {
                       onClick={() => {
                         this.setState({ nav: 'sub_task' });
                         this.scrollToAnchor('sub_task');
+                      }}
+                    />
+                  </li>
+                </Tooltip>
+              )
+            }
+            {
+              this.state.typeCode !== 'sub_task' && (
+                <Tooltip placement="right" title="相关任务">
+                  <li id="LINK_TASKS-nav" className={`c7n-li ${this.state.nav === 'link_task' ? 'c7n-li-active' : ''}`}>
+                    <Icon
+                      type="link c7n-icon-li"
+                      role="none"
+                      onClick={() => {
+                        this.setState({ nav: 'link_task' });
+                        this.scrollToAnchor('link_task');
                       }}
                     />
                   </li>
@@ -1123,9 +1237,25 @@ class CreateSprint extends Component {
                 <div className="line-start">
                   <div style={{ display: 'flex', flex: 1 }}>
                     <span
-                      style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255, 177, 0, 0.2)', marginRight: 12, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                      style={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: '50%',
+                        // background: 'rgba(255, 177, 0, 0.2)',
+                        marginRight: 12,
+                        flexShrink: 0,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
                     >
-                      <Icon type="schedule" style={{ fontSize: '24px', color: '#ffb100' }} />
+                      <Icon
+                        type={STATUS_ICON[this.state.statusCode] ? STATUS_ICON[this.state.statusCode].icon : 'timelapse'}
+                        style={{
+                          fontSize: '33px',
+                          color: this.state.statusColor || '#ffae02',
+                        }}
+                      />
                     </span>
                     <div>
                       <div style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.54)', marginBottom: 4 }}>
@@ -1152,12 +1282,9 @@ class CreateSprint extends Component {
                               this.state.statusId ? (
                                 <div
                                   style={{
-                                    background: this.state.origin.statusColor || STATUS[this.state.statusCode],
-                                    color: '#fff',
-                                    borderRadius: '2px',
-                                    padding: '0 8px',
-                                    display: 'inline-block',
-                                    margin: '2px auto 2px 0',
+                                    color: this.state.statusColor,
+                                    fontSize: '16px',
+                                    lineHeight: '18px',
                                   }}
                                 >
                                   { this.state.statusName }
@@ -1167,11 +1294,11 @@ class CreateSprint extends Component {
                           </div>}
                         >
                           <Select
-                            value={this.state.statusId}
-                            style={{ width: '150px' }}
+                            value={this.state.originStatus.length ? this.state.statusId : this.state.statusName}
+                            style={{ width: 150 }}
                             loading={this.state.selectLoading}
                             autoFocus
-                            getPopupContainer={triggerNode => triggerNode.parentNode}
+                            // getPopupContainer={triggerNode => triggerNode.parentNode}
                             onFocus={() => {
                               this.setState({
                                 selectLoading: true,
@@ -1250,11 +1377,11 @@ class CreateSprint extends Component {
                           </div>}
                         >
                           <Select
-                            value={this.state.priorityCode}
+                            value={this.state.originpriorities.length ? this.state.priorityCode : this.state.priorityName}
                             style={{ width: '150px' }}
                             loading={this.state.selectLoading}
                             autoFocus
-                            getPopupContainer={triggerNode => triggerNode.parentNode}
+                            // getPopupContainer={triggerNode => triggerNode.parentNode}
                             onFocus={() => {
                               this.setState({
                                 selectLoading: true,
@@ -1282,11 +1409,13 @@ class CreateSprint extends Component {
                                     <div
                                       className="c7n-level"
                                       style={{
-                                        backgroundColor: COLOR[type.valueCode].bgColor,
+                                        // backgroundColor: COLOR[type.valueCode].bgColor,
                                         color: COLOR[type.valueCode].color,
-                                        borderRadius: '2px',
-                                        padding: '0 8px',
-                                        display: 'inline-block',
+                                        // borderRadius: '2px',
+                                        // padding: '0 8px',
+                                        // display: 'inline-block',
+                                        fontSize: '16px',
+                                        lineHeight: '18px',
                                       }}
                                     >
                                       { type.name }
@@ -1308,8 +1437,18 @@ class CreateSprint extends Component {
                       <Icon type="directions_run" style={{ fontSize: '24px' }} />
                     </span>
                     <div>
-                      <div style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.54)', marginBottom: 4 }}>
-                        冲刺
+                      <div style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.54)', marginBottom: 4, display: 'flex', alignItems: 'center' }}>
+                        <span>冲刺</span>
+                        <Tooltip title={`已完成冲刺：${this.state.closeSprint.join(',')}`}>
+                          <Icon
+                            type="error"
+                            style={{
+                              fontSize: '13px',
+                              color: 'rgba(0,0,0,0.54)',
+                              marginLeft: 5,
+                            }}
+                          />
+                        </Tooltip>
                       </div>
                       <div>
                         {
@@ -1334,73 +1473,19 @@ class CreateSprint extends Component {
                                 {
                                   !this.state.closeSprint.length && !this.state.activeSprint.sprintId ? '无' : (
                                     <div>
-                                      {
-                                        this.state.closeSprint.map(v => (
-                                          <div 
-                                            style={{
-                                              color: 'rgba(0, 0, 0, 0.5)',
-                                              border: '1px solid rgba(0, 0, 0, 0.5)',
-                                              borderRadius: '2px',
-                                              fontSize: '13px',
-                                              lineHeight: '20px',
-                                              padding: '0 8px',
-                                              display: 'inline-block',
-                                              marginRight: 5,
-                                              marginTop: 5,
-                                            }}
-                                          >
-                                            {v.sprintName}
-                                          </div>
-                                        ))
-                                      }
-                                      {
-                                        this.state.activeSprint.sprintId && (
-                                          <div 
-                                            style={{
-                                              color: '#4d90fe',
-                                              border: '1px solid #4d90fe',
-                                              borderRadius: '2px',
-                                              fontSize: '13px',
-                                              lineHeight: '20px',
-                                              padding: '0 8px',
-                                              display: 'inline-block',
-                                              marginTop: 5,
-                                            }}
-                                          >
-                                            {this.state.activeSprint.sprintName}
-                                          </div>
-                                        )
-                                      }
+                                      <div 
+                                        style={{
+                                          fontSize: '12px',
+                                          lineHeight: '18px',
+                                        }}
+                                      >
+                                        {this.state.activeSprint.sprintId ? this.state.activeSprint.sprintName : '无活跃冲刺'}
+                                      </div>
                                     </div>
                                   )
                                 }
                               </div>}
                             >
-                              {
-                                this.state.closeSprint.length ? (
-                                  <div>
-                                    <span>已结束冲刺：</span>
-                                    {
-                                      this.state.closeSprint.map(v => (
-                                        <div 
-                                          style={{
-                                            color: 'rgba(0, 0, 0, 0.5)',
-                                            border: '1px solid rgba(0, 0, 0, 0.5)',
-                                            borderRadius: '2px',
-                                            fontSize: '13px',
-                                            lineHeight: '20px',
-                                            padding: '0 8px',
-                                            display: 'inline-block',
-                                            marginRight: 5,
-                                          }}
-                                        >
-                                          {v.sprintName}
-                                        </div>
-                                      ))
-                                    }
-                                  </div>
-                                ) : null
-                              }
                               <Select
                                 label="活跃冲刺"
                                 value={this.state.sprintId || undefined}
@@ -1437,7 +1522,7 @@ class CreateSprint extends Component {
                           ) : (
                             <div>
                               {
-                                this.state.sprintId ? (
+                                this.state.activeSprint.sprintId ? (
                                   <div 
                                     style={{
                                       // color: '#4d90fe',
@@ -1449,7 +1534,7 @@ class CreateSprint extends Component {
                                       // display: 'inline-block',
                                     }}
                                   >
-                                    {this.state.sprintName}
+                                    {this.state.activeSprint.sprintName}
                                   </div>
                                 ) : '无'
                               }
@@ -1631,7 +1716,7 @@ class CreateSprint extends Component {
                             </span>
                           </div>
                           <div className="c7n-value-wrapper">
-                            
+                          
                             <ReadAndEdit
                               callback={this.changeRae.bind(this)}
                               thisType="labelIssueRelDTOList"
@@ -1853,7 +1938,7 @@ class CreateSprint extends Component {
                                   </div>}
                                 >
                                   <Select
-                                    value={this.state.epicId || undefined}
+                                    value={this.state.originEpics.length ? this.state.epicId || undefined : this.state.epicName || undefined}
                                     getPopupContainer={triggerNode => triggerNode.parentNode}
                                     style={{ width: '150px' }}
                                     autoFocus
@@ -1952,10 +2037,14 @@ class CreateSprint extends Component {
                               onInit={() => {
                                 this.setAnIssueToState(this.state.origin);
                                 if (this.state.reporterId) {
+                                  this.setState({
+                                    flag: 'loading',
+                                  });
                                   getUser(this.state.reporterId).then((res) => {
                                     this.setState({
                                       reporterId: JSON.stringify(res),
                                       originUsers: [res],
+                                      flag: 'finish',
                                     });
                                   });
                                 } else {
@@ -1981,7 +2070,7 @@ class CreateSprint extends Component {
                               </div>}
                             >
                               <Select
-                                value={this.state.reporterId || undefined}
+                                value={this.state.flag === 'loading' ? undefined : this.state.reporterId || undefined}
                                 style={{ width: 150 }}
                                 loading={this.state.selectLoading}
                                 allowClear
@@ -2032,6 +2121,8 @@ class CreateSprint extends Component {
                                   if (res.id !== this.state.reporterId) {
                                     this.setState({
                                       reporterId: JSON.stringify(res),
+                                      reporterName: `${res.loginName}${res.realName}`,
+                                      reporterImageUrl: res.imageUrl,
                                     }, () => {
                                       this.updateIssue('reporterId');
                                     });
@@ -2058,10 +2149,14 @@ class CreateSprint extends Component {
                               onInit={() => {
                                 this.setAnIssueToState(this.state.origin);
                                 if (this.state.assigneeId) {
+                                  this.setState({
+                                    flag: 'loading',
+                                  });
                                   getUser(this.state.assigneeId).then((res) => {
                                     this.setState({
                                       assigneeId: JSON.stringify(res),
                                       originUsers: [res],
+                                      flag: 'finish',
                                     });
                                   });
                                 } else {
@@ -2087,7 +2182,7 @@ class CreateSprint extends Component {
                               </div>}
                             >
                               <Select
-                                value={this.state.assigneeId || undefined}
+                                value={this.state.flag === 'loading' ? undefined : this.state.assigneeId || undefined}
                                 style={{ width: 150 }}
                                 loading={this.state.selectLoading}
                                 allowClear
@@ -2138,6 +2233,8 @@ class CreateSprint extends Component {
                                   if (res.id !== this.state.assigneeId) {
                                     this.setState({
                                       assigneeId: JSON.stringify(res),
+                                      assigneeName: `${res.loginName}${res.realName}`,
+                                      assigneeImageUrl: res.imageUrl,
                                     }, () => {
                                       this.updateIssue('assigneeId');
                                     });
@@ -2190,7 +2287,7 @@ class CreateSprint extends Component {
                         </Button>
                         <Icon
                           className="c7n-des-edit"
-                          style={{ position: 'absolute', top: 5, right: -15 }}
+                          style={{ position: 'absolute', top: 8, right: -20 }}
                           role="none"
                           type="mode_edit mlr-3 pointer"
                           onClick={() => {

@@ -639,7 +639,7 @@ class CreateSprint extends Component {
     updateIssueType(issueupdateTypeDTO)
       .then((res) => {
         loadIssue(this.props.issueId).then((response) => {
-          this.setAnIssueToState(response);
+          this.reloadIssue(this.state.origin.issueId);
           this.props.onUpdate();
         });
       });
@@ -1261,7 +1261,7 @@ class CreateSprint extends Component {
                   {
                     this.state.issueId && this.state.typeCode !== 'issue_epic' ? (
                       <div style={{ display: 'flex' }}>
-                        <span>剩余时间：</span>
+                        <span>预估时间：</span>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -1920,7 +1920,7 @@ class CreateSprint extends Component {
                             ) : (
                               <div>
                                 {
-                                  this.state.sprintId ? (
+                                  this.state.activeSprint.sprintId ? (
                                     <div 
                                       style={{
                                         color: '#4d90fe',
@@ -1932,7 +1932,7 @@ class CreateSprint extends Component {
                                         display: 'inline-block',
                                       }}
                                     >
-                                      {this.state.sprintName}
+                                      {this.state.activeSprint.sprintName}
                                     </div>
                                   ) : '无'
                                 }
@@ -2317,18 +2317,18 @@ class CreateSprint extends Component {
                   </div>
                   {this.renderLogs()}
                 </div>
-
+                
                 <div id="data_log">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
-                      <Icon type="insert_invitation c7n-icon-title" />
+                      <Icon type="content_paste c7n-icon-title" />
                       <span>活动日志</span>
                     </div>
                     <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                   </div>
                   {this.renderDataLogs()}
                 </div>
-                
+
                 {
                   this.state.origin.typeCode !== 'sub_task' && (
                     <div id="sub_task">
@@ -2355,14 +2355,14 @@ class CreateSprint extends Component {
                     <div id="link_task">
                       <div className="c7n-title-wrapper">
                         <div className="c7n-title-left">
-                          <Icon type="link c7n-icon-title" />
-                          <span>相关任务</span>
+                          <Icon type="filter_none c7n-icon-title" />
+                          <span>问题链接</span>
                         </div>
                         <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                           <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
                             <Icon type="playlist_add icon" />
-                            <span>关联已有任务</span>
+                            <span>创建链接</span>
                           </Button>
                         </div>
                       </div>

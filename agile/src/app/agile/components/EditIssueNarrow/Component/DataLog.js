@@ -34,7 +34,7 @@ const PROP_SIMPLE = {
   WorklogId: '工作日志',
   issuetype: '类型',
   Rank: '排序',
-  resolution: '解决方案',
+  resolution: '解决状态',
   Comment: '评论',
 };
 
