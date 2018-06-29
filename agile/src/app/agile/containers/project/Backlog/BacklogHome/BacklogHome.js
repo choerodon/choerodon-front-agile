@@ -181,7 +181,7 @@ class BacklogHome extends Component {
         this.refresh();
       }).catch((error) => {
         BacklogStore.setSprintData(originData);
-        window.console.log(error);
+        window.console.error(error);
       });
     } else {
       // 如果不是多选
@@ -225,7 +225,7 @@ class BacklogHome extends Component {
               BacklogStore.setSprintData(newData);
             }).catch((error) => {
               BacklogStore.setSprintData(originData);
-              window.console.log(error);
+              window.console.error(error);
             });
           }
         });
@@ -255,7 +255,7 @@ class BacklogHome extends Component {
           BacklogStore.setSprintData(newData);
         }).catch((error) => {
           BacklogStore.setSprintData(originData);
-          window.console.log(error);
+          window.console.error(error);
         });
       }
     }
@@ -278,7 +278,7 @@ class BacklogHome extends Component {
             spinIf: false,
           });
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
         BacklogStore.axiosGetEpic().then((data3) => {
           const newEpic = [...data3];
@@ -287,13 +287,13 @@ class BacklogHome extends Component {
           });
           BacklogStore.setEpicData(newEpic);
         }).catch((error3) => {
-          window.console.log(error3);
+          window.console.error(error3);
         });
       }).catch((error2) => {
-        window.console.log(error2);
+        window.console.error(error2);
       });
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   changeState(state, value) {
@@ -322,7 +322,7 @@ class BacklogHome extends Component {
         loading: false,
       });
       message.success('创建失败');
-      window.console.log(error);
+      window.console.error(error);
     });
   }
 
@@ -331,7 +331,7 @@ class BacklogHome extends Component {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
 
@@ -340,7 +340,7 @@ class BacklogHome extends Component {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
 

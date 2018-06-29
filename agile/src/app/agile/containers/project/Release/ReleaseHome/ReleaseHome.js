@@ -64,7 +64,7 @@ class ReleaseHome extends Component {
         },
       });
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   handleClickMenu(record, e) {
@@ -77,14 +77,14 @@ class ReleaseHome extends Component {
             ReleaseStore.setVersionDetail(record);
             this.setState({ publicVersion: true }); 
           }).catch((error) => {
-            window.console.log(error);
+            window.console.error(error);
           });
       } else {
         ReleaseStore.axiosUnPublicRelease(
           record.versionId).then((res2) => {
           this.refresh(this.state.pagination);
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       }
     }
@@ -105,7 +105,7 @@ class ReleaseHome extends Component {
             });
           }
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       } else {
         this.setState({
@@ -121,7 +121,7 @@ class ReleaseHome extends Component {
           editRelease: true,
         });
       }).catch((error) => {
-        window.console.log(error);
+        window.console.error(error);
       });
     }
     if (e.key.indexOf('1') !== -1) {
@@ -130,14 +130,14 @@ class ReleaseHome extends Component {
         ReleaseStore.axiosUnFileVersion(record.versionId).then((res) => {
           this.refresh(this.state.pagination);
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       } else {
         // 归档
         ReleaseStore.axiosFileVersion(record.versionId).then((res) => {
           this.refresh(this.state.pagination);
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       }
     }
@@ -155,7 +155,7 @@ class ReleaseHome extends Component {
         sourceList: res,
       });
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   render() {
@@ -328,7 +328,7 @@ class ReleaseHome extends Component {
                   versionDelete: {},
                 });
               }).catch((error) => {
-                window.console.log(error);
+                window.console.error(error);
               });
             }}
             onCancel={() => {

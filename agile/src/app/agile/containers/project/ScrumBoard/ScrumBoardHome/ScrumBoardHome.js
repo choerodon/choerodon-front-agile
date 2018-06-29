@@ -68,7 +68,7 @@ class ScrumBoardHome extends Component {
         }
       }
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   refresh(boardId) {
@@ -123,10 +123,10 @@ class ScrumBoardHome extends Component {
           spinIf: false,
         });
       }).catch((error) => {
-        window.console.log(error);
+        window.console.error(error);
       });
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   // storeIssueNumberCount(storeParentIds, columns) {
@@ -299,7 +299,7 @@ class ScrumBoardHome extends Component {
         }
       }).catch((error) => {
         ScrumBoardStore.setBoardData(JSON.parse(JSON.stringify(originState)));
-        window.console.log(error);
+        window.console.error(error);
       });
     }
   }
@@ -313,7 +313,7 @@ class ScrumBoardHome extends Component {
           });
           this.getBoard();
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       }
     });
@@ -359,7 +359,7 @@ class ScrumBoardHome extends Component {
         });
       }
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   filterQuick(item) {
@@ -707,7 +707,7 @@ class ScrumBoardHome extends Component {
                   updateParentStatus: null,
                 });
               }).catch((error) => {
-                window.console.log(error);
+                window.console.error(error);
               });
             }}
           >

@@ -43,7 +43,6 @@ class StatusHome extends Component {
       loading: true,
     });
     StatusStore.axiosGetStatusList(data).then((res) => {
-      window.console.log(res);
       StatusStore.setStatusList(res.content);
       this.setState({
         pagination: {
@@ -57,7 +56,7 @@ class StatusHome extends Component {
       this.setState({
         loading: false,
       });
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   handleChangeTable(pagination, filters, sorter) {
@@ -109,7 +108,7 @@ class StatusHome extends Component {
                 ScrumBoardStore.axiosGetStatusCategory().then((data) => {
                   ScrumBoardStore.setStatusCategory(data);
                 }).catch((error) => {
-                  window.console.log(error);
+                  window.console.error(error);
                 });
               }
             }}

@@ -39,10 +39,8 @@ class StatusCard extends Component {
     });
     data[data.length - 1].subStatuses.splice(deleteIndex, 1);
     ScrumBoardStore.setBoardData(data);
-    ScrumBoardStore.axiosDeleteStatus(deleteCode).then((res) => {
-      window.console.log(res);
-    }).catch((error) => {
-      window.console.log(error);
+    ScrumBoardStore.axiosDeleteStatus(deleteCode).catch((error) => {
+      window.console.error(error);
       ScrumBoardStore.setBoardData(originData);
     });
   }
@@ -124,7 +122,7 @@ class StatusCard extends Component {
                             visible: true,
                           });
                         }).catch((error) => {
-                          window.console.log(error);
+                          window.console.error(error);
                         });
                       } else {
                         this.setState({
@@ -171,7 +169,7 @@ class StatusCard extends Component {
                           this.props.data.id, data).then((res) => {
                           this.props.refresh();
                         }).catch((error) => {
-                          window.console.log(error);
+                          window.console.error(error);
                         });
                       }}
                     >设置已完成</Radio>

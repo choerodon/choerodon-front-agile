@@ -35,7 +35,7 @@ class BurndownChartHome extends Component {
         this.getChartData();
       });
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   getChartData() {
@@ -93,7 +93,6 @@ class BurndownChartHome extends Component {
           });
           newData[index].rest = rest;
         });
-        window.console.log(newData);
         BurndownChartStore.setBurndownList(newData);
         this.setState({
           xAxis: _.map(newData, 'date'),
@@ -101,7 +100,7 @@ class BurndownChartHome extends Component {
           loading: false,
         });
       }).catch((error) => {
-        window.console.log(error);
+        window.console.error(error);
       });
   }
 
@@ -146,7 +145,6 @@ class BurndownChartHome extends Component {
         data: this.state.xAxis,
         axisLabel: {
           formatter(value, index) {
-            window.console.log();
             return `${value.split(' ')[0]}\n${value.split(' ')[1]}`;
           },
         },
@@ -207,7 +205,6 @@ class BurndownChartHome extends Component {
     return result;
   }
   renderDetail(item, record) {
-    window.console.log(record);
     let result = '-';
     if (record.type !== 'startSprint' && record.type !== 'endSprint') {
       if (item.statistical) {

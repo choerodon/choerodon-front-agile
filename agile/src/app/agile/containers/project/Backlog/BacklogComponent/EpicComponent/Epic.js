@@ -30,7 +30,7 @@ class Epic extends Component {
     BacklogStore.axiosGetColorLookupValue().then((res) => {
       BacklogStore.setColorLookupValue(res.lookupValues);
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
 
@@ -47,7 +47,7 @@ class Epic extends Component {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   renderEpic() {
@@ -146,7 +146,7 @@ class Epic extends Component {
                       this.props.issueRefresh();
                       this.props.refresh();
                     }).catch((error) => {
-                      window.console.log(error);
+                      window.console.error(error);
                       this.props.issueRefresh();
                       this.props.refresh();
                     });

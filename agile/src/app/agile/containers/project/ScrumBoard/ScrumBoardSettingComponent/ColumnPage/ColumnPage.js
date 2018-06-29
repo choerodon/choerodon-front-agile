@@ -30,7 +30,7 @@ class ColumnPage extends Component {
       ScrumBoardStore.axiosGetStatusCategory().then((data) => {
         ScrumBoardStore.setStatusCategory(data);
       }).catch((error) => {
-        window.console.log(error);
+        window.console.error(error);
       });
     }
   }
@@ -62,7 +62,7 @@ class ColumnPage extends Component {
         this.props.refresh();
       }).catch((error) => {
         ScrumBoardStore.setBoardData(originState2);
-        window.console.log(error);
+        window.console.error(error);
       });
     } else {
       // 移动状态
@@ -217,7 +217,7 @@ class ColumnPage extends Component {
       ScrumBoardStore.axiosGetStatusCategory().then((data) => {
         ScrumBoardStore.setStatusCategory(data);
       }).catch((error) => {
-        window.console.log(error);
+        window.console.error(error);
       });
     }
   }
@@ -307,7 +307,7 @@ class ColumnPage extends Component {
                 ScrumBoardStore.setBoardList(oldData);
                 ScrumBoardStore.setCurrentConstraint(value);
               }).catch((error) => {
-                window.console.log(error);
+                window.console.error(error);
               });
             }}
           >

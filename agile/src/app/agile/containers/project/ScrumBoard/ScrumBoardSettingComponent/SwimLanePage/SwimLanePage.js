@@ -27,7 +27,7 @@ class SwimLanePage extends Component {
       message.success('保存成功');
     }).catch((error) => {
       message.success('保存失败');
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   render() {

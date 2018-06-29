@@ -76,8 +76,6 @@ class StatusIssue extends Component {
           }
         });
       });
-
-      window.console.log(this.props.data, childrenList);
       const result = [];
       if (childrenList.length > 0) {
         const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;

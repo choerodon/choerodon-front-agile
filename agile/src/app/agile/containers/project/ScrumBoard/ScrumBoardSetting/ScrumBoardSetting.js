@@ -56,17 +56,17 @@ class ScrumBoardSetting extends Component {
             loading: false,
           });
         }).catch((error2) => {
-          window.console.log(error2);
+          window.console.error(error2);
         });
       }).catch((error) => {
-        window.console.log(error);
+        window.console.error(error);
       });
       ScrumBoardStore.axiosGetLookupValue('constraint').then((res) => {
         const oldLookup = ScrumBoardStore.getLookupValue;
         oldLookup.constraint = res.lookupValues;
         ScrumBoardStore.setLookupValue(oldLookup);
       }).catch((error) => {
-        window.console.log(error);
+        window.console.error(error);
       });
     }
   }
@@ -89,7 +89,7 @@ class ScrumBoardSetting extends Component {
         ScrumBoardStore.axiosDeleteBoard().then((res) => {
           history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       },
       onCancel() {

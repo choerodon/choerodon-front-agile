@@ -41,7 +41,7 @@ class AddStatus extends Component {
           this.setState({
             loading: false,
           });
-          window.console.log(error);
+          window.console.error(error);
         });
       }
     });
@@ -54,7 +54,7 @@ class AddStatus extends Component {
         callback();
       }
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   renderOptions() {

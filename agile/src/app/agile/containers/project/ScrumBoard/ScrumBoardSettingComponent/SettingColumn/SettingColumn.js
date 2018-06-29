@@ -24,7 +24,7 @@ class SettingColumn extends Component {
     ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
       this.props.refresh();
     }).catch((err) => {
-      window.console.log(err);
+      window.console.error(err);
     });
   }
   updateColumnMaxMin(type, value) {
@@ -78,7 +78,7 @@ class SettingColumn extends Component {
       this.props.data.columnId, data).then((res) => {
       this.props.refresh();
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   handleSaveColumnName(name) {
@@ -96,7 +96,7 @@ class SettingColumn extends Component {
       originData[this.props.index].name = res.name;
       ScrumBoardStore.setBoardData(originData);
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   renderStatus() {

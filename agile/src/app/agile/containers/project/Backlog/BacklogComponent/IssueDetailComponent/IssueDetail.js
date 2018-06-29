@@ -19,7 +19,7 @@ class IssueDetail extends Component {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   refreshIssueDetail() {
