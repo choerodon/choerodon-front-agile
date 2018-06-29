@@ -232,9 +232,9 @@ class CreateSprint extends Component {
               </Select>
             </div>
             <div className="dataPicker" style={{ width: 218, marginBottom: 32, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-              <p style={{ fontSize: '12px', transform: 'scale(0.8)', color: 'rgba(0, 0, 0, 0.54)', position: 'absolute', left: -5 }}>工作日期*</p>
               <div style={{ marginTop: 20, width: 220, paddingBottom: 3 }}>
                 <DatePicker
+                  label="工作日期*"
                   value={this.state.startTime}
                   // value={this.transTime(this.state.startTime)}
                   format={DATA_FORMAT}

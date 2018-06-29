@@ -4,12 +4,13 @@
 # IDE
 .idea
 .project
-.vscode
 
 # npm
 node_modules/
 npm-debug.log
 yarn-error.log
+yarn.lock
+package-lock.json
 
 # folder
 dist
@@ -19,9 +20,4 @@ webpack/dist
 webpack/dll
 
 #缓存
-
 .cache
-
-#config.js
-config.js
-/kanbanfront/node_modules/

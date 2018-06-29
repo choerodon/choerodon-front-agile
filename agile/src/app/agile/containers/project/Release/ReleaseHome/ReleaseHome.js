@@ -64,7 +64,7 @@ class ReleaseHome extends Component {
         },
       });
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   handleClickMenu(record, e) {
@@ -77,14 +77,14 @@ class ReleaseHome extends Component {
             ReleaseStore.setVersionDetail(record);
             this.setState({ publicVersion: true }); 
           }).catch((error) => {
-            window.console.log(error);
+            window.console.error(error);
           });
       } else {
         ReleaseStore.axiosUnPublicRelease(
           record.versionId).then((res2) => {
           this.refresh(this.state.pagination);
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       }
     }
@@ -105,7 +105,7 @@ class ReleaseHome extends Component {
             });
           }
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       } else {
         this.setState({
@@ -121,7 +121,7 @@ class ReleaseHome extends Component {
           editRelease: true,
         });
       }).catch((error) => {
-        window.console.log(error);
+        window.console.error(error);
       });
     }
     if (e.key.indexOf('1') !== -1) {
@@ -130,14 +130,14 @@ class ReleaseHome extends Component {
         ReleaseStore.axiosUnFileVersion(record.versionId).then((res) => {
           this.refresh(this.state.pagination);
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       } else {
         // 归档
         ReleaseStore.axiosFileVersion(record.versionId).then((res) => {
           this.refresh(this.state.pagination);
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       }
     }
@@ -155,7 +155,7 @@ class ReleaseHome extends Component {
         sourceList: res,
       });
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   render() {
@@ -270,7 +270,7 @@ class ReleaseHome extends Component {
         <Content
           title={`项目"${AppState.currentMenuType.name}"的发布版本`}
           description="根据项目周期，可以对软件项目追踪不同的版本，同时可以将对应的问题分配到版本中。例如：v1.0.0、v0.5.0等。"
-          link="http://choerodon.io/zh/docs/user-guide/agile/release/"
+          link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/release/"
         >
           <Spin spinning={this.state.loading}>
             {
@@ -328,7 +328,7 @@ class ReleaseHome extends Component {
                   versionDelete: {},
                 });
               }).catch((error) => {
-                window.console.log(error);
+                window.console.error(error);
               });
             }}
             onCancel={() => {

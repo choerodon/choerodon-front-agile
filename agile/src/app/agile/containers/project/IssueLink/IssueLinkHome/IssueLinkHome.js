@@ -141,7 +141,7 @@ class Link extends Component {
     ];
     return (
       <Page>
-        <Header title="快速搜索">
+        <Header title="问题链接">
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-link-type.createIssueLinkType']}>
             <Button funcTyp="flat" onClick={() => this.setState({ createLinkShow: true })}>
               <Icon type="playlist_add icon" />
@@ -156,7 +156,7 @@ class Link extends Component {
         <Content
           title="问题链接"
           description="通过自定义问题链接，可以帮助您更好的对多个问题进行关联，不再局限于父子任务。"
-          // link="#"
+          link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/setup/issue-link/"
         >
           <div>
             <Spin spinning={this.state.loading}>
