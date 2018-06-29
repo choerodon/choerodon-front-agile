@@ -1656,7 +1656,7 @@ class CreateSprint extends Component {
                       <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                     </div>
                     <div className="c7n-content-wrapper" style={{ display: 'flex' }}>
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, width: '50%' }}>
                         {
                           this.state.typeCode !== 'sub_task' ? (
                             <div className="line-start mt-10">
@@ -1675,7 +1675,9 @@ class CreateSprint extends Component {
                                   onOk={this.updateIssueSelect.bind(this, 'originComponents', 'componentIssueRelDTOList')}
                                   onCancel={this.resetComponentIssueRelDTOList.bind(this)}
                                   readModeContent={<div style={{ color: '#3f51b5' }}>
-                                    {this.transToArr(this.state.componentIssueRelDTOList, 'name')}
+                                    <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
+                                      {this.transToArr(this.state.componentIssueRelDTOList, 'name')}
+                                    </p>
                                   </div>}
                                 >
                                   <Select
@@ -1733,7 +1735,7 @@ class CreateSprint extends Component {
                               readModeContent={<div>
                                 {
                                   this.state.labelIssueRelDTOList.length > 0 ? (
-                                    <div style={{ display: 'flex' }}>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                                       {
                                         this.transToArr(this.state.labelIssueRelDTOList, 'labelName', 'array').map(label => (
                                           <div 
@@ -1745,6 +1747,7 @@ class CreateSprint extends Component {
                                               padding: '2px 12px',
                                               background: 'rgba(0, 0, 0, 0.08)',
                                               marginRight: '8px',
+                                              marginBottom: 3,
                                             }}
                                           >
                                             {label}
@@ -1806,8 +1809,10 @@ class CreateSprint extends Component {
                                   onInit={() => this.setAnIssueToState(this.state.origin)}
                                   onOk={this.updateVersionSelect.bind(this, 'originVersions', 'influenceVersions')}
                                   onCancel={this.resetInfluenceVersions.bind(this)}
-                                  readModeContent={<div style={{ color: '#3f51b5' }}>
-                                    {this.transToArr(this.state.influenceVersions, 'name')}
+                                  readModeContent={<div>
+                                    <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
+                                      {this.transToArr(this.state.influenceVersions, 'name')}
+                                    </p>
                                   </div>}
                                 >
                                   <Select
@@ -1862,7 +1867,9 @@ class CreateSprint extends Component {
                               onOk={this.updateVersionSelect.bind(this, 'originVersions', 'fixVersions')}
                               onCancel={this.resetFixVersions.bind(this)}
                               readModeContent={<div style={{ color: '#3f51b5' }}>
-                                {this.transToArr(this.state.fixVersions, 'name')}
+                                <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
+                                  {this.transToArr(this.state.fixVersions, 'name')}
+                                </p>
                               </div>}
                             >
                               <Select
@@ -2019,7 +2026,7 @@ class CreateSprint extends Component {
                         </div>
                       </div>
                       {/* --- */}
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, width: '50%' }}>
                         <div className="line-start mt-10">
                           <div className="c7n-property-wrapper">
                             <span className="c7n-subtitle">

@@ -141,7 +141,7 @@ class Link extends Component {
     ];
     return (
       <Page>
-        <Header title="快速搜索">
+        <Header title="问题链接">
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-link-type.createIssueLinkType']}>
             <Button funcTyp="flat" onClick={() => this.setState({ createLinkShow: true })}>
               <Icon type="playlist_add icon" />
