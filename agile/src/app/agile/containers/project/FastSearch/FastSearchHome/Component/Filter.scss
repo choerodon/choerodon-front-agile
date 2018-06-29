@@ -1,7 +1,11 @@
 .c7n-filter {
   .ant-calendar-picker {
     width: 300px;
-    margin-top: 17px;
+    margin-top: -2px;
+
+    .ant-calendar-picker-input {
+      height: 24px;
+    }
   }
 
   .ant-select-selection--multiple {
