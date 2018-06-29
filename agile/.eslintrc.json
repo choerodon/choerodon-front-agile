@@ -62,6 +62,6 @@
     ]
   },
   "globals": {
-    "HAP": true
+    "Choerodon": true
   }
 }
