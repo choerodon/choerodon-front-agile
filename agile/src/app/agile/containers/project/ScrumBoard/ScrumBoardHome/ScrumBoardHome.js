@@ -68,7 +68,7 @@ class ScrumBoardHome extends Component {
         }
       }
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   refresh(boardId) {
@@ -123,10 +123,10 @@ class ScrumBoardHome extends Component {
           spinIf: false,
         });
       }).catch((error) => {
-        window.console.log(error);
+        window.console.error(error);
       });
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   // storeIssueNumberCount(storeParentIds, columns) {
@@ -299,7 +299,7 @@ class ScrumBoardHome extends Component {
         }
       }).catch((error) => {
         ScrumBoardStore.setBoardData(JSON.parse(JSON.stringify(originState)));
-        window.console.log(error);
+        window.console.error(error);
       });
     }
   }
@@ -313,7 +313,7 @@ class ScrumBoardHome extends Component {
           });
           this.getBoard();
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       }
     });
@@ -359,7 +359,7 @@ class ScrumBoardHome extends Component {
         });
       }
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   filterQuick(item) {
@@ -707,7 +707,7 @@ class ScrumBoardHome extends Component {
                   updateParentStatus: null,
                 });
               }).catch((error) => {
-                window.console.log(error);
+                window.console.error(error);
               });
             }}
           >
@@ -752,7 +752,7 @@ class ScrumBoardHome extends Component {
               style={{ padding: 0 }}
               title={`创建项目“${AppState.currentMenuType.name}”的看板`}
               description="请在下面输入看板名称，创建一个新的board。新的board会默认为您创建'待处理'、'处理中'、'已完成'三个列，同时将todo、doing、done三个类别的状态自动关联入三个列中。"
-              link="http://choerodon.io/zh/docs/user-guide/agile/sprint/create-kanban/"
+              link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/sprint/create-kanban/"
             >
               <Form>
                 <FormItem>

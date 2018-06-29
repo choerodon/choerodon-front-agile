@@ -1502,7 +1502,9 @@ class CreateSprint extends Component {
                                 onOk={this.updateIssueSelect.bind(this, 'originComponents', 'componentIssueRelDTOList')}
                                 onCancel={this.resetComponentIssueRelDTOList.bind(this)}
                                 readModeContent={<div style={{ color: '#3f51b5' }}>
-                                  {this.transToArr(this.state.componentIssueRelDTOList, 'name')}
+                                  <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
+                                    {this.transToArr(this.state.componentIssueRelDTOList, 'name')}
+                                  </p>
                                 </div>}
                               >
                                 <Select
@@ -1560,7 +1562,7 @@ class CreateSprint extends Component {
                             readModeContent={<div>
                               {
                                 this.state.labelIssueRelDTOList.length > 0 ? (
-                                  <div style={{ display: 'flex' }}>
+                                  <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                                     {
                                       this.transToArr(this.state.labelIssueRelDTOList, 'labelName', 'array').map(label => (
                                         <div 
@@ -1572,6 +1574,7 @@ class CreateSprint extends Component {
                                             padding: '2px 12px',
                                             background: 'rgba(0, 0, 0, 0.08)',
                                             marginRight: '8px',
+                                            marginBottom: 3,
                                           }}
                                         >
                                           {label}
@@ -1634,7 +1637,9 @@ class CreateSprint extends Component {
                                 onOk={this.updateVersionSelect.bind(this, 'originVersions', 'influenceVersions')}
                                 onCancel={this.resetInfluenceVersions.bind(this)}
                                 readModeContent={<div style={{ color: '#3f51b5' }}>
-                                  {this.transToArr(this.state.influenceVersions, 'name')}
+                                  <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
+                                    {this.transToArr(this.state.influenceVersions, 'name')}
+                                  </p>
                                 </div>}
                               >
                                 <Select
@@ -1689,7 +1694,9 @@ class CreateSprint extends Component {
                             onOk={this.updateVersionSelect.bind(this, 'originVersions', 'fixVersions')}
                             onCancel={this.resetFixVersions.bind(this)}
                             readModeContent={<div style={{ color: '#3f51b5' }}>
-                              {this.transToArr(this.state.fixVersions, 'name')}
+                              <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
+                                {this.transToArr(this.state.fixVersions, 'name')}
+                              </p>
                             </div>}
                           >
                             <Select

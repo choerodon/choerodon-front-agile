@@ -46,7 +46,7 @@ class CreateVersion extends Component {
             loading: false,
           });
           this.props.onCancel();
-          window.console.log(error);
+          window.console.error(error);
         });
       } else {
         this.setState({
@@ -76,7 +76,7 @@ class CreateVersion extends Component {
           }}
           title={`创建项目“${AppState.currentMenuType.name}”的版本`}
           description="请在下面输入版本的名称、描述、开始和结束日期，创建新的软件版本。"
-          link="http://choerodon.io/zh/docs/user-guide/agile/backlog/version/"
+          link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/backlog/version/"
         >
           <Form style={{ width: 512 }}>
             <FormItem>

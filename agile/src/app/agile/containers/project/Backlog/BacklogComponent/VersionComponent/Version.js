@@ -39,7 +39,7 @@ class Version extends Component {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   renderVersion() {
@@ -140,7 +140,7 @@ class Version extends Component {
                         this.props.issueRefresh();
                         this.props.refresh();
                       }).catch((error) => {
-                        window.console.log(error);
+                        window.console.error(error);
                         this.props.refresh();
                       });
                     }

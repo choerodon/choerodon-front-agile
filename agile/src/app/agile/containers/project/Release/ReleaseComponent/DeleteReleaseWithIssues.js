@@ -54,7 +54,7 @@ class DeleteReleaseWithIssue extends Component {
       this.props.onCancel();
       this.props.refresh();
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   render() {

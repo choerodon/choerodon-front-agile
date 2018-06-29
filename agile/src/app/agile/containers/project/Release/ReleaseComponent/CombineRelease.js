@@ -56,7 +56,7 @@ class CombineRelease extends Component {
           this.props.onCancel();
           this.props.refresh();
         }).catch((error) => {
-          window.console.log(error);
+          window.console.error(error);
         });
       }
     });
@@ -86,7 +86,7 @@ class CombineRelease extends Component {
           }}
           title={`在项目“${AppState.currentMenuType.name}”中合并版本`}
           description="您可以通过合并版本的功能将多个版本的issue合并到一个版本中，被合并的版本将被删除。"
-          // link="#"
+          link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/release/merge-version/"
         >
           <p style={{ display: 'flex', alignItems: 'center' }}><span className="c7n-release-icon">!</span>一旦版本合并后，您就无法还原。</p>
           <Form style={{ width: '512px' }}>

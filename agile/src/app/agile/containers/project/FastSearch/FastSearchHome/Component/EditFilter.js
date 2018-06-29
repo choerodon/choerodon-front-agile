@@ -677,6 +677,7 @@ class AddComponent extends Component {
       // return data picker
       return (
         <DatePicker
+          label="值"
           format={'YYYY-MM-DD HH:mm:ss'}
           showTime
         />

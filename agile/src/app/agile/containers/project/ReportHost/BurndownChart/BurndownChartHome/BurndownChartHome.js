@@ -35,7 +35,7 @@ class BurndownChartHome extends Component {
         this.getChartData();
       });
     }).catch((error) => {
-      window.console.log(error);
+      window.console.error(error);
     });
   }
   getChartData() {
@@ -93,7 +93,6 @@ class BurndownChartHome extends Component {
           });
           newData[index].rest = rest;
         });
-        window.console.log(newData);
         BurndownChartStore.setBurndownList(newData);
         this.setState({
           xAxis: _.map(newData, 'date'),
@@ -101,7 +100,7 @@ class BurndownChartHome extends Component {
           loading: false,
         });
       }).catch((error) => {
-        window.console.log(error);
+        window.console.error(error);
       });
   }
 
@@ -146,7 +145,6 @@ class BurndownChartHome extends Component {
         data: this.state.xAxis,
         axisLabel: {
           formatter(value, index) {
-            window.console.log();
             return `${value.split(' ')[0]}\n${value.split(' ')[1]}`;
           },
         },
@@ -207,7 +205,6 @@ class BurndownChartHome extends Component {
     return result;
   }
   renderDetail(item, record) {
-    window.console.log(record);
     let result = '-';
     if (record.type !== 'startSprint' && record.type !== 'endSprint') {
       if (item.statistical) {
@@ -382,7 +379,7 @@ class BurndownChartHome extends Component {
         <Content
           title={sprintName ? `迭代冲刺“${sprintName}”的燃尽图` : '无冲刺迭代的燃尽图'}
           description="跟踪记录所有问题的剩余工作工作时间，预估完成冲刺任务的可能性，回顾总结迭代过程中的经验与不足。这有助于在团队管理方面取得更进一步的掌控与把握。"
-          // link="#"
+          link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/report/burn-down/"
         >
           <Spin spinning={this.state.loading}>
             {
