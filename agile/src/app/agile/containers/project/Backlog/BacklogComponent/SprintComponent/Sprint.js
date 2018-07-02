@@ -45,16 +45,20 @@ class Sprint extends Component {
   }
 
   onKeyUp(event) {
-    this.setState({
-      keydown: '',
-    });
+    if (document.activeElement.tagName !== 'INPUT') {
+      this.setState({
+        keydown: '',
+      });
+    }
   }
 
   onKeyDown(event) {
-    if (event.keyCode !== this.state.keydown) {
-      this.setState({
-        keydown: event.keyCode,
-      });
+    if (document.activeElement.tagName !== 'INPUT') {
+      if (event.keyCode !== this.state.keydown) {
+        this.setState({
+          keydown: event.keyCode,
+        });
+      }
     }
   }
 

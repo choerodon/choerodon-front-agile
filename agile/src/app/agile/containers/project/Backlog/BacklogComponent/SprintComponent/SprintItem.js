@@ -546,9 +546,15 @@ class SprintItem extends Component {
               }} 
               className="c7n-backlog-sprintGoalSide"
             >
-              <div style={{ backgroundColor: '#4D90FE' }}>{item.todoStoryPoint}</div>
-              <div style={{ backgroundColor: '#FFB100' }}>{item.doingStoryPoint}</div>
-              <div style={{ backgroundColor: '#00BFA5' }}>{item.doneStoryPoint}</div>
+              <Tooltip title={`待处理故事点: ${item.todoStoryPoint}`}>
+                <div style={{ backgroundColor: '#FFB100' }}>{item.todoStoryPoint}</div>
+              </Tooltip>
+              <Tooltip title={`处理中故事点: ${item.doingStoryPoint}`}>
+                <div style={{ backgroundColor: '#4D90FE' }}>{item.doingStoryPoint}</div>
+              </Tooltip>
+              <Tooltip title={`已完成故事点: ${item.doneStoryPoint}`}>
+                <div style={{ backgroundColor: '#00BFA5' }}>{item.doneStoryPoint}</div>
+              </Tooltip>
             </div>
           </div>
         </div>
