@@ -2032,7 +2032,7 @@ class CreateSprint extends Component {
                             }}
                             readModeContent={<div>
                               {
-                                this.state.reporterId ? (
+                                this.state.reporterId && this.state.reporterName ? (
                                   <UserHead
                                     user={{
                                       id: this.state.reporterId,
@@ -2147,7 +2147,7 @@ class CreateSprint extends Component {
                             }}
                             readModeContent={<div>
                               {
-                                this.state.assigneeId ? (
+                                this.state.assigneeId && this.state.assigneeName ? (
                                   <UserHead
                                     user={{
                                       id: this.state.assigneeId,
