@@ -17,7 +17,7 @@ class ReportHostHome extends Component {
   handleClickItem(item) {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    history.push(`${item.link}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
+    history.push(`${item.link}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
   }
   render() {
     const menu = (

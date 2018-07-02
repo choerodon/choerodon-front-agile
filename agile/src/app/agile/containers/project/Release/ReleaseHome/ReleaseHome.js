@@ -205,7 +205,7 @@ class ReleaseHome extends Component {
           onClick={() => {
             const { history } = this.props;
             const urlParams = AppState.currentMenuType;
-            history.push(`/agile/release/detail/${record.versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
+            history.push(`/agile/release/detail/${record.versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
           }}
         >{text}</span>
       ),

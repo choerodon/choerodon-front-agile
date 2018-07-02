@@ -662,7 +662,7 @@ class SprintItem extends Component {
                                   createIssueValue: e.target.value,
                                 });
                               }}
-                              maxLength={30}
+                              maxLength={44}
                               onPressEnter={this.handleBlurCreateIssue.bind(this)}
                               // onBlur={this.handleBlurCreateIssue.bind(this)}
                             />

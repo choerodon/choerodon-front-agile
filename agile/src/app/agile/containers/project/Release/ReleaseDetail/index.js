@@ -318,7 +318,7 @@ class ReleaseDetail extends Component {
               <span style={{ marginLeft: 12, fontSize: 13, color: '#FFB100', padding: '1px 10px', background: 'rgba(255,177,0,0.08)' }}>{ReleaseStore.getVersionDetail.statusName}</span>
             </div>
           )} 
-          backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`}
+          backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           {
             ReleaseStore.getVersionDetail.statusCode === 'archived' ? '' : (
