@@ -161,7 +161,7 @@ class CreateSprint extends Component {
                     this.setState({
                       selectLoading: true,
                     });
-                    loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
+                    loadIssuesInLink(0, 9999, this.props.issueId, input).then((res) => {
                       this.setState({
                         originIssues: res.content,
                         selectLoading: false,

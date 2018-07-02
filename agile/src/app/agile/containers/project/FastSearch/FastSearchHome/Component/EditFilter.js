@@ -78,7 +78,7 @@ class AddComponent extends Component {
     const projectId = AppState.currentMenuType.id;
     const OPTION_FILTER = {
       assignee: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -130,7 +130,7 @@ class AddComponent extends Component {
         name: 'name',
       },
     };
-    axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`).then(res => this.setState({ originUsers: res.content }));
+    axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`).then(res => this.setState({ originUsers: res.content }));
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`).then(res => this.setState({ originPriorities: res.lookupValues }));
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`).then(res => this.setState({ originStatus: res }));
     axios.get(`/agile/v1/projects/${projectId}/issues/epics/select_data`).then(res => this.setState({ originEpics: res }));
@@ -195,7 +195,7 @@ class AddComponent extends Component {
     const projectId = AppState.currentMenuType.id;
     const OPTION_FILTER = {
       assignee: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -216,21 +216,21 @@ class AddComponent extends Component {
         state: 'originStatus',
       },
       reporter: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
         state: 'originUsers',
       },
       created_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
         state: 'originUsers',
       },
       last_updated_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -483,7 +483,7 @@ class AddComponent extends Component {
     const projectId = AppState.currentMenuType.id;
     const OPTION_FILTER = {
       assignee: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -504,21 +504,21 @@ class AddComponent extends Component {
         state: 'originStatus',
       },
       reporter: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
         state: 'originUsers',
       },
       created_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
         state: 'originUsers',
       },
       last_updated_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -644,6 +644,9 @@ class AddComponent extends Component {
           <Select
             label="值"
             labelInValue
+            filter
+            optionFilterProp="children"
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
           >
             {this.tempOption(filter, false)}
           </Select>
@@ -654,6 +657,9 @@ class AddComponent extends Component {
           <Select
             label="值"
             labelInValue
+            filter
+            optionFilterProp="children"
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
               空
@@ -667,6 +673,9 @@ class AddComponent extends Component {
             label="值"
             labelInValue
             mode="multiple"
+            filter
+            optionFilterProp="children"
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
           >
             {this.tempOption(filter, false)}
           </Select>
@@ -690,6 +699,9 @@ class AddComponent extends Component {
           <Select
             label="值"
             labelInValue
+            filter
+            optionFilterProp="children"
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
               空
@@ -730,7 +742,7 @@ class AddComponent extends Component {
           // link="#"
         >
           <Form layout="vertical">
-            <FormItem>
+            <FormItem style={{ width: 520 }}>
               {getFieldDecorator('name', {
                 rules: [{
                   required: true,
@@ -739,7 +751,7 @@ class AddComponent extends Component {
               })(
                 <Input
                   label="名称"
-                  maxLength={30}
+                  maxLength={10}
                 />,
               )}
             </FormItem>
@@ -855,7 +867,7 @@ class AddComponent extends Component {
               <Icon type="add icon" />
               <span>添加属性</span>
             </Button>
-            <FormItem>
+            <FormItem style={{ width: 520 }}>
               {getFieldDecorator('description', {
                 initialValue: this.state.origin.description,
               })(
