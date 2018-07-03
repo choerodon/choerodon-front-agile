@@ -188,7 +188,7 @@ class BurndownChartHome extends Component {
     if (e.key === '0') {
       const { history } = this.props;
       const urlParams = AppState.currentMenuType;
-      history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
+      history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
   renderChartTitle() {
@@ -365,7 +365,7 @@ class BurndownChartHome extends Component {
       <Page>
         <Header
           title="燃尽图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`}
+          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <Button funcTyp="flat" onClick={this.getChartData.bind(this)}>
             <Icon type="refresh" />刷新

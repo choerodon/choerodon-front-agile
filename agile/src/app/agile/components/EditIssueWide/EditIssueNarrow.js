@@ -2069,7 +2069,7 @@ class CreateSprint extends Component {
                               }}
                               readModeContent={<div>
                                 {
-                                  this.state.reporterId ? (
+                                  this.state.reporterId && this.state.reporterName ? (
                                     <UserHead
                                       user={{
                                         id: this.state.reporterId,
@@ -2134,6 +2134,7 @@ class CreateSprint extends Component {
                                 getSelf().then((res) => {
                                   if (res.id !== this.state.reporterId) {
                                     this.setState({
+                                      currentRae: undefined,
                                       reporterId: JSON.stringify(res),
                                       reporterName: `${res.loginName}${res.realName}`,
                                       reporterImageUrl: res.imageUrl,
@@ -2183,7 +2184,7 @@ class CreateSprint extends Component {
                               }}
                               readModeContent={<div>
                                 {
-                                  this.state.assigneeId ? (
+                                  this.state.assigneeId && this.state.assigneeName ? (
                                     <UserHead
                                       user={{
                                         id: this.state.assigneeId,
@@ -2248,6 +2249,7 @@ class CreateSprint extends Component {
                                 getSelf().then((res) => {
                                   if (res.id !== this.state.assigneeId) {
                                     this.setState({
+                                      currentRae: undefined,
                                       assigneeId: JSON.stringify(res),
                                       assigneeName: `${res.loginName}${res.realName}`,
                                       assigneeImageUrl: res.imageUrl,

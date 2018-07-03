@@ -189,7 +189,7 @@ class AddComponent extends Component {
     const projectId = AppState.currentMenuType.id;
     const OPTION_FILTER = {
       assignee: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -207,19 +207,19 @@ class AddComponent extends Component {
         name: 'name',
       },
       reporter: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
       },
       created_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
       },
       last_updated_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -305,7 +305,7 @@ class AddComponent extends Component {
     const projectId = AppState.currentMenuType.id;
     const OPTION_FILTER = {
       assignee: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -323,19 +323,19 @@ class AddComponent extends Component {
         name: 'name',
       },
       reporter: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
       },
       created_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
       },
       last_updated_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users`,
+        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -434,6 +434,9 @@ class AddComponent extends Component {
           <Select
             label="值"
             labelInValue
+            filter
+            optionFilterProp="children"
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             onFocus={() => {
               this.getOption(filter, false);
             }}
@@ -447,6 +450,9 @@ class AddComponent extends Component {
           <Select
             label="值"
             labelInValue
+            filter
+            optionFilterProp="children"
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
               空
@@ -460,6 +466,9 @@ class AddComponent extends Component {
             label="值"
             labelInValue
             mode="multiple"
+            filter
+            optionFilterProp="children"
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             onFocus={() => {
               this.getOption(filter, false);
             }}
@@ -486,6 +495,9 @@ class AddComponent extends Component {
           <Select
             label="值"
             labelInValue
+            filter
+            optionFilterProp="children"
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
               空
