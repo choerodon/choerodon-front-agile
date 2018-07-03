@@ -192,6 +192,7 @@ class CreateSprint extends Component {
       description,
       epicId,
       epicName,
+      epicColor,
       estimateTime,
       issueCommentDTOList,
       issueId,
@@ -241,6 +242,7 @@ class CreateSprint extends Component {
       description,
       epicId,
       epicName,
+      epicColor,
       estimateTime,
       fileList,
       issueCommentDTOList,
@@ -1934,8 +1936,10 @@ class CreateSprint extends Component {
                                       this.state.epicId ? (
                                         <div 
                                           style={{
-                                            color: '#4d90fe',
-                                            border: '1px solid #4d90fe',
+                                            color: this.state.epicColor,
+                                            borderWidth: '1px',
+                                            borderStyle: 'solid',
+                                            borderColor: this.state.epicColor,
                                             borderRadius: '2px',
                                             fontSize: '13px',
                                             lineHeight: '20px',

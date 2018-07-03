@@ -42,7 +42,7 @@ class AGILEIndex extends React.Component {
           {/* 报告 */}
           <Route path={`${match.url}/reporthost`} component={REPORTHOSTINDEX} />
           {/* <Route path={`${match.url}/burndownchart`} component={BURNDOWNCHART} /> */}
-          {/* <Route path={`${match.url}/setting`} component={SETTINGINDEX} /> */}
+          <Route path={`${match.url}/setting`} component={SETTINGINDEX} /> 
           {/* 项目设置 */}
           <Route path={`${match.url}/projectSetting`} component={PROJECTSETTINGINDEX} />
           {/* 快速搜索 */}
