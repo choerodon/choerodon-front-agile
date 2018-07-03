@@ -537,7 +537,7 @@ class ScrumBoardHome extends Component {
           </Button>
         </Header>
         <Content style={{ padding: 0, display: 'flex', overflow: 'hidden' }}>
-          <div style={{ flexGrow: 1 }}>
+          <div style={{ flexGrow: 1, overflow: 'hidden' }}>
             <Spin spinning={this.state.spinIf}>
               <div className="c7n-scrumTools">
                 <div style={{ flexWrap: 'wrap' }} className="c7n-scrumTools-left">
