@@ -368,7 +368,7 @@ class StatusIssue extends Component {
             }
           </Draggable>
           <div>
-            {!type ? this.getChildren() : ''}
+            {!type && ScrumBoardStore.getSwimLaneCode === 'assignee' ? this.getChildren() : ''}
           </div>
         </div>
       );

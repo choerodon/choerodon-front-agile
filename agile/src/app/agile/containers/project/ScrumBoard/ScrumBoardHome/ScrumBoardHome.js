@@ -256,44 +256,49 @@ class ScrumBoardHome extends Component {
         JSON.parse(result.source.droppableId).columnId, 
         JSON.parse(result.destination.droppableId).columnId,
       ).then((data) => {
-        draggableData.objectVersionNumber = data.objectVersionNumber;
-        _.forEach(newState, (item, index) => {
-          if (String(item.columnId) === 
-          String(JSON.parse(result.destination.droppableId).columnId)) {
-            _.forEach(newState[index].subStatuses, (item2, index2) => {
-              if (String(item2.id) === 
-              String(JSON.parse(result.destination.droppableId).code)) {
-                destinationStatus = item2.categoryCode;
-                newState[index].subStatuses[index2].issues.splice(
-                  result.destination.index, 1, draggableData);
-              }
-            });
-          }
-        });
-        ScrumBoardStore.setBoardData(newState);
-        if (draggableData.parentIssueId) {
-          if (destinationStatus === 'done') {
-            let parentIdCode;
-            let parentIdNum;
-            let parentObjectVersionNumber;
-            _.forEach(ScrumBoardStore.getParentIds, (pi) => {
-              if (pi.issueId === draggableData.parentIssueId) {
-                parentIdCode = pi.categoryCode;
-                parentIdNum = pi.issueNum;
-                parentObjectVersionNumber = pi.objectVersionNumber;
-              }
-            });
-            const judge = ScrumBoardStore.judgeMoveParentToDone(
-              parentIdCode, draggableData.parentIssueId);
-            if (judge) {
-              this.setState({
-                judgeUpdateParent: {
-                  id: draggableData.parentIssueId,
-                  issueNumber: parentIdNum,
-                  code: parentIdCode,
-                  objectVersionNumber: parentObjectVersionNumber,
-                },
+        if (data.failed) {
+          message.info(data.message);
+          ScrumBoardStore.setBoardData(originState);
+        } else {
+          draggableData.objectVersionNumber = data.objectVersionNumber;
+          _.forEach(newState, (item, index) => {
+            if (String(item.columnId) === 
+            String(JSON.parse(result.destination.droppableId).columnId)) {
+              _.forEach(newState[index].subStatuses, (item2, index2) => {
+                if (String(item2.id) === 
+                String(JSON.parse(result.destination.droppableId).code)) {
+                  destinationStatus = item2.categoryCode;
+                  newState[index].subStatuses[index2].issues.splice(
+                    result.destination.index, 1, draggableData);
+                }
               });
+            }
+          });
+          ScrumBoardStore.setBoardData(newState);
+          if (draggableData.parentIssueId) {
+            if (destinationStatus === 'done') {
+              let parentIdCode;
+              let parentIdNum;
+              let parentObjectVersionNumber;
+              _.forEach(ScrumBoardStore.getParentIds, (pi) => {
+                if (pi.issueId === draggableData.parentIssueId) {
+                  parentIdCode = pi.categoryCode;
+                  parentIdNum = pi.issueNum;
+                  parentObjectVersionNumber = pi.objectVersionNumber;
+                }
+              });
+              const judge = ScrumBoardStore.judgeMoveParentToDone(
+                parentIdCode, draggableData.parentIssueId);
+              if (judge) {
+                this.setState({
+                  judgeUpdateParent: {
+                    id: draggableData.parentIssueId,
+                    issueNumber: parentIdNum,
+                    code: parentIdCode,
+                    objectVersionNumber: parentObjectVersionNumber,
+                  },
+                });
+              }
             }
           }
         }
