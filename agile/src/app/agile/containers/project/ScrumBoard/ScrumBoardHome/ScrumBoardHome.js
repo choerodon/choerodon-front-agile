@@ -256,44 +256,49 @@ class ScrumBoardHome extends Component {
         JSON.parse(result.source.droppableId).columnId, 
         JSON.parse(result.destination.droppableId).columnId,
       ).then((data) => {
-        draggableData.objectVersionNumber = data.objectVersionNumber;
-        _.forEach(newState, (item, index) => {
-          if (String(item.columnId) === 
-          String(JSON.parse(result.destination.droppableId).columnId)) {
-            _.forEach(newState[index].subStatuses, (item2, index2) => {
-              if (String(item2.id) === 
-              String(JSON.parse(result.destination.droppableId).code)) {
-                destinationStatus = item2.categoryCode;
-                newState[index].subStatuses[index2].issues.splice(
-                  result.destination.index, 1, draggableData);
-              }
-            });
-          }
-        });
-        ScrumBoardStore.setBoardData(newState);
-        if (draggableData.parentIssueId) {
-          if (destinationStatus === 'done') {
-            let parentIdCode;
-            let parentIdNum;
-            let parentObjectVersionNumber;
-            _.forEach(ScrumBoardStore.getParentIds, (pi) => {
-              if (pi.issueId === draggableData.parentIssueId) {
-                parentIdCode = pi.categoryCode;
-                parentIdNum = pi.issueNum;
-                parentObjectVersionNumber = pi.objectVersionNumber;
-              }
-            });
-            const judge = ScrumBoardStore.judgeMoveParentToDone(
-              parentIdCode, draggableData.parentIssueId);
-            if (judge) {
-              this.setState({
-                judgeUpdateParent: {
-                  id: draggableData.parentIssueId,
-                  issueNumber: parentIdNum,
-                  code: parentIdCode,
-                  objectVersionNumber: parentObjectVersionNumber,
-                },
+        if (data.failed) {
+          message.info(data.message);
+          ScrumBoardStore.setBoardData(originState);
+        } else {
+          draggableData.objectVersionNumber = data.objectVersionNumber;
+          _.forEach(newState, (item, index) => {
+            if (String(item.columnId) === 
+            String(JSON.parse(result.destination.droppableId).columnId)) {
+              _.forEach(newState[index].subStatuses, (item2, index2) => {
+                if (String(item2.id) === 
+                String(JSON.parse(result.destination.droppableId).code)) {
+                  destinationStatus = item2.categoryCode;
+                  newState[index].subStatuses[index2].issues.splice(
+                    result.destination.index, 1, draggableData);
+                }
               });
+            }
+          });
+          ScrumBoardStore.setBoardData(newState);
+          if (draggableData.parentIssueId) {
+            if (destinationStatus === 'done') {
+              let parentIdCode;
+              let parentIdNum;
+              let parentObjectVersionNumber;
+              _.forEach(ScrumBoardStore.getParentIds, (pi) => {
+                if (pi.issueId === draggableData.parentIssueId) {
+                  parentIdCode = pi.categoryCode;
+                  parentIdNum = pi.issueNum;
+                  parentObjectVersionNumber = pi.objectVersionNumber;
+                }
+              });
+              const judge = ScrumBoardStore.judgeMoveParentToDone(
+                parentIdCode, draggableData.parentIssueId);
+              if (judge) {
+                this.setState({
+                  judgeUpdateParent: {
+                    id: draggableData.parentIssueId,
+                    issueNumber: parentIdNum,
+                    code: parentIdCode,
+                    objectVersionNumber: parentObjectVersionNumber,
+                  },
+                });
+              }
             }
           }
         }
@@ -532,7 +537,7 @@ class ScrumBoardHome extends Component {
           </Button>
         </Header>
         <Content style={{ padding: 0, display: 'flex', overflow: 'hidden' }}>
-          <div style={{ flexGrow: 1 }}>
+          <div style={{ flexGrow: 1, overflow: 'hidden' }}>
             <Spin spinning={this.state.spinIf}>
               <div className="c7n-scrumTools">
                 <div style={{ flexWrap: 'wrap' }} className="c7n-scrumTools-left">
@@ -586,7 +591,7 @@ class ScrumBoardHome extends Component {
                     onClick={() => {
                       const { history } = this.props;
                       const urlParams = AppState.currentMenuType;
-                      history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&boardId=${ScrumBoardStore.getSelectedBoard}`);
+                      history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&boardId=${ScrumBoardStore.getSelectedBoard}`);
                     }}
                   >
                     <Icon type="settings icon" />

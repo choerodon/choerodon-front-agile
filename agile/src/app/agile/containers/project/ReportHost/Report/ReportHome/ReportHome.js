@@ -94,7 +94,7 @@ class ReleaseDetail extends Component {
     if (e.key === '0') {
       const { history } = this.props;
       const urlParams = AppState.currentMenuType;
-      history.push(`/agile/reporthost/burndownchart?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
+      history.push(`/agile/reporthost/burndownchart?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
   renderDoneIssue(column) {
@@ -237,7 +237,7 @@ class ReleaseDetail extends Component {
       <Page className="c7n-report">
         <Header 
           title="冲刺报告"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`}
+          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <Button 
             funcTyp="flat" 

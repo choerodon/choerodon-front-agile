@@ -87,7 +87,7 @@ class ScrumBoardSetting extends Component {
       cancelText: '取消',
       onOk() {
         ScrumBoardStore.axiosDeleteBoard().then((res) => {
-          history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
+          history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
         }).catch((error) => {
           window.console.error(error);
         });
@@ -104,7 +104,7 @@ class ScrumBoardSetting extends Component {
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <Page>
-        <Header title="配置看板" backPath={`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`}>
+        <Header title="配置看板" backPath={`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}>
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.board.deleteScrumBoard']}>
             <Button funcTyp="flat" onClick={this.handleDeleteBoard.bind(this)} disabled={ScrumBoardStore.getBoardList.length === 1}>
               <Icon type="delete_forever icon" />
