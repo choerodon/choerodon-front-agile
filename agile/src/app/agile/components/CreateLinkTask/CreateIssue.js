@@ -13,6 +13,7 @@ const { AppState } = stores;
 const { Sidebar } = Modal;
 const { Option } = Select;
 const FormItem = Form.Item;
+let sign = false;
 
 class CreateSprint extends Component {
   constructor(props) {
@@ -27,6 +28,8 @@ class CreateSprint extends Component {
       active: [],
       passive: [],
       show: [],
+
+      selected: [],
     };
   }
 
@@ -70,29 +73,58 @@ class CreateSprint extends Component {
     });
   }
 
+  handleSelect(value, option) {
+    const selected = _.map(option.slice(), v => v.key);
+    this.setState({ selected });
+  }
+
+  onFilterChange(input) {
+    if (!sign) {
+      this.setState({
+        selectLoading: true,
+      });
+      loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
+        this.setState({
+          originIssues: res.content,
+          selectLoading: false,
+        });
+      });
+      sign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
+      this.setState({
+        originIssues: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
+
   handleCreateIssue = () => {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const { linkTypeId, issues } = values;
-        const labelIssueRelDTOList = _.map(issues, (issue) => {
-          const target = _.find(this.state.originIssues, { issueNum: issue });
-          if (target) {
-            const currentLinkType = _.find(this.state.originLinks, { linkTypeId: linkTypeId.split('+')[0] * 1 });
-            if (currentLinkType.outWard === linkTypeId.split('+')[1]) {
-              return ({
-                linkTypeId: linkTypeId.split('+')[0] * 1,
-                linkedIssueId: target.issueId,
-                issueId: this.props.issueId,
-              });
-            } else {
-              return ({
-                linkTypeId: linkTypeId.split('+')[0] * 1,
-                issueId: target.issueId,
-                linkedIssueId: this.props.issueId,
-              });
-            }
+        const labelIssueRelDTOList = _.map(this.state.selected, (issue) => {
+          const currentLinkType = _.find(this.state.originLinks, { linkTypeId: linkTypeId.split('+')[0] * 1 });
+          if (currentLinkType.outWard === linkTypeId.split('+')[1]) {
+            return ({
+              linkTypeId: linkTypeId.split('+')[0] * 1,
+              linkedIssueId: issue * 1,
+              issueId: this.props.issueId,
+            });
           } else {
-            return {};
+            return ({
+              linkTypeId: linkTypeId.split('+')[0] * 1,
+              issueId: issue * 1,
+              linkedIssueId: this.props.issueId,
+            });
           }
         });
         this.setState({ createLoading: true });
@@ -157,21 +189,12 @@ class CreateSprint extends Component {
                   optionLabelProp="value"
                   filter
                   filterOption={false}
-                  onFilterChange={(input) => {
-                    this.setState({
-                      selectLoading: true,
-                    });
-                    loadIssuesInLink(0, 9999, this.props.issueId, input).then((res) => {
-                      this.setState({
-                        originIssues: res.content,
-                        selectLoading: false,
-                      });
-                    });
-                  }}
+                  onFilterChange={this.onFilterChange.bind(this)}
+                  onChange={this.handleSelect.bind(this)}
                 >
                   {this.state.originIssues.map(issue =>
                     (<Option
-                      key={issue.issueNum}
+                      key={issue.issueId}
                       value={issue.issueNum}
                     >
                       <div style={{ display: 'inline-flex', width: '100%', flex: 1 }}>
