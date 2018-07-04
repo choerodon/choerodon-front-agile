@@ -46,7 +46,6 @@ class Issue extends Component {
 
   getInit() {
     const Request = this.GetRequest(this.props.location.search);
-    window.console.log(Request);
     const { paramType, paramId, paramName } = Request;
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
@@ -175,9 +174,10 @@ class Issue extends Component {
 
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
     IssueStore.setBarFilters(barFilters);
-    this.setState({
-      barFilters,
-    });
+    window.console.log(barFilters);
+    if (barFilters === undefined || barFilters.length === 0) {
+      IssueStore.setBarFilters(undefined);
+    }
     const obj = {
       advancedSearchArgs: {},
       searchArgs: {},
@@ -517,48 +517,25 @@ class Issue extends Component {
     );
     return (
       <Page className="c7n-Issue c7n-region">
-        {
-          IssueStore.paramType ? (
-            <Header
-              title="问题管理"
-              // backPath={() => this.props.history.goBack()}
-            >
-              <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ create: true })}>
-                <Icon type="playlist_add icon" />
-                <span>创建问题</span>
-              </Button>
-              <Button
-                funcTyp="flat"
-                onClick={() => {
-                  const { current, pageSize } = IssueStore.pagination;
-                  IssueStore.loadIssues(current - 1, pageSize);
-                }}
-              >
-                <Icon type="autorenew icon" />
-                <span>刷新</span>
-              </Button>
-            </Header>
-          ) : (
-            <Header
-              title="问题管理"
-            >
-              <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ create: true })}>
-                <Icon type="playlist_add icon" />
-                <span>创建问题</span>
-              </Button>
-              <Button
-                funcTyp="flat"
-                onClick={() => {
-                  const { current, pageSize } = IssueStore.pagination;
-                  IssueStore.loadIssues(current - 1, pageSize);
-                }}
-              >
-                <Icon type="autorenew icon" />
-                <span>刷新</span>
-              </Button>
-            </Header>
-          )
-        }
+        <Header
+          title="问题管理"
+          backPath={IssueStore.getBackUrl}
+        >
+          <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ create: true })}>
+            <Icon type="playlist_add icon" />
+            <span>创建问题</span>
+          </Button>
+          <Button
+            funcTyp="flat"
+            onClick={() => {
+              const { current, pageSize } = IssueStore.pagination;
+              IssueStore.loadIssues(current - 1, pageSize);
+            }}
+          >
+            <Icon type="autorenew icon" />
+            <span>刷新</span>
+          </Button>
+        </Header>
         <Content style={{ display: 'flex', padding: '0' }}>
           {/* <Spin spinning={IssueStore.loading}> */}
           <div 

@@ -37,7 +37,7 @@ class SprintCommonStore {
   loadIssues(page = 0, size = 10) {
     this.setLoading(true);
     const { orderField, orderType } = this.order;
-    loadIssues(page, size, this.filter, orderField, orderType)
+    loadIssues(page, size, this.getFilter, orderField, orderType)
       .then((res) => {
         this.setIssues(res.content);
         this.setPagination({
@@ -91,6 +91,31 @@ class SprintCommonStore {
 
   @action setBarFilters(data) {
     this.barFilters = data;
+  }
+
+  @computed get getBackUrl() {
+    const urlParams = AppState.currentMenuType;
+    if (!this.paramType) {
+      return undefined;
+    } else if (this.paramType === 'sprint') {
+      return `/agile/reporthost/sprintReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
+    } else if (this.paramType === 'component') {
+      return `/agile/component?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
+    } else if (this.paramType === 'version') {
+      return `/agile/release/detail/${this.paramId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
+    }
+  }
+
+  @computed get getFilter() {
+    const filter = this.filter;
+    const otherArgs = {
+      type: this.paramType,
+      id: [this.paramId],
+    };
+    return {
+      ...filter,
+      otherArgs: this.barFilters ? otherArgs : undefined,
+    };
   }
 }
 const sprintCommonStore = new SprintCommonStore();

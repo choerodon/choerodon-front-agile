@@ -24,6 +24,7 @@ import IssueList from '../EditIssueNarrow/Component/IssueList';
 import LinkList from '../EditIssueNarrow/Component/LinkList';
 import CopyIssue from '../CopyIssue';
 import TransformSubIssue from '../TransformSubIssue';
+import CreateBranch from '../CreateBranch';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -64,6 +65,7 @@ class CreateSprint extends Component {
       createLoading: false,
       createSubTaskShow: false,
       createLinkTaskShow: false,
+      createBranchShow: false,
       editDesShow: false,
       origin: {},
       loading: true,
@@ -282,9 +284,9 @@ class CreateSprint extends Component {
   getCurrentNav(e) {
     let eles;
     if (this.state.typeCode !== 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'sub_task', 'link_task' ];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'sub_task', 'link_task', 'branch'];
     } else {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'branch'];
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
@@ -1144,6 +1146,18 @@ class CreateSprint extends Component {
                 </Tooltip>
               )
             }
+            <Tooltip placement="right" title="开发">
+              <li id="BRANCH-nav" className={`c7n-li ${this.state.nav === 'branch' ? 'c7n-li-active' : ''}`}>
+                <Icon
+                  type="branch c7n-icon-li"
+                  role="none"
+                  onClick={() => {
+                    this.setState({ nav: 'branch' });
+                    this.scrollToAnchor('branch');
+                  }}
+                />
+              </li>
+            </Tooltip>
           </ul>
         </div>
         <div className="c7n-content">
@@ -2461,6 +2475,24 @@ class CreateSprint extends Component {
                     </div>
                   )
                 }
+
+                <div id="branch">
+                  <div className="c7n-title-wrapper">
+                    <div className="c7n-title-left">
+                      <Icon type="branch c7n-icon-title" />
+                      <span>开发</span>
+                    </div>
+                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                    <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                      <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createBranchShow: true })}>
+                        <Icon type="playlist_add icon" />
+                        <span>创建分支</span>
+                      </Button>
+                    </div>
+                  </div>
+                  {/* {this.renderLinkIssues()} */}
+                </div>
+
               </div>
             </section>
           </div>
@@ -2531,6 +2563,14 @@ class CreateSprint extends Component {
               visible={this.state.transformSubIssueShow}
               onCancel={() => this.setState({ transformSubIssueShow: false })}
               onOk={this.handleTransformSubIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.createBranchShow ? (
+            <CreateBranch
+              onClose={() => this.setState({ createBranchShow: false })}
+              visible={this.state.createBranchShow}
             />
           ) : null
         }
