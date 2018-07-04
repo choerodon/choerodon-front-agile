@@ -17,6 +17,10 @@ class SprintCommonStore {
     orderType: '',
   };
   @observable loading = true;
+  @observable paramType = undefined;
+  @observable paramId = undefined;
+  @observable paramName = undefined;
+  @observable barFilters = undefined;
 
   init() {
     this.setOrder({
@@ -71,6 +75,22 @@ class SprintCommonStore {
 
   @action setLoading(data) {
     this.loading = data;
+  }
+
+  @action setParamType(data) {
+    this.paramType = data;
+  }
+
+  @action setParamId(data) {
+    this.paramId = data;
+  }
+
+  @action setParamName(data) {
+    this.paramName = data;
+  }
+
+  @action setBarFilters(data) {
+    this.barFilters = data;
   }
 }
 const sprintCommonStore = new SprintCommonStore();

@@ -22,6 +22,8 @@ import DataLogs from '../EditIssueNarrow/Component/DataLogs';
 import DataLog from '../EditIssueNarrow/Component/DataLog';
 import IssueList from '../EditIssueNarrow/Component/IssueList';
 import LinkList from '../EditIssueNarrow/Component/LinkList';
+import CopyIssue from '../CopyIssue';
+import TransformSubIssue from '../TransformSubIssue';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -641,6 +643,25 @@ class CreateSprint extends Component {
     }
   }
 
+  handleCopyIssue() {
+    this.reloadIssue();
+    this.setState({
+      copyIssueShow: false,
+    });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
+  }
+
+  handleTransformSubIssue() {
+    this.reloadIssue();
+    this.setState({
+      transformSubIssueShow: false,
+    });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
+  }
 
   handleClickMenu(e) {
     if (e.key === '0') {
@@ -649,6 +670,10 @@ class CreateSprint extends Component {
       this.handleDeleteIssue(this.state.origin.issueId);
     } else if (e.key === '2') {
       this.setState({ createSubTaskShow: true });
+    } else if (e.key === '3') {
+      this.setState({ copyIssueShow: true });
+    } else if (e.key === '4') {
+      this.setState({ transformSubIssueShow: true });
     }
   }
 
@@ -930,6 +955,12 @@ class CreateSprint extends Component {
             </Menu.Item>
           )
         }
+        <Menu.Item key="3">
+          复制问题
+        </Menu.Item>
+        <Menu.Item key="4">
+          转化为子任务
+        </Menu.Item>
       </Menu>
     );
     const callback = (value) => {
@@ -2482,6 +2513,24 @@ class CreateSprint extends Component {
               visible={this.state.createLinkTaskShow}
               onCancel={() => this.setState({ createLinkTaskShow: false })}
               onOk={this.handleCreateLinkIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.copyIssueShow ? (
+            <CopyIssue
+              visible={this.state.copyIssueShow}
+              onCancel={() => this.setState({ copyIssueShow: false })}
+              onOk={this.handleCopyIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.transformSubIssueShow ? (
+            <TransformSubIssue
+              visible={this.state.transformSubIssueShow}
+              onCancel={() => this.setState({ transformSubIssueShow: false })}
+              onOk={this.handleTransformSubIssue.bind(this)}
             />
           ) : null
         }
