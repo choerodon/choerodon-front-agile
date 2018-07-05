@@ -24,22 +24,19 @@ class BacklogHome extends Component {
       versionVisible: false,
       epicVisible: false,
       scrollIf: false,
+      more: false,
+      expand: false,
     };
   }
   componentWillMount() {
     this.refresh();
-    // window.addEventListener('click', (e) => {
-    //   if (!e.target.getAttribute('label')) {
-    //     if (this.sprintRef.getCurrentState('selected').issueIds.length > 0) {
-    //       if (!BacklogStore.getIsDragging) {
-    //         this.sprintRef.onChangeState('selected', {
-    //           droppableId: '',
-    //           issueIds: [],
-    //         });
-    //       }
-    //     }
-    //   }
-    // });
+  }
+  componentDidMount() {
+    if (document.getElementsByClassName('c7n-backlogTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-backlogTools-left')[0].clientHeight) {
+      this.setState({
+        more: true,
+      });
+    }
   }
   //  拖动结束事件
   onDragEnd(result) {
@@ -374,7 +371,12 @@ class BacklogHome extends Component {
         </Header>
         <Content style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div className="c7n-backlogTools">
-            <div className="c7n-backlogTools-left">
+            <div
+              className="c7n-backlogTools-left"
+              style={{
+                height: this.state.expand ? '' : 25,
+              }}
+            >
               <p style={{ marginRight: 32, whiteSpace: 'nowrap' }}>快速搜索:</p>
               <p
                 className="c7n-backlog-filter"
@@ -410,6 +412,22 @@ class BacklogHome extends Component {
                     </p>
                   )) : ''
               }
+            </div>
+            <div
+              style={{
+                display: this.state.more ? 'block' : 'none',
+                color: 'rgb(63, 81, 181)',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+              role="none"
+              onClick={() => {
+                this.setState({
+                  expand: !this.state.expand,
+                });
+              }}
+            >
+              {this.state.expand ? '...收起' : '...展开'}
             </div>
           </div>
           <div className="c7n-backlog">

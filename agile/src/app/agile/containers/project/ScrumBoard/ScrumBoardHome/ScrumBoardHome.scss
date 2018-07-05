@@ -37,11 +37,12 @@
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  padding: 15px 24px;
+  padding: 8px 24px;
 
   .c7n-scrumTools-left {
     display: flex;
     align-items: center;
+    overflow: hidden;
 
     p {
       white-space: nowrap;
@@ -51,7 +52,6 @@
       cursor: pointer;
       padding: 3px 8px;
       margin-right: 18px;
-      margin-top: 5px;
     }
   }
 
@@ -64,12 +64,21 @@
 }
 
 .c7n-scrumboard-page {
+  .ant-select-selection__rendered {
+    padding-right: unset;
+    margin-bottom: unset;
+  }
+
   .ant-select-arrow {
     right: unset;
   }
 
   .ant-select-selection-selected-value {
     color: #3f51b5;
+  }
+
+  .page-head .ant-btn:not(.back-btn) {
+    line-height: '';
   }
 }
 

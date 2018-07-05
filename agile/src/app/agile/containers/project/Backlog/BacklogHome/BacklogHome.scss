@@ -5,11 +5,13 @@
   padding: 15px 24px;
   border-bottom: 1px solid #d3d3d3;
   flex-shrink: 0;
+  align-items: center;
 
   .c7n-backlogTools-left {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    overflow: hidden;
   }
 }
 
@@ -48,4 +50,10 @@
   margin-right: 18px;
   border-radius: 2px;
   white-space: nowrap;
+}
+
+.c7n-quickfilter-more {
+  white-space: nowrap;
+  margin-left: 50px;
+  cursor: pointer;
 }

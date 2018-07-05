@@ -2,18 +2,22 @@
     width: 280px;
     height: 296px;
     background: #fafafa;
-    margin-right: 24px;
     padding: 18px;
+    display: flex;
+    flex-direction: column;
+    margin-right: 24px;
     
     .c7n-reporthost-itempic {
         height: 154px;
         box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.12), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
         border-radius: 2px;
-        margin-bottom: 18px;
         background-size: 100% 100%;
+        width: 220px;
+        align-self: center;
     }
 
     .c7n-reporthost-itembottom {
+        margin-top: 18px;
         .c7n-reporthost-itemdes {
             color:  rgba(0, 0, 0, 0.65);
         }
