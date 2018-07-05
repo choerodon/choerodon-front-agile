@@ -442,6 +442,7 @@ class SprintItem extends Component {
                       {/* <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ? 
                       ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div> */}
                       <Avatar
+                        style={{ marginRight: 8 }}
                         src={ass2.imageUrl ? ass2.imageUrl : undefined}
                         size="small"
                       >
@@ -686,12 +687,11 @@ class SprintItem extends Component {
                       </div>
                     ) : (
                       <div className="c7n-backlog-sprintIssueSide">
-                        <Icon
-                          className="c7n-backlog-createIssue"
-                          type="playlist_add"
-                          role="none"
+                        <Button 
+                          className="leftBtn" 
+                          functyp="flat" 
                           style={{
-                            cursor: 'pointer',
+                            color: '#3f51b5',
                           }}
                           onClick={() => {
                             this.setState({
@@ -699,7 +699,9 @@ class SprintItem extends Component {
                               createIssueValue: '',
                             });
                           }}
-                        >创建问题</Icon>
+                        >
+                          <Icon type="playlist_add" />创建问题
+                        </Button>
                       </div>
                     )}
                   </div>

@@ -39,10 +39,19 @@ class ScrumBoardHome extends Component {
       judgeUpdateParent: {},
       updateParentStatus: null,
       quickFilter: [],
+      more: false,
+      expandFilter: false,
     };
   }
   componentWillMount() {
     this.getBoard();
+  }
+  componentDidMount() {
+    if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
+      this.setState({
+        more: true,
+      });
+    }
   }
   getBoard() {
     ScrumBoardStore.axiosGetBoardList().then((data) => {
@@ -583,7 +592,7 @@ class ScrumBoardHome extends Component {
           <Select 
             className="leftBtn2 select-without-underline" 
             value={ScrumBoardStore.getSelectedBoard}
-            style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500 }}
+            style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: 28 }}
             dropdownStyle={{
               color: '#3F51B5',
             }}
@@ -615,42 +624,68 @@ class ScrumBoardHome extends Component {
           <div style={{ flexGrow: 1, overflow: 'hidden' }}>
             <Spin spinning={this.state.spinIf}>
               <div className="c7n-scrumTools">
-                <div style={{ flexWrap: 'wrap' }} className="c7n-scrumTools-left">
-                  <p style={{ marginRight: 24 }}>快速搜索:</p>
-                  <p
-                    className="c7n-scrumTools-filter"
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div 
+                    style={{ 
+                      width: '85%',
+                      flexWrap: 'wrap',
+                      height: this.state.expandFilter ? '' : 25,
+                    }} 
+                    className="c7n-scrumTools-left"
+                  >
+                    <p style={{ marginRight: 24 }}>快速搜索:</p>
+                    <p
+                      className="c7n-scrumTools-filter"
+                      style={{
+                        background: this.state.onlyMe ? '#3F51B5' : '',
+                        color: this.state.onlyMe ? 'white' : '#3F51B5',
+                      }}
+                      role="none"
+                      onClick={this.filterOnlyMe.bind(this)}
+                    >仅我的问题</p>
+                    <p
+                      className="c7n-scrumTools-filter"
+                      style={{
+                        background: this.state.recent ? '#3F51B5' : '',
+                        color: this.state.recent ? 'white' : '#3F51B5',
+                      }}
+                      role="none"
+                      onClick={this.filterOnlyStory.bind(this)}
+                    >仅故事</p>
+                    {
+                      ScrumBoardStore.getQuickSearchList.length > 0 ? 
+                        ScrumBoardStore.getQuickSearchList.map(item => (
+                          <p
+                            className="c7n-scrumTools-filter"
+                            style={{
+                              color: this.state.quickFilter.indexOf(item.filterId) !== -1 ? 'white' : '#3F51B5',
+                              background: this.state.quickFilter.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',
+                            }}
+                            role="none"
+                            onClick={this.filterQuick.bind(this, item)}
+                          >
+                            {item.name}
+                          </p>
+                        )) : ''
+                    }
+                  </div>
+                  <div
                     style={{
-                      background: this.state.onlyMe ? '#3F51B5' : '',
-                      color: this.state.onlyMe ? 'white' : '#3F51B5',
+                      display: this.state.more ? 'block' : 'none',
+                      color: 'rgb(63, 81, 181)',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap',
                     }}
                     role="none"
-                    onClick={this.filterOnlyMe.bind(this)}
-                  >仅我的问题</p>
-                  <p
-                    className="c7n-scrumTools-filter"
-                    style={{
-                      background: this.state.recent ? '#3F51B5' : '',
-                      color: this.state.recent ? 'white' : '#3F51B5',
+                    onClick={() => {
+                      this.setState({
+                        expandFilter: !this.state.expandFilter,
+                      });
                     }}
-                    role="none"
-                    onClick={this.filterOnlyStory.bind(this)}
-                  >仅故事</p>
-                  {
-                    ScrumBoardStore.getQuickSearchList.length > 0 ? 
-                      ScrumBoardStore.getQuickSearchList.map(item => (
-                        <p
-                          className="c7n-scrumTools-filter"
-                          style={{
-                            color: this.state.quickFilter.indexOf(item.filterId) !== -1 ? 'white' : '#3F51B5',
-                            background: this.state.quickFilter.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',
-                          }}
-                          role="none"
-                          onClick={this.filterQuick.bind(this, item)}
-                        >
-                          {item.name}
-                        </p>
-                      )) : ''
-                  }
+                  >
+                    {this.state.expandFilter ? '...收起' : '...展开'}
+                  </div>
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
                   <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
