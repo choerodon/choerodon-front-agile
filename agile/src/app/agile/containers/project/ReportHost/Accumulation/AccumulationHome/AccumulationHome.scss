@@ -1,0 +1,25 @@
+.c7n-accumulation-filterBottom {
+    margin-top: 50px;
+    border-top: 1px solid black;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.c7n-accumulation-filterTime {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0 0 0;
+
+    .c7n-accumulation-filterTimeItem {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+    }
+}
+
+.c7n-accumulation-sidebarP {
+    font-size: 18px;
+    margin: 16px 0;
+}

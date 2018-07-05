@@ -95,6 +95,16 @@ class BacklogHome extends Component {
     }
     return destinationData;
   }
+  getSprint() {
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
+      BacklogStore.setSprintData(data);
+      this.setState({
+        spinIf: false,
+      });
+    }).catch((error2) => {
+      window.console.error(error2);
+    });
+  }
   dragToSprint(result, sourceId, endId, endIndex, originData, newData1) {
     const newData = _.clone(newData1);
     // 如果是多选
@@ -178,7 +188,7 @@ class BacklogHome extends Component {
       BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
         ? 0 : endId, axiosParam).then((res) => {
         this.IssueDetail.refreshIssueDetail();
-        this.refresh();
+        this.getSprint();
       }).catch((error) => {
         BacklogStore.setSprintData(originData);
         window.console.error(error);
@@ -220,9 +230,10 @@ class BacklogHome extends Component {
             BacklogStore.setSprintData(newData);
             BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
               ? 0 : endId, axiosParam).then((res) => {
-              newData.sprintData[index].issueSearchDTOList[endIndex] = res[0];
+              // newData.sprintData[index].issueSearchDTOList[endIndex] = res[0];
               this.IssueDetail.refreshIssueDetail();
-              BacklogStore.setSprintData(newData);
+              // BacklogStore.setSprintData(newData);
+              this.getSprint();
             }).catch((error) => {
               BacklogStore.setSprintData(originData);
               window.console.error(error);
@@ -250,9 +261,10 @@ class BacklogHome extends Component {
         BacklogStore.setSprintData(newData);
         BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
           ? 0 : endId, axiosParam).then((res) => {
-          newData.backlogData.backLogIssue[endIndex] = res[0];
+          // newData.backlogData.backLogIssue[endIndex] = res[0];
           this.IssueDetail.refreshIssueDetail();
-          BacklogStore.setSprintData(newData);
+          // BacklogStore.setSprintData(newData);
+          this.getSprint();
         }).catch((error) => {
           BacklogStore.setSprintData(originData);
           window.console.error(error);
@@ -260,37 +272,31 @@ class BacklogHome extends Component {
       }
     }
   }
+
   refresh() {
     this.setState({
       spinIf: true,
     });
     ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
       ScrumBoardStore.setQuickSearchList(res);
-      BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
-        BacklogStore.setSprintData(data);
-        BacklogStore.axiosGetVersion().then((data2) => {
-          const newVersion = [...data2];
-          _.forEach(newVersion, (item, index) => {
-            newVersion[index].expand = false;
-          });
-          BacklogStore.setVersionData(newVersion);
-          this.setState({
-            spinIf: false,
-          });
-        }).catch((error) => {
-          window.console.error(error);
+      this.getSprint();
+      BacklogStore.axiosGetVersion().then((data2) => {
+        const newVersion = [...data2];
+        _.forEach(newVersion, (item, index) => {
+          newVersion[index].expand = false;
         });
-        BacklogStore.axiosGetEpic().then((data3) => {
-          const newEpic = [...data3];
-          _.forEach(newEpic, (item, index) => {
-            newEpic[index].expand = false;
-          });
-          BacklogStore.setEpicData(newEpic);
-        }).catch((error3) => {
-          window.console.error(error3);
+        BacklogStore.setVersionData(newVersion);
+      }).catch((error) => {
+        window.console.error(error);
+      });
+      BacklogStore.axiosGetEpic().then((data3) => {
+        const newEpic = [...data3];
+        _.forEach(newEpic, (item, index) => {
+          newEpic[index].expand = false;
         });
-      }).catch((error2) => {
-        window.console.error(error2);
+        BacklogStore.setEpicData(newEpic);
+      }).catch((error3) => {
+        window.console.error(error3);
       });
     }).catch((error) => {
       window.console.error(error);

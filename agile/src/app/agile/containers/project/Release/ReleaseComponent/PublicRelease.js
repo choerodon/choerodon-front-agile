@@ -74,8 +74,16 @@ class PublicRelease extends Component {
                   ReleaseStore.getPublicVersionDetail.fixIssueCount ? (
                     <p style={{ display: 'flex', alignItems: 'center' }}>
                       <div className="c7n-release-icon">!</div>
-                    还有{ReleaseStore.getPublicVersionDetail.fixIssueCount}个
-                      <span style={{ color: '#3F51B5' }}>这个版本仍然没有解决的问题。</span>
+                    还有
+                      <span 
+                        style={{ color: '#3F51B5', cursor: 'pointer' }}
+                        role="none"
+                        onClick={() => {
+                          const { history } = this.props;
+                          const urlParams = AppState.currentMenuType;
+                          history.push(`/agile/issues?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=发布版本过来的`);
+                        }}
+                      >{ReleaseStore.getPublicVersionDetail.fixIssueCount}个</span>这个版本仍然没有解决的问题。
                     </p>
                   ) : ''
                 }
