@@ -4,13 +4,14 @@
 # IDE
 .idea
 .project
+.vscode
 
 # npm
-node_modules/
+node_modules
 npm-debug.log
+package-lock.json
 yarn-error.log
 yarn.lock
-package-lock.json
 
 # folder
 dist
@@ -21,3 +22,5 @@ webpack/dll
 
 #缓存
 .cache
+sh.sh
+pythonsql.py

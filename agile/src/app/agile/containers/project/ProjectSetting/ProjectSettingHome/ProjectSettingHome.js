@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { stores, axios, Page, Header, Content, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
-import { Select, Form, Input, Button, Modal, Spin, Icon } from 'choerodon-ui';
+import { Form, Input, Button, Icon } from 'choerodon-ui';
 
 const { AppState } = stores;
-const { Option } = Select;
 const FormItem = Form.Item;
 
 class ProjectSetting extends Component {
@@ -18,7 +17,6 @@ class ProjectSetting extends Component {
   }
 
   componentDidMount() {
-    window.console.warn('project setting home');
     this.getProjectCode();
   }
 
@@ -93,7 +91,6 @@ class ProjectSetting extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { initValue, visible, onCancel, onOk } = this.props;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
@@ -113,9 +110,7 @@ class ProjectSetting extends Component {
             <Form layout="vertical">
               <FormItem label="项目Code" style={{ width: 512 }}>
                 {getFieldDecorator('code', {
-                  rules: [{
-                    validator: this.handleCheckSameName,
-                  }],
+                  rules: [{ validator: this.handleCheckSameName }],
                 })(
                   <Input
                     label="项目Code"
@@ -133,7 +128,7 @@ class ProjectSetting extends Component {
                   loading={this.state.loading}
                   onClick={() => this.handleUpdateProjectCode()}
                 >
-            保存
+                  保存
                 </Button>
               </Permission>
               <Button
@@ -142,13 +137,12 @@ class ProjectSetting extends Component {
                 style={{ marginLeft: 12 }}
                 onClick={() => this.getProjectCode()}
               >
-            取消
+                取消
               </Button>
             </div>
           </div>
         </Content>
       </Page>
-      
     );
   }
 }

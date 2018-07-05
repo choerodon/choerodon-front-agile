@@ -22,6 +22,9 @@ import DataLogs from './Component/DataLogs';
 import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
 import LinkList from './Component/LinkList';
+import CopyIssue from '../CopyIssue';
+import TransformSubIssue from '../TransformSubIssue';
+import CreateBranch from '../CreateBranch';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -45,7 +48,10 @@ class CreateSprint extends Component {
       createLoading: false,
       createSubTaskShow: false,
       createLinkTaskShow: false,
+      createBranchShow: false,
       editDesShow: false,
+      copyIssueShow: false,
+      transformSubIssueShow: false,
       origin: {},
       loading: true,
       nav: 'detail',
@@ -175,6 +181,7 @@ class CreateSprint extends Component {
       description,
       epicId,
       epicName,
+      epicColor,
       estimateTime,
       issueCommentDTOList,
       issueId,
@@ -223,6 +230,7 @@ class CreateSprint extends Component {
       description,
       epicId,
       epicName,
+      epicColor,
       estimateTime,
       fileList,
       issueCommentDTOList,
@@ -259,9 +267,9 @@ class CreateSprint extends Component {
   getCurrentNav(e) {
     let eles;
     if (this.state.typeCode !== 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'sub_task', 'link_task' ];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'sub_task', 'link_task', 'branch'];
     } else {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'branch'];
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
@@ -620,6 +628,25 @@ class CreateSprint extends Component {
     }
   }
 
+  handleCopyIssue() {
+    this.reloadIssue();
+    this.setState({
+      copyIssueShow: false,
+    });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
+  }
+
+  handleTransformSubIssue() {
+    this.reloadIssue();
+    this.setState({
+      transformSubIssueShow: false,
+    });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
+  }
 
   handleClickMenu(e) {
     if (e.key === '0') {
@@ -628,6 +655,10 @@ class CreateSprint extends Component {
       this.handleDeleteIssue(this.state.origin.issueId);
     } else if (e.key === '2') {
       this.setState({ createSubTaskShow: true });
+    } else if (e.key === '3') {
+      this.setState({ copyIssueShow: true });
+    } else if (e.key === '4') {
+      this.setState({ transformSubIssueShow: true });
     }
   }
 
@@ -909,6 +940,12 @@ class CreateSprint extends Component {
             </Menu.Item>
           )
         }
+        <Menu.Item key="3">
+          复制问题
+        </Menu.Item>
+        <Menu.Item key="4">
+          转化为子任务
+        </Menu.Item>
       </Menu>
     );
     const callback = (value) => {
@@ -1092,6 +1129,18 @@ class CreateSprint extends Component {
                 </Tooltip>
               )
             }
+            <Tooltip placement="right" title="开发">
+              <li id="BRANCH-nav" className={`c7n-li ${this.state.nav === 'branch' ? 'c7n-li-active' : ''}`}>
+                <Icon
+                  type="branch c7n-icon-li"
+                  role="none"
+                  onClick={() => {
+                    this.setState({ nav: 'branch' });
+                    this.scrollToAnchor('branch');
+                  }}
+                />
+              </li>
+            </Tooltip>
           </ul>
         </div>
         <div className="c7n-content">
@@ -1761,8 +1810,10 @@ class CreateSprint extends Component {
                                     this.state.epicId ? (
                                       <div 
                                         style={{
-                                          color: '#4d90fe',
-                                          border: '1px solid #4d90fe',
+                                          color: this.state.epicColor,
+                                          borderWidth: '1px',
+                                          borderStyle: 'solid',
+                                          borderColor: this.state.epicColor,
                                           borderRadius: '2px',
                                           fontSize: '13px',
                                           lineHeight: '20px',
@@ -2388,6 +2439,24 @@ class CreateSprint extends Component {
                     </div>
                   )
                 }
+
+                <div id="branch">
+                  <div className="c7n-title-wrapper">
+                    <div className="c7n-title-left">
+                      <Icon type="branch c7n-icon-title" />
+                      <span>开发</span>
+                    </div>
+                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                    <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                      <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
+                        <Icon type="playlist_add icon" />
+                        <span>创建分支</span>
+                      </Button>
+                    </div>
+                  </div>
+                  {/* {this.renderLinkIssues()} */}
+                </div>
+
               </div>
             </section>
           </div>
@@ -2433,6 +2502,36 @@ class CreateSprint extends Component {
               visible={this.state.createLinkTaskShow}
               onCancel={() => this.setState({ createLinkTaskShow: false })}
               onOk={this.handleCreateLinkIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.copyIssueShow ? (
+            <CopyIssue
+              issueNum={this.state.origin.issueNum}
+              issueSummary={this.state.origin.summary}
+              visible={this.state.copyIssueShow}
+              onCancel={() => this.setState({ copyIssueShow: false })}
+              onOk={this.handleCopyIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.transformSubIssueShow ? (
+            <TransformSubIssue
+              visible={this.state.transformSubIssueShow}
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              onCancel={() => this.setState({ transformSubIssueShow: false })}
+              onOk={this.handleTransformSubIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.createBranchShow ? (
+            <CreateBranch
+              onClose={() => this.setState({ createBranchShow: false })}
+              visible={this.state.createBranchShow}
             />
           ) : null
         }

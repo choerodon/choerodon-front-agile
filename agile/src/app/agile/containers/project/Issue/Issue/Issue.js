@@ -41,7 +41,32 @@ class Issue extends Component {
     };
   }
   componentDidMount() {
+    this.getInit();
+  }
+
+  getInit() {
+    const Request = this.GetRequest(this.props.location.search);
+    const { paramType, paramId, paramName } = Request;
+    IssueStore.setParamId(paramId);
+    IssueStore.setParamType(paramType);
+    const arr = [];
+    if (paramName) {
+      arr.push(paramName);
+    }
+    IssueStore.setBarFilters(arr);
     IssueStore.init();
+  }
+
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
   }
 
   handleCreateIssue(issueObj) {
@@ -147,7 +172,12 @@ class Issue extends Component {
     IssueStore.loadIssues(current - 1, size);
   }
 
-  handleFilterChange = (pagination, filters, sorter, param) => {
+  handleFilterChange = (pagination, filters, sorter, barFilters) => {
+    IssueStore.setBarFilters(barFilters);
+    window.console.log(barFilters);
+    if (barFilters === undefined || barFilters.length === 0) {
+      IssueStore.setBarFilters(undefined);
+    }
     const obj = {
       advancedSearchArgs: {},
       searchArgs: {},
@@ -485,11 +515,12 @@ class Issue extends Component {
         }
       </Menu>
     );
-    
     return (
       <Page className="c7n-Issue c7n-region">
-
-        <Header title="问题管理">
+        <Header
+          title="问题管理"
+          backPath={IssueStore.getBackUrl}
+        >
           <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ create: true })}>
             <Icon type="playlist_add icon" />
             <span>创建问题</span>
@@ -505,7 +536,6 @@ class Issue extends Component {
             <span>刷新</span>
           </Button>
         </Header>
-
         <Content style={{ display: 'flex', padding: '0' }}>
           {/* <Spin spinning={IssueStore.loading}> */}
           <div 
@@ -526,6 +556,7 @@ class Issue extends Component {
                 showHeader={false}
                 onChange={this.handleFilterChange}
                 pagination={false}
+                filters={IssueStore.barFilters || []}
               />
             </section>
             <section className="c7n-count">

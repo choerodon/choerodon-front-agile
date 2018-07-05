@@ -5,13 +5,13 @@
     - "backlog":
         icon: baseline-list_alt
         Routes: /agile/backlog
-        sort: 1
+        sort: 2
         permission:
           - 'agile-service.sprint.queryByProjectId'
     - "scrumboard":
         icon: directions_run
         Routes: /agile/scrumboard
-        sort: 2
+        sort: 1
         permission:
           - 'agile-service.board.queryByProjectId'
           - 'agile-service.board.queryByOptions'
