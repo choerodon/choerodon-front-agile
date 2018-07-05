@@ -1,4 +1,8 @@
 .c7n-createBranch {
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  }
+
   .c7n-title {
     font-size: 9px;
     color: rgba(0, 0, 0, 0.54);

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { observer } from 'mobx-react';
-import { Modal, Form, Radio, Input, Select, Tooltip } from 'choerodon-ui';
+import { Modal, Form, Radio, Input, Select, Tooltip, Icon } from 'choerodon-ui';
 import { stores, Content, axios } from 'choerodon-front-boot';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import './CreateBranch.scss';
@@ -24,10 +24,13 @@ class CreateBranch extends Component {
       initValue: null,
       type: 'custom',
 
+      selectLoading: false,
       originApps: [],
       originBranchs: [],
       branchs: [],
       tags: [],
+      branchsExpand: false,
+      tagsExpand: false,
     };
   }
 
@@ -192,6 +195,15 @@ class CreateBranch extends Component {
     this.setState({ type });
   };
 
+  // getBranchs() {
+  //   const branchs = this.state.branchs.slice();
+  //   const branchsExpand = this.state.branchsExpand;
+  //   if (branchs.length > 5 && !branchsExpand) {
+  //     return branchs.slice(0, 5);
+  //   }
+  //   return branchs;
+  // }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const { visible, intl, store } = this.props;
@@ -225,21 +237,28 @@ class CreateBranch extends Component {
             <FormItem
               className="branch-formItem"
             >
-              {getFieldDecorator('app')(
+              {getFieldDecorator('app', {
+                rules: [{
+                  required: true,
+                }],
+              })(
                 <Select
                   label="应用名称"
                   allowClear
                   onFocus={() => {
+                    this.setState({ selectLoading: true });
                     axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps`)
                       .then((res) => {
                         this.setState({
                           originApps: res,
+                          selectLoading: false,
                         });
                       });
                   }}
                   filter
                   optionFilterProp="children"
                   filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                  loading={this.state.selectLoading}
                 >
                   {this.state.originApps.map(app => (
                     <Option value={app.id} key={app.id}>
@@ -255,39 +274,67 @@ class CreateBranch extends Component {
             <FormItem
               className="branch-formItem"
             >
-              {getFieldDecorator('originBranch', {
+              {getFieldDecorator('branch', {
                 rules: [{
                   required: true,
-                  whitespace: true,
-                  message: intl.formatMessage({ id: 'required' }),
                 }],
-                initialValue: this.state.initValue,
               })(
                 <Select
                   label="分支来源"
                   allowClear
+                  disabled={!this.props.form.getFieldValue('app')}
                   onFocus={() => {
+                    this.setState({ selectLoading: true });
+                    let sign = 2;
                     axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/branches`)
                       .then((res) => {
+                        sign -= 1;
                         this.setState({
-                          originBranchs: res,
                           branchs: res,
-                          tags: res,
+                          selectLoading: sign !== 0,
+                        });
+                      });
+                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/tags?page=0&size=9999`)
+                      .then((res) => {
+                        sign -= 1;
+                        this.setState({
+                          tags: res.content,
+                          selectLoading: sign !== 0,
                         });
                       });
                   }}
                   filter
-                  optionFilterProp="children"
-                  filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                  optionLabelProp="value"
+                  // optionFilterProp="children"
+                  // filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                  loading={this.state.selectLoading}
                 >
                   <OptGroup label="分支" key="proGroup">
                     {this.state.branchs.map(s => (
-                      <Option value={s.name}>{s.name}</Option>
+                      <Option value={s.name}><Icon type="branch" />{s.name}</Option>
                     ))}
+                    {/* {
+                      this.state.branchs.length > 5 ? (
+                        <Option key="more">
+                          <div
+                            role="none"
+                            style={{
+                              margin: '-4px -20px',
+                              padding: '4px 20px',
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            <Icon type="branch" />展开所有
+                          </div>
+                        </Option>
+                      ) : null
+                    } */}
                   </OptGroup>
                   <OptGroup label="标记" key="pubGroup">
                     {this.state.tags.map(s => (
-                      <Option value={s.name}>{s.name}</Option>
+                      <Option value={s.name}><Icon type="local_offer" />{s.name}</Option>
                     ))}
                   </OptGroup>
                 </Select>,
@@ -302,22 +349,12 @@ class CreateBranch extends Component {
               {getFieldDecorator('type', {
                 rules: [{
                   required: true,
-                  whitespace: true,
-                  message: intl.formatMessage({ id: 'required' }),
                 }],
-                initialValue: this.state.type,
               })(
                 <Select
-                  onChange={this.changeType}
-                  key="service"
                   allowClear
-                  label={<FormattedMessage id={'branch.type'} />}
-                  filter
-                  dropdownMatchSelectWidth
-                  onSelect={this.selectTemplate}
-                  size="default"
-                  optionFilterProp="children"
-                  filterOption={false}
+                  label="分支类型"
+                  disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
                 >
                   {['feature', 'bugfix', 'release', 'hotfix', 'custom'].map(s => (
                     <Option value={s} key={s}>{this.getIcon(s)}<span>{s}</span></Option>
@@ -328,21 +365,19 @@ class CreateBranch extends Component {
             <FormItem
               className="c7n-formItem_281"
             >
-              {getFieldDecorator('branchName', {
+              {getFieldDecorator('name', {
                 rules: [{
                   required: true,
-                  whitespace: true,
-                  message: intl.formatMessage({ id: 'required' }),
                 }, {
                   validator: this.checkName,
                 }],
-                initialValue: this.state.initValue,
               })(
                 <Input
-                  label={<FormattedMessage id={'branch.name'} />}
+                  label="分支名称"
                   autoFocus
-                  prefix={`${this.state.type === 'custom' ? '' : `${this.state.type}-`}`}
+                  prefix={this.props.form.getFieldValue('type') === 'custom' ? '' : `${this.props.form.getFieldValue('type')}-`}
                   maxLength={30}
+                  disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
                 />,
               )}
             </FormItem>

@@ -2508,6 +2508,8 @@ class CreateSprint extends Component {
         {
           this.state.copyIssueShow ? (
             <CopyIssue
+              issueNum={this.state.origin.issueNum}
+              issueSummary={this.state.origin.summary}
               visible={this.state.copyIssueShow}
               onCancel={() => this.setState({ copyIssueShow: false })}
               onOk={this.handleCopyIssue.bind(this)}
@@ -2518,6 +2520,8 @@ class CreateSprint extends Component {
           this.state.transformSubIssueShow ? (
             <TransformSubIssue
               visible={this.state.transformSubIssueShow}
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
               onCancel={() => this.setState({ transformSubIssueShow: false })}
               onOk={this.handleTransformSubIssue.bind(this)}
             />

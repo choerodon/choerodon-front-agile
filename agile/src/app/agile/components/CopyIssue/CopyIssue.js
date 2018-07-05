@@ -2,13 +2,12 @@ import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Modal } from 'choerodon-ui';
+import { Modal, Form, Input } from 'choerodon-ui';
 
 import './CopyIssue.scss';
-import '../../containers/main.scss';
 
 const { AppState } = stores;
-const { Sidebar } = Modal;
+const FormItem = Form.Item;
 
 class CopyIssue extends Component {
   constructor(props) {
@@ -21,31 +20,49 @@ class CopyIssue extends Component {
   componentDidMount() {
   }
 
-  render() {
-    const { initValue, visible, onCancel, onOk } = this.props;
+  handleCopyIssue = () => {
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        window.console.log(values);
+        // const extra = {
+        // };
+        // this.setState({ createLoading: true });
+        // this.props.onOk(extra);
+      }
+    });
+  };
 
+  render() {
+    const { visible, onCancel, onOk, issueNum, issueSummary } = this.props;
+    const { getFieldDecorator } = this.props.form;
+  
     return (
-      <Sidebar
+      <Modal
         className="c7n-copyIssue"
-        title="复制问题"
+        title={`复制问题${issueNum}`}
         visible={visible || false}
-        onOk={this.handleCreateIssue}
+        onOk={this.handleCopyIssue}
         onCancel={onCancel}
         okText="复制"
         cancelText="取消"
         confirmLoading={this.state.createLoading}
       >
-        <Content
-          style={{
-            padding: 0,
-            width: 520,
-          }}
-          title="复制问题"
-          description="对问题进行复制"
-          link="#"
-        />
-      </Sidebar>
+        <Form layout="vertical">
+          <FormItem>
+            {getFieldDecorator('issueSummary', {
+              rules: [{ required: true, message: '请输入概要' }],
+              initialValue: issueSummary,
+            })(
+              <Input
+                label="概要"
+                prefix="CLONE - "
+                maxLength={30}
+              />,
+            )}
+          </FormItem>
+        </Form>
+      </Modal>
     );
   }
 }
-export default withRouter(CopyIssue);
+export default Form.create({})(withRouter(CopyIssue));
