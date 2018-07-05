@@ -86,7 +86,7 @@ class ReleaseDetail extends Component {
       todo: 'loadTodoIssues',
       remove: 'loadRemoveIssues',
     };
-    if (!ReportStore[key]) {
+    if (!ReportStore[key] && ReportStore.currentSprint.sprintId) {
       ReportStore[ARRAY[key]]();
     }
   }
