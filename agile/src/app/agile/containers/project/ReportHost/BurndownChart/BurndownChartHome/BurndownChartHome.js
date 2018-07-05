@@ -185,10 +185,13 @@ class BurndownChartHome extends Component {
     });
   }
   handleClick(e) {
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
     if (e.key === '0') {
-      const { history } = this.props;
-      const urlParams = AppState.currentMenuType;
       history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }
+    if (e.key === '1') {
+      history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
   renderChartTitle() {
@@ -358,6 +361,9 @@ class BurndownChartHome extends Component {
       <Menu onClick={this.handleClick.bind(this)}>
         <Menu.Item key="0">
           Sprint报告
+        </Menu.Item>
+        <Menu.Item key="1">
+          累积流量图
         </Menu.Item>
       </Menu>
     );

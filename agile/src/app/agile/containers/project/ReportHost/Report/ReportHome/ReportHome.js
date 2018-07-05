@@ -91,10 +91,13 @@ class ReleaseDetail extends Component {
     }
   }
   handleClick(e) {
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
     if (e.key === '0') {
-      const { history } = this.props;
-      const urlParams = AppState.currentMenuType;
       history.push(`/agile/reporthost/burndownchart?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }
+    if (e.key === '1') {
+      history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
   renderDoneIssue(column) {
@@ -230,6 +233,9 @@ class ReleaseDetail extends Component {
       <Menu onClick={this.handleClick.bind(this)}>
         <Menu.Item key="0">
           燃尽图
+        </Menu.Item>
+        <Menu.Item key="1">
+          累积流量图
         </Menu.Item>
       </Menu>
     );

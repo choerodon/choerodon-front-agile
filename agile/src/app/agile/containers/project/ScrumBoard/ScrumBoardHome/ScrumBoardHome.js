@@ -488,7 +488,82 @@ class ScrumBoardHome extends Component {
     }
     return result;
   }
-
+  renderOtherSwimlane() {
+    let result = '';
+    const data = ScrumBoardStore.getBoardData;
+    let flag = 0;
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      _.forEach(data, (item) => {
+        if (item.subStatuses) {
+          _.forEach(item.subStatuses, (item2) => {
+            if (item2.issues) {
+              _.forEach(item2.issues, (item3) => {
+                if (!item3.parentIssueId) {
+                  flag = 1;
+                }
+              });
+            }
+          });
+        }
+      });
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      _.forEach(data, (item) => {
+        if (item.subStatuses) {
+          _.forEach(item.subStatuses, (item2) => {
+            if (item2.issues) {
+              _.forEach(item2.issues, (item3) => {
+                if (!item3.assigneeId) {
+                  flag = 1;
+                }
+              });
+            }
+          });
+        }
+      });
+    } else {
+      flag = 1;
+    }
+    if (flag === 1) {
+      result = (
+        <div className="c7n-scrumboard-others">
+          <div className="c7n-scrumboard-otherHeader">
+            <Icon 
+              style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
+              type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+              role="none"
+              onClick={() => {
+                this.setState({
+                  expand: !this.state.expand,
+                });
+              }}
+            />
+            {this.renderOthersTitle()}
+          </div>
+          <div
+            className="c7n-scrumboard-otherContent"
+            style={{
+              display: this.state.expand ? 'flex' : 'none',
+            }}
+          >
+            <DragDropContext 
+              onDragEnd={this.handleDragEnd.bind(this)}
+              onDragStart={(start) => {
+                ScrumBoardStore.setDragStartItem(start);
+              }}
+            >
+              {this.renderIssueColumns()}
+            </DragDropContext>
+          </div>
+        </div>
+      );
+    }
+    // } else {
+    //   result = (
+    //     
+    //   );
+    // }
+    return result;
+  }
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -627,58 +702,33 @@ class ScrumBoardHome extends Component {
                     paddingBottom: 83,
                   }}
                 >
-                  {this.renderSwimlane()}
-                  {ScrumBoardStore.getCurrentSprint ? (
-                    <div className="c7n-scrumboard-others">
-                      <div className="c7n-scrumboard-otherHeader">
-                        <Icon 
-                          style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
-                          type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
-                          role="none"
-                          onClick={() => {
-                            this.setState({
-                              expand: !this.state.expand,
-                            });
-                          }}
-                        />
-                        {this.renderOthersTitle()}
+                  {
+                    ScrumBoardStore.getCurrentSprint ? (
+                      <div>
+                        {this.renderSwimlane()}
+                        {this.renderOtherSwimlane()}
                       </div>
+                    ) : (
                       <div
-                        className="c7n-scrumboard-otherContent"
                         style={{
-                          display: this.state.expand ? 'flex' : 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginTop: '80px',
                         }}
                       >
-                        <DragDropContext 
-                          onDragEnd={this.handleDragEnd.bind(this)}
-                          onDragStart={(start) => {
-                            ScrumBoardStore.setDragStartItem(start);
+                        <img style={{ width: 170 }} src={EmptyScrumboard} alt="emptyscrumboard" />
+                        <div
+                          style={{
+                            marginLeft: 40,
                           }}
                         >
-                          {this.renderIssueColumns()}
-                        </DragDropContext>
+                          <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
+                          <p style={{ fontSize: 20, lineHeight: '34px' }}>在<span style={{ color: '#3f51b5' }}>待办事项</span>中开始Sprint</p>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop: '80px',
-                      }}
-                    >
-                      <img style={{ width: 170 }} src={EmptyScrumboard} alt="emptyscrumboard" />
-                      <div
-                        style={{
-                          marginLeft: 40,
-                        }}
-                      >
-                        <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
-                        <p style={{ fontSize: 20, lineHeight: '34px' }}>在<span style={{ color: '#3f51b5' }}>待办事项</span>中开始Sprint</p>
-                      </div>
-                    </div>
-                  )}
+                    )
+                  }
                 </div>
               </div>
             </Spin>

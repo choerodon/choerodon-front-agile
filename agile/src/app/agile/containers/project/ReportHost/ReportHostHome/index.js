@@ -42,6 +42,12 @@ class ReportHostHome extends Component {
       des: '了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。',
       link: '/agile/reporthost/sprintReport',
       pic: sprintPic,
+    }, {
+      id: 3,
+      title: '累积流量图',
+      des: '',
+      link: '/agile/reporthost/accumulation',
+      pic: '',
     }];
     return (
       <Page>

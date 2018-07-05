@@ -16,6 +16,8 @@
 .c7n-backlog {
   display: flex;
   flex-grow: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
 
   .c7n-backlog-side {
     width: 24px;
