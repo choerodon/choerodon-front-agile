@@ -239,7 +239,18 @@ class ReleaseHome extends Component {
       ),
     }];
     return (
-      <Page>
+      <Page
+        service={[
+          'agile-service.product-version.releaseVersion',
+          'agile-service.product-version.revokeReleaseVersion',
+          'agile-service.product-version.revokeArchivedVersion',
+          'agile-service.product-version.archivedVersion',
+          'agile-service.product-version.deleteVersion',
+          'agile-service.product-version.updateVersion',
+          'agile-service.product-version.createVersion',
+          'agile-service.product-version.mergeVersion',
+        ]}
+      >
         <Header title="发布版本">
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
             <Button

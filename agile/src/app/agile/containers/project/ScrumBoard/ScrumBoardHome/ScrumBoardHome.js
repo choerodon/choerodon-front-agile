@@ -47,11 +47,16 @@ class ScrumBoardHome extends Component {
     this.getBoard();
   }
   componentDidMount() {
-    if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
-      this.setState({
-        more: true,
-      });
-    }
+    const timer = setInterval(() => {
+      if (document.getElementsByClassName('c7n-scrumTools-left').length > 0) {
+        if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
+          this.setState({
+            more: true,
+          });
+        }
+        clearInterval(timer);
+      }
+    }, 1000);
   }
   getBoard() {
     ScrumBoardStore.axiosGetBoardList().then((data) => {
@@ -91,45 +96,56 @@ class ScrumBoardHome extends Component {
         this.state.recent,
         this.state.quickFilter,
       ).then((data) => {
-        const parentIds = [];
-        const assigneeIds = [];
-        const storeParentIds = [];
-        const storeAssignee = [];
-        _.forEach(data.columnsData.columns, (col) => {
-          _.forEach(col.subStatuses, (sub) => {
-            _.forEach(sub.issues, (iss) => {
-              if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
-                if (parentIds.indexOf(iss.issueId) === -1) {
-                  parentIds.push(iss.issueId);
-                  storeParentIds.push({
-                    status: sub.name,
-                    categoryCode: sub.categoryCode,
-                    ...iss,
-                  });
-                }
-              }
-              if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
-                if (assigneeIds.indexOf(iss.assigneeId) === -1) {
-                  if (iss.assigneeId) {
-                    assigneeIds.push(iss.assigneeId);
-                    storeAssignee.push({
-                      assigneeId: iss.assigneeId,
-                      assigneeName: iss.assigneeName,
-                      imageUrl: iss.imageUrl,
+        ScrumBoardStore.axiosGetAllEpicData().then((data2) => {
+          const parentIds = [];
+          const assigneeIds = [];
+          const storeParentIds = [];
+          const storeAssignee = [];
+          const epicData = data.epicInfo;
+          _.forEach(data.columnsData.columns, (col) => {
+            _.forEach(col.subStatuses, (sub) => {
+              _.forEach(sub.issues, (iss) => {
+                if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
+                  if (parentIds.indexOf(iss.issueId) === -1) {
+                    parentIds.push(iss.issueId);
+                    storeParentIds.push({
+                      status: sub.name,
+                      categoryCode: sub.categoryCode,
+                      ...iss,
                     });
                   }
                 }
+                if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
+                  if (assigneeIds.indexOf(iss.assigneeId) === -1) {
+                    if (iss.assigneeId) {
+                      assigneeIds.push(iss.assigneeId);
+                      storeAssignee.push({
+                        assigneeId: iss.assigneeId,
+                        assigneeName: iss.assigneeName,
+                        imageUrl: iss.imageUrl,
+                      });
+                    }
+                  }
+                }
+              });
+            });
+          });
+          _.forEach(epicData, (item, index) => {
+            _.forEach(data2, (item2) => {
+              if (String(item.epicId) === String(item2.issueId)) {
+                epicData[index].color = item2.color;
               }
             });
           });
-        });
-        ScrumBoardStore.setAssigneer(storeAssignee);
-        ScrumBoardStore.setCurrentSprint(data.currentSprint);
-        ScrumBoardStore.setParentIds(storeParentIds);
-        ScrumBoardStore.setBoardData(data.columnsData.columns);
-        // this.storeIssueNumberCount(storeParentIds, )
-        this.setState({
-          spinIf: false,
+          ScrumBoardStore.setAssigneer(storeAssignee);
+          ScrumBoardStore.setCurrentSprint(data.currentSprint);
+          ScrumBoardStore.setParentIds(storeParentIds);
+          ScrumBoardStore.setEpicData(epicData);
+          ScrumBoardStore.setBoardData(data.columnsData.columns);
+          // this.storeIssueNumberCount(storeParentIds, )
+          this.setState({
+            spinIf: false,
+          });
         });
       }).catch((error) => {
         window.console.error(error);
@@ -431,6 +447,17 @@ class ScrumBoardHome extends Component {
           );
         }
       });
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      _.forEach(data, (item) => {
+        if (item.subStatuses.length > 0) {
+          result.push(
+            <StatusBodyColumn
+              data={item}
+              epicId={id}
+            />,
+          );
+        }
+      });
     } else {
       _.forEach(data, (item) => {
         if (item.subStatuses.length > 0) {
@@ -448,8 +475,13 @@ class ScrumBoardHome extends Component {
     let ids = [];
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       ids = ScrumBoardStore.getParentIds;
+      ids = _.sortBy(ids, o => o.issueId);
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       ids = ScrumBoardStore.getAssigneer;
+      ids = _.sortBy(ids, o => o.assigneeId);
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      ids = ScrumBoardStore.getEpicData;
+      ids = _.sortBy(ids, o => o.epicId);
     }
     const result = [];
     _.forEach(ids, (item) => {
@@ -576,7 +608,16 @@ class ScrumBoardHome extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
-      <Page className="c7n-scrumboard-page">
+      <Page
+        className="c7n-scrumboard-page"
+        service={[
+          'agile-service.board.deleteScrumBoard',
+          'agile-service.issue-status.createStatus',
+          'agile-service.board-column.createBoardColumn',
+          'agile-service.issue-status.deleteStatus',
+          'agile-service.issue-status.updateStatus',
+        ]}
+      >
         <Header title="活跃冲刺">
           <Button 
             funcTyp="flat"
@@ -624,12 +665,12 @@ class ScrumBoardHome extends Component {
           <div style={{ flexGrow: 1, overflow: 'hidden' }}>
             <Spin spinning={this.state.spinIf}>
               <div className="c7n-scrumTools">
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
                   <div 
                     style={{ 
                       width: '85%',
                       flexWrap: 'wrap',
-                      height: this.state.expandFilter ? '' : 25,
+                      height: this.state.expandFilter ? '' : 27,
                     }} 
                     className="c7n-scrumTools-left"
                   >

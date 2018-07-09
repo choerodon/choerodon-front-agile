@@ -7,6 +7,8 @@ import _ from 'lodash';
 import '../../../../main.scss';
 import BurndownChartStore from '../../../../../stores/project/burndownChart/BurndownChartStore';
 import './BurndownChartHome.scss';
+import restSvg from '../../../../../assets/image/rest.svg';
+import hopeSvg from '../../../../../assets/image/hope.svg';
 
 const { AppState } = stores;
 const Option = Select.Option;
@@ -103,7 +105,16 @@ class BurndownChartHome extends Component {
         window.console.error(error);
       });
   }
-
+  getMaxY() {
+    const data = this.state.yAxis;
+    let max = 0;
+    _.forEach(data, (item) => {
+      if (item > max) {
+        max = item;
+      }
+    });
+    return max;
+  }
   getOption() {
     return {
       title: {
@@ -121,10 +132,10 @@ class BurndownChartHome extends Component {
         right: '0%',
         data: [{
           name: '期望值',
-          icon: 'image://data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7',
+          icon: `image://${hopeSvg}`,
         }, {
           name: '剩余值',
-          icon: 'pin',
+          icon: `image://${restSvg}`,
         }],
       },
       grid: {
@@ -156,7 +167,7 @@ class BurndownChartHome extends Component {
         {
           name: '期望值',
           type: 'line',
-          data: [[0, this.state.yAxis[0]], [this.state.yAxis.length - 1, 0]],
+          data: [[0, this.getMaxY()], [this.state.yAxis.length - 1, 0]],
           itemStyle: {
             color: 'grey',
           },
@@ -192,6 +203,9 @@ class BurndownChartHome extends Component {
     }
     if (e.key === '1') {
       history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }
+    if (e.key === '2') {
+      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`)
     }
   }
   renderChartTitle() {
@@ -364,6 +378,9 @@ class BurndownChartHome extends Component {
         </Menu.Item>
         <Menu.Item key="1">
           累积流量图
+        </Menu.Item>
+        <Menu.Item key="2">
+        版本报告
         </Menu.Item>
       </Menu>
     );

@@ -319,7 +319,7 @@ class ReleaseDetail extends Component {
       ),
     }];
     return (
-      <page>
+      <Page>
         <Header 
           title={(
             <div style={{ whiteSpace: 'nowrap' }}>
@@ -486,7 +486,7 @@ class ReleaseDetail extends Component {
           </Spin>
           
         </Content>
-      </page>
+      </Page>
     );
   }
 }
