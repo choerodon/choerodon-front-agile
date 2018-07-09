@@ -352,6 +352,19 @@ class ReleaseDetail extends Component {
               </Button>
             )
           }
+          <Button 
+            funcTyp="flat" 
+            style={{
+              marginLeft: 80,
+            }}
+            onClick={() => {
+              const { history } = this.props;
+              history.push(`/agile/release/logs/${this.props.match.params.id}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+            }}
+          >
+            <Icon type="publish2" />
+            <span>版本日志</span>
+          </Button>
           
         </Header>
         <Content className="c7n-versionDetail">

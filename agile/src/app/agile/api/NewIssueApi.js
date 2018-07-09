@@ -129,6 +129,11 @@ export function loadDatalogs(issueId, projectId = AppState.currentMenuType.id) {
   return axios.get(`agile/v1/projects/${projectId}/data_log?issueId=${issueId}`);
 }
 
+export function loadBranchs(issueId, projectId = AppState.currentMenuType.id) {
+  return axios.get(`/devops/v1/project/${projectId}/issue/${issueId}/commit_and_merge_request/count`);
+}
+
+
 export function updateWorklog(logId, worklog, projectId = AppState.currentMenuType.id) {
   return axios.patch(`agile/v1/projects/${projectId}/work_log/${logId}`, worklog);
 }

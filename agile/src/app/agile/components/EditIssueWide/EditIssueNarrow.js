@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { stores, axios, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon } from 'choerodon-ui';
+import TimeAgo from 'timeago-react';
+import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon, Popover } from 'choerodon-ui';
 import { STATUS, COLOR, TYPE, ICON, TYPE_NAME } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
 import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload } from '../../common/utils';
-import { loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
+import { loadBranchs, loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
@@ -25,6 +26,7 @@ import LinkList from '../EditIssueNarrow/Component/LinkList';
 import CopyIssue from '../CopyIssue';
 import TransformSubIssue from '../TransformSubIssue';
 import CreateBranch from '../CreateBranch';
+import Commits from '../Commits';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -67,6 +69,7 @@ class CreateSprint extends Component {
       createLinkTaskShow: false,
       createBranchShow: false,
       editDesShow: false,
+      commitShow: false,
       origin: {},
       loading: true,
       nav: 'detail',
@@ -111,6 +114,7 @@ class CreateSprint extends Component {
       worklogs: [],
       datalogs: [],
       fileList: [],
+      branchs: {},
       issueCommentDTOList: [],
       issueLinkDTOList: [],
       labelIssueRelDTOList: [],
@@ -422,6 +426,11 @@ class CreateSprint extends Component {
       loadDatalogs(issueId).then((res) => {
         this.setState({
           datalogs: res,
+        });
+      });
+      loadBranchs(issueId).then((res) => {
+        this.setState({
+          branchs: res,
         });
       });
       this.setState({
@@ -936,6 +945,84 @@ class CreateSprint extends Component {
     }
   }
 
+  renderBranchs() {
+    return (
+      <div>
+        {
+          this.state.branchs.totalCommit || this.state.totalMergeRequest ? (
+            <div>
+              {
+                this.state.branchs.totalCommit ? (
+                  <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
+                      <span
+                        style={{ color: '#3f51b5', cursor: 'pointer' }}
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            commitShow: true,
+                          });
+                        }}
+                      >
+                        {this.state.branchs.totalCommit}提交
+                      </span>
+                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>开放</span>
+                    </div>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
+                      <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
+                      <span>
+                        <Popover
+                          title="提交修改时间"
+                          content={this.state.branchs.commitUpdateTime}
+                          placement="left"
+                        >
+                          <TimeAgo
+                            datetime={this.state.branchs.commitUpdateTime}
+                            locale={Choerodon.getMessage('zh_CN', 'en')}
+                          />
+                        </Popover> 
+                      </span>
+                    </div>
+                  </div>
+                ) : null
+              }
+              {
+                this.state.branchs.totalMergeRequest ? (
+                  <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
+                      <span style={{ color: '#3f51b5' }}>{this.state.branchs.totalMergeRequest}合并请求</span>
+                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>开放</span>
+                    </div>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
+                      <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
+                      <span>
+                        <Popover
+                          title="合并请求修改时间"
+                          content={this.state.branchs.mergeRequestUpdateTime}
+                          placement="left"
+                        >
+                          <TimeAgo
+                            datetime={this.state.branchs.mergeRequestUpdateTime}
+                            locale={Choerodon.getMessage('zh_CN', 'en')}
+                          />
+                        </Popover> 
+                      </span>
+                    </div>
+                  </div>
+                ) : null
+              }
+            </div>
+          ) : (
+            <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+              <span style={{ marginRight: 12 }}>暂无</span>
+            </div>
+          )
+        }
+        
+      </div>
+    );
+  }
+
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -1251,7 +1338,7 @@ class CreateSprint extends Component {
                     </Dropdown>
                   </div>
                 </div>
-                {
+                {/* {
                   this.state.typeCode === 'issue_epic' ? (
                     <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
                       <span style={{ flexShrink: 0 }}>名称：</span>
@@ -1285,7 +1372,7 @@ class CreateSprint extends Component {
                       </ReadAndEdit>
                     </div>
                   ) : null
-                }
+                } */}
                 <div className="line-start">
                   <div style={{ display: 'flex', flex: 1 }}>
                     <span
@@ -1498,6 +1585,7 @@ class CreateSprint extends Component {
                               fontSize: '13px',
                               color: 'rgba(0,0,0,0.54)',
                               marginLeft: 5,
+                              lineHeight: '18px',
                             }}
                           />
                         </Tooltip>
@@ -2073,6 +2161,51 @@ class CreateSprint extends Component {
                             </span>
                           </div>
                         </div>
+                        {
+                          this.state.typeCode === 'issue_epic' ? (
+                            <div className="line-start mt-10">
+                              <div className="c7n-property-wrapper">
+                                <span className="c7n-property">
+                                  Epic名：
+                                </span>
+                              </div>
+                              <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', width: 200 }}>
+                                <ReadAndEdit
+                                  callback={this.changeRae.bind(this)}
+                                  thisType="epicName"
+                                  current={this.state.currentRae}
+                                  handleEnter
+                                  line
+                                  origin={this.state.epicName}
+                                  onInit={() => this.setAnIssueToState()}
+                                  onOk={this.updateIssue.bind(this, 'epicName')}
+                                  onCancel={this.resetEpicName.bind(this)}
+                                  readModeContent={<div>
+                                    <p style={{ wordBreak: 'break-word', marginBottom: 0 }}>
+                                      {this.state.epicName}
+                                    </p>
+                                  </div>}
+                                >
+                                  <TextArea
+                                    maxLength={44}
+                                    style={{ width: '200px' }}
+                                    value={this.state.epicName}
+                                    size="small"
+                                    autoFocus={{ minRows: 2, maxRows: 6 }}
+                                    onChange={this.handleEpicNameChange.bind(this)}
+                                    onPressEnter={() => {
+                                      this.updateIssue('epicName');
+                                      this.setState({
+                                        currentRae: undefined,
+                                      });
+                                    }}
+                                  />
+                                </ReadAndEdit>
+                              </div>
+                            </div>
+                          ) : null
+                        }
+                        
                       </div>
                       {/* --- */}
                       <div style={{ flex: 1, width: '50%' }}>
@@ -2377,7 +2510,7 @@ class CreateSprint extends Component {
                       <Icon type="attach_file c7n-icon-title" />
                       <span>附件</span>
                     </div>
-                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '130px' }} />
+                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px' }} />
                   </div>
                   <div className="c7n-content-wrapper" style={{ marginTop: '-47px' }}>
                     <UploadButtonNow
@@ -2490,7 +2623,7 @@ class CreateSprint extends Component {
                       </Button>
                     </div>
                   </div>
-                  {/* {this.renderLinkIssues()} */}
+                  {this.renderBranchs()} 
                 </div>
 
               </div>
@@ -2551,6 +2684,7 @@ class CreateSprint extends Component {
         {
           this.state.copyIssueShow ? (
             <CopyIssue
+              issueId={this.state.origin.issueId}
               issueNum={this.state.origin.issueNum}
               issueSummary={this.state.origin.summary}
               visible={this.state.copyIssueShow}
@@ -2573,8 +2707,26 @@ class CreateSprint extends Component {
         {
           this.state.createBranchShow ? (
             <CreateBranch
-              onClose={() => this.setState({ createBranchShow: false })}
+              issueId={this.state.origin.issueId}
+              onOk={() => {
+                this.setState({ createBranchShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => this.setState({ createBranchShow: false })}
               visible={this.state.createBranchShow}
+            />
+          ) : null
+        }
+        {
+          this.state.commitShow ? (
+            <Commits
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              time={this.state.origin.commitUpdateTime}
+              onCancel={() => {
+                this.setState({ commitShow: false });
+              }}
+              visible={this.state.commitShow}
             />
           ) : null
         }

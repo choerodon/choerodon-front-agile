@@ -58,18 +58,33 @@ class TransformSubIssue extends Component {
   handleTransformSubIssue = () => {
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        const projectId = AppState.currentMenuType.id;
+        const { initValue, visible, onCancel, onOk, issueId, issueNum } = this.props;
         window.console.log(values);
-        // const extra = {
-        // };
-        // this.setState({ createLoading: true });
-        // this.props.onOk(extra);
+        const parentIssueId = values.issues;
+        const status = values.status;
+        window.console.table({
+          parentIssueId,
+          status,
+          issueId,
+        });
+        this.setState({
+          loading: true,
+        });
+        // axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/copy_issue?summary=${values.issueSummary}`)
+        //   .then((res) => {
+        //     this.setState({
+        //       loading: false,
+        //     });
+        //     this.props.onOk();
+        //   });
       }
     });
   };
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { initValue, visible, onCancel, onOk } = this.props;
+    const { initValue, visible, onCancel, onOk, issueId, issueNum } = this.props;
 
     return (
       <Sidebar
@@ -80,14 +95,14 @@ class TransformSubIssue extends Component {
         onCancel={onCancel}
         okText="转化"
         cancelText="取消"
-        confirmLoading={this.state.createLoading}
+        confirmLoading={this.state.loading}
       >
         <Content
           style={{
             padding: 0,
             width: 520,
           }}
-          title={`将问题“${this.props.issueNum}”转化为子任务`}
+          title={`将问题“${issueNum}”转化为子任务`}
           description="请在下面输入环境编码、名称、描述，创建新环境。新环境默认新增在环境流水线的最后一个节点。"
           link="#"
         >
@@ -115,8 +130,8 @@ class TransformSubIssue extends Component {
                 >
                   {this.state.originIssues.map(issue =>
                     (<Option
-                      key={issue.issueNum}
-                      value={issue.issueNum}
+                      key={issue.issueId}
+                      value={issue.issueId}
                     >
                       <div style={{ display: 'inline-flex', width: '100%', flex: 1 }}>
                         <div>
@@ -141,7 +156,7 @@ class TransformSubIssue extends Component {
               )}
             </FormItem>
             <FormItem label="状态" style={{ width: 520 }}>
-              {getFieldDecorator('statusIs', {
+              {getFieldDecorator('status', {
                 rules: [{ required: true, message: '请选择状态' }],
               })(
                 <Select

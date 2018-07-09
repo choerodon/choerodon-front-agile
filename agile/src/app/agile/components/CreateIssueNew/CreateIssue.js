@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { stores } from 'choerodon-front-boot';
+import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Select, Form, Input, Button, Modal, Icon } from 'choerodon-ui';
+import { Select, Form, Input, Button, Modal, Icon, Tooltip } from 'choerodon-ui';
 
 import './CreateIssue.scss';
 import '../../containers/main.scss';
@@ -41,18 +41,39 @@ class CreateIssue extends Component {
       originLabels: [],
       originComponents: [],
       originEpics: [],
-      originpriorities: [],
+      originPriorities: [],
       originFixVersions: [],
       originSprints: [],
       originUsers: [],
+
+      origin: {},
     };
   }
 
   componentDidMount() {
+    this.loadPriorities();
+    this.getProjectSetting();
+  }
+
+  getProjectSetting() {
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
+      .then((res) => {
+        this.setState({
+          origin: res,
+        });
+      });
   }
 
   setFileList = (data) => {
     this.setState({ fileList: data });
+  }
+
+  loadPriorities() {
+    loadPriorities().then((res) => {
+      this.setState({
+        originPriorities: res.lookupValues,
+      });
+    });
   }
 
   handleFullEdit = (delta) => {
@@ -248,24 +269,13 @@ class CreateIssue extends Component {
             <FormItem label="优先级" style={{ width: 520 }}>
               {getFieldDecorator('priorityCode', {
                 rules: [{ required: true, message: '优先级为必选项' }],
+                initialValue: this.state.origin.defaultPriorityCode,
               })(
                 <Select
                   label="优先级"
                   getPopupContainer={triggerNode => triggerNode.parentNode}
-                  loading={this.state.selectLoading}
-                  onFocus={() => {
-                    this.setState({
-                      selectLoading: true,
-                    });
-                    loadPriorities().then((res) => {
-                      this.setState({
-                        originpriorities: res.lookupValues,
-                        selectLoading: false,
-                      });
-                    });
-                  }}
                 >
-                  {this.transformPriorityCode(this.state.originpriorities).map(type =>
+                  {this.transformPriorityCode(this.state.originPriorities).map(type =>
                     (<Option key={type.valueCode} value={type.valueCode}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                         <div
@@ -309,7 +319,7 @@ class CreateIssue extends Component {
               }
             </div>
 
-            <FormItem label="经办人" style={{ width: 520 }}>
+            <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
               {getFieldDecorator('assigneedId', {})(
                 <Select
                   label="经办人"
@@ -347,6 +357,17 @@ class CreateIssue extends Component {
                 </Select>,
               )}
             </FormItem>
+            <Tooltip title={'可自行选择经办人，如不选择，会应用模块的默认经办人逻辑和项目的默认经办人策略'}>
+              <Icon
+                type="error"
+                style={{
+                  fontSize: '16px',
+                  color: 'rgba(0,0,0,0.54)',
+                  marginLeft: 15,
+                  marginTop: 20,
+                }}
+              />
+            </Tooltip>
 
             {
               this.props.form.getFieldValue('typeCode') !== 'issue_epic' && (

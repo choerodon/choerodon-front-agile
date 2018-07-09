@@ -94,7 +94,7 @@ class IssueDescription extends Component {
 
   render() {
     return (
-      <div className="c7n-read-delta" style={{ width: '100%' }}>
+      <div className="c7n-read-delta" style={{ width: '100%', wordBreak: 'break-all' }}>
         <div dangerouslySetInnerHTML={{ __html: `${this.escape(this.props.data)}` }} />
         {
           this.state.open ? (

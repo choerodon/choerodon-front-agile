@@ -120,6 +120,7 @@ class Issue extends Component {
         summary: this.state.createIssueValue,
         typeCode: this.state.selectIssueType,
         epicId: 0,
+        epicName: this.state.selectIssueType === 'issue_epic' ? this.state.createIssueValue : undefined,
         parentIssueId: 0,
       };
       this.setState({
