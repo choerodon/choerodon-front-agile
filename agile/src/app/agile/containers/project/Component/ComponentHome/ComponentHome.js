@@ -102,8 +102,8 @@ class ComponentHome extends Component {
               this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=component&paramId=${record.componentId}&paramName=${record.name}`);
             }}
           >
-            <span style={{ display: 'inline-block', width: 25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }}>{issueCount}</span>
-            <span>issues</span>
+            <span style={{ display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>{issueCount} issues</span>
+            {/* <span>{issueCount}issues</span> */}
           </div>
         ),
       },

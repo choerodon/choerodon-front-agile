@@ -919,6 +919,33 @@ class CreateSprint extends Component {
     }
   }
 
+  renderBranchs() {
+    return (
+      <div>
+        <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+          <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
+            <span style={{ color: '#3f51b5' }}>3提交</span>
+            <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>开放</span>
+          </div>
+          <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
+            <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
+            <span>3天前</span>
+          </div>
+        </div>
+        <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+          <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
+            <span style={{ color: '#3f51b5' }}>2和并请求</span>
+            <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>开放</span>
+          </div>
+          <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
+            <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
+            <span>3天前</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -1234,7 +1261,7 @@ class CreateSprint extends Component {
                     </Dropdown>
                   </div>
                 </div>
-                {
+                {/* {
                   this.state.typeCode === 'issue_epic' ? (
                     <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
                       <span style={{ flexShrink: 0 }}>名称：</span>
@@ -1268,7 +1295,7 @@ class CreateSprint extends Component {
                       </ReadAndEdit>
                     </div>
                   ) : null
-                }
+                } */}
                 <div className="line-start">
                   {
                     this.state.issueId && this.state.typeCode === 'story' ? (
@@ -1919,11 +1946,11 @@ class CreateSprint extends Component {
                                             <div 
                                               style={{
                                                 color: '#4d90fe',
-                                                border: '1px solid #4d90fe',
-                                                borderRadius: '2px',
+                                                // border: '1px solid #4d90fe',
+                                                // borderRadius: '2px',
                                                 fontSize: '13px',
                                                 lineHeight: '20px',
-                                                padding: '0 8px',
+                                                // padding: '0 8px',
                                                 display: 'inline-block',
                                                 marginTop: 5,
                                               }}
@@ -1987,11 +2014,11 @@ class CreateSprint extends Component {
                                     <div 
                                       style={{
                                         color: '#4d90fe',
-                                        border: '1px solid #4d90fe',
-                                        borderRadius: '2px',
+                                        // border: '1px solid #4d90fe',
+                                        // borderRadius: '2px',
                                         fontSize: '13px',
                                         lineHeight: '20px',
-                                        padding: '0 8px',
+                                        // padding: '0 8px',
                                         display: 'inline-block',
                                       }}
                                     >
@@ -2041,6 +2068,52 @@ class CreateSprint extends Component {
                           </span>
                         </div>
                       </div>
+
+                      {
+                        this.state.typeCode === 'issue_epic' ? (
+                          <div className="line-start mt-10">
+                            <div className="c7n-property-wrapper">
+                              <span className="c7n-property">
+                                Epic名：
+                              </span>
+                            </div>
+                            <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                              <ReadAndEdit
+                                callback={this.changeRae.bind(this)}
+                                thisType="epicName"
+                                current={this.state.currentRae}
+                                handleEnter
+                                line
+                                origin={this.state.epicName}
+                                onInit={() => this.setAnIssueToState()}
+                                onOk={this.updateIssue.bind(this, 'epicName')}
+                                onCancel={this.resetEpicName.bind(this)}
+                                readModeContent={<div>
+                                  <p style={{ wordBreak: 'break-word', marginBottom: 0 }}>
+                                    {this.state.epicName}
+                                  </p>
+                                </div>}
+                              >
+                                <TextArea
+                                  maxLength={44}
+                                  style={{ width: '200px' }}
+                                  value={this.state.epicName}
+                                  size="small"
+                                  autoFocus={{ minRows: 2, maxRows: 6 }}
+                                  onChange={this.handleEpicNameChange.bind(this)}
+                                  onPressEnter={() => {
+                                    this.updateIssue('epicName');
+                                    this.setState({
+                                      currentRae: undefined,
+                                    });
+                                  }}
+                                />
+                              </ReadAndEdit>
+                            </div>
+                          </div>
+                        ) : null
+                      }
+
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-subtitle">
@@ -2341,7 +2414,7 @@ class CreateSprint extends Component {
                       <Icon type="attach_file c7n-icon-title" />
                       <span>附件</span>
                     </div>
-                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '130px' }} />
+                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px' }} />
                   </div>
                   <div className="c7n-content-wrapper" style={{ marginTop: '-47px' }}>
                     <UploadButtonNow
@@ -2454,7 +2527,7 @@ class CreateSprint extends Component {
                       </Button>
                     </div>
                   </div>
-                  {/* {this.renderLinkIssues()} */}
+                  {this.renderBranchs()} 
                 </div>
 
               </div>
@@ -2508,6 +2581,7 @@ class CreateSprint extends Component {
         {
           this.state.copyIssueShow ? (
             <CopyIssue
+              issueId={this.state.origin.issueId}
               issueNum={this.state.origin.issueNum}
               issueSummary={this.state.origin.summary}
               visible={this.state.copyIssueShow}

@@ -41,6 +41,7 @@ class UserHead extends Component {
           display: 'inline-block',
           lineHeight: '20px',
           fontSize: '13px',
+          textAlign: 'center',
         }}
       >
         { `${priority.priorityName}` }

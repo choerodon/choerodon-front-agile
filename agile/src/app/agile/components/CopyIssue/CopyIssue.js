@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Modal, Form, Input } from 'choerodon-ui';
+import { Modal, Form, Input, Checkbox } from 'choerodon-ui';
 
 import './CopyIssue.scss';
 
@@ -13,7 +13,7 @@ class CopyIssue extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      createLoading: false,
+      loading: false,
     };
   }
 
@@ -23,17 +23,25 @@ class CopyIssue extends Component {
   handleCopyIssue = () => {
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        const projectId = AppState.currentMenuType.id;
+        const { visible, onCancel, onOk, issueId, issueNum, issueSummary } = this.props; 
         window.console.log(values);
-        // const extra = {
-        // };
-        // this.setState({ createLoading: true });
-        // this.props.onOk(extra);
+        this.setState({
+          loading: true,
+        });
+        axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/copy_issue?summary=${values.issueSummary}`)
+          .then((res) => {
+            this.setState({
+              loading: false,
+            });
+            this.props.onOk();
+          });
       }
     });
   };
 
   render() {
-    const { visible, onCancel, onOk, issueNum, issueSummary } = this.props;
+    const { visible, onCancel, onOk, issueId, issueNum, issueSummary } = this.props;
     const { getFieldDecorator } = this.props.form;
   
     return (
@@ -45,7 +53,7 @@ class CopyIssue extends Component {
         onCancel={onCancel}
         okText="复制"
         cancelText="取消"
-        confirmLoading={this.state.createLoading}
+        confirmLoading={this.state.loading}
       >
         <Form layout="vertical">
           <FormItem>
@@ -58,6 +66,13 @@ class CopyIssue extends Component {
                 prefix="CLONE - "
                 maxLength={30}
               />,
+            )}
+          </FormItem>
+          <FormItem>
+            {getFieldDecorator('copySubIssue', {})(
+              <Checkbox>
+                是否复制子任务
+              </Checkbox>,
             )}
           </FormItem>
         </Form>

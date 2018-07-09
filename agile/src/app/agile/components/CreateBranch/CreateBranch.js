@@ -20,7 +20,7 @@ class CreateBranch extends Component {
       name: 'feature',
       value: '',
       projectId: menu.id,
-      submitting: false,
+      confirmLoading: false,
       initValue: null,
       type: 'custom',
 
@@ -38,93 +38,6 @@ class CreateBranch extends Component {
     const { store } = this.props;
     // store.loadIssue();
   }
-
-  /**
-   * 提交分支数据
-   * @param e
-   */
-  handleOk = (e) => {
-    e.preventDefault();
-    const { store } = this.props;
-    const appId = store.app;
-    const { projectId, type } = this.state;
-    this.props.form.validateFieldsAndScroll((err, data) => {
-      window.console.log(`${type}${data.branchName}`);
-      if (!err) {
-        const postData = data;
-        postData.branchName = type ? `${type}-${data.branchName}` : data.branchName;
-        this.setState({ submitting: true });
-        store.createBranch(projectId, appId, postData)
-          .then(() => {
-            this.props.onClose();
-            this.props.form.resetFields();
-            this.setState({ submitting: false });
-          })
-          .catch((error) => {
-            Choerodon.prompt(error.response.data.message);
-            this.setState({ submitting: false });
-          });
-      }
-    });
-  };
-  /**
-   * 验证分支名的正则
-   * @param rule
-   * @param value
-   * @param callback
-   */
-  checkName =(rule, value, callback) => {
-    // eslint-disable-next-line no-useless-escape
-    const endWith = /(\/|\.|\.lock)$/;
-    const contain = /(\s|~|\^|:|\?|\*|\[|\\|\.\.|@\{|\/{2,}){1}/;
-    const single = /^@+$/;
-    const { intl } = this.props;
-    if (endWith.test(value)) {
-      callback(intl.formatMessage({ id: 'branch.checkNameEnd' }));
-    } else if (contain.test(value) || single.test(value)) {
-      callback(intl.formatMessage({ id: 'branch.check' }));
-    } else {
-      callback();
-    }
-  };
-  /**
-   * 获取列表的icon
-   * @param type 分支类型
-   * @returns {*}
-   */
-  getIcon =(name) => {
-    let icon;
-    let type;
-    if (name) {
-      type = name.split('-')[0];
-    }
-    switch (type) {
-      case 'feature':
-        icon = <span className="c7n-branch-icon icon-feature">F</span>;
-        break;
-      case 'bugfix':
-        icon = <span className="c7n-branch-icon icon-develop">B</span>;
-        break;
-      case 'hotfix':
-        icon = <span className="c7n-branch-icon icon-hotfix">H</span>;
-        break;
-      case 'master':
-        icon = <span className="c7n-branch-icon icon-master">M</span>;
-        break;
-      case 'release':
-        icon = <span className="c7n-branch-icon icon-release">R</span>;
-        break;
-      default:
-        icon = <span className="c7n-branch-icon icon-custom">C</span>;
-    }
-    return icon;
-  };
-
-
-  handleClose = () => {
-    this.props.form.resetFields();
-    this.props.onClose();
-  };
 
   getOptionContent =(s) => {
     const { formatMessage } = this.props.intl;
@@ -163,6 +76,100 @@ class CreateBranch extends Component {
       </Tooltip>
       <span className="branch-issue-content">{`${s.issueNum}    ${s.summary}`}</span>
     </span>);
+  };
+
+  /**
+   * 获取列表的icon
+   * @param type 分支类型
+   * @returns {*}
+   */
+  getIcon =(name) => {
+    let icon;
+    let type;
+    if (name) {
+      type = name.split('-')[0];
+    }
+    switch (type) {
+      case 'feature':
+        icon = <span className="c7n-branch-icon icon-feature">F</span>;
+        break;
+      case 'bugfix':
+        icon = <span className="c7n-branch-icon icon-develop">B</span>;
+        break;
+      case 'hotfix':
+        icon = <span className="c7n-branch-icon icon-hotfix">H</span>;
+        break;
+      case 'master':
+        icon = <span className="c7n-branch-icon icon-master">M</span>;
+        break;
+      case 'release':
+        icon = <span className="c7n-branch-icon icon-release">R</span>;
+        break;
+      default:
+        icon = <span className="c7n-branch-icon icon-custom">C</span>;
+    }
+    return icon;
+  };
+
+  /**
+   * 提交分支数据
+   * @param e
+   */
+  handleOk = (e) => {
+    e.preventDefault();
+    this.props.form.validateFieldsAndScroll((err, values) => {
+      window.console.log(values);
+      if (!err) {
+        const devopsBranchDTO = {
+          branchName: values.name,
+          issueId: this.props.issueId,
+          originBranch: values.branch,
+        };
+        const applicationId = values.app;
+        const projectId = AppState.currentMenuType.id;
+        this.setState({
+          confirmLoading: true,
+        });
+        axios.post(`/devops/v1/projects/${projectId}/apps/${applicationId}/git/branch`, devopsBranchDTO)
+          .then((res) => {
+            this.setState({
+              confirmLoading: false,
+            });
+            this.props.onOk();
+          })
+          .catch((error) => {
+            window.console.error('create branch failed');
+            this.setState({
+              confirmLoading: false,
+            });
+          });
+      }
+    });
+  };
+  /**
+   * 验证分支名的正则
+   * @param rule
+   * @param value
+   * @param callback
+   */
+  checkName =(rule, value, callback) => {
+    // eslint-disable-next-line no-useless-escape
+    const endWith = /(\/|\.|\.lock)$/;
+    const contain = /(\s|~|\^|:|\?|\*|\[|\\|\.\.|@\{|\/{2,}){1}/;
+    const single = /^@+$/;
+    const { intl } = this.props;
+    if (endWith.test(value)) {
+      callback(intl.formatMessage({ id: 'branch.checkNameEnd' }));
+    } else if (contain.test(value) || single.test(value)) {
+      callback(intl.formatMessage({ id: 'branch.check' }));
+    } else {
+      callback();
+    }
+  };
+
+  handleClose = () => {
+    this.props.form.resetFields();
+    this.props.onClose();
   };
 
   changeType =(value) => {
@@ -216,10 +223,10 @@ class CreateBranch extends Component {
         title="创建分支"
         visible={visible}
         onOk={this.handleOk}
-        onCancel={this.handleClose}
+        onCancel={this.props.onCancel}
         okText="创建"
         cancelText="取消"
-        confirmLoading={this.state.submitting}
+        confirmLoading={this.state.confirmLoading}
       >
         <Content
           style={{
@@ -286,7 +293,7 @@ class CreateBranch extends Component {
                   onFocus={() => {
                     this.setState({ selectLoading: true });
                     let sign = 2;
-                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/branches`)
+                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git_flow/branches`)
                       .then((res) => {
                         sign -= 1;
                         this.setState({
@@ -294,11 +301,11 @@ class CreateBranch extends Component {
                           selectLoading: sign !== 0,
                         });
                       });
-                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/tags?page=0&size=9999`)
+                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git_flow/tags?page=0&size=9999`)
                       .then((res) => {
                         sign -= 1;
                         this.setState({
-                          tags: res.content,
+                          tags: res.tagList,
                           selectLoading: sign !== 0,
                         });
                       });

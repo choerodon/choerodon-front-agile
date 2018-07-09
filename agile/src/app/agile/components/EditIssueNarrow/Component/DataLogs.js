@@ -54,7 +54,7 @@ class DataLogs extends Component {
           datalogs.length > 5 && !this.state.expand ? (
             <div style={{ marginTop: 5 }}>
               <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ expand: true })}>
-                <Icon type="baseline-arrow_right icon" style={{ marginRight: 2 }} />
+                <Icon type="baseline-arrow_drop_down icon" style={{ marginRight: 2 }} />
                 <span>展开</span>
               </Button>
             </div>
@@ -64,7 +64,7 @@ class DataLogs extends Component {
           datalogs.length > 5 && this.state.expand ? (
             <div style={{ marginTop: 5 }}>
               <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ expand: false })}>
-                <Icon type="baseline-arrow_drop_down icon" style={{ marginRight: 2 }} />
+                <Icon type="baseline-arrow_drop_up icon" style={{ marginRight: 2 }} />
                 <span>折叠</span>
               </Button>
             </div>

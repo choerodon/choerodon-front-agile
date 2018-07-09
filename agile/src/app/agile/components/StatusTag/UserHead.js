@@ -43,6 +43,7 @@ class UserHead extends Component {
           lineHeight: '20px',
           fontSize: '12px',
           width: 48,
+          textAlign: 'center',
           ...this.props.style,
         }}
       >
