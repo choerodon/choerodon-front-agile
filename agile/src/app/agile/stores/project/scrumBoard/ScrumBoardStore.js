@@ -24,6 +24,28 @@ class ScrumBoardStore {
   @observable assigneer = [];
   @observable swimlaneBasedCode = '';
   @observable quickSearchList = [];
+  @observable epicData = [];
+  @observable allEpicData = [];
+
+  @computed get getAllEpicData() {
+    return toJS(this.allEpicData);
+  }
+
+  @action setAllEpicData(data) {
+    this.allEpicData = data;
+  }
+
+  axiosGetAllEpicData() {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`);
+  }
+
+  @computed get getEpicData() {
+    return toJS(this.epicData);
+  }
+
+  @action setEpicData(data) {
+    this.epicData = data;
+  }
 
   @computed get getQuickSearchList() {
     return toJS(this.quickSearchList);

@@ -3,9 +3,10 @@
     height: 296px;
     background: #fafafa;
     padding: 18px;
-    display: flex;
-    flex-direction: column;
+    // display: flex;
+    // flex-direction: column;
     margin-right: 24px;
+    margin-top: 24px;
     
     .c7n-reporthost-itempic {
         height: 154px;
@@ -22,4 +23,8 @@
             color:  rgba(0, 0, 0, 0.65);
         }
     }
+}
+
+.page-content .c7n-reporthost-item:nth-child(1), .page-content .c7n-reporthost-item:nth-child(2), .page-content .c7n-reporthost-item:nth-child(3) {
+    margin-top: 0;
 }

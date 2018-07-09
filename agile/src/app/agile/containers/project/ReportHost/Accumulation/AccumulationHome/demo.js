@@ -29,7 +29,6 @@ class AccumulationHome extends Component {
       options: {},
       options2: {},
       optionsVisible: false,
-      sprintData: {},
     };
   }
   componentWillMount() {
@@ -64,9 +63,6 @@ class AccumulationHome extends Component {
       const data2 = res2.columnsData.columns;
       _.forEach(data2, (item, index) => {
         data2[index].check = true;
-      });
-      this.setState({
-        sprintData: res2.currentSprint,
       });
       AccumulationStore.setColumnData(data2);
       if (type) {
@@ -165,16 +161,9 @@ class AccumulationHome extends Component {
         },
         grid: {
           left: '3%',
-          right: '3%',
+          right: '4%',
+          bottom: '3%',
           containLabel: true,
-        },
-        toolbox: {
-          left: 'center',
-          feature: {
-            dataZoom: {
-              yAxisIndex: 'none',
-            },
-          },
         },
         xAxis: [
           {
@@ -191,12 +180,42 @@ class AccumulationHome extends Component {
           },
         ],
         series: legendSeries,
-        dataZoom: [{
-          startValue: newxAxis[0],
-          type: 'slider',
-          // right: '50%',
-          // left: '0%',
-        }],
+      },
+      options2: {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            label: {
+              backgroundColor: '#6a7985',
+            },
+          },
+        },
+        legend: {
+          // show: false,
+          left: '0%',
+          data: legendData,
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true,
+        },
+        xAxis: {
+          data: newxAxis,
+        },
+        yAxis: [
+          {
+            type: 'value',
+          },
+        ],
+        series: legendSeries,
+        brush: {
+          xAxisIndex: 0,
+          toolbox: ['lineX'],
+          throttleType: 'debounce',
+        },
       },
       optionsVisible: false,
     });
@@ -226,9 +245,6 @@ class AccumulationHome extends Component {
     if (e.key === '1') {
       history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
-    if (e.key === '2') {
-      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`)
-    }
   }
   handleOnBrushSelected(params) {
     window.console.log(params);
@@ -243,9 +259,6 @@ class AccumulationHome extends Component {
         </Menu.Item>
         <Menu.Item key="1">
         Sprint报告
-        </Menu.Item>
-        <Menu.Item key="2">
-        版本报告
         </Menu.Item>
       </Menu>
     );
@@ -268,7 +281,7 @@ class AccumulationHome extends Component {
           </Dropdown>
         </Header>
         <Content
-          title={`迭代冲刺“${this.state.sprintData.sprintName}”的累积流量图`}
+          title="迭代冲刺“xxxx”的累积流量图"
           description="显示状态的问题。这有助于您识别潜在的瓶颈, 需要对此进行调查。"
           link="#"
           style={{
@@ -310,11 +323,25 @@ class AccumulationHome extends Component {
             <ReactEcharts
               option={this.state.options}
               style={{
-                height: '600px',
+                height: '400px',
               }}
               notMerge
               lazyUpdate
             />
+            <div>
+              <p style={{ fontSize: 18 }}>概览</p>
+              <p style={{ marginTop: 7 }}>在图中或概览图中点击并拖动光标选择日期范围(在概览图中双击鼠标将重置)。</p>
+              <ReactEcharts
+                option={this.state.options2}
+                style={{
+                  width: '600px',
+                  height: '200px',
+                }}
+                notMerge
+                lazyUpdate
+                onEvents={onEvents}
+              />
+            </div>
           </div>
         </Content>
       </Page>

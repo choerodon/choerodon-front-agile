@@ -280,7 +280,7 @@ class SprintItem extends Component {
     //   startDate endDate
     let result = '';
     if (!_.isNull(item[type])) {
-      result = `${item[type].split('-')[0]}年${item[type].split('-')[1]}月${item[type].split('-')[2].substring(0, 2)}日`;
+      result = `${item[type].split('-')[0]}年${item[type].split('-')[1]}月${item[type].split('-')[2].substring(0, 2)}日 ${item[type].split(' ')[1]}`;
     } else {
       result = '无';
     }
@@ -487,7 +487,8 @@ class SprintItem extends Component {
               >
                 <EasyEdit
                   type="date"
-                  defaultValue={item.startDate ? moment(item.startDate.split(' ')[0], 'YYYY-MM-DD') : ''}
+                  time
+                  defaultValue={item.startDate ? moment(item.startDate, 'YYYY-MM-DD HH-mm-ss') : ''}
                   disabledDate={item.endDate ? current => current > moment(item.endDate, 'YYYY-MM-DD HH:mm:ss') : ''}
                   onChange={(date, dateString) => {
                     this.updateDate('startDate', dateString);
@@ -501,7 +502,8 @@ class SprintItem extends Component {
                 <p>~</p>
                 <EasyEdit
                   type="date"
-                  defaultValue={item.endDate ? moment(item.endDate.split(' ')[0], 'YYYY-MM-DD') : ''}
+                  time
+                  defaultValue={item.endDate ? moment(item.endDate, 'YYYY-MM-DD HH-mm-ss') : ''}
                   disabledDate={item.startDate ? current => current < moment(item.startDate, 'YYYY-MM-DD HH:mm:ss') : ''}
                   onChange={(date, dateString) => {
                     this.updateDate('endDate', dateString);

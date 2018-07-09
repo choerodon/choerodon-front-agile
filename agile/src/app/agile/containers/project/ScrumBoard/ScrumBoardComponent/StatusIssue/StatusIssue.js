@@ -215,6 +215,18 @@ class StatusIssue extends Component {
     }
   }
 
+  renderEpicData(param) {
+    const data = ScrumBoardStore.getEpicData;
+    const item = this.props.data;
+    let result;
+    _.forEach(data, (items) => {
+      if (String(items.epicId) === String(item.epicId)) {
+        result = items[param];
+      }
+    });
+    return result;
+  }
+
   renderReturn(item, index, issueId, type) {
     if (this.renderSubDisplay(item, type) === 'block') {
       return (
@@ -318,6 +330,26 @@ class StatusIssue extends Component {
                               </span>
                             </Tooltip>
                           </p>
+                          <p
+                            style={{
+                              margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
+                            }}
+                          >
+                            <Tooltip title={`史诗: ${this.renderEpicData('epicName')}`}>
+                              <span
+                                className="textDisplayOneColumn"
+                                style={{
+                                  color: this.renderEpicData('color'),
+                                  border: `1px solid ${this.renderEpicData('color')}`,
+                                  // marginLeft: '10px',
+                                  padding: '2px 8px',
+                                  maxWidth: '80px',
+                                }}
+                              >
+                                {this.renderEpicData('epicName')}
+                              </span>
+                            </Tooltip>
+                          </p>
                         </div>
                         <div className="c7n-scrumboard-issueBottom">
                           <Tooltip title={`优先级: ${item.priorityName}`}>
@@ -379,6 +411,7 @@ class StatusIssue extends Component {
     const item = this.props.data;
     const index = this.props.index;
     const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
+    window.console.log(ScrumBoardStore.getEpicData);
     return this.renderReturn(item, index, issueId);
   }
 }

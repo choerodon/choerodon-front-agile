@@ -99,6 +99,9 @@ class ReleaseDetail extends Component {
     if (e.key === '1') {
       history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
+    if (e.key === '2') {
+      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`)
+    }
   }
   renderDoneIssue(column) {
     return (
@@ -236,6 +239,9 @@ class ReleaseDetail extends Component {
         </Menu.Item>
         <Menu.Item key="1">
           累积流量图
+        </Menu.Item>
+        <Menu.Item key="2">
+          版本报告
         </Menu.Item>
       </Menu>
     );

@@ -41,6 +41,7 @@ class IssueDetail extends Component {
             onCancel={() => {
               BacklogStore.setClickIssueDetail({});
               BacklogStore.setIsLeaveSprint(false);
+              this.props.cancelCallback();
             }}
             onDeleteIssue={() => {
               BacklogStore.setClickIssueDetail({});

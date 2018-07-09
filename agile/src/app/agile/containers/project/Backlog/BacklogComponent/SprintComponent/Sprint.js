@@ -104,6 +104,15 @@ class Sprint extends Component {
     }
   }
 
+  resetMuilterChose() {
+    this.setState({
+      selected: {
+        droppableId: '',
+        issueIds: [],
+      },
+    });
+  }
+
   handleClickIssue(sprintId, item) {
     // command ctrl shift
     if (this.state.keydown === 91 || this.state.keydown === 17 || this.state.keydown === 16) {
@@ -180,8 +189,8 @@ class Sprint extends Component {
     } else {
       this.setState({
         selected: {
-          droppableId: '',
-          issueIds: [],
+          droppableId: sprintId,
+          issueIds: [item.issueId],
         },
       });
       BacklogStore.setClickIssueDetail(item);

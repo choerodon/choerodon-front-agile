@@ -110,6 +110,42 @@ class StatusBodyColumn extends Component {
           }
         });
       }
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      if (this.props.epicId) {
+        _.forEach(data, (item, index) => {
+          if (item.epicId) {
+            if (item.epicId === this.props.epicId) {
+              result.push(
+                <StatusIssue
+                  data={item}
+                  index={index}
+                  droppableId={droppableId}
+                  statusName={statusName}
+                  categoryCode={categoryCode}
+                  statusData={this.props.data.subStatuses}
+                  renderIssues={this.renderIssues.bind(this)}
+                />,
+              );
+            }
+          }
+        });
+      } else {
+        _.forEach(data, (item, index) => {
+          if (!item.epicId) {
+            result.push(
+              <StatusIssue
+                data={item}
+                index={index}
+                droppableId={droppableId}
+                statusName={statusName}
+                categoryCode={categoryCode}
+                statusData={this.props.data.subStatuses}
+                renderIssues={this.renderIssues.bind(this)}
+              />,
+            );
+          }
+        });
+      }
     } else {
       _.forEach(data, (item, index) => {
         result.push(
@@ -145,6 +181,14 @@ class StatusBodyColumn extends Component {
       } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
         if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) === 
         String(this.props.assigneeId)
+        ) {
+          return 'rgba(140,158,255,0.12)';
+        } else {
+          return 'rgba(0, 0, 0, 0.04)';
+        }
+      } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId) === 
+        String(this.props.epicId)
         ) {
           return 'rgba(140,158,255,0.12)';
         } else {
@@ -274,6 +318,45 @@ class StatusBodyColumn extends Component {
       } else {
         return 'unset';
       }
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId) === 
+      String(this.props.epicId)) {
+        // 如果在同一个泳道
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) !== 
+        String(this.props.data.columnId)) {
+          let flag = 0;
+          // 如果不在同一列
+          if (data.length === 1) {
+            // 如果只有一个状态
+            if (drag) {
+              return '2px dashed #1AB16F';
+            } else {
+              return '2px dashed #26348B';
+            }
+          } else {
+            // 如果有多个状态
+            if (index > 0) {
+              if (position === 'top') {
+                // 如果当前状态不是第一个 并且是top border
+                flag = 1;
+              }
+            }
+            if (flag === 1) {
+              return 'unset';
+            } else if (drag) {
+              return '2px dashed #1AB16F';
+            } else {
+              return '2px dashed #26348B';
+            }
+          }
+        } else if (drag) {
+          return '2px dashed #1AB16F';
+        } else {
+          return '2px dashed #26348B';
+        }
+      } else {
+        return 'unset';
+      }
     }
     if (drag) {
       return '2px dashed #1AB16F';
@@ -312,6 +395,7 @@ class StatusBodyColumn extends Component {
               code: item.id,
               parentId: this.props.source,
               assigneeId: this.props.assigneeId,
+              epicId: this.props.epicId,
             })
           }
         >

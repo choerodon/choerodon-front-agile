@@ -32,11 +32,16 @@ class BacklogHome extends Component {
     this.refresh();
   }
   componentDidMount() {
-    if (document.getElementsByClassName('c7n-backlogTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-backlogTools-left')[0].clientHeight) {
-      this.setState({
-        more: true,
-      });
-    }
+    const timer = setInterval(() => {
+      if (document.getElementsByClassName('c7n-backlogTools-left').length > 0) {
+        if (document.getElementsByClassName('c7n-backlogTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-backlogTools-left')[0].clientHeight) {
+          this.setState({
+            more: true,
+          });
+        }
+        clearInterval(timer);
+      }
+    }, 1000);
   }
   //  拖动结束事件
   onDragEnd(result) {
@@ -357,10 +362,19 @@ class BacklogHome extends Component {
     BacklogStore.setQuickFilters(newState);
     this.refresh();
   }
+
+  resetSprintChose() {
+    this.sprintRef.resetMuilterChose();
+  }
   
   render() {
+    const that = this;
     return (
-      <Page>
+      <Page
+        service={[
+          'agile-service.product-version.createVersion',
+        ]}
+      >
         <Header title="待办事项">
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint.bind(this)}>
             <Icon type="playlist_add" />创建冲刺
@@ -374,7 +388,7 @@ class BacklogHome extends Component {
             <div
               className="c7n-backlogTools-left"
               style={{
-                height: this.state.expand ? '' : 25,
+                height: this.state.expand ? '' : 27,
               }}
             >
               <p style={{ marginRight: 32, whiteSpace: 'nowrap' }}>快速搜索:</p>
@@ -516,6 +530,7 @@ class BacklogHome extends Component {
                   onRef={(ref) => {
                     this.IssueDetail = ref;
                   }}
+                  cancelCallback={this.resetSprintChose.bind(this)}
                 />
               </DragDropContext>
             </div>
