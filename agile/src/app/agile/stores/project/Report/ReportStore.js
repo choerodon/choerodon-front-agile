@@ -32,6 +32,8 @@ class ReportStore {
         this.setSprints(res || []);
         if (res && res.length) {
           this.changeCurrentSprint(res[0].sprintId);
+        } else {
+          this.setCurrentSprint({});
         }
       })
       .catch((error) => {
@@ -41,19 +43,23 @@ class ReportStore {
   }
 
   changeCurrentSprint(sprintId) {
-    loadSprint(sprintId)
-      .then((res) => {
-        this.setCurrentSprint(res || {});
-        // ready to load when activeKey change
-        this.setTodo(false);
-        this.setDone(false);
-        this.setRemove(false);
-        this.getChartData();
-        this.loadCurrentTab();
-      })
-      .catch((error) => {
-        window.console.error('some thing wrong, get currentSprint failed');
-      });
+    if (sprintId) {
+      loadSprint(sprintId)
+        .then((res) => {
+          this.setCurrentSprint(res || {});
+          // ready to load when activeKey change
+          this.setTodo(false);
+          this.setDone(false);
+          this.setRemove(false);
+          this.getChartData();
+          this.loadCurrentTab();
+        })
+        .catch((error) => {
+          window.console.error('some thing wrong, get currentSprint failed');
+        });
+    } else {
+      this.init();
+    }
   }
 
   loadCurrentTab() {
@@ -62,6 +68,9 @@ class ReportStore {
       todo: 'loadTodoIssues',
       remove: 'loadRemoveIssues',
     };
+    if (!this.currentSprint.sprintId) {
+      return;
+    }
     this[ARRAY[this.activeKey]]();
   }
 

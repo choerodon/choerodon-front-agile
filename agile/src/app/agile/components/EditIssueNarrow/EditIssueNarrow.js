@@ -136,6 +136,9 @@ class CreateSprint extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.issueId !== this.props.issueId) {
+      this.setState({
+        currentRae: undefined,
+      });
       this.reloadIssue(nextProps.issueId);
     }
   }
