@@ -16,6 +16,7 @@ class VersionReport extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      options: {},
       chosenVersion: '',
       datas: [{
         status: 'done',
@@ -47,9 +48,91 @@ class VersionReport extends Component {
   }
   getReportData() {
     VersionReportStore.axiosGetReportData(this.state.chosenVersion).then((res) => {
+      VersionReportStore.setReportData(res);
       window.console.log(res);
+      this.getOptions();
     }).catch((error) => {
       window.console.log(error);
+    });
+  }
+  getOptions() {
+    const data = VersionReportStore.getReportData.versionReport;
+    data.reverse();
+    const xAxis = [];
+    _.forEach(data, (item) => {
+      if (xAxis.length === 0) {
+        xAxis.push(item.changeDate);
+      } else if (xAxis.indexOf(item.changeDate) === -1) {
+        xAxis.push(item.changeDate);
+      }
+    });
+    const total = [];
+    const complete = [];
+    const percent = [];
+    _.forEach(xAxis, (item, index) => {
+      _.forEach(data, (item2) => {
+        if (item === item2.changeDate) {
+          total.push(item2.totalStoryPoints);
+          complete.push(item2.completedStoryPoints);
+          percent.push(parseInt(item2.unEstimatedPercentage * 100, 10));
+        }
+      });
+    });
+    window.console.log(xAxis);
+    window.console.log(total);
+    window.console.log(complete);
+    window.console.log(percent);
+    const options = {
+      // title: {
+      //   text: 'Step Line',
+      // },
+      tooltip: {
+        trigger: 'axis',
+      },
+      legend: {
+        data: ['总计故事点', '已完成故事点', '未预估问题的百分比'],
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true,
+      },
+      // toolbox: {
+      //   feature: {
+      //     saveAsImage: {},
+      //   },
+      // },
+      xAxis: {
+        type: 'category',
+        data: xAxis,
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: [
+        {
+          name: '总计故事点',
+          type: 'line',
+          step: 'start',
+          data: total,
+        },
+        {
+          name: '已完成故事点',
+          type: 'line',
+          step: 'middle',
+          data: complete,
+        },
+        {
+          name: '未预估问题的百分比',
+          type: 'line',
+          step: 'end',
+          data: percent,
+        },
+      ],
+    };
+    this.setState({
+      options,
     });
   }
   updateIssues(data) {
@@ -147,6 +230,7 @@ class VersionReport extends Component {
                 chosenVersion: value,
               }, () => {
                 this.updateIssues(this.state.datas);
+                this.getReportData();
               });
             }}
           >
@@ -156,6 +240,16 @@ class VersionReport extends Component {
               ))
             }
           </Select>
+          <div className="c7n-versionReport-report">
+            <ReactEcharts
+              option={this.state.options}
+              style={{
+                height: '400px',
+              }}
+              notMerge
+              lazyUpdate
+            />
+          </div>
           <div className="c7n-versionReport-issues">
             <Tabs defaultActiveKey="1">
               <TabPane tab="已完成的问题" key="1">
