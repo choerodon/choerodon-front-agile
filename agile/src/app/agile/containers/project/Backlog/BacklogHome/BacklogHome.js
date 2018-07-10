@@ -24,22 +24,24 @@ class BacklogHome extends Component {
       versionVisible: false,
       epicVisible: false,
       scrollIf: false,
+      more: false,
+      expand: false,
     };
   }
   componentWillMount() {
     this.refresh();
-    // window.addEventListener('click', (e) => {
-    //   if (!e.target.getAttribute('label')) {
-    //     if (this.sprintRef.getCurrentState('selected').issueIds.length > 0) {
-    //       if (!BacklogStore.getIsDragging) {
-    //         this.sprintRef.onChangeState('selected', {
-    //           droppableId: '',
-    //           issueIds: [],
-    //         });
-    //       }
-    //     }
-    //   }
-    // });
+  }
+  componentDidMount() {
+    const timer = setInterval(() => {
+      if (document.getElementsByClassName('c7n-backlogTools-left').length > 0) {
+        if (document.getElementsByClassName('c7n-backlogTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-backlogTools-left')[0].clientHeight) {
+          this.setState({
+            more: true,
+          });
+        }
+        clearInterval(timer);
+      }
+    }, 1000);
   }
   //  拖动结束事件
   onDragEnd(result) {
@@ -94,6 +96,16 @@ class BacklogHome extends Component {
       }
     }
     return destinationData;
+  }
+  getSprint() {
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
+      BacklogStore.setSprintData(data);
+      this.setState({
+        spinIf: false,
+      });
+    }).catch((error2) => {
+      window.console.error(error2);
+    });
   }
   dragToSprint(result, sourceId, endId, endIndex, originData, newData1) {
     const newData = _.clone(newData1);
@@ -178,7 +190,7 @@ class BacklogHome extends Component {
       BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
         ? 0 : endId, axiosParam).then((res) => {
         this.IssueDetail.refreshIssueDetail();
-        this.refresh();
+        this.getSprint();
       }).catch((error) => {
         BacklogStore.setSprintData(originData);
         window.console.error(error);
@@ -220,9 +232,10 @@ class BacklogHome extends Component {
             BacklogStore.setSprintData(newData);
             BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
               ? 0 : endId, axiosParam).then((res) => {
-              newData.sprintData[index].issueSearchDTOList[endIndex] = res[0];
+              // newData.sprintData[index].issueSearchDTOList[endIndex] = res[0];
               this.IssueDetail.refreshIssueDetail();
-              BacklogStore.setSprintData(newData);
+              // BacklogStore.setSprintData(newData);
+              this.getSprint();
             }).catch((error) => {
               BacklogStore.setSprintData(originData);
               window.console.error(error);
@@ -250,9 +263,10 @@ class BacklogHome extends Component {
         BacklogStore.setSprintData(newData);
         BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog' 
           ? 0 : endId, axiosParam).then((res) => {
-          newData.backlogData.backLogIssue[endIndex] = res[0];
+          // newData.backlogData.backLogIssue[endIndex] = res[0];
           this.IssueDetail.refreshIssueDetail();
-          BacklogStore.setSprintData(newData);
+          // BacklogStore.setSprintData(newData);
+          this.getSprint();
         }).catch((error) => {
           BacklogStore.setSprintData(originData);
           window.console.error(error);
@@ -260,37 +274,31 @@ class BacklogHome extends Component {
       }
     }
   }
+
   refresh() {
     this.setState({
       spinIf: true,
     });
     ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
       ScrumBoardStore.setQuickSearchList(res);
-      BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
-        BacklogStore.setSprintData(data);
-        BacklogStore.axiosGetVersion().then((data2) => {
-          const newVersion = [...data2];
-          _.forEach(newVersion, (item, index) => {
-            newVersion[index].expand = false;
-          });
-          BacklogStore.setVersionData(newVersion);
-          this.setState({
-            spinIf: false,
-          });
-        }).catch((error) => {
-          window.console.error(error);
+      this.getSprint();
+      BacklogStore.axiosGetVersion().then((data2) => {
+        const newVersion = [...data2];
+        _.forEach(newVersion, (item, index) => {
+          newVersion[index].expand = false;
         });
-        BacklogStore.axiosGetEpic().then((data3) => {
-          const newEpic = [...data3];
-          _.forEach(newEpic, (item, index) => {
-            newEpic[index].expand = false;
-          });
-          BacklogStore.setEpicData(newEpic);
-        }).catch((error3) => {
-          window.console.error(error3);
+        BacklogStore.setVersionData(newVersion);
+      }).catch((error) => {
+        window.console.error(error);
+      });
+      BacklogStore.axiosGetEpic().then((data3) => {
+        const newEpic = [...data3];
+        _.forEach(newEpic, (item, index) => {
+          newEpic[index].expand = false;
         });
-      }).catch((error2) => {
-        window.console.error(error2);
+        BacklogStore.setEpicData(newEpic);
+      }).catch((error3) => {
+        window.console.error(error3);
       });
     }).catch((error) => {
       window.console.error(error);
@@ -354,10 +362,19 @@ class BacklogHome extends Component {
     BacklogStore.setQuickFilters(newState);
     this.refresh();
   }
+
+  resetSprintChose() {
+    this.sprintRef.resetMuilterChose();
+  }
   
   render() {
+    const that = this;
     return (
-      <Page>
+      <Page
+        service={[
+          'agile-service.product-version.createVersion',
+        ]}
+      >
         <Header title="待办事项">
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint.bind(this)}>
             <Icon type="playlist_add" />创建冲刺
@@ -368,7 +385,12 @@ class BacklogHome extends Component {
         </Header>
         <Content style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div className="c7n-backlogTools">
-            <div className="c7n-backlogTools-left">
+            <div
+              className="c7n-backlogTools-left"
+              style={{
+                height: this.state.expand ? '' : 27,
+              }}
+            >
               <p style={{ marginRight: 32, whiteSpace: 'nowrap' }}>快速搜索:</p>
               <p
                 className="c7n-backlog-filter"
@@ -404,6 +426,22 @@ class BacklogHome extends Component {
                     </p>
                   )) : ''
               }
+            </div>
+            <div
+              style={{
+                display: this.state.more ? 'block' : 'none',
+                color: 'rgb(63, 81, 181)',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+              role="none"
+              onClick={() => {
+                this.setState({
+                  expand: !this.state.expand,
+                });
+              }}
+            >
+              {this.state.expand ? '...收起' : '...展开'}
             </div>
           </div>
           <div className="c7n-backlog">
@@ -492,6 +530,7 @@ class BacklogHome extends Component {
                   onRef={(ref) => {
                     this.IssueDetail = ref;
                   }}
+                  cancelCallback={this.resetSprintChose.bind(this)}
                 />
               </DragDropContext>
             </div>

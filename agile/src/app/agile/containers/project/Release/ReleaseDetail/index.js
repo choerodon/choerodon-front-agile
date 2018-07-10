@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, DatePicker, Tabs, Table, Popover, Modal, Radio, Form, Select, Icon, Spin } from 'choerodon-ui';
+import { Button, DatePicker, Tabs, Table, Popover, Modal, Radio, Form, Select, Icon, Spin, Avatar } from 'choerodon-ui';
 import moment from 'moment';
 import EditIssue from '../../../../components/EditIssueNarrow';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -78,7 +78,7 @@ class ReleaseDetail extends Component {
         return '#00BFA5';
       } else {
         return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="class" />
+          <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
         );
       }
     }
@@ -292,7 +292,16 @@ class ReleaseDetail extends Component {
       title: '经办人',
       dataIndex: 'assigneeName',
       key: 'assigneeName',
-      render: text => <span className="textDisplayOneColumn">{text}</span>,
+      render: (text, record) => (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Avatar size="small" src={record.imageUrl ? record.imageUrl : ''}>
+            {
+              record.imageUrl ? '' : text.substring(0, 1)
+            }
+          </Avatar>
+          <span className="textDisplayOneColumn">{text}</span>
+        </div>
+      ),
     }, {
       width: '15%',
       title: '状态',
@@ -310,7 +319,7 @@ class ReleaseDetail extends Component {
       ),
     }];
     return (
-      <page>
+      <Page>
         <Header 
           title={(
             <div style={{ whiteSpace: 'nowrap' }}>
@@ -490,7 +499,7 @@ class ReleaseDetail extends Component {
           </Spin>
           
         </Content>
-      </page>
+      </Page>
     );
   }
 }

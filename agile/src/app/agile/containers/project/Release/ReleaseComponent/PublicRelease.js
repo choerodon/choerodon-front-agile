@@ -3,6 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import { Modal, Form, Radio, Select, DatePicker } from 'choerodon-ui';
 import moment from 'moment';
+import { withRouter } from 'react-router-dom';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 
 const { Sidebar } = Modal;
@@ -40,6 +41,11 @@ class PublicRelease extends Component {
       }
     });
   }
+  goIssue() {
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
+    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=版本${ReleaseStore.getVersionDetail.name}中${ReleaseStore.getPublicVersionDetail.fixIssueCount}个未解决的问题`);
+  }
   renderRadioDisabled() {
     if (ReleaseStore.getPublicVersionDetail.versionNames) {
       if (ReleaseStore.getPublicVersionDetail.versionNames.length > 0) {
@@ -74,8 +80,12 @@ class PublicRelease extends Component {
                   ReleaseStore.getPublicVersionDetail.fixIssueCount ? (
                     <p style={{ display: 'flex', alignItems: 'center' }}>
                       <div className="c7n-release-icon">!</div>
-                    还有{ReleaseStore.getPublicVersionDetail.fixIssueCount}个
-                      <span style={{ color: '#3F51B5' }}>这个版本仍然没有解决的问题。</span>
+                    还有
+                      <span 
+                        style={{ color: '#3F51B5', cursor: 'pointer' }}
+                        role="none"
+                        onClick={this.goIssue.bind(this)}
+                      >{ReleaseStore.getPublicVersionDetail.fixIssueCount}个</span>这个版本仍然没有解决的问题。
                     </p>
                   ) : ''
                 }
@@ -134,7 +144,7 @@ class PublicRelease extends Component {
                   }
                   <FormItem>
                     {getFieldDecorator('startDate', {})(
-                      <DatePicker label="开始日期" />,
+                      <DatePicker style={{ width: 512 }} label="发布日期" />,
                     )}
                   </FormItem>
                 </Form>
@@ -147,4 +157,4 @@ class PublicRelease extends Component {
   }
 }
 
-export default Form.create()(PublicRelease);
+export default Form.create()(withRouter(PublicRelease));

@@ -5,6 +5,9 @@ import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import './ReportHostHome.scss';
 import burndownPic from '../../../../assets/image/burndowchart.svg';
 import sprintPic from '../../../../assets/image/sprint.svg';
+import accumulation from '../../../../assets/image/accumulation.svg';
+import versionReport from '../../../../assets/image/versionReport.svg';
+import { version } from '../../../../../../../node_modules/moment';
 
 const { AppState } = stores;
 
@@ -42,6 +45,18 @@ class ReportHostHome extends Component {
       des: '了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。',
       link: '/agile/reporthost/sprintReport',
       pic: sprintPic,
+    }, {
+      id: 3,
+      title: '累积流量图',
+      des: '显示状态的问题，这有助于您识别潜在的瓶颈， 需要对此进行调查。',
+      link: '/agile/reporthost/accumulation',
+      pic: accumulation,
+    }, {
+      id: 4,
+      title: '版本报告',
+      des: '跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。',
+      link: '/agile/reporthost/versionReport',
+      pic: versionReport,
     }];
     return (
       <Page>
@@ -60,7 +75,7 @@ class ReportHostHome extends Component {
           description="这里会根据您项目的进展情况以多个维度直观地记录和展示您项目、迭代、版本、进度等汇总情况。点击您需要查看的报告类型可以查看具体的详细内容。"
           link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/report/"
         >
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', width: 950, flexWrap: 'wrap' }}>
             {
               data.map(item => (
                 <div
@@ -71,12 +86,14 @@ class ReportHostHome extends Component {
                   role="none"
                   onClick={this.handleClickItem.bind(this, item)}
                 >
-                  <div
-                    className="c7n-reporthost-itempic"
-                    style={{
-                      backgroundImage: `url(${item.pic})`,
-                    }}
-                  />
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <div
+                      className="c7n-reporthost-itempic"
+                      style={{
+                        backgroundImage: `url(${item.pic})`,
+                      }}
+                    />
+                  </div>
                   <div className="c7n-reporthost-itembottom">
                     <p className="c7n-reporthost-itemtitle">{item.title}</p>
                     <p className="c7n-reporthost-itemdes">{item.des}</p>

@@ -123,7 +123,7 @@ class CreateEpic extends Component {
                   message: '概要不能为空',
                 }],
               })(
-                <TextArea autoSize label="概要" maxLength={30} />,
+                <TextArea autoSize label="概要" maxLength={44} />,
               )}
             </FormItem>
           </Form>

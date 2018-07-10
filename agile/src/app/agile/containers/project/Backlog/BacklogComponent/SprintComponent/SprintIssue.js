@@ -69,7 +69,7 @@ class SprintIssue extends Component {
       } else {
         return (
           <Tooltip title="类型： 故事">
-            <Icon style={{ color: 'white', fontSize: '14px' }} type="class" />
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
           </Tooltip>
         );
       }
@@ -290,7 +290,7 @@ class SprintIssue extends Component {
                     </div>
                     <div 
                       style={{ 
-                        maxWidth: 60,
+                        width: 60,
                         marginLeft: !_.isNull(item.statusName) ? '12px' : 0,
                       }} 
                       label="sprintIssue"
@@ -311,16 +311,20 @@ class SprintIssue extends Component {
                     <div 
                       style={{ 
                         maxWidth: 20,
-                        marginLeft: !_.isNull(item.storyPoints) ? '12px' : 0,
+                        marginLeft: '12px',
                       }}
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {item.storyPoints && item.typeCode === 'story' ? (
-                        <Tooltip title={`故事点: ${item.storyPoints}`}>
-                          <div label="sprintIssue" className="c7n-backlog-sprintIssueStoryPoint">{item.storyPoints}</div>
-                        </Tooltip>
-                      ) : ''}
+                      <Tooltip title={`故事点: ${item.storyPoints}`}>
+                        <div
+                          label="sprintIssue"
+                          className="c7n-backlog-sprintIssueStoryPoint"
+                          style={{
+                            visibility: item.storyPoints && item.typeCode === 'story' ? 'visible' : 'hidden',
+                          }}
+                        >{item.storyPoints}</div>
+                      </Tooltip>
                     </div>
                   </div>
                 </div>

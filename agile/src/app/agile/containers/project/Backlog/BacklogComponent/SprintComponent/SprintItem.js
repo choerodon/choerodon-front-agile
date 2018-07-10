@@ -280,7 +280,7 @@ class SprintItem extends Component {
     //   startDate endDate
     let result = '';
     if (!_.isNull(item[type])) {
-      result = `${item[type].split('-')[0]}年${item[type].split('-')[1]}月${item[type].split('-')[2].substring(0, 2)}日`;
+      result = `${item[type].split('-')[0]}年${item[type].split('-')[1]}月${item[type].split('-')[2].substring(0, 2)}日 ${item[type].split(' ')[1]}`;
     } else {
       result = '无';
     }
@@ -442,6 +442,7 @@ class SprintItem extends Component {
                       {/* <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ? 
                       ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div> */}
                       <Avatar
+                        style={{ marginRight: 8 }}
                         src={ass2.imageUrl ? ass2.imageUrl : undefined}
                         size="small"
                       >
@@ -486,7 +487,8 @@ class SprintItem extends Component {
               >
                 <EasyEdit
                   type="date"
-                  defaultValue={item.startDate ? moment(item.startDate.split(' ')[0], 'YYYY-MM-DD') : ''}
+                  time
+                  defaultValue={item.startDate ? moment(item.startDate, 'YYYY-MM-DD HH-mm-ss') : ''}
                   disabledDate={item.endDate ? current => current > moment(item.endDate, 'YYYY-MM-DD HH:mm:ss') : ''}
                   onChange={(date, dateString) => {
                     this.updateDate('startDate', dateString);
@@ -500,7 +502,8 @@ class SprintItem extends Component {
                 <p>~</p>
                 <EasyEdit
                   type="date"
-                  defaultValue={item.endDate ? moment(item.endDate.split(' ')[0], 'YYYY-MM-DD') : ''}
+                  time
+                  defaultValue={item.endDate ? moment(item.endDate, 'YYYY-MM-DD HH-mm-ss') : ''}
                   disabledDate={item.startDate ? current => current < moment(item.startDate, 'YYYY-MM-DD HH:mm:ss') : ''}
                   onChange={(date, dateString) => {
                     this.updateDate('endDate', dateString);
@@ -686,12 +689,11 @@ class SprintItem extends Component {
                       </div>
                     ) : (
                       <div className="c7n-backlog-sprintIssueSide">
-                        <Icon
-                          className="c7n-backlog-createIssue"
-                          type="playlist_add"
-                          role="none"
+                        <Button 
+                          className="leftBtn" 
+                          functyp="flat" 
                           style={{
-                            cursor: 'pointer',
+                            color: '#3f51b5',
                           }}
                           onClick={() => {
                             this.setState({
@@ -699,7 +701,9 @@ class SprintItem extends Component {
                               createIssueValue: '',
                             });
                           }}
-                        >创建问题</Icon>
+                        >
+                          <Icon type="playlist_add" />创建问题
+                        </Button>
                       </div>
                     )}
                   </div>
