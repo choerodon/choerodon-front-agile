@@ -41,7 +41,7 @@ class ScrumBoardSetting extends Component {
     if (!boardId) {
       const { history } = this.props;
       const urlParams = AppState.currentMenuType;
-      history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}`);
+      history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     } else {
       ScrumBoardStore.axiosGetBoardDataBySetting(boardId).then((data) => {
         ScrumBoardStore.axiosGetUnsetData(boardId).then((data2) => {

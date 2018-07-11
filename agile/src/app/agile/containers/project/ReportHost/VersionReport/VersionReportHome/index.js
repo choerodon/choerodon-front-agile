@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { toJS } from 'mobx';
-import { Button, Icon, Select, Tabs, Table } from 'choerodon-ui';
+import { Button, Icon, Select, Tabs, Table, Dropdown, Menu } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
+import moment from 'moment';
 import VersionReportStore from '../../../../../stores/project/versionReport/VersionReport';
+import './VersionReportHome.scss';
+import '../../../../main.scss';
 
 const { AppState } = stores;
 const Option = Select.Option;
@@ -49,52 +52,151 @@ class VersionReport extends Component {
   getReportData() {
     VersionReportStore.axiosGetReportData(this.state.chosenVersion).then((res) => {
       VersionReportStore.setReportData(res);
-      window.console.log(res);
       this.getOptions();
     }).catch((error) => {
       window.console.log(error);
     });
   }
-  getOptions() {
+  getAddIssues(date, type, string) {
     const data = VersionReportStore.getReportData.versionReport;
-    data.reverse();
-    const xAxis = [];
+    let addIssues = [];
     _.forEach(data, (item) => {
-      if (xAxis.length === 0) {
-        xAxis.push(item.changeDate);
-      } else if (xAxis.indexOf(item.changeDate) === -1) {
-        xAxis.push(item.changeDate);
+      if (item.changeDate.split(' ')[0] === date) {
+        if (item[type]) {
+          addIssues = [...addIssues, ...item[type]];
+        }
+      }
+    });
+    let result = '';
+    if (addIssues.length > 0) {
+      result += `<p>${string}:</p>`;
+      _.forEach(addIssues, (item) => {
+        result += `<p>${item.issueNum} 改变故事点: ${item.changeStoryPoints ? item.changeStoryPoints : 0}</p>`;
+      });
+    }
+    return result;
+  }
+  getOptions() {
+    Date.prototype.format = function () {
+      let s = '';
+      const mouth = (this.getMonth() + 1) >= 10 ? (this.getMonth() + 1) : (`0${this.getMonth() + 1}`);
+      const day = this.getDate() >= 10 ? this.getDate() : (`0${this.getDate()}`);
+      s += `${this.getFullYear()}-`; // 获取年份。
+      s += `${mouth}-`; // 获取月份。
+      s += day; // 获取日。
+      return (s); // 返回日期。
+    };
+
+    function getAll(begin, end) {
+      const ab = begin.split('-');
+      const ae = end.split('-');
+      const db = new Date();
+      db.setUTCFullYear(ab[0], ab[1] - 1, ab[2]);
+      const de = new Date();
+      de.setUTCFullYear(ae[0], ae[1] - 1, ae[2]);
+      const unixDb = db.getTime();
+      const unixDe = de.getTime();
+      const result = [];
+      for (let k = unixDb; k <= unixDe;) {
+        result.push((new Date(parseInt(k))).format());
+        k += 24 * 60 * 60 * 1000;
+      }
+      return result;
+    }
+    const version = VersionReportStore.getReportData.version;
+    let startDate;
+    let endDate;
+    if (version.startDate) {
+      startDate = version.startDate.split(' ')[0];
+    } else {
+      startDate = version.creationDate.split(' ')[0];
+    }
+    if (version.releaseDate) {
+      endDate = version.releaseDate.split(' ')[0];
+    } else {
+      endDate = VersionReportStore.getReportData.versionReport[0].changeDate.split(' ')[0];
+    }
+    const xAxis = getAll(startDate, endDate);
+    const data = VersionReportStore.getReportData.versionReport;
+    const seriesData = {};
+    _.forEach(data, (item) => {
+      if (!seriesData[item.changeDate.split(' ')[0]]) {
+        seriesData[item.changeDate.split(' ')[0]] = {
+          time: item.changeDate,
+          total: item.totalStoryPoints,
+          complete: item.completedStoryPoints,
+          percent: parseInt(item.unEstimatedPercentage * 100, 10),
+        };
+      } else if (moment(item.changeDate).isAfter(seriesData[item.changeDate.split(' ')[0]].time)) {
+        seriesData[item.changeDate.split(' ')[0]] = {
+          time: item.changeDate,
+          total: item.totalStoryPoints,
+          complete: item.completedStoryPoints,
+          percent: parseInt(item.unEstimatedPercentage * 100, 10),
+        };
       }
     });
     const total = [];
     const complete = [];
     const percent = [];
-    _.forEach(xAxis, (item, index) => {
-      _.forEach(data, (item2) => {
-        if (item === item2.changeDate) {
-          total.push(item2.totalStoryPoints);
-          complete.push(item2.completedStoryPoints);
-          percent.push(parseInt(item2.unEstimatedPercentage * 100, 10));
-        }
-      });
+    _.forOwn(seriesData, (value, key) => {
+      total.push([
+        key, value.total,
+      ]);
+      complete.push([
+        key, value.complete,
+      ]);
+      percent.push([
+        key, value.percent,
+      ]);
     });
-    window.console.log(xAxis);
-    window.console.log(total);
-    window.console.log(complete);
-    window.console.log(percent);
     const options = {
-      // title: {
-      //   text: 'Step Line',
-      // },
       tooltip: {
         trigger: 'axis',
+        formatter: (params) => {
+          return `
+            <div>
+              <p>日期: ${params[0].data[0]}</p>
+              <p>总计故事点: ${params[0].data[1]}</p>
+              <p>已完成故事点: ${params[1].data[1]}</p>
+              <p>未预估问题的百分比: ${params[2].data[1]}</p>
+              ${this.getAddIssues(params[0].data[0], 'addIssues', '添加的问题')}
+              ${this.getAddIssues(params[0].data[0], 'completedIssues', '完成的问题')}
+              ${this.getAddIssues(params[0].data[0], 'removeIssues', '移出的问题')}
+              ${this.getAddIssues(params[0].data[0], 'storyPointsChangIssues', '故事点改变的问题')}
+              ${this.getAddIssues(params[0].data[0], 'unCompletedIssues', '未完成的问题')}
+            </div>
+          `;
+        },
       },
       legend: {
-        data: ['总计故事点', '已完成故事点', '未预估问题的百分比'],
+        selectedMode: false,
+        top: 20,
+        right: 100,
+        orient: 'horizontal',
+        data: [{
+          icon: 'roundRect',
+          name: '总计故事点',
+          // textStyle: {
+          //   backgroundColor: 'rgba(77,144,254,0.10)',
+          // },
+        }, {
+          icon: 'roundRect',
+          name: '已完成故事点',
+          // textStyle: {
+          //   backgroundColor: 'rgba(0,191,165,0.10)',
+          // },
+        }, {
+          icon: 'roundRect',
+          name: '未预估问题的百分比',
+          // textStyle: {
+          //   backgroundColor: 'rgba(244,67,54,0.10)',
+          // },
+        }],
       },
       grid: {
-        left: '3%',
-        right: '4%',
+        left: '1%',
+        right: '1%',
         bottom: '3%',
         containLabel: true,
       },
@@ -104,30 +206,47 @@ class VersionReport extends Component {
       //   },
       // },
       xAxis: {
-        type: 'category',
+        type: 'time',
         data: xAxis,
+        name: '日期',
       },
-      yAxis: {
+      yAxis: [{
+        name: '故事点',
         type: 'value',
-      },
+      }, {
+        name: '百分比',
+        type: 'value',
+      }],
       series: [
         {
           name: '总计故事点',
           type: 'line',
           step: 'start',
           data: total,
+          yAxisIndex: 0,
+          itemStyle: {
+            normal: { color: '#4D90FE' },
+          },
         },
         {
           name: '已完成故事点',
           type: 'line',
           step: 'middle',
           data: complete,
+          yAxisIndex: 0,
+          itemStyle: {
+            normal: { color: '#00BFA5' },
+          },
         },
         {
           name: '未预估问题的百分比',
           type: 'line',
           step: 'end',
           data: percent,
+          yAxisIndex: 1,
+          itemStyle: {
+            normal: { color: '#F44336' },
+          },
         },
       ],
     };
@@ -148,6 +267,19 @@ class VersionReport extends Component {
         window.console.log(error2);
       });
     });
+  }
+  handleClick(e) {
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
+    if (e.key === '0') {
+      history.push(`/agile/reporthost/burndownchart?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }
+    if (e.key === '1') {
+      history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }
+    if (e.key === '2') {
+      history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }
   }
   renderTabTable(type) {
     const columns = [{
@@ -175,14 +307,12 @@ class VersionReport extends Component {
       dataIndex: 'storyPoints',
       key: 'storyPoints',
     }];
-    window.console.log(VersionReportStore.getIssues[type].pagination);
     return (
       <Table
         dataSource={VersionReportStore.getIssues[type].data}
         columns={columns}
         pagination={VersionReportStore.getIssues[type].pagination}
         onChange={(pagination, filters, sorter) => {
-          window.console.log(pagination);
           const data = _.clone(this.state.datas);
           let newIndex;
           _.forEach(data, (item, index) => {
@@ -201,9 +331,23 @@ class VersionReport extends Component {
       />
     );
   }
+
   render() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
+    const menu = (
+      <Menu onClick={this.handleClick.bind(this)}>
+        <Menu.Item key="0">
+        燃尽图
+        </Menu.Item>
+        <Menu.Item key="1">
+        Sprint报告
+        </Menu.Item>
+        <Menu.Item key="2">
+        累积流量图
+        </Menu.Item>
+      </Menu>
+    );
     return (
       <Page>
         <Header
@@ -213,9 +357,14 @@ class VersionReport extends Component {
           <Button funcTyp="flat" onClick={() => { this.getData(); }}>
             <Icon type="refresh" />刷新
           </Button>
+          <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
+            <Button icon="arrow_drop_down" funcTyp="flat">
+              切换报表
+            </Button>
+          </Dropdown>
         </Header>
         <Content
-          title="迭代冲刺“xxxx”的版本报告"
+          title={`迭代冲刺“${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}”的版本报告`}
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
           link="#"
         >
@@ -236,10 +385,14 @@ class VersionReport extends Component {
           >
             {
               VersionReportStore.getVersionList.map(item => (
-                <Option value={String(item.versionId)}>{item.name}</Option>
+                <Option value={String(item.versionId)}>V {item.name}</Option>
               ))
             }
           </Select>
+          <div className="c7n-versionReport-versionInfo">
+            <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.releaseDate ? `发布于 ${VersionReportStore.getReportData.version.releaseDate}` : '未发布'}</p>
+            <p style={{ color: '#3F51B5' }}>在“问题管理中”查看V {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}<Icon style={{ fontSize: 13 }} type="open_in_new" /></p>
+          </div>
           <div className="c7n-versionReport-report">
             <ReactEcharts
               option={this.state.options}

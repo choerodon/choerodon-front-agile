@@ -89,7 +89,6 @@ class AccumulationFilter extends Component {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, value) => {
       if (!err) {
-        window.console.log(value);
         AccumulationStore.setTimeData(this.setStoreCheckData(AccumulationStore.getTimeData, value.circle, 'id'));
         AccumulationStore.setStartDate(value.startDate);
         AccumulationStore.setEndDate(value.endDate);

@@ -41,15 +41,17 @@ class AccumulationHome extends Component {
       AccumulationStore.setFilterList(newData);
       ScrumBoardStore.axiosGetBoardList().then((res) => {
         const newData2 = _.clone(res);
+        let newIndex;
         _.forEach(newData2, (item, index) => {
-          if (index === 0) {
+          if (item.userDefault) {
             newData2[index].check = true;
+            newIndex = index;
           } else {
             newData2[index].check = false;
           }
         });
         AccumulationStore.setBoardList(newData2);
-        this.getColumnData(res[0].boardId, true);
+        this.getColumnData(res[newIndex].boardId, true);
       }).catch((error) => {
         window.console.log(error);
       });
@@ -60,7 +62,6 @@ class AccumulationHome extends Component {
   }
   getColumnData(id, type) {
     ScrumBoardStore.axiosGetBoardData(id, 0, false, []).then((res2) => {
-      window.console.log(res2);
       const data2 = res2.columnsData.columns;
       _.forEach(data2, (item, index) => {
         data2[index].check = true;
@@ -69,9 +70,15 @@ class AccumulationHome extends Component {
         sprintData: res2.currentSprint,
       });
       AccumulationStore.setColumnData(data2);
-      if (type) {
-        this.getData();
-      }
+      AccumulationStore.axiosGetProjectInfo().then((res) => {
+        AccumulationStore.setProjectInfo(res);
+        AccumulationStore.setStartDate(moment(res.creationDate.split(' ')[0]));
+        if (type) {
+          this.getData();
+        }
+      }).catch((error) => {
+        window.console.log(error);
+      });
     }).catch((error) => {
       window.console.log(error);
     });
@@ -99,7 +106,6 @@ class AccumulationHome extends Component {
       quickFilterIds,
       startDate,
     }).then((res) => {
-      window.console.log(res);
       AccumulationStore.setAccumulationData(res);
       this.getOption();
     }).catch((error) => {
@@ -107,46 +113,58 @@ class AccumulationHome extends Component {
     });
   }
   getOption() {
-    // 维度
-    const legendData = AccumulationStore.getAccumulationData.columnDTOList;
-    _.forEach(legendData, (item, index) => {
-      legendData[index].icon = 'roundRect';
+    const data = _.clone(AccumulationStore.getAccumulationData);
+    const legendData = [];
+    _.forEach(data, (item) => {
+      legendData.push({
+        icon: 'rect',
+        name: item.name,
+      });
     });
-    // series数据
-    const legendSeries = [];
-    // x轴
     const newxAxis = [];
-    const data = AccumulationStore.getAccumulationData;
-    _.forEach(data.columnChangeDTOList, (item) => {
-      if (newxAxis.indexOf(item.date.split(' ')[0]) === -1) {
+    _.forEach(data[0].coordinateDTOList, (item) => {
+      if (newxAxis.length === 0) {
+        newxAxis.push(item.date.split(' ')[0]);
+      } else if (newxAxis.indexOf(item.date.split(' ')[0]) === -1) {
         newxAxis.push(item.date.split(' ')[0]);
       }
     });
-    _.forEach(legendData, (item, index) => {
+    window.console.log(legendData);
+    window.console.log(newxAxis);
+    const legendSeries = [];
+    _.forEach(data, (item, index) => {
       legendSeries.push({
         name: item.name,
         type: 'line',
         stack: '总量',
-        areaStyle: { normal: {} },
+        areaStyle: { normal: {
+          color: item.color,
+        } },
+        lineStyle: { normal: {
+          color: item.color,
+        } },
+        itemStyle: {
+          normal: { color: item.color },
+        },
         data: [],
       });
-      _.forEach(newxAxis, (item2, index2) => {
-        let num = 0;
-        _.forEach(data.columnChangeDTOList, (item3) => {
-          if (String(item3.columnTo) === String(item.columnId)) {
-            if (item3.date.split(' ')[0] === item2) {
-              num += 1;
+      _.forEach(newxAxis, (item2) => {
+        let date = '';
+        let max = 0;
+        _.forEach(item.coordinateDTOList, (item3) => {
+          if (item3.date.split(' ')[0] === item2) {
+            if (date === '') {
+              date = item3.date;
+              max = item3.issueCount;
+            } else if (moment(item3.date).isAfter(date)) {
+              date = item3.date;
+              max = item3.issueCount;
             }
           }
         });
-        legendSeries[index].data.push(num);
+        legendSeries[index].data.push(max);
       });
     });
-    window.console.log('维度----------------------');
-    window.console.log(legendData);
-    window.console.log('x轴-----------------------');
-    window.console.log(newxAxis);
-    window.console.log('series数据-------------------');
     window.console.log(legendSeries);
     this.setState({
       options: {
@@ -227,12 +245,12 @@ class AccumulationHome extends Component {
       history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
     if (e.key === '2') {
-      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`)
+      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
-  handleOnBrushSelected(params) {
-    window.console.log(params);
-  }
+  // handleOnBrushSelected(params) {
+  //   window.console.log(params);
+  // }
   render() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
@@ -249,9 +267,9 @@ class AccumulationHome extends Component {
         </Menu.Item>
       </Menu>
     );
-    const onEvents = {
-      brushSelected: this.handleOnBrushSelected.bind(this),
-    };
+    // const onEvents = {
+    //   brushSelected: this.handleOnBrushSelected.bind(this),
+    // };
     return (
       <Page>
         <Header
