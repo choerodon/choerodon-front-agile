@@ -4,6 +4,7 @@ import { Button, Spin, message, Icon, Select, Table, Menu, Dropdown } from 'choe
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
+import moment from 'moment';
 import '../../../../main.scss';
 import BurndownChartStore from '../../../../../stores/project/burndownChart/BurndownChartStore';
 import './BurndownChartHome.scss';
@@ -23,6 +24,7 @@ class BurndownChartHome extends Component {
       select: 'remainingEstimatedTime',
       defaultSprint: '',
       loading: false,
+      endDate: '',
     };
   }
   componentWillMount() {
@@ -33,6 +35,7 @@ class BurndownChartHome extends Component {
       BurndownChartStore.setSprintList(res);
       this.setState({
         defaultSprint: res[0].sprintId,
+        endDate: res[0].endDate,
       }, () => {
         this.getChartData();
       });
@@ -96,11 +99,19 @@ class BurndownChartHome extends Component {
           newData[index].rest = rest;
         });
         BurndownChartStore.setBurndownList(newData);
-        this.setState({
-          xAxis: _.map(newData, 'date'),
-          yAxis: _.map(newData, 'rest'),
-          loading: false,
-        });
+        if (moment(this.state.endDate).isAfter(_.map(newData, 'date')[_.map(newData, 'date').length - 1])) {
+          this.setState({
+            xAxis: [..._.map(newData, 'date'), '2018-07-19 00:00:05'],
+            yAxis: _.map(newData, 'rest'),
+            loading: false,
+          });
+        } else {
+          this.setState({
+            xAxis: _.map(newData, 'date'),
+            yAxis: _.map(newData, 'rest'),
+            loading: false,
+          });
+        }
       }).catch((error) => {
         window.console.error(error);
       });
@@ -167,7 +178,7 @@ class BurndownChartHome extends Component {
         {
           name: '期望值',
           type: 'line',
-          data: [[0, this.getMaxY()], [this.state.yAxis.length - 1, 0]],
+          data: [[0, this.getMaxY()], [this.state.xAxis.length - 1, 0]],
           itemStyle: {
             color: 'grey',
           },
@@ -205,7 +216,7 @@ class BurndownChartHome extends Component {
       history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
     if (e.key === '2') {
-      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`)
+      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
   renderChartTitle() {
@@ -414,8 +425,15 @@ class BurndownChartHome extends Component {
                       label="迭代冲刺" 
                       value={this.state.defaultSprint}
                       onChange={(value) => {
+                        let endDate;
+                        _.forEach(BurndownChartStore.getSprintList, (item) => {
+                          if (item.sprintId === value) {
+                            endDate = item.endDate;
+                          }
+                        });
                         this.setState({
                           defaultSprint: value,
+                          endDate,
                         }, () => {
                           this.getChartData();
                         });

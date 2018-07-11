@@ -411,7 +411,6 @@ class StatusIssue extends Component {
     const item = this.props.data;
     const index = this.props.index;
     const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
-    window.console.log(ScrumBoardStore.getEpicData);
     return this.renderReturn(item, index, issueId);
   }
 }

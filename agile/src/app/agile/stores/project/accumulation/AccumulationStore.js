@@ -42,6 +42,19 @@ class AccumulationStore {
   @observable endDate = moment();
   @observable accumulationData = {};
   @observable boardList = [];
+  @observable projectInfo = {};
+
+  @computed get getProjectInfo() {
+    return toJS(this.projectInfo);
+  }
+
+  @action setProjectInfo(data) {
+    this.projectInfo = data;
+  }
+
+  axiosGetProjectInfo() {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`);
+  }
 
   @computed get getBoardList() {
     return toJS(this.boardList);
