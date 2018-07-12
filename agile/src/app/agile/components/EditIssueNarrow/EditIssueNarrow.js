@@ -414,6 +414,9 @@ class CreateSprint extends Component {
         editDesShow: false,
       });
     });
+    // if (this.props.onUpdate) {
+    //   this.props.onUpdate();
+    // }
   }
 
   refresh = () => {
@@ -525,6 +528,7 @@ class CreateSprint extends Component {
     const origin = this.state[originPros];
     let target;
     let transPros;
+    let newSign = false;
     if (!this.state[pros].length) {
       transPros = [];
     } else if (typeof this.state[pros][0] !== 'string') {
@@ -542,6 +546,7 @@ class CreateSprint extends Component {
           relationType: pros === 'fixVersions' ? 'fix' : 'influence',
         });
       } else {
+        newSign = true;
         return ({
           name: pro,
           relationType: pros === 'fixVersions' ? 'fix' : 'influence',
@@ -556,6 +561,9 @@ class CreateSprint extends Component {
         this.reloadIssue();
         if (this.props.onUpdate) {
           this.props.onUpdate();
+        }
+        if (newSign && this.props.onCreateVersion) {
+          this.props.onCreateVersion();
         }
       });
   }

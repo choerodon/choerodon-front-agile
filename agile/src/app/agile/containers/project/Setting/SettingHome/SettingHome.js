@@ -5,6 +5,9 @@ import { Button, Icon, Tabs } from 'choerodon-ui';
 import ProjectSetting from '../SettingComponent/ProjectSetting';
 import Search from '../SettingComponent/Search';
 import Link from '../SettingComponent/Link';
+import TableCanDragAndDrop from '../SettingComponent/TableCanDragAndDrop';
+import TableCouldDragAndDrop from '../SettingComponent/TableCouldDragAndDrop';
+import CreateTest from '../SettingComponent/CreateTest';
 
 const FileSaver = require('file-saver');
 
@@ -48,6 +51,33 @@ class SettingHome extends Component {
       });
   }
 
+  md() {
+    const arr = [
+      {
+        issueNum: 'AG-1',
+        summary: '我是任务一我是任务一我是任务一我是任务一',
+        typeCode: 'story',
+      },
+      {
+        issueNum: 'AG-2',
+        summary: '我是任务二我是任务二我是任务二我是任务二',
+        typeCode: 'story',
+      },
+    ];
+    let str = '';
+
+    str += '# 发布日志\n\n';
+    str += '## [0.7.0] - 2018-06-29\n\n';
+
+    str += '### 史诗\n';
+
+    arr.forEach((v) => {
+      str += `- [${v.issueNum}]-${v.summary}\n`;
+    });
+    const blob = new Blob([str], { type: 'text/plain;charset=utf-8' });
+    FileSaver.saveAs(blob, 'test.md');
+  }
+
   render() {
     return (
       <Page>
@@ -65,6 +95,13 @@ class SettingHome extends Component {
             <Icon type="refresh" />获取
           </Button>
           <a href={this.state.url}>url</a>
+          <Button funcTyp="flat" onClick={() => this.md()}>
+            <Icon type="refresh" />生成md
+          </Button>
+          <TableCanDragAndDrop />
+          <div style={{ marginTop: 50 }} />
+          <TableCouldDragAndDrop />
+          <CreateTest />
         </Content>
       </Page>
     );

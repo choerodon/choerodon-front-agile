@@ -263,6 +263,15 @@ class ReleaseDetail extends Component {
               切换报表
             </Button>
           </Dropdown>
+          <Button 
+            funcTyp="flat" 
+            onClick={() => {
+              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题`);
+            }}
+          >
+            <Icon type="autorenew icon" />
+            <span>查看问题列表</span>
+          </Button>
         </Header>
         <Content
           title={`迭代冲刺 "${ReportStore.currentSprint.sprintName || ''}" 的冲刺报告`}
