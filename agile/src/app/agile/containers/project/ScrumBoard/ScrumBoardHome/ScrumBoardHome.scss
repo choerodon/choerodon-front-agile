@@ -82,14 +82,27 @@
   }
 }
 
-.textDisplayOneColumn {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  .textDisplayOneColumn {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
 }
+@-moz-document url-prefix() {
+  .textDisplayOneColumn {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
+  .c7n-scrumboard-container {
+    padding-bottom: 83px;
+  }
+}
 .wrapSpin {
   height: 100%;
 }

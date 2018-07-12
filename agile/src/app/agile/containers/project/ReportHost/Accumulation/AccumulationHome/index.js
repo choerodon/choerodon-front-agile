@@ -136,7 +136,7 @@ class AccumulationHome extends Component {
       legendSeries.push({
         name: item.name,
         type: 'line',
-        stack: '总量',
+        // stack: '总量',
         areaStyle: { normal: {
           color: item.color,
         } },

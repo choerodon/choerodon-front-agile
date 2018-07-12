@@ -359,6 +359,7 @@ class StatusIssue extends Component {
                                 background: this.renderPriorityStyle('background', item),
                                 color: this.renderPriorityStyle('color', item),
                                 textAlign: 'center',
+                                height: 20,
                               }}
                             >{item.priorityName}</p>
                           </Tooltip>
@@ -371,6 +372,7 @@ class StatusIssue extends Component {
                                 textOverflow: 'ellipsis',
                                 lineHeight: '20px',
                                 paddingLeft: 10,
+                                whiteSpace: 'normal',
                               }}
                             >{item.summary}</p>
                           </Tooltip>
