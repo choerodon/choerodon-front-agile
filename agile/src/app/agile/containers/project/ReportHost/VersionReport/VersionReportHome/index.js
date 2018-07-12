@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { toJS } from 'mobx';
-import { Button, Icon, Select, Tabs, Table, Dropdown, Menu } from 'choerodon-ui';
+import { Button, Icon, Select, Tabs, Table, Dropdown, Menu, Tooltip } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
@@ -153,8 +153,7 @@ class VersionReport extends Component {
     const options = {
       tooltip: {
         trigger: 'axis',
-        formatter: (params) => {
-          return `
+        formatter: params => `
             <div>
               <p>日期: ${params[0].data[0]}</p>
               <p>总计故事点: ${params[0].data[1]}</p>
@@ -166,8 +165,7 @@ class VersionReport extends Component {
               ${this.getAddIssues(params[0].data[0], 'storyPointsChangIssues', '故事点改变的问题')}
               ${this.getAddIssues(params[0].data[0], 'unCompletedIssues', '未完成的问题')}
             </div>
-          `;
-        },
+          `,
       },
       legend: {
         selectedMode: false,
@@ -281,11 +279,76 @@ class VersionReport extends Component {
       history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
+  renderTypecode(item, type) {
+    if (item.typeCode === 'story') {
+      if (type === 'background') {
+        return '#00BFA5';
+      } else {
+        return (
+          <Tooltip title="类型： 故事">
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
+          </Tooltip>
+        );
+      }
+    }
+    if (item.typeCode === 'task') {
+      if (type === 'background') {
+        return '#4D90FE';
+      } else {
+        return (
+          <Tooltip title="类型： 任务">
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
+          </Tooltip>
+        );
+      }
+    }
+    if (item.typeCode === 'bug') {
+      if (type === 'background') {
+        return '#F44336';
+      } else {
+        return (
+          <Tooltip title="类型： 缺陷">
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
+          </Tooltip>
+        );
+      }
+    }
+    if (item.typeCode === 'issue_epic') {
+      if (type === 'background') {
+        return 'rgb(116, 59, 231)';
+      } else {
+        return (
+          <Tooltip title="类型： 史诗">
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="priority" />
+          </Tooltip>
+        );
+      }
+    }
+    return '';
+  }
+  renderPriorityStyle(type, item) {
+    if (type === 'color') {
+      if (item.priorityCode === 'medium') {
+        return 'rgb(53, 117, 223)';
+      } else if (item.priorityCode === 'high') {
+        return 'rgb(255, 177, 0)';
+      } else {
+        return 'rgba(0, 0, 0, 0.36)';
+      }
+    } else if (item.priorityCode === 'medium') {
+      return 'rgba(77, 144, 254, 0.2)';
+    } else if (item.priorityCode === 'high') {
+      return 'rgba(255, 177, 0, 0.12)';
+    } else {
+      return 'rgba(0, 0, 0, 0.08)';
+    }
+  }
   renderTabTable(type) {
     const columns = [{
       title: '关键字',
       dataIndex: 'issueNum',
       key: 'issueNum',
+      render: text => <span style={{ color: '#3F51B5' }}>{text}</span>,
     }, {
       title: '概要',
       dataIndex: 'summary',
@@ -294,14 +357,57 @@ class VersionReport extends Component {
       title: '问题类型',
       dataIndex: 'typeName',
       key: 'typeName',
+      render: (text, record) => (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <div
+            style={{
+              background: this.renderTypecode(record, 'background'),
+              width: 20,
+              height: 20,
+              borderRadius: '50%',
+              textAlign: 'center',
+            }}
+          >
+            {this.renderTypecode(record, 'icon')}
+          </div>
+          <span style={{ marginLeft: 8 }}>{record.typeName}</span>
+        </div>
+      ),
     }, {
       title: '优先级',
       dataIndex: 'priorityName',
       key: 'priorityName',
+      render: (text, record) => (
+        <span
+          style={{
+            color: this.renderPriorityStyle('color', record),
+            background: this.renderPriorityStyle('background', record),
+            padding: '1px 4px',
+          }}
+        >
+          {text}
+        </span>
+      ),
     }, {
       title: '状态',
       dataIndex: 'statusName',
       key: 'statusName',
+      render: (text, record) => (
+        <span 
+          label="sprintIssue" 
+          className="c7n-backlog-sprintIssueStatus"
+          style={{
+            background: record.statusColor ? record.statusColor : '#4d90fe',
+            color: 'white',
+            padding: '4px 6px',
+          }}
+        >{text}</span>
+      ),
     }, {
       title: '故事点',
       dataIndex: 'storyPoints',

@@ -780,7 +780,7 @@ class ScrumBoardHome extends Component {
                 >
                   {
                     ScrumBoardStore.getCurrentSprint ? (
-                      <div>
+                      <div className="c7n-scrumboard-container">
                         {this.renderSwimlane()}
                         {this.renderOtherSwimlane()}
                       </div>

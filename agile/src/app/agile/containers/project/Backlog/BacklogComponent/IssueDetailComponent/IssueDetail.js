@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import _ from 'lodash';
 import EditIssue from '../../../../../components/EditIssueNarrow';
 import './IssueDetail.scss';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
@@ -47,6 +48,17 @@ class IssueDetail extends Component {
               BacklogStore.setClickIssueDetail({});
               BacklogStore.setIsLeaveSprint(false);
               this.props.refresh();
+            }}
+            onCreateVersion={() => {
+              BacklogStore.axiosGetVersion().then((data2) => {
+                const newVersion = [...data2];
+                _.forEach(newVersion, (item, index) => {
+                  newVersion[index].expand = false;
+                });
+                BacklogStore.setVersionData(newVersion);
+              }).catch((error) => {
+                window.console.error(error);
+              });
             }}
             onUpdate={this.handleIssueUpdate.bind(this)}
           />
