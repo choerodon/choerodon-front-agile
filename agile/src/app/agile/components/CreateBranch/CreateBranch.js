@@ -121,7 +121,7 @@ class CreateBranch extends Component {
       window.console.log(values);
       if (!err) {
         const devopsBranchDTO = {
-          branchName: values.name,
+          branchName: values.type === 'custom' ? values.name : `${values.type}-${values.name}`,
           issueId: this.props.issueId,
           originBranch: values.branch,
         };
@@ -293,7 +293,7 @@ class CreateBranch extends Component {
                   onFocus={() => {
                     this.setState({ selectLoading: true });
                     let sign = 2;
-                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git_flow/branches`)
+                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/branches`)
                       .then((res) => {
                         sign -= 1;
                         this.setState({
@@ -301,11 +301,11 @@ class CreateBranch extends Component {
                           selectLoading: sign !== 0,
                         });
                       });
-                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git_flow/tags?page=0&size=9999`)
+                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/tags?page=0&size=9999`)
                       .then((res) => {
                         sign -= 1;
                         this.setState({
-                          tags: res.tagList,
+                          tags: res.content,
                           selectLoading: sign !== 0,
                         });
                       });

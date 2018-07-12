@@ -7,37 +7,37 @@ import TimeAgo from 'timeago-react';
 const { AppState } = stores;
 const Sidebar = Modal.Sidebar;
 
-class Commits extends Component {
+class MergeRequest extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      commits: [],
+      mergeRequests: [],
       loading: false,
     };
   }
 
   componentDidMount() {
-    this.loadCommits();
+    this.loadMergeRequest();
   }
 
-  loadCommits() {
+  loadMergeRequest() {
     const { issueId } = this.props;
     this.setState({ loading: true });
-    axios.get(`/devops/v1/project/${AppState.currentMenuType.id}/issue/${issueId}/commit/list`)
+    axios.get(`/devops/v1/project/${AppState.currentMenuType.id}/issue/${issueId}/merge_request/list`)
       .then((res) => {
         this.setState({
-          commits: res,
+          mergeRequests: res,
           loading: false,
         });
       });
   }
 
-  createMergeRequest(record) {
+  mergeRequest(record) {
     const projectId = AppState.currentMenuType.id;
-    const { appId } = record;
+    const { appId, id } = record;
     axios.get(`/devops/v1/projects/${projectId}/apps/${appId}/git/url`)
       .then((res) => {
-        const url = `${res}/merge_requests/new?change_branches=true&merge_request[source_branch]=${record.branchName}&merge_request[target_branch]=master`;
+        const url = `${res}/merge_requests/${id}`;
         window.open(url, '_blank');
       })
       .catch((error) => {
@@ -49,7 +49,7 @@ class Commits extends Component {
     const { issueId, issueNum, time, visible, onCancel } = this.props;
     const column = [
       {
-        title: '应用名称',
+        title: '编码',
         dataIndex: 'appName',
         width: '25%',
         render: appName => (
@@ -63,7 +63,7 @@ class Commits extends Component {
         ),
       },
       {
-        title: '分支',
+        title: '名称',
         dataIndex: 'branchName',
         width: '30%',
         render: branchName => (
@@ -78,6 +78,34 @@ class Commits extends Component {
       },
       {
         title: '状态',
+        dataIndex: 'status',
+        width: '30%',
+        render: status => (
+          <div style={{ width: '100%', overflow: 'hidden' }}>
+            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={status}>
+              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+                {status}
+              </p>
+            </Tooltip>
+          </div>
+        ),
+      },
+      {
+        title: '审查人',
+        dataIndex: 'status',
+        width: '30%',
+        render: status => (
+          <div style={{ width: '100%', overflow: 'hidden' }}>
+            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={status}>
+              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+                {status}
+              </p>
+            </Tooltip>
+          </div>
+        ),
+      },
+      {
+        title: '更新时间',
         dataIndex: 'status',
         width: '30%',
         render: status => (
@@ -146,4 +174,4 @@ class Commits extends Component {
     );
   }
 }
-export default withRouter(Commits);
+export default withRouter(MergeRequest);
