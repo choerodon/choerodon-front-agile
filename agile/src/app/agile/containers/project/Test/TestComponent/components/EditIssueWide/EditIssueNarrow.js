@@ -29,7 +29,9 @@ import CreateBranch from '../CreateBranch';
 import Commits from '../Commits';
 import MergeRequest from '../MergeRequest';
 import TestStepTable from '../TestStepTable';
+import TestExecuteTable from '../TestExecuteTable';
 import CreateTest from '../CreateTest';
+import ExecuteTest from '../ExecuteTest';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -75,6 +77,7 @@ class CreateSprint extends Component {
       editDesShow: false,
       commitShow: false,
       mergeRequestShow: false,
+      executeTestShow: false,
       origin: {},
       loading: true,
       nav: 'detail',
@@ -120,6 +123,7 @@ class CreateSprint extends Component {
       datalogs: [],
       fileList: [],
       testStepData: [],
+      testExecute: [],
       branchs: {},
       issueCommentDTOList: [],
       issueLinkDTOList: [],
@@ -446,6 +450,12 @@ class CreateSprint extends Component {
         .then((res) => {
           this.setState({ testStepData: res }, () => {
             this.setState({ testStepData: res });
+          });
+        });
+      axios.get(`/test/v1/projects/${AppState.currentMenuType.id}/cycle/case/query/issue/${issueId}`)
+        .then((res) => {
+          this.setState({ testExecuteData: res }, () => {
+            this.setState({ testExecuteData: res });
           });
         });
       this.setState({
@@ -1398,7 +1408,7 @@ class CreateSprint extends Component {
                     </div>
                   ) : null
                 } */}
-                <div className="line-start">
+                <div className="line-start" style={{ alignItems: 'center' }}>
                   <div style={{ display: 'flex', flex: 1 }}>
                     <span
                       style={{
@@ -1796,6 +1806,16 @@ class CreateSprint extends Component {
                             </ReadAndEdit>
                           </div>
                         </div>
+                      </div>
+                    ) : null
+                  }
+                  {
+                    this.state.issueId && this.state.typeCode === 'issue_test' ? (
+                      <div style={{ display: 'flex', flex: 1, justifyContent: 'center', borderLeft: '1px solid rgba(0, 0, 0, 0.26)' }}>
+                        <Button funcType="flat" style={{ color: '#000' }} onClick={() => this.setState({ executeTestShow: true })}>
+                          <Icon type="explicit-outline" />
+                          <span style={{ paddingLeft: 12 }}>执行测试</span>
+                        </Button>
                       </div>
                     ) : null
                   }
@@ -2554,6 +2574,25 @@ class CreateSprint extends Component {
                   </div>
                 </div>
 
+                <div id="testExecute">
+                  <div className="c7n-title-wrapper">
+                    <div className="c7n-title-left">
+                      <Icon type="subject c7n-icon-title" />
+                      <span>测试执行</span>
+                    </div>
+                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                  </div>
+                  <div className="c7n-content-wrapper" style={{ paddingLeft: 0 }}>
+                    <TestExecuteTable
+                      issueId={this.state.origin.issueId}
+                      data={this.state.testExecuteData}
+                      onOk={() => {
+                        this.reloadIssue();
+                      }}
+                    />
+                  </div>
+                </div>
+
                 <div id="attachment">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
@@ -2807,7 +2846,19 @@ class CreateSprint extends Component {
             />
           ) : null
         }
-        
+        {
+          this.state.executeTestShow ? (
+            <ExecuteTest
+              issueId={this.state.origin.issueId}
+              visible={this.state.executeTestShow}
+              onCancel={() => this.setState({ executeTestShow: false })}
+              onOk={() => {
+                this.setState({ executeTestShow: false });
+                this.reloadIssue();
+              }}
+            />
+          ) : null
+        }
       </div>
     );
   }

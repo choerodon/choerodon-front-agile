@@ -8,6 +8,7 @@ const ICON = {
   task: 'assignment',
   issue_epic: 'priority',
   sub_task: 'relation',
+  issue_test: 'test',
 };
 
 const TYPE = {
@@ -16,6 +17,7 @@ const TYPE = {
   task: '#4d90fe',
   issue_epic: '#743be7',
   sub_task: '#4d90fe',
+  issue_test: '#ff7043',
 };
 
 const NAME = {
@@ -24,6 +26,7 @@ const NAME = {
   task: '任务',
   issue_epic: '史诗',
   sub_task: '子任务',
+  issue_test: '测试',
 };
 
 class UserHead extends Component {
