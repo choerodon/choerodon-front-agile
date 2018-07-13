@@ -26,6 +26,7 @@ const NAME = {
   bug: '故障',
   task: '任务',
   issue_epic: '史诗',
+  issue_test: '测试',
 };
 
 class CreateIssue extends Component {
@@ -223,14 +224,14 @@ class CreateIssue extends Component {
           <Form layout="vertical">
             <FormItem label="问题类型" style={{ width: 520 }}>
               {getFieldDecorator('typeCode', {
-                initialValue: 'story',
+                initialValue: 'issue_test',
                 rules: [{ required: true }],
               })(
                 <Select
                   label="问题类型"
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
-                  {['story', 'task', 'bug', 'issue_epic'].map(type => (
+                  {['issue_test'].map(type => (
                     <Option key={type} value={type}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                         <TypeTag

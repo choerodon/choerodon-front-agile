@@ -24,12 +24,19 @@ class CopyIssue extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const projectId = AppState.currentMenuType.id;
-        const { visible, onCancel, onOk, issueId, issueNum, issueSummary } = this.props; 
-        window.console.log(values);
+        const { visible, onCancel, onOk, issueId, issueNum } = this.props;
+        const { issueSummary, copySubIssue, copyLinkIssue, sprint } = values;
+        const copyConditionDTO = {
+          issueLink: copyLinkIssue || false,
+          sprintValues: sprint,
+          subTask: copySubIssue || false,
+          summary: issueSummary || false,
+        };
+        window.console.log(copyConditionDTO);
         this.setState({
           loading: true,
         });
-        axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/copy_issue?summary=${values.issueSummary}`)
+        axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/copy_issue`, copyConditionDTO)
           .then((res) => {
             this.setState({
               loading: false,
@@ -68,13 +75,39 @@ class CopyIssue extends Component {
               />,
             )}
           </FormItem>
-          <FormItem>
-            {getFieldDecorator('copySubIssue', {})(
-              <Checkbox>
-                是否复制子任务
-              </Checkbox>,
-            )}
-          </FormItem>
+          {
+            this.props.issue.closeSprint.length || this.props.issue.activeSprint ? (
+              <FormItem>
+                {getFieldDecorator('sprint', {})(
+                  <Checkbox>
+                    是否复制冲刺
+                  </Checkbox>,
+                )}
+              </FormItem>
+            ) : null
+          }
+          {
+            this.props.issue.subIssueDTOList.length ? (
+              <FormItem>
+                {getFieldDecorator('copySubIssue', {})(
+                  <Checkbox>
+                    是否复制子任务
+                  </Checkbox>,
+                )}
+              </FormItem>
+            ) : null
+          }
+          {
+            this.props.issueLink.length ? (
+              <FormItem>
+                {getFieldDecorator('copyLinkIssue', {})(
+                  <Checkbox>
+                    是否复制关联任务
+                  </Checkbox>,
+                )}
+              </FormItem>
+            ) : null
+          }
         </Form>
       </Modal>
     );

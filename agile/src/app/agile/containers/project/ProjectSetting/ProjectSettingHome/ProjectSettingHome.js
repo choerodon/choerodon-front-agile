@@ -126,8 +126,8 @@ class ProjectSetting extends Component {
   }
 
   handleUpdateProjectSetting = () => {
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
+    this.props.form.validateFields((err, values, modify) => {
+      if (!err && modify) {
         window.console.log(values);
         const projectInfoDTO = {
           ...this.state.origin,
@@ -145,6 +145,9 @@ class ProjectSetting extends Component {
               origin: res,
               loading: false,
               couldUpdate: false,
+              code: res.projectCode,
+              priorityCode: res.defaultPriorityCode,
+              strategy: res.defaultAssigneeType,
             });
           })
           .catch((error) => {
@@ -158,7 +161,7 @@ class ProjectSetting extends Component {
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator, isModifiedFields, getFieldValue } = this.props.form;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     const radioStyle = {

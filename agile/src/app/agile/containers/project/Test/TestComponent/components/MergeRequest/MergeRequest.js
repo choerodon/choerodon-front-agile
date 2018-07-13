@@ -51,13 +51,13 @@ class MergeRequest extends Component {
     const column = [
       {
         title: '编码',
-        dataIndex: 'appName',
+        dataIndex: 'id',
         width: '25%',
-        render: appName => (
+        render: id => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
-            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={appName}>
+            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={id}>
               <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
-                {appName}
+                # {id}
               </p>
             </Tooltip>
           </div>
@@ -118,9 +118,9 @@ class MergeRequest extends Component {
       },
       {
         title: '',
-        dataIndex: 'id',
+        dataIndex: 'gitlabMergeRequestId',
         width: '10%',
-        render: (id, record) => (
+        render: (gitlabMergeRequestId, record) => (
           <div>
             <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>创建合并请求</span></div>}>
               <Button shape="circle" onClick={this.createMergeRequest.bind(this, record)}>

@@ -12,6 +12,7 @@ class SprintCommonStore {
     advancedSearchArgs: {},
     searchArgs: {},
   };
+  @observable filteredInfo = {};
   @observable order = {
     orderField: '',
     orderType: '',
@@ -31,6 +32,7 @@ class SprintCommonStore {
       advancedSearchArgs: {},
       searchArgs: {},
     });
+    this.setFilteredInfo({});
     this.loadIssues();
   }
 
@@ -67,6 +69,10 @@ class SprintCommonStore {
 
   @action setFilter(data) {
     this.filter = data;
+  }
+
+  @action setFilteredInfo(data) {
+    this.filteredInfo = data;
   }
 
   @action setOrder(data) {

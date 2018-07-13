@@ -46,15 +46,28 @@ class Issue extends Component {
 
   getInit() {
     const Request = this.GetRequest(this.props.location.search);
-    const { paramType, paramId, paramName } = Request;
+    const { paramType, paramId, paramName, paramStatus } = Request;
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
     const arr = [];
     if (paramName) {
       arr.push(paramName);
     }
-    IssueStore.setBarFilters(arr);
-    IssueStore.init();
+    if (paramStatus) {
+      const obj = {
+        advancedSearchArgs: {},
+        searchArgs: {},
+      };
+      const a = [paramStatus];
+      obj.advancedSearchArgs.statusCode = a || [];
+      IssueStore.setBarFilters(arr);
+      IssueStore.setFilter(obj);
+      IssueStore.setFilteredInfo({ statusCode: [paramStatus] });
+      IssueStore.loadIssues();
+    } else {
+      IssueStore.setBarFilters(arr);
+      IssueStore.init();
+    }
   }
 
   GetRequest(url) {
@@ -174,6 +187,7 @@ class Issue extends Component {
   }
 
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
+    IssueStore.setFilteredInfo(filters);
     IssueStore.setBarFilters(barFilters);
     window.console.log(barFilters);
     if (barFilters === undefined || barFilters.length === 0) {
@@ -439,6 +453,7 @@ class Issue extends Component {
           },
         ],
         filterMultiple: true,
+        filteredValue: IssueStore.filteredInfo.statusCode || null,
       },
     ];
     const columns = [
