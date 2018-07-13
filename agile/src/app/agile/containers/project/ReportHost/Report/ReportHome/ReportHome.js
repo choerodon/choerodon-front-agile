@@ -296,13 +296,25 @@ class ReleaseDetail extends Component {
             )}
           </Select>
           <div className="c7n-sprintMessage">
-            <span>
-              {ReportStore.getCurrentSprintStatus.status}冲刺, 
-              共 {ReportStore.currentSprint.issueCount || 0} 个问题
-            </span>
-            <span>
-              {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
-            </span>
+            <div className="c7n-sprintContent">
+              <span>
+                {ReportStore.getCurrentSprintStatus.status}冲刺, 
+                共 {ReportStore.currentSprint.issueCount || 0} 个问题
+              </span>
+              <span>
+                {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
+              </span>
+            </div>
+            <p
+              style={{ color: '#3F51B5' }}
+              role="none"
+              onClick={() => {
+                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}`);
+              }}
+            >
+              在“问题管理中”查看
+              <Icon style={{ fontSize: 13 }} type="open_in_new" />
+            </p>
           </div>
           <ReactEcharts className="c7n-chart" option={this.getOption()} />
 

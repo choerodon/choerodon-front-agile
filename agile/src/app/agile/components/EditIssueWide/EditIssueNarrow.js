@@ -1062,9 +1062,13 @@ class CreateSprint extends Component {
         <Menu.Item key="3">
           复制问题
         </Menu.Item>
-        <Menu.Item key="4">
-          转化为子任务
-        </Menu.Item>
+        {
+          this.state.typeCode !== 'sub_task' && this.state.origin.subIssueDTOList && this.state.origin.subIssueDTOList.length === 0 && (
+            <Menu.Item key="4">
+              转化为子任务
+            </Menu.Item>
+          )
+        }
       </Menu>
     );
     const callback = (value) => {
@@ -2701,6 +2705,8 @@ class CreateSprint extends Component {
             <CopyIssue
               issueId={this.state.origin.issueId}
               issueNum={this.state.origin.issueNum}
+              issue={this.state.origin}
+              issueLink={this.state.linkIssues}
               issueSummary={this.state.origin.summary}
               visible={this.state.copyIssueShow}
               onCancel={() => this.setState({ copyIssueShow: false })}

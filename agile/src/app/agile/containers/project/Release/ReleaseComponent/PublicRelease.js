@@ -44,7 +44,7 @@ class PublicRelease extends Component {
   goIssue() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=版本${ReleaseStore.getVersionDetail.name}中${ReleaseStore.getPublicVersionDetail.fixIssueCount}个未解决的问题`);
+    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=版本${ReleaseStore.getVersionDetail.name}中的问题&paramStatus=todo`);
   }
   renderRadioDisabled() {
     if (ReleaseStore.getPublicVersionDetail.versionNames) {
