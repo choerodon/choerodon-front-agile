@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { Select, Form, Input, Button, Modal, Icon, Tooltip } from 'choerodon-ui';
 
 import './CreateTest.scss';
-import { UploadButton, NumericInput } from '../../../../../components/CommonComponent';
+import { UploadButton } from '../../../../../components/CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../../../../common/utils';
 
 const { AppState } = stores;
@@ -31,35 +31,30 @@ class CreateTest extends Component {
   handleCreateIssue = () => {
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        this.setState({ createLoading: true });
-        const obj = {};
-        this.handleSave(obj);
+        const { testStep, testData, expectedResult } = values;
+        const { nextRank, issueId } = this.props;
+        const testCaseStepDTO = {
+          attachments: [],
+          issueId: 7031,
+          lastRank: null,
+          nextRank,
+          testStep,
+          testData,
+          expectedResult,
+        };
+        this.handleSave(testCaseStepDTO);
       }
     });
   };
 
-  handleSave = (data) => {
-    const fileList = this.state.fileList;
-    const callback = (newFileList) => {
-      this.setState({ fileList: newFileList });
-    };
-    // createSubIssue(this.props.issueId, data)
-    //   .then((res) => {
-    //     if (fileList.length > 0) {
-    //       const config = {
-    //         issueType: res.statusId,
-    //         issueId: res.issueId,
-    //         fileName: fileList[0].name,
-    //         projectId: AppState.currentMenuType.id,
-    //       };
-    //       if (fileList.some(one => !one.url)) {
-    //         handleFileUpload(this.state.fileList, callback, config);
-    //       }
-    //     }
-    //     this.props.onOk(res);
-    //   })
-    //   .catch((error) => {
-    //   });
+  handleSave = (testCaseStepDTO) => {
+    const projectId = AppState.currentMenuType.id;
+    this.setState({ createLoading: true });
+    axios.put(`/test/v1/projects/${projectId}/case/step/change`, testCaseStepDTO)
+      .then((res) => {
+        this.setState({ createLoading: false });
+        this.props.onOk();
+      });
   };
 
   render() {
@@ -68,7 +63,7 @@ class CreateTest extends Component {
 
     return (
       <Sidebar
-        className="c7n-createSubIssue"
+        className="c7n-createTest"
         title="测试详细信息"
         visible
         onOk={this.handleCreateIssue}
@@ -88,39 +83,27 @@ class CreateTest extends Component {
         >
           <Form layout="vertical">
             <FormItem label="测试步骤">
-              {getFieldDecorator('step', {
+              {getFieldDecorator('testStep', {
                 rules: [{ required: true, message: '测试步骤为必输项' }],
               })(
                 <Input label="测试步骤" maxLength={30} />,
               )}
             </FormItem>
             <FormItem label="测试数据">
-              {getFieldDecorator('data', {
+              {getFieldDecorator('testData', {
                 rules: [{ required: true, message: '测试数据为必输项' }],
               })(
                 <Input label="测试数据" maxLength={30} />,
               )}
             </FormItem>
             <FormItem label="预期结果">
-              {getFieldDecorator('result', {
+              {getFieldDecorator('expectedResult', {
                 rules: [{ required: true, message: '预期结果为必输项' }],
               })(
                 <Input label="预期结果" maxLength={30} />,
               )}
             </FormItem>
           </Form>
-          
-          <div className="sign-upload" style={{ marginTop: 38 }}>
-            <div style={{ display: 'flex', marginBottom: 13, alignItems: 'center' }}>
-              <div style={{ fontWeight: 'bold' }}>分步附件</div>
-            </div>
-            <UploadButton
-              funcType="raised"
-              onRemove={this.setFileList}
-              onBeforeUpload={this.setFileList}
-              fileList={this.state.fileList}
-            />
-          </div>
         </Content>
       </Sidebar>
     );

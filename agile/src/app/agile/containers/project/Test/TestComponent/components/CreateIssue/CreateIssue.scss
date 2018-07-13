@@ -1,0 +1,33 @@
+.c7n-createIssue {
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  }
+
+  .clear-p-mw {
+    margin-bottom: 24px;
+
+    p {
+      max-width: inherit !important;
+    }
+  }
+
+  .sign-upload {
+    .ant-upload {
+      display: flex !important;
+      margin-left: 40px;
+    }
+
+    .ant-btn {
+      color: #3f51b5;
+    }
+  }
+
+  .ant-upload-list-item {
+    display: inline-block;
+  }
+
+  .ant-upload-list-item-info {
+    padding-right: 20px;
+    max-width: 100%;
+  }
+}

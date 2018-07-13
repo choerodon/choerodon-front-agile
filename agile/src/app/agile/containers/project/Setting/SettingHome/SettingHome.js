@@ -101,7 +101,10 @@ class SettingHome extends Component {
           <TableCanDragAndDrop />
           <div style={{ marginTop: 50 }} />
           <TableCouldDragAndDrop />
-          <CreateTest />
+          <CreateTest
+            issueId={7031}
+            nextRank={null}
+          />
         </Content>
       </Page>
     );
