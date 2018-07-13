@@ -42,8 +42,8 @@ class VersionReportStore {
       this.reportData = data;
     }
 
-    axiosGetReportData(versionId) {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${versionId}`);
+    axiosGetReportData(versionId, type) {
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${versionId}?type=${type}`);
     }
 
   @computed get getIssues() {

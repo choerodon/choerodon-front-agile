@@ -34,6 +34,7 @@ class VersionReport extends Component {
         page: 0,
         size: 10,
       }],
+      type: 'storyPoints',
     };
   }
   componentWillMount() {
@@ -43,14 +44,14 @@ class VersionReport extends Component {
         chosenVersion: String(res[0].versionId),
       }, () => {
         this.updateIssues(this.state.datas);
-        this.getReportData();
+        this.getReportData(this.state.type);
       });
     }).catch((error) => {
       window.console.log(error);
     });
   }
-  getReportData() {
-    VersionReportStore.axiosGetReportData(this.state.chosenVersion).then((res) => {
+  getReportData(type) {
+    VersionReportStore.axiosGetReportData(this.state.chosenVersion, type).then((res) => {
       VersionReportStore.setReportData(res);
       this.getOptions();
     }).catch((error) => {
@@ -71,11 +72,12 @@ class VersionReport extends Component {
     if (addIssues.length > 0) {
       result += `<p>${string}:</p>`;
       _.forEach(addIssues, (item) => {
-        result += `<p>${item.issueNum} 改变故事点: ${item.changeStoryPoints ? item.changeStoryPoints : 0}</p>`;
+        result += `<p>${item.issueNum} 改变故事点: ${item.changeField ? item.changeField : 0}</p>`;
       });
     }
     return result;
   }
+
   getOptions() {
     Date.prototype.format = function () {
       let s = '';
@@ -123,15 +125,15 @@ class VersionReport extends Component {
       if (!seriesData[item.changeDate.split(' ')[0]]) {
         seriesData[item.changeDate.split(' ')[0]] = {
           time: item.changeDate,
-          total: item.totalStoryPoints,
-          complete: item.completedStoryPoints,
+          total: item.totalField,
+          complete: item.completedField,
           percent: parseInt(item.unEstimatedPercentage * 100, 10),
         };
       } else if (moment(item.changeDate).isAfter(seriesData[item.changeDate.split(' ')[0]].time)) {
         seriesData[item.changeDate.split(' ')[0]] = {
           time: item.changeDate,
-          total: item.totalStoryPoints,
-          complete: item.completedStoryPoints,
+          total: item.totalField,
+          complete: item.completedField,
           percent: parseInt(item.unEstimatedPercentage * 100, 10),
         };
       }
@@ -162,7 +164,7 @@ class VersionReport extends Component {
               ${this.getAddIssues(params[0].data[0], 'addIssues', '添加的问题')}
               ${this.getAddIssues(params[0].data[0], 'completedIssues', '完成的问题')}
               ${this.getAddIssues(params[0].data[0], 'removeIssues', '移出的问题')}
-              ${this.getAddIssues(params[0].data[0], 'storyPointsChangIssues', '故事点改变的问题')}
+              ${this.getAddIssues(params[0].data[0], 'fieldChangIssues', '故事点改变的问题')}
               ${this.getAddIssues(params[0].data[0], 'unCompletedIssues', '未完成的问题')}
             </div>
           `,
@@ -209,7 +211,7 @@ class VersionReport extends Component {
         name: '日期',
       },
       yAxis: [{
-        name: '故事点',
+        name: this.renderYname(),
         type: 'value',
       }, {
         name: '百分比',
@@ -438,6 +440,20 @@ class VersionReport extends Component {
     );
   }
 
+  renderYname() {
+    let result = '';
+    if (this.state.type === 'storyPoints') {
+      result = '故事点';
+    }
+    if (this.state.type === 'remainingEstimatedTime') {
+      result = '剩余时间';
+    }
+    if (this.state.type === 'issueCount') {
+      result = '问题计数';
+    }
+    return result;
+  }
+
   render() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
@@ -478,20 +494,51 @@ class VersionReport extends Component {
             label="版本" 
             value={this.state.chosenVersion}
             style={{
-              width: 512,
+              width: 244,
             }}
             onChange={(value) => {
               this.setState({
                 chosenVersion: value,
               }, () => {
                 this.updateIssues(this.state.datas);
-                this.getReportData();
+                this.getReportData(this.state.type);
               });
             }}
           >
             {
               VersionReportStore.getVersionList.map(item => (
                 <Option value={String(item.versionId)}>V {item.name}</Option>
+              ))
+            }
+          </Select>
+          <Select
+            label="单位" 
+            value={this.state.type}
+            style={{
+              width: 244,
+              marginLeft: 24,
+            }}
+            onChange={(value) => {
+              this.setState({
+                type: value,
+              }, () => {
+                this.updateIssues(this.state.datas);
+                this.getReportData(this.state.type);
+              });
+            }}
+          >
+            {
+              [{
+                name: '故事点',
+                id: 'storyPoints',
+              }, {
+                name: '剩余时间',
+                id: 'remainingEstimatedTime',
+              }, {
+                name: '问题计数',
+                id: 'issueCount',
+              }].map(item => (
+                <Option value={String(item.id)}>{item.name}</Option>
               ))
             }
           </Select>

@@ -9,6 +9,7 @@ import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoard
 import AccumulationStore from '../../../../../stores/project/accumulation/AccumulationStore';
 import AccumulationFilter from '../AccumulationComponent/AccumulationFilter';
 import './AccumulationHome.scss';
+import '../../BurndownChart/BurndownChartHome/BurndownChartHome.scss';
 import '../../../../main.scss';
 
 const { AppState } = stores;
@@ -285,56 +286,69 @@ class AccumulationHome extends Component {
             </Button>
           </Dropdown>
         </Header>
-        <Content
-          title={`迭代冲刺“${this.state.sprintData.sprintName}”的累积流量图`}
-          description="显示状态的问题。这有助于您识别潜在的瓶颈, 需要对此进行调查。"
-          link="#"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <div className="c7n-accumulation-filter">
-            <Button>
-              {`${AccumulationStore.getStartDate.format('D/M/YYYY')}到${AccumulationStore.getEndDate.format('D/M/YYYY')}(${this.getTimeType(AccumulationStore.getTimeData, 'name')})`}
-            </Button>
-            <Button
-              style={{ color: '#3F51B5' }} 
-              icon="settings"
-              onClick={() => {
-                this.setState({
-                  optionsVisible: true,
-                });
+        {
+          !_.isNull(this.state.sprintData) ? (
+            <Content
+              title={`迭代冲刺“${this.state.sprintData.sprintName ? this.state.sprintData.sprintName : ''}”的累积流量图`}
+              description="显示状态的问题。这有助于您识别潜在的瓶颈, 需要对此进行调查。"
+              link="#"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
               }}
-            >修改报告</Button>
-            {
-              this.state.optionsVisible ? (
-                <AccumulationFilter
-                  visible={this.state.optionsVisible}
-                  getTimeType={this.getTimeType.bind(this)}
-                  getColumnData={this.getColumnData.bind(this)}
-                  getData={this.getData.bind(this)}
-                  onCancel={() => {
-                    this.getColumnData(this.getTimeType(AccumulationStore.getBoardList, 'boardId'));
+            >
+              <div className="c7n-accumulation-filter">
+                <Button>
+                  {`${AccumulationStore.getStartDate.format('D/M/YYYY')}到${AccumulationStore.getEndDate.format('D/M/YYYY')}(${this.getTimeType(AccumulationStore.getTimeData, 'name')})`}
+                </Button>
+                <Button
+                  style={{ color: '#3F51B5' }} 
+                  icon="settings"
+                  onClick={() => {
                     this.setState({
-                      optionsVisible: false,
+                      optionsVisible: true,
                     });
                   }}
+                >修改报告</Button>
+                {
+                  this.state.optionsVisible ? (
+                    <AccumulationFilter
+                      visible={this.state.optionsVisible}
+                      getTimeType={this.getTimeType.bind(this)}
+                      getColumnData={this.getColumnData.bind(this)}
+                      getData={this.getData.bind(this)}
+                      onCancel={() => {
+                        this.getColumnData(this.getTimeType(AccumulationStore.getBoardList, 'boardId'));
+                        this.setState({
+                          optionsVisible: false,
+                        });
+                      }}
+                    />
+                  ) : ''
+                }
+              </div>
+              <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
+                <ReactEcharts
+                  option={this.state.options}
+                  style={{
+                    height: '600px',
+                  }}
+                  notMerge
+                  lazyUpdate
                 />
-              ) : ''
-            }
-          </div>
-          <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
-            <ReactEcharts
-              option={this.state.options}
-              style={{
-                height: '600px',
-              }}
-              notMerge
-              lazyUpdate
-            />
-          </div>
-        </Content>
+              </div>
+            </Content>
+          ) : (
+            <div 
+              className="c7n-chart-noSprint c7n-accumulation-nosprint"
+            >
+              <div className="c7n-chart-icon">
+                <Icon type="info_outline" />
+              </div>
+              <p style={{ marginLeft: 20 }}>该面板无可用冲刺</p>
+            </div>
+          )
+        }
       </Page>
     );
   }
