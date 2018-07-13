@@ -292,7 +292,7 @@ class ReleaseDetail extends Component {
       title: '经办人',
       dataIndex: 'assigneeName',
       key: 'assigneeName',
-      render: (text, record) => (
+      render: (text, record) => (text ? (
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Avatar size="small" src={record.imageUrl ? record.imageUrl : ''}>
             {
@@ -301,7 +301,8 @@ class ReleaseDetail extends Component {
           </Avatar>
           <span className="textDisplayOneColumn">{text}</span>
         </div>
-      ),
+      ) : '') 
+      ,
     }, {
       width: '15%',
       title: '状态',
