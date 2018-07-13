@@ -140,7 +140,13 @@ class Link extends Component {
       },
     ];
     return (
-      <Page>
+      <Page
+        service={[
+          'agile-service.issue-link-type.updateIssueLinkType',
+          'agile-service.issue-link-type.deleteIssueLinkType',
+          'agile-service.issue-link-type.createIssueLinkType',
+        ]}
+      >
         <Header title="问题链接">
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-link-type.createIssueLinkType']}>
             <Button funcTyp="flat" onClick={() => this.setState({ createLinkShow: true })}>

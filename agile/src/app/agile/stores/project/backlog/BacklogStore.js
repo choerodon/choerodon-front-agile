@@ -57,6 +57,14 @@ class BacklogStore {
     return data;
   }
 
+  @action clearSprintFilter() {
+    this.chosenEpic = 'all';
+    this.chosenVersion = 'all';
+    this.onlyMe = false;
+    this.recent = false;
+    this.quickFilters = [];
+  }
+
   axiosDeleteSprint(id) {
     return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/${id}`);
   }

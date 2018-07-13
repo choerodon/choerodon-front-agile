@@ -172,7 +172,14 @@ class ComponentHome extends Component {
       },
     ];
     return (
-      <Page className="c7n-component">
+      <Page
+        className="c7n-component"
+        service={[
+          'agile-service.issue-component.updateComponent',
+          'agile-service.issue-component.deleteComponent',
+          'agile-service.issue-component.createComponent',
+        ]}
+      >
         <Header title="模块管理">
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-component.createComponent']}>
             <Button funcTyp="flat" onClick={() => this.setState({ createComponentShow: true })}>
