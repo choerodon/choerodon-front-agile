@@ -60,12 +60,18 @@ class ScrumBoardHome extends Component {
   }
   getBoard() {
     ScrumBoardStore.axiosGetBoardList().then((data) => {
+      let index;
+      _.forEach(data, (item, i) => {
+        if (item.userDefault) {
+          index = i;
+        }
+      });
       ScrumBoardStore.setBoardList(data);
-      ScrumBoardStore.setCurrentConstraint(data[0].columnConstraint);
+      ScrumBoardStore.setCurrentConstraint(data[index].columnConstraint);
       if (!ScrumBoardStore.getSelectedBoard) {
-        ScrumBoardStore.setSwimLaneCode(data[0].swimlaneBasedCode);
-        ScrumBoardStore.setSelectedBoard(data[0].boardId);
-        this.refresh(data[0].boardId);
+        ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
+        ScrumBoardStore.setSelectedBoard(data[index].boardId);
+        this.refresh(data[index].boardId);
       } else {
         let flag = 0;
         _.forEach(data, (da) => {
@@ -76,9 +82,9 @@ class ScrumBoardHome extends Component {
         if (flag > 0) {
           this.refresh(ScrumBoardStore.getSelectedBoard);
         } else {
-          ScrumBoardStore.setSelectedBoard(data[0].boardId);
-          ScrumBoardStore.setSwimLaneCode(data[0].swimlaneBasedCode);
-          this.refresh(data[0].boardId);
+          ScrumBoardStore.setSelectedBoard(data[index].boardId);
+          ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
+          this.refresh(data[index].boardId);
         }
       }
     }).catch((error) => {
@@ -616,6 +622,7 @@ class ScrumBoardHome extends Component {
           'agile-service.board-column.createBoardColumn',
           'agile-service.issue-status.deleteStatus',
           'agile-service.issue-status.updateStatus',
+          'agile-service.issue.deleteIssue',
         ]}
       >
         <Header title="活跃冲刺">

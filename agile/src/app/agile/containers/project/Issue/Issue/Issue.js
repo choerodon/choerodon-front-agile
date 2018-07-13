@@ -517,7 +517,10 @@ class Issue extends Component {
       </Menu>
     );
     return (
-      <Page className="c7n-Issue c7n-region">
+      <Page
+        className="c7n-Issue c7n-region"
+        service={['agile-service.issue.deleteIssue']}
+      >
         <Header
           title="问题管理"
           backPath={IssueStore.getBackUrl}

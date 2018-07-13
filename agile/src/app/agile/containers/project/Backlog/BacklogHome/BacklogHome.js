@@ -43,6 +43,9 @@ class BacklogHome extends Component {
       }
     }, 1000);
   }
+  componentWillUnmount() {
+    BacklogStore.clearSprintFilter();
+  }
   //  拖动结束事件
   onDragEnd(result) {
     this.versionRef.changeState([]);
@@ -373,6 +376,7 @@ class BacklogHome extends Component {
       <Page
         service={[
           'agile-service.product-version.createVersion',
+          'agile-service.issue.deleteIssue',
         ]}
       >
         <Header title="待办事项">

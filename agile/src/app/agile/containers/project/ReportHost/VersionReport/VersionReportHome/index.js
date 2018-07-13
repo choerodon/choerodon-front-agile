@@ -176,19 +176,19 @@ class VersionReport extends Component {
         orient: 'horizontal',
         data: [{
           icon: 'roundRect',
-          name: '总计故事点',
+          name: this.renderLegendName('total'),
           // textStyle: {
           //   backgroundColor: 'rgba(77,144,254,0.10)',
           // },
         }, {
           icon: 'roundRect',
-          name: '已完成故事点',
+          name: this.renderLegendName('completed'),
           // textStyle: {
           //   backgroundColor: 'rgba(0,191,165,0.10)',
           // },
         }, {
           icon: 'roundRect',
-          name: '未预估问题的百分比',
+          name: this.renderLegendName('percent'),
           // textStyle: {
           //   backgroundColor: 'rgba(244,67,54,0.10)',
           // },
@@ -219,7 +219,7 @@ class VersionReport extends Component {
       }],
       series: [
         {
-          name: '总计故事点',
+          name: this.renderLegendName('total'),
           type: 'line',
           step: 'start',
           data: total,
@@ -229,7 +229,7 @@ class VersionReport extends Component {
           },
         },
         {
-          name: '已完成故事点',
+          name: this.renderLegendName('completed'),
           type: 'line',
           step: 'middle',
           data: complete,
@@ -239,7 +239,7 @@ class VersionReport extends Component {
           },
         },
         {
-          name: '未预估问题的百分比',
+          name: this.renderLegendName('percent'),
           type: 'line',
           step: 'end',
           data: percent,
@@ -280,6 +280,43 @@ class VersionReport extends Component {
     if (e.key === '2') {
       history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
+  }
+  renderLegendName(type) {
+    let result;
+    if (this.state.type === 'storyPoints') {
+      if (type === 'total') {
+        result = '总计故事点';
+      }
+      if (type === 'completed') {
+        result = '已完成故事点';
+      }
+      if (type === 'percent') {
+        result = '未预估问题百分比';
+      }
+    }
+    if (this.state.type === 'remainingEstimatedTime') {
+      if (type === 'total') {
+        result = '剩余预计时间';
+      }
+      if (type === 'completed') {
+        result = '已完成剩余预计时间';
+      }
+      if (type === 'percent') {
+        result = '未预估问题百分比';
+      }
+    }
+    if (this.state.type === 'issueCount') {
+      if (type === 'total') {
+        result = '总问题数';
+      }
+      if (type === 'completed') {
+        result = '已完成问题数';
+      }
+      if (type === 'percent') {
+        result = '未预估问题百分比';
+      }
+    }
+    return result;
   }
   renderTypecode(item, type) {
     if (item.typeCode === 'story') {

@@ -167,7 +167,11 @@ class ProjectSetting extends Component {
       lineHeight: '30px',
     };
     return (
-      <Page>
+      <Page
+        service={[
+          'agile-service.project-info.updateProjectInfo',
+        ]}
+      >
         <Header title="项目设置">
           <Button funcTyp="flat" onClick={() => this.getProjectSetting()}>
             <Icon type="refresh icon" />
