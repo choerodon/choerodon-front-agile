@@ -27,6 +27,7 @@ import CopyIssue from '../CopyIssue';
 import TransformSubIssue from '../TransformSubIssue';
 import CreateBranch from '../CreateBranch';
 import Commits from '../Commits';
+import MergeRequest from '../MergeRequest';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -70,6 +71,7 @@ class CreateSprint extends Component {
       createBranchShow: false,
       editDesShow: false,
       commitShow: false,
+      mergeRequestShow: false,
       origin: {},
       loading: true,
       nav: 'detail',
@@ -952,10 +954,10 @@ class CreateSprint extends Component {
     return (
       <div>
         {
-          this.state.branchs.totalCommit || this.state.totalMergeRequest ? (
+          this.state.branchs.totalCommit || this.state.branchs.totalMergeRequest ? (
             <div>
               {
-                this.state.branchs.totalCommit ? (
+                [].length === 0 ? (
                   <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
                       <span
@@ -967,13 +969,13 @@ class CreateSprint extends Component {
                           });
                         }}
                       >
-                        {this.state.branchs.totalCommit}提交
+                        {this.state.branchs.totalCommit || '0'}提交
                       </span>
                       <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>开放</span>
                     </div>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
-                      <span>
+                      <span style={{ width: 60, display: 'inline-block' }}>
                         <Popover
                           title="提交修改时间"
                           content={this.state.branchs.commitUpdateTime}
@@ -993,12 +995,22 @@ class CreateSprint extends Component {
                 this.state.branchs.totalMergeRequest ? (
                   <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
-                      <span style={{ color: '#3f51b5' }}>{this.state.branchs.totalMergeRequest}合并请求</span>
-                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>开放</span>
+                      <span
+                        style={{ color: '#3f51b5', cursor: 'pointer' }}
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            mergeRequestShow: true,
+                          });
+                        }}
+                      >
+                        {this.state.branchs.totalMergeRequest}合并请求
+                      </span>
+                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>{this.state.branchs.mergeRequestStatus === 'opened' ? '开放' : ''}</span>
                     </div>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
-                      <span>
+                      <span style={{ width: 60, display: 'inline-block' }}>
                         <Popover
                           title="合并请求修改时间"
                           content={this.state.branchs.mergeRequestUpdateTime}
@@ -2725,11 +2737,24 @@ class CreateSprint extends Component {
             <Commits
               issueId={this.state.origin.issueId}
               issueNum={this.state.origin.issueNum}
-              time={this.state.origin.commitUpdateTime}
+              time={this.state.branchs.commitUpdateTime}
               onCancel={() => {
                 this.setState({ commitShow: false });
               }}
               visible={this.state.commitShow}
+            />
+          ) : null
+        }
+        {
+          this.state.mergeRequestShow ? (
+            <MergeRequest
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              num={this.state.branchs.totalMergeRequest}
+              onCancel={() => {
+                this.setState({ mergeRequestShow: false });
+              }}
+              visible={this.state.mergeRequestShow}
             />
           ) : null
         }
