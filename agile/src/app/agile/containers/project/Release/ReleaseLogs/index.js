@@ -74,15 +74,9 @@ class ReleaseLogs extends Component {
     } else {
       str += '\n';
     }
-
-    // str += '### 史诗\n';
-
-    // arr.forEach((v) => {
-    //   str += `- [${v.issueNum}]-${v.summary}\n`;
-    // });
     A.forEach((v, i) => this.combine(v, i));
     const blob = new Blob([str], { type: 'text/plain;charset=utf-8' });
-    FileSaver.saveAs(blob, 'test.md');
+    FileSaver.saveAs(blob, `版本${this.state.version.name}的发布日志.md`);
   }
 
   combine(typeCode, i) {
@@ -122,12 +116,15 @@ class ReleaseLogs extends Component {
   }
 
   render() {
+    const urlParams = AppState.currentMenuType;
+    const versionId = this.props.match.params.id;
     return (
       <Page>
         <Header 
           title="版本日志"
+          backPath={`/agile/release/detail/${versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
-          <Button 
+          {/* <Button 
             funcTyp="flat" 
             onClick={() => {
               // fresh
@@ -136,7 +133,7 @@ class ReleaseLogs extends Component {
           >
             <Icon type="refresh" />
             <span>刷新</span>
-          </Button>
+          </Button> */}
           <Button 
             funcTyp="flat" 
             onClick={() => {
@@ -150,7 +147,7 @@ class ReleaseLogs extends Component {
           
         </Header>
         <Content
-          title="项目“猪齿鱼开发” 的版本日志"
+          title={`版本"${this.state.version.name}" 的版本日志`}
           description="您可以在此查看版本的版本日志，并进行修改。"
           link="#"
         >

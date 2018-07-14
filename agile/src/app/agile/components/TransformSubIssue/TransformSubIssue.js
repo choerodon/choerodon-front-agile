@@ -63,21 +63,21 @@ class TransformSubIssue extends Component {
         window.console.log(values);
         const parentIssueId = values.issues;
         const status = values.status;
-        window.console.table({
-          parentIssueId,
-          status,
+        const issueTransformSubTask = {
           issueId,
-        });
+          parentIssueId,
+          statusId: status,
+        };
         this.setState({
           loading: true,
         });
-        // axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/copy_issue?summary=${values.issueSummary}`)
-        //   .then((res) => {
-        //     this.setState({
-        //       loading: false,
-        //     });
-        //     this.props.onOk();
-        //   });
+        axios.post(`/agile/v1/projects/${projectId}/issues/transformed_sub_task`, issueTransformSubTask)
+          .then((res) => {
+            this.setState({
+              loading: false,
+            });
+            this.props.onOk();
+          });
       }
     });
   };
@@ -167,7 +167,7 @@ class TransformSubIssue extends Component {
                     this.state.originStatus.map(status => (
                       <Option key={status.id} value={status.id}>
                         
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center' }}>
                           <div
                             style={{
                               width: 15,

@@ -28,7 +28,7 @@ class CopyIssue extends Component {
         const { issueSummary, copySubIssue, copyLinkIssue, sprint } = values;
         const copyConditionDTO = {
           issueLink: copyLinkIssue || false,
-          sprintValues: sprint,
+          sprintValues: sprint || false,
           subTask: copySubIssue || false,
           summary: issueSummary || false,
         };
