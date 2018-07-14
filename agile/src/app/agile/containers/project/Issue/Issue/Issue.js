@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import { Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon } from 'choerodon-ui';
 
 import '../../../main.scss';
@@ -49,6 +49,8 @@ class Issue extends Component {
     const { paramType, paramId, paramName, paramStatus } = Request;
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
+    IssueStore.setParamName(paramName);
+    IssueStore.setParamStatus(paramStatus);
     const arr = [];
     if (paramName) {
       arr.push(paramName);
@@ -126,29 +128,32 @@ class Issue extends Component {
 
   handleBlurCreateIssue() {
     if (this.state.createIssueValue !== '') {
-      const data = {
-        priorityCode: 'medium',
-        projectId: AppState.currentMenuType.id,
-        sprintId: 0,
-        summary: this.state.createIssueValue,
-        typeCode: this.state.selectIssueType,
-        epicId: 0,
-        epicName: this.state.selectIssueType === 'issue_epic' ? this.state.createIssueValue : undefined,
-        parentIssueId: 0,
-      };
-      this.setState({
-        createLoading: true,
-      });
-      createIssue(data)
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
         .then((res) => {
-          IssueStore.init();
+          const data = {
+            priorityCode: res.defaultPriorityCode || 'medium',
+            projectId: AppState.currentMenuType.id,
+            sprintId: 0,
+            summary: this.state.createIssueValue,
+            typeCode: this.state.selectIssueType,
+            epicId: 0,
+            epicName: this.state.selectIssueType === 'issue_epic' ? this.state.createIssueValue : undefined,
+            parentIssueId: 0,
+          };
           this.setState({
-            // createIssue: false,
-            createIssueValue: '',
-            createLoading: false,
+            createLoading: true,
           });
-        })
-        .catch((error) => {
+          createIssue(data)
+            .then((response) => {
+              IssueStore.init();
+              this.setState({
+                // createIssue: false,
+                createIssueValue: '',
+                createLoading: false,
+              });
+            })
+            .catch((error) => {
+            });
         });
     }
   }
@@ -777,6 +782,10 @@ class Issue extends Component {
                   IssueStore.init();
                 }}
                 onUpdate={this.handleIssueUpdate.bind(this)}
+                onCopyAndTransformToSubIssue={() => {
+                  const { current, pageSize } = IssueStore.pagination;
+                  IssueStore.loadIssues(current - 1, pageSize);
+                }}
               />
             }
           </div>

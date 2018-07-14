@@ -21,6 +21,7 @@ class SprintCommonStore {
   @observable paramType = undefined;
   @observable paramId = undefined;
   @observable paramName = undefined;
+  @observable paramStatus = undefined;
   @observable barFilters = undefined;
 
   init() {
@@ -95,6 +96,10 @@ class SprintCommonStore {
     this.paramName = data;
   }
 
+  @action setParamStatus(data) {
+    this.paramStatus = data;
+  }
+
   @action setBarFilters(data) {
     this.barFilters = data;
   }
@@ -107,8 +112,10 @@ class SprintCommonStore {
       return `/agile/reporthost/sprintReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     } else if (this.paramType === 'component') {
       return `/agile/component?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
+    } else if (this.paramType === 'version' && this.paramStatus) {
+      return `/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     } else if (this.paramType === 'version') {
-      return `/agile/release/detail/${this.paramId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
+      return `/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     }
   }
 

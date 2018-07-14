@@ -245,7 +245,6 @@ class CreateSubIssue extends Component {
                 <Select
                   label="优先级"
                   getPopupContainer={triggerNode => triggerNode.parentNode}
-                  loading={this.state.selectLoading}
                 >
                   {this.transformPriorityCode(this.state.originPriorities).map(type =>
                     (<Option key={type.valueCode} value={type.valueCode}>

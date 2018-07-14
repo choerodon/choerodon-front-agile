@@ -667,6 +667,9 @@ class CreateSprint extends Component {
     if (this.props.onUpdate) {
       this.props.onUpdate();
     }
+    if (this.props.onCopyAndTransformToSubIssue) {
+      this.props.onCopyAndTransformToSubIssue();
+    }
   }
 
   handleTransformSubIssue() {
@@ -676,6 +679,9 @@ class CreateSprint extends Component {
     });
     if (this.props.onUpdate) {
       this.props.onUpdate();
+    }
+    if (this.props.onCopyAndTransformToSubIssue) {
+      this.props.onCopyAndTransformToSubIssue();
     }
   }
 
