@@ -131,7 +131,8 @@ class SprintIssue extends Component {
                   display: this.renderIssueDisplay() ? 'block' : 'flex',
                   alignItems: 'center',
                   cursor: 'move',
-                  flexWrap: 'wrap',
+                  flexWrap: 'nowrap',
+                  justifyContent: 'space-between',
                   // position: 'relative',
                 }}
                 label="sprintIssue"
@@ -155,7 +156,9 @@ class SprintIssue extends Component {
                   label="sprintIssue" 
                   className="c7n-backlog-sprintIssueSide"
                   style={{
-                    width: this.renderIssueDisplay() ? 'unset' : 0,
+                    width: 0,
+                    flexGrow: 1,
+                    // width: this.renderIssueDisplay() ? 'unset' : 0,
                   }}
                 >
                   <div
@@ -190,8 +193,8 @@ class SprintIssue extends Component {
                   style={{ 
                     marginTop: this.props.epicVisible || this.props.versionVisible || JSON.stringify(BacklogStore.getClickIssueDetail) !== '{}' ? 5 : 0,
                     justifyContent: this.renderIssueDisplay() ? 'space-between' : 'flex-end',
-                    width: this.renderIssueDisplay() ? 'unset' : 0,
-                    flex: 2,
+                    // width: this.renderIssueDisplay() ? 'unset' : 0,
+                    // flex: 2,
                   }} 
                   label="sprintIssue"
                   className="c7n-backlog-sprintIssueSide"
