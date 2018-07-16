@@ -58,6 +58,9 @@ class ScrumBoardHome extends Component {
       }
     }, 1000);
   }
+  componentWillUnmount() {
+    ScrumBoardStore.setClickIssueDetail({});
+  }
   getBoard() {
     ScrumBoardStore.axiosGetBoardList().then((data) => {
       let index;
@@ -66,6 +69,9 @@ class ScrumBoardHome extends Component {
           index = i;
         }
       });
+      if (!index) {
+        index = 0;
+      }
       ScrumBoardStore.setBoardList(data);
       ScrumBoardStore.setCurrentConstraint(data[index].columnConstraint);
       if (!ScrumBoardStore.getSelectedBoard) {

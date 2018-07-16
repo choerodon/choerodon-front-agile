@@ -312,7 +312,19 @@ class BurndownChartHome extends Component {
         <div>
           {
             text.map(item => (
-              <p style={{ whiteSpace: 'nowrap', color: '#3F51B5' }}>{item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}</p>
+              <p
+                style={{ 
+                  whiteSpace: 'nowrap', 
+                  color: '#3F51B5',
+                  cursor: 'pointer',
+                }}
+                role="none"
+                onClick={() => {
+                  const { history } = this.props;
+                  const urlParams = AppState.currentMenuType;
+                  history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}&paramIssueId=${item.issueId}`);
+                }}
+              >{item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}</p>
             ))
           }
         </div>
