@@ -48,11 +48,12 @@ class Issue extends Component {
 
   getInit() {
     const Request = this.GetRequest(this.props.location.search);
-    const { paramType, paramId, paramName, paramStatus } = Request;
+    const { paramType, paramId, paramName, paramStatus, paramIssueId } = Request;
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
     IssueStore.setParamName(paramName);
     IssueStore.setParamStatus(paramStatus);
+    IssueStore.setParamIssueId(paramIssueId);
     const arr = [];
     if (paramName) {
       arr.push(paramName);
@@ -68,9 +69,29 @@ class Issue extends Component {
       IssueStore.setFilter(obj);
       IssueStore.setFilteredInfo({ statusCode: [paramStatus] });
       IssueStore.loadIssues();
+    } else if (paramIssueId) {
+      IssueStore.setBarFilters(arr);
+      IssueStore.init();
+      IssueStore.loadIssues()
+        .then((res) => {
+          window.console.log(res);
+          this.setState({
+            selectedIssue: res.content.length ? res.content[0] : {},
+            expand: true,
+          });
+        });
+      // IssueStore.init()
+      //   .then((res) => {
+      //     window.console.log(res);
+      //     this.setState({
+      //       selectedIssue: res,
+      //       expand: true,
+      //     });
+      //   });
     } else {
       IssueStore.setBarFilters(arr);
       IssueStore.init();
+      IssueStore.loadIssues();
     }
   }
 
@@ -89,6 +110,7 @@ class Issue extends Component {
   handleCreateIssue(issueObj) {
     this.setState({ create: false });
     IssueStore.init();
+    IssueStore.loadIssues();
   }
 
   handleChangeIssueId(issueId) {
@@ -148,6 +170,7 @@ class Issue extends Component {
           createIssue(data)
             .then((response) => {
               IssueStore.init();
+              IssueStore.loadIssues();
               this.setState({
                 // createIssue: false,
                 createIssueValue: '',
@@ -797,6 +820,7 @@ class Issue extends Component {
                     selectedIssue: {},
                   });
                   IssueStore.init();
+                  IssueStore.loadIssues();
                 }}
                 onUpdate={this.handleIssueUpdate.bind(this)}
                 onCopyAndTransformToSubIssue={() => {
