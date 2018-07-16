@@ -122,7 +122,9 @@ class VersionReport extends Component {
     const xAxis = [];
     const seriesData = {};
     _.forEach(data, (item) => {
-      xAxis.push(item.changeDate.split(' ')[0]);
+      if (xAxis.indexOf(item.changeDate.split(' ')[0]) === -1) {
+        xAxis.push(item.changeDate.split(' ')[0]);
+      }
       if (!seriesData[item.changeDate.split(' ')[0]]) {
         seriesData[item.changeDate.split(' ')[0]] = {
           time: item.changeDate,
@@ -153,21 +155,27 @@ class VersionReport extends Component {
         key, value.percent,
       ]);
     });
-    if (moment(version.startDate).isBefore(data[data.length - 1].changeDate)) {
-      total.unshift([version.startDate.split(' ')[0], total[0][1]]);
-      complete.unshift([version.startDate.split(' ')[0], complete[0][1]]);
-      percent.unshift([version.startDate.split(' ')[0], percent[0][1]]);
-      xAxis.unshift(version.startDate.split(' ')[0]);
+    if (version.startDate) {
+      if (moment(version.startDate.split(' ')[0]).isBefore(data[0].changeDate.split(' ')[0])) {
+        total.unshift([version.startDate.split(' ')[0], data[0].totalField]);
+        complete.unshift([version.startDate.split(' ')[0], data[0].completedField]);
+        percent.unshift([version.startDate.split(' ')[0], parseInt(data[0].unEstimatedPercentage, 10)]);
+        xAxis.unshift(version.startDate.split(' ')[0]);
+      }
     }
+    window.console.log(xAxis);
+    window.console.log(total);
+    window.console.log(complete);
+    window.console.log(percent);
     const options = {
       tooltip: {
         trigger: 'axis',
         formatter: params => `
             <div>
               <p>日期: ${params[0].data[0]}</p>
-              <p>总计故事点: ${params[0].data[1]}</p>
-              <p>已完成故事点: ${params[1].data[1]}</p>
-              <p>未预估问题的百分比: ${params[2].data[1]}%</p>
+              <p>总计${this.renderYname()}: ${params[0].data[1]}</p>
+              <p>已完成${this.renderYname()}: ${params[1].data[1]}</p>
+              ${this.state.type === 'issueCount' ? '' : `<p>未预估问题的百分比: ${params[2].data[1]}%</p>`}
               ${this.getAddIssues(params[0].data[0], 'addIssues', '添加的问题')}
               ${this.getAddIssues(params[0].data[0], 'completedIssues', '完成的问题')}
               ${this.getAddIssues(params[0].data[0], 'removeIssues', '移出的问题')}
@@ -245,7 +253,7 @@ class VersionReport extends Component {
             normal: { color: '#00BFA5' },
           },
         },
-        {
+        this.state.type === 'issueCount' ? '' : {
           name: this.renderLegendName('percent'),
           type: 'line',
           step: 'end',
@@ -290,13 +298,13 @@ class VersionReport extends Component {
   }
   renderUnitColumn(type) {
     let result = '';
-    if (this.state.type === "storyPoints") {
+    if (this.state.type === 'storyPoints') {
       if (type === 'title') {
         result = '故事点';
       } else {
         result = 'storyPoints';
       }
-    } else if (this.state.type === "remainingEstimatedTime") {
+    } else if (this.state.type === 'remainingEstimatedTime') {
       if (type === 'title') {
         result = '剩余时间';
       } else {
@@ -411,7 +419,18 @@ class VersionReport extends Component {
       title: '关键字',
       dataIndex: 'issueNum',
       key: 'issueNum',
-      render: text => <span style={{ color: '#3F51B5' }}>{text}</span>,
+      render: (text, record) => (<span 
+        style={{ 
+          color: '#3F51B5',
+          cursor: 'pointer',
+        }}
+        role="none"
+        onClick={() => {
+          const { history } = this.props;
+          const urlParams = AppState.currentMenuType;
+          history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${text}&paramIssueId=${record.issueId}`);
+        }}
+      >{text}</span>),
     }, {
       title: '概要',
       dataIndex: 'summary',

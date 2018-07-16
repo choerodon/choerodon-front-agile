@@ -58,6 +58,9 @@ class ScrumBoardHome extends Component {
       }
     }, 1000);
   }
+  componentWillUnmount() {
+    ScrumBoardStore.setClickIssueDetail({});
+  }
   getBoard() {
     ScrumBoardStore.axiosGetBoardList().then((data) => {
       let index;

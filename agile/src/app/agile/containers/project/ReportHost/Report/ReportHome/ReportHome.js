@@ -100,7 +100,7 @@ class ReleaseDetail extends Component {
       history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
     if (e.key === '2') {
-      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`)
+      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
   renderDoneIssue(column) {
@@ -158,7 +158,18 @@ class ReleaseDetail extends Component {
         title: '关键字',
         dataIndex: 'issueNum',
         render: (issueNum, record) => (
-          <span style={{ color: '#3f51b5' }}>{issueNum} {record.addIssue ? '*' : ''}</span>
+          <span
+            style={{ 
+              color: '#3f51b5',
+              cursor: 'pointer',
+            }}
+            role="none"
+            onClick={() => {
+              const { history } = this.props;
+              const urlParams = AppState.currentMenuType;
+              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}`);
+            }}
+          >{issueNum} {record.addIssue ? '*' : ''}</span>
         ),
       }, {
         width: '30%',
@@ -263,7 +274,7 @@ class ReleaseDetail extends Component {
               切换报表
             </Button>
           </Dropdown>
-          <Button 
+          {/* <Button 
             funcTyp="flat" 
             onClick={() => {
               this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题`);
@@ -271,7 +282,7 @@ class ReleaseDetail extends Component {
           >
             <Icon type="autorenew icon" />
             <span>查看问题列表</span>
-          </Button>
+          </Button> */}
         </Header>
         <Content
           title={`迭代冲刺 "${ReportStore.currentSprint.sprintName || ''}" 的冲刺报告`}
@@ -306,10 +317,13 @@ class ReleaseDetail extends Component {
               </span>
             </div>
             <p
-              style={{ color: '#3F51B5' }}
+              style={{ 
+                color: '#3F51B5',
+                cursor: 'pointer',                
+              }}
               role="none"
               onClick={() => {
-                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}`);
+                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题`);
               }}
             >
               在“问题管理中”查看

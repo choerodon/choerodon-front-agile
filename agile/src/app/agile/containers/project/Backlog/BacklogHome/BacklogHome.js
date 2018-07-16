@@ -45,6 +45,7 @@ class BacklogHome extends Component {
   }
   componentWillUnmount() {
     BacklogStore.clearSprintFilter();
+    BacklogStore.setClickIssueDetail({});
   }
   //  拖动结束事件
   onDragEnd(result) {
