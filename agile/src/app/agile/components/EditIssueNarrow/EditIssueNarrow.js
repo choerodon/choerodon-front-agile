@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { stores, axios, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon } from 'choerodon-ui';
+import TimeAgo from 'timeago-react';
+import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon, Popover } from 'choerodon-ui';
 import { STATUS, COLOR, TYPE, ICON, TYPE_NAME } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
 import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload } from '../../common/utils';
-import { loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
+import { loadBranchs, loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
@@ -25,6 +26,8 @@ import LinkList from './Component/LinkList';
 import CopyIssue from '../CopyIssue';
 import TransformSubIssue from '../TransformSubIssue';
 import CreateBranch from '../CreateBranch';
+import Commits from '../Commits';
+import MergeRequest from '../MergeRequest';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -103,6 +106,7 @@ class CreateSprint extends Component {
       linkIssues: [],
       fixVersions: [],
       influenceVersions: [],
+      branchs: {},
 
       originStatus: [],
       originpriorities: [],
@@ -280,7 +284,8 @@ class CreateSprint extends Component {
   isInLook(ele) {
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
-    return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
+    // return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
+    return a + ele.offsetHeight > target.scrollTop;
   }
 
   scrollToAnchor = (anchorName) => {
@@ -408,6 +413,11 @@ class CreateSprint extends Component {
       loadDatalogs(issueId).then((res) => {
         this.setState({
           datalogs: res,
+        });
+      });
+      loadBranchs(issueId).then((res) => {
+        this.setState({
+          branchs: res || {},
         });
       });
       this.setState({
@@ -939,26 +949,86 @@ class CreateSprint extends Component {
   renderBranchs() {
     return (
       <div>
-        <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
-          <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
-            <span style={{ color: '#3f51b5' }}>3提交</span>
-            <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>开放</span>
-          </div>
-          <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
-            <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
-            <span>3天前</span>
-          </div>
-        </div>
-        <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
-          <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
-            <span style={{ color: '#3f51b5' }}>2和并请求</span>
-            <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>开放</span>
-          </div>
-          <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
-            <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
-            <span>3天前</span>
-          </div>
-        </div>
+        {
+          this.state.branchs.totalCommit || this.state.branchs.totalMergeRequest ? (
+            <div>
+              {
+                [].length === 0 ? (
+                  <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
+                      <span
+                        style={{ color: '#3f51b5', cursor: 'pointer' }}
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            commitShow: true,
+                          });
+                        }}
+                      >
+                        {this.state.branchs.totalCommit || '0'}提交
+                      </span>
+                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>开放</span>
+                    </div>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
+                      <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
+                      <span style={{ width: 60, display: 'inline-block' }}>
+                        <Popover
+                          title="提交修改时间"
+                          content={this.state.branchs.commitUpdateTime}
+                          placement="left"
+                        >
+                          <TimeAgo
+                            datetime={this.state.branchs.commitUpdateTime}
+                            locale={Choerodon.getMessage('zh_CN', 'en')}
+                          />
+                        </Popover> 
+                      </span>
+                    </div>
+                  </div>
+                ) : null
+              }
+              {
+                this.state.branchs.totalMergeRequest ? (
+                  <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
+                      <span
+                        style={{ color: '#3f51b5', cursor: 'pointer' }}
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            mergeRequestShow: true,
+                          });
+                        }}
+                      >
+                        {this.state.branchs.totalMergeRequest}合并请求
+                      </span>
+                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>{this.state.branchs.mergeRequestStatus === 'opened' ? '开放' : ''}</span>
+                    </div>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
+                      <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
+                      <span style={{ width: 60, display: 'inline-block' }}>
+                        <Popover
+                          title="合并请求修改时间"
+                          content={this.state.branchs.mergeRequestUpdateTime}
+                          placement="left"
+                        >
+                          <TimeAgo
+                            datetime={this.state.branchs.mergeRequestUpdateTime}
+                            locale={Choerodon.getMessage('zh_CN', 'en')}
+                          />
+                        </Popover> 
+                      </span>
+                    </div>
+                  </div>
+                ) : null
+              }
+            </div>
+          ) : (
+            <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+              <span style={{ marginRight: 12 }}>暂无</span>
+            </div>
+          )
+        }
       </div>
     );
   }
@@ -1400,7 +1470,7 @@ class CreateSprint extends Component {
               </div>
             </div>
           </div>
-          <div className="c7n-content-bottom" id="scroll-area">
+          <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
             <section className="c7n-body-editIssue">
               <div className="c7n-content-editIssue">
                 <div className="c7n-details">
@@ -2542,7 +2612,7 @@ class CreateSprint extends Component {
                     </div>
                     <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                      <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
+                      <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createBranchShow: true })}>
                         <Icon type="playlist_add icon" />
                         <span>创建分支</span>
                       </Button>
@@ -2627,8 +2697,39 @@ class CreateSprint extends Component {
         {
           this.state.createBranchShow ? (
             <CreateBranch
-              onClose={() => this.setState({ createBranchShow: false })}
+              issueId={this.state.origin.issueId}
+              onOk={() => {
+                this.setState({ createBranchShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => this.setState({ createBranchShow: false })}
               visible={this.state.createBranchShow}
+            />
+          ) : null
+        }
+        {
+          this.state.commitShow ? (
+            <Commits
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              time={this.state.branchs.commitUpdateTime}
+              onCancel={() => {
+                this.setState({ commitShow: false });
+              }}
+              visible={this.state.commitShow}
+            />
+          ) : null
+        }
+        {
+          this.state.mergeRequestShow ? (
+            <MergeRequest
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              num={this.state.branchs.totalMergeRequest}
+              onCancel={() => {
+                this.setState({ mergeRequestShow: false });
+              }}
+              visible={this.state.mergeRequestShow}
             />
           ) : null
         }

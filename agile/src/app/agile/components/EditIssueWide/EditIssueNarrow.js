@@ -303,7 +303,8 @@ class CreateSprint extends Component {
   isInLook(ele) {
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
-    return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
+    // return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
+    return a + ele.offsetHeight > target.scrollTop;
   }
 
   scrollToAnchor = (anchorName) => {
@@ -435,7 +436,7 @@ class CreateSprint extends Component {
       });
       loadBranchs(issueId).then((res) => {
         this.setState({
-          branchs: res,
+          branchs: res || {},
         });
       });
       this.setState({
@@ -1803,7 +1804,7 @@ class CreateSprint extends Component {
               </div>
             </div>
           </div>
-          <div className="c7n-content-bottom" id="scroll-area">
+          <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
             <section className="c7n-body-editIssue">
               <div className="c7n-content-editIssue">
                 <div className="c7n-details">

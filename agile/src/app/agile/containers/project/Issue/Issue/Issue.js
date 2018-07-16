@@ -22,6 +22,8 @@ import TypeTag from '../../../../components/TypeTag';
 import EmptyBlock from '../../../../components/EmptyBlock';
 import { ReadAndEdit } from '../../../../components/CommonComponent';
 
+const FileSaver = require('file-saver');
+
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -46,11 +48,12 @@ class Issue extends Component {
 
   getInit() {
     const Request = this.GetRequest(this.props.location.search);
-    const { paramType, paramId, paramName, paramStatus } = Request;
+    const { paramType, paramId, paramName, paramStatus, paramIssueId } = Request;
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
     IssueStore.setParamName(paramName);
     IssueStore.setParamStatus(paramStatus);
+    IssueStore.setParamIssueId(paramIssueId);
     const arr = [];
     if (paramName) {
       arr.push(paramName);
@@ -66,9 +69,29 @@ class Issue extends Component {
       IssueStore.setFilter(obj);
       IssueStore.setFilteredInfo({ statusCode: [paramStatus] });
       IssueStore.loadIssues();
+    } else if (paramIssueId) {
+      IssueStore.setBarFilters(arr);
+      IssueStore.init();
+      IssueStore.loadIssues()
+        .then((res) => {
+          window.console.log(res);
+          this.setState({
+            selectedIssue: res.content.length ? res.content[0] : {},
+            expand: true,
+          });
+        });
+      // IssueStore.init()
+      //   .then((res) => {
+      //     window.console.log(res);
+      //     this.setState({
+      //       selectedIssue: res,
+      //       expand: true,
+      //     });
+      //   });
     } else {
       IssueStore.setBarFilters(arr);
       IssueStore.init();
+      IssueStore.loadIssues();
     }
   }
 
@@ -87,6 +110,7 @@ class Issue extends Component {
   handleCreateIssue(issueObj) {
     this.setState({ create: false });
     IssueStore.init();
+    IssueStore.loadIssues();
   }
 
   handleChangeIssueId(issueId) {
@@ -146,6 +170,7 @@ class Issue extends Component {
           createIssue(data)
             .then((response) => {
               IssueStore.init();
+              IssueStore.loadIssues();
               this.setState({
                 // createIssue: false,
                 createIssueValue: '',
@@ -212,6 +237,17 @@ class Issue extends Component {
     IssueStore.setFilter(obj);
     const { current, pageSize } = IssueStore.pagination;
     IssueStore.loadIssues(current - 1, pageSize);
+  }
+
+  exportExcel() {
+    const projectId = AppState.currentMenuType.id;
+    const searchParam = IssueStore.getFilter;
+    axios.post(`/zuul/agile/v1/projects/${projectId}/issues/export`, searchParam, { responseType: 'arraybuffer' })
+      .then((data) => {
+        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const fileName = `${AppState.currentMenuType.name}.xls`;
+        FileSaver.saveAs(blob, fileName);
+      });
   }
 
   renderWideIssue(issue) {
@@ -549,6 +585,10 @@ class Issue extends Component {
             <Icon type="playlist_add icon" />
             <span>创建问题</span>
           </Button>
+          <Button className="leftBtn" funcTyp="flat" onClick={() => this.exportExcel()}>
+            <Icon type="file_upload icon" />
+            <span>导出</span>
+          </Button>
           <Button
             funcTyp="flat"
             onClick={() => {
@@ -780,6 +820,7 @@ class Issue extends Component {
                     selectedIssue: {},
                   });
                   IssueStore.init();
+                  IssueStore.loadIssues();
                 }}
                 onUpdate={this.handleIssueUpdate.bind(this)}
                 onCopyAndTransformToSubIssue={() => {

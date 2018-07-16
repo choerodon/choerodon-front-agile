@@ -22,6 +22,7 @@ class SprintCommonStore {
   @observable paramId = undefined;
   @observable paramName = undefined;
   @observable paramStatus = undefined;
+  @observable paramIssueId = undefined;
   @observable barFilters = undefined;
 
   init() {
@@ -34,13 +35,13 @@ class SprintCommonStore {
       searchArgs: {},
     });
     this.setFilteredInfo({});
-    this.loadIssues();
+    // this.loadIssues();
   }
 
   loadIssues(page = 0, size = 10) {
     this.setLoading(true);
     const { orderField, orderType } = this.order;
-    loadIssues(page, size, this.getFilter, orderField, orderType)
+    return loadIssues(page, size, this.getFilter, orderField, orderType)
       .then((res) => {
         this.setIssues(res.content);
         this.setPagination({
@@ -49,6 +50,7 @@ class SprintCommonStore {
           total: res.totalElements,
         });
         this.setLoading(false);
+        return Promise.resolve(res);
       });
   }
 
@@ -100,6 +102,10 @@ class SprintCommonStore {
     this.paramStatus = data;
   }
 
+  @action setParamIssueId(data) {
+    this.paramIssueId = data;
+  }
+
   @action setBarFilters(data) {
     this.barFilters = data;
   }
@@ -114,7 +120,7 @@ class SprintCommonStore {
       return `/agile/component?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     } else if (this.paramType === 'version' && this.paramStatus) {
       return `/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
-    } else if (this.paramType === 'version') {
+    } else if (this.paramType === 'versionReport') {
       return `/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     }
   }
@@ -123,7 +129,8 @@ class SprintCommonStore {
     const filter = this.filter;
     const otherArgs = {
       type: this.paramType,
-      id: [this.paramId],
+      id: this.paramId ? [this.paramId] : undefined,
+      issueIds: this.paramIssueId ? [this.paramIssueId] : undefined,
     };
     return {
       ...filter,

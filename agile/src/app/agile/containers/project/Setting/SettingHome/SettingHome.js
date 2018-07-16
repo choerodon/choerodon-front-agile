@@ -37,7 +37,7 @@ class SettingHome extends Component {
     //   responseType: 'arraybuffer', 
     //   timeout: 60000,
     // })
-    axios.post(`/agile/v1/projects/${projectId}/issues/export`)
+    axios.post(`/agile/v1/projects/${projectId}/issues/export`, {}, { responseType: 'arraybuffer' })
       .then((data) => {
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const fileName = 'test.xls';
@@ -51,32 +51,32 @@ class SettingHome extends Component {
       });
   }
 
-  md() {
-    const arr = [
-      {
-        issueNum: 'AG-1',
-        summary: '我是任务一我是任务一我是任务一我是任务一',
-        typeCode: 'story',
-      },
-      {
-        issueNum: 'AG-2',
-        summary: '我是任务二我是任务二我是任务二我是任务二',
-        typeCode: 'story',
-      },
-    ];
-    let str = '';
+  // md() {
+  //   const arr = [
+  //     {
+  //       issueNum: 'AG-1',
+  //       summary: '我是任务一我是任务一我是任务一我是任务一',
+  //       typeCode: 'story',
+  //     },
+  //     {
+  //       issueNum: 'AG-2',
+  //       summary: '我是任务二我是任务二我是任务二我是任务二',
+  //       typeCode: 'story',
+  //     },
+  //   ];
+  //   let str = '';
 
-    str += '# 发布日志\n\n';
-    str += '## [0.7.0] - 2018-06-29\n\n';
+  //   str += '# 发布日志\n\n';
+  //   str += '## [0.7.0] - 2018-06-29\n\n';
 
-    str += '### 史诗\n';
+  //   str += '### 史诗\n';
 
-    arr.forEach((v) => {
-      str += `- [${v.issueNum}]-${v.summary}\n`;
-    });
-    const blob = new Blob([str], { type: 'text/plain;charset=utf-8' });
-    FileSaver.saveAs(blob, 'test.md');
-  }
+  //   arr.forEach((v) => {
+  //     str += `- [${v.issueNum}]-${v.summary}\n`;
+  //   });
+  //   const blob = new Blob([str], { type: 'text/plain;charset=utf-8' });
+  //   FileSaver.saveAs(blob, 'test.md');
+  // }
 
   render() {
     return (
@@ -95,16 +95,16 @@ class SettingHome extends Component {
             <Icon type="refresh" />获取
           </Button>
           <a href={this.state.url}>url</a>
-          <Button funcTyp="flat" onClick={() => this.md()}>
+          {/* <Button funcTyp="flat" onClick={() => this.md()}>
             <Icon type="refresh" />生成md
-          </Button>
-          <TableCanDragAndDrop />
+          </Button> */}
+          {/* <TableCanDragAndDrop />
           <div style={{ marginTop: 50 }} />
           <TableCouldDragAndDrop />
           <CreateTest
             issueId={7031}
             nextRank={null}
-          />
+          /> */}
         </Content>
       </Page>
     );
