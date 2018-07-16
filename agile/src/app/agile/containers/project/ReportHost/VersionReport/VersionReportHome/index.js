@@ -72,56 +72,57 @@ class VersionReport extends Component {
     if (addIssues.length > 0) {
       result += `<p>${string}:</p>`;
       _.forEach(addIssues, (item) => {
-        result += `<p>${item.issueNum} 改变故事点: ${item.changeField ? item.changeField : 0}</p>`;
+        result += `<p>${item.issueNum} 改变${this.renderYname()}: ${item.changeField ? item.changeField : 0}</p>`;
       });
     }
     return result;
   }
 
   getOptions() {
-    Date.prototype.format = function () {
-      let s = '';
-      const mouth = (this.getMonth() + 1) >= 10 ? (this.getMonth() + 1) : (`0${this.getMonth() + 1}`);
-      const day = this.getDate() >= 10 ? this.getDate() : (`0${this.getDate()}`);
-      s += `${this.getFullYear()}-`; // 获取年份。
-      s += `${mouth}-`; // 获取月份。
-      s += day; // 获取日。
-      return (s); // 返回日期。
-    };
+    // Date.prototype.format = function () {
+    //   let s = '';
+    //   const mouth = (this.getMonth() + 1) >= 10 ? (this.getMonth() + 1) : (`0${this.getMonth() + 1}`);
+    //   const day = this.getDate() >= 10 ? this.getDate() : (`0${this.getDate()}`);
+    //   s += `${this.getFullYear()}-`; // 获取年份。
+    //   s += `${mouth}-`; // 获取月份。
+    //   s += day; // 获取日。
+    //   return (s); // 返回日期。
+    // };
 
-    function getAll(begin, end) {
-      const ab = begin.split('-');
-      const ae = end.split('-');
-      const db = new Date();
-      db.setUTCFullYear(ab[0], ab[1] - 1, ab[2]);
-      const de = new Date();
-      de.setUTCFullYear(ae[0], ae[1] - 1, ae[2]);
-      const unixDb = db.getTime();
-      const unixDe = de.getTime();
-      const result = [];
-      for (let k = unixDb; k <= unixDe;) {
-        result.push((new Date(parseInt(k))).format());
-        k += 24 * 60 * 60 * 1000;
-      }
-      return result;
-    }
+    // function getAll(begin, end) {
+    //   const ab = begin.split('-');
+    //   const ae = end.split('-');
+    //   const db = new Date();
+    //   db.setUTCFullYear(ab[0], ab[1] - 1, ab[2]);
+    //   const de = new Date();
+    //   de.setUTCFullYear(ae[0], ae[1] - 1, ae[2]);
+    //   const unixDb = db.getTime();
+    //   const unixDe = de.getTime();
+    //   const result = [];
+    //   for (let k = unixDb; k <= unixDe;) {
+    //     result.push((new Date(parseInt(k))).format());
+    //     k += 24 * 60 * 60 * 1000;
+    //   }
+    //   return result;
+    // }
     const version = VersionReportStore.getReportData.version;
-    let startDate;
-    let endDate;
-    if (version.startDate) {
-      startDate = version.startDate.split(' ')[0];
-    } else {
-      startDate = version.creationDate.split(' ')[0];
-    }
-    if (version.releaseDate) {
-      endDate = version.releaseDate.split(' ')[0];
-    } else {
-      endDate = VersionReportStore.getReportData.versionReport[0].changeDate.split(' ')[0];
-    }
-    const xAxis = getAll(startDate, endDate);
+    // let startDate;
+    // let endDate;
+    // if (version.startDate) {
+    //   startDate = version.startDate.split(' ')[0];
+    // } else {
+    //   startDate = version.creationDate.split(' ')[0];
+    // }
+    // if (version.releaseDate) {
+    //   endDate = version.releaseDate.split(' ')[0];
+    // } else {
+    //   endDate = VersionReportStore.getReportData.versionReport[0].changeDate.split(' ')[0];
+    // }
     const data = VersionReportStore.getReportData.versionReport;
+    const xAxis = [];
     const seriesData = {};
     _.forEach(data, (item) => {
+      xAxis.push(item.changeDate.split(' ')[0]);
       if (!seriesData[item.changeDate.split(' ')[0]]) {
         seriesData[item.changeDate.split(' ')[0]] = {
           time: item.changeDate,
@@ -152,6 +153,12 @@ class VersionReport extends Component {
         key, value.percent,
       ]);
     });
+    if (moment(version.startDate).isBefore(data[data.length - 1].changeDate)) {
+      total.unshift([version.startDate.split(' ')[0], total[0][1]]);
+      complete.unshift([version.startDate.split(' ')[0], complete[0][1]]);
+      percent.unshift([version.startDate.split(' ')[0], percent[0][1]]);
+      xAxis.unshift(version.startDate.split(' ')[0]);
+    }
     const options = {
       tooltip: {
         trigger: 'axis',
@@ -164,7 +171,7 @@ class VersionReport extends Component {
               ${this.getAddIssues(params[0].data[0], 'addIssues', '添加的问题')}
               ${this.getAddIssues(params[0].data[0], 'completedIssues', '完成的问题')}
               ${this.getAddIssues(params[0].data[0], 'removeIssues', '移出的问题')}
-              ${this.getAddIssues(params[0].data[0], 'fieldChangIssues', '故事点改变的问题')}
+              ${this.getAddIssues(params[0].data[0], 'fieldChangIssues', '改变的问题')}
               ${this.getAddIssues(params[0].data[0], 'unCompletedIssues', '未完成的问题')}
             </div>
           `,
@@ -206,7 +213,7 @@ class VersionReport extends Component {
       //   },
       // },
       xAxis: {
-        type: 'time',
+        type: 'category',
         data: xAxis,
         name: '日期',
       },
@@ -280,6 +287,23 @@ class VersionReport extends Component {
     if (e.key === '2') {
       history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
+  }
+  renderUnitColumn(type) {
+    let result = '';
+    if (this.state.type === "storyPoints") {
+      if (type === 'title') {
+        result = '故事点';
+      } else {
+        result = 'storyPoints';
+      }
+    } else if (this.state.type === "remainingEstimatedTime") {
+      if (type === 'title') {
+        result = '剩余时间';
+      } else {
+        result = 'remainingTime';
+      }
+    }
+    return result;
   }
   renderLegendName(type) {
     let result;
@@ -448,10 +472,11 @@ class VersionReport extends Component {
         >{text}</span>
       ),
     }, {
-      title: '故事点',
-      dataIndex: 'storyPoints',
-      key: 'storyPoints',
+      title: this.renderUnitColumn('title'),
+      dataIndex: this.renderUnitColumn('index'),
+      key: this.renderUnitColumn('index'),
     }];
+
     return (
       <Table
         dataSource={VersionReportStore.getIssues[type].data}
@@ -489,6 +514,12 @@ class VersionReport extends Component {
       result = '问题计数';
     }
     return result;
+  }
+
+  goIssues() {
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
+    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=versionReport&paramId=${this.state.chosenVersion}&paramName=版本${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}中的问题`);
   }
 
   render() {
@@ -581,7 +612,14 @@ class VersionReport extends Component {
           </Select>
           <div className="c7n-versionReport-versionInfo">
             <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.releaseDate ? `发布于 ${VersionReportStore.getReportData.version.releaseDate}` : '未发布'}</p>
-            <p style={{ color: '#3F51B5' }}>在“问题管理中”查看V {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}<Icon style={{ fontSize: 13 }} type="open_in_new" /></p>
+            <p
+              style={{ 
+                color: '#3F51B5',
+                cursor: 'pointer',
+              }}
+              role="none"
+              onClick={this.goIssues.bind(this)}
+            >在“问题管理中”查看V {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}<Icon style={{ fontSize: 13 }} type="open_in_new" /></p>
           </div>
           <div className="c7n-versionReport-report">
             <ReactEcharts
