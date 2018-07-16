@@ -22,6 +22,8 @@ import TypeTag from '../../../../components/TypeTag';
 import EmptyBlock from '../../../../components/EmptyBlock';
 import { ReadAndEdit } from '../../../../components/CommonComponent';
 
+const FileSaver = require('file-saver');
+
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -212,6 +214,17 @@ class Issue extends Component {
     IssueStore.setFilter(obj);
     const { current, pageSize } = IssueStore.pagination;
     IssueStore.loadIssues(current - 1, pageSize);
+  }
+
+  exportExcel() {
+    const projectId = AppState.currentMenuType.id;
+    const searchParam = IssueStore.getFilter;
+    axios.post(`/zuul/agile/v1/projects/${projectId}/issues/export`, searchParam, { responseType: 'arraybuffer' })
+      .then((data) => {
+        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const fileName = `${AppState.currentMenuType.name}.xls`;
+        FileSaver.saveAs(blob, fileName);
+      });
   }
 
   renderWideIssue(issue) {
@@ -548,6 +561,10 @@ class Issue extends Component {
           <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ create: true })}>
             <Icon type="playlist_add icon" />
             <span>创建问题</span>
+          </Button>
+          <Button className="leftBtn" funcTyp="flat" onClick={() => this.exportExcel()}>
+            <Icon type="file_upload icon" />
+            <span>导出</span>
           </Button>
           <Button
             funcTyp="flat"
