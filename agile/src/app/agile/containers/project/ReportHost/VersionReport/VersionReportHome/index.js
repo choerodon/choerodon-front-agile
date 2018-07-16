@@ -72,7 +72,7 @@ class VersionReport extends Component {
     if (addIssues.length > 0) {
       result += `<p>${string}:</p>`;
       _.forEach(addIssues, (item) => {
-        result += `<p>${item.issueNum} 改变${this.renderYname()}: ${item.changeField ? item.changeField : 0}</p>`;
+        result += `<p>${item.issueNum} ${this.renderYname()}变化了: ${item.changeField ? item.changeField : 0}</p>`;
       });
     }
     return result;
