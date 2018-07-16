@@ -118,7 +118,7 @@ class VersionReport extends Component {
     // } else {
     //   endDate = VersionReportStore.getReportData.versionReport[0].changeDate.split(' ')[0];
     // }
-    const data = VersionReportStore.getReportData.versionReport;
+    const data = VersionReportStore.getReportData.versionReport.reverse();
     const xAxis = [];
     const seriesData = {};
     _.forEach(data, (item) => {
@@ -167,7 +167,7 @@ class VersionReport extends Component {
               <p>日期: ${params[0].data[0]}</p>
               <p>总计故事点: ${params[0].data[1]}</p>
               <p>已完成故事点: ${params[1].data[1]}</p>
-              <p>未预估问题的百分比: ${params[2].data[1]}</p>
+              <p>未预估问题的百分比: ${params[2].data[1]}%</p>
               ${this.getAddIssues(params[0].data[0], 'addIssues', '添加的问题')}
               ${this.getAddIssues(params[0].data[0], 'completedIssues', '完成的问题')}
               ${this.getAddIssues(params[0].data[0], 'removeIssues', '移出的问题')}

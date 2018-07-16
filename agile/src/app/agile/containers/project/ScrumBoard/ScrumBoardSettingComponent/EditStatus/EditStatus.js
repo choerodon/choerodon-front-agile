@@ -14,7 +14,9 @@ const { AppState } = stores;
 class EditStatus extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      changeName: false,
+    };
   }
   handleEditStatus(e) {
     e.preventDefault();
@@ -39,7 +41,11 @@ class EditStatus extends Component {
   checkStatusName(rule, value, callback) {
     ScrumBoardStore.axiosCheckRepeatName(value).then((res) => {
       if (res) {
-        callback('状态名称重复');
+        if (this.state.changeName) {
+          callback('状态名称重复');
+        } else {
+          callback();
+        }
       } else {
         callback();
       }
@@ -103,7 +109,17 @@ class EditStatus extends Component {
                   validator: this.checkStatusName.bind(this),
                 }],
               })(
-                <Input label="状态名称" placeholder="请输入状态名称" />,
+                <Input
+                  label="状态名称" 
+                  placeholder="请输入状态名称"
+                  onChange={() => {
+                    if (!this.state.changeName) {
+                      this.setState({
+                        changeName: true,
+                      });
+                    }
+                  }}
+                />,
               )}
             </FormItem>
             <FormItem>
