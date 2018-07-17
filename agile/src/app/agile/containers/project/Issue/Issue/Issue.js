@@ -48,12 +48,13 @@ class Issue extends Component {
 
   getInit() {
     const Request = this.GetRequest(this.props.location.search);
-    const { paramType, paramId, paramName, paramStatus, paramIssueId } = Request;
+    const { paramType, paramId, paramName, paramStatus, paramIssueId, paramUrl } = Request;
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
     IssueStore.setParamName(paramName);
     IssueStore.setParamStatus(paramStatus);
     IssueStore.setParamIssueId(paramIssueId);
+    IssueStore.setParamUrl(paramUrl);
     const arr = [];
     if (paramName) {
       arr.push(paramName);

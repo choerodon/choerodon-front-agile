@@ -99,7 +99,7 @@ class ComponentHome extends Component {
             style={{ width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center', cursor: 'pointer', color: '#3f51b5' }}
             role="none"
             onClick={() => {
-              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=component&paramId=${record.componentId}&paramName=${record.name}`);
+              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=component&paramId=${record.componentId}&paramName=模块"${record.name}"下的问题&paramUrl=component`);
             }}
           >
             <span style={{ display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>{issueCount} issues</span>
@@ -252,6 +252,7 @@ class ComponentHome extends Component {
                 component={this.state.component}
                 onCancel={() => this.setState({ confirmShow: false })}
                 onOk={this.deleteComponent.bind(this)}
+                history={this.props.history}
               />
             ) : null
           }

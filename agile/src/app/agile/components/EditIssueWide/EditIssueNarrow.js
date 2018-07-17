@@ -477,6 +477,15 @@ class CreateSprint extends Component {
             this.props.onUpdate();
           }
         });
+    } else if (pro === 'storyPoints' || pro === 'remainingTime') {
+      obj[pro] = this.state[pro] === '' ? null : this.state[pro];
+      updateIssue(obj)
+        .then((res) => {
+          this.reloadIssue();
+          if (this.props.onUpdate) {
+            this.props.onUpdate();
+          }
+        });
     } else {
       obj[pro] = this.state[pro] || 0;
       updateIssue(obj)
@@ -730,7 +739,10 @@ class CreateSprint extends Component {
       content: <div style={{ marginBottom: 32 }}>
         <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
         <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
-        <p>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
+        <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
+        {
+          this.state.subIssueDTOList.length ? <p>{`注意：问题的 ${this.state.subIssueDTOList.length} 个子任务将被删除。`}</p> : null
+        }
       </div>,
       onOk() {
         return deleteIssue(issueId)
@@ -961,7 +973,7 @@ class CreateSprint extends Component {
     return (
       <div>
         {
-          this.state.branchs.totalCommit || this.state.branchs.totalMergeRequest ? (
+          this.state.branchs.branchCount ? (
             <div>
               {
                 [].length === 0 ? (
@@ -1734,7 +1746,7 @@ class CreateSprint extends Component {
                               onOk={this.updateIssue.bind(this, 'storyPoints')}
                               onCancel={this.resetStoryPoints.bind(this)}
                               readModeContent={<span>
-                                {this.state.storyPoints ? `${this.state.storyPoints} 点` : '无'}
+                                {this.state.storyPoints === undefined || this.state.storyPoints === null ? '无' : `${this.state.storyPoints} 点`}
                               </span>}
                             >
                               <NumericInput
@@ -1778,7 +1790,7 @@ class CreateSprint extends Component {
                               onOk={this.updateIssue.bind(this, 'remainingTime')}
                               onCancel={this.resetRemainingTime.bind(this)}
                               readModeContent={<span>
-                                {this.state.remainingTime ? `${this.state.remainingTime} 小时` : '无'}
+                                {this.state.remainingTime === undefined || this.state.remainingTime === null ? '无' : `${this.state.remainingTime} 小时`}
                               </span>}
                             >
                               <NumericInput
@@ -1954,7 +1966,7 @@ class CreateSprint extends Component {
                           </div>
                         </div>
                         {
-                          this.state.typeCode !== 'sub_task' ? (
+                          this.state.typeCode === 'bug' ? (
                             <div className="line-start mt-10">
                               <div className="c7n-property-wrapper">
                                 <span className="c7n-property">

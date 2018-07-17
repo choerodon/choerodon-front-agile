@@ -372,7 +372,7 @@ class ReleaseDetail extends Component {
               history.push(`/agile/release/logs/${this.props.match.params.id}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
             }}
           >
-            <Icon type="publish2" />
+            <Icon type="find_in_page" />
             <span>版本日志</span>
           </Button>
           

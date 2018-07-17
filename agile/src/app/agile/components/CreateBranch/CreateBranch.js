@@ -239,7 +239,7 @@ class CreateBranch extends Component {
         >
           <Form layout="vertical" className="c7n-sidebar-form">
             <div className="branch-formItem-icon">
-              <span className="icon icon-assignment" />
+              <span className="icon icon-widgets" />
             </div>
             <FormItem
               className="branch-formItem"
