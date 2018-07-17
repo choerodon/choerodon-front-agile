@@ -167,7 +167,7 @@ class ReleaseDetail extends Component {
             onClick={() => {
               const { history } = this.props;
               const urlParams = AppState.currentMenuType;
-              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}`);
+              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/sprintreport`);
             }}
           >{issueNum} {record.addIssue ? '*' : ''}</span>
         ),
@@ -323,7 +323,7 @@ class ReleaseDetail extends Component {
               }}
               role="none"
               onClick={() => {
-                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题`);
+                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题&paramUrl=reporthost/sprintreport`);
               }}
             >
               在“问题管理中”查看

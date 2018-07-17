@@ -45,7 +45,8 @@ class Sprint extends Component {
   }
 
   onKeyUp(event) {
-    if (document.activeElement.tagName !== 'INPUT') {
+    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      window.console.log('here');
       this.setState({
         keydown: '',
       });
@@ -53,8 +54,9 @@ class Sprint extends Component {
   }
 
   onKeyDown(event) {
-    if (document.activeElement.tagName !== 'INPUT') {
+    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       if (event.keyCode !== this.state.keydown) {
+        window.console.log('here');
         this.setState({
           keydown: event.keyCode,
         });
