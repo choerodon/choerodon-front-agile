@@ -89,6 +89,9 @@ class ReleaseLogs extends Component {
   }
 
   renderSubsetIssues(typeCode) {
+    const menu = AppState.currentMenuType;
+    const urlParams = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <div>
         <div style={{ margin: '17px 0' }}>
@@ -104,7 +107,23 @@ class ReleaseLogs extends Component {
             this.state[typeCode].map(issue => (
               <li style={{ marginBottom: 16 }}>
                 <span>[</span>
-                <a href="#">{issue.issueNum}</a>
+                {
+                  issue.typeCode !== 'sub_task' ? (
+                    <a
+                      role="none"
+                      onClick={() => {
+                        this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}&paramUrl=release/logs/${this.props.match.params.id}`);
+                        return false;
+                      }}
+                    >
+                      {issue.issueNum}
+                    </a>
+                  ) : (
+                    <span>
+                      {issue.issueNum}
+                    </span>
+                  )
+                }
                 <span>]</span>
                 {` - ${issue.summary}`}
               </li>

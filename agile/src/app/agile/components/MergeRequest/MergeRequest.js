@@ -122,9 +122,9 @@ class MergeRequest extends Component {
         width: '10%',
         render: (gitlabMergeRequestId, record) => (
           <div>
-            <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>创建合并请求</span></div>}>
+            <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>合并请求</span></div>}>
               <Button shape="circle" onClick={this.createMergeRequest.bind(this, record)}>
-                <Icon type="mode_edit" />
+                <Icon type="device_hub" />
               </Button>
             </Popover>
           </div>

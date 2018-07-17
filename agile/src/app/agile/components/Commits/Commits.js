@@ -132,7 +132,7 @@ class Commits extends Component {
           <div>
             <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>创建合并请求</span></div>}>
               <Button shape="circle" onClick={this.createMergeRequest.bind(this, record)}>
-                <Icon type="mode_edit" />
+                <Icon type="merge_request" />
               </Button>
             </Popover>
           </div>
