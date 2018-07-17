@@ -11,6 +11,7 @@ import AccumulationFilter from '../AccumulationComponent/AccumulationFilter';
 import './AccumulationHome.scss';
 import '../../BurndownChart/BurndownChartHome/BurndownChartHome.scss';
 import '../../../../main.scss';
+import txt from '../test';
 
 const { AppState } = stores;
 

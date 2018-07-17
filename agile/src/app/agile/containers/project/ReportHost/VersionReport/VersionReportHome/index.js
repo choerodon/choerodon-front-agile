@@ -254,7 +254,7 @@ class VersionReport extends Component {
         {
           name: this.renderLegendName('total'),
           type: 'line',
-          step: 'start',
+          step: true,
           data: total,
           yAxisIndex: 0,
           itemStyle: {
@@ -271,7 +271,7 @@ class VersionReport extends Component {
         {
           name: this.renderLegendName('completed'),
           type: 'line',
-          step: 'middle',
+          step: true,
           data: complete,
           yAxisIndex: 0,
           itemStyle: {
@@ -284,14 +284,11 @@ class VersionReport extends Component {
         this.state.type === 'issueCount' ? '' : {
           name: this.renderLegendName('percent'),
           type: 'line',
-          step: 'end',
+          step: true,
           data: percent,
           yAxisIndex: 1,
           itemStyle: {
             normal: { color: '#F44336' },
-          },
-          areaStyle: {
-            color: this.renderLegendAreaStyle('percent'),
           },
         },
       ],
@@ -625,7 +622,7 @@ class VersionReport extends Component {
           >
             {
               VersionReportStore.getVersionList.map(item => (
-                <Option value={String(item.versionId)}>V {item.name}</Option>
+                <Option value={String(item.versionId)}>{item.name}</Option>
               ))
             }
           </Select>

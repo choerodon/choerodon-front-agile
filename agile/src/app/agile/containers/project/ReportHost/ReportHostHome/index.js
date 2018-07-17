@@ -7,7 +7,6 @@ import burndownPic from '../../../../assets/image/burndowchart.svg';
 import sprintPic from '../../../../assets/image/sprint.svg';
 import accumulation from '../../../../assets/image/accumulation.svg';
 import versionReport from '../../../../assets/image/versionReport.svg';
-import { version } from '../../../../../../../node_modules/moment';
 
 const { AppState } = stores;
 
