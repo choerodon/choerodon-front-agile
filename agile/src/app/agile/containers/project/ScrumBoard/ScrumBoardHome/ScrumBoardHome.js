@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Select, Spin, message, Icon, Modal, Input, Form } from 'choerodon-ui';
+import { Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip } from 'choerodon-ui';
 import _ from 'lodash';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { withRouter } from 'react-router-dom';
@@ -665,7 +665,11 @@ class ScrumBoardHome extends Component {
           >
             {
               ScrumBoardStore.getBoardList.map(item => (
-                <Option value={item.boardId}>{item.name}</Option>
+                <Option value={item.boardId}>
+                  <Tooltip title={item.name}>
+                    {item.name}
+                  </Tooltip>
+                </Option>
               ))
             }
           </Select>
