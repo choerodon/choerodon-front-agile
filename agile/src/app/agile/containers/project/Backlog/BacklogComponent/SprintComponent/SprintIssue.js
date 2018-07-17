@@ -156,9 +156,9 @@ class SprintIssue extends Component {
                   label="sprintIssue" 
                   className="c7n-backlog-sprintIssueSide"
                   style={{
-                    width: 0,
+                    // width: 0,
                     flexGrow: 1,
-                    // width: this.renderIssueDisplay() ? 'unset' : 0,
+                    width: this.renderIssueDisplay() ? 'unset' : 0,
                   }}
                 >
                   <div

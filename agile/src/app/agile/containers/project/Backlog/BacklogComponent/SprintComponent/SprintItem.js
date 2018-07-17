@@ -97,7 +97,7 @@ class SprintItem extends Component {
     });
     if (this.state.createIssueValue !== '') {
       const data = {
-        priorityCode: BacklogStore.getProjectInfo.defaultPriorityCode,
+        priorityCode: BacklogStore.getProjectInfo.defaultPriorityCode ? BacklogStore.getProjectInfo.defaultPriorityCode : 'medium',
         projectId: AppState.currentMenuType.id,
         sprintId: !this.props.backlog ? this.props.item.sprintId : 0,
         summary: this.state.createIssueValue,

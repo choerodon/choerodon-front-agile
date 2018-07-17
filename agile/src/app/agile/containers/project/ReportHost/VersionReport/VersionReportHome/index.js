@@ -72,54 +72,35 @@ class VersionReport extends Component {
     if (addIssues.length > 0) {
       result += `<p>${string}:</p>`;
       _.forEach(addIssues, (item) => {
-        result += `<p>${item.issueNum} ${this.renderYname()}变化了: ${item.changeField ? item.changeField : 0}</p>`;
+        result += `<p>${item.issueNum} `;
+        if (this.state.type !== 'issueCount') {
+          if (type === 'fieldChangIssues') {
+            result += `${this.renderYname()}变化了: ${item.changeField ? item.changeField : 0}</p>`;
+          } else {
+            result += `${this.renderYname()}变化了: ${item.newValue ? item.newValue : 0}</p>`;
+          }
+        } else {
+          result += '</p>';
+        }
       });
     }
     return result;
   }
 
-  getOptions() {
-    // Date.prototype.format = function () {
-    //   let s = '';
-    //   const mouth = (this.getMonth() + 1) >= 10 ? (this.getMonth() + 1) : (`0${this.getMonth() + 1}`);
-    //   const day = this.getDate() >= 10 ? this.getDate() : (`0${this.getDate()}`);
-    //   s += `${this.getFullYear()}-`; // 获取年份。
-    //   s += `${mouth}-`; // 获取月份。
-    //   s += day; // 获取日。
-    //   return (s); // 返回日期。
-    // };
+  renderLegendAreaStyle(type) {
+    if (type === 'total') {
+      return 'rgba(77,144,254,0.10)';
+    } else if (type === 'completed') {
+      return 'rgba(0,191,165,0.10)';
+    } else {
+      return 'rgba(244,67,54,0.10';
+    }
+  }
 
-    // function getAll(begin, end) {
-    //   const ab = begin.split('-');
-    //   const ae = end.split('-');
-    //   const db = new Date();
-    //   db.setUTCFullYear(ab[0], ab[1] - 1, ab[2]);
-    //   const de = new Date();
-    //   de.setUTCFullYear(ae[0], ae[1] - 1, ae[2]);
-    //   const unixDb = db.getTime();
-    //   const unixDe = de.getTime();
-    //   const result = [];
-    //   for (let k = unixDb; k <= unixDe;) {
-    //     result.push((new Date(parseInt(k))).format());
-    //     k += 24 * 60 * 60 * 1000;
-    //   }
-    //   return result;
-    // }
+  getOptions() {
     const version = VersionReportStore.getReportData.version;
-    // let startDate;
-    // let endDate;
-    // if (version.startDate) {
-    //   startDate = version.startDate.split(' ')[0];
-    // } else {
-    //   startDate = version.creationDate.split(' ')[0];
-    // }
-    // if (version.releaseDate) {
-    //   endDate = version.releaseDate.split(' ')[0];
-    // } else {
-    //   endDate = VersionReportStore.getReportData.versionReport[0].changeDate.split(' ')[0];
-    // }
     const data = VersionReportStore.getReportData.versionReport.reverse();
-    const xAxis = [];
+    let xAxis = [];
     const seriesData = {};
     _.forEach(data, (item) => {
       if (xAxis.indexOf(item.changeDate.split(' ')[0]) === -1) {
@@ -141,9 +122,9 @@ class VersionReport extends Component {
         };
       }
     });
-    const total = [];
-    const complete = [];
-    const percent = [];
+    let total = [];
+    let complete = [];
+    let percent = [];
     _.forOwn(seriesData, (value, key) => {
       total.push([
         key, value.total,
@@ -163,10 +144,47 @@ class VersionReport extends Component {
         xAxis.unshift(version.startDate.split(' ')[0]);
       }
     }
+    // 如果当前版本为发布
+    if (version.statusCode === 'released') {
+      // 如果有releaseDate
+      if (version.releaseDate) {
+        // 如果发布时间小于今天的时间
+        const deleteItems = [];
+        if (moment(version.releaseDate.split(' ')[0]).isBefore(data[data.length - 1].changeDate)) {
+          xAxis = _.remove(xAxis, o => moment(o).isBefore(version.releaseDate) || moment(o).isSame(version.releaseDate));
+          complete = _.remove(complete, o => moment(o[0]).isBefore(version.releaseDate) || moment(o[0]).isSame(version.releaseDate));
+          percent = _.remove(percent, o => moment(o[0]).isBefore(version.releaseDate) || moment(o[0]).isSame(version.releaseDate));
+          total = _.remove(total, o => moment(o[0]).isBefore(version.releaseDate) || moment(o[0]).isSame(version.releaseDate));
+        } else if (moment(version.releaseDate.split(' ')[0]).isAfter(data[data.length - 1].changeDate)) {
+          // 如果发布时间大于今天的时间
+          xAxis.push(version.releaseDate.split(' ')[0]);
+          total.push([version.releaseDate.split(' ')[0], data[data.length - 1].totalField]);
+          complete.push([version.releaseDate.split(' ')[0], data[data.length - 1].completedField]);
+          percent.push([version.releaseDate.split(' ')[0], parseInt(data[data.length - 1].unEstimatedPercentage, 10)]);
+        }
+      }
+    }
     window.console.log(xAxis);
     window.console.log(total);
     window.console.log(complete);
     window.console.log(percent);
+    let markAreaLengh = 0;
+    if (xAxis.length >= 2) {
+      markAreaLengh = parseInt(xAxis.length / 2, 10);
+    }
+    const markAreaData = [];
+    for (let a = 0; a < markAreaLengh; a += 1) {
+      markAreaData.push([{
+        xAxis: 2 * a,
+        itemStyle: {
+          color: 'gainsboro',
+          opacity: 0.5,
+        },
+      }, {
+        xAxis: (2 * a) + 1,
+      }]);
+    }
+    window.console.log(markAreaData);
     const options = {
       tooltip: {
         trigger: 'axis',
@@ -223,7 +241,7 @@ class VersionReport extends Component {
       xAxis: {
         type: 'category',
         data: xAxis,
-        name: '日期',
+        // name: '日期',
       },
       yAxis: [{
         name: this.renderYname(),
@@ -242,6 +260,13 @@ class VersionReport extends Component {
           itemStyle: {
             normal: { color: '#4D90FE' },
           },
+          markArea: {
+            silent: true,
+            data: markAreaData,
+          },
+          areaStyle: {
+            color: this.renderLegendAreaStyle('total'),
+          },
         },
         {
           name: this.renderLegendName('completed'),
@@ -252,6 +277,9 @@ class VersionReport extends Component {
           itemStyle: {
             normal: { color: '#00BFA5' },
           },
+          areaStyle: {
+            color: this.renderLegendAreaStyle('completed'),
+          },
         },
         this.state.type === 'issueCount' ? '' : {
           name: this.renderLegendName('percent'),
@@ -261,6 +289,9 @@ class VersionReport extends Component {
           yAxisIndex: 1,
           itemStyle: {
             normal: { color: '#F44336' },
+          },
+          areaStyle: {
+            color: this.renderLegendAreaStyle('percent'),
           },
         },
       ],
@@ -428,7 +459,7 @@ class VersionReport extends Component {
         onClick={() => {
           const { history } = this.props;
           const urlParams = AppState.currentMenuType;
-          history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${text}&paramIssueId=${record.issueId}`);
+          history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${text}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
         }}
       >{text}</span>),
     }, {
@@ -538,7 +569,7 @@ class VersionReport extends Component {
   goIssues() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=versionReport&paramId=${this.state.chosenVersion}&paramName=版本${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}中的问题`);
+    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${this.state.chosenVersion}&paramName=版本${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}中的问题&paramUrl=reporthost/versionReport`);
   }
 
   render() {
@@ -630,7 +661,7 @@ class VersionReport extends Component {
             }
           </Select>
           <div className="c7n-versionReport-versionInfo">
-            <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.releaseDate ? `发布于 ${VersionReportStore.getReportData.version.releaseDate}` : '未发布'}</p>
+            <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate}` : '未发布'}</p>
             <p
               style={{ 
                 color: '#3F51B5',
