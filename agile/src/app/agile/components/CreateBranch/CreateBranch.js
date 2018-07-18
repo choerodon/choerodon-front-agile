@@ -28,55 +28,24 @@ class CreateBranch extends Component {
       originApps: [],
       originBranchs: [],
       branchs: [],
+      branchsShowMore: false,
+      branchsMaxPage: 0,
+      branchsInput: '',
+      branchsSize: 5,
+      branchsObj: {},
       tags: [],
+      tagsShowMore: false,
+      tagsMaxPage: 0,
+      tagsInput: '',
+      tagsSize: 5,
+      tagsObj: {},
       branchsExpand: false,
       tagsExpand: false,
     };
   }
 
   componentDidMount() {
-    const { store } = this.props;
-    // store.loadIssue();
   }
-
-  getOptionContent =(s) => {
-    const { formatMessage } = this.props.intl;
-    let mes = '';
-    let icon = '';
-    let color = '';
-    switch (s.typeCode) {
-      case 'story':
-        mes = formatMessage({ id: 'branch.issue.story' });
-        icon = 'turned_in';
-        color = '#00bfa5';
-        break;
-      case 'bug':
-        mes = formatMessage({ id: 'branch.issue.bug' });
-        icon = 'bug_report';
-        color = '#f44336';
-        break;
-      case 'issue_epic':
-        mes = formatMessage({ id: 'branch.issue.epic' });
-        icon = 'priority';
-        color = '#743be7';
-        break;
-      case 'sub_task':
-        mes = formatMessage({ id: 'branch.issue.subtask' });
-        icon = 'relation';
-        color = '#4d90fe';
-        break;
-      default:
-        mes = formatMessage({ id: 'branch.issue.task' });
-        icon = 'assignment';
-        color = '#4d90fe';
-    }
-    return (<span>
-      <Tooltip title={mes}>
-        <div style={{ background: color }} className="branch-issue"><i className={`icon icon-${icon}`} /></div>
-      </Tooltip>
-      <span className="branch-issue-content">{`${s.issueNum}    ${s.summary}`}</span>
-    </span>);
-  };
 
   /**
    * 获取列表的icon
@@ -167,54 +136,9 @@ class CreateBranch extends Component {
     }
   };
 
-  handleClose = () => {
-    this.props.form.resetFields();
-    this.props.onClose();
-  };
-
-  changeType =(value) => {
-    let type = '';
-    if (value !== 'custom') {
-      type = `${value}-`;
-    }
-    this.setState({ type });
-  };
-
-  changeIssue =(value, options) => {
-    const key = options.key;
-    let type = '';
-    switch (key) {
-      case 'story':
-        type = 'feature';
-        break;
-      case 'bug':
-        type = 'bugfix';
-        break;
-      case 'issue_epic':
-        type = 'custom';
-        break;
-      case 'sub_task':
-        type = 'custom';
-        break;
-      default:
-        type = 'custom';
-    }
-    this.setState({ type });
-  };
-
-  // getBranchs() {
-  //   const branchs = this.state.branchs.slice();
-  //   const branchsExpand = this.state.branchsExpand;
-  //   if (branchs.length > 5 && !branchsExpand) {
-  //     return branchs.slice(0, 5);
-  //   }
-  //   return branchs;
-  // }
-
   render() {
     const { getFieldDecorator } = this.props.form;
     const { visible, intl, store } = this.props;
-    // const issue = store.issue.slice();
     const branches = [];
     const tags = [];
     return (
@@ -290,38 +214,50 @@ class CreateBranch extends Component {
                   label="分支来源"
                   allowClear
                   disabled={!this.props.form.getFieldValue('app')}
-                  onFocus={() => {
-                    this.setState({ selectLoading: true });
-                    let sign = 2;
-                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/branches`)
-                      .then((res) => {
-                        sign -= 1;
-                        this.setState({
-                          branchs: res,
-                          selectLoading: sign !== 0,
-                        });
-                      });
-                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/tags?page=0&size=9999`)
-                      .then((res) => {
-                        sign -= 1;
-                        this.setState({
-                          tags: res.content,
-                          selectLoading: sign !== 0,
-                        });
-                      });
-                  }}
                   filter
+                  filterOption={false}
                   optionLabelProp="value"
                   // optionFilterProp="children"
                   // filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                   loading={this.state.selectLoading}
+                  onFilterChange={(input) => {
+                    this.setState({ branchsInput: input });
+                    axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/branches?page=0&size=5`, {
+                      searchParam: {
+                        branchName: [input],
+                      },
+                      param: '',
+                    })
+                      .then((res) => {
+                        this.setState({
+                          branchs: res.content,
+                          branchsSize: res.numberOfElements,
+                          branchsShowMore: res.totalPages !== 1,
+                          branchsObj: res,
+                        });
+                      });
+                    axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/tags_list_options?page=0&size=5`, {
+                      searchParam: {
+                        tagName: [input],
+                      },
+                      param: '',
+                    })
+                      .then((res) => {
+                        this.setState({
+                          tags: res.content,
+                          tagsSize: res.numberOfElements,
+                          tagsShowMore: res.totalPages !== 1,
+                          tagsObj: res,
+                        });
+                      });
+                  }}
                 >
-                  <OptGroup label="分支" key="proGroup">
+                  <OptGroup label="分支" key="branchGroup">
                     {this.state.branchs.map(s => (
-                      <Option value={s.name}><Icon type="branch" />{s.name}</Option>
+                      <Option value={s.branchName}><Icon type="branch" />{s.branchName}</Option>
                     ))}
-                    {/* {
-                      this.state.branchs.length > 5 ? (
+                    {
+                      this.state.branchsObj.totalElements > this.state.branchsObj.numberOfElements && this.state.branchsObj.numberOfElements > 0 ? (
                         <Option key="more">
                           <div
                             role="none"
@@ -331,22 +267,69 @@ class CreateBranch extends Component {
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
+                              axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/branches?page=0&size=${this.state.branchsSize + 5}`, {
+                                searchParam: {
+                                  branchName: [this.state.branchsInput],
+                                },
+                                param: null,
+                              })
+                                .then((res) => {
+                                  this.setState({
+                                    branchs: res.content,
+                                    branchsSize: res.numberOfElements,
+                                    branchsShowMore: res.totalPages !== 1,
+                                    branchsObj: res,
+                                  });
+                                });
                             }}
                           >
-                            <Icon type="branch" />展开所有
+                            查看更多
                           </div>
                         </Option>
                       ) : null
-                    } */}
+                    } 
                   </OptGroup>
-                  <OptGroup label="标记" key="pubGroup">
+                  <OptGroup label="tag" key="tagGroup">
                     {this.state.tags.map(s => (
                       <Option value={s.name}><Icon type="local_offer" />{s.name}</Option>
                     ))}
+                    {
+                      this.state.tagsObj.totalElements > this.state.branchsObj.numberOfElements && this.state.branchsObj.numberOfElements > 0 ? (
+                        <Option key="more">
+                          <div
+                            role="none"
+                            style={{
+                              margin: '-4px -20px',
+                              padding: '4px 20px',
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/tags_list_options?page=0&size=${this.state.tagsSize + 5}`, {
+                                searchParam: {
+                                  tagName: [this.state.branchsInput],
+                                },
+                                param: null,
+                              })
+                                .then((res) => {
+                                  this.setState({
+                                    tags: res.content,
+                                    tagsSize: res.numberOfElements,
+                                    tagsShowMore: res.totalPages !== 1,
+                                    tagsObj: res,
+                                  });
+                                });
+                            }}
+                          >
+                            查看更多
+                          </div>
+                        </Option>
+                      ) : null
+                    } 
                   </OptGroup>
                 </Select>,
               )}
             </FormItem>
+            
             <div className="branch-formItem-icon">
               <span className="icon icon-branch" />
             </div>

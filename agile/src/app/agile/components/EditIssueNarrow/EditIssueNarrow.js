@@ -25,6 +25,7 @@ import IssueList from './Component/IssueList';
 import LinkList from './Component/LinkList';
 import CopyIssue from '../CopyIssue';
 import TransformSubIssue from '../TransformSubIssue';
+import TransformFromSubIssue from '../TransformFromSubIssue';
 import CreateBranch from '../CreateBranch';
 import Commits from '../Commits';
 import MergeRequest from '../MergeRequest';
@@ -684,6 +685,19 @@ class CreateSprint extends Component {
     }
   }
 
+  handleTransformFromSubIssue() {
+    this.reloadIssue();
+    this.setState({
+      transformFromSubIssueShow: false,
+    });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
+  }
+
   handleClickMenu(e) {
     if (e.key === '0') {
       this.setState({ dailyLogShow: true });
@@ -695,6 +709,8 @@ class CreateSprint extends Component {
       this.setState({ copyIssueShow: true });
     } else if (e.key === '4') {
       this.setState({ transformSubIssueShow: true });
+    } else if (e.key === '5') {
+      this.setState({ transformFromSubIssueShow: true });
     }
   }
 
@@ -1073,6 +1089,13 @@ class CreateSprint extends Component {
           this.state.typeCode !== 'sub_task' && this.state.origin.subIssueDTOList && this.state.origin.subIssueDTOList.length === 0 && (
             <Menu.Item key="4">
               转化为子任务
+            </Menu.Item>
+          )
+        }
+        {
+          this.state.typeCode === 'sub_task' && (
+            <Menu.Item key="5">
+              转化为任务
             </Menu.Item>
           )
         }
@@ -2701,8 +2724,21 @@ class CreateSprint extends Component {
               visible={this.state.transformSubIssueShow}
               issueId={this.state.origin.issueId}
               issueNum={this.state.origin.issueNum}
+              ovn={this.state.origin.objectVersionNumber}
               onCancel={() => this.setState({ transformSubIssueShow: false })}
               onOk={this.handleTransformSubIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.transformFromSubIssueShow ? (
+            <TransformFromSubIssue
+              visible={this.state.transformFromSubIssueShow}
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              ovn={this.state.origin.objectVersionNumber}
+              onCancel={() => this.setState({ transformFromSubIssueShow: false })}
+              onOk={this.handleTransformFromSubIssue.bind(this)}
             />
           ) : null
         }

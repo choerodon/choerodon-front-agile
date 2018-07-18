@@ -59,7 +59,7 @@ class TransformSubIssue extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const projectId = AppState.currentMenuType.id;
-        const { initValue, visible, onCancel, onOk, issueId, issueNum } = this.props;
+        const { initValue, visible, onCancel, onOk, issueId, issueNum, ovn } = this.props;
         window.console.log(values);
         const parentIssueId = values.issues;
         const status = values.status;
@@ -67,6 +67,7 @@ class TransformSubIssue extends Component {
           issueId,
           parentIssueId,
           statusId: status,
+          objectVersionNumber: ovn,
         };
         this.setState({
           loading: true,
