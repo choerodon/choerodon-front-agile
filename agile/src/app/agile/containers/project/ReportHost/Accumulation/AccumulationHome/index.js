@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Icon, DatePicker, Popover, Dropdown, Menu, Modal, Form, Select } from 'choerodon-ui';
+import { Button, Icon, DatePicker, Popover, Dropdown, Menu, Modal, Form, Select, Checkbox } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
@@ -14,6 +14,8 @@ import '../../../../main.scss';
 import txt from '../test';
 
 const { AppState } = stores;
+const { RangePicker } = DatePicker;
+const Option = Select.Option;
 
 @observer
 class AccumulationHome extends Component {
@@ -87,6 +89,8 @@ class AccumulationHome extends Component {
   }
   getData() {
     const columnData = AccumulationStore.getColumnData;
+    window.console.log(AccumulationStore.getEndDate);
+    window.console.log(AccumulationStore.getStartDate);
     const endDate = AccumulationStore.getEndDate.format('YYYY-MM-DD HH:mm:ss');
     const filterList = AccumulationStore.getFilterList;
     const startDate = AccumulationStore.getStartDate.format('YYYY-MM-DD HH:mm:ss');
@@ -260,6 +264,53 @@ class AccumulationHome extends Component {
       history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
+  setStoreCheckData(data, id, params, array) {
+    const newData = _.clone(data);
+    _.forEach(newData, (item, index) => {
+      if (array) {
+        if (id.indexOf(String(item[params])) !== -1) {
+          newData[index].check = true;
+        } else {
+          newData[index].check = false;
+        }
+      } else if (String(item[params]) === String(id)) {
+        newData[index].check = true;
+      } else {
+        newData[index].check = false;
+      }
+    });
+    return newData;
+  }
+  getFilterData() {
+    return [{
+      data: AccumulationStore.getBoardList,
+      onChecked: id => String(this.getTimeType(AccumulationStore.getBoardList, 'boardId')) === String(id),
+      onChange: (id, bool) => {
+        AccumulationStore.setBoardList(this.setStoreCheckData(AccumulationStore.getBoardList, id, 'boardId'));
+        this.getColumnData(id, true);
+      },
+      id: 'boardId',
+      text: '看板',
+    }, {
+      data: AccumulationStore.getColumnData,
+      onChecked: id => this.getTimeType(AccumulationStore.getColumnData, 'columnId', 'array').indexOf(String(id)) !== -1,
+      onChange: (id, bool) => {
+        AccumulationStore.changeColumnData(id, bool);
+        this.getData();
+      },
+      id: 'columnId',
+      text: '列',
+    }, {
+      data: AccumulationStore.getFilterList,
+      onChecked: id => this.getTimeType(AccumulationStore.getFilterList, 'filterId', 'array').indexOf(String(id)) !== -1,
+      onChange: (id, bool) => {
+        AccumulationStore.changeFilterData(id, bool);
+        this.getData();
+      },
+      id: 'filterId',
+      text: '快速搜索',
+    }];
+  }
   // handleOnBrushSelected(params) {
   //   window.console.log(params);
   // }
@@ -279,9 +330,6 @@ class AccumulationHome extends Component {
         </Menu.Item>
       </Menu>
     );
-    // const onEvents = {
-    //   brushSelected: this.handleOnBrushSelected.bind(this),
-    // };
     return (
       <Page>
         <Header
@@ -309,18 +357,54 @@ class AccumulationHome extends Component {
               }}
             >
               <div className="c7n-accumulation-filter">
-                <p>
-                  {`${AccumulationStore.getStartDate.format('D/M/YYYY')}到${AccumulationStore.getEndDate.format('D/M/YYYY')}(${this.getTimeType(AccumulationStore.getTimeData, 'name')})`}
-                </p>
-                <Button
-                  style={{ color: '#3F51B5', marginLeft: 20 }} 
-                  icon="settings"
-                  onClick={() => {
-                    this.setState({
-                      optionsVisible: true,
-                    });
+                <RangePicker
+                  value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
+                  allowClear={false}
+                  onChange={(date, dateString) => {
+                    AccumulationStore.setStartDate(moment(dateString[0]));
+                    AccumulationStore.setEndDate(moment(dateString[1]));
+                    this.getData();
                   }}
-                >修改报告</Button>
+                />
+                {
+                  this.getFilterData().map((item, index) => (
+                    <Popover
+                      placement="bottom"
+                      trigger="click"
+                      content={(
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                          }}
+                        >
+                          {
+                            item.data.map(items => (
+                              <Checkbox
+                                checked={item.onChecked(items[item.id])}
+                                onChange={(e) => {
+                                  item.onChange(items[item.id], e.target.checked);
+                                }}
+                              >
+                                {items.name}
+                              </Checkbox>
+                            ))
+                          }
+                        </div>
+                      )}
+                    >
+                      <Button 
+                        style={{ 
+                          marginLeft: index === 0 ? 20 : 0, 
+                          color: '#3F51B5', 
+                        }}
+                      >
+                        {item.text}
+                        <Icon type="baseline-arrow_drop_down" />
+                      </Button>
+                    </Popover>
+                  ))
+                }
                 {
                   this.state.optionsVisible ? (
                     <AccumulationFilter
