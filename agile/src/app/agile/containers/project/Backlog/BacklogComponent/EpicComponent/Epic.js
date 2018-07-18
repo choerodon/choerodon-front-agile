@@ -94,7 +94,8 @@ class Epic extends Component {
               <div
                 className="c7n-backlog-epicRight"
                 style={{
-                  display: this.state.hoverBlockButton ? 'flex' : 'none',
+                  display: 'flex',
+                  visibility: this.state.hoverBlockButton ? 'visible' : 'hidden',
                 }}
               >
                 <p

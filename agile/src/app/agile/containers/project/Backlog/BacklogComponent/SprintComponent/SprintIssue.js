@@ -178,10 +178,10 @@ class SprintIssue extends Component {
                     label="sprintIssue" 
                     style={{ 
                       marginLeft: 8,
-                      whiteSpace: 'nowrap',
+                      whiteSpace: this.renderIssueDisplay() ? 'normal' : 'nowrap',
                       textOverflow: 'ellipsis',
                       overflow: 'hidden',
-                      height: 20,
+                      height: this.renderIssueDisplay ? 'auto' : 20,
                     }}
                   >{`${item.issueNum} `}
                     <Tooltip title={item.summary} placement="topLeft">
