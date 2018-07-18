@@ -20,6 +20,7 @@ const { AppState } = stores;
 const { Sidebar } = Modal;
 const { Option } = Select;
 const FormItem = Form.Item;
+let sign = false;
 
 class CreateSubIssue extends Component {
   constructor(props) {
@@ -62,6 +63,35 @@ class CreateSubIssue extends Component {
         });
       });
   }
+
+  onFilterChange(input) {
+    if (!sign) {
+      this.setState({
+        selectLoading: true,
+      });
+      getUsers(input).then((res) => {
+        this.setState({
+          originUsers: res.content,
+          selectLoading: false,
+        });
+      });
+      sign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    getUsers(input).then((res) => {
+      this.setState({
+        originUsers: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
 
   setFileList = (data) => {
     this.setState({ fileList: data });
@@ -299,17 +329,7 @@ class CreateSubIssue extends Component {
                   filter
                   filterOption={false}
                   allowClear
-                  onFilterChange={(input) => {
-                    this.setState({
-                      selectLoading: true,
-                    });
-                    getUsers(input).then((res) => {
-                      this.setState({
-                        originUsers: res.content,
-                        selectLoading: false,
-                      });
-                    });
-                  }}
+                  onFilterChange={this.onFilterChange.bind(this)}
                 >
                   {this.state.originUsers.map(user =>
                     (<Option key={user.id} value={user.id}>

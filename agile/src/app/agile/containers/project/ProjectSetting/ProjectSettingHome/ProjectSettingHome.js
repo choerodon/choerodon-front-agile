@@ -12,6 +12,7 @@ const { AppState } = stores;
 const { Option } = Select;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
+let sign = false;
 
 class ProjectSetting extends Component {
   constructor(props) {
@@ -91,6 +92,35 @@ class ProjectSetting extends Component {
       return arr;
     }
   }
+
+  onFilterChange(input) {
+    if (!sign) {
+      this.setState({
+        selectLoading: true,
+      });
+      getUsers(input).then((res) => {
+        this.setState({
+          originUsers: res.content,
+          selectLoading: false,
+        });
+      });
+      sign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    getUsers(input).then((res) => {
+      this.setState({
+        originUsers: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
 
   handleCheckSameName = (rule, value, callback) => {
     if (!value) {
@@ -248,21 +278,11 @@ class ProjectSetting extends Component {
                     label="默认经办人"
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     loading={this.state.selectLoading}
-                    disabled={this.props.form.getFieldValue('strategy') != 'default_assignee'}
+                    disabled={this.props.form.getFieldValue('strategy') !== 'default_assignee'}
                     filter
                     filterOption={false}
                     allowClear
-                    onFilterChange={(input) => {
-                      this.setState({
-                        selectLoading: true,
-                      });
-                      getUsers(input).then((res) => {
-                        this.setState({
-                          originUsers: res.content,
-                          selectLoading: false,
-                        });
-                      });
-                    }}
+                    onFilterChange={this.onFilterChange.bind(this)}
                   >
                     {this.state.originUsers.map(user =>
                       (<Option key={user.id} value={user.id}>

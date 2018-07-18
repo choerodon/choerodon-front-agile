@@ -13,6 +13,7 @@ const { AppState } = stores;
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
 const { Option } = Select;
+let sign = false;
 
 class TransformSubIssue extends Component {
   constructor(props) {
@@ -29,6 +30,35 @@ class TransformSubIssue extends Component {
   componentDidMount() {
     this.getStatus();
   }
+
+  onFilterChange(input) {
+    if (!sign) {
+      this.setState({
+        selectLoading: true,
+      });
+      loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
+        this.setState({
+          originIssues: res.content,
+          selectLoading: false,
+        });
+      });
+      sign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
+      this.setState({
+        originIssues: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
 
   getStatus() {
     this.setState({
@@ -117,17 +147,7 @@ class TransformSubIssue extends Component {
                   loading={this.state.selectLoading}
                   filter
                   filterOption={false}
-                  onFilterChange={(input) => {
-                    this.setState({
-                      selectLoading: true,
-                    });
-                    loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
-                      this.setState({
-                        originIssues: res.content,
-                        selectLoading: false,
-                      });
-                    });
-                  }}
+                  onFilterChange={this.onFilterChange.bind(this)}
                 >
                   {this.state.originIssues.map(issue =>
                     (<Option

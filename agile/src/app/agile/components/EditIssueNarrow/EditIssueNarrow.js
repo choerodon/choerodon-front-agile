@@ -36,6 +36,7 @@ const { TextArea } = Input;
 const confirm = Modal.confirm;
 let sign = true;
 let flag;
+let filterSign = false;
 
 class CreateSprint extends Component {
   constructor(props) {
@@ -305,6 +306,35 @@ class CreateSprint extends Component {
       }
     }
   }
+
+  onFilterChange(input) {
+    if (!filterSign) {
+      this.setState({
+        selectLoading: true,
+      });
+      getUsers(input).then((res) => {
+        this.setState({
+          originUsers: res.content,
+          selectLoading: false,
+        });
+      });
+      filterSign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    getUsers(input).then((res) => {
+      this.setState({
+        originUsers: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
 
   handleTitleChange = (e) => {
     this.setState({ summary: e.target.value });
@@ -2302,17 +2332,7 @@ class CreateSprint extends Component {
                               allowClear
                               autoFocus
                               filter
-                              onFilterChange={(input) => {
-                                this.setState({
-                                  selectLoading: true,
-                                });
-                                getUsers(input).then((res) => {
-                                  this.setState({
-                                    originUsers: res.content,
-                                    selectLoading: false,
-                                  });
-                                });
-                              }}
+                              onFilterChange={this.onFilterChange.bind(this)}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               onChange={(value) => {
                                 this.setState({ reporterId: value });
@@ -2417,17 +2437,7 @@ class CreateSprint extends Component {
                               allowClear
                               autoFocus
                               filter
-                              onFilterChange={(input) => {
-                                this.setState({
-                                  selectLoading: true,
-                                });
-                                getUsers(input).then((res) => {
-                                  this.setState({
-                                    originUsers: res.content,
-                                    selectLoading: false,
-                                  });
-                                });
-                              }}
+                              onFilterChange={this.onFilterChange.bind(this)}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               onChange={(value) => {
                                 this.setState({ assigneeId: value });
