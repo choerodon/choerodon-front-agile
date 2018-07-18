@@ -54,8 +54,8 @@ class VersionReportStore {
       this.issues[type][type2] = data;
     }
 
-    axiosGetIssues(versionId, data) {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${versionId}/issues?status=${data.status}&page=${data.page}&size=${data.size}`);
+    axiosGetIssues(versionId, data, util) {
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${versionId}/issues?status=${data.status}&type=${util}&page=${data.page}&size=${data.size}`);
     }
 
   @computed get getVersionList() {

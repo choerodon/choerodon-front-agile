@@ -306,7 +306,7 @@ class VersionReport extends Component {
   }
   updateIssues(data) {
     _.forEach(data, (item) => {
-      VersionReportStore.axiosGetIssues(this.state.chosenVersion, item).then((res2) => {
+      VersionReportStore.axiosGetIssues(this.state.chosenVersion, item, this.state.type).then((res2) => {
         VersionReportStore.setIssues(item.status, 'data', res2.content);
         VersionReportStore.setIssues(item.status, 'pagination', {
           current: res2.number + 1,
@@ -695,9 +695,13 @@ class VersionReport extends Component {
               <TabPane tab="未完成的问题" key="2">
                 {this.renderTabTable('unfinished')}  
               </TabPane>
-              <TabPane tab="未完成的未预估问题" key="3">
-                {this.renderTabTable('unfinishedUnestimated')}
-              </TabPane>
+              {
+                this.state.type === 'issueCount' ? '' : (
+                  <TabPane tab="未完成的未预估问题" key="3">
+                    {this.renderTabTable('unfinishedUnestimated')}
+                  </TabPane>
+                )
+              }
             </Tabs>
           </div>
         </Content>
