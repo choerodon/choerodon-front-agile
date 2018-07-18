@@ -241,6 +241,13 @@ class VersionReport extends Component {
       xAxis: {
         type: 'category',
         data: xAxis,
+        boundaryGap: false,
+        axisLabel: {
+          formatter(value, index) {
+            window.console.log(value);
+            return `${value.split('-')[1]}/${value.split('-')[2]}`;
+          },
+        },
         // name: '日期',
       },
       yAxis: [{
@@ -663,6 +670,8 @@ class VersionReport extends Component {
               style={{ 
                 color: '#3F51B5',
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
               }}
               role="none"
               onClick={this.goIssues.bind(this)}

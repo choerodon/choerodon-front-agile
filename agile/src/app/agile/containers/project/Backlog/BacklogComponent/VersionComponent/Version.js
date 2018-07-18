@@ -86,7 +86,8 @@ class Version extends Component {
                 <div 
                   className="c7n-backlog-versionRight"
                   style={{
-                    display: this.state.hoverBlockButton ? 'flex' : 'none',
+                    display: 'flex',
+                    visibility: this.state.hoverBlockButton ? 'visible' : 'hidden',
                   }}
                 >
                   <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
