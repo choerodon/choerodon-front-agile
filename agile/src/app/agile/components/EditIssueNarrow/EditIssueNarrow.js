@@ -782,7 +782,7 @@ class CreateSprint extends Component {
       content: <div style={{ marginBottom: 32 }}>
         <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
         <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
-        <p>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
+        <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
         {
           this.state.subIssueDTOList.length ? <p>{`注意：问题的${this.state.subIssueDTOList.length}子任务将被删除。`}</p> : null
         }
@@ -1038,16 +1038,20 @@ class CreateSprint extends Component {
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
                       <span style={{ width: 60, display: 'inline-block' }}>
-                        <Popover
-                          title="提交修改时间"
-                          content={this.state.branchs.commitUpdateTime}
-                          placement="left"
-                        >
-                          <TimeAgo
-                            datetime={this.state.branchs.commitUpdateTime}
-                            locale={Choerodon.getMessage('zh_CN', 'en')}
-                          />
-                        </Popover> 
+                        {
+                          this.state.branchs.commitUpdateTime ? (
+                            <Popover
+                              title="提交修改时间"
+                              content={this.state.branchs.commitUpdateTime}
+                              placement="left"
+                            >
+                              <TimeAgo
+                                datetime={this.state.branchs.commitUpdateTime}
+                                locale={Choerodon.getMessage('zh_CN', 'en')}
+                              />
+                            </Popover> 
+                          ) : ''
+                        }
                       </span>
                     </div>
                   </div>
@@ -1073,16 +1077,20 @@ class CreateSprint extends Component {
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
                       <span style={{ width: 60, display: 'inline-block' }}>
-                        <Popover
-                          title="合并请求修改时间"
-                          content={this.state.branchs.mergeRequestUpdateTime}
-                          placement="left"
-                        >
-                          <TimeAgo
-                            datetime={this.state.branchs.mergeRequestUpdateTime}
-                            locale={Choerodon.getMessage('zh_CN', 'en')}
-                          />
-                        </Popover> 
+                        {
+                          this.state.branchs.mergeRequestUpdateTime ? (
+                            <Popover
+                              title="合并请求修改时间"
+                              content={this.state.branchs.mergeRequestUpdateTime}
+                              placement="left"
+                            >
+                              <TimeAgo
+                                datetime={this.state.branchs.mergeRequestUpdateTime}
+                                locale={Choerodon.getMessage('zh_CN', 'en')}
+                              />
+                            </Popover> 
+                          ) : ''
+                        }
                       </span>
                     </div>
                   </div>

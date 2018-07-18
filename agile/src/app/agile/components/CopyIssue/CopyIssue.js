@@ -71,7 +71,7 @@ class CopyIssue extends Component {
               <Input
                 label="概要"
                 prefix="CLONE - "
-                maxLength={30}
+                maxLength={44}
               />,
             )}
           </FormItem>

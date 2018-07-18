@@ -146,12 +146,16 @@ class Commits extends Component {
         className="c7n-commits"
         title={(
           <div>
-            <span>{`${issueNum}: `}</span>
+            <span>{`${time ? 'issueNum : ' : 'issueNum'} `}</span>
             <span>
-              <TimeAgo
-                datetime={time}
-                locale={Choerodon.getMessage('zh_CN', 'en')}
-              />
+              {
+                time ? (
+                  <TimeAgo
+                    datetime={time}
+                    locale={Choerodon.getMessage('zh_CN', 'en')}
+                  />
+                ) : ''
+              }
             </span>
           </div>
         )}

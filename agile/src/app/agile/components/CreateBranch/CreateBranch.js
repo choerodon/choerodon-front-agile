@@ -364,7 +364,6 @@ class CreateBranch extends Component {
               })(
                 <Input
                   label="分支名称"
-                  autoFocus
                   prefix={this.props.form.getFieldValue('type') === 'custom' || !this.props.form.getFieldValue('type') ? '' : `${this.props.form.getFieldValue('type')}-`}
                   maxLength={30}
                   disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}

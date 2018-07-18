@@ -1049,16 +1049,20 @@ class CreateSprint extends Component {
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
                       <span style={{ width: 60, display: 'inline-block' }}>
-                        <Popover
-                          title="提交修改时间"
-                          content={this.state.branchs.commitUpdateTime}
-                          placement="left"
-                        >
-                          <TimeAgo
-                            datetime={this.state.branchs.commitUpdateTime}
-                            locale={Choerodon.getMessage('zh_CN', 'en')}
-                          />
-                        </Popover> 
+                        {
+                          this.state.branchs.commitUpdateTime ? (
+                            <Popover
+                              title="提交修改时间"
+                              content={this.state.branchs.commitUpdateTime}
+                              placement="left"
+                            >
+                              <TimeAgo
+                                datetime={this.state.branchs.commitUpdateTime}
+                                locale={Choerodon.getMessage('zh_CN', 'en')}
+                              />
+                            </Popover> 
+                          ) : ''
+                        }
                       </span>
                     </div>
                   </div>
@@ -1084,16 +1088,20 @@ class CreateSprint extends Component {
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
                       <span style={{ width: 60, display: 'inline-block' }}>
-                        <Popover
-                          title="合并请求修改时间"
-                          content={this.state.branchs.mergeRequestUpdateTime}
-                          placement="left"
-                        >
-                          <TimeAgo
-                            datetime={this.state.branchs.mergeRequestUpdateTime}
-                            locale={Choerodon.getMessage('zh_CN', 'en')}
-                          />
-                        </Popover> 
+                        {
+                          this.state.branchs.mergeRequestUpdateTime ? (
+                            <Popover
+                              title="合并请求修改时间"
+                              content={this.state.branchs.mergeRequestUpdateTime}
+                              placement="left"
+                            >
+                              <TimeAgo
+                                datetime={this.state.branchs.mergeRequestUpdateTime}
+                                locale={Choerodon.getMessage('zh_CN', 'en')}
+                              />
+                            </Popover> 
+                          ) : ''
+                        }
                       </span>
                     </div>
                   </div>

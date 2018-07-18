@@ -54,10 +54,18 @@ class ProjectSetting extends Component {
           priorityCode: res.defaultPriorityCode,
           strategy: res.defaultAssigneeType,
         });
+        this.props.form.setFieldsValue({
+          code: res.projectCode,
+          priorityCode: res.defaultPriorityCode,
+          strategy: res.defaultAssigneeType,
+        });
         if (res.defaultAssigneeId) {
           this.loadUser(res.defaultAssigneeId);
         } else {
           this.setState({
+            assignee: undefined,
+          });
+          this.props.form.setFieldsValue({
             assignee: undefined,
           });
         }
@@ -77,6 +85,9 @@ class ProjectSetting extends Component {
       this.setState({
         assignee: assigneeId,
         originUsers: [res.content[0]],
+      });
+      this.props.form.setFieldsValue({
+        assignee: assigneeId,
       });
     });
   }
