@@ -33,12 +33,14 @@ class Commits extends Component {
   }
 
   createMergeRequest(record) {
+    const win = window.open('loadin');
     const projectId = AppState.currentMenuType.id;
     const { appId } = record;
     axios.get(`/devops/v1/projects/${projectId}/apps/${appId}/git/url`)
       .then((res) => {
         const url = `${res}/merge_requests/new?change_branches=true&merge_request[source_branch]=${record.branchName}&merge_request[target_branch]=master`;
-        window.open(url, '_blank');
+        // window.open(url, '_blank');
+        win.location.href = url;
       })
       .catch((error) => {
         window.console.error('get gitlab url failed');

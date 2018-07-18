@@ -126,6 +126,8 @@ class CreateSprint extends Component {
       linkIssues: [],
       fixVersions: [],
       influenceVersions: [],
+      fixVersionsFixed: [],
+      influenceVersionsFixed: [],
 
       originStatus: [],
       originpriorities: [],
@@ -242,8 +244,12 @@ class CreateSprint extends Component {
       name: issueAttachment.fileName,
       url: issueAttachment.url,
     }));
-    const fixVersions = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
-    const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
+    const fixVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
+    const fixVersionsFixed = _.filter(fixVersionsTotal, { statusCode: 'archived' }) || [];
+    const fixVersions = _.filter(fixVersionsTotal, v => v.statusCode !== 'archived') || [];
+    const influenceVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
+    const influenceVersionsFixed =  _.filter(influenceVersionsTotal, { statusCode: 'archived' }) || [];
+    const influenceVersions = _.filter(influenceVersionsTotal, v => v.statusCode !== 'archived') || [];
     this.setState({
       origin: issue,
       activeSprint: activeSprint || {},
@@ -289,6 +295,8 @@ class CreateSprint extends Component {
       subIssueDTOList,
       fixVersions,
       influenceVersions,
+      fixVersionsFixed,
+      influenceVersionsFixed,
     });
   }
 
@@ -2036,12 +2044,32 @@ class CreateSprint extends Component {
                                   onOk={this.updateVersionSelect.bind(this, 'originVersions', 'influenceVersions')}
                                   onCancel={this.resetInfluenceVersions.bind(this)}
                                   readModeContent={<div>
-                                    <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
-                                      {this.transToArr(this.state.influenceVersions, 'name')}
-                                    </p>
+                                    {
+                                      !this.state.influenceVersionsFixed.length && !this.state.influenceVersions.length ? "无" : (
+                                        <div>
+                                          <div style={{ color: '#000' }}>
+                                            {_.map(this.state.influenceVersionsFixed, 'name').join(' , ')}
+                                          </div>
+                                          <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
+                                            {_.map(this.state.influenceVersions, 'name').join(' , ')}
+                                          </p>
+                                        </div>
+                                      )
+                                    }
                                   </div>}
                                 >
+                                  {
+                                    this.state.influenceVersionsFixed.length ? (
+                                      <div>
+                                        <span>已归档版本：</span>
+                                        <span>
+                                          {_.map(this.state.influenceVersionsFixed, 'name').join(' , ')}
+                                        </span>
+                                      </div>
+                                    ) : null
+                                  }
                                   <Select
+                                    label="未归档版本"
                                     value={this.transToArr(this.state.influenceVersions, 'name', 'array')}
                                     mode="tags"
                                     autoFocus
@@ -2053,7 +2081,7 @@ class CreateSprint extends Component {
                                       this.setState({
                                         selectLoading: true,
                                       });
-                                      loadVersions().then((res) => {
+                                      loadVersions(['version_planning', 'released']).then((res) => {
                                         this.setState({
                                           originVersions: res,
                                           selectLoading: false,
@@ -2093,12 +2121,32 @@ class CreateSprint extends Component {
                               onOk={this.updateVersionSelect.bind(this, 'originVersions', 'fixVersions')}
                               onCancel={this.resetFixVersions.bind(this)}
                               readModeContent={<div style={{ color: '#3f51b5' }}>
-                                <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
-                                  {this.transToArr(this.state.fixVersions, 'name')}
-                                </p>
+                                {
+                                  !this.state.fixVersionsFixed.length && !this.state.fixVersions.length ? "无" : (
+                                    <div>
+                                      <div style={{ color: '#000' }}>
+                                        {_.map(this.state.fixVersionsFixed, 'name').join(' , ')}
+                                      </div>
+                                      <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
+                                        {_.map(this.state.fixVersions, 'name').join(' , ')}
+                                      </p>
+                                    </div>
+                                  )
+                                }
                               </div>}
                             >
+                              {
+                                this.state.fixVersionsFixed.length ? (
+                                  <div>
+                                    <span>已归档版本：</span>
+                                    <span>
+                                      {_.map(this.state.fixVersionsFixed, 'name').join(' , ')}
+                                    </span>
+                                  </div>
+                                ) : null
+                              }
                               <Select
+                                label="未归档版本"
                                 value={this.transToArr(this.state.fixVersions, 'name', 'array')}
                                 mode="tags"
                                 autoFocus
@@ -2110,7 +2158,7 @@ class CreateSprint extends Component {
                                   this.setState({
                                     selectLoading: true,
                                   });
-                                  loadVersions().then((res) => {
+                                  loadVersions(['version_planning', 'released']).then((res) => {
                                     this.setState({
                                       originVersions: res,
                                       selectLoading: false,
