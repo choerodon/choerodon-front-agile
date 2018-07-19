@@ -54,6 +54,11 @@ const STATUS_ICON = {
     bgColor: '',
   },
 };
+const STATUS_SHOW = {
+  opened: '开放',
+  merged: '已合并',
+  closed: '关闭',
+};
 
 class CreateSprint extends Component {
   constructor(props) {
@@ -1035,7 +1040,6 @@ class CreateSprint extends Component {
                       >
                         {this.state.branchs.totalCommit || '0'}提交
                       </span>
-                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>开放</span>
                     </div>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1074,7 +1078,9 @@ class CreateSprint extends Component {
                       >
                         {this.state.branchs.totalMergeRequest}合并请求
                       </span>
-                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>{this.state.branchs.mergeRequestStatus === 'opened' ? '开放' : ''}</span>
+                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>
+                        {['opened', 'merged', 'closed'].includes(this.state.branchs.mergeRequestStatus) ? STATUS_SHOW[this.state.branchs.mergeRequestStatus] : ''}
+                      </span>
                     </div>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>

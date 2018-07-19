@@ -163,9 +163,8 @@ class CreateBranch extends Component {
             padding: 0,
             width: 512,
           }}
-          title={`对问题“${this.props.issueNum}”创建分支`}
-          description="采用Git flow工作流模式，自动创建分支模式所特有的流水线，持续交付过程中对feature、release、hotfix等分支进行管理。"
-          link="#"
+          title={`对问题“ ${this.props.issueNum} ”创建分支`}
+          description="您可以在此选择应用、分支来源，可以修改默认的分支类型及分支名称，即可为该问题创建关联的分支。"
         >
           <Form layout="vertical" className="c7n-sidebar-form">
             <div className="branch-formItem-icon">
@@ -351,7 +350,7 @@ class CreateBranch extends Component {
                 <Select
                   allowClear
                   label="分支类型"
-                  disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
+                  // disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
                 >
                   {['feature', 'bugfix', 'release', 'hotfix', 'custom'].map(s => (
                     <Option value={s} key={s}>{this.getIcon(s)}<span>{s}</span></Option>
@@ -374,7 +373,7 @@ class CreateBranch extends Component {
                   label="分支名称"
                   prefix={this.props.form.getFieldValue('type') === 'custom' || !this.props.form.getFieldValue('type') ? '' : `${this.props.form.getFieldValue('type')}-`}
                   maxLength={30}
-                  disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
+                  // disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
                 />,
               )}
             </FormItem>

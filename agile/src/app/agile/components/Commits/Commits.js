@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import _ from 'lodash';
 import { Modal, Table, Tooltip, Popover, Button, Icon } from 'choerodon-ui';
 import { stores, Content, axios } from 'choerodon-front-boot';
 import TimeAgo from 'timeago-react';
 
 const { AppState } = stores;
 const Sidebar = Modal.Sidebar;
+const STATUS_SHOW = {
+  opened: '开放',
+  merged: '已合并',
+  closed: '关闭',
+};
 
 class Commits extends Component {
   constructor(props) {
@@ -33,7 +39,7 @@ class Commits extends Component {
   }
 
   createMergeRequest(record) {
-    const win = window.open('loadin');
+    const win = window.open('');
     const projectId = AppState.currentMenuType.id;
     const { appId } = record;
     axios.get(`/devops/v1/projects/${projectId}/apps/${appId}/git/url`)
@@ -44,6 +50,20 @@ class Commits extends Component {
       })
       .catch((error) => {
       });
+  }
+
+  getStatus(mergeRequests) {
+    if (!mergeRequests.length) {
+      return '';
+    }
+    const statusArray = _.map(mergeRequests, 'state');
+    if (statusArray.includes('opened')) {
+      return '开放';
+    }
+    if (statusArray.includes('merged')) {
+      return '已合并';
+    }
+    return '关闭';
   }
 
   render() {
@@ -109,17 +129,17 @@ class Commits extends Component {
                         record.mergeRequests.map(v => (
                           <li style={{ listStyleType: 'none' }}>
                             <span style={{ display: 'inline-block', width: 150 }}>{v.title}</span>
-                            <span style={{ display: 'inline-block', width: 50 }}>{v.state === 'opened' ? '开放' : ''}</span>
+                            <span style={{ display: 'inline-block', width: 50 }}>{['opened', 'merged', 'closed'].includes(v.state) ? STATUS_SHOW[v.state] : ''}</span>
                           </li>
                         ))
                       }
                     </ul>
-                  ) : <div>暂无merge request</div>
+                  ) : <div>暂无相关合并请求</div>
                 }
               </div>)}
             >
               <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
-                开放
+                {this.getStatus(record.mergeRequests)}
               </p>
             </Popover>
           </div>
@@ -143,21 +163,7 @@ class Commits extends Component {
     return (
       <Sidebar
         className="c7n-commits"
-        title={(
-          <div>
-            <span>{`${time ? 'issueNum : ' : 'issueNum'} `}</span>
-            <span>
-              {
-                time ? (
-                  <TimeAgo
-                    datetime={time}
-                    locale={Choerodon.getMessage('zh_CN', 'en')}
-                  />
-                ) : ''
-              }
-            </span>
-          </div>
-        )}
+        title="关联分支"
         visible={visible || false}
         okText="关闭"
         okCancel={false}
@@ -169,8 +175,8 @@ class Commits extends Component {
             paddingRight: 0,
             paddingTop: 0,
           }}
-          title="查看提交"
-          description="采用Git flow工作流模式，自动创建分支模式所特有的流水线，持续交付过程中对feature、release、hotfix等分支进行管理。"
+          title={`查看问题“ ${this.props.issueNum} ”关联的分支`}
+          description="您可以在此查看该问题关联的所有分支、提交及合并请求状态，及为某分支创建合并请求。"
         >
           <Table
             filterBar={false}
@@ -178,6 +184,7 @@ class Commits extends Component {
             columns={column}
             dataSource={this.state.commits}
             loading={this.state.loading}
+            scroll={{ x: true }}
           />
         </Content>
       </Sidebar>
