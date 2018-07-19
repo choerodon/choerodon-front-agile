@@ -153,9 +153,14 @@ class ScrumBoardHome extends Component {
           ScrumBoardStore.setParentIds(storeParentIds);
           ScrumBoardStore.setEpicData(epicData);
           const newColumnData = data.columnsData.columns;
+          const statusList = [];
           _.forEach(newColumnData, (item, index) => {
             if (item.subStatuses) {
               _.forEach(item.subStatuses, (item2, index2) => {
+                statusList.push({
+                  id: item2.id,
+                  name: item2.name,
+                });
                 if (item2.issues) {
                   _.forEach(item2.issues, (item3, index3) => {
                     newColumnData[index].subStatuses[index2].issues[index3].statusName = item2.name;
@@ -165,6 +170,7 @@ class ScrumBoardHome extends Component {
               });
             }
           });
+          ScrumBoardStore.setStatusList(statusList);
           ScrumBoardStore.setBoardData(newColumnData);
           // this.storeIssueNumberCount(storeParentIds, )
           this.setState({
@@ -307,7 +313,14 @@ class ScrumBoardHome extends Component {
           message.info(data.message);
           ScrumBoardStore.setBoardData(originState);
         } else {
+          window.console.log(ScrumBoardStore.getStatusList);
+          _.forEach(ScrumBoardStore.getStatusList, (item, index) => {
+            if (data.statusId === item.id) {
+              draggableData.statusName = item.name;
+            }
+          });
           draggableData.objectVersionNumber = data.objectVersionNumber;
+          draggableData.categoryCode = JSON.parse(result.destination.droppableId).categoryCode;
           _.forEach(newState, (item, index) => {
             if (String(item.columnId) === 
             String(JSON.parse(result.destination.droppableId).columnId)) {

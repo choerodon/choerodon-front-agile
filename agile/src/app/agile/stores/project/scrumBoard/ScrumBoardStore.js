@@ -26,6 +26,15 @@ class ScrumBoardStore {
   @observable quickSearchList = [];
   @observable epicData = [];
   @observable allEpicData = [];
+  @observable statusList = [];
+
+  @computed get getStatusList() {
+    return toJS(this.statusList);
+  }
+
+  @action setStatusList(data) {
+    this.statusList = data;
+  }
 
   @computed get getAllEpicData() {
     return toJS(this.allEpicData);

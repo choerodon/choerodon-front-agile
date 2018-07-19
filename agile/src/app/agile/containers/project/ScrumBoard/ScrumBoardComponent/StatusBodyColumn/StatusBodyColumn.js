@@ -422,6 +422,7 @@ class StatusBodyColumn extends Component {
               parentId: this.props.source,
               assigneeId: this.props.assigneeId,
               epicId: this.props.epicId,
+              categoryCode: this.props.data.categoryCode,
             })
           }
         >
