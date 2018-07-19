@@ -12,6 +12,7 @@ const { AppState } = stores;
 const { Option } = Select;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
+let sign = false;
 
 class ProjectSetting extends Component {
   constructor(props) {
@@ -53,10 +54,18 @@ class ProjectSetting extends Component {
           priorityCode: res.defaultPriorityCode,
           strategy: res.defaultAssigneeType,
         });
+        this.props.form.setFieldsValue({
+          code: res.projectCode,
+          priorityCode: res.defaultPriorityCode,
+          strategy: res.defaultAssigneeType,
+        });
         if (res.defaultAssigneeId) {
           this.loadUser(res.defaultAssigneeId);
         } else {
           this.setState({
+            assignee: undefined,
+          });
+          this.props.form.setFieldsValue({
             assignee: undefined,
           });
         }
@@ -77,6 +86,9 @@ class ProjectSetting extends Component {
         assignee: assigneeId,
         originUsers: [res.content[0]],
       });
+      this.props.form.setFieldsValue({
+        assignee: assigneeId,
+      });
     });
   }
 
@@ -91,6 +103,35 @@ class ProjectSetting extends Component {
       return arr;
     }
   }
+
+  onFilterChange(input) {
+    if (!sign) {
+      this.setState({
+        selectLoading: true,
+      });
+      getUsers(input).then((res) => {
+        this.setState({
+          originUsers: res.content,
+          selectLoading: false,
+        });
+      });
+      sign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    getUsers(input).then((res) => {
+      this.setState({
+        originUsers: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
 
   handleCheckSameName = (rule, value, callback) => {
     if (!value) {
@@ -128,7 +169,6 @@ class ProjectSetting extends Component {
   handleUpdateProjectSetting = () => {
     this.props.form.validateFields((err, values, modify) => {
       if (!err && modify) {
-        window.console.log(values);
         const projectInfoDTO = {
           ...this.state.origin,
           projectCode: values.code,
@@ -148,7 +188,9 @@ class ProjectSetting extends Component {
               code: res.projectCode,
               priorityCode: res.defaultPriorityCode,
               strategy: res.defaultAssigneeType,
+              assignee: res.defaultAssigneeId,
             });
+            Choerodon.prompt('修改成功');
           })
           .catch((error) => {
             this.setState({
@@ -176,14 +218,14 @@ class ProjectSetting extends Component {
         ]}
       >
         <Header title="项目设置">
-          <Button funcTyp="flat" onClick={() => this.getProjectSetting()}>
+          <Button funcType="flat" onClick={() => this.getProjectSetting()}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
         </Header>
         <Content
           title="项目设置"
-          description="根据项目需求，可以分拆为多个模块，每个模块可以进行负责人划分，配置后可以将项目中的问题归类到对应的模块中。例如“后端任务”，“基础架构”等等。"
+          description="根据项目需求，用户可自行修改项目code、默认优先级以及默认经办人策略。修改项目code后，所有的问题编号前缀将发生改变。通过设置项目的默认优先级后，在项目里创建问题时会默认给问题赋值一个优先级，用户可自行修改。默认经办人策略为问题的创建提供便利，可根据用户需求选择策略。"
           link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/setup/project-setting/"
         >
           <div style={{ marginTop: 8 }}>
@@ -230,7 +272,8 @@ class ProjectSetting extends Component {
               <FormItem label="默认经办人策略" style={{ width: 512 }}>
                 {getFieldDecorator('strategy', {
                   rules: [{ required: true, message: '默认经办人策略为必选项' }],
-                  initialValue: this.state.strategy || 'undistributed',
+                  // initialValue: this.state.strategy || 'undistributed',
+                  initialValue: this.state.strategy || undefined,
                 })(
                   <RadioGroup label="默认经办人策略" onChange={this.onChangeStrategy}>
                     <Radio style={radioStyle} value={'undistributed'}>无</Radio>
@@ -248,21 +291,11 @@ class ProjectSetting extends Component {
                     label="默认经办人"
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     loading={this.state.selectLoading}
-                    disabled={this.props.form.getFieldValue('strategy') != 'default_assignee'}
+                    disabled={this.props.form.getFieldValue('strategy') !== 'default_assignee'}
                     filter
                     filterOption={false}
                     allowClear
-                    onFilterChange={(input) => {
-                      this.setState({
-                        selectLoading: true,
-                      });
-                      getUsers(input).then((res) => {
-                        this.setState({
-                          originUsers: res.content,
-                          selectLoading: false,
-                        });
-                      });
-                    }}
+                    onFilterChange={this.onFilterChange.bind(this)}
                   >
                     {this.state.originUsers.map(user =>
                       (<Option key={user.id} value={user.id}>

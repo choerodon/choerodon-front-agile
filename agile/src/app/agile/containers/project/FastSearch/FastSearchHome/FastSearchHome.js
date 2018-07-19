@@ -27,7 +27,6 @@ class Search extends Component {
   }
 
   componentDidMount() {
-    window.console.warn('fast search load success');
     this.loadFilters();
   }
 
@@ -64,7 +63,6 @@ class Search extends Component {
         });
       })
       .catch((error) => {
-        window.console.warn('load components failed, check your organization and project are correct, or please try again later');
       });
   }
 
@@ -135,11 +133,11 @@ class Search extends Component {
     return (
       <Page>
         <Header title="快速搜索">
-          <Button funcTyp="flat" onClick={() => this.setState({ createFileterShow: true })}>
+          <Button funcType="flat" onClick={() => this.setState({ createFileterShow: true })}>
             <Icon type="playlist_add icon" />
             <span>创建快速搜索</span>
           </Button>
-          <Button funcTyp="flat" onClick={() => this.loadFilters()}>
+          <Button funcType="flat" onClick={() => this.loadFilters()}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>

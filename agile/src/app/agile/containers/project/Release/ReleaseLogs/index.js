@@ -144,7 +144,7 @@ class ReleaseLogs extends Component {
           backPath={`/agile/release/detail/${versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           {/* <Button 
-            funcTyp="flat" 
+            funcType="flat" 
             onClick={() => {
               // fresh
               this.loadIssues();
@@ -154,7 +154,7 @@ class ReleaseLogs extends Component {
             <span>刷新</span>
           </Button> */}
           <Button 
-            funcTyp="flat" 
+            funcType="flat" 
             onClick={() => {
               // fresh
               this.export();
@@ -167,8 +167,7 @@ class ReleaseLogs extends Component {
         </Header>
         <Content
           title={`版本"${this.state.version.name}" 的版本日志`}
-          description="您可以在此查看版本的版本日志，并进行修改。"
-          link="#"
+          description="您可以在此查看版本的版本日志，按照问题类型来分类显示问题列表，并且可以点击到具体问题进行修改。"
         >
           {
             A.map(e => (

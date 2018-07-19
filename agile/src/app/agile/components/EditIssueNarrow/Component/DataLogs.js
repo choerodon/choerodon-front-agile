@@ -42,6 +42,7 @@ class DataLogs extends Component {
           datalogs.map((datalog, i) => (
             <DataLog
               i={i}
+              key={datalog.logId}
               datalog={datalog}
               origin={datalogs}
               expand={this.state.expand}
@@ -53,7 +54,7 @@ class DataLogs extends Component {
         {
           datalogs.length > 5 && !this.state.expand ? (
             <div style={{ marginTop: 5 }}>
-              <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ expand: true })}>
+              <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ expand: true })}>
                 <Icon type="baseline-arrow_drop_down icon" style={{ marginRight: 2 }} />
                 <span>展开</span>
               </Button>
@@ -63,7 +64,7 @@ class DataLogs extends Component {
         {
           datalogs.length > 5 && this.state.expand ? (
             <div style={{ marginTop: 5 }}>
-              <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ expand: false })}>
+              <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ expand: false })}>
                 <Icon type="baseline-arrow_drop_up icon" style={{ marginRight: 2 }} />
                 <span>折叠</span>
               </Button>

@@ -41,7 +41,6 @@ class ReleaseDetail extends Component {
         loading: false,
       });
     }).catch((error) => {
-      window.console.error(error);
     });
     ReleaseStore.axiosGetVersionStatusIssues(this.props.match.params.id).then((res2) => {
       ReleaseStore.setVersionStatusIssues(res2);
@@ -49,7 +48,6 @@ class ReleaseDetail extends Component {
         loading: false,
       });
     }).catch((error2) => {
-      window.console.error(error2);
     });
   }
   handleChangeTab(key) {
@@ -59,7 +57,6 @@ class ReleaseDetail extends Component {
       });
       ReleaseStore.setVersionStatusIssues(res2);
     }).catch((error2) => {
-      window.console.error(error2);
     });
   }
  
@@ -333,7 +330,7 @@ class ReleaseDetail extends Component {
           {
             ReleaseStore.getVersionDetail.statusCode === 'archived' ? '' : (
               <Button 
-                funcTyp="flat" 
+                funcType="flat" 
                 style={{
                   marginLeft: 80,
                 }}
@@ -345,14 +342,12 @@ class ReleaseDetail extends Component {
                         ReleaseStore.setPublicVersionDetail(res);
                         this.setState({ publicVersion: true }); 
                       }).catch((error) => {
-                        window.console.error(error);
                       });
                   } else {
                     ReleaseStore.axiosUnPublicRelease(
                       ReleaseStore.getVersionDetail.versionId).then((res2) => {
                       this.refresh();
                     }).catch((error) => {
-                      window.console.error(error);
                     });
                   }
                 }}
@@ -363,7 +358,7 @@ class ReleaseDetail extends Component {
             )
           }
           <Button 
-            funcTyp="flat" 
+            funcType="flat" 
             style={{
               marginLeft: 80,
             }}

@@ -30,7 +30,6 @@ class ColumnPage extends Component {
       ScrumBoardStore.axiosGetStatusCategory().then((data) => {
         ScrumBoardStore.setStatusCategory(data);
       }).catch((error) => {
-        window.console.error(error);
       });
     }
   }
@@ -62,7 +61,6 @@ class ColumnPage extends Component {
         this.props.refresh();
       }).catch((error) => {
         ScrumBoardStore.setBoardData(originState2);
-        window.console.error(error);
       });
     } else {
       // 移动状态
@@ -217,7 +215,6 @@ class ColumnPage extends Component {
       ScrumBoardStore.axiosGetStatusCategory().then((data) => {
         ScrumBoardStore.setStatusCategory(data);
       }).catch((error) => {
-        window.console.error(error);
       });
     }
   }
@@ -307,7 +304,6 @@ class ColumnPage extends Component {
                 ScrumBoardStore.setBoardList(oldData);
                 ScrumBoardStore.setCurrentConstraint(value);
               }).catch((error) => {
-                window.console.error(error);
               });
             }}
           >
@@ -322,7 +318,7 @@ class ColumnPage extends Component {
           <div>
             <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.createStatus']}>
               <Button 
-                funcTyp="flat"
+                funcType="flat"
                 type="primary"
                 onClick={this.handleAddStatus.bind(this)}
               >
@@ -332,7 +328,7 @@ class ColumnPage extends Component {
             </Permission>
             <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.board-column.createBoardColumn']}>
               <Button 
-                funcTyp="flat"
+                funcType="flat"
                 type="primary"
                 onClick={this.handleAddColumn.bind(this)}
               >

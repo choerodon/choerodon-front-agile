@@ -16,15 +16,6 @@ class IssueDescription extends Component {
   }
 
   componentDidMount() {
-    // const imgs = document.querySelector('img');
-    // document.querySelector('img').addEventListener('click', (e) => {
-    //   window.console.info(e.target.nodeName);
-    //   this.setState({
-    //     open: true,
-    //     src: e.target.src,
-    //   });
-    //   e.stopPropagation();
-    // });
     const that = this;
     window.addEventListener('click', (e) => {
       if (e.target.nodeName === 'IMG' && this.props.data && this.props.data.search(e.target.src) > -1) {

@@ -4,11 +4,14 @@
   justify-content: center;
 
   .c7n-wrap {
-    width: 800px;
-    height: 280px;
+    width: 100%;
+    max-width: 800px;
+    min-height: 280px;
     display: flex;
     border-radius: 4px;
-    padding: 40px 100px  40px 135px;
+    // padding: 40px 100px  40px 135px;
+    justify-content: center;
+    align-items: center;
 
     .c7n-imgWrap {
       width: 200px;
@@ -26,6 +29,8 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      width: 150px;
+      flex-shrink: 0;
 
       .c7n-title {
         font-size: 14px;

@@ -43,6 +43,7 @@ class Issue extends Component {
     };
   }
   componentDidMount() {
+    window.console.warn('above is not mine');
     this.getInit();
   }
 
@@ -75,7 +76,6 @@ class Issue extends Component {
       IssueStore.init();
       IssueStore.loadIssues()
         .then((res) => {
-          window.console.log(res);
           this.setState({
             selectedIssue: res.content.length ? res.content[0] : {},
             expand: true,
@@ -83,7 +83,6 @@ class Issue extends Component {
         });
       // IssueStore.init()
       //   .then((res) => {
-      //     window.console.log(res);
       //     this.setState({
       //       selectedIssue: res,
       //       expand: true,
@@ -220,7 +219,6 @@ class Issue extends Component {
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
     IssueStore.setFilteredInfo(filters);
     IssueStore.setBarFilters(barFilters);
-    window.console.log(barFilters);
     if (barFilters === undefined || barFilters.length === 0) {
       IssueStore.setBarFilters(undefined);
     }
@@ -576,22 +574,22 @@ class Issue extends Component {
     return (
       <Page
         className="c7n-Issue c7n-region"
-        service={['agile-service.issue.deleteIssue']}
+        service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
       >
         <Header
           title="问题管理"
           backPath={IssueStore.getBackUrl}
         >
-          <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ create: true })}>
+          <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ create: true })}>
             <Icon type="playlist_add icon" />
             <span>创建问题</span>
           </Button>
-          <Button className="leftBtn" funcTyp="flat" onClick={() => this.exportExcel()}>
+          <Button className="leftBtn" funcType="flat" onClick={() => this.exportExcel()}>
             <Icon type="file_upload icon" />
             <span>导出</span>
           </Button>
           <Button
-            funcTyp="flat"
+            funcType="flat"
             onClick={() => {
               const { current, pageSize } = IssueStore.pagination;
               IssueStore.loadIssues(current - 1, pageSize);
@@ -652,7 +650,7 @@ class Issue extends Component {
                   />
                 ) : (
                   <Table
-                    rowKey={record => record.id}
+                    rowKey={record => record.issueId}
                     columns={columns}
                     dataSource={_.slice(IssueStore.issues)}
                     filterBar={false}
@@ -748,7 +746,7 @@ class Issue extends Component {
                     <Button
                       className="leftBtn"
                       style={{ color: '#3f51b5' }}
-                      funcTyp="flat"
+                      funcType="flat"
                       onClick={() => {
                         this.setState({ 
                           createIssue: true,
@@ -806,29 +804,31 @@ class Issue extends Component {
             }}
           >
             {
-              this.state.expand && <EditIssue
-                issueId={this.state.selectedIssue.issueId}
-                changeIssueId={this.handleChangeIssueId.bind(this)}
-                onCancel={() => {
-                  this.setState({
-                    expand: false,
-                    selectedIssue: {},
-                  });
-                }}
-                onDeleteIssue={() => {
-                  this.setState({
-                    expand: false,
-                    selectedIssue: {},
-                  });
-                  IssueStore.init();
-                  IssueStore.loadIssues();
-                }}
-                onUpdate={this.handleIssueUpdate.bind(this)}
-                onCopyAndTransformToSubIssue={() => {
-                  const { current, pageSize } = IssueStore.pagination;
-                  IssueStore.loadIssues(current - 1, pageSize);
-                }}
-              />
+              this.state.expand ? (
+                <EditIssue
+                  issueId={this.state.selectedIssue.issueId}
+                  // changeIssueId={this.handleChangeIssueId.bind(this)}
+                  onCancel={() => {
+                    this.setState({
+                      expand: false,
+                      selectedIssue: {},
+                    });
+                  }}
+                  onDeleteIssue={() => {
+                    this.setState({
+                      expand: false,
+                      selectedIssue: {},
+                    });
+                    IssueStore.init();
+                    IssueStore.loadIssues();
+                  }}
+                  onUpdate={this.handleIssueUpdate.bind(this)}
+                  onCopyAndTransformToSubIssue={() => {
+                    const { current, pageSize } = IssueStore.pagination;
+                    IssueStore.loadIssues(current - 1, pageSize);
+                  }}
+                />
+              ) : null
             }
           </div>
           {/* </Spin> */}

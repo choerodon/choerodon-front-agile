@@ -67,7 +67,6 @@ class TransformSubIssue extends Component {
       if (!err) {
         const projectId = AppState.currentMenuType.id;
         const { initValue, visible, onCancel, onOk, issueId, issueNum, ovn } = this.props;
-        window.console.log(values);
         const typeCode = values.typeCode;
         const epicName = values.epicName;
         const issueupdateTypeDTO = {
@@ -111,8 +110,7 @@ class TransformSubIssue extends Component {
             width: 520,
           }}
           title={`将问题“${issueNum}”转化为任务`}
-          description="请在下面输入环境编码、名称、描述，创建新环境。新环境默认新增在环境流水线的最后一个节点。"
-          link="#"
+          description="请在下面选择问题类型，表示将该子任务转化为该种问题，实现子任务与其他类型问题之间的互转。"
         >
           <Form layout="vertical">
             <FormItem label="问题类型" style={{ width: 520 }}>

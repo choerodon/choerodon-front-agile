@@ -26,7 +26,14 @@ class EasyEdit extends Component {
       hoverIf: false,
     };
   }
+  handleOnOk() {
+    this.setState({
+      edit: false,
+      hoverIf: false,
+    });
+  }
   renderEdit() {
+    const that = this;
     if (this.props.type === 'input') {
       return (
         <Input
@@ -70,6 +77,11 @@ class EasyEdit extends Component {
             this.setState({
               edit: false,
               hoverIf: false,
+            });
+          }}
+          onOk={() => {
+            this.setState({
+              edit: false,
             });
           }}
         />

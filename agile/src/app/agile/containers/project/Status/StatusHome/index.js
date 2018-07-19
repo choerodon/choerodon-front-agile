@@ -56,7 +56,6 @@ class StatusHome extends Component {
       this.setState({
         loading: false,
       });
-      window.console.error(error);
     });
   }
   handleChangeTable(pagination, filters, sorter) {
@@ -101,21 +100,20 @@ class StatusHome extends Component {
       <Page>
         <Header title="状态">
           <Button 
-            funcTyp="flat" 
+            funcType="flat" 
             onClick={() => { 
               this.setState({ addStatus: true });
               if (JSON.stringify(ScrumBoardStore.getStatusCategory) === '{}') {
                 ScrumBoardStore.axiosGetStatusCategory().then((data) => {
                   ScrumBoardStore.setStatusCategory(data);
                 }).catch((error) => {
-                  window.console.error(error);
                 });
               }
             }}
           >
             <Icon type="playlist_add icon" />创建状态
           </Button>
-          <Button funcTyp="flat">
+          <Button funcType="flat">
             <Icon type="refresh" />刷新
           </Button>
         </Header>

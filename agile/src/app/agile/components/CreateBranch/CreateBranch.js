@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { observer } from 'mobx-react';
+import _ from 'lodash';
 import { Modal, Form, Radio, Input, Select, Tooltip, Icon } from 'choerodon-ui';
 import { stores, Content, axios } from 'choerodon-front-boot';
 import { injectIntl, FormattedMessage } from 'react-intl';
@@ -11,6 +12,13 @@ const { AppState } = stores;
 const Sidebar = Modal.Sidebar;
 const { Option, OptGroup } = Select;
 const FormItem = Form.Item;
+const MAP = {
+  bug: 'bugfix',
+  task: 'custom',
+  story: 'feature',
+  issue_epic: 'custom',
+  sub_task: 'custom',
+};
 
 class CreateBranch extends Component {
   constructor(props) {
@@ -87,7 +95,6 @@ class CreateBranch extends Component {
   handleOk = (e) => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
-      window.console.log(values);
       if (!err) {
         const devopsBranchDTO = {
           branchName: values.type === 'custom' ? values.name : `${values.type}-${values.name}`,
@@ -107,7 +114,6 @@ class CreateBranch extends Component {
             this.props.onOk();
           })
           .catch((error) => {
-            window.console.error('create branch failed');
             this.setState({
               confirmLoading: false,
             });
@@ -157,9 +163,8 @@ class CreateBranch extends Component {
             padding: 0,
             width: 512,
           }}
-          title="对问题“C7NCD-112”创建分支"
-          description="采用Git flow工作流模式，自动创建分支模式所特有的流水线，持续交付过程中对feature、release、hotfix等分支进行管理。"
-          link="#"
+          title={`对问题“ ${this.props.issueNum} ”创建分支`}
+          description="您可以在此选择应用、分支来源，可以修改默认的分支类型及分支名称，即可为该问题创建关联的分支。"
         >
           <Form layout="vertical" className="c7n-sidebar-form">
             <div className="branch-formItem-icon">
@@ -254,7 +259,7 @@ class CreateBranch extends Component {
                 >
                   <OptGroup label="分支" key="branchGroup">
                     {this.state.branchs.map(s => (
-                      <Option value={s.branchName}><Icon type="branch" />{s.branchName}</Option>
+                      <Option value={s.branchName} key={s.branchName}><Icon type="branch" />{s.branchName}</Option>
                     ))}
                     {
                       this.state.branchsObj.totalElements > this.state.branchsObj.numberOfElements && this.state.branchsObj.numberOfElements > 0 ? (
@@ -291,7 +296,7 @@ class CreateBranch extends Component {
                   </OptGroup>
                   <OptGroup label="tag" key="tagGroup">
                     {this.state.tags.map(s => (
-                      <Option value={s.name}><Icon type="local_offer" />{s.name}</Option>
+                      <Option value={s.name} key={s.name}><Icon type="local_offer" />{s.name}</Option>
                     ))}
                     {
                       this.state.tagsObj.totalElements > this.state.branchsObj.numberOfElements && this.state.branchsObj.numberOfElements > 0 ? (
@@ -340,11 +345,12 @@ class CreateBranch extends Component {
                 rules: [{
                   required: true,
                 }],
+                initialValue: _.keys(MAP).includes(this.props.typeCode) ? MAP[this.props.typeCode]: undefined,
               })(
                 <Select
                   allowClear
                   label="分支类型"
-                  disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
+                  // disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
                 >
                   {['feature', 'bugfix', 'release', 'hotfix', 'custom'].map(s => (
                     <Option value={s} key={s}>{this.getIcon(s)}<span>{s}</span></Option>
@@ -361,13 +367,13 @@ class CreateBranch extends Component {
                 }, {
                   validator: this.checkName,
                 }],
+                initialValue: this.props.issueNum,
               })(
                 <Input
                   label="分支名称"
-                  autoFocus
                   prefix={this.props.form.getFieldValue('type') === 'custom' || !this.props.form.getFieldValue('type') ? '' : `${this.props.form.getFieldValue('type')}-`}
                   maxLength={30}
-                  disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
+                  // disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
                 />,
               )}
             </FormItem>

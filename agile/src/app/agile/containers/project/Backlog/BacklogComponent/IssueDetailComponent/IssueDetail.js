@@ -16,12 +16,10 @@ class IssueDetail extends Component {
     this.props.onRef(this);
   }
   handleIssueUpdate() {
-    window.console.log('here');
     const chosenEpic = BacklogStore.getChosenEpic;
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   refreshIssueDetail() {
@@ -41,19 +39,16 @@ class IssueDetail extends Component {
             }}
             issueId={BacklogStore.getClickIssueDetail.issueId}
             onCancel={() => {
-              window.console.log('here');
               BacklogStore.setClickIssueDetail({});
               BacklogStore.setIsLeaveSprint(false);
               this.props.cancelCallback();
             }}
             onDeleteIssue={() => {
-              window.console.log('here');
               BacklogStore.setClickIssueDetail({});
               BacklogStore.setIsLeaveSprint(false);
               this.props.refresh();
             }}
             onCreateVersion={() => {
-              window.console.log('here');
               BacklogStore.axiosGetVersion().then((data2) => {
                 const newVersion = [...data2];
                 _.forEach(newVersion, (item, index) => {
@@ -61,7 +56,6 @@ class IssueDetail extends Component {
                 });
                 BacklogStore.setVersionData(newVersion);
               }).catch((error) => {
-                window.console.error(error);
               });
             }}
             onUpdate={this.handleIssueUpdate.bind(this)}

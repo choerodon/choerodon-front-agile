@@ -46,7 +46,6 @@ class Sprint extends Component {
 
   onKeyUp(event) {
     if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
-      window.console.log('here');
       this.setState({
         keydown: '',
       });
@@ -56,7 +55,6 @@ class Sprint extends Component {
   onKeyDown(event) {
     if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
       if (event.keyCode !== this.state.keydown) {
-        window.console.log('here');
         this.setState({
           keydown: event.keyCode,
         });
@@ -101,7 +99,6 @@ class Sprint extends Component {
         this.setState({
           loading: false,
         });
-        window.console.error(error);
       });
     }
   }

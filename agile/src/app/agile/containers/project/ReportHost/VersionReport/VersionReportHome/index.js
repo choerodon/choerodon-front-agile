@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { toJS } from 'mobx';
-import { Button, Icon, Select, Tabs, Table, Dropdown, Menu, Tooltip } from 'choerodon-ui';
+import { Button, Icon, Select, Tabs, Table, Dropdown, Menu, Tooltip, Spin } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
@@ -35,6 +35,7 @@ class VersionReport extends Component {
         size: 10,
       }],
       type: 'storyPoints',
+      loading: false,
     };
   }
   componentWillMount() {
@@ -47,15 +48,22 @@ class VersionReport extends Component {
         this.getReportData(this.state.type);
       });
     }).catch((error) => {
-      window.console.log(error);
     });
   }
   getReportData(type) {
+    this.setState({
+      loading: true,
+    });
     VersionReportStore.axiosGetReportData(this.state.chosenVersion, type).then((res) => {
       VersionReportStore.setReportData(res);
       this.getOptions();
+      this.setState({
+        loading: false,
+      });
     }).catch((error) => {
-      window.console.log(error);
+      this.setState({
+        loading: false,
+      });
     });
   }
   getAddIssues(date, type, string) {
@@ -164,10 +172,6 @@ class VersionReport extends Component {
         }
       }
     }
-    window.console.log(xAxis);
-    window.console.log(total);
-    window.console.log(complete);
-    window.console.log(percent);
     let markAreaLengh = 0;
     if (xAxis.length >= 2) {
       markAreaLengh = parseInt(xAxis.length / 2, 10);
@@ -184,7 +188,6 @@ class VersionReport extends Component {
         xAxis: (2 * a) + 1,
       }]);
     }
-    window.console.log(markAreaData);
     const options = {
       tooltip: {
         trigger: 'axis',
@@ -244,7 +247,6 @@ class VersionReport extends Component {
         boundaryGap: false,
         axisLabel: {
           formatter(value, index) {
-            window.console.log(value);
             return `${value.split('-')[1]}/${value.split('-')[2]}`;
           },
         },
@@ -306,7 +308,7 @@ class VersionReport extends Component {
   }
   updateIssues(data) {
     _.forEach(data, (item) => {
-      VersionReportStore.axiosGetIssues(this.state.chosenVersion, item).then((res2) => {
+      VersionReportStore.axiosGetIssues(this.state.chosenVersion, item, this.state.type).then((res2) => {
         VersionReportStore.setIssues(item.status, 'data', res2.content);
         VersionReportStore.setIssues(item.status, 'pagination', {
           current: res2.number + 1,
@@ -314,7 +316,6 @@ class VersionReport extends Component {
           pageSize: res2.size,
         });
       }).catch((error2) => {
-        window.console.log(error2);
       });
     });
   }
@@ -598,108 +599,120 @@ class VersionReport extends Component {
           title="版本报告"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
-          <Button funcTyp="flat" onClick={() => { this.getData(); }}>
+          <Button 
+            funcTyp="flat" 
+            onClick={() => { 
+              this.updateIssues(this.state.datas);
+              this.getReportData(this.state.type);
+            }}
+          >
             <Icon type="refresh" />刷新
           </Button>
           <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcTyp="flat">
+            <Button icon="arrow_drop_down" funcType="flat">
               切换报表
             </Button>
           </Dropdown>
         </Header>
         <Content
-          title={`迭代冲刺“${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}”的版本报告`}
+          title={`迭代冲刺“${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}”的版本报告`}
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
           link="#"
         >
-          <Select
-            label="版本" 
-            value={this.state.chosenVersion}
-            style={{
-              width: 244,
-            }}
-            onChange={(value) => {
-              this.setState({
-                chosenVersion: value,
-              }, () => {
-                this.updateIssues(this.state.datas);
-                this.getReportData(this.state.type);
-              });
-            }}
-          >
-            {
-              VersionReportStore.getVersionList.map(item => (
-                <Option value={String(item.versionId)}>{item.name}</Option>
-              ))
-            }
-          </Select>
-          <Select
-            label="单位" 
-            value={this.state.type}
-            style={{
-              width: 244,
-              marginLeft: 24,
-            }}
-            onChange={(value) => {
-              this.setState({
-                type: value,
-              }, () => {
-                this.updateIssues(this.state.datas);
-                this.getReportData(this.state.type);
-              });
-            }}
-          >
-            {
-              [{
-                name: '故事点',
-                id: 'storyPoints',
-              }, {
-                name: '剩余时间',
-                id: 'remainingEstimatedTime',
-              }, {
-                name: '问题计数',
-                id: 'issueCount',
-              }].map(item => (
-                <Option value={String(item.id)}>{item.name}</Option>
-              ))
-            }
-          </Select>
-          <div className="c7n-versionReport-versionInfo">
-            <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate}` : '未发布'}</p>
-            <p
-              style={{ 
-                color: '#3F51B5',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-              role="none"
-              onClick={this.goIssues.bind(this)}
-            >在“问题管理中”查看V {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}<Icon style={{ fontSize: 13 }} type="open_in_new" /></p>
-          </div>
-          <div className="c7n-versionReport-report">
-            <ReactEcharts
-              option={this.state.options}
+          <Spin spinning={this.state.loading}>
+            <Select
+              label="版本" 
+              value={this.state.chosenVersion}
               style={{
-                height: '400px',
+                width: 244,
               }}
-              notMerge
-              lazyUpdate
-            />
-          </div>
-          <div className="c7n-versionReport-issues">
-            <Tabs defaultActiveKey="1">
-              <TabPane tab="已完成的问题" key="1">
-                {this.renderTabTable('done')}
-              </TabPane>
-              <TabPane tab="未完成的问题" key="2">
-                {this.renderTabTable('unfinished')}  
-              </TabPane>
-              <TabPane tab="未完成的未预估问题" key="3">
-                {this.renderTabTable('unfinishedUnestimated')}
-              </TabPane>
-            </Tabs>
-          </div>
+              onChange={(value) => {
+                this.setState({
+                  chosenVersion: value,
+                }, () => {
+                  this.updateIssues(this.state.datas);
+                  this.getReportData(this.state.type);
+                });
+              }}
+            >
+              {
+                VersionReportStore.getVersionList.map(item => (
+                  <Option value={String(item.versionId)}>{item.name}</Option>
+                ))
+              }
+            </Select>
+            <Select
+              label="单位" 
+              value={this.state.type}
+              style={{
+                width: 244,
+                marginLeft: 24,
+              }}
+              onChange={(value) => {
+                this.setState({
+                  type: value,
+                }, () => {
+                  this.updateIssues(this.state.datas);
+                  this.getReportData(this.state.type);
+                });
+              }}
+            >
+              {
+                [{
+                  name: '故事点',
+                  id: 'storyPoints',
+                }, {
+                  name: '剩余时间',
+                  id: 'remainingEstimatedTime',
+                }, {
+                  name: '问题计数',
+                  id: 'issueCount',
+                }].map(item => (
+                  <Option value={String(item.id)}>{item.name}</Option>
+                ))
+              }
+            </Select>
+            <div className="c7n-versionReport-versionInfo">
+              <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate}` : '未发布'}</p>
+              <p
+                style={{ 
+                  color: '#3F51B5',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                role="none"
+                onClick={this.goIssues.bind(this)}
+              >在“问题管理中”查看V {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}<Icon style={{ fontSize: 13 }} type="open_in_new" /></p>
+            </div>
+            <div className="c7n-versionReport-report">
+              <ReactEcharts
+                option={this.state.options}
+                style={{
+                  height: '400px',
+                }}
+                notMerge
+                lazyUpdate
+              />
+            </div>
+            <div className="c7n-versionReport-issues">
+              <Tabs defaultActiveKey="1">
+                <TabPane tab="已完成的问题" key="1">
+                  {this.renderTabTable('done')}
+                </TabPane>
+                <TabPane tab="未完成的问题" key="2">
+                  {this.renderTabTable('unfinished')}  
+                </TabPane>
+                {
+                  this.state.type === 'issueCount' ? '' : (
+                    <TabPane tab="未完成的未预估问题" key="3">
+                      {this.renderTabTable('unfinishedUnestimated')}
+                    </TabPane>
+                  )
+                }
+              </Tabs>
+            </div>
+          </Spin>
         </Content>
       </Page>
     );

@@ -148,12 +148,12 @@ class StatusIssue extends Component {
       );
     }
   }
-  renderStatusBackground() {
-    if (this.props.categoryCode === 'todo') {
+  renderStatusBackground(categoryCode) {
+    if (categoryCode === 'todo') {
       return 'rgb(255, 177, 0)';
-    } else if (this.props.categoryCode === 'doing') {
+    } else if (categoryCode === 'doing') {
       return 'rgb(77, 144, 254)';
-    } else if (this.props.categoryCode === 'done') {
+    } else if (categoryCode === 'done') {
       return 'rgb(0, 191, 165)';
     } else {
       return 'gray';
@@ -234,7 +234,7 @@ class StatusIssue extends Component {
           className="c7n-boardIssue"
           style={{
             borderTop: this.renderSubDisplay(item, type, 'border') ? '1px solid rgba(0, 0, 0, 0.20)' : 'unset',
-            display: this.renderSubDisplay(item, type),
+            // display: this.renderSubDisplay(item, type),
           }}
         >
           <Draggable 
@@ -314,19 +314,19 @@ class StatusIssue extends Component {
                               margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
                             }}
                           >
-                            <Tooltip title={`状态: ${this.props.statusName}`}>
+                            <Tooltip title={`状态: ${item.statusName}`}>
                               <span
                                 style={{ 
                                   borderRadius: 2, 
                                   padding: '2px 8px', 
-                                  background: this.renderStatusBackground(),
+                                  background: this.renderStatusBackground(item.categoryCode),
                                   // background: '#4D90FE', 
                                   color: 'white',
                                   maxWidth: 56,
                                 }}
                                 className="textDisplayOneColumn"
                               >
-                                {this.props.statusName}
+                                {item.statusName}
                               </span>
                             </Tooltip>
                           </p>

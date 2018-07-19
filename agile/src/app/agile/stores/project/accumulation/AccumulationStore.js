@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { observable, action, computed, toJS } from 'mobx';
 import { store, stores } from 'choerodon-front-boot';
+import _ from 'lodash';
 import moment from 'moment';
 
 const { AppState } = stores;
@@ -43,6 +44,22 @@ class AccumulationStore {
   @observable accumulationData = {};
   @observable boardList = [];
   @observable projectInfo = {};
+
+  @action changeFilterData(id, bool) {
+    _.forEach(this.filterList, (item, index) => {
+      if (item.filterId === id) {
+        this.filterList[index].check = bool;
+      }
+    });
+  }
+
+  @action changeColumnData(id, bool) {
+    _.forEach(this.columnData, (item, index) => {
+      if (item.columnId === id) {
+        this.columnData[index].check = bool;
+      }
+    });
+  }
 
   @computed get getProjectInfo() {
     return toJS(this.projectInfo);

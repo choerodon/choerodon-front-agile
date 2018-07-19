@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, Form, Input, Select, message } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
+import _ from 'lodash';
 import UserHead from '../../../../components/UserHead';
 import { getUsers, getUser } from '../../../../api/CommonApi';
 import { loadComponent, updateComponent } from '../../../../api/ComponentApi';
@@ -11,6 +12,7 @@ const { TextArea } = Input;
 const { Option } = Select;
 const { AppState } = stores;
 const FormItem = Form.Item;
+let sign = false;
 
 class EditComponent extends Component {
   constructor(props) {
@@ -31,6 +33,35 @@ class EditComponent extends Component {
   componentDidMount() {
     this.loadComponent(this.props.componentId);
   }
+
+  onFilterChange(input) {
+    if (!sign) {
+      this.setState({
+        selectLoading: true,
+      });
+      getUsers(input).then((res) => {
+        this.setState({
+          originUsers: res.content,
+          selectLoading: false,
+        });
+      });
+      sign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    getUsers(input).then((res) => {
+      this.setState({
+        originUsers: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
 
   getFirst(str) {
     if (!str) {
@@ -143,17 +174,7 @@ class EditComponent extends Component {
                   loading={this.state.selectLoading}
                   allowClear
                   filter
-                  onFilterChange={(input) => {
-                    this.setState({
-                      selectLoading: true,
-                    });
-                    getUsers(input).then((res) => {
-                      this.setState({
-                        originUsers: res.content,
-                        selectLoading: false,
-                      });
-                    });
-                  }}
+                  onFilterChange={this.onFilterChange.bind(this)}
                 >
                   {this.state.originUsers.map(user =>
                     (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>

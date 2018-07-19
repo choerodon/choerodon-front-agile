@@ -40,7 +40,6 @@ class BurndownChartHome extends Component {
         this.getChartData();
       });
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   getChartData() {
@@ -73,6 +72,9 @@ class BurndownChartHome extends Component {
                 index = i;
               }
             });
+            if (newData[index].type.indexOf(item.type) === -1) {
+              newData[index].type += `-${item.type}`;
+            }
             newData[index].issues = [...newData[index].issues, {
               issueId: item.issueId,
               issueNum: item.issueNum,
@@ -113,7 +115,6 @@ class BurndownChartHome extends Component {
           });
         }
       }).catch((error) => {
-        window.console.error(error);
       });
   }
   getMaxY() {
@@ -261,7 +262,7 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
-  renderTypeText(text) {
+  judgeText(text) {
     let result = '';
     if (text === 'startSprint') {
       result = '开启冲刺';
@@ -297,6 +298,18 @@ class BurndownChartHome extends Component {
       }
     }
     return result;
+  }
+  renderTypeText(text) {
+    const splitArray = text.split('-');
+    return (
+      <div>
+        {
+          splitArray.map(item => (
+            <p>{this.judgeText(item)}</p>
+          ))
+        }
+      </div>
+    );
   }
 
   render() {
@@ -417,11 +430,11 @@ class BurndownChartHome extends Component {
           title="燃尽图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
-          <Button funcTyp="flat" onClick={this.getChartData.bind(this)}>
+          <Button funcType="flat" onClick={this.getChartData.bind(this)}>
             <Icon type="refresh" />刷新
           </Button>
           <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcTyp="flat">
+            <Button icon="arrow_drop_down" funcType="flat">
               切换报表
             </Button>
           </Dropdown>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Icon, DatePicker, Popover, Dropdown, Menu, Modal, Form, Select } from 'choerodon-ui';
+import { Button, Icon, DatePicker, Popover, Dropdown, Menu, Modal, Form, Select, Checkbox, Spin } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
@@ -14,6 +14,8 @@ import '../../../../main.scss';
 import txt from '../test';
 
 const { AppState } = stores;
+const { RangePicker } = DatePicker;
+const Option = Select.Option;
 
 @observer
 class AccumulationHome extends Component {
@@ -32,6 +34,7 @@ class AccumulationHome extends Component {
       options2: {},
       optionsVisible: false,
       sprintData: {},
+      loading: false,
     };
   }
   componentWillMount() {
@@ -55,11 +58,9 @@ class AccumulationHome extends Component {
         AccumulationStore.setBoardList(newData2);
         this.getColumnData(res[newIndex].boardId, true);
       }).catch((error) => {
-        window.console.log(error);
       });
       // this.getData();
     }).catch((error) => {
-      window.console.log(error);
     });
   }
   getColumnData(id, type) {
@@ -79,13 +80,14 @@ class AccumulationHome extends Component {
           this.getData();
         }
       }).catch((error) => {
-        window.console.log(error);
       });
     }).catch((error) => {
-      window.console.log(error);
     });
   }
   getData() {
+    this.setState({
+      loading: true,
+    });
     const columnData = AccumulationStore.getColumnData;
     const endDate = AccumulationStore.getEndDate.format('YYYY-MM-DD HH:mm:ss');
     const filterList = AccumulationStore.getFilterList;
@@ -109,9 +111,14 @@ class AccumulationHome extends Component {
       startDate,
     }).then((res) => {
       AccumulationStore.setAccumulationData(res);
+      this.setState({
+        loading: false,
+      });
       this.getOption();
     }).catch((error) => {
-      window.console.log(error);
+      this.setState({
+        loading: false,
+      });
     });
   }
   getOption() {
@@ -124,15 +131,15 @@ class AccumulationHome extends Component {
       });
     });
     const newxAxis = [];
-    _.forEach(data[0].coordinateDTOList, (item) => {
-      if (newxAxis.length === 0) {
-        newxAxis.push(item.date.split(' ')[0]);
-      } else if (newxAxis.indexOf(item.date.split(' ')[0]) === -1) {
-        newxAxis.push(item.date.split(' ')[0]);
-      }
-    });
-    window.console.log(legendData);
-    window.console.log(newxAxis);
+    if (data.length > 0) {
+      _.forEach(data[0].coordinateDTOList, (item) => {
+        if (newxAxis.length === 0) {
+          newxAxis.push(item.date.split(' ')[0]);
+        } else if (newxAxis.indexOf(item.date.split(' ')[0]) === -1) {
+          newxAxis.push(item.date.split(' ')[0]);
+        }
+      });
+    }
     const legendSeries = [];
     _.forEach(data, (item, index) => {
       legendSeries.push({
@@ -167,7 +174,6 @@ class AccumulationHome extends Component {
         legendSeries[index].data.push(max);
       });
     });
-    window.console.log(legendSeries);
     this.setState({
       options: {
         tooltip: {
@@ -188,15 +194,15 @@ class AccumulationHome extends Component {
           right: '3%',
           containLabel: true,
         },
-        toolbox: {
-          left: 'center',
-          feature: {
-            restore: {},
-            // dataZoom: {
-            //   yAxisIndex: 'none',
-            // },
-          },
-        },
+        // toolbox: {
+        //   left: 'left',
+        //   feature: {
+        //     restore: {},
+        //     // dataZoom: {
+        //     //   yAxisIndex: 'none',
+        //     // },
+        //   },
+        // },
         xAxis: [
           {
             name: '日期',
@@ -260,8 +266,54 @@ class AccumulationHome extends Component {
       history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
+  setStoreCheckData(data, id, params, array) {
+    const newData = _.clone(data);
+    _.forEach(newData, (item, index) => {
+      if (array) {
+        if (id.indexOf(String(item[params])) !== -1) {
+          newData[index].check = true;
+        } else {
+          newData[index].check = false;
+        }
+      } else if (String(item[params]) === String(id)) {
+        newData[index].check = true;
+      } else {
+        newData[index].check = false;
+      }
+    });
+    return newData;
+  }
+  getFilterData() {
+    return [{
+      data: AccumulationStore.getBoardList,
+      onChecked: id => String(this.getTimeType(AccumulationStore.getBoardList, 'boardId')) === String(id),
+      onChange: (id, bool) => {
+        AccumulationStore.setBoardList(this.setStoreCheckData(AccumulationStore.getBoardList, id, 'boardId'));
+        this.getColumnData(id, true);
+      },
+      id: 'boardId',
+      text: '看板',
+    }, {
+      data: AccumulationStore.getColumnData,
+      onChecked: id => this.getTimeType(AccumulationStore.getColumnData, 'columnId', 'array').indexOf(String(id)) !== -1,
+      onChange: (id, bool) => {
+        AccumulationStore.changeColumnData(id, bool);
+        this.getData();
+      },
+      id: 'columnId',
+      text: '列',
+    }, {
+      data: AccumulationStore.getFilterList,
+      onChecked: id => this.getTimeType(AccumulationStore.getFilterList, 'filterId', 'array').indexOf(String(id)) !== -1,
+      onChange: (id, bool) => {
+        AccumulationStore.changeFilterData(id, bool);
+        this.getData();
+      },
+      id: 'filterId',
+      text: '快速搜索',
+    }];
+  }
   // handleOnBrushSelected(params) {
-  //   window.console.log(params);
   // }
   render() {
     const { history } = this.props;
@@ -279,20 +331,17 @@ class AccumulationHome extends Component {
         </Menu.Item>
       </Menu>
     );
-    // const onEvents = {
-    //   brushSelected: this.handleOnBrushSelected.bind(this),
-    // };
     return (
       <Page>
         <Header
           title="累积流量图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
-          <Button funcTyp="flat" onClick={() => { this.getData(); }}>
+          <Button funcType="flat" onClick={() => { this.getData(); }}>
             <Icon type="refresh" />刷新
           </Button>
           <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcTyp="flat">
+            <Button icon="arrow_drop_down" funcType="flat">
               切换报表
             </Button>
           </Dropdown>
@@ -308,46 +357,84 @@ class AccumulationHome extends Component {
                 flexDirection: 'column',
               }}
             >
-              <div className="c7n-accumulation-filter">
-                <p>
-                  {`${AccumulationStore.getStartDate.format('D/M/YYYY')}到${AccumulationStore.getEndDate.format('D/M/YYYY')}(${this.getTimeType(AccumulationStore.getTimeData, 'name')})`}
-                </p>
-                <Button
-                  style={{ color: '#3F51B5', marginLeft: 20 }} 
-                  icon="settings"
-                  onClick={() => {
-                    this.setState({
-                      optionsVisible: true,
-                    });
-                  }}
-                >修改报告</Button>
-                {
-                  this.state.optionsVisible ? (
-                    <AccumulationFilter
-                      visible={this.state.optionsVisible}
-                      getTimeType={this.getTimeType.bind(this)}
-                      getColumnData={this.getColumnData.bind(this)}
-                      getData={this.getData.bind(this)}
-                      onCancel={() => {
-                        this.getColumnData(this.getTimeType(AccumulationStore.getBoardList, 'boardId'));
-                        this.setState({
-                          optionsVisible: false,
-                        });
-                      }}
-                    />
-                  ) : ''
-                }
-              </div>
-              <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
-                <ReactEcharts
-                  option={this.state.options}
-                  style={{
-                    height: '600px',
-                  }}
-                  notMerge
-                  lazyUpdate
-                />
-              </div>
+              <Spin spinning={this.state.loading}>
+                <div className="c7n-accumulation-filter">
+                  <RangePicker
+                    value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
+                    allowClear={false}
+                    onChange={(date, dateString) => {
+                      AccumulationStore.setStartDate(moment(dateString[0]));
+                      AccumulationStore.setEndDate(moment(dateString[1]));
+                      this.getData();
+                    }}
+                  />
+                  {
+                    this.getFilterData().map((item, index) => (
+                      <Popover
+                        placement="bottom"
+                        trigger="click"
+                        content={(
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                            }}
+                          >
+                            {
+                              item.data.map(items => (
+                                <Checkbox
+                                  checked={item.onChecked(items[item.id])}
+                                  onChange={(e) => {
+                                    item.onChange(items[item.id], e.target.checked);
+                                  }}
+                                >
+                                  {items.name}
+                                </Checkbox>
+                              ))
+                            }
+                          </div>
+                        )}
+                      >
+                        <Button 
+                          style={{ 
+                            marginLeft: index === 0 ? 20 : 0, 
+                            color: '#3F51B5', 
+                          }}
+                        >
+                          {item.text}
+                          <Icon type="baseline-arrow_drop_down" />
+                        </Button>
+                      </Popover>
+                    ))
+                  }
+                  {
+                    this.state.optionsVisible ? (
+                      <AccumulationFilter
+                        visible={this.state.optionsVisible}
+                        getTimeType={this.getTimeType.bind(this)}
+                        getColumnData={this.getColumnData.bind(this)}
+                        getData={this.getData.bind(this)}
+                        onCancel={() => {
+                          this.getColumnData(this.getTimeType(AccumulationStore.getBoardList, 'boardId'));
+                          this.setState({
+                            optionsVisible: false,
+                          });
+                        }}
+                      />
+                    ) : ''
+                  }
+                </div>
+                <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
+                  <ReactEcharts
+                    option={this.state.options}
+                    style={{
+                      height: '600px',
+                    }}
+                    notMerge
+                    lazyUpdate
+                  />
+                </div>
+              </Spin>
             </Content>
           ) : (
             <div 

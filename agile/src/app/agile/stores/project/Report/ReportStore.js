@@ -38,7 +38,6 @@ class ReportStore {
       })
       .catch((error) => {
         this.setSprints([]);
-        window.console.error('some thing wrong, get sprints failed');
       });
   }
 
@@ -55,7 +54,6 @@ class ReportStore {
           this.loadCurrentTab();
         })
         .catch((error) => {
-          window.console.error('some thing wrong, get currentSprint failed');
         });
     } else {
       this.init();
@@ -126,7 +124,6 @@ class ReportStore {
         yAxis: _.map(newData, 'rest'),
       });
     }).catch((error) => {
-      window.console.error(error);
     });
   }
 

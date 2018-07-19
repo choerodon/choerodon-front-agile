@@ -94,7 +94,6 @@ class ScrumBoardHome extends Component {
         }
       }
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   refresh(boardId) {
@@ -153,17 +152,34 @@ class ScrumBoardHome extends Component {
           ScrumBoardStore.setCurrentSprint(data.currentSprint);
           ScrumBoardStore.setParentIds(storeParentIds);
           ScrumBoardStore.setEpicData(epicData);
-          ScrumBoardStore.setBoardData(data.columnsData.columns);
+          const newColumnData = data.columnsData.columns;
+          const statusList = [];
+          _.forEach(newColumnData, (item, index) => {
+            if (item.subStatuses) {
+              _.forEach(item.subStatuses, (item2, index2) => {
+                statusList.push({
+                  id: item2.id,
+                  name: item2.name,
+                });
+                if (item2.issues) {
+                  _.forEach(item2.issues, (item3, index3) => {
+                    newColumnData[index].subStatuses[index2].issues[index3].statusName = item2.name;
+                    newColumnData[index].subStatuses[index2].issues[index3].categoryCode = item2.categoryCode;
+                  });
+                }
+              });
+            }
+          });
+          ScrumBoardStore.setStatusList(statusList);
+          ScrumBoardStore.setBoardData(newColumnData);
           // this.storeIssueNumberCount(storeParentIds, )
           this.setState({
             spinIf: false,
           });
         });
       }).catch((error) => {
-        window.console.error(error);
       });
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   // storeIssueNumberCount(storeParentIds, columns) {
@@ -297,7 +313,13 @@ class ScrumBoardHome extends Component {
           message.info(data.message);
           ScrumBoardStore.setBoardData(originState);
         } else {
+          _.forEach(ScrumBoardStore.getStatusList, (item, index) => {
+            if (data.statusId === item.id) {
+              draggableData.statusName = item.name;
+            }
+          });
           draggableData.objectVersionNumber = data.objectVersionNumber;
+          draggableData.categoryCode = JSON.parse(result.destination.droppableId).categoryCode;
           _.forEach(newState, (item, index) => {
             if (String(item.columnId) === 
             String(JSON.parse(result.destination.droppableId).columnId)) {
@@ -341,7 +363,6 @@ class ScrumBoardHome extends Component {
         }
       }).catch((error) => {
         ScrumBoardStore.setBoardData(JSON.parse(JSON.stringify(originState)));
-        window.console.error(error);
       });
     }
   }
@@ -355,7 +376,6 @@ class ScrumBoardHome extends Component {
           });
           this.getBoard();
         }).catch((error) => {
-          window.console.error(error);
         });
       }
     });
@@ -390,7 +410,6 @@ class ScrumBoardHome extends Component {
             title: 'warnning',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
             onCancel() {
-              window.console.log('Cancel');
             },
           });
         }
@@ -401,7 +420,6 @@ class ScrumBoardHome extends Component {
         });
       }
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   filterQuick(item) {
@@ -629,11 +647,13 @@ class ScrumBoardHome extends Component {
           'agile-service.issue-status.deleteStatus',
           'agile-service.issue-status.updateStatus',
           'agile-service.issue.deleteIssue',
+          'agile-service.board.queryByProjectId',
+          'agile-service.board.queryByOptions',
         ]}
       >
         <Header title="活跃冲刺">
           <Button 
-            funcTyp="flat"
+            funcType="flat"
             onClick={() => {
               this.setState({
                 addBoard: true,
@@ -646,7 +666,7 @@ class ScrumBoardHome extends Component {
           <Select 
             className="leftBtn2 select-without-underline" 
             value={ScrumBoardStore.getSelectedBoard}
-            style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: 28 }}
+            style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: '28px' }}
             dropdownStyle={{
               color: '#3F51B5',
             }}
@@ -673,7 +693,7 @@ class ScrumBoardHome extends Component {
               ))
             }
           </Select>
-          <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>
+          <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -746,16 +766,16 @@ class ScrumBoardHome extends Component {
                   </div>
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
+                  <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint && ScrumBoardStore.getCurrentSprint.dayRemain >= 0 ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
                   <Button
-                    funcTyp="flat"
+                    funcType="flat"
                     onClick={this.handleFinishSprint.bind(this)}
                   >
                     <Icon type="power_settings_new icon" />
                     <span style={{ marginLeft: 0 }}>完成Sprint</span>
                   </Button>
                   <Button
-                    funcTyp="flat"
+                    funcType="flat"
                     onClick={() => {
                       const { history } = this.props;
                       const urlParams = AppState.currentMenuType;
@@ -855,7 +875,6 @@ class ScrumBoardHome extends Component {
                   updateParentStatus: null,
                 });
               }).catch((error) => {
-                window.console.error(error);
               });
             }}
           >

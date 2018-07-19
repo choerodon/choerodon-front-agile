@@ -62,10 +62,8 @@ class BacklogHome extends Component {
     const originData = JSON.parse(JSON.stringify(BacklogStore.getSprintData));
     const newData = JSON.parse(JSON.stringify(BacklogStore.getSprintData));
     if (String(endId).indexOf('epic') !== -1) {
-      window.console.log('epic');
       // 移动到epic
     } else if (String(endId).indexOf('version') !== -1) {
-      window.console.log('version');
       // 移到version
     } else {
       // 移动到sprint
@@ -108,7 +106,6 @@ class BacklogHome extends Component {
         spinIf: false,
       });
     }).catch((error2) => {
-      window.console.error(error2);
     });
   }
   dragToSprint(result, sourceId, endId, endIndex, originData, newData1) {
@@ -197,7 +194,6 @@ class BacklogHome extends Component {
         this.getSprint();
       }).catch((error) => {
         BacklogStore.setSprintData(originData);
-        window.console.error(error);
       });
     } else {
       // 如果不是多选
@@ -242,7 +238,6 @@ class BacklogHome extends Component {
               this.getSprint();
             }).catch((error) => {
               BacklogStore.setSprintData(originData);
-              window.console.error(error);
             });
           }
         });
@@ -273,7 +268,6 @@ class BacklogHome extends Component {
           this.getSprint();
         }).catch((error) => {
           BacklogStore.setSprintData(originData);
-          window.console.error(error);
         });
       }
     }
@@ -293,7 +287,6 @@ class BacklogHome extends Component {
         });
         BacklogStore.setVersionData(newVersion);
       }).catch((error) => {
-        window.console.error(error);
       });
       BacklogStore.axiosGetEpic().then((data3) => {
         const newEpic = [...data3];
@@ -302,10 +295,8 @@ class BacklogHome extends Component {
         });
         BacklogStore.setEpicData(newEpic);
       }).catch((error3) => {
-        window.console.error(error3);
       });
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   changeState(state, value) {
@@ -334,7 +325,6 @@ class BacklogHome extends Component {
         loading: false,
       });
       message.success('创建失败');
-      window.console.error(error);
     });
   }
 
@@ -343,7 +333,6 @@ class BacklogHome extends Component {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.error(error);
     });
   }
 
@@ -352,7 +341,6 @@ class BacklogHome extends Component {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.error(error);
     });
   }
 
@@ -378,6 +366,7 @@ class BacklogHome extends Component {
         service={[
           'agile-service.product-version.createVersion',
           'agile-service.issue.deleteIssue',
+          'agile-service.sprint.queryByProjectId',
         ]}
       >
         <Header title="待办事项">

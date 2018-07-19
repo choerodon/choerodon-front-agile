@@ -32,7 +32,6 @@ class CopyIssue extends Component {
           subTask: copySubIssue || false,
           summary: issueSummary || false,
         };
-        window.console.log(copyConditionDTO);
         this.setState({
           loading: true,
         });
@@ -71,7 +70,7 @@ class CopyIssue extends Component {
               <Input
                 label="概要"
                 prefix="CLONE - "
-                maxLength={30}
+                maxLength={44}
               />,
             )}
           </FormItem>
