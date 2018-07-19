@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Icon, DatePicker, Popover, Dropdown, Menu, Modal, Form, Select, Checkbox } from 'choerodon-ui';
+import { Button, Icon, DatePicker, Popover, Dropdown, Menu, Modal, Form, Select, Checkbox, Spin } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
@@ -34,6 +34,7 @@ class AccumulationHome extends Component {
       options2: {},
       optionsVisible: false,
       sprintData: {},
+      loading: false,
     };
   }
   componentWillMount() {
@@ -88,6 +89,9 @@ class AccumulationHome extends Component {
     });
   }
   getData() {
+    this.setState({
+      loading: true,
+    });
     const columnData = AccumulationStore.getColumnData;
     window.console.log(AccumulationStore.getEndDate);
     window.console.log(AccumulationStore.getStartDate);
@@ -113,8 +117,14 @@ class AccumulationHome extends Component {
       startDate,
     }).then((res) => {
       AccumulationStore.setAccumulationData(res);
+      this.setState({
+        loading: false,
+      });
       this.getOption();
     }).catch((error) => {
+      this.setState({
+        loading: false,
+      });
       window.console.log(error);
     });
   }
@@ -128,13 +138,15 @@ class AccumulationHome extends Component {
       });
     });
     const newxAxis = [];
-    _.forEach(data[0].coordinateDTOList, (item) => {
-      if (newxAxis.length === 0) {
-        newxAxis.push(item.date.split(' ')[0]);
-      } else if (newxAxis.indexOf(item.date.split(' ')[0]) === -1) {
-        newxAxis.push(item.date.split(' ')[0]);
-      }
-    });
+    if (data.length > 0) {
+      _.forEach(data[0].coordinateDTOList, (item) => {
+        if (newxAxis.length === 0) {
+          newxAxis.push(item.date.split(' ')[0]);
+        } else if (newxAxis.indexOf(item.date.split(' ')[0]) === -1) {
+          newxAxis.push(item.date.split(' ')[0]);
+        }
+      });
+    }
     window.console.log(legendData);
     window.console.log(newxAxis);
     const legendSeries = [];
@@ -192,15 +204,15 @@ class AccumulationHome extends Component {
           right: '3%',
           containLabel: true,
         },
-        toolbox: {
-          left: 'center',
-          feature: {
-            restore: {},
-            // dataZoom: {
-            //   yAxisIndex: 'none',
-            // },
-          },
-        },
+        // toolbox: {
+        //   left: 'left',
+        //   feature: {
+        //     restore: {},
+        //     // dataZoom: {
+        //     //   yAxisIndex: 'none',
+        //     // },
+        //   },
+        // },
         xAxis: [
           {
             name: '日期',
@@ -330,6 +342,7 @@ class AccumulationHome extends Component {
         </Menu.Item>
       </Menu>
     );
+    window.console.log(AccumulationStore.getAccumulationData);
     return (
       <Page>
         <Header
@@ -356,82 +369,84 @@ class AccumulationHome extends Component {
                 flexDirection: 'column',
               }}
             >
-              <div className="c7n-accumulation-filter">
-                <RangePicker
-                  value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
-                  allowClear={false}
-                  onChange={(date, dateString) => {
-                    AccumulationStore.setStartDate(moment(dateString[0]));
-                    AccumulationStore.setEndDate(moment(dateString[1]));
-                    this.getData();
-                  }}
-                />
-                {
-                  this.getFilterData().map((item, index) => (
-                    <Popover
-                      placement="bottom"
-                      trigger="click"
-                      content={(
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
+              <Spin spinning={this.state.loading}>
+                <div className="c7n-accumulation-filter">
+                  <RangePicker
+                    value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
+                    allowClear={false}
+                    onChange={(date, dateString) => {
+                      AccumulationStore.setStartDate(moment(dateString[0]));
+                      AccumulationStore.setEndDate(moment(dateString[1]));
+                      this.getData();
+                    }}
+                  />
+                  {
+                    this.getFilterData().map((item, index) => (
+                      <Popover
+                        placement="bottom"
+                        trigger="click"
+                        content={(
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                            }}
+                          >
+                            {
+                              item.data.map(items => (
+                                <Checkbox
+                                  checked={item.onChecked(items[item.id])}
+                                  onChange={(e) => {
+                                    item.onChange(items[item.id], e.target.checked);
+                                  }}
+                                >
+                                  {items.name}
+                                </Checkbox>
+                              ))
+                            }
+                          </div>
+                        )}
+                      >
+                        <Button 
+                          style={{ 
+                            marginLeft: index === 0 ? 20 : 0, 
+                            color: '#3F51B5', 
                           }}
                         >
-                          {
-                            item.data.map(items => (
-                              <Checkbox
-                                checked={item.onChecked(items[item.id])}
-                                onChange={(e) => {
-                                  item.onChange(items[item.id], e.target.checked);
-                                }}
-                              >
-                                {items.name}
-                              </Checkbox>
-                            ))
-                          }
-                        </div>
-                      )}
-                    >
-                      <Button 
-                        style={{ 
-                          marginLeft: index === 0 ? 20 : 0, 
-                          color: '#3F51B5', 
+                          {item.text}
+                          <Icon type="baseline-arrow_drop_down" />
+                        </Button>
+                      </Popover>
+                    ))
+                  }
+                  {
+                    this.state.optionsVisible ? (
+                      <AccumulationFilter
+                        visible={this.state.optionsVisible}
+                        getTimeType={this.getTimeType.bind(this)}
+                        getColumnData={this.getColumnData.bind(this)}
+                        getData={this.getData.bind(this)}
+                        onCancel={() => {
+                          this.getColumnData(this.getTimeType(AccumulationStore.getBoardList, 'boardId'));
+                          this.setState({
+                            optionsVisible: false,
+                          });
                         }}
-                      >
-                        {item.text}
-                        <Icon type="baseline-arrow_drop_down" />
-                      </Button>
-                    </Popover>
-                  ))
-                }
-                {
-                  this.state.optionsVisible ? (
-                    <AccumulationFilter
-                      visible={this.state.optionsVisible}
-                      getTimeType={this.getTimeType.bind(this)}
-                      getColumnData={this.getColumnData.bind(this)}
-                      getData={this.getData.bind(this)}
-                      onCancel={() => {
-                        this.getColumnData(this.getTimeType(AccumulationStore.getBoardList, 'boardId'));
-                        this.setState({
-                          optionsVisible: false,
-                        });
-                      }}
-                    />
-                  ) : ''
-                }
-              </div>
-              <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
-                <ReactEcharts
-                  option={this.state.options}
-                  style={{
-                    height: '600px',
-                  }}
-                  notMerge
-                  lazyUpdate
-                />
-              </div>
+                      />
+                    ) : ''
+                  }
+                </div>
+                <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
+                  <ReactEcharts
+                    option={this.state.options}
+                    style={{
+                      height: '600px',
+                    }}
+                    notMerge
+                    lazyUpdate
+                  />
+                </div>
+              </Spin>
             </Content>
           ) : (
             <div 

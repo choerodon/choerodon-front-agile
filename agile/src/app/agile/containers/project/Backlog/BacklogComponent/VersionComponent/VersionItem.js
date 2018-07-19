@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import moment from 'moment';
-import { stores } from 'choerodon-front-boot';
+import { stores, Permission } from 'choerodon-front-boot';
 import { Input, DatePicker, Icon, Dropdown, Menu } from 'choerodon-ui';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
@@ -114,6 +114,8 @@ class VersionItem extends Component {
   render() {
     const item = this.props.data;
     const index = this.props.index;
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <div 
         className={BacklogStore.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
@@ -171,21 +173,23 @@ class VersionItem extends Component {
             >
               <div className="c7n-backlog-versionItemTitleName">
                 <p>{item.name}</p>
-                <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
-                  <Icon
-                    style={{
-                      width: 12,
-                      height: 12,
-                      background: '#f5f5f5',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      border: '1px solid #ccc',
-                      borderRadius: 2,
-                    }}
-                    type="arrow_drop_down"
-                  />
-                </Dropdown>
+                <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
+                  <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
+                    <Icon
+                      style={{
+                        width: 12,
+                        height: 12,
+                        background: '#f5f5f5',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        border: '1px solid #ccc',
+                        borderRadius: 2,
+                      }}
+                      type="arrow_drop_down"
+                    />
+                  </Dropdown>
+                </Permission>
               </div>
             </EasyEdit>
             <div className="c7n-backlog-versionItemProgress">

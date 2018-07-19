@@ -153,7 +153,20 @@ class ScrumBoardHome extends Component {
           ScrumBoardStore.setCurrentSprint(data.currentSprint);
           ScrumBoardStore.setParentIds(storeParentIds);
           ScrumBoardStore.setEpicData(epicData);
-          ScrumBoardStore.setBoardData(data.columnsData.columns);
+          const newColumnData = data.columnsData.columns;
+          _.forEach(newColumnData, (item, index) => {
+            if (item.subStatuses) {
+              _.forEach(item.subStatuses, (item2, index2) => {
+                if (item2.issues) {
+                  _.forEach(item2.issues, (item3, index3) => {
+                    newColumnData[index].subStatuses[index2].issues[index3].statusName = item2.name;
+                    newColumnData[index].subStatuses[index2].issues[index3].categoryCode = item2.categoryCode;
+                  });
+                }
+              });
+            }
+          });
+          ScrumBoardStore.setBoardData(newColumnData);
           // this.storeIssueNumberCount(storeParentIds, )
           this.setState({
             spinIf: false,
@@ -648,7 +661,7 @@ class ScrumBoardHome extends Component {
           <Select 
             className="leftBtn2 select-without-underline" 
             value={ScrumBoardStore.getSelectedBoard}
-            style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: 28 }}
+            style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: '28px' }}
             dropdownStyle={{
               color: '#3F51B5',
             }}
@@ -748,7 +761,7 @@ class ScrumBoardHome extends Component {
                   </div>
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
+                  <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint && ScrumBoardStore.getCurrentSprint.dayRemain >= 0 ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
                   <Button
                     funcTyp="flat"
                     onClick={this.handleFinishSprint.bind(this)}

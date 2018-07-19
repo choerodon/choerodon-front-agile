@@ -32,7 +32,8 @@ class StatusBodyColumn extends Component {
   //   }
   // }
   renderIssues(issues, droppableId, statusName, categoryCode) {
-    const data = issues;
+    let data = issues;
+    data = _.sortBy(data, o => o.issueId);
     const result = [];
     const parentIds = [];
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
@@ -223,7 +224,21 @@ class StatusBodyColumn extends Component {
         // 如果当前列的状态包含拖动卡片的状态列
         if (item.id !== dropCode) {
           // 并且当前状态列的id不等于拖动时的状态列id
-          flag = 1;
+          if (this.props.source) {
+            if (String(JSON.parse(data.source.droppableId).parentId) === String(this.props.source)) {
+              flag = 1;
+            }
+          } else if (this.props.assigneeId) {
+            if (String(JSON.parse(data.source.droppableId).assigneeId) === String(this.props.assigneeId)) {
+              flag = 1;
+            }
+          } else if (this.props.epicId) {
+            if (String(JSON.parse(data.source.droppableId).epicId) === String(this.props.epicId)) {
+              flag = 1;
+            }
+          } else if (!JSON.parse(data.source.droppableId).hasOwnProperty('parentId') && !JSON.parse(data.source.droppableId).hasOwnProperty('assigneeId') && !JSON.parse(data.source.droppableId).hasOwnProperty('epicId')) {
+            flag = 1;
+          }
         }
       }
       if (flag === 1) {
@@ -368,8 +383,19 @@ class StatusBodyColumn extends Component {
     if (JSON.stringify(dragStartData) !== '{}') {
       let flag = 0;
       if (data.length > 1) {
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
-        String(this.props.source)) {
+        if (this.props.source) {
+          if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === String(this.props.source)) {
+            flag = 1;
+          }
+        } else if (this.props.assigneeId) {
+          if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) === String(this.props.assigneeId)) {
+            flag = 1;
+          }
+        } else if (this.props.epicId) {
+          if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId) === String(this.props.epicId)) {
+            flag = 1;
+          }
+        } else if (!JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).hasOwnProperty('parentId') && !JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).hasOwnProperty('assigneeId') && !JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).hasOwnProperty('epicId')) {
           flag = 1;
         }
       }

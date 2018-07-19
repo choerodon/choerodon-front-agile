@@ -73,6 +73,9 @@ class BurndownChartHome extends Component {
                 index = i;
               }
             });
+            if (newData[index].type.indexOf(item.type) === -1) {
+              newData[index].type += `-${item.type}`;
+            }
             newData[index].issues = [...newData[index].issues, {
               issueId: item.issueId,
               issueNum: item.issueNum,
@@ -99,6 +102,7 @@ class BurndownChartHome extends Component {
           newData[index].rest = rest;
         });
         BurndownChartStore.setBurndownList(newData);
+        window.console.log(newData);
         if (moment(this.state.endDate).isAfter(_.map(newData, 'date')[_.map(newData, 'date').length - 1])) {
           this.setState({
             xAxis: [..._.map(newData, 'date'), '2018-07-19 00:00:05'],
@@ -261,7 +265,7 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
-  renderTypeText(text) {
+  judgeText(text) {
     let result = '';
     if (text === 'startSprint') {
       result = '开启冲刺';
@@ -297,6 +301,18 @@ class BurndownChartHome extends Component {
       }
     }
     return result;
+  }
+  renderTypeText(text) {
+    const splitArray = text.split('-');
+    return (
+      <div>
+        {
+          splitArray.map(item => (
+            <p>{this.judgeText(item)}</p>
+          ))
+        }
+      </div>
+    );
   }
 
   render() {

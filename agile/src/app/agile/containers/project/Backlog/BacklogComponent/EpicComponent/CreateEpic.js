@@ -113,7 +113,7 @@ class CreateEpic extends Component {
                   message: '史诗名称不能为空',
                 }],
               })(
-                <Input label="史诗名称" maxLength={30} />,
+                <Input label="史诗名称" maxLength={44} />,
               )}
             </FormItem>
             <FormItem>
