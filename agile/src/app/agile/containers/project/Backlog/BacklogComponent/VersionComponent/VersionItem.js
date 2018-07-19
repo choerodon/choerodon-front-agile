@@ -68,7 +68,6 @@ class VersionItem extends Component {
       this.setState({
         editDescription: false,
       });
-      window.console.error(error);
     });
   }
   handleBlurName(value) {
@@ -90,7 +89,6 @@ class VersionItem extends Component {
       this.setState({
         editName: false,
       });
-      window.console.error(error);
     });
   }
   updateDate(type, date2) {
@@ -107,7 +105,6 @@ class VersionItem extends Component {
       originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
       BacklogStore.setVersionData(originData);
     }).catch((error) => {
-      window.console.error(error);
     });
   }
 
@@ -142,7 +139,6 @@ class VersionItem extends Component {
               this.props.issueRefresh();
               this.props.refresh();
             }).catch((error) => {
-              window.console.error(error);
               this.props.issueRefresh();
               this.props.refresh();
             });

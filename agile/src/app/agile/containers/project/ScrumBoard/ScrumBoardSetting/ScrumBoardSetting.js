@@ -56,17 +56,14 @@ class ScrumBoardSetting extends Component {
             loading: false,
           });
         }).catch((error2) => {
-          window.console.error(error2);
         });
       }).catch((error) => {
-        window.console.error(error);
       });
       ScrumBoardStore.axiosGetLookupValue('constraint').then((res) => {
         const oldLookup = ScrumBoardStore.getLookupValue;
         oldLookup.constraint = res.lookupValues;
         ScrumBoardStore.setLookupValue(oldLookup);
       }).catch((error) => {
-        window.console.error(error);
       });
     }
   }
@@ -89,11 +86,9 @@ class ScrumBoardSetting extends Component {
         ScrumBoardStore.axiosDeleteBoard().then((res) => {
           history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
         }).catch((error) => {
-          window.console.error(error);
         });
       },
       onCancel() {
-        window.console.log('Cancel');
       },
     });
   }
@@ -106,12 +101,12 @@ class ScrumBoardSetting extends Component {
       <Page>
         <Header title="配置看板" backPath={`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}>
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.board.deleteScrumBoard']}>
-            <Button funcTyp="flat" onClick={this.handleDeleteBoard.bind(this)} disabled={ScrumBoardStore.getBoardList.length === 1}>
+            <Button funcType="flat" onClick={this.handleDeleteBoard.bind(this)} disabled={ScrumBoardStore.getBoardList.length === 1}>
               <Icon type="delete_forever icon" />
               <span>删除看板</span>
             </Button>
           </Permission>
-          <Button funcTyp="flat" onClick={this.refresh.bind(this)}>
+          <Button funcType="flat" onClick={this.refresh.bind(this)}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>

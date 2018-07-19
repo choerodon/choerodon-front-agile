@@ -328,7 +328,7 @@ class CreateIssue extends Component {
               <div style={{ display: 'flex', marginBottom: 13, alignItems: 'center' }}>
                 <div style={{ fontWeight: 'bold' }}>描述</div>
                 <div style={{ marginLeft: 80 }}>
-                  <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
+                  <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
                     <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: 12 }} />
                     <span style={{ color: '#3f51b5' }}>全屏编辑</span>
                   </Button>
@@ -463,7 +463,7 @@ class CreateIssue extends Component {
                     this.setState({
                       selectLoading: true,
                     });
-                    loadVersions(['version_planning']).then((res) => {
+                    loadVersions(['version_planning', 'released']).then((res) => {
                       this.setState({
                         originFixVersions: res,
                         selectLoading: false,

@@ -43,7 +43,6 @@ class Commits extends Component {
         win.location.href = url;
       })
       .catch((error) => {
-        window.console.error('get gitlab url failed');
       });
   }
 
@@ -170,9 +169,8 @@ class Commits extends Component {
             paddingRight: 0,
             paddingTop: 0,
           }}
-          title="查看的提交"
+          title="查看提交"
           description="采用Git flow工作流模式，自动创建分支模式所特有的流水线，持续交付过程中对feature、release、hotfix等分支进行管理。"
-          link="#"
         >
           <Table
             filterBar={false}

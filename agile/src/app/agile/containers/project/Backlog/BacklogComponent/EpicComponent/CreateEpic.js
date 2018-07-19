@@ -43,7 +43,6 @@ class CreateEpic extends Component {
           this.setState({
             loading: false,
           });
-          window.console.error(error);
         });
       } else {
         this.setState({

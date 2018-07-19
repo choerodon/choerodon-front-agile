@@ -33,7 +33,6 @@ class EditStatus extends Component {
           this.props.onChangeVisible(false);
           this.props.refresh();
         }).catch((error) => {
-          window.console.error(error);
         });
       }
     });
@@ -50,7 +49,6 @@ class EditStatus extends Component {
         callback();
       }
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   renderOptions() {

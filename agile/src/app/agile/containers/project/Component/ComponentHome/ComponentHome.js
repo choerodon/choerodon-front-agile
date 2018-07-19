@@ -67,7 +67,6 @@ class ComponentHome extends Component {
         });
       })
       .catch((error) => {
-        window.console.warn('load components failed, check your organization and project are correct, or please try again later');
       });
   }
 
@@ -183,12 +182,12 @@ class ComponentHome extends Component {
       >
         <Header title="模块管理">
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-component.createComponent']}>
-            <Button funcTyp="flat" onClick={() => this.setState({ createComponentShow: true })}>
+            <Button funcType="flat" onClick={() => this.setState({ createComponentShow: true })}>
               <Icon type="playlist_add icon" />
               <span>创建模块</span>
             </Button>
           </Permission>
-          <Button funcTyp="flat" onClick={() => this.loadComponents()}>
+          <Button funcType="flat" onClick={() => this.loadComponents()}>
             <Icon type="autorenew icon" />
             <span>刷新</span>
           </Button>

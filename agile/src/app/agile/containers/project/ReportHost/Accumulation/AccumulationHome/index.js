@@ -58,11 +58,9 @@ class AccumulationHome extends Component {
         AccumulationStore.setBoardList(newData2);
         this.getColumnData(res[newIndex].boardId, true);
       }).catch((error) => {
-        window.console.log(error);
       });
       // this.getData();
     }).catch((error) => {
-      window.console.log(error);
     });
   }
   getColumnData(id, type) {
@@ -82,10 +80,8 @@ class AccumulationHome extends Component {
           this.getData();
         }
       }).catch((error) => {
-        window.console.log(error);
       });
     }).catch((error) => {
-      window.console.log(error);
     });
   }
   getData() {
@@ -93,8 +89,6 @@ class AccumulationHome extends Component {
       loading: true,
     });
     const columnData = AccumulationStore.getColumnData;
-    window.console.log(AccumulationStore.getEndDate);
-    window.console.log(AccumulationStore.getStartDate);
     const endDate = AccumulationStore.getEndDate.format('YYYY-MM-DD HH:mm:ss');
     const filterList = AccumulationStore.getFilterList;
     const startDate = AccumulationStore.getStartDate.format('YYYY-MM-DD HH:mm:ss');
@@ -183,7 +177,6 @@ class AccumulationHome extends Component {
         legendSeries[index].data.push(max);
       });
     });
-    window.console.log(legendSeries);
     this.setState({
       options: {
         tooltip: {
@@ -324,7 +317,6 @@ class AccumulationHome extends Component {
     }];
   }
   // handleOnBrushSelected(params) {
-  //   window.console.log(params);
   // }
   render() {
     const { history } = this.props;
@@ -349,11 +341,11 @@ class AccumulationHome extends Component {
           title="累积流量图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
-          <Button funcTyp="flat" onClick={() => { this.getData(); }}>
+          <Button funcType="flat" onClick={() => { this.getData(); }}>
             <Icon type="refresh" />刷新
           </Button>
           <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcTyp="flat">
+            <Button icon="arrow_drop_down" funcType="flat">
               切换报表
             </Button>
           </Dropdown>

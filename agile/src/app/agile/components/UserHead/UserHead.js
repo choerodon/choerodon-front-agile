@@ -12,6 +12,13 @@ class UserHead extends Component {
   componentDidMount() {
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.user.id === this.props.user.id) {
+      return false;
+    }
+    return true;
+  }
+
   getFirst(str) {
     if (!str) {
       return '';

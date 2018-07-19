@@ -841,6 +841,7 @@ class CreateSprint extends Component {
         {
           this.state.issueCommentDTOList.map(comment => (
             <Comment
+              key={comment.commentId}
               comment={comment}
               onDeleteComment={() => this.reloadIssue()}
               onUpdateComment={() => this.reloadIssue()}
@@ -860,6 +861,7 @@ class CreateSprint extends Component {
         {
           this.state.worklogs.map(worklog => (
             <Log
+              key={worklog.logId}
               worklog={worklog}
               onDeleteLog={() => this.reloadIssue()}
               onUpdateLog={() => this.reloadIssue()}
@@ -879,19 +881,6 @@ class CreateSprint extends Component {
         datalogs={this.state.datalogs}
       />
     );
-    // return (
-    //   <div>
-    //     {
-    //       this.state.datalogs.map((datalog, i) => (
-    //         <DataLog
-    //           i={i}
-    //           datalog={datalog}
-    //           origin={this.state.datalogs}
-    //         />
-    //       ))
-    //     }
-    //   </div>
-    // );
   }
 
   /**
@@ -913,7 +902,7 @@ class CreateSprint extends Component {
       <div className="c7n-tasks">
         {
           _.map(group, (v, k) => (
-            <div>
+            <div key={k}>
               <div style={{ margin: '7px auto' }}>{k}</div>
               {
                 _.map(v, (linkIssue, i) => this.renderLinkList(linkIssue, i))
@@ -933,6 +922,7 @@ class CreateSprint extends Component {
   renderIssueList(issue, i) {
     return (
       <IssueList
+        key={issue.issueId}
         issue={{
           ...issue,
           typeCode: issue.typeCode || 'sub_task',
@@ -951,6 +941,7 @@ class CreateSprint extends Component {
   renderLinkList(link, i) {
     return (
       <LinkList
+        key={link.linkId}
         issue={{
           ...link,
           typeCode: link.typeCode,
@@ -1980,7 +1971,8 @@ class CreateSprint extends Component {
                                     <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                                       {
                                         this.transToArr(this.state.labelIssueRelDTOList, 'labelName', 'array').map(label => (
-                                          <div 
+                                          <div
+                                            key={label}
                                             style={{
                                               color: '#000',
                                               borderRadius: '100px',
@@ -2608,7 +2600,7 @@ class CreateSprint extends Component {
                       </div>
                       <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                       <div className="c7n-title-right" style={{ marginLeft: '14px', position: 'relative' }}>
-                        <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ edit: true })}>
+                        <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })}>
                           <Icon type="zoom_out_map icon" style={{ marginRight: 2 }} />
                           <span>全屏编辑</span>
                         </Button>
@@ -2657,7 +2649,7 @@ class CreateSprint extends Component {
                     </div>
                     <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                      <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ addCommit: true })}>
+                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ addCommit: true })}>
                         <Icon type="playlist_add icon" />
                         <span>添加评论</span>
                       </Button>
@@ -2674,7 +2666,7 @@ class CreateSprint extends Component {
                     </div>
                     <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                      <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ dailyLogShow: true })}>
+                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ dailyLogShow: true })}>
                         <Icon type="playlist_add icon" />
                         <span>登记工作</span>
                       </Button>
@@ -2704,7 +2696,7 @@ class CreateSprint extends Component {
                         </div>
                         <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                          <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createSubTaskShow: true })}>
+                          <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createSubTaskShow: true })}>
                             <Icon type="playlist_add icon" />
                             <span>创建子任务</span>
                           </Button>
@@ -2725,7 +2717,7 @@ class CreateSprint extends Component {
                         </div>
                         <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                          <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
+                          <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
                             <Icon type="playlist_add icon" />
                             <span>创建相关任务</span>
                           </Button>
@@ -2744,7 +2736,7 @@ class CreateSprint extends Component {
                     </div>
                     <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                      <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createBranchShow: true })}>
+                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createBranchShow: true })}>
                         <Icon type="playlist_add icon" />
                         <span>创建分支</span>
                       </Button>
@@ -2850,6 +2842,8 @@ class CreateSprint extends Component {
           this.state.createBranchShow ? (
             <CreateBranch
               issueId={this.state.origin.issueId}
+              typeCode={this.state.origin.typeCode}
+              issueNum={this.state.origin.issueNum}
               onOk={() => {
                 this.setState({ createBranchShow: false });
                 this.reloadIssue();

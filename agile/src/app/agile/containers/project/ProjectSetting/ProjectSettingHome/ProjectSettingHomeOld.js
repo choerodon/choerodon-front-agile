@@ -101,7 +101,7 @@ class ProjectSetting extends Component {
     return (
       <Page>
         <Header title="项目设置">
-          <Button funcTyp="flat" onClick={() => this.getProjectCode()}>
+          <Button funcType="flat" onClick={() => this.getProjectCode()}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>

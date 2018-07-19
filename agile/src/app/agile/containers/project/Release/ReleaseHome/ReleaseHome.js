@@ -64,7 +64,6 @@ class ReleaseHome extends Component {
         },
       });
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   handleClickMenu(record, e) {
@@ -77,14 +76,12 @@ class ReleaseHome extends Component {
             ReleaseStore.setVersionDetail(record);
             this.setState({ publicVersion: true }); 
           }).catch((error) => {
-            window.console.error(error);
           });
       } else {
         ReleaseStore.axiosUnPublicRelease(
           record.versionId).then((res2) => {
           this.refresh(this.state.pagination);
         }).catch((error) => {
-          window.console.error(error);
         });
       }
     }
@@ -105,7 +102,6 @@ class ReleaseHome extends Component {
             });
           }
         }).catch((error) => {
-          window.console.error(error);
         });
       } else {
         this.setState({
@@ -121,7 +117,6 @@ class ReleaseHome extends Component {
           editRelease: true,
         });
       }).catch((error) => {
-        window.console.error(error);
       });
     }
     if (e.key.indexOf('1') !== -1) {
@@ -130,14 +125,12 @@ class ReleaseHome extends Component {
         ReleaseStore.axiosUnFileVersion(record.versionId).then((res) => {
           this.refresh(this.state.pagination);
         }).catch((error) => {
-          window.console.error(error);
         });
       } else {
         // 归档
         ReleaseStore.axiosFileVersion(record.versionId).then((res) => {
           this.refresh(this.state.pagination);
         }).catch((error) => {
-          window.console.error(error);
         });
       }
     }
@@ -155,7 +148,6 @@ class ReleaseHome extends Component {
         sourceList: res,
       });
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   render() {
@@ -261,7 +253,7 @@ class ReleaseHome extends Component {
                 });
               }}
               className="leftBtn"
-              funcTyp="flat"
+              funcType="flat"
             >
               <Icon type="playlist_add" />创建发布版本
             </Button>
@@ -269,13 +261,13 @@ class ReleaseHome extends Component {
           <Permission service={['agile-service.product-version.mergeVersion']} type={type} projectId={projectId} organizationId={orgId}>
             <Button 
               className="leftBtn2" 
-              funcTyp="flat"
+              funcType="flat"
               onClick={this.handleCombineRelease.bind(this)}
             >
               <Icon type="device_hub" />版本合并
             </Button>
           </Permission>
-          <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this, this.state.pagination)}>
+          <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, this.state.pagination)}>
             <Icon type="refresh" />刷新
           </Button>
         </Header>
@@ -340,7 +332,6 @@ class ReleaseHome extends Component {
                   versionDelete: {},
                 });
               }).catch((error) => {
-                window.console.error(error);
               });
             }}
             onCancel={() => {

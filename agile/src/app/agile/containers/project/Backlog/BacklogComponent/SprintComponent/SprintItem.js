@@ -88,7 +88,6 @@ class SprintItem extends Component {
     BacklogStore.axiosUpdateSprint(data).then((res) => {
       this.props.refresh();
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   handleBlurCreateIssue() {
@@ -125,7 +124,6 @@ class SprintItem extends Component {
         this.setState({
           loading: false,
         });
-        window.console.error(error);
       });
     }
   }
@@ -142,7 +140,6 @@ class SprintItem extends Component {
       });
       this.props.refresh();
     }).catch((error) => {
-      window.console.error(error);
     });
   }
 
@@ -159,7 +156,6 @@ class SprintItem extends Component {
       });
       this.props.refresh();
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   handleFinishSprint() {
@@ -178,7 +174,6 @@ class SprintItem extends Component {
             title: 'warnning',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
             onCancel() {
-              window.console.log('Cancel');
             },
           });
         }
@@ -189,7 +184,6 @@ class SprintItem extends Component {
         });
       }
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   handleStartSprint() {
@@ -202,7 +196,6 @@ class SprintItem extends Component {
             startSprintVisible: true,
           });
         }).catch((error) => {
-          window.console.error(error);
         });
       }
     }
@@ -212,7 +205,6 @@ class SprintItem extends Component {
       BacklogStore.axiosDeleteSprint(this.props.item.sprintId).then((res) => {
         this.props.refresh();
       }).catch((error) => {
-        window.console.error(error);
       });
     }
   }
@@ -226,7 +218,6 @@ class SprintItem extends Component {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   renderIssueOrIntro(issues, sprintId) {

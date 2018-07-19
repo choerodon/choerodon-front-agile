@@ -263,19 +263,19 @@ class ReleaseDetail extends Component {
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <Button 
-            funcTyp="flat" 
+            funcType="flat" 
             onClick={() => ReportStore.changeCurrentSprint(ReportStore.currentSprint.sprintId)}
           >
             <Icon type="autorenew icon" />
             <span>刷新</span>
           </Button>
           <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcTyp="flat">
+            <Button icon="arrow_drop_down" funcType="flat">
               切换报表
             </Button>
           </Dropdown>
           {/* <Button 
-            funcTyp="flat" 
+            funcType="flat" 
             onClick={() => {
               this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题`);
             }}

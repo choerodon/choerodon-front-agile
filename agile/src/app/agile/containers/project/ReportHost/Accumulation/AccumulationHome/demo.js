@@ -50,16 +50,13 @@ class AccumulationHome extends Component {
         AccumulationStore.setBoardList(newData2);
         this.getColumnData(res[0].boardId, true);
       }).catch((error) => {
-        window.console.log(error);
       });
       // this.getData();
     }).catch((error) => {
-      window.console.log(error);
     });
   }
   getColumnData(id, type) {
     ScrumBoardStore.axiosGetBoardData(id, 0, false, []).then((res2) => {
-      window.console.log(res2);
       const data2 = res2.columnsData.columns;
       _.forEach(data2, (item, index) => {
         data2[index].check = true;
@@ -69,7 +66,6 @@ class AccumulationHome extends Component {
         this.getData();
       }
     }).catch((error) => {
-      window.console.log(error);
     });
   }
   getData() {
@@ -95,11 +91,9 @@ class AccumulationHome extends Component {
       quickFilterIds,
       startDate,
     }).then((res) => {
-      window.console.log(res);
       AccumulationStore.setAccumulationData(res);
       this.getOption();
     }).catch((error) => {
-      window.console.log(error);
     });
   }
   getOption() {
@@ -138,12 +132,6 @@ class AccumulationHome extends Component {
         legendSeries[index].data.push(num);
       });
     });
-    window.console.log('维度----------------------');
-    window.console.log(legendData);
-    window.console.log('x轴-----------------------');
-    window.console.log(newxAxis);
-    window.console.log('series数据-------------------');
-    window.console.log(legendSeries);
     this.setState({
       options: {
         tooltip: {
@@ -247,7 +235,6 @@ class AccumulationHome extends Component {
     }
   }
   handleOnBrushSelected(params) {
-    window.console.log(params);
   }
   render() {
     const { history } = this.props;
@@ -271,11 +258,11 @@ class AccumulationHome extends Component {
           title="累积流量图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
-          <Button funcTyp="flat" onClick={() => { this.getData(); }}>
+          <Button funcType="flat" onClick={() => { this.getData(); }}>
             <Icon type="refresh" />刷新
           </Button>
           <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcTyp="flat">
+            <Button icon="arrow_drop_down" funcType="flat">
               切换报表
             </Button>
           </Dropdown>

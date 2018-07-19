@@ -48,7 +48,6 @@ class VersionReport extends Component {
         this.getReportData(this.state.type);
       });
     }).catch((error) => {
-      window.console.log(error);
     });
   }
   getReportData(type) {
@@ -174,10 +173,6 @@ class VersionReport extends Component {
         }
       }
     }
-    window.console.log(xAxis);
-    window.console.log(total);
-    window.console.log(complete);
-    window.console.log(percent);
     let markAreaLengh = 0;
     if (xAxis.length >= 2) {
       markAreaLengh = parseInt(xAxis.length / 2, 10);
@@ -194,7 +189,6 @@ class VersionReport extends Component {
         xAxis: (2 * a) + 1,
       }]);
     }
-    window.console.log(markAreaData);
     const options = {
       tooltip: {
         trigger: 'axis',
@@ -254,7 +248,6 @@ class VersionReport extends Component {
         boundaryGap: false,
         axisLabel: {
           formatter(value, index) {
-            window.console.log(value);
             return `${value.split('-')[1]}/${value.split('-')[2]}`;
           },
         },
@@ -324,7 +317,6 @@ class VersionReport extends Component {
           pageSize: res2.size,
         });
       }).catch((error2) => {
-        window.console.log(error2);
       });
     });
   }
@@ -618,13 +610,13 @@ class VersionReport extends Component {
             <Icon type="refresh" />刷新
           </Button>
           <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcTyp="flat">
+            <Button icon="arrow_drop_down" funcType="flat">
               切换报表
             </Button>
           </Dropdown>
         </Header>
         <Content
-          title={`迭代冲刺“${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}”的版本报告`}
+          title={`迭代冲刺“${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}”的版本报告`}
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
           link="#"
         >

@@ -40,7 +40,6 @@ class DeleteComponent extends Component {
         this.setState({
           loading: false,
         });
-        window.console.error('something wrong when delete filter, please refresh and try again');
       });
   }
 

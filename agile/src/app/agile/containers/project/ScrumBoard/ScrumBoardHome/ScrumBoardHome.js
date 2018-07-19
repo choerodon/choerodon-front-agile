@@ -94,7 +94,6 @@ class ScrumBoardHome extends Component {
         }
       }
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   refresh(boardId) {
@@ -173,10 +172,8 @@ class ScrumBoardHome extends Component {
           });
         });
       }).catch((error) => {
-        window.console.error(error);
       });
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   // storeIssueNumberCount(storeParentIds, columns) {
@@ -354,7 +351,6 @@ class ScrumBoardHome extends Component {
         }
       }).catch((error) => {
         ScrumBoardStore.setBoardData(JSON.parse(JSON.stringify(originState)));
-        window.console.error(error);
       });
     }
   }
@@ -368,7 +364,6 @@ class ScrumBoardHome extends Component {
           });
           this.getBoard();
         }).catch((error) => {
-          window.console.error(error);
         });
       }
     });
@@ -403,7 +398,6 @@ class ScrumBoardHome extends Component {
             title: 'warnning',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
             onCancel() {
-              window.console.log('Cancel');
             },
           });
         }
@@ -414,7 +408,6 @@ class ScrumBoardHome extends Component {
         });
       }
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   filterQuick(item) {
@@ -648,7 +641,7 @@ class ScrumBoardHome extends Component {
       >
         <Header title="活跃冲刺">
           <Button 
-            funcTyp="flat"
+            funcType="flat"
             onClick={() => {
               this.setState({
                 addBoard: true,
@@ -688,7 +681,7 @@ class ScrumBoardHome extends Component {
               ))
             }
           </Select>
-          <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>
+          <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -763,14 +756,14 @@ class ScrumBoardHome extends Component {
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
                   <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint && ScrumBoardStore.getCurrentSprint.dayRemain >= 0 ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
                   <Button
-                    funcTyp="flat"
+                    funcType="flat"
                     onClick={this.handleFinishSprint.bind(this)}
                   >
                     <Icon type="power_settings_new icon" />
                     <span style={{ marginLeft: 0 }}>完成Sprint</span>
                   </Button>
                   <Button
-                    funcTyp="flat"
+                    funcType="flat"
                     onClick={() => {
                       const { history } = this.props;
                       const urlParams = AppState.currentMenuType;
@@ -870,7 +863,6 @@ class ScrumBoardHome extends Component {
                   updateParentStatus: null,
                 });
               }).catch((error) => {
-                window.console.error(error);
               });
             }}
           >

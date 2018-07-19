@@ -53,7 +53,6 @@ class EditRelease extends Component {
           this.setState({
             loading: false,
           });
-          window.console.error(error);
         });
       }
     });

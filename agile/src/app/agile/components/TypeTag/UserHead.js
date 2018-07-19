@@ -36,6 +36,13 @@ class UserHead extends Component {
   componentDidMount() {
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.type.typeCode === this.props.type.typeCode) {
+      return false;
+    }
+    return true;
+  }
+
   render() {
     const { type } = this.props; 
     return (

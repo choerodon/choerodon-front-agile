@@ -42,7 +42,6 @@ class MergeRequest extends Component {
         window.open(url, '_blank');
       })
       .catch((error) => {
-        window.console.error('get gitlab url failed');
       });
   }
 
@@ -146,9 +145,8 @@ class MergeRequest extends Component {
             paddingRight: 0,
             paddingTop: 0,
           }}
-          title="查看的提交"
+          title="查看合并请求"
           description="采用Git flow工作流模式，自动创建分支模式所特有的流水线，持续交付过程中对feature、release、hotfix等分支进行管理。"
-          link="#"
         >
           <Table
             filterBar={false}
