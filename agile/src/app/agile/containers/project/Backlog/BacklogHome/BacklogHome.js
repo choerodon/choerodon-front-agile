@@ -378,6 +378,7 @@ class BacklogHome extends Component {
         service={[
           'agile-service.product-version.createVersion',
           'agile-service.issue.deleteIssue',
+          'agile-service.sprint.queryByProjectId',
         ]}
       >
         <Header title="待办事项">

@@ -178,6 +178,7 @@ class ComponentHome extends Component {
           'agile-service.issue-component.updateComponent',
           'agile-service.issue-component.deleteComponent',
           'agile-service.issue-component.createComponent',
+          'agile-service.issue-component.listByProjectId',
         ]}
       >
         <Header title="模块管理">

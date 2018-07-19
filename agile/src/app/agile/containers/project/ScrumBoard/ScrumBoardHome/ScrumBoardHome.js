@@ -629,6 +629,8 @@ class ScrumBoardHome extends Component {
           'agile-service.issue-status.deleteStatus',
           'agile-service.issue-status.updateStatus',
           'agile-service.issue.deleteIssue',
+          'agile-service.board.queryByProjectId',
+          'agile-service.board.queryByOptions',
         ]}
       >
         <Header title="活跃冲刺">
