@@ -34,7 +34,6 @@ class EpicItem extends Component {
                   BacklogStore.axiosUpdateIssue(data).then((res) => {
                     this.props.refresh();
                   }).catch((error) => {
-                    window.console.error(error);
                   });
                 }}
               />
@@ -74,7 +73,6 @@ class EpicItem extends Component {
       originEpic[this.props.index].objectVersionNumber = res.objectVersionNumber;
       BacklogStore.setEpicData(originEpic);
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   render() {
@@ -97,7 +95,6 @@ class EpicItem extends Component {
               this.props.issueRefresh();
               this.props.refresh();
             }).catch((error) => {
-              window.console.error(error);
               this.props.issueRefresh();
               this.props.refresh();
             });
@@ -123,6 +120,7 @@ class EpicItem extends Component {
                   onPressEnter={this.handleSave.bind(this)}
                   onClick={e => e.stopPropagation()}
                   onBlur={this.handleSave.bind(this)}
+                  maxLength={44}
                 />
               ) : (
                 <p>{item.epicName}</p>

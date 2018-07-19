@@ -50,11 +50,9 @@ class AddColumn extends Component {
                   that.props.onChangeVisible(false);
                   that.props.refresh();
                 }).catch((error) => {
-                  window.console.error(error);
                 });
               },
               onCancel() {
-                window.console.log('cancel');
               },
             });
           } else {
@@ -75,14 +73,12 @@ class AddColumn extends Component {
                 loading: false,
               });
             }).catch((error) => {
-              window.console.error(error);
               this.setState({
                 loading: false,
               });
             });
           }
         }).catch((error) => {
-          window.console.error(error);
           this.setState({
             loading: false,
           });

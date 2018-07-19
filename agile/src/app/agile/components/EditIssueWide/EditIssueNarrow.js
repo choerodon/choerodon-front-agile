@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { stores, axios, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon } from 'choerodon-ui';
+import TimeAgo from 'timeago-react';
+import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon, Popover } from 'choerodon-ui';
 import { STATUS, COLOR, TYPE, ICON, TYPE_NAME } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
 import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload } from '../../common/utils';
-import { loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
+import { loadBranchs, loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
@@ -22,6 +23,12 @@ import DataLogs from '../EditIssueNarrow/Component/DataLogs';
 import DataLog from '../EditIssueNarrow/Component/DataLog';
 import IssueList from '../EditIssueNarrow/Component/IssueList';
 import LinkList from '../EditIssueNarrow/Component/LinkList';
+import CopyIssue from '../CopyIssue';
+import TransformSubIssue from '../TransformSubIssue';
+import TransformFromSubIssue from '../TransformFromSubIssue';
+import CreateBranch from '../CreateBranch';
+import Commits from '../Commits';
+import MergeRequest from '../MergeRequest';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -29,6 +36,7 @@ const { TextArea } = Input;
 const confirm = Modal.confirm;
 let sign = true;
 let flag;
+let filterSign = false;
 const STATUS_ICON = {
   done: {
     icon: 'check_circle',
@@ -46,6 +54,11 @@ const STATUS_ICON = {
     bgColor: '',
   },
 };
+const STATUS_SHOW = {
+  opened: '开放',
+  merged: '已合并',
+  closed: '关闭',
+};
 
 class CreateSprint extends Component {
   constructor(props) {
@@ -62,7 +75,10 @@ class CreateSprint extends Component {
       createLoading: false,
       createSubTaskShow: false,
       createLinkTaskShow: false,
+      createBranchShow: false,
       editDesShow: false,
+      commitShow: false,
+      mergeRequestShow: false,
       origin: {},
       loading: true,
       nav: 'detail',
@@ -107,6 +123,7 @@ class CreateSprint extends Component {
       worklogs: [],
       datalogs: [],
       fileList: [],
+      branchs: {},
       issueCommentDTOList: [],
       issueLinkDTOList: [],
       labelIssueRelDTOList: [],
@@ -114,6 +131,8 @@ class CreateSprint extends Component {
       linkIssues: [],
       fixVersions: [],
       influenceVersions: [],
+      fixVersionsFixed: [],
+      influenceVersionsFixed: [],
 
       originStatus: [],
       originpriorities: [],
@@ -195,6 +214,7 @@ class CreateSprint extends Component {
       description,
       epicId,
       epicName,
+      epicColor,
       estimateTime,
       issueCommentDTOList,
       issueId,
@@ -229,8 +249,12 @@ class CreateSprint extends Component {
       name: issueAttachment.fileName,
       url: issueAttachment.url,
     }));
-    const fixVersions = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
-    const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
+    const fixVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
+    const fixVersionsFixed = _.filter(fixVersionsTotal, { statusCode: 'archived' }) || [];
+    const fixVersions = _.filter(fixVersionsTotal, v => v.statusCode !== 'archived') || [];
+    const influenceVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
+    const influenceVersionsFixed =  _.filter(influenceVersionsTotal, { statusCode: 'archived' }) || [];
+    const influenceVersions = _.filter(influenceVersionsTotal, v => v.statusCode !== 'archived') || [];
     this.setState({
       origin: issue,
       activeSprint: activeSprint || {},
@@ -244,6 +268,7 @@ class CreateSprint extends Component {
       description,
       epicId,
       epicName,
+      epicColor,
       estimateTime,
       fileList,
       issueCommentDTOList,
@@ -275,15 +300,17 @@ class CreateSprint extends Component {
       subIssueDTOList,
       fixVersions,
       influenceVersions,
+      fixVersionsFixed,
+      influenceVersionsFixed,
     });
   }
 
   getCurrentNav(e) {
     let eles;
     if (this.state.typeCode !== 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'sub_task', 'link_task' ];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'sub_task', 'link_task', 'branch'];
     } else {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'branch'];
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
@@ -291,7 +318,8 @@ class CreateSprint extends Component {
   isInLook(ele) {
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
-    return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
+    // return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
+    return a + ele.offsetHeight > target.scrollTop;
   }
 
   scrollToAnchor = (anchorName) => {
@@ -310,6 +338,35 @@ class CreateSprint extends Component {
       }
     }
   }
+
+  onFilterChange(input) {
+    if (!filterSign) {
+      this.setState({
+        selectLoading: true,
+      });
+      getUsers(input).then((res) => {
+        this.setState({
+          originUsers: res.content,
+          selectLoading: false,
+        });
+      });
+      filterSign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    getUsers(input).then((res) => {
+      this.setState({
+        originUsers: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
 
   handleTitleChange = (e) => {
     this.setState({ summary: e.target.value });
@@ -421,6 +478,11 @@ class CreateSprint extends Component {
           datalogs: res,
         });
       });
+      loadBranchs(issueId).then((res) => {
+        this.setState({
+          branchs: res || {},
+        });
+      });
       this.setState({
         editDesShow: false,
       });
@@ -452,6 +514,15 @@ class CreateSprint extends Component {
       }
     } else if (pro === 'assigneeId' || pro === 'reporterId') {
       obj[pro] = this.state[pro] ? JSON.parse(this.state[pro]).id || 0 : 0;
+      updateIssue(obj)
+        .then((res) => {
+          this.reloadIssue();
+          if (this.props.onUpdate) {
+            this.props.onUpdate();
+          }
+        });
+    } else if (pro === 'storyPoints' || pro === 'remainingTime') {
+      obj[pro] = this.state[pro] === '' ? null : this.state[pro];
       updateIssue(obj)
         .then((res) => {
           this.reloadIssue();
@@ -642,6 +713,44 @@ class CreateSprint extends Component {
     }
   }
 
+  handleCopyIssue() {
+    this.reloadIssue();
+    this.setState({
+      copyIssueShow: false,
+    });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
+    if (this.props.onCopyAndTransformToSubIssue) {
+      this.props.onCopyAndTransformToSubIssue();
+    }
+  }
+
+  handleTransformSubIssue() {
+    this.reloadIssue();
+    this.setState({
+      transformSubIssueShow: false,
+    });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
+    if (this.props.onCopyAndTransformToSubIssue) {
+      this.props.onCopyAndTransformToSubIssue();
+    }
+  }
+
+  handleTransformFromSubIssue() {
+    this.reloadIssue();
+    this.setState({
+      transformFromSubIssueShow: false,
+    });
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
+    if (this.props.onCopyAndTransformToSubIssue) {
+      this.props.onCopyAndTransformToSubIssue();
+    }
+  }
 
   handleClickMenu(e) {
     if (e.key === '0') {
@@ -650,6 +759,12 @@ class CreateSprint extends Component {
       this.handleDeleteIssue(this.state.origin.issueId);
     } else if (e.key === '2') {
       this.setState({ createSubTaskShow: true });
+    } else if (e.key === '3') {
+      this.setState({ copyIssueShow: true });
+    } else if (e.key === '4') {
+      this.setState({ transformSubIssueShow: true });
+    } else if (e.key === '5') {
+      this.setState({ transformFromSubIssueShow: true });
     }
   }
 
@@ -683,7 +798,10 @@ class CreateSprint extends Component {
       content: <div style={{ marginBottom: 32 }}>
         <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
         <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
-        <p>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
+        <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
+        {
+          this.state.subIssueDTOList.length ? <p>{`注意：问题的 ${this.state.subIssueDTOList.length} 个子任务将被删除。`}</p> : null
+        }
       </div>,
       onOk() {
         return deleteIssue(issueId)
@@ -728,6 +846,7 @@ class CreateSprint extends Component {
         {
           this.state.issueCommentDTOList.map(comment => (
             <Comment
+              key={comment.commentId}
               comment={comment}
               onDeleteComment={() => this.reloadIssue()}
               onUpdateComment={() => this.reloadIssue()}
@@ -747,6 +866,7 @@ class CreateSprint extends Component {
         {
           this.state.worklogs.map(worklog => (
             <Log
+              key={worklog.logId}
               worklog={worklog}
               onDeleteLog={() => this.reloadIssue()}
               onUpdateLog={() => this.reloadIssue()}
@@ -766,19 +886,6 @@ class CreateSprint extends Component {
         datalogs={this.state.datalogs}
       />
     );
-    // return (
-    //   <div>
-    //     {
-    //       this.state.datalogs.map((datalog, i) => (
-    //         <DataLog
-    //           i={i}
-    //           datalog={datalog}
-    //           origin={this.state.datalogs}
-    //         />
-    //       ))
-    //     }
-    //   </div>
-    // );
   }
 
   /**
@@ -800,7 +907,7 @@ class CreateSprint extends Component {
       <div className="c7n-tasks">
         {
           _.map(group, (v, k) => (
-            <div>
+            <div key={k}>
               <div style={{ margin: '7px auto' }}>{k}</div>
               {
                 _.map(v, (linkIssue, i) => this.renderLinkList(linkIssue, i))
@@ -820,6 +927,7 @@ class CreateSprint extends Component {
   renderIssueList(issue, i) {
     return (
       <IssueList
+        key={issue.issueId}
         issue={{
           ...issue,
           typeCode: issue.typeCode || 'sub_task',
@@ -838,6 +946,7 @@ class CreateSprint extends Component {
   renderLinkList(link, i) {
     return (
       <LinkList
+        key={link.linkId}
         issue={{
           ...link,
           typeCode: link.typeCode,
@@ -910,6 +1019,103 @@ class CreateSprint extends Component {
     }
   }
 
+  renderBranchs() {
+    return (
+      <div>
+        {
+          this.state.branchs.branchCount ? (
+            <div>
+              {
+                [].length === 0 ? (
+                  <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
+                      <span
+                        style={{ color: '#3f51b5', cursor: 'pointer' }}
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            commitShow: true,
+                          });
+                        }}
+                      >
+                        {this.state.branchs.totalCommit || '0'}提交
+                      </span>
+                    </div>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
+                      <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
+                      <span style={{ width: 60, display: 'inline-block' }}>
+                        {
+                          this.state.branchs.commitUpdateTime ? (
+                            <Popover
+                              title="提交修改时间"
+                              content={this.state.branchs.commitUpdateTime}
+                              placement="left"
+                            >
+                              <TimeAgo
+                                datetime={this.state.branchs.commitUpdateTime}
+                                locale={Choerodon.getMessage('zh_CN', 'en')}
+                              />
+                            </Popover> 
+                          ) : ''
+                        }
+                      </span>
+                    </div>
+                  </div>
+                ) : null
+              }
+              {
+                this.state.branchs.totalMergeRequest ? (
+                  <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
+                      <span
+                        style={{ color: '#3f51b5', cursor: 'pointer' }}
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            mergeRequestShow: true,
+                          });
+                        }}
+                      >
+                        {this.state.branchs.totalMergeRequest}合并请求
+                      </span>
+                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>
+                        {['opened', 'merged', 'closed'].includes(this.state.branchs.mergeRequestStatus) ? STATUS_SHOW[this.state.branchs.mergeRequestStatus] : ''}
+                      </span>
+                    </div>
+                    <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
+                      <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
+                      <span style={{ width: 60, display: 'inline-block' }}>
+                        {
+                          this.state.branchs.mergeRequestUpdateTime ? (
+                            <Popover
+                              title="合并请求修改时间"
+                              content={this.state.branchs.mergeRequestUpdateTime}
+                              placement="left"
+                            >
+                              <TimeAgo
+                                datetime={this.state.branchs.mergeRequestUpdateTime}
+                                locale={Choerodon.getMessage('zh_CN', 'en')}
+                              />
+                            </Popover> 
+                          ) : ''
+                        }
+                      </span>
+                    </div>
+                  </div>
+                ) : null
+              }
+            </div>
+          ) : (
+            <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+              <span style={{ marginRight: 12 }}>暂无</span>
+            </div>
+          )
+        }
+        
+      </div>
+    );
+  }
+
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -928,6 +1134,23 @@ class CreateSprint extends Component {
           this.state.typeCode !== 'sub_task' && (
             <Menu.Item key="2">
               创建子任务
+            </Menu.Item>
+          )
+        }
+        <Menu.Item key="3">
+          复制问题
+        </Menu.Item>
+        {
+          this.state.typeCode !== 'sub_task' && this.state.origin.subIssueDTOList && this.state.origin.subIssueDTOList.length === 0 && (
+            <Menu.Item key="4">
+              转化为子任务
+            </Menu.Item>
+          )
+        }
+        {
+          this.state.typeCode === 'sub_task' && (
+            <Menu.Item key="5">
+              转化为任务
             </Menu.Item>
           )
         }
@@ -1114,6 +1337,18 @@ class CreateSprint extends Component {
                 </Tooltip>
               )
             }
+            <Tooltip placement="right" title="开发">
+              <li id="BRANCH-nav" className={`c7n-li ${this.state.nav === 'branch' ? 'c7n-li-active' : ''}`}>
+                <Icon
+                  type="branch c7n-icon-li"
+                  role="none"
+                  onClick={() => {
+                    this.setState({ nav: 'branch' });
+                    this.scrollToAnchor('branch');
+                  }}
+                />
+              </li>
+            </Tooltip>
           </ul>
         </div>
         <div className="c7n-content">
@@ -1207,7 +1442,7 @@ class CreateSprint extends Component {
                     </Dropdown>
                   </div>
                 </div>
-                {
+                {/* {
                   this.state.typeCode === 'issue_epic' ? (
                     <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
                       <span style={{ flexShrink: 0 }}>名称：</span>
@@ -1241,7 +1476,7 @@ class CreateSprint extends Component {
                       </ReadAndEdit>
                     </div>
                   ) : null
-                }
+                } */}
                 <div className="line-start">
                   <div style={{ display: 'flex', flex: 1 }}>
                     <span
@@ -1454,6 +1689,7 @@ class CreateSprint extends Component {
                               fontSize: '13px',
                               color: 'rgba(0,0,0,0.54)',
                               marginLeft: 5,
+                              lineHeight: '18px',
                             }}
                           />
                         </Tooltip>
@@ -1576,7 +1812,7 @@ class CreateSprint extends Component {
                               onOk={this.updateIssue.bind(this, 'storyPoints')}
                               onCancel={this.resetStoryPoints.bind(this)}
                               readModeContent={<span>
-                                {this.state.storyPoints ? `${this.state.storyPoints} 点` : '无'}
+                                {this.state.storyPoints === undefined || this.state.storyPoints === null ? '无' : `${this.state.storyPoints} 点`}
                               </span>}
                             >
                               <NumericInput
@@ -1620,7 +1856,7 @@ class CreateSprint extends Component {
                               onOk={this.updateIssue.bind(this, 'remainingTime')}
                               onCancel={this.resetRemainingTime.bind(this)}
                               readModeContent={<span>
-                                {this.state.remainingTime ? `${this.state.remainingTime} 小时` : '无'}
+                                {this.state.remainingTime === undefined || this.state.remainingTime === null ? '无' : `${this.state.remainingTime} 小时`}
                               </span>}
                             >
                               <NumericInput
@@ -1646,7 +1882,7 @@ class CreateSprint extends Component {
               </div>
             </div>
           </div>
-          <div className="c7n-content-bottom" id="scroll-area">
+          <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
             <section className="c7n-body-editIssue">
               <div className="c7n-content-editIssue">
                 <div className="c7n-details">
@@ -1741,7 +1977,8 @@ class CreateSprint extends Component {
                                     <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                                       {
                                         this.transToArr(this.state.labelIssueRelDTOList, 'labelName', 'array').map(label => (
-                                          <div 
+                                          <div
+                                            key={label}
                                             style={{
                                               color: '#000',
                                               borderRadius: '100px',
@@ -1796,7 +2033,7 @@ class CreateSprint extends Component {
                           </div>
                         </div>
                         {
-                          this.state.typeCode !== 'sub_task' ? (
+                          this.state.typeCode === 'bug' ? (
                             <div className="line-start mt-10">
                               <div className="c7n-property-wrapper">
                                 <span className="c7n-property">
@@ -1813,12 +2050,32 @@ class CreateSprint extends Component {
                                   onOk={this.updateVersionSelect.bind(this, 'originVersions', 'influenceVersions')}
                                   onCancel={this.resetInfluenceVersions.bind(this)}
                                   readModeContent={<div>
-                                    <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
-                                      {this.transToArr(this.state.influenceVersions, 'name')}
-                                    </p>
+                                    {
+                                      !this.state.influenceVersionsFixed.length && !this.state.influenceVersions.length ? "无" : (
+                                        <div>
+                                          <div style={{ color: '#000' }}>
+                                            {_.map(this.state.influenceVersionsFixed, 'name').join(' , ')}
+                                          </div>
+                                          <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
+                                            {_.map(this.state.influenceVersions, 'name').join(' , ')}
+                                          </p>
+                                        </div>
+                                      )
+                                    }
                                   </div>}
                                 >
+                                  {
+                                    this.state.influenceVersionsFixed.length ? (
+                                      <div>
+                                        <span>已归档版本：</span>
+                                        <span>
+                                          {_.map(this.state.influenceVersionsFixed, 'name').join(' , ')}
+                                        </span>
+                                      </div>
+                                    ) : null
+                                  }
                                   <Select
+                                    label="未归档版本"
                                     value={this.transToArr(this.state.influenceVersions, 'name', 'array')}
                                     mode="tags"
                                     autoFocus
@@ -1830,7 +2087,7 @@ class CreateSprint extends Component {
                                       this.setState({
                                         selectLoading: true,
                                       });
-                                      loadVersions().then((res) => {
+                                      loadVersions(['version_planning', 'released']).then((res) => {
                                         this.setState({
                                           originVersions: res,
                                           selectLoading: false,
@@ -1870,12 +2127,32 @@ class CreateSprint extends Component {
                               onOk={this.updateVersionSelect.bind(this, 'originVersions', 'fixVersions')}
                               onCancel={this.resetFixVersions.bind(this)}
                               readModeContent={<div style={{ color: '#3f51b5' }}>
-                                <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
-                                  {this.transToArr(this.state.fixVersions, 'name')}
-                                </p>
+                                {
+                                  !this.state.fixVersionsFixed.length && !this.state.fixVersions.length ? "无" : (
+                                    <div>
+                                      <div style={{ color: '#000' }}>
+                                        {_.map(this.state.fixVersionsFixed, 'name').join(' , ')}
+                                      </div>
+                                      <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginBottom: 0 }}>
+                                        {_.map(this.state.fixVersions, 'name').join(' , ')}
+                                      </p>
+                                    </div>
+                                  )
+                                }
                               </div>}
                             >
+                              {
+                                this.state.fixVersionsFixed.length ? (
+                                  <div>
+                                    <span>已归档版本：</span>
+                                    <span>
+                                      {_.map(this.state.fixVersionsFixed, 'name').join(' , ')}
+                                    </span>
+                                  </div>
+                                ) : null
+                              }
                               <Select
+                                label="未归档版本"
                                 value={this.transToArr(this.state.fixVersions, 'name', 'array')}
                                 mode="tags"
                                 autoFocus
@@ -1887,7 +2164,7 @@ class CreateSprint extends Component {
                                   this.setState({
                                     selectLoading: true,
                                   });
-                                  loadVersions().then((res) => {
+                                  loadVersions(['version_planning', 'released']).then((res) => {
                                     this.setState({
                                       originVersions: res,
                                       selectLoading: false,
@@ -1937,8 +2214,10 @@ class CreateSprint extends Component {
                                       this.state.epicId ? (
                                         <div 
                                           style={{
-                                            color: '#4d90fe',
-                                            border: '1px solid #4d90fe',
+                                            color: this.state.epicColor,
+                                            borderWidth: '1px',
+                                            borderStyle: 'solid',
+                                            borderColor: this.state.epicColor,
                                             borderRadius: '2px',
                                             fontSize: '13px',
                                             lineHeight: '20px',
@@ -2027,6 +2306,51 @@ class CreateSprint extends Component {
                             </span>
                           </div>
                         </div>
+                        {
+                          this.state.typeCode === 'issue_epic' ? (
+                            <div className="line-start mt-10">
+                              <div className="c7n-property-wrapper">
+                                <span className="c7n-property">
+                                  Epic名：
+                                </span>
+                              </div>
+                              <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', width: 200 }}>
+                                <ReadAndEdit
+                                  callback={this.changeRae.bind(this)}
+                                  thisType="epicName"
+                                  current={this.state.currentRae}
+                                  handleEnter
+                                  line
+                                  origin={this.state.epicName}
+                                  onInit={() => this.setAnIssueToState()}
+                                  onOk={this.updateIssue.bind(this, 'epicName')}
+                                  onCancel={this.resetEpicName.bind(this)}
+                                  readModeContent={<div>
+                                    <p style={{ wordBreak: 'break-word', marginBottom: 0 }}>
+                                      {this.state.epicName}
+                                    </p>
+                                  </div>}
+                                >
+                                  <TextArea
+                                    maxLength={44}
+                                    style={{ width: '200px' }}
+                                    value={this.state.epicName}
+                                    size="small"
+                                    autoFocus={{ minRows: 2, maxRows: 6 }}
+                                    onChange={this.handleEpicNameChange.bind(this)}
+                                    onPressEnter={() => {
+                                      this.updateIssue('epicName');
+                                      this.setState({
+                                        currentRae: undefined,
+                                      });
+                                    }}
+                                  />
+                                </ReadAndEdit>
+                              </div>
+                            </div>
+                          ) : null
+                        }
+                        
                       </div>
                       {/* --- */}
                       <div style={{ flex: 1, width: '50%' }}>
@@ -2092,17 +2416,7 @@ class CreateSprint extends Component {
                                 allowClear
                                 autoFocus
                                 filter
-                                onFilterChange={(input) => {
-                                  this.setState({
-                                    selectLoading: true,
-                                  });
-                                  getUsers(input).then((res) => {
-                                    this.setState({
-                                      originUsers: res.content,
-                                      selectLoading: false,
-                                    });
-                                  });
-                                }}
+                                onFilterChange={this.onFilterChange.bind(this)}
                                 getPopupContainer={triggerNode => triggerNode.parentNode}
                                 onChange={(value) => {
                                   this.setState({ reporterId: value });
@@ -2207,17 +2521,7 @@ class CreateSprint extends Component {
                                 allowClear
                                 autoFocus
                                 filter
-                                onFilterChange={(input) => {
-                                  this.setState({
-                                    selectLoading: true,
-                                  });
-                                  getUsers(input).then((res) => {
-                                    this.setState({
-                                      originUsers: res.content,
-                                      selectLoading: false,
-                                    });
-                                  });
-                                }}
+                                onFilterChange={this.onFilterChange.bind(this)}
                                 getPopupContainer={triggerNode => triggerNode.parentNode}
                                 onChange={(value) => {
                                   this.setState({ assigneeId: value });
@@ -2302,7 +2606,7 @@ class CreateSprint extends Component {
                       </div>
                       <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                       <div className="c7n-title-right" style={{ marginLeft: '14px', position: 'relative' }}>
-                        <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ edit: true })}>
+                        <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })}>
                           <Icon type="zoom_out_map icon" style={{ marginRight: 2 }} />
                           <span>全屏编辑</span>
                         </Button>
@@ -2331,7 +2635,7 @@ class CreateSprint extends Component {
                       <Icon type="attach_file c7n-icon-title" />
                       <span>附件</span>
                     </div>
-                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '130px' }} />
+                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px' }} />
                   </div>
                   <div className="c7n-content-wrapper" style={{ marginTop: '-47px' }}>
                     <UploadButtonNow
@@ -2351,7 +2655,7 @@ class CreateSprint extends Component {
                     </div>
                     <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                      <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ addCommit: true })}>
+                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ addCommit: true })}>
                         <Icon type="playlist_add icon" />
                         <span>添加评论</span>
                       </Button>
@@ -2368,7 +2672,7 @@ class CreateSprint extends Component {
                     </div>
                     <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                      <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ dailyLogShow: true })}>
+                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ dailyLogShow: true })}>
                         <Icon type="playlist_add icon" />
                         <span>登记工作</span>
                       </Button>
@@ -2398,7 +2702,7 @@ class CreateSprint extends Component {
                         </div>
                         <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                          <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createSubTaskShow: true })}>
+                          <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createSubTaskShow: true })}>
                             <Icon type="playlist_add icon" />
                             <span>创建子任务</span>
                           </Button>
@@ -2419,7 +2723,7 @@ class CreateSprint extends Component {
                         </div>
                         <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                          <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
+                          <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
                             <Icon type="playlist_add icon" />
                             <span>创建相关任务</span>
                           </Button>
@@ -2429,6 +2733,24 @@ class CreateSprint extends Component {
                     </div>
                   )
                 }
+
+                <div id="branch">
+                  <div className="c7n-title-wrapper">
+                    <div className="c7n-title-left">
+                      <Icon type="branch c7n-icon-title" />
+                      <span>开发</span>
+                    </div>
+                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                    <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createBranchShow: true })}>
+                        <Icon type="playlist_add icon" />
+                        <span>创建分支</span>
+                      </Button>
+                    </div>
+                  </div>
+                  {this.renderBranchs()} 
+                </div>
+
               </div>
             </section>
           </div>
@@ -2481,6 +2803,85 @@ class CreateSprint extends Component {
               visible={this.state.createLinkTaskShow}
               onCancel={() => this.setState({ createLinkTaskShow: false })}
               onOk={this.handleCreateLinkIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.copyIssueShow ? (
+            <CopyIssue
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              issue={this.state.origin}
+              issueLink={this.state.linkIssues}
+              issueSummary={this.state.origin.summary}
+              visible={this.state.copyIssueShow}
+              onCancel={() => this.setState({ copyIssueShow: false })}
+              onOk={this.handleCopyIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.transformSubIssueShow ? (
+            <TransformSubIssue
+              visible={this.state.transformSubIssueShow}
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              ovn={this.state.origin.objectVersionNumber}
+              onCancel={() => this.setState({ transformSubIssueShow: false })}
+              onOk={this.handleTransformSubIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.transformFromSubIssueShow ? (
+            <TransformFromSubIssue
+              visible={this.state.transformFromSubIssueShow}
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              ovn={this.state.origin.objectVersionNumber}
+              onCancel={() => this.setState({ transformFromSubIssueShow: false })}
+              onOk={this.handleTransformFromSubIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.createBranchShow ? (
+            <CreateBranch
+              issueId={this.state.origin.issueId}
+              typeCode={this.state.origin.typeCode}
+              issueNum={this.state.origin.issueNum}
+              onOk={() => {
+                this.setState({ createBranchShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => this.setState({ createBranchShow: false })}
+              visible={this.state.createBranchShow}
+            />
+          ) : null
+        }
+        {
+          this.state.commitShow ? (
+            <Commits
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              time={this.state.branchs.commitUpdateTime}
+              onCancel={() => {
+                this.setState({ commitShow: false });
+              }}
+              visible={this.state.commitShow}
+            />
+          ) : null
+        }
+        {
+          this.state.mergeRequestShow ? (
+            <MergeRequest
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              num={this.state.branchs.totalMergeRequest}
+              onCancel={() => {
+                this.setState({ mergeRequestShow: false });
+              }}
+              visible={this.state.mergeRequestShow}
             />
           ) : null
         }

@@ -1,6 +1,7 @@
 .c7n-scrumsetting {
   display: flex;
-  overflow: auto;
+  overflow-y: hidden;
+  overflow-x: auto
 }
 
 .wrapSpin {
@@ -20,8 +21,13 @@
 }
 
 .c7n-scrumboard {
-  .ant-tabs {
+  .ant-tabs-tabpane {
     overflow-y: auto;
     overflow-x: hidden;
+  }
+  @-moz-document url-prefix() {
+    .ant-tabs {
+      overflow: auto;
+    }
   }
 }

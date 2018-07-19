@@ -155,7 +155,7 @@ class CreateSprint extends Component {
         <div className="c7n-region">
           <h2 className="c7n-space-first">对问题创建链接</h2>
           <p>
-            请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。
+            请在下面输入相关任务的基本信息，包括所要创建的关系（复制、阻塞、关联、破坏、被复制、被阻塞、被破坏等）以及所要关联的问题（支持多选）。
             {/* <a href="#" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
               <span className="c7n-external-link-content">
               了解详情

@@ -4,9 +4,12 @@ import { Button, Spin, message, Icon, Select, Table, Menu, Dropdown } from 'choe
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
+import moment from 'moment';
 import '../../../../main.scss';
 import BurndownChartStore from '../../../../../stores/project/burndownChart/BurndownChartStore';
 import './BurndownChartHome.scss';
+import restSvg from '../../../../../assets/image/rest.svg';
+import hopeSvg from '../../../../../assets/image/hope.svg';
 
 const { AppState } = stores;
 const Option = Select.Option;
@@ -21,6 +24,7 @@ class BurndownChartHome extends Component {
       select: 'remainingEstimatedTime',
       defaultSprint: '',
       loading: false,
+      endDate: '',
     };
   }
   componentWillMount() {
@@ -31,11 +35,11 @@ class BurndownChartHome extends Component {
       BurndownChartStore.setSprintList(res);
       this.setState({
         defaultSprint: res[0].sprintId,
+        endDate: res[0].endDate,
       }, () => {
         this.getChartData();
       });
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   getChartData() {
@@ -68,6 +72,9 @@ class BurndownChartHome extends Component {
                 index = i;
               }
             });
+            if (newData[index].type.indexOf(item.type) === -1) {
+              newData[index].type += `-${item.type}`;
+            }
             newData[index].issues = [...newData[index].issues, {
               issueId: item.issueId,
               issueNum: item.issueNum,
@@ -94,16 +101,32 @@ class BurndownChartHome extends Component {
           newData[index].rest = rest;
         });
         BurndownChartStore.setBurndownList(newData);
-        this.setState({
-          xAxis: _.map(newData, 'date'),
-          yAxis: _.map(newData, 'rest'),
-          loading: false,
-        });
+        if (moment(this.state.endDate).isAfter(_.map(newData, 'date')[_.map(newData, 'date').length - 1])) {
+          this.setState({
+            xAxis: [..._.map(newData, 'date'), '2018-07-19 00:00:05'],
+            yAxis: _.map(newData, 'rest'),
+            loading: false,
+          });
+        } else {
+          this.setState({
+            xAxis: _.map(newData, 'date'),
+            yAxis: _.map(newData, 'rest'),
+            loading: false,
+          });
+        }
       }).catch((error) => {
-        window.console.error(error);
       });
   }
-
+  getMaxY() {
+    const data = this.state.yAxis;
+    let max = 0;
+    _.forEach(data, (item) => {
+      if (item > max) {
+        max = item;
+      }
+    });
+    return max;
+  }
   getOption() {
     return {
       title: {
@@ -121,10 +144,10 @@ class BurndownChartHome extends Component {
         right: '0%',
         data: [{
           name: '期望值',
-          icon: 'pin',
+          icon: `image://${hopeSvg}`,
         }, {
           name: '剩余值',
-          icon: 'pin',
+          icon: `image://${restSvg}`,
         }],
       },
       grid: {
@@ -156,7 +179,7 @@ class BurndownChartHome extends Component {
         {
           name: '期望值',
           type: 'line',
-          data: [[0, this.state.yAxis[0]], [this.state.yAxis.length - 1, 0]],
+          data: [[0, this.getMaxY()], [this.state.xAxis.length - 1, 0]],
           itemStyle: {
             color: 'grey',
           },
@@ -185,10 +208,16 @@ class BurndownChartHome extends Component {
     });
   }
   handleClick(e) {
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
     if (e.key === '0') {
-      const { history } = this.props;
-      const urlParams = AppState.currentMenuType;
       history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }
+    if (e.key === '1') {
+      history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }
+    if (e.key === '2') {
+      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
   renderChartTitle() {
@@ -233,7 +262,7 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
-  renderTypeText(text) {
+  judgeText(text) {
     let result = '';
     if (text === 'startSprint') {
       result = '开启冲刺';
@@ -270,6 +299,18 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
+  renderTypeText(text) {
+    const splitArray = text.split('-');
+    return (
+      <div>
+        {
+          splitArray.map(item => (
+            <p>{this.judgeText(item)}</p>
+          ))
+        }
+      </div>
+    );
+  }
 
   render() {
     const columns = [{
@@ -284,7 +325,23 @@ class BurndownChartHome extends Component {
         <div>
           {
             text.map(item => (
-              <p style={{ whiteSpace: 'nowrap', color: '#3F51B5' }}>{item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}</p>
+              <p
+                style={{ 
+                  whiteSpace: 'nowrap', 
+                  color: '#3F51B5',
+                  cursor: 'pointer',
+                }}
+                role="none"
+                onClick={() => {
+                  const { history } = this.props;
+                  const urlParams = AppState.currentMenuType;
+                  if (item.parentIssueId) {
+                    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${item.parentIssueNum}&paramIssueId=${item.parentIssueId}&paramUrl=reporthost/burndownchart`);
+                  } else {
+                    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${item.issueNum}&paramIssueId=${item.issueId}&paramUrl=reporthost/burndownchart`);
+                  }
+                }}
+              >{item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}</p>
             ))
           }
         </div>
@@ -359,6 +416,12 @@ class BurndownChartHome extends Component {
         <Menu.Item key="0">
           Sprint报告
         </Menu.Item>
+        <Menu.Item key="1">
+          累积流量图
+        </Menu.Item>
+        <Menu.Item key="2">
+        版本报告
+        </Menu.Item>
       </Menu>
     );
     return (
@@ -367,11 +430,11 @@ class BurndownChartHome extends Component {
           title="燃尽图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
-          <Button funcTyp="flat" onClick={this.getChartData.bind(this)}>
+          <Button funcType="flat" onClick={this.getChartData.bind(this)}>
             <Icon type="refresh" />刷新
           </Button>
           <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcTyp="flat">
+            <Button icon="arrow_drop_down" funcType="flat">
               切换报表
             </Button>
           </Dropdown>
@@ -391,8 +454,15 @@ class BurndownChartHome extends Component {
                       label="迭代冲刺" 
                       value={this.state.defaultSprint}
                       onChange={(value) => {
+                        let endDate;
+                        _.forEach(BurndownChartStore.getSprintList, (item) => {
+                          if (item.sprintId === value) {
+                            endDate = item.endDate;
+                          }
+                        });
                         this.setState({
                           defaultSprint: value,
+                          endDate,
                         }, () => {
                           this.getChartData();
                         });

@@ -27,6 +27,13 @@ class UserHead extends Component {
   componentDidMount() {
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.status.statusName === this.props.status.statusName && nextProps.status.statusColor === this.props.status.statusColor) {
+      return false;
+    }
+    return true;
+  }
+
   render() {
     const { status } = this.props; 
     return (
@@ -43,6 +50,7 @@ class UserHead extends Component {
           lineHeight: '20px',
           fontSize: '12px',
           width: 48,
+          textAlign: 'center',
           ...this.props.style,
         }}
       >

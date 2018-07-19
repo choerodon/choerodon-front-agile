@@ -67,12 +67,12 @@ class ComponentHome extends Component {
         });
       })
       .catch((error) => {
-        window.console.warn('load components failed, check your organization and project are correct, or please try again later');
       });
   }
 
   render() {
     const menu = AppState.currentMenuType;
+    const urlParams = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     const column = [
       {
@@ -93,10 +93,16 @@ class ComponentHome extends Component {
         title: '问题',
         dataIndex: 'issueCount',
         width: '10%',
-        render: issueCount => (
-          <div style={{ width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-            <span style={{ display: 'inline-block', width: 25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }}>{issueCount}</span>
-            <span>issues</span>
+        render: (issueCount, record) => (
+          <div
+            style={{ width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center', cursor: 'pointer', color: '#3f51b5' }}
+            role="none"
+            onClick={() => {
+              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=component&paramId=${record.componentId}&paramName=模块"${record.name}"下的问题&paramUrl=component`);
+            }}
+          >
+            <span style={{ display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>{issueCount} issues</span>
+            {/* <span>{issueCount}issues</span> */}
           </div>
         ),
       },
@@ -165,15 +171,23 @@ class ComponentHome extends Component {
       },
     ];
     return (
-      <Page className="c7n-component">
+      <Page
+        className="c7n-component"
+        service={[
+          'agile-service.issue-component.updateComponent',
+          'agile-service.issue-component.deleteComponent',
+          'agile-service.issue-component.createComponent',
+          'agile-service.issue-component.listByProjectId',
+        ]}
+      >
         <Header title="模块管理">
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-component.createComponent']}>
-            <Button funcTyp="flat" onClick={() => this.setState({ createComponentShow: true })}>
+            <Button funcType="flat" onClick={() => this.setState({ createComponentShow: true })}>
               <Icon type="playlist_add icon" />
               <span>创建模块</span>
             </Button>
           </Permission>
-          <Button funcTyp="flat" onClick={() => this.loadComponents()}>
+          <Button funcType="flat" onClick={() => this.loadComponents()}>
             <Icon type="autorenew icon" />
             <span>刷新</span>
           </Button>
@@ -238,6 +252,7 @@ class ComponentHome extends Component {
                 component={this.state.component}
                 onCancel={() => this.setState({ confirmShow: false })}
                 onOk={this.deleteComponent.bind(this)}
+                history={this.props.history}
               />
             ) : null
           }

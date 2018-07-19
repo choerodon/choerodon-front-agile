@@ -39,7 +39,6 @@ class Version extends Component {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   renderVersion() {
@@ -86,7 +85,8 @@ class Version extends Component {
                 <div 
                   className="c7n-backlog-versionRight"
                   style={{
-                    display: this.state.hoverBlockButton ? 'flex' : 'none',
+                    display: 'flex',
+                    visibility: this.state.hoverBlockButton ? 'visible' : 'hidden',
                   }}
                 >
                   <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
@@ -140,7 +140,6 @@ class Version extends Component {
                         this.props.issueRefresh();
                         this.props.refresh();
                       }).catch((error) => {
-                        window.console.error(error);
                         this.props.refresh();
                       });
                     }

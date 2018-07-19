@@ -38,7 +38,6 @@ class StartSprint extends Component {
           this.props.onCancel();
           this.props.refresh();
         }).catch((error) => {
-          window.console.error(error);
         });
       }
     });

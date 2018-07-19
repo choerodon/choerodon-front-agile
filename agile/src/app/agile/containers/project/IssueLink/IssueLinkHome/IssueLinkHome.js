@@ -28,7 +28,6 @@ class Link extends Component {
   }
 
   componentDidMount() {
-    window.console.warn('issue link home succeed');
     this.loadLinks();
   }
 
@@ -65,7 +64,6 @@ class Link extends Component {
         });
       })
       .catch((error) => {
-        window.console.warn('load components failed, check your organization and project are correct, or please try again later');
       });
   }
 
@@ -140,15 +138,21 @@ class Link extends Component {
       },
     ];
     return (
-      <Page>
+      <Page
+        service={[
+          'agile-service.issue-link-type.updateIssueLinkType',
+          'agile-service.issue-link-type.deleteIssueLinkType',
+          'agile-service.issue-link-type.createIssueLinkType',
+        ]}
+      >
         <Header title="问题链接">
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-link-type.createIssueLinkType']}>
-            <Button funcTyp="flat" onClick={() => this.setState({ createLinkShow: true })}>
+            <Button funcType="flat" onClick={() => this.setState({ createLinkShow: true })}>
               <Icon type="playlist_add icon" />
               <span>创建链接</span>
             </Button>
           </Permission>
-          <Button funcTyp="flat" onClick={() => this.loadLinks()}>
+          <Button funcType="flat" onClick={() => this.loadLinks()}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>

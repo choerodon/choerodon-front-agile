@@ -74,7 +74,6 @@ class DeleteLink extends Component {
         this.setState({
           loading: false,
         });
-        window.console.error('something wrong when delete component, please refresh and try again');
       });
   }
 

@@ -43,7 +43,6 @@ class CreateEpic extends Component {
           this.setState({
             loading: false,
           });
-          window.console.error(error);
         });
       } else {
         this.setState({
@@ -113,7 +112,7 @@ class CreateEpic extends Component {
                   message: '史诗名称不能为空',
                 }],
               })(
-                <Input label="史诗名称" maxLength={30} />,
+                <Input label="史诗名称" maxLength={44} />,
               )}
             </FormItem>
             <FormItem>
@@ -123,7 +122,7 @@ class CreateEpic extends Component {
                   message: '概要不能为空',
                 }],
               })(
-                <TextArea autoSize label="概要" maxLength={30} />,
+                <TextArea autoSize label="概要" maxLength={44} />,
               )}
             </FormItem>
           </Form>

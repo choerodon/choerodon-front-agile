@@ -12,6 +12,13 @@ class UserHead extends Component {
   componentDidMount() {
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.user.id === this.props.user.id) {
+      return false;
+    }
+    return true;
+  }
+
   getFirst(str) {
     if (!str) {
       return '';
@@ -29,7 +36,7 @@ class UserHead extends Component {
     const { user, color } = this.props; 
     return (
       <div
-        className="c7n-emptyBlock"
+        className="c7n-userHead"
         style={{
           ...this.props.style,
           display: user.id ? 'flex' : 'none',
@@ -101,7 +108,7 @@ class UserHead extends Component {
                 color: color || 'rgba(0, 0, 0, 0.65)',
               }}
             >
-              {`${user.loginName}${user.realName}`}
+              {`${user.loginName || ''}${user.realName || ''}`}
             </span>
           )
         }

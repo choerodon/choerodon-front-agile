@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, DatePicker, Tabs, Table, Popover, Modal, Radio, Form, Select, Icon, Spin } from 'choerodon-ui';
+import { Button, DatePicker, Tabs, Table, Popover, Modal, Radio, Form, Select, Icon, Spin, Avatar } from 'choerodon-ui';
 import moment from 'moment';
 import EditIssue from '../../../../components/EditIssueNarrow';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -41,7 +41,6 @@ class ReleaseDetail extends Component {
         loading: false,
       });
     }).catch((error) => {
-      window.console.error(error);
     });
     ReleaseStore.axiosGetVersionStatusIssues(this.props.match.params.id).then((res2) => {
       ReleaseStore.setVersionStatusIssues(res2);
@@ -49,7 +48,6 @@ class ReleaseDetail extends Component {
         loading: false,
       });
     }).catch((error2) => {
-      window.console.error(error2);
     });
   }
   handleChangeTab(key) {
@@ -59,7 +57,6 @@ class ReleaseDetail extends Component {
       });
       ReleaseStore.setVersionStatusIssues(res2);
     }).catch((error2) => {
-      window.console.error(error2);
     });
   }
  
@@ -78,7 +75,7 @@ class ReleaseDetail extends Component {
         return '#00BFA5';
       } else {
         return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="class" />
+          <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
         );
       }
     }
@@ -292,7 +289,17 @@ class ReleaseDetail extends Component {
       title: '经办人',
       dataIndex: 'assigneeName',
       key: 'assigneeName',
-      render: text => <span className="textDisplayOneColumn">{text}</span>,
+      render: (text, record) => (text ? (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Avatar size="small" src={record.imageUrl ? record.imageUrl : ''}>
+            {
+              record.imageUrl ? '' : text.substring(0, 1)
+            }
+          </Avatar>
+          <span className="textDisplayOneColumn">{text}</span>
+        </div>
+      ) : '') 
+      ,
     }, {
       width: '15%',
       title: '状态',
@@ -310,7 +317,7 @@ class ReleaseDetail extends Component {
       ),
     }];
     return (
-      <page>
+      <Page>
         <Header 
           title={(
             <div style={{ whiteSpace: 'nowrap' }}>
@@ -323,7 +330,7 @@ class ReleaseDetail extends Component {
           {
             ReleaseStore.getVersionDetail.statusCode === 'archived' ? '' : (
               <Button 
-                funcTyp="flat" 
+                funcType="flat" 
                 style={{
                   marginLeft: 80,
                 }}
@@ -335,14 +342,12 @@ class ReleaseDetail extends Component {
                         ReleaseStore.setPublicVersionDetail(res);
                         this.setState({ publicVersion: true }); 
                       }).catch((error) => {
-                        window.console.error(error);
                       });
                   } else {
                     ReleaseStore.axiosUnPublicRelease(
                       ReleaseStore.getVersionDetail.versionId).then((res2) => {
                       this.refresh();
                     }).catch((error) => {
-                      window.console.error(error);
                     });
                   }
                 }}
@@ -352,6 +357,19 @@ class ReleaseDetail extends Component {
               </Button>
             )
           }
+          <Button 
+            funcType="flat" 
+            style={{
+              marginLeft: 80,
+            }}
+            onClick={() => {
+              const { history } = this.props;
+              history.push(`/agile/release/logs/${this.props.match.params.id}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+            }}
+          >
+            <Icon type="find_in_page" />
+            <span>版本日志</span>
+          </Button>
           
         </Header>
         <Content className="c7n-versionDetail">
@@ -477,7 +495,7 @@ class ReleaseDetail extends Component {
           </Spin>
           
         </Content>
-      </page>
+      </Page>
     );
   }
 }

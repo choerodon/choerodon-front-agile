@@ -48,6 +48,7 @@ class AssigneeModal extends Component {
         <Content
           style={{
             padding: 0,
+            overflow: 'hidden',
           }}
           title={`"${this.props.data.sprintName}"的经办人工作量`}
           description="您可以在这里查看当前冲刺中问题的分配情况，包括每位成员的问题数量、故事点数总和、剩余预估时间总和等信息。"
@@ -60,6 +61,7 @@ class AssigneeModal extends Component {
               totalRemainingTime: this.props.total.totalTime,
             })}
             columns={columns}
+            filterBar={false}
           />
         </Content>
       </Sidebar>

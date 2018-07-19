@@ -12,7 +12,6 @@ const BACKLOGINDEX = asyncRouter(() => import('./project/Backlog'));
 const SCRUMBOARDINDEX = asyncRouter(() => import('./project/ScrumBoard'));
 const ISSUEIndex = asyncRouter(() => import('./project/Issue'));
 const COMPONENTIndex = asyncRouter(() => import('./project/Component'));
-const SETTINGINDEX = asyncRouter(() => import('./project/Setting'));
 const PROJECTSETTINGINDEX = asyncRouter(() => import('./project/ProjectSetting'));
 const FASTSEARCHINDEX = asyncRouter(() => import('./project/FastSearch'));
 const REPORTHOSTINDEX = asyncRouter(() => import('./project/ReportHost'));
@@ -42,7 +41,6 @@ class AGILEIndex extends React.Component {
           {/* 报告 */}
           <Route path={`${match.url}/reporthost`} component={REPORTHOSTINDEX} />
           {/* <Route path={`${match.url}/burndownchart`} component={BURNDOWNCHART} /> */}
-          {/* <Route path={`${match.url}/setting`} component={SETTINGINDEX} /> */}
           {/* 项目设置 */}
           <Route path={`${match.url}/projectSetting`} component={PROJECTSETTINGINDEX} />
           {/* 快速搜索 */}

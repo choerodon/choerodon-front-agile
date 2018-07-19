@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
 import { stores, axios, Page, Header, Content, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
-import { Select, Form, Input, Button, Modal, Spin, Icon } from 'choerodon-ui';
+import _ from 'lodash';
+import { Form, Input, Button, Icon, Select, Radio } from 'choerodon-ui';
+import { COLOR } from '../../../../common/Constant';
+import { loadPriorities } from '../../../../api/NewIssueApi';
+import { getUsers, getUser } from '../../../../api/CommonApi';
+import UserHead from '../../../../components/UserHead';
 
 const { AppState } = stores;
 const { Option } = Select;
 const FormItem = Form.Item;
+const RadioGroup = Radio.Group;
+let sign = false;
 
 class ProjectSetting extends Component {
   constructor(props) {
@@ -14,25 +21,117 @@ class ProjectSetting extends Component {
       origin: {},
       loading: false,
       couldUpdate: false,
+      originPriorities: [],
+      originUsers: [],
+
+      code: undefined,
+      priorityCode: undefined,
+      strategy: undefined,
+      assignee: undefined,
     };
   }
 
   componentDidMount() {
-    window.console.warn('project setting home');
-    this.getProjectCode();
+    this.loadPriorities();
+    this.getProjectSetting();
   }
 
-  getProjectCode() {
+  onChangeStrategy = (e) => {
+    const strategy = e.target.value;
+    if (strategy !== 'assignee') {
+      this.props.form.setFieldsValue({
+        assignee: undefined,
+      }); 
+    }
+  }
+
+  getProjectSetting() {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
       .then((res) => {
         this.setState({
           origin: res,
+          code: res.projectCode,
+          priorityCode: res.defaultPriorityCode,
+          strategy: res.defaultAssigneeType,
         });
         this.props.form.setFieldsValue({
           code: res.projectCode,
+          priorityCode: res.defaultPriorityCode,
+          strategy: res.defaultAssigneeType,
         });
+        if (res.defaultAssigneeId) {
+          this.loadUser(res.defaultAssigneeId);
+        } else {
+          this.setState({
+            assignee: undefined,
+          });
+          this.props.form.setFieldsValue({
+            assignee: undefined,
+          });
+        }
       });
   }
+
+  loadPriorities() {
+    loadPriorities().then((res) => {
+      this.setState({
+        originPriorities: res.lookupValues,
+      });
+    });
+  }
+
+  loadUser(assigneeId) {
+    getUser(assigneeId).then((res) => {
+      this.setState({
+        assignee: assigneeId,
+        originUsers: [res.content[0]],
+      });
+      this.props.form.setFieldsValue({
+        assignee: assigneeId,
+      });
+    });
+  }
+
+  transformPriorityCode(originpriorityCode) {
+    if (!originpriorityCode.length) {
+      return [];
+    } else {
+      const arr = [];
+      arr[0] = _.find(originpriorityCode, { valueCode: 'high' });
+      arr[1] = _.find(originpriorityCode, { valueCode: 'medium' });
+      arr[2] = _.find(originpriorityCode, { valueCode: 'low' });
+      return arr;
+    }
+  }
+
+  onFilterChange(input) {
+    if (!sign) {
+      this.setState({
+        selectLoading: true,
+      });
+      getUsers(input).then((res) => {
+        this.setState({
+          originUsers: res.content,
+          selectLoading: false,
+        });
+      });
+      sign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    getUsers(input).then((res) => {
+      this.setState({
+        originUsers: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
 
   handleCheckSameName = (rule, value, callback) => {
     if (!value) {
@@ -46,29 +145,36 @@ class ProjectSetting extends Component {
       });
       callback();
     } else {
-      axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info/check?projectName=${value}`)
-        .then((res) => {
-          if (res) {
-            this.setState({
-              couldUpdate: false,
-            });
-            callback('存在同名code，请选择其他项目code');
-          } else {
-            this.setState({
-              couldUpdate: true,
-            });
-            callback();
-          }
-        });
+      // axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info/check?projectName=${value}`)
+      //   .then((res) => {
+      //     if (res) {
+      //       this.setState({
+      //         couldUpdate: false,
+      //       });
+      //       callback('存在同名code，请选择其他项目code');
+      //     } else {
+      //       this.setState({
+      //         couldUpdate: true,
+      //       });
+      //       callback();
+      //     }
+      //   });
+      this.setState({
+        couldUpdate: true,
+      });
+      callback();
     }
   }
 
-  handleUpdateProjectCode = () => {
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
+  handleUpdateProjectSetting = () => {
+    this.props.form.validateFields((err, values, modify) => {
+      if (!err && modify) {
         const projectInfoDTO = {
           ...this.state.origin,
           projectCode: values.code,
+          defaultPriorityCode: values.priorityCode,
+          defaultAssigneeType: values.strategy,
+          defaultAssigneeId: values.assignee || 0,
         };
         this.setState({
           loading: true,
@@ -79,7 +185,12 @@ class ProjectSetting extends Component {
               origin: res,
               loading: false,
               couldUpdate: false,
+              code: res.projectCode,
+              priorityCode: res.defaultPriorityCode,
+              strategy: res.defaultAssigneeType,
+              assignee: res.defaultAssigneeId,
             });
+            Choerodon.prompt('修改成功');
           })
           .catch((error) => {
             this.setState({
@@ -92,35 +203,115 @@ class ProjectSetting extends Component {
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
-    const { initValue, visible, onCancel, onOk } = this.props;
+    const { getFieldDecorator, isModifiedFields, getFieldValue } = this.props.form;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
+    const radioStyle = {
+      display: 'block',
+      height: '30px',
+      lineHeight: '30px',
+    };
     return (
-      <Page>
+      <Page
+        service={[
+          'agile-service.project-info.updateProjectInfo',
+        ]}
+      >
         <Header title="项目设置">
-          <Button funcTyp="flat" onClick={() => this.getProjectCode()}>
+          <Button funcType="flat" onClick={() => this.getProjectSetting()}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
         </Header>
         <Content
           title="项目设置"
-          description="项目编码用于问题编号的前缀，如无特殊需求，不建议频繁修改。"
+          description="根据项目需求，用户可自行修改项目code、默认优先级以及默认经办人策略。修改项目code后，所有的问题编号前缀将发生改变。通过设置项目的默认优先级后，在项目里创建问题时会默认给问题赋值一个优先级，用户可自行修改。默认经办人策略为问题的创建提供便利，可根据用户需求选择策略。"
           link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/setup/project-setting/"
         >
           <div style={{ marginTop: 8 }}>
             <Form layout="vertical">
               <FormItem label="项目Code" style={{ width: 512 }}>
                 {getFieldDecorator('code', {
-                  rules: [{
-                    validator: this.handleCheckSameName,
-                  }],
+                  rules: [{ required: true, message: '项目Code必填' }],
+                  initialValue: this.state.code,
                 })(
                   <Input
                     label="项目Code"
                     maxLength={5}
                   />,
+                )}
+              </FormItem>
+              <FormItem label="默认优先级" style={{ width: 512 }}>
+                {getFieldDecorator('priorityCode', {
+                  rules: [{ required: true, message: '优先级为必选项' }],
+                  initialValue: this.state.priorityCode,
+                })(
+                  <Select
+                    label="默认优先级"
+                    getPopupContainer={triggerNode => triggerNode.parentNode}
+                    loading={this.state.selectLoading}
+                  >
+                    {this.transformPriorityCode(this.state.originPriorities).map(type =>
+                      (<Option key={type.valueCode} value={type.valueCode}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
+                          <div
+                            style={{ color: COLOR[type.valueCode].color, width: 20, height: 20, textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: 8 }}
+                          >
+                            <Icon
+                              type="flag"
+                              style={{ fontSize: '13px' }}
+                            />
+                          </div>
+                          <span>{type.name}</span>
+                        </div>
+                      </Option>),
+                    )}
+                  </Select>,
+                )}
+              </FormItem>
+              <FormItem label="默认经办人策略" style={{ width: 512 }}>
+                {getFieldDecorator('strategy', {
+                  rules: [{ required: true, message: '默认经办人策略为必选项' }],
+                  // initialValue: this.state.strategy || 'undistributed',
+                  initialValue: this.state.strategy || undefined,
+                })(
+                  <RadioGroup label="默认经办人策略" onChange={this.onChangeStrategy}>
+                    <Radio style={radioStyle} value={'undistributed'}>无</Radio>
+                    <Radio style={radioStyle} value={'current_user'}>默认创建人</Radio>
+                    <Radio style={radioStyle} value={'default_assignee'}>指定经办人</Radio>
+                  </RadioGroup>,
+                )}
+              </FormItem>
+              <FormItem label="默认经办人" style={{ width: 512 }}>
+                {getFieldDecorator('assignee', {
+                  rules: [{ required: this.props.form.getFieldValue('strategy') === 'default_assignee', message: '默认经办人必选' }],
+                  initialValue: this.state.assignee || undefined,
+                })(
+                  <Select
+                    label="默认经办人"
+                    getPopupContainer={triggerNode => triggerNode.parentNode}
+                    loading={this.state.selectLoading}
+                    disabled={this.props.form.getFieldValue('strategy') !== 'default_assignee'}
+                    filter
+                    filterOption={false}
+                    allowClear
+                    onFilterChange={this.onFilterChange.bind(this)}
+                  >
+                    {this.state.originUsers.map(user =>
+                      (<Option key={user.id} value={user.id}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
+                          <UserHead
+                            user={{
+                              id: user.id,
+                              loginName: user.loginName,
+                              realName: user.realName,
+                              avatar: user.imageUrl,
+                            }}
+                          />
+                        </div>
+                      </Option>),
+                    )}
+                  </Select>,
                 )}
               </FormItem>
             </Form>
@@ -129,26 +320,23 @@ class ProjectSetting extends Component {
                 <Button
                   type="primary"
                   funcType="raised"
-                  disabled={!this.state.couldUpdate}
                   loading={this.state.loading}
-                  onClick={() => this.handleUpdateProjectCode()}
+                  onClick={() => this.handleUpdateProjectSetting()}
                 >
-            保存
+                  保存
                 </Button>
               </Permission>
               <Button
                 funcType="raised"
-                disabled={this.state.origin.projectCode === this.props.form.getFieldValue('code')}
                 style={{ marginLeft: 12 }}
-                onClick={() => this.getProjectCode()}
+                onClick={() => this.getProjectSetting()}
               >
-            取消
+                取消
               </Button>
             </div>
           </div>
         </Content>
       </Page>
-      
     );
   }
 }

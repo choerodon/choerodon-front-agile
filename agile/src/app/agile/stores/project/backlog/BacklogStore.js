@@ -21,6 +21,19 @@ class BacklogStore {
   @observable sprintWidth;
   @observable colorLookupValue = [];
   @observable quickFilters = [];
+  @observable projectInfo = {};
+
+  @computed get getProjectInfo() {
+    return toJS(this.projectInfo);
+  }
+
+  @action setProjectInfo(data) {
+    this.projectInfo = data;
+  }
+
+  axiosGetProjectInfo() {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`);
+  }
 
   @computed get getQuickFilters() {
     return toJS(this.quickFilters);
@@ -55,6 +68,14 @@ class BacklogStore {
       data.advancedSearchArgs.onlyStory = 'true';
     }
     return data;
+  }
+
+  @action clearSprintFilter() {
+    this.chosenEpic = 'all';
+    this.chosenVersion = 'all';
+    this.onlyMe = false;
+    this.recent = false;
+    this.quickFilters = [];
   }
 
   axiosDeleteSprint(id) {

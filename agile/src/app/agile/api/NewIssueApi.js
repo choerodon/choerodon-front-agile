@@ -129,6 +129,11 @@ export function loadDatalogs(issueId, projectId = AppState.currentMenuType.id) {
   return axios.get(`agile/v1/projects/${projectId}/data_log?issueId=${issueId}`);
 }
 
+export function loadBranchs(issueId, projectId = AppState.currentMenuType.id) {
+  return axios.get(`/devops/v1/project/${projectId}/issue/${issueId}/commit_and_merge_request/count`);
+}
+
+
 export function updateWorklog(logId, worklog, projectId = AppState.currentMenuType.id) {
   return axios.patch(`agile/v1/projects/${projectId}/work_log/${logId}`, worklog);
 }
@@ -157,9 +162,9 @@ export function loadIssues(page = 0, size = 10, searchDTO, orderField, orderType
 export function loadIssuesInLink(page = 0, size = 10, issueId, content) {
   const projectId = AppState.currentMenuType.id;
   if (content) {
-    return axios.get(`/agile/v1/projects/${projectId}/issues/${issueId}/summary?content=${content}&page=${page}&size=${size}`);
+    return axios.get(`/agile/v1/projects/${projectId}/issues/summary?issueId=${issueId}&self=false&content=${content}&page=${page}&size=${size}`);
   } else {
-    return axios.get(`/agile/v1/projects/${projectId}/issues/${issueId}/summary?page=${page}&size=${size}`);
+    return axios.get(`/agile/v1/projects/${projectId}/issues/summary?issueId=${issueId}&self=false&page=${page}&size=${size}`);
   }
 }
 

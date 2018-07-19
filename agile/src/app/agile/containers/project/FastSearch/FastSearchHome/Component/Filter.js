@@ -643,7 +643,7 @@ class AddComponent extends Component {
             }
             <Button
               type="primary"
-              funcTyp="flat"
+              funcType="flat"
               onClick={() => {
                 const arr = this.state.filters.slice();
                 arr.push({

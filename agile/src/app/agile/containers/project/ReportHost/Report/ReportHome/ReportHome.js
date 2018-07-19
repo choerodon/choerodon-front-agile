@@ -91,10 +91,16 @@ class ReleaseDetail extends Component {
     }
   }
   handleClick(e) {
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
     if (e.key === '0') {
-      const { history } = this.props;
-      const urlParams = AppState.currentMenuType;
       history.push(`/agile/reporthost/burndownchart?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }
+    if (e.key === '1') {
+      history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }
+    if (e.key === '2') {
+      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
     }
   }
   renderDoneIssue(column) {
@@ -152,7 +158,18 @@ class ReleaseDetail extends Component {
         title: '关键字',
         dataIndex: 'issueNum',
         render: (issueNum, record) => (
-          <span style={{ color: '#3f51b5' }}>{issueNum} {record.addIssue ? '*' : ''}</span>
+          <span
+            style={{ 
+              color: '#3f51b5',
+              cursor: 'pointer',
+            }}
+            role="none"
+            onClick={() => {
+              const { history } = this.props;
+              const urlParams = AppState.currentMenuType;
+              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/sprintreport`);
+            }}
+          >{issueNum} {record.addIssue ? '*' : ''}</span>
         ),
       }, {
         width: '30%',
@@ -231,6 +248,12 @@ class ReleaseDetail extends Component {
         <Menu.Item key="0">
           燃尽图
         </Menu.Item>
+        <Menu.Item key="1">
+          累积流量图
+        </Menu.Item>
+        <Menu.Item key="2">
+          版本报告
+        </Menu.Item>
       </Menu>
     );
     return (
@@ -240,17 +263,26 @@ class ReleaseDetail extends Component {
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <Button 
-            funcTyp="flat" 
+            funcType="flat" 
             onClick={() => ReportStore.changeCurrentSprint(ReportStore.currentSprint.sprintId)}
           >
             <Icon type="autorenew icon" />
             <span>刷新</span>
           </Button>
           <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcTyp="flat">
+            <Button icon="arrow_drop_down" funcType="flat">
               切换报表
             </Button>
           </Dropdown>
+          {/* <Button 
+            funcType="flat" 
+            onClick={() => {
+              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题`);
+            }}
+          >
+            <Icon type="autorenew icon" />
+            <span>查看问题列表</span>
+          </Button> */}
         </Header>
         <Content
           title={`迭代冲刺 "${ReportStore.currentSprint.sprintName || ''}" 的冲刺报告`}
@@ -275,13 +307,28 @@ class ReleaseDetail extends Component {
             )}
           </Select>
           <div className="c7n-sprintMessage">
-            <span>
-              {ReportStore.getCurrentSprintStatus.status}冲刺, 
-              共 {ReportStore.currentSprint.issueCount || 0} 个问题
-            </span>
-            <span>
-              {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
-            </span>
+            <div className="c7n-sprintContent">
+              <span>
+                {ReportStore.getCurrentSprintStatus.status}冲刺, 
+                共 {ReportStore.currentSprint.issueCount || 0} 个问题
+              </span>
+              <span>
+                {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
+              </span>
+            </div>
+            <p
+              style={{ 
+                color: '#3F51B5',
+                cursor: 'pointer',                
+              }}
+              role="none"
+              onClick={() => {
+                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题&paramUrl=reporthost/sprintreport`);
+              }}
+            >
+              在“问题管理中”查看
+              <Icon style={{ fontSize: 13 }} type="open_in_new" />
+            </p>
           </div>
           <ReactEcharts className="c7n-chart" option={this.getOption()} />
 

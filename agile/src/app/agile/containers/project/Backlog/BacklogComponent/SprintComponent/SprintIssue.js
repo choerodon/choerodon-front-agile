@@ -69,7 +69,7 @@ class SprintIssue extends Component {
       } else {
         return (
           <Tooltip title="类型： 故事">
-            <Icon style={{ color: 'white', fontSize: '14px' }} type="class" />
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
           </Tooltip>
         );
       }
@@ -131,7 +131,8 @@ class SprintIssue extends Component {
                   display: this.renderIssueDisplay() ? 'block' : 'flex',
                   alignItems: 'center',
                   cursor: 'move',
-                  flexWrap: 'wrap',
+                  flexWrap: 'nowrap',
+                  justifyContent: 'space-between',
                   // position: 'relative',
                 }}
                 label="sprintIssue"
@@ -155,6 +156,8 @@ class SprintIssue extends Component {
                   label="sprintIssue" 
                   className="c7n-backlog-sprintIssueSide"
                   style={{
+                    // width: 0,
+                    flexGrow: 1,
                     width: this.renderIssueDisplay() ? 'unset' : 0,
                   }}
                 >
@@ -175,10 +178,10 @@ class SprintIssue extends Component {
                     label="sprintIssue" 
                     style={{ 
                       marginLeft: 8,
-                      whiteSpace: 'nowrap',
+                      whiteSpace: this.renderIssueDisplay() ? 'normal' : 'nowrap',
                       textOverflow: 'ellipsis',
                       overflow: 'hidden',
-                      height: 20,
+                      height: this.renderIssueDisplay ? 'auto' : 20,
                     }}
                   >{`${item.issueNum} `}
                     <Tooltip title={item.summary} placement="topLeft">
@@ -190,8 +193,8 @@ class SprintIssue extends Component {
                   style={{ 
                     marginTop: this.props.epicVisible || this.props.versionVisible || JSON.stringify(BacklogStore.getClickIssueDetail) !== '{}' ? 5 : 0,
                     justifyContent: this.renderIssueDisplay() ? 'space-between' : 'flex-end',
-                    width: this.renderIssueDisplay() ? 'unset' : 0,
-                    flex: 2,
+                    // width: this.renderIssueDisplay() ? 'unset' : 0,
+                    // flex: 2,
                   }} 
                   label="sprintIssue"
                   className="c7n-backlog-sprintIssueSide"
@@ -290,7 +293,7 @@ class SprintIssue extends Component {
                     </div>
                     <div 
                       style={{ 
-                        maxWidth: 60,
+                        width: 60,
                         marginLeft: !_.isNull(item.statusName) ? '12px' : 0,
                       }} 
                       label="sprintIssue"
@@ -311,16 +314,20 @@ class SprintIssue extends Component {
                     <div 
                       style={{ 
                         maxWidth: 20,
-                        marginLeft: !_.isNull(item.storyPoints) ? '12px' : 0,
+                        marginLeft: '12px',
                       }}
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {item.storyPoints && item.typeCode === 'story' ? (
-                        <Tooltip title={`故事点: ${item.storyPoints}`}>
-                          <div label="sprintIssue" className="c7n-backlog-sprintIssueStoryPoint">{item.storyPoints}</div>
-                        </Tooltip>
-                      ) : ''}
+                      <Tooltip title={`故事点: ${item.storyPoints}`}>
+                        <div
+                          label="sprintIssue"
+                          className="c7n-backlog-sprintIssueStoryPoint"
+                          style={{
+                            visibility: item.storyPoints && item.typeCode === 'story' ? 'visible' : 'hidden',
+                          }}
+                        >{item.storyPoints}</div>
+                      </Tooltip>
                     </div>
                   </div>
                 </div>

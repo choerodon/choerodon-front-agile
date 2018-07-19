@@ -16,15 +16,6 @@ class IssueDescription extends Component {
   }
 
   componentDidMount() {
-    // const imgs = document.querySelector('img');
-    // document.querySelector('img').addEventListener('click', (e) => {
-    //   window.console.info(e.target.nodeName);
-    //   this.setState({
-    //     open: true,
-    //     src: e.target.src,
-    //   });
-    //   e.stopPropagation();
-    // });
     const that = this;
     window.addEventListener('click', (e) => {
       if (e.target.nodeName === 'IMG' && this.props.data && this.props.data.search(e.target.src) > -1) {
@@ -94,7 +85,7 @@ class IssueDescription extends Component {
 
   render() {
     return (
-      <div className="c7n-read-delta" style={{ width: '100%' }}>
+      <div className="c7n-read-delta" style={{ width: '100%', wordBreak: 'break-all' }}>
         <div dangerouslySetInnerHTML={{ __html: `${this.escape(this.props.data)}` }} />
         {
           this.state.open ? (

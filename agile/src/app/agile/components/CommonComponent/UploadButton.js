@@ -119,7 +119,7 @@ class UploadButton extends React.Component {
     };
     return (
       <Upload {...props} fileList={fileList} className="upload-button">
-        <Button>
+        <Button type={this.props.funcType || 'primary'}>
           <Icon type="file_upload" /> 上传附件
         </Button>
       </Upload>

@@ -66,7 +66,6 @@ class DeleteComponent extends Component {
         this.setState({
           loading: false,
         });
-        window.console.error('something wrong when delete component, please refresh and try again');
       });
   }
 
@@ -113,6 +112,9 @@ class DeleteComponent extends Component {
   }
 
   render() {
+    const menu = AppState.currentMenuType;
+    const urlParams = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <Modal
         width={600}
@@ -132,7 +134,15 @@ class DeleteComponent extends Component {
         </div>
         <ul style={{ margin: '20px 0 20px 20px', paddingLeft: '20px' }}>
           <li>
-            <span style={{ color: '#303f9f' }}>相关的问题（{this.state.component.issueCount}）</span>
+            <span
+              style={{ color: '#303f9f', cursor: 'pointer' }}
+              role="none"
+              onClick={() => {
+                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=component&paramId=${this.state.component.componentId}&paramName=${this.state.component.name}&paramUrl=component`);
+              }}
+            >
+              相关的问题（{this.state.component.issueCount}）
+            </span>
           </li>
         </ul>
         {

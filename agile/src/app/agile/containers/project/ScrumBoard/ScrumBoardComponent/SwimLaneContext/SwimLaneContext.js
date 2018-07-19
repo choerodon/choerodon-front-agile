@@ -133,6 +133,22 @@ class SwimLaneContext extends Component {
           {item.assigneeName}
         </div>
       );
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      result = (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Icon 
+            style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
+            type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+            role="none"
+            onClick={() => {
+              this.setState({
+                expand: !this.state.expand,
+              });
+            }}
+          />
+          {item.epicName}
+        </div>
+      );
     }
     return result;
   }
@@ -143,6 +159,8 @@ class SwimLaneContext extends Component {
       id = item.issueId;
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       id = item.assigneeId;
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      id = item.epicId;
     }
     return (
       <div className="c7n-scrumboard-others">

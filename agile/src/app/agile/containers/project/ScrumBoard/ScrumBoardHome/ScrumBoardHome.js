@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Select, Spin, message, Icon, Modal, Input, Form } from 'choerodon-ui';
+import { Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip } from 'choerodon-ui';
 import _ from 'lodash';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { withRouter } from 'react-router-dom';
@@ -39,19 +39,45 @@ class ScrumBoardHome extends Component {
       judgeUpdateParent: {},
       updateParentStatus: null,
       quickFilter: [],
+      more: false,
+      expandFilter: false,
     };
   }
   componentWillMount() {
     this.getBoard();
   }
+  componentDidMount() {
+    const timer = setInterval(() => {
+      if (document.getElementsByClassName('c7n-scrumTools-left').length > 0) {
+        if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
+          this.setState({
+            more: true,
+          });
+        }
+        clearInterval(timer);
+      }
+    }, 1000);
+  }
+  componentWillUnmount() {
+    ScrumBoardStore.setClickIssueDetail({});
+  }
   getBoard() {
     ScrumBoardStore.axiosGetBoardList().then((data) => {
+      let index;
+      _.forEach(data, (item, i) => {
+        if (item.userDefault) {
+          index = i;
+        }
+      });
+      if (!index) {
+        index = 0;
+      }
       ScrumBoardStore.setBoardList(data);
-      ScrumBoardStore.setCurrentConstraint(data[0].columnConstraint);
+      ScrumBoardStore.setCurrentConstraint(data[index].columnConstraint);
       if (!ScrumBoardStore.getSelectedBoard) {
-        ScrumBoardStore.setSwimLaneCode(data[0].swimlaneBasedCode);
-        ScrumBoardStore.setSelectedBoard(data[0].boardId);
-        this.refresh(data[0].boardId);
+        ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
+        ScrumBoardStore.setSelectedBoard(data[index].boardId);
+        this.refresh(data[index].boardId);
       } else {
         let flag = 0;
         _.forEach(data, (da) => {
@@ -62,13 +88,12 @@ class ScrumBoardHome extends Component {
         if (flag > 0) {
           this.refresh(ScrumBoardStore.getSelectedBoard);
         } else {
-          ScrumBoardStore.setSelectedBoard(data[0].boardId);
-          ScrumBoardStore.setSwimLaneCode(data[0].swimlaneBasedCode);
-          this.refresh(data[0].boardId);
+          ScrumBoardStore.setSelectedBoard(data[index].boardId);
+          ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
+          this.refresh(data[index].boardId);
         }
       }
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   refresh(boardId) {
@@ -82,51 +107,79 @@ class ScrumBoardHome extends Component {
         this.state.recent,
         this.state.quickFilter,
       ).then((data) => {
-        const parentIds = [];
-        const assigneeIds = [];
-        const storeParentIds = [];
-        const storeAssignee = [];
-        _.forEach(data.columnsData.columns, (col) => {
-          _.forEach(col.subStatuses, (sub) => {
-            _.forEach(sub.issues, (iss) => {
-              if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
-                if (parentIds.indexOf(iss.issueId) === -1) {
-                  parentIds.push(iss.issueId);
-                  storeParentIds.push({
-                    status: sub.name,
-                    categoryCode: sub.categoryCode,
-                    ...iss,
-                  });
-                }
-              }
-              if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
-                if (assigneeIds.indexOf(iss.assigneeId) === -1) {
-                  if (iss.assigneeId) {
-                    assigneeIds.push(iss.assigneeId);
-                    storeAssignee.push({
-                      assigneeId: iss.assigneeId,
-                      assigneeName: iss.assigneeName,
-                      imageUrl: iss.imageUrl,
+        ScrumBoardStore.axiosGetAllEpicData().then((data2) => {
+          const parentIds = [];
+          const assigneeIds = [];
+          const storeParentIds = [];
+          const storeAssignee = [];
+          const epicData = data.epicInfo;
+          _.forEach(data.columnsData.columns, (col) => {
+            _.forEach(col.subStatuses, (sub) => {
+              _.forEach(sub.issues, (iss) => {
+                if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
+                  if (parentIds.indexOf(iss.issueId) === -1) {
+                    parentIds.push(iss.issueId);
+                    storeParentIds.push({
+                      status: sub.name,
+                      categoryCode: sub.categoryCode,
+                      ...iss,
                     });
                   }
                 }
+                if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
+                  if (assigneeIds.indexOf(iss.assigneeId) === -1) {
+                    if (iss.assigneeId) {
+                      assigneeIds.push(iss.assigneeId);
+                      storeAssignee.push({
+                        assigneeId: iss.assigneeId,
+                        assigneeName: iss.assigneeName,
+                        imageUrl: iss.imageUrl,
+                      });
+                    }
+                  }
+                }
+              });
+            });
+          });
+          _.forEach(epicData, (item, index) => {
+            _.forEach(data2, (item2) => {
+              if (String(item.epicId) === String(item2.issueId)) {
+                epicData[index].color = item2.color;
               }
             });
           });
-        });
-        ScrumBoardStore.setAssigneer(storeAssignee);
-        ScrumBoardStore.setCurrentSprint(data.currentSprint);
-        ScrumBoardStore.setParentIds(storeParentIds);
-        ScrumBoardStore.setBoardData(data.columnsData.columns);
-        // this.storeIssueNumberCount(storeParentIds, )
-        this.setState({
-          spinIf: false,
+          ScrumBoardStore.setAssigneer(storeAssignee);
+          ScrumBoardStore.setCurrentSprint(data.currentSprint);
+          ScrumBoardStore.setParentIds(storeParentIds);
+          ScrumBoardStore.setEpicData(epicData);
+          const newColumnData = data.columnsData.columns;
+          const statusList = [];
+          _.forEach(newColumnData, (item, index) => {
+            if (item.subStatuses) {
+              _.forEach(item.subStatuses, (item2, index2) => {
+                statusList.push({
+                  id: item2.id,
+                  name: item2.name,
+                });
+                if (item2.issues) {
+                  _.forEach(item2.issues, (item3, index3) => {
+                    newColumnData[index].subStatuses[index2].issues[index3].statusName = item2.name;
+                    newColumnData[index].subStatuses[index2].issues[index3].categoryCode = item2.categoryCode;
+                  });
+                }
+              });
+            }
+          });
+          ScrumBoardStore.setStatusList(statusList);
+          ScrumBoardStore.setBoardData(newColumnData);
+          // this.storeIssueNumberCount(storeParentIds, )
+          this.setState({
+            spinIf: false,
+          });
         });
       }).catch((error) => {
-        window.console.error(error);
       });
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   // storeIssueNumberCount(storeParentIds, columns) {
@@ -260,7 +313,13 @@ class ScrumBoardHome extends Component {
           message.info(data.message);
           ScrumBoardStore.setBoardData(originState);
         } else {
+          _.forEach(ScrumBoardStore.getStatusList, (item, index) => {
+            if (data.statusId === item.id) {
+              draggableData.statusName = item.name;
+            }
+          });
           draggableData.objectVersionNumber = data.objectVersionNumber;
+          draggableData.categoryCode = JSON.parse(result.destination.droppableId).categoryCode;
           _.forEach(newState, (item, index) => {
             if (String(item.columnId) === 
             String(JSON.parse(result.destination.droppableId).columnId)) {
@@ -304,7 +363,6 @@ class ScrumBoardHome extends Component {
         }
       }).catch((error) => {
         ScrumBoardStore.setBoardData(JSON.parse(JSON.stringify(originState)));
-        window.console.error(error);
       });
     }
   }
@@ -318,7 +376,6 @@ class ScrumBoardHome extends Component {
           });
           this.getBoard();
         }).catch((error) => {
-          window.console.error(error);
         });
       }
     });
@@ -353,7 +410,6 @@ class ScrumBoardHome extends Component {
             title: 'warnning',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
             onCancel() {
-              window.console.log('Cancel');
             },
           });
         }
@@ -364,7 +420,6 @@ class ScrumBoardHome extends Component {
         });
       }
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   filterQuick(item) {
@@ -422,6 +477,17 @@ class ScrumBoardHome extends Component {
           );
         }
       });
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      _.forEach(data, (item) => {
+        if (item.subStatuses.length > 0) {
+          result.push(
+            <StatusBodyColumn
+              data={item}
+              epicId={id}
+            />,
+          );
+        }
+      });
     } else {
       _.forEach(data, (item) => {
         if (item.subStatuses.length > 0) {
@@ -439,8 +505,13 @@ class ScrumBoardHome extends Component {
     let ids = [];
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       ids = ScrumBoardStore.getParentIds;
+      ids = _.sortBy(ids, o => o.issueId);
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       ids = ScrumBoardStore.getAssigneer;
+      ids = _.sortBy(ids, o => o.assigneeId);
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      ids = ScrumBoardStore.getEpicData;
+      ids = _.sortBy(ids, o => o.epicId);
     }
     const result = [];
     _.forEach(ids, (item) => {
@@ -488,14 +559,101 @@ class ScrumBoardHome extends Component {
     }
     return result;
   }
-
+  renderOtherSwimlane() {
+    let result = '';
+    const data = ScrumBoardStore.getBoardData;
+    let flag = 0;
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      _.forEach(data, (item) => {
+        if (item.subStatuses) {
+          _.forEach(item.subStatuses, (item2) => {
+            if (item2.issues) {
+              _.forEach(item2.issues, (item3) => {
+                if (!item3.parentIssueId) {
+                  flag = 1;
+                }
+              });
+            }
+          });
+        }
+      });
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      _.forEach(data, (item) => {
+        if (item.subStatuses) {
+          _.forEach(item.subStatuses, (item2) => {
+            if (item2.issues) {
+              _.forEach(item2.issues, (item3) => {
+                if (!item3.assigneeId) {
+                  flag = 1;
+                }
+              });
+            }
+          });
+        }
+      });
+    } else {
+      flag = 1;
+    }
+    if (flag === 1) {
+      result = (
+        <div className="c7n-scrumboard-others">
+          <div className="c7n-scrumboard-otherHeader">
+            <Icon 
+              style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
+              type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+              role="none"
+              onClick={() => {
+                this.setState({
+                  expand: !this.state.expand,
+                });
+              }}
+            />
+            {this.renderOthersTitle()}
+          </div>
+          <div
+            className="c7n-scrumboard-otherContent"
+            style={{
+              display: this.state.expand ? 'flex' : 'none',
+            }}
+          >
+            <DragDropContext 
+              onDragEnd={this.handleDragEnd.bind(this)}
+              onDragStart={(start) => {
+                ScrumBoardStore.setDragStartItem(start);
+              }}
+            >
+              {this.renderIssueColumns()}
+            </DragDropContext>
+          </div>
+        </div>
+      );
+    }
+    // } else {
+    //   result = (
+    //     
+    //   );
+    // }
+    return result;
+  }
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
-      <Page className="c7n-scrumboard-page">
+      <Page
+        className="c7n-scrumboard-page"
+        service={[
+          'agile-service.board.deleteScrumBoard',
+          'agile-service.issue-status.createStatus',
+          'agile-service.board-column.createBoardColumn',
+          'agile-service.issue-status.deleteStatus',
+          'agile-service.issue-status.updateStatus',
+          'agile-service.issue.deleteIssue',
+          'agile-service.board.queryByProjectId',
+          'agile-service.board.queryByOptions',
+        ]}
+      >
         <Header title="活跃冲刺">
           <Button 
-            funcTyp="flat"
+            funcType="flat"
             onClick={() => {
               this.setState({
                 addBoard: true,
@@ -508,7 +666,7 @@ class ScrumBoardHome extends Component {
           <Select 
             className="leftBtn2 select-without-underline" 
             value={ScrumBoardStore.getSelectedBoard}
-            style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500 }}
+            style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: '28px' }}
             dropdownStyle={{
               color: '#3F51B5',
             }}
@@ -527,11 +685,15 @@ class ScrumBoardHome extends Component {
           >
             {
               ScrumBoardStore.getBoardList.map(item => (
-                <Option value={item.boardId}>{item.name}</Option>
+                <Option value={item.boardId}>
+                  <Tooltip title={item.name}>
+                    {item.name}
+                  </Tooltip>
+                </Option>
               ))
             }
           </Select>
-          <Button className="leftBtn2" funcTyp="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>
+          <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -540,54 +702,80 @@ class ScrumBoardHome extends Component {
           <div style={{ flexGrow: 1, overflow: 'hidden' }}>
             <Spin spinning={this.state.spinIf}>
               <div className="c7n-scrumTools">
-                <div style={{ flexWrap: 'wrap' }} className="c7n-scrumTools-left">
-                  <p style={{ marginRight: 24 }}>快速搜索:</p>
-                  <p
-                    className="c7n-scrumTools-filter"
+                <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                  <div 
+                    style={{ 
+                      width: '85%',
+                      flexWrap: 'wrap',
+                      height: this.state.expandFilter ? '' : 27,
+                    }} 
+                    className="c7n-scrumTools-left"
+                  >
+                    <p style={{ marginRight: 24 }}>快速搜索:</p>
+                    <p
+                      className="c7n-scrumTools-filter"
+                      style={{
+                        background: this.state.onlyMe ? '#3F51B5' : '',
+                        color: this.state.onlyMe ? 'white' : '#3F51B5',
+                      }}
+                      role="none"
+                      onClick={this.filterOnlyMe.bind(this)}
+                    >仅我的问题</p>
+                    <p
+                      className="c7n-scrumTools-filter"
+                      style={{
+                        background: this.state.recent ? '#3F51B5' : '',
+                        color: this.state.recent ? 'white' : '#3F51B5',
+                      }}
+                      role="none"
+                      onClick={this.filterOnlyStory.bind(this)}
+                    >仅故事</p>
+                    {
+                      ScrumBoardStore.getQuickSearchList.length > 0 ? 
+                        ScrumBoardStore.getQuickSearchList.map(item => (
+                          <p
+                            className="c7n-scrumTools-filter"
+                            style={{
+                              color: this.state.quickFilter.indexOf(item.filterId) !== -1 ? 'white' : '#3F51B5',
+                              background: this.state.quickFilter.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',
+                            }}
+                            role="none"
+                            onClick={this.filterQuick.bind(this, item)}
+                          >
+                            {item.name}
+                          </p>
+                        )) : ''
+                    }
+                  </div>
+                  <div
                     style={{
-                      background: this.state.onlyMe ? '#3F51B5' : '',
-                      color: this.state.onlyMe ? 'white' : '#3F51B5',
+                      display: this.state.more ? 'block' : 'none',
+                      color: 'rgb(63, 81, 181)',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap',
                     }}
                     role="none"
-                    onClick={this.filterOnlyMe.bind(this)}
-                  >仅我的问题</p>
-                  <p
-                    className="c7n-scrumTools-filter"
-                    style={{
-                      background: this.state.recent ? '#3F51B5' : '',
-                      color: this.state.recent ? 'white' : '#3F51B5',
+                    onClick={() => {
+                      this.setState({
+                        expandFilter: !this.state.expandFilter,
+                      });
                     }}
-                    role="none"
-                    onClick={this.filterOnlyStory.bind(this)}
-                  >仅故事</p>
-                  {
-                    ScrumBoardStore.getQuickSearchList.length > 0 ? 
-                      ScrumBoardStore.getQuickSearchList.map(item => (
-                        <p
-                          className="c7n-scrumTools-filter"
-                          style={{
-                            color: this.state.quickFilter.indexOf(item.filterId) !== -1 ? 'white' : '#3F51B5',
-                            background: this.state.quickFilter.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',
-                          }}
-                          role="none"
-                          onClick={this.filterQuick.bind(this, item)}
-                        >
-                          {item.name}
-                        </p>
-                      )) : ''
-                  }
+                  >
+                    {this.state.expandFilter ? '...收起' : '...展开'}
+                  </div>
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
+                  <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint && ScrumBoardStore.getCurrentSprint.dayRemain >= 0 ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
                   <Button
-                    funcTyp="flat"
+                    funcType="flat"
                     onClick={this.handleFinishSprint.bind(this)}
                   >
                     <Icon type="power_settings_new icon" />
                     <span style={{ marginLeft: 0 }}>完成Sprint</span>
                   </Button>
                   <Button
-                    funcTyp="flat"
+                    funcType="flat"
                     onClick={() => {
                       const { history } = this.props;
                       const urlParams = AppState.currentMenuType;
@@ -627,58 +815,33 @@ class ScrumBoardHome extends Component {
                     paddingBottom: 83,
                   }}
                 >
-                  {this.renderSwimlane()}
-                  {ScrumBoardStore.getCurrentSprint ? (
-                    <div className="c7n-scrumboard-others">
-                      <div className="c7n-scrumboard-otherHeader">
-                        <Icon 
-                          style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
-                          type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
-                          role="none"
-                          onClick={() => {
-                            this.setState({
-                              expand: !this.state.expand,
-                            });
-                          }}
-                        />
-                        {this.renderOthersTitle()}
+                  {
+                    ScrumBoardStore.getCurrentSprint ? (
+                      <div className="c7n-scrumboard-container">
+                        {this.renderSwimlane()}
+                        {this.renderOtherSwimlane()}
                       </div>
+                    ) : (
                       <div
-                        className="c7n-scrumboard-otherContent"
                         style={{
-                          display: this.state.expand ? 'flex' : 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginTop: '80px',
                         }}
                       >
-                        <DragDropContext 
-                          onDragEnd={this.handleDragEnd.bind(this)}
-                          onDragStart={(start) => {
-                            ScrumBoardStore.setDragStartItem(start);
+                        <img style={{ width: 170 }} src={EmptyScrumboard} alt="emptyscrumboard" />
+                        <div
+                          style={{
+                            marginLeft: 40,
                           }}
                         >
-                          {this.renderIssueColumns()}
-                        </DragDropContext>
+                          <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
+                          <p style={{ fontSize: 20, lineHeight: '34px' }}>在<span style={{ color: '#3f51b5' }}>待办事项</span>中开始Sprint</p>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop: '80px',
-                      }}
-                    >
-                      <img style={{ width: 170 }} src={EmptyScrumboard} alt="emptyscrumboard" />
-                      <div
-                        style={{
-                          marginLeft: 40,
-                        }}
-                      >
-                        <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
-                        <p style={{ fontSize: 20, lineHeight: '34px' }}>在<span style={{ color: '#3f51b5' }}>待办事项</span>中开始Sprint</p>
-                      </div>
-                    </div>
-                  )}
+                    )
+                  }
                 </div>
               </div>
             </Spin>
@@ -712,7 +875,6 @@ class ScrumBoardHome extends Component {
                   updateParentStatus: null,
                 });
               }).catch((error) => {
-                window.console.error(error);
               });
             }}
           >

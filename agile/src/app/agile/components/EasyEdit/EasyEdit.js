@@ -9,6 +9,7 @@
  * disabled
  * byHand
  * editIf
+ * time
  */
 
 import React, { Component } from 'react';
@@ -25,7 +26,14 @@ class EasyEdit extends Component {
       hoverIf: false,
     };
   }
+  handleOnOk() {
+    this.setState({
+      edit: false,
+      hoverIf: false,
+    });
+  }
   renderEdit() {
+    const that = this;
     if (this.props.type === 'input') {
       return (
         <Input
@@ -54,6 +62,8 @@ class EasyEdit extends Component {
           open={this.state.edit}
           defaultValue={this.props.defaultValue}
           disabledDate={this.props.disabledDate}
+          format="YYYY-MM-DD HH:mm:ss"
+          showTime={this.props.time}
           onOpenChange={(status) => {
             if (!status) {
               this.setState({
@@ -67,6 +77,11 @@ class EasyEdit extends Component {
             this.setState({
               edit: false,
               hoverIf: false,
+            });
+          }}
+          onOk={() => {
+            this.setState({
+              edit: false,
             });
           }}
         />

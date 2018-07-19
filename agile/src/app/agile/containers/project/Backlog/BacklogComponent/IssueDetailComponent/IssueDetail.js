@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import _ from 'lodash';
 import EditIssue from '../../../../../components/EditIssueNarrow';
 import './IssueDetail.scss';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
@@ -19,7 +20,6 @@ class IssueDetail extends Component {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
       BacklogStore.setSprintData(res);
     }).catch((error) => {
-      window.console.error(error);
     });
   }
   refreshIssueDetail() {
@@ -41,11 +41,22 @@ class IssueDetail extends Component {
             onCancel={() => {
               BacklogStore.setClickIssueDetail({});
               BacklogStore.setIsLeaveSprint(false);
+              this.props.cancelCallback();
             }}
             onDeleteIssue={() => {
               BacklogStore.setClickIssueDetail({});
               BacklogStore.setIsLeaveSprint(false);
               this.props.refresh();
+            }}
+            onCreateVersion={() => {
+              BacklogStore.axiosGetVersion().then((data2) => {
+                const newVersion = [...data2];
+                _.forEach(newVersion, (item, index) => {
+                  newVersion[index].expand = false;
+                });
+                BacklogStore.setVersionData(newVersion);
+              }).catch((error) => {
+              });
             }}
             onUpdate={this.handleIssueUpdate.bind(this)}
           />

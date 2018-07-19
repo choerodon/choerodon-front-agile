@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import { Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon } from 'choerodon-ui';
 
 import '../../../main.scss';
@@ -22,6 +22,8 @@ import TypeTag from '../../../../components/TypeTag';
 import EmptyBlock from '../../../../components/EmptyBlock';
 import { ReadAndEdit } from '../../../../components/CommonComponent';
 
+const FileSaver = require('file-saver');
+
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -41,12 +43,74 @@ class Issue extends Component {
     };
   }
   componentDidMount() {
-    IssueStore.init();
+    window.console.warn('above is not mine');
+    this.getInit();
+  }
+
+  getInit() {
+    const Request = this.GetRequest(this.props.location.search);
+    const { paramType, paramId, paramName, paramStatus, paramIssueId, paramUrl } = Request;
+    IssueStore.setParamId(paramId);
+    IssueStore.setParamType(paramType);
+    IssueStore.setParamName(paramName);
+    IssueStore.setParamStatus(paramStatus);
+    IssueStore.setParamIssueId(paramIssueId);
+    IssueStore.setParamUrl(paramUrl);
+    const arr = [];
+    if (paramName) {
+      arr.push(paramName);
+    }
+    if (paramStatus) {
+      const obj = {
+        advancedSearchArgs: {},
+        searchArgs: {},
+      };
+      const a = [paramStatus];
+      obj.advancedSearchArgs.statusCode = a || [];
+      IssueStore.setBarFilters(arr);
+      IssueStore.setFilter(obj);
+      IssueStore.setFilteredInfo({ statusCode: [paramStatus] });
+      IssueStore.loadIssues();
+    } else if (paramIssueId) {
+      IssueStore.setBarFilters(arr);
+      IssueStore.init();
+      IssueStore.loadIssues()
+        .then((res) => {
+          this.setState({
+            selectedIssue: res.content.length ? res.content[0] : {},
+            expand: true,
+          });
+        });
+      // IssueStore.init()
+      //   .then((res) => {
+      //     this.setState({
+      //       selectedIssue: res,
+      //       expand: true,
+      //     });
+      //   });
+    } else {
+      IssueStore.setBarFilters(arr);
+      IssueStore.init();
+      IssueStore.loadIssues();
+    }
+  }
+
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
   }
 
   handleCreateIssue(issueObj) {
     this.setState({ create: false });
     IssueStore.init();
+    IssueStore.loadIssues();
   }
 
   handleChangeIssueId(issueId) {
@@ -88,28 +152,33 @@ class Issue extends Component {
 
   handleBlurCreateIssue() {
     if (this.state.createIssueValue !== '') {
-      const data = {
-        priorityCode: 'medium',
-        projectId: AppState.currentMenuType.id,
-        sprintId: 0,
-        summary: this.state.createIssueValue,
-        typeCode: this.state.selectIssueType,
-        epicId: 0,
-        parentIssueId: 0,
-      };
-      this.setState({
-        createLoading: true,
-      });
-      createIssue(data)
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
         .then((res) => {
-          IssueStore.init();
+          const data = {
+            priorityCode: res.defaultPriorityCode || 'medium',
+            projectId: AppState.currentMenuType.id,
+            sprintId: 0,
+            summary: this.state.createIssueValue,
+            typeCode: this.state.selectIssueType,
+            epicId: 0,
+            epicName: this.state.selectIssueType === 'issue_epic' ? this.state.createIssueValue : undefined,
+            parentIssueId: 0,
+          };
           this.setState({
-            // createIssue: false,
-            createIssueValue: '',
-            createLoading: false,
+            createLoading: true,
           });
-        })
-        .catch((error) => {
+          createIssue(data)
+            .then((response) => {
+              IssueStore.init();
+              IssueStore.loadIssues();
+              this.setState({
+                // createIssue: false,
+                createIssueValue: '',
+                createLoading: false,
+              });
+            })
+            .catch((error) => {
+            });
         });
     }
   }
@@ -147,7 +216,12 @@ class Issue extends Component {
     IssueStore.loadIssues(current - 1, size);
   }
 
-  handleFilterChange = (pagination, filters, sorter, param) => {
+  handleFilterChange = (pagination, filters, sorter, barFilters) => {
+    IssueStore.setFilteredInfo(filters);
+    IssueStore.setBarFilters(barFilters);
+    if (barFilters === undefined || barFilters.length === 0) {
+      IssueStore.setBarFilters(undefined);
+    }
     const obj = {
       advancedSearchArgs: {},
       searchArgs: {},
@@ -162,6 +236,17 @@ class Issue extends Component {
     IssueStore.setFilter(obj);
     const { current, pageSize } = IssueStore.pagination;
     IssueStore.loadIssues(current - 1, pageSize);
+  }
+
+  exportExcel() {
+    const projectId = AppState.currentMenuType.id;
+    const searchParam = IssueStore.getFilter;
+    axios.post(`/zuul/agile/v1/projects/${projectId}/issues/export`, searchParam, { responseType: 'arraybuffer' })
+      .then((data) => {
+        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const fileName = `${AppState.currentMenuType.name}.xls`;
+        FileSaver.saveAs(blob, fileName);
+      });
   }
 
   renderWideIssue(issue) {
@@ -408,6 +493,7 @@ class Issue extends Component {
           },
         ],
         filterMultiple: true,
+        filteredValue: IssueStore.filteredInfo.statusCode || null,
       },
     ];
     const columns = [
@@ -485,17 +571,25 @@ class Issue extends Component {
         }
       </Menu>
     );
-    
     return (
-      <Page className="c7n-Issue c7n-region">
-
-        <Header title="问题管理">
-          <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ create: true })}>
+      <Page
+        className="c7n-Issue c7n-region"
+        service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
+      >
+        <Header
+          title="问题管理"
+          backPath={IssueStore.getBackUrl}
+        >
+          <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ create: true })}>
             <Icon type="playlist_add icon" />
             <span>创建问题</span>
           </Button>
+          <Button className="leftBtn" funcType="flat" onClick={() => this.exportExcel()}>
+            <Icon type="file_upload icon" />
+            <span>导出</span>
+          </Button>
           <Button
-            funcTyp="flat"
+            funcType="flat"
             onClick={() => {
               const { current, pageSize } = IssueStore.pagination;
               IssueStore.loadIssues(current - 1, pageSize);
@@ -505,7 +599,6 @@ class Issue extends Component {
             <span>刷新</span>
           </Button>
         </Header>
-
         <Content style={{ display: 'flex', padding: '0' }}>
           {/* <Spin spinning={IssueStore.loading}> */}
           <div 
@@ -526,6 +619,7 @@ class Issue extends Component {
                 showHeader={false}
                 onChange={this.handleFilterChange}
                 pagination={false}
+                filters={IssueStore.barFilters || []}
               />
             </section>
             <section className="c7n-count">
@@ -556,7 +650,7 @@ class Issue extends Component {
                   />
                 ) : (
                   <Table
-                    rowKey={record => record.id}
+                    rowKey={record => record.issueId}
                     columns={columns}
                     dataSource={_.slice(IssueStore.issues)}
                     filterBar={false}
@@ -652,7 +746,7 @@ class Issue extends Component {
                     <Button
                       className="leftBtn"
                       style={{ color: '#3f51b5' }}
-                      funcTyp="flat"
+                      funcType="flat"
                       onClick={() => {
                         this.setState({ 
                           createIssue: true,
@@ -710,24 +804,31 @@ class Issue extends Component {
             }}
           >
             {
-              this.state.expand && <EditIssue
-                issueId={this.state.selectedIssue.issueId}
-                changeIssueId={this.handleChangeIssueId.bind(this)}
-                onCancel={() => {
-                  this.setState({
-                    expand: false,
-                    selectedIssue: {},
-                  });
-                }}
-                onDeleteIssue={() => {
-                  this.setState({
-                    expand: false,
-                    selectedIssue: {},
-                  });
-                  IssueStore.init();
-                }}
-                onUpdate={this.handleIssueUpdate.bind(this)}
-              />
+              this.state.expand ? (
+                <EditIssue
+                  issueId={this.state.selectedIssue.issueId}
+                  // changeIssueId={this.handleChangeIssueId.bind(this)}
+                  onCancel={() => {
+                    this.setState({
+                      expand: false,
+                      selectedIssue: {},
+                    });
+                  }}
+                  onDeleteIssue={() => {
+                    this.setState({
+                      expand: false,
+                      selectedIssue: {},
+                    });
+                    IssueStore.init();
+                    IssueStore.loadIssues();
+                  }}
+                  onUpdate={this.handleIssueUpdate.bind(this)}
+                  onCopyAndTransformToSubIssue={() => {
+                    const { current, pageSize } = IssueStore.pagination;
+                    IssueStore.loadIssues(current - 1, pageSize);
+                  }}
+                />
+              ) : null
             }
           </div>
           {/* </Spin> */}

@@ -148,12 +148,12 @@ class StatusIssue extends Component {
       );
     }
   }
-  renderStatusBackground() {
-    if (this.props.categoryCode === 'todo') {
+  renderStatusBackground(categoryCode) {
+    if (categoryCode === 'todo') {
       return 'rgb(255, 177, 0)';
-    } else if (this.props.categoryCode === 'doing') {
+    } else if (categoryCode === 'doing') {
       return 'rgb(77, 144, 254)';
-    } else if (this.props.categoryCode === 'done') {
+    } else if (categoryCode === 'done') {
       return 'rgb(0, 191, 165)';
     } else {
       return 'gray';
@@ -215,6 +215,18 @@ class StatusIssue extends Component {
     }
   }
 
+  renderEpicData(param) {
+    const data = ScrumBoardStore.getEpicData;
+    const item = this.props.data;
+    let result;
+    _.forEach(data, (items) => {
+      if (String(items.epicId) === String(item.epicId)) {
+        result = items[param];
+      }
+    });
+    return result;
+  }
+
   renderReturn(item, index, issueId, type) {
     if (this.renderSubDisplay(item, type) === 'block') {
       return (
@@ -222,7 +234,7 @@ class StatusIssue extends Component {
           className="c7n-boardIssue"
           style={{
             borderTop: this.renderSubDisplay(item, type, 'border') ? '1px solid rgba(0, 0, 0, 0.20)' : 'unset',
-            display: this.renderSubDisplay(item, type),
+            // display: this.renderSubDisplay(item, type),
           }}
         >
           <Draggable 
@@ -302,19 +314,39 @@ class StatusIssue extends Component {
                               margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
                             }}
                           >
-                            <Tooltip title={`状态: ${this.props.statusName}`}>
+                            <Tooltip title={`状态: ${item.statusName}`}>
                               <span
                                 style={{ 
                                   borderRadius: 2, 
                                   padding: '2px 8px', 
-                                  background: this.renderStatusBackground(),
+                                  background: this.renderStatusBackground(item.categoryCode),
                                   // background: '#4D90FE', 
                                   color: 'white',
                                   maxWidth: 56,
                                 }}
                                 className="textDisplayOneColumn"
                               >
-                                {this.props.statusName}
+                                {item.statusName}
+                              </span>
+                            </Tooltip>
+                          </p>
+                          <p
+                            style={{
+                              margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
+                            }}
+                          >
+                            <Tooltip title={`史诗: ${this.renderEpicData('epicName')}`}>
+                              <span
+                                className="textDisplayOneColumn"
+                                style={{
+                                  color: this.renderEpicData('color'),
+                                  border: `1px solid ${this.renderEpicData('color')}`,
+                                  // marginLeft: '10px',
+                                  padding: '2px 8px',
+                                  maxWidth: '80px',
+                                }}
+                              >
+                                {this.renderEpicData('epicName')}
                               </span>
                             </Tooltip>
                           </p>
@@ -327,6 +359,7 @@ class StatusIssue extends Component {
                                 background: this.renderPriorityStyle('background', item),
                                 color: this.renderPriorityStyle('color', item),
                                 textAlign: 'center',
+                                height: 20,
                               }}
                             >{item.priorityName}</p>
                           </Tooltip>
@@ -339,6 +372,7 @@ class StatusIssue extends Component {
                                 textOverflow: 'ellipsis',
                                 lineHeight: '20px',
                                 paddingLeft: 10,
+                                whiteSpace: 'normal',
                               }}
                             >{item.summary}</p>
                           </Tooltip>

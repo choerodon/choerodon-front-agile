@@ -115,7 +115,6 @@ class CreateSprint extends Component {
         this.props.onOk();
       })
       .catch((error) => {
-        window.console.error('创建工作日志失败');
       });
   };
 
@@ -128,7 +127,7 @@ class CreateSprint extends Component {
   }
 
   handleTimeChange = (e) => {
-    this.setState({ time: e.target.value });
+    this.setState({ time: e });
   }
 
   handleTimeUnitChange = (value) => {
@@ -136,7 +135,7 @@ class CreateSprint extends Component {
   }
 
   handleReduceChange = (e) => {
-    this.setState({ reduce: e.target.value });
+    this.setState({ reduce: e });
   }
 
   handleReduceUnitChange = (value) => {
@@ -247,9 +246,15 @@ class CreateSprint extends Component {
               <RadioGroup label="剩余的估计" onChange={this.onRadioChange} value={this.state.radio}>
                 <Radio style={radioStyle} value={1}>自动调整</Radio>
                 <Radio style={radioStyle} value={2}>不设置预估时间</Radio>
-                <Radio style={radioStyle} value={3}>
+                <Radio
+                  style={{
+                    ...radioStyle,
+                    marginBottom: 20,
+                  }}
+                  value={3}
+                >
                   <span style={{ display: 'inline-block', width: 52 }}>设置为</span>
-                  <Input
+                  <NumericInput
                     style={tempAlignStyle}
                     disabled={this.state.radio !== 3}
                     value={this.state.time}
@@ -270,7 +275,7 @@ class CreateSprint extends Component {
                 </Radio>
                 <Radio style={radioStyle} value={4}>
                   <span style={{ display: 'inline-block', width: 52 }}>缩减</span>
-                  <Input
+                  <NumericInput
                     style={tempAlignStyle}
                     disabled={this.state.radio !== 4}
                     value={this.state.reduce}
@@ -297,7 +302,7 @@ class CreateSprint extends Component {
                 <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
                   <div style={{ fontWeight: 'bold' }}>工作说明</div>
                   <div style={{ marginLeft: '80px' }}>
-                    <Button className="leftBtn" funcTyp="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
+                    <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
                       <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: '12px' }} />
                       <span style={{ color: '#3f51b5' }}>全屏编辑</span>
                     </Button>

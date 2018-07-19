@@ -1,4 +1,0 @@
-[submodule "boot"]
-	path = boot
-	url = ../choerodon-front-boot
-
