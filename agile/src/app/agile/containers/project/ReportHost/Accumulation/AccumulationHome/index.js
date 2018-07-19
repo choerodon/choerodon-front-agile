@@ -119,7 +119,6 @@ class AccumulationHome extends Component {
       this.setState({
         loading: false,
       });
-      window.console.log(error);
     });
   }
   getOption() {
@@ -141,8 +140,6 @@ class AccumulationHome extends Component {
         }
       });
     }
-    window.console.log(legendData);
-    window.console.log(newxAxis);
     const legendSeries = [];
     _.forEach(data, (item, index) => {
       legendSeries.push({
@@ -334,7 +331,6 @@ class AccumulationHome extends Component {
         </Menu.Item>
       </Menu>
     );
-    window.console.log(AccumulationStore.getAccumulationData);
     return (
       <Page>
         <Header

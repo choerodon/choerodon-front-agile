@@ -101,7 +101,6 @@ class BurndownChartHome extends Component {
           newData[index].rest = rest;
         });
         BurndownChartStore.setBurndownList(newData);
-        window.console.log(newData);
         if (moment(this.state.endDate).isAfter(_.map(newData, 'date')[_.map(newData, 'date').length - 1])) {
           this.setState({
             xAxis: [..._.map(newData, 'date'), '2018-07-19 00:00:05'],

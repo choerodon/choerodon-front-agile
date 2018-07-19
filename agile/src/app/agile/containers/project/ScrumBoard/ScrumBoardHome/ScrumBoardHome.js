@@ -313,7 +313,6 @@ class ScrumBoardHome extends Component {
           message.info(data.message);
           ScrumBoardStore.setBoardData(originState);
         } else {
-          window.console.log(ScrumBoardStore.getStatusList);
           _.forEach(ScrumBoardStore.getStatusList, (item, index) => {
             if (data.statusId === item.id) {
               draggableData.statusName = item.name;

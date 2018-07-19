@@ -64,7 +64,6 @@ class VersionReport extends Component {
       this.setState({
         loading: false,
       });
-      window.console.log(error);
     });
   }
   getAddIssues(date, type, string) {
