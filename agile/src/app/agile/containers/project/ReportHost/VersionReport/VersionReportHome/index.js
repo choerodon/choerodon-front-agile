@@ -148,7 +148,7 @@ class VersionReport extends Component {
       if (moment(version.startDate.split(' ')[0]).isBefore(data[0].changeDate.split(' ')[0])) {
         total.unshift([version.startDate.split(' ')[0], data[0].totalField]);
         complete.unshift([version.startDate.split(' ')[0], data[0].completedField]);
-        percent.unshift([version.startDate.split(' ')[0], parseInt(data[0].unEstimatedPercentage, 10)]);
+        percent.unshift([version.startDate.split(' ')[0], parseInt(data[0].unEstimatedPercentage, 10) * 100]);
         xAxis.unshift(version.startDate.split(' ')[0]);
       }
     }
@@ -168,7 +168,7 @@ class VersionReport extends Component {
           xAxis.push(version.releaseDate.split(' ')[0]);
           total.push([version.releaseDate.split(' ')[0], data[data.length - 1].totalField]);
           complete.push([version.releaseDate.split(' ')[0], data[data.length - 1].completedField]);
-          percent.push([version.releaseDate.split(' ')[0], parseInt(data[data.length - 1].unEstimatedPercentage, 10)]);
+          percent.push([version.releaseDate.split(' ')[0], parseInt(data[data.length - 1].unEstimatedPercentage, 10) * 100]);
         }
       }
     }

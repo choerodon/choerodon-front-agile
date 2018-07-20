@@ -346,106 +346,94 @@ class AccumulationHome extends Component {
             </Button>
           </Dropdown>
         </Header>
-        {
-          !_.isNull(this.state.sprintData) ? (
-            <Content
-              title={`迭代冲刺“${this.state.sprintData.sprintName ? this.state.sprintData.sprintName : ''}”的累积流量图`}
-              description="显示状态的问题。这有助于您识别潜在的瓶颈, 需要对此进行调查。"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Spin spinning={this.state.loading}>
-                <div className="c7n-accumulation-filter">
-                  <RangePicker
-                    value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
-                    allowClear={false}
-                    onChange={(date, dateString) => {
-                      AccumulationStore.setStartDate(moment(dateString[0]));
-                      AccumulationStore.setEndDate(moment(dateString[1]));
-                      this.getData();
-                    }}
-                  />
-                  {
-                    this.getFilterData().map((item, index) => (
-                      <Popover
-                        placement="bottom"
-                        trigger="click"
-                        content={(
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                            }}
-                          >
-                            {
-                              item.data.map(items => (
-                                <Checkbox
-                                  checked={item.onChecked(items[item.id])}
-                                  onChange={(e) => {
-                                    item.onChange(items[item.id], e.target.checked);
-                                  }}
-                                >
-                                  {items.name}
-                                </Checkbox>
-                              ))
-                            }
-                          </div>
-                        )}
-                      >
-                        <Button 
-                          style={{ 
-                            marginLeft: index === 0 ? 20 : 0, 
-                            color: '#3F51B5', 
-                          }}
-                        >
-                          {item.text}
-                          <Icon type="baseline-arrow_drop_down" />
-                        </Button>
-                      </Popover>
-                    ))
-                  }
-                  {
-                    this.state.optionsVisible ? (
-                      <AccumulationFilter
-                        visible={this.state.optionsVisible}
-                        getTimeType={this.getTimeType.bind(this)}
-                        getColumnData={this.getColumnData.bind(this)}
-                        getData={this.getData.bind(this)}
-                        onCancel={() => {
-                          this.getColumnData(this.getTimeType(AccumulationStore.getBoardList, 'boardId'));
-                          this.setState({
-                            optionsVisible: false,
-                          });
+        <Content
+          title="累积流量图"
+          description="显示状态的问题。这有助于您识别潜在的瓶颈, 需要对此进行调查。"
+          link="#"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Spin spinning={this.state.loading}>
+            <div className="c7n-accumulation-filter">
+              <RangePicker
+                value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
+                allowClear={false}
+                onChange={(date, dateString) => {
+                  AccumulationStore.setStartDate(moment(dateString[0]));
+                  AccumulationStore.setEndDate(moment(dateString[1]));
+                  this.getData();
+                }}
+              />
+              {
+                this.getFilterData().map((item, index) => (
+                  <Popover
+                    placement="bottom"
+                    trigger="click"
+                    content={(
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
                         }}
-                      />
-                    ) : ''
-                  }
-                </div>
-                <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
-                  <ReactEcharts
-                    option={this.state.options}
-                    style={{
-                      height: '600px',
+                      >
+                        {
+                          item.data.map(items => (
+                            <Checkbox
+                              checked={item.onChecked(items[item.id])}
+                              onChange={(e) => {
+                                item.onChange(items[item.id], e.target.checked);
+                              }}
+                            >
+                              {items.name}
+                            </Checkbox>
+                          ))
+                        }
+                      </div>
+                    )}
+                  >
+                    <Button 
+                      style={{ 
+                        marginLeft: index === 0 ? 20 : 0, 
+                        color: '#3F51B5', 
+                      }}
+                    >
+                      {item.text}
+                      <Icon type="baseline-arrow_drop_down" />
+                    </Button>
+                  </Popover>
+                ))
+              }
+              {
+                this.state.optionsVisible ? (
+                  <AccumulationFilter
+                    visible={this.state.optionsVisible}
+                    getTimeType={this.getTimeType.bind(this)}
+                    getColumnData={this.getColumnData.bind(this)}
+                    getData={this.getData.bind(this)}
+                    onCancel={() => {
+                      this.getColumnData(this.getTimeType(AccumulationStore.getBoardList, 'boardId'));
+                      this.setState({
+                        optionsVisible: false,
+                      });
                     }}
-                    notMerge
-                    lazyUpdate
                   />
-                </div>
-              </Spin>
-            </Content>
-          ) : (
-            <div 
-              className="c7n-chart-noSprint c7n-accumulation-nosprint"
-            >
-              <div className="c7n-chart-icon">
-                <Icon type="info_outline" />
-              </div>
-              <p style={{ marginLeft: 20 }}>该面板无可用冲刺</p>
+                ) : ''
+              }
             </div>
-          )
-        }
+            <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
+              <ReactEcharts
+                option={this.state.options}
+                style={{
+                  height: '600px',
+                }}
+                notMerge
+                lazyUpdate
+              />
+            </div>
+          </Spin>
+        </Content>
       </Page>
     );
   }
