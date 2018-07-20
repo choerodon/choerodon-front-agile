@@ -102,7 +102,6 @@ class MergeRequest extends Component {
             <UserHead
               user={{
                 id: authorId,
-                loginName: record.authorLoginName,
                 realName: record.authorName,
                 avatar: record.imageUrl,
               }}
@@ -159,7 +158,7 @@ class MergeRequest extends Component {
             paddingRight: 0,
             paddingTop: 0,
           }}
-          title={`查看问题“ ${this.props.issueNum} ”关联的合并请求`}
+          title={`查看问题“${this.props.issueNum}”关联的合并请求`}
           description="您可以在此查看该问题关联的所有合并请求相关信息，及查看合并请求详情。"
         >
           <Table

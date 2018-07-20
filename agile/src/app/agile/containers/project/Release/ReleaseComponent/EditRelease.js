@@ -79,7 +79,7 @@ class EditRelease extends Component {
                 padding: 0,
                 width: 512,
               }}
-              title={`在项目"${AppState.currentMenuType.name}"中修改发布计划`}
+              title={`在项目“${AppState.currentMenuType.name}”中修改发布计划`}
               description="请在下面输入应用模板编码、名称、描述，创建默认最简模板。您也可以通过复制于现有模板，以便节省部分共同操作，提升效率。"
             >
               <Form>

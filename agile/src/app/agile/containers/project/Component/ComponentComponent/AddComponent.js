@@ -113,7 +113,7 @@ class AddComponent extends Component {
             padding: 0,
             width: 512,
           }}
-          title={`在项目"${AppState.currentMenuType.name}"中创建模块`}
+          title={`在项目“${AppState.currentMenuType.name}”中创建模块`}
           description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，创建新模版。"
         >
           <Form>

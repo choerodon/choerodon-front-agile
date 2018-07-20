@@ -52,10 +52,10 @@ class Epic extends Component {
     const data = BacklogStore.getEpicData;
     const result = [];
     if (data.length > 0) {
-      _.forEach(data, (item, index) => {
+      for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
           <EpicItem
-            data={item}
+            data={data[index]}
             handleClickEpic={this.handleClickEpic.bind(this)}
             draggableIds={this.state.draggableIds}
             refresh={this.props.refresh.bind(this)}
@@ -64,7 +64,7 @@ class Epic extends Component {
           />
           ,
         );
-      });
+      }
     }
     return result;
   }
@@ -76,11 +76,17 @@ class Epic extends Component {
           this.setState({
             hoverBlockButton: true,
           });
+          if (BacklogStore.getIsDragging) {
+            BacklogStore.setIsLeaveSprint(true);
+          }
         }}
         onMouseLeave={() => {
           this.setState({
             hoverBlockButton: false,
           });
+          if (BacklogStore.getIsDragging) {
+            BacklogStore.setIsLeaveSprint(false);
+          }
         }}
       >
         {this.props.visible ? (
@@ -110,6 +116,7 @@ class Epic extends Component {
                   role="none"
                   onClick={() => {
                     this.props.changeVisible('epicVisible', false);
+                    BacklogStore.setIsLeaveSprint(false);
                   }}
                   style={{
                     cursor: 'pointer',

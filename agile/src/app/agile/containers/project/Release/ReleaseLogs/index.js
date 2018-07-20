@@ -166,7 +166,7 @@ class ReleaseLogs extends Component {
           
         </Header>
         <Content
-          title={`版本"${this.state.version.name}" 的版本日志`}
+          title={`版本“${this.state.version.name}” 的版本日志`}
           description="您可以在此查看版本的版本日志，按照问题类型来分类显示问题列表，并且可以点击到具体问题进行修改。"
         >
           {
