@@ -108,6 +108,12 @@ class VersionReport extends Component {
   getOptions() {
     const version = VersionReportStore.getReportData.version;
     const data = VersionReportStore.getReportData.versionReport.reverse();
+    if (data.length === 0) {
+      this.setState({
+        options: {},
+      });
+      return;
+    }
     let xAxis = [];
     const seriesData = {};
     _.forEach(data, (item) => {
@@ -684,16 +690,20 @@ class VersionReport extends Component {
                 onClick={this.goIssues.bind(this)}
               >在“问题管理中”查看V {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}<Icon style={{ fontSize: 13 }} type="open_in_new" /></p>
             </div>
-            <div className="c7n-versionReport-report">
-              <ReactEcharts
-                option={this.state.options}
-                style={{
-                  height: '400px',
-                }}
-                notMerge
-                lazyUpdate
-              />
-            </div>
+            {
+              JSON.stringify(this.state.options) === '{}' ? '' : (
+                <div className="c7n-versionReport-report">
+                  <ReactEcharts
+                    option={this.state.options}
+                    style={{
+                      height: '400px',
+                    }}
+                    notMerge
+                    lazyUpdate
+                  />
+                </div>
+              )
+            }
             <div className="c7n-versionReport-issues">
               <Tabs defaultActiveKey="1">
                 <TabPane tab="已完成的问题" key="1">

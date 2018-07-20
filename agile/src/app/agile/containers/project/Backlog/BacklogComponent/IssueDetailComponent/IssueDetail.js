@@ -51,9 +51,9 @@ class IssueDetail extends Component {
             onCreateVersion={() => {
               BacklogStore.axiosGetVersion().then((data2) => {
                 const newVersion = [...data2];
-                _.forEach(newVersion, (item, index) => {
+                for (let index = 0, len = newVersion.length; index < len; index += 1) {
                   newVersion[index].expand = false;
-                });
+                }
                 BacklogStore.setVersionData(newVersion);
               }).catch((error) => {
               });

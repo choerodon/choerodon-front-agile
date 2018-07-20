@@ -94,6 +94,12 @@ class AccumulationHome extends Component {
     const startDate = AccumulationStore.getStartDate.format('YYYY-MM-DD HH:mm:ss');
     const columnIds = [];
     const quickFilterIds = [];
+    let boardId;
+    _.forEach(AccumulationStore.getBoardList, (bi) => {
+      if (bi.check) {
+        boardId = bi.boardId;
+      }
+    });
     _.forEach(columnData, (cd) => {
       if (cd.check) {
         columnIds.push(cd.columnId);
@@ -109,6 +115,7 @@ class AccumulationHome extends Component {
       endDate,
       quickFilterIds,
       startDate,
+      boardId,
     }).then((res) => {
       AccumulationStore.setAccumulationData(res);
       this.setState({
@@ -141,11 +148,11 @@ class AccumulationHome extends Component {
       });
     }
     const legendSeries = [];
-    _.forEach(data, (item, index) => {
+    _.forEach(data.reverse(), (item, index) => {
       legendSeries.push({
         name: item.name,
         type: 'line',
-        // stack: '总量',
+        stack: true,
         areaStyle: { normal: {
           color: item.color,
         } },
@@ -424,6 +431,7 @@ class AccumulationHome extends Component {
             </div>
             <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
               <ReactEcharts
+                ref={(e) => { this.echarts_react = e; }}
                 option={this.state.options}
                 style={{
                   height: '600px',
