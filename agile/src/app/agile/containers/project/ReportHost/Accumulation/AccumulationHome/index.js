@@ -351,7 +351,6 @@ class AccumulationHome extends Component {
             <Content
               title={`迭代冲刺“${this.state.sprintData.sprintName ? this.state.sprintData.sprintName : ''}”的累积流量图`}
               description="显示状态的问题。这有助于您识别潜在的瓶颈, 需要对此进行调查。"
-              link="#"
               style={{
                 display: 'flex',
                 flexDirection: 'column',

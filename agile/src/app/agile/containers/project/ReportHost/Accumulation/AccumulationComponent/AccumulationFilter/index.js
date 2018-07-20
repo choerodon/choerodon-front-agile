@@ -113,7 +113,6 @@ class AccumulationFilter extends Component {
         <Content
           title="修改迭代冲刺“xxxx”的累积流量图"
           description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，创建新模版。"
-          link="#"
           style={{
             padding: 0,
           }}

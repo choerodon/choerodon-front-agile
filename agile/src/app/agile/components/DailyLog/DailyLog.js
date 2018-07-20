@@ -199,16 +199,10 @@ class CreateSprint extends Component {
         cancelText="取消"
         confirmLoading={this.state.createLoading}
       >
-        <div className="c7n-region">
+        <div className="c7n-region-agile">
           <h2 className="c7n-space-first">{`登记"${this.props.issueNum}"的工作日志`}</h2>
           <p>
             您可以在这里记录您的工作，花费的时间会在关联问题中预估时间进行扣减，以便更精确地计算问题进度和提升工作效率。
-            {/* <a href="#" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
-              <span className="c7n-external-link-content">
-              了解详情
-              </span>
-              <Icon type="open_in_new" />
-            </a> */}
           </p>
           <section className="info">
             <div className="line-info">

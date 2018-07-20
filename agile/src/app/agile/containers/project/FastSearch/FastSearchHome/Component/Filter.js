@@ -124,22 +124,22 @@ class AddComponent extends Component {
         return `'${v}'`;
       }
     } else if (type === '[object Array]') {
-        const v = _.map(value, 'key');
-        return `(${  v.join(',')  })`;
-      } else if (type === '[object Object]') {
-        if (value.key) {
-          const v = value.key;
-          if (Object.prototype.toString.call(v) === '[object Number]') {
-            return v;
-          } else if (Object.prototype.toString.call(v) === '[object String]') {
-            return v;
-          }
-        } else {
-          return value.format('YYYY-MM-DD HH:mm:ss');
+      const v = _.map(value, 'key');
+      return `(${  v.join(',')  })`;
+    } else if (type === '[object Object]') {
+      if (value.key) {
+        const v = value.key;
+        if (Object.prototype.toString.call(v) === '[object Number]') {
+          return v;
+        } else if (Object.prototype.toString.call(v) === '[object String]') {
+          return v;
         }
       } else {
-        return value;
+        return value.format('YYYY-MM-DD HH:mm:ss');
       }
+    } else {
+      return value;
+    }
   }
 
   getLabel(value) {
@@ -533,9 +533,8 @@ class AddComponent extends Component {
             padding: 0,
             width: 700,
           }}
-          title={`在项目"${AppState.currentMenuType.name}"中创建快速搜索`}
+          title={`在项目“${AppState.currentMenuType.name}”中创建快速搜索`}
           description="通过定义快速搜索，可以在待办事项和活跃冲刺的快速搜索工具栏生效，帮助您更好的筛选过滤问题面板。"
-          // link="#"
         >
           <Form layout="vertical">
             <FormItem style={{ width: 520 }}>

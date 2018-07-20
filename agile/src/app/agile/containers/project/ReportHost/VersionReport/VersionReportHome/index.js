@@ -617,7 +617,6 @@ class VersionReport extends Component {
         <Content
           title={`迭代冲刺“${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}”的版本报告`}
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
-          link="#"
         >
           <Spin spinning={this.state.loading}>
             <Select

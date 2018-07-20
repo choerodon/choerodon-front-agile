@@ -95,7 +95,6 @@ class EditStatus extends Component {
           style={{ padding: 0 }}
           title={`修改看板“${name}”的状态`}
           description="请在下面输入状态名称，选择状态的类别。可以添加、删除、重新排序和重命名一个状态，配置完成后，您可以通过board对问题拖拽进行状态的流转。"
-          // link="#"
         >
           <Form style={{ width: 512 }}>
             <FormItem>
