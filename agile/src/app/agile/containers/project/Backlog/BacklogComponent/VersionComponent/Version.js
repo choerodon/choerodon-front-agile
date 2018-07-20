@@ -70,11 +70,17 @@ class Version extends Component {
           this.setState({
             hoverBlockButton: true,
           });
+          if (BacklogStore.getIsDragging) {
+            BacklogStore.setIsLeaveSprint(true);
+          }
         }}
         onMouseLeave={() => {
           this.setState({
             hoverBlockButton: false,
           });
+          if (BacklogStore.getIsDragging) {
+            BacklogStore.setIsLeaveSprint(false);
+          }
         }}
       >
         {
@@ -109,6 +115,7 @@ class Version extends Component {
                     }}
                     onClick={() => {
                       this.props.changeVisible('versionVisible', false);
+                      BacklogStore.setIsLeaveSprint(false);
                     }}
                   />
                 </div>

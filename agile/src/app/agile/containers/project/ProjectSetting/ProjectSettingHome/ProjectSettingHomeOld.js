@@ -109,7 +109,7 @@ class ProjectSetting extends Component {
         <Content
           title="项目设置"
           description="项目编码用于问题编号的前缀，如无特殊需求，不建议频繁修改。"
-          link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/setup/project-setting/"
+          link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/setup/project-setting/"
         >
           <div style={{ marginTop: 8 }}>
             <Form layout="vertical">

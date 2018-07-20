@@ -272,9 +272,9 @@ class ReleaseHome extends Component {
           </Button>
         </Header>
         <Content
-          title={`项目"${AppState.currentMenuType.name}"的发布版本`}
+          title={`项目“${AppState.currentMenuType.name}”的发布版本`}
           description="根据项目周期，可以对软件项目追踪不同的版本，同时可以将对应的问题分配到版本中。例如：v1.0.0、v0.5.0等。"
-          link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/release/"
+          link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/release/"
         >
           <Spin spinning={this.state.loading}>
             {
@@ -317,7 +317,7 @@ class ReleaseHome extends Component {
             refresh={this.refresh.bind(this, this.state.pagination)}
           />
           <Modal
-            title={`删除版本 V${this.state.versionDelete.name}`}
+            title={`删除版本 ${this.state.versionDelete.name}`}
             visible={JSON.stringify(this.state.versionDelete) !== '{}'}
             closable={false}
             okText="删除"

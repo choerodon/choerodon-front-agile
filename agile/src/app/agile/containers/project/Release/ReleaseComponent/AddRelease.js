@@ -69,9 +69,9 @@ class AddRelease extends Component {
             padding: 0,
             width: 512,
           }}
-          title={`在项目"${AppState.currentMenuType.name}"中创建发布版本`}
+          title={`在项目“${AppState.currentMenuType.name}”中创建发布版本`}
           description="请在下面输入版本的名称、描述、开始和结束日期，创建新的软件版本。"
-          link="http://v0-7.choerodon.io/zh/docs/user-guide/agile/release/"
+          link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/release/"
         >
           <Form>
             <FormItem>

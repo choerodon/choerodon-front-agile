@@ -59,7 +59,7 @@ class DeleteReleaseWithIssue extends Component {
   render() {
     return (
       <Sidebar
-        title={`删除版本 V${this.props.versionDelInfo.versionName}`}
+        title={`删除版本 ${this.props.versionDelInfo.versionName}`}
         closable={false}
         visible={JSON.stringify(this.props.versionDelInfo) !== '{}'}
         okText="删除"

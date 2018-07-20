@@ -149,17 +149,17 @@ class Sprint extends Component {
               clickSprintDatas = BacklogStore.getSprintData.backlogData.backLogIssue;
             }
             const indexs = [];
-            _.forEach(clickSprintDatas, (cs, index) => {
-              if (cs.issueId === firstClick || cs.issueId === item.issueId) {
+            for (let index = 0, len = clickSprintDatas.length; index < len; index += 1) {
+              if (clickSprintDatas[index].issueId === firstClick || clickSprintDatas[index].issueId === item.issueId) {
                 indexs.push(index);
               }
-            });
+            }
             const issueIds = [];
-            _.forEach(clickSprintDatas, (cs2, index2) => {
-              if (index2 >= indexs[0] && index2 <= indexs[1]) {
-                issueIds.push(cs2.issueId);
+            for (let index = 0, len = clickSprintDatas.length; index < len; index += 1) {
+              if (index >= indexs[0] && index <= indexs[1]) {
+                issueIds.push(clickSprintDatas[index].issueId);
               }
-            });
+            }
             this.setState({
               selected: {
                 droppableId: sprintId,
@@ -279,12 +279,6 @@ class Sprint extends Component {
       <div
         role="none"
         className="c7n-backlog-sprint"
-        onMouseEnter={() => {
-          BacklogStore.setIsLeaveSprint(false);
-        }}
-        onMouseLeave={() => {
-          BacklogStore.setIsLeaveSprint(true);
-        }}
       >
         <Spin spinning={this.props.spinIf}>
           {this.renderSprint()}

@@ -108,6 +108,12 @@ class VersionReport extends Component {
   getOptions() {
     const version = VersionReportStore.getReportData.version;
     const data = VersionReportStore.getReportData.versionReport.reverse();
+    if (data.length === 0) {
+      this.setState({
+        options: {},
+      });
+      return;
+    }
     let xAxis = [];
     const seriesData = {};
     _.forEach(data, (item) => {
@@ -148,7 +154,7 @@ class VersionReport extends Component {
       if (moment(version.startDate.split(' ')[0]).isBefore(data[0].changeDate.split(' ')[0])) {
         total.unshift([version.startDate.split(' ')[0], data[0].totalField]);
         complete.unshift([version.startDate.split(' ')[0], data[0].completedField]);
-        percent.unshift([version.startDate.split(' ')[0], parseInt(data[0].unEstimatedPercentage, 10)]);
+        percent.unshift([version.startDate.split(' ')[0], parseInt(data[0].unEstimatedPercentage, 10) * 100]);
         xAxis.unshift(version.startDate.split(' ')[0]);
       }
     }
@@ -168,7 +174,7 @@ class VersionReport extends Component {
           xAxis.push(version.releaseDate.split(' ')[0]);
           total.push([version.releaseDate.split(' ')[0], data[data.length - 1].totalField]);
           complete.push([version.releaseDate.split(' ')[0], data[data.length - 1].completedField]);
-          percent.push([version.releaseDate.split(' ')[0], parseInt(data[data.length - 1].unEstimatedPercentage, 10)]);
+          percent.push([version.releaseDate.split(' ')[0], parseInt(data[data.length - 1].unEstimatedPercentage, 10) * 100]);
         }
       }
     }
@@ -617,7 +623,6 @@ class VersionReport extends Component {
         <Content
           title={`迭代冲刺“${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}”的版本报告`}
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
-          link="#"
         >
           <Spin spinning={this.state.loading}>
             <Select
@@ -685,16 +690,20 @@ class VersionReport extends Component {
                 onClick={this.goIssues.bind(this)}
               >在“问题管理中”查看V {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}<Icon style={{ fontSize: 13 }} type="open_in_new" /></p>
             </div>
-            <div className="c7n-versionReport-report">
-              <ReactEcharts
-                option={this.state.options}
-                style={{
-                  height: '400px',
-                }}
-                notMerge
-                lazyUpdate
-              />
-            </div>
+            {
+              JSON.stringify(this.state.options) === '{}' ? '' : (
+                <div className="c7n-versionReport-report">
+                  <ReactEcharts
+                    option={this.state.options}
+                    style={{
+                      height: '400px',
+                    }}
+                    notMerge
+                    lazyUpdate
+                  />
+                </div>
+              )
+            }
             <div className="c7n-versionReport-issues">
               <Tabs defaultActiveKey="1">
                 <TabPane tab="已完成的问题" key="1">

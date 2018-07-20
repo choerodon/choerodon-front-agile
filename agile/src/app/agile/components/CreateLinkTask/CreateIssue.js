@@ -152,7 +152,7 @@ class CreateSprint extends Component {
         cancelText="取消"
         confirmLoading={this.state.createLoading}
       >
-        <div className="c7n-region">
+        <div className="c7n-region-agile">
           <h2 className="c7n-space-first">对问题创建链接</h2>
           <p>
             请在下面输入相关任务的基本信息，包括所要创建的关系（复制、阻塞、关联、破坏、被复制、被阻塞、被破坏等）以及所要关联的问题（支持多选）。
