@@ -69,28 +69,28 @@ class VersionReport extends Component {
   getAddIssues(date, type, string) {
     const data = VersionReportStore.getReportData.versionReport;
     let addIssues = [];
-    _.forEach(data, (item) => {
-      if (item.changeDate.split(' ')[0] === date) {
-        if (item[type]) {
-          addIssues = [...addIssues, ...item[type]];
+    for (let index = 0, len = data.length; index < len; index += 1) {
+      if (data[index].changeDate.split(' ')[0] === date) {
+        if (data[index][type]) {
+          addIssues = [...addIssues, ...data[index][type]];
         }
       }
-    });
+    }
     let result = '';
     if (addIssues.length > 0) {
       result += `<p>${string}:</p>`;
-      _.forEach(addIssues, (item) => {
-        result += `<p>${item.issueNum} `;
+      for (let index = 0, len = addIssues.length; index < len; index += 1) {
+        result += `<p>${addIssues[index].issueNum} `;
         if (this.state.type !== 'issueCount') {
           if (type === 'fieldChangIssues') {
-            result += `${this.renderYname()}变化了: ${item.changeField ? item.changeField : 0}</p>`;
+            result += `${this.renderYname()}变化了: ${addIssues[index].changeField ? addIssues[index].changeField : 0}</p>`;
           } else {
-            result += `${this.renderYname()}变化了: ${item.newValue ? item.newValue : 0}</p>`;
+            result += `${this.renderYname()}变化了: ${addIssues[index].newValue ? addIssues[index].newValue : 0}</p>`;
           }
         } else {
           result += '</p>';
         }
-      });
+      }
     }
     return result;
   }
@@ -116,26 +116,26 @@ class VersionReport extends Component {
     }
     let xAxis = [];
     const seriesData = {};
-    _.forEach(data, (item) => {
-      if (xAxis.indexOf(item.changeDate.split(' ')[0]) === -1) {
-        xAxis.push(item.changeDate.split(' ')[0]);
+    for (let index = 0, len = data.length; index < len; index += 1) {
+      if (xAxis.indexOf(data[index].changeDate.split(' ')[0]) === -1) {
+        xAxis.push(data[index].changeDate.split(' ')[0]);
       }
-      if (!seriesData[item.changeDate.split(' ')[0]]) {
-        seriesData[item.changeDate.split(' ')[0]] = {
-          time: item.changeDate,
-          total: item.totalField,
-          complete: item.completedField,
-          percent: parseInt(item.unEstimatedPercentage * 100, 10),
+      if (!seriesData[data[index].changeDate.split(' ')[0]]) {
+        seriesData[data[index].changeDate.split(' ')[0]] = {
+          time: data[index].changeDate,
+          total: data[index].totalField,
+          complete: data[index].completedField,
+          percent: parseInt(data[index].unEstimatedPercentage * 100, 10),
         };
-      } else if (moment(item.changeDate).isAfter(seriesData[item.changeDate.split(' ')[0]].time)) {
-        seriesData[item.changeDate.split(' ')[0]] = {
-          time: item.changeDate,
-          total: item.totalField,
-          complete: item.completedField,
-          percent: parseInt(item.unEstimatedPercentage * 100, 10),
+      } else if (moment(data[index].changeDate).isAfter(seriesData[data[index].changeDate.split(' ')[0]].time)) {
+        seriesData[data[index].changeDate.split(' ')[0]] = {
+          time: data[index].changeDate,
+          total: data[index].totalField,
+          complete: data[index].completedField,
+          percent: parseInt(data[index].unEstimatedPercentage * 100, 10),
         };
       }
-    });
+    }
     let total = [];
     let complete = [];
     let percent = [];
@@ -194,6 +194,11 @@ class VersionReport extends Component {
         xAxis: (2 * a) + 1,
       }]);
     }
+    // ${this.getAddIssues(params[0].data[0], 'addIssues', '添加的问题')}
+    // ${this.getAddIssues(params[0].data[0], 'completedIssues', '完成的问题')}
+    // ${this.getAddIssues(params[0].data[0], 'removeIssues', '移出的问题')}
+    // ${this.getAddIssues(params[0].data[0], 'fieldChangIssues', '改变的问题')}
+    // ${this.getAddIssues(params[0].data[0], 'unCompletedIssues', '未完成的问题')}
     const options = {
       tooltip: {
         trigger: 'axis',
@@ -203,11 +208,6 @@ class VersionReport extends Component {
               <p>总计${this.renderYname()}: ${params[0].data[1]}</p>
               <p>已完成${this.renderYname()}: ${params[1].data[1]}</p>
               ${this.state.type === 'issueCount' ? '' : `<p>未预估问题的百分比: ${params[2].data[1]}%</p>`}
-              ${this.getAddIssues(params[0].data[0], 'addIssues', '添加的问题')}
-              ${this.getAddIssues(params[0].data[0], 'completedIssues', '完成的问题')}
-              ${this.getAddIssues(params[0].data[0], 'removeIssues', '移出的问题')}
-              ${this.getAddIssues(params[0].data[0], 'fieldChangIssues', '改变的问题')}
-              ${this.getAddIssues(params[0].data[0], 'unCompletedIssues', '未完成的问题')}
             </div>
           `,
       },
@@ -313,17 +313,17 @@ class VersionReport extends Component {
     });
   }
   updateIssues(data) {
-    _.forEach(data, (item) => {
-      VersionReportStore.axiosGetIssues(this.state.chosenVersion, item, this.state.type).then((res2) => {
-        VersionReportStore.setIssues(item.status, 'data', res2.content);
-        VersionReportStore.setIssues(item.status, 'pagination', {
+    for (let index = 0, len = data.length; index < len; index += 1) {
+      VersionReportStore.axiosGetIssues(this.state.chosenVersion, data[index], this.state.type).then((res2) => {
+        VersionReportStore.setIssues(data[index].status, 'data', res2.content);
+        VersionReportStore.setIssues(data[index].status, 'pagination', {
           current: res2.number + 1,
           total: res2.totalElements,
           pageSize: res2.size,
         });
       }).catch((error2) => {
       });
-    });
+    }
   }
   handleClick(e) {
     const { history } = this.props;
@@ -546,13 +546,13 @@ class VersionReport extends Component {
         onChange={(pagination, filters, sorter) => {
           const data = _.clone(this.state.datas);
           let newIndex;
-          _.forEach(data, (item, index) => {
-            if (item.status === type) {
+          for (let index = 0, len = data.length; index < len; index += 1) {
+            if (data[index].status === type) {
               newIndex = index;
               data[index].page = pagination.current - 1;
               data[index].size = pagination.pageSize;
             }
-          });
+          }
           this.setState({
             datas: data,
           }, () => {
@@ -621,7 +621,7 @@ class VersionReport extends Component {
           </Dropdown>
         </Header>
         <Content
-          title={`迭代冲刺“${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}”的版本报告`}
+          title={`“${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}”的版本报告`}
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
         >
           <Spin spinning={this.state.loading}>
@@ -678,7 +678,7 @@ class VersionReport extends Component {
               }
             </Select>
             <div className="c7n-versionReport-versionInfo">
-              <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate}` : '未发布'}</p>
+              <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate ? VersionReportStore.getReportData.version.releaseDate : '未指定发布日期'}` : '未发布'}</p>
               <p
                 style={{ 
                   color: '#3F51B5',

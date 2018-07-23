@@ -606,7 +606,7 @@ class Issue extends Component {
             style={{
               width: this.state.expand ? '28%' : '100%',
               display: 'block',
-              overflowY: 'scroll',
+              overflowY: 'auto',
               overflowX: 'hidden',
             }}
           >
@@ -620,6 +620,7 @@ class Issue extends Component {
                 onChange={this.handleFilterChange}
                 pagination={false}
                 filters={IssueStore.barFilters || []}
+                filterBarPlaceholder="过滤表"
               />
             </section>
             <section className="c7n-count">

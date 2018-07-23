@@ -19,19 +19,19 @@ class AccumulationFilter extends Component {
   }
   setStoreCheckData(data, id, params, array) {
     const newData = _.clone(data);
-    _.forEach(newData, (item, index) => {
+    for (let index = 0, len = newData.length; index < len; index += 1) {
       if (array) {
-        if (id.indexOf(String(item[params])) !== -1) {
+        if (id.indexOf(String(newData[index][params])) !== -1) {
           newData[index].check = true;
         } else {
           newData[index].check = false;
         }
-      } else if (String(item[params]) === String(id)) {
+      } else if (String(newData[index][params]) === String(id)) {
         newData[index].check = true;
       } else {
         newData[index].check = false;
       }
-    });
+    }
     return newData;
   }
   changeStartDate(id) {

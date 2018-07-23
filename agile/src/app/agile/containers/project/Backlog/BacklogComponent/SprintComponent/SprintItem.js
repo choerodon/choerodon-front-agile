@@ -46,17 +46,19 @@ class SprintItem extends Component {
     let totalIssue = 0;
     let totalStoryPoints = 0;
     let totalTime = 0;
-    _.forEach(assignData, (item) => {
-      if (item.issueCount) {
-        totalIssue += item.issueCount;
+    if (Array.isArray(assignData)) {
+      for (let index = 0, len = assignData.length; index < len; index += 1) {
+        if (assignData[index].issueCount) {
+          totalIssue += assignData[index].issueCount;
+        }
+        if (assignData[index].totalStoryPoints) {
+          totalStoryPoints += assignData[index].totalStoryPoints;
+        }
+        if (assignData[index].totalRemainingTime) {
+          totalTime += assignData[index].totalRemainingTime;
+        }
       }
-      if (item.totalStoryPoints) {
-        totalStoryPoints += item.totalStoryPoints;
-      }
-      if (item.totalRemainingTime) {
-        totalTime += item.totalRemainingTime;
-      }
-    });
+    }
     this.setState({
       total: {
         totalIssue,
@@ -167,9 +169,9 @@ class SprintItem extends Component {
         if (res.parentsDoneUnfinishedSubtasks.length > 0) {
           flag = 1;
           let issueNums = '';
-          _.forEach(res.parentsDoneUnfinishedSubtasks, (items) => {
-            issueNums += `${items.issueNum} `;
-          });
+          for (let index = 0, len = res.parentsDoneUnfinishedSubtasks.length; index < len; index += 1) {
+            issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
+          }
           confirm({
             title: 'warnning',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
@@ -417,7 +419,7 @@ class SprintItem extends Component {
             {
               this.props.item.assigneeIssues ? (
                 this.props.item.assigneeIssues
-                  .filter(ass => !_.isNull(ass.assigneeId))
+                  .filter(ass => ass.assigneeId)
                   .map(ass2 => (
                     <Tooltip 
                       placement="bottom"
@@ -582,7 +584,7 @@ class SprintItem extends Component {
                     }}
                   >
                     {this.state.createIssue ? (
-                      <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block' }}>
+                      <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           <Select
                             value={this.state.selectIssueType}
@@ -609,7 +611,7 @@ class SprintItem extends Component {
                                     marginRight: 0,
                                   }}
                                 >
-                                  <Icon style={{ color: 'white', fontSize: '14px' }} type="class" />
+                                  <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
                                 </div>
                               </Tooltip>
                             </Option>
