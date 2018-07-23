@@ -296,7 +296,7 @@ class CreateBranch extends Component {
                   </OptGroup>
                   <OptGroup label="tag" key="tagGroup">
                     {this.state.tags.map(s => (
-                      <Option value={s.name} key={s.name}><Icon type="local_offer" />{s.name}</Option>
+                      <Option value={s.tagName} key={s.tagName}><Icon type="local_offer" />{s.tagName}</Option>
                     ))}
                     {
                       this.state.tagsObj.totalElements > this.state.branchsObj.numberOfElements && this.state.branchsObj.numberOfElements > 0 ? (

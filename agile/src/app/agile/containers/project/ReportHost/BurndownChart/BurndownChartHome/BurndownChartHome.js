@@ -50,56 +50,56 @@ class BurndownChartHome extends Component {
       .axiosGetBurndownChartReport(this.state.defaultSprint, this.state.select).then((res) => {
         const data = res;
         const newData = [];
-        _.forEach(data, (item) => {
-          if (!_.some(newData, { date: item.date })) {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (!_.some(newData, { date: data[index].date })) {
             newData.push({
-              date: item.date,
+              date: data[index].date,
               issues: [{
-                issueId: item.issueId,
-                issueNum: item.issueNum,
-                newValue: item.newValue,
-                oldValue: item.oldValue,
-                statistical: item.statistical,
-                parentIssueId: item.parentIssueId,
-                parentIssueNum: item.parentIssueNum,
+                issueId: data[index].issueId,
+                issueNum: data[index].issueNum,
+                newValue: data[index].newValue,
+                oldValue: data[index].oldValue,
+                statistical: data[index].statistical,
+                parentIssueId: data[index].parentIssueId,
+                parentIssueNum: data[index].parentIssueNum,
               }],
-              type: item.type,
+              type: data[index].type,
             });
           } else {
-            let index;
-            _.forEach(newData, (item2, i) => {
-              if (item2.date === item.date) {
-                index = i;
+            let index2;
+            for (let i = 0, len2 = newData.length; i < len2; i += 1) {
+              if (newData[i].date === data[index].date) {
+                index2 = i;
               }
-            });
-            if (newData[index].type.indexOf(item.type) === -1) {
-              newData[index].type += `-${item.type}`;
             }
-            newData[index].issues = [...newData[index].issues, {
-              issueId: item.issueId,
-              issueNum: item.issueNum,
-              newValue: item.newValue,
-              oldValue: item.oldValue,
-              statistical: item.statistical,
-              parentIssueId: item.parentIssueId,
-              parentIssueNum: item.parentIssueNum,
+            if (newData[index2].type.indexOf(data[index].type) === -1) {
+              newData[index2].type += `-${data[index].type}`;
+            }
+            newData[index2].issues = [...newData[index2].issues, {
+              issueId: data[index].issueId,
+              issueNum: data[index].issueNum,
+              newValue: data[index].newValue,
+              oldValue: data[index].oldValue,
+              statistical: data[index].statistical,
+              parentIssueId: data[index].parentIssueId,
+              parentIssueNum: data[index].parentIssueNum,
             }];
           }
-        });
-        _.forEach(newData, (item, index) => {
+        }
+        for (let index = 0, dataLen = newData.length; index < dataLen; index += 1) {
           let rest = 0;
-          if (item.type !== 'endSprint') {
+          if (newData[index].type !== 'endSprint') {
             if (index > 0) {
               rest = newData[index - 1].rest;
             }
           }
-          _.forEach(item.issues, (is) => {
-            if (is.statistical) {
-              rest += is.newValue - is.oldValue;
+          for (let i = 0, len = newData[index].issues.length; i < len; i += 1) {
+            if (newData[index].issues[i].statistical) {
+              rest += newData[index].issues[i].newValue - newData[index].issues[i].oldValue;
             }
-          });
+          }
           newData[index].rest = rest;
-        });
+        }
         BurndownChartStore.setBurndownList(newData);
         if (moment(this.state.endDate).isAfter(_.map(newData, 'date')[_.map(newData, 'date').length - 1])) {
           this.setState({
@@ -120,11 +120,11 @@ class BurndownChartHome extends Component {
   getMaxY() {
     const data = this.state.yAxis;
     let max = 0;
-    _.forEach(data, (item) => {
-      if (item > max) {
-        max = item;
+    for (let index = 0, len = data.length; index < len; index += 1) {
+      if (data[index] > max) {
+        max = data[index];
       }
-    });
+    }
     return max;
   }
   getOption() {
@@ -404,11 +404,11 @@ class BurndownChartHome extends Component {
       key: 'rest',
     }];
     let sprintName;
-    _.forEach(BurndownChartStore.getSprintList, (item) => {
-      if (item.sprintId === this.state.defaultSprint) {
-        sprintName = item.sprintName;
+    for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
+      if (BurndownChartStore.getSprintList[index].sprintId === this.state.defaultSprint) {
+        sprintName = BurndownChartStore.getSprintList[index].sprintName;
       }
-    });
+    }
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     const menu = (
@@ -455,11 +455,11 @@ class BurndownChartHome extends Component {
                       value={this.state.defaultSprint}
                       onChange={(value) => {
                         let endDate;
-                        _.forEach(BurndownChartStore.getSprintList, (item) => {
-                          if (item.sprintId === value) {
-                            endDate = item.endDate;
+                        for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
+                          if (BurndownChartStore.getSprintList[index].sprintId === value) {
+                            endDate = BurndownChartStore.getSprintList[index].endDate;
                           }
-                        });
+                        }
                         this.setState({
                           defaultSprint: value,
                           endDate,

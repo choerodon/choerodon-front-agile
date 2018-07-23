@@ -387,6 +387,7 @@ class AccumulationHome extends Component {
                   <Popover
                     placement="bottom"
                     trigger="click"
+                    getPopupContainer={() => document.getElementsByClassName('c7n-accumulation-filter')[0]}
                     content={(
                       <div
                         style={{

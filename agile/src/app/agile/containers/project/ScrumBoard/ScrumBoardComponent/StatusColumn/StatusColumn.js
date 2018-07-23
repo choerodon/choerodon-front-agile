@@ -13,9 +13,9 @@ class StatusColumn extends Component {
   showIssueLength() {
     const data = this.props.data.subStatuses;
     let length = 0;
-    _.forEach(data, (item) => {
-      length += item.issues.length;
-    });
+    for (let index = 0, len = data.length; index < len; index += 1) {
+      length += data[index].issues.length;
+    }
     return length;
   }
   render() {

@@ -28,20 +28,20 @@ class StatusIssue extends Component {
     let result = false;
     if (parentId) {
       const data = this.props.statusData;
-      _.forEach(data, (item) => {
-        _.forEach(item.issues, (item2) => {
-          if (item2.issueId === parentId) {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        for (let index2 = 0, len2 = data[index].issues.length; index2 < len2; index2 += 1) {
+          if (data[index].issues[index2].issueId === parentId) {
             // 如果同一列有父卡
-            if (item2.assigneeId) {
-              if (item2.assigneeId === items.assigneeId) {
+            if (data[index].issues[index2].assigneeId) {
+              if (data[index].issues[index2].assigneeId === items.assigneeId) {
                 result = true;
               }
             } else if (!items.assigneeId) {
               result = true;
             }
           }
-        });
-      });
+        }
+      }
     }
     return result;
   }
@@ -52,36 +52,36 @@ class StatusIssue extends Component {
     const allStatus = this.props.statusData;
     let flag = 0;
     if (parentsIds.length > 0) {
-      _.forEach(parentsIds, (item) => {
-        if (item.issueId === itemIssueId) {
+      for (let index = 0, len = parentsIds.length; index < len; index += 1) {
+        if (parentsIds[index].issueId === itemIssueId) {
           // 该任务是父卡
           flag = 1;
         }
-      });
+      }
     }
     if (flag === 1) {
       const childrenList = [];
-      _.forEach(allStatus, (item) => {
-        _.forEach(item.issues, (is) => {
-          if (is.assigneeId) {
-            if (is.assigneeId === itemAssigneeId) {
-              if (is.parentIssueId === itemIssueId) {
-                childrenList.push(is);
+      for (let index = 0, len = allStatus.length; index < len; index += 1) {
+        for (let index2 = 0, len2 = allStatus[index].issues; index2 < len2; index2 += 1) {
+          if (allStatus[index].issues[index2].assigneeId) {
+            if (allStatus[index].issues[index2].assigneeId === itemAssigneeId) {
+              if (allStatus[index].issues[index2].parentIssueId === itemIssueId) {
+                childrenList.push(allStatus[index].issues[index2]);
               }
             }
           } else if (!itemAssigneeId) {
-            if (is.parentIssueId === itemIssueId) {
-              childrenList.push(is);
+            if (allStatus[index].issues[index2].parentIssueId === itemIssueId) {
+              childrenList.push(allStatus[index].issues[index2]);
             }
           }
-        });
-      });
+        }
+      }
       const result = [];
       if (childrenList.length > 0) {
         const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
-        _.forEach(childrenList, (child, index) => {
-          result.push(this.renderReturn(child, `sub-${index}`, issueId, 'child'));
-        });
+        for (let index = 0, len = childrenList.length; index < len; index += 1) {
+          result.push(this.renderReturn(childrenList[index], `sub-${index}`, issueId, 'child'));
+        }
         return result;
       } 
     }
@@ -181,11 +181,11 @@ class StatusIssue extends Component {
     let result = 'block';
     if (item.parentIssueId) {
       const columnData = this.props.statusData;
-      _.forEach(columnData, (items) => {
-        _.forEach(items.issues, (is) => {
-          if (is.issueId === item.parentIssueId) {
-            if (is.assigneeId) {
-              if (is.assigneeId === item.assigneeId) {
+      for (let index = 0, len = columnData.length; index < len; index += 1) {
+        for (let index2 = 0, len2 = columnData[index].issues.length; index2 < len2; index2 += 1) {
+          if (columnData[index].issues[index2].issueId === item.parentIssueId) {
+            if (columnData[index].issues[index2].assigneeId) {
+              if (columnData[index].issues[index2].assigneeId === item.assigneeId) {
                 if (!type) {
                   if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
                     result = 'none';
@@ -200,8 +200,8 @@ class StatusIssue extends Component {
               }
             }
           }
-        });
-      });
+        }
+      }
       if (border) {
         return true;
       } else {
@@ -219,11 +219,11 @@ class StatusIssue extends Component {
     const data = ScrumBoardStore.getEpicData;
     const item = this.props.data;
     let result;
-    _.forEach(data, (items) => {
-      if (String(items.epicId) === String(item.epicId)) {
-        result = items[param];
+    for (let index = 0, len = data.length; index < len; index += 1) {
+      if (String(data[index].epicId) === String(item.epicId)) {
+        result = data[index][param];
       }
-    });
+    }
     return result;
   }
 

@@ -419,7 +419,7 @@ class SprintItem extends Component {
             {
               this.props.item.assigneeIssues ? (
                 this.props.item.assigneeIssues
-                  .filter(ass => !_.isNull(ass.assigneeId))
+                  .filter(ass => ass.assigneeId)
                   .map(ass2 => (
                     <Tooltip 
                       placement="bottom"

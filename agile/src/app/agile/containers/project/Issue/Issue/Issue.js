@@ -606,7 +606,7 @@ class Issue extends Component {
             style={{
               width: this.state.expand ? '28%' : '100%',
               display: 'block',
-              overflowY: 'scroll',
+              overflowY: 'auto',
               overflowX: 'hidden',
             }}
           >
