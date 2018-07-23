@@ -198,10 +198,10 @@ class Sprint extends Component {
 
   renderSprintIssue(data, sprintId) {
     const result = [];
-    _.forEach(data, (item, index) => {
+    for (let index = 0, len = data.length; index < len; index += 1) {
       result.push(
         <SprintIssue
-          data={item}
+          data={data[index]}
           index={index}
           selected={this.state.selected}
           epicVisible={this.props.epicVisible}
@@ -211,7 +211,7 @@ class Sprint extends Component {
           draggableId={this.state.draggableId}
         />,
       );
-    });
+    }
     return result;
   }
   renderSprint() {
@@ -220,17 +220,17 @@ class Sprint extends Component {
       const data = BacklogStore.getSprintData.sprintData;
       if (data) {
         if (data.length > 0) {
-          _.forEach(data, (item, index) => {
+          for (let index = 0, len = data.length; index < len; index += 1) {
             result.push(
               <SprintItem
-                item={item}
+                item={data[index]}
                 renderSprintIssue={this.renderSprintIssue.bind(this)}
                 refresh={this.props.refresh.bind(this)}
                 index={index}
               />
               ,
             );
-          });
+          }
         } else {
           result = (
             <div

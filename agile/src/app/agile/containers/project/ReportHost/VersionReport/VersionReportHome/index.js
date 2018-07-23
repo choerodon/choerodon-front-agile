@@ -194,6 +194,11 @@ class VersionReport extends Component {
         xAxis: (2 * a) + 1,
       }]);
     }
+    // ${this.getAddIssues(params[0].data[0], 'addIssues', '添加的问题')}
+    // ${this.getAddIssues(params[0].data[0], 'completedIssues', '完成的问题')}
+    // ${this.getAddIssues(params[0].data[0], 'removeIssues', '移出的问题')}
+    // ${this.getAddIssues(params[0].data[0], 'fieldChangIssues', '改变的问题')}
+    // ${this.getAddIssues(params[0].data[0], 'unCompletedIssues', '未完成的问题')}
     const options = {
       tooltip: {
         trigger: 'axis',
@@ -203,11 +208,6 @@ class VersionReport extends Component {
               <p>总计${this.renderYname()}: ${params[0].data[1]}</p>
               <p>已完成${this.renderYname()}: ${params[1].data[1]}</p>
               ${this.state.type === 'issueCount' ? '' : `<p>未预估问题的百分比: ${params[2].data[1]}%</p>`}
-              ${this.getAddIssues(params[0].data[0], 'addIssues', '添加的问题')}
-              ${this.getAddIssues(params[0].data[0], 'completedIssues', '完成的问题')}
-              ${this.getAddIssues(params[0].data[0], 'removeIssues', '移出的问题')}
-              ${this.getAddIssues(params[0].data[0], 'fieldChangIssues', '改变的问题')}
-              ${this.getAddIssues(params[0].data[0], 'unCompletedIssues', '未完成的问题')}
             </div>
           `,
       },
@@ -678,7 +678,7 @@ class VersionReport extends Component {
               }
             </Select>
             <div className="c7n-versionReport-versionInfo">
-              <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate}` : '未发布'}</p>
+              <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate ? VersionReportStore.getReportData.version.releaseDate : '未指定发布日期'}` : '未发布'}</p>
               <p
                 style={{ 
                   color: '#3F51B5',
