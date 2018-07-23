@@ -59,17 +59,6 @@ class SprintItem extends Component {
         }
       }
     }
-    // _.forEach(assignData, (item) => {
-    //   if (item.issueCount) {
-    //     totalIssue += item.issueCount;
-    //   }
-    //   if (item.totalStoryPoints) {
-    //     totalStoryPoints += item.totalStoryPoints;
-    //   }
-    //   if (item.totalRemainingTime) {
-    //     totalTime += item.totalRemainingTime;
-    //   }
-    // });
     this.setState({
       total: {
         totalIssue,
@@ -183,9 +172,6 @@ class SprintItem extends Component {
           for (let index = 0, len = res.parentsDoneUnfinishedSubtasks.length; index < len; index += 1) {
             issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
           }
-          // _.forEach(res.parentsDoneUnfinishedSubtasks, (items) => {
-          //   issueNums += `${items.issueNum} `;
-          // });
           confirm({
             title: 'warnning',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,

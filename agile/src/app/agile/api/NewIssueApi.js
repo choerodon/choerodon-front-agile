@@ -175,5 +175,5 @@ export function createLink(issueId, issueLinkCreateDTOList) {
 
 export function loadLinkIssues(issueId) {
   const projectId = AppState.currentMenuType.id;
-  return axios.get(`/agile/v1/projects/${projectId}/issue_links/${issueId}?issueTest=true`);
+  return axios.get(`/agile/v1/projects/${projectId}/issue_links/${issueId}?no_issue_test=true`);
 }

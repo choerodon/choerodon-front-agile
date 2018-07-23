@@ -40,21 +40,21 @@ class AccumulationHome extends Component {
   componentWillMount() {
     AccumulationStore.axiosGetFilterList().then((data) => {
       const newData = _.clone(data);
-      _.forEach(newData, (item, index) => {
+      for (let index = 0, len = newData.length; index < len; index += 1) {
         newData[index].check = false;
-      });
+      }
       AccumulationStore.setFilterList(newData);
       ScrumBoardStore.axiosGetBoardList().then((res) => {
         const newData2 = _.clone(res);
         let newIndex;
-        _.forEach(newData2, (item, index) => {
-          if (item.userDefault) {
+        for (let index = 0, len = newData2.length; index < len; index += 1) {
+          if (newData2[index].userDefault) {
             newData2[index].check = true;
             newIndex = index;
           } else {
             newData2[index].check = false;
           }
-        });
+        }
         AccumulationStore.setBoardList(newData2);
         this.getColumnData(res[newIndex].boardId, true);
       }).catch((error) => {
@@ -66,9 +66,9 @@ class AccumulationHome extends Component {
   getColumnData(id, type) {
     ScrumBoardStore.axiosGetBoardData(id, 0, false, []).then((res2) => {
       const data2 = res2.columnsData.columns;
-      _.forEach(data2, (item, index) => {
+      for (let index = 0, len = data2.length; index < len; index += 1) {
         data2[index].check = true;
-      });
+      }
       this.setState({
         sprintData: res2.currentSprint,
       });
@@ -95,21 +95,21 @@ class AccumulationHome extends Component {
     const columnIds = [];
     const quickFilterIds = [];
     let boardId;
-    _.forEach(AccumulationStore.getBoardList, (bi) => {
-      if (bi.check) {
-        boardId = bi.boardId;
+    for (let index = 0, len = AccumulationStore.getBoardList.length; index < len; index += 1) {
+      if (AccumulationStore.getBoardList[index].check) {
+        boardId = AccumulationStore.getBoardList[index].boardId;
       }
-    });
-    _.forEach(columnData, (cd) => {
-      if (cd.check) {
-        columnIds.push(cd.columnId);
+    }
+    for (let index2 = 0, len2 = columnData.length; index2 < len2; index2 += 1) {
+      if (columnData[index2].check) {
+        columnIds.push(columnData[index2].columnId);
       }
-    });
-    _.forEach(filterList, (fl) => {
-      if (fl.check) {
-        quickFilterIds.push(fl.filterId);
+    }
+    for (let index3 = 0, len3 = filterList.length; index3 < len3; index3 += 1) {
+      if (filterList[index3].check) {
+        quickFilterIds.push(filterList[index3].filterId);
       }
-    });
+    }
     AccumulationStore.axiosGetAccumulationData({
       columnIds,
       endDate,
@@ -131,12 +131,12 @@ class AccumulationHome extends Component {
   getOption() {
     let data = _.clone(AccumulationStore.getAccumulationData);
     const legendData = [];
-    _.forEach(data, (item) => {
+    for (let index = 0, len = data.length; index < len; index += 1) {
       legendData.push({
         icon: 'rect',
-        name: item.name,
+        name: data[index].name,
       });
-    });
+    }
     const newxAxis = [];
     if (data.length > 0) {
       for (let index = 0, len = data.length; index < len; index += 1) {
@@ -190,39 +190,6 @@ class AccumulationHome extends Component {
         }
       }
     }
-    // _.forEach(data.reverse(), (item, index) => {
-    //   legendSeries.push({
-    //     name: item.name,
-    //     type: 'line',
-    //     stack: true,
-    //     areaStyle: { normal: {
-    //       color: item.color,
-    //     } },
-    //     lineStyle: { normal: {
-    //       color: item.color,
-    //     } },
-    //     itemStyle: {
-    //       normal: { color: item.color },
-    //     },
-    //     data: [],
-    //   });
-    //   _.forEach(newxAxis, (item2) => {
-    //     let date = '';
-    //     let max = 0;
-    //     _.forEach(item.coordinateDTOList, (item3) => {
-    //       if (item3.date.split(' ')[0] === item2) {
-    //         if (date === '') {
-    //           date = item3.date;
-    //           max = item3.issueCount;
-    //         } else if (moment(item3.date).isAfter(date)) {
-    //           date = item3.date;
-    //           max = item3.issueCount;
-    //         }
-    //       }
-    //     });
-    //     legendSeries[index].data.push(max);
-    //   });
-    // });
     this.setState({
       options: {
         tooltip: {
@@ -291,15 +258,15 @@ class AccumulationHome extends Component {
     if (array) {
       result = [];
     }
-    _.forEach(data, (item) => {
-      if (item.check) {
+    for (let index = 0, len = data.length; index < len; index += 1) {
+      if (data[index].check) {
         if (array) {
-          result.push(String(item[type]));
+          result.push(String(data[index][type]));
         } else {
-          result = item[type];
+          result = data[index][type];
         }
       }
-    });
+    }
     return result;
   }
   handleClick(e) {
@@ -317,19 +284,19 @@ class AccumulationHome extends Component {
   }
   setStoreCheckData(data, id, params, array) {
     const newData = _.clone(data);
-    _.forEach(newData, (item, index) => {
+    for (let index = 0, len = newData.length; index < len; index += 1) {
       if (array) {
-        if (id.indexOf(String(item[params])) !== -1) {
+        if (id.indexOf(String(newData[index][params])) !== -1) {
           newData[index].check = true;
         } else {
           newData[index].check = false;
         }
-      } else if (String(item[params]) === String(id)) {
+      } else if (String(newData[index][params]) === String(id)) {
         newData[index].check = true;
       } else {
         newData[index].check = false;
       }
-    });
+    }
     return newData;
   }
   getFilterData() {
