@@ -37,16 +37,16 @@ class StatusBodyColumn extends Component {
     const result = [];
     const parentIds = [];
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
-      _.forEach(ScrumBoardStore.getParentIds, (pi) => {
-        parentIds.push(pi.issueId);
-      });
+      for (let index = 0, len = ScrumBoardStore.getParentIds.length; index < len; index += 1) {
+        parentIds.push(ScrumBoardStore.getParentIds[index].issueId);
+      }
       if (!this.props.parentId) {
-        _.forEach(data, (item, index) => {
-          if (!item.parentIssueId) {
-            if (_.indexOf(parentIds, item.issueId) === -1) {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (!data[index].parentIssueId) {
+            if (_.indexOf(parentIds, data[index].issueId) === -1) {
               result.push(
                 <StatusIssue
-                  data={item}
+                  data={data[index]}
                   index={index}
                   droppableId={droppableId}
                   statusName={statusName}
@@ -57,13 +57,13 @@ class StatusBodyColumn extends Component {
               );
             }
           }
-        });
+        }
       } else {
-        _.forEach(data, (item, index) => {
-          if (item.parentIssueId === this.props.parentId) {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (data[index].parentIssueId === this.props.parentId) {
             result.push(
               <StatusIssue
-                data={item}
+                data={data[index]}
                 index={index}
                 droppableId={droppableId}
                 statusName={statusName}
@@ -73,16 +73,16 @@ class StatusBodyColumn extends Component {
               />,
             );
           }
-        });
+        }
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       if (this.props.assigneeId) {
-        _.forEach(data, (item, index) => {
-          if (item.assigneeId) {
-            if (item.assigneeId === this.props.assigneeId) {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (data[index].assigneeId) {
+            if (data[index].assigneeId === this.props.assigneeId) {
               result.push(
                 <StatusIssue
-                  data={item}
+                  data={data[index]}
                   index={index}
                   droppableId={droppableId}
                   statusName={statusName}
@@ -93,13 +93,13 @@ class StatusBodyColumn extends Component {
               );
             }
           }
-        });
+        }
       } else {
-        _.forEach(data, (item, index) => {
-          if (!item.assigneeId) {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (!data[index].assigneeId) {
             result.push(
               <StatusIssue
-                data={item}
+                data={data[index]}
                 index={index}
                 droppableId={droppableId}
                 statusName={statusName}
@@ -109,16 +109,16 @@ class StatusBodyColumn extends Component {
               />,
             );
           }
-        });
+        }
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
       if (this.props.epicId) {
-        _.forEach(data, (item, index) => {
-          if (item.epicId) {
-            if (item.epicId === this.props.epicId) {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (data[index].epicId) {
+            if (data[index].epicId === this.props.epicId) {
               result.push(
                 <StatusIssue
-                  data={item}
+                  data={data[index]}
                   index={index}
                   droppableId={droppableId}
                   statusName={statusName}
@@ -129,13 +129,13 @@ class StatusBodyColumn extends Component {
               );
             }
           }
-        });
+        }
       } else {
-        _.forEach(data, (item, index) => {
-          if (!item.epicId) {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (!data[index].epicId) {
             result.push(
               <StatusIssue
-                data={item}
+                data={data[index]}
                 index={index}
                 droppableId={droppableId}
                 statusName={statusName}
@@ -145,13 +145,13 @@ class StatusBodyColumn extends Component {
               />,
             );
           }
-        });
+        }
       }
     } else {
-      _.forEach(data, (item, index) => {
+      for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
           <StatusIssue
-            data={item}
+            data={data[index]}
             index={index}
             droppableId={droppableId}
             statusName={statusName}
@@ -160,7 +160,7 @@ class StatusBodyColumn extends Component {
             renderIssues={this.renderIssues.bind(this)}
           />,
         );
-      });
+      }
     }
     return result;
   }
@@ -216,9 +216,9 @@ class StatusBodyColumn extends Component {
     } else {
       const dropCode = JSON.parse(data.source.droppableId).code;
       const currentStatusList = [];
-      _.forEach(this.props.data.subStatuses, (i) => {
-        currentStatusList.push(i.id);
-      });
+      for (let index = 0, len = this.props.data.subStatuses.length; index < len; index += 1) {
+        currentStatusList.push(this.props.data.subStatuses[index].id);
+      }
       let flag = 0;
       if (_.indexOf(currentStatusList, dropCode) !== -1) {
         // 如果当前列的状态包含拖动卡片的状态列
@@ -412,13 +412,13 @@ class StatusBodyColumn extends Component {
     const dragStartData = ScrumBoardStore.getDragStartItem;
     const data = this.props.data.subStatuses;
     const result = [];
-    _.forEach(data, (item, index) => {
+    for (let index = 0, len = data.length; index < len; index += 1) {
       result.push(
         <Droppable 
           droppableId={
             JSON.stringify({
               columnId: this.props.data.columnId,
-              code: item.id,
+              code: data[index].id,
               parentId: this.props.source,
               assigneeId: this.props.assigneeId,
               epicId: this.props.epicId,
@@ -441,8 +441,8 @@ class StatusBodyColumn extends Component {
                   'unset' : this.renderBorder(data, index, 'right', snapshot.isDraggingOver),
                 borderBottom: JSON.stringify(dragStartData) === '{}' ? 
                   'unset' : this.renderBorder(data, index, 'bottom', snapshot.isDraggingOver),
-                visibility: this.renderDisplay(item, 'visibility'),
-                height: this.renderDisplay(item, 'height'),
+                visibility: this.renderDisplay(data[index], 'visibility'),
+                height: this.renderDisplay(data[index], 'height'),
                 position: 'relative',
               }}
             >
@@ -454,16 +454,16 @@ class StatusBodyColumn extends Component {
                   lineHeight: '26px',
                 }}
               >
-                {item.name}
+                {data[index].name}
               </p>
               <div className="c7n-itemBodyColumn" style={{ minHeight: 83 }}>
-                {this.renderIssues(item.issues, item.id, item.name, item.categoryCode)}
+                {this.renderIssues(data[index].issues, data[index].id, data[index].name, data[index].categoryCode)}
               </div>
             </div>
           )}
         </Droppable>,
       );
-    });
+    }
     return result;
   }
   render() {

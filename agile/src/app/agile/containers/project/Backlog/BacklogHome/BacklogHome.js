@@ -73,8 +73,8 @@ class BacklogHome extends Component {
   getDestinationData(endId, endIndex, newData) {
     let destinationData = {};
     if (endId !== 'backlog') {
-      _.forEach(newData.sprintData, (item, index) => {
-        if (String(item.sprintId) === String(endId)) {
+      for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
+        if (String(newData.sprintData[index].sprintId) === String(endId)) {
           if (newData.sprintData[index].issueSearchDTOList) {
             if (newData.sprintData[index].issueSearchDTOList.length > 0) {
               if (endIndex >= newData.sprintData[index].issueSearchDTOList.length) {
@@ -87,7 +87,7 @@ class BacklogHome extends Component {
             }
           }
         }
-      });
+      }
     } else if (newData.backlogData.backLogIssue.length > 0) {
       if (endIndex >= newData.backlogData.backLogIssue.length) {
         destinationData = 
@@ -116,12 +116,12 @@ class BacklogHome extends Component {
       let spliceDatas = [];
       // 起始如果是sprint
       if (sourceId !== 'backlog') {
-        _.forEach(newData.sprintData, (item, index) => {
-          if (String(item.sprintId) === String(sourceId)) {
+        for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
+          if (String(newData.sprintData[index].sprintId) === String(sourceId)) {
             spliceDatas = _.remove(newData.sprintData[index].issueSearchDTOList, 
               n => this.sprintRef.getCurrentState('selected').issueIds.indexOf(n.issueId) !== -1);
           }
-        });
+        }
       } else {
         // 起始如果是backlog
         spliceDatas = _.remove(newData.backlogData.backLogIssue, 
@@ -131,19 +131,19 @@ class BacklogHome extends Component {
       // 如果移动到sprint
       if (endId !== 'backlog') {
         let afIndex;
-        _.forEach(newData.sprintData, (item, index) => {
-          if (String(item.sprintId) === String(endId)) {
+        for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
+          if (String(newData.sprintData[index].sprintId) === String(endId)) {
             if (_.isNull(newData.sprintData[index].issueSearchDTOList)) {
               newData.sprintData[index].issueSearchDTOList = [];
             }
             if (endIndex !== 0) {
-              _.forEach(newData.sprintData[index].issueSearchDTOList, (af, aindex) => {
+              for (let aindex = 0, len2 = newData.sprintData[index].issueSearchDTOList.length; aindex < len2; aindex += 1) {
                 if (destinationData.issueId) {
-                  if (af.issueId === destinationData.issueId) {
+                  if (newData.sprintData[index].issueSearchDTOList[aindex].issueId === destinationData.issueId) {
                     afIndex = aindex + 1;
                   }
                 }
-              });
+              }
               newData.sprintData[index].issueSearchDTOList.splice(afIndex, 0, spliceDatas);
               newData.sprintData[index].issueSearchDTOList = 
                 _.flattenDeep(newData.sprintData[index].issueSearchDTOList);
@@ -157,7 +157,7 @@ class BacklogHome extends Component {
             axiosParam.outsetIssueId = destinationData.issueId; 
             BacklogStore.setSprintData(newData);
           }
-        });
+        }
       } else {
         // 如果移动到backlog
         if (_.isNull(newData.backlogData.backLogIssue)) {
@@ -165,13 +165,13 @@ class BacklogHome extends Component {
         }
         let afIndex;
         if (endIndex !== 0) {
-          _.forEach(newData.backlogData.backLogIssue, (af, aindex) => {
+          for (let aindex = 0, len = newData.backlogData.backLogIssue.length; aindex < len; aindex += 1) {
             if (destinationData.issueId) {
-              if (af.issueId === destinationData.issueId) {
+              if (newData.backlogData.backLogIssue[aindex].issueId === destinationData.issueId) {
                 afIndex = aindex + 1;
               }
             }
-          });
+          }
           newData.backlogData.backLogIssue.splice(afIndex, 0, spliceDatas);
           newData.backlogData.backLogIssue = _.flattenDeep(newData.backlogData.backLogIssue);
         } else {
@@ -201,17 +201,17 @@ class BacklogHome extends Component {
       const sourceIndex = result.source.index;
       let spliceData = {};
       if (sourceId !== 'backlog') {
-        _.forEach(newData.sprintData, (item, index) => {
-          if (String(item.sprintId) === String(sourceId)) {
+        for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
+          if (String(newData.sprintData[index].sprintId) === String(sourceId)) {
             spliceData = newData.sprintData[index].issueSearchDTOList.splice(sourceIndex, 1)[0];
           }
-        });
+        }
       } else {
         spliceData = newData.backlogData.backLogIssue.splice(sourceIndex, 1)[0];
       }
       if (endId !== 'backlog') {
-        _.forEach(newData.sprintData, (item, index) => {
-          if (String(item.sprintId) === String(endId)) {
+        for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
+          if (String(newData.sprintData[index].sprintId) === String(endId)) {
             if (_.isNull(newData.sprintData[index].issueSearchDTOList)) {
               newData.sprintData[index].issueSearchDTOList = [];
             }
@@ -240,7 +240,7 @@ class BacklogHome extends Component {
               BacklogStore.setSprintData(originData);
             });
           }
-        });
+        }
       } else {
         if (_.isNull(newData.backlogData.backLogIssue)) {
           newData.backlogData.backLogIssue = [];
@@ -282,17 +282,17 @@ class BacklogHome extends Component {
       this.getSprint();
       BacklogStore.axiosGetVersion().then((data2) => {
         const newVersion = [...data2];
-        _.forEach(newVersion, (item, index) => {
+        for (let index = 0, len = newVersion.length; index < len; index += 1) {
           newVersion[index].expand = false;
-        });
+        }
         BacklogStore.setVersionData(newVersion);
       }).catch((error) => {
       });
       BacklogStore.axiosGetEpic().then((data3) => {
         const newEpic = [...data3];
-        _.forEach(newEpic, (item, index) => {
+        for (let index = 0, len = newEpic.length; index < len; index += 1) {
           newEpic[index].expand = false;
-        });
+        }
         BacklogStore.setEpicData(newEpic);
       }).catch((error3) => {
       });

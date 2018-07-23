@@ -64,11 +64,11 @@ class ScrumBoardHome extends Component {
   getBoard() {
     ScrumBoardStore.axiosGetBoardList().then((data) => {
       let index;
-      _.forEach(data, (item, i) => {
-        if (item.userDefault) {
+      for (let i = 0, len = data.length; i < len; i += 1) {
+        if (data[i].userDefault) {
           index = i;
         }
-      });
+      }
       if (!index) {
         index = 0;
       }
@@ -80,11 +80,11 @@ class ScrumBoardHome extends Component {
         this.refresh(data[index].boardId);
       } else {
         let flag = 0;
-        _.forEach(data, (da) => {
-          if (data.boardId === ScrumBoardStore.getSelectedBoard) {
+        for (let index2 = 0, len = data.length; index2 < len; index2 += 1) {
+          if (data[index2].boardId === ScrumBoardStore.getSelectedBoard) {
             flag += 1;
           }
-        });
+        }
         if (flag > 0) {
           this.refresh(ScrumBoardStore.getSelectedBoard);
         } else {
@@ -113,50 +113,50 @@ class ScrumBoardHome extends Component {
           const storeParentIds = [];
           const storeAssignee = [];
           const epicData = data.epicInfo;
-          _.forEach(data.columnsData.columns, (col) => {
-            _.forEach(col.subStatuses, (sub) => {
-              _.forEach(sub.issues, (iss) => {
-                if (data.parentIds.indexOf(parseInt(iss.issueId, 10)) !== -1) {
-                  if (parentIds.indexOf(iss.issueId) === -1) {
-                    parentIds.push(iss.issueId);
+          for (let index = 0, len = data.columnsData.columns.length; index < len; index += 1) {
+            for (let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length; index2 < len2; index2 += 1) {
+              for (let index3 = 0, len3 = data.columnsData.columns[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
+                if (data.parentIds.indexOf(parseInt(data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId, 10)) !== -1) {
+                  if (parentIds.indexOf(data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId) === -1) {
+                    parentIds.push(data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId);
                     storeParentIds.push({
-                      status: sub.name,
-                      categoryCode: sub.categoryCode,
-                      ...iss,
+                      status: data.columnsData.columns[index].subStatuses[index2].name,
+                      categoryCode: data.columnsData.columns[index].subStatuses[index2].categoryCode,
+                      ...data.columnsData.columns[index].subStatuses[index2].issues[index3],
                     });
                   }
                 }
-                if (data.assigneeIds.indexOf(parseInt(iss.assigneeId, 10)) !== -1) {
-                  if (assigneeIds.indexOf(iss.assigneeId) === -1) {
-                    if (iss.assigneeId) {
-                      assigneeIds.push(iss.assigneeId);
+                if (data.assigneeIds.indexOf(parseInt(data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId, 10)) !== -1) {
+                  if (assigneeIds.indexOf(data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId) === -1) {
+                    if (data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId) {
+                      assigneeIds.push(data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId);
                       storeAssignee.push({
-                        assigneeId: iss.assigneeId,
-                        assigneeName: iss.assigneeName,
-                        imageUrl: iss.imageUrl,
+                        assigneeId: data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId,
+                        assigneeName: data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeName,
+                        imageUrl: data.columnsData.columns[index].subStatuses[index2].issues[index3].imageUrl,
                       });
                     }
                   }
                 }
-              });
-            });
-          });
-          _.forEach(epicData, (item, index) => {
-            _.forEach(data2, (item2) => {
-              if (String(item.epicId) === String(item2.issueId)) {
-                epicData[index].color = item2.color;
               }
-            });
-          });
+            }
+          }
+          for (let index = 0, len = epicData.length; index < len; index += 1) {
+            for (let index2 = 0, len2 = data2.length; index2 < len2; index2 += 1) {
+              if (String(epicData[index].epicId) === String(data2[index2].issueId)) {
+                epicData[index].color = data2[index2].color;
+              }
+            }
+          }
           ScrumBoardStore.setAssigneer(storeAssignee);
           ScrumBoardStore.setCurrentSprint(data.currentSprint);
           ScrumBoardStore.setParentIds(storeParentIds);
           ScrumBoardStore.setEpicData(epicData);
           const newColumnData = data.columnsData.columns;
           const statusList = [];
-          _.forEach(newColumnData, (item, index) => {
-            if (item.subStatuses) {
-              _.forEach(item.subStatuses, (item2, index2) => {
+          for (let index = 0, len = newColumnData.length; index < len; index += 1) {
+            if (newColumnData[index].subStatuses) {
+              _.forEach(newColumnData[index].subStatuses, (item2, index2) => {
                 statusList.push({
                   id: item2.id,
                   name: item2.name,
@@ -169,7 +169,10 @@ class ScrumBoardHome extends Component {
                 }
               });
             }
-          });
+          }
+          // _.forEach(newColumnData, (item, index) => {
+
+          // });
           ScrumBoardStore.setStatusList(statusList);
           ScrumBoardStore.setBoardData(newColumnData);
           // this.storeIssueNumberCount(storeParentIds, )

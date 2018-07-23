@@ -45,10 +45,10 @@ class Version extends Component {
     const data = BacklogStore.getVersionData;
     const result = [];
     if (data.length > 0) {
-      _.forEach(data, (item, index) => {
+      for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
           <VersionItem
-            data={item}
+            data={data[index]}
             index={index}
             handelClickVersion={this.handelClickVersion.bind(this)}
             draggableIds={this.state.draggableIds}
@@ -56,7 +56,7 @@ class Version extends Component {
             issueRefresh={this.props.issueRefresh.bind(this)}
           />,
         );
-      });
+      }
     }
     return result;
   }
