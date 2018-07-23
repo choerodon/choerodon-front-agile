@@ -620,6 +620,7 @@ class Issue extends Component {
                 onChange={this.handleFilterChange}
                 pagination={false}
                 filters={IssueStore.barFilters || []}
+                filterBarPlaceholder="过滤表"
               />
             </section>
             <section className="c7n-count">
