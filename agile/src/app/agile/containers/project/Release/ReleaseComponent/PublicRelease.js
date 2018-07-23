@@ -142,7 +142,12 @@ class PublicRelease extends Component {
                     ) : ''
                   }
                   <FormItem>
-                    {getFieldDecorator('startDate', {})(
+                    {getFieldDecorator('startDate', {
+                      rules: [{
+                        required: true,
+                        message: '发布日期是必须的',
+                      }],
+                    })(
                       <DatePicker style={{ width: 512 }} label="发布日期" />,
                     )}
                   </FormItem>

@@ -129,7 +129,7 @@ class AccumulationHome extends Component {
     });
   }
   getOption() {
-    const data = _.clone(AccumulationStore.getAccumulationData);
+    let data = _.clone(AccumulationStore.getAccumulationData);
     const legendData = [];
     _.forEach(data, (item) => {
       legendData.push({
@@ -139,48 +139,90 @@ class AccumulationHome extends Component {
     });
     const newxAxis = [];
     if (data.length > 0) {
-      _.forEach(data[0].coordinateDTOList, (item) => {
-        if (newxAxis.length === 0) {
-          newxAxis.push(item.date.split(' ')[0]);
-        } else if (newxAxis.indexOf(item.date.split(' ')[0]) === -1) {
-          newxAxis.push(item.date.split(' ')[0]);
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        for (let index2 = 0, len2 = data[index].coordinateDTOList.length; index2 < len2; index2 += 1) {
+          if (newxAxis.length === 0) {
+            newxAxis.push(data[index].coordinateDTOList[index2].date.split(' ')[0]);
+          } else if (newxAxis.indexOf(data[index].coordinateDTOList[index2].date.split(' ')[0]) === -1) {
+            newxAxis.push(data[index].coordinateDTOList[index2].date.split(' ')[0]);
+          }
         }
-      });
+      }
     }
     const legendSeries = [];
-    _.forEach(data.reverse(), (item, index) => {
+    data = data.reverse();
+    for (let index = 0, len = data.length; index < len; index += 1) {
       legendSeries.push({
-        name: item.name,
+        name: data[index].name,
         type: 'line',
         stack: true,
         areaStyle: { normal: {
-          color: item.color,
+          color: data[index].color,
         } },
         lineStyle: { normal: {
-          color: item.color,
+          color: data[index].color,
         } },
         itemStyle: {
-          normal: { color: item.color },
+          normal: { color: data[index].color },
         },
         data: [],
       });
-      _.forEach(newxAxis, (item2) => {
+      for (let index2 = 0, len2 = newxAxis.length; index2 < len2; index2 += 1) {
         let date = '';
         let max = 0;
-        _.forEach(item.coordinateDTOList, (item3) => {
-          if (item3.date.split(' ')[0] === item2) {
+        let flag = 0;
+        for (let index3 = 0, len3 = data[index].coordinateDTOList.length; index3 < len3; index3 += 1) {
+          if (data[index].coordinateDTOList[index3].date.split(' ')[0] === newxAxis[index2]) {
+            flag = 1;
             if (date === '') {
-              date = item3.date;
-              max = item3.issueCount;
-            } else if (moment(item3.date).isAfter(date)) {
-              date = item3.date;
-              max = item3.issueCount;
+              date = data[index].coordinateDTOList[index3].date;
+              max = data[index].coordinateDTOList[index3].issueCount;
+            } else if (moment(data[index].coordinateDTOList[index3].date).isAfter(date)) {
+              date = data[index].coordinateDTOList[index3].date;
+              max = data[index].coordinateDTOList[index3].issueCount;
             }
           }
-        });
-        legendSeries[index].data.push(max);
-      });
-    });
+        }
+        if (flag === 1) {
+          legendSeries[index].data.push(max);
+        } else {
+          legendSeries[index].data.push(legendSeries[index].data[legendSeries[index].data.length - 1]);
+        }
+      }
+    }
+    // _.forEach(data.reverse(), (item, index) => {
+    //   legendSeries.push({
+    //     name: item.name,
+    //     type: 'line',
+    //     stack: true,
+    //     areaStyle: { normal: {
+    //       color: item.color,
+    //     } },
+    //     lineStyle: { normal: {
+    //       color: item.color,
+    //     } },
+    //     itemStyle: {
+    //       normal: { color: item.color },
+    //     },
+    //     data: [],
+    //   });
+    //   _.forEach(newxAxis, (item2) => {
+    //     let date = '';
+    //     let max = 0;
+    //     _.forEach(item.coordinateDTOList, (item3) => {
+    //       if (item3.date.split(' ')[0] === item2) {
+    //         if (date === '') {
+    //           date = item3.date;
+    //           max = item3.issueCount;
+    //         } else if (moment(item3.date).isAfter(date)) {
+    //           date = item3.date;
+    //           max = item3.issueCount;
+    //         }
+    //       }
+    //     });
+    //     legendSeries[index].data.push(max);
+    //   });
+    // });
     this.setState({
       options: {
         tooltip: {
