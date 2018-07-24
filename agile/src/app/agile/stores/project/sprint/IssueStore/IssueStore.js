@@ -119,6 +119,8 @@ class SprintCommonStore {
     const urlParams = AppState.currentMenuType;
     if (!this.paramUrl) {
       return undefined;
+    } else if (this.paramUrl === 'backlog') {
+      return `/agile/${this.paramUrl}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramIssueId=${this.paramIssueId}`;
     } else {
       return `/agile/${this.paramUrl}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     }

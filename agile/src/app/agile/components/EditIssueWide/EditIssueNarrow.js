@@ -64,6 +64,7 @@ class CreateSprint extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      issueLoading: false,
       flag: undefined,
       selectLoading: true,
       saveLoading: false,
@@ -302,6 +303,7 @@ class CreateSprint extends Component {
       influenceVersions,
       fixVersionsFixed,
       influenceVersionsFixed,
+      issueLoading: false,
     });
   }
 
@@ -459,6 +461,8 @@ class CreateSprint extends Component {
       editComment: undefined,
       editLogId: undefined,
       editLog: undefined,
+
+      issueLoading: true,
     }, () => {
       loadIssue(issueId).then((res) => {
         this.setAnIssueToState(res);
@@ -1212,6 +1216,26 @@ class CreateSprint extends Component {
     );
     return (
       <div className="choerodon-modal-editIssue">
+        {
+          this.state.issueLoading ? (
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0, 
+                background: 'rgba(255, 255, 255, 0.65)',
+                zIndex: 9999,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Spin />
+            </div>
+          ) : null 
+        }
         <div className="c7n-nav">
           <div>
             <Dropdown overlay={typeList} trigger={['click']} disabled={this.state.typeCode === 'sub_task'}>
