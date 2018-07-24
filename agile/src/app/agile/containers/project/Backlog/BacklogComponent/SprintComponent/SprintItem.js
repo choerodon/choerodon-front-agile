@@ -210,7 +210,6 @@ class SprintItem extends Component {
       });
     }
   }
-
   clearFilter() {
     BacklogStore.setChosenEpic('all');
     BacklogStore.setChosenVersion('all');
@@ -399,7 +398,7 @@ class SprintItem extends Component {
                     BacklogStore.getChosenVersion !== 'all' 
                     || BacklogStore.getChosenEpic !== 'all'
                     || BacklogStore.getOnlyMe
-                    || BacklogStore.getRecent
+                    || BacklogStore.getRecent // 仅故事
                     || BacklogStore.getQuickFilters.length > 0 ? 'block' : 'none',
                 }}
                 role="none"

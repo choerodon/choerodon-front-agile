@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import './StatusColumn.scss';
-
+// 列状态
 @inject('AppState')
 @observer
 class StatusColumn extends Component {

@@ -455,7 +455,7 @@ class ScrumBoardHome extends Component {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
-  // 渲染第三方状态列
+  // 渲染状态列
   renderStatusColumns() {
     const data = ScrumBoardStore.getBoardData;
     const result = [];
@@ -583,12 +583,14 @@ class ScrumBoardHome extends Component {
     let result = '';
     const data = ScrumBoardStore.getBoardData;
     let flag = 0;
+    // 如果没有其他任务则其他任务列就不渲染，
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       _.forEach(data, (item) => {
         if (item.subStatuses) {
           _.forEach(item.subStatuses, (item2) => {
             if (item2.issues) {
               _.forEach(item2.issues, (item3) => {
+                // 是否有父级
                 if (!item3.parentIssueId) {
                   flag = 1;
                 }
@@ -603,6 +605,7 @@ class ScrumBoardHome extends Component {
           _.forEach(item.subStatuses, (item2) => {
             if (item2.issues) {
               _.forEach(item2.issues, (item3) => {
+                // 是否有近半人
                 if (!item3.assigneeId) {
                   flag = 1;
                 }
@@ -611,9 +614,11 @@ class ScrumBoardHome extends Component {
           });
         }
       });
+      // 差一个史诗的判断
     } else {
       flag = 1;
     }
+    // 有flag才渲染
     if (flag === 1) {
       result = (
         <div className="c7n-scrumboard-others">

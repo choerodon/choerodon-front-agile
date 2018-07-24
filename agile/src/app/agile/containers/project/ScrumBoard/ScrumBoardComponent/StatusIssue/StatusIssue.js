@@ -5,7 +5,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import { Icon, Avatar, Tooltip } from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import './StatusIssue.scss';
-
+// 单个列的issueCard
 @observer
 class StatusIssue extends Component {
   constructor(props) {
