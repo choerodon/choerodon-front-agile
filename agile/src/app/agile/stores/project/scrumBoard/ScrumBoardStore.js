@@ -88,18 +88,18 @@ class ScrumBoardStore {
     if (parentCategoryCode !== 'done') {
       const data = this.boardData;
       let subTasks = [];
-      _.forEach(data, (item) => {
-        _.forEach(item.subStatuses, (sub) => {
-          _.forEach(sub.issues, (iss) => {
-            if (iss.parentIssueId === parentId) {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        for (let index2 = 0, len2 = data[index].subStatuses.length; index2 < len2; index2 += 1) {
+          for (let index3 = 0, len3 = data[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
+            if (data[index].subStatuses[index2].issues[index3].parentIssueId === parentId) {
               subTasks.push({
-                categoryCode: sub.categoryCode,
-                ...iss,
+                categoryCode: data[index].subStatuses[index2].categoryCode,
+                ...data[index].subStatuses[index2].issues[index3],
               });
             }
-          });
-        });
-      });
+          }
+        }
+      }
       subTasks = _.uniqBy(subTasks, 'issueId');
       const end = _.remove(subTasks, n => n.categoryCode !== 'done');
       if (end.length === 0) {
