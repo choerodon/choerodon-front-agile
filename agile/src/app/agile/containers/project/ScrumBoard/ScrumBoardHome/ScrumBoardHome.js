@@ -74,25 +74,25 @@ class ScrumBoardHome extends Component {
       }
       ScrumBoardStore.setBoardList(data);
       ScrumBoardStore.setCurrentConstraint(data[index].columnConstraint);
-      if (!ScrumBoardStore.getSelectedBoard) {
-        ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
-        ScrumBoardStore.setSelectedBoard(data[index].boardId);
-        this.refresh(data[index].boardId);
-      } else {
-        let flag = 0;
-        for (let index2 = 0, len = data.length; index2 < len; index2 += 1) {
-          if (data[index2].boardId === ScrumBoardStore.getSelectedBoard) {
-            flag += 1;
-          }
-        }
-        if (flag > 0) {
-          this.refresh(ScrumBoardStore.getSelectedBoard);
-        } else {
-          ScrumBoardStore.setSelectedBoard(data[index].boardId);
-          ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
-          this.refresh(data[index].boardId);
-        }
-      }
+      // if (!ScrumBoardStore.getSelectedBoard) {
+      ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
+      ScrumBoardStore.setSelectedBoard(data[index].boardId);
+      this.refresh(data[index].boardId);
+      // } else {
+      //   let flag = 0;
+      //   for (let index2 = 0, len = data.length; index2 < len; index2 += 1) {
+      //     if (data[index2].boardId === ScrumBoardStore.getSelectedBoard) {
+      //       flag += 1;
+      //     }
+      //   }
+      //   if (flag > 0) {
+      //     this.refresh(ScrumBoardStore.getSelectedBoard);
+      //   } else {
+      //     ScrumBoardStore.setSelectedBoard(data[index].boardId);
+      //     ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
+      //     this.refresh(data[index].boardId);
+      //   }
+      // }
     }).catch((error) => {
     });
   }
@@ -112,7 +112,7 @@ class ScrumBoardHome extends Component {
           const assigneeIds = [];
           const storeParentIds = [];
           const storeAssignee = [];
-          const epicData = data.epicInfo;
+          const epicData = data.epicInfo ? data.epicInfo : [];
           for (let index = 0, len = data.columnsData.columns.length; index < len; index += 1) {
             for (let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length; index2 < len2; index2 += 1) {
               for (let index3 = 0, len3 = data.columnsData.columns[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
@@ -156,23 +156,20 @@ class ScrumBoardHome extends Component {
           const statusList = [];
           for (let index = 0, len = newColumnData.length; index < len; index += 1) {
             if (newColumnData[index].subStatuses) {
-              _.forEach(newColumnData[index].subStatuses, (item2, index2) => {
+              for (let index2 = 0, len2 = newColumnData[index].subStatuses.length; index2 < len2; index2 += 1) {
                 statusList.push({
-                  id: item2.id,
-                  name: item2.name,
+                  id: newColumnData[index].subStatuses[index2].id,
+                  name: newColumnData[index].subStatuses[index2].name,
                 });
-                if (item2.issues) {
-                  _.forEach(item2.issues, (item3, index3) => {
-                    newColumnData[index].subStatuses[index2].issues[index3].statusName = item2.name;
-                    newColumnData[index].subStatuses[index2].issues[index3].categoryCode = item2.categoryCode;
-                  });
+                if (newColumnData[index].subStatuses[index2].issues) {
+                  for (let index3 = 0, len3 = newColumnData[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
+                    newColumnData[index].subStatuses[index2].issues[index3].statusName = newColumnData[index].subStatuses[index2].name;
+                    newColumnData[index].subStatuses[index2].issues[index3].categoryCode = newColumnData[index].subStatuses[index2].categoryCode;
+                  }
                 }
-              });
+              }
             }
           }
-          // _.forEach(newColumnData, (item, index) => {
-
-          // });
           ScrumBoardStore.setStatusList(statusList);
           ScrumBoardStore.setBoardData(newColumnData);
           // this.storeIssueNumberCount(storeParentIds, )
@@ -200,70 +197,70 @@ class ScrumBoardHome extends Component {
       if (JSON.parse(result.source.droppableId).columnId !== 
       JSON.parse(result.destination.droppableId).columnId) {
         // 如果是拖不同列
-        _.forEach(originState, (ori, oriIndex) => {
-          if (String(ori.columnId) === String(JSON.parse(result.source.droppableId).columnId)) {
+        for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
+          if (String(originState[oriIndex].columnId) === String(JSON.parse(result.source.droppableId).columnId)) {
             let totalIssues = 0;
-            _.forEach(ori.subStatuses, (sub) => {
-              totalIssues += sub.issues.length;
-            });
-            if (ori.minNum >= totalIssues) {
+            for (let index = 0, len2 = originState[oriIndex].subStatuses.length; index < len2; index += 1) {
+              totalIssues += originState[oriIndex].subStatuses[index].issues.length;
+            }
+            if (originState[oriIndex].minNum >= totalIssues) {
               flag = 1;
-              message.info(`少于列${ori.name}的最小长度，无法更新`);
+              message.info(`少于列${originState[oriIndex].name}的最小长度，无法更新`);
             }
           }
-        });
-        _.forEach(originState, (ori, oriIndex) => {
-          if (String(ori.columnId) === 
+        }
+        for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
+          if (String(originState[oriIndex].columnId) === 
           String(JSON.parse(result.destination.droppableId).columnId)) {
             let totalIssues = 0;
-            _.forEach(ori.subStatuses, (sub) => {
-              totalIssues += sub.issues.length;
-            });
-            if (ori.maxNum <= totalIssues) {
+            for (let index = 0, len2 = originState[oriIndex].subStatuses.length; index < len2; index += 1) {
+              totalIssues += originState[oriIndex].subStatuses[index].issues.length;
+            }
+            if (originState[oriIndex].maxNum <= totalIssues) {
               flag = 1;
-              message.info(`多于列${ori.name}的最大长度，无法更新`);
+              message.info(`多于列${originState[oriIndex].name}的最大长度，无法更新`);
             }
           }
-        });
+        }
       }
     } else if (ScrumBoardStore.getCurrentConstraint === 'issue_without_sub_task') {
       // 问题计数 不包含子任务
       if (JSON.parse(result.source.droppableId).columnId !== 
       JSON.parse(result.destination.droppableId).columnId) {
         // 如果是拖不同列
-        _.forEach(originState, (ori, oriIndex) => {
-          if (String(ori.columnId) === String(JSON.parse(result.source.droppableId).columnId)) {
+        for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
+          if (String(originState[oriIndex].columnId) === String(JSON.parse(result.source.droppableId).columnId)) {
             let totalIssues = 0;
-            _.forEach(ori.subStatuses, (sub) => {
-              _.forEach(sub.issues, (iss) => {
-                if (iss.typeCode !== 'sub_task') {
+            for (let index = 0, len2 = originState[oriIndex].subStatuses.length; index < len2; index += 1) {
+              for (let index2 = 0, len3 = originState[oriIndex].subStatuses[index].issues.length; index2 < len3; index2 += 1) {
+                if (originState[oriIndex].subStatuses[index].issues[index2].typeCode !== 'sub_task') {
                   totalIssues += 1;
                 }
-              });
-            });
-            if (ori.minNum >= totalIssues) {
+              }
+            }
+            if (originState[oriIndex].minNum >= totalIssues) {
               flag = 1;
-              message.info(`少于列${ori.name}的最小长度，无法更新`);
+              message.info(`少于列${originState[oriIndex].name}的最小长度，无法更新`);
             }
           }
-        });
-        _.forEach(originState, (ori, oriIndex) => {
-          if (String(ori.columnId) === 
+        }
+        for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
+          if (String(originState[oriIndex].columnId) === 
           String(JSON.parse(result.destination.droppableId).columnId)) {
             let totalIssues = 0;
-            _.forEach(ori.subStatuses, (sub) => {
-              _.forEach(sub.issues, (iss) => {
-                if (iss.typeCode !== 'sub_task') {
+            for (let index = 0, len2 = originState[oriIndex].subStatuses.length; index < len2; index += 1) {
+              for (let index2 = 0, len3 = originState[oriIndex].subStatuses[index].issues.length; index2 < len3; index2 += 1) {
+                if (originState[oriIndex].subStatuses[index].issues[index2].typeCode !== 'sub_task') {
                   totalIssues += 1;
                 }
-              });
-            });
-            if (ori.maxNum <= totalIssues) {
+              }
+            }
+            if (originState[oriIndex].maxNum <= totalIssues) {
               flag = 1;
-              message.info(`多于列${ori.name}的最大长度，无法更新`);
+              message.info(`多于列${originState[oriIndex].name}的最大长度，无法更新`);
             }
           }
-        });
+        }
       }
     }
     if (flag === 0) {
@@ -277,34 +274,34 @@ class ScrumBoardHome extends Component {
       // const splitData = result.draggableId.split(',');
       // const splitData2 = result.destination.droppableId.split(',');
       let draggableData = {};
-      _.forEach(newState, (item, index) => {
-        if (String(item.columnId) === String(JSON.parse(result.source.droppableId).columnId)) {
-          _.forEach(newState[index].subStatuses, (item2, index2) => {
-            if (String(item2.id) === String(JSON.parse(result.source.droppableId).code)) {
+      for (let index = 0, len = newState.length; index < len; index += 1) {
+        if (String(newState[index].columnId) === String(JSON.parse(result.source.droppableId).columnId)) {
+          for (let index2 = 0, len2 = newState[index].subStatuses.length; index2 < len2; index2 += 1) {
+            if (String(newState[index].subStatuses[index2].id) === String(JSON.parse(result.source.droppableId).code)) {
               let spliceIndex = '';
-              _.forEach(newState[index].subStatuses[index2].issues, (item3, index3) => {
-                if (String(item3.issueId) === String(issueId)) {
+              for (let index3 = 0, len3 = newState[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
+                if (String(newState[index].subStatuses[index2].issues[index3].issueId) === String(issueId)) {
                   spliceIndex = index3;
                 }
-              });
+              }
               draggableData = 
               newState[index].subStatuses[index2].issues.splice(spliceIndex, 1)[0];
             }
-          });
+          }
         }
-      });
-      _.forEach(newState, (item, index) => {
-        if (String(item.columnId) === 
+      }
+      for (let index = 0, len = newState.length; index < len; index += 1) {
+        if (String(newState[index].columnId) === 
         String(JSON.parse(result.destination.droppableId).columnId)) {
-          _.forEach(newState[index].subStatuses, (item2, index2) => {
-            if (String(item2.id) === 
+          for (let index2 = 0, len2 = newState[index].subStatuses.length; index2 < len2; index2 += 1) {
+            if (String(newState[index].subStatuses[index2].id) === 
             String(JSON.parse(result.destination.droppableId).code)) {
               newState[index].subStatuses[index2].issues.splice(
                 result.destination.index, 0, draggableData);
             }
-          });
+          }
         }
-      });
+      }
       ScrumBoardStore.setBoardData(newState);
       let destinationStatus;
       ScrumBoardStore.updateIssue(
@@ -316,39 +313,39 @@ class ScrumBoardHome extends Component {
           message.info(data.message);
           ScrumBoardStore.setBoardData(originState);
         } else {
-          _.forEach(ScrumBoardStore.getStatusList, (item, index) => {
-            if (data.statusId === item.id) {
-              draggableData.statusName = item.name;
+          for (let index = 0, len = ScrumBoardStore.getStatusList.length; index < len; index += 1) {
+            if (data.statusId === ScrumBoardStore.getStatusList[index].id) {
+              draggableData.statusName = ScrumBoardStore.getStatusList[index].name;
             }
-          });
+          }
           draggableData.objectVersionNumber = data.objectVersionNumber;
           draggableData.categoryCode = JSON.parse(result.destination.droppableId).categoryCode;
-          _.forEach(newState, (item, index) => {
-            if (String(item.columnId) === 
+          for (let index = 0, len = newState.length; index < len; index += 1) {
+            if (String(newState[index].columnId) === 
             String(JSON.parse(result.destination.droppableId).columnId)) {
-              _.forEach(newState[index].subStatuses, (item2, index2) => {
-                if (String(item2.id) === 
+              for (let index2 = 0, len2 = newState[index].subStatuses.length; index2 < len2; index2 += 1) {
+                if (String(newState[index].subStatuses[index2].id) === 
                 String(JSON.parse(result.destination.droppableId).code)) {
-                  destinationStatus = item2.categoryCode;
+                  destinationStatus = newState[index].subStatuses[index2].categoryCode;
                   newState[index].subStatuses[index2].issues.splice(
                     result.destination.index, 1, draggableData);
                 }
-              });
+              }
             }
-          });
+          }
           ScrumBoardStore.setBoardData(newState);
           if (draggableData.parentIssueId) {
             if (destinationStatus === 'done') {
               let parentIdCode;
               let parentIdNum;
               let parentObjectVersionNumber;
-              _.forEach(ScrumBoardStore.getParentIds, (pi) => {
-                if (pi.issueId === draggableData.parentIssueId) {
-                  parentIdCode = pi.categoryCode;
-                  parentIdNum = pi.issueNum;
-                  parentObjectVersionNumber = pi.objectVersionNumber;
+              for (let index = 0, len = ScrumBoardStore.getParentIds.length; index < len; index += 1) {
+                if (ScrumBoardStore.getParentIds[index].issueId === draggableData.parentIssueId) {
+                  parentIdCode = ScrumBoardStore.getParentIds[index].categoryCode;
+                  parentIdNum = ScrumBoardStore.getParentIds[index].issueNum;
+                  parentObjectVersionNumber = ScrumBoardStore.getParentIds[index].objectVersionNumber;
                 }
-              });
+              }
               const judge = ScrumBoardStore.judgeMoveParentToDone(
                 parentIdCode, draggableData.parentIssueId);
               if (judge) {
@@ -406,9 +403,9 @@ class ScrumBoardHome extends Component {
         if (res.parentsDoneUnfinishedSubtasks.length > 0) {
           flag = 1;
           let issueNums = '';
-          _.forEach(res.parentsDoneUnfinishedSubtasks, (items) => {
-            issueNums += `${items.issueNum} `;
-          });
+          for (let index = 0, len = res.parentsDoneUnfinishedSubtasks.length; index < len; index += 1) {
+            issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
+          }
           confirm({
             title: 'warnning',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
@@ -442,15 +439,15 @@ class ScrumBoardHome extends Component {
   renderStatusColumns() {
     const data = ScrumBoardStore.getBoardData;
     const result = [];
-    _.forEach(data, (item) => {
-      if (item.subStatuses.length > 0) {
+    for (let index = 0, len = data.length; index < len; index += 1) {
+      if (data[index].subStatuses.length > 0) {
         result.push(
           <StatusColumn
-            data={item}
+            data={data[index]}
           />,
         );
       }
-    });
+    }
     return result;
   }
   // 渲染issue列
@@ -458,49 +455,49 @@ class ScrumBoardHome extends Component {
     const result = [];
     const data = ScrumBoardStore.getBoardData;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
-      _.forEach(data, (item) => {
-        if (item.subStatuses.length > 0) {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
-              data={item}
+              data={data[index]}
               parentId={id}
               source={_.isUndefined(id) ? 'other' : id}
             />,
           );
         }
-      });
+      }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
-      _.forEach(data, (item) => {
-        if (item.subStatuses.length > 0) {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
-              data={item}
+              data={data[index]}
               assigneeId={id}
             />,
           );
         }
-      });
+      }
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
-      _.forEach(data, (item) => {
-        if (item.subStatuses.length > 0) {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
-              data={item}
+              data={data[index]}
               epicId={id}
             />,
           );
         }
-      });
+      }
     } else {
-      _.forEach(data, (item) => {
-        if (item.subStatuses.length > 0) {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
-              data={item}
+              data={data[index]}
             />,
           );
         }
-      });
+      }
     }
     return result;
   }
@@ -517,10 +514,10 @@ class ScrumBoardHome extends Component {
       ids = _.sortBy(ids, o => o.epicId);
     }
     const result = [];
-    _.forEach(ids, (item) => {
+    for (let index = 0, len = ids.length; index < len; index += 1) {
       result.push(
         <SwimLaneContext
-          data={item}
+          data={ids[index]}
           handleDragEnd={this.handleDragEnd.bind(this)}
           renderIssueColumns={this.renderIssueColumns.bind(this)}
           changeState={(name, value) => {
@@ -530,7 +527,7 @@ class ScrumBoardHome extends Component {
           }}
         />,
       );
-    });
+    }
     return result;
   }
   renderHeight() {
@@ -567,33 +564,33 @@ class ScrumBoardHome extends Component {
     const data = ScrumBoardStore.getBoardData;
     let flag = 0;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
-      _.forEach(data, (item) => {
-        if (item.subStatuses) {
-          _.forEach(item.subStatuses, (item2) => {
-            if (item2.issues) {
-              _.forEach(item2.issues, (item3) => {
-                if (!item3.parentIssueId) {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        if (data[index].subStatuses) {
+          for (let index2 = 0, len2 = data[index].subStatuses.length; index2 < len2; index2 += 1) {
+            if (data[index].subStatuses[index2].issues) {
+              for (let index3 = 0, len3 = data[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
+                if (!data[index].subStatuses[index2].issues[index3].parentIssueId) {
                   flag = 1;
                 }
-              });
+              }
             }
-          });
+          }
         }
-      });
+      }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
-      _.forEach(data, (item) => {
-        if (item.subStatuses) {
-          _.forEach(item.subStatuses, (item2) => {
-            if (item2.issues) {
-              _.forEach(item2.issues, (item3) => {
-                if (!item3.assigneeId) {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        if (data[index].subStatuses) {
+          for (let index2 = 0, len2 = data[index].subStatuses.length; index2 < len2; index2 += 1) {
+            if (data[index].subStatuses[index2].issues) {
+              for (let index3 = 0, len3 = data[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
+                if (!data[index].subStatuses[index2].issues[index3].assigneeId) {
                   flag = 1;
                 }
-              });
+              }
             }
-          });
+          }
         }
-      });
+      }
     } else {
       flag = 1;
     }
@@ -675,12 +672,12 @@ class ScrumBoardHome extends Component {
             }}
             onChange={(value) => {
               let newCode;
-              _.forEach(ScrumBoardStore.getBoardList, (item) => {
-                if (item.boardId === value) {
-                  ScrumBoardStore.setCurrentConstraint(item.columnConstraint);
-                  newCode = item.swimlaneBasedCode;
+              for (let index = 0, len = ScrumBoardStore.getBoardList.length; index < len; index += 1) {
+                if (ScrumBoardStore.getBoardList[index].boardId === value) {
+                  ScrumBoardStore.setCurrentConstraint(ScrumBoardStore.getBoardList[index].columnConstraint);
+                  newCode = ScrumBoardStore.getBoardList[index].swimlaneBasedCode;
                 }
-              });
+              }
               ScrumBoardStore.setSelectedBoard(value);
               ScrumBoardStore.setSwimLaneCode(newCode);
               this.refresh(value);
