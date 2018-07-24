@@ -112,7 +112,7 @@ class ScrumBoardHome extends Component {
           const assigneeIds = [];
           const storeParentIds = [];
           const storeAssignee = [];
-          const epicData = data.epicInfo;
+          const epicData = data.epicInfo ? data.epicInfo : [];
           for (let index = 0, len = data.columnsData.columns.length; index < len; index += 1) {
             for (let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length; index2 < len2; index2 += 1) {
               for (let index3 = 0, len3 = data.columnsData.columns[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
