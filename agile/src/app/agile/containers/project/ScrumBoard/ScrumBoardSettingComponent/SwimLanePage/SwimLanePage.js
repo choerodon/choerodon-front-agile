@@ -33,11 +33,11 @@ class SwimLanePage extends Component {
     const data = ScrumBoardStore.getBoardList;
     const selectBoard = ScrumBoardStore.getSelectedBoard;
     let defaultSelect;
-    _.forEach(data, (item) => {
-      if (String(item.boardId) === String(selectBoard)) {
-        defaultSelect = item;
+    for (let index = 0, len = data.length; index < len; index += 1) {
+      if (String(data[index].boardId) === String(selectBoard)) {
+        defaultSelect = data[index];
       }
-    });
+    }
     return (
       <Content
         description="泳道是指看板中一横排的主板，基于横排对问题进行状态的流转。泳道类型可以在下面进行修改，并将自动保存。注意：修改泳道会修改看板的分组维度，同时修改看板样式。"

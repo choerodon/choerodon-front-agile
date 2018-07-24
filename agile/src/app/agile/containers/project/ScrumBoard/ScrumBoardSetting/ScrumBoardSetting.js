@@ -72,11 +72,11 @@ class ScrumBoardSetting extends Component {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     let name;
-    _.forEach(ScrumBoardStore.getBoardList, (item) => {
-      if (item.boardId === ScrumBoardStore.getSelectedBoard) {
-        name = item.name;
+    for (let index = 0, len = ScrumBoardStore.getBoardList.length; index < len; index += 1) {
+      if (ScrumBoardStore.getBoardList[index].boardId === ScrumBoardStore.getSelectedBoard) {
+        name = ScrumBoardStore.getBoardList[index].name;
       }
-    });
+    }
     confirm({
       title: `删除看板${name}`,
       content: '确定要删除该看板吗?',

@@ -22,9 +22,9 @@ class StatusCard extends Component {
   getStatusNumber() {
     const data = ScrumBoardStore.getBoardData;
     let length = 0;
-    _.forEach(data, (item) => {
-      length += item.subStatuses.length;
-    });
+    for (let index = 0, len = data.length; index < len; index += 1) {
+      length += data[index].subStatuses.length;
+    }
     return length;
   }
   handleDeleteStatus() {
@@ -32,11 +32,11 @@ class StatusCard extends Component {
     const data = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
     const deleteCode = this.props.data.id;
     let deleteIndex = '';
-    _.forEach(data[data.length - 1].subStatuses, (item, index) => {
-      if (String(item.id) === String(deleteCode)) {
+    for (let index = 0, len = data[data.length - 1].subStatuses.length; index < len; index += 1) {
+      if (String(data[data.length - 1].subStatuses[index].id) === String(deleteCode)) {
         deleteIndex = index;
       }
-    });
+    }
     data[data.length - 1].subStatuses.splice(deleteIndex, 1);
     ScrumBoardStore.setBoardData(data);
     ScrumBoardStore.axiosDeleteStatus(deleteCode).catch((error) => {

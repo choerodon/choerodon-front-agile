@@ -71,27 +71,27 @@ class ColumnPage extends Component {
       const newState = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
       let draggableData = {};
       let columnIndex;
-      _.forEach(newState, (item, index) => {
-        if (String(item.columnId) === String(result.source.droppableId.split(',')[1])) {
+      for (let index = 0, len = newState.length; index < len; index += 1) {
+        if (String(newState[index].columnId) === String(result.source.droppableId.split(',')[1])) {
           columnIndex = index;
           draggableData = newState[index].subStatuses.splice(result.source.index, 1)[0];
         }
-      });
+      }
       if (result.destination.droppableId.split(',')[1] === 'unset') {
         const code = result.draggableId.split(',')[0];
         const columnId = result.source.droppableId.split(',')[1];
         const minNum = result.source.droppableId.split(',')[2];
         let totalNum = 0;
         if (ScrumBoardStore.getCurrentConstraint !== 'constraint_none') {
-          _.forEach(newState[columnIndex].subStatuses, (sub) => {
-            _.forEach(sub.issues, (iss) => {
+          for (let index = 0, len = newState[columnIndex].subStatuses.length; index < len; index += 1) {
+            for (let index2 = 0, len2 = newState[columnIndex].subStatuses[index].issues.length; index2 < len2; index2 += 1) {
               if (ScrumBoardStore.getCurrentConstraint === 'issue') {
                 totalNum += 1;
-              } else if (iss.typeCode !== 'sub_task') {
+              } else if (newState[columnIndex].subStatuses[index].issues[index2].typeCode !== 'sub_task') {
                 totalNum += 1;
               }
-            });
-          });
+            }
+          }
           if (!isNaN(minNum)) {
             if (parseInt(totalNum, 10) < parseInt(minNum, 10)) {
               message.info('剩余状态issue数小于列的最小issue数，无法移动状态');
@@ -99,22 +99,22 @@ class ColumnPage extends Component {
             }
           }
         }
-        _.forEach(newState, (item, index) => {
-          if (String(item.columnId) === String(result.destination.droppableId.split(',')[1])) {
+        for (let index = 0, len = newState.length; index < len; index += 1) {
+          if (String(newState[index].columnId) === String(result.destination.droppableId.split(',')[1])) {
             newState[index].subStatuses.splice(result.destination.index, 0, draggableData);
           }
-        });
+        }
         ScrumBoardStore.setBoardData(newState);
         ScrumBoardStore.moveStatusToUnset(code, {
           columnId,
         }).then((data) => {
           const newData = data;
           newData.issues = draggableData.issues;
-          _.forEach(newState, (item, index) => {
-            if (String(item.columnId) === String(result.destination.droppableId.split(',')[1])) {
+          for (let index = 0, len = newState.length; index < len; index += 1) {
+            if (String(newState[index].columnId) === String(result.destination.droppableId.split(',')[1])) {
               newState[index].subStatuses.splice(result.destination.index, 1, newData);
             }
-          });
+          }
           ScrumBoardStore.setBoardData(newState);
           this.props.refresh();
         }).catch((error) => {
@@ -134,15 +134,15 @@ class ColumnPage extends Component {
         const maxNum = result.destination.droppableId.split(',')[3];
         let totalNum = 0;
         if (ScrumBoardStore.getCurrentConstraint !== 'constraint_none') {
-          _.forEach(newState[columnIndex].subStatuses, (sub) => {
-            _.forEach(sub.issues, (iss) => {
+          for (let index = 0, len = newState[columnIndex].subStatuses.length; index < len; index += 1) {
+            for (let index2 = 0, len2 = newState[columnIndex].subStatuses[index].issues.length; index2 < len2; index2 += 1) {
               if (ScrumBoardStore.getCurrentConstraint === 'issue') {
                 totalNum += 1;
-              } else if (iss.typeCode !== 'sub_task') {
+              } else if (newState[columnIndex].subStatuses[index].issues[index2].typeCode !== 'sub_task') {
                 totalNum += 1;
               }
-            });
-          });
+            }
+          }
           if (!isNaN(minNum)) {
             if (parseInt(totalNum, 10) < parseInt(minNum, 10)) {
               message.info('剩余状态issue数小于列的最小issue数，无法移动状态');
@@ -150,37 +150,37 @@ class ColumnPage extends Component {
             }
           }
           let destinationTotal = 0;
-          _.forEach(newState, (newS) => {
-            if (parseInt(newS.columnId, 10) === parseInt(columnId, 10)) {
-              _.forEach(newS.subStatuses, (sub2) => {
-                _.forEach(sub2.issues, (iss) => {
+          for (let index = 0, len = newState.length; index < len; index += 1) {
+            if (parseInt(newState[index].columnId, 10) === parseInt(columnId, 10)) {
+              for (let index2 = 0, len2 = newState[index].subStatuses.length; index2 < len2; index2 += 1) {
+                for (let index3 = 0, len3 = newState[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
                   if (ScrumBoardStore.getCurrentConstraint === 'issue') {
                     destinationTotal += 1;
-                  } else if (iss.typeCode !== 'sub_task') {
+                  } else if (newState[index].subStatuses[index2].issues[index3].typeCode !== 'sub_task') {
                     destinationTotal += 1;
                   }
-                });
-              });
+                }
+              }
             }
-          });
+          }
           let draggableTotal = 0;
-          _.forEach(draggableData.issues, (di) => {
+          for (let index = 0, len = draggableData.issues.length; index < len; index += 1) {
             if (ScrumBoardStore.getCurrentConstraint === 'issue') {
               draggableTotal += 1;
-            } else if (di.typeCode !== 'sub_task') {
+            } else if (draggableData.issues[index].typeCode !== 'sub_task') {
               draggableTotal += 1;
             }
-          });
+          }
           if ((destinationTotal + draggableTotal) > parseInt(maxNum, 10)) {
             message.info('移动至目标列后的issue数大于目标列的最大issue数，无法移动状态');
             return;
           }
         }
-        _.forEach(newState, (item, index) => {
-          if (String(item.columnId) === String(result.destination.droppableId.split(',')[1])) {
+        for (let index = 0, len = newState.length; index < len; index += 1) {
+          if (String(newState[index].columnId) === String(result.destination.droppableId.split(',')[1])) {
             newState[index].subStatuses.splice(result.destination.index, 0, draggableData);
           }
-        });
+        }
         ScrumBoardStore.setBoardData(newState);
         ScrumBoardStore.moveStatusToColumn(code, {
           // categorycode,
@@ -191,11 +191,11 @@ class ColumnPage extends Component {
         }).then((data) => {
           const newData = data;
           newData.issues = draggableData.issues;
-          _.forEach(newState, (item, index) => {
-            if (String(item.columnId) === String(result.destination.droppableId.split(',')[1])) {
+          for (let index = 0, len = newState.length; index < len; index += 1) {
+            if (String(newState[index].columnId) === String(result.destination.droppableId.split(',')[1])) {
               newState[index].subStatuses.splice(result.destination.index, 1, newData);
             }
-          });
+          }
           ScrumBoardStore.setBoardData(newState);
           this.props.refresh();
         }).catch((error) => {
@@ -220,16 +220,16 @@ class ColumnPage extends Component {
   }
   renderColumn(data) {
     const result = [];
-    _.forEach(data, (item, index) => {
+    for (let index = 0, len = data.length; index < len; index += 1) {
       result.push(
         <SettingColumn
-          data={item}
+          data={data[index]}
           refresh={this.props.refresh.bind(this)}
           index={index}
           styleValue={`${parseFloat(parseFloat(1 / data.length) * 100)}%`}
         />,
       );
-    });   
+    }
     return result;
   }
   renderUnsetColumn() {
@@ -284,23 +284,23 @@ class ColumnPage extends Component {
             onChange={(value) => {
               let objectVersionNumber;
               const oldData = ScrumBoardStore.getBoardList;
-              _.forEach(oldData, (item) => {
-                if (item.boardId === ScrumBoardStore.getSelectedBoard) {
-                  objectVersionNumber = item.objectVersionNumber;
+              for (let index = 0, len = oldData.length; index < len; index += 1) {
+                if (oldData[index].boardId === ScrumBoardStore.getSelectedBoard) {
+                  objectVersionNumber = oldData[index].objectVersionNumber;
                 }
-              });
+              }
               ScrumBoardStore.axiosUpdateBoard({
                 boardId: ScrumBoardStore.getSelectedBoard,
                 columnConstraint: value,
                 projectId: AppState.currentMenuType.id,
                 objectVersionNumber,
               }).then((res) => {
-                _.forEach(oldData, (item, index) => {
-                  if (item.boardId === ScrumBoardStore.getSelectedBoard) {
+                for (let index = 0, len = oldData.length; index < len; index += 1) {
+                  if (oldData[index].boardId === ScrumBoardStore.getSelectedBoard) {
                     oldData.objectVersionNumber = res.objectVersionNumber;
                     oldData.columnConstraint = res.columnConstraint;
                   }
-                });
+                }
                 ScrumBoardStore.setBoardList(oldData);
                 ScrumBoardStore.setCurrentConstraint(value);
               }).catch((error) => {

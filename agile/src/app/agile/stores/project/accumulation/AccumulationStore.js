@@ -46,19 +46,19 @@ class AccumulationStore {
   @observable projectInfo = {};
 
   @action changeFilterData(id, bool) {
-    _.forEach(this.filterList, (item, index) => {
-      if (item.filterId === id) {
+    for (let index = 0, len = this.filterList.length; index < len; index += 1) {
+      if (this.filterList[index].filterId === id) {
         this.filterList[index].check = bool;
       }
-    });
+    }
   }
 
   @action changeColumnData(id, bool) {
-    _.forEach(this.columnData, (item, index) => {
-      if (item.columnId === id) {
+    for (let index = 0, len = this.columnData.length; index < len; index += 1) {
+      if (this.columnData[index].columnId === id) {
         this.columnData[index].check = bool;
       }
-    });
+    }
   }
 
   @computed get getProjectInfo() {

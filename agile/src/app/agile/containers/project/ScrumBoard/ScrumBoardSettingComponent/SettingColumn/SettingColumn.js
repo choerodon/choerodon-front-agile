@@ -28,15 +28,15 @@ class SettingColumn extends Component {
   }
   updateColumnMaxMin(type, value) {
     let totalIssues = 0;
-    _.forEach(this.props.data.subStatuses, (sub) => {
-      _.forEach(sub.issues, (iss) => {
+    for (let index = 0, len = this.props.data.subStatuses.length; index < len; index += 1) {
+      for (let index2 = 0, len2 = this.props.data.subStatuses[index].issues.length; index2 < len2; index += 1) {
         if (ScrumBoardStore.getCurrentConstraint === 'issue') {
           totalIssues += 1;
-        } else if (iss.typeCode !== 'sub_task') {
+        } else if (this.props.data.subStatuses[index].issues[index2].typeCode !== 'sub_task') {
           totalIssues += 1;
         }
-      });
-    });
+      }
+    }
     const maxminObj = {};
     if (type === 'maxNum') {
       if (this.props.data.minNum) {
@@ -99,16 +99,16 @@ class SettingColumn extends Component {
   renderStatus() {
     const list = this.props.data.subStatuses;
     const result = [];
-    _.forEach(list, (item, index) => {
+    for (let index = 0, len = list.length; index < len; index += 1) {
       result.push(
         <StatusCard
           columnId={this.props.data.columnId}
-          data={item}
+          data={list[index]}
           index={index}
           refresh={this.props.refresh.bind(this)}
         />,
       );
-    });
+    }
     return result;
   }
   render() {
