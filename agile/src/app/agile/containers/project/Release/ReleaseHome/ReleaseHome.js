@@ -3,6 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
 import { Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin } from 'choerodon-ui';
 import { Action } from 'choerodon-front-boot';
+import DragSortingTable from '../ReleaseComponent/DragSortingTable';
 import { withRouter } from 'react-router-dom';
 import AddRelease from '../ReleaseComponent/AddRelease';
 import '../../../main.scss';
@@ -279,7 +280,7 @@ class ReleaseHome extends Component {
           <Spin spinning={this.state.loading}>
             {
               versionData.length > 0 ? (
-                <Table
+                <DragSortingTable
                   columns={versionColumn}
                   dataSource={versionData}
                   pagination={this.state.pagination}

@@ -7,6 +7,7 @@ const BurndownChart = asyncRouter(() => (import('./BurndownChart')));
 const sprintReport = asyncRouter(() => (import('./Report')));
 const Accumulation = asyncRouter(() => (import('./Accumulation')));
 const VersionReport = asyncRouter(() => (import('./VersionReport')));
+const PieChartReport = asyncRouter(() => (import('./pieChart')));
 
 const ReportHostIndex = ({ match }) => (
   <Switch>
@@ -15,6 +16,7 @@ const ReportHostIndex = ({ match }) => (
     <Route path={`${match.url}/sprintreport`} component={sprintReport} />
     <Route path={`${match.url}/accumulation`} component={Accumulation} />
     <Route path={`${match.url}/versionReport`} component={VersionReport} />
+    <Route path={`${match.url}/pieChartReport`} component={PieChartReport} />
     <Route path={'*'} component={nomatch} />
   </Switch>
 );

@@ -28,10 +28,13 @@ class BacklogHome extends Component {
       expand: false,
     };
   }
-  componentWillMount() {
-    this.refresh();
-  }
   componentDidMount() {
+    this.refresh();
+    const url = this.GetRequest(this.props.location.search);
+    if (url.paramIssueId) {
+      BacklogStore.setClickIssueDetail({ issueId: url.paramIssueId });
+    }
+
     const timer = setInterval(() => {
       if (document.getElementsByClassName('c7n-backlogTools-left').length > 0) {
         if (document.getElementsByClassName('c7n-backlogTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-backlogTools-left')[0].clientHeight) {
@@ -47,6 +50,7 @@ class BacklogHome extends Component {
     BacklogStore.clearSprintFilter();
     BacklogStore.setClickIssueDetail({});
   }
+
   //  拖动结束事件
   onDragEnd(result) {
     this.versionRef.changeState([]);
@@ -107,6 +111,17 @@ class BacklogHome extends Component {
       });
     }).catch((error2) => {
     });
+  }
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
   }
   dragToSprint(result, sourceId, endId, endIndex, originData, newData1) {
     const newData = _.clone(newData1);
@@ -273,29 +288,46 @@ class BacklogHome extends Component {
     }
   }
 
+  /**
+   * 加载版本数据
+   */
+  loadVersion =() => {
+    BacklogStore.axiosGetVersion().then((data2) => {
+      const newVersion = [...data2];
+      for (let index = 0, len = newVersion.length; index < len; index += 1) {
+        newVersion[index].expand = false;
+      }
+      BacklogStore.setVersionData(newVersion);
+    }).catch((error) => {
+    });
+  };
+  /**
+   * 加载史诗
+   */
+  loadEpic =() => {
+    BacklogStore.axiosGetEpic().then((data3) => {
+      const newEpic = [...data3];
+      for (let index = 0, len = newEpic.length; index < len; index += 1) {
+        newEpic[index].expand = false;
+      }
+      BacklogStore.setEpicData(newEpic);
+    }).catch((error3) => {
+    });
+  };
   refresh() {
     this.setState({
       spinIf: true,
     });
+    this.getSprint();
+    const { versionVisible, epicVisible } = this.state;
+    if (versionVisible) {
+      this.loadVersion();
+    }
+    if (epicVisible) {
+      this.loadEpic();
+    }
     ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
       ScrumBoardStore.setQuickSearchList(res);
-      this.getSprint();
-      BacklogStore.axiosGetVersion().then((data2) => {
-        const newVersion = [...data2];
-        for (let index = 0, len = newVersion.length; index < len; index += 1) {
-          newVersion[index].expand = false;
-        }
-        BacklogStore.setVersionData(newVersion);
-      }).catch((error) => {
-      });
-      BacklogStore.axiosGetEpic().then((data3) => {
-        const newEpic = [...data3];
-        for (let index = 0, len = newEpic.length; index < len; index += 1) {
-          newEpic[index].expand = false;
-        }
-        BacklogStore.setEpicData(newEpic);
-      }).catch((error3) => {
-      });
     }).catch((error) => {
     });
   }
@@ -377,7 +409,7 @@ class BacklogHome extends Component {
             <Icon type="refresh" />刷新
           </Button>
         </Header>
-        <Content style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div className="c7n-backlogTools">
             <div
               className="c7n-backlogTools-left"
@@ -444,6 +476,7 @@ class BacklogHome extends Component {
                 <p
                   role="none"
                   onClick={() => {
+                    this.loadVersion();
                     this.setState({
                       versionVisible: true,
                     });
@@ -457,6 +490,7 @@ class BacklogHome extends Component {
                   }}
                   role="none"
                   onClick={() => {
+                    this.loadEpic();
                     this.setState({
                       epicVisible: true,
                     });
@@ -486,7 +520,7 @@ class BacklogHome extends Component {
                 }}
               >
                 <div style={{ display: 'flex', flexGrow: 1 }}>
-                  <Version
+                  {this.state.versionVisible ? <Version
                     onRef={(ref) => {
                       this.versionRef = ref;
                     }}
@@ -496,8 +530,8 @@ class BacklogHome extends Component {
                     issueRefresh={() => {
                       this.IssueDetail.refreshIssueDetail();
                     }}
-                  />
-                  <Epic
+                  /> : null }
+                  {this.state.epicVisible && <Epic
                     onRef={(ref) => {
                       this.epicRef = ref;
                     }}
@@ -507,7 +541,7 @@ class BacklogHome extends Component {
                     issueRefresh={() => {
                       this.IssueDetail.refreshIssueDetail();
                     }}
-                  />
+                  />}
                   <Sprint
                     onRef={(ref) => {
                       this.sprintRef = ref;
@@ -518,18 +552,18 @@ class BacklogHome extends Component {
                     spinIf={this.state.spinIf}
                   />
                 </div>
-                <IssueDetail
+                {JSON.stringify(BacklogStore.getClickIssueDetail) !== '{}' && <IssueDetail
                   visible={JSON.stringify(BacklogStore.getClickIssueDetail) !== '{}'}
                   refresh={this.refresh.bind(this)}
                   onRef={(ref) => {
                     this.IssueDetail = ref;
                   }}
                   cancelCallback={this.resetSprintChose.bind(this)}
-                />
+                />}
               </DragDropContext>
             </div>
           </div>
-        </Content>
+        </div>
       </Page>
     );
   }

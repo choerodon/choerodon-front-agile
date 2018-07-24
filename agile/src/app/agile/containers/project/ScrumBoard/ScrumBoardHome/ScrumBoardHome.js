@@ -47,6 +47,10 @@ class ScrumBoardHome extends Component {
     this.getBoard();
   }
   componentDidMount() {
+    const url = this.GetRequest(this.props.location.search);
+    if (url.paramIssueId) {
+      ScrumBoardStore.setClickIssueDetail({ issueId: url.paramIssueId });
+    }
     const timer = setInterval(() => {
       if (document.getElementsByClassName('c7n-scrumTools-left').length > 0) {
         if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
@@ -96,6 +100,17 @@ class ScrumBoardHome extends Component {
     }).catch((error) => {
     });
   }
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
+  }
   refresh(boardId) {
     this.setState({
       spinIf: true,
@@ -113,6 +128,7 @@ class ScrumBoardHome extends Component {
           const storeParentIds = [];
           const storeAssignee = [];
           const epicData = data.epicInfo;
+          // 为了拿三种模式的渲染泳道经办人的信息...
           for (let index = 0, len = data.columnsData.columns.length; index < len; index += 1) {
             for (let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length; index2 < len2; index2 += 1) {
               for (let index3 = 0, len3 = data.columnsData.columns[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
@@ -148,6 +164,7 @@ class ScrumBoardHome extends Component {
               }
             }
           }
+
           ScrumBoardStore.setAssigneer(storeAssignee);
           ScrumBoardStore.setCurrentSprint(data.currentSprint);
           ScrumBoardStore.setParentIds(storeParentIds);
