@@ -76,49 +76,49 @@ class ReportStore {
     loadChartData(this.currentSprint.sprintId, 'storyPoints').then((res) => {
       const data = res;
       const newData = [];
-      _.forEach(data, (item) => {
-        if (!_.some(newData, { date: item.date })) {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        if (!_.some(newData, { date: data[index].date })) {
           newData.push({
-            date: item.date,
+            date: data[index].date,
             issues: [{
-              issueId: item.issueId,
-              issueNum: item.issueNum,
-              newValue: item.newValue,
-              oldValue: item.oldValue,
-              statistical: item.statistical,
+              issueId: data[index].issueId,
+              issueNum: data[index].issueNum,
+              newValue: data[index].newValue,
+              oldValue: data[index].oldValue,
+              statistical: data[index].statistical,
             }],
-            type: item.type,
+            type: data[index].type,
           });
         } else {
-          let index;
-          _.forEach(newData, (item2, i) => {
-            if (item2.date === item.date) {
-              index = i;
+          let index2;
+          for (let i = 0, len2 = newData.length; i < len2; i += 1) {
+            if (newData[i].date === data[index].date) {
+              index2 = i;
             }
-          });
-          newData[index].issues = [...newData[index].issues, {
-            issueId: item.issueId,
-            issueNum: item.issueNum,
-            newValue: item.newValue,
-            oldValue: item.oldValue,
-            statistical: item.statistical,
+          }
+          newData[index2].issues = [...newData[index2].issues, {
+            issueId: data[index].issueId,
+            issueNum: data[index].issueNum,
+            newValue: data[index].newValue,
+            oldValue: data[index].oldValue,
+            statistical: data[index].statistical,
           }];
         }
-      });
-      _.forEach(newData, (item, index) => {
+      }
+      for (let index = 0, len = newData.length; index < len; index += 1) {
         let rest = 0;
-        if (item.type !== 'endSprint') {
+        if (newData[index].type !== 'endSprint') {
           if (index > 0) {
             rest = newData[index - 1].rest;
           }
         }
-        _.forEach(item.issues, (is) => {
-          if (is.statistical) {
-            rest += is.newValue - is.oldValue;
+        for (let i = 0, len2 = newData[index].issues.length; i < len2; i += 1) {
+          if (newData[index].issues[i].statistical) {
+            rest += newData[index].issues[i].newValue - newData[index].issues[i].oldValue;
           }
-        });
+        }
         newData[index].rest = rest;
-      });
+      }
       this.setChartData({
         xAxis: _.map(newData, 'date'),
         yAxis: _.map(newData, 'rest'),

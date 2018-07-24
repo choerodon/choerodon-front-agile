@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import _ from 'lodash';
 import EditIssue from '../../../../../components/EditIssueNarrow';
 import './IssueDetail.scss';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
