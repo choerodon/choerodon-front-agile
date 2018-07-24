@@ -21,6 +21,10 @@ class IssueDetail extends Component {
     }).catch((error) => {
     });
   }
+
+  /**
+   * 刷新issue详情的数据
+   */
   refreshIssueDetail() {
     if (this.editIssue) {
       this.editIssue.refresh();

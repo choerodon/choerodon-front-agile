@@ -11,6 +11,7 @@ class SprintIssue extends Component {
     super(props);
     this.state = {};
   }
+
   getFirst(str) {
     if (!str) {
       return '';

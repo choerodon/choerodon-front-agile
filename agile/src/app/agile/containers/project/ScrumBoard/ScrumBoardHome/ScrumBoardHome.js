@@ -451,7 +451,7 @@ class ScrumBoardHome extends Component {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
-  // 渲染第三方状态列
+  // 渲染状态列
   renderStatusColumns() {
     const data = ScrumBoardStore.getBoardData;
     const result = [];
@@ -579,13 +579,24 @@ class ScrumBoardHome extends Component {
     let result = '';
     const data = ScrumBoardStore.getBoardData;
     let flag = 0;
+    // 如果没有其他任务则其他任务列就不渲染，
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+<<<<<<< HEAD
       for (let index = 0, len = data.length; index < len; index += 1) {
         if (data[index].subStatuses) {
           for (let index2 = 0, len2 = data[index].subStatuses.length; index2 < len2; index2 += 1) {
             if (data[index].subStatuses[index2].issues) {
               for (let index3 = 0, len3 = data[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
                 if (!data[index].subStatuses[index2].issues[index3].parentIssueId) {
+=======
+      _.forEach(data, (item) => {
+        if (item.subStatuses) {
+          _.forEach(item.subStatuses, (item2) => {
+            if (item2.issues) {
+              _.forEach(item2.issues, (item3) => {
+                // 是否有父级
+                if (!item3.parentIssueId) {
+>>>>>>> [IMP]添加table拖拽
                   flag = 1;
                 }
               }
@@ -594,22 +605,38 @@ class ScrumBoardHome extends Component {
         }
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+<<<<<<< HEAD
       for (let index = 0, len = data.length; index < len; index += 1) {
         if (data[index].subStatuses) {
           for (let index2 = 0, len2 = data[index].subStatuses.length; index2 < len2; index2 += 1) {
             if (data[index].subStatuses[index2].issues) {
               for (let index3 = 0, len3 = data[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
                 if (!data[index].subStatuses[index2].issues[index3].assigneeId) {
+=======
+      _.forEach(data, (item) => {
+        if (item.subStatuses) {
+          _.forEach(item.subStatuses, (item2) => {
+            if (item2.issues) {
+              _.forEach(item2.issues, (item3) => {
+                // 是否有近半人
+                if (!item3.assigneeId) {
+>>>>>>> [IMP]添加table拖拽
                   flag = 1;
                 }
               }
             }
           }
         }
+<<<<<<< HEAD
       }
+=======
+      });
+      // 差一个史诗的判断
+>>>>>>> [IMP]添加table拖拽
     } else {
       flag = 1;
     }
+    // 有flag才渲染
     if (flag === 1) {
       result = (
         <div className="c7n-scrumboard-others">

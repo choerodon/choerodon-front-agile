@@ -103,6 +103,10 @@ class BacklogHome extends Component {
     }
     return destinationData;
   }
+
+  /**
+   * 加载选择快速搜索的冲刺数据
+   */
   getSprint() {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
       BacklogStore.setSprintData(data);
@@ -289,6 +293,7 @@ class BacklogHome extends Component {
   }
 
   /**
+<<<<<<< Updated upstream
    * 加载版本数据
    */
   loadVersion =() => {
@@ -331,11 +336,21 @@ class BacklogHome extends Component {
     }).catch((error) => {
     });
   }
+
+  /**
+   *
+   * @param state
+   * @param value
+   */
   changeState(state, value) {
     this.setState({
       [state]: value,
     });
   }
+
+  /**
+   * 创建冲刺
+    */
   handleCreateSprint() {
     this.setState({
       loading: true,
@@ -360,6 +375,9 @@ class BacklogHome extends Component {
     });
   }
 
+  /**
+   * 筛选仅自己的故事
+   */
   filterOnlyMe() {
     BacklogStore.setOnlyMe(!BacklogStore.getOnlyMe);
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
@@ -368,6 +386,9 @@ class BacklogHome extends Component {
     });
   }
 
+  /**
+   * 筛选仅故事
+   */
   filterOnlyStory() {
     BacklogStore.setRecent(!BacklogStore.getRecent);
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
@@ -376,6 +397,10 @@ class BacklogHome extends Component {
     });
   }
 
+  /**
+   * add/remove快速查询的字段
+   * @param item
+   */
   filterQuick(item) {
     const newState = [...BacklogStore.getQuickFilters];
     if (newState.indexOf(item.filterId) === -1) {
@@ -520,7 +545,7 @@ class BacklogHome extends Component {
                 }}
               >
                 <div style={{ display: 'flex', flexGrow: 1 }}>
-                  {this.state.versionVisible ? <Version
+                  <Version
                     onRef={(ref) => {
                       this.versionRef = ref;
                     }}
@@ -530,8 +555,8 @@ class BacklogHome extends Component {
                     issueRefresh={() => {
                       this.IssueDetail.refreshIssueDetail();
                     }}
-                  /> : null }
-                  {this.state.epicVisible && <Epic
+                  />
+                  <Epic
                     onRef={(ref) => {
                       this.epicRef = ref;
                     }}
@@ -541,7 +566,7 @@ class BacklogHome extends Component {
                     issueRefresh={() => {
                       this.IssueDetail.refreshIssueDetail();
                     }}
-                  />}
+                  />
                   <Sprint
                     onRef={(ref) => {
                       this.sprintRef = ref;
@@ -552,14 +577,14 @@ class BacklogHome extends Component {
                     spinIf={this.state.spinIf}
                   />
                 </div>
-                {JSON.stringify(BacklogStore.getClickIssueDetail) !== '{}' && <IssueDetail
+                <IssueDetail
                   visible={JSON.stringify(BacklogStore.getClickIssueDetail) !== '{}'}
                   refresh={this.refresh.bind(this)}
                   onRef={(ref) => {
                     this.IssueDetail = ref;
                   }}
                   cancelCallback={this.resetSprintChose.bind(this)}
-                />}
+                />
               </DragDropContext>
             </div>
           </div>

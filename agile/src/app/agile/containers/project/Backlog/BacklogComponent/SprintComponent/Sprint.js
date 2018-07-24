@@ -1,18 +1,14 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Collapse, Button, Select, Input, Icon, Tooltip, Avatar, Spin } from 'choerodon-ui';
+import { Spin } from 'choerodon-ui';
 import _ from 'lodash';
-import { axios, stores } from 'choerodon-front-boot';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { stores } from 'choerodon-front-boot';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import './Sprint.scss';
 import SprintItem from './SprintItem';
 import EmptyBacklog from '../../../../../assets/image/emptyBacklog.png';
 import SprintIssue from './SprintIssue';
 
-const Panel = Collapse.Panel;
-const Option = Select.Option;
-let scroll;
 const { AppState } = stores;
 
 @observer
@@ -103,6 +99,9 @@ class Sprint extends Component {
     }
   }
 
+  /**
+   * issue详情回退关闭详情侧边栏
+   */
   resetMuilterChose() {
     this.setState({
       selected: {
