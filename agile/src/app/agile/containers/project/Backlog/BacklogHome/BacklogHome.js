@@ -74,6 +74,15 @@ class BacklogHome extends Component {
       this.dragToSprint(result, sourceId, endId, endIndex, originData, newData);
     }
   }
+  /**
+   *获取多选拖动结束的数据
+   *
+   * @param {*} endId
+   * @param {*} endIndex
+   * @param {*} newData
+   * @returns
+   * @memberof BacklogHome
+   */
   getDestinationData(endId, endIndex, newData) {
     let destinationData = {};
     if (endId !== 'backlog') {
@@ -127,6 +136,17 @@ class BacklogHome extends Component {
     }
     return theRequest;
   }
+  /**
+   *拖动到冲刺中的事件
+   *
+   * @param {*} result
+   * @param {*} sourceId
+   * @param {*} endId
+   * @param {*} endIndex
+   * @param {*} originData
+   * @param {*} newData1
+   * @memberof BacklogHome
+   */
   dragToSprint(result, sourceId, endId, endIndex, originData, newData1) {
     const newData = _.clone(newData1);
     // 如果是多选

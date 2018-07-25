@@ -17,6 +17,11 @@ class CloseSprint extends Component {
       selectChose: '0',
     };
   }
+  /**
+   *完成冲刺事件
+   *
+   * @memberof CloseSprint
+   */
   handleCloseSprint() {
     const data = {
       incompleteIssuesDestination: parseInt(this.state.selectChose, 10),

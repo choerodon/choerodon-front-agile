@@ -36,11 +36,25 @@ class Epic extends Component {
   componentDidMount() {
     this.props.onRef(this);
   }
+
+  /**
+   *这里是父组件修改该组件state的函数
+   *
+   * @param {*} value
+   * @memberof Epic
+   */
   changeState(value) {
     this.setState({
       draggableIds: value,
     });
   }
+
+  /**
+   *点击epicItem的事件
+   *
+   * @param {*} type
+   * @memberof Epic
+   */
   handleClickEpic(type) {
     BacklogStore.setChosenEpic(type);
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
@@ -48,6 +62,13 @@ class Epic extends Component {
     }).catch((error) => {
     });
   }
+
+  /**
+   *
+   *渲染单个epicItem
+   * @returns
+   * @memberof Epic
+   */
   renderEpic() {
     const data = BacklogStore.getEpicData;
     const result = [];

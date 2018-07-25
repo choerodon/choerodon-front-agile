@@ -12,6 +12,13 @@ class StatusIssue extends Component {
     super(props);
     this.state = {};
   }
+  /**
+   *获取首字母
+   *
+   * @param {*} str
+   * @returns
+   * @memberof StatusIssue
+   */
   getFirst(str) {
     if (!str) {
       return '';
@@ -24,6 +31,14 @@ class StatusIssue extends Component {
     }
     return str[0];
   }
+  /**
+   *是否有父卡
+   *
+   * @param {*} parentId
+   * @param {*} items
+   * @returns
+   * @memberof StatusIssue
+   */
   getParent(parentId, items) {
     let result = false;
     if (parentId) {
@@ -45,6 +60,12 @@ class StatusIssue extends Component {
     }
     return result;
   }
+  /**
+   *获取子卡
+   *
+   * @returns
+   * @memberof StatusIssue
+   */
   getChildren() {
     const parentsIds = ScrumBoardStore.getParentIds;
     const itemIssueId = this.props.data.issueId;
@@ -87,6 +108,12 @@ class StatusIssue extends Component {
     }
     return '';
   }
+  /**
+   *单个issue是否渲染
+   *
+   * @returns
+   * @memberof StatusIssue
+   */
   renderIssueDisplay() {
     const dragStartData = ScrumBoardStore.getDragStartItem;
     // 没有开始拖
@@ -106,6 +133,14 @@ class StatusIssue extends Component {
       }
     }
   }
+  /**
+   *issue类型
+   *
+   * @param {*} type
+   * @param {*} item
+   * @returns
+   * @memberof StatusIssue
+   */
   renderTypeCode(type, item) {
     const typeCode = item.typeCode;
     if (typeCode === 'story') {
@@ -159,6 +194,14 @@ class StatusIssue extends Component {
       return 'gray';
     }
   }
+  /**
+   *优先级样式
+   *
+   * @param {*} type
+   * @param {*} item
+   * @returns
+   * @memberof StatusIssue
+   */
   renderPriorityStyle(type, item) {
     if (type === 'color') {
       if (item.priorityName === '中') {
@@ -215,6 +258,13 @@ class StatusIssue extends Component {
     }
   }
 
+  /**
+   *渲染史诗
+   *
+   * @param {*} param
+   * @returns
+   * @memberof StatusIssue
+   */
   renderEpicData(param) {
     const data = ScrumBoardStore.getEpicData;
     const item = this.props.data;
@@ -227,6 +277,16 @@ class StatusIssue extends Component {
     return result;
   }
 
+  /**
+   *渲染issue逻辑
+   *
+   * @param {*} item
+   * @param {*} index
+   * @param {*} issueId
+   * @param {*} type
+   * @returns
+   * @memberof StatusIssue
+   */
   renderReturn(item, index, issueId, type) {
     if (this.renderSubDisplay(item, type) === 'block') {
       return (

@@ -22,6 +22,12 @@ class VersionItem extends Component {
       hoverBlockEditDes: false,
     };
   }
+  /**
+   *下拉菜单的menu
+   *
+   * @returns
+   * @memberof VersionItem
+   */
   getmenu() {
     return (
       <Menu onClick={this.clickMenu.bind(this)}>
@@ -29,6 +35,12 @@ class VersionItem extends Component {
       </Menu>
     );
   }
+  /**
+   *点击单个menu的事件
+   *
+   * @param {*} e
+   * @memberof VersionItem
+   */
   clickMenu(e) {
     e.domEvent.stopPropagation();
     if (e.key === '0') {
@@ -37,18 +49,37 @@ class VersionItem extends Component {
       });
     }
   }
+  /**
+   *好像这个方法没用了
+
+   *
+   * @param {*} e
+   * @memberof VersionItem
+   */
   handleClickName(e) {
     e.stopPropagation();
     this.setState({
       editName: true,
     });
   }
+  /**
+   *
+   *这个方法好像也没用了
+   * @param {*} e
+   * @memberof VersionItem
+   */
   handleClickDes(e) {
     e.stopPropagation();
     this.setState({
       editDescription: true,
     });
   }
+  /**
+   *更新描述
+   *
+   * @param {*} value
+   * @memberof VersionItem
+   */
   handleOnBlurDes(value) {
     const data = {
       objectVersionNumber: this.props.data.objectVersionNumber,
@@ -70,6 +101,12 @@ class VersionItem extends Component {
       });
     });
   }
+  /**
+   *更改名称
+   *
+   * @param {*} value
+   * @memberof VersionItem
+   */
   handleBlurName(value) {
     const data = {
       objectVersionNumber: this.props.data.objectVersionNumber,
@@ -91,6 +128,13 @@ class VersionItem extends Component {
       });
     });
   }
+  /**
+   *更新日期
+   *
+   * @param {*} type
+   * @param {*} date2
+   * @memberof VersionItem
+   */
   updateDate(type, date2) {
     let date = date2;
     const data = {

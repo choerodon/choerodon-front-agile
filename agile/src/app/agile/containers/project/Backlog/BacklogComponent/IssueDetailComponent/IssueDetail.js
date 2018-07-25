@@ -15,6 +15,11 @@ class IssueDetail extends Component {
   componentDidMount() {
     this.props.onRef(this);
   }
+  /**
+   *detail有更新回调待办事项更新
+   *
+   * @memberof IssueDetail
+   */
   handleIssueUpdate() {
     const chosenEpic = BacklogStore.getChosenEpic;
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {

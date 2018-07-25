@@ -164,6 +164,13 @@ class StatusBodyColumn extends Component {
     }
     return result;
   }
+  /**
+   *每个droppable背景色渲染
+   *
+   * @param {*} isDraggingOver
+   * @returns
+   * @memberof StatusBodyColumn
+   */
   renderBackground(isDraggingOver) {
     // 如果拖动过这个drop
     if (isDraggingOver) {
@@ -254,6 +261,16 @@ class StatusBodyColumn extends Component {
       }
     }
   }
+  /**
+   *droppable的边框渲染逻辑
+   *
+   * @param {*} data
+   * @param {*} index
+   * @param {*} position
+   * @param {*} drag
+   * @returns
+   * @memberof StatusBodyColumn
+   */
   renderBorder(data, index, position, drag) {
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
@@ -379,6 +396,14 @@ class StatusBodyColumn extends Component {
       return '2px dashed #26348B';
     }
   }
+  /**
+   *是否显示状态名称
+   *
+   * @param {*} dragStartData
+   * @param {*} data
+   * @returns
+   * @memberof StatusBodyColumn
+   */
   renderStatusDisplay(dragStartData, data) {
     if (JSON.stringify(dragStartData) !== '{}') {
       let flag = 0;
@@ -408,6 +433,12 @@ class StatusBodyColumn extends Component {
       return 'none';
     }
   }
+  /**
+   *渲染列
+   *
+   * @returns
+   * @memberof StatusBodyColumn
+   */
   renderStatusColumn() {
     const dragStartData = ScrumBoardStore.getDragStartItem;
     const data = this.props.data.subStatuses;

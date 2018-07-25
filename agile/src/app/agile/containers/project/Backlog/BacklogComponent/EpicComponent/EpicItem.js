@@ -13,6 +13,12 @@ class EpicItem extends Component {
       editName: false,
     };
   }
+  /**
+   *每个epic 右侧下拉选择项的menu
+   *
+   * @returns
+   * @memberof EpicItem
+   */
   getmenu() {
     return (
       <Menu onClick={this.clickMenu.bind(this)}>
@@ -46,6 +52,12 @@ class EpicItem extends Component {
       </Menu>
     );
   }
+  /**
+   *menu的点击事件
+   *
+   * @param {*} e
+   * @memberof EpicItem
+   */
   clickMenu(e) {
     e.domEvent.stopPropagation();
     if (e.key === '1') {
@@ -57,6 +69,12 @@ class EpicItem extends Component {
       BacklogStore.setClickIssueDetail(this.props.data);
     }
   }
+  /**
+   *epic名称保存事件
+   *
+   * @param {*} e
+   * @memberof EpicItem
+   */
   handleSave(e) {
     e.stopPropagation();
     this.setState({
