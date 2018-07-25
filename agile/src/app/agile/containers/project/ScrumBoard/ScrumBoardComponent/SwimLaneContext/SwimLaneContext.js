@@ -27,6 +27,13 @@ class SwimLaneContext extends Component {
     }
     return str[0];
   }
+  /**
+   *类型
+   *
+   * @param {*} type
+   * @returns
+   * @memberof SwimLaneContext
+   */
   renderTypeCode(type) {
     const typeCode = this.props.data.typeCode;
     if (typeCode === 'story') {
@@ -53,6 +60,13 @@ class SwimLaneContext extends Component {
       );
     }
   }
+  /**
+   *泳道名称
+   *
+   * @param {*} item
+   * @returns
+   * @memberof SwimLaneContext
+   */
   renderSwimLaneTitle(item) {
     let result;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {

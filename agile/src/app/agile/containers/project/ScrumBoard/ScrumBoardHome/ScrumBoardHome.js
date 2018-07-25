@@ -201,6 +201,13 @@ class ScrumBoardHome extends Component {
   // storeIssueNumberCount(storeParentIds, columns) {
 
   // }
+  /**
+   *拖动结束事件
+   *
+   * @param {*} result
+   * @returns
+   * @memberof ScrumBoardHome
+   */
   handleDragEnd(result) {
     ScrumBoardStore.setDragStartItem({});
     if (!result.destination) {
@@ -382,6 +389,12 @@ class ScrumBoardHome extends Component {
       });
     }
   }
+  /**
+   *创建面板
+   *
+   * @param {*} e
+   * @memberof ScrumBoardHome
+   */
   handleCreateBoard(e) {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
@@ -396,6 +409,11 @@ class ScrumBoardHome extends Component {
       }
     });
   }
+  /**
+   *仅故事
+   *
+   * @memberof ScrumBoardHome
+   */
   filterOnlyStory() {
     this.setState({
       recent: !this.state.recent,
@@ -403,6 +421,11 @@ class ScrumBoardHome extends Component {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
+  /**
+   *仅我的
+   *
+   * @memberof ScrumBoardHome
+   */
   filterOnlyMe() {
     this.setState({
       onlyMe: !this.state.onlyMe,
@@ -410,6 +433,11 @@ class ScrumBoardHome extends Component {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
+  /**
+   *完成冲刺
+   *
+   * @memberof ScrumBoardHome
+   */
   handleFinishSprint() {
     BacklogStore.axiosGetSprintCompleteMessage(
       ScrumBoardStore.getCurrentSprint.sprintId).then((res) => {
@@ -438,6 +466,12 @@ class ScrumBoardHome extends Component {
     }).catch((error) => {
     });
   }
+  /**
+   *快速搜索
+   *
+   * @param {*} item
+   * @memberof ScrumBoardHome
+   */
   filterQuick(item) {
     const newState = [...this.state.quickFilter];
     if (newState.indexOf(item.filterId) === -1) {
@@ -552,6 +586,12 @@ class ScrumBoardHome extends Component {
     }
     return '';
   }
+  /**
+   *更新父任务匹配的默认选项
+   *
+   * @returns
+   * @memberof ScrumBoardHome
+   */
   renderUpdateParentDefault() {
     if (ScrumBoardStore.getBoardData.length > 0) {
       if (ScrumBoardStore.getBoardData[ScrumBoardStore.getBoardData.length - 1].columnId !== 'unset') {

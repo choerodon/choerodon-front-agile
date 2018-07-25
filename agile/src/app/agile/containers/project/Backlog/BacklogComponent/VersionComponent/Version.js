@@ -29,11 +29,23 @@ class Version extends Component {
   componentDidMount() {
     this.props.onRef(this);
   }
+  /**
+   *其他组件修改该组件state的方法
+   *
+   * @param {*} value
+   * @memberof Version
+   */
   changeState(value) {
     this.setState({
       draggableIds: value,
     });
   }
+  /**
+   *点击versionItem事件
+   *
+   * @param {*} type
+   * @memberof Version
+   */
   handelClickVersion(type) {
     BacklogStore.setChosenVersion(type);
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {

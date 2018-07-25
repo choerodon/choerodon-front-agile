@@ -10,6 +10,12 @@ class StatusColumn extends Component {
     super(props);
     this.state = {};
   }
+  /**
+   *显示issue个数
+   *
+   * @returns
+   * @memberof StatusColumn
+   */
   showIssueLength() {
     const data = this.props.data.subStatuses;
     let length = 0;

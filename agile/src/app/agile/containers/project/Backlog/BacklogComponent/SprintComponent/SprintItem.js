@@ -67,6 +67,13 @@ class SprintItem extends Component {
       },
     });
   }
+  /**
+   *获取首字母
+   *
+   * @param {*} str
+   * @returns
+   * @memberof SprintItem
+   */
   getFirst(str) {
     if (!str) {
       return '';
@@ -79,6 +86,13 @@ class SprintItem extends Component {
     }
     return str[0];
   }
+  /**
+   *开始结束时间更新事件
+   *
+   * @param {*} type
+   * @param {*} date2
+   * @memberof SprintItem
+   */
   updateDate(type, date2) {
     let date = date2;
     const data = {
@@ -92,6 +106,11 @@ class SprintItem extends Component {
     }).catch((error) => {
     });
   }
+  /**
+   *简易创建issue事件
+   *
+   * @memberof SprintItem
+   */
   handleBlurCreateIssue() {
     this.setState({
       loading: true,
@@ -129,6 +148,12 @@ class SprintItem extends Component {
       });
     }
   }
+  /**
+   *修改冲刺名
+   *
+   * @param {*} value
+   * @memberof SprintItem
+   */
   handleBlurName(value) {
     const data = {
       objectVersionNumber: this.props.item.objectVersionNumber,
@@ -145,6 +170,12 @@ class SprintItem extends Component {
     });
   }
 
+  /**
+   *修改冲刺目标
+   *
+   * @param {*} value
+   * @memberof SprintItem
+   */
   handleBlurGoal(value) {
     const data = {
       objectVersionNumber: this.props.item.objectVersionNumber,
@@ -160,6 +191,11 @@ class SprintItem extends Component {
     }).catch((error) => {
     });
   }
+  /**
+   *完成冲刺事件
+   *
+   * @memberof SprintItem
+   */
   handleFinishSprint() {
     BacklogStore.axiosGetSprintCompleteMessage(
       this.props.item.sprintId).then((res) => {
@@ -188,6 +224,11 @@ class SprintItem extends Component {
     }).catch((error) => {
     });
   }
+  /**
+   *开启冲刺事件
+   *
+   * @memberof SprintItem
+   */
   handleStartSprint() {
     if (!BacklogStore.getSprintData.sprintData.filter(items => items.statusCode === 'started').length > 0) {
       if (this.props.item.issueSearchDTOList.length > 0) {
@@ -202,6 +243,12 @@ class SprintItem extends Component {
       }
     }
   }
+  /**
+   *删除冲刺事件
+   *
+   * @param {*} e
+   * @memberof SprintItem
+   */
   handleDeleteSprint(e) {
     if (e.key === '0') {
       BacklogStore.axiosDeleteSprint(this.props.item.sprintId).then((res) => {
@@ -210,6 +257,11 @@ class SprintItem extends Component {
       });
     }
   }
+  /**
+   *清除过滤器
+   *
+   * @memberof SprintItem
+   */
   clearFilter() {
     BacklogStore.setChosenEpic('all');
     BacklogStore.setChosenVersion('all');
@@ -221,6 +273,14 @@ class SprintItem extends Component {
     }).catch((error) => {
     });
   }
+  /**
+   *单个冲刺渲染issue或者无issue提示
+   *
+   * @param {*} issues
+   * @param {*} sprintId
+   * @returns
+   * @memberof SprintItem
+   */
   renderIssueOrIntro(issues, sprintId) {
     if (issues) {
       if (issues.length > 0) {
@@ -250,6 +310,13 @@ class SprintItem extends Component {
     }
     return '';
   }
+  /**
+   *开启冲刺字段样式
+   *
+   * @param {*} type
+   * @returns
+   * @memberof SprintItem
+   */
   renderOpenColor(type) {
     if (BacklogStore.getSprintData.sprintData.filter(items => items.statusCode === 'started').length === 0) {
       if (this.props.item.issueSearchDTOList) {
@@ -268,6 +335,14 @@ class SprintItem extends Component {
       return 'not-allowed';
     }
   }
+  /**
+   *渲染初始化开始与结束时间
+   *
+   * @param {*} item
+   * @param {*} type
+   * @returns
+   * @memberof SprintItem
+   */
   renderData(item, type) {
     //   startDate endDate
     let result = '';

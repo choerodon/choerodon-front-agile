@@ -21,6 +21,12 @@ class StartSprint extends Component {
       endDate: null,
     };
   }
+  /**
+   *开启冲刺事件
+   *
+   * @param {*} e
+   * @memberof StartSprint
+   */
   handleStartSprint(e) {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
