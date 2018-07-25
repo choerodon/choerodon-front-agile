@@ -62,7 +62,7 @@ class StatusIssue extends Component {
     if (flag === 1) {
       const childrenList = [];
       for (let index = 0, len = allStatus.length; index < len; index += 1) {
-        for (let index2 = 0, len2 = allStatus[index].issues; index2 < len2; index2 += 1) {
+        for (let index2 = 0, len2 = allStatus[index].issues.length; index2 < len2; index2 += 1) {
           if (allStatus[index].issues[index2].assigneeId) {
             if (allStatus[index].issues[index2].assigneeId === itemAssigneeId) {
               if (allStatus[index].issues[index2].parentIssueId === itemIssueId) {
