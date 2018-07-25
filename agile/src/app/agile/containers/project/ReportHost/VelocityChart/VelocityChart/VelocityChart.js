@@ -226,7 +226,7 @@ class VelocityChart extends Component {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     return (
-      <Page className="c7n-report">
+      <Page className="c7n-velocity">
         <Header 
           title="迭代速度图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
@@ -239,7 +239,7 @@ class VelocityChart extends Component {
             funcType="flat" 
             onClick={this.refresh.bind(this)}
           >
-            <Icon type="autorenew icon" />
+            <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
         </Header>

@@ -18,8 +18,6 @@ import CreateSubTask from '../CreateSubTask';
 import CreateLinkTask from '../CreateLinkTask';
 import UserHead from '../UserHead';
 import Comment from './Component/Comment';
-import Log from './Component/Log';
-import DataLogs from './Component/DataLogs';
 import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
 import LinkList from './Component/LinkList';
@@ -291,9 +289,9 @@ class CreateSprint extends Component {
   getCurrentNav(e) {
     let eles;
     if (this.state.typeCode !== 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'sub_task', 'link_task', 'branch'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'sub_task', 'link_task', 'branch'];
     } else {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'branch'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'branch'];
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
@@ -851,37 +849,6 @@ class CreateSprint extends Component {
   }
 
   /**
-   * Log
-   */
-  renderLogs() {
-    return (
-      <div>
-        {
-          this.state.worklogs.map(worklog => (
-            <Log
-              key={worklog.logId}
-              worklog={worklog}
-              onDeleteLog={() => this.reloadIssue()}
-              onUpdateLog={() => this.reloadIssue()}
-            />
-          ))
-        }
-      </div>
-    );
-  }
-
-  /**
-   * DataLog
-   */
-  renderDataLogs() {
-    return (
-      <DataLogs
-        datalogs={this.state.datalogs}
-      />
-    );
-  }
-
-  /**
    * SubIssue
    */
   renderSubIssues() {
@@ -1293,30 +1260,7 @@ class CreateSprint extends Component {
                 />
               </li>
             </Tooltip>
-            <Tooltip placement="right" title="工作日志">
-              <li id="LOG-nav" className={`c7n-li ${this.state.nav === 'log' ? 'c7n-li-active' : ''}`}>
-                <Icon
-                  type="work_log c7n-icon-li"
-                  role="none"
-                  onClick={() => {
-                    this.setState({ nav: 'log' });
-                    this.scrollToAnchor('log');
-                  }}
-                />
-              </li>
-            </Tooltip>
-            <Tooltip placement="right" title="活动日志">
-              <li id="DATA_LOG-nav" className={`c7n-li ${this.state.nav === 'data_log' ? 'c7n-li-active' : ''}`}>
-                <Icon
-                  type="insert_invitation c7n-icon-li"
-                  role="none"
-                  onClick={() => {
-                    this.setState({ nav: 'data_log' });
-                    this.scrollToAnchor('data_log');
-                  }}
-                />
-              </li>
-            </Tooltip>
+            
             {
               this.state.typeCode !== 'sub_task' && (
                 <Tooltip placement="right" title="子任务">
@@ -2665,34 +2609,6 @@ class CreateSprint extends Component {
                   {this.renderCommits()}
                 </div>
 
-                <div id="log">
-                  <div className="c7n-title-wrapper">
-                    <div className="c7n-title-left">
-                      <Icon type="work_log c7n-icon-title" />
-                      <span>工作日志</span>
-                    </div>
-                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
-                    <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ dailyLogShow: true })}>
-                        <Icon type="playlist_add icon" />
-                        <span>登记工作</span>
-                      </Button>
-                    </div>
-                  </div>
-                  {this.renderLogs()}
-                </div>
-                
-                <div id="data_log">
-                  <div className="c7n-title-wrapper">
-                    <div className="c7n-title-left">
-                      <Icon type="work_log c7n-icon-title" />
-                      <span>活动日志</span>
-                    </div>
-                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
-                  </div>
-                  {this.renderDataLogs()}
-                </div>
-
                 {
                   this.state.origin.typeCode !== 'sub_task' && (
                     <div id="sub_task">
@@ -2725,8 +2641,8 @@ class CreateSprint extends Component {
                         <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                           <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
-                            <Icon type="playlist_add icon" />
-                            <span>创建相关任务</span>
+                            <Icon type="relate icon" />
+                            <span>关联已有任务</span>
                           </Button>
                         </div>
                       </div>
