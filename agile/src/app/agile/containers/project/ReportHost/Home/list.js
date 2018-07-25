@@ -41,4 +41,11 @@ export default [
     link: '/agile/reporthost/EpicReport',
     pic: 'epicReport',
   },
+  {
+    key: 'pieReport',
+    title: '比例图',
+    des: '显示了按指定字段过滤的问题的比例详细内容。这有助于您看到的细分设置的问题。',
+    link: '/agile/reporthost/pieChartReport',
+    pic: 'epicReport',
+  },
 ];
