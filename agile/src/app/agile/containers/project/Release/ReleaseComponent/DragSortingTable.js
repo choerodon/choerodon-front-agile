@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import update from 'immutability-helper';
-
+import isEqual from 'lodash/isEqual';
 // import './test.scss';
 
 const dragDirection = (
@@ -103,12 +103,19 @@ BodyRow = DropTarget('row', rowTarget, (connect, monitor) => ({
   }))(BodyRow),
 );
 
+@DragDropContext(HTML5Backend)
 class DragSortingTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
       data: props.dataSource,
+      sourceData: props.dataSource,
     };
+  }
+  componentWillReceiveProps(nextProps) {
+    if (!isEqual(this.state.sourceData, this.props.dataSource)) {
+      this.setState({ data: this.props.dataSource, sourceData: this.props.dataSource });
+    }
   }
   components = {
     body: {
@@ -116,8 +123,9 @@ class DragSortingTable extends Component {
     },
   };
 
+
   moveRow = (dragIndex, hoverIndex) => {
-    const { data } = this.state;
+    const data = this.state.data || this.props.dataSource;
     const dragRow = data[dragIndex];
     window.console.log(dragIndex, hoverIndex);
     this.setState(
@@ -129,11 +137,10 @@ class DragSortingTable extends Component {
     );
   };
   render() {
-    const data = this.state.data.length && this.state.data;
     return (
       <Table
         columns={this.props.columns}
-        dataSource={data}
+        dataSource={this.state.data}
         pagination={this.props.pagination}
         onChange={this.props.onChange}
         components={this.components}
@@ -147,4 +154,4 @@ class DragSortingTable extends Component {
   }
 }
 
-export default DragDropContext(HTML5Backend)(DragSortingTable);
+export default DragSortingTable;

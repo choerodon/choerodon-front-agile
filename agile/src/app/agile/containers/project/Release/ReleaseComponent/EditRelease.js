@@ -101,7 +101,7 @@ class EditRelease extends Component {
                     <DatePicker
                       style={{ width: '100%' }}
                       label="开始日期"
-                      disabledDate={this.state.endDate ? current => current > moment(this.state.endDate) : ''}
+                      disabledDate={this.state.endDate ? current => current > moment(this.state.endDate) : () => false}
                       onChange={(date) => {
                         this.setState({
                           startDate: date,
@@ -117,7 +117,7 @@ class EditRelease extends Component {
                     <DatePicker
                       style={{ width: '100%' }}
                       label="结束日期"
-                      disabledDate={this.state.startDate ? current => current < moment(this.state.startDate) : ''}
+                      disabledDate={this.state.startDate ? current => current < moment(this.state.startDate) : () => false}
                       onChange={(date) => {
                         this.setState({
                           endDate: date,

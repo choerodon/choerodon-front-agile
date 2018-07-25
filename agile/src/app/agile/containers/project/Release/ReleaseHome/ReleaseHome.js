@@ -226,7 +226,7 @@ class ReleaseHome extends Component {
       dataIndex: 'option',
       key: 'option',
       render: (text, record) => (
-        <Dropdown overlay={getMenu(record)} trigger="click">
+        <Dropdown overlay={getMenu(record)} trigger={['click']}>
           <Button shape="circle" icon="more_vert" />
         </Dropdown>
       ),

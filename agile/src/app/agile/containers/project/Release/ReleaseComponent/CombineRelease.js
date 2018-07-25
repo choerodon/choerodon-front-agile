@@ -52,6 +52,7 @@ class CombineRelease extends Component {
           data.sourceVersionIds.splice(data.sourceVersionIds.indexOf(data.targetVersionId), 1);
         }
         ReleaseStore.axiosMergeVersion(data).then((res) => {
+          this.props.form.resetFields();
           this.props.onCancel();
           this.props.refresh();
         }).catch((error) => {
@@ -67,6 +68,10 @@ class CombineRelease extends Component {
     }
     return false;
   }
+  handleCancel = () => {
+    this.props.form.resetFields();
+    this.props.onCancel();
+  };
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -75,7 +80,7 @@ class CombineRelease extends Component {
         okText="合并"
         cancelText="取消"
         visible={this.props.visible}
-        onCancel={this.props.onCancel.bind(this)}
+        onCancel={this.handleCancel}
         onOk={this.handleCombine.bind(this)}
       >
         <Content
@@ -100,7 +105,7 @@ class CombineRelease extends Component {
                   label="合并版本"
                 >
                   {this.props.sourceList.length > 0 ? this.props.sourceList.map(item => (
-                    <Option value={String(item.versionId)}>{item.name}</Option>
+                    <Option value={String(item.versionId)} key={item.versionId}>{item.name}</Option>
                   )) : ''}
                 </Select>,
               )}
@@ -117,6 +122,7 @@ class CombineRelease extends Component {
                 >
                   {this.props.sourceList.length > 0 ? this.props.sourceList.map(item => (
                     <Option
+                      key={item.versionId}
                       value={String(item.versionId)}
                     >{item.name}</Option>
                   )) : ''}

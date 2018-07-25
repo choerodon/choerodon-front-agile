@@ -313,7 +313,6 @@ class BacklogHome extends Component {
   }
 
   /**
-<<<<<<< Updated upstream
    * 加载版本数据
    */
   loadVersion =() => {
