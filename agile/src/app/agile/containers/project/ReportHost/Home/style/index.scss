@@ -1,0 +1,67 @@
+.c7n-reportHome-pane {
+    width: 950px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .c7n-item {
+        width: 280px;
+        height: 296px;
+        background: #fafafa;
+        padding: 18px;
+        margin-right: 24px;
+        margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        
+        .c7n-item-pic {
+            width: 220px;
+            height: 154px;
+            background-size: 100% 100%;
+            border-radius: 2px;
+            background-color: #fff;
+            box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.12), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+        }
+
+        .burndownchart {
+            background-image: url('./pics/burndownchart.svg');
+        }
+
+        .sprint {
+            background-image: url('./pics/sprint.svg');
+        }
+
+        .accumulation {
+            background-image: url('./pics/accumulation.svg');
+        }
+
+        .versionReport {
+            background-image: url('./pics/versionReport.svg');
+        }
+
+        .c7n-item-word {
+            margin-top: 18px;
+            font-size: 13px;
+            line-height: 20px;
+
+            .c7n-item-title {
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            .c7n-item-des {
+                color:  rgba(0, 0, 0, 0.65);
+                margin-bottom: 0;
+            }
+        }
+
+        &:hover {
+            .c7n-item-title {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
