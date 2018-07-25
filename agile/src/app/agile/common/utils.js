@@ -201,6 +201,6 @@ export function formatDate(str) {
   if (d.length < 3 || t.length < 3) {
     return '';
   }
-  return `${d[2]}/${MONTH[d[1] * 1 - 1]}月/${d[0].slice(2)} ${t[0] < 12 ? t[0] : t[0] * 1 - 12}:${t[1]}  ${t[0] * 1 < 12 ? ' 上' : ' 下'}午`;
+  return `${d[2]}/${MONTH[d[1] * 1 - 1]}月/${d[0]} ${t[0] < 12 ? t[0] : t[0] * 1 - 12}:${t[1]}  ${t[0] * 1 < 12 ? ' 上' : ' 下'}午`;
 }
 

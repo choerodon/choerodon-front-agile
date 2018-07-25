@@ -227,12 +227,13 @@ class Issue extends Component {
       searchArgs: {},
     };
     const { statusCode, priorityCode, typeCode } = filters;
-    const { issueNum, summary } = filters;
+    const { issueNum, summary, assignee } = filters;
     obj.advancedSearchArgs.statusCode = statusCode || [];
     obj.advancedSearchArgs.priorityCode = priorityCode || [];
     obj.advancedSearchArgs.typeCode = typeCode || [];
     obj.searchArgs.issueNum = issueNum && issueNum.length ? issueNum[0] : '';
     obj.searchArgs.summary = summary && summary.length ? summary[0] : '';
+    obj.searchArgs.assignee = assignee && assignee.length ? assignee[0] : '';
     IssueStore.setFilter(obj);
     const { current, pageSize } = IssueStore.pagination;
     IssueStore.loadIssues(current - 1, pageSize);
@@ -441,6 +442,12 @@ class Issue extends Component {
           },
         ],
         filterMultiple: true,
+      },
+      {
+        title: '经办人',
+        dataIndex: 'assignee',
+        key: 'assignee',
+        filters: [],
       },
       {
         title: '编号',
