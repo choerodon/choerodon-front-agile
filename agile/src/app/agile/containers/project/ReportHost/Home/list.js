@@ -36,8 +36,8 @@ export default [
   },
   {
     key: 'epicReport',
-    title: 'Epic报告',
-    des: '显示状态的问题，这有助于您识别潜在的瓶颈，需要对此进行调查。',
+    title: '史诗报告图',
+    des: '随时了解完成一个史诗的进展。这有助于您管理您的团队的进度剩余的不完整unestimated的工作。',
     link: '/agile/reporthost/EpicReport',
     pic: 'epicReport',
   },
