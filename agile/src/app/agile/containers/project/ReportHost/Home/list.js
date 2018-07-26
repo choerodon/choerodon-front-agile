@@ -30,14 +30,14 @@ export default [
   {
     key: 'velocityChart',
     title: '迭代速度图',
-    des: '跟踪各个Sprint已完成的工时量。这有助于您确定您的团队的速度并预估团队在未来Sprint中实际完成的工作。',
+    des: '跟踪各个迭代已完成的工时量。这有助于您确定团队的开发速度并预估在未来迭代中能完成的工作量。',
     link: '/agile/reporthost/velocityChart',
     pic: 'velocityChart',
   },
   {
     key: 'epicReport',
     title: '史诗报告图',
-    des: '随时了解完成一个史诗的进展。这有助于您管理您的团队的进度剩余的不完整unestimated的工作。',
+    des: '随时了解一个史诗的完成进度。这有助于您跟踪未完成或未分配问题来管理团队的开发进度。',
     link: '/agile/reporthost/EpicReport',
     pic: 'epicReport',
   },
