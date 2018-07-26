@@ -10,6 +10,8 @@ import BurndownChartStore from '../../../../../stores/project/burndownChart/Burn
 import './BurndownChartHome.scss';
 import restSvg from '../../../../../assets/image/rest.svg';
 import hopeSvg from '../../../../../assets/image/hope.svg';
+import NoDataComponent from '../../Component/noData';
+import epicSvg from '../../Home/style/pics/no_sprint.svg';
 
 const { AppState } = stores;
 const Option = Select.Option;
@@ -492,12 +494,7 @@ class BurndownChartHome extends Component {
                   />
                 </div>
               ) : (
-                <div className="c7n-chart-noSprint">
-                  <div className="c7n-chart-icon">
-                    <Icon type="info_outline" />
-                  </div>
-                  <p style={{ marginLeft: 20 }}>该面板无可用冲刺</p>
-                </div>
+                <NoDataComponent title={'冲刺'} links={[{ name: '待办事项', link: '/agile/backlog' }]} img={epicSvg} />
               )
             }
           </Spin>

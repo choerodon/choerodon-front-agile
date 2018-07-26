@@ -43,8 +43,8 @@ export default [
   },
   {
     key: 'pieReport',
-    title: '比例图',
-    des: '显示了按指定字段过滤的问题的比例详细内容。这有助于您看到的细分设置的问题。',
+    title: '统计图',
+    des: '根据指定字段以统计图呈现项目或筛选器下的问题。这可以使您一目了然地了解问题详情。',
     link: '/agile/reporthost/pieReport',
     pic: 'pieReport',
   },

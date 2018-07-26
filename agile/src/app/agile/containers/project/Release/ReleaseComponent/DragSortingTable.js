@@ -114,7 +114,7 @@ class DragSortingTable extends Component {
     };
   }
   componentWillReceiveProps(nextProps) {
-    if (!isEqual(this.state.sourceData, this.props.dataSource)) {
+    if (!isEqual(this.state.data, this.props.dataSource)) {
       this.setState({ data: this.props.dataSource, sourceData: this.props.dataSource });
     }
   }
@@ -127,7 +127,24 @@ class DragSortingTable extends Component {
   moveRow = (dragIndex, hoverIndex) => {
     const data = this.state.data || this.props.dataSource;
     const dragRow = data[dragIndex];
-    window.console.log(dragIndex, hoverIndex);
+    let beforeSequence = null;
+    let afterSequence = null;
+    // 拖的方向
+    if (hoverIndex === 0) {
+      afterSequence = data[hoverIndex].sequence;
+    } else if (hoverIndex === data.length - 1) {
+      beforeSequence = data[hoverIndex].sequence;
+    } else if (dragIndex > hoverIndex) {
+      afterSequence = data[hoverIndex].sequence;
+      beforeSequence = data[hoverIndex - 1].sequence;
+    } else if (dragIndex < hoverIndex) {
+      afterSequence = data[hoverIndex + 1].sequence;
+      beforeSequence = data[hoverIndex].sequence;
+    }
+    const versionId = data[dragIndex].versionId;
+    const { objectVersionNumber } = data[dragIndex];
+    const postData = { afterSequence, beforeSequence, versionId, objectVersionNumber };
+    window.console.log(postData);
     this.setState(
       update(this.state, {
         data: {
@@ -135,6 +152,7 @@ class DragSortingTable extends Component {
         },
       }),
     );
+    this.props.handleDrag(postData);
   };
   render() {
     return (

@@ -59,6 +59,8 @@ class ReleaseStore {
     }
   }
 
+  handleDataDrag = (projectId, data) => axios.put(`/agile/v1/projects/${projectId}/product_version/drag`, JSON.stringify(data));
+
   @computed get getVersionStatusIssues() {
     return toJS(this.versionStatusIssues);
   }

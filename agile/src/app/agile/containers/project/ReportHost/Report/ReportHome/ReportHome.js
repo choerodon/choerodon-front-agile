@@ -8,7 +8,9 @@ import './ReleaseDetail.scss';
 import StatusTag from '../../../../../components/StatusTag';
 import PriorityTag from '../../../../../components/PriorityTag';
 import TypeTag from '../../../../../components/TypeTag';
-import { formatDate } from '../../../../../common/utils'; 
+import { formatDate } from '../../../../../common/utils';
+import NoDataComponent from '../../Component/noData';
+import epicSvg from '../../Home/style/pics/no_sprint.svg';
 
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
@@ -274,75 +276,69 @@ class ReleaseDetail extends Component {
               切换报表
             </Button>
           </Dropdown>
-          {/* <Button 
-            funcType="flat" 
-            onClick={() => {
-              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题`);
-            }}
-          >
-            <Icon type="autorenew icon" />
-            <span>查看问题列表</span>
-          </Button> */}
         </Header>
         <Content
-          title={`迭代冲刺“${ReportStore.currentSprint.sprintName || ''}”的冲刺报告`}
+          title={ReportStore.currentSprint.sprintName ? `迭代冲刺“${ReportStore.currentSprint.sprintName}”的冲刺报告` : '无冲刺报告'}
           description="了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。"
           link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
-          <Select
-            value={ReportStore.currentSprint.sprintId}
-            onChange={(value) => {
-              ReportStore.changeCurrentSprint(value);
-            }}
-            style={{ width: 520 }}
-            label="迭代冲刺"
-            loading={this.state.selectLoading}
-            filter
-            filterOption={(input, option) => 
-              option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-          >
-            {ReportStore.sprints.map(sprint =>
-              (<Option key={sprint.sprintId} value={sprint.sprintId}>{sprint.sprintName}</Option>),
-            )}
-          </Select>
-          <div className="c7n-sprintMessage">
-            <div className="c7n-sprintContent">
+          {ReportStore.sprints.length ? <React.Fragment>
+            <Select
+              value={ReportStore.currentSprint.sprintId}
+              onChange={(value) => {
+                ReportStore.changeCurrentSprint(value);
+              }}
+              style={{ width: 520 }}
+              label="迭代冲刺"
+              loading={this.state.selectLoading}
+              filter
+              filterOption={(input, option) =>
+                option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {ReportStore.sprints.map(sprint =>
+                (<Option key={sprint.sprintId} value={sprint.sprintId}>{sprint.sprintName}</Option>),
+              )}
+            </Select>
+            <div className="c7n-sprintMessage">
+              <div className="c7n-sprintContent">
               <span>
-                {ReportStore.getCurrentSprintStatus.status}冲刺, 
+                {ReportStore.getCurrentSprintStatus.status}冲刺,
                 共 {ReportStore.currentSprint.issueCount || 0} 个问题
               </span>
-              <span>
+                <span>
                 {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
               </span>
+              </div>
+              <p
+                style={{
+                  color: '#3F51B5',
+                  cursor: 'pointer',
+                }}
+                role="none"
+                onClick={() => {
+                  this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题&paramUrl=reporthost/sprintreport`);
+                }}
+              >
+                在“问题管理中”查看
+                <Icon style={{ fontSize: 13 }} type="open_in_new" />
+              </p>
             </div>
-            <p
-              style={{ 
-                color: '#3F51B5',
-                cursor: 'pointer',                
-              }}
-              role="none"
-              onClick={() => {
-                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题&paramUrl=reporthost/sprintreport`);
-              }}
-            >
-              在“问题管理中”查看
-              <Icon style={{ fontSize: 13 }} type="open_in_new" />
-            </p>
-          </div>
-          <ReactEcharts className="c7n-chart" option={this.getOption()} />
+            <ReactEcharts className="c7n-chart" option={this.getOption()} />
 
-          <Tabs activeKey={ReportStore.activeKey} onChange={this.callback}>
-            <TabPane tab="已完成的问题" key="done">
-              {this.renderDoneIssue(column)}
-            </TabPane>
-            <TabPane tab="未完成的问题" key="todo">
-              {this.renderTodoIssue(column)}
-            </TabPane>
-            <TabPane tab="从Sprint中删除的问题" key="remove">
-              {this.renderRemoveIssue(column)}
-            </TabPane>
-          </Tabs>
+            <Tabs activeKey={ReportStore.activeKey} onChange={this.callback}>
+              <TabPane tab="已完成的问题" key="done">
+                {this.renderDoneIssue(column)}
+              </TabPane>
+              <TabPane tab="未完成的问题" key="todo">
+                {this.renderTodoIssue(column)}
+              </TabPane>
+              <TabPane tab="从Sprint中删除的问题" key="remove">
+                {this.renderRemoveIssue(column)}
+              </TabPane>
+            </Tabs>
+          </React.Fragment> : <NoDataComponent title={'冲刺'} links={[{ name: '待办事项', link: '/agile/backlog' }]} img={epicSvg} /> }
+
         </Content>
       </Page>
     );

@@ -151,6 +151,15 @@ class ReleaseHome extends Component {
     }).catch((error) => {
     });
   }
+
+  handleDrag =(data) => {
+    ReleaseStore.handleDataDrag(AppState.currentMenuType.id,data)
+      .then(() => {
+        // this.refresh(this.state.pagination);
+      }).catch((error) => {
+      this.refresh(this.state.pagination);
+      });
+  };
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -281,6 +290,7 @@ class ReleaseHome extends Component {
             {
               versionData.length > 0 ? (
                 <DragSortingTable
+                  handleDrag={this.handleDrag}
                   columns={versionColumn}
                   dataSource={versionData}
                   pagination={this.state.pagination}
