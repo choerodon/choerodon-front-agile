@@ -66,6 +66,7 @@ class ReleaseDetail extends Component {
             {value:1548, name:'ff@hand-china.com'},
             {value:130, name:'bb@hand-china.com'},
             {value:1542, name:'nn@hand-china.com'}
+            ]
         }
       ]
     };
