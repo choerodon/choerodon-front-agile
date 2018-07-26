@@ -14,6 +14,11 @@ class IssueDetail extends Component {
   componentDidMount() {
     this.props.onRef(this);
   }
+  /**
+   *detail有更新回调待办事项更新
+   *
+   * @memberof IssueDetail
+   */
   handleIssueUpdate() {
     const chosenEpic = BacklogStore.getChosenEpic;
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
@@ -21,6 +26,10 @@ class IssueDetail extends Component {
     }).catch((error) => {
     });
   }
+
+  /**
+   * 刷新issue详情的数据
+   */
   refreshIssueDetail() {
     if (this.editIssue) {
       this.editIssue.refresh();

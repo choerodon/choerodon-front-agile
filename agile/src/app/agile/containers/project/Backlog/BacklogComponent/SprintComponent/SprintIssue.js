@@ -11,6 +11,14 @@ class SprintIssue extends Component {
     super(props);
     this.state = {};
   }
+
+  /**
+   *拿到首字母
+   *
+   * @param {*} str
+   * @returns
+   * @memberof SprintIssue
+   */
   getFirst(str) {
     if (!str) {
       return '';
@@ -23,6 +31,14 @@ class SprintIssue extends Component {
     }
     return str[0];
   }
+  /**
+   *渲染优先级样式
+   *
+   * @param {*} type
+   * @param {*} item
+   * @returns
+   * @memberof SprintIssue
+   */
   renderPriorityStyle(type, item) {
     if (type === 'color') {
       if (item.priorityCode === 'medium') {
@@ -40,6 +56,13 @@ class SprintIssue extends Component {
       return 'rgba(0, 0, 0, 0.08)';
     }
   }
+  /**
+   *渲染issue背景色
+   *
+   * @param {*} item
+   * @returns
+   * @memberof SprintIssue
+   */
   renderIssueBackground(item) {
     if (BacklogStore.getClickIssueDetail.issueId === item.issueId) {
       return 'rgba(140,158,255,0.08)';
@@ -49,6 +72,12 @@ class SprintIssue extends Component {
       return 'unset';
     }
   }
+  /**
+   *根据打开的组件个数 判断issue样式
+   *
+   * @returns
+   * @memberof SprintIssue
+   */
   renderIssueDisplay() {
     let flag = 0;
     if (this.props.epicVisible) {
@@ -62,6 +91,14 @@ class SprintIssue extends Component {
     }
     return flag >= 2;
   }
+  /**
+   *issue类型样式
+   *
+   * @param {*} item
+   * @param {*} type
+   * @returns
+   * @memberof SprintIssue
+   */
   renderTypecode(item, type) {
     if (item.typeCode === 'story') {
       if (type === 'background') {

@@ -20,6 +20,12 @@ class CreateVersion extends Component {
       endDate: null,
     };
   }
+  /**
+   *创建版本
+   *
+   * @param {*} e
+   * @memberof CreateVersion
+   */
   handleCreateVersion(e) {
     this.setState({
       loading: true,

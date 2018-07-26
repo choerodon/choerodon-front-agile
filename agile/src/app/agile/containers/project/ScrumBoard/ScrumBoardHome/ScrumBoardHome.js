@@ -47,6 +47,10 @@ class ScrumBoardHome extends Component {
     this.getBoard();
   }
   componentDidMount() {
+    const url = this.GetRequest(this.props.location.search);
+    if (url.paramIssueId) {
+      ScrumBoardStore.setClickIssueDetail({ issueId: url.paramIssueId });
+    }
     const timer = setInterval(() => {
       if (document.getElementsByClassName('c7n-scrumTools-left').length > 0) {
         if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
@@ -95,6 +99,17 @@ class ScrumBoardHome extends Component {
       // }
     }).catch((error) => {
     });
+  }
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
   }
   refresh(boardId) {
     this.setState({
@@ -148,6 +163,7 @@ class ScrumBoardHome extends Component {
               }
             }
           }
+
           ScrumBoardStore.setAssigneer(storeAssignee);
           ScrumBoardStore.setCurrentSprint(data.currentSprint);
           ScrumBoardStore.setParentIds(storeParentIds);
@@ -185,6 +201,13 @@ class ScrumBoardHome extends Component {
   // storeIssueNumberCount(storeParentIds, columns) {
 
   // }
+  /**
+   *拖动结束事件
+   *
+   * @param {*} result
+   * @returns
+   * @memberof ScrumBoardHome
+   */
   handleDragEnd(result) {
     ScrumBoardStore.setDragStartItem({});
     if (!result.destination) {
@@ -366,6 +389,12 @@ class ScrumBoardHome extends Component {
       });
     }
   }
+  /**
+   *创建面板
+   *
+   * @param {*} e
+   * @memberof ScrumBoardHome
+   */
   handleCreateBoard(e) {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
@@ -380,6 +409,11 @@ class ScrumBoardHome extends Component {
       }
     });
   }
+  /**
+   *仅故事
+   *
+   * @memberof ScrumBoardHome
+   */
   filterOnlyStory() {
     this.setState({
       recent: !this.state.recent,
@@ -387,6 +421,11 @@ class ScrumBoardHome extends Component {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
+  /**
+   *仅我的
+   *
+   * @memberof ScrumBoardHome
+   */
   filterOnlyMe() {
     this.setState({
       onlyMe: !this.state.onlyMe,
@@ -394,6 +433,11 @@ class ScrumBoardHome extends Component {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
+  /**
+   *完成冲刺
+   *
+   * @memberof ScrumBoardHome
+   */
   handleFinishSprint() {
     BacklogStore.axiosGetSprintCompleteMessage(
       ScrumBoardStore.getCurrentSprint.sprintId).then((res) => {
@@ -422,6 +466,12 @@ class ScrumBoardHome extends Component {
     }).catch((error) => {
     });
   }
+  /**
+   *快速搜索
+   *
+   * @param {*} item
+   * @memberof ScrumBoardHome
+   */
   filterQuick(item) {
     const newState = [...this.state.quickFilter];
     if (newState.indexOf(item.filterId) === -1) {
@@ -435,7 +485,7 @@ class ScrumBoardHome extends Component {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
-  // 渲染第三方状态列
+  // 渲染状态列
   renderStatusColumns() {
     const data = ScrumBoardStore.getBoardData;
     const result = [];
@@ -536,6 +586,12 @@ class ScrumBoardHome extends Component {
     }
     return '';
   }
+  /**
+   *更新父任务匹配的默认选项
+   *
+   * @returns
+   * @memberof ScrumBoardHome
+   */
   renderUpdateParentDefault() {
     if (ScrumBoardStore.getBoardData.length > 0) {
       if (ScrumBoardStore.getBoardData[ScrumBoardStore.getBoardData.length - 1].columnId !== 'unset') {
@@ -563,6 +619,7 @@ class ScrumBoardHome extends Component {
     let result = '';
     const data = ScrumBoardStore.getBoardData;
     let flag = 0;
+    // 如果没有其他任务则其他任务列就不渲染，
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       for (let index = 0, len = data.length; index < len; index += 1) {
         if (data[index].subStatuses) {
@@ -594,6 +651,7 @@ class ScrumBoardHome extends Component {
     } else {
       flag = 1;
     }
+    // 有flag才渲染
     if (flag === 1) {
       result = (
         <div className="c7n-scrumboard-others">

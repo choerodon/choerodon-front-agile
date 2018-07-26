@@ -35,6 +35,7 @@ class AddRelease extends Component {
           releaseDate: values.endDate ? `${moment(values.endDate).format('YYYY-MM-DD')} 00:00:00` : null,
         };
         ReleaseStore.axiosAddRelease(data).then((res) => {
+          this.props.form.resetFields();
           this.props.onCancel();
           this.props.refresh();
           this.setState({
@@ -52,13 +53,17 @@ class AddRelease extends Component {
       }
     });
   }
+  handleCancel = () => {
+    this.props.form.resetFields();
+    this.props.onCancel();
+  };
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
       <Sidebar
         title="创建发布版本"
         visible={this.props.visible}
-        onCancel={this.props.onCancel.bind(this)}
+        onCancel={this.handleCancel}
         onOk={this.handleOk.bind(this)}
         okText="创建"
         cancelText="取消"
@@ -89,7 +94,7 @@ class AddRelease extends Component {
                 <DatePicker
                   style={{ width: '100%' }} 
                   label="开始日期"
-                  disabledDate={this.state.endDate ? current => current > moment(this.state.endDate) : ''}
+                  disabledDate={this.state.endDate ? current => current > moment(this.state.endDate) : () => false}
                   onChange={(date) => {
                     this.setState({
                       startDate: date,
@@ -108,13 +113,13 @@ class AddRelease extends Component {
                       endDate: date,
                     });
                   }}
-                  disabledDate={this.state.startDate ? current => current < moment(this.state.startDate) : ''}
+                  disabledDate={this.state.startDate ? current => current < moment(this.state.startDate) : () => false}
                 />,
               )}
             </FormItem>
             <FormItem>
               {getFieldDecorator('description', {})(
-                <TextArea label="版本描述" autoSize maxLength={30} />,
+                <TextArea label="版本描述" autosize maxLength={30} />,
               )}
             </FormItem>
           </Form>

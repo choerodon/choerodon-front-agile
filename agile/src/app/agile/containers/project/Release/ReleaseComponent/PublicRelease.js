@@ -77,7 +77,7 @@ class PublicRelease extends Component {
               <div>
                 {
                   ReleaseStore.getPublicVersionDetail.fixIssueCount ? (
-                    <p style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
                       <div className="c7n-release-icon">!</div>
                     还有
                       <span 
@@ -85,7 +85,7 @@ class PublicRelease extends Component {
                         role="none"
                         onClick={this.goIssue.bind(this)}
                       >{ReleaseStore.getPublicVersionDetail.fixIssueCount}个</span>这个版本仍然没有解决的问题。
-                    </p>
+                    </div>
                   ) : ''
                 }
                 <Form style={{ width: 512, marginTop: 24 }}>
@@ -132,7 +132,7 @@ class PublicRelease extends Component {
                             >
                               {
                                 ReleaseStore.getPublicVersionDetail.versionNames.map(item => (
-                                  <Option value={item.versionId}>{item.name}</Option>
+                                  <Option key={item.versionId} value={item.versionId}>{item.name}</Option>
                                 ))
                               }
                             </Select>,

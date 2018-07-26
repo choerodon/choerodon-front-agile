@@ -1,18 +1,14 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Collapse, Button, Select, Input, Icon, Tooltip, Avatar, Spin } from 'choerodon-ui';
+import { Spin } from 'choerodon-ui';
 import _ from 'lodash';
-import { axios, stores } from 'choerodon-front-boot';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { stores } from 'choerodon-front-boot';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import './Sprint.scss';
 import SprintItem from './SprintItem';
 import EmptyBacklog from '../../../../../assets/image/emptyBacklog.png';
 import SprintIssue from './SprintIssue';
 
-const Panel = Collapse.Panel;
-const Option = Select.Option;
-let scroll;
 const { AppState } = stores;
 
 @observer
@@ -38,12 +34,25 @@ class Sprint extends Component {
     window.addEventListener('keyup', this.onKeyUp.bind(this));
   }
 
+  /**
+   *父组件修改该组件state的方法
+   *
+   * @param {*} params
+   * @param {*} data
+   * @memberof Sprint
+   */
   onChangeState(params, data) {
     this.setState({
       [params]: data,
     });
   }
 
+  /**
+   *键盘按起事件
+   *
+   * @param {*} event
+   * @memberof Sprint
+   */
   onKeyUp(event) {
     if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
       this.setState({
@@ -52,6 +61,12 @@ class Sprint extends Component {
     }
   }
 
+  /**
+   *键盘按下事件
+   *
+   * @param {*} event
+   * @memberof Sprint
+   */
   onKeyDown(event) {
     if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
       if (event.keyCode !== this.state.keydown) {
@@ -62,10 +77,22 @@ class Sprint extends Component {
     }
   }
 
+  /**
+   *父组件获取该组件state方法
+   *
+   * @param {*} data
+   * @returns
+   * @memberof Sprint
+   */
   getCurrentState(data) {
     return this.state[data];
   }
 
+  /**
+   *这个方法好像没用了 以防万一 没有删除掉
+   *
+   * @memberof Sprint
+   */
   handleBlurCreateIssue() {
     this.setState({
       loading: true,
@@ -103,6 +130,9 @@ class Sprint extends Component {
     }
   }
 
+  /**
+   * issue详情回退关闭详情侧边栏
+   */
   resetMuilterChose() {
     this.setState({
       selected: {
@@ -112,6 +142,13 @@ class Sprint extends Component {
     });
   }
 
+  /**
+   *单个issue点击事件
+   *
+   * @param {*} sprintId
+   * @param {*} item
+   * @memberof Sprint
+   */
   handleClickIssue(sprintId, item) {
     // command ctrl shift
     if (this.state.keydown === 91 || this.state.keydown === 17 || this.state.keydown === 16) {
@@ -196,6 +233,14 @@ class Sprint extends Component {
     }
   }
 
+  /**
+   *渲染issue组件
+   *
+   * @param {*} data
+   * @param {*} sprintId
+   * @returns
+   * @memberof Sprint
+   */
   renderSprintIssue(data, sprintId) {
     const result = [];
     for (let index = 0, len = data.length; index < len; index += 1) {
@@ -214,6 +259,12 @@ class Sprint extends Component {
     }
     return result;
   }
+  /**
+   *渲染非待办事项冲刺
+   *
+   * @returns
+   * @memberof Sprint
+   */
   renderSprint() {
     let result = [];
     if (JSON.stringify(BacklogStore.getSprintData) !== '{}') {
@@ -253,6 +304,12 @@ class Sprint extends Component {
     }
     return result;
   }
+  /**
+   *渲染待办事项
+   *
+   * @returns
+   * @memberof Sprint
+   */
   renderBacklog() {
     if (JSON.stringify(BacklogStore.getSprintData) !== '{}') {
       const data = BacklogStore.getSprintData.backlogData;

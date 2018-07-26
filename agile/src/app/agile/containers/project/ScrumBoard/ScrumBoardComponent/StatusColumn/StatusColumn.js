@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import './StatusColumn.scss';
-
+// 列状态
 @inject('AppState')
 @observer
 class StatusColumn extends Component {
@@ -10,6 +10,12 @@ class StatusColumn extends Component {
     super(props);
     this.state = {};
   }
+  /**
+   *显示issue个数
+   *
+   * @returns
+   * @memberof StatusColumn
+   */
   showIssueLength() {
     const data = this.props.data.subStatuses;
     let length = 0;

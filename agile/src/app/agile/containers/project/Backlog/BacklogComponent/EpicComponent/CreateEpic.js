@@ -18,6 +18,13 @@ class CreateEpic extends Component {
       loading: false,
     };
   }
+
+  /**
+   *
+   * 创建史诗
+   * @param {*} e
+   * @memberof CreateEpic
+   */
   handleCreateEpic(e) {
     this.setState({
       loading: true,
