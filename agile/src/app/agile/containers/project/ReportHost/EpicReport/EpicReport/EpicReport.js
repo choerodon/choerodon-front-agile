@@ -35,11 +35,20 @@ class EpicReport extends Component {
         itemWidth: 14,
         data: [
           {
-            name: '提交',
+            name: '已完成 原预估时间',
             icon: 'rectangle',
-          }, {
-            name: '已完成',
+          },
+          {
+            name: '总计 原预估时间',
             icon: 'rectangle',
+          },
+          {
+            name: '问题数量',
+            icon: 'line',
+          },
+          {
+            name: '未预估问题数',
+            icon: 'line',
           },
         ],
       },
@@ -86,7 +95,7 @@ class EpicReport extends Component {
           },
         },
         splitArea: {
-          show: true,
+          show: false,
           interval: 0,
           color: 'rgba(0, 0, 0, 0.16)',
         },
@@ -127,6 +136,12 @@ class EpicReport extends Component {
             fontSize: 12,
             fontStyle: 'normal',
             // fontWeight: 'bold',
+          },
+          formatter(value, index) {
+            if (value) {
+              return `${value}h`;
+            }
+            return value;
           },
         },
         splitLine: {
@@ -174,23 +189,49 @@ class EpicReport extends Component {
       }],
       series: [
         {
-          name: '提交',
+          name: '问题数量',
           type: 'line',
           step: true,
           itemStyle: {
-            color: '#303f9f',
+            color: 'rgba(48, 63, 159, 1)',
           },
-          yAxisIndex: 0,
+          yAxisIndex: 1,
           data: [11, 20, 16, 11, 7, 8, 5],
         },
         {
-          name: '已完成',
+          name: '未预估问题数',
           type: 'line',
           step: true,
-          yAxisIndex: 1,
-          data: [0, 14, 18, 20, 25, 28, 25],
           itemStyle: {
             color: '#ff9915',
+          },
+          yAxisIndex: 1,
+          data: [1, 10, 6, 1, 3, 0, 1],
+        },
+        {
+          name: '已完成 原预估时间',
+          type: 'line',
+          step: true,
+          yAxisIndex: 0,
+          data: [0, 14, 18, 20, 25, 28, 25],
+          itemStyle: {
+            color: '#4e90fe',
+          },
+          areaStyle: {
+            color: 'rgba(77, 144, 254, 0.1)',
+          },
+        },
+        {
+          name: '总计 原预估时间',
+          type: 'line',
+          step: true,
+          yAxisIndex: 0,
+          data: [0, 30, 30, 28, 30, 30, 30],
+          itemStyle: {
+            color: 'rgba(0, 0, 0, 0.16)',
+          },
+          areaStyle: {
+            color: 'rgba(245, 245, 245, 0.5)',
           },
         },
       ],
@@ -292,7 +333,6 @@ class EpicReport extends Component {
         rowKey={record => record.sprintId}
         dataSource={[]}
         columns={column}
-        filterBar={false}
         scroll={{ x: true }}
         loading={false}
       />
@@ -322,19 +362,29 @@ class EpicReport extends Component {
         </Header>
         <Content
           title="史诗报告图"
-          description="随时了解完成一个史诗的进展。这有助于您管理您的团队的进度剩余的不完整unestimated 的工作。"
+          description="随时了解一个史诗的完成进度。这有助于您跟踪未完成或未分配问题来管理团队的开发进度。"
           // link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
-          <Select
-            style={{ width: 512 }}
-            label="史诗选择"
-          >
-            {
-              [].map(epic => (
-                <Option key={epic.issueId} value={epic.issueId}>{epic.summary}</Option>
-              ))
-            }
-          </Select>
+          <div style={{ display: 'flex' }}>
+            <Select
+              style={{ width: 244 }}
+              label="史诗选择"
+            >
+              {
+                [].map(epic => (
+                  <Option key={epic.issueId} value={epic.issueId}>{epic.summary}</Option>
+                ))
+              }
+            </Select>
+            <Select
+              style={{ width: 244, marginLeft: 24 }}
+              label="单位选择"
+            >
+              <Option key="storyPoint" value="storyPoint">故事点</Option>
+              <Option key="count" value="count">问题计数</Option>
+              <Option key="remain" value="remain">剩余时间</Option>
+            </Select>
+          </div>
           <div className="c7n-report">
             <div className="c7n-chart">
               <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
