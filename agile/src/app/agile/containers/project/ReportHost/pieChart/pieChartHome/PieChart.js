@@ -11,6 +11,7 @@ import { Button, Tabs, Table, Select, Icon, Tooltip, Dropdown, Menu } from 'choe
 import filter from 'lodash/filter';
 import ReportStore from '../../../../../stores/project/Report';
 import reportData from '../../Home/list';
+import './pie.scss';
 import VersionReportStore from "../../../../../stores/project/versionReport/VersionReport";
 // import './ReleaseDetail.scss';
 
@@ -27,45 +28,56 @@ class ReleaseDetail extends Component {
     };
   }
   componentDidMount() {
+    const pie = this.pie;
     // ReportStore.init();
   }
 
   getOption() {
     return {
-      title : {
-        text: '某站点用户访问来源',
-        subtext: '统计图',
-        x:'center'
-      },
+      // title : {
+      //   text: '某站点用户访问来源',
+      //   subtext: '统计图',
+      //   x:'center'
+      // },
+      color:['#9665E2','#F7667F','#FAD352', '#45A3FC','#56CA77'],
+      // color:['#9665E2','#F7667F'],
       tooltip : {
         trigger: 'item',
-        formatter: "{a} <br/>{b} : {c} ({d}%)"
-      },
-      legend: {
-        orient: 'vertical',
-        left: 'left',
-        data: ['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
+        formatter: "问题: {c} {a} <br/>{b} : {d}%",
+        padding: 10,
+        textStyle: {
+          color: '#000',
+        },
+        extraCssText: 'background: #FFFFFF;\n' +
+        'border: 1px solid #DDDDDD;\n' +
+        'box-shadow: 0 2px 4px 0 rgba(0,0,0,0.20);',
       },
       series : [
         {
-          name: '访问来源',
+          name: '',
           type: 'pie',
-          radius : '55%',
-          center: ['50%', '60%'],
+          // radius: '55%',
+          hoverAnimation: false,
+          center: ['40%', '50%'],
           data:[
-            {value:335, name:'直接访问'},
-            {value:310, name:'邮件营销'},
-            {value:234, name:'联盟广告'},
-            {value:135, name:'视频广告'},
-            {value:1548, name:'搜索引擎'}
+            {value:335, name:'gg@hand-china.com'},
+            {value:310, name:'aa@hand-china.com'},
+            {value:234, name:'bb@hand-china.com'},
+            {value:135, name:'cc@hand-china.com'},
+            {value:1548, name:'ff@hand-china.com'},
+            {value:130, name:'bb@hand-china.com'},
+            {value:1542, name:'nn@hand-china.com'}
           ],
           itemStyle: {
             emphasis: {
               shadowBlur: 10,
               shadowOffsetX: 0,
               shadowColor: 'rgba(0, 0, 0, 0.5)'
-            }
-          }
+            },
+            borderWidth:2, //设置border的宽度有多大
+            borderColor:'#fff',
+          },
+          selectedOffset: 20,
         }
       ]
     };
@@ -78,6 +90,20 @@ class ReleaseDetail extends Component {
     history.push(`${url}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
   }
   render() {
+    const data = [
+      {value:335, name:'gg@hand-china.com'},
+      {value:310, name:'aa@hand-china.com'},
+      {value:234, name:'bb@hand-china.com'},
+      {value:135, name:'cc@hand-china.com'},
+      {value:1548, name:'ff@hand-china.com'},
+      {value:130, name:'bb@hand-china.com'},
+      {value:1542, name:'nn@hand-china.com'}
+    ];
+    let total = 0;
+    for (let i = 0; i < data.length; i += 1) {
+      total += data[i].value;
+    }
+    const colors = ['#9665E2','#F7667F','#FAD352', '#45A3FC','#56CA77'];
     const menu = (
       <Menu onClick={this.handleClick.bind(this)}>
         {reportData.map(item => (
@@ -100,9 +126,9 @@ class ReleaseDetail extends Component {
       { title: '解决结果', value: '' },
     ];
     return (
-      <Page className="c7n-report">
+      <Page className="pie-chart">
         <Header
-          title="饼图"
+          title="统计图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <Button>刷新</Button>
@@ -113,7 +139,7 @@ class ReleaseDetail extends Component {
           </Dropdown>
         </Header>
         <Content
-          title={`迭代冲刺“${ReportStore.currentSprint.sprintName || ''}”的饼图`}
+          title={`迭代冲刺“${ReportStore.currentSprint.sprintName || ''}”的统计图`}
           description="了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。"
           link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
@@ -121,7 +147,8 @@ class ReleaseDetail extends Component {
             label="统计类型"
             value={this.state.chosenVersion}
             style={{
-              width: 244,
+              width: 512,
+              marginBottom: 32,
             }}
             onChange={(value) => {
 
@@ -133,11 +160,38 @@ class ReleaseDetail extends Component {
               ))
             }
           </Select>
-          <ReactEchartsCore
-            echarts={echarts}
-            className="c7n-chart"
-            option={this.getOption()}
-          />
+          <div style={{ marginTop: 30, display: 'flex' }}>
+            <ReactEchartsCore
+              ref={(pie) => { this.pie = pie; }}
+              style={{ width: '58%', height: 404 }}
+              echarts={echarts}
+              option={this.getOption()}
+            />
+            <div className="pie-title">
+              <p className="pie-legend-title">数据统计</p>
+              <table>
+                <thead>
+                  <tr>
+                    <td style={{ paddingRight: 106 }}>经办人</td>
+                    <td style={{ paddingRight: 68 }}>问题</td>
+                    <td>百分比</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((item, index) => (
+                    <tr>
+                      <td style={{ paddingTop: 12, paddingRight: 106 }}>
+                        <div className="pie-legend-icon" style={{ background: colors[index % 5] }} />
+                        <div className="pie-legend-text" >{item.name}</div>
+                      </td>
+                      <td style={{ paddingTop: 12, paddingRight: 68 }}>{item.value}</td>
+                      <td style={{ paddingTop: 12 }}>{`${((item.value/total)*100).toFixed(2)} %`}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </Content>
       </Page>
     );

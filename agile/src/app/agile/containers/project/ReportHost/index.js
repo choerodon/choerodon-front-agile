@@ -20,7 +20,7 @@ const ReportHostIndex = ({ match }) => (
     <Route path={`${match.url}/versionReport`} component={VersionReport} />
     <Route path={`${match.url}/velocityChart`} component={VelocityReport} />
     <Route path={`${match.url}/EpicReport`} component={EpicReport} />
-    <Route path={`${match.url}/pieChartReport`} component={PieChartReport} />
+    <Route path={`${match.url}/pieReport`} component={PieChartReport} />
     <Route path={'*'} component={nomatch} />
   </Switch>
 );
