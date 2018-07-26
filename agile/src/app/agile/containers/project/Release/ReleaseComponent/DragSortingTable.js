@@ -103,6 +103,7 @@ BodyRow = DropTarget('row', rowTarget, (connect, monitor) => ({
   }))(BodyRow),
 );
 
+
 @DragDropContext(HTML5Backend)
 class DragSortingTable extends Component {
   constructor(props) {
@@ -122,7 +123,6 @@ class DragSortingTable extends Component {
       row: BodyRow,
     },
   };
-
 
   moveRow = (dragIndex, hoverIndex) => {
     const data = this.state.data || this.props.dataSource;
@@ -155,3 +155,4 @@ class DragSortingTable extends Component {
 }
 
 export default DragSortingTable;
+

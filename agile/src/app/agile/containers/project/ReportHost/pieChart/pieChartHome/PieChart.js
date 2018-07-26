@@ -28,7 +28,6 @@ class ReleaseDetail extends Component {
     };
   }
   componentDidMount() {
-    const pie = this.pie;
     // ReportStore.init();
   }
 
@@ -67,22 +66,10 @@ class ReleaseDetail extends Component {
             {value:1548, name:'ff@hand-china.com'},
             {value:130, name:'bb@hand-china.com'},
             {value:1542, name:'nn@hand-china.com'}
-          ],
-          itemStyle: {
-            emphasis: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)'
-            },
-            borderWidth:2, //设置border的宽度有多大
-            borderColor:'#fff',
-          },
-          selectedOffset: 20,
         }
       ]
     };
   }
-
   handleClick(e) {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
