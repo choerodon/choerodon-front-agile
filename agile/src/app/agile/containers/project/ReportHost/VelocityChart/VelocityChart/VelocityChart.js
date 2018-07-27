@@ -186,7 +186,21 @@ class VelocityChart extends Component {
     VS.loadChartData(unit);
   }
 
-  transformRemainTime(remainTime) {
+  getTableValue(record, type) {
+    const currentUnit = VS.beforeCurrentUnit;
+    const CAMEL = {
+      story_point: 'StoryPoints',
+      remain_time: 'RemainTime',
+      issue_count: 'IssueCount',
+    };
+    const currentProp = `${type}${CAMEL[currentUnit]}`;
+    if (currentUnit === 'remain_time') {
+      return this.transformRemainTime(record[currentProp]);
+    }
+    return record[currentProp] || 0;
+  }
+
+  transformRemainTime(remainTime, type) {
     if (!remainTime) {
       return '0';
     }
@@ -222,24 +236,30 @@ class VelocityChart extends Component {
         ),
       }, {
         width: '33%',
-        title: '预估时间',
+        title: '预估',
         dataIndex: 'committedRemainTime',
         render: (committedRemainTime, record) => (
-          <span>{this.transformRemainTime(committedRemainTime)}</span>
+          <span>
+            {/* {this.transformRemainTime(committedRemainTime)} */}
+            {this.getTableValue(record, 'committed')}
+          </span>
         ),
       }, {
         width: '33%',
         title: '完成',
         dataIndex: 'completedRemainTime',
         render: (completedRemainTime, record) => (
-          <span>{this.transformRemainTime(completedRemainTime)}</span>
+          <span>
+            {/* {this.transformRemainTime(completedRemainTime)} */}
+            {this.getTableValue(record, 'completed')}
+          </span>
         ),
       },
     ];
     return (
       <Table
         rowKey={record => record.sprintId}
-        dataSource={VS.tableData}
+        dataSource={VS.chartData}
         columns={column}
         filterBar={false}
         pagination={false}

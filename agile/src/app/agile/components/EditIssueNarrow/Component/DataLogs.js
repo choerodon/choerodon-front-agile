@@ -9,13 +9,6 @@ import { delta2Html, text2Delta, beforeTextUpload, formatDate } from '../../../c
 import { deleteWorklog, updateWorklog } from '../../../api/NewIssueApi';
 import DataLog from './DataLog';
 
-const PROP = {
-  Sprint: '冲刺',
-  status: '状态',
-  resolution: '',
-  'Story Points': '故事点',
-};
-
 class DataLogs extends Component {
   constructor(props, context) {
     super(props, context);

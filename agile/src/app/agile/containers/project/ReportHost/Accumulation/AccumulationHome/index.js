@@ -12,6 +12,7 @@ import './AccumulationHome.scss';
 import '../../BurndownChart/BurndownChartHome/BurndownChartHome.scss';
 import '../../../../main.scss';
 import txt from '../test';
+import SwithChart from '../../Component/switchChart';
 
 const { AppState } = stores;
 const { RangePicker } = DatePicker;
@@ -269,19 +270,7 @@ class AccumulationHome extends Component {
     }
     return result;
   }
-  handleClick(e) {
-    const { history } = this.props;
-    const urlParams = AppState.currentMenuType;
-    if (e.key === '0') {
-      history.push(`/agile/reporthost/burndownchart?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-    if (e.key === '1') {
-      history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-    if (e.key === '2') {
-      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-  }
+  
   setStoreCheckData(data, id, params, array) {
     const newData = _.clone(data);
     for (let index = 0, len = newData.length; index < len; index += 1) {
@@ -334,33 +323,20 @@ class AccumulationHome extends Component {
   render() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    const menu = (
-      <Menu onClick={this.handleClick.bind(this)}>
-        <Menu.Item key="0">
-        燃尽图
-        </Menu.Item>
-        <Menu.Item key="1">
-        Sprint报告
-        </Menu.Item>
-        <Menu.Item key="2">
-        版本报告
-        </Menu.Item>
-      </Menu>
-    );
     return (
       <Page>
         <Header
           title="累积流量图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
+          <SwithChart
+            history={this.props.history}
+            current="accumulation"
+          />
           <Button funcType="flat" onClick={() => { this.getData(); }}>
-            <Icon type="refresh" />刷新
+            <Icon type="refresh icon" />
+            <span>刷新</span>
           </Button>
-          <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcType="flat">
-              切换报表
-            </Button>
-          </Dropdown>
         </Header>
         <Content
           title="累积流量图"

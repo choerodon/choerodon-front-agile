@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import { Icon, Popconfirm } from 'choerodon-ui';
+import { Icon, Popconfirm, Popover } from 'choerodon-ui';
 import { AppState } from 'choerodon-front-boot';
 import _ from 'lodash';
 import UserHead from '../../UserHead';
-import WYSIWYGEditor from '../../WYSIWYGEditor';
-import { IssueDescription } from '../../CommonComponent';
-import { delta2Html, text2Delta, beforeTextUpload, formatDate } from '../../../common/utils';
-import { deleteWorklog, updateWorklog } from '../../../api/NewIssueApi';
+import { formatDate } from '../../../common/utils';
 import { getUser } from '../../../api/CommonApi';
 import './DataLog.scss';
 
@@ -46,27 +43,281 @@ class DataLog extends Component {
     };
   }
 
-  componentDidMount() {
-    // this.loadUser();
-  }
-
-  transform() {
-
-  }
-
-  loadUser() {
-    const { datalog, i, origin, user, callback } = this.props;
-    if (i && origin[i].lastUpdatedBy === origin[i - 1].lastUpdatedBy) {
-      this.setState({
-        user,
-      });
+  getMode1(datalog) {
+    const { field, oldString, oldValue, newString, newValue } = datalog;
+    if (!oldValue && newValue) {
+      // null -> xxx
+      if (['labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child'].includes(field)) {
+        return '新建';
+      }
+      return '更新';
+    } else if (oldValue && newValue) {
+      // xxx -> yyy
+      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+        return '将';
+      }
+      if (['description', 'Attachment', 'WorklogId', 'Comment', 'timespent'].includes(field)) {
+        return '更新';
+      }
+      if (field === 'status') {
+        if (newValue === 'doing' || newString === '进行中') {
+          return '开始处理';
+        }
+        if (newValue === 'done' || newString === '已完成') {
+          return '完成任务';
+        }
+        if (newValue === 'todo' || newString === '待处理') {
+          return '置为待办';
+        }
+      }
+    } else if (oldValue && !newValue) {
+      // yyy -> null
+      if (['Epic Link', 'Sprint', 'assignee', 'reporter', 'labels', 'WorklogId', 'Comment', 'Component', 'Fix Version', 'Epic Child', 'resolution'].includes(field)) {
+        return '移除';
+      }
+      if (['Story Points', 'timeestimate'].includes(field)) {
+        return '将';
+      }
+      if (['Attachment', 'timespent'].includes(field)) {
+        return '更新';
+      }
     } else {
-      getUser(datalog.lastUpdatedBy)
-        .then((res) => {
-          this.setState({ user: res.content[0] });
-          callback(res);
-        });
+      // null -> null
+      if (field === 'Rank') {
+        return '更新';
+      }
+      if (field === 'issuetype') {
+        return '将';
+      }
+      if (field === 'resolution') {
+        if (oldString && !newString) {
+          return '移除';
+        } else if (!oldString && newString) {
+          return '更新';
+        }
+      }
+      if (field === 'summary' || field === 'Epic Name') {
+        return '将';
+      }
+      if (field === 'Story Points') {
+        return '将';
+      }
+      if (field === 'labels') {
+        if (!oldString && newString) {
+          return '创建';
+        }
+        return '移除';
+      }
     }
+  }
+
+  getMode2(datalog) {
+    const { field, oldString, oldValue, newString, newValue } = datalog;
+    if (field === 'status') {
+      return '';
+    }
+    return ` 【${PROP[field] || PROP_SIMPLE[field]}】 `;
+  }
+
+  // ['由', '']
+  getMode3(datalog) {
+    const { field, oldString, oldValue, newString, newValue } = datalog;
+    if (!oldValue && newValue) {
+      // null -> xxx
+      return '';
+    } else if (oldValue && newValue) {
+      // xxx -> yyy
+      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+        return '由';
+      } else {
+        return '';
+      }
+    } else if (oldValue && !newValue) {
+      // yyy -> null
+      if (['Story Points', 'timeestimate'].includes(field)) {
+        return '由';
+      } else {
+        return '';
+      }
+    } else {
+      if (field === 'Rank') {
+        return '';
+      }
+      if (field === 'issuetype') {
+        return '由';
+      }
+      if (field === 'resolution') {
+        return '';
+      }
+      if (field === 'summary' || field === 'Epic Name') {
+        return '由';
+      }
+      if (field === 'Story Points') {
+        return '由';
+      }
+      if (field === 'labels') {
+        return '';
+      }
+    }
+  }
+
+  // 原值，只有移除和修改可能出现
+  getMode4(datalog) {
+    const { field, oldString, oldValue, newString, newValue } = datalog;
+    if (!oldValue && newValue) {
+      // null -> xxx
+      return '';
+    } else if (oldValue && newValue) {
+      // xxx -> yyy
+      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+        return ` 【${oldString}】 `;
+      }
+      if (['description', 'Attachment', 'WorklogId', 'Rank', 'Comment'].includes(field)) {
+        return '';
+      }
+      if (field === 'status') {
+        return '';
+      }
+    } else if (oldValue && !newValue) {
+      // yyy -> null
+      if (['Story Points', 'timeestimate'].includes(field)) {
+        return ` 【${oldString}】 `;
+      } else if (['Attachment', 'timespent'].includes(field)) {
+        return '';
+      } else {
+        return ` 【${oldString}】 `;
+      }
+    } else {
+      if (field === 'Rank') {
+        return '';
+      }
+      if (field === 'issuetype') {
+        return ` 【${oldString}】 `;
+      }
+      if (field === 'resolution') {
+        return '';
+      }
+      if (field === 'summary' || field === 'Epic Name') {
+        return ` 【${oldString}】 `;
+      }
+      if (field === 'Story Points') {
+        if (!oldString) {
+          return ' 【未预估】 ';
+        }
+        return ` 【${oldString}】 `;
+      }
+      if (field === 'labels') {
+        if (!oldString && newString) {
+          return '';
+        }
+        return ` 【${oldString}】 `;
+      }
+    }
+  }
+
+  // ['改变为', '为', '']
+  getMode5(datalog) {
+    const { field, oldString, oldValue, newString, newValue } = datalog;
+    if (!oldValue && newValue) {
+      // null -> xxx
+      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
+        return '为';
+      }
+      return '';
+    } else if (oldValue && newValue) {
+      // xxx -> yyy
+      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+        return '改变为';
+      }
+      return '';
+    } else if (oldValue && !newValue) {
+      // yyy -> null
+      if (['Story Points', 'timeestimate'].includes(field)) {
+        return '改变为';
+      }
+      return '';
+    } else {
+      if (field === 'issuetype') {
+        return '改变为';
+      }
+      if (field === 'summary' || field === 'Epic Name') {
+        return '改变为';
+      }
+      if (field === 'Story Points') {
+        return '改变为';
+      }
+      return '';
+    }
+  }
+
+  // 新值，只有新增和修改可能出现
+  getMode6(datalog) {
+    const { field, oldString, oldValue, newString, newValue } = datalog;
+    if (!oldValue && newValue) {
+      // null -> xxx
+      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
+        return ` 【${newString}】 `;
+      }
+      if (['description', 'Attachment', 'WorklogId', 'Rank', 'Comment', 'timespent'].includes(field)) {
+        return '';
+      }
+      if (['labels', 'Component', 'Fix Version', 'Epic Child'].includes(field)) {
+        return ` 【${newString}】 `;
+      }
+    } else if (oldValue && newValue) {
+      // xxx -> yyy
+      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter', 'labels', 'Component', 'Fix Version', 'Epic Child'].includes(field)) {
+        return ` 【${newString}】 `;
+      }
+      if (['description', 'Attachment', 'WorklogId', 'Rank', 'Comment', 'timespent'].includes(field)) {
+        return '';
+      }
+      if (field === 'status') {
+        return '';
+      }
+    } else if (oldValue && !newValue) {
+      // yyy -> null
+      if (['Story Points', 'timeestimate'].includes(field)) {
+        return ' 【未预估】 ';
+      } else {
+        return '';
+      }
+    } else {
+      if (field === 'Rank' || field === 'resolution') {
+        return '';
+      }
+      if (field === 'issuetype') {
+        return ` 【${newString}】 `;
+      }
+      if (field === 'summary' || field === 'Epic Name') {
+        return ` 【${newString}】 `;
+      }
+      if (field === 'Story Points') {
+        if (!newString) {
+          return ' 【未预估】 ';
+        }
+        return ` 【${newString}】 `;
+      }
+      if (field === 'labels') {
+        if (!oldString && newString) {
+          return ` 【${newString}】 `;
+        }
+        return '';
+      }
+    }
+  }
+
+  getFirst(str) {
+    if (!str) {
+      return '';
+    }
+    const re = /[\u4E00-\u9FA5]/g;
+    for (let i = 0, len = str.length; i < len; i += 1) {
+      if (re.test(str[i])) {
+        return str[i];
+      }
+    }
+    return str[0];
   }
 
   render() {
@@ -104,34 +355,74 @@ class DataLog extends Component {
                 </div>
                 <div style={{ flex: 1, borderBottom: '1px solid rgba(0, 0, 0, 0.12)', padding: '8.5px 0' }}>
                   <div>
-                    <span style={{ color: '#303f9f' }}>
-                      {datalog.name}
-                    </span>
-                    {
-                      PROP[datalog.field] ? (
-                        <div style={{ display: 'inline' }}>
-                    将
-                          <span style={{ fontWeight: 'bold' }}>
-                            {` ${PROP[datalog.field] || datalog.field} `}
-                          </span>
-                    由 
-                          <span style={{ fontWeight: 'bold', paddingLeft: 5, paddingRight: 5 }}>
-                            {datalog.oldString || '无'}
-                          </span>
-                    改为
-                          <span style={{ fontWeight: 'bold', paddingLeft: 5, paddingRight: 5 }}>
-                            {datalog.newString || '无'}
-                          </span>
+                    <Popover
+                      placement="bottomLeft"
+                      content={(
+                        <div style={{ padding: '5px 2px 0' }}>
+                          <div
+                            style={{
+                              width: 62,
+                              height: 62,
+                              background: '#c5cbe8',
+                              color: '#6473c3',
+                              overflow: 'hidden',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              textAlign: 'center',
+                              borderRadius: '50%',
+                              fontSize: '28px',
+                              margin: '0 auto',
+                            }}
+                          >
+                            {
+                              datalog.imageUrl ? (
+                                <img src={datalog.imageUrl} alt="" style={{ width: '100%' }} />
+                              ) : (
+                                <span style={{ width: 62, height: 62, lineHeight: '62px', textAlign: 'center', color: '#6473c3' }}>
+                                  {this.getFirst(datalog.name)}
+                                </span>
+                              )
+                            }
+                          </div>
+                          <h1 style={{ margin: '8px auto 18px', fontSize: '13px', lineHeight: '20px', textAlign: 'center' }}>
+                            {datalog.name}
+                          </h1>
+                          <div style={{ color: 'rgba(0, 0, 0, 0.65)', fontSize: '13px', textAlign: 'center', display: 'flex' }}>
+                            <Icon type="markunread" style={{ lineHeight: '20px' }} />
+                            <span style={{ marginLeft: 6, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              hong.li@hand-china.com
+                            </span>
+                          </div>
                         </div>
-                      ) : (
-                        <div style={{ display: 'inline' }}>
-                    修改了
-                          <span style={{ fontWeight: 'bold' }}>
-                            {` ${PROP_SIMPLE[datalog.field] || datalog.field} `}
-                          </span>
-                        </div>
-                      )
-                    }
+                      )}
+                    >
+                      <span style={{ color: '#303f9f' }}>
+                        {`${datalog.name} `}
+                      </span>
+                    </Popover>
+
+                    <div style={{ display: 'inline' }}>
+                      <span>
+                        {this.getMode1(datalog)}
+                      </span>
+                      <span style={{ color: '#303f9f' }}>
+                        {this.getMode2(datalog)}
+                      </span>
+                      <span>
+                        {this.getMode3(datalog)}
+                      </span>
+                      <span style={{ color: '#303f9f' }}>
+                        {this.getMode4(datalog)}
+                      </span>
+                      <span>
+                        {this.getMode5(datalog)}
+                      </span>
+                      <span style={{ color: '#303f9f' }}>
+                        {this.getMode6(datalog)}
+                      </span>
+                    </div>
+
                   </div>
                   <div style={{ marginTop: 5 }}>- {formatDate(datalog.lastUpdateDate)}</div>
                 </div>

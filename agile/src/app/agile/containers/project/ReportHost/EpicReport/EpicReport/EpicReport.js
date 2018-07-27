@@ -192,6 +192,7 @@ class EpicReport extends Component {
           name: '问题数量',
           type: 'line',
           step: true,
+          symbol: 'none',
           itemStyle: {
             color: 'rgba(48, 63, 159, 1)',
           },
@@ -202,6 +203,7 @@ class EpicReport extends Component {
           name: '未预估问题数',
           type: 'line',
           step: true,
+          symbol: 'none',
           itemStyle: {
             color: '#ff9915',
           },
@@ -212,6 +214,7 @@ class EpicReport extends Component {
           name: '已完成 原预估时间',
           type: 'line',
           step: true,
+          symbol: 'none',
           yAxisIndex: 0,
           data: [0, 14, 18, 20, 25, 28, 25],
           itemStyle: {
@@ -225,6 +228,7 @@ class EpicReport extends Component {
           name: '总计 原预估时间',
           type: 'line',
           step: true,
+          symbol: 'none',
           yAxisIndex: 0,
           data: [0, 30, 30, 28, 30, 30, 30],
           itemStyle: {
