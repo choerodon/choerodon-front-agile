@@ -11,6 +11,7 @@ import './VersionReportHome.scss';
 import '../../../../main.scss';
 import NoDataComponent from '../../Component/noData';
 import versionSvg from '../../Home/style/pics/no_version.svg';
+import SwithChart from '../../Component/switchChart';
 
 const { AppState } = stores;
 const Option = Select.Option;
@@ -327,19 +328,6 @@ class VersionReport extends Component {
       });
     }
   }
-  handleClick(e) {
-    const { history } = this.props;
-    const urlParams = AppState.currentMenuType;
-    if (e.key === '0') {
-      history.push(`/agile/reporthost/burndownchart?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-    if (e.key === '1') {
-      history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-    if (e.key === '2') {
-      history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-  }
   renderUnitColumn(type) {
     let result = '';
     if (this.state.type === 'storyPoints') {
@@ -589,43 +577,29 @@ class VersionReport extends Component {
   render() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    const menu = (
-      <Menu onClick={this.handleClick.bind(this)}>
-        <Menu.Item key="0">
-        燃尽图
-        </Menu.Item>
-        <Menu.Item key="1">
-        Sprint报告
-        </Menu.Item>
-        <Menu.Item key="2">
-        累积流量图
-        </Menu.Item>
-      </Menu>
-    );
-    const title = VersionReportStore.getVersionList.length ? `${VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.name}的版本报告` : '无版本的版本报告';
     return (
       <Page>
         <Header
           title="版本报告"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
+          <SwithChart
+            history={this.props.history}
+            current="versionReport"
+          />
           <Button 
-            funcType="flat"
+            funcType="flat" 
             onClick={() => { 
               this.updateIssues(this.state.datas);
               this.getReportData(this.state.type);
             }}
           >
-            <Icon type="refresh" />刷新
+            <Icon type="refresh icon" />
+            <span>刷新</span>
           </Button>
-          <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcType="flat">
-              切换报表
-            </Button>
-          </Dropdown>
         </Header>
         <Content
-          title={title}
+          title="版本报告"
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
         >
           <Spin spinning={this.state.loading}>

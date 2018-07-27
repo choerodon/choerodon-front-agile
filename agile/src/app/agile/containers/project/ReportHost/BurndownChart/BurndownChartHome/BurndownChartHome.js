@@ -12,6 +12,7 @@ import restSvg from '../../../../../assets/image/rest.svg';
 import hopeSvg from '../../../../../assets/image/hope.svg';
 import NoDataComponent from '../../Component/noData';
 import epicSvg from '../../Home/style/pics/no_sprint.svg';
+import SwithChart from '../../Component/switchChart';
 
 const { AppState } = stores;
 const Option = Select.Option;
@@ -209,19 +210,7 @@ class BurndownChartHome extends Component {
       this.getChartData();
     });
   }
-  handleClick(e) {
-    const { history } = this.props;
-    const urlParams = AppState.currentMenuType;
-    if (e.key === '0') {
-      history.push(`/agile/reporthost/sprintreport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-    if (e.key === '1') {
-      history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-    if (e.key === '2') {
-      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-  }
+  
   renderChartTitle() {
     let result = '';
     if (this.state.select === 'remainingEstimatedTime') {
@@ -413,33 +402,21 @@ class BurndownChartHome extends Component {
     }
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    const menu = (
-      <Menu onClick={this.handleClick.bind(this)}>
-        <Menu.Item key="0">
-          Sprint报告
-        </Menu.Item>
-        <Menu.Item key="1">
-          累积流量图
-        </Menu.Item>
-        <Menu.Item key="2">
-        版本报告
-        </Menu.Item>
-      </Menu>
-    );
+    
     return (
       <Page>
         <Header
           title="燃尽图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
+          <SwithChart
+            history={this.props.history}
+            current="burndownchart"
+          />
           <Button funcType="flat" onClick={this.getChartData.bind(this)}>
-            <Icon type="refresh" />刷新
+            <Icon type="refresh icon" />
+            <span>刷新</span>
           </Button>
-          <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcType="flat">
-              切换报表
-            </Button>
-          </Dropdown>
         </Header>
         <Content
           title={sprintName ? `迭代冲刺“${sprintName}”的燃尽图` : '无冲刺迭代的燃尽图'}

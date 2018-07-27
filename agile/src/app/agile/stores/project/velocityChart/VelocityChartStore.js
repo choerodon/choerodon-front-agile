@@ -29,6 +29,7 @@ class VelocityChartStore {
   @observable tableData = [];
   @observable chartLoading = false;
   @observable chartData = [];
+  @observable beforeCurrentUnit = 'story_point';
   @observable currentUnit = 'story_point';
   @observable chartDataX = [];
   @observable chartDataYCommitted = [];
@@ -37,27 +38,31 @@ class VelocityChartStore {
 
   loadChartAndTableData() {
     this.loadChartData();
-    this.loadTableData();
+    // this.loadTableData();
   }
 
   loadChartData(unit = this.currentUnit) {
     this.setChartLoading(true);
+    this.setTableLoading(true);
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/velocity_chart?type=${unit}`)
       .then((res) => {
+        this.setBeforeCurrentUnit(unit);
         this.setChartData(res);
         this.splitData(res);
         this.setChartLoading(false);
+        this.setTableLoading(false);
+        // this.setTableData(res);
       });
   }
 
-  loadTableData() {
-    this.setTableLoading(true);
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/velocity_chart?type=remain_time`)
-      .then((res) => {
-        this.setTableData(res);
-        this.setTableLoading(false);
-      });
-  }
+  // loadTableData() {
+  //   this.setTableLoading(true);
+  //   axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/velocity_chart?type=remain_time`)
+  //     .then((res) => {
+  //       this.setTableData(res);
+  //       this.setTableLoading(false);
+  //     });
+  // }
 
   splitData(data) {
     this.setChartDataX(this.getChartDataX(data));
@@ -80,6 +85,10 @@ class VelocityChartStore {
 
   @action setChartData(data) {
     this.chartData = data;
+  }
+
+  @action setBeforeCurrentUnit(data) {
+    this.beforeCurrentUnit = data;
   }
 
   @action setCurrentUnit(data) {

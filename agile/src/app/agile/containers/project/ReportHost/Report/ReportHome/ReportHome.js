@@ -11,6 +11,7 @@ import TypeTag from '../../../../../components/TypeTag';
 import { formatDate } from '../../../../../common/utils';
 import NoDataComponent from '../../Component/noData';
 import epicSvg from '../../Home/style/pics/no_sprint.svg';
+import SwithChart from '../../Component/switchChart';
 
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
@@ -92,19 +93,7 @@ class ReleaseDetail extends Component {
       ReportStore[ARRAY[key]]();
     }
   }
-  handleClick(e) {
-    const { history } = this.props;
-    const urlParams = AppState.currentMenuType;
-    if (e.key === '0') {
-      history.push(`/agile/reporthost/burndownchart?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-    if (e.key === '1') {
-      history.push(`/agile/reporthost/accumulation?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-    if (e.key === '2') {
-      history.push(`/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-    }
-  }
+  
   renderDoneIssue(column) {
     return (
       <div>
@@ -245,37 +234,33 @@ class ReleaseDetail extends Component {
     ];
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    const menu = (
-      <Menu onClick={this.handleClick.bind(this)}>
-        <Menu.Item key="0">
-          燃尽图
-        </Menu.Item>
-        <Menu.Item key="1">
-          累积流量图
-        </Menu.Item>
-        <Menu.Item key="2">
-          版本报告
-        </Menu.Item>
-      </Menu>
-    );
+    
     return (
       <Page className="c7n-report">
         <Header 
           title="冲刺报告"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
+          <SwithChart
+            history={this.props.history}
+            current="sprint"
+          />
           <Button 
             funcType="flat" 
             onClick={() => ReportStore.changeCurrentSprint(ReportStore.currentSprint.sprintId)}
           >
-            <Icon type="autorenew icon" />
+            <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
-          <Dropdown placement="bottomCenter" trigger={['click']} overlay={menu}>
-            <Button icon="arrow_drop_down" funcType="flat">
-              切换报表
-            </Button>
-          </Dropdown>
+          {/* <Button 
+            funcType="flat" 
+            onClick={() => {
+              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题`);
+            }}
+          >
+            <Icon type="autorenew icon" />
+            <span>查看问题列表</span>
+          </Button> */}
         </Header>
         <Content
           title={ReportStore.currentSprint.sprintName ? `迭代冲刺“${ReportStore.currentSprint.sprintName}”的冲刺报告` : '无冲刺报告'}
@@ -302,13 +287,13 @@ class ReleaseDetail extends Component {
             </Select>
             <div className="c7n-sprintMessage">
               <div className="c7n-sprintContent">
-              <span>
-                {ReportStore.getCurrentSprintStatus.status}冲刺,
-                共 {ReportStore.currentSprint.issueCount || 0} 个问题
-              </span>
                 <span>
-                {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
-              </span>
+                  {ReportStore.getCurrentSprintStatus.status}冲刺,
+                  共 {ReportStore.currentSprint.issueCount || 0} 个问题
+                </span>
+                <span>
+                  {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
+                </span>
               </div>
               <p
                 style={{
