@@ -313,10 +313,6 @@ class BacklogHome extends Component {
   }
 
   /**
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
->>>>>>> 0567469e5a34bd53f4f44825aa9542ceb51ab0fb
    * 加载版本数据
    */
   loadVersion =() => {
@@ -488,6 +484,7 @@ class BacklogHome extends Component {
                 ScrumBoardStore.getQuickSearchList.length > 0 ?
                   ScrumBoardStore.getQuickSearchList.map(item => (
                     <p
+                      key={item.filterId}
                       className="c7n-backlog-filter"
                       style={{
                         background: BacklogStore.getQuickFilters.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',

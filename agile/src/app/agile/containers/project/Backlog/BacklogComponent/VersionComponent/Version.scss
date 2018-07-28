@@ -76,10 +76,14 @@
           }
           
           .c7n-backlog-versionItemParamValue {
-            padding: 0px 8px; 
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.26); 
+            border-radius: 100px;
+            background: rgba(0, 0, 0, 0.26);
             color: white;
+            min-width: 24px;
+            height: 16px;
+            text-align: center;
+            line-height: 16px;
+
           }
         }
       }

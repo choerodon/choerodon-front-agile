@@ -3,8 +3,8 @@ import { observer, inject } from 'mobx-react';
 import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
 import { Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin } from 'choerodon-ui';
 import { Action } from 'choerodon-front-boot';
-import DragSortingTable from '../ReleaseComponent/DragSortingTable';
 import { withRouter } from 'react-router-dom';
+import DragSortingTable from '../ReleaseComponent/DragSortingTable';
 import AddRelease from '../ReleaseComponent/AddRelease';
 import '../../../main.scss';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -86,7 +86,7 @@ class ReleaseHome extends Component {
         });
       }
     }
-    if (e.key.indexOf('2') !== -1) {
+    if (e.key.indexOf('4') !== -1) {
       if (ReleaseStore.getVersionList.length > 1) {
         ReleaseStore.axiosVersionIssueStatistics(record.versionId).then((res) => {
           if (res.fixIssueCount > 0 || res.influenceIssueCount > 0) {
@@ -110,7 +110,7 @@ class ReleaseHome extends Component {
         });
       }
     }
-    if (e.key.indexOf('3') !== -1) {
+    if (e.key.indexOf('5') !== -1) {
       ReleaseStore.axiosGetVersionDetail(record.versionId).then((res) => {
         ReleaseStore.setVersionDetail(res);
         this.setState({
@@ -120,7 +120,7 @@ class ReleaseHome extends Component {
       }).catch((error) => {
       });
     }
-    if (e.key.indexOf('1') !== -1) {
+    if (e.key.indexOf('3') !== -1) {
       if (record.statusCode === 'archived') {
         // 撤销归档
         ReleaseStore.axiosUnFileVersion(record.versionId).then((res) => {
@@ -164,38 +164,6 @@ class ReleaseHome extends Component {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     const versionData = ReleaseStore.getVersionList.length > 0 ? ReleaseStore.getVersionList : [];
-    const getMenu = record => (
-      <Menu onClick={this.handleClickMenu.bind(this, record)}>
-        {
-          record.statusCode === 'archived' ? '' : (
-            <Permission type={type} projectId={projectId} organizationId={orgId} service={record.statusCode === 'version_planning' ? ['agile-service.product-version.releaseVersion'] : ['agile-service.product-version.revokeReleaseVersion']}>
-              <Menu.Item key="0">
-                {record.statusCode === 'version_planning' ? '发布' : '撤销发布'}
-              </Menu.Item>
-            </Permission>
-          )
-        }
-        <Permission type={type} projectId={projectId} organizationId={orgId} service={record.statusCode === 'archived' ? ['agile-service.product-version.revokeArchivedVersion'] : ['agile-service.product-version.archivedVersion']}>
-          <Menu.Item key="3">
-            {record.statusCode === 'archived' ? '撤销归档' : '归档'}
-          </Menu.Item>
-        </Permission>
-        {
-          record.statusCode === 'archived' ? '' : (
-            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.deleteVersion']}>
-              <Menu.Item key="4">
-          删除
-              </Menu.Item>
-            </Permission>
-          )
-        }
-        <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.updateVersion']}>
-          <Menu.Item key="5">
-          编辑
-          </Menu.Item>
-        </Permission>
-      </Menu>
-    );
     const versionColumn = [{
       title: '版本',
       dataIndex: 'name',
@@ -235,9 +203,39 @@ class ReleaseHome extends Component {
       dataIndex: 'option',
       key: 'option',
       render: (text, record) => (
-        <Dropdown overlay={getMenu(record)} trigger={['click']}>
-          <Button shape="circle" icon="more_vert" />
-        </Dropdown>
+        <Action
+          data={record.statusCode === 'archived' ? [
+            {
+              service: record.statusCode === 'archived' ? ['agile-service.product-version.revokeArchivedVersion'] : ['agile-service.product-version.archivedVersion'],
+              text: record.statusCode === 'archived' ? '撤销归档' : '归档',
+              action: this.handleClickMenu.bind(this, record, { key: '3' }),
+            },
+            {
+              service: ['agile-service.product-version.updateVersion'],
+              text: '编辑',
+              action: this.handleClickMenu.bind(this, record, { key: '5' }),
+            }] : [
+            {
+              service: record.statusCode === 'version_planning' ? ['agile-service.product-version.releaseVersion'] : ['agile-service.product-version.revokeReleaseVersion'],
+              text: record.statusCode === 'version_planning' ? '发布' : '撤销发布',
+              action: this.handleClickMenu.bind(this, record, { key: '0' }),
+            },
+            {
+              service: record.statusCode === 'archived' ? ['agile-service.product-version.revokeArchivedVersion'] : ['agile-service.product-version.archivedVersion'],
+              text: record.statusCode === 'archived' ? '撤销归档' : '归档',
+              action: this.handleClickMenu.bind(this, record, { key: '3' }),
+            },
+            {
+              service: ['agile-service.product-version.deleteVersion'],
+              text: '删除',
+              action: this.handleClickMenu.bind(this, record, { key: '4' }),
+            },
+            {
+              service: ['agile-service.product-version.updateVersion'],
+              text: '编辑',
+              action: this.handleClickMenu.bind(this, record, { key: '5' }),
+            }]}
+        />
       ),
     }];
     return (
