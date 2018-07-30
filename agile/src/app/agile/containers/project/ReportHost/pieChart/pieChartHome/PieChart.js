@@ -30,22 +30,27 @@ class ReleaseDetail extends Component {
 
   getRich = () => {
     const data = VersionReportStore.getPieData;
-    const rich = {};
+    const rich = {
+      border: {
+        width: 18,
+        height: 18,
+        borderRadius: 18,
+      },
+    };
     if (data.length) {
       data.map((item, index) => {
-        if (item.jsonObject && item.jsonObject.assigneeImageUrl) {
-          rich[index] = {
-            width: 18,
-            height: 18,
-            borderRadius: 18,
-            borderWidth: 1,
-            align: 'center',
-            backgroundColor: {
-              image: item.jsonObject.assigneeImageUrl,
-            },
-
-          };
-        } else if (item.jsonObject && !item.jsonObject.assigneeImageUrl) {
+        // if (item.jsonObject && item.jsonObject.assigneeImageUrl === 'null') {
+        //   rich[index] = {
+        //     // width: 18,
+        //     height: 18,
+        //     borderRadius: 18,
+        //     backgroundColor: {
+        //       image: item.jsonObject.assigneeImageUrl,
+        //     },
+        //
+        //   };
+        // } else if (item.jsonObject && !item.jsonObject.assigneeImageUrl) {
+        if (item.jsonObject) {
           rich[index] = {
             width: 18,
             height: 18,
@@ -91,6 +96,7 @@ class ReleaseDetail extends Component {
       tooltip: {
         trigger: 'item',
         formatter: '问题: {c} {a} <br/>{b} : {d}%',
+        // formatter: (value) => <div>{value.data.name}</div>,
         padding: 10,
         textStyle: {
           color: '#000',
@@ -113,10 +119,12 @@ class ReleaseDetail extends Component {
               if (value.data.name === null) {
                 return '未分配';
               } else {
-                if (this.state.type === '经办人' && value.data.jsonObject.assigneeImageUrl) {
-                  return `{${value.dataIndex}|}${value.data.name}`;
-                } else if (this.state.type === '经办人' && !value.data.jsonObject.assigneeImageUrl) {
-                  return `{${value.dataIndex}|${this.getFirstName(value.data.name)}}${value.data.name}`;
+                // if (this.state.type === '经办人' && value.data.jsonObject.assigneeImageUrl) {
+                //   return `{${value.dataIndex}|}${value.data.name}`;
+                // } else if (this.state.type === '经办人' && !value.data.jsonObject.assigneeImageUrl) {
+                if (this.state.type === '经办人') {
+                  // return `{${value.dataIndex}|${this.getFirstName(value.data.name)}}${value.data.name}`;
+                  return value.data.name;
                 } else {
                   return value.data.name;
                 }
@@ -126,6 +134,7 @@ class ReleaseDetail extends Component {
           },
           itemStyle: {
             normal: {
+              // borderRadius: 18,
               borderWidth: 2,
               borderColor: '#ffffff',
             },
@@ -138,6 +147,9 @@ class ReleaseDetail extends Component {
       ],
     };
   }
+  handelRefresh = () => {
+    VersionReportStore.getPieDatas(AppState.currentMenuType.id, this.state.type);
+  };
   changeType =(value, option) => {
     VersionReportStore.setPieData([]);
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
@@ -172,7 +184,7 @@ class ReleaseDetail extends Component {
             history={this.props.history}
             current="pieReport"
           />
-          <Button><Icon type="refresh" />刷新</Button>
+          <Button onClick={this.handelRefresh}><Icon type="refresh" />刷新</Button>
         </Header>
         <Content
           title={`项目"${AppState.currentMenuType.name}"下的问题统计图`}
@@ -217,9 +229,8 @@ class ReleaseDetail extends Component {
                       <tr>
                         <td>
                           <div className="pie-legend-icon" style={{ background: colors[index] }} />
-                          <Tooltip title={item.name && item.name}>
+                          <Tooltip title={this.state.type === '经办人' ? item && item.jsonObject.email : item && item.name}>
                             {this.state.type === '经办人' ? <div className="pie-legend-text" >{item.name ? item.jsonObject.email : '未分配'}</div> : <div className="pie-legend-text" >{item.name ? item.name : '未分配'}</div> }
-
                           </Tooltip>
                         </td>
                         <td>{item.value}</td>
