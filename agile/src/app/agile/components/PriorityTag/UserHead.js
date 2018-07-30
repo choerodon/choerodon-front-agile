@@ -6,14 +6,17 @@ const COLOR = {
   medium: {
     color: '#3575df',
     bgColor: 'rgba(77, 144, 254, 0.2)',
+    name: '中',
   },
   high: {
     color: '#ffb100',
     bgColor: 'rgba(255, 177, 0, 0.12)',
+    name: '高',
   },
   low: {
     color: 'rgba(0, 0, 0, 0.36)',
     bgColor: 'rgba(0, 0, 0, 0.08)',
+    name: '低',
   },
 };
 
@@ -44,7 +47,7 @@ class UserHead extends Component {
           textAlign: 'center',
         }}
       >
-        { `${priority.priorityName}` }
+        {priority.priorityName || COLOR[priority.priorityCode].name}
       </div>
     );
   }
