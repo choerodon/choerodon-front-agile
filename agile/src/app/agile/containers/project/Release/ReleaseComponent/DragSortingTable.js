@@ -146,7 +146,6 @@ class DragSortingTable extends Component {
     const versionId = data[dragIndex].versionId;
     const { objectVersionNumber } = data[dragIndex];
     const postData = { afterSequence, beforeSequence, versionId, objectVersionNumber };
-    window.console.log(postData);
     this.setState(
       update(this.state, {
         data: {

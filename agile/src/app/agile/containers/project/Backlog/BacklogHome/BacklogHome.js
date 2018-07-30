@@ -192,6 +192,7 @@ class BacklogHome extends Component {
                 _.flattenDeep(newData.sprintData[index].issueSearchDTOList);
             }
             axiosParam.before = endIndex === 0;
+            axiosParam.rankIndex = result.source.index > result.destination.index;
             axiosParam.issueIds = this.sprintRef.getCurrentState('selected').issueIds;
             axiosParam.outsetIssueId = destinationData.issueId; 
             BacklogStore.setSprintData(newData);
@@ -218,6 +219,7 @@ class BacklogHome extends Component {
           newData.backlogData.backLogIssue = _.flattenDeep(newData.backlogData.backLogIssue);
         }
         axiosParam.before = endIndex === 0;
+        axiosParam.rankIndex = result.source.index > result.destination.index;
         axiosParam.issueIds = this.sprintRef.getCurrentState('selected').issueIds;
         axiosParam.outsetIssueId = 
               destinationData.issueId; 

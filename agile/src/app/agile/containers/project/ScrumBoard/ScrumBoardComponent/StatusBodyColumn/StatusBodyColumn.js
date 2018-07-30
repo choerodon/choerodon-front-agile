@@ -33,7 +33,7 @@ class StatusBodyColumn extends Component {
   // }
   renderIssues(issues, droppableId, statusName, categoryCode) {
     let data = issues;
-    data = _.sortBy(data, o => o.issueId);
+    data = _.sortBy(data, o => o.rankIndex);
     const result = [];
     const parentIds = [];
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
