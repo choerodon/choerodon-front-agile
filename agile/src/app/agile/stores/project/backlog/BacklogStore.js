@@ -261,6 +261,11 @@ class BacklogStore {
   axiosGetSprint(data) {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?quickFilterIds=${this.quickFilters}`, data);
   }
+
+  handleEpicDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data);
+
+
+  handleVersionDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/drag`, data);
 }
 
 const backlogStore = new BacklogStore();

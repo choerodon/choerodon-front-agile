@@ -4,6 +4,8 @@ import { Draggable } from 'react-beautiful-dnd';
 import { Icon, Avatar, Tooltip } from 'choerodon-ui';
 import _ from 'lodash';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
+import Typetag from '../../../../../components/TypeTag';
+import UserHead from '../../../../../components/UserHead';
 
 @observer
 class SprintIssue extends Component {
@@ -198,20 +200,12 @@ class SprintIssue extends Component {
                     width: this.renderIssueDisplay() ? 'unset' : 0,
                   }}
                 >
-                  <div
-                    className="c7n-backlog-sprintType"
-                    style={{
-                      background: this.renderTypecode(item, 'background'),
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      flexShrink: 0,
+                  <Typetag
+                    type={{
+                      typeCode: item.typeCode,
                     }}
-                    label="sprintIssue"
-                  >
-                    {this.renderTypecode(item, 'icon')}
-                  </div>
-                  <p 
+                  />
+                  <div
                     label="sprintIssue" 
                     style={{ 
                       marginLeft: 8,
@@ -224,7 +218,7 @@ class SprintIssue extends Component {
                     <Tooltip title={item.summary} placement="topLeft">
                       {item.summary}
                     </Tooltip>
-                  </p>
+                  </div>
                 </div>
                 <div 
                   style={{ 
@@ -312,21 +306,14 @@ class SprintIssue extends Component {
                       label="sprintIssue" 
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {!_.isNull(item.assigneeName) ? (
-                        <Tooltip title={`经办人: ${item.assigneeName}`}>
-                          <div style={{ display: 'inline-block' }} label="sprintIssue">
-                            <Avatar
-                              size="small"
-                              src={item.imageUrl ? item.imageUrl : undefined}
-                            >
-                              {
-                                !item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''
-                              }
-                            </Avatar>
-                            <span style={{ color: 'rgba(0,0,0,0.65)' }} label="sprintIssue">{item.assigneeName}</span>
-                          </div>
-                        </Tooltip>
-                      ) : ''}
+                      <UserHead
+                        user={{
+                          id: item.assigneeId,
+                          loginName: '',
+                          realName: item.assigneeName,
+                          avatar: item.imageUrl,
+                        }}
+                      />
                     </div>
                     <div 
                       style={{ 

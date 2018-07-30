@@ -293,7 +293,7 @@ class StatusIssue extends Component {
         <div
           className="c7n-boardIssue"
           style={{
-            borderTop: this.renderSubDisplay(item, type, 'border') ? '1px solid rgba(0, 0, 0, 0.20)' : 'unset',
+            // borderTop: this.renderSubDisplay(item, type, 'border') ? '1px solid rgba(0, 0, 0, 0.20)' : 'unset',
             // display: this.renderSubDisplay(item, type),
           }}
         >

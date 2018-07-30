@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import _ from 'lodash';
 import { Modal, Form, Input, DatePicker, Icon } from 'choerodon-ui';
 import { Content, stores, Permission } from 'choerodon-front-boot';
-import moment from 'moment';
-import ReleaseStore from '../../../../../stores/project/release/ReleaseStore';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import VersionItem from './VersionItem';
 import './Version.scss';
 import CreateVersion from './CreateVersion';
 
-const { Sidebar } = Modal;
-const FormItem = Form.Item;
-const { TextArea } = Input;
 const { AppState } = stores;
 
 @observer
@@ -59,19 +54,85 @@ class Version extends Component {
     if (data.length > 0) {
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
-          <VersionItem
-            data={data[index]}
-            index={index}
-            handelClickVersion={this.handelClickVersion.bind(this)}
-            draggableIds={this.state.draggableIds}
-            refresh={this.props.refresh.bind(this)}
-            issueRefresh={this.props.issueRefresh.bind(this)}
-          />,
+          <Droppable droppableId={`${index}-version`} key={data[index].versionId.toString()}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                style={{
+                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                  padding: 'grid',
+                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                }}
+              >
+                <VersionItem
+                  data={data[index]}
+                  index={index}
+                  handelClickVersion={this.handelClickVersion.bind(this)}
+                  draggableIds={this.state.draggableIds}
+                  refresh={this.props.refresh.bind(this)}
+                  issueRefresh={this.props.issueRefresh.bind(this)}
+                />
+                {provided.placeholder}
+              </div>
+            )}
+
+          </Droppable>,
         );
       }
     }
     return result;
   }
+
+  /**
+   * 处理史诗拖动
+   * @param result
+   */
+  handleVersionDrag =(result) => {
+    if (!result.destination) {
+      return;
+    }
+    const data = BacklogStore.getVersionData;
+    const sourceIndex = parseInt(result.source.droppableId.split('-')[0], 10);
+    const tarIndex = parseInt(result.destination.droppableId, 10);
+    let beforeSequence = null;
+    let afterSequence = null;
+    const res = Array.from(data);
+    const [removed] = res.splice(sourceIndex, 1);
+    res.splice(tarIndex, 0, removed);
+    BacklogStore.setVersionData(res);
+    // 拖的方向
+    if (tarIndex === 0) {
+      afterSequence = res[1].sequence;
+    } else if (tarIndex === res.length - 1) {
+      beforeSequence = res[res.length - 2].sequence;
+    } else {
+      afterSequence = res[tarIndex + 1].sequence;
+      beforeSequence = res[tarIndex - 1].sequence;
+    }
+    const epicId = data[sourceIndex].versionId;
+    const { objectVersionNumber } = data[sourceIndex];
+    const postData = { afterSequence, beforeSequence, versionId: epicId, objectVersionNumber };
+    BacklogStore.handleVersionDrap(postData)
+      .then(() => {
+        BacklogStore.axiosGetVersion().then((data3) => {
+          const newEpic = [...data3];
+          for (let index = 0, len = newEpic.length; index < len; index += 1) {
+            newEpic[index].expand = false;
+          }
+          BacklogStore.setVersionData(newEpic);
+        }).catch((error3) => {
+        });
+      }).catch(() => {
+        BacklogStore.axiosGetVersion().then((data3) => {
+          const newEpic = [...data3];
+          for (let index = 0, len = newEpic.length; index < len; index += 1) {
+            newEpic[index].expand = false;
+          }
+          BacklogStore.setVersionData(newEpic);
+        }).catch((error3) => {
+        });
+      });
+  };
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -144,7 +205,9 @@ class Version extends Component {
                 >
                   所有问题
                 </div>
-                {this.renderVersion()}
+                <DragDropContext onDragEnd={this.handleVersionDrag}>
+                  {this.renderVersion()}
+                </DragDropContext>
                 <div
                   className={BacklogStore.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
                   style={{ 

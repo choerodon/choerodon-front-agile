@@ -112,10 +112,10 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   handleBlurCreateIssue() {
-    this.setState({
-      loading: true,
-    });
     if (this.state.createIssueValue !== '') {
+      this.setState({
+        loading: true,
+      });
       const data = {
         priorityCode: BacklogStore.getProjectInfo.defaultPriorityCode ? BacklogStore.getProjectInfo.defaultPriorityCode : 'medium',
         projectId: AppState.currentMenuType.id,
@@ -435,7 +435,7 @@ class SprintItem extends Component {
         <div className="c7n-backlog-sprintTop">
           <div className="c7n-backlog-springTitle">
             <div className="c7n-backlog-sprintTitleSide">
-              <p className="c7n-backlog-sprintName">
+              <div className="c7n-backlog-sprintName">
                 {
                   !this.props.backlog ? (
                     <Icon
@@ -461,7 +461,7 @@ class SprintItem extends Component {
                     role="none"
                   >{item.sprintName}</span>
                 </EasyEdit>
-              </p>
+              </div>
               <p className="c7n-backlog-sprintQuestion">
                 {item.issueSearchDTOList && item.issueSearchDTOList.length > 0 ? `${item.issueSearchDTOList.length}个问题可见` : '0个问题可见'}
                 {/* {!_.isNull(item.issueCount) ? ` 共${item.issueCount}个问题` : ' 共0个问题'} */}
@@ -494,13 +494,14 @@ class SprintItem extends Component {
               this.props.item.assigneeIssues ? (
                 this.props.item.assigneeIssues
                   .filter(ass => ass.assigneeId)
-                  .map(ass2 => (
-                    <Tooltip 
+                  .map((ass2, index) => (
+                    <Tooltip
+                      key={`tooltip-${index}`}
                       placement="bottom"
                       title={(
                         <div>
                           <p>{ass2.assigneeName}</p>
-                          <p>{ass2.totalStoryPoints} story points</p>
+                          <p>{ass2.totalStoryPoints} 故事点</p>
                           <p>{ass2.totalRemainingTime ? ass2.totalRemainingTime : '无'} 剩余预估时间</p>
                           <p>{ass2.issueCount} 问题</p>
                         </div>
@@ -561,10 +562,10 @@ class SprintItem extends Component {
                     this.updateDate('startDate', dateString);
                   }}
                 >
-                  <p
+                  <div
                     className="c7n-backlog-sprintDataItem"
                     role="none"
-                  >{this.renderData(item, 'startDate')}</p>
+                  >{this.renderData(item, 'startDate')}</div>
                 </EasyEdit>
                 <p>~</p>
                 <EasyEdit
@@ -576,10 +577,10 @@ class SprintItem extends Component {
                     this.updateDate('endDate', dateString);
                   }}
                 >
-                  <p
+                  <div
                     className="c7n-backlog-sprintDataItem"
                     role="none"
-                  >{this.renderData(item, 'endDate')}</p>
+                  >{this.renderData(item, 'endDate')}</div>
                 </EasyEdit>
               </div>
             ) : ''}
@@ -597,7 +598,7 @@ class SprintItem extends Component {
                 defaultValue={item.sprintGoal}
                 enterOrBlur={this.handleBlurGoal.bind(this)}
               >
-                <p
+                <div
                   role="none"
                   style={{
                     cursor: 'pointer',
@@ -607,7 +608,7 @@ class SprintItem extends Component {
                       editGoal: true,
                     });
                   }}
-                >{item.sprintGoal ? item.sprintGoal : '无'}</p>
+                >{item.sprintGoal ? item.sprintGoal : '无'}</div>
               </EasyEdit>
             </div>
             <div 
@@ -630,7 +631,7 @@ class SprintItem extends Component {
         </div>
         {this.state.expand ? (
           <Droppable 
-            droppableId={item.sprintId}
+            droppableId={item.sprintId.toString()}
             isDropDisabled={BacklogStore.getIsLeaveSprint}
           >
             {(provided, snapshot) => (
@@ -673,7 +674,7 @@ class SprintItem extends Component {
                             }}
                             dropdownMatchSelectWidth={false}
                           >
-                            <Option value="story">
+                            <Option value="story" key={'story'}>
                               <Tooltip title="故事">
                                 <div
                                   className="c7n-backlog-sprintType"
@@ -689,7 +690,7 @@ class SprintItem extends Component {
                                 </div>
                               </Tooltip>
                             </Option>
-                            <Option value="task">
+                            <Option value="task" key={'task'}>
                               <Tooltip title="任务">
                                 <div
                                   className="c7n-backlog-sprintType"
@@ -705,7 +706,7 @@ class SprintItem extends Component {
                                 </div>
                               </Tooltip>
                             </Option>
-                            <Option value="bug">
+                            <Option value="bug" key={'bug'}>
                               <Tooltip title="缺陷">
                                 <div
                                   className="c7n-backlog-sprintType"

@@ -246,6 +246,7 @@ class Sprint extends Component {
     for (let index = 0, len = data.length; index < len; index += 1) {
       result.push(
         <SprintIssue
+          key={`sprint-${index}`}
           data={data[index]}
           index={index}
           selected={this.state.selected}
@@ -274,6 +275,7 @@ class Sprint extends Component {
           for (let index = 0, len = data.length; index < len; index += 1) {
             result.push(
               <SprintItem
+                key={`sprint-${index}`}
                 item={data[index]}
                 renderSprintIssue={this.renderSprintIssue.bind(this)}
                 refresh={this.props.refresh.bind(this)}
