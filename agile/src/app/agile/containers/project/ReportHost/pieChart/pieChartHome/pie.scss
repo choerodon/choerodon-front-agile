@@ -4,13 +4,15 @@
     background: #FFFFFF;
     box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
     // top: 20%;
-    left: 45%;
+    min-width: 326px;
     padding: 24px;
-    height: 304px;
+    max-height: 304px;
     overflow: auto;
+
 
     .pie-legend-title {
       font-size: 18px;
+      margin-bottom: 20px;
     }
 
 
@@ -18,7 +20,7 @@
       float: left;
       border-radius: 2px;
       width: 14px;
-      height: 14px;
+      min-height: 14px;
       display: inline-block;
       margin-right: 8px;
     }
@@ -27,6 +29,10 @@
       display: inline-block;
       float: left;
       line-height: 15px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 80%;
     }
 
 

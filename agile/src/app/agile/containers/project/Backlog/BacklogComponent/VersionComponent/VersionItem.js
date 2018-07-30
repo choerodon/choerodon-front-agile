@@ -317,7 +317,7 @@ class VersionItem extends Component {
               </div>
               <div className="c7n-backlog-versionItemParam">
                 <p className="c7n-backlog-versionItemParamKey">预估</p>
-                <p className="c7n-backlog-versionItemParamValue">{item.totalEstimate}p</p>
+                <p className="c7n-backlog-versionItemParamValue" style={{ minWidth: 31, color: 'rgba(0,0,0,0.65)' }}>{item.totalEstimate}p</p>
               </div>
             </div>
           </div>

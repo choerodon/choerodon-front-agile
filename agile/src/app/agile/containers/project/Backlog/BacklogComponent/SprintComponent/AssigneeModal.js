@@ -26,7 +26,7 @@ class AssigneeModal extends Component {
       key: 'issueCount',
       render: text => (text || '无'),
     }, {
-      title: 'Story Points',
+      title: '故事点',
       dataIndex: 'totalStoryPoints',
       key: 'totalStoryPoints',
       render: text => (text || '无'),

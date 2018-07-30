@@ -4,7 +4,7 @@ import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import update from 'immutability-helper';
 import isEqual from 'lodash/isEqual';
-// import './test.scss';
+import './DrapSortingTable.scss';
 
 const dragDirection = (
   dragIndex,
@@ -67,7 +67,7 @@ let BodyRow = (props) => {
     ),
   );
 };
-
+// 开始拖
 const rowSource = {
   beginDrag(props) {
     return {
@@ -75,7 +75,7 @@ const rowSource = {
     };
   },
 };
-
+// 拖结束
 const rowTarget = {
   drop(props, monitor) {
     const dragIndex = monitor.getItem().index;
@@ -94,12 +94,14 @@ BodyRow = DropTarget('row', rowTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   sourceClientOffset: monitor.getSourceClientOffset(),
+  className: 'drop',
 }))(
   DragSource('row', rowSource, (connect, monitor) => ({
     connectDragSource: connect.dragSource(),
     dragRow: monitor.getItem(),
     clientOffset: monitor.getClientOffset(),
     initialClientOffset: monitor.getInitialClientOffset(),
+    className: 'drab',
   }))(BodyRow),
 );
 
@@ -157,6 +159,7 @@ class DragSortingTable extends Component {
   render() {
     return (
       <Table
+        rowClassName={'table-row'}
         columns={this.props.columns}
         dataSource={this.state.data}
         pagination={this.props.pagination}
@@ -165,6 +168,9 @@ class DragSortingTable extends Component {
         onRow={(record, index) => ({
           index,
           moveRow: this.moveRow,
+          onMouseEnter: (e) => {
+            e.target.parentElement.className = 'hover-row';
+          },
         })}
         rowKey={record => record.versionId}
       />

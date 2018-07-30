@@ -196,7 +196,7 @@ class EpicItem extends Component {
               </div>
               <div className="c7n-backlog-epicItemParam">
                 <p className="c7n-backlog-epicItemParamKey">预估</p>
-                <p className="c7n-backlog-epicItemParamValue">{item.totalEstimate}p</p>
+                <p className="c7n-backlog-epicItemParamValue" style={{ minWidth: 31, color: 'rgba(0,0,0,0.65)' }}>{item.totalEstimate}p</p>
               </div>
             </div>
           </div>
