@@ -83,6 +83,9 @@ class DataLog extends Component {
       }
     } else {
       // null -> null
+      if (field === 'priority') {
+        return '将';
+      }
       if (field === 'Rank') {
         return '更新';
       }
@@ -140,6 +143,9 @@ class DataLog extends Component {
         return '';
       }
     } else {
+      if (field === 'priority') {
+        return '由';
+      }
       if (field === 'Rank') {
         return '';
       }
@@ -188,6 +194,9 @@ class DataLog extends Component {
         return ` 【${oldString}】 `;
       }
     } else {
+      if (field === 'priority') {
+        return ` 【${oldString}】 `;
+      }
       if (field === 'Rank') {
         return '';
       }
@@ -237,6 +246,9 @@ class DataLog extends Component {
       }
       return '';
     } else {
+      if (field === 'priority') {
+        return '改变为';
+      }
       if (field === 'issuetype') {
         return '改变为';
       }
@@ -283,6 +295,9 @@ class DataLog extends Component {
         return '';
       }
     } else {
+      if (field === 'priority') {
+        return ` 【${newString}】 `;
+      }
       if (field === 'Rank' || field === 'resolution') {
         return '';
       }

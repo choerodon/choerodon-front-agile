@@ -3,7 +3,7 @@ import { store, stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
 
 const { AppState } = stores;
-const A = {
+const UNIT_STATUS = {
   issue_count: {
     committed: 'committedIssueCount',
     completed: 'completedIssueCount',
@@ -17,7 +17,7 @@ const A = {
     completed: 'completedRemainTime',
   },
 };
-const UNIT = {
+const UNIT2NAME = {
   story_point: '故事点',
   issue_count: '问题计数',
   remain_time: '剩余时间',
@@ -31,14 +31,9 @@ class VelocityChartStore {
   @observable chartData = [];
   @observable beforeCurrentUnit = 'story_point';
   @observable currentUnit = 'story_point';
-  @observable chartDataX = [];
-  @observable chartDataYCommitted = [];
-  @observable chartDataYCompleted = [];
-  @observable chartYAxisName = '故事点';
 
   loadChartAndTableData() {
     this.loadChartData();
-    // this.loadTableData();
   }
 
   loadChartData(unit = this.currentUnit) {
@@ -48,27 +43,9 @@ class VelocityChartStore {
       .then((res) => {
         this.setBeforeCurrentUnit(unit);
         this.setChartData(res);
-        this.splitData(res);
         this.setChartLoading(false);
         this.setTableLoading(false);
-        // this.setTableData(res);
       });
-  }
-
-  // loadTableData() {
-  //   this.setTableLoading(true);
-  //   axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/velocity_chart?type=remain_time`)
-  //     .then((res) => {
-  //       this.setTableData(res);
-  //       this.setTableLoading(false);
-  //     });
-  // }
-
-  splitData(data) {
-    this.setChartDataX(this.getChartDataX(data));
-    this.setChartDataYCommitted(this.getChartDataYCommitted(data));
-    this.setChartDataYCompleted(this.getChartDataYCompleted(data));
-    this.setChartYAxisName(this.getChartYAxisName());
   }
 
   @action setTableLoading(data) {
@@ -95,43 +72,25 @@ class VelocityChartStore {
     this.currentUnit = data;
   }
 
-  @action setChartDataX(data) {
-    this.chartDataX = data;
-  }
-
-  @action setChartDataYCommitted(data) {
-    this.chartDataYCommitted = data;
-  }
-
-  @action setChartDataYCompleted(data) {
-    this.chartDataYCompleted = data;
-  }
-
-  @action setChartYAxisName(data) {
-    this.chartYAxisName = data;
-  }
-
-  getChartDataX(chartData) {
-    const sprints = _.map(chartData, 'sprintName');
+  @computed get getChartDataX() {
+    const sprints = _.map(this.chartData, 'sprintName');
     return sprints;
   }
 
-  getChartDataYCommitted(chartData) {
-    const prop = A[this.currentUnit].committed;
-    window.console.log(prop);
-    const committed = _.map(chartData, prop);
-    window.console.log(committed);
+  @computed get getChartDataYCommitted() {
+    const prop = UNIT_STATUS[this.beforeCurrentUnit].committed;
+    const committed = _.map(this.chartData, prop);
     return committed;
   }
 
-  getChartDataYCompleted(chartData) {
-    const prop = A[this.currentUnit].completed;
-    const completed = _.map(chartData, prop);
+  @computed get getChartDataYCompleted() {
+    const prop = UNIT_STATUS[this.beforeCurrentUnit].completed;
+    const completed = _.map(this.chartData, prop);
     return completed;
   }
 
-  getChartYAxisName() {
-    const name = UNIT[this.currentUnit];
+  @computed get getChartYAxisName() {
+    const name = UNIT2NAME[this.beforeCurrentUnit];
     return name;
   }
 }
