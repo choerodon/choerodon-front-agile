@@ -34,7 +34,7 @@ class UserHead extends Component {
     const { priority } = this.props; 
     return (
       <div
-        className=""
+        className="c7n-priorityTag"
         style={{
           ...this.props.style,
           backgroundColor: COLOR[priority.priorityCode].bgColor,

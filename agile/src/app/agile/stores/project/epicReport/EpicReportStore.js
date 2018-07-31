@@ -137,7 +137,18 @@ class EpicReportStore {
     return all;
   }
 
+  @computed get getChartDataYIssueCountCompleted() {
+    if (this.beforeCurrentUnit === 'issue_count') {
+      const all = _.map(this.chartData, 'issueCompletedCount');
+      return all;
+    }
+    return [];
+  }
+
   @computed get getChartDataYIssueCountUnEstimate() {
+    if (this.beforeCurrentUnit === 'issue_count') {
+      return [];
+    }
     const all = _.map(this.chartData, 'unEstimateIssueCount');
     return all;
   }

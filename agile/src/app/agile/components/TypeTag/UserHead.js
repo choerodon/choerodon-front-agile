@@ -51,7 +51,7 @@ class UserHead extends Component {
     return (
       <div style={{ display: 'flex' }}>
         <div
-          className=""
+          className="c7n-typeTag"
           style={{
             backgroundColor: TYPE[type.typeCode],
             display: 'flex',

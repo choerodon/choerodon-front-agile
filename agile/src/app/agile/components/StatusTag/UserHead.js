@@ -38,7 +38,7 @@ class UserHead extends Component {
     const { status } = this.props; 
     return (
       <div
-        className=""
+        className="c7n-statusTag"
         style={{
           background: status.statusColor,
           color: '#fff',

@@ -274,7 +274,7 @@ class VelocityChart extends Component {
           // link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
           {
-            !(!VS.loadChartData && !VS.chartDataX.length) ? (
+            !(!VS.chartLoading && !VS.getChartDataX.length) ? (
               <div>
                 <Select
                   style={{ width: 512 }}
