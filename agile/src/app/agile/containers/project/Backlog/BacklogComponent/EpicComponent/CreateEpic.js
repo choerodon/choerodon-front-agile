@@ -25,10 +25,7 @@ class CreateEpic extends Component {
    * @param {*} e
    * @memberof CreateEpic
    */
-  handleCreateEpic(e) {
-    this.setState({
-      loading: true,
-    });
+  handleCreateEpic =(e) => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, value) => {
       if (!err) {
@@ -39,21 +36,27 @@ class CreateEpic extends Component {
           summary: value.summary,
           typeCode: 'issue_epic',
         };
+        this.setState({
+          loading: true,
+        });
         BacklogStore.axiosEasyCreateIssue(data).then((res) => {
           this.setState({
             loading: false,
           });
           this.props.form.resetFields();
           this.props.onCancel();
-          this.props.refresh();
+          BacklogStore.axiosGetEpic().then((data3) => {
+            const newEpic = [...data3];
+            for (let index = 0, len = newEpic.length; index < len; index += 1) {
+              newEpic[index].expand = false;
+            }
+            BacklogStore.setEpicData(newEpic);
+          }).catch((error3) => {
+          });
         }).catch((error) => {
           this.setState({
             loading: false,
           });
-        });
-      } else {
-        this.setState({
-          loading: false,
         });
       }
     });
@@ -71,7 +74,7 @@ class CreateEpic extends Component {
           this.props.onCancel();
         }}
         confirmLoading={this.state.loading}
-        onOk={this.handleCreateEpic.bind(this)}
+        onOk={this.handleCreateEpic}
       >
         <Content
           style={{
@@ -129,7 +132,7 @@ class CreateEpic extends Component {
                   message: '概要不能为空',
                 }],
               })(
-                <TextArea autoSize label="概要" maxLength={44} />,
+                <TextArea autosize label="概要" maxLength={44} />,
               )}
             </FormItem>
           </Form>

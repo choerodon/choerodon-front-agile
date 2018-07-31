@@ -823,8 +823,9 @@ class ScrumBoardHome extends Component {
                     {this.state.expandFilter ? '...收起' : '...展开'}
                   </div>
                 </div>
-                <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint && ScrumBoardStore.getCurrentSprint.dayRemain >= 0 ? `${ScrumBoardStore.getCurrentSprint.dayRemain}days剩余` : '无剩余时间'}`}</span>
+                <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}>
+                  <Icon type="av_timer" />
+                  <span style={{ paddingLeft: 5, marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint && ScrumBoardStore.getCurrentSprint.dayRemain >= 0 ? `${ScrumBoardStore.getCurrentSprint.dayRemain} days剩余` : '无剩余时间'}`}</span>
                   <Button
                     funcType="flat"
                     onClick={this.handleFinishSprint.bind(this)}

@@ -11,6 +11,8 @@ import { Button, Select, Icon, Spin, Tooltip } from 'choerodon-ui';
 import './pie.scss';
 import SwitchChart from '../../Component/switchChart';
 import VersionReportStore from '../../../../../stores/project/versionReport/VersionReport';
+import NoDataComponent from '../../Component/noData';
+import pic from '../../../../../assets/image/问题管理－空.png';
 
 const Option = Select.Option;
 const { AppState } = stores;
@@ -151,9 +153,9 @@ class ReleaseDetail extends Component {
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, this.state.type);
   };
   changeType =(value, option) => {
-    VersionReportStore.setPieData([]);
-    VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
+    // VersionReportStore.setPieData([]);
     this.setState({ type: option.key });
+    VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
   };
   render() {
     const data = VersionReportStore.getPieData;
@@ -187,60 +189,62 @@ class ReleaseDetail extends Component {
           <Button onClick={this.handelRefresh}><Icon type="refresh" />刷新</Button>
         </Header>
         <Content
-          title={`项目"${AppState.currentMenuType.name}"下的问题统计图`}
+          title={data.length ? `项目"${AppState.currentMenuType.name}"下的问题统计图` : '无问题的统计图'}
           description="了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。"
         >
           <Spin spinning={VersionReportStore.pieLoading}>
-            <Select
-              getPopupContainer={triggerNode => triggerNode.parentNode}
-              defaultValue={'assignee'}
-              label="统计类型"
-              style={{
-                width: 512,
-                marginBottom: 32,
-              }}
-              onChange={this.changeType}
-            >
-              {
-                type.map(item => (
-                  <Option value={item.value} key={item.title}>{item.title}</Option>
-                ))
-              }
-            </Select>
-            <div style={{ marginTop: 30, display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-              <ReactEchartsCore
-                ref={(pie) => { this.pie = pie; }}
-                style={{ width: '58%', height: 500 }}
-                echarts={echarts}
-                option={this.getOption()}
-              />
-              <div className="pie-title">
-                <p className="pie-legend-title">数据统计</p>
-                <table>
-                  <thead>
-                    <tr>
-                      <td style={{ paddingRight: 106 }}>{this.state.type}</td>
-                      <td style={{ paddingRight: 68 }}>问题</td>
-                      <td>百分比</td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.map((item, index) => (
+            {data.length ? <React.Fragment>
+              <Select
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                defaultValue={'assignee'}
+                label="统计类型"
+                style={{
+                  width: 512,
+                  marginBottom: 32,
+                }}
+                onChange={this.changeType}
+              >
+                {
+                  type.map(item => (
+                    <Option value={item.value} key={item.title}>{item.title}</Option>
+                  ))
+                }
+              </Select>
+              <div style={{ marginTop: 30, display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                <ReactEchartsCore
+                  ref={(pie) => { this.pie = pie; }}
+                  style={{ width: '58%', height: 500 }}
+                  echarts={echarts}
+                  option={this.getOption()}
+                />
+                <div className="pie-title">
+                  <p className="pie-legend-title">数据统计</p>
+                  <table>
+                    <thead>
                       <tr>
-                        <td>
-                          <div className="pie-legend-icon" style={{ background: colors[index] }} />
-                          <Tooltip title={this.state.type === '经办人' ? item && item.jsonObject.email : item && item.name}>
-                            {this.state.type === '经办人' ? <div className="pie-legend-text" >{item.name ? item.jsonObject.email : '未分配'}</div> : <div className="pie-legend-text" >{item.name ? item.name : '未分配'}</div> }
-                          </Tooltip>
-                        </td>
-                        <td>{item.value}</td>
-                        <td style={{ paddingTop: 12 }}>{`${((item.value / total) * 100).toFixed(2)} %`}</td>
+                        <td style={{ paddingRight: 106 }}>{this.state.type}</td>
+                        <td style={{ paddingRight: 68 }}>问题</td>
+                        <td>百分比</td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {data.map((item, index) => (
+                        <tr>
+                          <td>
+                            <div className="pie-legend-icon" style={{ background: colors[index] }} />
+                            <Tooltip title={item && item.name}>
+                              <div className="pie-legend-text" >{item.name ? item.name : '未分配'}</div>
+                            </Tooltip>
+                          </td>
+                          <td>{item.value}</td>
+                          <td style={{ paddingTop: 12 }}>{`${((item.value / total) * 100).toFixed(2)} %`}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+            </React.Fragment> : <NoDataComponent title={'问题'} links={[{ name: '问题管理', link: '/agile/issue' }]} img={pic} /> }
           </Spin>
         </Content>
       </Page>

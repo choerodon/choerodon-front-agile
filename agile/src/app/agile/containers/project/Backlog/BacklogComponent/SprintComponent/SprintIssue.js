@@ -11,7 +11,11 @@ import UserHead from '../../../../../components/UserHead';
 class SprintIssue extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      selected: {
+        issueIds: [],
+      },
+    };
   }
 
   /**
@@ -93,51 +97,6 @@ class SprintIssue extends Component {
     }
     return flag >= 2;
   }
-  /**
-   *issue类型样式
-   *
-   * @param {*} item
-   * @param {*} type
-   * @returns
-   * @memberof SprintIssue
-   */
-  renderTypecode(item, type) {
-    if (item.typeCode === 'story') {
-      if (type === 'background') {
-        return '#00BFA5';
-      } else {
-        return (
-          <Tooltip title="类型： 故事">
-            <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
-          </Tooltip>
-        );
-      }
-    }
-    if (item.typeCode === 'task') {
-      if (type === 'background') {
-        return '#4D90FE';
-      } else {
-        return (
-          <Tooltip title="类型： 任务">
-            <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
-          </Tooltip>
-        );
-      }
-    }
-    if (item.typeCode === 'bug') {
-      if (type === 'background') {
-        return '#F44336';
-      } else {
-        return (
-          <Tooltip title="类型： 缺陷">
-            <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
-          </Tooltip>
-        );
-      }
-    }
-    return '';
-  }
-
   render() {
     const item = this.props.data;
     const index = this.props.index;
@@ -160,8 +119,7 @@ class SprintIssue extends Component {
                 {...provided1.dragHandleProps}
                 style={{
                   userSelect: 'none',
-                  // background: snapshot1.isDragging ? 'lightgreen' : 'white',  
-                  background: this.props.selected.issueIds.indexOf(item.issueId) !== -1 ? '#ebf2f9' : this.renderIssueBackground(item),
+                  background: this.props.selected.issueIds.includes(item.issueId) ? 'rgb(235, 242, 249)' : this.renderIssueBackground(item),
                   padding: '10px 36px 10px 20px',
                   borderBottom: '1px solid rgba(0,0,0,0.12)',
                   paddingLeft: 43,
@@ -213,6 +171,7 @@ class SprintIssue extends Component {
                       textOverflow: 'ellipsis',
                       overflow: 'hidden',
                       height: this.renderIssueDisplay ? 'auto' : 20,
+                      wordBreak: 'break-all',
                     }}
                   >{`${item.issueNum} `}
                     <Tooltip title={item.summary} placement="topLeft">
@@ -232,7 +191,7 @@ class SprintIssue extends Component {
                 >
                   <div className="c7n-backlog-sprintSideRightItems">
                     <div
-                      style={{ 
+                      style={{
                         maxWidth: 34,
                         marginLeft: !_.isNull(item.priorityName) && !this.renderIssueDisplay() ? '12px' : 0,
                       }} 

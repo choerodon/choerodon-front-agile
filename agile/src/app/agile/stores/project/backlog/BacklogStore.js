@@ -22,6 +22,14 @@ class BacklogStore {
   @observable colorLookupValue = [];
   @observable quickFilters = [];
   @observable projectInfo = {};
+  @observable selected = {
+    droppableId: '',
+    issueIds: [],
+  };
+
+  @action setSelected(data) {
+    this.selected = data;
+  }
 
   @computed get getProjectInfo() {
     return toJS(this.projectInfo);

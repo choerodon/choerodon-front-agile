@@ -46,11 +46,19 @@
           font-size: 16px;
         }
 
+        i {
+          cursor: pointer;
+        }
+
         div.c7n-backlog-epicItemsHead {
           flex-grow: 1;
           display: flex;
           justify-content: space-between;
           align-items: center;
+
+          i {
+            cursor: pointer;
+          }
         }
       }
 
@@ -93,7 +101,7 @@
 
 .c7n-backlog-epicColor {
   display: flex;
-  margin: 15px 0;
+  margin: 15px 0 13px 0;
 
   .c7n-backlog-epicColorItem {
     width: 16px;

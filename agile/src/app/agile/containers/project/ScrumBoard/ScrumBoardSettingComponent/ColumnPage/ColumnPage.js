@@ -370,24 +370,32 @@ class ColumnPage extends Component {
             {this.renderUnsetColumn()}
           </DragDropContext>
         </div>
-        <AddStatus
-          visible={this.state.addStatus}
-          onChangeVisible={(data) => {
-            this.setState({
-              addStatus: data,
-            });
-          }}
-          refresh={this.props.refresh.bind(this)}
-        />
-        <AddColumn
-          visible={this.state.addColumn}
-          onChangeVisible={(data) => {
-            this.setState({
-              addColumn: data,
-            });
-          }}
-          refresh={this.props.refresh.bind(this)}
-        />
+        {
+          this.state.addStatus ? (
+            <AddStatus
+              visible={this.state.addStatus}
+              onChangeVisible={(data) => {
+                this.setState({
+                  addStatus: data,
+                });
+              }}
+              refresh={this.props.refresh.bind(this)}
+            />
+          ) : ''
+        }
+        {
+          this.state.addColumn ? (
+            <AddColumn
+              visible={this.state.addColumn}
+              onChangeVisible={(data) => {
+                this.setState({
+                  addColumn: data,
+                });
+              }}
+              refresh={this.props.refresh.bind(this)}
+            />
+          ) : ''
+        }
       </Content>
     );
   }
