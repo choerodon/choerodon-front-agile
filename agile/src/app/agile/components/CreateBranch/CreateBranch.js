@@ -14,10 +14,10 @@ const { Option, OptGroup } = Select;
 const FormItem = Form.Item;
 const MAP = {
   bug: 'bugfix',
-  task: 'custom',
+  task: 'feature',
   story: 'feature',
-  issue_epic: 'custom',
-  sub_task: 'custom',
+  issue_epic: 'feature',
+  sub_task: 'feature',
 };
 
 class CreateBranch extends Component {

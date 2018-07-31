@@ -3,7 +3,7 @@ import { store, stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
 
 const { AppState } = stores;
-const A = {
+const UNIT_STATUS = {
   issue_count: {
     committed: undefined,
     completed: undefined,
@@ -17,14 +17,14 @@ const A = {
     completed: 'completedRemainTimes',
   },
 };
-const UNIT = {
+const UNIT2NAME = {
   story_point: '故事点',
   issue_count: '问题计数',
   remain_time: '剩余时间',
 };
 
-@store('VelocityChartStore')
-class VelocityChartStore {
+@store('EpicReportStore')
+class EpicReportStore {
   @observable tableLoading = false;
   @observable tableData = [];
   @observable chartLoading = false;
@@ -32,25 +32,25 @@ class VelocityChartStore {
   @observable beforeCurrentUnit = 'story_point';
   @observable currentUnit = 'story_point';
   @observable epics = [];
+  @observable epicFinishLoading = false;
   @observable currentEpicId = undefined;
-  @observable chartDataX = [];
-  @observable chartDataYCommitted = [];
-  @observable chartDataYCompleted = [];
-  @observable chartYAxisName = '故事点';
 
   loadEpicAndChartAndTableData() {
     this.loadEpics()
-      .then((res) => {
-        this.loadChartData();
-        this.loadTableData();
+      .then(() => {
+        if (this.epics.length) {
+          this.loadChartData();
+          this.loadTableData();
+        }
       });
   }
 
   loadEpics() {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`)
       .then((res) => {
+        this.setEpicFinishLoading(true);
         this.setEpics(res);
-        this.setCurrentEpic(res.length ? res[0].issueId : {});
+        this.setCurrentEpic(res.length ? res[0].issueId : undefined);
       });
   }
 
@@ -71,13 +71,6 @@ class VelocityChartStore {
         this.setTableData(res);
         this.setTableLoading(false);
       });
-  }
-
-  splitData(data) {
-    this.setChartDataX(this.getChartDataX(data));
-    this.setChartDataYCommitted(this.getChartDataYCommitted(data));
-    this.setChartDataYCompleted(this.getChartDataYCompleted(data));
-    this.setChartYAxisName(this.getChartYAxisName());
   }
 
   @action setTableLoading(data) {
@@ -108,24 +101,12 @@ class VelocityChartStore {
     this.epics = data;
   }
 
+  @action setEpicFinishLoading(data) {
+    this.epicFinishLoading = data;
+  }
+
   @action setCurrentEpic(data) {
     this.currentEpicId = data;
-  }
-
-  @action setChartDataX(data) {
-    this.chartDataX = data;
-  }
-
-  @action setChartDataYCommitted(data) {
-    this.chartDataYCommitted = data;
-  }
-
-  @action setChartDataYCompleted(data) {
-    this.chartDataYCompleted = data;
-  }
-
-  @action setChartYAxisName(data) {
-    this.chartYAxisName = data;
   }
 
   @computed get getChartDataX() {
@@ -134,7 +115,7 @@ class VelocityChartStore {
   }
 
   @computed get getChartDataYAll() {
-    const prop = A[this.beforeCurrentUnit].committed;
+    const prop = UNIT_STATUS[this.beforeCurrentUnit].committed;
     if (!prop) {
       return [];
     }
@@ -143,7 +124,7 @@ class VelocityChartStore {
   }
 
   @computed get getChartDataYCompleted() {
-    const prop = A[this.beforeCurrentUnit].completed;
+    const prop = UNIT_STATUS[this.beforeCurrentUnit].completed;
     if (!prop) {
       return [];
     }
@@ -162,7 +143,7 @@ class VelocityChartStore {
   }
 
   @computed get getChartYAxisName() {
-    const name = UNIT[this.beforeCurrentUnit];
+    const name = UNIT2NAME[this.beforeCurrentUnit];
     return name;
   }
 
@@ -175,5 +156,5 @@ class VelocityChartStore {
   }
 }
 
-const velocityChartStore = new VelocityChartStore();
-export default velocityChartStore;
+const epicReportStore = new EpicReportStore();
+export default epicReportStore;

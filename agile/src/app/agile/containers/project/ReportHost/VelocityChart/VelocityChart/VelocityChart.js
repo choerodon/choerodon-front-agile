@@ -3,9 +3,11 @@ import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Tabs, Table, Select, Icon, Tooltip, Dropdown, Menu, Spin } from 'choerodon-ui';
+import { Button, Table, Select, Icon, Spin } from 'choerodon-ui';
+import pic from './no_sprint.svg';
 import SwithChart from '../../Component/switchChart';
 import VS from '../../../../../stores/project/velocityChart';
+import EmptyBlock from '../../../../../components/EmptyBlock';
 import './VelocityChart.scss';
 
 const { AppState } = stores;
@@ -13,19 +15,9 @@ const Option = Select.Option;
 
 @observer
 class VelocityChart extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-  
   componentDidMount() {
     VS.setCurrentUnit('story_point');
     VS.setChartData([]);
-    VS.setChartDataX([]);
-    VS.setChartDataYCommitted([]);
-    VS.setChartDataYCompleted([]);
-    VS.setChartYAxisName('故事点');
     VS.setTableData([]);
     VS.loadChartAndTableData();
   }
@@ -36,9 +28,9 @@ class VelocityChart extends Component {
         trigger: 'axis',
       },
       legend: {
-        orient: 'horizontal', // 'vertical'
-        x: 'right', // 'center' | 'left' | {number},
-        y: 0, // 'center' | 'bottom' | {number}
+        orient: 'horizontal',
+        x: 'right',
+        y: 0,
         padding: [0, 50, 0, 0],
         itemWidth: 14,
         data: [
@@ -61,17 +53,16 @@ class VelocityChart extends Component {
       calculable: true,
       xAxis: {
         name: '冲刺',
+        type: 'category',
+        boundaryGap: true,
+        nameGap: -10,
         nameLocation: 'end',
         nameTextStyle: {
           color: '#000',
-          // verticalAlign: 'bottom',
           padding: [35, 0, 0, 0],
         },
-        nameGap: -10,
-        type: 'category',
         axisTick: { show: false },
-        splitNumber: 3,
-        axisLine: { // 轴线
+        axisLine: {
           show: true,
           lineStyle: {
             color: '#eee',
@@ -87,13 +78,8 @@ class VelocityChart extends Component {
             color: 'rgba(0, 0, 0, 0.65)',
             fontSize: 12,
             fontStyle: 'normal',
-            // fontWeight: 'bold',
           },
         },
-        // splitArea: {
-        //   show: true,
-        //   interval: 0,
-        // },
         splitLine: {
           show: false,
           onGap: false,
@@ -104,24 +90,17 @@ class VelocityChart extends Component {
             type: 'solid',
           }, 
         },
-        boundaryGap: true,
-        // boundaryGap: false,
-        // data: ['7/1-7/7 迭代冲刺', '7/8-7/14 迭代冲刺', '7/15-7/21 迭代冲刺', '7/22-7/27 迭代冲刺', '7/28-8/1 迭代冲刺', '', ''],
-        data: VS.chartDataX.slice(),
-        // axisLabel: {
-        //   formatter(value, index) {
-        //     return `${value.split(' ')[0]}\n${value.split(' ')[1]}`;
-        //   },
-        // },
+        data: VS.getChartDataX,
       },
       yAxis: {
-        name: VS.chartYAxisName,
+        name: VS.getChartYAxisName,
+        type: 'value',
+        
         nameTextStyle: {
           color: '#000',
         },
-        type: 'value',
         axisTick: { show: false },
-        axisLine: { // 轴线
+        axisLine: {
           show: true,
           lineStyle: {
             color: '#eee',
@@ -137,7 +116,6 @@ class VelocityChart extends Component {
             color: 'rgba(0, 0, 0, 0.65)',
             fontSize: 12,
             fontStyle: 'normal',
-            // fontWeight: 'bold',
           },
         },
         splitLine: {
@@ -158,13 +136,13 @@ class VelocityChart extends Component {
           itemStyle: {
             color: '#d3d3d3',
           },
-          data: VS.chartDataYCommitted.slice(),
+          data: VS.getChartDataYCommitted,
         },
         {
           name: '已完成',
           type: 'bar',
           barWidth: 34,
-          data: VS.chartDataYCompleted.slice(),
+          data: VS.getChartDataYCompleted,
           itemStyle: {
             color: '#00bfa5',
           },
@@ -176,16 +154,7 @@ class VelocityChart extends Component {
       ],
     };
   }
-
-  refresh() {
-    VS.loadChartAndTableData();
-  }
-
-  handleChangeCurrentUnit(unit) {
-    VS.setCurrentUnit(unit);
-    VS.loadChartData(unit);
-  }
-
+  
   getTableValue(record, type) {
     const currentUnit = VS.beforeCurrentUnit;
     const CAMEL = {
@@ -198,6 +167,15 @@ class VelocityChart extends Component {
       return this.transformRemainTime(record[currentProp]);
     }
     return record[currentProp] || 0;
+  }
+
+  refresh() {
+    VS.loadChartAndTableData();
+  }
+
+  handleChangeCurrentUnit(unit) {
+    VS.setCurrentUnit(unit);
+    VS.loadChartData(unit);
   }
 
   transformRemainTime(remainTime, type) {
@@ -228,7 +206,7 @@ class VelocityChart extends Component {
             onClick={() => {
               const { history } = this.props;
               const urlParams = AppState.currentMenuType;
-              // history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/sprintreport`);
+              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${record.sprintId}&paramName=${sprintName}下的问题&paramUrl=reporthost/velocityChart`);
             }}
           >
             {sprintName}
@@ -295,20 +273,48 @@ class VelocityChart extends Component {
           description="跟踪各个迭代已完成的工时量。这有助于您确定团队的开发速度并预估在未来迭代中能完成的工作量。"
           // link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
-          <Select
-            style={{ width: 512 }}
-            label="单位选择"
-            value={VS.currentUnit}
-            onChange={this.handleChangeCurrentUnit.bind(this)}
-          >
-            <Option key="story_point" value="story_point">故事点</Option>
-            <Option key="issue_count" value="issue_count">问题计数</Option>
-            <Option key="remain_time" value="remain_time">剩余时间</Option>
-          </Select>
-          <Spin spinning={VS.chartLoading}>
-            <ReactEcharts className="c7n-chart" option={this.getOption()} />
-          </Spin>
-          {this.renderTable()}
+          {
+            !(!VS.loadChartData && !VS.chartDataX.length) ? (
+              <div>
+                <Select
+                  style={{ width: 512 }}
+                  label="单位选择"
+                  value={VS.currentUnit}
+                  onChange={this.handleChangeCurrentUnit.bind(this)}
+                >
+                  <Option key="story_point" value="story_point">故事点</Option>
+                  <Option key="issue_count" value="issue_count">问题计数</Option>
+                  <Option key="remain_time" value="remain_time">剩余时间</Option>
+                </Select>
+                <Spin spinning={VS.chartLoading}>
+                  <ReactEcharts className="c7n-chart" option={this.getOption()} />
+                </Spin>
+                {this.renderTable()}
+              </div>
+            ) : (
+              <EmptyBlock
+                style={{ marginTop: 40 }}
+                textWidth="auto"
+                pic={pic}
+                title="当前项目无可用冲刺"
+                des={
+                  <div>
+                    <span>请在</span>
+                    <span
+                      style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
+                      role="none"
+                      onClick={() => {
+                        history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+                      }}
+                    >
+                      待办事项
+                    </span>
+                    <span>中创建一个冲刺</span>
+                  </div>
+                }
+              />
+            )
+          }
         </Content>
       </Page>
     );

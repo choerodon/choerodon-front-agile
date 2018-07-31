@@ -1,3 +1,3 @@
-import VelocityChartStore from './VelocityChartStore';
+import EpicReportStore from './EpicReportStore';
 
-export default VelocityChartStore;
+export default EpicReportStore;

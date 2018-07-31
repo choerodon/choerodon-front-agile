@@ -3,12 +3,14 @@ import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Tabs, Table, Select, Icon, Tooltip, Dropdown, Menu, Spin } from 'choerodon-ui';
+import { Button, Tabs, Table, Select, Icon, Tooltip, Spin } from 'choerodon-ui';
+import pic from './no_epic.svg';
 import SwithChart from '../../Component/switchChart';
 import StatusTag from '../../../../../components/StatusTag';
 import PriorityTag from '../../../../../components/PriorityTag';
 import TypeTag from '../../../../../components/TypeTag';
 import ES from '../../../../../stores/project/epicReport';
+import EmptyBlock from '../../../../../components/EmptyBlock';
 import './EpicReport.scss';
 
 const TabPane = Tabs.TabPane;
@@ -18,12 +20,6 @@ const MONTH = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '�
 
 @observer
 class EpicReport extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
   componentDidMount() {
     ES.loadEpicAndChartAndTableData();
   }
@@ -34,9 +30,9 @@ class EpicReport extends Component {
         trigger: 'axis',
       },
       legend: {
-        orient: 'horizontal', // 'vertical'
-        x: 'center', // 'center' | 'left' | {number},
-        y: 0, // 'center' | 'bottom' | {number}
+        orient: 'horizontal',
+        x: 'center',
+        y: 0,
         padding: [0, 50, 0, 0],
         itemWidth: 14,
         data: [
@@ -67,18 +63,18 @@ class EpicReport extends Component {
       },
       calculable: true,
       xAxis: {
-        name: '日期',
+        // name: '日期',
+        type: 'category',
+        boundaryGap: false,
         nameLocation: 'end',
+        nameGap: -10,
         nameTextStyle: {
           color: '#000',
           // verticalAlign: 'bottom',
           padding: [35, 0, 0, 0],
         },
-        nameGap: -10,
-        type: 'category',
         axisTick: { show: false },
-        splitNumber: 3,
-        axisLine: { // 轴线
+        axisLine: {
           show: true,
           lineStyle: {
             color: '#eee',
@@ -94,7 +90,6 @@ class EpicReport extends Component {
             color: 'rgba(0, 0, 0, 0.65)',
             fontSize: 12,
             fontStyle: 'normal',
-            // fontWeight: 'bold',
           },
           formatter(value, index) {
             return `${value.split('-')[2]}/${MONTH[value.split('-')[1] * 1]}月`;
@@ -115,89 +110,83 @@ class EpicReport extends Component {
             type: 'solid',
           }, 
         },
-        boundaryGap: true,
         data: ES.getChartDataX,
       },
-      yAxis: [{
-        nameTextStyle: {
-          color: '#000',
-        },
-        type: 'value',
-        axisTick: { show: false },
-        axisLine: { // 轴线
-          show: true,
-          lineStyle: {
-            color: '#eee',
-            type: 'solid',
-            width: 2,
+      yAxis: [
+        {
+          type: 'value',
+          minInterval: 1,
+          axisTick: { show: false },
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: '#eee',
+              type: 'solid',
+              width: 2,
+            },
+          },
+          axisLabel: {
+            show: true,
+            interval: 'auto',
+            margin: 18,
+            textStyle: {
+              color: 'rgba(0, 0, 0, 0.65)',
+              fontSize: 12,
+              fontStyle: 'normal',
+            },
+            formatter(value, index) {
+              if (value && ES.beforeCurrentUnit === 'remain_time') {
+                return `${value}h`;
+              }
+              return value;
+            },
+          },
+          splitLine: {
+            show: true,
+            lineStyle: {
+              color: '#eee',
+              type: 'solid',
+              width: 1,
+            },
           },
         },
-        axisLabel: {
-          show: true,
-          interval: 'auto',
-          margin: 18,
-          textStyle: {
-            color: 'rgba(0, 0, 0, 0.65)',
-            fontSize: 12,
-            fontStyle: 'normal',
-            // fontWeight: 'bold',
+        {
+          name: '问题计数',
+          nameTextStyle: {
+            color: '#000',
           },
-          formatter(value, index) {
-            if (value && ES.beforeCurrentUnit === 'remain_time') {
-              return `${value}h`;
-            }
-            return value;
+          type: 'value',
+          minInterval: 1,
+          axisTick: { show: false },
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: '#eee',
+              type: 'solid',
+              width: 2,
+            },
           },
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: '#eee',
-            type: 'solid',
-            width: 1,
+          axisLabel: {
+            show: true,
+            interval: 'auto',
+            margin: 18,
+            textStyle: {
+              color: 'rgba(0, 0, 0, 0.65)',
+              fontSize: 12,
+              fontStyle: 'normal',
+            },
           },
-        },
-      }, {
-        name: '问题计数',
-        nameTextStyle: {
-          color: '#000',
-        },
-        type: 'value',
-        axisTick: { show: false },
-        axisLine: { // 轴线
-          show: true,
-          lineStyle: {
-            color: '#eee',
-            type: 'solid',
-            width: 2,
+          splitLine: {
+            show: false,
           },
         },
-        axisLabel: {
-          show: true,
-          interval: 'auto',
-          margin: 18,
-          textStyle: {
-            color: 'rgba(0, 0, 0, 0.65)',
-            fontSize: 12,
-            fontStyle: 'normal',
-            // fontWeight: 'bold',
-          },
-        },
-        splitLine: {
-          show: false,
-          // lineStyle: {
-          //   color: '#eee',
-          //   type: 'solid',
-          //   width: 1,
-          // },
-        },
-      }],
+      ],
       series: [
         {
           name: '问题数量',
           type: 'line',
           step: true,
-          symbol: 'none',
+          symbol: ES.getChartDataYIssueCountAll.length === 1 ? 'auto' : 'none',
           itemStyle: {
             color: 'rgba(48, 63, 159, 1)',
           },
@@ -208,7 +197,7 @@ class EpicReport extends Component {
           name: '未预估问题数',
           type: 'line',
           step: true,
-          symbol: 'none',
+          symbol: ES.getChartDataYIssueCountUnEstimate.length === 1 ? 'auto' : 'none',
           itemStyle: {
             color: '#ff9915',
           },
@@ -219,7 +208,7 @@ class EpicReport extends Component {
           name: `已完成 ${ES.getChartYAxisName}`,
           type: 'line',
           step: true,
-          symbol: 'none',
+          symbol: ES.getChartDataYCompleted.length === 1 ? 'auto' : 'none',
           yAxisIndex: 0,
           data: ES.getChartDataYCompleted,
           itemStyle: {
@@ -233,7 +222,7 @@ class EpicReport extends Component {
           name: `总计 ${ES.getChartYAxisName}`,
           type: 'line',
           step: true,
-          symbol: 'none',
+          symbol: ES.getChartDataYAll.length === 1 ? 'auto' : 'none',
           yAxisIndex: 0,
           data: ES.getChartDataYAll,
           itemStyle: {
@@ -255,7 +244,7 @@ class EpicReport extends Component {
       return ES.tableData.filter(v => v.completed === 0);
     }
     if (type === 'unFinishAndunEstimate') {
-      return ES.tableData.filter(v => v.completed === 0 && v.storyPoints === null);
+      return ES.tableData.filter(v => v.completed === 0 && ((v.storyPoints === null && v.typeCode === 'story') || (v.remainTime === null && v.typeCode === 'task')));
     }
     return [];
   }
@@ -326,16 +315,12 @@ class EpicReport extends Component {
         dataIndex: 'typeCode',
         render: (typeCode, record) => (
           <div>
-            <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.typeCode}`}>
-              <div>
-                <TypeTag
-                  type={{
-                    typeCode: record.typeCode,
-                  }}
-                  showName
-                />
-              </div>
-            </Tooltip>
+            <TypeTag
+              type={{
+                typeCode: record.typeCode,
+              }}
+              showName
+            />
           </div>
         ),
       }, {
@@ -344,16 +329,12 @@ class EpicReport extends Component {
         dataIndex: 'priorityCode',
         render: (priorityCode, record) => (
           <div>
-            <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityName}`}>
-              <div style={{ marginRight: 12 }}>
-                <PriorityTag
-                  priority={{
-                    priorityCode: record.priorityCode,
-                    priorityName: record.priorityName,
-                  }}
-                />
-              </div>
-            </Tooltip>
+            <PriorityTag
+              priority={{
+                priorityCode: record.priorityCode,
+                priorityName: record.priorityName,
+              }}
+            />
           </div>
         ),
       }, {
@@ -367,7 +348,7 @@ class EpicReport extends Component {
                 <StatusTag
                   style={{ display: 'inline-block' }}
                   status={{
-                    statusColor: record.statusColor,
+                    statusColor: record.color,
                     statusName: record.statusName,
                   }}
                 />
@@ -381,7 +362,7 @@ class EpicReport extends Component {
         dataIndex: 'storyPoints',
         render: (storyPoints, record) => (
           <div>
-            {record.typeCode === 'story' ? storyPoints || '0' : ''}
+            {record.typeCode === 'story' ? storyPoints || '未预估' : ''}
           </div>
         ),
       },
@@ -390,6 +371,7 @@ class EpicReport extends Component {
       <Table
         rowKey={record => record.issueId}
         dataSource={this.getTableDta(type)}
+        filterBar={false}
         columns={column}
         scroll={{ x: true }}
         loading={ES.tableLoading}
@@ -423,96 +405,135 @@ class EpicReport extends Component {
           description="随时了解一个史诗的完成进度。这有助于您跟踪未完成或未分配问题来管理团队的开发进度。"
           // link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
-          <div style={{ display: 'flex' }}>
-            <Select
-              style={{ width: 244 }}
-              label="史诗选择"
-              value={ES.currentEpicId}
-              onChange={this.handleChangeCurrentEpic.bind(this)}
-            >
-              {
-                ES.epics.map(epic => (
-                  <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>
-                ))
-              }
-            </Select>
-            <Select
-              style={{ width: 244, marginLeft: 24 }}
-              label="单位选择"
-              value={ES.currentUnit}
-              onChange={this.handleChangeCurrentUnit.bind(this)}
-            >
-              <Option key="story_point" value="story_point">故事点</Option>
-              <Option key="issue_count" value="issue_count">问题计数</Option>
-              <Option key="remain_time" value="remain_time">剩余时间</Option>
-            </Select>
-          </div>
-          <Spin spinning={ES.chartLoading}>
-            <div className="c7n-report">
-              <div className="c7n-chart">
-                <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
-              </div>
-              <div className="c7n-toolbar">
-                <h2>汇总</h2>
-                <h4>问题汇总</h4>
-                <ul>
-                  <li>
-                    <span className="c7n-tip">合计：</span>
-                    <span>
-                      {ES.getLatest.issueCount}
-                    </span>
-                  </li>
-                  <li><span className="c7n-tip">已完成：</span><span>{ES.getLatest.issueCompletedCount}</span></li>
-                  <li><span className="c7n-tip">未预估：</span><span>{ES.getLatest.unEstimateIssueCount}</span></li>
-                </ul>
-                {
-                  ES.beforeCurrentUnit !== 'issue_count' ? (
-                    <div>
-                      <h4>{`${ES.getChartYAxisName}`}汇总</h4>
+          {
+            !(!ES.epics.length && ES.epicFinishLoading) ? (
+              <div>
+                <div style={{ display: 'flex' }}>
+                  <Select
+                    style={{ width: 244 }}
+                    label="史诗选择"
+                    value={ES.currentEpicId}
+                    onChange={this.handleChangeCurrentEpic.bind(this)}
+                  >
+                    {
+                      ES.epics.map(epic => (
+                        <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>
+                      ))
+                    }
+                  </Select>
+                  <Select
+                    style={{ width: 244, marginLeft: 24 }}
+                    label="单位选择"
+                    value={ES.currentUnit}
+                    onChange={this.handleChangeCurrentUnit.bind(this)}
+                  >
+                    <Option key="story_point" value="story_point">故事点</Option>
+                    <Option key="issue_count" value="issue_count">问题计数</Option>
+                    <Option key="remain_time" value="remain_time">剩余时间</Option>
+                  </Select>
+                </div>
+                <Spin spinning={ES.chartLoading}>
+                  <div className="c7n-report">
+                    <div className="c7n-chart">
+                      <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
+                    </div>
+                    <div className="c7n-toolbar">
+                      <h2>汇总</h2>
+                      <h4>问题汇总</h4>
                       <ul>
                         <li>
                           <span className="c7n-tip">合计：</span>
                           <span>
-                            {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.allStoryPoints : this.transformRemainTime(ES.getLatest.allRemainTimes)}
+                            {ES.getLatest.issueCount}
                           </span>
                         </li>
-                        <li>
-                          <span className="c7n-tip">已完成：</span>
-                          <span>
-                            {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.completedStoryPoints : this.transformRemainTime(ES.getLatest.completedRemainTimes)}
-                          </span>
-                        </li>
+                        <li><span className="c7n-tip">已完成：</span><span>{ES.getLatest.issueCompletedCount}</span></li>
+                        <li><span className="c7n-tip">未预估：</span><span>{ES.getLatest.unEstimateIssueCount}</span></li>
                       </ul>
+                      {
+                        ES.beforeCurrentUnit !== 'issue_count' ? (
+                          <div>
+                            <h4>{`${ES.getChartYAxisName}`}汇总</h4>
+                            <ul>
+                              <li>
+                                <span className="c7n-tip">合计：</span>
+                                <span>
+                                  {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.allStoryPoints : this.transformRemainTime(ES.getLatest.allRemainTimes)}
+                                </span>
+                              </li>
+                              <li>
+                                <span className="c7n-tip">已完成：</span>
+                                <span>
+                                  {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.completedStoryPoints : this.transformRemainTime(ES.getLatest.completedRemainTimes)}
+                                </span>
+                              </li>
+                            </ul>
+                          </div>
+                        ) : null
+                      }
+                      <p
+                        style={{ 
+                          color: '#3F51B5',
+                          cursor: 'pointer',                
+                        }}
+                        role="none"
+                        onClick={() => {
+                          this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
+                        }}
+                      >
+                        在“问题管理”中查看
+                        <Icon style={{ fontSize: 13 }} type="open_in_new" />
+                      </p>
                     </div>
-                  ) : null
-                }
-                <p
-                  style={{ 
-                    color: '#3F51B5',
-                    cursor: 'pointer',                
-                  }}
-                  role="none"
-                  onClick={() => {
-                    this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
-                  }}
-                >
-                  在“问题管理”中查看
-                  <Icon style={{ fontSize: 13 }} type="open_in_new" />
-                </p>
+                  </div>
+                </Spin>
+                <Tabs>
+                  <TabPane tab="已完成的问题" key="done">
+                    {this.renderTable('compoleted')}
+                  </TabPane>
+                  <TabPane tab="未完成的问题" key="todo">
+                    {this.renderTable('unFinish')}
+                  </TabPane>
+                  <TabPane tab="未完成的未预估问题" key="undo">
+                    {this.renderTable('unFinishAndunEstimate')}
+                  </TabPane>
+                </Tabs>
               </div>
-            </div>
-          </Spin>
-          <Tabs>
-            <TabPane tab="已完成的问题" key="done">
-              {this.renderTable('compoleted')}
-            </TabPane>
-            <TabPane tab="未完成的问题" key="todo">
-              {this.renderTable('unFinish')}
-            </TabPane>
-            <TabPane tab="未完成的未预估问题" key="undo">
-              {this.renderTable('unFinishAndunEstimate')}
-            </TabPane>
-          </Tabs>
+            ) : (
+              <EmptyBlock
+                style={{ marginTop: 40 }}
+                textWidth="auto"
+                pic={pic}
+                title="当前项目无可用史诗"
+                des={
+                  <div>
+                    <span>请在</span>
+                    <span
+                      style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
+                      role="none"
+                      onClick={() => {
+                        history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+                      }}
+                    >
+                      待办事项
+                    </span>
+                    <span>或</span>
+                    <span
+                      style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
+                      role="none"
+                      onClick={() => {
+                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+                      }}
+                    >
+                      问题管理
+                    </span>
+                    <span>中创建一个史诗</span>
+                  </div>
+                }
+              />
+            )
+          }
+          
         </Content>
       </Page>
     );
