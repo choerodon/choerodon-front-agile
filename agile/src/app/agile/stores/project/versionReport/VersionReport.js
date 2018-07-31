@@ -93,7 +93,7 @@ class VersionReportStore {
 
     getPieDatas = (projectId, type) => {
       this.changePieLoading(true);
-      axios.get(`/agile/v1/projects/29/reports/pie_chart?fieldName=${type}`)
+      axios.get(`/agile/v1/projects/${projectId}/reports/pie_chart?fieldName=${type}`)
         .then((data) => {
           if (data.length) {
             const colors = ['#9665E2', '#F0657D', '#FAD352', '#FF9915', '#45A3FC', '#3F51B5', '#47CBCA', '#59CB79', '#F953BA', '#D3D3D3'];

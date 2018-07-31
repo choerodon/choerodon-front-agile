@@ -22,11 +22,13 @@
     "moment": "^2.22.2",
     "npm": "^6.2.0",
     "quill-delta-to-html": "^0.8.2",
+    "react-addons-perf": "^15.4.2",
     "react-beautiful-dnd": "^7.1.2",
     "react-dnd": "^5.0.0",
     "react-dnd-html5-backend": "^5.0.1",
     "react-image-lightbox": "^4.6.0",
     "react-quill": "^1.2.6",
-    "timeago-react": "^2.0.0"
+    "timeago-react": "^2.0.0",
+    "why-did-you-update": "^0.1.1"
   }
 }

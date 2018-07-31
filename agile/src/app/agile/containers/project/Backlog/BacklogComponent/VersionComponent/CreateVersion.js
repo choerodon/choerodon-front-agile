@@ -4,6 +4,7 @@ import { Modal, Form, Input, DatePicker, Icon } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import moment from 'moment';
 import ReleaseStore from '../../../../../stores/project/release/ReleaseStore';
+import BacklogStore from "../../../../../stores/project/backlog/BacklogStore";
 
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
@@ -27,9 +28,6 @@ class CreateVersion extends Component {
    * @memberof CreateVersion
    */
   handleCreateVersion(e) {
-    this.setState({
-      loading: true,
-    });
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, value) => {
       if (!err) {
@@ -40,22 +38,28 @@ class CreateVersion extends Component {
           startDate: value.startDate ? `${moment(value.startDate).format('YYYY-MM-DD')} 00:00:00` : null,
           releaseDate: value.endDate ? `${moment(value.endDate).format('YYYY-MM-DD')} 00:00:00` : null,
         };
+        this.setState({
+          loading: true,
+        });
         ReleaseStore.axiosAddRelease(data).then((res) => {
           this.setState({
             loading: false,
           });
           this.props.form.resetFields();
           this.props.onCancel();
-          this.props.refresh();
+          BacklogStore.axiosGetVersion().then((data2) => {
+            const newVersion = [...data2];
+            for (let index = 0, len = newVersion.length; index < len; index += 1) {
+              newVersion[index].expand = false;
+            }
+            BacklogStore.setVersionData(newVersion);
+          }).catch((error) => {
+          });
         }).catch((error) => {
           this.setState({
             loading: false,
           });
           this.props.onCancel();
-        });
-      } else {
-        this.setState({
-          loading: false,
         });
       }
     });

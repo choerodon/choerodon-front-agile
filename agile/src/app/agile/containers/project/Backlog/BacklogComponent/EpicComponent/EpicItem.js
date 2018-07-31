@@ -23,7 +23,7 @@ class EpicItem extends Component {
   getmenu() {
     return (
       <Menu onClick={this.clickMenu.bind(this)}>
-        <div style={{ padding: '5px 12px' }}>
+        <div style={{ padding: '24px 12px 12px 12px' }}>
           颜色
           <div className="c7n-backlog-epicColor">
             {BacklogStore.getColorLookupValue.map(item => (
@@ -49,8 +49,8 @@ class EpicItem extends Component {
           </div>
         </div>
         <Menu.Divider />
-        <Menu.Item key="1">编辑名称</Menu.Item>
-        <Menu.Item key="2">查看史诗详情</Menu.Item>
+        <Menu.Item key="1"><div style={{ marginTop: '24px' }}>编辑名称</div></Menu.Item>
+        <Menu.Item key="2"><div style={{ margin: '24px 0' }}>查看史诗详情</div></Menu.Item>
       </Menu>
     );
   }

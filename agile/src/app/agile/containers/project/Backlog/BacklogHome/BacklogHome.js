@@ -14,6 +14,9 @@ import BacklogStore from '../../../../stores/project/backlog/BacklogStore';
 import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
 
 const { AppState } = stores;
+// const { whyDidYouUpdate } = require('why-did-you-update');
+//
+// whyDidYouUpdate(React);
 
 @observer
 class BacklogHome extends Component {
@@ -30,11 +33,11 @@ class BacklogHome extends Component {
   }
   componentDidMount() {
     this.refresh();
+    this.loadQuickFilter();
     const url = this.GetRequest(this.props.location.search);
     if (url.paramIssueId) {
       BacklogStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
-
     const timer = setInterval(() => {
       if (document.getElementsByClassName('c7n-backlogTools-left').length > 0) {
         if (document.getElementsByClassName('c7n-backlogTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-backlogTools-left')[0].clientHeight) {
@@ -352,11 +355,17 @@ class BacklogHome extends Component {
     if (epicVisible) {
       this.loadEpic();
     }
+  }
+
+  /**
+   * 加载快速搜索
+   */
+  loadQuickFilter = () => {
     ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
       ScrumBoardStore.setQuickSearchList(res);
     }).catch((error) => {
     });
-  }
+  };
 
   /**
    *
@@ -451,7 +460,14 @@ class BacklogHome extends Component {
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint.bind(this)}>
             <Icon type="playlist_add" />创建冲刺
           </Button>
-          <Button className="leftBtn2" functyp="flat" onClick={this.refresh.bind(this)}>
+          <Button
+            className="leftBtn2"
+            functyp="flat"
+            onClick={() => {
+              this.refresh();
+              this.loadQuickFilter();
+            }}
+          >
             <Icon type="refresh" />刷新
           </Button>
         </Header>

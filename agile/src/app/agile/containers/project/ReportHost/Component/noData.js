@@ -31,7 +31,7 @@ class NoDataComponent extends Component {
       }
     }
     return (<div className="nodata-container">
-      <img src={this.props.img} alt="" />
+      <img src={this.props.img} alt="" width={200} />
       <div className="nodata-content">
         <span className="nodata-text">当前项目无可用{this.props.title}</span>
         {linkDom}

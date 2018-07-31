@@ -764,12 +764,12 @@ class SprintItem extends Component {
                             color: '#3f51b5',
                           }}
                           onClick={() => {
+                            this.setState({
+                              createIssue: true,
+                              createIssueValue: '',
+                            });
                             BacklogStore.axiosGetProjectInfo().then((res) => {
                               BacklogStore.setProjectInfo(res);
-                              this.setState({
-                                createIssue: true,
-                                createIssueValue: '',
-                              });
                             });
                           }}
                         >

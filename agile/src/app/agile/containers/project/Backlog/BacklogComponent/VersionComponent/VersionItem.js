@@ -32,7 +32,7 @@ class VersionItem extends Component {
   getmenu() {
     return (
       <Menu onClick={this.clickMenu.bind(this)}>
-        <Menu.Item key="0">编辑名称</Menu.Item>
+        <Menu.Item key="0"><div>编辑名称</div></Menu.Item>
       </Menu>
     );
   }
@@ -169,8 +169,8 @@ class VersionItem extends Component {
             style={{
               background: BacklogStore.getChosenVersion === item.versionId ? 'rgba(140, 158, 255, 0.08)' : 'white',
               paddingLeft: 0,
-              cursor: 'move',
               ...provided1.draggableProps.style,
+              cursor: 'move',
             }}
             role="none"
             onClick={this.props.handelClickVersion.bind(this, item.versionId)}
@@ -222,7 +222,7 @@ class VersionItem extends Component {
                   <div className="c7n-backlog-versionItemTitleName">
                     <p>{item.name}</p>
                     <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
-                      <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
+                      <Dropdown onClick={e => e.stopPropagation()} style={{ width: 214 }} overlay={this.getmenu()} trigger={['click']}>
                         <Icon
                           style={{
                             width: 12,
@@ -233,6 +233,7 @@ class VersionItem extends Component {
                             alignItems: 'center',
                             border: '1px solid #ccc',
                             borderRadius: 2,
+                            cursor: 'pointer',
                           }}
                           type="arrow_drop_down"
                         />

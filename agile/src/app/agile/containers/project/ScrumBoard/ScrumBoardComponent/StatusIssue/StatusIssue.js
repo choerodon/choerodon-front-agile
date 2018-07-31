@@ -369,18 +369,20 @@ class StatusIssue extends Component {
                             </div>
                             <p style={{ marginLeft: 5 }} className="textDisplayOneColumn">{item.issueNum}</p>
                           </div>
+                        </div>
+                        <div style={{ display: 'flex', margin: '5px 0 5px 12px' }}>
                           <p
                             style={{
-                              margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
+                              margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 5px 5px 15px' : '0 0 0 13px',
                             }}
                           >
                             <Tooltip title={`状态: ${item.statusName}`}>
                               <span
-                                style={{ 
-                                  borderRadius: 2, 
-                                  padding: '2px 8px', 
+                                style={{
+                                  borderRadius: 2,
+                                  padding: '2px 8px',
                                   background: this.renderStatusBackground(item.categoryCode),
-                                  // background: '#4D90FE', 
+                                  // background: '#4D90FE',
                                   color: 'white',
                                   maxWidth: 56,
                                 }}
@@ -404,6 +406,7 @@ class StatusIssue extends Component {
                                   // marginLeft: '10px',
                                   padding: '2px 8px',
                                   maxWidth: '80px',
+                                  borderRadius: 2,
                                 }}
                               >
                                 {this.renderEpicData('epicName')}
@@ -433,6 +436,7 @@ class StatusIssue extends Component {
                                 lineHeight: '20px',
                                 paddingLeft: 10,
                                 whiteSpace: 'normal',
+                                wordBreak: 'break-all',
                               }}
                             >{item.summary}</p>
                           </Tooltip>
