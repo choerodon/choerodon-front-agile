@@ -4,6 +4,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table, Avatar, Dropdown, Menu } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
+import { fromJS, is } from 'immutable';
 import moment from 'moment';
 import CloseSprint from './CloseSprint';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
@@ -11,6 +12,7 @@ import StartSprint from './StartSprint';
 import emptyPng from '../../../../../assets/image/emptySprint.png';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 import AssigneeModal from './AssigneeModal';
+
 
 const { Sidebar } = Modal;
 const Option = Select.Option;
@@ -38,6 +40,10 @@ class SprintItem extends Component {
         totalIssue: '无',
         totalStoryPoints: '无',
         totalTime: '无',
+      },
+      selected: {
+        droppableId: '',
+        issueIds: [],
       },
     };
   }
@@ -67,6 +73,20 @@ class SprintItem extends Component {
       },
     });
   }
+
+  shouldComponentUpdate = (nextProps, nextState) => {
+    const thisProps = fromJS(this.props || {});
+    const thisState = fromJS(this.state || {});
+    const nextStates = fromJS(nextState || {});
+    if (thisProps.size !== nextProps.size ||
+      thisState.size !== nextState.size) {
+      return true;
+    }
+    if (is(thisState, nextStates)) {
+      return false;
+    }
+    return true;
+  };
   /**
    *获取首字母
    *
@@ -112,7 +132,7 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   handleBlurCreateIssue() {
-    if (this.state.createIssueValue !== '') {
+    if (this.addInput.input.value !== '') {
       this.setState({
         loading: true,
       });
@@ -120,7 +140,7 @@ class SprintItem extends Component {
         priorityCode: BacklogStore.getProjectInfo.defaultPriorityCode ? BacklogStore.getProjectInfo.defaultPriorityCode : 'medium',
         projectId: AppState.currentMenuType.id,
         sprintId: !this.props.backlog ? this.props.item.sprintId : 0,
-        summary: this.state.createIssueValue,
+        summary: this.addInput.input.value,
         typeCode: this.state.selectIssueType,
         ...!isNaN(BacklogStore.getChosenEpic) ? {
           epicId: BacklogStore.getChosenEpic,
@@ -136,8 +156,8 @@ class SprintItem extends Component {
       };
       BacklogStore.axiosEasyCreateIssue(data).then((res) => {
         this.setState({
-          // createIssue: false,
-          createIssueValue: '',
+          createIssue: false,
+          // createIssueValue: '',
           loading: false,
         });
         this.props.refresh();
@@ -726,12 +746,9 @@ class SprintItem extends Component {
                           <div style={{ marginLeft: 8, flexGrow: 1 }}>
                             <Input
                               autoFocus
-                              value={this.state.createIssueValue}
                               placeholder="需要做什么"
-                              onChange={(e) => {
-                                this.setState({
-                                  createIssueValue: e.target.value,
-                                });
+                              ref={(ref) => {
+                                this.addInput = ref;
                               }}
                               maxLength={44}
                               onPressEnter={this.handleBlurCreateIssue.bind(this)}
@@ -766,7 +783,6 @@ class SprintItem extends Component {
                           onClick={() => {
                             this.setState({
                               createIssue: true,
-                              createIssueValue: '',
                             });
                             BacklogStore.axiosGetProjectInfo().then((res) => {
                               BacklogStore.setProjectInfo(res);

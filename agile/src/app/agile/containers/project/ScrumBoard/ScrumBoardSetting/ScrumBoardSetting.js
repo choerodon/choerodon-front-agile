@@ -5,7 +5,6 @@ import _ from 'lodash';
 import { Button, Spin, Modal, Form, Input, Select, Tabs, message, Icon } from 'choerodon-ui';
 import { withRouter } from 'react-router-dom';
 import './ScrumBoardSetting.scss';
-import '../../../main.scss';
 import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
 import ColumnPage from '../ScrumBoardSettingComponent/ColumnPage/ColumnPage';
 import SwimLanePage from '../ScrumBoardSettingComponent/SwimLanePage/SwimLanePage';

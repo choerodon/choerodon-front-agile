@@ -10,7 +10,6 @@ import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardSto
 import StatusColumn from '../ScrumBoardComponent/StatusColumn/StatusColumn';
 import StatusBodyColumn from '../ScrumBoardComponent/StatusBodyColumn/StatusBodyColumn';
 import './ScrumBoardHome.scss';
-import '../../../main.scss';
 import IssueDetail from '../ScrumBoardComponent/IssueDetail/IssueDetail';
 import SwimLaneContext from '../ScrumBoardComponent/SwimLaneContext/SwimLaneContext';
 import BacklogStore from '../../../../stores/project/backlog/BacklogStore';

@@ -22,13 +22,16 @@ class BacklogStore {
   @observable colorLookupValue = [];
   @observable quickFilters = [];
   @observable projectInfo = {};
-  @observable selected = {
-    droppableId: '',
-    issueIds: [],
-  };
+  @observable quickSearchList = [];
+  @observable selectIssues = [];
 
-  @action setSelected(data) {
-    this.selected = data;
+
+  @computed get getSelectIssue() {
+    return this.selectIssues;
+  }
+
+  @action setSelectIssue(data) {
+    this.selectIssues = data;
   }
 
   @computed get getProjectInfo() {
@@ -264,6 +267,18 @@ class BacklogStore {
 
   @action setSprintData(data) {
     this.sprintData = data;
+  }
+
+  @computed get getQuickSearchList() {
+    return toJS(this.quickSearchList);
+  }
+
+  @action setQuickSearchList(data) {
+    this.quickSearchList = data;
+  }
+
+  axiosGetQuickSearchList() {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`);
   }
 
   axiosGetSprint(data) {

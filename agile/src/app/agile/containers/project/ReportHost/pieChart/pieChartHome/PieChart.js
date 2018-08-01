@@ -190,7 +190,7 @@ class ReleaseDetail extends Component {
         </Header>
         <Content
           title={data.length ? `项目"${AppState.currentMenuType.name}"下的问题统计图` : '无问题的统计图'}
-          description="了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。"
+          description="根据指定字段以统计图呈现项目或筛选器下的问题，这可以使您一目了然地了解问题详情。"
         >
           <Spin spinning={VersionReportStore.pieLoading}>
             {data.length ? <React.Fragment>

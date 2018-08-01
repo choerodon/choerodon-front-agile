@@ -5,7 +5,6 @@ import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import moment from 'moment';
-import '../../../../main.scss';
 import BurndownChartStore from '../../../../../stores/project/burndownChart/BurndownChartStore';
 import './BurndownChartHome.scss';
 import restSvg from '../../../../../assets/image/rest.svg';

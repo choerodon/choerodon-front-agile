@@ -6,7 +6,6 @@ import { Action } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import DragSortingTable from '../ReleaseComponent/DragSortingTable';
 import AddRelease from '../ReleaseComponent/AddRelease';
-import '../../../main.scss';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 import './ReleaseHome.scss';
 import EditRelease from '../ReleaseComponent/EditRelease';

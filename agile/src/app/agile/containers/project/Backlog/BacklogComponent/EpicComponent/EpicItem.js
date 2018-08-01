@@ -100,7 +100,7 @@ class EpicItem extends Component {
     const data = BacklogStore.getEpicData;
     const index = this.props.index;
     return (
-      <Draggable draggableId={`epicItem-${index}`} key={`epicItem-${index}`} index={`epicItem-${index}`}>
+      <Draggable draggableId={`epicItem-${index}`} key={`epicItem-${index}`} index={index}>
         {(provided1, snapshot1) => (
           <div
             ref={provided1.innerRef}

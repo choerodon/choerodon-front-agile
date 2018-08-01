@@ -3,7 +3,6 @@ import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import { Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon } from 'choerodon-ui';
-
 import './Issue.scss';
 
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
