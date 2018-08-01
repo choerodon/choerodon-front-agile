@@ -8,6 +8,19 @@ const { AppState } = stores;
 class BurndownChartStore {
   @observable burndownList = [];
   @observable sprintList = [];
+  @observable burndownCoordinate = {}
+
+  @computed get getBurndownCoordinate() {
+    return toJS(this.burndownCoordinate);
+  }
+
+  @action setBurndownCoordinate(data) {
+    this.burndownCoordinate = data;
+  }
+
+  axiosGetBurndownCoordinate(sprintId, type) {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${type}`);
+  }
 
   @computed get getSprintList() {
     return toJS(this.sprintList);
