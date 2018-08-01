@@ -370,7 +370,7 @@ class StatusIssue extends Component {
                             <p style={{ marginLeft: 5 }} className="textDisplayOneColumn">{item.issueNum}</p>
                           </div>
                         </div>
-                        <div style={{ display: 'flex', margin: '5px 0 5px 12px' }}>
+                        <div style={{ display: 'flex', margin: '5px 0 5px 12px', alignItems: 'center' }}>
                           <p
                             style={{
                               margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 5px 5px 15px' : '0 0 0 13px',

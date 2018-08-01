@@ -132,7 +132,7 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   handleBlurCreateIssue() {
-    if (this.state.createIssueValue !== '') {
+    if (this.addInput.input.value !== '') {
       this.setState({
         loading: true,
       });
@@ -140,7 +140,7 @@ class SprintItem extends Component {
         priorityCode: BacklogStore.getProjectInfo.defaultPriorityCode ? BacklogStore.getProjectInfo.defaultPriorityCode : 'medium',
         projectId: AppState.currentMenuType.id,
         sprintId: !this.props.backlog ? this.props.item.sprintId : 0,
-        summary: this.state.createIssueValue,
+        summary: this.addInput.input.value,
         typeCode: this.state.selectIssueType,
         ...!isNaN(BacklogStore.getChosenEpic) ? {
           epicId: BacklogStore.getChosenEpic,
@@ -746,12 +746,9 @@ class SprintItem extends Component {
                           <div style={{ marginLeft: 8, flexGrow: 1 }}>
                             <Input
                               autoFocus
-                              value={this.state.createIssueValue}
                               placeholder="需要做什么"
-                              onChange={(e) => {
-                                this.setState({
-                                  createIssueValue: e.target.value,
-                                });
+                              ref={(ref) => {
+                                this.addInput = ref;
                               }}
                               maxLength={44}
                               onPressEnter={this.handleBlurCreateIssue.bind(this)}
