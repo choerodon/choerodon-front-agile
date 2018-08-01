@@ -8,7 +8,6 @@ import _ from 'lodash';
 import moment from 'moment';
 import VersionReportStore from '../../../../../stores/project/versionReport/VersionReport';
 import './VersionReportHome.scss';
-import '../../../../main.scss';
 import NoDataComponent from '../../Component/noData';
 import versionSvg from '../../Home/style/pics/no_version.svg';
 import SwithChart from '../../Component/switchChart';

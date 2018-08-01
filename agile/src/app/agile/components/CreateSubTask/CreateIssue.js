@@ -5,7 +5,6 @@ import _ from 'lodash';
 import { Select, Form, Input, Button, Modal, Icon, Tooltip } from 'choerodon-ui';
 
 import './CreateIssue.scss';
-import '../../containers/main.scss';
 import { UploadButton, NumericInput } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
 import { loadIssue, loadLabels, loadPriorities, loadVersions, createSubIssue } from '../../api/NewIssueApi';
@@ -224,7 +223,7 @@ class CreateSubIssue extends Component {
       >
         <div className="c7n-region-agile">
           <h2 className="c7n-space-first">在项目“{AppState.currentMenuType.name}”中创建子任务</h2>
-          <p>
+          <p style={{ width: 520 }}>
             请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。
           </p>
           <Form layout="vertical">

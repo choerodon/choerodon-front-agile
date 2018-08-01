@@ -6,7 +6,6 @@ import _ from 'lodash';
 import { Select, Form, Input, DatePicker, Button, Modal, Tabs, Tooltip, Radio, message, Icon } from 'choerodon-ui';
 
 import './DailyLog.scss';
-import '../../containers/main.scss';
 import { NumericInput } from '../CommonComponent';
 import {
   delta2Html,
@@ -201,7 +200,7 @@ class CreateSprint extends Component {
       >
         <div className="c7n-region-agile">
           <h2 className="c7n-space-first">{`登记"${this.props.issueNum}"的工作日志`}</h2>
-          <p>
+          <p style={{ width: 520 }}>
             您可以在这里记录您的工作，花费的时间会在关联问题中预估时间进行扣减，以便更精确地计算问题进度和提升工作效率。
           </p>
           <section className="info">

@@ -3,9 +3,6 @@ import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import moment from 'moment';
 import { Select, Form, Input, DatePicker, Button, Modal, Tabs, Tooltip } from 'choerodon-ui';
-
-// import './CreateIssue.scss';
-import '../../containers/main.scss';
 import { UploadButton, NumericInput } from '../CommonComponent';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 

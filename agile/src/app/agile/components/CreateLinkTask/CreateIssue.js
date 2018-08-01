@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { stores, axios } from 'choerodon-front-boot';
+import { stores, axios, Content } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import { Select, Form, Input, Button, Modal, Spin, Icon } from 'choerodon-ui';
 
 import './CreateIssue.scss';
-import '../../containers/main.scss';
 import { createLink, loadIssuesInLink } from '../../api/NewIssueApi';
 import TypeTag from '../TypeTag';
 
@@ -152,17 +151,13 @@ class CreateSprint extends Component {
         cancelText="取消"
         confirmLoading={this.state.createLoading}
       >
-        <div className="c7n-region-agile">
-          <h2 className="c7n-space-first">对问题创建链接</h2>
-          <p>
-            请在下面输入相关任务的基本信息，包括所要创建的关系（复制、阻塞、关联、破坏、被复制、被阻塞、被破坏等）以及所要关联的问题（支持多选）。
-            {/* <a href="#" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
-              <span className="c7n-external-link-content">
-              了解详情
-              </span>
-              <Icon type="open_in_new" />
-            </a> */}
-          </p>
+        <Content
+          style={{
+            padding: 0,
+          }}
+          title="对问题创建链接"
+          description="请在下面输入相关任务的基本信息，包括所要创建的关系（复制、阻塞、关联、破坏、被复制、被阻塞、被破坏等）以及所要关联的问题（支持多选）。"
+        >
           <Form layout="vertical">
             <FormItem label="关系" style={{ width: 520 }}>
               {getFieldDecorator('linkTypeId', {})(
@@ -220,7 +215,7 @@ class CreateSprint extends Component {
               )}
             </FormItem>
           </Form>
-        </div>
+        </Content>
       </Sidebar>
     );
   }

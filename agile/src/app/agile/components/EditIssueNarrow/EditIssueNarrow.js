@@ -6,7 +6,6 @@ import TimeAgo from 'timeago-react';
 import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon, Popover } from 'choerodon-ui';
 import { STATUS, COLOR, TYPE, ICON, TYPE_NAME } from '../../common/Constant';
 import './EditIssueNarrow.scss';
-import '../../containers/main.scss';
 import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
 import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload } from '../../common/utils';
 import { loadBranchs, loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
@@ -1211,7 +1210,7 @@ class CreateSprint extends Component {
               </div>
             </Dropdown>
           </div>
-          <ul className="c7n-nav-ul">
+          <ul className="c7n-nav-ul" style={{ padding: 0 }}>
             <Tooltip placement="right" title="详情">
               <li id="DETAILS-nav" className={`c7n-li ${this.state.nav === 'detail' ? 'c7n-li-active' : ''}`}>
                 <Icon

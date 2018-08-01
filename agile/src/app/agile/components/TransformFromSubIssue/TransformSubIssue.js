@@ -7,7 +7,6 @@ import { createLink, loadIssuesInLink, updateIssueType } from '../../api/NewIssu
 import TypeTag from '../TypeTag';
 
 import './TransformSubIssue.scss';
-import '../../containers/main.scss';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;

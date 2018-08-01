@@ -4,7 +4,6 @@ import _ from 'lodash';
 import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import { Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon } from 'choerodon-ui';
 
-import '../../../main.scss';
 import './Issue.scss';
 
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
@@ -227,13 +226,17 @@ class Issue extends Component {
       searchArgs: {},
     };
     const { statusCode, priorityCode, typeCode } = filters;
-    const { issueNum, summary, assignee } = filters;
+    const { issueNum, summary, assignee, sprint, version, component, epic } = filters;
     obj.advancedSearchArgs.statusCode = statusCode || [];
     obj.advancedSearchArgs.priorityCode = priorityCode || [];
     obj.advancedSearchArgs.typeCode = typeCode || [];
     obj.searchArgs.issueNum = issueNum && issueNum.length ? issueNum[0] : '';
     obj.searchArgs.summary = summary && summary.length ? summary[0] : '';
     obj.searchArgs.assignee = assignee && assignee.length ? assignee[0] : '';
+    obj.searchArgs.sprint = sprint && sprint.length ? sprint[0] : '';
+    obj.searchArgs.version = version && version.length ? version[0] : '';
+    obj.searchArgs.component = component && component.length ? component[0] : '';
+    obj.searchArgs.epic = epic && epic.length ? epic[0] : '';
     IssueStore.setFilter(obj);
     const { current, pageSize } = IssueStore.pagination;
     IssueStore.loadIssues(current - 1, pageSize);
@@ -502,6 +505,30 @@ class Issue extends Component {
         filterMultiple: true,
         filteredValue: IssueStore.filteredInfo.statusCode || null,
       },
+      {
+        title: '冲刺',
+        dataIndex: 'sprint',
+        key: 'sprint',
+        filters: [],
+      },
+      {
+        title: '模块',
+        dataIndex: 'component',
+        key: 'component',
+        filters: [],
+      },
+      {
+        title: '版本',
+        dataIndex: 'version',
+        key: 'version',
+        filters: [],
+      },
+      {
+        title: '史诗',
+        dataIndex: 'epic',
+        key: 'epic',
+        filters: [],
+      },
     ];
     const columns = [
       {
@@ -580,7 +607,7 @@ class Issue extends Component {
     );
     return (
       <Page
-        className="c7n-Issue c7n-region-agile"
+        className="c7n-Issue"
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
       >
         <Header
@@ -606,7 +633,7 @@ class Issue extends Component {
             <span>刷新</span>
           </Button>
         </Header>
-        <Content style={{ display: 'flex', padding: '0' }}>
+        <Content style={{ display: 'flex', padding: '0', width: '100%' }}>
           {/* <Spin spinning={IssueStore.loading}> */}
           <div 
             className="c7n-content-issue" 
@@ -665,7 +692,6 @@ class Issue extends Component {
                     showHeader={false}
                     scroll={{ x: true }}
                     loading={IssueStore.loading}
-                    onChange={this.handleTableChange}
                     pagination={false}
                     onRow={record => ({
                       onClick: () => {

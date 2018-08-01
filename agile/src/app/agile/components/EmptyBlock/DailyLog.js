@@ -33,9 +33,9 @@ class EmptyBlock extends Component {
             <h1 className="c7n-title">
               {this.props.title || ''}
             </h1>
-            <p className="c7n-des">
+            <div className="c7n-des">
               {this.props.des || ''}
-            </p>
+            </div>
           </div>
         </div>
       </div>

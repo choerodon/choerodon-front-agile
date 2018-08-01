@@ -4,14 +4,14 @@ import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import { Button, Tabs, Table, Select, Icon, Tooltip, Spin } from 'choerodon-ui';
-import pic from './no_epic.svg';
+import pic from './no_version.svg';
 import SwithChart from '../../Component/switchChart';
 import StatusTag from '../../../../../components/StatusTag';
 import PriorityTag from '../../../../../components/PriorityTag';
 import TypeTag from '../../../../../components/TypeTag';
-import ES from '../../../../../stores/project/epicReport';
+import VS from '../../../../../stores/project/versionReportNew';
 import EmptyBlock from '../../../../../components/EmptyBlock';
-import './EpicReport.scss';
+import './VersionReport.scss';
 
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -21,7 +21,7 @@ const MONTH = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '�
 @observer
 class EpicReport extends Component {
   componentDidMount() {
-    ES.loadEpicAndChartAndTableData();
+    VS.loadEpicAndChartAndTableData();
   }
   
   getOption() {
@@ -37,31 +37,31 @@ class EpicReport extends Component {
         itemWidth: 14,
         data: [
           ...[
-            ES.beforeCurrentUnit === 'issue_count' ? {} : {
-              name: `已完成 ${ES.getChartYAxisName}`,
+            VS.beforeCurrentUnit === 'issue_count' ? {} : {
+              name: `已完成 ${VS.getChartYAxisName}`,
               icon: 'rectangle',
             },
           ],
           ...[
-            ES.beforeCurrentUnit === 'issue_count' ? {} : {
-              name: `总计 ${ES.getChartYAxisName}`,
+            VS.beforeCurrentUnit === 'issue_count' ? {} : {
+              name: `总计 ${VS.getChartYAxisName}`,
               icon: 'rectangle',
             },
           ],
           ...[
-            {
+            VS.beforeCurrentUnit === 'issue_count' ? {
               name: '问题数量',
               icon: 'line',
-            },
+            } : {},
           ],
           ...[
-            ES.beforeCurrentUnit === 'issue_count' ? {} : {
-              name: '未预估问题数',
+            VS.beforeCurrentUnit === 'issue_count' ? {} : {
+              name: '未预估问题百分比',
               icon: 'line',
             },
           ],
           ...[
-            ES.beforeCurrentUnit === 'issue_count' ? {
+            VS.beforeCurrentUnit === 'issue_count' ? {
               name: '已完成问题数',
               icon: 'line',
             } : {},
@@ -72,7 +72,7 @@ class EpicReport extends Component {
         y2: 10,
         top: '30',
         left: 0,
-        right: '50',
+        right: '20',
         containLabel: true,
       },
       calculable: true,
@@ -120,11 +120,11 @@ class EpicReport extends Component {
           interval: 0,
           lineStyle: {
             color: ['#eee'],
-            width: 1,
+            width: 2,
             type: 'solid',
           }, 
         },
-        data: ES.getChartDataX,
+        data: VS.getChartDataX,
       },
       yAxis: [
         {
@@ -149,7 +149,7 @@ class EpicReport extends Component {
               fontStyle: 'normal',
             },
             formatter(value, index) {
-              if (value && ES.beforeCurrentUnit === 'remain_time') {
+              if (value && VS.beforeCurrentUnit === 'remain_time') {
                 return `${value}h`;
               }
               return value;
@@ -160,12 +160,12 @@ class EpicReport extends Component {
             lineStyle: {
               color: '#eee',
               type: 'solid',
-              width: 1,
+              width: 2,
             },
           },
         },
         {
-          name: '问题计数',
+          name: VS.beforeCurrentUnit === 'issue_count' ? '' : '百分比',
           nameTextStyle: {
             color: '#000',
           },
@@ -189,6 +189,12 @@ class EpicReport extends Component {
               fontSize: 12,
               fontStyle: 'normal',
             },
+            formatter(value, index) {
+              if (value && VS.beforeCurrentUnit !== 'issue_count') {
+                return `${value}%`;
+              }
+              return value;
+            },
           },
           splitLine: {
             show: false,
@@ -200,61 +206,70 @@ class EpicReport extends Component {
           name: '问题数量',
           type: 'line',
           step: true,
-          symbol: ES.getChartDataYIssueCountAll.length === 1 ? 'auto' : 'none',
+          symbol: VS.getChartDataYIssueCountAll.length === 1 ? 'auto' : 'none',
           itemStyle: {
-            color: 'rgba(48, 63, 159, 1)',
+            color: '#78aafe',
           },
-          yAxisIndex: 1,
-          data: ES.getChartDataYIssueCountAll,
+          areaStyle: {
+            color: 'rgba(77, 144, 254, 0.1)',
+          },
+          yAxisIndex: VS.beforeCurrentUnit === 'issue_count' ? 0 : 1,
+          data: VS.getChartDataYIssueCountAll,
         },
         {
           name: '已完成问题数',
           type: 'line',
           step: true,
-          symbol: ES.getChartDataYIssueCountCompleted.length === 1 ? 'auto' : 'none',
+          symbol: VS.getChartDataYIssueCountCompleted.length === 1 ? 'auto' : 'none',
           itemStyle: {
-            color: '#000',
+            color: '#00bfa4',
           },
-          yAxisIndex: 1,
-          data: ES.getChartDataYIssueCountCompleted,
+          areaStyle: {
+            color: 'rgba(0, 191, 165, 0.1)',
+          },
+          yAxisIndex: VS.beforeCurrentUnit === 'issue_count' ? 0 : 1,
+          data: VS.getChartDataYIssueCountCompleted,
         },
         {
-          name: '未预估问题数',
+          name: '未预估问题百分比',
           type: 'line',
           step: true,
-          symbol: ES.getChartDataYIssueCountUnEstimate.length === 1 ? 'auto' : 'none',
+          symbol: VS.getChartDataYIssueCountUnEstimate.length === 1 ? 'auto' : 'none',
           itemStyle: {
-            color: '#ff9915',
+            color: '#f44336',
+          },
+          areaStyle: {
+            color: 'rgba(244, 67, 54, 0.1)',
           },
           yAxisIndex: 1,
-          data: ES.getChartDataYIssueCountUnEstimate,
+          data: VS.getChartDataYIssueCountUnEstimate,
         },
         {
-          name: `已完成 ${ES.getChartYAxisName}`,
+          name: `已完成 ${VS.getChartYAxisName}`,
           type: 'line',
           step: true,
-          symbol: ES.getChartDataYCompleted.length === 1 ? 'auto' : 'none',
+          symbol: VS.getChartDataYCompleted.length === 1 ? 'auto' : 'none',
           yAxisIndex: 0,
-          data: ES.getChartDataYCompleted,
+          data: VS.getChartDataYCompleted,
           itemStyle: {
-            color: '#4e90fe',
+            color: '#00bfa4',
+          },
+          areaStyle: {
+            color: 'rgba(0, 191, 165, 0.1)',
+          },
+        },
+        {
+          name: `总计 ${VS.getChartYAxisName}`,
+          type: 'line',
+          step: true,
+          symbol: VS.getChartDataYAll.length === 1 ? 'auto' : 'none',
+          yAxisIndex: 0,
+          data: VS.getChartDataYAll,
+          itemStyle: {
+            color: '#78aafe',
           },
           areaStyle: {
             color: 'rgba(77, 144, 254, 0.1)',
-          },
-        },
-        {
-          name: `总计 ${ES.getChartYAxisName}`,
-          type: 'line',
-          step: true,
-          symbol: ES.getChartDataYAll.length === 1 ? 'auto' : 'none',
-          yAxisIndex: 0,
-          data: ES.getChartDataYAll,
-          itemStyle: {
-            color: 'rgba(0, 0, 0, 0.16)',
-          },
-          areaStyle: {
-            color: 'rgba(245, 245, 245, 0.5)',
           },
         },
       ],
@@ -263,30 +278,30 @@ class EpicReport extends Component {
 
   getTableDta(type) {
     if (type === 'compoleted') {
-      return ES.tableData.filter(v => v.completed === 1);
+      return VS.tableData.filter(v => v.completed === 1);
     }
     if (type === 'unFinish') {
-      return ES.tableData.filter(v => v.completed === 0);
+      return VS.tableData.filter(v => v.completed === 0);
     }
     if (type === 'unFinishAndunEstimate') {
-      return ES.tableData.filter(v => v.completed === 0 && ((v.storyPoints === null && v.typeCode === 'story') || (v.remainTime === null && v.typeCode === 'task')));
+      return VS.tableData.filter(v => v.completed === 0 && ((v.storyPoints === null && v.typeCode === 'story') || (v.remainTime === null && v.typeCode !== 'story')));
     }
     return [];
   }
 
   refresh() {
-    ES.loadEpicAndChartAndTableData();
+    VS.loadEpicAndChartAndTableData();
   }
 
-  handleChangeCurrentEpic(epicId) {
-    ES.setCurrentEpic(epicId);
-    ES.loadChartData();
-    ES.loadTableData();
+  handleChangeCurrentVersion(versionId) {
+    VS.setCurrentVersion(versionId);
+    VS.loadChartData();
+    VS.loadTableData();
   }
 
   handleChangeCurrentUnit(unit) {
-    ES.setCurrentUnit(unit);
-    ES.loadChartData();
+    VS.setCurrentUnit(unit);
+    VS.loadChartData();
   }
 
   transformRemainTime(remainTime) {
@@ -383,12 +398,12 @@ class EpicReport extends Component {
         ),
       }, {
         width: '10%',
-        title: ES.beforeCurrentUnit === 'story_point' ? '故事点' : '剩余时间',
+        title: VS.beforeCurrentUnit === 'story_point' ? '故事点' : '剩余时间',
         dataIndex: 'storyPoints',
         render: (storyPoints, record) => (
           <div>
             {
-              ES.beforeCurrentUnit === 'story_point' ? (
+              VS.beforeCurrentUnit === 'story_point' ? (
                 <div>
                   {record.typeCode === 'story' ? storyPoints || '未预估' : ''}
                 </div>
@@ -409,7 +424,7 @@ class EpicReport extends Component {
         filterBar={false}
         columns={column}
         scroll={{ x: true }}
-        loading={ES.tableLoading}
+        loading={VS.tableLoading}
       />
     );
   }
@@ -418,14 +433,14 @@ class EpicReport extends Component {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     return (
-      <Page className="c7n-epicReport">
+      <Page className="c7n-versionReport">
         <Header 
-          title="史诗报告图"
+          title="版本报告"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}
-            current="epicReport"
+            current="versionReport"
           />
           <Button 
             funcType="flat" 
@@ -436,30 +451,30 @@ class EpicReport extends Component {
           </Button>
         </Header>
         <Content
-          title="史诗报告图"
-          description="随时了解一个史诗的完成进度。这有助于您跟踪未完成或未分配问题来管理团队的开发进度。"
+          title="版本报告"
+          description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
           // link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
           {
-            !(!ES.epics.length && ES.epicFinishLoading) ? (
+            !(!VS.versions.length && VS.versionFinishLoading) ? (
               <div>
                 <div style={{ display: 'flex' }}>
                   <Select
                     style={{ width: 244 }}
-                    label="史诗选择"
-                    value={ES.currentEpicId}
-                    onChange={this.handleChangeCurrentEpic.bind(this)}
+                    label="版本选择"
+                    value={VS.currentVersionId}
+                    onChange={this.handleChangeCurrentVersion.bind(this)}
                   >
                     {
-                      ES.epics.map(epic => (
-                        <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>
+                      VS.versions.map(version => (
+                        <Option key={version.versionId} value={version.versionId}>{version.name}</Option>
                       ))
                     }
                   </Select>
                   <Select
                     style={{ width: 244, marginLeft: 24 }}
                     label="单位选择"
-                    value={ES.currentUnit}
+                    value={VS.currentUnit}
                     onChange={this.handleChangeCurrentUnit.bind(this)}
                   >
                     <Option key="story_point" value="story_point">故事点</Option>
@@ -467,62 +482,28 @@ class EpicReport extends Component {
                     <Option key="remain_time" value="remain_time">剩余时间</Option>
                   </Select>
                 </div>
-                <Spin spinning={ES.chartLoading}>
+                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between' }}>
+                  <p style={{ fontWeight: '600' }}>{VS.getCurrentVersion.versionId && VS.getCurrentVersion.statusCode === 'released' ? `发布于 ${VS.getCurrentVersion.releaseDate ? VS.getCurrentVersion.releaseDate : '未指定发布日期'}` : '未发布'}</p>
+                  <p
+                    style={{
+                      color: '#3F51B5',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                    role="none"
+                    onClick={() => {
+                      this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
+                    }}
+                  >
+                    在“问题管理中”查看
+                    <Icon style={{ fontSize: 13 }} type="open_in_new" />
+                  </p>
+                </div>
+                <Spin spinning={VS.chartLoading}>
                   <div className="c7n-report">
                     <div className="c7n-chart">
                       <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
-                    </div>
-                    <div className="c7n-toolbar">
-                      <h2>汇总</h2>
-                      <h4>问题汇总</h4>
-                      <ul>
-                        <li>
-                          <span className="c7n-tip">合计：</span>
-                          <span>
-                            {ES.getLatest.issueCount}
-                          </span>
-                        </li>
-                        <li><span className="c7n-tip">已完成：</span><span>{ES.getLatest.issueCompletedCount}</span></li>
-                        {
-                          ES.beforeCurrentUnit === 'issue_count' ? null : (
-                            <li><span className="c7n-tip">未预估：</span><span>{ES.getLatest.unEstimateIssueCount}</span></li>
-                          )
-                        }
-                      </ul>
-                      {
-                        ES.beforeCurrentUnit !== 'issue_count' ? (
-                          <div>
-                            <h4>{`${ES.getChartYAxisName}`}汇总</h4>
-                            <ul>
-                              <li>
-                                <span className="c7n-tip">合计：</span>
-                                <span>
-                                  {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.allStoryPoints : this.transformRemainTime(ES.getLatest.allRemainTimes)}
-                                </span>
-                              </li>
-                              <li>
-                                <span className="c7n-tip">已完成：</span>
-                                <span>
-                                  {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.completedStoryPoints : this.transformRemainTime(ES.getLatest.completedRemainTimes)}
-                                </span>
-                              </li>
-                            </ul>
-                          </div>
-                        ) : null
-                      }
-                      <p
-                        style={{ 
-                          color: '#3F51B5',
-                          cursor: 'pointer',                
-                        }}
-                        role="none"
-                        onClick={() => {
-                          this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
-                        }}
-                      >
-                        在“问题管理”中查看
-                        <Icon style={{ fontSize: 13 }} type="open_in_new" />
-                      </p>
                     </div>
                   </div>
                 </Spin>
@@ -534,7 +515,7 @@ class EpicReport extends Component {
                     {this.renderTable('unFinish')}
                   </TabPane>
                   {
-                    ES.beforeCurrentUnit === 'issue_count' ? null : (
+                    VS.beforeCurrentUnit === 'issue_count' ? null : (
                       <TabPane tab="未完成的未预估问题" key="undo">
                         {this.renderTable('unFinishAndunEstimate')}
                       </TabPane>
@@ -547,7 +528,7 @@ class EpicReport extends Component {
                 style={{ marginTop: 40 }}
                 textWidth="auto"
                 pic={pic}
-                title="当前项目无可用史诗"
+                title="当前项目无可用版本"
                 des={
                   <div>
                     <span>请在</span>
@@ -555,22 +536,12 @@ class EpicReport extends Component {
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-                        history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+                        history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
-                      待办事项
+                      发布版本
                     </span>
-                    <span>或</span>
-                    <span
-                      style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
-                      role="none"
-                      onClick={() => {
-                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-                      }}
-                    >
-                      问题管理
-                    </span>
-                    <span>中创建一个史诗</span>
+                    <span>中创建一个版本</span>
                   </div>
                 }
               />
