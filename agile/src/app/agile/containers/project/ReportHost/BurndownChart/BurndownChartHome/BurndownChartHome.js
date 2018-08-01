@@ -33,6 +33,32 @@ class BurndownChartHome extends Component {
   componentWillMount() {
     this.getSprintData();
   }
+  getBetweenDateStr(start, end) {
+    const result = [];
+    const beginDay = start.split('-');
+    const endDay = end.split('-');
+    const diffDay = new Date();
+    const dateList = new Array();
+    let i = 0;
+    diffDay.setDate(beginDay[2]);
+    diffDay.setMonth(beginDay[1] - 1);
+    diffDay.setFullYear(beginDay[0]);
+    result.push(start);
+    while (i == 0) {
+      const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
+      diffDay.setTime(countDay);
+      dateList[2] = diffDay.getDate();
+      dateList[1] = diffDay.getMonth() + 1;
+      dateList[0] = diffDay.getFullYear();
+      if (String(dateList[1]).length == 1) { dateList[1] = `0${dateList[1]}`; }
+      if (String(dateList[2]).length == 1) { dateList[2] = `0${dateList[2]}`; }
+      result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
+      if (dateList[0] == endDay[0] && dateList[1] == endDay[1] && dateList[2] == endDay[2]) {
+        i = 1;
+      }
+    }
+    return result;
+  }
   getSprintData() {
     BurndownChartStore.axiosGetSprintList().then((res) => {
       BurndownChartStore.setSprintList(res);
@@ -41,8 +67,48 @@ class BurndownChartHome extends Component {
         endDate: res[0].endDate,
       }, () => {
         this.getChartData();
+        this.getChartCoordinate();
       });
     }).catch((error) => {
+    });
+  }
+  getChartCoordinate() {
+    BurndownChartStore.axiosGetBurndownCoordinate(this.state.defaultSprint, this.state.select).then((res) => {
+      const keys = Object.keys(res);
+      let [minDate, maxDate] = [keys[0], keys[0]];
+      for (let a = 1, len = keys.length; a < len; a += 1) {
+        if (moment(keys[a]).isAfter(maxDate)) {
+          maxDate = keys[a];
+        }
+        if (moment(keys[a]).isBefore(minDate)) {
+          minDate = keys[a];
+        }
+      }
+      // 如果后端给的最大日期小于结束日期
+      let allDate;
+      if (moment(maxDate).isBefore(this.state.endDate.split(' ')[0])) {
+        allDate = this.getBetweenDateStr(minDate, this.state.endDate.split(' ')[0]);
+      } else {
+        allDate = this.getBetweenDateStr(minDate, maxDate);
+      }
+      // const allDate = this.getBetweenDateStr(minDate, maxDate);
+      const allDateValues = [];
+      for (let b = 0, len = allDate.length; b < len; b += 1) {
+        const nowKey = allDate[b];
+        if (res.hasOwnProperty(nowKey)) {
+          allDateValues.push(res[allDate[b]]);
+        } else if (moment(nowKey).isAfter(maxDate)) {
+          allDateValues.push(null);
+        } else {
+          const beforeKey = allDate[b - 1];
+          allDateValues.push(res[beforeKey]);
+          res[nowKey] = res[beforeKey];
+        }
+      }
+      this.setState({
+        xAxis: allDate,
+        yAxis: allDateValues,
+      });
     });
   }
   getChartData() {
@@ -104,19 +170,22 @@ class BurndownChartHome extends Component {
           newData[index].rest = rest;
         }
         BurndownChartStore.setBurndownList(newData);
-        if (moment(this.state.endDate).isAfter(_.map(newData, 'date')[_.map(newData, 'date').length - 1])) {
-          this.setState({
-            xAxis: [..._.map(newData, 'date'), this.state.endDate],
-            yAxis: _.map(newData, 'rest'),
-            loading: false,
-          });
-        } else {
-          this.setState({
-            xAxis: _.map(newData, 'date'),
-            yAxis: _.map(newData, 'rest'),
-            loading: false,
-          });
-        }
+        this.setState({
+          loading: false,
+        });
+        // if (moment(this.state.endDate).isAfter(_.map(newData, 'date')[_.map(newData, 'date').length - 1])) {
+        //   this.setState({
+        //     xAxis: [..._.map(newData, 'date'), this.state.endDate],
+        //     yAxis: _.map(newData, 'rest'),
+        //     loading: false,
+        //   });
+        // } else {
+        //   this.setState({
+        //     xAxis: _.map(newData, 'date'),
+        //     yAxis: _.map(newData, 'rest'),
+        //     loading: false,
+        //   });
+        // }
       }).catch((error) => {
       });
   }
@@ -169,11 +238,6 @@ class BurndownChartHome extends Component {
         type: 'category',
         boundaryGap: false,
         data: this.state.xAxis,
-        axisLabel: {
-          formatter(value, index) {
-            return `${value.split(' ')[0]}\n${value.split(' ')[1]}`;
-          },
-        },
       },
       yAxis: {
         type: 'value',
@@ -182,7 +246,7 @@ class BurndownChartHome extends Component {
         {
           name: '期望值',
           type: 'line',
-          data: [[0, this.getMaxY()], [this.state.xAxis.length - 1, 0]],
+          data: [[0, this.getMaxY()], [this.state.endDate.split(' ')[0], 0]],
           itemStyle: {
             color: 'grey',
           },
@@ -208,6 +272,7 @@ class BurndownChartHome extends Component {
       select: value,
     }, () => {
       this.getChartData();
+      this.getChartCoordinate();
     });
   }
   
@@ -444,6 +509,7 @@ class BurndownChartHome extends Component {
                           endDate,
                         }, () => {
                           this.getChartData();
+                          this.getChartCoordinate();
                         });
                       }}
                     >
