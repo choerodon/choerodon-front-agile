@@ -4,6 +4,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table, Avatar, Dropdown, Menu } from 'choerodon-ui';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
+import { fromJS, is } from 'immutable';
 import moment from 'moment';
 import CloseSprint from './CloseSprint';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
@@ -11,6 +12,7 @@ import StartSprint from './StartSprint';
 import emptyPng from '../../../../../assets/image/emptySprint.png';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 import AssigneeModal from './AssigneeModal';
+
 
 const { Sidebar } = Modal;
 const Option = Select.Option;
@@ -38,6 +40,10 @@ class SprintItem extends Component {
         totalIssue: '无',
         totalStoryPoints: '无',
         totalTime: '无',
+      },
+      selected: {
+        droppableId: '',
+        issueIds: [],
       },
     };
   }
@@ -67,6 +73,20 @@ class SprintItem extends Component {
       },
     });
   }
+
+  shouldComponentUpdate = (nextProps, nextState) => {
+    const thisProps = fromJS(this.props || {});
+    const thisState = fromJS(this.state || {});
+    const nextStates = fromJS(nextState || {});
+    if (thisProps.size !== nextProps.size ||
+      thisState.size !== nextState.size) {
+      return true;
+    }
+    if (is(thisState, nextStates)) {
+      return false;
+    }
+    return true;
+  };
   /**
    *获取首字母
    *

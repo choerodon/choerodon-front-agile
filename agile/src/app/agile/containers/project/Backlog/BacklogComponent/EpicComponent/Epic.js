@@ -1,18 +1,15 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import _ from 'lodash';
 import { Dropdown, Menu, Modal, Form, Input, Select, Icon, Spin } from 'choerodon-ui';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { fromJS, is } from 'immutable'
 import { Content, stores } from 'choerodon-front-boot';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EpicItem from './EpicItem';
 import './Epic.scss';
 import CreateEpic from './CreateEpic';
 
-const { Sidebar } = Modal;
 const FormItem = Form.Item;
-const { TextArea } = Input;
-const Option = Select.Option;
 const { AppState } = stores;
 
 @observer
@@ -36,6 +33,19 @@ class Epic extends Component {
   componentDidMount() {
     this.props.onRef(this);
   }
+  shouldComponentUpdate = (nextProps, nextState) => {
+    const thisProps = fromJS(this.props || {});
+    const thisState = fromJS(this.state || {});
+    const nextStates = fromJS(nextState || {});
+    if (thisProps.size !== nextProps.size ||
+      thisState.size !== nextState.size) {
+      return true;
+    }
+    if (is(thisState, nextStates)) {
+      return false;
+    }
+    return true;
+  };
 
   /**
    *这里是父组件修改该组件state的函数
@@ -75,28 +85,14 @@ class Epic extends Component {
     if (data.length > 0) {
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
-          <Droppable droppableId={`${index}-epic`} key={data[index].issueId.toString()}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                style={{
-                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                  padding: 'grid',
-                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                }}
-              >
-                <EpicItem
-                  data={data[index]}
-                  handleClickEpic={this.handleClickEpic.bind(this)}
-                  draggableIds={this.state.draggableIds}
-                  refresh={this.props.refresh.bind(this)}
-                  index={index}
-                  issueRefresh={this.props.issueRefresh.bind(this)}
-                />
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>,
+          <EpicItem
+            data={data[index]}
+            handleClickEpic={this.handleClickEpic.bind(this)}
+            draggableIds={this.state.draggableIds}
+            refresh={this.props.refresh.bind(this)}
+            index={index}
+            issueRefresh={this.props.issueRefresh.bind(this)}
+          />,
         );
       }
     }
@@ -112,8 +108,8 @@ class Epic extends Component {
       return;
     }
     const data = BacklogStore.getEpicData;
-    const sourceIndex = parseInt(result.source.droppableId.split('-')[0], 10);
-    const tarIndex = parseInt(result.destination.droppableId, 10);
+    const sourceIndex = result.source.index;
+    const tarIndex = result.destination.index;
     let beforeSequence = null;
     let afterSequence = null;
     const res = Array.from(data);
@@ -222,10 +218,22 @@ class Epic extends Component {
                 所有问题
               </div>
               <DragDropContext onDragEnd={this.handleEpicDrag}>
-                {this.renderEpic()}
-
+                <Droppable droppableId={'epic'}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      style={{
+                        background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                        padding: 'grid',
+                        // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                      }}
+                    >
+                      {this.renderEpic()}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
               </DragDropContext>
-
               <div
                 className={BacklogStore.getIsDragging ? 'c7n-backlog-epicItems c7n-backlog-dragToEpic' : 'c7n-backlog-epicItems'}
                 style={{

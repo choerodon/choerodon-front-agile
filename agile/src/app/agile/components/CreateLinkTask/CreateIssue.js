@@ -3,7 +3,6 @@ import { stores, axios, Content } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import { Select, Form, Input, Button, Modal, Spin, Icon } from 'choerodon-ui';
-
 import './CreateIssue.scss';
 import { createLink, loadIssuesInLink } from '../../api/NewIssueApi';
 import TypeTag from '../TypeTag';

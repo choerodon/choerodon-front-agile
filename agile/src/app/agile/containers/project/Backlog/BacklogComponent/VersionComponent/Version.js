@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Modal, Form, Input, DatePicker, Icon } from 'choerodon-ui';
 import { Content, stores, Permission } from 'choerodon-front-boot';
+import { fromJS, is } from 'immutable';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import VersionItem from './VersionItem';
@@ -24,6 +25,19 @@ class Version extends Component {
   componentDidMount() {
     this.props.onRef(this);
   }
+  shouldComponentUpdate = (nextProps, nextState) => {
+    const thisProps = fromJS(this.props || {});
+    const thisState = fromJS(this.state || {});
+    const nextStates = fromJS(nextState || {});
+    if (thisProps.size !== nextProps.size ||
+      thisState.size !== nextState.size) {
+      return true;
+    }
+    if (is(thisState, nextStates)) {
+      return false;
+    }
+    return true;
+  };
   /**
    *其他组件修改该组件state的方法
    *
@@ -54,29 +68,14 @@ class Version extends Component {
     if (data.length > 0) {
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
-          <Droppable droppableId={`${index}-version`} key={data[index].versionId.toString()}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                style={{
-                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                  padding: 'grid',
-                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                }}
-              >
-                <VersionItem
-                  data={data[index]}
-                  index={index}
-                  handelClickVersion={this.handelClickVersion.bind(this)}
-                  draggableIds={this.state.draggableIds}
-                  refresh={this.props.refresh.bind(this)}
-                  issueRefresh={this.props.issueRefresh.bind(this)}
-                />
-                {provided.placeholder}
-              </div>
-            )}
-
-          </Droppable>,
+          <VersionItem
+            data={data[index]}
+            index={index}
+            handelClickVersion={this.handelClickVersion.bind(this)}
+            draggableIds={this.state.draggableIds}
+            refresh={this.props.refresh.bind(this)}
+            issueRefresh={this.props.issueRefresh.bind(this)}
+          />,
         );
       }
     }
@@ -92,8 +91,8 @@ class Version extends Component {
       return;
     }
     const data = BacklogStore.getVersionData;
-    const sourceIndex = parseInt(result.source.droppableId.split('-')[0], 10);
-    const tarIndex = parseInt(result.destination.droppableId, 10);
+    const sourceIndex = result.source.index;
+    const tarIndex = result.destination.index;
     let beforeSequence = null;
     let afterSequence = null;
     const res = Array.from(data);
@@ -161,7 +160,7 @@ class Version extends Component {
             <div className="c7n-backlog-versionContent">
               <div className="c7n-backlog-versionTitle">
                 <p style={{ fontWeight: 'bold' }}>版本</p>
-                <div 
+                <div
                   className="c7n-backlog-versionRight"
                   style={{
                     display: 'flex',
@@ -179,7 +178,7 @@ class Version extends Component {
                       }}
                     >创建版本</p>
                   </Permission>
-                  <Icon 
+                  <Icon
                     type="close"
                     role="none"
                     style={{
@@ -194,9 +193,9 @@ class Version extends Component {
                 </div>
               </div>
               <div className="c7n-backlog-versionChoice">
-                <div 
-                  className="c7n-backlog-versionItems" 
-                  style={{ 
+                <div
+                  className="c7n-backlog-versionItems"
+                  style={{
                     color: '#3F51B5',
                     background: BacklogStore.getChosenVersion === 'all' ? 'rgba(140, 158, 255, 0.08)' : '',
                   }}
@@ -206,11 +205,26 @@ class Version extends Component {
                   所有问题
                 </div>
                 <DragDropContext onDragEnd={this.handleVersionDrag}>
-                  {this.renderVersion()}
+                  <Droppable droppableId={'version'} key={'version'}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        style={{
+                          background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                          padding: 'grid',
+                          // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                        }}
+                      >
+                        {this.renderVersion()}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
                 </DragDropContext>
+
                 <div
                   className={BacklogStore.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
-                  style={{ 
+                  style={{
                     background: BacklogStore.getChosenVersion === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
                   }}
                   role="none"

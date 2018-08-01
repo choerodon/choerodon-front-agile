@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Draggable } from 'react-beautiful-dnd';
+import { fromJS, is } from 'immutable';
 import { Icon, Avatar, Tooltip } from 'choerodon-ui';
 import _ from 'lodash';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
@@ -17,6 +18,20 @@ class SprintIssue extends Component {
       },
     };
   }
+
+  shouldComponentUpdate = (nextProps, nextState) => {
+    const thisProps = fromJS(this.props || {});
+    const thisState = fromJS(this.state || {});
+    const nextStates = fromJS(nextState || {});
+    if (thisProps.size !== nextProps.size ||
+      thisState.size !== nextState.size) {
+      return true;
+    }
+    if (is(thisState, nextStates)) {
+      return false;
+    }
+    return true;
+  };
 
   /**
    *拿到首字母
@@ -142,15 +157,15 @@ class SprintIssue extends Component {
                     display: BacklogStore.getClickIssueDetail.issueId === item.issueId ? 'block' : 'none',
                   }}
                 />
-                <div 
+                <div
                   className="c7n-backlog-sprintCount"
                   style={{
                     display: String(this.props.draggableId) === String(item.issueId) && this.props.selected.issueIds.length > 0 ? 'flex' : 'none',
                   }}
                   label="sprintIssue"
                 >{this.props.selected.issueIds.length}</div>
-                <div 
-                  label="sprintIssue" 
+                <div
+                  label="sprintIssue"
                   className="c7n-backlog-sprintIssueSide"
                   style={{
                     // width: 0,
@@ -164,8 +179,8 @@ class SprintIssue extends Component {
                     }}
                   />
                   <div
-                    label="sprintIssue" 
-                    style={{ 
+                    label="sprintIssue"
+                    style={{
                       marginLeft: 8,
                       whiteSpace: this.renderIssueDisplay() ? 'normal' : 'nowrap',
                       textOverflow: 'ellipsis',
@@ -179,13 +194,13 @@ class SprintIssue extends Component {
                     </Tooltip>
                   </div>
                 </div>
-                <div 
-                  style={{ 
+                <div
+                  style={{
                     marginTop: this.props.epicVisible || this.props.versionVisible || JSON.stringify(BacklogStore.getClickIssueDetail) !== '{}' ? 5 : 0,
                     justifyContent: this.renderIssueDisplay() ? 'space-between' : 'flex-end',
                     // width: this.renderIssueDisplay() ? 'unset' : 0,
                     // flex: 2,
-                  }} 
+                  }}
                   label="sprintIssue"
                   className="c7n-backlog-sprintIssueSide"
                 >
@@ -194,14 +209,14 @@ class SprintIssue extends Component {
                       style={{
                         maxWidth: 34,
                         marginLeft: !_.isNull(item.priorityName) && !this.renderIssueDisplay() ? '12px' : 0,
-                      }} 
-                      label="sprintIssue" 
+                      }}
+                      label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
                       {!_.isNull(item.priorityName) ? (
                         <Tooltip title={`优先级: ${item.priorityName}`}>
-                          <span 
-                            label="sprintIssue" 
+                          <span
+                            label="sprintIssue"
                             className="c7n-backlog-sprintIssuePriority"
                             style={{
                               color: this.renderPriorityStyle('color', item),
@@ -212,14 +227,14 @@ class SprintIssue extends Component {
                       ) : ''}
                     </div>
                     <div
-                      style={{ 
+                      style={{
                         maxWidth: 50,
                         marginLeft: item.versionNames.length ? '12px' : 0,
                         border: '1px solid rgba(0, 0, 0, 0.36)',
                         borderRadius: '2px',
                         display: item.versionNames.length > 0 ? 'block' : 'none',
                       }}
-                      label="sprintIssue" 
+                      label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
                       {item.versionNames.length > 0 ? (
@@ -230,20 +245,20 @@ class SprintIssue extends Component {
                         </Tooltip>
                       ) : ''}
                     </div>
-                    <div 
-                      style={{ 
+                    <div
+                      style={{
                         maxWidth: 86,
                         marginLeft: !_.isNull(item.epicName) ? '12px' : 0,
                         border: `1px solid ${item.color}`,
                         display: !_.isNull(item.epicName) ? 'block' : 'none',
-                      }} 
-                      label="sprintIssue" 
+                      }}
+                      label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
                       {!_.isNull(item.epicName) ? (
                         <Tooltip title={`史诗: ${item.epicName}`}>
-                          <span 
-                            label="sprintIssue" 
+                          <span
+                            label="sprintIssue"
                             className="c7n-backlog-sprintIssueEpic"
                             style={{
                             // border: `1px solid ${item.color}`,
@@ -255,14 +270,14 @@ class SprintIssue extends Component {
                     </div>
                   </div>
                   <div className="c7n-backlog-sprintSideRightItems">
-                    <div 
-                      style={{ 
+                    <div
+                      style={{
                         maxWidth: 105,
                         marginLeft: !_.isNull(item.assigneeName) ? '12px' : 0,
                         flexGrow: 0,
                         flexShrink: 0,
-                      }} 
-                      label="sprintIssue" 
+                      }}
+                      label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
                       <UserHead
@@ -274,18 +289,18 @@ class SprintIssue extends Component {
                         }}
                       />
                     </div>
-                    <div 
-                      style={{ 
+                    <div
+                      style={{
                         width: 60,
                         marginLeft: !_.isNull(item.statusName) ? '12px' : 0,
-                      }} 
+                      }}
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
                       {!_.isNull(item.statusName) ? (
                         <Tooltip title={`状态: ${item.statusName}`}>
-                          <span 
-                            label="sprintIssue" 
+                          <span
+                            label="sprintIssue"
                             className="c7n-backlog-sprintIssueStatus"
                             style={{
                               background: item.statusColor ? item.statusColor : '#4d90fe',
@@ -294,8 +309,8 @@ class SprintIssue extends Component {
                         </Tooltip>
                       ) : ''}
                     </div>
-                    <div 
-                      style={{ 
+                    <div
+                      style={{
                         maxWidth: 20,
                         marginLeft: '12px',
                       }}

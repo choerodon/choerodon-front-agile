@@ -159,7 +159,7 @@ class VersionItem extends Component {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
-      <Draggable draggableId={`versionItem-${index}`} key={`versionItem-${index}`} index={`versionItem-${index}`}>
+      <Draggable draggableId={`versionItem-${index}`} key={`versionItem-${index}`} index={index}>
         {(provided1, snapshot1) => (
           <div
             ref={provided1.innerRef}
