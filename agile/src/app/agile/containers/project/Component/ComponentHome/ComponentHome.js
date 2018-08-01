@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import { Button, Table, Spin, Popover, Tooltip, Icon } from 'choerodon-ui';
 import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
 import './ComponentHome.scss';
-import '../../../main.scss';
 import pic from '../../../../assets/image/模块管理－空.png';
 import { loadComponents } from '../../../../api/ComponentApi';
 import CreateComponent from '../ComponentComponent/AddComponent';
