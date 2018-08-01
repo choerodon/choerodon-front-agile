@@ -23,6 +23,16 @@ class BacklogStore {
   @observable quickFilters = [];
   @observable projectInfo = {};
   @observable quickSearchList = [];
+  @observable selectIssues = [];
+
+
+  @computed get getSelectIssue() {
+    return this.selectIssues;
+  }
+
+  @action setSelectIssue(data) {
+    this.selectIssues = data;
+  }
 
   @computed get getProjectInfo() {
     return toJS(this.projectInfo);

@@ -134,7 +134,7 @@ class SprintIssue extends Component {
                 {...provided1.dragHandleProps}
                 style={{
                   userSelect: 'none',
-                  background: this.props.selected.issueIds.includes(item.issueId) ? 'rgb(235, 242, 249)' : this.renderIssueBackground(item),
+                  background: BacklogStore.getSelectIssue.includes(item.issueId) ? 'rgb(235, 242, 249)' : this.renderIssueBackground(item),
                   padding: '10px 36px 10px 20px',
                   borderBottom: '1px solid rgba(0,0,0,0.12)',
                   paddingLeft: 43,
@@ -149,7 +149,9 @@ class SprintIssue extends Component {
                 }}
                 label="sprintIssue"
                 role="none"
-                onClick={this.props.handleClickIssue.bind(this, sprintId, item)}
+                onClick={
+                  this.props.handleClickIssue.bind(this, sprintId, item)
+                }
               >
                 <div
                   className="c7n-backlog-issueSideBorder"

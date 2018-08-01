@@ -166,6 +166,7 @@ class Sprint extends Component {
             issueIds: [item.issueId],
           },
         });
+        BacklogStore.setSelectIssue([item.issueId]);
       } else if (String(
           this.state.selected.droppableId) === String(sprintId)) {
         // 如果点击的是当前列的卡片
@@ -180,6 +181,7 @@ class Sprint extends Component {
                 issueIds: [...originIssueIds, item.issueId],
               },
             });
+            BacklogStore.setSelectIssue([...originIssueIds, item.issueId]);
           } else {
             let clickSprintDatas = [];
             const firstClick = originIssueIds[0];
@@ -209,6 +211,7 @@ class Sprint extends Component {
                 issueIds,
               },
             });
+            BacklogStore.setSelectIssue(issueIds);
           }
         } else if (originIssueIds.length > 1) {
           // 如果存在 并且不是最后一个
@@ -219,6 +222,7 @@ class Sprint extends Component {
               issueIds: originIssueIds,
             },
           });
+          BacklogStore.setSelectIssue(originIssueIds);
         } else {
           this.setState({
             selected: {
@@ -226,6 +230,7 @@ class Sprint extends Component {
               issueIds: [],
             },
           });
+          BacklogStore.setSelectIssue([]);
         }
       }
     } else {
@@ -235,6 +240,7 @@ class Sprint extends Component {
           issueIds: [item.issueId],
         },
       });
+      BacklogStore.setSelectIssue([item.issueId]);
       BacklogStore.setClickIssueDetail(item);
     }
   }

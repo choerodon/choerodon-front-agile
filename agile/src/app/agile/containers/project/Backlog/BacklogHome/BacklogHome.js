@@ -156,13 +156,6 @@ class BacklogHome extends Component {
       message.success('创建成功');
       if (document.getElementById('sprint_last')) {
         document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_last').offsetTop - 100;
-        const anchorElement = document.getElementById('sprint_last');
-        if (anchorElement) {
-          anchorElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-        }
       }
     }).catch((error) => {
       this.setState({
@@ -217,7 +210,7 @@ class BacklogHome extends Component {
     return (
       <Page
         service={[
-          'agile-service.product-version.createVersion',
+          // 'agile-service.product-version.createVersion',
           'agile-service.issue.deleteIssue',
           'agile-service.sprint.queryByProjectId',
         ]}

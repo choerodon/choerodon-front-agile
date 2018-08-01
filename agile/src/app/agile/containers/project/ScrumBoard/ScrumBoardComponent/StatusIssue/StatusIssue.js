@@ -338,7 +338,7 @@ class StatusIssue extends Component {
                       className="c7n-scrumboard-issue"
                       style={{
                         marginLeft: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 16 : 0,
-                        background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',  
+                        background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',
                         borderTop: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 'unset' : '1px solid rgba(0, 0, 0, 0.20)',
                       }}
                     >

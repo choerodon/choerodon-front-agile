@@ -156,8 +156,8 @@ class SprintItem extends Component {
       };
       BacklogStore.axiosEasyCreateIssue(data).then((res) => {
         this.setState({
-          // createIssue: false,
-          createIssueValue: '',
+          createIssue: false,
+          // createIssueValue: '',
           loading: false,
         });
         this.props.refresh();
@@ -783,7 +783,6 @@ class SprintItem extends Component {
                           onClick={() => {
                             this.setState({
                               createIssue: true,
-                              createIssueValue: '',
                             });
                             BacklogStore.axiosGetProjectInfo().then((res) => {
                               BacklogStore.setProjectInfo(res);
