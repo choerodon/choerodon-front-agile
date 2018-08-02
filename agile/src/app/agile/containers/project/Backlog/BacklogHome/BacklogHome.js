@@ -14,6 +14,7 @@ import BacklogStore from '../../../../stores/project/backlog/BacklogStore';
 import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
 
 const { AppState } = stores;
+
 // const { whyDidYouUpdate } = require('why-did-you-update');
 //
 // whyDidYouUpdate(React);

@@ -493,6 +493,7 @@ class ScrumBoardHome extends Component {
       if (data[index].subStatuses.length > 0) {
         result.push(
           <StatusColumn
+            key={data[index].columnId}
             data={data[index]}
           />,
         );
@@ -509,6 +510,7 @@ class ScrumBoardHome extends Component {
         if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
+              key={data[index].columnId}
               data={data[index]}
               parentId={id}
               source={_.isUndefined(id) ? 'other' : id}
@@ -521,6 +523,7 @@ class ScrumBoardHome extends Component {
         if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
+              key={data[index].columnId}
               data={data[index]}
               assigneeId={id}
             />,
@@ -532,6 +535,7 @@ class ScrumBoardHome extends Component {
         if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
+              key={data[index].columnId}
               data={data[index]}
               epicId={id}
             />,
@@ -543,6 +547,7 @@ class ScrumBoardHome extends Component {
         if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
+              key={data[index].columnId}
               data={data[index]}
             />,
           );
@@ -567,6 +572,7 @@ class ScrumBoardHome extends Component {
     for (let index = 0, len = ids.length; index < len; index += 1) {
       result.push(
         <SwimLaneContext
+          key={ids[index].assigneeId}
           data={ids[index]}
           handleDragEnd={this.handleDragEnd.bind(this)}
           renderIssueColumns={this.renderIssueColumns.bind(this)}
@@ -743,7 +749,7 @@ class ScrumBoardHome extends Component {
           >
             {
               ScrumBoardStore.getBoardList.map(item => (
-                <Option value={item.boardId}>
+                <Option key={item.boardId} value={item.boardId}>
                   <Tooltip title={item.name}>
                     {item.name}
                   </Tooltip>
@@ -792,6 +798,7 @@ class ScrumBoardHome extends Component {
                       ScrumBoardStore.getQuickSearchList.length > 0 ? 
                         ScrumBoardStore.getQuickSearchList.map(item => (
                           <p
+                            key={item.filterId}
                             className="c7n-scrumTools-filter"
                             style={{
                               color: this.state.quickFilter.indexOf(item.filterId) !== -1 ? 'white' : '#3F51B5',
@@ -956,7 +963,7 @@ class ScrumBoardHome extends Component {
                     ScrumBoardStore
                       .getBoardData[ScrumBoardStore.getBoardData.length - 1].subStatuses
                       .map(item => (
-                        <Option value={item.id}>{item.name}</Option>
+                        <Option key={item.id} value={item.id}>{item.name}</Option>
                       )) : ''
                 }
               </Select>
