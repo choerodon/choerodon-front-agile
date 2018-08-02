@@ -31,7 +31,7 @@ class StatusBodyColumn extends Component {
   //     }
   //   }
   // }
-  renderIssues(issues, droppableId, statusName, categoryCode) {
+  renderIssues(issues, droppableId, statusName, categoryCode, clickItem) {
     let data = issues;
     data = _.orderBy(data, ['rank'], 'desc');
     // data = _.sortBy(data, o => o.rank);
@@ -47,6 +47,7 @@ class StatusBodyColumn extends Component {
             if (_.indexOf(parentIds, data[index].issueId) === -1) {
               result.push(
                 <StatusIssue
+                  key={data[index].issueId}
                   data={data[index]}
                   index={index}
                   droppableId={droppableId}
@@ -54,6 +55,11 @@ class StatusBodyColumn extends Component {
                   categoryCode={categoryCode}
                   statusData={this.props.data.subStatuses}
                   renderIssues={this.renderIssues.bind(this)}
+                  ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
+                  parentsIds={ScrumBoardStore.getParentIds}
+                  epicDatas={ScrumBoardStore.getEpicData}
+                  dragStartData={ScrumBoardStore.getDragStartItem}
+                  swimLaneCode={ScrumBoardStore.getSwimLaneCode}
                 />,
               );
             }
@@ -64,6 +70,7 @@ class StatusBodyColumn extends Component {
           if (data[index].parentIssueId === this.props.parentId) {
             result.push(
               <StatusIssue
+                key={data[index].issueId}
                 data={data[index]}
                 index={index}
                 droppableId={droppableId}
@@ -71,6 +78,11 @@ class StatusBodyColumn extends Component {
                 categoryCode={categoryCode}
                 statusData={this.props.data.subStatuses}
                 renderIssues={this.renderIssues.bind(this)}
+                ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
+                parentsIds={ScrumBoardStore.getParentIds}
+                epicDatas={ScrumBoardStore.getEpicData}
+                dragStartData={ScrumBoardStore.getDragStartItem}
+                swimLaneCode={ScrumBoardStore.getSwimLaneCode}
               />,
             );
           }
@@ -83,6 +95,7 @@ class StatusBodyColumn extends Component {
             if (data[index].assigneeId === this.props.assigneeId) {
               result.push(
                 <StatusIssue
+                  key={data[index].issueId}
                   data={data[index]}
                   index={index}
                   droppableId={droppableId}
@@ -90,6 +103,11 @@ class StatusBodyColumn extends Component {
                   categoryCode={categoryCode}
                   statusData={this.props.data.subStatuses}
                   renderIssues={this.renderIssues.bind(this)}
+                  ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
+                  parentsIds={ScrumBoardStore.getParentIds}
+                  epicDatas={ScrumBoardStore.getEpicData}
+                  dragStartData={ScrumBoardStore.getDragStartItem}
+                  swimLaneCode={ScrumBoardStore.getSwimLaneCode}
                 />,
               );
             }
@@ -100,6 +118,7 @@ class StatusBodyColumn extends Component {
           if (!data[index].assigneeId) {
             result.push(
               <StatusIssue
+                key={data[index].issueId}
                 data={data[index]}
                 index={index}
                 droppableId={droppableId}
@@ -107,6 +126,11 @@ class StatusBodyColumn extends Component {
                 categoryCode={categoryCode}
                 statusData={this.props.data.subStatuses}
                 renderIssues={this.renderIssues.bind(this)}
+                ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
+                parentsIds={ScrumBoardStore.getParentIds}
+                epicDatas={ScrumBoardStore.getEpicData}
+                dragStartData={ScrumBoardStore.getDragStartItem}
+                swimLaneCode={ScrumBoardStore.getSwimLaneCode}
               />,
             );
           }
@@ -119,6 +143,7 @@ class StatusBodyColumn extends Component {
             if (data[index].epicId === this.props.epicId) {
               result.push(
                 <StatusIssue
+                  key={data[index].issueId}
                   data={data[index]}
                   index={index}
                   droppableId={droppableId}
@@ -126,6 +151,11 @@ class StatusBodyColumn extends Component {
                   categoryCode={categoryCode}
                   statusData={this.props.data.subStatuses}
                   renderIssues={this.renderIssues.bind(this)}
+                  ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
+                  parentsIds={ScrumBoardStore.getParentIds}
+                  epicDatas={ScrumBoardStore.getEpicData}
+                  dragStartData={ScrumBoardStore.getDragStartItem}
+                  swimLaneCode={ScrumBoardStore.getSwimLaneCode}
                 />,
               );
             }
@@ -136,6 +166,7 @@ class StatusBodyColumn extends Component {
           if (!data[index].epicId) {
             result.push(
               <StatusIssue
+                key={data[index].issueId}
                 data={data[index]}
                 index={index}
                 droppableId={droppableId}
@@ -143,6 +174,11 @@ class StatusBodyColumn extends Component {
                 categoryCode={categoryCode}
                 statusData={this.props.data.subStatuses}
                 renderIssues={this.renderIssues.bind(this)}
+                ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
+                parentsIds={ScrumBoardStore.getParentIds}
+                epicDatas={ScrumBoardStore.getEpicData}
+                dragStartData={ScrumBoardStore.getDragStartItem}
+                swimLaneCode={ScrumBoardStore.getSwimLaneCode}
               />,
             );
           }
@@ -152,6 +188,7 @@ class StatusBodyColumn extends Component {
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
           <StatusIssue
+            key={data[index].issueId}
             data={data[index]}
             index={index}
             droppableId={droppableId}
@@ -159,6 +196,11 @@ class StatusBodyColumn extends Component {
             categoryCode={categoryCode}
             statusData={this.props.data.subStatuses}
             renderIssues={this.renderIssues.bind(this)}
+            ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
+            parentsIds={ScrumBoardStore.getParentIds}
+            epicDatas={ScrumBoardStore.getEpicData}
+            dragStartData={ScrumBoardStore.getDragStartItem}
+            swimLaneCode={ScrumBoardStore.getSwimLaneCode}
           />,
         );
       }
@@ -440,13 +482,14 @@ class StatusBodyColumn extends Component {
    * @returns
    * @memberof StatusBodyColumn
    */
-  renderStatusColumn() {
+  renderStatusColumn(clickItem) {
     const dragStartData = ScrumBoardStore.getDragStartItem;
     const data = this.props.data.subStatuses;
     const result = [];
     for (let index = 0, len = data.length; index < len; index += 1) {
       result.push(
-        <Droppable 
+        <Droppable
+          key={data[index].id} 
           droppableId={
             JSON.stringify({
               columnId: this.props.data.columnId,
@@ -489,7 +532,7 @@ class StatusBodyColumn extends Component {
                 {data[index].name}
               </p>
               <div className="c7n-itemBodyColumn" style={{ minHeight: 83 }}>
-                {this.renderIssues(data[index].issues, data[index].id, data[index].name, data[index].categoryCode)}
+                {this.renderIssues(data[index].issues, data[index].id, data[index].name, data[index].categoryCode, clickItem)}
               </div>
             </div>
           )}
@@ -499,9 +542,10 @@ class StatusBodyColumn extends Component {
     return result;
   }
   render() {
+    const clickItem = ScrumBoardStore.getClickIssueDetail;
     return (
       <div className="c7n-scrumboard-statusBody">
-        {this.renderStatusColumn()}
+        {this.renderStatusColumn(clickItem)}
       </div>
     );
   }
