@@ -10,6 +10,7 @@ import './BacklogHome.scss';
 import BacklogStore from '../../../../stores/project/backlog/BacklogStore';
 
 const { AppState } = stores;
+
 // const { whyDidYouUpdate } = require('why-did-you-update');
 //
 // whyDidYouUpdate(React);

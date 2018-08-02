@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import { Draggable } from 'react-beautiful-dnd';
@@ -6,11 +6,23 @@ import { Icon, Avatar, Tooltip } from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import './StatusIssue.scss';
 // 单个列的issueCard
-@observer
+// @observer
 class StatusIssue extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+  }
+  shouldComponentUpdate(nextProps) {
+    if (nextProps.ifClickMe !== this.props.ifClickMe) {
+      return true;
+    }
+    if (nextProps.dragStartData !== this.props.dragStartData) {
+      return true;
+    }
+    if (nextProps.data.objectVersionNumber !== this.props.data.objectVersionNumber) {
+      return true;
+    }
+    return false;
   }
   /**
    *获取首字母
@@ -67,7 +79,7 @@ class StatusIssue extends Component {
    * @memberof StatusIssue
    */
   getChildren() {
-    const parentsIds = ScrumBoardStore.getParentIds;
+    const parentsIds = this.props.parentsIds;
     const itemIssueId = this.props.data.issueId;
     const itemAssigneeId = this.props.data.assigneeId;
     const allStatus = this.props.statusData;
@@ -99,9 +111,9 @@ class StatusIssue extends Component {
       }
       const result = [];
       if (childrenList.length > 0) {
-        const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
+        // const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
         for (let index = 0, len = childrenList.length; index < len; index += 1) {
-          result.push(this.renderReturn(childrenList[index], `sub-${index}`, issueId, 'child'));
+          result.push(this.renderReturn(childrenList[index], `sub-${index}`, 'child'));
         }
         return result;
       } 
@@ -115,7 +127,7 @@ class StatusIssue extends Component {
    * @memberof StatusIssue
    */
   renderIssueDisplay() {
-    const dragStartData = ScrumBoardStore.getDragStartItem;
+    const dragStartData = this.props.dragStartData;
     // 没有开始拖
     if (JSON.stringify(dragStartData) === '{}') {
       return 'visible';
@@ -230,14 +242,14 @@ class StatusIssue extends Component {
             if (columnData[index].issues[index2].assigneeId) {
               if (columnData[index].issues[index2].assigneeId === item.assigneeId) {
                 if (!type) {
-                  if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+                  if (this.props.swimLaneCode === 'assignee') {
                     result = 'none';
                   }
                 }
               }
             } else if (!item.assigneeId) {
               if (!type) {
-                if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+                if (this.props.swimLaneCode === 'assignee') {
                   result = 'none';
                 }
               }
@@ -266,7 +278,7 @@ class StatusIssue extends Component {
    * @memberof StatusIssue
    */
   renderEpicData(param) {
-    const data = ScrumBoardStore.getEpicData;
+    const data = this.props.epicDatas;
     const item = this.props.data;
     let result;
     for (let index = 0, len = data.length; index < len; index += 1) {
@@ -287,10 +299,11 @@ class StatusIssue extends Component {
    * @returns
    * @memberof StatusIssue
    */
-  renderReturn(item, index, issueId, type) {
+  renderReturn(item, index, type) {
     if (this.renderSubDisplay(item, type) === 'block') {
       return (
         <div
+          key={item.issueId}
           className="c7n-boardIssue"
           style={{
             // borderTop: this.renderSubDisplay(item, type, 'border') ? '1px solid rgba(0, 0, 0, 0.20)' : 'unset',
@@ -325,7 +338,7 @@ class StatusIssue extends Component {
                       overflow: 'hidden',
                     }}
                     role="none"
-                    onClick={() => {
+                    onClick={(e) => {
                       ScrumBoardStore.setClickIssueDetail(item);
                     }}
                   >
@@ -337,24 +350,24 @@ class StatusIssue extends Component {
                     <div 
                       className="c7n-scrumboard-issue"
                       style={{
-                        marginLeft: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 16 : 0,
-                        background: ScrumBoardStore.getClickIssueDetail.issueId === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',
-                        borderTop: item.parentIssueId && ScrumBoardStore.getSwimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 'unset' : '1px solid rgba(0, 0, 0, 0.20)',
+                        marginLeft: item.parentIssueId && this.props.swimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 16 : 0,
+                        background: this.props.ifClickMe ? 'rgba(140, 158, 255, 0.08)' : 'white',  
+                        borderTop: item.parentIssueId && this.props.swimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 'unset' : '1px solid rgba(0, 0, 0, 0.20)',
                       }}
                     >
                       <div 
                         className="c7n-scrumboard-issueBorder" 
                         style={{
                           background: this.renderTypeCode('background', item),
-                          display: ScrumBoardStore.getSwimLaneCode === 'assignee' ? 'block' : 'none',
+                          display: this.props.swimLaneCode === 'assignee' ? 'block' : 'none',
                         }}
                       />
                       <div style={{ flexGrow: 1 }}>
                         <div
-                          label={ScrumBoardStore.getClickIssueDetail.issueId}
+                          // label={ScrumBoardStore.getClickIssueDetail.issueId}
                           className="c7n-scrumboard-issueTop"
                           style={{
-                            display: issueId ? 'block' : 'flex',
+                            // display: issueId ? 'block' : 'flex',
                             flexWrap: 'wrap',
                           }}
                         >
@@ -373,7 +386,7 @@ class StatusIssue extends Component {
                         <div style={{ display: 'flex', margin: '5px 0 5px 12px', alignItems: 'center' }}>
                           <p
                             style={{
-                              margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 5px 5px 15px' : '0 0 0 13px',
+                              // margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 5px 5px 15px' : '0 0 0 13px',
                             }}
                           >
                             <Tooltip title={`状态: ${item.statusName}`}>
@@ -394,7 +407,7 @@ class StatusIssue extends Component {
                           </p>
                           <p
                             style={{
-                              margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
+                              // margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
                             }}
                           >
                             <Tooltip title={`史诗: ${this.renderEpicData('epicName')}`}>
@@ -403,7 +416,7 @@ class StatusIssue extends Component {
                                 style={{
                                   color: this.renderEpicData('color'),
                                   border: `1px solid ${this.renderEpicData('color')}`,
-                                  // marginLeft: '10px',
+                                  marginLeft: '10px',
                                   padding: '2px 8px',
                                   maxWidth: '80px',
                                   borderRadius: 2,
@@ -466,7 +479,7 @@ class StatusIssue extends Component {
             }
           </Draggable>
           <div>
-            {!type && ScrumBoardStore.getSwimLaneCode === 'assignee' ? this.getChildren() : ''}
+            {!type && this.props.swimLaneCode === 'assignee' ? this.getChildren() : ''}
           </div>
         </div>
       );
@@ -476,8 +489,8 @@ class StatusIssue extends Component {
   render() {
     const item = this.props.data;
     const index = this.props.index;
-    const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
-    return this.renderReturn(item, index, issueId);
+    // const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
+    return this.renderReturn(item, index);
   }
 }
 
