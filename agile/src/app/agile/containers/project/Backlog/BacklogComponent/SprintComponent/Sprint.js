@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Spin } from 'choerodon-ui';
+import { Spin, Tooltip } from 'choerodon-ui';
 import _ from 'lodash';
 import { stores } from 'choerodon-front-boot';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import './Sprint.scss';
+import Typetag from '../../../../../components/TypeTag';
+import UserHead from '../../../../../components/UserHead';
 import SprintItem from './SprintItem';
 import EmptyBacklog from '../../../../../assets/image/emptyBacklog.png';
 import SprintIssue from './SprintIssue';
@@ -29,70 +31,8 @@ class Sprint extends Component {
       },
     };
   }
-
   componentDidMount() {
     this.props.onRef(this);
-    window.addEventListener('keydown', this.onKeyDown.bind(this));
-    window.addEventListener('keyup', this.onKeyUp.bind(this));
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.onKeyDown.bind(this));
-    window.removeEventListener('keyup', this.onKeyUp.bind(this));
-  }
-
-  /**
-   *父组件修改该组件state的方法
-   *
-   * @param {*} params
-   * @param {*} data
-   * @memberof Sprint
-   */
-  onChangeState(params, data) {
-    this.setState({
-      [params]: data,
-    });
-  }
-
-  /**
-   *键盘按起事件
-   *
-   * @param {*} event
-   * @memberof Sprint
-   */
-  onKeyUp(event) {
-    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
-      this.setState({
-        keydown: '',
-      });
-    }
-  }
-
-  /**
-   *键盘按下事件
-   *
-   * @param {*} event
-   * @memberof Sprint
-   */
-  onKeyDown(event) {
-    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
-      if (event.keyCode !== this.state.keydown) {
-        this.setState({
-          keydown: event.keyCode,
-        });
-      }
-    }
-  }
-
-  /**
-   *父组件获取该组件state方法
-   *
-   * @param {*} data
-   * @returns
-   * @memberof Sprint
-   */
-  getCurrentState(data) {
-    return this.state[data];
   }
 
   /**
@@ -100,7 +40,7 @@ class Sprint extends Component {
    *
    * @memberof Sprint
    */
-  handleBlurCreateIssue() {
+  handleBlurCreateIssue=()=> {
     this.setState({
       loading: true,
     });
@@ -140,7 +80,7 @@ class Sprint extends Component {
   /**
    * issue详情回退关闭详情侧边栏
    */
-  resetMuilterChose() {
+  resetMuilterChose=() => {
     this.setState({
       selected: {
         droppableId: '',
@@ -148,204 +88,8 @@ class Sprint extends Component {
       },
     });
   }
-  /**
-   *单个issue点击事件
-   *
-   * @param {*} sprintId
-   * @param {*} item
-   * @memberof Sprint
-   */
-  handleClickIssue(sprintId, item) {
-    // command ctrl shift
-    if (this.state.keydown === 91 || this.state.keydown === 17 || this.state.keydown === 16) {
-      // 如果没点击
-      if (this.state.selected.droppableId === '') {
-        this.setState({
-          selected: {
-            droppableId: sprintId,
-            issueIds: [item.issueId],
-          },
-        });
-        BacklogStore.setSelectIssue([item.issueId]);
-      } else if (String(
-          this.state.selected.droppableId) === String(sprintId)) {
-        // 如果点击的是当前列的卡片
-        const originIssueIds = _.clone(this.state.selected.issueIds);
-        // 如果不存在
-        if (originIssueIds.indexOf(item.issueId) === -1) {
-          // 如果不是shift 则加一条issueid
-          if (this.state.keydown !== 16) {
-            this.setState({
-              selected: {
-                droppableId: sprintId,
-                issueIds: [...originIssueIds, item.issueId],
-              },
-            });
-            BacklogStore.setSelectIssue([...originIssueIds, item.issueId]);
-          } else {
-            let clickSprintDatas = [];
-            const firstClick = originIssueIds[0];
-            if (item.sprintId) {
-              // 如果是shift 并且点击的是冲刺里的issue
-              clickSprintDatas = BacklogStore.getSprintData.sprintData
-                .filter(s => s.sprintId === item.sprintId)[0].issueSearchDTOList;
-            } else {
-              // 如果是shift 并且点击的是backlog里的issue
-              clickSprintDatas = BacklogStore.getSprintData.backlogData.backLogIssue;
-            }
-            const indexs = [];
-            for (let index = 0, len = clickSprintDatas.length; index < len; index += 1) {
-              if (clickSprintDatas[index].issueId === firstClick || clickSprintDatas[index].issueId === item.issueId) {
-                indexs.push(index);
-              }
-            }
-            const issueIds = [];
-            for (let index = 0, len = clickSprintDatas.length; index < len; index += 1) {
-              if (index >= indexs[0] && index <= indexs[1]) {
-                issueIds.push(clickSprintDatas[index].issueId);
-              }
-            }
-            this.setState({
-              selected: {
-                droppableId: sprintId,
-                issueIds,
-              },
-            });
-            BacklogStore.setSelectIssue(issueIds);
-          }
-        } else if (originIssueIds.length > 1) {
-          // 如果存在 并且不是最后一个
-          originIssueIds.splice(originIssueIds.indexOf(item.issueId), 1);
-          this.setState({
-            selected: {
-              droppableId: sprintId,
-              issueIds: originIssueIds,
-            },
-          });
-          BacklogStore.setSelectIssue(originIssueIds);
-        } else {
-          this.setState({
-            selected: {
-              droppableId: '',
-              issueIds: [],
-            },
-          });
-          BacklogStore.setSelectIssue([]);
-        }
-      }
-    } else {
-      this.setState({
-        selected: {
-          droppableId: sprintId,
-          issueIds: [item.issueId],
-        },
-      });
-      BacklogStore.setSelectIssue([item.issueId]);
-      BacklogStore.setClickIssueDetail(item);
-    }
-  }
-  /**
-   *渲染issue组件
-   *
-   * @param {*} data
-   * @param {*} sprintId
-   * @returns
-   * @memberof Sprint
-   */
-  renderSprintIssue(data, sprintId) {
-    const result = [];
-    for (let index = 0, len = data.length; index < len; index += 1) {
-      result.push(
-        <SprintIssue
-          key={`sprint-${index}`}
-          data={data[index]}
-          index={index}
-          selected={this.state.selected}
-          epicVisible={this.props.epicVisible}
-          versionVisible={this.props.versionVisible}
-          sprintId={sprintId}
-          handleClickIssue={this.handleClickIssue.bind(this)}
-          draggableId={this.state.draggableId}
-        />,
-      );
-    }
-    return result;
-  }
-  /**
-   *渲染非待办事项冲刺
-   *
-   * @returns
-   * @memberof Sprint
-   */
-  renderSprint() {
-    let result = [];
-    if (JSON.stringify(BacklogStore.getSprintData) !== '{}') {
-      const data = BacklogStore.getSprintData.sprintData;
-      if (data) {
-        if (data.length > 0) {
-          for (let index = 0, len = data.length; index < len; index += 1) {
-            result.push(
-              <SprintItem
-                renderSprintIssue={this.renderSprintIssue.bind(this)}
-                key={`sprint-${index}`}
-                item={data[index]}
-                refresh={this.props.refresh.bind(this)}
-                index={index}
-              />
-              ,
-            );
-          }
-        } else {
-          result = (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: '40px 0',
-              }}
-            >
-              <img style={{ width: 172 }} alt="emptybacklog" src={EmptyBacklog} />
-              <div style={{ marginLeft: 40 }}>
-                <p style={{ color: 'rgba(0,0,0,0.65)' }}>用问题填充您的待办事项</p>
-                <p style={{ fontSize: 16, lineHeight: '28px', marginTop: 8 }}>这是您的团队待办事项。创建并预估新的问题，并通<br />过上下拖动来对待办事项排优先级</p>
-              </div>
-            </div>
-          );
-        }
-      }
-    }
-    return result;
-  }
-  /**
-   *渲染待办事项
-   *
-   * @returns
-   * @memberof Sprint
-   */
-  renderBacklog() {
-    if (JSON.stringify(BacklogStore.getSprintData) !== '{}') {
-      const data = BacklogStore.getSprintData.backlogData;
-      if (data) {
-        const paramItem = {
-          sprintName: '待办事项',
-          issueSearchDTOList: data.backLogIssue,
-          sprintId: 'backlog',
-        };
-        return (
-          <SprintItem
-            renderSprintIssue={this.renderSprintIssue.bind(this)}
-            backlog
-            item={paramItem}
-            refresh={this.props.refresh.bind(this)}
-          />
-        );
-      }
-    }
-    return '';
-  }
 
-  onDragEnd(result) {
+  onDragEnd=(result) => {
     // this.props.changeEpicStat();
     this.props.version.changeState([]);
     this.props.epic.changeState([]);
@@ -377,7 +121,7 @@ class Sprint extends Component {
    * @returns
    * @memberof BacklogHome
    */
-  getDestinationData(endId, endIndex, newData) {
+  getDestinationData =(endId, endIndex, newData) => {
     let destinationData = {};
     if (endId !== 'backlog') {
       for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
@@ -410,7 +154,7 @@ class Sprint extends Component {
   /**
    * 加载数据
    */
-  getSprint() {
+  getSprint=() => {
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((data) => {
       BacklogStore.setSprintData(data);
       this.setState({
@@ -431,10 +175,10 @@ class Sprint extends Component {
    * @param {*} newData1
    * @memberof BacklogHome
    */
-  dragToSprint(result, sourceId, endId, endIndex, originData, newData1) {
+  dragToSprint=(result, sourceId, endId, endIndex, originData, newData1) => {
     const newData = _.clone(newData1);
     // 如果是多选
-    if (this.getCurrentState('selected').issueIds.length > 0) {
+    if (this.sprintItemRef.getCurrentState('selected').issueIds.length > 0) {
       const destinationData = this.getDestinationData(endId, endIndex, newData);
       let spliceDatas = [];
       // 起始如果是sprint
@@ -442,13 +186,13 @@ class Sprint extends Component {
         for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
           if (String(newData.sprintData[index].sprintId) === String(sourceId)) {
             spliceDatas = _.remove(newData.sprintData[index].issueSearchDTOList,
-              n => this.getCurrentState('selected').issueIds.indexOf(n.issueId) !== -1);
+              n => this.sprintItemRef.getCurrentState('selected').issueIds.indexOf(n.issueId) !== -1);
           }
         }
       } else {
         // 起始如果是backlog
         spliceDatas = _.remove(newData.backlogData.backLogIssue,
-          n => this.getCurrentState('selected').issueIds.indexOf(n.issueId) !== -1);
+          n => this.sprintItemRef.getCurrentState('selected').issueIds.indexOf(n.issueId) !== -1);
       }
       const axiosParam = {};
       // 如果移动到sprint
@@ -477,7 +221,7 @@ class Sprint extends Component {
             }
             axiosParam.before = endIndex === 0;
             axiosParam.rankIndex = result.source.index > result.destination.index;
-            axiosParam.issueIds = this.getCurrentState('selected').issueIds;
+            axiosParam.issueIds = this.sprintItemRef.getCurrentState('selected').issueIds;
             axiosParam.outsetIssueId = destinationData.issueId;
             BacklogStore.setSprintData(newData);
           }
@@ -504,7 +248,7 @@ class Sprint extends Component {
         }
         axiosParam.before = endIndex === 0;
         axiosParam.rankIndex = result.source.index > result.destination.index;
-        axiosParam.issueIds = this.getCurrentState('selected').issueIds;
+        axiosParam.issueIds = this.sprintItemRef.getCurrentState('selected').issueIds;
         axiosParam.outsetIssueId =
           destinationData.issueId;
         BacklogStore.setSprintData(newData);
@@ -600,19 +344,19 @@ class Sprint extends Component {
   render() {
     return (
       <DragDropContext
-        onDragEnd={this.onDragEnd.bind(this)}
+        onDragEnd={this.onDragEnd}
         onDragStart={(result) => {
           BacklogStore.setIsDragging(true);
           this.onChangeState('draggableId', result.draggableId);
-          if (this.getCurrentState('selected').issueIds.indexOf(result.draggableId) === -1) {
+          if (this.sprintItemRef.getCurrentState('selected').issueIds.indexOf(result.draggableId) === -1) {
             this.onChangeState('selected', {
               droppableId: '',
               issueIds: [],
             });
           }
-          if (this.getCurrentState('selected').issueIds.length > 0) {
-            this.props.version.changeState(this.getCurrentState('selected').issueIds);
-            this.props.epic.changeState(this.getCurrentState('selected').issueIds);
+          if (this.sprintItemRef.getCurrentState('selected').issueIds.length > 0) {
+            this.props.version.changeState(this.sprintItemRef.getCurrentState('selected').issueIds);
+            this.props.epic.changeState(this.sprintItemRef.getCurrentState('selected').issueIds);
           } else {
             this.props.version.changeState([result.draggableId]);
             this.props.epic.changeState([result.draggableId]);
@@ -624,8 +368,14 @@ class Sprint extends Component {
           className="c7n-backlog-sprint"
         >
           <Spin spinning={this.props.spinIf}>
-            {this.renderSprint()}
-            {this.renderBacklog()}
+            <SprintItem
+              epicVisible={this.props.epicVisible}
+              versionVisible={this.props.versionVisible}
+              onRef={(ref) => {
+                this.sprintItemRef = ref;
+              }}
+              refresh={this.props.refresh}
+            />
           </Spin>
         </div>
       </DragDropContext>

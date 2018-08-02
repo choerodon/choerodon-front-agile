@@ -4,7 +4,7 @@ import { Form, Modal, Select, Input, DatePicker } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
-import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
+// import this.props.store from '../../../../../stores/project/backlog/this.props.store';
 
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
@@ -27,7 +27,7 @@ class StartSprint extends Component {
    * @param {*} e
    * @memberof StartSprint
    */
-  handleStartSprint(e) {
+  handleStartSprint =(e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -40,7 +40,7 @@ class StartSprint extends Component {
           sprintName: values.name,
           objectVersionNumber: this.props.data.objectVersionNumber,
         };
-        BacklogStore.axiosStartSprint(data).then((res) => {
+        this.props.store.axiosStartSprint(data).then((res) => {
           this.props.onCancel();
           this.props.refresh();
         }).catch((error) => {
@@ -51,15 +51,15 @@ class StartSprint extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const data = this.props.data;
-    const completeMessage = JSON.stringify(BacklogStore.getOpenSprintDetail) === '{}' ? null : BacklogStore.getOpenSprintDetail;
+    const completeMessage = JSON.stringify(this.props.store.getOpenSprintDetail) === '{}' ? null : this.props.store.getOpenSprintDetail;
     return (
       <Sidebar
         title="开启冲刺"
         visible={this.props.visible}
         okText="开启"
         cancelText="取消"
-        onCancel={this.props.onCancel.bind(this)}
-        onOk={this.handleStartSprint.bind(this)}
+        onCancel={this.props.onCancel}
+        onOk={this.handleStartSprint}
       >
         <Content
           style={{

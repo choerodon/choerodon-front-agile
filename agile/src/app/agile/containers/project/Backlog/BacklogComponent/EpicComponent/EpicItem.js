@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { Dropdown, Menu, Input, Icon } from 'choerodon-ui';
 import _ from 'lodash';
-import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
+// import this.props.store from '../../../../../stores/project/backlog/this.props.store';
 
 @inject('AppState')
 @observer
@@ -26,7 +26,7 @@ class EpicItem extends Component {
         <div style={{ padding: '24px 12px 12px 12px' }}>
           颜色
           <div className="c7n-backlog-epicColor">
-            {BacklogStore.getColorLookupValue.map(item => (
+            {this.props.store.getColorLookupValue.map(item => (
               <div
                 key={item.name}
                 style={{ background: item.name }}
@@ -39,7 +39,7 @@ class EpicItem extends Component {
                     issueId: this.props.data.issueId,
                     objectVersionNumber: this.props.data.objectVersionNumber,
                   };
-                  BacklogStore.axiosUpdateIssue(data).then((res) => {
+                  this.props.store.axiosUpdateIssue(data).then((res) => {
                     this.props.refresh();
                   }).catch((error) => {
                   });
@@ -68,7 +68,7 @@ class EpicItem extends Component {
       });
     }
     if (e.key === '2') {
-      BacklogStore.setClickIssueDetail(this.props.data);
+      this.props.store.setClickIssueDetail(this.props.data);
     }
   }
   /**
@@ -87,17 +87,17 @@ class EpicItem extends Component {
       issueId: this.props.data.issueId,
       epicName: e.target.value,
     };
-    BacklogStore.axiosUpdateIssue(dataP).then((res) => {
-      const originEpic = _.clone(BacklogStore.getEpicData);
+    this.props.store.axiosUpdateIssue(dataP).then((res) => {
+      const originEpic = _.clone(this.props.store.getEpicData);
       originEpic[this.props.index].epicName = res.epicName;
       originEpic[this.props.index].objectVersionNumber = res.objectVersionNumber;
-      BacklogStore.setEpicData(originEpic);
+      this.props.store.setEpicData(originEpic);
     }).catch((error) => {
     });
   }
   render() {
     const item = this.props.data;
-    const data = BacklogStore.getEpicData;
+    const data = this.props.store.getEpicData;
     const index = this.props.index;
     return (
       <Draggable draggableId={`epicItem-${index}`} key={`epicItem-${index}`} index={index}>
@@ -106,9 +106,9 @@ class EpicItem extends Component {
             ref={provided1.innerRef}
             {...provided1.draggableProps}
             {...provided1.dragHandleProps}
-            className={BacklogStore.getIsDragging ? 'c7n-backlog-epicItems c7n-backlog-dragToEpic' : 'c7n-backlog-epicItems'}
+            className={this.props.store.getIsDragging ? 'c7n-backlog-epicItems c7n-backlog-dragToEpic' : 'c7n-backlog-epicItems'}
             style={{
-              background: BacklogStore.getChosenEpic === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',
+              background: this.props.store.getChosenEpic === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',
               paddingLeft: 0,
               cursor: 'move',
               ...provided1.draggableProps.style,
@@ -116,8 +116,8 @@ class EpicItem extends Component {
             role="none"
             onClick={this.props.handleClickEpic.bind(this, item.issueId)}
             onMouseUp={() => {
-              if (BacklogStore.getIsDragging) {
-                BacklogStore.axiosUpdateIssuesToEpic(
+              if (this.props.store.getIsDragging) {
+                this.props.store.axiosUpdateIssuesToEpic(
                   item.issueId, this.props.draggableIds).then((res) => {
                   this.props.issueRefresh();
                   this.props.refresh();
@@ -137,7 +137,7 @@ class EpicItem extends Component {
                 onClick={(e) => {
                   e.stopPropagation();
                   data[index].expand = !data[index].expand;
-                  BacklogStore.setEpicData(data);
+                  this.props.store.setEpicData(data);
                 }}
               />
               <div style={{ width: '100%' }}>

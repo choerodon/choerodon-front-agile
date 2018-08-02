@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 import { asyncRouter, nomatch } from 'choerodon-front-boot';
 
-const BacklogHome = asyncRouter(() => (import('./BacklogHome')));
+const BacklogHome = asyncRouter(() => (import('./BacklogHome')), () => import('../../../stores/project/backlog/BacklogStore'));
 
 const BacklogIndex = ({ match }) => (
   <Switch>

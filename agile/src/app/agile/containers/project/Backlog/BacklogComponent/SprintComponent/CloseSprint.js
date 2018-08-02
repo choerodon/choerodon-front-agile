@@ -28,7 +28,7 @@ class CloseSprint extends Component {
       projectId: parseInt(AppState.currentMenuType.id, 10),
       sprintId: this.props.data.sprintId,
     };
-    BacklogStore.axiosCloseSprint(data).then((res) => {
+    this.props.store.axiosCloseSprint(data).then((res) => {
       this.props.onCancel();
       this.props.refresh();
     }).catch((error) => {
@@ -36,7 +36,7 @@ class CloseSprint extends Component {
   }
   render() {
     const data = this.props.data;
-    const completeMessage = JSON.stringify(BacklogStore.getSprintCompleteMessage) === '{}' ? null : BacklogStore.getSprintCompleteMessage;
+    const completeMessage = JSON.stringify(this.props.store.getSprintCompleteMessage) === '{}' ? null : this.props.store.getSprintCompleteMessage;
     return (
       <Sidebar
         title="完成冲刺"
