@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { observable, action, computed, toJS } from 'mobx';
+import { observable, action, computed, toJS, reaction } from 'mobx';
 import { store, stores } from 'choerodon-front-boot';
 
 const { AppState } = stores;
@@ -25,6 +25,44 @@ class BacklogStore {
   @observable quickSearchList = [];
   @observable selectIssues = [];
 
+
+  @computed get asJson() {
+    return {
+      sprintData: this.sprintData,
+      versionData: this.versionData,
+      epicData: this.epicData,
+      chosenVersion: this.chosenVersion,
+      chosenEpic: this.chosenEpic,
+      onlyMe: this.onlyMe,
+      recent: this.recent,
+      isDragging: this.isDragging,
+      isLeaveSprint: this.isLeaveSprint,
+      clickIssueDetail: this.clickIssueDetail,
+      sprintCompleteMessage: this.sprintCompleteMessage,
+      openSprintDetail: this.openSprintDetail,
+      sprintWidth: this.sprintWidth,
+      colorLookupValue: this.colorLookupValue,
+      quickFilters: this.quickFilters,
+      projectInfo: this.projectInfo,
+      quickSearchList: this.quickSearchList,
+      selectIssues: this.selectIssues,
+    };
+  }
+
+  saveHandler = reaction(
+    // 观察在 JSON 中使用了的任何东西:
+    () => this.asJson,
+    // 如何 autoSave 为 true, 把 json 发送到服务端
+    (json, reactions) => {
+      console.log(json);
+      reactions.dispose();
+    },
+  );
+
+  dispose() {
+    // 清理观察者
+    this.saveHandler();
+  }
 
   @computed get getSelectIssue() {
     return this.selectIssues;
@@ -266,6 +304,8 @@ class BacklogStore {
   }
 
   @action setSprintData(data) {
+    let data1 = this.getSprintData;
+    data1 = null;
     this.sprintData = data;
   }
 

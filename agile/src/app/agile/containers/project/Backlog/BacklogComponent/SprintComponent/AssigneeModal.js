@@ -36,6 +36,24 @@ class AssigneeModal extends Component {
       index: 'totalRemainingTime',
       render: text => (text || '无'),
     }];
+    const assignData = this.props.data.assigneeIssues;
+    let totalIssue = 0;
+    let totalStoryPoints = 0;
+    let totalTime = 0;
+    if (Array.isArray(assignData)) {
+      for (let index = 0, lens = assignData.length; index < lens; index += 1) {
+        if (assignData[index].issueCount) {
+          totalIssue += assignData[index].issueCount;
+        }
+        if (assignData[index].totalStoryPoints) {
+          totalStoryPoints += assignData[index].totalStoryPoints;
+        }
+        if (assignData[index].totalRemainingTime) {
+          totalTime += assignData[index].totalRemainingTime;
+        }
+      }
+    }
+    const total = { totalIssue, totalStoryPoints, totalTime };
     return (
       <Sidebar
         title="经办人工作量"
@@ -56,12 +74,13 @@ class AssigneeModal extends Component {
           <Table
             dataSource={_.concat(this.props.data.assigneeIssues, {
               assigneeName: '合计',
-              issueCount: this.props.total.totalIssue,
-              totalStoryPoints: this.props.total.totalStoryPoints,
-              totalRemainingTime: this.props.total.totalTime,
+              issueCount: total.totalIssue,
+              totalStoryPoints: total.totalStoryPoints,
+              totalRemainingTime: total.totalTime,
             })}
             columns={columns}
             filterBar={false}
+            rowKey={'assigneeName'}
           />
         </Content>
       </Sidebar>

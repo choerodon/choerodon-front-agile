@@ -4,7 +4,7 @@ import { Modal, Form, Input, DatePicker, Icon } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import moment from 'moment';
 import ReleaseStore from '../../../../../stores/project/release/ReleaseStore';
-import BacklogStore from "../../../../../stores/project/backlog/BacklogStore";
+// import this.props.store from "../../../../../stores/project/backlog/this.props.store";
 
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
@@ -47,12 +47,12 @@ class CreateVersion extends Component {
           });
           this.props.form.resetFields();
           this.props.onCancel();
-          BacklogStore.axiosGetVersion().then((data2) => {
+          this.props.store.axiosGetVersion().then((data2) => {
             const newVersion = [...data2];
             for (let index = 0, len = newVersion.length; index < len; index += 1) {
               newVersion[index].expand = false;
             }
-            BacklogStore.setVersionData(newVersion);
+            this.props.store.setVersionData(newVersion);
           }).catch((error) => {
           });
         }).catch((error) => {

@@ -40,7 +40,7 @@ class SprintIssue extends Component {
    * @returns
    * @memberof SprintIssue
    */
-  getFirst(str) {
+  getFirst =(str) => {
     if (!str) {
       return '';
     }
@@ -60,7 +60,7 @@ class SprintIssue extends Component {
    * @returns
    * @memberof SprintIssue
    */
-  renderPriorityStyle(type, item) {
+  renderPriorityStyle =(type, item) => {
     if (type === 'color') {
       if (item.priorityCode === 'medium') {
         return 'rgb(53, 117, 223)';
@@ -84,7 +84,7 @@ class SprintIssue extends Component {
    * @returns
    * @memberof SprintIssue
    */
-  renderIssueBackground(item) {
+  renderIssueBackground =(item) => {
     if (BacklogStore.getClickIssueDetail.issueId === item.issueId) {
       return 'rgba(140,158,255,0.08)';
     } else if (BacklogStore.getIsDragging) {
@@ -99,7 +99,7 @@ class SprintIssue extends Component {
    * @returns
    * @memberof SprintIssue
    */
-  renderIssueDisplay() {
+  renderIssueDisplay=() => {
     let flag = 0;
     if (this.props.epicVisible) {
       flag += 1;

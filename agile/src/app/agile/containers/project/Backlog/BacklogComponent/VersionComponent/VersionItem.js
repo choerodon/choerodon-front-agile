@@ -5,7 +5,7 @@ import moment from 'moment';
 import { stores, Permission } from 'choerodon-front-boot';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { Input, DatePicker, Icon, Dropdown, Menu } from 'choerodon-ui';
-import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
+// import this.props.store from '../../../../../stores/project/backlog/this.props.store';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 
 const { AppState } = stores;
@@ -88,14 +88,14 @@ class VersionItem extends Component {
       versionId: this.props.data.versionId,
       description: value,
     };
-    BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
+    this.props.store.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
       this.setState({
         editDescription: false,
       });
-      const originData = _.clone(BacklogStore.getVersionData);
+      const originData = _.clone(this.props.store.getVersionData);
       originData[this.props.index].description = res.description;
       originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
-      BacklogStore.setVersionData(originData);
+      this.props.store.setVersionData(originData);
     }).catch((error) => {
       this.setState({
         editDescription: false,
@@ -115,14 +115,14 @@ class VersionItem extends Component {
       versionId: this.props.data.versionId,
       name: value,
     };
-    BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
+    this.props.store.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
       this.setState({
         editName: false,
       });
-      const originData = _.clone(BacklogStore.getVersionData);
+      const originData = _.clone(this.props.store.getVersionData);
       originData[this.props.index].name = res.name;
       originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
-      BacklogStore.setVersionData(originData);
+      this.props.store.setVersionData(originData);
     }).catch((error) => {
       this.setState({
         editName: false,
@@ -144,11 +144,11 @@ class VersionItem extends Component {
       versionId: this.props.data.versionId,
       [type]: date ? date += ' 00:00:00' : null,
     };
-    BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
-      const originData = _.clone(BacklogStore.getVersionData);
+    this.props.store.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
+      const originData = _.clone(this.props.store.getVersionData);
       originData[this.props.index][type] = res[type];
       originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
-      BacklogStore.setVersionData(originData);
+      this.props.store.setVersionData(originData);
     }).catch((error) => {
     });
   }
@@ -165,9 +165,9 @@ class VersionItem extends Component {
             ref={provided1.innerRef}
             {...provided1.draggableProps}
             {...provided1.dragHandleProps}
-            className={BacklogStore.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
+            className={this.props.store.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
             style={{
-              background: BacklogStore.getChosenVersion === item.versionId ? 'rgba(140, 158, 255, 0.08)' : 'white',
+              background: this.props.store.getChosenVersion === item.versionId ? 'rgba(140, 158, 255, 0.08)' : 'white',
               paddingLeft: 0,
               ...provided1.draggableProps.style,
               cursor: 'move',
@@ -185,8 +185,8 @@ class VersionItem extends Component {
               });
             }}
             onMouseUp={() => {
-              if (BacklogStore.getIsDragging) {
-                BacklogStore.axiosUpdateIssuesToVersion(
+              if (this.props.store.getIsDragging) {
+                this.props.store.axiosUpdateIssuesToVersion(
                   item.versionId, this.props.draggableIds).then((res) => {
                   this.props.issueRefresh();
                   this.props.refresh();
@@ -202,10 +202,10 @@ class VersionItem extends Component {
                 type={item.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
                 role="none"
                 onClick={(e) => {
-                  const data = BacklogStore.getVersionData;
+                  const data = this.props.store.getVersionData;
                   e.stopPropagation();
                   data[index].expand = !data[index].expand;
-                  BacklogStore.setVersionData(data);
+                  this.props.store.setVersionData(data);
                 }}
               />
               <div style={{ width: '100%' }}>

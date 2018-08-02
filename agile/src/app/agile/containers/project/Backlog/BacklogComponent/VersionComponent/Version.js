@@ -4,7 +4,7 @@ import { Modal, Form, Input, DatePicker, Icon } from 'choerodon-ui';
 import { Content, stores, Permission } from 'choerodon-front-boot';
 import { fromJS, is } from 'immutable';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
+// import this.props.store from '../../../../../stores/project/backlog/this.props.store';
 import VersionItem from './VersionItem';
 import './Version.scss';
 import CreateVersion from './CreateVersion';
@@ -56,19 +56,20 @@ class Version extends Component {
    * @memberof Version
    */
   handelClickVersion(type) {
-    BacklogStore.setChosenVersion(type);
-    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
-      BacklogStore.setSprintData(res);
+    this.props.store.setChosenVersion(type);
+    this.props.store.axiosGetSprint(this.props.store.getSprintFilter()).then((res) => {
+      this.props.store.setSprintData(res);
     }).catch((error) => {
     });
   }
   renderVersion() {
-    const data = BacklogStore.getVersionData;
+    const data = this.props.store.getVersionData;
     const result = [];
     if (data.length > 0) {
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
           <VersionItem
+            store={this.props.store}
             data={data[index]}
             index={index}
             handelClickVersion={this.handelClickVersion.bind(this)}
@@ -90,7 +91,7 @@ class Version extends Component {
     if (!result.destination) {
       return;
     }
-    const data = BacklogStore.getVersionData;
+    const data = this.props.store.getVersionData;
     const sourceIndex = result.source.index;
     const tarIndex = result.destination.index;
     let beforeSequence = null;
@@ -98,7 +99,7 @@ class Version extends Component {
     const res = Array.from(data);
     const [removed] = res.splice(sourceIndex, 1);
     res.splice(tarIndex, 0, removed);
-    BacklogStore.setVersionData(res);
+    this.props.store.setVersionData(res);
     // 拖的方向
     if (tarIndex === 0) {
       afterSequence = res[1].sequence;
@@ -111,23 +112,23 @@ class Version extends Component {
     const epicId = data[sourceIndex].versionId;
     const { objectVersionNumber } = data[sourceIndex];
     const postData = { afterSequence, beforeSequence, versionId: epicId, objectVersionNumber };
-    BacklogStore.handleVersionDrap(postData)
+    this.props.store.handleVersionDrap(postData)
       .then(() => {
-        BacklogStore.axiosGetVersion().then((data3) => {
+        this.props.store.axiosGetVersion().then((data3) => {
           const newEpic = [...data3];
           for (let index = 0, len = newEpic.length; index < len; index += 1) {
             newEpic[index].expand = false;
           }
-          BacklogStore.setVersionData(newEpic);
+          this.props.store.setVersionData(newEpic);
         }).catch((error3) => {
         });
       }).catch(() => {
-        BacklogStore.axiosGetVersion().then((data3) => {
+        this.props.store.axiosGetVersion().then((data3) => {
           const newEpic = [...data3];
           for (let index = 0, len = newEpic.length; index < len; index += 1) {
             newEpic[index].expand = false;
           }
-          BacklogStore.setVersionData(newEpic);
+          this.props.store.setVersionData(newEpic);
         }).catch((error3) => {
         });
       });
@@ -142,16 +143,16 @@ class Version extends Component {
           this.setState({
             hoverBlockButton: true,
           });
-          if (BacklogStore.getIsDragging) {
-            BacklogStore.setIsLeaveSprint(true);
+          if (this.props.store.getIsDragging) {
+            this.props.store.setIsLeaveSprint(true);
           }
         }}
         onMouseLeave={() => {
           this.setState({
             hoverBlockButton: false,
           });
-          if (BacklogStore.getIsDragging) {
-            BacklogStore.setIsLeaveSprint(false);
+          if (this.props.store.getIsDragging) {
+            this.props.store.setIsLeaveSprint(false);
           }
         }}
       >
@@ -187,7 +188,7 @@ class Version extends Component {
                     }}
                     onClick={() => {
                       this.props.changeVisible('versionVisible', false);
-                      BacklogStore.setIsLeaveSprint(false);
+                      this.props.store.setIsLeaveSprint(false);
                     }}
                   />
                 </div>
@@ -197,7 +198,7 @@ class Version extends Component {
                   className="c7n-backlog-versionItems"
                   style={{
                     color: '#3F51B5',
-                    background: BacklogStore.getChosenVersion === 'all' ? 'rgba(140, 158, 255, 0.08)' : '',
+                    background: this.props.store.getChosenVersion === 'all' ? 'rgba(140, 158, 255, 0.08)' : '',
                   }}
                   role="none"
                   onClick={this.handelClickVersion.bind(this, 'all')}
@@ -223,15 +224,15 @@ class Version extends Component {
                 </DragDropContext>
 
                 <div
-                  className={BacklogStore.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
+                  className={this.props.store.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
                   style={{
-                    background: BacklogStore.getChosenVersion === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
+                    background: this.props.store.getChosenVersion === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
                   }}
                   role="none"
                   onClick={this.handelClickVersion.bind(this, 'unset')}
                   onMouseUp={() => {
-                    if (BacklogStore.getIsDragging) {
-                      BacklogStore.axiosUpdateIssuesToVersion(
+                    if (this.props.store.getIsDragging) {
+                      this.props.store.axiosUpdateIssuesToVersion(
                         0, this.state.draggableIds).then((res) => {
                         this.props.issueRefresh();
                         this.props.refresh();
@@ -245,6 +246,7 @@ class Version extends Component {
                 </div>
               </div>
               <CreateVersion
+                store={this.props.store}
                 visible={this.state.addVersion}
                 onCancel={() => {
                   this.setState({

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Modal, Form, Select, Icon, Input } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
-import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
+// import this.props.store from '../../../../../stores/project/backlog/this.props.store';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
@@ -39,18 +39,18 @@ class CreateEpic extends Component {
         this.setState({
           loading: true,
         });
-        BacklogStore.axiosEasyCreateIssue(data).then((res) => {
+        this.props.store.axiosEasyCreateIssue(data).then((res) => {
           this.setState({
             loading: false,
           });
           this.props.form.resetFields();
           this.props.onCancel();
-          BacklogStore.axiosGetEpic().then((data3) => {
+          this.props.store.axiosGetEpic().then((data3) => {
             const newEpic = [...data3];
             for (let index = 0, len = newEpic.length; index < len; index += 1) {
               newEpic[index].expand = false;
             }
-            BacklogStore.setEpicData(newEpic);
+            this.props.store.setEpicData(newEpic);
           }).catch((error3) => {
           });
         }).catch((error) => {
