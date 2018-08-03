@@ -83,6 +83,10 @@
   .page-head .ant-btn:not(.back-btn) {
     line-height: '';
   }
+
+  p {
+    margin-bottom: 0;
+  }
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {

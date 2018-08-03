@@ -51,6 +51,7 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
     const timer = setInterval(() => {
+      // this.renderHeight();
       if (document.getElementsByClassName('c7n-scrumTools-left').length > 0) {
         if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
           this.setState({
@@ -761,7 +762,7 @@ class ScrumBoardHome extends Component {
             <span>刷新</span>
           </Button>
         </Header>
-        <Content style={{ padding: 0, display: 'flex', overflow: 'hidden' }}>
+        <div style={{ padding: 0, display: 'flex' }}>
           <div style={{ flexGrow: 1, overflow: 'hidden' }}>
             <Spin spinning={this.state.spinIf}>
               <div className="c7n-scrumTools">
@@ -876,7 +877,7 @@ class ScrumBoardHome extends Component {
                 <div
                   className="c7n-scrumboard-content"
                   style={{
-                    height: this.renderHeight(),
+                    height: `calc(100vh - ${58}px)`,
                     paddingBottom: 83,
                   }}
                 >
@@ -1005,7 +1006,7 @@ class ScrumBoardHome extends Component {
               </Form>
             </Content>
           </Sidebar>
-        </Content>
+        </div>
       </Page>
     );
   }
