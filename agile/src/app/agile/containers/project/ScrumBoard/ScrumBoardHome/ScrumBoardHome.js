@@ -42,25 +42,22 @@ class ScrumBoardHome extends Component {
       expandFilter: false,
     };
   }
-  componentWillMount() {
-    this.getBoard();
-  }
   componentDidMount() {
+    this.getBoard();
     const url = this.GetRequest(this.props.location.search);
     if (url.paramIssueId) {
       ScrumBoardStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
-    const timer = setInterval(() => {
-      // this.renderHeight();
-      if (document.getElementsByClassName('c7n-scrumTools-left').length > 0) {
-        if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
-          this.setState({
-            more: true,
-          });
-        }
-        clearInterval(timer);
+  }
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+    if (document.getElementsByClassName('c7n-scrumTools-left').length > 0 && !prevState.more) {
+      if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
+        this.setState({
+          more: true,
+        });
       }
-    }, 1000);
+    }
+    return null;
   }
   componentWillUnmount() {
     ScrumBoardStore.setClickIssueDetail({});

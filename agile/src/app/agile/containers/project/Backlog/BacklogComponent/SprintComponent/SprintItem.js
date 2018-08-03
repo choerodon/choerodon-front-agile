@@ -12,7 +12,7 @@ import emptyPng from '../../../../../assets/image/emptySprint.png';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 import AssigneeModal from './AssigneeModal';
 import EmptyBacklog from '../../../../../assets/image/emptyBacklog.png';
-import './Sprint.scss'
+import './Sprint.scss';
 
 const Option = Select.Option;
 const confirm = Modal.confirm;
