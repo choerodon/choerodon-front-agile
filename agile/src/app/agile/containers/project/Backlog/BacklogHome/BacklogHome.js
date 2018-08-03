@@ -34,18 +34,19 @@ class BacklogHome extends Component {
     if (url.paramIssueId) {
       this.props.BacklogStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
-    const timer = setInterval(() => {
-      if (document.getElementsByClassName('c7n-backlogTools-left').length > 0) {
-        if (document.getElementsByClassName('c7n-backlogTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-backlogTools-left')[0].clientHeight) {
-          this.setState({
-            more: true,
-          });
-        }
-        clearInterval(timer);
-      }
-    }, 1000);
   }
-
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+    if (document.getElementsByClassName('c7n-backlogTools-left').length > 0 && !prevState.more) {
+      if (document.getElementsByClassName('c7n-backlogTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-backlogTools-left')[0].clientHeight) {
+        this.setState({
+          more: true,
+        });
+        console.log('渲染了');
+      }
+      console.log('没渲染');
+    }
+    return null;
+  }
   componentWillUnmount() {
     this.props.BacklogStore.dispose();
   }

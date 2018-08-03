@@ -42,24 +42,22 @@ class ScrumBoardHome extends Component {
       expandFilter: false,
     };
   }
-  componentWillMount() {
-    this.getBoard();
-  }
   componentDidMount() {
+    this.getBoard();
     const url = this.GetRequest(this.props.location.search);
     if (url.paramIssueId) {
       ScrumBoardStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
-    const timer = setInterval(() => {
-      if (document.getElementsByClassName('c7n-scrumTools-left').length > 0) {
-        if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
-          this.setState({
-            more: true,
-          });
-        }
-        clearInterval(timer);
+  }
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+    if (document.getElementsByClassName('c7n-scrumTools-left').length > 0 && !prevState.more) {
+      if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
+        this.setState({
+          more: true,
+        });
       }
-    }, 1000);
+    }
+    return null;
   }
   componentWillUnmount() {
     ScrumBoardStore.setClickIssueDetail({});
@@ -761,7 +759,7 @@ class ScrumBoardHome extends Component {
             <span>刷新</span>
           </Button>
         </Header>
-        <Content style={{ padding: 0, display: 'flex', overflow: 'hidden' }}>
+        <div style={{ padding: 0, display: 'flex' }}>
           <div style={{ flexGrow: 1, overflow: 'hidden' }}>
             <Spin spinning={this.state.spinIf}>
               <div className="c7n-scrumTools">
@@ -876,7 +874,7 @@ class ScrumBoardHome extends Component {
                 <div
                   className="c7n-scrumboard-content"
                   style={{
-                    height: this.renderHeight(),
+                    height: `calc(100vh - ${58}px)`,
                     paddingBottom: 83,
                   }}
                 >
@@ -1005,7 +1003,7 @@ class ScrumBoardHome extends Component {
               </Form>
             </Content>
           </Sidebar>
-        </Content>
+        </div>
       </Page>
     );
   }
