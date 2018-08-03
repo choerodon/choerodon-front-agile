@@ -24,6 +24,18 @@ class EpicReport extends Component {
     ES.loadEpicAndChartAndTableData();
   }
   
+  getLabel(record) {
+    if (ES.beforeCurrentUnit === 'story_point') {
+      if (record.typeCode === 'story') {
+        return record.storyPoints === null ? '未预估' : record.storyPoints;
+      } else {
+        return '';
+      }
+    } else {
+      return record.remainTime === null ? '未预估' : record.remainTime; 
+    }
+  }
+
   getOption() {
     return {
       tooltip: {
@@ -287,6 +299,7 @@ class EpicReport extends Component {
   handleChangeCurrentUnit(unit) {
     ES.setCurrentUnit(unit);
     ES.loadChartData();
+    // ES.loadTableData();
   }
 
   transformRemainTime(remainTime) {
@@ -387,17 +400,7 @@ class EpicReport extends Component {
         dataIndex: 'storyPoints',
         render: (storyPoints, record) => (
           <div>
-            {
-              ES.beforeCurrentUnit === 'story_point' ? (
-                <div>
-                  {record.typeCode === 'story' ? storyPoints || '未预估' : ''}
-                </div>
-              ) : (
-                <div>
-                  {record.remainTime || '未预估'}
-                </div>
-              )
-            }
+            {this.getLabel(record)}
           </div>
         ),
       },
@@ -468,62 +471,73 @@ class EpicReport extends Component {
                   </Select>
                 </div>
                 <Spin spinning={ES.chartLoading}>
-                  <div className="c7n-report">
-                    <div className="c7n-chart">
-                      <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
-                    </div>
-                    <div className="c7n-toolbar">
-                      <h2>汇总</h2>
-                      <h4>问题汇总</h4>
-                      <ul>
-                        <li>
-                          <span className="c7n-tip">合计：</span>
-                          <span>
-                            {ES.getLatest.issueCount}
-                          </span>
-                        </li>
-                        <li><span className="c7n-tip">已完成：</span><span>{ES.getLatest.issueCompletedCount}</span></li>
-                        {
-                          ES.beforeCurrentUnit === 'issue_count' ? null : (
-                            <li><span className="c7n-tip">未预估：</span><span>{ES.getLatest.unEstimateIssueCount}</span></li>
-                          )
-                        }
-                      </ul>
-                      {
-                        ES.beforeCurrentUnit !== 'issue_count' ? (
-                          <div>
-                            <h4>{`${ES.getChartYAxisName}`}汇总</h4>
+                  <div>
+                    {
+                      ES.chartData.length ? (
+                        <div className="c7n-report">
+                          <div className="c7n-chart">
+                            <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
+                          </div>
+                          <div className="c7n-toolbar">
+                            <h2>汇总</h2>
+                            <h4>问题汇总</h4>
                             <ul>
                               <li>
                                 <span className="c7n-tip">合计：</span>
                                 <span>
-                                  {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.allStoryPoints : this.transformRemainTime(ES.getLatest.allRemainTimes)}
+                                  {ES.getLatest.issueCount}
                                 </span>
                               </li>
-                              <li>
-                                <span className="c7n-tip">已完成：</span>
-                                <span>
-                                  {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.completedStoryPoints : this.transformRemainTime(ES.getLatest.completedRemainTimes)}
-                                </span>
-                              </li>
+                              <li><span className="c7n-tip">已完成：</span><span>{ES.getLatest.issueCompletedCount}</span></li>
+                              {
+                                ES.beforeCurrentUnit === 'issue_count' ? null : (
+                                  <li><span className="c7n-tip">未预估：</span><span>{ES.getLatest.unEstimateIssueCount}</span></li>
+                                )
+                              }
                             </ul>
+                            {
+                              ES.beforeCurrentUnit !== 'issue_count' ? (
+                                <div>
+                                  <h4>{`${ES.getChartYAxisName}`}汇总</h4>
+                                  <ul>
+                                    <li>
+                                      <span className="c7n-tip">合计：</span>
+                                      <span>
+                                        {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.allStoryPoints : this.transformRemainTime(ES.getLatest.allRemainTimes)}
+                                      </span>
+                                    </li>
+                                    <li>
+                                      <span className="c7n-tip">已完成：</span>
+                                      <span>
+                                        {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.completedStoryPoints : this.transformRemainTime(ES.getLatest.completedRemainTimes)}
+                                      </span>
+                                    </li>
+                                  </ul>
+                                </div>
+                              ) : null
+                            }
+                            <p
+                              style={{ 
+                                color: '#3F51B5',
+                                cursor: 'pointer',                
+                              }}
+                              role="none"
+                              onClick={() => {
+                                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
+                              }}
+                            >
+                              在“问题管理”中查看
+                              <Icon style={{ fontSize: 13 }} type="open_in_new" />
+                            </p>
                           </div>
-                        ) : null
-                      }
-                      <p
-                        style={{ 
-                          color: '#3F51B5',
-                          cursor: 'pointer',                
-                        }}
-                        role="none"
-                        onClick={() => {
-                          this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
-                        }}
-                      >
-                        在“问题管理”中查看
-                        <Icon style={{ fontSize: 13 }} type="open_in_new" />
-                      </p>
-                    </div>
+                        </div>
+                      ) : (
+                        <div style={{ padding: '20px 0', textAlign: 'center' }}>
+                          当前单位下问题均未预估，切换单位或从下方问题列表进行预估。
+                        </div>
+                      )
+                    }
+                    
                   </div>
                 </Spin>
                 <Tabs>
