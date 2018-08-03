@@ -10,7 +10,7 @@ import Typetag from '../../../../../components/TypeTag';
 import UserHead from '../../../../../components/UserHead';
 import SprintItem from './SprintItem';
 import EmptyBacklog from '../../../../../assets/image/emptyBacklog.png';
-import SprintIssue from './SprintIssue';
+import SprintIssue from './SprintIssueOld';
 
 const { AppState } = stores;
 

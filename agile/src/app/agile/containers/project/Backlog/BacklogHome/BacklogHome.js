@@ -1,20 +1,16 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
+import { Page, Header, stores } from 'choerodon-front-boot';
+import { DragDropContext } from 'react-beautiful-dnd';
 import { Button, Spin, message, Icon } from 'choerodon-ui';
+import _ from 'lodash';
 import Version from '../BacklogComponent/VersionComponent/Version';
 import Epic from '../BacklogComponent/EpicComponent/Epic';
-import { DragDropContext, Draggable } from 'react-beautiful-dnd'
-import Sprint from '../BacklogComponent/SprintComponent/Sprint';
 import IssueDetail from '../BacklogComponent/IssueDetailComponent/IssueDetail';
 import './BacklogHome.scss';
-// import BacklogStore from '../../../../stores/project/backlog/this.props.BacklogStore';
 import SprintItem from '../BacklogComponent/SprintComponent/SprintItem';
-const { AppState } = stores;
 
-// const { whyDidYouUpdate } = require('why-did-you-update');
-//
-// whyDidYouUpdate(React);
+const { AppState } = stores;
 
 @observer
 class BacklogHome extends Component {
@@ -34,7 +30,7 @@ class BacklogHome extends Component {
     this.props.BacklogStore.setClickIssueDetail({});
     this.refresh();
     this.loadQuickFilter();
-    const url = this.GetRequest(this.props.location.search);
+    const url = this.handleRequest(this.props.location.search);
     if (url.paramIssueId) {
       this.props.BacklogStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
@@ -54,20 +50,22 @@ class BacklogHome extends Component {
     this.props.BacklogStore.dispose();
   }
 
-  //  拖动结束事件
+
   /**
    * 加载选择快速搜索的冲刺数据
    */
   getSprint =() => {
-    this.props.BacklogStore.axiosGetSprint(this.props.BacklogStore.getSprintFilter()).then((data) => {
-      this.props.BacklogStore.setSprintData(data);
-      this.setState({
-        spinIf: false,
+    this.props.BacklogStore.axiosGetSprint(this.props.BacklogStore.getSprintFilter())
+      .then((data) => {
+        this.props.BacklogStore.setSprintData(data);
+        this.setState({
+          spinIf: false,
+        });
+      }).catch((error2) => {
       });
-    }).catch((error2) => {
-    });
-  }
-  GetRequest =(url) => {
+  };
+
+  handleRequest =(url) => {
     const theRequest = {};
     if (url.indexOf('?') !== -1) {
       const str = url.split('?')[1];
@@ -78,8 +76,6 @@ class BacklogHome extends Component {
     }
     return theRequest;
   }
-
-
   /**
    * 加载版本数据
    */
@@ -173,10 +169,11 @@ class BacklogHome extends Component {
    */
   filterOnlyMe =() => {
     this.props.BacklogStore.setOnlyMe(!this.props.BacklogStore.getOnlyMe);
-    this.props.BacklogStore.axiosGetSprint(this.props.BacklogStore.getSprintFilter()).then((res) => {
-      this.props.BacklogStore.setSprintData(res);
-    }).catch((error) => {
-    });
+    this.props.BacklogStore.axiosGetSprint(this.props.BacklogStore.getSprintFilter())
+      .then((res) => {
+        this.props.BacklogStore.setSprintData(res);
+      }).catch((error) => {
+      });
   }
 
   /**
@@ -184,10 +181,11 @@ class BacklogHome extends Component {
    */
   filterOnlyStory =() => {
     this.props.BacklogStore.setRecent(!this.props.BacklogStore.getRecent);
-    this.props.BacklogStore.axiosGetSprint(this.props.BacklogStore.getSprintFilter()).then((res) => {
-      this.props.BacklogStore.setSprintData(res);
-    }).catch((error) => {
-    });
+    this.props.BacklogStore.axiosGetSprint(this.props.BacklogStore.getSprintFilter())
+      .then((res) => {
+        this.props.BacklogStore.setSprintData(res);
+      }).catch((error) => {
+      });
   }
 
   /**
@@ -263,7 +261,7 @@ class BacklogHome extends Component {
               if (endIndex >= newData.sprintData[index].issueSearchDTOList.length) {
                 destinationData =
                   newData.sprintData[index].issueSearchDTOList[
-                  newData.sprintData[index].issueSearchDTOList.length - 1];
+                    newData.sprintData[index].issueSearchDTOList.length - 1];
               } else {
                 destinationData = newData.sprintData[index].issueSearchDTOList[endIndex];
               }
@@ -275,7 +273,7 @@ class BacklogHome extends Component {
       if (endIndex >= newData.backlogData.backLogIssue.length) {
         destinationData =
           newData.backlogData.backLogIssue[
-          newData.backlogData.backLogIssue - 1];
+            newData.backlogData.backLogIssue - 1];
       } else {
         destinationData = newData.backlogData.backLogIssue[endIndex];
       }
@@ -287,13 +285,14 @@ class BacklogHome extends Component {
    * 加载数据
    */
   getSprint=() => {
-    this.props.BacklogStore.axiosGetSprint(this.props.BacklogStore.getSprintFilter()).then((data) => {
-      this.props.BacklogStore.setSprintData(data);
-      this.setState({
-        spinIf: false,
+    this.props.BacklogStore.axiosGetSprint(this.props.BacklogStore.getSprintFilter())
+      .then((data) => {
+        this.props.BacklogStore.setSprintData(data);
+        this.setState({
+          spinIf: false,
+        });
+      }).catch((error2) => {
       });
-    }).catch((error2) => {
-    });
   }
 
   /**
@@ -336,7 +335,8 @@ class BacklogHome extends Component {
               newData.sprintData[index].issueSearchDTOList = [];
             }
             if (endIndex !== 0) {
-              for (let aindex = 0, len2 = newData.sprintData[index].issueSearchDTOList.length; aindex < len2; aindex += 1) {
+              const len2 = newData.sprintData[index].issueSearchDTOList.length;
+              for (let aindex = 0; aindex < len2; aindex += 1) {
                 if (destinationData.issueId) {
                   if (newData.sprintData[index].issueSearchDTOList[aindex].issueId === destinationData.issueId) {
                     afIndex = aindex + 1;
@@ -365,7 +365,8 @@ class BacklogHome extends Component {
         }
         let afIndex;
         if (endIndex !== 0) {
-          for (let aindex = 0, len = newData.backlogData.backLogIssue.length; aindex < len; aindex += 1) {
+          const len = newData.backlogData.backLogIssue.length;
+          for (let aindex = 0; aindex < len; aindex += 1) {
             if (destinationData.issueId) {
               if (newData.backlogData.backLogIssue[aindex].issueId === destinationData.issueId) {
                 afIndex = aindex + 1;

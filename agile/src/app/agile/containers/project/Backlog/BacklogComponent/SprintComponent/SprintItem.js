@@ -1,22 +1,19 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
-import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table, Avatar, Dropdown, Menu } from 'choerodon-ui';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import { Droppable } from 'react-beautiful-dnd';
+import { Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu } from 'choerodon-ui';
+import { stores } from 'choerodon-front-boot';
 import _ from 'lodash';
-import { fromJS, is } from 'immutable';
 import moment from 'moment';
 import CloseSprint from './CloseSprint';
-// import this.props.store from '../../../../../stores/project/backlog/this.props.store';
+import IssueItem from './IssueItem';
 import StartSprint from './StartSprint';
 import emptyPng from '../../../../../assets/image/emptySprint.png';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 import AssigneeModal from './AssigneeModal';
-import Typetag from '../../../../../components/TypeTag';
-import UserHead from '../../../../../components/UserHead';
 import EmptyBacklog from '../../../../../assets/image/emptyBacklog.png';
+import './Sprint.scss'
 
-const { Sidebar } = Modal;
 const Option = Select.Option;
 const confirm = Modal.confirm;
 const { AppState } = stores;
@@ -29,20 +26,11 @@ class SprintItem extends Component {
       editStartDate: false,
       editendDate: false,
       expand: true,
-      createIssue: false,
       selectIssueType: 'story',
-      createIssueValue: '',
       editName: false,
       editGoal: false,
-      closeSprintVisible: false,
-      startSprintVisible: false,
       visibleAssign: false,
       loading: false,
-      total: {
-        totalIssue: '无',
-        totalStoryPoints: '无',
-        totalTime: '无',
-      },
       selected: {
         droppableId: '',
         issueIds: [],
@@ -102,21 +90,6 @@ class SprintItem extends Component {
       }
     }
   }
-
-  // shouldComponentUpdate = (nextProps, nextState) => {
-  //   const thisProps = fromJS(this.props || {});
-  //   const thisState = fromJS(this.state || {});
-  //   const nextStates = fromJS(nextState || {});
-  //   if (thisProps.size !== nextProps.size ||
-  //     thisState.size !== nextState.size) {
-  //     return true;
-  //   }
-  //   if (is(thisState, nextStates)) {
-  //     return false;
-  //   }
-  //
-  //   return true;
-  // };
   /**
    *获取首字母
    *
@@ -248,7 +221,7 @@ class SprintItem extends Component {
    *
    * @memberof SprintItem
    */
-  handleFinishSprint =(item) => {
+  handleFinishSprint =(item, indexs) => {
     this.props.store.axiosGetSprintCompleteMessage(
       item.sprintId).then((res) => {
       this.props.store.setSprintCompleteMessage(res);
@@ -257,7 +230,8 @@ class SprintItem extends Component {
         if (res.parentsDoneUnfinishedSubtasks.length > 0) {
           flag = 1;
           let issueNums = '';
-          for (let index = 0, len = res.parentsDoneUnfinishedSubtasks.length; index < len; index += 1) {
+          const len = res.parentsDoneUnfinishedSubtasks.length;
+          for (let index = 0; index < len; index += 1) {
             issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
           }
           confirm({
@@ -270,7 +244,9 @@ class SprintItem extends Component {
       }
       if (flag === 0) {
         this.setState({
-          closeSprintVisible: true,
+          [`${indexs}-closeSprint`]: {
+            closeSprintVisible: true,
+          },
         });
       }
     }).catch((error) => {
@@ -281,14 +257,14 @@ class SprintItem extends Component {
    *
    * @memberof SprintItem
    */
-  handleStartSprint =(item) => {
+  handleStartSprint =(item, index) => {
     if (!this.props.store.getSprintData.sprintData.filter(items => items.statusCode === 'started').length > 0) {
       if (item.issueSearchDTOList.length > 0) {
         this.props.store.axiosGetOpenSprintDetail(
           item.sprintId).then((res) => {
           this.props.store.setOpenSprintDetail(res);
           this.setState({
-            startSprintVisible: true,
+            [`${index}-startSprint`]: { startSprintVisible: true },
           });
         }).catch((error) => {
         });
@@ -325,161 +301,6 @@ class SprintItem extends Component {
     }).catch((error) => {
     });
   }
-  /**
-   *单个冲刺渲染issue或者无issue提示
-   *
-   * @param {*} issues
-   * @param {*} sprintId
-   * @returns
-   * @memberof SprintItem
-   */
-  renderIssueOrIntro =(type, index, issues, sprintId) => {
-    if (issues) {
-      if (issues.length > 0) {
-        return this.renderSprintIssue(issues, sprintId);
-      }
-    }
-    if (type !== 'backlog') {
-      if (index === 0) {
-        return (
-          <div style={{ display: 'flex', height: 100 }} className="c7n-noissue-notzero">
-            <img style={{ width: 80, height: 70 }} alt="空sprint" src={emptyPng} />
-            <div style={{ marginLeft: 20 }}>
-              <p>计划您的SPRINT</p>
-              <p>这是一个Sprint。将问题拖拽至此来计划一个Sprint。</p>
-            </div>
-          </div>
-        );
-      } else if (this.props.store.getChosenEpic !== 'all' || this.props.store.getChosenVersion !== 'all') {
-        return (
-          <div className="c7n-noissue-notzero">在sprint中所有问题已筛选</div>
-        );
-      } else {
-        return (
-          <div className="c7n-noissue-notzero">要计划一次sprint, 可以拖动本次sprint页脚到某个问题的下方，或者把问题拖放到这里</div>
-        );
-      }
-    }
-    return '';
-  }
-  /**
-   *开启冲刺字段样式
-   *
-   * @param {*} type
-   * @returns
-   * @memberof SprintItem
-   */
-  renderOpenColor =(item, type) => {
-    if (this.props.store.getSprintData.sprintData.filter(items => items.statusCode === 'started').length === 0) {
-      if (item.issueSearchDTOList) {
-        if (item.issueSearchDTOList.length > 0) {
-          if (type === 'color') {
-            return '#3f51b5';
-          } else {
-            return 'pointer';
-          }
-        }
-      }
-    }
-    if (type === 'color') {
-      return 'rgba(0,0,0,0.26)';
-    } else {
-      return 'not-allowed';
-    }
-  }
-  /**
-   *渲染初始化开始与结束时间
-   *
-   * @param {*} item
-   * @param {*} type
-   * @returns
-   * @memberof SprintItem
-   */
-  renderData =(item, type) => {
-    //   startDate endDate
-    let result = '';
-    if (!_.isNull(item[type])) {
-      result = `${item[type].split('-')[0]}年${item[type].split('-')[1]}月${item[type].split('-')[2].substring(0, 2)}日 ${item[type].split(' ')[1]}`;
-    } else {
-      result = '无';
-    }
-    return result;
-  }
-
-
-  renderStatusCodeDom =(item) => {
-    const menu = (
-      <Menu
-        onClick={this.handleDeleteSprint.bind(this, item)}
-      >
-        <Menu.Item key="0">
-          删除sprint
-        </Menu.Item>
-      </Menu>
-    );
-    if (item.statusCode) {
-      return (
-        <div className="c7n-backlog-sprintTitleSide">
-          {item.statusCode === 'started' ? (
-            <p className="c7n-backlog-sprintStatus">活跃</p>
-          ) : (
-            <p className="c7n-backlog-sprintStatus2">未开始</p>
-          )}
-          {item.statusCode === 'started' ? (
-            <div style={{ display: 'flex' }}>
-              <p
-                className="c7n-backlog-closeSprint"
-                role="none"
-                onClick={this.handleFinishSprint.bind(this, item)}
-              >完成冲刺</p>
-              {/* <Dropdown overlay={menu} trigger={['click']}>
-                <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
-              </Dropdown> */}
-            </div>
-          ) : (
-            <div style={{ display: 'flex' }}>
-              <p
-                className="c7n-backlog-openSprint"
-                style={{
-                  color: this.renderOpenColor(item, 'color'),
-                  cursor: this.renderOpenColor(item, 'cursor'),
-                }}
-                role="none"
-                onClick={this.handleStartSprint.bind(this, item)}
-              >开启冲刺</p>
-              <Dropdown overlay={menu} trigger={['click']}>
-                <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
-              </Dropdown>
-            </div>
-          )}
-          <StartSprint
-            store={this.props.store}
-            visible={this.state.startSprintVisible}
-            onCancel={() => {
-              this.setState({
-                startSprintVisible: false,
-              });
-            }}
-            data={item}
-            refresh={this.props.refresh}
-          />
-          <CloseSprint
-            store={this.props.store}
-            visible={this.state.closeSprintVisible}
-            onCancel={() => {
-              this.setState({
-                closeSprintVisible: false,
-              });
-            }}
-            data={item}
-            refresh={this.props.refresh}
-          />
-        </div>
-      );
-    }
-    return '';
-  };
-
 
   /**
    *单个issue点击事件
@@ -501,7 +322,7 @@ class SprintItem extends Component {
         });
         this.props.store.setSelectIssue([item.issueId]);
       } else if (String(
-          this.state.selected.droppableId) === String(sprintId)) {
+        this.state.selected.droppableId) === String(sprintId)) {
         // 如果点击的是当前列的卡片
         const originIssueIds = _.clone(this.state.selected.issueIds);
         // 如果不存在
@@ -577,6 +398,170 @@ class SprintItem extends Component {
       this.props.store.setClickIssueDetail(item);
     }
   }
+  /**
+   *单个冲刺渲染issue或者无issue提示
+   *
+   * @param {*} issues
+   * @param {*} sprintId
+   * @returns
+   * @memberof SprintItem this.renderSprintIssue(issues, sprintId);
+   */
+  renderIssueOrIntro =(type, index, issues, sprintId) => {
+    if (issues) {
+      if (issues.length > 0) {
+        return (<IssueItem
+          sprintItemRef={this.sprintItemRef}
+          versionVisible={this.props.versionVisible}
+          epicVisible={this.props.epicVisible}
+          store={this.props.store}
+          sprtintId={sprintId}
+          data={issues}
+          selected={this.state.selected}
+          draggableId={this.state.draggableId}
+          handleClickIssue={this.handleClickIssue}
+        />);
+      }
+    }
+    if (type !== 'backlog') {
+      if (index === 0) {
+        return (
+          <div style={{ display: 'flex', height: 100 }} className="c7n-noissue-notzero">
+            <img style={{ width: 80, height: 70 }} alt="空sprint" src={emptyPng} />
+            <div style={{ marginLeft: 20 }}>
+              <p>计划您的SPRINT</p>
+              <p>这是一个Sprint。将问题拖拽至此来计划一个Sprint。</p>
+            </div>
+          </div>
+        );
+      } else if (this.props.store.getChosenEpic !== 'all' || this.props.store.getChosenVersion !== 'all') {
+        return (
+          <div className="c7n-noissue-notzero">在sprint中所有问题已筛选</div>
+        );
+      } else {
+        return (
+          <div className="c7n-noissue-notzero">要计划一次sprint, 可以拖动本次sprint页脚到某个问题的下方，或者把问题拖放到这里</div>
+        );
+      }
+    }
+    return '';
+  }
+  /**
+   *开启冲刺字段样式
+   *
+   * @param {*} type
+   * @returns
+   * @memberof SprintItem
+   */
+  renderOpenColor =(item, type) => {
+    if (this.props.store.getSprintData.sprintData.filter(items => items.statusCode === 'started').length === 0) {
+      if (item.issueSearchDTOList) {
+        if (item.issueSearchDTOList.length > 0) {
+          if (type === 'color') {
+            return '#3f51b5';
+          } else {
+            return 'pointer';
+          }
+        }
+      }
+    }
+    if (type === 'color') {
+      return 'rgba(0,0,0,0.26)';
+    } else {
+      return 'not-allowed';
+    }
+  }
+  /**
+   *渲染初始化开始与结束时间
+   *
+   * @param {*} item
+   * @param {*} type
+   * @returns
+   * @memberof SprintItem
+   */
+  renderData =(item, type) => {
+    //   startDate endDate
+    let result = '';
+    if (!_.isNull(item[type])) {
+      result = `${item[type].split('-')[0]}年${item[type].split('-')[1]}月${item[type].split('-')[2].substring(0, 2)}日 ${item[type].split(' ')[1]}`;
+    } else {
+      result = '无';
+    }
+    return result;
+  }
+
+
+  renderStatusCodeDom =(item, index) => {
+    const menu = (
+      <Menu
+        onClick={this.handleDeleteSprint.bind(this, item)}
+      >
+        <Menu.Item key="0">
+          删除sprint
+        </Menu.Item>
+      </Menu>
+    );
+    if (item.statusCode) {
+      return (
+        <div className="c7n-backlog-sprintTitleSide">
+          {item.statusCode === 'started' ? (
+            <p className="c7n-backlog-sprintStatus">活跃</p>
+          ) : (
+            <p className="c7n-backlog-sprintStatus2">未开始</p>
+          )}
+          {item.statusCode === 'started' ? (
+            <div style={{ display: 'flex' }}>
+              <p
+                className="c7n-backlog-closeSprint"
+                role="none"
+                onClick={this.handleFinishSprint.bind(this, item, index)}
+              >完成冲刺</p>
+              {/* <Dropdown overlay={menu} trigger={['click']}>
+                <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
+              </Dropdown> */}
+            </div>
+          ) : (
+            <div style={{ display: 'flex' }}>
+              <p
+                className="c7n-backlog-openSprint"
+                style={{
+                  color: this.renderOpenColor(item, 'color'),
+                  cursor: this.renderOpenColor(item, 'cursor'),
+                }}
+                role="none"
+                onClick={this.handleStartSprint.bind(this, item, index)}
+              >开启冲刺</p>
+              <Dropdown overlay={menu} trigger={['click']}>
+                <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
+              </Dropdown>
+            </div>
+          )}
+          <StartSprint
+            store={this.props.store}
+            visible={(this.state[`${index}-startSprint`] && this.state[`${index}-startSprint`].startSprintVisible) || false}
+            onCancel={() => {
+              this.setState({
+                [`${index}-startSprint`]: { startSprintVisible: false },
+              });
+            }}
+            data={item}
+            refresh={this.props.refresh}
+          />
+          <CloseSprint
+            store={this.props.store}
+            visible={(this.state[`${index}-closeSprint`] && this.state[`${index}-closeSprint`].closeSprintVisible) || false}
+            onCancel={() => {
+              this.setState({
+                [`${index}-closeSprint`]: { closeSprintVisible: false },
+              });
+            }}
+            data={item}
+            refresh={this.props.refresh}
+          />
+        </div>
+      );
+    }
+    return '';
+  };
 
   /**
    *拿到首字母
@@ -597,303 +582,6 @@ class SprintItem extends Component {
     }
     return str[0];
   }
-  /**
-   *渲染优先级样式
-   *
-   * @param {*} type
-   * @param {*} item
-   * @returns
-   * @memberof SprintIssue
-   */
-  renderPriorityStyle =(type, item) => {
-    if (type === 'color') {
-      if (item.priorityCode === 'medium') {
-        return 'rgb(53, 117, 223)';
-      } else if (item.priorityCode === 'high') {
-        return 'rgb(255, 177, 0)';
-      } else {
-        return 'rgba(0, 0, 0, 0.36)';
-      }
-    } else if (item.priorityCode === 'medium') {
-      return 'rgba(77, 144, 254, 0.2)';
-    } else if (item.priorityCode === 'high') {
-      return 'rgba(255, 177, 0, 0.12)';
-    } else {
-      return 'rgba(0, 0, 0, 0.08)';
-    }
-  }
-  /**
-   *渲染issue背景色
-   *
-   * @param {*} item
-   * @returns
-   * @memberof SprintIssue
-   */
-  renderIssueBackground =(item) => {
-    if (this.props.store.getClickIssueDetail.issueId === item.issueId) {
-      return 'rgba(140,158,255,0.08)';
-    } else if (this.props.store.getIsDragging) {
-      return 'white';
-    } else {
-      return 'unset';
-    }
-  }
-  /**
-   *根据打开的组件个数 判断issue样式
-   *
-   * @returns
-   * @memberof SprintIssue
-   */
-  renderIssueDisplay=() => {
-    let flag = 0;
-    if (this.props.epicVisible) {
-      flag += 1;
-    }
-    if (this.props.versionVisible) {
-      flag += 1;
-    }
-    if (JSON.stringify(this.props.store.getClickIssueDetail) !== '{}') {
-      flag += 1;
-    }
-    return flag >= 2;
-  }
-  /**
-   *渲染issue组件
-   *
-   * @param {*} data
-   * @param {*} sprintId
-   * @returns
-   * @memberof Sprint
-   */
-  renderSprintIssue=(data, sprintId) => {
-    const result = [];
-    for (let index = 0, len = data.length; index < len; index += 1) {
-      const item = data[index];
-      result.push(
-        <Draggable key={item.issueId} draggableId={item.issueId} index={index}>
-          {(provided1, snapshot1) =>
-            (
-              <div
-                className={this.props.store.getIsDragging ? 'c7n-backlog-sprintIssue' : 'c7n-backlog-sprintIssue c7n-backlog-sprintIssueHover'}
-                style={{
-                  position: 'relative',
-                }}
-                label="sprintIssue"
-              >
-                <div
-                  className="c7n-backlog-sprintIssueItem"
-                  ref={provided1.innerRef}
-                  {...provided1.draggableProps}
-                  {...provided1.dragHandleProps}
-                  style={{
-                    userSelect: 'none',
-                    background: this.state.selected.issueIds.includes(item.issueId) ? 'rgb(235, 242, 249)' : this.renderIssueBackground(item),
-                    padding: '10px 36px 10px 20px',
-                    borderBottom: '1px solid rgba(0,0,0,0.12)',
-                    paddingLeft: 43,
-                    ...provided1.draggableProps.style,
-                    fontSize: 13,
-                    display: this.renderIssueDisplay() ? 'block' : 'flex',
-                    alignItems: 'center',
-                    cursor: 'move',
-                    flexWrap: 'nowrap',
-                    justifyContent: 'space-between',
-                    // position: 'relative',
-                  }}
-                  label="sprintIssue"
-                  role="none"
-                  onClick={
-                    this.handleClickIssue.bind(this, sprintId, item)
-                  }
-                >
-                  <div
-                    className="c7n-backlog-issueSideBorder"
-                    style={{
-                      display: this.props.store.getClickIssueDetail.issueId === item.issueId ? 'block' : 'none',
-                    }}
-                  />
-                  <div
-                    className="c7n-backlog-sprintCount"
-                    style={{
-                      display: String(this.state.draggableId) === String(item.issueId) && this.state.selected.issueIds.length > 0 ? 'flex' : 'none',
-                    }}
-                    label="sprintIssue"
-                  >{this.state.selected.issueIds.length}</div>
-                  <div
-                    label="sprintIssue"
-                    className="c7n-backlog-sprintIssueSide"
-                    style={{
-                      // width: 0,
-                      flexGrow: 1,
-                      width: this.renderIssueDisplay() ? 'unset' : 0,
-                    }}
-                  >
-                    <Typetag
-                      type={{
-                        typeCode: item.typeCode,
-                      }}
-                    />
-                    <div
-                      label="sprintIssue"
-                      style={{
-                        marginLeft: 8,
-                        whiteSpace: this.renderIssueDisplay() ? 'normal' : 'nowrap',
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden',
-                        height: this.renderIssueDisplay ? 'auto' : 20,
-                        wordBreak: 'break-all',
-                      }}
-                    >{`${item.issueNum} `}
-                      <Tooltip title={item.summary} placement="topLeft">
-                        {item.summary}
-                      </Tooltip>
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      marginTop: this.props.epicVisible || this.props.versionVisible || JSON.stringify(this.props.store.getClickIssueDetail) !== '{}' ? 5 : 0,
-                      justifyContent: this.renderIssueDisplay() ? 'space-between' : 'flex-end',
-                      // width: this.renderIssueDisplay() ? 'unset' : 0,
-                      // flex: 2,
-                    }}
-                    label="sprintIssue"
-                    className="c7n-backlog-sprintIssueSide"
-                  >
-                    <div className="c7n-backlog-sprintSideRightItems">
-                      <div
-                        style={{
-                          maxWidth: 34,
-                          marginLeft: !_.isNull(item.priorityName) && !this.renderIssueDisplay() ? '12px' : 0,
-                        }}
-                        label="sprintIssue"
-                        className="c7n-backlog-sprintIssueRight"
-                      >
-                        {!_.isNull(item.priorityName) ? (
-                          <Tooltip title={`优先级: ${item.priorityName}`}>
-                            <span
-                              label="sprintIssue"
-                              className="c7n-backlog-sprintIssuePriority"
-                              style={{
-                                color: this.renderPriorityStyle('color', item),
-                                background: this.renderPriorityStyle('background', item),
-                              }}
-                            >{item.priorityName}</span>
-                          </Tooltip>
-                        ) : ''}
-                      </div>
-                      <div
-                        style={{
-                          maxWidth: 50,
-                          marginLeft: item.versionNames.length ? '12px' : 0,
-                          border: '1px solid rgba(0, 0, 0, 0.36)',
-                          borderRadius: '2px',
-                          display: item.versionNames.length > 0 ? 'block' : 'none',
-                        }}
-                        label="sprintIssue"
-                        className="c7n-backlog-sprintIssueRight"
-                      >
-                        {item.versionNames.length > 0 ? (
-                          <Tooltip title={`版本: ${item.versionNames.join(', ')}`}>
-                            <span label="sprintIssue" className="c7n-backlog-sprintIssueVersion">
-                              <span>{item.versionNames.join(', ')}</span>
-                            </span>
-                          </Tooltip>
-                        ) : ''}
-                      </div>
-                      <div
-                        style={{
-                          maxWidth: 86,
-                          marginLeft: !_.isNull(item.epicName) ? '12px' : 0,
-                          border: `1px solid ${item.color}`,
-                          display: !_.isNull(item.epicName) ? 'block' : 'none',
-                        }}
-                        label="sprintIssue"
-                        className="c7n-backlog-sprintIssueRight"
-                      >
-                        {!_.isNull(item.epicName) ? (
-                          <Tooltip title={`史诗: ${item.epicName}`}>
-                            <span
-                              label="sprintIssue"
-                              className="c7n-backlog-sprintIssueEpic"
-                              style={{
-                                // border: `1px solid ${item.color}`,
-                                color: item.color,
-                              }}
-                            >{item.epicName}</span>
-                          </Tooltip>
-                        ) : ''}
-                      </div>
-                    </div>
-                    <div className="c7n-backlog-sprintSideRightItems">
-                      <div
-                        style={{
-                          maxWidth: 105,
-                          marginLeft: !_.isNull(item.assigneeName) ? '12px' : 0,
-                          flexGrow: 0,
-                          flexShrink: 0,
-                        }}
-                        label="sprintIssue"
-                        className="c7n-backlog-sprintIssueRight"
-                      >
-                        <UserHead
-                          user={{
-                            id: item.assigneeId,
-                            loginName: '',
-                            realName: item.assigneeName,
-                            avatar: item.imageUrl,
-                          }}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          width: 60,
-                          marginLeft: !_.isNull(item.statusName) ? '12px' : 0,
-                        }}
-                        label="sprintIssue"
-                        className="c7n-backlog-sprintIssueRight"
-                      >
-                        {!_.isNull(item.statusName) ? (
-                          <Tooltip title={`状态: ${item.statusName}`}>
-                            <span
-                              label="sprintIssue"
-                              className="c7n-backlog-sprintIssueStatus"
-                              style={{
-                                background: item.statusColor ? item.statusColor : '#4d90fe',
-                              }}
-                            >{item.statusName}</span>
-                          </Tooltip>
-                        ) : ''}
-                      </div>
-                      <div
-                        style={{
-                          maxWidth: 20,
-                          marginLeft: '12px',
-                        }}
-                        label="sprintIssue"
-                        className="c7n-backlog-sprintIssueRight"
-                      >
-                        <Tooltip title={`故事点: ${item.storyPoints}`}>
-                          <div
-                            label="sprintIssue"
-                            className="c7n-backlog-sprintIssueStoryPoint"
-                            style={{
-                              visibility: item.storyPoints && item.typeCode === 'story' ? 'visible' : 'hidden',
-                            }}
-                          >{item.storyPoints}</div>
-                        </Tooltip>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {provided1.placeholder}
-              </div>
-            )
-          }
-        </Draggable>,
-      );
-    }
-    return result;
-  }
 
   /**
    *父组件获取该组件state方法
@@ -902,9 +590,8 @@ class SprintItem extends Component {
    * @returns
    * @memberof Sprint
    */
-  getCurrentState=(data) => {
-    return this.state[data];
-  }
+  getCurrentState=data => this.state[data];
+
 
   /**
    *渲染非待办事项冲刺
@@ -966,7 +653,7 @@ class SprintItem extends Component {
                       >清空所有筛选器</p>
                     </div>
                     <div style={{ flexGrow: 1 }}>
-                      {this.renderStatusCodeDom(item)}
+                      {this.renderStatusCodeDom(item, indexs)}
                     </div>
                   </div>
                   <div
