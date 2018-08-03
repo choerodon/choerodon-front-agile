@@ -24,6 +24,18 @@ class EpicReport extends Component {
     VS.loadEpicAndChartAndTableData();
   }
   
+  getLabel(record) {
+    if (VS.beforeCurrentUnit === 'story_point') {
+      if (record.typeCode === 'story') {
+        return record.storyPoints === null ? '未预估' : record.storyPoints;
+      } else {
+        return '';
+      }
+    } else {
+      return record.remainTime === null ? '未预估' : record.remainTime; 
+    }
+  }
+
   getOption() {
     return {
       tooltip: {
@@ -402,17 +414,7 @@ class EpicReport extends Component {
         dataIndex: 'storyPoints',
         render: (storyPoints, record) => (
           <div>
-            {
-              VS.beforeCurrentUnit === 'story_point' ? (
-                <div>
-                  {record.typeCode === 'story' ? storyPoints || '未预估' : ''}
-                </div>
-              ) : (
-                <div>
-                  {record.remainTime || '未预估'}
-                </div>
-              )
-            }
+            {this.getLabel(record)}
           </div>
         ),
       },
@@ -502,9 +504,17 @@ class EpicReport extends Component {
                 </div>
                 <Spin spinning={VS.chartLoading}>
                   <div className="c7n-report">
-                    <div className="c7n-chart">
-                      <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
-                    </div>
+                    {
+                      VS.chartData.length ? (
+                        <div className="c7n-chart">
+                          <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
+                        </div>
+                      ) : (
+                        <div style={{ padding: '20px 0', textAlign: 'center', width: '100%' }}>
+                          当前单位下问题均未预估，切换单位或从下方问题列表进行预估。
+                        </div>
+                      )
+                    }
                   </div>
                 </Spin>
                 <Tabs>
