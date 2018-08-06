@@ -5,7 +5,6 @@ import { Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip } from
 import _ from 'lodash';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { withRouter } from 'react-router-dom';
-import axios from 'axios';
 import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
 import StatusColumn from '../ScrumBoardComponent/StatusColumn/StatusColumn';
 import StatusBodyColumn from '../ScrumBoardComponent/StatusBodyColumn/StatusBodyColumn';
@@ -75,25 +74,9 @@ class ScrumBoardHome extends Component {
       }
       ScrumBoardStore.setBoardList(data);
       ScrumBoardStore.setCurrentConstraint(data[index].columnConstraint);
-      // if (!ScrumBoardStore.getSelectedBoard) {
       ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
       ScrumBoardStore.setSelectedBoard(data[index].boardId);
       this.refresh(data[index].boardId);
-      // } else {
-      //   let flag = 0;
-      //   for (let index2 = 0, len = data.length; index2 < len; index2 += 1) {
-      //     if (data[index2].boardId === ScrumBoardStore.getSelectedBoard) {
-      //       flag += 1;
-      //     }
-      //   }
-      //   if (flag > 0) {
-      //     this.refresh(ScrumBoardStore.getSelectedBoard);
-      //   } else {
-      //     ScrumBoardStore.setSelectedBoard(data[index].boardId);
-      //     ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
-      //     this.refresh(data[index].boardId);
-      //   }
-      // }
     }).catch((error) => {
     });
   }
@@ -397,6 +380,8 @@ class ScrumBoardHome extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         ScrumBoardStore.axiosCreateBoard(values.name).then((res) => {
+          this.props.form.resetFields();
+          message.success('创建成功');
           this.setState({
             addBoard: false,
           });
@@ -482,7 +467,7 @@ class ScrumBoardHome extends Component {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
-  // 渲染状态列
+  // 渲染状态列表头
   renderStatusColumns() {
     const data = ScrumBoardStore.getBoardData;
     const result = [];
@@ -553,11 +538,16 @@ class ScrumBoardHome extends Component {
     }
     return result;
   }
+
+  /**
+   * 渲染被分配的任务列
+   * @returns {Array}
+   */
   renderSwimlane() {
     let ids = [];
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       ids = ScrumBoardStore.getParentIds;
-      ids = _.sortBy(ids, o => o.issueId);
+      ids = _.sortBy(ids, o => o.rank);
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       ids = ScrumBoardStore.getAssigneer;
       ids = _.sortBy(ids, o => o.assigneeId);
@@ -569,7 +559,7 @@ class ScrumBoardHome extends Component {
     for (let index = 0, len = ids.length; index < len; index += 1) {
       result.push(
         <SwimLaneContext
-          key={ids[index].assigneeId}
+          key={`${ids[index].assigneeId}-${index}`}
           data={ids[index]}
           handleDragEnd={this.handleDragEnd.bind(this)}
           renderIssueColumns={this.renderIssueColumns.bind(this)}
@@ -725,11 +715,12 @@ class ScrumBoardHome extends Component {
             <span>创建看板</span>
           </Button>
           <Select 
-            className="leftBtn2 select-without-underline" 
+            className="select-without-underline"
             value={ScrumBoardStore.getSelectedBoard}
             style={{ maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: '28px' }}
             dropdownStyle={{
               color: '#3F51B5',
+              width: 200,
             }}
             onChange={(value) => {
               let newCode;

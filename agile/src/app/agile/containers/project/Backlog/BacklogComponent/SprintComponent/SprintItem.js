@@ -839,7 +839,7 @@ class SprintItem extends Component {
                                   <Select
                                     value={this.state.selectIssueType}
                                     style={{
-                                      width: 50,
+                                      width: 65,
                                       height: 20,
                                     }}
                                     onChange={(value) => {
@@ -850,7 +850,7 @@ class SprintItem extends Component {
                                     dropdownMatchSelectWidth={false}
                                   >
                                     <Option value="story" key={'story'}>
-                                      <Tooltip title="故事">
+                                      <div style={{ display: 'flex' }}>
                                         <div
                                           className="c7n-backlog-sprintType"
                                           style={{
@@ -858,15 +858,16 @@ class SprintItem extends Component {
                                             display: 'flex',
                                             justifyContent: 'center',
                                             alignItems: 'center',
-                                            marginRight: 0,
+                                            marginRight: 8,
                                           }}
                                         >
                                           <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
                                         </div>
-                                      </Tooltip>
+                                        <div>故事</div>
+                                      </div>
                                     </Option>
                                     <Option value="task" key={'task'}>
-                                      <Tooltip title="任务">
+                                      <div style={{ display: 'flex' }}>
                                         <div
                                           className="c7n-backlog-sprintType"
                                           style={{
@@ -874,15 +875,16 @@ class SprintItem extends Component {
                                             display: 'flex',
                                             justifyContent: 'center',
                                             alignItems: 'center',
-                                            marginRight: 0,
+                                            marginRight: 8,
                                           }}
                                         >
                                           <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
                                         </div>
-                                      </Tooltip>
+                                        <div>任务</div>
+                                      </div>
                                     </Option>
                                     <Option value="bug" key={'bug'}>
-                                      <Tooltip title="缺陷">
+                                      <div style={{ display: 'flex' }}>
                                         <div
                                           className="c7n-backlog-sprintType"
                                           style={{
@@ -890,12 +892,13 @@ class SprintItem extends Component {
                                             display: 'flex',
                                             justifyContent: 'center',
                                             alignItems: 'center',
-                                            marginRight: 0,
+                                            marginRight: 8,
                                           }}
                                         >
                                           <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
                                         </div>
-                                      </Tooltip>
+                                        <div>缺陷</div>
+                                      </div>
                                     </Option>
                                   </Select>
                                   <div style={{ marginLeft: 8, flexGrow: 1 }}>
@@ -1194,7 +1197,7 @@ class SprintItem extends Component {
                               <Select
                                 value={this.state.selectIssueType}
                                 style={{
-                                  width: 50,
+                                  width: 65,
                                   height: 20,
                                 }}
                                 onChange={(value) => {
@@ -1205,7 +1208,7 @@ class SprintItem extends Component {
                                 dropdownMatchSelectWidth={false}
                               >
                                 <Option value="story" key={'story'}>
-                                  <Tooltip title="故事">
+                                  <div style={{ display: 'flex' }}>
                                     <div
                                       className="c7n-backlog-sprintType"
                                       style={{
@@ -1213,15 +1216,16 @@ class SprintItem extends Component {
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        marginRight: 0,
+                                        marginRight: 8,
                                       }}
                                     >
                                       <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
                                     </div>
-                                  </Tooltip>
+                                    <div>故事</div>
+                                  </div>
                                 </Option>
                                 <Option value="task" key={'task'}>
-                                  <Tooltip title="任务">
+                                  <div style={{ display: 'flex' }}>
                                     <div
                                       className="c7n-backlog-sprintType"
                                       style={{
@@ -1229,15 +1233,16 @@ class SprintItem extends Component {
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        marginRight: 0,
+                                        marginRight: 8,
                                       }}
                                     >
                                       <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
                                     </div>
-                                  </Tooltip>
+                                    <div>任务</div>
+                                  </div>
                                 </Option>
                                 <Option value="bug" key={'bug'}>
-                                  <Tooltip title="缺陷">
+                                  <div style={{ display: 'flex' }}>
                                     <div
                                       className="c7n-backlog-sprintType"
                                       style={{
@@ -1245,12 +1250,13 @@ class SprintItem extends Component {
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        marginRight: 0,
+                                        marginRight: 8,
                                       }}
                                     >
                                       <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
                                     </div>
-                                  </Tooltip>
+                                    <div>缺陷</div>
+                                  </div>
                                 </Option>
                               </Select>
                               <div style={{ marginLeft: 8, flexGrow: 1 }}>
