@@ -54,7 +54,6 @@ class BacklogStore {
     () => this.asJson,
     // 如何 autoSave 为 true, 把 json 发送到服务端
     (json, reactions) => {
-      console.log(json);
       reactions.dispose();
     },
   );

@@ -77,7 +77,7 @@ class ScrumBoardSetting extends Component {
       }
     }
     confirm({
-      title: `删除看板${name}`,
+      title: `删除看板"${name}"`,
       content: '确定要删除该看板吗?',
       okText: '删除',
       cancelText: '取消',
