@@ -41,9 +41,7 @@ class BacklogHome extends Component {
         this.setState({
           more: true,
         });
-        console.log('渲染了');
       }
-      console.log('没渲染');
     }
     return null;
   }
@@ -205,7 +203,7 @@ class BacklogHome extends Component {
   }
 
   resetSprintChose =() => {
-    this.sprintRef.resetMuilterChose();
+    this.resetMuilterChose();
   }
 
   /**
@@ -280,20 +278,6 @@ class BacklogHome extends Component {
       }
     }
     return destinationData;
-  }
-
-  /**
-   * 加载数据
-   */
-  getSprint=() => {
-    this.props.BacklogStore.axiosGetSprint(this.props.BacklogStore.getSprintFilter())
-      .then((data) => {
-        this.props.BacklogStore.setSprintData(data);
-        this.setState({
-          spinIf: false,
-        });
-      }).catch((error2) => {
-      });
   }
 
   /**
@@ -466,7 +450,7 @@ class BacklogHome extends Component {
         this.props.BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog'
           ? 0 : endId, axiosParam).then((res) => {
           // newData.backlogData.backLogIssue[endIndex] = res[0];
-          this.props.IssueDetail.refreshIssueDetail();
+          this.IssueDetail.refreshIssueDetail();
           this.props.BacklogStore.setSprintData(newData);
           this.getSprint();
         }).catch((error) => {

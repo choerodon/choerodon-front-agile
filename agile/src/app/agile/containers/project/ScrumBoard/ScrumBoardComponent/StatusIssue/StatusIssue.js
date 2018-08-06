@@ -389,19 +389,19 @@ class StatusIssue extends Component {
                               // margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 5px 5px 15px' : '0 0 0 13px',
                             }}
                           >
-                            <Tooltip title={`状态: ${item.statusName}`}>
+                            <Tooltip title={`状态: ${this.props.statusName}`}>
                               <span
                                 style={{
                                   borderRadius: 2,
                                   padding: '2px 8px',
-                                  background: this.renderStatusBackground(item.categoryCode),
+                                  background: this.renderStatusBackground(this.props.categoryCode),
                                   // background: '#4D90FE',
                                   color: 'white',
                                   maxWidth: 56,
                                 }}
                                 className="textDisplayOneColumn"
                               >
-                                {item.statusName}
+                                {this.props.statusName}
                               </span>
                             </Tooltip>
                           </p>

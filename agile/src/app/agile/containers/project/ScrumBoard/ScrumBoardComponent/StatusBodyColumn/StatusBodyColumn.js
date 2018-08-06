@@ -1,3 +1,6 @@
+/**
+ * 列状态
+ */
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
