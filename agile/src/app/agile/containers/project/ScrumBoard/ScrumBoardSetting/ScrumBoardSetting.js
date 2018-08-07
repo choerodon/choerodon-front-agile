@@ -24,7 +24,7 @@ class ScrumBoardSetting extends Component {
       loading: false,
     };
   }
-  componentWillMount() {
+  componentDidMount() {
     this.refresh();
   }
   // getQueryVariable(variable) {

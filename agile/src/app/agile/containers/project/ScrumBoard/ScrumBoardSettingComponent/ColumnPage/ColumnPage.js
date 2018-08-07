@@ -310,7 +310,7 @@ class ColumnPage extends Component {
             {
               ScrumBoardStore.getLookupValue.constraint ? (
                 ScrumBoardStore.getLookupValue.constraint.map(item => (
-                  <Option value={item.valueCode}>{item.name}</Option>
+                  <Option key={item.valueCode} value={item.valueCode}>{item.name}</Option>
                 ))
               ) : ''
             }

@@ -102,6 +102,7 @@ class SettingColumn extends Component {
     for (let index = 0, len = list.length; index < len; index += 1) {
       result.push(
         <StatusCard
+          key={`${this.props.data.columnId}-${index}`}
           columnId={this.props.data.columnId}
           data={list[index]}
           index={index}
