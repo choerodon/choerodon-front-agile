@@ -1,0 +1,17 @@
+.c7n-typeTag {
+  display: flex;
+
+  .icon {
+    display: flex;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: #fff;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .name {
+    margin-left: 8px;
+  }
+}

@@ -1,22 +1,13 @@
 import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
-import { withRouter } from 'react-router-dom';
 import moment from 'moment';
-import _ from 'lodash';
-import { Select, Form, Input, DatePicker, Button, Modal, Tabs, Tooltip, Radio, message, Icon } from 'choerodon-ui';
-
-import './DailyLog.scss';
+import { Select, DatePicker, Button, Modal, Radio, message, Icon } from 'choerodon-ui';
 import { NumericInput } from '../CommonComponent';
-import {
-  delta2Html,
-  escape,
-  handleFileUpload,
-  text2Delta,
-  beforeTextUpload,
-} from '../../common/utils';
+import { beforeTextUpload } from '../../common/utils';
 import { createWorklog } from '../../api/NewIssueApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
+import './DailyLog.scss';
 
 const DATA_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 const { Sidebar } = Modal;
@@ -30,7 +21,7 @@ const TYPE = {
   4: 'reduce',
 };
 
-class CreateSprint extends Component {
+class DailyLog extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -47,14 +38,8 @@ class CreateSprint extends Component {
     };
   }
 
-  componentDidMount() {
-  }
-
-
   onRadioChange = (e) => {
-    this.setState({
-      radio: e.target.value,
-    });
+    this.setState({ radio: e.target.value });
   }
 
   handleFullEdit = (delta) => {
@@ -112,8 +97,6 @@ class CreateSprint extends Component {
     createWorklog(data)
       .then((res) => {
         this.props.onOk();
-      })
-      .catch((error) => {
       });
   };
 
@@ -143,9 +126,7 @@ class CreateSprint extends Component {
 
   changeEndTime = (value) => {
     const startTime = this.transTime(value);
-    this.setState({
-      startTime: value,
-    });
+    this.setState({ startTime: value });
   }
 
   isEmpty(data) {
@@ -168,7 +149,6 @@ class CreateSprint extends Component {
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
     const { initValue, visible, onCancel, onOk } = this.props;
     const radioStyle = {
       display: 'block',
@@ -189,7 +169,7 @@ class CreateSprint extends Component {
 
     return (
       <Sidebar
-        className="choerodon-modal-createSprint"
+        className="c7n-dailyLog"
         title="登记工作日志"
         visible={visible || false}
         onOk={this.handleCreateDailyLog}
@@ -198,8 +178,8 @@ class CreateSprint extends Component {
         cancelText="取消"
         confirmLoading={this.state.createLoading}
       >
-        <div className="c7n-region-agile">
-          <h2 className="c7n-space-first">{`登记"${this.props.issueNum}"的工作日志`}</h2>
+        <div>
+          <h2>{`登记"${this.props.issueNum}"的工作日志`}</h2>
           <p style={{ width: 520 }}>
             您可以在这里记录您的工作，花费的时间会在关联问题中预估时间进行扣减，以便更精确地计算问题进度和提升工作效率。
           </p>
@@ -217,22 +197,17 @@ class CreateSprint extends Component {
                 onChange={this.handleDissipateUnitChange.bind(this)}
               >
                 {['h', 'd', 'w'].map(type => (
-                  <Option key={`${type}`} value={`${type}`}>
-                    {type}
-                  </Option>),
+                  <Option key={type} value={type}>{type}</Option>),
                 )}
               </Select>
             </div>
             <div className="dataPicker" style={{ width: 218, marginBottom: 32, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-              <div style={{ marginTop: 20, width: 220, paddingBottom: 3 }}>
-                <DatePicker
-                  label="工作日期*"
-                  value={this.state.startTime}
-                  // value={this.transTime(this.state.startTime)}
-                  format={DATA_FORMAT}
-                  onChange={this.changeEndTime}
-                />
-              </div>
+              <DatePicker
+                label="工作日期*"
+                value={this.state.startTime}
+                format={DATA_FORMAT}
+                onChange={this.changeEndTime}
+              />
             </div>
 
             <div className="line-info">
@@ -260,13 +235,17 @@ class CreateSprint extends Component {
                     onChange={this.handleTimeUnitChange.bind(this)}
                   >
                     {['h', 'd', 'w'].map(type => (
-                      <Option key={`${type}`} value={`${type}`}>
-                        {type}
-                      </Option>),
+                      <Option key={`${type}`} value={`${type}`}>{type}</Option>),
                     )}
                   </Select>
                 </Radio>
-                <Radio style={radioStyle} value={4}>
+                <Radio
+                  style={{
+                    ...radioStyle,
+                    marginBottom: 20,
+                  }}
+                  value={4}
+                >
                   <span style={{ display: 'inline-block', width: 52 }}>缩减</span>
                   <NumericInput
                     style={tempAlignStyle}
@@ -281,9 +260,7 @@ class CreateSprint extends Component {
                     onChange={this.handleReduceUnitChange.bind(this)}
                   >
                     {['h', 'd', 'w'].map(type => (
-                      <Option key={`${type}`} value={`${type}`}>
-                        {type}
-                      </Option>),
+                      <Option key={`${type}`} value={`${type}`}>{type}</Option>),
                     )}
                   </Select>
                 </Radio>
@@ -291,31 +268,29 @@ class CreateSprint extends Component {
             </div>
 
             <div className="c7n-sidebar-info">
-              <div>
-                <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
-                  <div style={{ fontWeight: 'bold' }}>工作说明</div>
-                  <div style={{ marginLeft: '80px' }}>
-                    <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
-                      <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: '12px' }} />
-                      <span style={{ color: '#3f51b5' }}>全屏编辑</span>
-                    </Button>
-                  </div>
+              <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
+                <div style={{ fontWeight: 'bold' }}>工作说明</div>
+                <div style={{ marginLeft: '80px' }}>
+                  <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
+                    <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: '12px' }} />
+                    <span style={{ color: '#3f51b5' }}>全屏编辑</span>
+                  </Button>
                 </div>
-                {
-                  !this.state.edit && (
-                    <div className="clear-p-mw">
-                      <WYSIWYGEditor
-                        value={this.state.delta}
-                        style={{ height: 200, width: '100%' }}
-                        onChange={(value) => {
-                          this.setState({ delta: value });
-                        }}
-                      />
-                    </div>
-                  )
-                }
               </div>
-            </div> 
+              {
+                !this.state.edit && (
+                  <div className="clear-p-mw">
+                    <WYSIWYGEditor
+                      value={this.state.delta}
+                      style={{ height: 200, width: '100%' }}
+                      onChange={(value) => {
+                        this.setState({ delta: value });
+                      }}
+                    />
+                  </div>
+                )
+              }
+            </div>
           </section>
         </div>
         {
@@ -332,4 +307,4 @@ class CreateSprint extends Component {
     );
   }
 }
-export default Form.create({})(withRouter(CreateSprint));
+export default DailyLog;

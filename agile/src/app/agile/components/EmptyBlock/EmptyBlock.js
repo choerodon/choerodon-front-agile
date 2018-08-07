@@ -1,16 +1,7 @@
 import React, { Component } from 'react';
-import './DailyLog.scss';
+import './EmptyBlock.scss';
 
 class EmptyBlock extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
-  componentDidMount() {
-  }
-
   render() {
     return (
       <div

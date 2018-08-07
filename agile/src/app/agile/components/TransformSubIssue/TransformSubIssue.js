@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
-import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import { Modal, Form, Select } from 'choerodon-ui';
 import { createLink, loadIssuesInLink } from '../../api/NewIssueApi';
@@ -12,6 +11,11 @@ const { AppState } = stores;
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
 const { Option } = Select;
+const STATUS_COLOR = {
+  todo: 'rgb(74, 103, 133)',
+  doing: 'rgb(246, 195, 66)',
+  done: 'rgb(20, 136, 44)',
+};
 let sign = false;
 
 class TransformSubIssue extends Component {
@@ -47,18 +51,6 @@ class TransformSubIssue extends Component {
     }
   }
 
-  debounceFilterIssues = _.debounce((input) => {
-    this.setState({
-      selectLoading: true,
-    });
-    loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
-      this.setState({
-        originIssues: res.content,
-        selectLoading: false,
-      });
-    });
-  }, 500);
-
   getStatus() {
     this.setState({
       selectLoading: true,
@@ -72,17 +64,17 @@ class TransformSubIssue extends Component {
       });
   }
 
-  setBackground(categoryCode) {
-    let result;
-    if (categoryCode === 'todo') {
-      result = 'rgb(74, 103, 133)';
-    } else if (categoryCode === 'doing') {
-      result = 'rgb(246, 195, 66)';
-    } else {
-      result = 'rgb(20, 136, 44)';
-    }
-    return result;
-  }
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
+      this.setState({
+        originIssues: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
 
   handleTransformSubIssue = () => {
     this.props.form.validateFields((err, values) => {
@@ -154,9 +146,7 @@ class TransformSubIssue extends Component {
                       <div style={{ display: 'inline-flex', width: '100%', flex: 1 }}>
                         <div>
                           <TypeTag
-                            type={{
-                              typeCode: issue.typeCode,
-                            }}
+                            typeCode={issue.typeCode}
                           />
                         </div>
                         <a style={{ paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -184,13 +174,12 @@ class TransformSubIssue extends Component {
                   {
                     this.state.originStatus.map(status => (
                       <Option key={status.id} value={status.id}>
-                        
                         <div style={{ display: 'inline-flex', alignItems: 'center' }}>
                           <div
                             style={{
                               width: 15,
                               height: 15,
-                              background: this.setBackground(status.categoryCode),
+                              background: STATUS_COLOR[status.categoryCode],
                               marginRight: 6,
                               borderRadius: '2px',
                             }}
@@ -210,4 +199,4 @@ class TransformSubIssue extends Component {
     );
   }
 }
-export default Form.create({})(withRouter(TransformSubIssue));
+export default Form.create({})(TransformSubIssue);

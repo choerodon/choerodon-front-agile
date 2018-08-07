@@ -1,3 +1,3 @@
-import UserHead from './UserHead';
+import PriorityTag from './PriorityTag';
 
-export default UserHead;
+export default PriorityTag;

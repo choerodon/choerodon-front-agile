@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
-import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Select, Form, Input, Button, Modal, Spin, Icon } from 'choerodon-ui';
-import './CreateIssue.scss';
+import { Select, Form, Modal } from 'choerodon-ui';
 import { createLink, loadIssuesInLink } from '../../api/NewIssueApi';
 import TypeTag from '../TypeTag';
+import './CreateLinkTask.scss';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
@@ -13,26 +12,40 @@ const { Option } = Select;
 const FormItem = Form.Item;
 let sign = false;
 
-class CreateSprint extends Component {
+class CreateLinkTask extends Component {
   constructor(props) {
     super(props);
     this.state = {
       createLoading: false,
       selectLoading: true,
-
       originIssues: [],
       originLinks: [],
-
       active: [],
       passive: [],
       show: [],
-
       selected: [],
     };
   }
 
   componentDidMount() {
     this.getLinks();
+  }
+
+  onFilterChange(input) {
+    if (!sign) {
+      this.setState({
+        selectLoading: true,
+      });
+      loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
+        this.setState({
+          originIssues: res.content,
+          selectLoading: false,
+        });
+      });
+      sign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
   }
 
   getLinks() {
@@ -74,23 +87,6 @@ class CreateSprint extends Component {
   handleSelect(value, option) {
     const selected = _.map(option.slice(), v => v.key);
     this.setState({ selected });
-  }
-
-  onFilterChange(input) {
-    if (!sign) {
-      this.setState({
-        selectLoading: true,
-      });
-      loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
-        this.setState({
-          originIssues: res.content,
-          selectLoading: false,
-        });
-      });
-      sign = true;
-    } else {
-      this.debounceFilterIssues(input);
-    }
   }
 
   debounceFilterIssues = _.debounce((input) => {
@@ -151,9 +147,7 @@ class CreateSprint extends Component {
         confirmLoading={this.state.createLoading}
       >
         <Content
-          style={{
-            padding: 0,
-          }}
+          style={{ padding: 0 }}
           title="对问题创建链接"
           description="请在下面输入相关任务的基本信息，包括所要创建的关系（复制、阻塞、关联、破坏、被复制、被阻塞、被破坏等）以及所要关联的问题（支持多选）。"
         >
@@ -162,7 +156,6 @@ class CreateSprint extends Component {
               {getFieldDecorator('linkTypeId', {})(
                 <Select
                   label="关系"
-                  // labelInValue
                   loading={this.state.selectLoading}
                 >
                   {this.state.show.map(link =>
@@ -191,17 +184,13 @@ class CreateSprint extends Component {
                       key={issue.issueId}
                       value={issue.issueNum}
                     >
-                      <div style={{ display: 'inline-flex', width: '100%', flex: 1 }}>
-                        <div>
-                          <TypeTag
-                            type={{
-                              typeCode: issue.typeCode,
-                            }}
-                          />
-                        </div>
-                        <a style={{ paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ display: 'inline-flex', width: '100%', flex: 1, alignItems: 'center' }}>
+                        <TypeTag
+                          typeCode={issue.typeCode}
+                        />
+                        <span style={{ paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {issue.issueNum}
-                        </a>
+                        </span>
                         <div style={{ overflow: 'hidden', flex: 1 }}>
                           <p style={{ paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset' }}>
                             {issue.summary}
@@ -219,4 +208,4 @@ class CreateSprint extends Component {
     );
   }
 }
-export default Form.create({})(withRouter(CreateSprint));
+export default Form.create({})(CreateLinkTask);

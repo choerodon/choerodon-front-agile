@@ -7,12 +7,11 @@ import './Issue.scss';
 
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 
-import { STATUS, COLOR, TYPE, ICON, TYPE_NAME } from '../../../../common/Constant';
+import { TYPE, ICON, TYPE_NAME } from '../../../../common/Constant';
 import pic from '../../../../assets/image/问题管理－空.png';
 import { loadIssue, createIssue } from '../../../../api/NewIssueApi';
 import EditIssue from '../../../../components/EditIssueWide';
 import CreateIssue from '../../../../components/CreateIssueNew';
-import DailyLog from '../../../../components/DailyLog';
 import UserHead from '../../../../components/UserHead';
 import PriorityTag from '../../../../components/PriorityTag';
 import StatusTag from '../../../../components/StatusTag';
@@ -109,19 +108,6 @@ class Issue extends Component {
     this.setState({ create: false });
     IssueStore.init();
     IssueStore.loadIssues();
-  }
-
-  handleChangeIssueId(issueId) {
-    this.setState({
-      expand: false,
-    }, () => {
-      this.setState({
-        selectedIssue: {
-          issueId,
-        },
-        expand: true,
-      });
-    });
   }
 
   handleIssueUpdate(issueId = this.state.selectedIssue.issueId) {
@@ -258,9 +244,7 @@ class Issue extends Component {
         <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[issue.typeCode]}`}>
           <div>
             <TypeTag
-              type={{
-                typeCode: issue.typeCode,
-              }}
+              typeCode={issue.typeCode}
             />
           </div>
         </Tooltip>
@@ -281,10 +265,7 @@ class Issue extends Component {
           <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityName}`}>
             <div style={{ marginRight: 12 }}>
               <PriorityTag
-                priority={{
-                  priorityCode: issue.priorityCode,
-                  priorityName: issue.priorityName,
-                }}
+                priority={issue.priorityCode}
               />
             </div>
           </Tooltip>
@@ -311,10 +292,8 @@ class Issue extends Component {
           <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusName}`}>
             <div>
               <StatusTag
-                status={{
-                  statusColor: issue.statusColor,
-                  statusName: issue.statusName,
-                }}
+                name={issue.statusName}
+                color={issue.statusColor}
               />
             </div>
           </Tooltip>
@@ -330,9 +309,7 @@ class Issue extends Component {
           <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[issue.typeCode]}`}>
             <div>
               <TypeTag
-                type={{
-                  typeCode: issue.typeCode,
-                }}
+                typeCode={issue.typeCode}
               />
             </div>
           </Tooltip>
@@ -354,10 +331,7 @@ class Issue extends Component {
             <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityName}`}>
               <div style={{ marginRight: 12 }}>
                 <PriorityTag
-                  priority={{
-                    priorityCode: issue.priorityCode,
-                    priorityName: issue.priorityName,
-                  }}
+                  priority={issue.priorityCode}
                 />
               </div>
             </Tooltip>
@@ -384,10 +358,8 @@ class Issue extends Component {
             <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusName}`}>
               <div>
                 <StatusTag
-                  status={{
-                    statusColor: issue.statusColor,
-                    statusName: issue.statusName,
-                  }}
+                  name={issue.statusName}
+                  color={issue.statusColor}
                 />
               </div>
             </Tooltip>
@@ -591,13 +563,9 @@ class Issue extends Component {
             <Menu.Item key={type}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
-                  type={{
-                    typeCode: type,
-                  }}
+                  typeCode={type}
+                  showName
                 />
-                <span style={{ marginLeft: 8 }}>
-                  {TYPE_NAME[type]}
-                </span>
               </div>
             </Menu.Item>
           ))
@@ -840,7 +808,6 @@ class Issue extends Component {
               this.state.expand ? (
                 <EditIssue
                   issueId={this.state.selectedIssue.issueId}
-                  // changeIssueId={this.handleChangeIssueId.bind(this)}
                   onCancel={() => {
                     this.setState({
                       expand: false,

@@ -1,3 +1,3 @@
-import UserHead from './UserHead';
+import StatusTag from './StatusTag';
 
-export default UserHead;
+export default StatusTag;

@@ -84,6 +84,12 @@
     padding-left: 24px;
     // padding-right: 24px;
 
+    .ant-table {
+      table {
+        border-collapse: collapse;
+      }
+    }
+
     .c7n-status {
       border: 1px solid;
       border-radius: 2px;

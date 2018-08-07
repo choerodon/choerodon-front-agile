@@ -96,9 +96,7 @@ class ReleaseLogs extends Component {
       <div>
         <div style={{ margin: '17px 0' }}>
           <TypeTag
-            type={{
-              typeCode,
-            }}
+            typeCode={typeCode}
             showName
           />
         </div>

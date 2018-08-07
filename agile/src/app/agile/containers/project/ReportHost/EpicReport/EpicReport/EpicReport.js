@@ -225,7 +225,7 @@ class EpicReport extends Component {
           step: true,
           symbol: ES.getChartDataYIssueCountCompleted.length === 1 ? 'auto' : 'none',
           itemStyle: {
-            color: '#000',
+            color: '#00bfa4',
           },
           yAxisIndex: 1,
           data: ES.getChartDataYIssueCountCompleted,
@@ -354,9 +354,7 @@ class EpicReport extends Component {
         render: (typeCode, record) => (
           <div>
             <TypeTag
-              type={{
-                typeCode: record.typeCode,
-              }}
+              typeCode={record.typeCode}
               showName
             />
           </div>
@@ -368,10 +366,7 @@ class EpicReport extends Component {
         render: (priorityCode, record) => (
           <div>
             <PriorityTag
-              priority={{
-                priorityCode: record.priorityCode,
-                priorityName: record.priorityName,
-              }}
+              priority={record.priorityCode}
             />
           </div>
         ),
@@ -385,10 +380,8 @@ class EpicReport extends Component {
               <div>
                 <StatusTag
                   style={{ display: 'inline-block' }}
-                  status={{
-                    statusColor: record.statusColor,
-                    statusName: record.statusName,
-                  }}
+                  name={record.statusName}
+                  color={record.statusColor}
                 />
               </div>
             </Tooltip>
@@ -488,7 +481,11 @@ class EpicReport extends Component {
                                   {ES.getLatest.issueCount}
                                 </span>
                               </li>
-                              <li><span className="c7n-tip">已完成：</span><span>{ES.getLatest.issueCompletedCount}</span></li>
+                              {
+                                ES.beforeCurrentUnit === 'issue_count' ? (
+                                  <li><span className="c7n-tip">已完成：</span><span>{ES.getLatest.issueCompletedCount}</span></li>
+                                ) : null
+                              }
                               {
                                 ES.beforeCurrentUnit === 'issue_count' ? null : (
                                   <li><span className="c7n-tip">未预估：</span><span>{ES.getLatest.unEstimateIssueCount}</span></li>
@@ -532,8 +529,8 @@ class EpicReport extends Component {
                           </div>
                         </div>
                       ) : (
-                        <div style={{ padding: '20px 0', textAlign: 'center' }}>
-                          当前单位下问题均未预估，切换单位或从下方问题列表进行预估。
+                        <div style={{ padding: '30px 0 20px', textAlign: 'center' }}>
+                          {ES.tableData.length ? '当前单位下问题均未预估，切换单位或从下方问题列表进行预估。' : '当前史诗下没有问题。'}
                         </div>
                       )
                     }

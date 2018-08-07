@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
-import { observer } from 'mobx-react';
 import _ from 'lodash';
-import { Modal, Form, Radio, Input, Select, Tooltip, Icon } from 'choerodon-ui';
+import { Modal, Form, Input, Select, Icon } from 'choerodon-ui';
 import { stores, Content, axios } from 'choerodon-front-boot';
-import { injectIntl, FormattedMessage } from 'react-intl';
 import './CreateBranch.scss';
-import './commom.scss';
 
 const { AppState } = stores;
 const Sidebar = Modal.Sidebar;
@@ -22,76 +18,25 @@ const MAP = {
 
 class CreateBranch extends Component {
   constructor(props) {
-    const menu = AppState.currentMenuType;
     super(props);
     this.state = {
       name: 'feature',
       value: '',
-      projectId: menu.id,
       confirmLoading: false,
-      initValue: null,
-      type: 'custom',
-
       selectLoading: false,
       originApps: [],
-      originBranchs: [],
       branchs: [],
       branchsShowMore: false,
-      branchsMaxPage: 0,
       branchsInput: '',
       branchsSize: 5,
       branchsObj: {},
       tags: [],
       tagsShowMore: false,
-      tagsMaxPage: 0,
-      tagsInput: '',
       tagsSize: 5,
       tagsObj: {},
-      branchsExpand: false,
-      tagsExpand: false,
     };
   }
 
-  componentDidMount() {
-  }
-
-  /**
-   * 获取列表的icon
-   * @param type 分支类型
-   * @returns {*}
-   */
-  getIcon =(name) => {
-    let icon;
-    let type;
-    if (name) {
-      type = name.split('-')[0];
-    }
-    switch (type) {
-      case 'feature':
-        icon = <span className="c7n-branch-icon icon-feature">F</span>;
-        break;
-      case 'bugfix':
-        icon = <span className="c7n-branch-icon icon-develop">B</span>;
-        break;
-      case 'hotfix':
-        icon = <span className="c7n-branch-icon icon-hotfix">H</span>;
-        break;
-      case 'master':
-        icon = <span className="c7n-branch-icon icon-master">M</span>;
-        break;
-      case 'release':
-        icon = <span className="c7n-branch-icon icon-release">R</span>;
-        break;
-      default:
-        icon = <span className="c7n-branch-icon icon-custom">C</span>;
-    }
-    return icon;
-  };
-
-  /**
-   * 提交分支数据
-   * @param e
-   */
   handleOk = (e) => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
@@ -121,22 +66,16 @@ class CreateBranch extends Component {
       }
     });
   };
-  /**
-   * 验证分支名的正则
-   * @param rule
-   * @param value
-   * @param callback
-   */
+
   checkName =(rule, value, callback) => {
     // eslint-disable-next-line no-useless-escape
     const endWith = /(\/|\.|\.lock)$/;
     const contain = /(\s|~|\^|:|\?|\*|\[|\\|\.\.|@\{|\/{2,}){1}/;
     const single = /^@+$/;
-    const { intl } = this.props;
     if (endWith.test(value)) {
-      callback(intl.formatMessage({ id: 'branch.checkNameEnd' }));
+      callback('不能以"/"、"."、".lock"结尾');
     } else if (contain.test(value) || single.test(value)) {
-      callback(intl.formatMessage({ id: 'branch.check' }));
+      callback('只能包含字母、数字、\'——\'、\'_\'');
     } else {
       callback();
     }
@@ -144,9 +83,7 @@ class CreateBranch extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { visible, intl, store } = this.props;
-    const branches = [];
-    const tags = [];
+    const { visible, store } = this.props;
     return (
       <Sidebar
         className="c7n-createBranch"
@@ -170,13 +107,9 @@ class CreateBranch extends Component {
             <div className="branch-formItem-icon">
               <span className="icon icon-widgets" />
             </div>
-            <FormItem
-              className="branch-formItem"
-            >
+            <FormItem className="branch-formItem">
               {getFieldDecorator('app', {
-                rules: [{
-                  required: true,
-                }],
+                rules: [{ required: true }],
               })(
                 <Select
                   label="应用名称"
@@ -197,9 +130,7 @@ class CreateBranch extends Component {
                   loading={this.state.selectLoading}
                 >
                   {this.state.originApps.map(app => (
-                    <Option value={app.id} key={app.id}>
-                      {app.name}
-                    </Option>
+                    <Option value={app.id} key={app.id}>{app.name}</Option>
                   ))}
                 </Select>,
               )}
@@ -207,13 +138,9 @@ class CreateBranch extends Component {
             <div className="branch-formItem-icon">
               <span className="icon icon-wrap_text" />
             </div>
-            <FormItem
-              className="branch-formItem"
-            >
+            <FormItem className="branch-formItem">
               {getFieldDecorator('branch', {
-                rules: [{
-                  required: true,
-                }],
+                rules: [{ required: true }],
               })(
                 <Select
                   label="分支来源"
@@ -222,8 +149,6 @@ class CreateBranch extends Component {
                   filter
                   filterOption={false}
                   optionLabelProp="value"
-                  // optionFilterProp="children"
-                  // filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                   loading={this.state.selectLoading}
                   onFilterChange={(input) => {
                     this.setState({ branchsInput: input });
@@ -338,29 +263,27 @@ class CreateBranch extends Component {
             <div className="branch-formItem-icon">
               <span className="icon icon-branch" />
             </div>
-            <FormItem
-              className={'c7n-formItem_180'}
-            >
+            <FormItem className={'c7n-formItem_180'}>
               {getFieldDecorator('type', {
-                rules: [{
-                  required: true,
-                }],
-                initialValue: _.keys(MAP).includes(this.props.typeCode) ? MAP[this.props.typeCode]: undefined,
+                rules: [{ required: true }],
+                initialValue: MAP[this.props.typeCode || 'task'],
               })(
                 <Select
                   allowClear
                   label="分支类型"
-                  // disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
                 >
                   {['feature', 'bugfix', 'release', 'hotfix', 'custom'].map(s => (
-                    <Option value={s} key={s}>{this.getIcon(s)}<span>{s}</span></Option>
+                    <Option value={s} key={s}>
+                      <span className={`c7n-branch-icon icon-${s === 'bugfix' ? 'develop' : s}`}>
+                        {s.slice(0, 1).toUpperCase()}
+                      </span>
+                      <span>{s}</span>
+                    </Option>
                   ))}
                 </Select>,
               )}
             </FormItem>
-            <FormItem
-              className="c7n-formItem_281"
-            >
+            <FormItem className="c7n-formItem_281">
               {getFieldDecorator('name', {
                 rules: [{
                   required: true,
@@ -373,7 +296,6 @@ class CreateBranch extends Component {
                   label="分支名称"
                   prefix={this.props.form.getFieldValue('type') === 'custom' || !this.props.form.getFieldValue('type') ? '' : `${this.props.form.getFieldValue('type')}-`}
                   maxLength={30}
-                  // disabled={!(this.props.form.getFieldValue('app') && this.props.form.getFieldValue('branch'))}
                 />,
               )}
             </FormItem>
@@ -383,4 +305,4 @@ class CreateBranch extends Component {
     );
   }
 }
-export default Form.create({})(withRouter(injectIntl(CreateBranch)));
+export default Form.create({})(CreateBranch);

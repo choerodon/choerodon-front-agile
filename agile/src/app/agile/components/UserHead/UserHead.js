@@ -1,17 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Table, Spin, Popover, Tooltip, Icon, Avatar } from 'choerodon-ui';
-import './UserHead.scss';
+// import './UserHead.scss';
 
 class UserHead extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
-  componentDidMount() {
-  }
-
   shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.user.id === this.props.user.id) {
       return false;
@@ -56,6 +46,7 @@ class UserHead extends Component {
                 alignItems: 'center',
                 textAlign: 'center',
                 borderRadius: 4,
+                flexShrink: 0,
               }}
             >
               {

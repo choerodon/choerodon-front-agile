@@ -368,9 +368,7 @@ class EpicReport extends Component {
         render: (typeCode, record) => (
           <div>
             <TypeTag
-              type={{
-                typeCode: record.typeCode,
-              }}
+              typeCode={record.typeCode}
               showName
             />
           </div>
@@ -382,10 +380,7 @@ class EpicReport extends Component {
         render: (priorityCode, record) => (
           <div>
             <PriorityTag
-              priority={{
-                priorityCode: record.priorityCode,
-                priorityName: record.priorityName,
-              }}
+              priority={record.priorityCode}
             />
           </div>
         ),
@@ -399,10 +394,8 @@ class EpicReport extends Component {
               <div>
                 <StatusTag
                   style={{ display: 'inline-block' }}
-                  status={{
-                    statusColor: record.statusColor,
-                    statusName: record.statusName,
-                  }}
+                  name={record.statusName}
+                  color={record.statusColor}
                 />
               </div>
             </Tooltip>
@@ -485,13 +478,14 @@ class EpicReport extends Component {
                   </Select>
                 </div>
                 <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between' }}>
-                  <p style={{ fontWeight: '600' }}>{VS.getCurrentVersion.versionId && VS.getCurrentVersion.statusCode === 'released' ? `发布于 ${VS.getCurrentVersion.releaseDate ? VS.getCurrentVersion.releaseDate : '未指定发布日期'}` : '未发布'}</p>
+                  <p style={{ fontWeight: '600', marginBottom: 0 }}>{VS.getCurrentVersion.versionId && VS.getCurrentVersion.statusCode === 'released' ? `发布于 ${VS.getCurrentVersion.releaseDate ? VS.getCurrentVersion.releaseDate : '未指定发布日期'}` : '未发布'}</p>
                   <p
                     style={{
                       color: '#3F51B5',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
+                      marginBottom: 0,
                     }}
                     role="none"
                     onClick={() => {
@@ -511,7 +505,7 @@ class EpicReport extends Component {
                         </div>
                       ) : (
                         <div style={{ padding: '20px 0', textAlign: 'center', width: '100%' }}>
-                          当前单位下问题均未预估，切换单位或从下方问题列表进行预估。
+                          {VS.tableData.length ? '当前单位下问题均未预估，切换单位或从下方问题列表进行预估。' : '当前版本下没有问题。'}
                         </div>
                       )
                     }

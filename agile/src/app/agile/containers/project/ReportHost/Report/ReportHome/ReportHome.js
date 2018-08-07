@@ -175,9 +175,7 @@ class ReleaseDetail extends Component {
             <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.typeCode}`}>
               <div>
                 <TypeTag
-                  type={{
-                    typeCode: record.typeCode,
-                  }}
+                  typeCode={record.typeCode}
                   showName
                 />
               </div>
@@ -193,10 +191,7 @@ class ReleaseDetail extends Component {
             <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityName}`}>
               <div style={{ marginRight: 12 }}>
                 <PriorityTag
-                  priority={{
-                    priorityCode: record.priorityCode,
-                    priorityName: record.priorityName,
-                  }}
+                  priority={record.priorityCode}
                 />
               </div>
             </Tooltip>
@@ -212,10 +207,8 @@ class ReleaseDetail extends Component {
               <div>
                 <StatusTag
                   style={{ display: 'inline-block' }}
-                  status={{
-                    statusColor: record.statusColor,
-                    statusName: record.statusName,
-                  }}
+                  name={record.statusName}
+                  color={record.statusColor}
                 />
               </div>
             </Tooltip>
