@@ -844,6 +844,7 @@ class ScrumBoardHome extends Component {
               {
                 this.state.closeSprintVisible ? (
                   <CloseSprint
+                    store={BacklogStore}
                     visible={this.state.closeSprintVisible}
                     onCancel={() => {
                       this.setState({
