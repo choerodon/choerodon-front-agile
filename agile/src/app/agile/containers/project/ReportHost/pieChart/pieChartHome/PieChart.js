@@ -24,6 +24,7 @@ class ReleaseDetail extends Component {
     this.state = {
       colors: [],
       type: '经办人',
+      value: 'assignee'
     };
   }
   componentDidMount() {
@@ -150,11 +151,11 @@ class ReleaseDetail extends Component {
     };
   }
   handelRefresh = () => {
-    VersionReportStore.getPieDatas(AppState.currentMenuType.id, this.state.type);
+    VersionReportStore.getPieDatas(AppState.currentMenuType.id, this.state.value);
   };
   changeType =(value, option) => {
     // VersionReportStore.setPieData([]);
-    this.setState({ type: option.key });
+    this.setState({ type: option.key, value });
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
   };
   render() {

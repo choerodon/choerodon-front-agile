@@ -87,6 +87,8 @@ class BurndownChartHome extends Component {
       let allDate;
       if (moment(maxDate).isBefore(this.state.endDate.split(' ')[0])) {
         allDate = this.getBetweenDateStr(minDate, this.state.endDate.split(' ')[0]);
+      } else if (moment(minDate).isSame(maxDate)) {
+        allDate = [minDate];
       } else {
         allDate = this.getBetweenDateStr(minDate, maxDate);
       }

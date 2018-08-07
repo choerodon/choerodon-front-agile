@@ -1,0 +1,42 @@
+.c7n-map {
+  .toolbar {
+    height: 48px;
+    display: flex;
+  }
+  .wrap {
+    width: 500px;
+    height: 500px;
+    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .inner {
+    /*width: 1000px;*/
+    /*height: 1000px;*/
+    position: relative;
+    padding-top: 200px;
+  }
+  .top {
+    position: absolute;
+    width: 1000px;
+    height: 200px;
+    top: 0;
+    background: lightblue;
+    overflow: hidden;
+  }
+  .bottom-wrap {
+    width: 1000px;
+    height: 1000px;
+    background: lightcoral;
+    position: absolute;
+    top: 200px;
+  }
+  .bottom {
+    height: 300px;
+    overflow-y: scroll;
+    direction: ltr;
+    box-sizing: border-box;
+    width: 1018px;
+    will-change: transform;
+  }
+}

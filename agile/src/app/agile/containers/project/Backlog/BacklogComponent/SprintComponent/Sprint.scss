@@ -168,7 +168,7 @@
       .c7n-backlog-sprintSideRightItems {
         display: flex;
         align-items: center;
-        margin-left: 26px;
+        // margin-left: 26px;
       }
 
       .ant-input-underline {
@@ -181,7 +181,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        // margin-left: 12px;
+        margin-left: 13px;
 
         .c7n-backlog-sprintIssuePriority {
           border-radius: 2px;

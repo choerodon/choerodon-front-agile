@@ -164,14 +164,14 @@ class IssueItem extends Component {
                     >
                       {!_.isNull(item.priorityName) ? (
                         <Tooltip title={`优先级: ${item.priorityName}`}>
-                              <span
-                                label="sprintIssue"
-                                className="c7n-backlog-sprintIssuePriority"
-                                style={{
-                                  color: this.renderPriorityStyle('color', item),
-                                  background: this.renderPriorityStyle('background', item),
-                                }}
-                              >{item.priorityName}</span>
+                          <span
+                            label="sprintIssue"
+                            className="c7n-backlog-sprintIssuePriority"
+                            style={{
+                              color: this.renderPriorityStyle('color', item),
+                              background: this.renderPriorityStyle('background', item),
+                            }}
+                          >{item.priorityName}</span>
                         </Tooltip>
                       ) : ''}
                     </div>
@@ -188,9 +188,9 @@ class IssueItem extends Component {
                     >
                       {item.versionNames.length > 0 ? (
                         <Tooltip title={`版本: ${item.versionNames.join(', ')}`}>
-                              <span label="sprintIssue" className="c7n-backlog-sprintIssueVersion">
-                                <span>{item.versionNames.join(', ')}</span>
-                              </span>
+                          <span label="sprintIssue" className="c7n-backlog-sprintIssueVersion">
+                            <span>{item.versionNames.join(', ')}</span>
+                          </span>
                         </Tooltip>
                       ) : ''}
                     </div>
@@ -206,14 +206,14 @@ class IssueItem extends Component {
                     >
                       {!_.isNull(item.epicName) ? (
                         <Tooltip title={`史诗: ${item.epicName}`}>
-                              <span
-                                label="sprintIssue"
-                                className="c7n-backlog-sprintIssueEpic"
-                                style={{
-                                  // border: `1px solid ${item.color}`,
-                                  color: item.color,
-                                }}
-                              >{item.epicName}</span>
+                          <span
+                            label="sprintIssue"
+                            className="c7n-backlog-sprintIssueEpic"
+                            style={{
+                              // border: `1px solid ${item.color}`,
+                              color: item.color,
+                            }}
+                          >{item.epicName}</span>
                         </Tooltip>
                       ) : ''}
                     </div>
@@ -249,13 +249,13 @@ class IssueItem extends Component {
                     >
                       {!_.isNull(item.statusName) ? (
                         <Tooltip title={`状态: ${item.statusName}`}>
-                              <span
-                                label="sprintIssue"
-                                className="c7n-backlog-sprintIssueStatus"
-                                style={{
-                                  background: item.statusColor ? item.statusColor : '#4d90fe',
-                                }}
-                              >{item.statusName}</span>
+                          <span
+                            label="sprintIssue"
+                            className="c7n-backlog-sprintIssueStatus"
+                            style={{
+                              background: item.statusColor ? item.statusColor : '#4d90fe',
+                            }}
+                          >{item.statusName}</span>
                         </Tooltip>
                       ) : ''}
                     </div>
