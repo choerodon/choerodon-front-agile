@@ -1,0 +1,52 @@
+import React, { Component } from 'react';
+import './PriorityTag.scss';
+
+const PRIORITY_MAP = {
+  medium: {
+    color: '#3575df',
+    bgColor: 'rgba(77, 144, 254, 0.2)',
+    name: '中',
+  },
+  high: {
+    color: '#ffb100',
+    bgColor: 'rgba(255, 177, 0, 0.12)',
+    name: '高',
+  },
+  low: {
+    color: 'rgba(0, 0, 0, 0.36)',
+    bgColor: 'rgba(0, 0, 0, 0.08)',
+    name: '低',
+  },
+  default: {
+    color: 'transparent',
+    bgColor: 'transparent',
+    name: '',
+  },
+};
+
+class PriorityTag extends Component {
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.priority.priorityCode === this.props.priority.priorityCode) {
+      return false;
+    }
+    return true;
+  }
+
+  render() {
+    const { priority } = this.props;
+    const currentPriority = PRIORITY_MAP[priority] || PRIORITY_MAP.default;
+    return (
+      <div
+        className="c7n-priorityTag"
+        style={{
+          backgroundColor: currentPriority.bgColor,
+          color: currentPriority.color,
+        }}
+      >
+        {currentPriority.name}
+      </div>
+    );
+  }
+}
+
+export default PriorityTag;

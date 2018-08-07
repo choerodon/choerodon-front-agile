@@ -1,5 +1,5 @@
 "agile":
-  icon: today
+  icon: agile
   sort: 1
   project:
     - "backlog":

@@ -4,7 +4,7 @@ const { AppState } = stores;
 
 export function loadComponents(componentId) {
   if (componentId) {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component?componentId=${componentId}?no_issue_test=true`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component?componentId=${componentId}&no_issue_test=true`);
   }
   return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component?no_issue_test=true`);
 }
@@ -21,11 +21,6 @@ export function createComponent(obj) {
   );
 }
 
-/**
- * ok
- * @param {*} componentId 
- * @param {*} obj 
- */
 export function updateComponent(componentId, obj) {
   const projectId = AppState.currentMenuType.id;
   const component = {

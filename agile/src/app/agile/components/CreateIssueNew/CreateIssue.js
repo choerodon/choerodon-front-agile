@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
-import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import { Select, Form, Input, Button, Modal, Icon, Tooltip } from 'choerodon-ui';
-
-import './CreateIssue.scss';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
 import { createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics } from '../../api/NewIssueApi';
@@ -14,18 +11,12 @@ import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import UserHead from '../UserHead';
 import TypeTag from '../TypeTag';
+import './CreateIssue.scss';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
 const { Option } = Select;
 const FormItem = Form.Item;
-
-const NAME = {
-  story: '故事',
-  bug: '故障',
-  task: '任务',
-  issue_epic: '史诗',
-};
 let sign = false;
 
 class CreateIssue extends Component {
@@ -55,15 +46,6 @@ class CreateIssue extends Component {
     this.getProjectSetting();
   }
 
-  getProjectSetting() {
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
-      .then((res) => {
-        this.setState({
-          origin: res,
-        });
-      });
-  }
-
   onFilterChange(input) {
     if (!sign) {
       this.setState({
@@ -81,10 +63,19 @@ class CreateIssue extends Component {
     }
   }
 
+  getProjectSetting() {
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
+      .then((res) => {
+        this.setState({ origin: res });
+      });
+  }
+
+  setFileList = (data) => {
+    this.setState({ fileList: data });
+  }
+
   debounceFilterIssues = _.debounce((input) => {
-    this.setState({
-      selectLoading: true,
-    });
+    this.setState({ selectLoading: true });
     getUsers(input).then((res) => {
       this.setState({
         originUsers: res.content,
@@ -93,15 +84,9 @@ class CreateIssue extends Component {
     });
   }, 500);
 
-  setFileList = (data) => {
-    this.setState({ fileList: data });
-  }
-
   loadPriorities() {
     loadPriorities().then((res) => {
-      this.setState({
-        originPriorities: res.lookupValues,
-      });
+      this.setState({ originPriorities: res.lookupValues });
     });
   }
 
@@ -238,9 +223,9 @@ class CreateIssue extends Component {
         cancelText="取消"
         confirmLoading={this.state.createLoading}
       >
-        <div className="c7n-region-agile">
-          <h2 className="c7n-space-first">在项目“{AppState.currentMenuType.name}”中创建问题</h2>
-          <p style={{ width: 520 }}>
+        <div>
+          <h2>在项目“{AppState.currentMenuType.name}”中创建问题</h2>
+          <p style={{ width: 520, marginBottom: 24 }}>
             请在下面输入问题的详细信息，包含详细描述、人员信息、版本信息、进度预估、优先级等等。您可以通过丰富的任务描述帮助相关人员更快更全面的理解任务，同时更好的把控问题进度。
             <a href="http://v0-8.choerodon.io/zh/docs/user-guide/agile/issue/create-issue/" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
               <span className="c7n-external-link-content">
@@ -263,11 +248,9 @@ class CreateIssue extends Component {
                     <Option key={type} value={type}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                         <TypeTag
-                          type={{
-                            typeCode: type,
-                          }}
+                          typeCode={type}
+                          showName
                         />
-                        <span style={{ marginLeft: 8 }}>{NAME[type]}</span>
                       </div>
                     </Option>),
                   )}
@@ -396,7 +379,8 @@ class CreateIssue extends Component {
                       label="史诗"
                       allowClear
                       filter
-                      filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                      filterOption={(input, option) => 
+                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                       getPopupContainer={triggerNode => triggerNode.parentNode}
                       loading={this.state.selectLoading}
                       onFocus={() => {
@@ -426,7 +410,8 @@ class CreateIssue extends Component {
                   label="冲刺"
                   allowClear
                   filter
-                  filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                  filterOption={(input, option) => 
+                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                   loading={this.state.selectLoading}
                   onFocus={() => {
@@ -442,7 +427,9 @@ class CreateIssue extends Component {
                   }}
                 >
                   {this.state.originSprints.map(sprint =>
-                    <Option key={sprint.sprintId} value={sprint.sprintId}>{sprint.sprintName}</Option>,
+                    (<Option key={sprint.sprintId} value={sprint.sprintId}>
+                      {sprint.sprintName}
+                    </Option>),
                   )}
                 </Select>,
               )}
@@ -477,7 +464,7 @@ class CreateIssue extends Component {
               )}
             </FormItem>
 
-            <FormItem label="模板" style={{ width: 520 }}>
+            <FormItem label="模块" style={{ width: 520 }}>
               {getFieldDecorator('componentIssueRel', {
                 rules: [{ transform: value => (value ? value.toString() : value) }],
               })(
@@ -529,7 +516,9 @@ class CreateIssue extends Component {
                   }}
                 >
                   {this.state.originLabels.map(label =>
-                    <Option key={label.labelName} value={label.labelName}>{label.labelName}</Option>,
+                    (<Option key={label.labelName} value={label.labelName}>
+                      {label.labelName}
+                    </Option>),
                   )}
                 </Select>,
               )}
@@ -563,4 +552,4 @@ class CreateIssue extends Component {
     );
   }
 }
-export default Form.create({})(withRouter(CreateIssue));
+export default Form.create({})(CreateIssue);

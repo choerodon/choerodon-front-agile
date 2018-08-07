@@ -1,3 +1,3 @@
-import DailyLog from './DailyLog';
+import EmptyBlock from './EmptyBlock';
 
-export default DailyLog;
+export default EmptyBlock;

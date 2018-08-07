@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
 import { Modal, Table, Tooltip, Popover, Button, Icon } from 'choerodon-ui';
 import { stores, Content, axios } from 'choerodon-front-boot';
 import TimeAgo from 'timeago-react';
@@ -45,7 +44,6 @@ class MergeRequest extends Component {
     axios.get(`/devops/v1/projects/${projectId}/apps/${applicationId}/git/url`)
       .then((res) => {
         const url = `${res}/merge_requests/${gitlabMergeRequestId}`;
-        // window.open(url, '_blank');
         win.location.href = url;
       })
       .catch((error) => {
@@ -174,4 +172,4 @@ class MergeRequest extends Component {
     );
   }
 }
-export default withRouter(MergeRequest);
+export default MergeRequest;

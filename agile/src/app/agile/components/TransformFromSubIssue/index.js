@@ -1,3 +1,3 @@
-import TransformSubIssue from './TransformSubIssue';
+import TransformFromSubIssue from './TransformFromSubIssue';
 
-export default TransformSubIssue;
+export default TransformFromSubIssue;

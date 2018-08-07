@@ -1,26 +1,17 @@
 import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
-import { withRouter } from 'react-router-dom';
-import _ from 'lodash';
 import { Modal, Form, Select, Input } from 'choerodon-ui';
-import { createLink, loadIssuesInLink, updateIssueType } from '../../api/NewIssueApi';
+import { updateIssueType } from '../../api/NewIssueApi';
 import TypeTag from '../TypeTag';
 
-import './TransformSubIssue.scss';
+import './TransformFromSubIssue.scss';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
 const { Option } = Select;
 
-const NAME = {
-  story: '故事',
-  bug: '故障',
-  task: '任务',
-  issue_epic: '史诗',
-};
-
-class TransformSubIssue extends Component {
+class TransformFromSubIssue extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -47,18 +38,6 @@ class TransformSubIssue extends Component {
           originStatus: res,
         });
       });
-  }
-
-  setBackground(categoryCode) {
-    let result;
-    if (categoryCode === 'todo') {
-      result = 'rgb(74, 103, 133)';
-    } else if (categoryCode === 'doing') {
-      result = 'rgb(246, 195, 66)';
-    } else {
-      result = 'rgb(20, 136, 44)';
-    }
-    return result;
   }
 
   handleTransformSubIssue = () => {
@@ -94,7 +73,7 @@ class TransformSubIssue extends Component {
 
     return (
       <Sidebar
-        className="c7n-transformSubIssue"
+        className="c7n-transformFromSubIssue"
         title="转化为问题"
         visible={visible || false}
         onOk={this.handleTransformSubIssue}
@@ -125,18 +104,15 @@ class TransformSubIssue extends Component {
                     <Option key={type} value={type}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                         <TypeTag
-                          type={{
-                            typeCode: type,
-                          }}
+                          typeCode={type}
+                          showName
                         />
-                        <span style={{ marginLeft: 8 }}>{NAME[type]}</span>
                       </div>
                     </Option>),
                   )}
                 </Select>,
               )}
             </FormItem>
-
             {
               this.props.form.getFieldValue('typeCode') === 'issue_epic' && (
                 <FormItem label="Epic名称" style={{ width: 520 }}>
@@ -154,4 +130,4 @@ class TransformSubIssue extends Component {
     );
   }
 }
-export default Form.create({})(withRouter(TransformSubIssue));
+export default Form.create({})(TransformFromSubIssue);

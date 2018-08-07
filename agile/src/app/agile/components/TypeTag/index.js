@@ -1,3 +1,3 @@
-import UserHead from './UserHead';
+import TypeTag from './TypeTag';
 
-export default UserHead;
+export default TypeTag;

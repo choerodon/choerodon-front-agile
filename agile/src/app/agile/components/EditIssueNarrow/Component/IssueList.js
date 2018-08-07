@@ -53,9 +53,7 @@ class IssueList extends Component {
         <Tooltip mouseEnterDelay={0.5} title="任务类型: 子任务">
           <div>
             <TypeTag
-              type={{
-                typeCode: issue.typeCode,
-              }}
+              typeCode={issue.typeCode}
             />
           </div>
         </Tooltip>
@@ -76,10 +74,7 @@ class IssueList extends Component {
           <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityName}`}>
             <div style={{ marginRight: 12 }}>
               <PriorityTag
-                priority={{
-                  priorityCode: issue.priorityCode,
-                  priorityName: issue.priorityName,
-                }}
+                priority={issue.priorityCode}
               />
             </div>
           </Tooltip>
@@ -88,10 +83,8 @@ class IssueList extends Component {
           <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusName}`}>
             <div>
               <StatusTag
-                status={{
-                  statusColor: issue.statusColor,
-                  statusName: issue.statusName,
-                }}
+                name={issue.statusName}
+                color={issue.statusColor}
               />
             </div>
           </Tooltip>

@@ -1,3 +1,3 @@
-import CreateSubTask from './CreateIssue';
+import CreateSubTask from './CreateSubTask';
 
 export default CreateSubTask;

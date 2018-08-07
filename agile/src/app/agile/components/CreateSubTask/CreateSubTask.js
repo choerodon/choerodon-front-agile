@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
-import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import { Select, Form, Input, Button, Modal, Icon, Tooltip } from 'choerodon-ui';
-
-import './CreateIssue.scss';
-import { UploadButton, NumericInput } from '../CommonComponent';
+import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
 import { loadIssue, loadLabels, loadPriorities, loadVersions, createSubIssue } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
@@ -14,6 +11,7 @@ import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import UserHead from '../UserHead';
 import TypeTag from '../TypeTag';
+import './CreateSubTask.scss';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
@@ -31,12 +29,10 @@ class CreateSubIssue extends Component {
       fileList: [],
       sprint: {},
       selectLoading: true,
-
       originLabels: [],
       originPriorities: [],
       originFixVersions: [],
       originUsers: [],
-
       origin: {},
     };
   }
@@ -52,15 +48,6 @@ class CreateSubIssue extends Component {
     });
     this.loadPriorities();
     this.getProjectSetting();
-  }
-
-  getProjectSetting() {
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
-      .then((res) => {
-        this.setState({
-          origin: res,
-        });
-      });
   }
 
   onFilterChange(input) {
@@ -80,10 +67,19 @@ class CreateSubIssue extends Component {
     }
   }
 
+  getProjectSetting() {
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
+      .then((res) => {
+        this.setState({ origin: res });
+      });
+  }
+
+  setFileList = (data) => {
+    this.setState({ fileList: data });
+  }
+
   debounceFilterIssues = _.debounce((input) => {
-    this.setState({
-      selectLoading: true,
-    });
+    this.setState({ selectLoading: true });
     getUsers(input).then((res) => {
       this.setState({
         originUsers: res.content,
@@ -92,15 +88,9 @@ class CreateSubIssue extends Component {
     });
   }, 500);
 
-  setFileList = (data) => {
-    this.setState({ fileList: data });
-  }
-
   loadPriorities() {
     loadPriorities().then((res) => {
-      this.setState({
-        originPriorities: res.lookupValues,
-      });
+      this.setState({ originPriorities: res.lookupValues });
     });
   }
 
@@ -221,40 +211,15 @@ class CreateSubIssue extends Component {
         cancelText="取消"
         confirmLoading={this.state.createLoading}
       >
-        <div className="c7n-region-agile">
-          <h2 className="c7n-space-first">在项目“{AppState.currentMenuType.name}”中创建子任务</h2>
-          <p style={{ width: 520 }}>
+        <div>
+          <h2>在项目“{AppState.currentMenuType.name}”中创建子任务</h2>
+          <p style={{ width: 520, marginBottom: 24 }}>
             请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。
           </p>
           <Form layout="vertical">
-            <FormItem label="问题类型" style={{ width: 520 }}>
-              {getFieldDecorator('typeCode', {
-                initialValue: 'sub_task',
-                rules: [{ required: true }],
-              })(
-                <Select
-                  label="问题类型"
-                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                >
-                  {['sub_task'].map(type => (
-                    <Option key={type} value={type}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
-                        <TypeTag
-                          type={{
-                            typeCode: type,
-                          }}
-                        />
-                        <span style={{ marginLeft: 8 }}>子任务</span>
-                      </div>
-                    </Option>),
-                  )}
-                </Select>,
-              )}
-            </FormItem>
-
             <FormItem label="概要" style={{ width: 520 }}>
               {getFieldDecorator('summary', {
-                rules: [{ required: true, message: '概要为必输项'}],
+                rules: [{ required: true, message: '概要为必输项' }],
               })(
                 <Input label="概要" maxLength={44} />,
               )}
@@ -353,7 +318,6 @@ class CreateSubIssue extends Component {
               />
             </Tooltip>
 
-
             <FormItem label="冲刺" style={{ width: 520 }}>
               {getFieldDecorator('sprintId', {
                 initialValue: this.state.sprint.sprintName,
@@ -415,7 +379,9 @@ class CreateSubIssue extends Component {
                   }}
                 >
                   {this.state.originLabels.map(label =>
-                    <Option key={label.labelName} value={label.labelName}>{label.labelName}</Option>,
+                    (<Option key={label.labelName} value={label.labelName}>
+                      {label.labelName}
+                    </Option>),
                   )}
                 </Select>,
               )}
@@ -449,4 +415,4 @@ class CreateSubIssue extends Component {
     );
   }
 }
-export default Form.create({})(withRouter(CreateSubIssue));
+export default Form.create({})(CreateSubIssue);

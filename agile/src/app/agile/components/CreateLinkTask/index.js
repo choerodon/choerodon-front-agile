@@ -1,3 +1,3 @@
-import CreateSubTask from './CreateIssue';
+import CreateLinkTask from './CreateLinkTask';
 
-export default CreateSubTask;
+export default CreateLinkTask;

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import { Modal, Table, Tooltip, Popover, Button, Icon } from 'choerodon-ui';
 import { stores, Content, axios } from 'choerodon-front-boot';
@@ -26,6 +25,20 @@ class Commits extends Component {
     this.loadCommits();
   }
 
+  getStatus(mergeRequests) {
+    if (!mergeRequests.length) {
+      return '';
+    }
+    const statusArray = _.map(mergeRequests, 'state');
+    if (statusArray.includes('opened')) {
+      return '开放';
+    }
+    if (statusArray.includes('merged')) {
+      return '已合并';
+    }
+    return '关闭';
+  }
+
   loadCommits() {
     const { issueId } = this.props;
     this.setState({ loading: true });
@@ -45,25 +58,10 @@ class Commits extends Component {
     axios.get(`/devops/v1/projects/${projectId}/apps/${appId}/git/url`)
       .then((res) => {
         const url = `${res}/merge_requests/new?change_branches=true&merge_request[source_branch]=${record.branchName}&merge_request[target_branch]=master`;
-        // window.open(url, '_blank');
         win.location.href = url;
       })
       .catch((error) => {
       });
-  }
-
-  getStatus(mergeRequests) {
-    if (!mergeRequests.length) {
-      return '';
-    }
-    const statusArray = _.map(mergeRequests, 'state');
-    if (statusArray.includes('opened')) {
-      return '开放';
-    }
-    if (statusArray.includes('merged')) {
-      return '已合并';
-    }
-    return '关闭';
   }
 
   render() {
@@ -191,4 +189,4 @@ class Commits extends Component {
     );
   }
 }
-export default withRouter(Commits);
+export default Commits;

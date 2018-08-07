@@ -125,9 +125,7 @@ class IssueItem extends Component {
                   }}
                 >
                   <Typetag
-                    type={{
-                      typeCode: item.typeCode,
-                    }}
+                    typeCode={item.typeCode}
                   />
                   <div
                     label="sprintIssue"
@@ -231,14 +229,15 @@ class IssueItem extends Component {
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      <UserHead
+                      {item.assigneeId && <UserHead
                         user={{
                           id: item.assigneeId,
                           loginName: '',
                           realName: item.assigneeName,
                           avatar: item.imageUrl,
                         }}
-                      />
+                      />}
+
                     </div>
                     <div
                       style={{
