@@ -17,6 +17,7 @@ const FASTSEARCHINDEX = asyncRouter(() => import('./project/FastSearch'));
 const REPORTHOSTINDEX = asyncRouter(() => import('./project/ReportHost'));
 const ISSUELINKINDEX = asyncRouter(() => import('./project/IssueLink'));
 const STATUSINDEX = asyncRouter(() => import('./project/Status'));
+const USERMAPINDEX = asyncRouter(() => import('./project/userMap'));
 
 class AGILEIndex extends React.Component {
   render() {
@@ -49,6 +50,7 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/issueLink`} component={ISSUELINKINDEX} />
           {/* 状态 */}
           <Route path={`${match.url}/status`} component={STATUSINDEX} />
+          <Route path={`${match.url}/userMap`} component={USERMAPINDEX} />
           <Route path={'*'} component={nomatch} />
         </Switch>
       </IntlProviderAsync>
