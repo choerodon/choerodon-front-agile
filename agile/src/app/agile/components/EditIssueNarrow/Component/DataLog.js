@@ -44,11 +44,11 @@ class DataLog extends Component {
   }
 
   getMode1(datalog) {
-    const { field, oldString, oldValue, newString, newValue } = datalog;
+    const { field, oldString, oldValue, newString, newValue, categoryCode } = datalog;
     if (!oldValue && newValue) {
       // null -> xxx
       if (['labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child'].includes(field)) {
-        return '新建';
+        return '创建';
       }
       return '更新';
     } else if (oldValue && newValue) {
@@ -60,13 +60,13 @@ class DataLog extends Component {
         return '更新';
       }
       if (field === 'status') {
-        if (newValue === 'doing' || newString === '进行中') {
+        if (categoryCode === 'doing') {
           return '开始处理';
         }
-        if (newValue === 'done' || newString === '已完成') {
+        if (categoryCode === 'done') {
           return '完成任务';
         }
-        if (newValue === 'todo' || newString === '待处理') {
+        if (categoryCode === 'todo') {
           return '置为待办';
         }
       }

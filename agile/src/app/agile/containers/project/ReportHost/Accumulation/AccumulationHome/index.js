@@ -58,7 +58,7 @@ class AccumulationHome extends Component {
           }
         }
         AccumulationStore.setBoardList(newData2);
-        this.getColumnData(res[newIndex].boardId, true);
+        this.getColumnData(res[newIndex || 0].boardId, true);
       }).catch((error) => {
       });
       // this.getData();
@@ -233,6 +233,7 @@ class AccumulationHome extends Component {
           {
             name: '问题数',
             type: 'value',
+            minInterval: 1,
           },
         ],
         series: legendSeries,
@@ -342,7 +343,7 @@ class AccumulationHome extends Component {
         <Content
           title="累积流量图"
           description="显示状态的问题。这有助于您识别潜在的瓶颈, 需要对此进行调查。"
-          link="#"
+          link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/cumulative-flow/"
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -384,6 +385,11 @@ class AccumulationHome extends Component {
                                 {items.name}
                               </Checkbox>
                             ))
+                          }
+                          {
+                            item.id === 'filterId' && !item.data.length ? (
+                              <div>无过滤器</div>
+                            ) : null
                           }
                         </div>
                       )}

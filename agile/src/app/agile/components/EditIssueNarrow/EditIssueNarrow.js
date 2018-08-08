@@ -755,6 +755,8 @@ class CreateSprint extends Component {
       this.setState({ transformSubIssueShow: true });
     } else if (e.key === '5') {
       this.setState({ transformFromSubIssueShow: true });
+    } else if (e.key === '6') {
+      this.setState({ createBranchShow: true });
     }
   }
 
@@ -1111,6 +1113,9 @@ class CreateSprint extends Component {
             </Menu.Item>
           )
         }
+        <Menu.Item key="6">
+          创建分支
+        </Menu.Item>
       </Menu>
     );
     const callback = (value) => {

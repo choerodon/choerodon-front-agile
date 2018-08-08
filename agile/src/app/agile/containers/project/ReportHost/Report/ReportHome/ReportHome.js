@@ -53,6 +53,7 @@ class ReleaseDetail extends Component {
       },
       yAxis: {
         type: 'value',
+        minInterval: 1,
       },
       series: [
         {
