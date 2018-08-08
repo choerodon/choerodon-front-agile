@@ -1,42 +1,71 @@
 .c7n-map {
-  .toolbar {
-    height: 48px;
+
+  p {
+    margin-bottom: 0;
+  }
+  .c7n-usermap-quickFilter {
+    // height: 48px;
     display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 10px 24px;
+    // border-bottom: 1px solid #d3d3d3;
+
+    .filter {
+      flex-wrap: wrap;
+      overflow: hidden;
+      height: 27px;
+      display: flex;
+
+      p {
+        cursor: pointer;
+        // padding: 3px 8px;
+        margin-right: 18px;
+        border-radius: 2px;
+        white-space: nowrap;
+        line-height: 25px;
+      }
+    }
+
   }
-  .wrap {
-    width: 500px;
-    height: 500px;
-    overflow: hidden;
-    overflow-x: auto;
-    overflow-y: hidden;
+  .content {
+    padding: 0 24px;
+
+    .epic-card {
+      width: 220px;
+      height: 82px;
+      background: #FFFFFF;
+      box-shadow: 0 -1px 6px 0 rgba(0,0,0,0.12);
+      border-radius: 2px;
+      margin-right: 10px;
+    }
+    .swimlan-title {
+      height: 42px;
+      margin-bottom: 10px;
+      background: rgba(0,0,0,0.02);
+    }
+
+    .swimlan-column {
+      display: flex;
+    }
+    .swimlan-column-item {
+      background: rgba(0,0,0,0.02);
+      border-radius: 2px;
+      width: 220px;
+      margin-right: 10px;
+    }
   }
-  .inner {
-    /*width: 1000px;*/
-    /*height: 1000px;*/
-    position: relative;
-    padding-top: 200px;
+
+}
+
+.menu-title {
+  font-size: 16px;
+  color: rgba(0,0,0,0.65);
+  text-align: left;
+  margin: 32px 0 12px 0;
+
+  &:first-child {
+    margin-top: 0;
   }
-  .top {
-    position: absolute;
-    width: 1000px;
-    height: 200px;
-    top: 0;
-    background: lightblue;
-    overflow: hidden;
-  }
-  .bottom-wrap {
-    width: 1000px;
-    height: 1000px;
-    background: lightcoral;
-    position: absolute;
-    top: 200px;
-  }
-  .bottom {
-    height: 300px;
-    overflow-y: scroll;
-    direction: ltr;
-    box-sizing: border-box;
-    width: 1018px;
-    will-change: transform;
-  }
+
 }
