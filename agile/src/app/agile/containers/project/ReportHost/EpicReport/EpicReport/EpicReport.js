@@ -287,7 +287,12 @@ class EpicReport extends Component {
   }
 
   refresh() {
-    ES.loadEpicAndChartAndTableData();
+    if (!ES.currentEpicId) {
+      ES.loadEpicAndChartAndTableData();
+    } else {
+      ES.loadChartData();
+      ES.loadTableData();
+    }
   }
 
   handleChangeCurrentEpic(epicId) {

@@ -100,7 +100,7 @@ class ComponentHome extends Component {
               this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=component&paramId=${record.componentId}&paramName=模块"${record.name}"下的问题&paramUrl=component`);
             }}
           >
-            <span style={{ display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>{issueCount} issues</span>
+            <span style={{ display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>{issueCount || 0} issues</span>
             {/* <span>{issueCount}issues</span> */}
           </div>
         ),

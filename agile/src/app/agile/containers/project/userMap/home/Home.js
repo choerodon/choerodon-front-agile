@@ -19,85 +19,102 @@ class Home extends Component {
     };
   }
   componentDidMount() {
-
+    this.initData();
   }
+  initData =() => {
+    this.props.UserMapStore.initData();
+  };
 
+  addFilter = () => {
+
+  };
+
+  changeMode =() => {
+
+  };
+  handleCreateEpic = () => {
+
+  };
   render() {
-    const epicData = [{ name: '问题管理' }, { name: '代办事项' }, { name: '报告相关' }, { name: '模块挂你' }];
+    const { UserMapStore } = this.props;
+    const epicData = UserMapStore.getEpics;
+    const { filters } = UserMapStore;
+    const swimlanMenu = (
+      <Menu onClick={this.changeMode} selectable>
+        <Menu.Item key="1">无泳道</Menu.Item>
+        <Menu.Item key="2">版本泳道</Menu.Item>
+        <Menu.Item key="3">冲刺泳道</Menu.Item>
+      </Menu>
+    );
+    const moreMenu = (
+      <Menu onClick={this.filterIssue} style={{ padding: '20px 14px' }}>
+        <div className="menu-title">问题过滤</div>
+        <Menu.Item key="1"> <Checkbox>待处理</Checkbox></Menu.Item>
+        <Menu.Item key="2"><Checkbox>处理中</Checkbox></Menu.Item>
+        <Menu.Item key="2"><Checkbox>已完成</Checkbox></Menu.Item>
+        <div className="menu-title">史诗过滤器</div>
+        <Menu.Item key="1"> <Checkbox>已完成的史诗</Checkbox></Menu.Item>
+        <Menu.Item key="2"><Checkbox>应用快速搜索到史诗</Checkbox></Menu.Item>
+        <div className="menu-title">导出</div>
+        <Menu.Item key="1">导出成excel</Menu.Item>
+        <Menu.Item key="2">导出为图片</Menu.Item>
+      </Menu>
+    );
     return (
       <Page
         className="c7n-map"
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
       >
         <Header title="用户故事地图">
-          <Button funcType="flat">
-            <Icon type="autorenew icon" />
-            <span>刷新</span>
+          <Dropdown overlay={swimlanMenu} trigger={'click'}>
+            <Button>
+              无泳道 <Icon type="arrow_drop_down" />
+            </Button>
+          </Dropdown>
+          <Dropdown overlay={moreMenu} trigger={'click'}>
+            <Button>
+              更多 <Icon type="arrow_drop_down" />
+            </Button>
+          </Dropdown>
+          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
+            <Icon type="playlist_add" />创建史诗
           </Button>
+
         </Header>
-        <Content>
-          <section className="toolbar">
-            <div><Button>创建史诗</Button></div>
-            <div><Select label="Select" placeholder="Please Select" allowClear style={{ width: 200 }}>
-              <Option value="jack">无泳道</Option>
-              <Option value="lucy">版本</Option>
-              <Option value="disabled">冲刺</Option>
-            </Select></div>
-            <div>
-              <Select label="Select" placeholder="Please Select" allowClear style={{ width: 200 }}>
-                <Option value="jack">无泳道</Option>
-                <Option value="lucy">版本</Option>
-                <Option value="disabled">冲刺</Option>
-              </Select>
+        <div className="c7n-userMap">
+          <section className="c7n-usermap-quickFilter">
+            <div className="filter">
+              <p>快速搜索:</p>
+              <p>仅我的问题</p>
+              <p>仅用户故事</p>
+              {filters.map(filter => <p>{filter.name}</p>) }
             </div>
-            <Button>...</Button>
-            <Card style={{ display: this.state.expandMore ? 'block' : 'none' }}>
-              <div>
-                <p>SHOW ISSUES</p>
-                <Checkbox defaultChecked={false} disabled />
-                <br />
-                <Checkbox defaultChecked disabled />
-              </div>
-              <div>
-                <p>EPIC FILTER</p>
-                <Checkbox defaultChecked={false} disabled />
-                <br />
-                <Checkbox defaultChecked disabled />
-              </div>
-              <div>
-                <div>
-                  <p>EXPORT</p>
-                  <p>导出成excel</p>
-                  <p>保存为图片</p>
-                </div>
-              </div>
-            </Card>
           </section>
           <section className="content">
-            <div className="wrap">
-              <div className="inner">
-                <div className="top">
-                  {_.map(epicData, epic => (
-                    <div>
-                      {epic.name}
-                    </div>
-                  ))}
-                </div>
-                <div className="bottom-wrap">
-                  <div className="bottom">
-                    <h5>If the above syntax looks too cumbersome, or you import react-virtualized components from a lot of places, you can also configure a Webpack alias. For example:</h5>
-                    <h5>If the above syntax looks too cumbersome, or you import react-virtualized components from a lot of places, you can also configure a Webpack alias. For example:</h5>
-                    <h5>If the above syntax looks too cumbersome, or you import react-virtualized components from a lot of places, you can also configure a Webpack alias. For example:</h5>
-                    <h5>If the above syntax looks too cumbersome, or you import react-virtualized components from a lot of places, you can also configure a Webpack alias. For example:</h5>
-                    <h5>If the above syntax looks too cumbersome, or you import react-virtualized components from a lot of places, you can also configure a Webpack alias. For example:</h5>
-                    <h5>If the above syntax looks too cumbersome, or you import react-virtualized components from a lot of places, you can also configure a Webpack alias. For example:</h5>
-                    <h5>If the above syntax looks too cumbersome, or you import react-virtualized components from a lot of places, you can also configure a Webpack alias. For example:</h5>
+            <div style={{ display: 'flex', margin: '10px 0 12px 0' }}>
+              {epicData.length && epicData.map(epic => (
+                <div style={{ width: 220, marginRight: 10 }}>
+                  <div className="epic-card">
+                    {epic.epicName}
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
+            <div className="swimlan-title">
+              <p>C7N sprint1</p>
+            </div>
+            <div className="swimlan-column">
+              {epicData.length && epicData.map(epic => (
+                <div className="swimlan-column-item">
+                  <div className="epic-card">
+                    Add new or existing issue
+                  </div>
+
+                </div>
+              ))}
             </div>
           </section>
-        </Content>
+        </div>
         <CreateEpic visble={this.state.createEpic} />
       </Page>
     );

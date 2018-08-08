@@ -12,11 +12,12 @@
     // padding: 40px 100px  40px 135px;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
 
     .c7n-imgWrap {
       width: 200px;
       height: 200px;
-      margin-right: 50px;
+      margin: 25px;
       flex-shrink: 0;
       overflow: hidden;
 
@@ -31,6 +32,7 @@
       justify-content: center;
       // width: 150px;
       flex-shrink: 0;
+      margin: 25px;
 
       .c7n-title {
         font-size: 14px;
