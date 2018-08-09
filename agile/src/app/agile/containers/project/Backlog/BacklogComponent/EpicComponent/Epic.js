@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Dropdown, Menu, Modal, Form, Input, Select, Icon, Spin } from 'choerodon-ui';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { fromJS, is } from 'immutable'
+import { fromJS, is } from 'immutable';
 import { Content, stores } from 'choerodon-front-boot';
-// importthis.props.store from '../../../../../stores/project/backlog/BacklogStore';
+import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EpicItem from './EpicItem';
 import './Epic.scss';
 import CreateEpic from './CreateEpic';
@@ -24,8 +24,8 @@ class Epic extends Component {
     };
   }
   componentWillMount() {
-   this.props.store.axiosGetColorLookupValue().then((res) => {
-     this.props.store.setColorLookupValue(res.lookupValues);
+   BacklogStore.axiosGetColorLookupValue().then((res) => {
+     BacklogStore.setColorLookupValue(res.lookupValues);
     }).catch((error) => {
     });
   }
@@ -66,9 +66,9 @@ class Epic extends Component {
    * @memberof Epic
    */
   handleClickEpic =(type) => {
-   this.props.store.setChosenEpic(type);
-   this.props.store.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
-     this.props.store.setSprintData(res);
+   BacklogStore.setChosenEpic(type);
+   BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter()).then((res) => {
+     BacklogStore.setSprintData(res);
     }).catch((error) => {
     });
   }
@@ -80,20 +80,34 @@ class Epic extends Component {
    * @memberof Epic
    */
   renderEpic =() => {
-    const data = this.props.store.getEpicData;
+    const data = BacklogStore.getEpicData;
     const result = [];
     if (data.length > 0) {
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
-          <EpicItem
-            store={this.props.store}
-            data={data[index]}
-            handleClickEpic={this.handleClickEpic}
-            draggableIds={this.state.draggableIds}
-            refresh={this.props.refresh}
-            index={index}
-            issueRefresh={this.props.issueRefresh}
-          />,
+          <Droppable droppableId={`${index}-epic`} key={data[index].issueId.toString()}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                style={{
+                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                  padding: 'grid',
+                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                }}
+              >
+                <EpicItem
+                  data={data[index]}
+                  handleClickEpic={this.handleClickEpic.bind(this)}
+                  draggableIds={this.state.draggableIds}
+                  refresh={this.props.refresh.bind(this)}
+                  index={index}
+                  issueRefresh={this.props.issueRefresh.bind(this)}
+                />
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+
         );
       }
     }
@@ -108,15 +122,15 @@ class Epic extends Component {
     if (!result.destination) {
       return;
     }
-    const data =this.props.store.getEpicData;
-    const sourceIndex = result.source.index;
-    const tarIndex = result.destination.index;
+    const data = BacklogStore.getEpicData;
+    const sourceIndex = parseInt(result.source.droppableId.split('-')[0], 10);
+    const tarIndex = parseInt(result.destination.droppableId, 10);
     let beforeSequence = null;
     let afterSequence = null;
     const res = Array.from(data);
     const [removed] = res.splice(sourceIndex, 1);
     res.splice(tarIndex, 0, removed);
-   this.props.store.setEpicData(res);
+    BacklogStore.setEpicData(res);
     if (tarIndex === 0) {
       afterSequence = res[1].epicSequence;
     } else if (tarIndex === res.length - 1) {
@@ -128,27 +142,28 @@ class Epic extends Component {
     const epicId = data[sourceIndex].issueId;
     const { objectVersionNumber } = data[sourceIndex];
     const postData = { afterSequence, beforeSequence, epicId, objectVersionNumber };
-   this.props.store.handleEpicDrap(postData)
+    BacklogStore.handleEpicDrap(postData)
       .then(() => {
-       this.props.store.axiosGetEpic().then((data3) => {
+        BacklogStore.axiosGetEpic().then((data3) => {
           const newEpic = [...data3];
           for (let index = 0, len = newEpic.length; index < len; index += 1) {
             newEpic[index].expand = false;
           }
-         this.props.store.setEpicData(newEpic);
+          BacklogStore.setEpicData(newEpic);
         }).catch((error3) => {
         });
       }).catch(() => {
-       this.props.store.axiosGetEpic().then((data3) => {
-          const newEpic = [...data3];
-          for (let index = 0, len = newEpic.length; index < len; index += 1) {
-            newEpic[index].expand = false;
-          }
-         this.props.store.setEpicData(newEpic);
-        }).catch((error3) => {
-        });
+      BacklogStore.axiosGetEpic().then((data3) => {
+        const newEpic = [...data3];
+        for (let index = 0, len = newEpic.length; index < len; index += 1) {
+          newEpic[index].expand = false;
+        }
+        BacklogStore.setEpicData(newEpic);
+      }).catch((error3) => {
       });
+    });
   };
+
   render() {
     return (
       <div
@@ -157,16 +172,16 @@ class Epic extends Component {
           this.setState({
             hoverBlockButton: true,
           });
-          if (this.props.store.getIsDragging) {
-           this.props.store.setIsLeaveSprint(true);
+          if (BacklogStore.getIsDragging) {
+           BacklogStore.setIsLeaveSprint(true);
           }
         }}
         onMouseLeave={() => {
           this.setState({
             hoverBlockButton: false,
           });
-          if (this.props.store.getIsDragging) {
-           this.props.store.setIsLeaveSprint(false);
+          if (BacklogStore.getIsDragging) {
+           BacklogStore.setIsLeaveSprint(false);
           }
         }}
       >
@@ -197,7 +212,7 @@ class Epic extends Component {
                   role="none"
                   onClick={() => {
                     this.props.changeVisible('epicVisible', false);
-                   this.props.store.setIsLeaveSprint(false);
+                   BacklogStore.setIsLeaveSprint(false);
                   }}
                   style={{
                     cursor: 'pointer',
@@ -211,7 +226,7 @@ class Epic extends Component {
                 className="c7n-backlog-epicItems"
                 style={{
                   color: '#3F51B5',
-                  background:this.props.store.getChosenEpic === 'all' ? 'rgba(140, 158, 255, 0.08)' : '',
+                  background:BacklogStore.getChosenEpic === 'all' ? 'rgba(140, 158, 255, 0.08)' : '',
                 }}
                 role="none"
                 onClick={this.handleClickEpic.bind(this, 'all')}
@@ -219,32 +234,18 @@ class Epic extends Component {
                 所有问题
               </div>
               <DragDropContext onDragEnd={this.handleEpicDrag}>
-                <Droppable droppableId={'epic'}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      style={{
-                        background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                        padding: 'grid',
-                        // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                      }}
-                    >
-                      {this.renderEpic()}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
+                {this.renderEpic()}
               </DragDropContext>
               <div
-                className={this.props.store.getIsDragging ? 'c7n-backlog-epicItems c7n-backlog-dragToEpic' : 'c7n-backlog-epicItems'}
+                className={BacklogStore.getIsDragging ? 'c7n-backlog-epicItems c7n-backlog-dragToEpic' : 'c7n-backlog-epicItems'}
                 style={{
-                  background:this.props.store.getChosenEpic === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
+                  background:BacklogStore.getChosenEpic === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
                 }}
                 role="none"
                 onClick={this.handleClickEpic.bind(this, 'unset')}
                 onMouseUp={() => {
-                  if (this.props.store.getIsDragging) {
-                   this.props.store.axiosUpdateIssuesToEpic(
+                  if (BacklogStore.getIsDragging) {
+                   BacklogStore.axiosUpdateIssuesToEpic(
                       0, this.state.draggableIds).then((res) => {
                       this.props.issueRefresh();
                       this.props.refresh();
@@ -259,7 +260,7 @@ class Epic extends Component {
               </div>
             </div>
             <CreateEpic
-              store={this.props.store}
+              store={BacklogStore}
               visible={this.state.addEpic}
               onCancel={() => {
                 this.setState({

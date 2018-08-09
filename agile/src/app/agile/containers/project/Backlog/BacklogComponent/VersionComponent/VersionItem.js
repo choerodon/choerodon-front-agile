@@ -5,7 +5,7 @@ import moment from 'moment';
 import { stores, Permission } from 'choerodon-front-boot';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { Input, DatePicker, Icon, Dropdown, Menu } from 'choerodon-ui';
-// import this.props.store from '../../../../../stores/project/backlog/this.props.store';
+import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 
 const { AppState } = stores;
@@ -32,7 +32,7 @@ class VersionItem extends Component {
   getmenu() {
     return (
       <Menu onClick={this.clickMenu.bind(this)}>
-        <Menu.Item key="0"><div>编辑名称</div></Menu.Item>
+        <Menu.Item key="0">编辑名称</Menu.Item>
       </Menu>
     );
   }
@@ -88,14 +88,14 @@ class VersionItem extends Component {
       versionId: this.props.data.versionId,
       description: value,
     };
-    this.props.store.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
+    BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
       this.setState({
         editDescription: false,
       });
-      const originData = _.clone(this.props.store.getVersionData);
+      const originData = _.clone(BacklogStore.getVersionData);
       originData[this.props.index].description = res.description;
       originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
-      this.props.store.setVersionData(originData);
+      BacklogStore.setVersionData(originData);
     }).catch((error) => {
       this.setState({
         editDescription: false,
@@ -115,14 +115,14 @@ class VersionItem extends Component {
       versionId: this.props.data.versionId,
       name: value,
     };
-    this.props.store.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
+    BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
       this.setState({
         editName: false,
       });
-      const originData = _.clone(this.props.store.getVersionData);
+      const originData = _.clone(BacklogStore.getVersionData);
       originData[this.props.index].name = res.name;
       originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
-      this.props.store.setVersionData(originData);
+      BacklogStore.setVersionData(originData);
     }).catch((error) => {
       this.setState({
         editName: false,
@@ -144,11 +144,11 @@ class VersionItem extends Component {
       versionId: this.props.data.versionId,
       [type]: date ? date += ' 00:00:00' : null,
     };
-    this.props.store.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
-      const originData = _.clone(this.props.store.getVersionData);
+    BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
+      const originData = _.clone(BacklogStore.getVersionData);
       originData[this.props.index][type] = res[type];
       originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
-      this.props.store.setVersionData(originData);
+      BacklogStore.setVersionData(originData);
     }).catch((error) => {
     });
   }
@@ -159,18 +159,18 @@ class VersionItem extends Component {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
-      <Draggable draggableId={`versionItem-${index}`} key={`versionItem-${index}`} index={index}>
+      <Draggable draggableId={`versionItem-${index}`} key={`versionItem-${index}`} index={`versionItem-${index}`}>
         {(provided1, snapshot1) => (
           <div
             ref={provided1.innerRef}
             {...provided1.draggableProps}
             {...provided1.dragHandleProps}
-            className={this.props.store.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
+            className={BacklogStore.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
             style={{
-              background: this.props.store.getChosenVersion === item.versionId ? 'rgba(140, 158, 255, 0.08)' : 'white',
+              background: BacklogStore.getChosenVersion === item.versionId ? 'rgba(140, 158, 255, 0.08)' : 'white',
               paddingLeft: 0,
-              ...provided1.draggableProps.style,
               cursor: 'move',
+              ...provided1.draggableProps.style,
             }}
             role="none"
             onClick={this.props.handelClickVersion.bind(this, item.versionId)}
@@ -185,8 +185,8 @@ class VersionItem extends Component {
               });
             }}
             onMouseUp={() => {
-              if (this.props.store.getIsDragging) {
-                this.props.store.axiosUpdateIssuesToVersion(
+              if (BacklogStore.getIsDragging) {
+                BacklogStore.axiosUpdateIssuesToVersion(
                   item.versionId, this.props.draggableIds).then((res) => {
                   this.props.issueRefresh();
                   this.props.refresh();
@@ -202,10 +202,10 @@ class VersionItem extends Component {
                 type={item.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
                 role="none"
                 onClick={(e) => {
-                  const data = this.props.store.getVersionData;
+                  const data = BacklogStore.getVersionData;
                   e.stopPropagation();
                   data[index].expand = !data[index].expand;
-                  this.props.store.setVersionData(data);
+                  BacklogStore.setVersionData(data);
                 }}
               />
               <div style={{ width: '100%' }}>
@@ -222,7 +222,7 @@ class VersionItem extends Component {
                   <div className="c7n-backlog-versionItemTitleName">
                     <p>{item.name}</p>
                     <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
-                      <Dropdown onClick={e => e.stopPropagation()} style={{ width: 214 }} overlay={this.getmenu()} trigger={['click']}>
+                      <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
                         <Icon
                           style={{
                             width: 12,
@@ -233,7 +233,6 @@ class VersionItem extends Component {
                             alignItems: 'center',
                             border: '1px solid #ccc',
                             borderRadius: 2,
-                            cursor: 'pointer',
                           }}
                           type="arrow_drop_down"
                         />
@@ -313,19 +312,19 @@ class VersionItem extends Component {
                     </EasyEdit>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
-                    <p className="c7n-backlog-versionItemParamKey">问题</p>
+                    <p className="c7n-backlog-versionItemParamKey">问题数</p>
                     <p className="c7n-backlog-versionItemParamValue">{item.issueCount}</p>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
-                    <p className="c7n-backlog-versionItemParamKey">已完成</p>
+                    <p className="c7n-backlog-versionItemParamKey">已完成问题数</p>
                     <p className="c7n-backlog-versionItemParamValue">{item.doneIssueCount}</p>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
-                    <p className="c7n-backlog-versionItemParamKey">未预估</p>
+                    <p className="c7n-backlog-versionItemParamKey">未预估问题数</p>
                     <p className="c7n-backlog-versionItemParamValue">{item.notEstimate}</p>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
-                    <p className="c7n-backlog-versionItemParamKey">预估</p>
+                    <p className="c7n-backlog-versionItemParamKey">预估故事点数</p>
                     <p className="c7n-backlog-versionItemParamValue" style={{ minWidth: 31, color: 'rgba(0,0,0,0.65)' }}>{item.totalEstimate}p</p>
                   </div>
                 </div>

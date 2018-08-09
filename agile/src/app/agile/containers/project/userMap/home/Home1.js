@@ -11,18 +11,24 @@ const TabPane = Tabs.TabPane;
 const { AppState } = stores;
 
 @observer
-class Home extends Component {
+class Home1 extends Component {
   constructor(props) {
     super(props);
     this.state = {
       moreMenuShow: false,
-      scrollPosition: 'fixed',
     };
   }
   componentDidMount() {
     this.initData();
     // window.addEventListener('scroll', this.handleScroll, true);
     // window.onscroll = this.handleScroll;
+  }
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+    const ele = document.getElementsByClassName('issue-content');
+    if (ele.length > 0) {
+      ele[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('issue-content')[0].offsetTop, 10) + 48}px)`;
+    }
+    return null;
   }
   initData =() => {
     this.props.UserMapStore.initData();
@@ -32,17 +38,7 @@ class Home extends Component {
 
   };
   handleScroll = (e) => {
-    const position = this.state.scrollPosition;
-    const ele = document.getElementById('map-content');
-    if (ele.scrollLeft !== 0 && position !== 'absolute') {
-      this.setState({ scrollPosition: 'absolute' });
-      window.console.log('左右');
-    }
-    if (ele.scrollTop !== 0 && position !== 'fixed') {
-      this.setState({ scrollPosition: 'fixed' });
-      window.console.log('上下');
-    }
-  };
+  }
   changeMode =(options) => {
     this.props.UserMapStore.setMode(options.key);
   };
@@ -126,35 +122,44 @@ class Home extends Component {
             <Icon type="playlist_add" />创建史诗
           </Button>
         </Header>
-        <div className="c7n-userMap" onScroll={this.handleScroll} id="map-content">
-          <div style={{ position: 'fixed', width: '100%', height: 48, zIndex: 1200, overflow: 'hidden', top: 106, background: 'white' }}>
-            <section className="c7n-usermap-quickFilter">
-              <div className="filter">
-                <p>快速搜索:</p>
-                <p role="none" style={{ background: `${currentFilters.includes('onlyMe') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyMe') ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={'onlyMe'}>仅我的问题</p>
-                <p role="none" style={{ background: `${currentFilters.includes('onlyStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyStory') ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={'onlyStory'}>仅用户故事</p>
-                {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId.toString()) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId.toString()) ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={filter.filterId}>{filter.name}</p>) }
+        <div className="c7n-userMap">
+          <section className="c7n-usermap-quickFilter">
+            <div className="filter">
+              <p>快速搜索:</p>
+              <p role="none" style={{ background: `${currentFilters.includes('onlyMe') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyMe') ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={'onlyMe'}>仅我的问题</p>
+              <p role="none" style={{ background: `${currentFilters.includes('onlyStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyStory') ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={'onlyStory'}>仅用户故事</p>
+              {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId.toString()) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId.toString()) ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={filter.filterId}>{filter.name}</p>) }
+            </div>
+          </section>
+          <section className="wrap">
+            <div style={{ display: 'flex', margin: '10px 0 12px 0', overflow: 'hidden', position: 'relative' }}>
+              <div style={{ position: 'relative', display: 'flex' }}>
+                {epicData.length && epicData.map(epic => (
+                  <div style={{ width: 220, marginRight: 10 }}>
+                    <div className="epic-card">
+                      {epic.epicName}
+                    </div>
+                  </div>
+                ))}
               </div>
-            </section>
-          </div>
-          <div className="wrap">
-            <div style={{ display: 'flex', height: 82, marginTop: 48 }}>
-              {epicData.length && epicData.map(epic => (
-                <div className="epic-card">
-                  {epic.epicName}
+            </div>
+            <div className="issue-content" style={{ height: `calc(100vh - ${199}px)` }}>
+              {mode === 'none' && <React.Fragment>
+                <div style={{ position: 'relative' }}>
+                  <div className="swimlan-title">
+                    <p>issues</p>
+                  </div>
                 </div>
-              ))}
+                <div className="swimlan-column">
+                  <div style={{ height: 1000 }}>bbb</div>
+                </div>
+              </React.Fragment>}
             </div>
-            <div>
-              <div>
-
-              </div>
-            </div>
-          </div>
+          </section>
         </div>
         <CreateEpic visible={createEpic} />
       </Page>
     );
   }
 }
-export default Home;
+export default Home1;

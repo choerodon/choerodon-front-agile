@@ -4,7 +4,7 @@ import { Modal, Form, Input, DatePicker, Icon } from 'choerodon-ui';
 import { Content, stores, Permission } from 'choerodon-front-boot';
 import { fromJS, is } from 'immutable';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-// import this.props.store from '../../../../../stores/project/backlog/this.props.store';
+import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import VersionItem from './VersionItem';
 import './Version.scss';
 import CreateVersion from './CreateVersion';
@@ -68,15 +68,30 @@ class Version extends Component {
     if (data.length > 0) {
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
-          <VersionItem
-            store={this.props.store}
-            data={data[index]}
-            index={index}
-            handelClickVersion={this.handelClickVersion.bind(this)}
-            draggableIds={this.state.draggableIds}
-            refresh={this.props.refresh.bind(this)}
-            issueRefresh={this.props.issueRefresh.bind(this)}
-          />,
+          <Droppable droppableId={`${index}-version`} key={data[index].versionId.toString()}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                style={{
+                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                  padding: 'grid',
+                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                }}
+              >
+                <VersionItem
+                  data={data[index]}
+                  index={index}
+                  handelClickVersion={this.handelClickVersion.bind(this)}
+                  draggableIds={this.state.draggableIds}
+                  refresh={this.props.refresh.bind(this)}
+                  issueRefresh={this.props.issueRefresh.bind(this)}
+                />
+                {provided.placeholder}
+              </div>
+            )}
+
+          </Droppable>
+
         );
       }
     }
@@ -91,15 +106,15 @@ class Version extends Component {
     if (!result.destination) {
       return;
     }
-    const data = this.props.store.getVersionData;
-    const sourceIndex = result.source.index;
-    const tarIndex = result.destination.index;
+    const data = BacklogStore.getVersionData;
+    const sourceIndex = parseInt(result.source.droppableId.split('-')[0], 10);
+    const tarIndex = parseInt(result.destination.droppableId, 10);
     let beforeSequence = null;
     let afterSequence = null;
     const res = Array.from(data);
     const [removed] = res.splice(sourceIndex, 1);
     res.splice(tarIndex, 0, removed);
-    this.props.store.setVersionData(res);
+    BacklogStore.setVersionData(res);
     // 拖的方向
     if (tarIndex === 0) {
       afterSequence = res[1].sequence;
@@ -112,27 +127,28 @@ class Version extends Component {
     const epicId = data[sourceIndex].versionId;
     const { objectVersionNumber } = data[sourceIndex];
     const postData = { afterSequence, beforeSequence, versionId: epicId, objectVersionNumber };
-    this.props.store.handleVersionDrap(postData)
+    BacklogStore.handleVersionDrap(postData)
       .then(() => {
-        this.props.store.axiosGetVersion().then((data3) => {
+        BacklogStore.axiosGetVersion().then((data3) => {
           const newEpic = [...data3];
           for (let index = 0, len = newEpic.length; index < len; index += 1) {
             newEpic[index].expand = false;
           }
-          this.props.store.setVersionData(newEpic);
+          BacklogStore.setVersionData(newEpic);
         }).catch((error3) => {
         });
       }).catch(() => {
-        this.props.store.axiosGetVersion().then((data3) => {
-          const newEpic = [...data3];
-          for (let index = 0, len = newEpic.length; index < len; index += 1) {
-            newEpic[index].expand = false;
-          }
-          this.props.store.setVersionData(newEpic);
-        }).catch((error3) => {
-        });
+      BacklogStore.axiosGetVersion().then((data3) => {
+        const newEpic = [...data3];
+        for (let index = 0, len = newEpic.length; index < len; index += 1) {
+          newEpic[index].expand = false;
+        }
+        BacklogStore.setVersionData(newEpic);
+      }).catch((error3) => {
       });
+    });
   };
+
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -206,21 +222,7 @@ class Version extends Component {
                   所有问题
                 </div>
                 <DragDropContext onDragEnd={this.handleVersionDrag}>
-                  <Droppable droppableId={'version'} key={'version'}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        style={{
-                          background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                          padding: 'grid',
-                          // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                        }}
-                      >
-                        {this.renderVersion()}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
+                  {this.renderVersion()}
                 </DragDropContext>
 
                 <div
