@@ -13,7 +13,7 @@ class UserMapStore {
   @observable sprints = [];
   @observable versions = [];
   @observable issues = [];
-  @observable mode = 'no';
+  @observable mode = 'none';
   @observable createEpic = false;
 
 
@@ -92,7 +92,7 @@ class UserMapStore {
     });
   loadIssues = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?quickFilterIds=${this.currentFilters}`);
 
-  initData = (data = { advancedSearchArgs: {}, otherArgs: {}, searchArgs: {} }) => axios.all([axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`), axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`), axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/issues/no_sub?page=0&size=999&sort=`, data)])
+  initData = (type = 'none', pageType = 'usermap') => axios.all([axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`), axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`), axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/user_map/issues?type=${type}&pageType=${pageType}`)])
     .then(axios.spread((epics, filters, issues) => {
       this.setFilters(filters);
       this.setEpics(epics);

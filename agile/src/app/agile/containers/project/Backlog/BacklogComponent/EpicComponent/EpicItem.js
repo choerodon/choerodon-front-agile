@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { Dropdown, Menu, Input, Icon } from 'choerodon-ui';
 import _ from 'lodash';
-// import this.props.store from '../../../../../stores/project/backlog/this.props.store';
+import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
 @inject('AppState')
 @observer
@@ -23,10 +23,10 @@ class EpicItem extends Component {
   getmenu() {
     return (
       <Menu onClick={this.clickMenu.bind(this)}>
-        <div style={{ padding: '24px 12px 12px 12px' }}>
+        <div style={{ padding: '5px 12px' }}>
           颜色
           <div className="c7n-backlog-epicColor">
-            {this.props.store.getColorLookupValue.map(item => (
+            {BacklogStore.getColorLookupValue.map(item => (
               <div
                 key={item.name}
                 style={{ background: item.name }}
@@ -39,7 +39,7 @@ class EpicItem extends Component {
                     issueId: this.props.data.issueId,
                     objectVersionNumber: this.props.data.objectVersionNumber,
                   };
-                  this.props.store.axiosUpdateIssue(data).then((res) => {
+                  BacklogStore.axiosUpdateIssue(data).then((res) => {
                     this.props.refresh();
                   }).catch((error) => {
                   });
@@ -49,8 +49,8 @@ class EpicItem extends Component {
           </div>
         </div>
         <Menu.Divider />
-        <Menu.Item key="1"><div style={{ marginTop: '24px' }}>编辑名称</div></Menu.Item>
-        <Menu.Item key="2"><div style={{ margin: '24px 0' }}>查看史诗详情</div></Menu.Item>
+        <Menu.Item key="1">编辑名称</Menu.Item>
+        <Menu.Item key="2">查看史诗详情</Menu.Item>
       </Menu>
     );
   }
@@ -68,7 +68,7 @@ class EpicItem extends Component {
       });
     }
     if (e.key === '2') {
-      this.props.store.setClickIssueDetail(this.props.data);
+      BacklogStore.setClickIssueDetail(this.props.data);
     }
   }
   /**
@@ -87,28 +87,28 @@ class EpicItem extends Component {
       issueId: this.props.data.issueId,
       epicName: e.target.value,
     };
-    this.props.store.axiosUpdateIssue(dataP).then((res) => {
-      const originEpic = _.clone(this.props.store.getEpicData);
+    BacklogStore.axiosUpdateIssue(dataP).then((res) => {
+      const originEpic = _.clone(BacklogStore.getEpicData);
       originEpic[this.props.index].epicName = res.epicName;
       originEpic[this.props.index].objectVersionNumber = res.objectVersionNumber;
-      this.props.store.setEpicData(originEpic);
+      BacklogStore.setEpicData(originEpic);
     }).catch((error) => {
     });
   }
   render() {
     const item = this.props.data;
-    const data = this.props.store.getEpicData;
+    const data = BacklogStore.getEpicData;
     const index = this.props.index;
     return (
-      <Draggable draggableId={`epicItem-${index}`} key={`epicItem-${index}`} index={index}>
+      <Draggable draggableId={`epicItem-${index}`} key={`epicItem-${index}`} index={`epicItem-${index}`}>
         {(provided1, snapshot1) => (
           <div
             ref={provided1.innerRef}
             {...provided1.draggableProps}
             {...provided1.dragHandleProps}
-            className={this.props.store.getIsDragging ? 'c7n-backlog-epicItems c7n-backlog-dragToEpic' : 'c7n-backlog-epicItems'}
+            className={BacklogStore.getIsDragging ? 'c7n-backlog-epicItems c7n-backlog-dragToEpic' : 'c7n-backlog-epicItems'}
             style={{
-              background: this.props.store.getChosenEpic === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',
+              background: BacklogStore.getChosenEpic === item.issueId ? 'rgba(140, 158, 255, 0.08)' : 'white',
               paddingLeft: 0,
               cursor: 'move',
               ...provided1.draggableProps.style,
@@ -116,8 +116,8 @@ class EpicItem extends Component {
             role="none"
             onClick={this.props.handleClickEpic.bind(this, item.issueId)}
             onMouseUp={() => {
-              if (this.props.store.getIsDragging) {
-                this.props.store.axiosUpdateIssuesToEpic(
+              if (BacklogStore.getIsDragging) {
+                BacklogStore.axiosUpdateIssuesToEpic(
                   item.issueId, this.props.draggableIds).then((res) => {
                   this.props.issueRefresh();
                   this.props.refresh();
@@ -137,7 +137,7 @@ class EpicItem extends Component {
                 onClick={(e) => {
                   e.stopPropagation();
                   data[index].expand = !data[index].expand;
-                  this.props.store.setEpicData(data);
+                  BacklogStore.setEpicData(data);
                 }}
               />
               <div style={{ width: '100%' }}>
@@ -194,19 +194,19 @@ class EpicItem extends Component {
                 <p className="c7n-backlog-epicItemDetail">详情</p>
                 <div className="c7n-backlog-epicItemParams">
                   <div className="c7n-backlog-epicItemParam">
-                    <p className="c7n-backlog-epicItemParamKey">问题</p>
+                    <p className="c7n-backlog-epicItemParamKey">问题数</p>
                     <p className="c7n-backlog-epicItemParamValue">{item.issueCount}</p>
                   </div>
                   <div className="c7n-backlog-epicItemParam">
-                    <p className="c7n-backlog-epicItemParamKey">已完成</p>
+                    <p className="c7n-backlog-epicItemParamKey">已完成问题数</p>
                     <p className="c7n-backlog-epicItemParamValue">{item.doneIssueCount}</p>
                   </div>
                   <div className="c7n-backlog-epicItemParam">
-                    <p className="c7n-backlog-epicItemParamKey">未预估</p>
+                    <p className="c7n-backlog-epicItemParamKey">未预估问题数</p>
                     <p className="c7n-backlog-epicItemParamValue">{item.notEstimate}</p>
                   </div>
                   <div className="c7n-backlog-epicItemParam">
-                    <p className="c7n-backlog-epicItemParamKey">预估</p>
+                    <p className="c7n-backlog-epicItemParamKey">预估故事点数</p>
                     <p className="c7n-backlog-epicItemParamValue"
                        style={{minWidth: 31, color: 'rgba(0,0,0,0.65)'}}>{item.totalEstimate}p</p>
                   </div>
