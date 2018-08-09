@@ -377,7 +377,7 @@ class BacklogHome extends Component {
       });
       this.props.BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog'
         ? 0 : endId, axiosParam).then((res) => {
-        this.props.IssueDetail.refreshIssueDetail();
+        this.IssueDetail.refreshIssueDetail();
         this.getSprint();
       }).catch((error) => {
         this.props.BacklogStore.setSprintData(originData);

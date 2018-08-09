@@ -12,18 +12,18 @@ class StatusIssue extends Component {
     super(props);
     this.state = {};
   }
-  shouldComponentUpdate(nextProps) {
-    if (nextProps.ifClickMe !== this.props.ifClickMe) {
-      return true;
-    }
-    if (nextProps.dragStartData !== this.props.dragStartData) {
-      return true;
-    }
-    if (nextProps.data.objectVersionNumber !== this.props.data.objectVersionNumber) {
-      return true;
-    }
-    return false;
-  }
+  // shouldComponentUpdate(nextProps) {
+  //   if (nextProps.ifClickMe !== this.props.ifClickMe) {
+  //     return true;
+  //   }
+  //   if (nextProps.dragStartData !== this.props.dragStartData) {
+  //     return true;
+  //   }
+  //   if (nextProps.data.objectVersionNumber !== this.props.data.objectVersionNumber) {
+  //     return true;
+  //   }
+  //   return false;
+  // }
   /**
    *获取首字母
    *

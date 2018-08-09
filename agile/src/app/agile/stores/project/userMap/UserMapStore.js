@@ -13,6 +13,8 @@ class UserMapStore {
   @observable sprints = [];
   @observable versions = [];
   @observable issues = [];
+  @observable mode = 'no';
+  @observable createEpic = false;
 
 
   @action setEpics(data) {
@@ -62,6 +64,22 @@ class UserMapStore {
     return this.issues;
   }
 
+  @action setMode(data) {
+    this.mode = data;
+  }
+
+  @computed get getMode() {
+    return this.mode;
+  }
+
+  @action setCreateEpic(data) {
+    this.createEpic = data;
+  }
+
+  @computed get getCreateEpic() {
+    return this.createEpic;
+  }
+
 
   loadEpic = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`)
     .then((epics) => {
@@ -74,11 +92,11 @@ class UserMapStore {
     });
   loadIssues = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?quickFilterIds=${this.currentFilters}`);
 
-  initData = () => axios.all([`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`, `/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`, `/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?quickFilterIds=${this.currentFilters}`])
+  initData = (data = { advancedSearchArgs: {}, otherArgs: {}, searchArgs: {} }) => axios.all([axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`), axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`), axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/issues/no_sub?page=0&size=999&sort=`, data)])
     .then(axios.spread((epics, filters, issues) => {
       this.setFilters(filters);
       this.setEpics(epics);
-      this.setIssues(issues);
+      this.setIssues(issues.content);
       // 两个请求现在都执行完成
     }));
 }
