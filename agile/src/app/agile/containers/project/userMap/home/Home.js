@@ -139,15 +139,17 @@ class Home extends Component {
           </div>
           <div className="wrap">
             <div style={{ display: 'flex', height: 82, marginTop: 48 }}>
-              {epicData.length && epicData.map(epic => (
-                <div className="epic-card">
-                  {epic.epicName}
-                </div>
-              ))}
-            </div>
-            <div>
               <div>
-
+                {epicData.length && epicData.map(epic => (
+                  <div className="epic-card">
+                    {epic.epicName}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ width: '100%', height: 900, background: 'black' }}>
+              <div>
+kfkkf
               </div>
             </div>
           </div>

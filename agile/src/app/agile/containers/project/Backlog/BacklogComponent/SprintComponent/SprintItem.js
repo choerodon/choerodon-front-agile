@@ -201,7 +201,7 @@ class SprintItem extends Component {
    * @param {*} value
    * @memberof SprintItem
    */
-  handleBlurGoal =(value, item) => {
+  handleBlurGoal =(item, value) => {
     const data = {
       objectVersionNumber: item.objectVersionNumber,
       projectId: AppState.currentMenuType.id,
