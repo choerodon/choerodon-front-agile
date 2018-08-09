@@ -19,17 +19,28 @@
 
       p {
         cursor: pointer;
-        // padding: 3px 8px;
+        padding: 3px 8px;
         margin-right: 18px;
         border-radius: 2px;
         white-space: nowrap;
-        line-height: 25px;
+        // line-height: 25px;
       }
     }
 
   }
-  .content {
-    padding: 0 24px;
+
+  .moreMenu {
+    display: block;
+    position: absolute;
+    top: 50px;
+    left: 18%;
+    z-index: 1050;
+    background: #FFFFFF;
+    box-shadow: 0 5px 5px -3px rgba(0,0,0,0.20), 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12);
+    border-radius: 2px;
+  }
+  .wrap {
+    padding: 0 0 0 24px;
 
     .epic-card {
       width: 220px;
@@ -40,8 +51,10 @@
       margin-right: 10px;
     }
     .swimlan-title {
+      position: fixed;
       height: 42px;
       margin-bottom: 10px;
+      width: 100%;
       background: rgba(0,0,0,0.02);
     }
 
@@ -63,6 +76,11 @@
   color: rgba(0,0,0,0.65);
   text-align: left;
   margin: 32px 0 12px 0;
+  line-height: 16px;
+
+  div {
+    line-height: 0;
+  }
 
   &:first-child {
     margin-top: 0;

@@ -168,7 +168,7 @@ class DragSortingTable extends Component {
           index,
           moveRow: this.moveRow,
           onMouseEnter: (e) => {
-            e.target.parentElement.className = 'hover-row';
+            e.target.parentElement.classList.add('hover-row');
           },
         })}
         rowKey={record => record.versionId}
