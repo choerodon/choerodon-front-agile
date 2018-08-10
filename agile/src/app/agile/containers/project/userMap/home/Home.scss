@@ -1,5 +1,6 @@
 .c7n-map {
-  // background: rgba(0,0,0,0.02);
+  // background: rgba(0,0,0,0.02)
+  position: absolute;
 
   p {
     margin-bottom: 0;
@@ -9,10 +10,14 @@
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    padding: 10px 24px;
+    // padding: 10px 0;
+    position: relative;
+    width: 100%;
+    margin-bottom: 47px;
     // border-bottom: 1px solid #d3d3d3;
 
     .filter {
+      position: fixed;
       flex-wrap: wrap;
       overflow: hidden;
       height: 27px;
@@ -40,36 +45,112 @@
     box-shadow: 0 5px 5px -3px rgba(0,0,0,0.20), 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12);
     border-radius: 2px;
   }
-  .wrap {
-    padding: 0 0 0 24px;
 
-    .epic-card {
-      width: 220px;
-      height: 82px;
-      background: #FFFFFF;
-      box-shadow: 0 -1px 6px 0 rgba(0,0,0,0.12);
-      border-radius: 2px;
-      margin-right: 10px;
-    }
-    .swimlan-title {
-      position: fixed;
-      height: 42px;
-      margin-bottom: 10px;
-      width: 100%;
-      background: rgba(0,0,0,0.02);
-    }
-
-    .swimlan-column {
+  .c7n-userMap {
+    position: relative;
+    left: 24px;
+    top: 10px;
+    // position: absolute;
+    .epic {
+      margin-top: 12px;
       display: flex;
+      .epic-card {
+        width: 220px;
+        height: 98px;
+        background: #FFFFFF;
+        box-shadow: 0 -1px 6px 0 rgba(0,0,0,0.12);
+        border-radius: 2px;
+        margin-right: 10px;
+        min-width: 220px;
+      }
     }
-    .swimlan-column-item {
+    .point-span {
+      text-align: center;
+      border-radius: 100px;
+      margin-right: 13px;
+      width: 27px;
+      height: 20px
+    }
+    .swimlane-title {
+      position: relative;
+      border-bottom: 1px solid rgba(0,0,0,0.12);
+      margin-bottom: 42px;
+    }
+
+    .swimlane-column {
       background: rgba(0,0,0,0.02);
       border-radius: 2px;
       width: 220px;
+      min-width: 220px;
       margin-right: 10px;
+      min-height: 142px;
+
+      .issue-card {
+        width: 220px;
+        min-width: 220px;
+        height: 142px;
+        background: #FFFFFF;
+        border: 1px solid rgba(0,0,0,0.20);
+        border-radius: 2px;
+      }
     }
   }
 
+  .map-content {
+    margin-left: 24px!important;
+  }
+  .filter {
+    position: fixed;
+    flex-wrap: wrap;
+    overflow: hidden;
+    height: 27px;
+    display: flex;
+
+    p {
+      cursor: pointer;
+      padding: 3px 8px;
+      margin-right: 18px;
+      border-radius: 2px;
+      white-space: nowrap;
+      // line-height: 25px;
+    }
+  }
+
+  .epic-card {
+    width: 220px;
+    height: 98px;
+    background: #FFFFFF;
+    box-shadow: 0 -1px 6px 0 rgba(0,0,0,0.12);
+    border-radius: 2px;
+    margin-right: 10px;
+    min-width: 220px;
+  }
+  .point-span {
+    text-align: center;
+    border-radius: 100px;
+    margin-right: 13px;
+    width: 27px;
+    height: 20px
+  }
+
+  .swimlane-column {
+    padding-top: 10px;
+    background: rgba(0,0,0,0.02);
+    border-radius: 2px;
+    width: 220px;
+    min-width: 220px;
+    margin-right: 10px;
+    min-height: 142px;
+
+    .issue-card {
+      width: 220px;
+      min-width: 220px;
+      height: 142px;
+      background: #FFFFFF;
+      border: 1px solid rgba(0,0,0,0.20);
+      border-radius: 2px;
+    }
+  }
 }
 
 .menu-title {

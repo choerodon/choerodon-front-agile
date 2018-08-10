@@ -41,6 +41,7 @@ class Home1 extends Component {
   }
   changeMode =(options) => {
     this.props.UserMapStore.setMode(options.key);
+    this.props.UserMapStore.loadIssues(options.key, 'usermap');
   };
   handleCreateEpic = () => {
     this.props.UserMapStore.setCreateEpic(true);
@@ -71,22 +72,11 @@ class Home1 extends Component {
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
     const { filters, mode, issues, createEpic, currentFilters } = UserMapStore;
-    window.console.log(createEpic);
     const swimlanMenu = (
       <Menu onClick={this.changeMode} selectable>
-        <Menu.Item key="no">无泳道</Menu.Item>
+        <Menu.Item key="none">无泳道</Menu.Item>
         <Menu.Item key="version">版本泳道</Menu.Item>
         <Menu.Item key="sprint">冲刺泳道</Menu.Item>
-      </Menu>
-    );
-    const moreMenu = (
-      <Menu style={{ padding: '20px 14px' }}>
-        <div className="menu-title">史诗过滤器</div>
-        <Menu.Item key="1"> <Checkbox>已完成的史诗</Checkbox></Menu.Item>
-        <Menu.Item key="2"><Checkbox>应用快速搜索到史诗</Checkbox></Menu.Item>
-        <div className="menu-title">导出</div>
-        <Menu.Item key="3">导出成excel</Menu.Item>
-        <Menu.Item key="4">导出为图片</Menu.Item>
       </Menu>
     );
     return (
@@ -97,7 +87,7 @@ class Home1 extends Component {
         <Header title="用户故事地图">
           <Dropdown overlay={swimlanMenu} trigger={['click']}>
             <Button>
-              {mode === 'no' && '无泳道'}
+              {mode === 'none' && '无泳道'}
               {mode === 'version' && '版本泳道'}
               {mode === 'sprint' && '冲刺泳道'}
               <Icon type="arrow_drop_down" />
@@ -122,40 +112,73 @@ class Home1 extends Component {
             <Icon type="playlist_add" />创建史诗
           </Button>
         </Header>
-        <div className="c7n-userMap">
-          <section className="c7n-usermap-quickFilter">
-            <div className="filter">
-              <p>快速搜索:</p>
-              <p role="none" style={{ background: `${currentFilters.includes('onlyMe') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyMe') ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={'onlyMe'}>仅我的问题</p>
-              <p role="none" style={{ background: `${currentFilters.includes('onlyStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyStory') ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={'onlyStory'}>仅用户故事</p>
-              {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId.toString()) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId.toString()) ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={filter.filterId}>{filter.name}</p>) }
-            </div>
-          </section>
-          <section className="wrap">
-            <div style={{ display: 'flex', margin: '10px 0 12px 0', overflow: 'hidden', position: 'relative' }}>
-              <div style={{ position: 'relative', display: 'flex' }}>
-                {epicData.length && epicData.map(epic => (
-                  <div style={{ width: 220, marginRight: 10 }}>
-                    <div className="epic-card">
-                      {epic.epicName}
-                    </div>
-                  </div>
-                ))}
+        <div style={{ float: 'left' }} className="map-content">
+          <div style={{ height: 48, marginBottom: 10 }}>
+            <div style={{ width: '100%', height: 48, background: 'white', position: 'relative', paddingTop: 10 }}>
+              <div className="filter">
+                <p>快速搜索:</p>
+                <p role="none" style={{ background: `${currentFilters.includes('onlyMe') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyMe') ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={'onlyMe'}>仅我的问题</p>
+                <p role="none" style={{ background: `${currentFilters.includes('onlyStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyStory') ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={'onlyStory'}>仅用户故事</p>
+                {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId.toString()) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId.toString()) ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={filter.filterId}>{filter.name}</p>) }
               </div>
             </div>
-            <div className="issue-content" style={{ height: `calc(100vh - ${199}px)` }}>
-              {mode === 'none' && <React.Fragment>
-                <div style={{ position: 'relative' }}>
-                  <div className="swimlan-title">
-                    <p>issues</p>
-                  </div>
+          </div>
+          <div style={{ display: 'flex', height: 98 }} >
+            {epicData.map(epic => (<div className="epic-card">
+              {epic.issueId}
+            </div>))}
+          </div>
+          {mode === 'none' && (<React.Fragment>
+            <div style={{ width: '100%', height: 42, position: 'relative' }}>
+              <div style={{ position: 'fixed', background: 'rgba(0,0,0,0.02)', height: 42, width: '100%', borderBottom: '1px solid rgba(0,0,0,0.12)', borderTop: '1px solid rgba(0,0,0,0.12)' }}>
+                <span style={{ position: 'fixed', left: 274 }}>issue</span>
+                <div style={{ position: 'fixed', right: 10, display: 'flex', marginTop: 10 }}>
+                  <p className="point-span" style={{ background: '#4D90FE' }}>
+                    {_.reduce(issues, (sum, issue) => {
+                      if (issue.statusCode === 'todo') {
+                        return sum + issue.storyPoints;
+                      } else {
+                        return sum;
+                      }
+                    }, 0)}
+                  </p>
+                  <p className="point-span" style={{ background: '#FFB100' }}>
+                    {_.reduce(issues, (sum, issue) => {
+                      if (issue.statusCode === 'doing') {
+                        return sum + issue.storyPoints;
+                      } else {
+                        return sum;
+                      }
+                    }, 0)}
+                  </p>
+                  <p className="point-span" style={{ background: '#00BFA5' }}>
+                    {_.reduce(issues, (sum, issue) => {
+                      if (issue.statusCode === 'done') {
+                        return sum + issue.storyPoints;
+                      } else {
+                        return sum;
+                      }
+                    }, 0)}
+                  </p>
+                  <p>
+                    <Icon type="baseline-arrow_drop_down" />
+                  </p>
+
                 </div>
-                <div className="swimlan-column">
-                  <div style={{ height: 1000 }}>bbb</div>
-                </div>
-              </React.Fragment>}
+              </div>
             </div>
-          </section>
+            <div className="swimlane-container" style={{ overflowY: 'scroll', height: `calc(100vh - ${304}px)`, width: `${epicData.length * 220 + epicData.length * 10 - 10}px`}}>
+              <div style={{ display: 'flex' }}>
+                {epicData.map((epic, index) => (<div className="swimlane-column">
+                  <React.Fragment>
+                    {_.filter(issues, issue => issue.epicId === epic.issueId).map(item => (
+                      <div className="issue-card">{item.epicId}</div>
+                    ))}
+                  </React.Fragment>
+                </div>))}
+              </div>
+            </div>
+          </React.Fragment>)}
         </div>
         <CreateEpic visible={createEpic} />
       </Page>
