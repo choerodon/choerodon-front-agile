@@ -94,7 +94,6 @@ class UserMapStore {
     .then((issues) => {
       this.setIssues(issues);
     });
-<<<<<<< Updated upstream
   loadSprints = (data = []) => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, data)
     .then((sprints) => {
       this.setSprints(sprints);
@@ -104,15 +103,11 @@ class UserMapStore {
     .then((versions) => {
       this.setVersions(versions);
     });
-
-  initData = (type = 'none', pageType = 'usermap') => axios.all([axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`), axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`), axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/user_map/issues?type=${type}&pageType=${pageType}`)])
-=======
   initData = (type = 'none', pageType = 'usermap') => axios.all([
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`),
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${type}&pageType=${pageType}`),
   ])
->>>>>>> Stashed changes
     .then(axios.spread((epics, filters, issues) => {
       this.setFilters(filters);
       this.setEpics(epics);
