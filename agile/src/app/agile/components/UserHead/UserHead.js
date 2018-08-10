@@ -23,7 +23,8 @@ class UserHead extends Component {
   }
 
   render() {
-    const { user, color } = this.props; 
+    const { user, color, size } = this.props;
+    const s = size || 18;
     return (
       <div
         className="c7n-userHead"
@@ -62,8 +63,8 @@ class UserHead extends Component {
           ) : (
             <div
               style={{
-                width: 18,
-                height: 18,
+                width: s,
+                height: s,
                 background: '#c5cbe8',
                 color: '#6473c3',
                 overflow: 'hidden',
@@ -79,7 +80,7 @@ class UserHead extends Component {
                 user.avatar ? (
                   <img src={user.avatar} alt="" style={{ width: '100%' }} />
                 ) : (
-                  <span style={{ width: 18, height: 18, lineHeight: '18px', textAlign: 'center', color: '#6473c3' }}>
+                  <span style={{ width: s, height: s, lineHeight: `${s}px`, textAlign: 'center', color: '#6473c3' }}>
                     {this.getFirst(user.realName)}
                   </span>
                 )

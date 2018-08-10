@@ -16,6 +16,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table } from 'choerodon-ui';
 
+let isClick = false;
 @inject('AppState')
 @observer
 class EasyEdit extends Component {
@@ -26,10 +27,11 @@ class EasyEdit extends Component {
       hoverIf: false,
     };
   }
-  handleOnOk() {
+  handleOnOk(e) {
+    isClick = true;
     this.setState({
       edit: false,
-      hoverIf: false,
+      // hoverIf: false,
     });
   }
   renderEdit() {
@@ -37,6 +39,7 @@ class EasyEdit extends Component {
     if (this.props.type === 'input') {
       return (
         <Input
+          maxLength={this.props.maxLength}
           defaultValue={this.props.defaultValue}
           autoFocus
           onPressEnter={(e) => {
@@ -79,11 +82,7 @@ class EasyEdit extends Component {
               hoverIf: false,
             });
           }}
-          onOk={() => {
-            this.setState({
-              edit: false,
-            });
-          }}
+          onOk={this.handleOnOk.bind(this)}
         />
       );
     }
@@ -101,12 +100,13 @@ class EasyEdit extends Component {
         role="none"
         onClick={() => {
           if (!this.props.disabled) {
-            if (!this.props.byHand) {
+            if (!this.props.byHand && !isClick) {
               this.setState({
                 edit: true,
               });
             }
           }
+          isClick = false;
         }}
         onMouseEnter={() => {
           if (!this.props.disabled) {

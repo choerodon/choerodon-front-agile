@@ -4,7 +4,7 @@ import { asyncRouter, nomatch } from 'choerodon-front-boot';
 
 const ReportHostHome = asyncRouter(() => (import('./Home')));
 const BurndownChart = asyncRouter(() => (import('./BurndownChart')));
-const sprintReport = asyncRouter(() => (import('./Report')));
+const sprintReport = asyncRouter(() => (import('./SprintReport')));
 const Accumulation = asyncRouter(() => (import('./Accumulation')));
 const VersionReport = asyncRouter(() => (import('./VersionReport')));
 const VelocityReport = asyncRouter(() => (import('./VelocityChart')));

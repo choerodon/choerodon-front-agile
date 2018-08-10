@@ -81,7 +81,7 @@ class UserMapStore {
   }
 
 
-  loadEpic = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`)
+  loadEpic = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`)
     .then((epics) => {
       this.setEpics(epics);
     });
@@ -90,7 +90,7 @@ class UserMapStore {
     .then((filters) => {
       this.setFilters(filters);
     });
-  loadIssues = (type, pageType) => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/user_map/issues?type=${type}&pageType=${pageType}`)
+  loadIssues = (type, pageType) => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${type}&pageType=${pageType}`)
     .then((issues) => {
       this.setIssues(issues);
     });
@@ -103,8 +103,11 @@ class UserMapStore {
     .then((versions) => {
       this.setVersions(versions);
     });
-
-  initData = (type = 'none', pageType = 'usermap') => axios.all([axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`), axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`), axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/user_map/issues?type=${type}&pageType=${pageType}`)])
+  initData = (type = 'none', pageType = 'usermap') => axios.all([
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`),
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${type}&pageType=${pageType}`),
+  ])
     .then(axios.spread((epics, filters, issues) => {
       this.setFilters(filters);
       this.setEpics(epics);

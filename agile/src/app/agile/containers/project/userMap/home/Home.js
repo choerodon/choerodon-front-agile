@@ -5,6 +5,11 @@ import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import { Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon, Card, Checkbox } from 'choerodon-ui';
 import './Home.scss';
 import CreateEpic from '../component/CreateEpic';
+import Backlog from '../component/Backlog/Backlog.js';
+import IssueCard from '../component/IssueCard/IssueCard.js';
+import EpicCard from '../component/EpicCard/EpicCard.js';
+import CreateIssue from '../component/CreateIssue/CreateIssue.js';
+
 
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
@@ -203,7 +208,11 @@ class Home extends Component {
               </section>
             </React.Fragment>)}
         </div>
+        <Backlog />
         <CreateEpic visible={createEpic} />
+        <IssueCard />
+        <EpicCard />
+        <CreateIssue />
       </Page>
     );
   }

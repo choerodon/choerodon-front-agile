@@ -179,11 +179,11 @@ class SprintItem extends Component {
    * @param {*} value
    * @memberof SprintItem
    */
-  handleBlurName =(value) => {
+  handleBlurName =(item, value) => {
     const data = {
-      objectVersionNumber: this.props.item.objectVersionNumber,
+      objectVersionNumber: item.objectVersionNumber,
       projectId: AppState.currentMenuType.id,
-      sprintId: this.props.item.sprintId,
+      sprintId: item.sprintId,
       sprintName: value,
     };
     this.props.store.axiosUpdateSprint(data).then((res) => {
@@ -624,9 +624,10 @@ class SprintItem extends Component {
                           }}
                         />
                         <EasyEdit
+                          maxLength={30}
                           type="input"
                           defaultValue={item.sprintName}
-                          enterOrBlur={this.handleBlurName}
+                          enterOrBlur={this.handleBlurName.bind(this, item)}
                         >
                           <span
                             style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
@@ -727,6 +728,7 @@ class SprintItem extends Component {
                         className="c7n-backlog-sprintData"
                         style={{
                           display: 'flex',
+                          flexWrap: 'wrap'
                         }}
                       >
                         <EasyEdit

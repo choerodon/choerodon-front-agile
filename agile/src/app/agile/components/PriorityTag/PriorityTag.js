@@ -26,7 +26,7 @@ const PRIORITY_MAP = {
 
 class PriorityTag extends Component {
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.priority.priorityCode === this.props.priority.priorityCode) {
+    if (nextProps.priority === this.props.priority) {
       return false;
     }
     return true;
