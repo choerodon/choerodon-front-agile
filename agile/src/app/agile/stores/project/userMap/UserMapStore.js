@@ -94,6 +94,15 @@ class UserMapStore {
     .then((issues) => {
       this.setIssues(issues);
     });
+  loadSprints = (data = []) => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, data)
+    .then((sprints) => {
+      this.setSprints(sprints);
+    });
+
+  loadVersions = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version`)
+    .then((versions) => {
+      this.setVersions(versions);
+    });
 
   initData = (type = 'none', pageType = 'usermap') => axios.all([axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`), axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`), axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/user_map/issues?type=${type}&pageType=${pageType}`)])
     .then(axios.spread((epics, filters, issues) => {
