@@ -5,6 +5,10 @@ import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import { Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon, Card, Checkbox } from 'choerodon-ui';
 import './Home.scss';
 import CreateEpic from '../component/CreateEpic';
+import Backlog from '../component/Backlog/Backlog.js';
+import EpicCard from '../component/EpicCard/EpicCard.js';
+import IssueCard from '../component/IssueCard/IssueCard.js';
+import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
@@ -128,9 +132,11 @@ class Home1 extends Component {
             </div>
           </div>
           <div style={{ display: 'flex', height: 98 }} >
-            {epicData.map(epic => (<div className="epic-card">
-              {epic.issueId}
-            </div>))}
+            {epicData.map(epic => (
+              <EpicCard
+                epic={epic}
+              />
+            ))}
           </div>
           <div className="swimlane-container" style={{ overflowY: 'scroll', height: `calc(100vh - ${document.getElementById('autoRouter').offsetTop + 48 + 48 + 10 + 98 + 58}px)`, minWidth: `${epicData.length * 220 + epicData.length * 10 - 10}px`}}>
             {mode === 'none' && (<React.Fragment>
@@ -176,7 +182,9 @@ class Home1 extends Component {
                 {epicData.map((epic, index) => (<div className="swimlane-column">
                   <React.Fragment>
                     {_.filter(issues, issue => issue.epicId === epic.issueId).map(item => (
-                      <div className="issue-card">{item.epicId}</div>
+                      <IssueCard
+                        issue={item}
+                      />
                     ))}
                   </React.Fragment>
                 </div>))}
@@ -389,6 +397,7 @@ class Home1 extends Component {
           </div>
         </div>
         <CreateEpic visible={createEpic} />
+        <Backlog />
       </Page>
     );
   }

@@ -1,0 +1,53 @@
+.c7n-backlog {
+  width: 350px;
+  height: calc(100vh - 47px);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 12px;
+  background: #fff;
+  box-shadow: 0 5px 5px -3px rgba(0,0,0,0.20), 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12);
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  .ant-input-underline {
+    display: none;
+  }
+
+  .ant-input-wrapper {
+    margin-bottom: 0;
+  }
+
+  .ant-input-prefix {
+    color: #000;
+  }
+
+  .ant-input-rendered {
+    margin-left: 36px !important;
+  }
+
+  .ant-input-placeholder {
+    color: rgba(0, 0, 0, 0.54);
+  }
+
+  .icon-search {
+    font-size: 24px;
+    margin-top: -2px;
+  }
+}
+
+.c7n-backlog-popover {
+  .ant-checkbox-wrapper + .ant-checkbox-wrapper {
+    margin-left: unset;
+  }
+
+  .ant-checkbox-wrapper {
+    margin-bottom: 20px;
+    margin-left: 0;
+  }
+
+  .ant-checkbox-wrapper:last-child {
+    margin-bottom: 0;
+  }
+}
