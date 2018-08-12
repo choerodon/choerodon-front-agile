@@ -62,4 +62,4 @@
         Routes: /agile/userMap
         sort: 10
         permission:
-          - 'agile-service.issue-link-type.updateIssueLinkType'
+          - 'agile-service.issue.listIssueWithoutSub'
