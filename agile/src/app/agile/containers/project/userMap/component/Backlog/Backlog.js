@@ -156,7 +156,7 @@ class Backlog extends Component {
 
   render() {
     return (
-      <div className="c7n-backlog">
+      <div className="c7n-userMap-backlog">
         <div style={{ display: 'flex', flexDirection: 'row', height: 38 }}>
           <div style={{ width: 224, height: 38, boxShadow: '0 1px 3px 0 rgba(0,0,0,0.20)', borderRadius: '2px', display: 'flex', justifyContent: 'center', alignItems: 'center', paddingLeft: 16, paddingRight: 16 }}>
             <Input

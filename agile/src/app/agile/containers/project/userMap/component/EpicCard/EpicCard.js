@@ -79,7 +79,7 @@ class EpicCard extends Component {
   render() {
     const { epic } = this.props;
     return (
-      <div className="c7n-epicCard">
+      <div className="c7n-userMap-epicCard">
         <div className="c7n-progress">
           <div
             className="c7n-bar"

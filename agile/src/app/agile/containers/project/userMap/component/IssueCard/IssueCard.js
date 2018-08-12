@@ -86,7 +86,7 @@ class IssueCard extends Component {
   render() {
     const { issue } = this.props;
     return (
-      <div className="c7n-issueCard">
+      <div className="c7n-userMap-issueCard">
         <div className="c7n-header">
           <div className="c7n-headerLeft">
             <UserHead
