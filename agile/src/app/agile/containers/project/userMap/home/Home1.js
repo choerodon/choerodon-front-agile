@@ -50,6 +50,7 @@ class Home1 extends Component {
       this.props.UserMapStore.loadVersions();
     }
     this.props.UserMapStore.loadIssues(options.key, 'usermap');
+    this.props.UserMapStore.loadBacklogIssues();
   };
   handleCreateEpic = () => {
     this.props.UserMapStore.setCreateEpic(true);

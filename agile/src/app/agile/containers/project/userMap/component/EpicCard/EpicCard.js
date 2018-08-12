@@ -15,6 +15,7 @@ class EpicCard extends Component {
       loading: false,
       epicName: '',
     };
+    this.isEnter = false;
   }
 
   componentDidMount() {
@@ -31,7 +32,8 @@ class EpicCard extends Component {
     this.setState({ epicName: e.target.value });
   }
 
-  updateEpicName = (e) => {
+  handlePressEnter = (e) => {
+    this.isEnter = true;
     e.preventDefault();
     const target = e.target;
     const { epic } = this.props;
@@ -48,6 +50,29 @@ class EpicCard extends Component {
           this.props.handleUpdateEpicName();
         }
         target.blur();
+      });
+  }
+
+  updateEpicName = (e) => {
+    if (this.isEnter) {
+      this.isEnter = false;
+      return;
+    }
+    e.preventDefault();
+    const target = e.target;
+    const { epic } = this.props;
+    const { issueId, objectVersionNumber } = epic;
+    const obj = {
+      issueId,
+      objectVersionNumber,
+      epicName: this.state.epicName,
+    };
+    updateIssue(obj)
+      .then((res) => {
+        this.setState({ isEdit: false });
+        if (this.props.handleUpdateEpicName) {
+          this.props.handleUpdateEpicName();
+        }
       });
   }
 
@@ -77,7 +102,7 @@ class EpicCard extends Component {
             autosize={{ minRows: 1, maxRows: 2 }}
             value={this.state.epicName}
             onChange={this.handleEpicNameChange.bind(this)}
-            onPressEnter={this.updateEpicName}
+            onPressEnter={this.handlePressEnter}
             onFocus={e => e.target.select()}
             onBlur={this.updateEpicName}
           />

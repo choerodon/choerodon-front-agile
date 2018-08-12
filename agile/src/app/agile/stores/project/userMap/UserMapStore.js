@@ -13,8 +13,10 @@ class UserMapStore {
   @observable sprints = [];
   @observable versions = [];
   @observable issues = [];
+  @observable backlogIssues = [];
   @observable mode = 'none';
   @observable createEpic = false;
+  @observable backlogExpand = [];
 
 
   @action setEpics(data) {
@@ -80,6 +82,14 @@ class UserMapStore {
     return this.createEpic;
   }
 
+  @action setBacklogIssues(data) {
+    this.backlogIssues = data;
+  }
+
+  @action setBacklogExpand(data) {
+    this.backlogExpand = data;
+  }
+
 
   loadEpic = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`)
     .then((epics) => {
@@ -103,6 +113,7 @@ class UserMapStore {
     .then((versions) => {
       this.setVersions(versions);
     });
+
   initData = (type = 'none', pageType = 'usermap') => axios.all([
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`),
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
@@ -114,6 +125,16 @@ class UserMapStore {
       this.setIssues(issues);
       // 两个请求现在都执行完成
     }));
+
+  loadBacklogIssues = () => {
+    const projectId = AppState.currentMenuType.id;
+    const type = this.mode;
+    axios.get(`/agile/v1/projects/${projectId}/issues/storymap/issues?type=${type}&pageType=backlog`)
+      .then((res) => {
+        this.setBacklogIssues(res);
+        this.setBacklogExpand([]);
+      });
+  }
 }
 
 const userMapStore = new UserMapStore();
