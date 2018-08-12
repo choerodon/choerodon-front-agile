@@ -22,6 +22,7 @@ class IssueCard extends Component {
       issue: {},
       summary: '',
     };
+    this.isEnter = false;
   }
 
   componentDidMount() {
@@ -40,7 +41,8 @@ class IssueCard extends Component {
     this.setState({ summary: e.target.value });
   }
 
-  updateIssueName = (e) => {
+  handlePressEnter = (e) => {
+    this.isEnter = true;
     e.preventDefault();
     const target = e.target;
     const { issue } = this.props;
@@ -56,6 +58,28 @@ class IssueCard extends Component {
           this.props.handleUpdateIssueName();
         }
         target.blur();
+      });
+  }
+
+  updateIssueName = (e) => {
+    if (this.isEnter) {
+      this.isEnter = false;
+      return;
+    }
+    e.preventDefault();
+    const target = e.target;
+    const { issue } = this.props;
+    const { issueId, objectVersionNumber } = issue;
+    const obj = {
+      issueId,
+      objectVersionNumber,
+      summary: this.state.summary,
+    };
+    updateIssue(obj)
+      .then((res) => {
+        if (this.props.handleUpdateIssueName) {
+          this.props.handleUpdateIssueName();
+        }
       });
   }
 
@@ -109,9 +133,9 @@ class IssueCard extends Component {
             autosize={{ minRows: 1, maxRows: 10 }}
             value={this.state.summary}
             onChange={this.handleIssueNameChange.bind(this)}
-            onPressEnter={this.updateIssueName}
+            onPressEnter={this.handlePressEnter}
             onFocus={e => e.target.select()}
-            onBlur={this.updateEpicName}
+            onBlur={this.updateIssueName}
           />
         </div>
         <div className="c7n-footer">

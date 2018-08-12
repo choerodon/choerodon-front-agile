@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import { Input, Icon, Popover, Menu, Checkbox } from 'choerodon-ui';
 import _ from 'lodash';
 import './Backlog.scss';
 import US from '../../../../../stores/project/userMap/UserMapStore';
 import TypeTag from '../../../../../components/TypeTag';
+import onClickOutside from '../../../../../components/CommonComponent/ClickOutSide';
 
+@observer
 class Backlog extends Component {
   constructor(props) {
     super(props);
@@ -13,34 +16,47 @@ class Backlog extends Component {
     };
   }
 
+  componentDidMount() {
+    this.loadIssues();
+  }
+
+  loadIssues() {
+    US.loadBacklogIssues();
+  }
+
+  handleClickOutside = (evt) => {
+    // window.console.log('click out side');
+  }
+
   handleClickExpand(id) {
-    const expand = this.state.expand;
+    const expand = US.backlogExpand.slice();
     const index = expand.findIndex(v => v === id);
     if (index === -1) {
       expand.push(id);
     } else {
       expand.splice(index, 1);
     }
-    this.setState({ expand });
+    US.setBacklogExpand(expand);
   }
 
   renderIssues() {
     const mode = US.mode;
+    const expand = US.backlogExpand;
     let group = [];
     if (mode === 'none') {
-      group = US.issues;
+      group = US.backlogIssues;
       return (
         <div>
           <div>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, paddingBottom: 4, borderBottom: '1px solid rgba(151, 151, 151, 0.2)' }}>
               <h4 style={{ fontSize: '14px', lineHeight: '20px' }}>Issues</h4>
               <Icon
-                type={this.state.expand.includes(0) ? 'expand_less' : 'expand_more'}
+                type={expand.includes(0) ? 'expand_less' : 'expand_more'}
                 onClick={this.handleClickExpand.bind(this, 0)}
               />
             </div>
             {
-              this.state.expand.includes(0) ? null : (
+              expand.includes(0) ? null : (
                 <ul style={{ padding: 0, margin: 0 }}>
                   {
                     _.map(group, (issue, i) => this.renderIssue(issue, i))
@@ -60,6 +76,7 @@ class Backlog extends Component {
               this.renderGroupIssue(v, i)
             ))
           }
+          {this.renderUnscheduledIssue()}
         </div>
       );
     }
@@ -67,15 +84,54 @@ class Backlog extends Component {
 
   renderGroupIssue(group, i) {
     const mode = US.mode;
-    const issues = US.issues.filter(v => v[`${mode}Id`] === group.id);
+    const expand = US.backlogExpand;
+    const issues = US.issues.filter(v => v[`${mode}Id`] === group[`${mode}Id`]);
     return (
       <div key={i}>
-        <h4 style={{ marginTop: 20, marginBottom: 4, paddingBottom: 4, fontSize: '14px', lineHeight: '20px', borderBottom: '1px solid rgba(151, 151, 151, 0.2)' }}>{group.name}</h4>
-        <ul style={{ padding: 0, margin: 0 }}>
-          {
-            _.map(issues, (issue, index) => this.renderIssue(issue, index))
-          }
-        </ul>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, paddingBottom: 4, borderBottom: '1px solid rgba(151, 151, 151, 0.2)' }}>
+          <h4 style={{ fontSize: '14px', lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{group.name || group.sprintName}</h4>
+          <Icon
+            type={expand.includes(group[`${mode}Id`]) ? 'expand_less' : 'expand_more'}
+            onClick={this.handleClickExpand.bind(this, group[`${mode}Id`])}
+          />
+        </div>
+        {
+          expand.includes(group[`${mode}Id`]) ? null : (
+            <ul style={{ padding: 0, margin: 0 }}>
+              {
+                _.map(issues, (issue, index) => this.renderIssue(issue, index))
+              }
+            </ul>
+          )
+        }
+        
+      </div>
+    );
+  }
+
+  renderUnscheduledIssue(group, i) {
+    const mode = US.mode;
+    const expand = US.backlogExpand;
+    const issues = US.issues.filter(v => v[`${mode}Id`] === null);
+    return (
+      <div key={i}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, paddingBottom: 4, borderBottom: '1px solid rgba(151, 151, 151, 0.2)' }}>
+          <h4 style={{ fontSize: '14px', lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Unscheduled</h4>
+          <Icon
+            type={expand.includes('Unscheduled') ? 'expand_less' : 'expand_more'}
+            onClick={this.handleClickExpand.bind(this, 'Unscheduled')}
+          />
+        </div>
+        {
+          expand.includes('Unscheduled') ? null : (
+            <ul style={{ padding: 0, margin: 0 }}>
+              {
+                _.map(issues, (issue, index) => this.renderIssue(issue, index))
+              }
+            </ul>
+          )
+        }
+        
       </div>
     );
   }
@@ -91,7 +147,7 @@ class Backlog extends Component {
         <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {issue.summary}
         </span>
-        <span style={{ width: 76, color: '#3f51b5', textAlign: 'right' }}>
+        <span style={{ color: '#3f51b5', textAlign: 'right' }}>
           {issue.issueNum}
         </span>
       </li>
@@ -160,4 +216,5 @@ class Backlog extends Component {
     );
   }
 }
-export default Backlog;
+
+export default onClickOutside(Backlog);
