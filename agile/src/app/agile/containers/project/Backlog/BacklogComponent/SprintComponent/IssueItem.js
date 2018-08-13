@@ -177,9 +177,11 @@ class IssueItem extends Component {
                     </div>
                     <div
                       style={{
+                        padding: '0 3px',
                         maxWidth: 50,
                         marginLeft: item.versionNames.length ? '12px' : 0,
                         border: '1px solid rgba(0, 0, 0, 0.36)',
+                        color: 'rgba(0, 0, 0, 0.36)',
                         borderRadius: '2px',
                         display: item.versionNames.length > 0 ? 'block' : 'none',
                       }}
@@ -196,10 +198,12 @@ class IssueItem extends Component {
                     </div>
                     <div
                       style={{
+                        padding: '0 3px',
                         maxWidth: 86,
                         marginLeft: !_.isNull(item.epicName) ? '12px' : 0,
                         border: `1px solid ${item.color}`,
                         display: !_.isNull(item.epicName) ? 'block' : 'none',
+                        color: 'rgba(0,0,0,0.36)',
                       }}
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
@@ -261,7 +265,7 @@ class IssueItem extends Component {
                     </div>
                     <div
                       style={{
-                        maxWidth: 20,
+                        maxWidth: 27,
                         marginLeft: '12px',
                       }}
                       label="sprintIssue"
