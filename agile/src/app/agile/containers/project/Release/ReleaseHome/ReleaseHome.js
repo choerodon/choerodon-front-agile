@@ -19,6 +19,11 @@ const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const { Sidebar } = Modal;
 const { AppState } = stores;
+const COLOR_MAP = {
+  规划中: '#ffb100',
+  已发布: '#00bfa5',
+  归档: 'rgba(0, 0, 0, 0.3)',
+};
 
 @observer
 class ReleaseHome extends Component {
@@ -182,17 +187,32 @@ class ReleaseHome extends Component {
       title: '版本状态',
       dataIndex: 'status',
       key: 'key',
-      render: text => <p><span style={{ color: '#00BFA5', background: ' rgba(0,191,165,0.08)', padding: '1px 10px' }}>{text}</span></p>,
+      render: text => (
+        <p style={{ marginBottom: 0 }}>
+          <span 
+            style={{ 
+              color: '#fff',
+              background: COLOR_MAP[text],
+              display: 'inline-block',
+              lineHeight: '20px',
+              borderRadius: '3px',
+              padding: '0 10px',
+            }}
+          >
+            {text === '归档' ? '已归档' : text}
+          </span>
+        </p>
+      ),
     }, {
       title: '开始日期',
       dataIndex: 'startDate',
       key: 'startDate',
-      render: text => (text ? <p>{text.split(' ')[0]}</p> : ''),
+      render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
     }, {
       title: '结束日期',
       dataIndex: 'releaseDate',
       key: 'releaseDate',
-      render: text => (text ? <p>{text.split(' ')[0]}</p> : ''),
+      render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
     }, {
       title: '描述',
       dataIndex: 'description',
