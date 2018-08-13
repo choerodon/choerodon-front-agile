@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Tooltip } from 'choerodon-ui';
 import { AppState } from 'choerodon-front-boot';
+import './NumericInput.scss';
 
 class NumericInput extends Component {
   constructor(props, context) {
@@ -62,13 +63,15 @@ class NumericInput extends Component {
       //   placement="topLeft"
       //   overlayClassName="numeric-input"
       // >
-      <Input
-        {...this.props}
-        onChange={this.onChange}
-        onBlur={this.onBlur}
-        // placeholder="Input a number"
-        maxLength="3"
-      />
+      <div className="c7n-numericInput">
+        <Input
+          {...this.props}
+          onChange={this.onChange}
+          onBlur={this.onBlur}
+          // placeholder="Input a number"
+          maxLength="3"
+        />
+      </div>
       // </Tooltip>
     );
   }

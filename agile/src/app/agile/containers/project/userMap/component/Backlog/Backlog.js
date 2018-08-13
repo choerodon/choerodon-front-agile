@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { Input, Icon, Popover, Menu, Checkbox } from 'choerodon-ui';
+import { stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import './Backlog.scss';
 import US from '../../../../../stores/project/userMap/UserMapStore';
 import TypeTag from '../../../../../components/TypeTag';
 import onClickOutside from '../../../../../components/CommonComponent/ClickOutSide';
+
+const { AppState } = stores;
 
 @observer
 class Backlog extends Component {
@@ -25,7 +29,7 @@ class Backlog extends Component {
   }
 
   handleClickOutside = (evt) => {
-    // window.console.log('click out side');
+    window.console.log('click out side');
   }
 
   handleClickExpand(id) {
@@ -39,6 +43,18 @@ class Backlog extends Component {
     US.setBacklogExpand(expand);
   }
 
+  handleClickFilter(id) {
+    const currentBacklogFilters = US.currentBacklogFilters.slice();
+    const index = currentBacklogFilters.findIndex(v => v === id);
+    if (index === -1) {
+      currentBacklogFilters.push(id);
+    } else {
+      currentBacklogFilters.splice(index, 1);
+    }
+    US.setCurrentBacklogFilter(currentBacklogFilters);
+    US.loadBacklogIssues();
+  }
+
   renderIssues() {
     const mode = US.mode;
     const expand = US.backlogExpand;
@@ -46,7 +62,7 @@ class Backlog extends Component {
     if (mode === 'none') {
       group = US.backlogIssues;
       return (
-        <div>
+        <div style={{ paddingRight: 12 }}>
           <div>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, paddingBottom: 4, borderBottom: '1px solid rgba(151, 151, 151, 0.2)' }}>
               <h4 style={{ fontSize: '14px', lineHeight: '20px' }}>Issues</h4>
@@ -70,7 +86,7 @@ class Backlog extends Component {
     } else {
       group = US[`${mode}s`];
       return (
-        <div>
+        <div style={{ paddingRight: 12 }}>
           {
             _.map(group, (v, i) => (
               this.renderGroupIssue(v, i)
@@ -85,7 +101,7 @@ class Backlog extends Component {
   renderGroupIssue(group, i) {
     const mode = US.mode;
     const expand = US.backlogExpand;
-    const issues = US.issues.filter(v => v[`${mode}Id`] === group[`${mode}Id`]);
+    const issues = US.backlogIssues.filter(v => v[`${mode}Id`] === group[`${mode}Id`]);
     return (
       <div key={i}>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, paddingBottom: 4, borderBottom: '1px solid rgba(151, 151, 151, 0.2)' }}>
@@ -112,7 +128,7 @@ class Backlog extends Component {
   renderUnscheduledIssue(group, i) {
     const mode = US.mode;
     const expand = US.backlogExpand;
-    const issues = US.issues.filter(v => v[`${mode}Id`] === null);
+    const issues = US.backlogIssues.filter(v => v[`${mode}Id`] === null);
     return (
       <div key={i}>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, paddingBottom: 4, borderBottom: '1px solid rgba(151, 151, 151, 0.2)' }}>
@@ -147,7 +163,15 @@ class Backlog extends Component {
         <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {issue.summary}
         </span>
-        <span style={{ color: '#3f51b5', textAlign: 'right' }}>
+        <span
+          style={{ color: '#3f51b5', textAlign: 'right', cursor: 'pointer', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          role="none"
+          onClick={() => {
+            const { history } = this.props;
+            const urlParams = AppState.currentMenuType;
+            history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}&paramUrl=usermap`);
+          }}
+        >
           {issue.issueNum}
         </span>
       </li>
@@ -157,7 +181,7 @@ class Backlog extends Component {
   render() {
     return (
       <div className="c7n-userMap-backlog">
-        <div style={{ display: 'flex', flexDirection: 'row', height: 38 }}>
+        <div style={{ display: 'flex', flexDirection: 'row', height: 38, paddingRight: 12 }}>
           <div style={{ width: 224, height: 38, boxShadow: '0 1px 3px 0 rgba(0,0,0,0.20)', borderRadius: '2px', display: 'flex', justifyContent: 'center', alignItems: 'center', paddingLeft: 16, paddingRight: 16 }}>
             <Input
               placeholder="按照名称搜索"
@@ -177,15 +201,30 @@ class Backlog extends Component {
                 }}
               >
                 {
-                  ['仅我的问题', '仅用户故事'].map(items => (
-                    <Checkbox>
-                      {items}
+                  [
+                    {
+                      name: '仅我的问题',
+                      id: 'mine',
+                    },
+                    {
+                      name: '仅用户故事',
+                      id: 'story',
+                    },
+                  ].map(items => (
+                    <Checkbox
+                      onChange={this.handleClickFilter.bind(this, items.id)}
+                      checked={US.currentBacklogFilters.includes(items.id)}
+                    >
+                      {items.name}
                     </Checkbox>
                   ))
                 }
                 {
                   US.filters.map(filter => (
-                    <Checkbox>
+                    <Checkbox
+                      onChange={this.handleClickFilter.bind(this, filter.filterId)}
+                      checked={US.currentBacklogFilters.includes(filter.filterId)}
+                    >
                       {filter.name}
                     </Checkbox>
                   ))
@@ -217,4 +256,4 @@ class Backlog extends Component {
   }
 }
 
-export default onClickOutside(Backlog);
+export default withRouter(onClickOutside(Backlog));

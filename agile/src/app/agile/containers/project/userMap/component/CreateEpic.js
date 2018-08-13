@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Modal, Form, Select, Icon, Input } from 'choerodon-ui';
-import { Content, stores } from 'choerodon-front-boot';
-// import this.props.store from '../../../../../stores/project/backlog/this.props.store';
+import { Content, stores, axios } from 'choerodon-front-boot';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
@@ -19,12 +18,6 @@ class CreateEpic extends Component {
     };
   }
 
-  /**
-   *
-   * 创建史诗
-   * @param {*} e
-   * @memberof CreateEpic
-   */
   handleCreateEpic =(e) => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, value) => {
@@ -39,25 +32,18 @@ class CreateEpic extends Component {
         this.setState({
           loading: true,
         });
-        this.props.store.axiosEasyCreateIssue(data).then((res) => {
-          this.setState({
-            loading: false,
+        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues`, data)
+          .then((res) => {
+            this.setState({
+              loading: false,
+            });
+            this.props.onOk();
+          })
+          .catch((error) => {
+            this.setState({
+              loading: false,
+            });
           });
-          this.props.form.resetFields();
-          this.props.onCancel();
-          this.props.store.axiosGetEpic().then((data3) => {
-            const newEpic = [...data3];
-            for (let index = 0, len = newEpic.length; index < len; index += 1) {
-              newEpic[index].expand = false;
-            }
-            this.props.store.setEpicData(newEpic);
-          }).catch((error3) => {
-          });
-        }).catch((error) => {
-          this.setState({
-            loading: false,
-          });
-        });
       }
     });
   }
@@ -85,36 +71,6 @@ class CreateEpic extends Component {
           link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/backlog/epic/"
         >
           <Form style={{ width: 512 }}>
-            <FormItem>
-              {getFieldDecorator('type', {
-                initialValue: 'epic',
-                rules: [{
-                  required: true,
-                  message: '',
-                }],
-              })(
-                <Select size="small" disabled label="问题类型">
-                  <Option value="epic">
-                    <div style={{ display: 'inline-flex', alignItems: 'center', margin: '5px 0' }}>
-                      <div
-                        style={{
-                          width: 20,
-                          height: 20,
-                          borderRadius: '50%',
-                          background: '#743BE7',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Icon style={{ color: 'white' }} type="priority" />
-                      </div>
-                      <p style={{ marginLeft: 8 }}>史诗</p>
-                    </div>
-                  </Option>
-                </Select>,
-              )}
-            </FormItem>
             <FormItem>
               {getFieldDecorator('name', {
                 rules: [{

@@ -47,6 +47,10 @@ class IssueCard extends Component {
     const target = e.target;
     const { issue } = this.props;
     const { issueId, objectVersionNumber } = issue;
+    if (!this.state.summary) {
+      this.isEnter = false;
+      return;
+    }
     const obj = {
       issueId,
       objectVersionNumber,
@@ -70,6 +74,7 @@ class IssueCard extends Component {
     const target = e.target;
     const { issue } = this.props;
     const { issueId, objectVersionNumber } = issue;
+    if (!this.state.summary) return;
     const obj = {
       issueId,
       objectVersionNumber,
