@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import { Input } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
 import './EpicCard.scss';
@@ -38,6 +39,10 @@ class EpicCard extends Component {
     const target = e.target;
     const { epic } = this.props;
     const { issueId, objectVersionNumber } = epic;
+    if (!this.state.epicName) {
+      this.isEnter = false;
+      return;
+    }
     const obj = {
       issueId,
       objectVersionNumber,
@@ -54,6 +59,7 @@ class EpicCard extends Component {
   }
 
   updateEpicName = (e) => {
+    if (!this.state.epicName) return;
     if (this.isEnter) {
       this.isEnter = false;
       return;
@@ -62,6 +68,7 @@ class EpicCard extends Component {
     const target = e.target;
     const { epic } = this.props;
     const { issueId, objectVersionNumber } = epic;
+    if (!this.state.epicName) return;
     const obj = {
       issueId,
       objectVersionNumber,
@@ -131,4 +138,4 @@ class EpicCard extends Component {
     );
   }
 }
-export default EpicCard;
+export default withRouter(EpicCard);

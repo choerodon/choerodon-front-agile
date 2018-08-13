@@ -1341,15 +1341,24 @@ class CreateSprint extends Component {
                         </span>
                       ) : null
                     }
-                    <a
-                      role="none"
-                      onClick={() => {
-                        this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${this.state.origin.issueNum}&paramIssueId=${this.state.origin.issueId}&paramUrl=backlog`);
-                        return false;
-                      }}
-                    >
-                      {this.state.issueNum}
-                    </a>
+                    {
+                      this.state.typeCode === 'sub_task' ? (
+                        <span>
+                          {this.state.issueNum}
+                        </span>
+                      ) : (
+                        <a
+                          role="none"
+                          onClick={() => {
+                            this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${this.state.origin.issueNum}&paramIssueId=${this.state.origin.issueId}&paramUrl=backlog`);
+                            return false;
+                          }}
+                        >
+                          {this.state.issueNum}
+                        </a>
+                      )
+                    }
+                    
                   </div>
                   
                   

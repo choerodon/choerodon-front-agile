@@ -1,0 +1,91 @@
+.c7n-userMap {
+  // background: rgba(0,0,0,0.02)
+  position: relative;
+
+  p {
+    margin-bottom: 0;
+  }
+
+  .c7n-userMap-content {
+    display: flex;
+
+    .userMap-right {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: stretch;
+      position: absolute;
+      left: 24px;
+
+      .toolbar {
+        padding: 10px 24px 10px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .filter {
+          // position: fixed;
+          flex-wrap: wrap;
+          overflow: hidden;
+          display: flex;
+
+          p {
+            cursor: pointer;
+            padding: 3px 8px;
+            margin-right: 18px;
+            border-radius: 2px;
+            white-space: nowrap;
+            // line-height: 25px;
+          }
+        }
+      }
+
+      .epic {
+        display: flex;
+        height: 98px;
+        overflow: scroll;
+      }
+
+      .swimlane {
+        overflow-y: scroll;
+
+        .swimlane-title {
+          height: 42px;
+          display: flex;
+          justify-content: space-between;
+          background: rgba(0,0,0,0.02);
+          border-bottom: 1px solid rgba(0,0,0,0.12);
+          border-top: 1px solid rgba(0,0,0,0.12);
+
+          .point-span {
+            text-align: center;
+            border-radius: 100px;
+            margin-right: 13px;
+            width: 27px;
+            height: 20px
+          }
+
+        }
+
+        .swimlane-column {
+          padding-top: 10px;
+          background: rgba(0,0,0,0.02);
+          border-radius: 2px;
+          width: 220px;
+          min-width: 220px;
+          margin-right: 10px;
+          min-height: 142px;
+
+        }
+      }
+    }
+
+    .uermap-left {
+      width: 372px;
+      position: absolute;
+      bottom: 0;
+      top: 0;
+      right: 0;
+    }
+  }
+
+}

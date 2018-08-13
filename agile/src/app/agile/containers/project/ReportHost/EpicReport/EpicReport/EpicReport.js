@@ -321,87 +321,96 @@ class EpicReport extends Component {
 
   renderTable(type) {
     const column = [
-      {
-        width: '15%',
-        title: '关键字',
-        dataIndex: 'issueNum',
-        render: (issueNum, record) => (
-          <span
-            style={{ 
-              color: '#3f51b5',
-              cursor: 'pointer',
-            }}
-            role="none"
-            onClick={() => {
-              const { history } = this.props;
-              const urlParams = AppState.currentMenuType;
-              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicReport`);
-            }}
-          >{issueNum} {record.addIssue ? '*' : ''}</span>
-        ),
-      }, {
-        width: '30%',
-        title: '概要',
-        dataIndex: 'summary',
-        render: summary => (
-          <div style={{ width: '100%', overflow: 'hidden' }}>
-            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={summary}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
-                {summary}
-              </p>
-            </Tooltip>
-          </div>
-        ),
-      }, {
-        width: '15%',
-        title: '问题类型',
-        dataIndex: 'typeCode',
-        render: (typeCode, record) => (
-          <div>
-            <TypeTag
-              typeCode={record.typeCode}
-              showName
-            />
-          </div>
-        ),
-      }, {
-        width: '15%',
-        title: '优先级',
-        dataIndex: 'priorityCode',
-        render: (priorityCode, record) => (
-          <div>
-            <PriorityTag
-              priority={record.priorityCode}
-            />
-          </div>
-        ),
-      }, {
-        width: '15%',
-        title: '状态',
-        dataIndex: 'statusCode',
-        render: (statusCode, record) => (
-          <div>
-            <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusName}`}>
-              <div>
-                <StatusTag
-                  style={{ display: 'inline-block' }}
-                  name={record.statusName}
-                  color={record.statusColor}
-                />
-              </div>
-            </Tooltip>
-          </div>
-        ),
-      }, {
-        width: '10%',
-        title: ES.beforeCurrentUnit === 'story_point' ? '故事点' : '剩余时间',
-        dataIndex: 'storyPoints',
-        render: (storyPoints, record) => (
-          <div>
-            {this.getLabel(record)}
-          </div>
-        ),
-      },
+      ...[
+        {
+          width: '15%',
+          title: '关键字',
+          dataIndex: 'issueNum',
+          render: (issueNum, record) => (
+            <span
+              style={{ 
+                color: '#3f51b5',
+                cursor: 'pointer',
+              }}
+              role="none"
+              onClick={() => {
+                const { history } = this.props;
+                const urlParams = AppState.currentMenuType;
+                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicReport`);
+              }}
+            >{issueNum} {record.addIssue ? '*' : ''}</span>
+          ),
+        },
+        {
+          width: '30%',
+          title: '概要',
+          dataIndex: 'summary',
+          render: summary => (
+            <div style={{ width: '100%', overflow: 'hidden' }}>
+              <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={summary}>
+                <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+                  {summary}
+                </p>
+              </Tooltip>
+            </div>
+          ),
+        },
+        {
+          width: '15%',
+          title: '问题类型',
+          dataIndex: 'typeCode',
+          render: (typeCode, record) => (
+            <div>
+              <TypeTag
+                typeCode={record.typeCode}
+                showName
+              />
+            </div>
+          ),
+        },
+        {
+          width: '15%',
+          title: '优先级',
+          dataIndex: 'priorityCode',
+          render: (priorityCode, record) => (
+            <div>
+              <PriorityTag
+                priority={record.priorityCode}
+              />
+            </div>
+          ),
+        },
+        {
+          width: '15%',
+          title: '状态',
+          dataIndex: 'statusCode',
+          render: (statusCode, record) => (
+            <div>
+              <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusName}`}>
+                <div>
+                  <StatusTag
+                    style={{ display: 'inline-block' }}
+                    name={record.statusName}
+                    color={record.statusColor}
+                  />
+                </div>
+              </Tooltip>
+            </div>
+          ),
+        },
+      ],
+      ...[
+        ES.beforeCurrentUnit === 'issue_count' ? {} : {
+          width: '10%',
+          title: ES.beforeCurrentUnit === 'story_point' ? '故事点' : '剩余时间',
+          dataIndex: 'storyPoints',
+          render: (storyPoints, record) => (
+            <div>
+              {this.getLabel(record)}
+            </div>
+          ),
+        },
+      ],
     ];
     return (
       <Table

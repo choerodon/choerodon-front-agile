@@ -1,6 +1,6 @@
 .c7n-map {
   // background: rgba(0,0,0,0.02)
-  position: absolute;
+  position: relative;
 
   p {
     margin-bottom: 0;
@@ -55,7 +55,7 @@
     margin-left: 24px!important;
   }
   .filter {
-    position: fixed;
+    // position: fixed;
     flex-wrap: wrap;
     overflow: hidden;
     display: flex;

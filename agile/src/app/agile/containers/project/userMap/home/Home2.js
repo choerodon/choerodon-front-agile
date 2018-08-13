@@ -443,11 +443,9 @@ class Home2 extends Component {
             <Backlog />
           </div>
         </div>
-        <CreateEpic
-          visible={createEpic}
-          onOk={() => UserMapStore.setCreateEpic(false)}
-          onCancel={() => UserMapStore.setCreateEpic(false)}
-        />
+
+        <CreateEpic visible={createEpic} />
+
       </Page>
     );
   }
