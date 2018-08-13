@@ -60,8 +60,8 @@ class ReleaseDetail extends Component {
           name: '期望值',
           type: 'line',
           data: [
-            [0, ReportStore.chartData.yAxis.slice()[0]],
-            [ReportStore.chartData.yAxis.slice().length - 1, 0],
+            [0, ReportStore.chartData.yAxis[0]],
+            [ReportStore.chartData.yAxis.length - 1, 0],
           ],
           itemStyle: {
             color: 'grey',
@@ -77,7 +77,7 @@ class ReleaseDetail extends Component {
           itemStyle: {
             color: 'red',
           },
-          data: ReportStore.chartData.yAxis.slice(),
+          data: ReportStore.chartData.yAxis,
         },
       ],
     };
@@ -246,15 +246,6 @@ class ReleaseDetail extends Component {
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
-          {/* <Button 
-            funcType="flat" 
-            onClick={() => {
-              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题`);
-            }}
-          >
-            <Icon type="autorenew icon" />
-            <span>查看问题列表</span>
-          </Button> */}
         </Header>
         <Content
           title={ReportStore.currentSprint.sprintName ? `迭代冲刺“${ReportStore.currentSprint.sprintName}”的冲刺报告` : '无冲刺报告'}

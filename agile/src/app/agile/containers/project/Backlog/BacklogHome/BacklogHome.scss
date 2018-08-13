@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  padding: 10px 24px;
+  padding: 10px 24px 5px;
   border-bottom: 1px solid #d3d3d3;
   flex-shrink: 0;
   align-items: center;
@@ -50,6 +50,7 @@
   margin-right: 18px;
   border-radius: 2px;
   white-space: nowrap;
+  margin-bottom: 5px;
 }
 
 .c7n-quickfilter-more {

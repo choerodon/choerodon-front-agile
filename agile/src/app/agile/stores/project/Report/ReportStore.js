@@ -50,7 +50,7 @@ class ReportStore {
           this.setTodo(false);
           this.setDone(false);
           this.setRemove(false);
-          this.getChartData();
+          // this.getChartData();
           this.loadCurrentTab();
         })
         .catch((error) => {
@@ -73,7 +73,7 @@ class ReportStore {
   }
 
   getChartData() {
-    loadChartData(this.currentSprint.sprintId, 'storyPoints').then((res) => {
+    loadChartData(this.currentSprint.sprintId, 'issueCount').then((res) => {
       const data = res;
       const newData = [];
       for (let index = 0, len = data.length; index < len; index += 1) {

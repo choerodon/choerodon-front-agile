@@ -198,15 +198,15 @@ class EpicItem extends Component {
                     <p className="c7n-backlog-epicItemParamValue">{item.issueCount}</p>
                   </div>
                   <div className="c7n-backlog-epicItemParam">
-                    <p className="c7n-backlog-epicItemParamKey">已完成问题数</p>
+                    <p className="c7n-backlog-epicItemParamKey">已完成数</p>
                     <p className="c7n-backlog-epicItemParamValue">{item.doneIssueCount}</p>
                   </div>
                   <div className="c7n-backlog-epicItemParam">
-                    <p className="c7n-backlog-epicItemParamKey">未预估问题数</p>
+                    <p className="c7n-backlog-epicItemParamKey">未预估数</p>
                     <p className="c7n-backlog-epicItemParamValue">{item.notEstimate}</p>
                   </div>
                   <div className="c7n-backlog-epicItemParam">
-                    <p className="c7n-backlog-epicItemParamKey">预估故事点数</p>
+                    <p className="c7n-backlog-epicItemParamKey">故事点数</p>
                     <p className="c7n-backlog-epicItemParamValue"
                        style={{minWidth: 31, color: 'rgba(0,0,0,0.65)'}}>{item.totalEstimate}p</p>
                   </div>

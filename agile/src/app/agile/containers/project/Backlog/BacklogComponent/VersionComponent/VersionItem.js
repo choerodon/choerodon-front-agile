@@ -316,15 +316,15 @@ class VersionItem extends Component {
                     <p className="c7n-backlog-versionItemParamValue">{item.issueCount}</p>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
-                    <p className="c7n-backlog-versionItemParamKey">已完成问题数</p>
+                    <p className="c7n-backlog-versionItemParamKey">已完成数</p>
                     <p className="c7n-backlog-versionItemParamValue">{item.doneIssueCount}</p>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
-                    <p className="c7n-backlog-versionItemParamKey">未预估问题数</p>
+                    <p className="c7n-backlog-versionItemParamKey">未预估数</p>
                     <p className="c7n-backlog-versionItemParamValue">{item.notEstimate}</p>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
-                    <p className="c7n-backlog-versionItemParamKey">预估故事点数</p>
+                    <p className="c7n-backlog-versionItemParamKey">故事点数</p>
                     <p className="c7n-backlog-versionItemParamValue" style={{ minWidth: 31, color: 'rgba(0,0,0,0.65)' }}>{item.totalEstimate}p</p>
                   </div>
                 </div>
