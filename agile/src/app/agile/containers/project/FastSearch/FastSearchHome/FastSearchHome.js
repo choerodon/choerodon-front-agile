@@ -6,7 +6,6 @@ import Filter from './Component/Filter';
 import EditFilter from './Component/EditFilter';
 import DeleteFilter from './Component/DeleteFilter';
 import SortTable from './Component/SortTable';
-
 const { AppState } = stores;
 const confirm = Modal.confirm;
 
@@ -66,7 +65,6 @@ class Search extends Component {
       })
       .catch((error) => {});
   }
-
   handleDrag = (data, postData) => {
     this.setState({
       filters: data,
