@@ -137,22 +137,20 @@ class SortTable extends Component {
     const dragRow = data[dragIndex];
     let beforeSequence = null;
     let afterSequence = null;
-    // 拖的方向
-    // if (hoverIndex === 0) {
-    //   afterSequence = data[hoverIndex][this.props.sortBy];
-    // } else if (hoverIndex === data.length - 1) {
-    //   beforeSequence = data[hoverIndex].sequence;
-    // } else if (dragIndex > hoverIndex) {
-    //   afterSequence = data[hoverIndex].sequence;
-    //   beforeSequence = data[hoverIndex - 1].sequence;
-    // } else if (dragIndex < hoverIndex) {
-    //   afterSequence = data[hoverIndex + 1].sequence;
-    //   beforeSequence = data[hoverIndex].sequence;
-    // }
-    const versionId = data[dragIndex].versionId;
+    if (hoverIndex === 0) {
+      afterSequence = result[1].sequence;
+    } else if (hoverIndex === data.length - 1) {
+      beforeSequence = result[data.length - 2].sequence;
+    } else {
+      afterSequence = result[hoverIndex + 1].sequence;
+      beforeSequence = result[hoverIndex - 1].sequence;
+    }
+    const versionId = data[dragIndex].filterId;
     const { objectVersionNumber } = data[dragIndex];
-    const postData = { afterSequence, beforeSequence, versionId, objectVersionNumber };
-    window.console.log(data, result);
+    const postData = { afterSequence, beforeSequence, filterId: versionId, objectVersionNumber };
+    window.console.log(1, beforeSequence);
+    window.console.log(2, afterSequence);
+
     this.props.handleDrag(result, postData);
   };
   render() {

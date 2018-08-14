@@ -50,7 +50,7 @@ class CreateIssue extends Component {
       </Menu>
     );
     return (
-      <div className="c7n-userMap-createIssue">
+      <div className="c7n-userMap-createIssue" style={{ ...this.props.style }}>
         <div className="c7n-content">
           <TextArea
             autoFocus

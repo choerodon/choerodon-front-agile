@@ -71,6 +71,23 @@ class Search extends Component {
     this.setState({
       filters: data,
     });
+    axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/drag`, postData)
+      .then(() => {
+        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
+          .then((res) => {
+            this.setState({
+              filters: res,
+            });
+          });
+      })
+      .catch(() => {
+        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
+          .then((ress) => {
+            this.setState({
+              filters: ress,
+            });
+          });
+      });
   };
 
   render() {
