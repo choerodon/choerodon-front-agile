@@ -36,7 +36,7 @@ export default [
   },
   {
     key: 'epicReport',
-    title: '史诗报告图',
+    title: '史诗报告',
     des: '随时了解一个史诗的完成进度。这有助于您跟踪未完成或未分配问题来管理团队的开发进度。',
     link: '/agile/reporthost/EpicReport',
     pic: 'epicReport',

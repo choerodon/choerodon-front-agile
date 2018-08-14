@@ -21,8 +21,9 @@ class IssueCard extends Component {
       loading: false,
       issue: {},
       summary: '',
+      originSummary: '',
+      isFocus: false,
     };
-    this.isEnter = false;
   }
 
   componentDidMount() {
@@ -34,6 +35,7 @@ class IssueCard extends Component {
     this.setState({
       issue,
       summary: issue.summary,
+      originSummary: issue.summary,
     });
   }
 
@@ -42,39 +44,25 @@ class IssueCard extends Component {
   }
 
   handlePressEnter = (e) => {
-    this.isEnter = true;
     e.preventDefault();
-    const target = e.target;
-    const { issue } = this.props;
-    const { issueId, objectVersionNumber } = issue;
     if (!this.state.summary) {
-      this.isEnter = false;
       return;
     }
-    const obj = {
-      issueId,
-      objectVersionNumber,
-      summary: this.state.summary,
-    };
-    updateIssue(obj)
-      .then((res) => {
-        if (this.props.handleUpdateIssueName) {
-          this.props.handleUpdateIssueName();
-        }
-        target.blur();
-      });
+    e.target.blur();
   }
 
   updateIssueName = (e) => {
-    if (this.isEnter) {
-      this.isEnter = false;
-      return;
-    }
     e.preventDefault();
-    const target = e.target;
+    this.setState({ isFocus: false });
     const { issue } = this.props;
     const { issueId, objectVersionNumber } = issue;
-    if (!this.state.summary) return;
+    if (!this.state.summary) {
+      this.setState({ summary: this.state.originSummary });
+      return;
+    }
+    if (this.state.summary === this.state.originSummary) {
+      return;
+    }
     const obj = {
       issueId,
       objectVersionNumber,
@@ -85,6 +73,7 @@ class IssueCard extends Component {
         if (this.props.handleUpdateIssueName) {
           this.props.handleUpdateIssueName();
         }
+        US.freshIssue(issueId, res.objectVersionNumber);
       });
   }
 
@@ -92,6 +81,12 @@ class IssueCard extends Component {
     const { issue } = this.props;
     return (
       <div className="c7n-userMap-issueCard">
+        <div
+          className="c7n-mask"
+          style={{
+            display: this.state.issue.statusCode === 'done' && !this.state.isFocus ? 'block' : 'none',
+          }}
+        />
         <div className="c7n-header">
           <div className="c7n-headerLeft">
             <UserHead
@@ -108,6 +103,7 @@ class IssueCard extends Component {
               className="c7n-issueNum"
               style={{ 
                 cursor: 'pointer',
+                textDecoration: this.state.issue.statusCode === 'done' ? 'line-through' : 'unset',
               }}
               role="none"
               onClick={() => {
@@ -125,13 +121,6 @@ class IssueCard extends Component {
           <Icon className="c7n-delete" type="delete" />
         </div>
         
-        {/* <div className="c7n-content">
-          <Input
-            className="c7n-textArea"
-            // autosize={{ minRows: 1, maxRows: 10 }}
-            defaultValue="作为部署管理员，我想看到对照版本里的Values修改参数并且每次只保存修改部分附件发挥第三的分…"
-          />
-        </div> */}
         <div className="c7n-content">
           <TextArea
             className="c7n-textArea"
@@ -139,7 +128,10 @@ class IssueCard extends Component {
             value={this.state.summary}
             onChange={this.handleIssueNameChange.bind(this)}
             onPressEnter={this.handlePressEnter}
-            onFocus={e => e.target.select()}
+            onFocus={(e) => {
+              e.target.select();
+              this.setState({ isFocus: true });
+            }}
             onBlur={this.updateIssueName}
           />
         </div>
