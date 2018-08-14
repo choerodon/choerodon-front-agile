@@ -29,7 +29,7 @@ class EditStatus extends Component {
           projectId: AppState.currentMenuType.id,
           categoryCode: values.categoryCode,
         };
-        ScrumBoardStore.axiosUpdateIssueStatus(this.props.data.i, params).then((data) => {
+        ScrumBoardStore.axiosUpdateIssueStatus(this.props.data.id, params).then((data) => {
           this.props.onChangeVisible(false);
           this.props.refresh();
         }).catch((error) => {

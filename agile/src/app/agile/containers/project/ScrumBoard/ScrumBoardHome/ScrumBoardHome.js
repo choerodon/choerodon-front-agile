@@ -54,6 +54,9 @@ class ScrumBoardHome extends Component {
             more: true,
           });
         }
+        if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
+          document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
+        }
         clearInterval(timer);
       }
     }, 1000);
@@ -866,7 +869,7 @@ class ScrumBoardHome extends Component {
                 <div
                   className="c7n-scrumboard-content"
                   style={{
-                    height: `calc(100vh - ${58}px)`,
+                    // height: `calc(100vh - ${88 + 48}px)`,
                     paddingBottom: 83,
                   }}
                 >
