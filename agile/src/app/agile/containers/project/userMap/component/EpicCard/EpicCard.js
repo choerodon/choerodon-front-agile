@@ -5,6 +5,7 @@ import { stores } from 'choerodon-front-boot';
 import './EpicCard.scss';
 import StatusTag from '../../../../../components/StatusTag';
 import { updateIssue } from '../../../../../api/NewIssueApi';
+import US from '../../../../../stores/project/userMap/UserMapStore';
 
 const { AppState } = stores;
 const { TextArea } = Input;
@@ -15,6 +16,7 @@ class EpicCard extends Component {
     this.state = {
       loading: false,
       epicName: '',
+      originEpicName: '',
     };
     this.isEnter = false;
   }
@@ -26,46 +28,33 @@ class EpicCard extends Component {
   setEpicNameInState() {
     const { epic } = this.props;
     const { epicName } = epic;
-    this.setState({ epicName });
+    this.setState({
+      epicName,
+      originEpicName: epicName,
+    });
   }
 
   handleEpicNameChange = (e) => {
     this.setState({ epicName: e.target.value });
-  }
+  };
 
   handlePressEnter = (e) => {
-    this.isEnter = true;
     e.preventDefault();
     const target = e.target;
-    const { epic } = this.props;
-    const { issueId, objectVersionNumber } = epic;
     if (!this.state.epicName) {
-      this.isEnter = false;
       return;
     }
-    const obj = {
-      issueId,
-      objectVersionNumber,
-      epicName: this.state.epicName,
-    };
-    updateIssue(obj)
-      .then((res) => {
-        this.setState({ isEdit: false });
-        if (this.props.handleUpdateEpicName) {
-          this.props.handleUpdateEpicName();
-        }
-        target.blur();
-      });
-  }
+    target.blur();
+  };
 
   updateEpicName = (e) => {
-    if (!this.state.epicName) return;
-    if (this.isEnter) {
-      this.isEnter = false;
-      return;
+    if (!this.state.epicName) {
+      this.setState({
+        epicName: this.state.originEpicName,
+      });
     }
+    if (this.state.epicName === this.state.originEpicName) return;
     e.preventDefault();
-    const target = e.target;
     const { epic } = this.props;
     const { issueId, objectVersionNumber } = epic;
     if (!this.state.epicName) return;
@@ -74,14 +63,16 @@ class EpicCard extends Component {
       objectVersionNumber,
       epicName: this.state.epicName,
     };
-    updateIssue(obj)
-      .then((res) => {
-        this.setState({ isEdit: false });
-        if (this.props.handleUpdateEpicName) {
-          this.props.handleUpdateEpicName();
-        }
+    updateIssue(obj).then((res) => {
+      this.setState({
+        isEdit: false,
       });
-  }
+      US.modifyEpic(issueId, res.objectVersionNumber);
+      if (this.props.handleUpdateEpicName) {
+        this.props.handleUpdateEpicName();
+      }
+    });
+  };
 
   render() {
     const { epic } = this.props;
@@ -116,10 +107,7 @@ class EpicCard extends Component {
         </div>
         <div className="c7n-footer">
           <div className="c7n-footer-left">
-            <StatusTag
-              name={epic.statusName}
-              color={epic.statusColor}
-            />
+            <StatusTag name={epic.statusName} color={epic.statusColor} />
             <span className="c7n-issueCount">{epic.totalEstimate}</span>
           </div>
           <span
@@ -128,7 +116,13 @@ class EpicCard extends Component {
             onClick={() => {
               const { history } = this.props;
               const urlParams = AppState.currentMenuType;
-              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${epic.issueNum}&paramIssueId=${epic.issueId}&paramUrl=usermap`);
+              history.push(
+                `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
+                  urlParams.name
+                }&organizationId=${urlParams.organizationId}&paramName=${
+                  epic.issueNum
+                }&paramIssueId=${epic.issueId}&paramUrl=usermap`,
+              );
             }}
           >
             {epic.issueNum}
