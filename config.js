@@ -16,7 +16,7 @@ switch (process.env.NODE_ENV) {
 }
 
 const config = {
-    port: 9090,
+    port: 8080,
     output: './dist',
     htmlTemplate: 'index.template.html',
     devServerConfig: {},
