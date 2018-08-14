@@ -380,7 +380,7 @@ class StatusIssue extends Component {
                             >
                               {this.renderTypeCode('icon', item)}
                             </div>
-                            <p style={{ marginLeft: 5 }} className="textDisplayOneColumn">{item.issueNum}</p>
+                            <p style={{ marginLeft: 5, textDecoration: item.categoryCode === 'done' ? 'line-through' : '' }} className="textDisplayOneColumn">{item.issueNum}</p>
                           </div>
                         </div>
                         <div style={{ display: 'flex', margin: '5px 0 5px 12px', alignItems: 'center' }}>

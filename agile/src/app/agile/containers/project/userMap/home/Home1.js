@@ -5,10 +5,10 @@ import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import { Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon, Card, Checkbox } from 'choerodon-ui';
 import './test.scss';
 import CreateEpic from '../component/CreateEpic';
-import CreateVOS from '../component/CreateVOS/CreateVOS.js';
 import Backlog from '../component/Backlog/Backlog.js';
 import EpicCard from '../component/EpicCard/EpicCard.js';
 import IssueCard from '../component/IssueCard/IssueCard.js';
+import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 
 const Option = Select.Option;
@@ -42,7 +42,7 @@ class Home2 extends Component {
     // window.onscroll = this.handleScroll;
   }
   componentWillUnmount() {
-    this.setCurrentFilter([]);
+    this.props.UserMapStore.setCurrentFilter([]);
   }
   initData =() => {
     this.setState({ loading: true });
@@ -84,7 +84,7 @@ class Home2 extends Component {
   };
 
   filterIssue =(e) => {
-    e.stopPropagation();
+
   };
 
   expandColumn =(id) => {
@@ -131,6 +131,9 @@ class Home2 extends Component {
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
       >
         <Header title="用户故事地图">
+          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
+            <Icon type="playlist_add" />创建史诗
+          </Button>
           <Dropdown overlay={swimlanMenu} trigger={['click']}>
             <Button>
               {mode === 'none' && '无泳道'}
@@ -139,44 +142,50 @@ class Home2 extends Component {
               <Icon type="arrow_drop_down" />
             </Button>
           </Dropdown>
-          <Popover
-            className={'moreMenu-popover'}
-            trigger={'click'}
-            content={<div style={{ padding: '2px -4px' }} className="moreMenu">
-              <div className="menu-title">史诗过滤器</div>
-              <div style={{ height: 22, marginBottom: 10 }}>
-                <Checkbox>已完成的史诗</Checkbox>
+          <div style={{ flex: 1, marginLeft: 8 }}>
+            <Popover
+              overlayClassName={'moreMenuPopover'}
+              arrowPointAtCenter={false}
+              placement="bottomLeft"
+              trigger={'click'}
+              content={<div>
+                <div className="menu-title">史诗过滤器</div>
+                <div style={{ height: 22, marginBottom: 20 }}>
+                  <Checkbox>已完成的史诗</Checkbox>
+                </div>
+                <div style={{ height: 22, marginBottom: 32 }} >
+                  <Checkbox>应用快速搜索到史诗</Checkbox>
+                </div>
+                <div className="menu-title">导出</div>
+                <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div>
+                <div style={{ height: 22, marginLeft: 26 }}>导出为图片</div>
+              </div>}
+            >
+              <div style={{ cursor: 'pointer', color: 'rgb(63, 81, 181)', fontWeight: 500, marginTop: 6 }}>
+                更多 <Icon type="arrow_drop_down" style={{ marginTop: -3 }} />
               </div>
-              <div style={{ height: 22 }} >
-                <Checkbox>应用快速搜索到史诗</Checkbox>
-              </div>
-              <div className="menu-title">导出</div>
-              <div style={{ height: 22, marginBottom: 10, marginLeft: 26 }}>导出为excel</div>
-              <div style={{ height: 22, marginBottom: 10, marginLeft: 26 }}>导出为图片</div>
-            </div>}
-          >
-            <div style={{ cursor: 'pointer', color: 'rgb(63, 81, 181)', fontWeight: 500, marginTop: 6 }}>
-              更多 <Icon type="arrow_drop_down" />
-            </div>
-          </Popover>
-          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
-            <Icon type="playlist_add" />创建史诗
-          </Button>
-          <Button style={{ position: 'absolute',right: '24px', color: 'white' }} type="primary" funcType="raised" onClick={this.showBackLog}>
-            <Icon type="playlist_add" />需求池
+            </Popover>
+          </div>
+
+          <Button style={{ color: 'white', marginRight: 24, fontSize: 12 }} type="primary" funcType="raised" onClick={this.showBackLog}>
+            <Icon type="layers" />需求池
           </Button>
         </Header>
         <div className="c7n-userMap-content">
-          <div className="userMap-right" style={{ width: `${showBackLog ? 'calc(100% - 372px)' : ''}` }}>
+          <div className="userMap-right" style={{ width: `${showBackLog ? 'calc(100% - 372px)' : 'calc(100% - 24px)'}` }} >
             <div className="toolbar">
               <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
                 <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
-                <p role="none" 
-                style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }} 
-                onClick={this.addFilter.bind(this,'mine')}>仅我的问题</p>
-                <p role="none" 
-                style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }} 
-                onClick={this.addFilter.bind(this,'userStory')}>仅用户故事</p>
+                <p
+                  role="none"
+                  style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                  onClick={this.addFilter.bind(this,'mine')}
+                >仅我的问题</p>
+                <p
+                  role="none"
+                  style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                  onClick={this.addFilter.bind(this,'userStory')}
+                >仅用户故事</p>
                 {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`, marginBottom: 3}} onClick={this.addFilter.bind(this,filter.filterId)}>{filter.name}</p>) }
               </div>
               <div
@@ -199,6 +208,7 @@ class Home2 extends Component {
             <div className="epic">
               {epicData.map(epic => (
                 <EpicCard
+                  key={epic.issueId}
                   epic={epic}
                 />
               ))}
@@ -243,9 +253,10 @@ class Home2 extends Component {
                 </div>
                 <div style={{ display: this.state.expandColumns.includes('-1-none') ? 'none' : 'flex' }}>
                   {epicData.map((epic, index) => (<div className="swimlane-column">
-                    <React.Fragment>
+                    <React.Fragment key={epic.issueId}>
                       {_.filter(issues, issue => issue.epicId === epic.issueId).map(item => (
                         <IssueCard
+                          key={item.issueId}
                           issue={item}
                         />
                       ))}
@@ -256,7 +267,7 @@ class Home2 extends Component {
               }
               {mode === 'sprint' && issues.length &&
               <React.Fragment>
-                {sprints.map(sprint => (<React.Fragment key={'sprint'}>
+                {sprints.map(sprint => (<React.Fragment key={sprint.sprintId}>
                   <div className="swimlane-title">
                     <p>{sprint.sprintName}</p>
                     <div style={{ display: 'flex' }}>
@@ -298,6 +309,7 @@ class Home2 extends Component {
                       <React.Fragment>
                         {_.filter(issues, issue => issue.epicId === epic.issueId && issue.sprintId === sprint.sprintId).map(item => (
                           <IssueCard
+                            key={item.issueId}
                             issue={item}
                           />
                         ))}
@@ -353,6 +365,7 @@ class Home2 extends Component {
                       <React.Fragment>
                         {_.filter(issues, issue => issue.epicId === epic.issueId && issue.sprintId == null).map(item => (
                           <IssueCard
+                            key={item.issueId}
                             issue={item}
                           />
                         ))}
@@ -363,7 +376,7 @@ class Home2 extends Component {
               </React.Fragment>
               }
               {mode === 'version' && issues.length && <React.Fragment>
-                {versions.map(version => (<React.Fragment>
+                {versions.map(version => (<React.Fragment key={version.versionId}>
                   <div className="swimlane-title">
                     <p>{version.name}</p>
                     <div style={{ display: 'flex' }}>
@@ -405,6 +418,7 @@ class Home2 extends Component {
                       <React.Fragment>
                         {_.filter(issues, issue => issue.epicId === epic.issueId && issue.versionId === version.versionId).map(item => (
                           <IssueCard
+                            key={item.issueId}
                             issue={item}
                           />
                         ))}
@@ -412,7 +426,7 @@ class Home2 extends Component {
                     </div>))}
                   </div>
                 </React.Fragment>))}
-                <React.Fragment key={'no-sprint'}>
+                <React.Fragment key={'no-version'}>
                   <div className="swimlane-title">
                     <p>
                       未计划的
@@ -460,6 +474,7 @@ class Home2 extends Component {
                       <React.Fragment>
                         {_.filter(issues, issue => issue.epicId === epic.issueId && issue.versionId == null).map(item => (
                           <IssueCard
+                            key={item.isssueId}
                             issue={item}
                           />
                         ))}
