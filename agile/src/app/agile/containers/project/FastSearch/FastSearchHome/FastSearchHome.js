@@ -5,6 +5,7 @@ import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import Filter from './Component/Filter';
 import EditFilter from './Component/EditFilter';
 import DeleteFilter from './Component/DeleteFilter';
+import DragSortingTable from './DragSortingTable';
 
 const { AppState } = stores;
 const confirm = Modal.confirm;
@@ -55,17 +56,22 @@ class Search extends Component {
     this.setState({
       loading: true,
     });
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
+    axios
+      .get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
       .then((res) => {
         this.setState({
           filters: res,
           loading: false,
         });
       })
-      .catch((error) => {
-      });
+      .catch((error) => {});
   }
-
+  handleDrag = (filters) => {
+    console.log(filters);
+    this.setState({
+      filters,
+    });
+  };
   render() {
     const column = [
       {
@@ -75,7 +81,14 @@ class Search extends Component {
         render: name => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={name}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: 0,
+                }}
+              >
                 {name}
               </p>
             </Tooltip>
@@ -89,7 +102,14 @@ class Search extends Component {
         render: expressQuery => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={expressQuery}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: 0,
+                }}
+              >
                 {expressQuery}
               </p>
             </Tooltip>
@@ -103,7 +123,14 @@ class Search extends Component {
         render: description => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={description.split('+++')[0]}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: 0,
+                }}
+              >
                 {description.split('+++')[0] || ''}
               </p>
             </Tooltip>
@@ -116,12 +143,28 @@ class Search extends Component {
         width: '15%',
         render: (filterId, record) => (
           <div>
-            <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>详情</span></div>}>
+            <Popover
+              placement="bottom"
+              mouseEnterDelay={0.5}
+              content={
+                <div>
+                  <span>详情</span>
+                </div>
+              }
+            >
               <Button shape="circle" onClick={this.showFilter.bind(this, record)}>
                 <Icon type="mode_edit" />
               </Button>
             </Popover>
-            <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>删除</span></div>}>
+            <Popover
+              placement="bottom"
+              mouseEnterDelay={0.5}
+              content={
+                <div>
+                  <span>删除</span>
+                </div>
+              }
+            >
               <Button shape="circle" onClick={this.clickDeleteFilter.bind(this, record)}>
                 <Icon type="delete_forever" />
               </Button>
@@ -149,49 +192,43 @@ class Search extends Component {
         >
           <div>
             <Spin spinning={this.state.loading}>
-              <Table
+              <DragSortingTable
+                handleDrag={this.handleDrag}
                 rowKey={record => record.filterId}
                 columns={column}
                 dataSource={this.state.filters}
                 scroll={{ x: true }}
               />
-          
             </Spin>
-            {
-              this.state.createFileterShow ? (
-                <Filter
-                  onOk={() => {
-                    this.setState({ createFileterShow: false });
-                    this.loadFilters();
-                  }}
-                  onCancel={() => this.setState({ createFileterShow: false })}
-                />
-              ) : null
-            }
-            {
-              this.state.editFilterShow ? (
-                <EditFilter
-                  filterId={this.state.currentFilterId}
-                  onOk={() => {
-                    this.setState({ editFilterShow: false });
-                    this.loadFilters();
-                  }}
-                  onCancel={() => this.setState({ editFilterShow: false })}
-                />
-              ) : null
-            }
-            {
-              this.state.deleteFilterShow ? (
-                <DeleteFilter
-                  filter={this.state.filter}
-                  onOk={() => {
-                    this.setState({ deleteFilterShow: false });
-                    this.loadFilters();
-                  }}
-                  onCancel={() => this.setState({ deleteFilterShow: false })}
-                />
-              ) : null
-            }
+            {this.state.createFileterShow ? (
+              <Filter
+                onOk={() => {
+                  this.setState({ createFileterShow: false });
+                  this.loadFilters();
+                }}
+                onCancel={() => this.setState({ createFileterShow: false })}
+              />
+            ) : null}
+            {this.state.editFilterShow ? (
+              <EditFilter
+                filterId={this.state.currentFilterId}
+                onOk={() => {
+                  this.setState({ editFilterShow: false });
+                  this.loadFilters();
+                }}
+                onCancel={() => this.setState({ editFilterShow: false })}
+              />
+            ) : null}
+            {this.state.deleteFilterShow ? (
+              <DeleteFilter
+                filter={this.state.filter}
+                onOk={() => {
+                  this.setState({ deleteFilterShow: false });
+                  this.loadFilters();
+                }}
+                onCancel={() => this.setState({ deleteFilterShow: false })}
+              />
+            ) : null}
           </div>
         </Content>
       </Page>

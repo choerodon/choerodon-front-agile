@@ -195,7 +195,7 @@ class UserMapStore {
       onlyStory,
       filterIds,
     };
-  }
+  };
 
   getQueryString = (filterObj) => {
     let query = '';
@@ -209,7 +209,7 @@ class UserMapStore {
       query += `&&quickFilterIds=${filterObj.filterIds.join(',')}`;
     }
     return query;
-  }
+  };
 
   loadBacklogIssues = () => {
     const projectId = AppState.currentMenuType.id;
@@ -229,6 +229,10 @@ class UserMapStore {
         this.setBacklogExpand([]);
       });
   };
+  modifyEpic(issueId, objectVersionNumber) {
+    const index = this.epics.findIndex(epic => epic.issueId === issueId);
+    this.epics[index].objectVersionNumber = objectVersionNumber;
+  }
 }
 
 const userMapStore = new UserMapStore();
