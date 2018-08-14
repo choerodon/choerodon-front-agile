@@ -29,6 +29,12 @@ class UserMapStore {
   createEpic = false;
   @observable
   backlogExpand = [];
+
+  @observable
+  createVOS = false;
+  @observable
+  createVOSType='';
+
   @action
   setEpics(data) {
     this.epics = data;
@@ -108,6 +114,26 @@ class UserMapStore {
     return this.createEpic;
   }
 
+  @action
+  setCreateVOS(data) {
+    this.createVOS = data;
+  }
+
+  @computed
+  get getCreateVOS() {
+    return this.createVOS;
+  }
+
+  @action
+  setCreateVOSType(data) {
+    this.createVOSType = data;
+  }
+
+  @computed
+  get getCreateVOSType() {
+    return this.createVOSType;
+  }
+  
   @action
   setBacklogIssues(data) {
     this.backlogIssues = data;

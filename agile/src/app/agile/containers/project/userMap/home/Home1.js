@@ -5,6 +5,7 @@ import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import { Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon, Card, Checkbox } from 'choerodon-ui';
 import './test.scss';
 import CreateEpic from '../component/CreateEpic';
+import CreateVOS from '../component/CreateVOS/CreateVOS.js';
 import Backlog from '../component/Backlog/Backlog.js';
 import EpicCard from '../component/EpicCard/EpicCard.js';
 import IssueCard from '../component/IssueCard/IssueCard.js';
@@ -100,6 +101,18 @@ class Home2 extends Component {
     this.setState({ showBackLog: !this.state.showBackLog });
   };
 
+  handleCreateVOS=(type) => {
+    this.props.UserMapStore.setCreateVOSType(type);
+    this.props.UserMapStore.setCreateVOS(true);
+  };  
+
+  handleCreateOk=() => {
+    const UserMapStore = this.props.UserMapStore;
+    UserMapStore.setCreateVOS(false);
+    // UserMapStore.loadIssues("userMap");
+    UserMapStore.getCreateVOSType === 'version' ? UserMapStore.loadVersions() : UserMapStore.loadSprints();
+  }
+  
   render() {
     const { showBackLog } = this.state;
     const { UserMapStore } = this.props;
@@ -294,7 +307,13 @@ class Home2 extends Component {
                 </React.Fragment>))}
                 <React.Fragment key={'no-sprint'}>
                   <div className="swimlane-title">
-                    <p>未计划的</p>
+                  <p>
+                      未计划的
+                      <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, 'sprint')}>
+                        <Icon type="playlist_add" />
+                        创建冲刺
+                      </Button>
+                    </p>
                     <div style={{ display: 'flex' }}>
                       <p className="point-span" style={{ background: '#4D90FE' }}>
                         {_.reduce(_.filter(issues, issue => issue.sprintId == null), (sum, issue) => {
@@ -395,7 +414,13 @@ class Home2 extends Component {
                 </React.Fragment>))}
                 <React.Fragment key={'no-sprint'}>
                   <div className="swimlane-title">
-                    <p>未计划的</p>
+                    <p>
+                      未计划的
+                      <Button className="createVersionBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, 'version')}>
+                        <Icon type="playlist_add" />
+                         创建版本
+                     </Button>
+                    </p>
                     <div style={{ display: 'flex' }}>
                       <p className="point-span" style={{ background: '#4D90FE' }}>
                         {_.reduce(_.filter(issues, issue => issue.versionId == null), (sum, issue) => {
@@ -454,6 +479,13 @@ class Home2 extends Component {
           visible={createEpic}
           onOk={() => UserMapStore.setCreateEpic(false)}
           onCancel={() => UserMapStore.setCreateEpic(false)}
+        />
+        <CreateVOS
+          visible={UserMapStore.createVOS}
+          // onOk={() => {UserMapStore.setCreateVOS(false)}}
+          onOk={this.handleCreateOk}
+          onCancel={ () => {UserMapStore.setCreateVOS(false)}}
+          type={UserMapStore.getCreateVOSType}
         />
       </Page>
     );
