@@ -5,6 +5,7 @@ import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
 import Filter from './Component/Filter';
 import EditFilter from './Component/EditFilter';
 import DeleteFilter from './Component/DeleteFilter';
+import SortTable from './Component/SortTable';
 
 const { AppState } = stores;
 const confirm = Modal.confirm;
@@ -66,12 +67,18 @@ class Search extends Component {
       });
   }
 
+  handleDrag = (data, postData) => {
+    this.setState({
+      filters: data,
+    });
+  };
+
   render() {
     const column = [
       {
         title: '名称',
         dataIndex: 'name',
-        width: '20%',
+        // width: '20%',
         render: name => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={name}>
@@ -85,7 +92,7 @@ class Search extends Component {
       {
         title: '筛选器',
         dataIndex: 'expressQuery',
-        width: '50%',
+        // width: '50%',
         render: expressQuery => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={expressQuery}>
@@ -99,7 +106,7 @@ class Search extends Component {
       {
         title: '描述',
         dataIndex: 'description',
-        width: '25%',
+        // width: '25%',
         render: description => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={description.split('+++')[0]}>
@@ -113,7 +120,8 @@ class Search extends Component {
       {
         title: '',
         dataIndex: 'filterId',
-        width: '15%',
+        width: '96',
+        align: 'right',
         render: (filterId, record) => (
           <div>
             <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>详情</span></div>}>
@@ -149,11 +157,13 @@ class Search extends Component {
         >
           <div>
             <Spin spinning={this.state.loading}>
-              <Table
+              <SortTable
+                handleDrag={this.handleDrag}
                 rowKey={record => record.filterId}
                 columns={column}
                 dataSource={this.state.filters}
                 scroll={{ x: true }}
+
               />
           
             </Spin>

@@ -62,7 +62,7 @@ class Home2 extends Component {
   };
   handleCreateEpic = () => {
     this.props.UserMapStore.setCreateEpic(true);
-  };
+  }
 
   addFilter =(filter) => {
     const { currentFilters } = this.props.UserMapStore;
