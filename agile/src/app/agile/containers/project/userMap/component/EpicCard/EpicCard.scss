@@ -108,11 +108,16 @@
       }
     }
 
-    .cyn-issueNum {
+    .c7n-issueNum {
       color: #3f51b5;
       font-size: 13px;
       line-height: 18px;
       cursor: pointer;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: right;
     }
   }
 }

@@ -28,8 +28,8 @@ class Home2 extends Component {
   componentDidMount() {
     this.initData();
     const timer = setInterval(() => {
-      if (document.getElementsByClassName('filter').length > 0) {
-        if (document.getElementsByClassName('filter')[0].scrollHeight + 3 > document.getElementsByClassName('filter')[0].clientHeight) {
+      if (document.getElementsByclassName('filter').length > 0) {
+        if (document.getElementsByclassName('filter')[0].scrollHeight + 3 > document.getElementsByclassName('filter')[0].clientHeight) {
           this.setState({
             more: true,
           });
@@ -37,17 +37,15 @@ class Home2 extends Component {
         clearInterval(timer);
       }
     }, 1000);
-    // window.addEventListener('scroll', this.handleScroll, true);
-    // window.onscroll = this.handleScroll;
-  }
-  componentWillUnmount() {
-    this.setCurrentFilter([]);
   }
   initData =() => {
     this.setState({ loading: true });
     this.props.UserMapStore.initData();
   };
 
+  addFilter = () => {
+
+  };
   changeMode =(options) => {
     this.props.UserMapStore.setMode(options.key);
     const mode = options.key;
@@ -63,18 +61,17 @@ class Home2 extends Component {
     this.props.UserMapStore.setCreateEpic(true);
   };
 
-  addFilter =(filter) => {
+  addFilter =(e) => {
     const { currentFilters } = this.props.UserMapStore;
     const arr = _.cloneDeep(currentFilters);
-    const value = filter;
-    const index = currentFilters.indexOf(value);
-    if (index !== -1) {
+    const value = e._dispatchInstances.key;
+    if (currentFilters.includes(value)) {
+      const index = arr.indexOf(value);
       arr.splice(index, 1);
     } else {
       arr.push(value);
     }
     this.props.UserMapStore.setCurrentFilter(arr);
-    this.props.UserMapStore.loadIssues('usermap');
   };
 
   changeMenuShow =(options) => {
@@ -149,7 +146,7 @@ class Home2 extends Component {
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
             <Icon type="playlist_add" />创建史诗
           </Button>
-          <Button style={{ position: 'absolute',right: '24px', color: 'white' }} type="primary" funcType="raised" onClick={this.showBackLog}>
+          <Button style={{ marginLeft: '60%', color: 'white' }} type="primary" funcType="raised" onClick={this.showBackLog}>
             <Icon type="playlist_add" />需求池
           </Button>
         </Header>
@@ -158,13 +155,9 @@ class Home2 extends Component {
             <div className="toolbar">
               <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
                 <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
-                <p role="none" 
-                style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }} 
-                onClick={this.addFilter.bind(this,'mine')}>仅我的问题</p>
-                <p role="none" 
-                style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }} 
-                onClick={this.addFilter.bind(this,'userStory')}>仅用户故事</p>
-                {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`, marginBottom: 3}} onClick={this.addFilter.bind(this,filter.filterId)}>{filter.name}</p>) }
+                <p role="none" style={{ background: `${currentFilters.includes('onlyMe') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyMe') ? 'white' : '#3F51B5'}`, marginBottom: 3 }} onClick={this.addFilter} key={'onlyMe'}>仅我的问题</p>
+                <p role="none" style={{ background: `${currentFilters.includes('onlyStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }} onClick={this.addFilter} key={'onlyStory'}>仅用户故事</p>
+                {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId.toString()) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId.toString()) ? 'white' : '#3F51B5'}`, marginBottom: 3}} onClick={this.addFilter} key={filter.filterId}>{filter.name}</p>) }
               </div>
               <div
                 style={{
@@ -450,11 +443,9 @@ class Home2 extends Component {
             <Backlog />
           </div>
         </div>
-        <CreateEpic
-          visible={createEpic}
-          onOk={() => UserMapStore.setCreateEpic(false)}
-          onCancel={() => UserMapStore.setCreateEpic(false)}
-        />
+
+        <CreateEpic visible={createEpic} />
+
       </Page>
     );
   }

@@ -192,20 +192,18 @@
           // border: 1px solid rgba(0, 0, 0, 0.36);
           // border-radius: 2px;
           color: rgba(0, 0, 0, 0.36);
-          padding: 0 3px;
           white-space: nowrap;
         }
 
         .c7n-backlog-sprintIssueEpic {
           border-radius: 2px;
-          padding: 0 4px;
           white-space: nowrap;
         }
 
         .c7n-backlog-sprintIssueStoryPoint {
-          width: 20px;
+          width: 27px;
           height: 20px;
-          border-radius: 50%;
+          border-radius: 100px;
           background: rgba(0, 0, 0, 0.08);
           display: flex;
           justify-content: center;

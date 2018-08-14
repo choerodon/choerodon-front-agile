@@ -683,7 +683,7 @@ class SprintItem extends Component {
                               {/* <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ?
                       ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div> */}
                               <Avatar
-                                style={{ marginRight: 8 }}
+                                style={{ marginRight: 8, flexShrink: 0 }}
                                 src={ass2.imageUrl ? ass2.imageUrl : undefined}
                                 size="small"
                               >
@@ -770,7 +770,7 @@ class SprintItem extends Component {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <p>本周冲刺目标：</p>
+                      <p>冲刺目标：</p>
                       <EasyEdit
                         type="input"
                         defaultValue={item.sprintGoal}
@@ -1070,7 +1070,7 @@ class SprintItem extends Component {
                           {/* <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ?
                       ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div> */}
                           <Avatar
-                            style={{ marginRight: 8 }}
+                            style={{ marginRight: 8, flexShrink: 0 }}
                             src={ass2.imageUrl ? ass2.imageUrl : undefined}
                             size="small"
                           >

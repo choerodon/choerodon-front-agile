@@ -17,7 +17,7 @@ class UserMapStore {
   @observable mode = 'none';
   @observable createEpic = false;
   @observable backlogExpand = [];
-
+  @observable currentBacklogFilters = [];
 
   @action setEpics(data) {
     this.epics = data;
@@ -90,6 +90,10 @@ class UserMapStore {
     this.backlogExpand = data;
   }
 
+  @action setCurrentBacklogFilter(data) {
+    this.currentBacklogFilters = data;
+  }
+
 
   loadEpic = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`)
     .then((epics) => {
@@ -140,10 +144,43 @@ class UserMapStore {
       // 两个请求现在都执行完成
     }));
 
+  getFiltersObj = (type = 'currentBacklogFilters') => {
+    const filters = this[type];
+    let [userId, onlyStory, filterIds] = [null, null, []];
+    if (filters.includes('mine')) {
+      userId = AppState.getUserId;
+    }
+    if (filters.includes('story')) {
+      onlyStory = true;
+    }
+    filterIds = filters.filter(v => v !== 'mine' && v !== 'story');
+    return {
+      userId,
+      onlyStory,
+      filterIds,
+    };
+  }
+
+  getQueryString = (filterObj) => {
+    let query = '';
+    if (filterObj.onlyStory) {
+      query += '&onlyStory=true';
+    }
+    if (filterObj.userId) {
+      query += `&assigneeId=${filterObj.userId}`;
+    }
+    if (Array.isArray(filterObj.filterIds) && filterObj.length) {
+      query += `&&quickFilterIds=${filterObj.filterIds.join(',')}`;
+    }
+    return query;
+  }
+
   loadBacklogIssues = () => {
     const projectId = AppState.currentMenuType.id;
     const type = this.mode;
-    axios.get(`/agile/v1/projects/${projectId}/issues/storymap/issues?type=${type}&pageType=backlog`)
+    const filters = this.getFiltersObj('currentBacklogFilters');
+    const query = this.getQueryString(filters);
+    axios.get(`/agile/v1/projects/${projectId}/issues/storymap/issues?type=${type}&pageType=backlog${query}`)
       .then((res) => {
         this.setBacklogIssues(res);
         this.setBacklogExpand([]);

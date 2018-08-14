@@ -1,6 +1,6 @@
 .c7n-map {
   // background: rgba(0,0,0,0.02)
-  position: absolute;
+  position: relative;
 
   p {
     margin-bottom: 0;
@@ -20,7 +20,6 @@
       position: fixed;
       flex-wrap: wrap;
       overflow: hidden;
-      height: 27px;
       display: flex;
 
       p {
@@ -50,60 +49,15 @@
     position: relative;
     left: 24px;
     top: 10px;
-    // position: absolute;
-    .epic {
-      margin-top: 12px;
-      display: flex;
-      .epic-card {
-        width: 220px;
-        height: 98px;
-        background: #FFFFFF;
-        box-shadow: 0 -1px 6px 0 rgba(0,0,0,0.12);
-        border-radius: 2px;
-        margin-right: 10px;
-        min-width: 220px;
-      }
-    }
-    .point-span {
-      text-align: center;
-      border-radius: 100px;
-      margin-right: 13px;
-      width: 27px;
-      height: 20px
-    }
-    .swimlane-title {
-      position: relative;
-      border-bottom: 1px solid rgba(0,0,0,0.12);
-      margin-bottom: 42px;
-    }
-
-    .swimlane-column {
-      background: rgba(0,0,0,0.02);
-      border-radius: 2px;
-      width: 220px;
-      min-width: 220px;
-      margin-right: 10px;
-      min-height: 142px;
-
-      .issue-card {
-        width: 220px;
-        min-width: 220px;
-        height: 142px;
-        background: #FFFFFF;
-        border: 1px solid rgba(0,0,0,0.20);
-        border-radius: 2px;
-      }
-    }
   }
 
   .map-content {
     margin-left: 24px!important;
   }
   .filter {
-    position: fixed;
+    // position: fixed;
     flex-wrap: wrap;
     overflow: hidden;
-    height: 27px;
     display: flex;
 
     p {
