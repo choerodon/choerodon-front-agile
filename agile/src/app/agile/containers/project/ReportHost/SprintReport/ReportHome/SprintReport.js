@@ -50,7 +50,7 @@ class SprintReport extends Component {
     diffDay.setDate(beginDay[2]);
     diffDay.setMonth(beginDay[1] - 1);
     diffDay.setFullYear(beginDay[0]);
-    result.push(start);
+    result.push(start.slice(5));
     while (i == 0) {
       const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
       diffDay.setTime(countDay);
@@ -59,7 +59,7 @@ class SprintReport extends Component {
       dateList[0] = diffDay.getFullYear();
       if (String(dateList[1]).length == 1) { dateList[1] = `0${dateList[1]}`; }
       if (String(dateList[2]).length == 1) { dateList[2] = `0${dateList[2]}`; }
-      result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
+      result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`.slice(5));
       if (dateList[0] == endDay[0] && dateList[1] == endDay[1] && dateList[2] == endDay[2]) {
         i = 1;
       }
