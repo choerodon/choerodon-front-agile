@@ -27,6 +27,9 @@ class Home1 extends Component {
     // window.addEventListener('scroll', this.handleScroll, true);
     // window.onscroll = this.handleScroll;
   }
+  componentWillUnmount() {
+    this.setCurrentFilter([]);
+  }
   getSnapshotBeforeUpdate(prevProps, prevState) {
     const ele = document.getElementsByClassName('issue-content');
     if (ele.length > 0) {
@@ -38,9 +41,6 @@ class Home1 extends Component {
     this.props.UserMapStore.initData();
   };
 
-  addFilter = () => {
-
-  };
   changeMode =(options) => {
     this.props.UserMapStore.setMode(options.key);
     const mode = options.key;
@@ -56,17 +56,18 @@ class Home1 extends Component {
     this.props.UserMapStore.setCreateEpic(true);
   };
 
-  addFilter =(e) => {
+  addFilter =(filter) => {
     const { currentFilters } = this.props.UserMapStore;
     const arr = _.cloneDeep(currentFilters);
-    const value = e._dispatchInstances.key;
-    if (currentFilters.includes(value)) {
-      const index = arr.indexOf(value);
+    const value = filter;
+    const index = currentFilters.indexOf(value);
+    if (index !== -1) {
       arr.splice(index, 1);
     } else {
       arr.push(value);
     }
     this.props.UserMapStore.setCurrentFilter(arr);
+    this.props.UserMapStore.loadIssues('usermap');
   };
 
   changeMenuShow =(options) => {
@@ -126,9 +127,31 @@ class Home1 extends Component {
             <div style={{ width: '100%', height: 48, background: 'white', position: 'relative', paddingTop: 10 }}>
               <div className="filter">
                 <p>快速搜索:</p>
-                <p role="none" style={{ background: `${currentFilters.includes('onlyMe') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyMe') ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={'onlyMe'}>仅我的问题</p>
-                <p role="none" style={{ background: `${currentFilters.includes('onlyStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('onlyStory') ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={'onlyStory'}>仅用户故事</p>
-                {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId.toString()) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId.toString()) ? 'white' : '#3F51B5'}` }} onClick={this.addFilter} key={filter.filterId}>{filter.name}</p>) }
+                <p
+                  role="none"
+                  style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}` }}
+                  onClick={this.addFilter.bind(this, 'mine')}
+                >
+                  仅我的问题
+                </p>
+                <p 
+                  role="none" 
+                  style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}` }} 
+                  onClick={this.addFilter.bind(this, 'userStory')}
+                >
+                  仅用户故事
+                </p>
+                {
+                  filters.map(filter =>
+                    (<p
+                      role="none" 
+                      style={{ background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}` }}
+                      onClick={this.addFilter.bind(this, filter.filterId)}
+                      key={filter.filterId}
+                    >
+                      {filter.name}
+                    </p>),
+                  ) }
               </div>
             </div>
           </div>
@@ -139,7 +162,7 @@ class Home1 extends Component {
               />
             ))}
           </div>
-          <div className="swimlane-container" style={{ overflowY: 'scroll', height: `calc(100vh - ${document.getElementById('autoRouter').offsetTop + 48 + 48 + 10 + 98 + 58}px)`, minWidth: `${epicData.length * 220 + epicData.length * 10 - 10}px`}}>
+          <div className="swimlane-container" style={{ overflowY: 'scroll', height: `calc(100vh - ${document.getElementById('autoRouter').offsetTop + 48 + 48 + 10 + 98 + 58}px)`, minWidth: `${epicData.length * 220 + epicData.length * 10 - 10}px` }}>
             {mode === 'none' && (<React.Fragment>
               <div style={{ width: '100%', height: 42, position: 'relative' }}>
                 <div style={{ position: 'fixed', background: 'rgba(0,0,0,0.02)', height: 42, width: '100%', borderBottom: '1px solid rgba(0,0,0,0.12)', borderTop: '1px solid rgba(0,0,0,0.12)' }}>

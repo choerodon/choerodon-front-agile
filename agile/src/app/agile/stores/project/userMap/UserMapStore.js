@@ -94,16 +94,30 @@ class UserMapStore {
   loadEpic = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`)
     .then((epics) => {
       this.setEpics(epics);
+    })
+    .catch((error) => {
+    
     });
 
   loadFilters = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
     .then((filters) => {
       this.setFilters(filters);
     });
-  loadIssues = (type, pageType) => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${type}&pageType=${pageType}`)
-    .then((issues) => {
-      this.setIssues(issues);
-    });
+  loadIssues = (pageType) => {
+    // const url = `/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}&assigneeId=${this.currentFilters.includes('mime') ? AppState.getUserId : null}&onlyStory=${this.currentFilters.includes('userStory')}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mime' || item !== 'userStory')}`;
+    let url = '';
+    if (this.currentFilters.includes('mine')) {
+      url += `&assigneeId=${AppState.getUserId}`;
+    } 
+    if (this.currentFilters.includes('userStory')) {
+      url += '&onlyStory=true';
+    }
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}${url}`)
+      .then((issues) => {
+        this.setIssues(issues);
+      });
+  }
+
   loadSprints = (data = []) => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, data)
     .then((sprints) => {
       this.setSprints(sprints);
