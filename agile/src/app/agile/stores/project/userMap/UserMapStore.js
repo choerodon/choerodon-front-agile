@@ -242,6 +242,25 @@ class UserMapStore {
     return query;
   };
 
+  // loadBacklogIssues = () => {
+  //   const projectId = AppState.currentMenuType.id;
+  //   const type = this.mode;
+  //   const userId = AppState.getUserId;
+  //   const cFilter = this.currentBacklogFilters[1].join(',');
+  //   const onlyStory = this.currentBacklogFilters[0].lastIndexOf('仅用户故事') > -1;
+  //   const assigneeId = this.currentBacklogFilters[0].lastIndexOf('仅我的问题') > -1 ? userId : null;
+  //   axios
+  //     .get(
+  //       `/agile/v1/projects/${projectId}/issues/storymap/issues?type=${type}&pageType=backlog${
+  //         cFilter ? `&${`quickFilterIds=${cFilter}`}` : ''
+  //       }${assigneeId ? `&assigneeId=${assigneeId}` : ''}${onlyStory ? '&onlyStory=true' : ''}`,
+  //     )
+  //     .then((res) => {
+  //       this.setBacklogIssues(res);
+  //       this.setBacklogExpand([]);
+  //     });
+  // };
+
   loadBacklogIssues = () => {
     const projectId = AppState.currentMenuType.id;
     const type = this.mode;
