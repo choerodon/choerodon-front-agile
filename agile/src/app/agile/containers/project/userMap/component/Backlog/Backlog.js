@@ -116,7 +116,7 @@ class Backlog extends Component {
     } else {
       group = US[`${mode}s`];
       return (
-        <div>
+        <div style={{ paddingRight: 12 }}>
           {_.map(group, (v, i) => this.renderGroupIssue(v, i))}
           {this.renderUnscheduledIssue()}
         </div>
@@ -211,6 +211,7 @@ class Backlog extends Component {
           padding: '5px 4px',
           border: '1px solid rgba(151, 151, 151, 0.2)',
           borderTop: 'none',
+          background: issue.statusCode === 'done' ? 'rgba(0, 0, 0, 0.06)' : '#fff',
         }}
       >
         <span style={{ marginRight: 4 }}>
@@ -221,7 +222,15 @@ class Backlog extends Component {
         >
           {issue.summary}
         </span>
-        <span style={{ color: '#3f51b5', textAlign: 'right' }}>{issue.issueNum}</span>
+        <span
+          style={{
+            color: '#3f51b5',
+            textAlign: 'right',
+            textDecoration: issue.statusCode === 'done' ? 'line-through' : 'unset',
+          }}
+        >
+          {issue.issueNum}
+        </span>
       </li>
     );
   }
@@ -229,7 +238,7 @@ class Backlog extends Component {
   render() {
     return (
       <div className="c7n-userMap-backlog">
-        <div style={{ display: 'flex', flexDirection: 'row', height: 38 }}>
+        <div style={{ display: 'flex', flexDirection: 'row', height: 38, paddingRight: 20 }}>
           <div
             style={{
               width: 224,
@@ -260,16 +269,37 @@ class Backlog extends Component {
                   flexDirection: 'column',
                 }}
               >
-                <Checkbox.Group
-                  onChange={this.handleQuickFilter('default')}
-                  options={['仅我的问题', '仅用户故事']}
-                />
-                <Checkbox.Group onChange={this.handleQuickFilter('custom')}>
-                  {US.filters.map(filter => (
-                    <Checkbox value={filter.filterId}>{filter.name}</Checkbox>
-                  ))}
-                </Checkbox.Group>
+                {
+                  [
+                    {
+                      name: '仅我的问题',
+                      id: 'mine',
+                    },
+                    {
+                      name: '仅用户故事',
+                      id: 'story',
+                    },
+                  ].map(items => (
+                    <Checkbox
+                      onChange={this.handleClickFilter.bind(this, items.id)}
+                      checked={US.currentBacklogFilters.includes(items.id)}
+                    >
+                      {items.name}
+                    </Checkbox>
+                  ))
+                }
+                {
+                  US.filters.map(filter => (
+                    <Checkbox
+                      onChange={this.handleClickFilter.bind(this, filter.filterId)}
+                      checked={US.currentBacklogFilters.includes(filter.filterId)}
+                    >
+                      {filter.name}
+                    </Checkbox>
+                  ))
+                }
               </div>
+
             }
             trigger="click"
             placement="bottomRight"

@@ -118,7 +118,8 @@ class EpicReport extends Component {
             fontStyle: 'normal',
           },
           formatter(value, index) {
-            return `${value.split('-')[2]}/${MONTH[value.split('-')[1] * 1]}月`;
+            // return `${value.split('-')[2]}/${MONTH[value.split('-')[1] * 1]}月`;
+            return value.slice(5);
           },
         },
         splitArea: {

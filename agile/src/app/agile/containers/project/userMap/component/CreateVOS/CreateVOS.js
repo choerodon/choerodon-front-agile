@@ -19,7 +19,12 @@ class CreateVOS extends Component {
   componentDidMount() {
     const { type } = this.props;
     if (type === 'sprint') {
+      const projectId = AppState.currentMenuType.id;
       // 请求下一个冲刺名，置入state
+      axios.get(`/agile/v1/projects/${projectId}/sprint/current_create_name`)
+        .then((res) => {
+          this.setState({ nextSprintName: res });
+        });
     }
   }
 
@@ -36,6 +41,14 @@ class CreateVOS extends Component {
         });
         if (type === 'sprint') {
           // 创建冲刺
+          axios.post(`/agile/v1/projects/${projectId}/sprint/create?sprintName=${name}`)
+            .then((res) => {
+              this.setState({ loading: false });
+              this.props.onOk();
+            })
+            .catch((error) => {
+              this.setState({ loading: false });
+            });
         } else {
           // 创建版本
           const versionCreateDTO = {
@@ -80,7 +93,7 @@ class CreateVOS extends Component {
             })(
               <Input
                 label={`${type === 'sprint' ? '冲刺' : '版本'}名称`}
-                defaultValue={this.state.nextSprintName}
+                // defaultValue={this.state.nextSprintName}
                 maxLength={30}
               />,
             )}

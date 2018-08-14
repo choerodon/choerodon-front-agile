@@ -41,7 +41,7 @@ class Home2 extends Component {
     // window.onscroll = this.handleScroll;
   }
   componentWillUnmount() {
-    this.setCurrentFilter([]);
+    this.props.UserMapStore.setCurrentFilter([]);
   }
   initData =() => {
     this.setState({ loading: true });
