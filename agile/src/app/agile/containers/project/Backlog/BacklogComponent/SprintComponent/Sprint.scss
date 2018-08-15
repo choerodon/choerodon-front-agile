@@ -19,8 +19,7 @@
 
     .c7n-backlog-springTitle {
       display: flex;
-      padding-left: 10px;
-      padding-right: 36px;
+      margin-right: 20px;
 
       .c7n-backlog-sprintTitleSide {
         display: flex;
@@ -86,10 +85,9 @@
     }
 
     .c7n-backlog-sprintDes {
-      padding-left: 38px;
+      margin: 10px 20px;
       display: flex;
       align-items: center;
-      margin-top: 12px;
 
       .c7n-backlog-sprintIcon {
         width: 20px;
@@ -118,28 +116,30 @@
     }
 
     .c7n-backlog-sprintGoal {
-      padding-left: 38px;
       font-size: 13px;
       color: rgba(0, 0, 0, 0.65);
       line-height: 20px;
-      margin-top: 12px;
+      -webkit-box-pack: justify;
+      -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
       justify-content: space-between;
-      padding-right: 36px;
+      margin: 10px 20px;
 
-      .c7n-backlog-sprintGoalSide {
-        div {
-          width: 27px;
-          height: 20px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          color: white;
-          border-radius: 100px;
-        }
+    }
 
-        div:not(:first-child) {
-          margin-left: 13px;
-        }
+    .c7n-backlog-sprintGoalSide {
+      div {
+        width: 27px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        border-radius: 100px;
+      }
+
+      div:not(:first-child) {
+        margin-left: 13px;
       }
     }
   }
