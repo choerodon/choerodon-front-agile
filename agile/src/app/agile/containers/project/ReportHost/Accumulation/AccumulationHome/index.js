@@ -357,79 +357,79 @@ class AccumulationHome extends Component {
           }}
         >
           <Spin spinning={this.state.loading}>
-            {AccumulationStore.getAccumulationData.length ? <React.Fragment>
-              <div className="c7n-accumulation-filter">
-                <RangePicker
-                  value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
-                  allowClear={false}
-                  onChange={(date, dateString) => {
-                    AccumulationStore.setStartDate(moment(dateString[0]));
-                    AccumulationStore.setEndDate(moment(dateString[1]));
-                    this.getData();
-                  }}
-                />
-                {
-                  this.getFilterData().map((item, index) => (
-                    <Popover
-                      placement="bottom"
-                      trigger="click"
-                      getPopupContainer={() => document.getElementsByClassName('c7n-accumulation-filter')[0]}
-                      content={(
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                          }}
-                        >
-                          {
-                            item.data.map(items => (
-                              <Checkbox
-                                checked={item.onChecked(items[item.id])}
-                                onChange={(e) => {
-                                  item.onChange(items[item.id], e.target.checked);
-                                }}
-                              >
-                                {items.name}
-                              </Checkbox>
-                            ))
-                          }
-                          {
-                            item.id === 'filterId' && !item.data.length ? (
-                              <div>无过滤器</div>
-                            ) : null
-                          }
-                        </div>
-                      )}
-                    >
-                      <Button
+            <div className="c7n-accumulation-filter">
+              <RangePicker
+                value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
+                allowClear={false}
+                onChange={(date, dateString) => {
+                  AccumulationStore.setStartDate(moment(dateString[0]));
+                  AccumulationStore.setEndDate(moment(dateString[1]));
+                  this.getData();
+                }}
+              />
+              {
+                this.getFilterData().map((item, index) => (
+                  <Popover
+                    placement="bottom"
+                    trigger="click"
+                    getPopupContainer={() => document.getElementsByClassName('c7n-accumulation-filter')[0]}
+                    content={(
+                      <div
                         style={{
-                          marginLeft: index === 0 ? 20 : 0,
-                          color: '#3F51B5',
+                          display: 'flex',
+                          flexDirection: 'column',
                         }}
                       >
-                        {item.text}
-                        <Icon type="baseline-arrow_drop_down" />
-                      </Button>
-                    </Popover>
-                  ))
-                }
-                {
-                  this.state.optionsVisible ? (
-                    <AccumulationFilter
-                      visible={this.state.optionsVisible}
-                      getTimeType={this.getTimeType.bind(this)}
-                      getColumnData={this.getColumnData.bind(this)}
-                      getData={this.getData.bind(this)}
-                      onCancel={() => {
-                        this.getColumnData(this.getTimeType(AccumulationStore.getBoardList, 'boardId'));
-                        this.setState({
-                          optionsVisible: false,
-                        });
+                        {
+                          item.data.map(items => (
+                            <Checkbox
+                              checked={item.onChecked(items[item.id])}
+                              onChange={(e) => {
+                                item.onChange(items[item.id], e.target.checked);
+                              }}
+                            >
+                              {items.name}
+                            </Checkbox>
+                          ))
+                        }
+                        {
+                          item.id === 'filterId' && !item.data.length ? (
+                            <div>无过滤器</div>
+                          ) : null
+                        }
+                      </div>
+                    )}
+                  >
+                    <Button
+                      style={{
+                        marginLeft: index === 0 ? 20 : 0,
+                        color: '#3F51B5',
                       }}
-                    />
-                  ) : ''
-                }
-              </div>
+                    >
+                      {item.text}
+                      <Icon type="baseline-arrow_drop_down" />
+                    </Button>
+                  </Popover>
+                ))
+              }
+              {
+                this.state.optionsVisible ? (
+                  <AccumulationFilter
+                    visible={this.state.optionsVisible}
+                    getTimeType={this.getTimeType.bind(this)}
+                    getColumnData={this.getColumnData.bind(this)}
+                    getData={this.getData.bind(this)}
+                    onCancel={() => {
+                      this.getColumnData(this.getTimeType(AccumulationStore.getBoardList, 'boardId'));
+                      this.setState({
+                        optionsVisible: false,
+                      });
+                    }}
+                  />
+                ) : ''
+              }
+            </div>
+            {AccumulationStore.getAccumulationData.length ? <React.Fragment>
               <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
                 <ReactEcharts
                   ref={(e) => { this.echarts_react = e; }}
