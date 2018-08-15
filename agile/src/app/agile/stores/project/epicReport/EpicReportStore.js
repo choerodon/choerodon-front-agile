@@ -34,6 +34,7 @@ class EpicReportStore {
   @observable epics = [];
   @observable epicFinishLoading = false;
   @observable currentEpicId = undefined;
+  @observable reload = false;
 
   loadEpicAndChartAndTableData() {
     this.loadEpics()
@@ -56,11 +57,13 @@ class EpicReportStore {
 
   loadChartData(epicId = this.currentEpicId, unit = this.currentUnit) {
     this.setChartLoading(true);
+    this.setReload(true);
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/epic_chart?epicId=${epicId}&type=${unit}`)
       .then((res) => {
         this.setBeforeCurrentUnit(unit);
         this.setChartData(res);
         this.setChartLoading(false);
+        this.setReload(false);
       });
   }
 
@@ -107,6 +110,10 @@ class EpicReportStore {
 
   @action setCurrentEpic(data) {
     this.currentEpicId = data;
+  }
+
+  @action setReload(data) {
+    this.reload = data;
   }
 
   @computed get getChartDataX() {

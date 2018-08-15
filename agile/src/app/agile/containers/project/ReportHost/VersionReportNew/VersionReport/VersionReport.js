@@ -37,7 +37,7 @@ class EpicReport extends Component {
   }
 
   getOption() {
-    return {
+    const commonOption = {
       tooltip: {
         trigger: 'axis',
       },
@@ -139,154 +139,237 @@ class EpicReport extends Component {
         },
         data: VS.getChartDataX,
       },
-      yAxis: [
-        {
-          type: 'value',
-          minInterval: 1,
-          axisTick: { show: false },
-          axisLine: {
-            show: true,
-            lineStyle: {
-              color: '#eee',
-              type: 'solid',
-              width: 2,
-            },
-          },
-          axisLabel: {
-            show: true,
-            interval: 'auto',
-            margin: 18,
-            textStyle: {
-              color: 'rgba(0, 0, 0, 0.65)',
-              fontSize: 12,
-              fontStyle: 'normal',
-            },
-            formatter(value, index) {
-              if (value && VS.beforeCurrentUnit === 'remain_time') {
-                return `${value}h`;
-              }
-              return value;
-            },
-          },
-          splitLine: {
-            show: true,
-            lineStyle: {
-              color: '#eee',
-              type: 'solid',
-              width: 2,
-            },
-          },
-        },
-        {
-          name: VS.beforeCurrentUnit === 'issue_count' ? '' : '百分比',
-          nameTextStyle: {
-            color: '#000',
-          },
-          type: 'value',
-          minInterval: 1,
-          axisTick: { show: false },
-          axisLine: {
-            show: true,
-            lineStyle: {
-              color: '#eee',
-              type: 'solid',
-              width: 2,
-            },
-          },
-          axisLabel: {
-            show: true,
-            interval: 'auto',
-            margin: 18,
-            textStyle: {
-              color: 'rgba(0, 0, 0, 0.65)',
-              fontSize: 12,
-              fontStyle: 'normal',
-            },
-            formatter(value, index) {
-              if (value && VS.beforeCurrentUnit !== 'issue_count') {
-                return `${value}%`;
-              }
-              return value;
-            },
-          },
-          splitLine: {
-            show: false,
-          },
-        },
-      ],
-      series: [
-        {
-          name: '问题数量',
-          type: 'line',
-          step: true,
-          symbol: VS.getChartDataYIssueCountAll.length === 1 ? 'auto' : 'none',
-          itemStyle: {
-            color: '#78aafe',
-          },
-          areaStyle: {
-            color: 'rgba(77, 144, 254, 0.1)',
-          },
-          yAxisIndex: VS.beforeCurrentUnit === 'issue_count' ? 0 : 1,
-          data: VS.getChartDataYIssueCountAll,
-        },
-        {
-          name: '已完成问题数',
-          type: 'line',
-          step: true,
-          symbol: VS.getChartDataYIssueCountCompleted.length === 1 ? 'auto' : 'none',
-          itemStyle: {
-            color: '#00bfa4',
-          },
-          areaStyle: {
-            color: 'rgba(0, 191, 165, 0.1)',
-          },
-          yAxisIndex: VS.beforeCurrentUnit === 'issue_count' ? 0 : 1,
-          data: VS.getChartDataYIssueCountCompleted,
-        },
-        {
-          name: '未预估问题百分比',
-          type: 'line',
-          step: true,
-          symbol: VS.getChartDataYIssueCountUnEstimate.length === 1 ? 'auto' : 'none',
-          itemStyle: {
-            color: '#f44336',
-          },
-          areaStyle: {
-            color: 'rgba(244, 67, 54, 0.1)',
-          },
-          yAxisIndex: 1,
-          data: VS.getChartDataYIssueCountUnEstimate,
-        },
-        {
-          name: `已完成 ${VS.getChartYAxisName}`,
-          type: 'line',
-          step: true,
-          symbol: VS.getChartDataYCompleted.length === 1 ? 'auto' : 'none',
-          yAxisIndex: 0,
-          data: VS.getChartDataYCompleted,
-          itemStyle: {
-            color: '#00bfa4',
-          },
-          areaStyle: {
-            color: 'rgba(0, 191, 165, 0.1)',
-          },
-        },
-        {
-          name: `总计 ${VS.getChartYAxisName}`,
-          type: 'line',
-          step: true,
-          symbol: VS.getChartDataYAll.length === 1 ? 'auto' : 'none',
-          yAxisIndex: 0,
-          data: VS.getChartDataYAll,
-          itemStyle: {
-            color: '#78aafe',
-          },
-          areaStyle: {
-            color: 'rgba(77, 144, 254, 0.1)',
-          },
-        },
-      ],
     };
+    let option;
+    if (VS.beforeCurrentUnit === 'issue_count') {
+      option = {
+        yAxis: [
+          {
+            name: '问题数',
+            nameTextStyle: {
+              color: '#000',
+            },
+            type: 'value',
+            minInterval: 1,
+            axisTick: { show: false },
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: '#eee',
+                type: 'solid',
+                width: 2,
+              },
+            },
+            axisLabel: {
+              show: true,
+              interval: 'auto',
+              margin: 18,
+              textStyle: {
+                color: 'rgba(0, 0, 0, 0.65)',
+                fontSize: 12,
+                fontStyle: 'normal',
+              },
+            },
+            splitLine: {
+              show: true,
+              lineStyle: {
+                color: '#eee',
+                type: 'solid',
+                width: 2,
+              },
+            },
+          },
+        ],
+        series: [
+          {
+            name: '问题数量',
+            type: 'line',
+            step: true,
+            itemStyle: {
+              color: '#78aafe',
+            },
+            areaStyle: {
+              color: 'rgba(77, 144, 254, 0.1)',
+            },
+            data: VS.getChartDataYIssueCountAll,
+          },
+          {
+            name: '已完成问题数',
+            type: 'line',
+            step: true,
+            itemStyle: {
+              color: '#00bfa4',
+            },
+            areaStyle: {
+              color: 'rgba(0, 191, 165, 0.1)',
+            },
+            data: VS.getChartDataYIssueCountCompleted,
+          },
+          {
+            name: '未预估问题百分比',
+            type: 'line',
+            step: true,
+            itemStyle: {
+              color: '#f44336',
+            },
+            areaStyle: {
+              color: 'rgba(244, 67, 54, 0.1)',
+            },
+            data: VS.getChartDataYIssueCountUnEstimate,
+          },
+        ],
+      };
+    } else {
+      option = {
+        yAxis: [
+          {
+            name: VS.getChartYAxisName,
+            nameTextStyle: {
+              color: '#000',
+            },
+            type: 'value',
+            minInterval: 1,
+            axisTick: { show: false },
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: '#eee',
+                type: 'solid',
+                width: 2,
+              },
+            },
+            axisLabel: {
+              show: true,
+              interval: 'auto',
+              margin: 18,
+              textStyle: {
+                color: 'rgba(0, 0, 0, 0.65)',
+                fontSize: 12,
+                fontStyle: 'normal',
+              },
+              formatter(value, index) {
+                if (value && VS.beforeCurrentUnit === 'remain_time') {
+                  return `${value}h`;
+                }
+                return value;
+              },
+            },
+            splitLine: {
+              show: true,
+              lineStyle: {
+                color: '#eee',
+                type: 'solid',
+                width: 2,
+              },
+            },
+          },
+          {
+            name: '百分比',
+            nameTextStyle: {
+              color: '#000',
+            },
+            type: 'value',
+            minInterval: 1,
+            axisTick: { show: false },
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: '#eee',
+                type: 'solid',
+                width: 2,
+              },
+            },
+            axisLabel: {
+              show: true,
+              interval: 'auto',
+              margin: 18,
+              textStyle: {
+                color: 'rgba(0, 0, 0, 0.65)',
+                fontSize: 12,
+                fontStyle: 'normal',
+              },
+              formatter(value, index) {
+                if (value && VS.beforeCurrentUnit !== 'issue_count') {
+                  return `${value}%`;
+                }
+                return value;
+              },
+            },
+            splitLine: {
+              show: false,
+            },
+          },
+        ],
+        series: [
+          {
+            name: '问题数量',
+            type: 'line',
+            step: true,
+            itemStyle: {
+              color: '#78aafe',
+            },
+            areaStyle: {
+              color: 'rgba(77, 144, 254, 0.1)',
+            },
+            yAxisIndex: 1,
+            data: VS.getChartDataYIssueCountAll,
+          },
+          {
+            name: '已完成问题数',
+            type: 'line',
+            step: true,
+            itemStyle: {
+              color: '#00bfa4',
+            },
+            areaStyle: {
+              color: 'rgba(0, 191, 165, 0.1)',
+            },
+            yAxisIndex: 1,
+            data: VS.getChartDataYIssueCountCompleted,
+          },
+          {
+            name: '未预估问题百分比',
+            type: 'line',
+            step: true,
+            itemStyle: {
+              color: '#f44336',
+            },
+            areaStyle: {
+              color: 'rgba(244, 67, 54, 0.1)',
+            },
+            yAxisIndex: 1,
+            data: VS.getChartDataYIssueCountUnEstimate,
+          },
+          {
+            name: `已完成 ${VS.getChartYAxisName}`,
+            type: 'line',
+            step: true,
+            yAxisIndex: 0,
+            data: VS.getChartDataYCompleted,
+            itemStyle: {
+              color: '#00bfa4',
+            },
+            areaStyle: {
+              color: 'rgba(0, 191, 165, 0.1)',
+            },
+          },
+          {
+            name: `总计 ${VS.getChartYAxisName}`,
+            type: 'line',
+            step: true,
+            yAxisIndex: 0,
+            data: VS.getChartDataYAll,
+            itemStyle: {
+              color: '#78aafe',
+            },
+            areaStyle: {
+              color: 'rgba(77, 144, 254, 0.1)',
+            },
+          },
+        ],
+      };
+    }
+    return Object.assign({}, commonOption, option);
   }
 
   getTableDta(type) {
@@ -351,7 +434,7 @@ class EpicReport extends Component {
               onClick={() => {
                 const { history } = this.props;
                 const urlParams = AppState.currentMenuType;
-                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicReport`);
+                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
               }}
             >{issueNum} {record.addIssue ? '*' : ''}</span>
           ),
@@ -516,7 +599,11 @@ class EpicReport extends Component {
                     {
                       VS.chartData.length ? (
                         <div className="c7n-chart">
-                          <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
+                          {
+                            VS.reload ? null : (
+                              <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
+                            )
+                          }
                         </div>
                       ) : (
                         <div style={{ padding: '20px 0', textAlign: 'center', width: '100%' }}>

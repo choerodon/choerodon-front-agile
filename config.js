@@ -36,6 +36,9 @@ const config = {
     theme: { // less/sass modify vars
         'primary-color': '#3F51B5',
     },
+    dashboard: {
+        'agile': 'src/app/agile/dashboard/*',
+    },
 };
 
 module.exports = config;
