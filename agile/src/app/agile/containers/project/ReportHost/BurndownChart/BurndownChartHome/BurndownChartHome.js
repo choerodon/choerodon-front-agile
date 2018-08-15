@@ -106,8 +106,7 @@ class BurndownChartHome extends Component {
           res[nowKey] = res[beforeKey];
         }
       }
-      window.console.log(allDate);
-      const sliceDate = _.map(allDate,item => item.slice(5));
+      const sliceDate = _.map(allDate, item => item.slice(5));
       this.setState({
         xAxis: sliceDate,
         yAxis: allDateValues,
