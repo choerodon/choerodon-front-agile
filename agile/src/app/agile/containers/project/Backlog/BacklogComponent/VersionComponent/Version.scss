@@ -61,6 +61,10 @@
       }
 
       .c7n-backlog-versionItemDes {
+        white-space:normal;
+        word-break:break-all;
+        word-wrap:break-word;
+        line-height: 13px;
         color: rgba(0, 0, 0, 0.65);
       }
 

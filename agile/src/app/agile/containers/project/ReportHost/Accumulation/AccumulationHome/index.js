@@ -430,7 +430,6 @@ class AccumulationHome extends Component {
               }
             </div>
             {AccumulationStore.getAccumulationData.length ? <React.Fragment>
-              
               <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
                 <ReactEcharts
                   ref={(e) => { this.echarts_react = e; }}

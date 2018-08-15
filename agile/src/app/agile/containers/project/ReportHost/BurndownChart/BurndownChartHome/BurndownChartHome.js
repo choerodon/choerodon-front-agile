@@ -27,6 +27,7 @@ class BurndownChartHome extends Component {
       defaultSprint: '',
       loading: false,
       endDate: '',
+      startDate: '',
     };
   }
   componentWillMount() {
@@ -64,6 +65,7 @@ class BurndownChartHome extends Component {
       this.setState({
         defaultSprint: res[0].sprintId,
         endDate: res[0].endDate,
+        startDate: res[0].startDate,
       }, () => {
         this.getChartData();
         this.getChartCoordinate();
@@ -73,7 +75,8 @@ class BurndownChartHome extends Component {
   }
   getChartCoordinate() {
     BurndownChartStore.axiosGetBurndownCoordinate(this.state.defaultSprint, this.state.select).then((res) => {
-      const keys = Object.keys(res);
+      this.setState({ expectCount: res.expectCount });
+      const keys = Object.keys(res.coordinate);
       let [minDate, maxDate] = [keys[0], keys[0]];
       for (let a = 1, len = keys.length; a < len; a += 1) {
         if (moment(keys[a]).isAfter(maxDate)) {
@@ -96,18 +99,17 @@ class BurndownChartHome extends Component {
       const allDateValues = [];
       for (let b = 0, len = allDate.length; b < len; b += 1) {
         const nowKey = allDate[b];
-        if (res.hasOwnProperty(nowKey)) {
-          allDateValues.push(res[allDate[b]]);
+        if (res.coordinate.hasOwnProperty(nowKey)) {
+          allDateValues.push(res.coordinate[allDate[b]]);
         } else if (moment(nowKey).isAfter(maxDate)) {
           allDateValues.push(null);
         } else {
           const beforeKey = allDate[b - 1];
-          allDateValues.push(res[beforeKey]);
-          res[nowKey] = res[beforeKey];
+          allDateValues.push(res.coordinate[beforeKey]);
+          res.coordinate[nowKey] = res.coordinate[beforeKey];
         }
       }
-      window.console.log(allDate);
-      const sliceDate = _.map(allDate,item => item.slice(5));
+      const sliceDate = _.map(allDate, item => item.slice(5));
       this.setState({
         xAxis: sliceDate,
         yAxis: allDateValues,
@@ -194,12 +196,18 @@ class BurndownChartHome extends Component {
       });
   }
   getMaxY() {
-    const data = this.state.yAxis;
+    // const data = this.state.yAxis;
+    // let max = 0;
+    // for (let index = 0, len = data.length; index < len; index += 1) {
+    //   if (data[index] > max) {
+    //     max = data[index];
+    //   }
+    // }
     let max = 0;
-    for (let index = 0, len = data.length; index < len; index += 1) {
-      if (data[index] > max) {
-        max = data[index];
-      }
+    const data = BurndownChartStore.getBurndownList;
+    const tar = data.filter(item => item.type === 'startSprint');
+    if (tar.length) {
+      max = tar[0].rest;
     }
     return max;
   }
@@ -250,7 +258,7 @@ class BurndownChartHome extends Component {
         {
           name: '期望值',
           type: 'line',
-          data: [[0, this.getMaxY()], [this.state.endDate.split(' ')[0], 0]],
+          data: [[this.state.startDate.split(' ')[0].slice(5), this.state.expectCount], [this.state.endDate.split(' ')[0].slice(5), 0]],
           itemStyle: {
             color: 'grey',
           },
