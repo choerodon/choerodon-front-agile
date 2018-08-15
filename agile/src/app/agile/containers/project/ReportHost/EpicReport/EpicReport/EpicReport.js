@@ -37,7 +37,7 @@ class EpicReport extends Component {
   }
 
   getOption() {
-    return {
+    const commonOption = {
       tooltip: {
         trigger: 'axis',
       },
@@ -139,8 +139,88 @@ class EpicReport extends Component {
         },
         data: ES.getChartDataX,
       },
-      yAxis: [
-        {
+    };
+    let option;
+    if (ES.beforeCurrentUnit === 'issue_count') {
+      option = {
+        yAxis: [{
+          name: '问题计数',
+          nameTextStyle: {
+            color: '#000',
+          },
+          type: 'value',
+          minInterval: 1,
+          axisTick: { show: false },
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: '#eee',
+              type: 'solid',
+              width: 2,
+            },
+          },
+          axisLabel: {
+            show: true,
+            interval: 'auto',
+            margin: 18,
+            textStyle: {
+              color: 'rgba(0, 0, 0, 0.65)',
+              fontSize: 12,
+              fontStyle: 'normal',
+            },
+          },
+          splitLine: {
+            show: true,
+            lineStyle: {
+              color: '#eee',
+              type: 'solid',
+              width: 1,
+            },
+          },
+        }],
+        series: [
+          {
+            name: '问题数量',
+            type: 'line',
+            step: true,
+            // symbol: ES.getChartDataYIssueCountAll.length === 1 ? 'auto' : 'none',
+            itemStyle: {
+              color: 'rgba(48, 63, 159, 1)',
+            },
+            // yAxisIndex: ES.beforeCurrentUnit === 'issue_count' ? 0 : 1,
+            data: ES.getChartDataYIssueCountAll,
+          },
+          {
+            name: '已完成问题数',
+            type: 'line',
+            step: true,
+            // symbol: ES.getChartDataYIssueCountCompleted.length === 1 ? 'auto' : 'none',
+            itemStyle: {
+              color: '#00bfa4',
+            },
+            // yAxisIndex: ES.beforeCurrentUnit === 'issue_count' ? 0 : 1,
+            data: ES.getChartDataYIssueCountCompleted,
+          },
+          {
+            name: '未预估问题数',
+            type: 'line',
+            step: true,
+            // symbol: ES.getChartDataYIssueCountUnEstimate.length === 1 ? 'auto' : 'none',
+            itemStyle: {
+              color: '#ff9915',
+            },
+            // yAxisIndex: ES.beforeCurrentUnit === 'issue_count' ? 0 : 1,
+            data: ES.getChartDataYIssueCountUnEstimate,
+          },
+        ],
+      };
+    } else {
+      option = {
+        yAxis: [{
+          name: ES.getChartYAxisName,
+          nameTextStyle: {
+            color: '#000',
+          },
           type: 'value',
           minInterval: 1,
           axisTick: { show: false },
@@ -206,72 +286,68 @@ class EpicReport extends Component {
           splitLine: {
             show: false,
           },
-        },
-      ],
-      series: [
-        {
-          name: '问题数量',
-          type: 'line',
-          step: true,
-          symbol: ES.getChartDataYIssueCountAll.length === 1 ? 'auto' : 'none',
-          itemStyle: {
-            color: 'rgba(48, 63, 159, 1)',
+        }],
+        series: [
+          {
+            name: '问题数量',
+            type: 'line',
+            step: true,
+            itemStyle: {
+              color: 'rgba(48, 63, 159, 1)',
+            },
+            yAxisIndex: 1,
+            data: ES.getChartDataYIssueCountAll,
           },
-          yAxisIndex: 1,
-          data: ES.getChartDataYIssueCountAll,
-        },
-        {
-          name: '已完成问题数',
-          type: 'line',
-          step: true,
-          symbol: ES.getChartDataYIssueCountCompleted.length === 1 ? 'auto' : 'none',
-          itemStyle: {
-            color: '#00bfa4',
+          {
+            name: '已完成问题数',
+            type: 'line',
+            step: true,
+            itemStyle: {
+              color: '#00bfa4',
+            },
+            yAxisIndex: 1,
+            data: ES.getChartDataYIssueCountCompleted,
           },
-          yAxisIndex: 1,
-          data: ES.getChartDataYIssueCountCompleted,
-        },
-        {
-          name: '未预估问题数',
-          type: 'line',
-          step: true,
-          symbol: ES.getChartDataYIssueCountUnEstimate.length === 1 ? 'auto' : 'none',
-          itemStyle: {
-            color: '#ff9915',
+          {
+            name: '未预估问题数',
+            type: 'line',
+            step: true,
+            itemStyle: {
+              color: '#ff9915',
+            },
+            yAxisIndex: 1,
+            data: ES.getChartDataYIssueCountUnEstimate,
           },
-          yAxisIndex: 1,
-          data: ES.getChartDataYIssueCountUnEstimate,
-        },
-        {
-          name: `已完成 ${ES.getChartYAxisName}`,
-          type: 'line',
-          step: true,
-          symbol: ES.getChartDataYCompleted.length === 1 ? 'auto' : 'none',
-          yAxisIndex: 0,
-          data: ES.getChartDataYCompleted,
-          itemStyle: {
-            color: '#4e90fe',
+          {
+            name: `已完成 ${ES.getChartYAxisName}`,
+            type: 'line',
+            step: true,
+            yAxisIndex: 0,
+            data: ES.getChartDataYCompleted,
+            itemStyle: {
+              color: '#4e90fe',
+            },
+            areaStyle: {
+              color: 'rgba(77, 144, 254, 0.1)',
+            },
           },
-          areaStyle: {
-            color: 'rgba(77, 144, 254, 0.1)',
+          {
+            name: `总计 ${ES.getChartYAxisName}`,
+            type: 'line',
+            step: true,
+            yAxisIndex: 0,
+            data: ES.getChartDataYAll,
+            itemStyle: {
+              color: 'rgba(0, 0, 0, 0.16)',
+            },
+            areaStyle: {
+              color: 'rgba(245, 245, 245, 0.5)',
+            },
           },
-        },
-        {
-          name: `总计 ${ES.getChartYAxisName}`,
-          type: 'line',
-          step: true,
-          symbol: ES.getChartDataYAll.length === 1 ? 'auto' : 'none',
-          yAxisIndex: 0,
-          data: ES.getChartDataYAll,
-          itemStyle: {
-            color: 'rgba(0, 0, 0, 0.16)',
-          },
-          areaStyle: {
-            color: 'rgba(245, 245, 245, 0.5)',
-          },
-        },
-      ],
-    };
+        ],
+      };
+    }
+    return Object.assign({}, commonOption, option);
   }
 
   getTableDta(type) {
@@ -306,6 +382,10 @@ class EpicReport extends Component {
     ES.setCurrentUnit(unit);
     ES.loadChartData();
     // ES.loadTableData();
+    // const instance = this.echarts_react.getEchartsInstance();
+    // instance.dispose();
+    // instance.init();
+    // instance.setOption(this.getOption());
   }
 
   transformRemainTime(remainTime) {
@@ -484,7 +564,15 @@ class EpicReport extends Component {
                       ES.chartData.length ? (
                         <div className="c7n-report">
                           <div className="c7n-chart">
-                            <ReactEcharts option={this.getOption()} style={{ height: 400 }} />
+                            {
+                              ES.reload ? null : (
+                                <ReactEcharts
+                                  ref={(e) => { this.echarts_react = e; }}
+                                  option={this.getOption()}
+                                  style={{ height: 400 }}
+                                />
+                              )
+                            }
                           </div>
                           <div className="c7n-toolbar">
                             <h2>汇总</h2>

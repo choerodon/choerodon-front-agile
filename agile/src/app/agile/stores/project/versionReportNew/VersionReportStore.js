@@ -34,6 +34,7 @@ class VersionReportStore {
   @observable versions = [];
   @observable versionFinishLoading = false;
   @observable currentVersionId = undefined;
+  @observable reload = false;
 
   loadEpicAndChartAndTableData() {
     this.loadVersions()
@@ -56,11 +57,13 @@ class VersionReportStore {
 
   loadChartData(versionId = this.currentVersionId, unit = this.currentUnit) {
     this.setChartLoading(true);
+    this.setReload(true);
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/version_chart?versionId=${versionId}&type=${unit}`)
       .then((res) => {
         this.setBeforeCurrentUnit(unit);
         this.setChartData(res);
         this.setChartLoading(false);
+        this.setReload(false);
       });
   }
 
@@ -107,6 +110,10 @@ class VersionReportStore {
 
   @action setCurrentVersion(data) {
     this.currentVersionId = data;
+  }
+
+  @action setReload(data) {
+    this.reload = data;
   }
 
   @computed get getChartDataX() {

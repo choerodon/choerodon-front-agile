@@ -24,3 +24,6 @@ webpack/dll
 .cache
 sh.sh
 pythonsql.py
+
+./dashboard.yml
+./config.yml

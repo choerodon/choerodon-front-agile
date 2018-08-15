@@ -1,0 +1,7 @@
+dashboard:
+  - code: "AgileDoc"
+    icon: agile
+    title: "敏捷文档"
+    description: "敏捷文档"
+    level: project
+    sort: 1

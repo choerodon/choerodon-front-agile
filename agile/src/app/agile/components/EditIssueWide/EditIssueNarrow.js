@@ -1506,7 +1506,7 @@ class CreateSprint extends Component {
                   ) : null
                 } */}
                 <div className="line-start">
-                  <div style={{ display: 'flex', flex: 1 }}>
+                  <div style={{ display: 'flex', flex: 1, flexShrink: 0 }}>
                     <span
                       style={{
                         width: 30,
@@ -1600,7 +1600,7 @@ class CreateSprint extends Component {
                       </div>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flex: 1 }}>
+                  <div style={{ display: 'flex', flex: 1, flexShrink: 0 }}>
                     <span
                       style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(77, 144, 254, 0.2)', marginRight: 12, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                     >
@@ -1701,13 +1701,13 @@ class CreateSprint extends Component {
                       </div>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flex: 1.2 }}>
+                  <div style={{ display: 'flex', flex: 1.2, flexShrink: 0, width: 0 }}>
                     <span
                       style={{ width: 30, height: 30, borderRadius: '50%', background: '#d8d8d8', marginRight: 12, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                     >
                       <Icon type="directions_run" style={{ fontSize: '24px' }} />
                     </span>
-                    <div>
+                    <div style={{ overflow: 'hidden' }}>
                       <div style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.54)', marginBottom: 4, display: 'flex', alignItems: 'center' }}>
                         <span>冲刺</span>
                         <Tooltip title={this.state.closeSprint.length ? `已完成冲刺：${_.map(this.state.closeSprint, 'sprintName').join(',')}` : '无已完成冲刺'}>
@@ -1749,6 +1749,9 @@ class CreateSprint extends Component {
                                         style={{
                                           fontSize: '12px',
                                           lineHeight: '18px',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis',
+                                          whiteSpace: 'nowrap',
                                         }}
                                       >
                                         {this.state.activeSprint.sprintId ? this.state.activeSprint.sprintName : '无活跃冲刺'}
@@ -1819,7 +1822,7 @@ class CreateSprint extends Component {
                   
                   {
                     this.state.issueId && this.state.typeCode === 'story' ? (
-                      <div style={{ display: 'flex', flex: 1 }}>
+                      <div style={{ display: 'flex', flex: 1, flexShrink: 0 }}>
                         <span
                           style={{ width: 30, height: 30, borderRadius: '50%', background: '#d8d8d8', marginRight: 12, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
@@ -1863,7 +1866,7 @@ class CreateSprint extends Component {
                   }
                   {
                     this.state.issueId && this.state.typeCode !== 'issue_epic' ? (
-                      <div style={{ display: 'flex', flex: 1 }}>
+                      <div style={{ display: 'flex', flex: 1, flexShrink: 0 }}>
                         <span
                           style={{ width: 30, height: 30, borderRadius: '50%', background: '#d8d8d8', marginRight: 12, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
