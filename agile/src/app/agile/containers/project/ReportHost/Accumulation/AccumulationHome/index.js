@@ -227,6 +227,13 @@ class AccumulationHome extends Component {
             type: 'category',
             boundaryGap: false,
             data: newxAxis,
+            axisLabel: {
+              show: true,
+              formatter(value, index) {
+                // return `${value.split('-')[2]}/${MONTH[value.split('-')[1] * 1]}月`;
+                return value.slice(5);
+              },
+            },
           },
         ],
         yAxis: [

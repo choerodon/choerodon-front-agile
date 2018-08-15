@@ -13,8 +13,8 @@ class UserMapStore {
   filters = [];
   @observable
   currentFilters = [];
-  @observable
-  currentBacklogFilters = [[], []];
+  // @observable
+  // currentBacklogFilters = [[], []];
   @observable
   sprints = [];
   @observable
@@ -39,6 +39,7 @@ class UserMapStore {
   setEpics(data) {
     this.epics = data;
   }
+  @observable currentBacklogFilters = [];
 
   @computed
   get getEpics() {
@@ -147,6 +148,10 @@ class UserMapStore {
   setCurrentBacklogFilters(type, data) {
     this.currentBacklogFilters[type] = data;
   }
+  @action setCurrentBacklogFilter(data) {
+    this.currentBacklogFilters = data;
+  }
+
   loadEpic = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`)
     .then((epics) => {
       this.setEpics(epics);
@@ -221,7 +226,7 @@ class UserMapStore {
       onlyStory,
       filterIds,
     };
-  }
+  };
 
   getQueryString = (filterObj) => {
     let query = '';
@@ -231,30 +236,52 @@ class UserMapStore {
     if (filterObj.userId) {
       query += `&assigneeId=${filterObj.userId}`;
     }
-    if (Array.isArray(filterObj.filterIds) && filterObj.length) {
+    if (Array.isArray(filterObj.filterIds) && filterObj.filterIds.length) {
       query += `&&quickFilterIds=${filterObj.filterIds.join(',')}`;
     }
     return query;
-  }
+  };
+
+  // loadBacklogIssues = () => {
+  //   const projectId = AppState.currentMenuType.id;
+  //   const type = this.mode;
+  //   const userId = AppState.getUserId;
+  //   const cFilter = this.currentBacklogFilters[1].join(',');
+  //   const onlyStory = this.currentBacklogFilters[0].lastIndexOf('仅用户故事') > -1;
+  //   const assigneeId = this.currentBacklogFilters[0].lastIndexOf('仅我的问题') > -1 ? userId : null;
+  //   axios
+  //     .get(
+  //       `/agile/v1/projects/${projectId}/issues/storymap/issues?type=${type}&pageType=backlog${
+  //         cFilter ? `&${`quickFilterIds=${cFilter}`}` : ''
+  //       }${assigneeId ? `&assigneeId=${assigneeId}` : ''}${onlyStory ? '&onlyStory=true' : ''}`,
+  //     )
+  //     .then((res) => {
+  //       this.setBacklogIssues(res);
+  //       this.setBacklogExpand([]);
+  //     });
+  // };
 
   loadBacklogIssues = () => {
     const projectId = AppState.currentMenuType.id;
     const type = this.mode;
-    const userId = AppState.getUserId;
-    const cFilter = this.currentBacklogFilters[1].join(',');
-    const onlyStory = this.currentBacklogFilters[0].lastIndexOf('仅我的问题') > -1;
-    const assigneeId = this.currentBacklogFilters[0].lastIndexOf('仅用户故事') > -1 ? userId : null;
-    axios
-      .get(
-        `/agile/v1/projects/${projectId}/issues/storymap/issues?type=${type}&pageType=backlog${
-          cFilter ? `&${`quickFilterIds=${cFilter}`}` : ''
-        }${assigneeId ? `&assigneeId=${assigneeId}` : ''}${onlyStory ? '&onlyStory=true' : ''}`,
-      )
+    const filters = this.getFiltersObj('currentBacklogFilters');
+    const query = this.getQueryString(filters);
+    axios.get(`/agile/v1/projects/${projectId}/issues/storymap/issues?type=${type}&pageType=backlog${query}`)
       .then((res) => {
         this.setBacklogIssues(res);
         this.setBacklogExpand([]);
       });
   };
+  modifyEpic(issueId, objectVersionNumber) {
+    const index = this.epics.findIndex(epic => epic.issueId === issueId);
+    this.epics[index].objectVersionNumber = objectVersionNumber;
+  }
+
+  freshIssue = (issueId, objectVersionNumber) => {
+    const index = this.issues.findIndex(issue => issue.issueId === issueId);
+    if (index === -1) return;
+    this.issues[index].objectVersionNumber = objectVersionNumber;
+  }
 }
 
 const userMapStore = new UserMapStore();
