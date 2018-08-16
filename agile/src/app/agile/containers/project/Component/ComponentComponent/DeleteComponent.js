@@ -135,7 +135,7 @@ class DeleteComponent extends Component {
           <Icon style={{ color: '#d50000', position: 'absolute', fontSize: '16px' }} type="error" />
           <div style={{ marginLeft: 20, width: 400 ,'line-height':'26px' }}>
 
-            有问题关联到这个模块，而且这个项目中已经没有其他模块可供关联
+            如果有问题关联到这个模块，而且这个项目中已经没有其他模块可供关联
             这个模块将会从所有问题中移除。
           </div>
         </div>

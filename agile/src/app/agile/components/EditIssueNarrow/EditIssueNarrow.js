@@ -787,12 +787,12 @@ class CreateSprint extends Component {
     confirm({
       width: 560,
       title: `删除问题${this.state.issueNum}`,
-      content: <div style={{ marginBottom: 32 }}>
+      content: <div>
         <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
         <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
         <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
         {
-          this.state.subIssueDTOList.length ? <p>{`注意：问题的${this.state.subIssueDTOList.length}子任务将被删除。`}</p> : null
+          this.state.subIssueDTOList.length ? <p style={{ color: '#d50000' }}>{`注意：问题的${this.state.subIssueDTOList.length}子任务将被删除。`}</p> : null
         }
       </div>,
       onOk() {
@@ -1283,7 +1283,7 @@ class CreateSprint extends Component {
             }
             {
               this.state.typeCode !== 'sub_task' && (
-                <Tooltip placement="right" title="相关任务">
+                <Tooltip placement="right" title="问题链接">
                   <li id="LINK_TASKS-nav" className={`c7n-li ${this.state.nav === 'link_task' ? 'c7n-li-active' : ''}`}>
                     <Icon
                       type="link c7n-icon-li"
@@ -2510,13 +2510,13 @@ class CreateSprint extends Component {
                       <div className="c7n-title-wrapper">
                         <div className="c7n-title-left">
                           <Icon type="link c7n-icon-title" />
-                          <span>相关任务</span>
+                          <span>问题链接</span>
                         </div>
                         <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                           <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
                             <Icon type="relate icon" />
-                            <span>关联已有任务</span>
+                            <span>创建链接</span>
                           </Button>
                         </div>
                       </div>

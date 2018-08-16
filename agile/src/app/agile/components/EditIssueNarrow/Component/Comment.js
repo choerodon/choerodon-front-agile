@@ -107,18 +107,16 @@ class Comment extends Component {
             ) : null
           }
           <div className="c7n-title-commit" style={{ flex: 1 }}>
-            <div style={{ flex: 1 }}>
-              <UserHead
-                user={{
-                  id: commit.userId,
-                  loginName: '',
-                  realName: commit.userName,
-                  avatar: commit.imageUrl,
-                }}
-                color={'#3f51b5'}
-              />
-            </div>
-            <span style={{ color: 'rgba(0, 0, 0, 0.65)', flexShrink: 0 }}>添加了评论</span>
+            <UserHead
+              user={{
+                id: commit.userId,
+                loginName: '',
+                realName: commit.userName,
+                avatar: commit.imageUrl,
+              }}
+              color={'#3f51b5'}
+            />
+            <span style={{ color: 'rgba(0, 0, 0, 0.65)', flexShrink: 0, marginLeft: 15 }}>添加了评论</span>
           </div>
           <div className="c7n-action">
             <Icon

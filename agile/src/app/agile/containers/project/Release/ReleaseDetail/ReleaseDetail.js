@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import { withRouter } from 'react-router-dom';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import { Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip } from 'choerodon-ui';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -508,5 +509,5 @@ class ReleaseDetail extends Component {
   }
 }
 
-export default Form.create()(ReleaseDetail);
+export default Form.create()(withRouter(ReleaseDetail));
 

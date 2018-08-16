@@ -596,7 +596,7 @@ class Issue extends Component {
               IssueStore.loadIssues(current - 1, pageSize);
             }}
           >
-            <Icon type="autorenew icon" />
+            <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
         </Header>
@@ -715,7 +715,7 @@ class Issue extends Component {
                           <Input
                             autoFocus
                             value={this.state.createIssueValue}
-                            placeholder="需要做什么"
+                            placeholder="需要做什么？"
                             onChange={(e) => {
                               this.setState({
                                 createIssueValue: e.target.value,
@@ -727,7 +727,14 @@ class Issue extends Component {
                           />
                         </div>
                       </div>
-                      <div style={{ marginTop: 10, display: 'flex', marginLeft: 50, paddingRight: 70 }}>
+                      <div
+                        style={{
+                          marginTop: 10,
+                          display: 'flex',
+                          marginLeft: 32,
+                          justifyContent: !this.state.expand ? 'flex-start' : 'flex-end',
+                        }}
+                      >
                         <Button 
                           type="primary"
                           onClick={() => {

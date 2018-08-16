@@ -159,7 +159,7 @@ class VersionReportStore {
     if (this.beforeCurrentUnit === 'issue_count') {
       return [];
     }
-    const all = _.map(this.chartData, v => (v.unEstimateIssueCount / v.issueCount).toFixed(2) * 100);
+    const all = _.map(this.chartData, v => (v.unEstimateIssueCount <= 0 ? 0 : (v.unEstimateIssueCount / v.issueCount).toFixed(2) * 100).toFixed(0));
     return all;
   }
 

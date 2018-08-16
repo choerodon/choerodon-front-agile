@@ -119,6 +119,9 @@ class Log extends Component {
               />
             </div>
             <span style={{ color: 'rgba(0, 0, 0, 0.65)' }}>记录了工作日志</span>
+            <span style={{ color: 'rgba(0, 0, 0, 0.65)', marginLeft: 2 }}>
+              - {formatDate(worklog.lastUpdateDate)}
+            </span>
           </div>
           <div className="c7n-action">
             <Icon
@@ -147,10 +150,7 @@ class Log extends Component {
             </Popconfirm>
           </div>
         </div>
-        <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: 2 }}>
-          - {formatDate(worklog.lastUpdateDate)}
-        </div>
-        <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: '10px', marginBottom: '10px' }}>
+        <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: '10px' }}>
           <span style={{ width: 70 }}>耗费时间:</span>
           <span style={{ color: '#000', fontWeight: '500' }}>{`${worklog.workTime}h` || '无'}</span>
         </div>
