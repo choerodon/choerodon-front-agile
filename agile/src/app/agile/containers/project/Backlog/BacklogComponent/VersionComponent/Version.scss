@@ -10,7 +10,7 @@
       display: flex;
       font-size: 13px;
       line-height: 20px;
-      padding: 0 12px;
+      padding: 0 12px 0 16px;
       justify-content: space-between;
       flex-wrap: wrap;
 
@@ -21,7 +21,7 @@
     }
 
     .c7n-backlog-versionChoice {
-      margin-top: 20px;
+      margin-top: 12px;
       font-size: 13px;
       line-height: 20px;
 
@@ -30,7 +30,7 @@
       }
 
       .c7n-backlog-versionItems {
-        padding: 8px 12px;
+        padding: 8.1px 12px 7.9px 16px;
         cursor: pointer;
       }
 
@@ -40,23 +40,26 @@
 
       .c7n-backlog-versionItemTitle {
         display: flex;
-        align-items: center;
+        align-items: baseline;
         cursor: move;
-
         span {
           font-size: 16px;
         }
 
         i {
           cursor: pointer;
+          font-size: 12px;
         }
 
         .c7n-backlog-versionItemTitleName {
           flex-grow: 1;
           display: flex;
-          align-items: center;
           justify-content: space-between;
           cursor: move;
+          align-items: baseline;
+          p{
+            word-break: break-all;
+          }
         }
       }
 
@@ -66,6 +69,7 @@
         word-wrap:break-word;
         line-height: 13px;
         color: rgba(0, 0, 0, 0.65);
+        min-height: 20px;
       }
 
       .c7n-backlog-versionItemDetail {
@@ -79,7 +83,7 @@
         .c7n-backlog-versionItemParam {
           display: flex;
           justify-content: space-between;
-          margin-top: 12px;
+          margin-top: 10px;
 
           .c7n-backlog-versionItemParamKey {
             color: rgba(0, 0, 0, 0.65);
