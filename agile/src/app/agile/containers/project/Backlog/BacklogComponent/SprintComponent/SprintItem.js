@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
-import { Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu } from 'choerodon-ui';
+import {
+ Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu 
+} from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
@@ -27,6 +29,7 @@ class SprintItem extends Component {
     this.state = {
       editStartDate: false,
       editendDate: false,
+      backlogExpand: true,
       expand: true,
       selectIssueType: 'story',
       editName: false,
@@ -39,6 +42,7 @@ class SprintItem extends Component {
       },
     };
   }
+
   componentDidMount() {
     this.props.onRef(this);
     window.addEventListener('keydown', this.onKeyDown);
@@ -92,6 +96,7 @@ class SprintItem extends Component {
       }
     }
   }
+
   /**
    *获取首字母
    *
@@ -111,6 +116,7 @@ class SprintItem extends Component {
     }
     return str[0];
   }
+
   /**
    *开始结束时间更新事件
    *
@@ -181,6 +187,7 @@ class SprintItem extends Component {
       });
     }
   }
+
   /**
    *修改冲刺名
    *
@@ -224,6 +231,7 @@ class SprintItem extends Component {
     }).catch((error) => {
     });
   }
+
   /**
    *完成冲刺事件
    *
@@ -231,7 +239,8 @@ class SprintItem extends Component {
    */
   handleFinishSprint =(item, indexs) => {
     this.props.store.axiosGetSprintCompleteMessage(
-      item.sprintId).then((res) => {
+      item.sprintId
+).then((res) => {
       this.props.store.setSprintCompleteMessage(res);
       let flag = 0;
       if (res.parentsDoneUnfinishedSubtasks) {
@@ -260,6 +269,7 @@ class SprintItem extends Component {
     }).catch((error) => {
     });
   }
+
   /**
    *开启冲刺事件
    *
@@ -269,7 +279,8 @@ class SprintItem extends Component {
     if (!this.props.store.getSprintData.sprintData.filter(items => items.statusCode === 'started').length > 0) {
       if (item.issueSearchDTOList.length > 0) {
         this.props.store.axiosGetOpenSprintDetail(
-          item.sprintId).then((res) => {
+          item.sprintId
+).then((res) => {
           this.props.store.setOpenSprintDetail(res);
           this.setState({
             [`${index}-startSprint`]: { startSprintVisible: true },
@@ -279,6 +290,7 @@ class SprintItem extends Component {
       }
     }
   }
+
   /**
    *删除冲刺事件
    *
@@ -293,6 +305,7 @@ class SprintItem extends Component {
       });
     }
   }
+
   /**
    *清除过滤器
    *
@@ -330,7 +343,8 @@ class SprintItem extends Component {
         });
         this.props.store.setSelectIssue([item.issueId]);
       } else if (String(
-        this.state.selected.droppableId) === String(sprintId)) {
+        this.state.selected.droppableId
+) === String(sprintId)) {
         // 如果点击的是当前列的卡片
         const originIssueIds = _.clone(this.state.selected.issueIds);
         // 如果不存在
@@ -406,6 +420,7 @@ class SprintItem extends Component {
       this.props.store.setClickIssueDetail(item);
     }
   }
+
   /**
    *单个冲刺渲染issue或者无issue提示
    *
@@ -417,7 +432,8 @@ class SprintItem extends Component {
   renderIssueOrIntro =(type, index, issues, sprintId) => {
     if (issues) {
       if (issues.length > 0) {
-        return (<IssueItem
+        return (
+<IssueItem
           sprintItemRef={this.sprintItemRef}
           versionVisible={this.props.versionVisible}
           epicVisible={this.props.epicVisible}
@@ -427,7 +443,8 @@ class SprintItem extends Component {
           selected={this.state.selected}
           draggableId={this.state.draggableId}
           handleClickIssue={this.handleClickIssue}
-        />);
+        />
+);
       }
     }
     if (type !== 'backlog') {
@@ -453,6 +470,7 @@ class SprintItem extends Component {
     }
     return '';
   }
+
   /**
    *开启冲刺字段样式
    *
@@ -478,6 +496,7 @@ class SprintItem extends Component {
       return 'not-allowed';
     }
   }
+
   /**
    *渲染初始化开始与结束时间
    *
@@ -522,7 +541,10 @@ class SprintItem extends Component {
                 className="c7n-backlog-closeSprint"
                 role="none"
                 onClick={this.handleFinishSprint.bind(this, item, index)}
-              >完成冲刺</p>
+              >
+完成冲刺
+
+              </p>
               {/* <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown> */}
@@ -537,7 +559,10 @@ class SprintItem extends Component {
                 }}
                 role="none"
                 onClick={this.handleStartSprint.bind(this, item, index)}
-              >开启冲刺</p>
+              >
+开启冲刺
+
+              </p>
               <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown>
@@ -663,7 +688,10 @@ class SprintItem extends Component {
                           <span
                             style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
                             role="none"
-                          >{item.sprintName}</span>
+                          >
+{item.sprintName}
+
+                          </span>
                         </EasyEdit>
                       </div>
                       <p className="c7n-backlog-sprintQuestion">
@@ -682,7 +710,10 @@ class SprintItem extends Component {
                         }}
                         role="none"
                         onClick={this.clearFilter}
-                      >清空所有筛选器</p>
+                      >
+清空所有筛选器
+
+                      </p>
                     </div>
                     <div style={{ flexGrow: 1 }}>
                       {this.renderStatusCodeDom(item, indexs)}
@@ -705,9 +736,21 @@ class SprintItem extends Component {
                               title={(
                                 <div>
                                   <p>{ass2.assigneeName}</p>
-                                  <p>{ass2.totalStoryPoints} 故事点</p>
-                                  <p>{ass2.totalRemainingTime ? ass2.totalRemainingTime : '无'} 剩余预估时间</p>
-                                  <p>{ass2.issueCount} 问题</p>
+                                  <p>
+{ass2.totalStoryPoints}
+{' '}
+故事点
+</p>
+                                  <p>
+{ass2.totalRemainingTime ? ass2.totalRemainingTime : '无'}
+{' '}
+剩余预估时间
+</p>
+                                  <p>
+{ass2.issueCount}
+{' '}
+问题
+</p>
                                 </div>
                               )}
                             >
@@ -783,7 +826,7 @@ class SprintItem extends Component {
                         className="c7n-backlog-sprintData"
                         style={{
                           display: 'flex',
-                          flexWrap: 'wrap'
+                          flexWrap: 'wrap',
                         }}
                       >
                         <EasyEdit
@@ -798,7 +841,10 @@ class SprintItem extends Component {
                           <div
                             className="c7n-backlog-sprintDataItem"
                             role="none"
-                          >{this.renderData(item, 'startDate')}</div>
+                          >
+{this.renderData(item, 'startDate')}
+
+                          </div>
                         </EasyEdit>
                         <p>~</p>
                         <EasyEdit
@@ -813,7 +859,10 @@ class SprintItem extends Component {
                           <div
                             className="c7n-backlog-sprintDataItem"
                             role="none"
-                          >{this.renderData(item, 'endDate')}</div>
+                          >
+{this.renderData(item, 'endDate')}
+
+                          </div>
                         </EasyEdit>
                       </div>
                     ) : ''}
@@ -834,7 +883,10 @@ class SprintItem extends Component {
                               editGoal: true,
                             });
                           }}
-                        >{item.sprintGoal ? item.sprintGoal : '无'}</div>
+                        >
+{item.sprintGoal ? item.sprintGoal : '无'}
+
+                        </div>
                       </EasyEdit>
                     </div>
                   </div>
@@ -903,7 +955,9 @@ class SprintItem extends Component {
                                     />
                                   </div>
                                 </div>
-                                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-start', paddingRight: 70 }}>
+                                <div style={{
+ marginTop: 10, display: 'flex', justifyContent: 'flex-start', paddingRight: 70 
+}}>
                                   <Button
                                     type="primary"
                                     onClick={() => {
@@ -913,12 +967,18 @@ class SprintItem extends Component {
                                         },
                                       });
                                     }}
-                                  >取消</Button>
+                                  >
+取消
+
+                                  </Button>
                                   <Button
                                     type="primary"
                                     loading={this.state.loading}
                                     onClick={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
-                                  >确定</Button>
+                                  >
+确定
+
+                                  </Button>
                                 </div>
                               </div>
                             ) : (
@@ -940,8 +1000,9 @@ class SprintItem extends Component {
                                     });
                                   }}
                                 >
-                                  <Icon type="playlist_add" />创建问题
-                                </Button>
+                                  <Icon type="playlist_add" />
+创建问题
+</Button>
                               </div>
                             )}
                           </div>
@@ -967,7 +1028,11 @@ class SprintItem extends Component {
               <img style={{ width: 172 }} alt="emptybacklog" src={EmptyBacklog} />
               <div style={{ marginLeft: 40 }}>
                 <p style={{ color: 'rgba(0,0,0,0.65)' }}>用问题填充您的待办事项</p>
-                <p style={{ fontSize: 16, lineHeight: '28px', marginTop: 8 }}>这是您的团队待办事项。创建并预估新的问题，并通<br />过上下拖动来对待办事项排优先级</p>
+                <p style={{ fontSize: 16, lineHeight: '28px', marginTop: 8 }}>
+这是您的团队待办事项。创建并预估新的问题，并通
+<br />
+过上下拖动来对待办事项排优先级
+</p>
               </div>
             </div>
           );
@@ -976,6 +1041,7 @@ class SprintItem extends Component {
     }
     return result;
   }
+
   /**
    *渲染待办事项
    *
@@ -1022,13 +1088,13 @@ class SprintItem extends Component {
                   <div className="c7n-backlog-sprintName">
                     <Icon
                       style={{ fontSize: 20, cursor: 'pointer' }}
-                      type={this.state['backlog'] && !this.state['backlog'].expand ? 'baseline-arrow_right' : 'baseline-arrow_drop_down'}
+                      type={this.state.backlogExpand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
                       role="none"
                       onClick={() => {
-                        this.setState({
-                          ['backlog']: { expand: this.state['backlog'] ? !this.state['backlog'].expand : false },
-                        });
-                      }}
+                            this.setState({
+                              backlogExpand: !this.state.backlogExpand,
+                            });
+                          }}
                     />
                     <span
                       style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
@@ -1051,14 +1117,17 @@ class SprintItem extends Component {
                     }}
                     role="none"
                     onClick={this.clearFilter}
-                  >清空所有筛选器</p>
+                  >
+清空所有筛选器
+
+                  </p>
                 </div>
                 <div style={{ flexGrow: 1 }}>
                   {this.renderStatusCodeDom(item)}
                 </div>
               </div>
             </div>
-            {this.state.expand ? (
+            {this.state.backlogExpand ? (
               <Droppable
                 droppableId={item.sprintId.toString()}
                 isDropDisabled={this.props.store.getIsLeaveSprint}
@@ -1123,7 +1192,9 @@ class SprintItem extends Component {
                                 />
                               </div>
                             </div>
-                            <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-start', paddingRight: 70 }}>
+                            <div style={{
+ marginTop: 10, display: 'flex', justifyContent: 'flex-start', paddingRight: 70 
+}}>
                               <Button
                                 type="primary"
                                 onClick={() => {
@@ -1131,12 +1202,18 @@ class SprintItem extends Component {
                                     '-1-create': false,
                                   });
                                 }}
-                              >取消</Button>
+                              >
+取消
+
+                              </Button>
                               <Button
                                 type="primary"
                                 loading={this.state.loading}
                                 onClick={this.handleBlurCreateIssue.bind(this, 'backlog', item, -1)}
-                              >确定</Button>
+                              >
+确定
+
+                              </Button>
                             </div>
                           </div>
                         ) : (
@@ -1149,15 +1226,16 @@ class SprintItem extends Component {
                               }}
                               onClick={() => {
                                 this.setState({
-                                  ['-1-create']: { createIssue: true },
+                                  '-1-create': { createIssue: true },
                                 });
                                 this.props.store.axiosGetProjectInfo().then((res) => {
                                   this.props.store.setProjectInfo(res);
                                 });
                               }}
                             >
-                              <Icon type="playlist_add" />创建问题
-                            </Button>
+                              <Icon type="playlist_add" />
+创建问题
+</Button>
                           </div>
                         )}
                       </div>

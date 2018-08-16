@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Icon, Popconfirm, Tooltip } from 'choerodon-ui';
 import { AppState } from 'choerodon-front-boot';
 import _ from 'lodash';
-import UserHead from '../../UserHead';
 import WYSIWYGEditor from '../../WYSIWYGEditor';
 import { IssueDescription } from '../../CommonComponent';
 import { delta2Html, text2Delta, beforeTextUpload, formatDate } from '../../../common/utils';
@@ -10,6 +9,7 @@ import { deleteIssue, updateCommit } from '../../../api/NewIssueApi';
 import PriorityTag from '../../PriorityTag';
 import StatusTag from '../../StatusTag';
 import TypeTag from '../../TypeTag';
+import UserHead from '../../UserHead';
 import './IssueList.scss';
 
 
@@ -38,7 +38,7 @@ class IssueList extends Component {
   }
 
   render() {
-    const { issue, i } = this.props;
+    const { issue, i, showAssignee } = this.props;
     return (
       <div
         style={{
@@ -48,6 +48,7 @@ class IssueList extends Component {
           cursor: 'pointer',
           borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
           borderTop: !i ? '1px solid rgba(0, 0, 0, 0.12)' : '',
+          marginLeft: 26,
         }}
       >
         <Tooltip mouseEnterDelay={0.5} title="任务类型: 子任务">
@@ -79,6 +80,22 @@ class IssueList extends Component {
             </div>
           </Tooltip>
         </div>
+        {
+          showAssignee ? (
+            <div style={{ marginRight: 29, display: 'flex', justifyContent: 'flex-end' }}>
+              <div>
+                <UserHead
+                  user={{
+                    id: issue.assigneeId,
+                    loginName: '',
+                    realName: issue.assigneeName,
+                    avatar: issue.imageUrl,
+                  }}
+                />
+              </div>
+            </div>
+          ) : null
+        }
         <div style={{ width: '48px', marginRight: '15px', display: 'flex', justifyContent: 'flex-end' }}>
           <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusName}`}>
             <div>

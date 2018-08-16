@@ -51,15 +51,4 @@
         sort: 8
         permission:
           - 'agile-service.quick-filter.create'
-    - "issuelink":
-        icon: link
-        Routes: /agile/issueLink
-        sort: 9
-        permission:
-          - 'agile-service.issue-link-type.updateIssueLinkType'
-    - "storyMap":
-        icon: agile
-        Routes: /agile/userMap
-        sort: 10
-        permission:
-          - 'agile-service.issue.listIssueWithoutSub'
+    

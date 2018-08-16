@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
-import { Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin } from 'choerodon-ui';
+import { Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin, Tooltip } from 'choerodon-ui';
 import { Action } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import DragSortingTable from '../ReleaseComponent/DragSortingTable';
@@ -172,16 +172,19 @@ class ReleaseHome extends Component {
       title: '版本',
       dataIndex: 'name',
       key: 'name',
+      width: '94px',
       render: (text, record) => (
-        <span
-          className="c7n-release-name"
+       <Tooltip title={ text }>
+          <div
           role="none"
+          style={{maxWidth: '94px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}
           onClick={() => {
             const { history } = this.props;
             const urlParams = AppState.currentMenuType;
             history.push(`/agile/release/detail/${record.versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
           }}
-        >{text}</span>
+        >{text}</div>
+        </Tooltip>
       ),
     }, {
       title: '版本状态',
