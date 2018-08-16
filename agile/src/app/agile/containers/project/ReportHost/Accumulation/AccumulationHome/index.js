@@ -139,7 +139,7 @@ class AccumulationHome extends Component {
         name: data[index].name,
       });
     }
-    const newxAxis = [];
+    let newxAxis = [];
     if (data.length > 0) {
       for (let index = 0, len = data.length; index < len; index += 1) {
         for (let index2 = 0, len2 = data[index].coordinateDTOList.length; index2 < len2; index2 += 1) {
@@ -151,6 +151,7 @@ class AccumulationHome extends Component {
         }
       }
     }
+    newxAxis = (_.orderBy(newxAxis, item => new Date(item).getTime()));
     const legendSeries = [];
     data = data.reverse();
     for (let index = 0, len = data.length; index < len; index += 1) {

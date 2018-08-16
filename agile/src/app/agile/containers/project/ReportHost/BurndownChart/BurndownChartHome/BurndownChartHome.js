@@ -511,14 +511,17 @@ class BurndownChartHome extends Component {
                       value={this.state.defaultSprint}
                       onChange={(value) => {
                         let endDate;
+                        let startDate;
                         for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
                           if (BurndownChartStore.getSprintList[index].sprintId === value) {
                             endDate = BurndownChartStore.getSprintList[index].endDate;
+                            startDate = BurndownChartStore.getSprintList[index].startDate;
                           }
                         }
                         this.setState({
                           defaultSprint: value,
                           endDate,
+                          startDate,
                         }, () => {
                           this.getChartData();
                           this.getChartCoordinate();
