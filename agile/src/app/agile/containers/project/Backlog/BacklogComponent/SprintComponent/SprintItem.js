@@ -696,6 +696,7 @@ class SprintItem extends Component {
                     }
                     <Icon
                       style={{
+                        flex: 1,
                         cursor: 'pointer',
                         fontSize: 20,
                         marginLeft: 8,
@@ -723,6 +724,30 @@ class SprintItem extends Component {
                       data={item}
                       // total={total}
                     />
+                    <div
+                      style={{
+                        display: 'flex',
+                        marginRight: 20,
+                      }}
+                      className="c7n-backlog-sprintGoalSide"
+                    >
+                      <Tooltip title={`待处理故事点: ${item.todoStoryPoint}`}>
+                        <div style={{ backgroundColor: '#FFB100' }}>{item.todoStoryPoint}</div>
+                      </Tooltip>
+                      <Tooltip title={`处理中故事点: ${item.doingStoryPoint}`}>
+                        <div style={{ backgroundColor: '#4D90FE' }}>{item.doingStoryPoint}</div>
+                      </Tooltip>
+                      <Tooltip title={`已完成故事点: ${item.doneStoryPoint}`}>
+                        <div style={{ backgroundColor: '#00BFA5' }}>{item.doneStoryPoint}</div>
+                      </Tooltip>
+                    </div>
+                  </div>
+                  <div
+                    className="c7n-backlog-sprintGoal"
+                    style={{
+                      display: item.statusCode === 'started' ? 'flex' : 'none',
+                    }}
+                  >
                     {item.statusCode === 'started' ? (
                       <div
                         className="c7n-backlog-sprintData"
@@ -762,13 +787,6 @@ class SprintItem extends Component {
                         </EasyEdit>
                       </div>
                     ) : ''}
-                  </div>
-                  <div
-                    className="c7n-backlog-sprintGoal"
-                    style={{
-                      display: item.statusCode === 'started' ? 'flex' : 'none',
-                    }}
-                  >
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <p>冲刺目标：</p>
                       <EasyEdit
@@ -788,22 +806,6 @@ class SprintItem extends Component {
                           }}
                         >{item.sprintGoal ? item.sprintGoal : '无'}</div>
                       </EasyEdit>
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                      }}
-                      className="c7n-backlog-sprintGoalSide"
-                    >
-                      <Tooltip title={`待处理故事点: ${item.todoStoryPoint}`}>
-                        <div style={{ backgroundColor: '#FFB100' }}>{item.todoStoryPoint}</div>
-                      </Tooltip>
-                      <Tooltip title={`处理中故事点: ${item.doingStoryPoint}`}>
-                        <div style={{ backgroundColor: '#4D90FE' }}>{item.doingStoryPoint}</div>
-                      </Tooltip>
-                      <Tooltip title={`已完成故事点: ${item.doneStoryPoint}`}>
-                        <div style={{ backgroundColor: '#00BFA5' }}>{item.doneStoryPoint}</div>
-                      </Tooltip>
                     </div>
                   </div>
                 </div>
