@@ -726,8 +726,7 @@ class SprintItem extends Component {
                     />
                     <div
                       style={{
-                        display: 'flex',
-                        marginRight: 20,
+                        display: item.statusCode === 'started' ? 'flex' : 'none',
                       }}
                       className="c7n-backlog-sprintGoalSide"
                     >
@@ -976,7 +975,7 @@ class SprintItem extends Component {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                padding: '40px 0',
+                padding: '42px 0 45px 0',
               }}
             >
               <img style={{ width: 172 }} alt="emptybacklog" src={EmptyBacklog} />
