@@ -94,7 +94,7 @@ class EasyEdit extends Component {
         style={{ 
           position: 'relative',
           cursor: 'pointer',
-          height: 20,
+          minHeight: 20,
           ...this.props.style ? this.props.style : {},
         }}
         role="none"
