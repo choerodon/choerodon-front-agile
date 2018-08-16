@@ -2,8 +2,12 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Table, Select, Icon, Spin } from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, 
+} from 'choerodon-front-boot';
+import {
+  Button, Table, Select, Icon, Spin, 
+} from 'choerodon-ui';
 import pic from './no_sprint.svg';
 import SwithChart from '../../Component/switchChart';
 import VS from '../../../../../stores/project/velocityChart';
@@ -79,6 +83,13 @@ class VelocityChart extends Component {
             color: 'rgba(0, 0, 0, 0.65)',
             fontSize: 12,
             fontStyle: 'normal',
+          },
+          formatter(value, index) {
+            if (value.length > 10) {
+              return `${value.slice(0, 10)}...`;
+            } else {
+              return value;
+            }
           },
         },
         splitLine: {
@@ -298,12 +309,15 @@ class VelocityChart extends Component {
                 onChange={this.handleChangeCurrentUnit.bind(this)}
               >
                 <Option key="story_point" value="story_point">
+
                   故事点
                 </Option>
                 <Option key="issue_count" value="issue_count">
+
                   问题计数
                 </Option>
                 <Option key="remain_time" value="remain_time">
+
                   剩余时间
                 </Option>
               </Select>
@@ -318,7 +332,7 @@ class VelocityChart extends Component {
               textWidth="auto"
               pic={pic}
               title="当前项目无可用冲刺"
-              des={
+              des={(
                 <div>
                   <span>请在</span>
                   <span
@@ -332,11 +346,12 @@ class VelocityChart extends Component {
                       );
                     }}
                   >
+
                     待办事项
                   </span>
                   <span>中创建一个冲刺</span>
                 </div>
-              }
+)}
             />
           )}
         </Content>
