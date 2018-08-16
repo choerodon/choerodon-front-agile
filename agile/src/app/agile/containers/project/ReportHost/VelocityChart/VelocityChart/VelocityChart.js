@@ -30,6 +30,9 @@ class VelocityChart extends Component {
     return {
       tooltip: {
         trigger: 'axis',
+        axisPointer: {
+          type: 'shadow',
+        },
       },
       legend: {
         orient: 'horizontal',

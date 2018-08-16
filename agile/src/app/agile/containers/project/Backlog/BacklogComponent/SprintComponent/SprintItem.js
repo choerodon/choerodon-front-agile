@@ -15,6 +15,8 @@ import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 import AssigneeModal from './AssigneeModal';
 import EmptyBacklog from '../../../../../assets/image/emptyBacklog.png';
 import './Sprint.scss';
+import TypeTag from '../../../../../components/TypeTag';
+import { ICON, TYPE } from '../../../../../common/Constant';
 
 const Option = Select.Option;
 const confirm = Modal.confirm;
@@ -136,6 +138,14 @@ class SprintItem extends Component {
     });
   }
 
+<<<<<<< HEAD
+=======
+  handleChangeType({ key }) {
+    this.setState({
+      selectIssueType: key,
+    });
+  }
+>>>>>>> 2b6ce4f449ada2c40d660fc9780983be93f2140f
   /**
    *简易创建issue事件
    *
@@ -626,6 +636,29 @@ class SprintItem extends Component {
    * @memberof Sprint
    */
   renderSprint=() => {
+    const typeList = (
+      <Menu
+        style={{
+          background: '#fff',
+          boxShadow: '0 5px 5px -3px rgba(0, 0, 0, 0.20), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12)',
+          borderRadius: '2px',
+        }}
+        onClick={this.handleChangeType.bind(this)}
+      >
+        {
+          ['story', 'task', 'bug'].map(type => (
+            <Menu.Item key={type}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <TypeTag
+                  typeCode={type}
+                  showName
+                />
+              </div>
+            </Menu.Item>
+          ))
+        }
+      </Menu>
+    );
     let result = [];
     if (JSON.stringify(this.props.store.getSprintData) !== '{}') {
       const data = this.props.store.getSprintData.sprintData;
@@ -883,7 +916,7 @@ class SprintItem extends Component {
                             style={{
                               userSelect: 'none',
                               background: 'white',
-                              padding: '10px 0 10px 43px',
+                              padding: '10px 0 10px 33px',
                               fontSize: 13,
                               display: 'flex',
                               alignItems: 'center',
@@ -892,6 +925,7 @@ class SprintItem extends Component {
                             {this.state[`${indexs}-create`] && this.state[`${indexs}-create`].createIssue ? (
                               <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
+<<<<<<< HEAD
                                   <Select
                                     value={this.state.selectIssueType}
                                     style={{
@@ -954,9 +988,28 @@ class SprintItem extends Component {
                                           <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
                                         </div>
                                         <div>缺陷</div>
+=======
+                                  <Dropdown overlay={typeList} trigger={['click']}>
+                                    <div style={{ display: 'flex', alignItem: 'center' }}>
+                                      <div
+                                        className="c7n-sign"
+                                        style={{
+                                          backgroundColor: TYPE[this.state.selectIssueType],
+                                          marginRight: 2,
+                                        }}
+                                      >
+                                        <Icon
+                                          style={{ fontSize: '14px' }}
+                                          type={ICON[this.state.selectIssueType]}
+                                        />
+>>>>>>> 2b6ce4f449ada2c40d660fc9780983be93f2140f
                                       </div>
-                                    </Option>
-                                  </Select>
+                                      <Icon
+                                        type="arrow_drop_down"
+                                        style={{ fontSize: 16 }}
+                                      />
+                                    </div>
+                                  </Dropdown>
                                   <div style={{ marginLeft: 8, flexGrow: 1 }}>
                                     <Input
                                       autoFocus
@@ -1064,6 +1117,29 @@ class SprintItem extends Component {
    * @memberof Sprint
    */
   renderBacklog=() => {
+    const typeList = (
+      <Menu
+        style={{
+          background: '#fff',
+          boxShadow: '0 5px 5px -3px rgba(0, 0, 0, 0.20), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12)',
+          borderRadius: '2px',
+        }}
+        onClick={this.handleChangeType.bind(this)}
+      >
+        {
+          ['story', 'task', 'bug'].map(type => (
+            <Menu.Item key={type}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <TypeTag
+                  typeCode={type}
+                  showName
+                />
+              </div>
+            </Menu.Item>
+          ))
+        }
+      </Menu>
+    );
     if (JSON.stringify(this.props.store.getSprintData) !== '{}') {
       const data = this.props.store.getSprintData.backlogData;
       if (data) {
@@ -1080,6 +1156,7 @@ class SprintItem extends Component {
                   <div className="c7n-backlog-sprintName">
                     <Icon
                       style={{ fontSize: 20, cursor: 'pointer' }}
+<<<<<<< HEAD
                       type={this.state.backlogExpand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
                       role="none"
                       onClick={() => {
@@ -1102,6 +1179,20 @@ class SprintItem extends Component {
 
                       </span>
                     </EasyEdit>
+=======
+                      type={this.state['backlog'] && !this.state['backlog'].expand ? 'baseline-arrow_right' : 'baseline-arrow_drop_down'}
+                      role="none"
+                      onClick={() => {
+                        this.setState({
+                          ['backlog']: { expand: this.state['backlog'] ? !this.state['backlog'].expand : false },
+                        });
+                      }}
+                    />
+                    <span
+                      style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                      role="none"
+                    >{item.sprintName}</span>
+>>>>>>> 2b6ce4f449ada2c40d660fc9780983be93f2140f
                   </div>
                   <p className="c7n-backlog-sprintQuestion">
                     {item.issueSearchDTOList && item.issueSearchDTOList.length > 0 ? `${item.issueSearchDTOList.length}个问题可见` : '0个问题可见'}
@@ -1128,6 +1219,7 @@ class SprintItem extends Component {
                   {this.renderStatusCodeDom(item)}
                 </div>
               </div>
+<<<<<<< HEAD
               <div
                 className="c7n-backlog-sprintDes"
                 style={{
@@ -1268,6 +1360,8 @@ class SprintItem extends Component {
                   </Tooltip>
                 </div>
               </div>
+=======
+>>>>>>> 2b6ce4f449ada2c40d660fc9780983be93f2140f
             </div>
             {this.state.backlogExpand ? (
               <Droppable
@@ -1292,7 +1386,7 @@ class SprintItem extends Component {
                         style={{
                           userSelect: 'none',
                           background: 'white',
-                          padding: '10px 0 10px 43px',
+                          padding: '10px 0 10px 33px',
                           fontSize: 13,
                           display: 'flex',
                           alignItems: 'center',
@@ -1301,6 +1395,7 @@ class SprintItem extends Component {
                         {this.state['-1-create'] && this.state['-1-create'].createIssue ? (
                           <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
+<<<<<<< HEAD
                               <Select
                                 value={this.state.selectIssueType}
                                 style={{
@@ -1363,9 +1458,28 @@ class SprintItem extends Component {
                                       <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
                                     </div>
                                     <div>缺陷</div>
+=======
+                              <Dropdown overlay={typeList} trigger={['click']}>
+                                <div style={{ display: 'flex', alignItem: 'center' }}>
+                                  <div
+                                    className="c7n-sign"
+                                    style={{
+                                      backgroundColor: TYPE[this.state.selectIssueType],
+                                      marginRight: 2,
+                                    }}
+                                  >
+                                    <Icon
+                                      style={{ fontSize: '14px' }}
+                                      type={ICON[this.state.selectIssueType]}
+                                    />
+>>>>>>> 2b6ce4f449ada2c40d660fc9780983be93f2140f
                                   </div>
-                                </Option>
-                              </Select>
+                                  <Icon
+                                    type="arrow_drop_down"
+                                    style={{ fontSize: 16 }}
+                                  />
+                                </div>
+                              </Dropdown>
                               <div style={{ marginLeft: 8, flexGrow: 1 }}>
                                 <Input
                                   autoFocus

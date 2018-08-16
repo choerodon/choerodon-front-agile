@@ -132,7 +132,7 @@ class EpicItem extends Component {
               className="c7n-backlog-epicItemTitle"
             >
               <Icon
-                type={item.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+                type={item.expand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
                 role="none"
                 onClick={(e) => {
                   e.stopPropagation();

@@ -97,6 +97,7 @@
     -webkit-box-orient: vertical;
     word-break: break-all;
     -webkit-line-clamp: 1;
+    height: 20px;
   }
 }
 @-moz-document url-prefix() {
@@ -105,6 +106,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    height: 20px;
   }
 
   .c7n-scrumboard-container {

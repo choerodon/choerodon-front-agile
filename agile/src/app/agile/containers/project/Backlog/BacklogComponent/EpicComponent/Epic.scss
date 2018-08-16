@@ -30,7 +30,7 @@
       }
 
       .c7n-backlog-epicItems {
-        padding: 8.1px 12px 7.9px 16px;
+        padding: 8px 12px 8px 16px;
         cursor: pointer;
       }
 
@@ -40,7 +40,7 @@
 
       .c7n-backlog-epicItemTitle {
         display: flex;
-        align-items: center;
+        align-items: baseline;
 
         span {
           font-size: 16px;
@@ -51,10 +51,11 @@
         }
 
         div.c7n-backlog-epicItemsHead {
+          word-break: break-all;
           flex-grow: 1;
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: baseline;
 
           i {
             cursor: pointer;
