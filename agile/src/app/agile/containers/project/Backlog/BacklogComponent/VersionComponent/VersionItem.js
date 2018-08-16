@@ -197,9 +197,10 @@ class VersionItem extends Component {
               }
             }}
           >
+
             <div className="c7n-backlog-versionItemTitle">
               <Icon
-                type={item.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+                type={item.expand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
                 role="none"
                 onClick={(e) => {
                   const data = BacklogStore.getVersionData;
@@ -256,6 +257,7 @@ class VersionItem extends Component {
                 </div>
               </div>
             </div>
+          
             {item.expand ? (
               <div style={{ paddingLeft: 12 }}>
                 <div
@@ -338,4 +340,3 @@ class VersionItem extends Component {
 }
 
 export default VersionItem;
-
