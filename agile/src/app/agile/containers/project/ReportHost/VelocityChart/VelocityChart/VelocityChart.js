@@ -37,7 +37,8 @@ class VelocityChart extends Component {
           {
             name: '提交',
             icon: 'rectangle',
-          }, {
+          },
+          {
             name: '已完成',
             icon: 'rectangle',
           },
@@ -88,14 +89,14 @@ class VelocityChart extends Component {
             color: ['#eee'],
             width: 1,
             type: 'solid',
-          }, 
+          },
         },
         data: VS.getChartDataX,
       },
       yAxis: {
         name: VS.getChartYAxisName,
         type: 'value',
-        
+
         nameTextStyle: {
           color: '#000',
         },
@@ -108,6 +109,7 @@ class VelocityChart extends Component {
             width: 2,
           },
         },
+
         axisLabel: {
           show: true,
           interval: 'auto',
@@ -137,6 +139,11 @@ class VelocityChart extends Component {
             color: '#d3d3d3',
           },
           data: VS.getChartDataYCommitted,
+          emphasis: {
+            itemStyle: {
+              color: '#e0e0e0',
+            },
+          },
         },
         {
           name: '已完成',
@@ -150,11 +157,16 @@ class VelocityChart extends Component {
             type: 'dashed',
             color: 'grey',
           },
+          emphasis: {
+            itemStyle: {
+              color: '#35e6ce',
+            },
+          },
         },
       ],
     };
   }
-  
+
   getTableValue(record, type) {
     const currentUnit = VS.beforeCurrentUnit;
     const CAMEL = {
@@ -198,7 +210,7 @@ class VelocityChart extends Component {
         dataIndex: 'sprintName',
         render: (sprintName, record) => (
           <span
-            style={{ 
+            style={{
               color: '#3f51b5',
               cursor: 'pointer',
             }}
@@ -206,13 +218,20 @@ class VelocityChart extends Component {
             onClick={() => {
               const { history } = this.props;
               const urlParams = AppState.currentMenuType;
-              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${record.sprintId}&paramName=${sprintName}下的问题&paramUrl=reporthost/velocityChart`);
+              history.push(
+                `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
+                  urlParams.name
+                }&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${
+                  record.sprintId
+                }&paramName=${sprintName}下的问题&paramUrl=reporthost/velocityChart`,
+              );
             }}
           >
             {sprintName}
           </span>
         ),
-      }, {
+      },
+      {
         width: '33%',
         title: '预估',
         dataIndex: 'committedRemainTime',
@@ -222,7 +241,8 @@ class VelocityChart extends Component {
             {this.getTableValue(record, 'committed')}
           </span>
         ),
-      }, {
+      },
+      {
         width: '33%',
         title: '完成',
         dataIndex: 'completedRemainTime',
@@ -252,18 +272,14 @@ class VelocityChart extends Component {
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-velocity">
-        <Header 
+        <Header
           title="迭代速度图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${
+            urlParams.name
+          }&organizationId=${urlParams.organizationId}`}
         >
-          <SwithChart
-            history={this.props.history}
-            current="velocityChart"
-          />
-          <Button 
-            funcType="flat" 
-            onClick={this.refresh.bind(this)}
-          >
+          <SwithChart history={this.props.history} current="velocityChart" />
+          <Button funcType="flat" onClick={this.refresh.bind(this)}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -273,48 +289,56 @@ class VelocityChart extends Component {
           description="跟踪各个迭代已完成的工时量。这有助于您确定团队的开发速度并预估在未来迭代中能完成的工作量。"
           // link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
-          {
-            !(!VS.chartLoading && !VS.getChartDataX.length) ? (
-              <div>
-                <Select
-                  style={{ width: 512 }}
-                  label="单位选择"
-                  value={VS.currentUnit}
-                  onChange={this.handleChangeCurrentUnit.bind(this)}
-                >
-                  <Option key="story_point" value="story_point">故事点</Option>
-                  <Option key="issue_count" value="issue_count">问题计数</Option>
-                  <Option key="remain_time" value="remain_time">剩余时间</Option>
-                </Select>
-                <Spin spinning={VS.chartLoading}>
-                  <ReactEcharts className="c7n-chart" option={this.getOption()} />
-                </Spin>
-                {this.renderTable()}
-              </div>
-            ) : (
-              <EmptyBlock
-                style={{ marginTop: 40 }}
-                textWidth="auto"
-                pic={pic}
-                title="当前项目无可用冲刺"
-                des={
-                  <div>
-                    <span>请在</span>
-                    <span
-                      style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
-                      role="none"
-                      onClick={() => {
-                        history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-                      }}
-                    >
-                      待办事项
-                    </span>
-                    <span>中创建一个冲刺</span>
-                  </div>
-                }
-              />
-            )
-          }
+          {!(!VS.chartLoading && !VS.getChartDataX.length) ? (
+            <div>
+              <Select
+                style={{ width: 512 }}
+                label="单位选择"
+                value={VS.currentUnit}
+                onChange={this.handleChangeCurrentUnit.bind(this)}
+              >
+                <Option key="story_point" value="story_point">
+                  故事点
+                </Option>
+                <Option key="issue_count" value="issue_count">
+                  问题计数
+                </Option>
+                <Option key="remain_time" value="remain_time">
+                  剩余时间
+                </Option>
+              </Select>
+              <Spin spinning={VS.chartLoading}>
+                <ReactEcharts className="c7n-chart" option={this.getOption()} />
+              </Spin>
+              {this.renderTable()}
+            </div>
+          ) : (
+            <EmptyBlock
+              style={{ marginTop: 40 }}
+              textWidth="auto"
+              pic={pic}
+              title="当前项目无可用冲刺"
+              des={
+                <div>
+                  <span>请在</span>
+                  <span
+                    style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
+                    role="none"
+                    onClick={() => {
+                      history.push(
+                        `/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${
+                          urlParams.name
+                        }&organizationId=${urlParams.organizationId}`,
+                      );
+                    }}
+                  >
+                    待办事项
+                  </span>
+                  <span>中创建一个冲刺</span>
+                </div>
+              }
+            />
+          )}
         </Content>
       </Page>
     );
