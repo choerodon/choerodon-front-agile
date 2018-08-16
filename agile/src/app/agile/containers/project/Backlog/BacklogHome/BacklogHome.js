@@ -404,6 +404,7 @@ class BacklogHome extends Component {
             }
             newData.sprintData[index].issueSearchDTOList.splice(endIndex, 0, spliceData);
             axiosParam.before = endIndex === 0;
+            axiosParam.rankIndex = result.source.index > result.destination.index;
             axiosParam.issueIds = [result.draggableId];
             if (endIndex === 0) {
               if (newData.sprintData[index].issueSearchDTOList.length === 1) {
@@ -434,6 +435,7 @@ class BacklogHome extends Component {
         }
         newData.backlogData.backLogIssue.splice(endIndex, 0, spliceData);
         axiosParam.before = endIndex === 0;
+        axiosParam.rankIndex = result.source.index > result.destination.index;
         axiosParam.issueIds = [result.draggableId];
         if (endIndex === 0) {
           if (newData.backlogData.backLogIssue.length === 1) {

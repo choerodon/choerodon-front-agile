@@ -86,7 +86,7 @@ class IssueItem extends Component {
                 style={{
                   userSelect: 'none',
                   background: this.props.store.getSelectIssue.includes(item.issueId) ? 'rgb(235, 242, 249)' : this.renderIssueBackground(item),
-                  padding: '12px 20px',
+                  padding: '10px 20px',
                   borderBottom: '1px solid rgba(0,0,0,0.12)',
                   ...provided1.draggableProps.style,
                   fontSize: 13,
