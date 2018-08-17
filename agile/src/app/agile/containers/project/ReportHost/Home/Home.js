@@ -21,7 +21,9 @@ class Home extends Component {
         role="none"
         onClick={this.handleClickItem.bind(this, report)}
       >
-        <div className={`c7n-item-pic ${report.pic}`} />
+        <div className="c7n-item-pic">
+          <div className={`c7n-item-picWrap ${report.pic}`} />
+        </div>
         <div className="c7n-item-word">
           <h4 className="c7n-item-title">{report.title}</h4>
           <p className="c7n-item-des">{report.des}</p>

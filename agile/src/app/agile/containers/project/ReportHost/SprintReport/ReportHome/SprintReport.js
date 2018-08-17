@@ -451,9 +451,9 @@ class SprintReport extends Component {
           </Button>
         </Header>
         <Content
-          title={sprintName ? `迭代冲刺“${sprintName}”的燃尽图` : '无冲刺迭代的燃尽图'}
-          description="跟踪记录所有问题的剩余工作工作时间，预估完成冲刺任务的可能性，回顾总结迭代过程中的经验与不足。这有助于在团队管理方面取得更进一步的掌控与把握。"
-          link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/burn-down/"
+          title={sprintName ? `迭代冲刺“${sprintName}”的冲刺报告` : '无冲刺迭代的冲刺报告'}
+          description="了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。"
+          link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
           <Spin spinning={this.state.loading}>
             {
@@ -461,19 +461,23 @@ class SprintReport extends Component {
                 <div>
                   <div>
                     <Select
+                      getPopupContainer={triggerNode => triggerNode.parentNode}
                       style={{ width: 244 }}
                       label="迭代冲刺"
                       value={this.state.defaultSprint}
                       onChange={(value) => {
                         let endDate;
+                        let startDate;
                         for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
                           if (BurndownChartStore.getSprintList[index].sprintId === value) {
                             endDate = BurndownChartStore.getSprintList[index].endDate;
+                            startDate = BurndownChartStore.getSprintList[index].startDate;
                           }
                         }
                         this.setState({
                           defaultSprint: value,
                           endDate,
+                          startDate,
                         }, () => {
                           this.getChartData();
                           this.getChartCoordinate();

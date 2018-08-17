@@ -799,13 +799,14 @@ class CreateSprint extends Component {
     const that = this;
     confirm({
       width: 560,
+      wrapClassName: 'deleteConfirm',
       title: `删除问题${this.state.issueNum}`,
-      content: <div style={{ marginBottom: 32 }}>
+      content: <div>
         <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
         <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
         <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
         {
-          this.state.subIssueDTOList.length ? <p>{`注意：问题的 ${this.state.subIssueDTOList.length} 个子任务将被删除。`}</p> : null
+          this.state.subIssueDTOList.length ? <p style={{ color: '#d50000' }}>{`注意：问题的 ${this.state.subIssueDTOList.length} 个子任务将被删除。`}</p> : null
         }
       </div>,
       onOk() {
@@ -913,7 +914,7 @@ class CreateSprint extends Component {
         {
           _.map(group, (v, k) => (
             <div key={k}>
-              <div style={{ margin: '7px auto' }}>{k}</div>
+              <div style={{ margin: '7px auto', marginLeft: 26 }}>{k}</div>
               {
                 _.map(v, (linkIssue, i) => this.renderLinkList(linkIssue, i))
               }
@@ -938,6 +939,7 @@ class CreateSprint extends Component {
           typeCode: issue.typeCode || 'sub_task',
         }}
         i={i}
+        showAssignee
         onOpen={(issueId, linkedIssueId) => {
           this.reloadIssue(issue.issueId);
         }}
@@ -957,6 +959,7 @@ class CreateSprint extends Component {
           typeCode: link.typeCode,
         }}
         i={i}
+        showAssignee
         onOpen={(issueId, linkedIssueId) => {
           this.reloadIssue(issueId === this.state.origin.issueId ? linkedIssueId : issueId);
         }}
@@ -1351,7 +1354,7 @@ class CreateSprint extends Component {
             }
             {
               this.state.typeCode !== 'sub_task' && (
-                <Tooltip placement="right" title="相关任务">
+                <Tooltip placement="right" title="问题链接">
                   <li id="LINK_TASKS-nav" className={`c7n-li ${this.state.nav === 'link_task' ? 'c7n-li-active' : ''}`}>
                     <Icon
                       type="link c7n-icon-li"
@@ -1395,7 +1398,7 @@ class CreateSprint extends Component {
                     height: 44,
                   }}
                 >
-                  <div style={{ fontSize: 16, lineHeight: '28px', fontWeight: 500 }}>
+                  <div style={{ fontSize: 13, lineHeight: '20px' }}>
                     {
                       this.state.typeCode === 'sub_task' ? (
                         <span>
@@ -1425,7 +1428,7 @@ class CreateSprint extends Component {
                     <span>隐藏详情</span>
                   </div>
                 </div>
-                <div className="line-justify" style={{ marginBottom: 5, alignItems: 'center', marginTop: 10 }}>
+                <div className="line-justify" style={{ marginBottom: 20, alignItems: 'center', marginTop: 20 }}>
                   <ReadAndEdit
                     callback={this.changeRae.bind(this)}
                     thisType="summary"
@@ -1926,7 +1929,7 @@ class CreateSprint extends Component {
                       <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                     </div>
                     <div className="c7n-content-wrapper" style={{ display: 'flex' }}>
-                      <div style={{ flex: 1, width: '50%' }}>
+                      <div style={{ flex: 1.4 }}>
                         {
                           this.state.typeCode !== 'sub_task' ? (
                             <div className="line-start mt-10">
@@ -2265,7 +2268,7 @@ class CreateSprint extends Component {
                                   <Select
                                     value={this.state.originEpics.length ? this.state.epicId || undefined : this.state.epicName || undefined}
                                     getPopupContainer={triggerNode => triggerNode.parentNode}
-                                    style={{ width: '150px' }}
+                                    style={{ width: '200px' }}
                                     autoFocus
                                     allowClear
                                     loading={this.state.selectLoading}
@@ -2384,7 +2387,7 @@ class CreateSprint extends Component {
                         
                       </div>
                       {/* --- */}
-                      <div style={{ flex: 1, width: '50%' }}>
+                      <div style={{ flex: 1 }}>
                         <div className="line-start mt-10">
                           <div className="c7n-property-wrapper">
                             <span className="c7n-subtitle">
@@ -2750,13 +2753,13 @@ class CreateSprint extends Component {
                       <div className="c7n-title-wrapper">
                         <div className="c7n-title-left">
                           <Icon type="link c7n-icon-title" />
-                          <span>相关任务</span>
+                          <span>问题链接</span>
                         </div>
                         <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                           <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
                             <Icon type="playlist_add icon" />
-                            <span>创建相关任务</span>
+                            <span>创建链接</span>
                           </Button>
                         </div>
                       </div>

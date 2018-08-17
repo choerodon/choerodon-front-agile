@@ -83,6 +83,12 @@ class DataLog extends Component {
       }
     } else {
       // null -> null
+      if (field === 'description') {
+        if (oldString && !newString) {
+          return '移除';
+        }
+        return '更新';
+      }
       if (field === 'priority') {
         return '将';
       }
@@ -188,7 +194,7 @@ class DataLog extends Component {
       // yyy -> null
       if (['Story Points', 'timeestimate'].includes(field)) {
         return ` 【${oldString}】 `;
-      } else if (['Attachment', 'timespent'].includes(field)) {
+      } else if (['Attachment', 'timespent', 'Comment'].includes(field)) {
         return '';
       } else {
         return ` 【${oldString}】 `;
@@ -406,7 +412,7 @@ class DataLog extends Component {
                           <div style={{ color: 'rgba(0, 0, 0, 0.65)', fontSize: '13px', textAlign: 'center', display: 'flex' }}>
                             <Icon type="markunread" style={{ lineHeight: '20px' }} />
                             <span style={{ marginLeft: 6, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              hong.li@hand-china.com
+                              {datalog.email}
                             </span>
                           </div>
                         </div>
@@ -439,7 +445,7 @@ class DataLog extends Component {
                     </div>
 
                   </div>
-                  <div style={{ marginTop: 5 }}>- {formatDate(datalog.lastUpdateDate)}</div>
+                  <div style={{ marginTop: 5, fontSize: '12px' }}>- {formatDate(datalog.lastUpdateDate)}</div>
                 </div>
               </div>
             </div>

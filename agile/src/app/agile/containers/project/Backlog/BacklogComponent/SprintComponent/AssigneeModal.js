@@ -60,8 +60,7 @@ class AssigneeModal extends Component {
         visible={this.props.visible}
         onOk={this.props.onCancel.bind(this)}
         okText="确定"
-        cancelText="取消"
-        onCancel={this.props.onCancel.bind(this)}
+        okCancel={false}
       >
         <Content
           style={{

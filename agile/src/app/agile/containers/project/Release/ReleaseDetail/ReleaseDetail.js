@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar } from 'choerodon-ui';
+import { withRouter } from 'react-router-dom';
+import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
+
+import { Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip } from 'choerodon-ui';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 import './ReleaseDetail.scss';
 import PublicRelease from '../ReleaseComponent/PublicRelease';
@@ -315,47 +317,62 @@ class ReleaseDetail extends Component {
       <Page>
         <Header
           title={(
-            <div style={{ whiteSpace: 'nowrap' }}>
-              <span>{`版本${ReleaseStore.getVersionDetail.name}`}</span>
-              <span style={{ marginLeft: 12, fontSize: 13, color: '#FFB100', padding: '1px 10px', background: 'rgba(255,177,0,0.08)' }}>{ReleaseStore.getVersionDetail.statusName}</span>
-            </div>
-          )}
+            <Tooltip title={`版本${ReleaseStore.getVersionDetail.name}`}>
+              <div 
+                  style={{ 
+                  display: 'inline-block',
+                  maxWidth: '141px', 
+                  whiteSpace: 'nowrap', 
+                  overflow: 'hidden', 
+                  textOverflow: 'ellipsis',
+                  marginTop: '23px'
+                  }}
+                  >
+                  {`版本 ${ReleaseStore.getVersionDetail.name}`}
+              </div>
+          </Tooltip>
+ )}
           backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
+          
+            <div style={{ marginLeft: 12, fontSize: 13, color: '#FFB100', padding: '1px 10px', background: 'rgba(255,177,0,0.08)', height: 20, lineHeight: '20px'}}>{ReleaseStore.getVersionDetail.statusName}</div>
+               
           {
             ReleaseStore.getVersionDetail.statusCode === 'archived' ? '' : (
-              <Button
-                funcType="flat"
-                style={{
-                  marginLeft: 80,
-                }}
-                onClick={() => {
-                  if (ReleaseStore.getVersionDetail.statusCode === 'version_planning') {
-                    ReleaseStore.axiosGetPublicVersionDetail(
-                      ReleaseStore.getVersionDetail.versionId)
-                      .then((res) => {
-                        ReleaseStore.setPublicVersionDetail(res);
-                        this.setState({ publicVersion: true });
+              <Permission service={ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? ['agile-service.product-version.releaseVersion'] : ['agile-service.product-version.revokeReleaseVersion']}>
+                <Button
+                  funcType="flat"
+                  style={{
+                    marginLeft: 8,
+                  }}
+                  onClick={() => {
+                    if (ReleaseStore.getVersionDetail.statusCode === 'version_planning') {
+                      ReleaseStore.axiosGetPublicVersionDetail(
+                        ReleaseStore.getVersionDetail.versionId)
+                        .then((res) => {
+                          ReleaseStore.setPublicVersionDetail(res);
+                          this.setState({ publicVersion: true });
+                        }).catch((error) => {
+                      });
+                    } else {
+                      ReleaseStore.axiosUnPublicRelease(
+                        ReleaseStore.getVersionDetail.versionId).then((res2) => {
+                        this.refresh();
                       }).catch((error) => {
-                    });
-                  } else {
-                    ReleaseStore.axiosUnPublicRelease(
-                      ReleaseStore.getVersionDetail.versionId).then((res2) => {
-                      this.refresh();
-                    }).catch((error) => {
-                    });
-                  }
-                }}
-              >
-                <Icon type="publish2" />
-                <span>{ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? '发布' : '撤销发布'}</span>
-              </Button>
+                      });
+                    }
+                  }}
+                >
+                  <Icon type="publish2" />
+                  <span>{ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? '发布' : '撤销发布'}</span>
+                </Button>
+              </Permission>
             )
           }
           <Button
             funcType="flat"
             style={{
-              marginLeft: 80,
+              marginLeft: 8,
             }}
             onClick={() => {
               const { history } = this.props;
@@ -426,7 +443,7 @@ class ReleaseDetail extends Component {
               <Tabs
                 animated={false}
                 onChange={this.handleChangeTab.bind(this)}
-                style={{ marginTop: 38 }}
+                style={{ marginTop: 28 }}
               >
                 <TabPane
                   tab={
@@ -495,5 +512,5 @@ class ReleaseDetail extends Component {
   }
 }
 
-export default Form.create()(ReleaseDetail);
+export default Form.create()(withRouter(ReleaseDetail));
 

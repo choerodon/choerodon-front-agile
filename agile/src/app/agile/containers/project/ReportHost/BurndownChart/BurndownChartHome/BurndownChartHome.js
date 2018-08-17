@@ -291,7 +291,7 @@ class BurndownChartHome extends Component {
   renderChartTitle() {
     let result = '';
     if (this.state.select === 'remainingEstimatedTime') {
-      result = '剩余预估时间';
+      result = '剩余时间';
     }
     if (this.state.select === 'storyPoints') {
       result = '故事点';
@@ -354,7 +354,7 @@ class BurndownChartHome extends Component {
       result = '在冲刺期间移动到已完成';
     }
     if (text === 'timeestimate') {
-      result = '用户修改剩余估计时间';
+      result = '用户修改剩余时间';
     }
     if (text === 'valueChange') {
       if (this.state.select === 'remainingEstimatedTime') {
@@ -505,20 +505,24 @@ class BurndownChartHome extends Component {
               BurndownChartStore.getSprintList.length > 0 ? (
                 <div>
                   <div>
-                    <Select 
+                    <Select
+                      getPopupContainer={triggerNode => triggerNode.parentNode}
                       style={{ width: 244 }} 
                       label="迭代冲刺" 
                       value={this.state.defaultSprint}
                       onChange={(value) => {
                         let endDate;
+                        let startDate;
                         for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
                           if (BurndownChartStore.getSprintList[index].sprintId === value) {
                             endDate = BurndownChartStore.getSprintList[index].endDate;
+                            startDate = BurndownChartStore.getSprintList[index].startDate;
                           }
                         }
                         this.setState({
                           defaultSprint: value,
                           endDate,
+                          startDate,
                         }, () => {
                           this.getChartData();
                           this.getChartCoordinate();
@@ -530,13 +534,14 @@ class BurndownChartHome extends Component {
                           <Option value={item.sprintId}>{item.sprintName}</Option>
                         )) : ''}
                     </Select>
-                    <Select 
+                    <Select
+                      getPopupContainer={triggerNode => triggerNode.parentNode}
                       style={{ width: 244, marginLeft: 24 }} 
                       label="单位" 
                       defaultValue={this.state.select}
                       onChange={this.handleChangeSelect.bind(this)}
                     >
-                      <Option value="remainingEstimatedTime">剩余预估时间</Option>
+                      <Option value="remainingEstimatedTime">剩余时间</Option>
                       <Option value="storyPoints">故事点</Option>
                       <Option value="issueCount">问题计数</Option>
                     </Select>

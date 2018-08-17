@@ -29,7 +29,7 @@ class SettingColumn extends Component {
   updateColumnMaxMin(type, value) {
     let totalIssues = 0;
     for (let index = 0, len = this.props.data.subStatuses.length; index < len; index += 1) {
-      for (let index2 = 0, len2 = this.props.data.subStatuses[index].issues.length; index2 < len2; index += 1) {
+      for (let index2 = 0, len2 = this.props.data.subStatuses[index].issues.length; index2 < len2; index2 += 1) {
         if (ScrumBoardStore.getCurrentConstraint === 'issue') {
           totalIssues += 1;
         } else if (this.props.data.subStatuses[index].issues[index2].typeCode !== 'sub_task') {

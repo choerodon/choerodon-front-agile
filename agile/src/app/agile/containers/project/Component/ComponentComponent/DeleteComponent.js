@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Modal, Radio, Select, message, Icon } from 'choerodon-ui';
+import {
+  Modal, Radio, Select, message, Icon, 
+} from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import { getUsers } from '../../../../api/CommonApi';
 import { createComponent } from '../../../../api/ComponentApi';
@@ -32,7 +34,7 @@ class DeleteComponent extends Component {
     this.setState({
       radio: e.target.value,
     });
-  }
+  };
 
   init() {
     this.setState({
@@ -71,7 +73,7 @@ class DeleteComponent extends Component {
 
   handleRelatedComponentChange = (value) => {
     this.setState({ relatedComponentId: value });
-  }
+  };
 
   renderDelete() {
     const radioStyle = {
@@ -83,7 +85,10 @@ class DeleteComponent extends Component {
     return (
       <div style={{ margin: '0 0 32px 20px' }}>
         <RadioGroup label="" onChange={this.onRadioChange} value={this.state.radio}>
-          <Radio style={radioStyle} value={1}>不关联到别的模块</Radio>
+          <Radio style={radioStyle} value={1}>
+
+            不关联到别的模块
+          </Radio>
           <Radio style={radioStyle} value={2}>
             <span>关联到其他模块</span>
             <Select
@@ -102,8 +107,8 @@ class DeleteComponent extends Component {
               {this.state.originComponents.map(component => (
                 <Option key={component.componentId} value={component.componentId}>
                   {component.name}
-                </Option>),
-              )}
+                </Option>
+              ))}
             </Select>
           </Radio>
         </RadioGroup>
@@ -128,8 +133,10 @@ class DeleteComponent extends Component {
       >
         <div style={{ margin: '20px 0', position: 'relative' }}>
           <Icon style={{ color: '#d50000', position: 'absolute', fontSize: '16px' }} type="error" />
-          <div style={{ marginLeft: 20, width: 400 }}>
-                    有问题关联到这个模块，而且这个项目中已经没有其他模块可供关联 这个模块将会从所有问题中移除。
+          <div style={{ marginLeft: 20, width: 400 ,'line-height':'26px' }}>
+
+            如果有问题关联到这个模块，而且这个项目中已经没有其他模块可供关联
+            这个模块将会从所有问题中移除。
           </div>
         </div>
         <ul style={{ margin: '20px 0 20px 20px', paddingLeft: '20px' }}>
@@ -138,20 +145,23 @@ class DeleteComponent extends Component {
               style={{ color: '#303f9f', cursor: 'pointer' }}
               role="none"
               onClick={() => {
-                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=component&paramId=${this.state.component.componentId}&paramName=${this.state.component.name}&paramUrl=component`);
+                this.props.history.push(
+                  `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
+                    urlParams.name
+                  }&organizationId=${urlParams.organizationId}&paramType=component&paramId=${
+                    this.state.component.componentId
+                  }&paramName=${this.state.component.name}&paramUrl=component`,
+                );
               }}
             >
-              相关的问题（{this.state.component.issueCount}）
+
+              相关的问题（
+              {this.state.component.issueCount || 0}
+）
             </span>
           </li>
         </ul>
-        {
-          this.state.component.issueCount ? (
-            <div>
-              {this.renderDelete()}
-            </div>
-          ) : null
-        }
+        {this.state.component.issueCount ? <div>{this.renderDelete()}</div> : null}
       </Modal>
     );
   }

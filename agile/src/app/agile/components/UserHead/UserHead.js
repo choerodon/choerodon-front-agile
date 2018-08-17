@@ -74,6 +74,7 @@ class UserHead extends Component {
                 marginRight: 5,
                 textAlign: 'center',
                 borderRadius: '50%',
+                flexShrink: 0,
               }}
             >
               {

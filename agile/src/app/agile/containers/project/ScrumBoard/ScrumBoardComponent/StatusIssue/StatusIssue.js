@@ -369,63 +369,54 @@ class StatusIssue extends Component {
                           style={{
                             // display: issueId ? 'block' : 'flex',
                             flexWrap: 'wrap',
+                            display: 'flex',
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <div
-                              className="c7n-scrumboard-issueIcon"
-                              style={{
-                                background: this.renderTypeCode('background', item),
-                              }}
-                            >
-                              {this.renderTypeCode('icon', item)}
-                            </div>
-                            <p style={{ marginLeft: 5, textDecoration: item.categoryCode === 'done' ? 'line-through' : '' }} className="textDisplayOneColumn">{item.issueNum}</p>
+                          <div
+                            className="c7n-scrumboard-issueIcon"
+                            style={{
+                              background: this.renderTypeCode('background', item),
+                            }}
+                          >
+                            {this.renderTypeCode('icon', item)}
                           </div>
-                        </div>
-                        <div style={{ display: 'flex', margin: '5px 0 5px 12px', alignItems: 'center' }}>
-                          <p
-                            style={{
-                              // margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 5px 5px 15px' : '0 0 0 13px',
-                            }}
-                          >
-                            <Tooltip title={`状态: ${this.props.statusName}`}>
-                              <span
-                                style={{
-                                  borderRadius: 2,
-                                  padding: '2px 8px',
-                                  background: this.renderStatusBackground(this.props.categoryCode),
-                                  // background: '#4D90FE',
-                                  color: 'white',
-                                  maxWidth: 56,
-                                }}
-                                className="textDisplayOneColumn"
-                              >
-                                {this.props.statusName}
-                              </span>
-                            </Tooltip>
-                          </p>
-                          <p
-                            style={{
-                              // margin: ScrumBoardStore.getClickIssueDetail.issueId ? '5px 0 5px 0' : '0 0 0 13px',
-                            }}
-                          >
-                            <Tooltip title={`史诗: ${this.renderEpicData('epicName')}`}>
-                              <span
-                                className="textDisplayOneColumn"
-                                style={{
-                                  color: this.renderEpicData('color'),
-                                  border: `1px solid ${this.renderEpicData('color')}`,
-                                  marginLeft: '10px',
-                                  padding: '2px 8px',
-                                  maxWidth: '80px',
-                                  borderRadius: 2,
-                                }}
-                              >
-                                {this.renderEpicData('epicName')}
-                              </span>
-                            </Tooltip>
-                          </p>
+                          <p style={{ marginLeft: 5, textDecoration: this.props.categoryCode === 'done' ? 'line-through' : '' }} className="textDisplayOneColumn">{item.issueNum}</p>
+                          <div style={{ display: 'flex', paddingLeft: ScrumBoardStore.getClickIssueDetail.issueId ? 0 : 24, alignItems: 'center' }}>
+                            <p>
+                              <Tooltip title={`状态: ${this.props.statusName}`}>
+                                <span
+                                  style={{
+                                    borderRadius: 2,
+                                    padding: '0 8px',
+                                    background: this.renderStatusBackground(this.props.categoryCode),
+                                    // background: '#4D90FE',
+                                    color: 'white',
+                                    maxWidth: 56,
+                                  }}
+                                  className="textDisplayOneColumn"
+                                >
+                                  {this.props.statusName}
+                                </span>
+                              </Tooltip>
+                            </p>
+                            <p>
+                              <Tooltip title={`史诗: ${this.renderEpicData('epicName')}`}>
+                                <span
+                                  className="textDisplayOneColumn"
+                                  style={{
+                                    color: this.renderEpicData('color'),
+                                    border: `1px solid ${this.renderEpicData('color')}`,
+                                    marginLeft: '10px',
+                                    padding: '0 8px',
+                                    maxWidth: '80px',
+                                    borderRadius: 2,
+                                  }}
+                                >
+                                  {this.renderEpicData('epicName')}
+                                </span>
+                              </Tooltip>
+                            </p>
+                          </div>
                         </div>
                         <div className="c7n-scrumboard-issueBottom">
                           <Tooltip title={`优先级: ${item.priorityName}`}>
@@ -457,20 +448,17 @@ class StatusIssue extends Component {
                       </div>
                       {/* <div style={{ flexShrink: 0 }} cla
                   ssName="c7n-scrumboard-issueSide">M</div> */}
-                      {
-                        item.assigneeName ? (
-                          <Tooltip title={`经办人: ${item.assigneeName}`}>
-                            <Avatar
-                              src={item.imageUrl ? item.imageUrl : undefined}
-                              style={{
-                                flexShrink: 0,
-                              }}
-                            >
-                              {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
-                            </Avatar>
-                          </Tooltip>
-                        ) : ''
-                      }
+                      <Tooltip title={`经办人: ${item.assigneeName}`}>
+                        {item.assigneeName ? <Avatar
+                          src={item.imageUrl ? item.imageUrl : undefined}
+                          style={{
+                            flexShrink: 0,
+                          }}
+                        >
+                          {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
+                        </Avatar> : <div style={{ width: 32, height: 32, flexShrink: 0 }} />}
+
+                      </Tooltip>
                     </div>
                   </div>
                   {provided.placeholder}
