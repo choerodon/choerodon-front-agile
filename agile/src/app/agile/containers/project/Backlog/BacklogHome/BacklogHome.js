@@ -152,8 +152,15 @@ class BacklogHome extends Component {
       });
       this.refresh();
       message.success('创建成功');
-      if (document.getElementById('sprint_last')) {
-        document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_last').offsetTop - 100;
+      // const anchorElement = document.getElementById('sprint_new');
+      // if (anchorElement) {
+      //   anchorElement.scrollIntoView({
+      //     behavior: 'smooth',
+      //     block: 'start',
+      //   });
+      // }
+      if (document.getElementById('sprint_new')) {
+        document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_new').offsetTop - 100;
       }
     }).catch((error) => {
       this.setState({

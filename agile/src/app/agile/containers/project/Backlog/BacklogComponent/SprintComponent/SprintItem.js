@@ -664,7 +664,7 @@ class SprintItem extends Component {
           for (let indexs = 0, len = data.length; indexs < len; indexs += 1) {
             const item = data[indexs];
             result.push(
-              <div key={item.sprintId} id={indexs === data.length - 1 ? 'sprint_last' : undefined}>
+              <div key={item.sprintId} id={indexs === 1 ? 'sprint_new' : undefined}>
                 <div className="c7n-backlog-sprintTop">
                   <div className="c7n-backlog-springTitle">
                     <div className="c7n-backlog-sprintTitleSide">
