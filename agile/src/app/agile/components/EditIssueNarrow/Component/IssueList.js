@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Icon, Popconfirm, Tooltip } from 'choerodon-ui';
-import { AppState } from 'choerodon-front-boot';
+import { stores, Permission } from 'choerodon-front-boot';
 import _ from 'lodash';
 import WYSIWYGEditor from '../../WYSIWYGEditor';
 import { IssueDescription } from '../../CommonComponent';
@@ -12,6 +12,7 @@ import TypeTag from '../../TypeTag';
 import UserHead from '../../UserHead';
 import './IssueList.scss';
 
+const { AppState } = stores;
 
 class IssueList extends Component {
   constructor(props, context) {
@@ -39,6 +40,8 @@ class IssueList extends Component {
 
   render() {
     const { issue, i, showAssignee } = this.props;
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <div
         style={{
@@ -106,25 +109,27 @@ class IssueList extends Component {
             </div>
           </Tooltip>
         </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: '16px',
-          }}
-        >
-          <Popconfirm
-            title="确认要删除该子任务吗?"
-            placement="left"
-            onConfirm={this.confirm.bind(this, issue.issueId)}
-            onCancel={this.cancel}
-            okText="删除"
-            cancelText="取消"
-            okType="danger"
+        <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue.deleteIssue']}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '16px',
+            }}
           >
-            <Icon type="delete_forever mlr-3 pointer" />
-          </Popconfirm>
-        </div>
+            <Popconfirm
+              title="确认要删除该子任务吗?"
+              placement="left"
+              onConfirm={this.confirm.bind(this, issue.issueId)}
+              onCancel={this.cancel}
+              okText="删除"
+              cancelText="取消"
+              okType="danger"
+            >
+              <Icon type="delete_forever mlr-3 pointer" />
+            </Popconfirm>
+          </div>
+        </Permission>
       </div>
     );
   }

@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { Modal, Form, Input, Select, Icon } from 'choerodon-ui';
 import { stores, Content, axios } from 'choerodon-front-boot';
 import './CreateBranch.scss';
+import './commom.scss';
 
 const { AppState } = stores;
 const Sidebar = Modal.Sidebar;

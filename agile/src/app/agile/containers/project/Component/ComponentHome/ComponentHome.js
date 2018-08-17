@@ -187,7 +187,7 @@ class ComponentHome extends Component {
             </Button>
           </Permission>
           <Button funcType="flat" onClick={() => this.loadComponents()}>
-            <Icon type="autorenew icon" />
+            <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
         </Header>
