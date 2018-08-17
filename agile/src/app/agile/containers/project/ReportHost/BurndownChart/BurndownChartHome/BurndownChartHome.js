@@ -541,7 +541,7 @@ class BurndownChartHome extends Component {
                       defaultValue={this.state.select}
                       onChange={this.handleChangeSelect.bind(this)}
                     >
-                      <Option value="remainingEstimatedTime">剩余预估时间</Option>
+                      <Option value="remainingEstimatedTime">剩余时间</Option>
                       <Option value="storyPoints">故事点</Option>
                       <Option value="issueCount">问题计数</Option>
                     </Select>

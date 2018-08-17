@@ -28,6 +28,7 @@ class EasyEdit extends Component {
     };
   }
   handleOnOk(e) {
+    this.props.onChange(this.state.date, this.state.dateString || e._i);
     isClick = true;
     this.setState({
       edit: false,
@@ -76,10 +77,11 @@ class EasyEdit extends Component {
             }
           }}
           onChange={(date, dateString) => {
-            this.props.onChange(date, dateString);
             this.setState({
               edit: false,
               hoverIf: false,
+              date,
+              dateString,
             });
           }}
           onOk={this.handleOnOk.bind(this)}
