@@ -175,15 +175,20 @@ class ReleaseHome extends Component {
       width: '94px',
       render: (text, record) => (
        <Tooltip title={ text }>
-          <div
-          role="none"
-          style={{maxWidth: '94px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}
-          onClick={() => {
-            const { history } = this.props;
-            const urlParams = AppState.currentMenuType;
-            history.push(`/agile/release/detail/${record.versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-          }}
-        >{text}</div>
+         <div
+            role="none"
+            style={{maxWidth: '94px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}
+        >
+            <a
+              role={"none"}
+              onClick={() => {
+              const { history } = this.props;
+              const urlParams = AppState.currentMenuType;
+              history.push(`/agile/release/detail/${record.versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+            }}>
+              {text}
+            </a>
+          </div>
         </Tooltip>
       ),
     }, {
