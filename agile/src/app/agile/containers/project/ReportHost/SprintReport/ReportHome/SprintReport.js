@@ -461,6 +461,7 @@ class SprintReport extends Component {
                 <div>
                   <div>
                     <Select
+                      getPopupContainer={triggerNode => triggerNode.parentNode}
                       style={{ width: 244 }}
                       label="迭代冲刺"
                       value={this.state.defaultSprint}

@@ -219,7 +219,6 @@ class ColumnPage extends Component {
     }
   }
   renderColumn(data) {
-    console.log(data);
     const result = [];
     for (let index = 0, len = data.length; index < len; index += 1) {
       result.push(
