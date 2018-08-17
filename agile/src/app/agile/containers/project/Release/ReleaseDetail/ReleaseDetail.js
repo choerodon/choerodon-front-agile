@@ -339,7 +339,7 @@ class ReleaseDetail extends Component {
                
           {
             ReleaseStore.getVersionDetail.statusCode === 'archived' ? '' : (
-              <Permission service={ReleaseStore.getVersionDetail.statusCode.statusCode === 'version_planning' ? ['agile-service.product-version.releaseVersion'] : ['agile-service.product-version.revokeReleaseVersion']}>
+              <Permission service={ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? ['agile-service.product-version.releaseVersion'] : ['agile-service.product-version.revokeReleaseVersion']}>
                 <Button
                   funcType="flat"
                   style={{
