@@ -273,45 +273,75 @@ class VersionItem extends Component {
                     });
                   }}
                 >
-                  <EasyEdit
-                    type="input"
-                    defaultValue={item.description}
-                    enterOrBlur={this.handleOnBlurDes.bind(this)}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <p className="c7n-backlog-versionItemDes">
+                  <Permission
+                    type={type}
+                    projectId={projectId}
+                    organizationId={orgId}
+                    service={['agile-service.product-version.updateVersion']}
+                    noAccessChildren={<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <p className="c7n-backlog-versionItemDes" ref={(versionId) => { this[item.versionId] = versionId; }}>
                         {!item.description ? '没有描述' : item.description}
                       </p>
-                    </div>
-                  </EasyEdit>
+                    </div>}
+                  >
+                    <EasyEdit
+                      type="input"
+                      defaultValue={item.description}
+                      enterOrBlur={this.handleOnBlurDes.bind(this)}
+                    >
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <p className="c7n-backlog-versionItemDes" ref={(versionId) => { this[item.versionId] = versionId; }}>
+                          {!item.description ? '没有描述' : item.description}
+                        </p>
+                      </div>
+                    </EasyEdit>
+                  </Permission>
                 </div>
                 <p className="c7n-backlog-versionItemDetail">详情</p>
                 <div className="c7n-backlog-versionItemParams">
                   <div className="c7n-backlog-versionItemParam">
                     <p style={{ color: 'rgba(0,0,0,0.65)' }}>开始日期</p>
-                    <EasyEdit
-                      type="date"
-                      defaultValue={item.startDate ? moment(item.startDate.split(' ')[0], 'YYYY-MM-DD') : ''}
-                      disabledDate={item.releaseDate ? current => current > moment(item.releaseDate, 'YYYY-MM-DD HH:mm:ss') : ''}
-                      onChange={(date, dateString) => {
-                        this.updateDate('startDate', dateString);
-                      }}
+                    <Permission
+                      type={type}
+                      projectId={projectId}
+                      organizationId={orgId}
+                      service={['agile-service.product-version.updateVersion']}
+                      noAccessChildren={<p>{!_.isNull(item.startDate) ? `${item.startDate.split('-')[2].substring(0, 2)}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[0].substring(2, 4)}` : '无'}</p>}
                     >
-                      <p>{!_.isNull(item.startDate) ? `${item.startDate.split('-')[2].substring(0, 2)}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[0].substring(2, 4)}` : '无'}</p>
-                    </EasyEdit>
+                      <EasyEdit
+                        type="date"
+                        defaultValue={item.startDate ? moment(item.startDate.split(' ')[0], 'YYYY-MM-DD') : ''}
+                        disabledDate={item.releaseDate ? current => current > moment(item.releaseDate, 'YYYY-MM-DD HH:mm:ss') : ''}
+                        onChange={(date, dateString) => {
+                          this.updateDate('startDate', dateString);
+                        }}
+                      >
+                        <p>{!_.isNull(item.startDate) ? `${item.startDate.split('-')[2].substring(0, 2)}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[0].substring(2, 4)}` : '无'}</p>
+                      </EasyEdit>
+                    </Permission>
+
                   </div>
                   <div className="c7n-backlog-versionItemParam">
                     <p style={{ color: 'rgba(0,0,0,0.65)' }}>发布日期</p>
-                    <EasyEdit
-                      type="date"
-                      defaultValue={item.releaseDate ? moment(item.releaseDate.split(' ')[0], 'YYYY-MM-DD') : ''}
-                      disabledDate={item.startDate ? current => current < moment(item.startDate, 'YYYY-MM-DD HH:mm:ss') : ''}
-                      onChange={(date, dateString) => {
-                        this.updateDate('releaseDate', dateString);
-                      }}
+                    <Permission
+                      type={type}
+                      projectId={projectId}
+                      organizationId={orgId}
+                      service={['agile-service.product-version.updateVersion']}
+                      noAccessChildren={<p>{!_.isNull(item.releaseDate) ? `${item.releaseDate.split('-')[2].substring(0, 2)}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[0].substring(2, 4)}` : '无'}</p>}
                     >
-                      <p>{!_.isNull(item.releaseDate) ? `${item.releaseDate.split('-')[2].substring(0, 2)}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[0].substring(2, 4)}` : '无'}</p>
-                    </EasyEdit>
+                      <EasyEdit
+                        type="date"
+                        defaultValue={item.releaseDate ? moment(item.releaseDate.split(' ')[0], 'YYYY-MM-DD') : ''}
+                        disabledDate={item.startDate ? current => current < moment(item.startDate, 'YYYY-MM-DD HH:mm:ss') : ''}
+                        onChange={(date, dateString) => {
+                          this.updateDate('releaseDate', dateString);
+                        }}
+                      >
+                        <p>{!_.isNull(item.releaseDate) ? `${item.releaseDate.split('-')[2].substring(0, 2)}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[0].substring(2, 4)}` : '无'}</p>
+                      </EasyEdit>
+                    </Permission>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
                     <p className="c7n-backlog-versionItemParamKey">问题数</p>
