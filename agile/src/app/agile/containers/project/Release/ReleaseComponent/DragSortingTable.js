@@ -131,15 +131,12 @@ class DragSortingTable extends Component {
     let afterSequence = null;
     // 拖的方向
     if (hoverIndex === 0) {
-      afterSequence = data[hoverIndex].sequence;
+      afterSequence = result[1].sequence;
     } else if (hoverIndex === data.length - 1) {
-      beforeSequence = data[hoverIndex].sequence;
-    } else if (dragIndex > hoverIndex) {
-      afterSequence = data[hoverIndex].sequence;
-      beforeSequence = data[hoverIndex - 1].sequence;
-    } else if (dragIndex < hoverIndex) {
-      afterSequence = data[hoverIndex + 1].sequence;
-      beforeSequence = data[hoverIndex].sequence;
+      beforeSequence = result[data.length - 2].sequence;
+    } else {
+      afterSequence = result[hoverIndex + 1].sequence;
+      beforeSequence = result[hoverIndex - 1].sequence;
     }
     const versionId = data[dragIndex].versionId;
     const { objectVersionNumber } = data[dragIndex];
