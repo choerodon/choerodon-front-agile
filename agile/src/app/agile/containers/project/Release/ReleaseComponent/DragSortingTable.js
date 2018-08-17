@@ -115,11 +115,6 @@ class DragSortingTable extends Component {
       sourceData: props.dataSource,
     };
   }
-  componentWillReceiveProps(nextProps) {
-    if (JSON.stringify(this.state.data) !== JSON.stringify(nextProps.dataSource)) {
-      this.setState({ data: this.props.dataSource, sourceData: this.props.dataSource });
-    }
-  }
   components = {
     body: {
       row: BodyRow,
@@ -127,7 +122,10 @@ class DragSortingTable extends Component {
   };
 
   moveRow = (dragIndex, hoverIndex) => {
-    const data = this.state.data || this.props.dataSource;
+    const data = this.props.dataSource;
+    const result = Array.from(data);
+    const [removed] = result.splice(dragIndex, 1);
+    result.splice(hoverIndex, 0, removed);
     const dragRow = data[dragIndex];
     let beforeSequence = null;
     let afterSequence = null;
@@ -153,14 +151,14 @@ class DragSortingTable extends Component {
         },
       }),
     );
-    this.props.handleDrag(postData);
+    this.props.handleDrag(result, postData);
   };
   render() {
     return (
       <Table
         rowClassName={'table-row'}
         columns={this.props.columns}
-        dataSource={this.state.data}
+        dataSource={this.props.dataSource}
         pagination={this.props.pagination}
         onChange={this.props.onChange}
         components={this.components}

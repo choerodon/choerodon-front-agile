@@ -156,10 +156,11 @@ class ReleaseHome extends Component {
     });
   }
 
-  handleDrag =(data) => {
-    ReleaseStore.handleDataDrag(AppState.currentMenuType.id,data)
+  handleDrag =(res, postData) => {
+    ReleaseStore.setVersionList(res);
+    ReleaseStore.handleDataDrag(AppState.currentMenuType.id, postData)
       .then(() => {
-        // this.refresh(this.state.pagination);
+        this.refresh(this.state.pagination);
       }).catch((error) => {
       this.refresh(this.state.pagination);
       });
