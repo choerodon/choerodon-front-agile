@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
+
 import { Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip } from 'choerodon-ui';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 import './ReleaseDetail.scss';
@@ -338,32 +339,34 @@ class ReleaseDetail extends Component {
                
           {
             ReleaseStore.getVersionDetail.statusCode === 'archived' ? '' : (
-              <Button
-                funcType="flat"
-                style={{
-                  marginLeft: 8,
-                }}
-                onClick={() => {
-                  if (ReleaseStore.getVersionDetail.statusCode === 'version_planning') {
-                    ReleaseStore.axiosGetPublicVersionDetail(
-                      ReleaseStore.getVersionDetail.versionId)
-                      .then((res) => {
-                        ReleaseStore.setPublicVersionDetail(res);
-                        this.setState({ publicVersion: true });
+              <Permission service={ReleaseStore.getVersionDetail.statusCode.statusCode === 'version_planning' ? ['agile-service.product-version.releaseVersion'] : ['agile-service.product-version.revokeReleaseVersion']}>
+                <Button
+                  funcType="flat"
+                  style={{
+                    marginLeft: 8,
+                  }}
+                  onClick={() => {
+                    if (ReleaseStore.getVersionDetail.statusCode === 'version_planning') {
+                      ReleaseStore.axiosGetPublicVersionDetail(
+                        ReleaseStore.getVersionDetail.versionId)
+                        .then((res) => {
+                          ReleaseStore.setPublicVersionDetail(res);
+                          this.setState({ publicVersion: true });
+                        }).catch((error) => {
+                      });
+                    } else {
+                      ReleaseStore.axiosUnPublicRelease(
+                        ReleaseStore.getVersionDetail.versionId).then((res2) => {
+                        this.refresh();
                       }).catch((error) => {
-                    });
-                  } else {
-                    ReleaseStore.axiosUnPublicRelease(
-                      ReleaseStore.getVersionDetail.versionId).then((res2) => {
-                      this.refresh();
-                    }).catch((error) => {
-                    });
-                  }
-                }}
-              >
-                <Icon type="publish2" />
-                <span>{ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? '发布' : '撤销发布'}</span>
-              </Button>
+                      });
+                    }
+                  }}
+                >
+                  <Icon type="publish2" />
+                  <span>{ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? '发布' : '撤销发布'}</span>
+                </Button>
+              </Permission>
             )
           }
           <Button

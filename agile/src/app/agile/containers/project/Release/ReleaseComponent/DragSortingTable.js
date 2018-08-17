@@ -116,7 +116,7 @@ class DragSortingTable extends Component {
     };
   }
   componentWillReceiveProps(nextProps) {
-    if (!isEqual(this.state.data, this.props.dataSource)) {
+    if (JSON.stringify(this.state.data) !== JSON.stringify(nextProps.props.dataSource)) {
       this.setState({ data: this.props.dataSource, sourceData: this.props.dataSource });
     }
   }
