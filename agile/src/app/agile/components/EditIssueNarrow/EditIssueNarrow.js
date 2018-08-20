@@ -17,6 +17,7 @@ import CreateSubTask from '../CreateSubTask';
 import CreateLinkTask from '../CreateLinkTask';
 import UserHead from '../UserHead';
 import Comment from './Component/Comment';
+import Log from './/Component/Log';
 import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
 import LinkList from './Component/LinkList';
@@ -288,9 +289,9 @@ class CreateSprint extends Component {
   getCurrentNav(e) {
     let eles;
     if (this.state.typeCode !== 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'sub_task', 'link_task', 'branch'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'sub_task', 'link_task', 'branch'];
     } else {
-      eles = ['detail', 'des', 'attachment', 'commit', 'branch'];
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'branch'];
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
@@ -850,6 +851,26 @@ class CreateSprint extends Component {
   }
 
   /**
+   * Log
+   */
+  renderLogs() {
+    return (
+      <div>
+        {
+          this.state.worklogs.map(worklog => (
+            <Log
+              key={worklog.logId}
+              worklog={worklog}
+              onDeleteLog={() => this.reloadIssue()}
+              onUpdateLog={() => this.reloadIssue()}
+            />
+          ))
+        }
+      </div>
+    );
+  }
+
+  /**
    * SubIssue
    */
   renderSubIssues() {
@@ -1264,7 +1285,18 @@ class CreateSprint extends Component {
                 />
               </li>
             </Tooltip>
-            
+            <Tooltip placement="right" title="工作日志">
+              <li id="LOG-nav" className={`c7n-li ${this.state.nav === 'log' ? 'c7n-li-active' : ''}`}>
+                <Icon
+                  type="work_log c7n-icon-li"
+                  role="none"
+                  onClick={() => {
+                    this.setState({ nav: 'log' });
+                    this.scrollToAnchor('log');
+                  }}
+                />
+              </li>
+            </Tooltip>
             {
               this.state.typeCode !== 'sub_task' && (
                 <Tooltip placement="right" title="子任务">
@@ -2095,6 +2127,148 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+                            冲刺：
+                          </span>
+                        </div>
+                        <div className="c7n-value-wrapper">
+                          {
+                            this.state.typeCode !== 'sub_task' ? (
+                              <ReadAndEdit
+                                callback={this.changeRae.bind(this)}
+                                thisType="sprintId"
+                                current={this.state.currentRae}
+                                origin={this.state.activeSprint.sprintId}
+                                onOk={this.updateIssue.bind(this, 'sprintId')}
+                                onCancel={this.resetSprintId.bind(this)}
+                                onInit={() => {
+                                  this.setAnIssueToState(this.state.origin);
+                                  loadSprints(['sprint_planning', 'started']).then((res) => {
+                                    this.setState({
+                                      originSprints: res,
+                                      sprintId: this.state.activeSprint.sprintId,
+                                    });
+                                  });
+                                }}
+                                readModeContent={<div>
+                                  {
+                                    !this.state.closeSprint.length && !this.state.activeSprint.sprintId ? '无' : (
+                                      <div>
+                                        {/* {
+                                          this.state.closeSprint.map(v => (
+                                            <div 
+                                              style={{
+                                                color: 'rgba(0, 0, 0, 0.5)',
+                                                border: '1px solid rgba(0, 0, 0, 0.5)',
+                                                borderRadius: '2px',
+                                                fontSize: '13px',
+                                                lineHeight: '20px',
+                                                padding: '0 8px',
+                                                display: 'inline-block',
+                                                marginRight: 5,
+                                              }}
+                                            >
+                                              {v.sprintName}
+                                            </div>
+                                          ))
+                                        } */}
+                                        <div>
+                                          {_.map(this.state.closeSprint, 'sprintName').join(' , ')}
+                                        </div>
+                                        {
+                                          this.state.activeSprint.sprintId && (
+                                            <div 
+                                              style={{
+                                                color: '#4d90fe',
+                                                // border: '1px solid #4d90fe',
+                                                // borderRadius: '2px',
+                                                fontSize: '13px',
+                                                lineHeight: '20px',
+                                                // padding: '0 8px',
+                                                display: 'inline-block',
+                                                marginTop: 5,
+                                              }}
+                                            >
+                                              {this.state.activeSprint.sprintName}
+                                            </div>
+                                          )
+                                        }
+                                      </div>
+                                    )
+                                  }
+                                </div>}
+                              >
+                                {
+                                  this.state.closeSprint.length ? (
+                                    <div>
+                                      <span>已结束冲刺：</span>
+                                      <span>
+                                        {_.map(this.state.closeSprint, 'sprintName').join(' , ')}
+                                      </span>
+                                    </div>
+                                  ) : null
+                                }
+                                <Select
+                                  label="活跃冲刺"
+                                  value={this.state.sprintId || undefined}
+                                  getPopupContainer={triggerNode => triggerNode.parentNode}
+                                  style={{ width: '150px' }}
+                                  autoFocus
+                                  allowClear
+                                  loading={this.state.selectLoading}
+                                  onFocus={() => {
+                                    this.setState({
+                                      selectLoading: true,
+                                    });
+                                    loadSprints(['sprint_planning', 'started']).then((res) => {
+                                      this.setState({
+                                        originSprints: res,
+                                        selectLoading: false,
+                                      });
+                                    });
+                                  }}
+                                  onChange={(value) => {
+                                    const sprint = _.find(this.state.originSprints,
+                                      { sprintId: value * 1 });
+                                    this.setState({
+                                      sprintId: value,
+                                      // sprintName: sprint.sprintName,
+                                    });
+                                  }}
+                                >
+                                  {this.state.originSprints.map(sprint =>
+                                    <Option key={`${sprint.sprintId}`} value={sprint.sprintId}>{sprint.sprintName}</Option>,
+                                  )}
+                                </Select>
+                              </ReadAndEdit>
+                            ) : (
+                              <div>
+                                {
+                                  this.state.activeSprint.sprintId ? (
+                                    <div 
+                                      style={{
+                                        color: '#4d90fe',
+                                        // border: '1px solid #4d90fe',
+                                        // borderRadius: '2px',
+                                        fontSize: '13px',
+                                        lineHeight: '20px',
+                                        // padding: '0 8px',
+                                        display: 'inline-block',
+                                      }}
+                                    >
+                                      {this.state.activeSprint.sprintName}
+                                    </div>
+                                  ) : '无'
+                                }
+                              </div>
+                            )
+                          }
+                        </div>
+                      </div>
+
+
+                      <div className="line-start mt-10">
+                        <div className="c7n-property-wrapper">
+                          <span className="c7n-property">
                             时间跟踪：
                           </span>
                         </div>
@@ -2482,6 +2656,23 @@ class CreateSprint extends Component {
                     </div>
                   </div>
                   {this.renderCommits()}
+                </div>
+
+                <div id="log">
+                  <div className="c7n-title-wrapper">
+                    <div className="c7n-title-left">
+                      <Icon type="work_log c7n-icon-title" />
+                      <span>工作日志</span>
+                    </div>
+                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                    <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ dailyLogShow: true })}>
+                        <Icon type="playlist_add icon" />
+                        <span>登记工作</span>
+                      </Button>
+                    </div>
+                  </div>
+                  {this.renderLogs()}
                 </div>
 
                 {
