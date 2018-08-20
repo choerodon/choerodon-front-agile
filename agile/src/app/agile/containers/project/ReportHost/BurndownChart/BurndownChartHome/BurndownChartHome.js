@@ -148,17 +148,31 @@ class BurndownChartHome extends Component {
               }
             }
             if (newData[index2].type.indexOf(data[index].type) === -1) {
-              newData[index2].type += `-${data[index].type}`;
+              newData.push({
+                date: data[index].date,
+                issues: [{
+                  issueId: data[index].issueId,
+                  issueNum: data[index].issueNum,
+                  newValue: data[index].newValue,
+                  oldValue: data[index].oldValue,
+                  statistical: data[index].statistical,
+                  parentIssueId: data[index].parentIssueId,
+                  parentIssueNum: data[index].parentIssueNum,
+                }],
+                type: data[index].type,
+              });
+              // newData[index2].type += `-${data[index].type}`;
+            } else {
+              newData[index2].issues = [...newData[index2].issues, {
+                issueId: data[index].issueId,
+                issueNum: data[index].issueNum,
+                newValue: data[index].newValue,
+                oldValue: data[index].oldValue,
+                statistical: data[index].statistical,
+                parentIssueId: data[index].parentIssueId,
+                parentIssueNum: data[index].parentIssueNum,
+              }];
             }
-            newData[index2].issues = [...newData[index2].issues, {
-              issueId: data[index].issueId,
-              issueNum: data[index].issueNum,
-              newValue: data[index].newValue,
-              oldValue: data[index].oldValue,
-              statistical: data[index].statistical,
-              parentIssueId: data[index].parentIssueId,
-              parentIssueNum: data[index].parentIssueNum,
-            }];
           }
         }
         for (let index = 0, dataLen = newData.length; index < dataLen; index += 1) {
@@ -419,7 +433,7 @@ class BurndownChartHome extends Component {
       dataIndex: 'type',
       key: 'type',
       render: text => (
-        <p>{this.renderTypeText(text)}</p>
+        <div>{this.renderTypeText(text)}</div>
       ),
     }, {
       title: '事件详情',
@@ -429,9 +443,9 @@ class BurndownChartHome extends Component {
         <div>
           {
             record.issues.map(item => (
-              <p>
+              <div>
                 {this.renderDetail(item, record)}
-              </p>
+              </div>
             ))
           }
         </div>
@@ -444,9 +458,9 @@ class BurndownChartHome extends Component {
         <div>
           {
             record.issues.map(item => (
-              <p>
+              <div>
                 {this.renderUp(item)}
-              </p>
+              </div>
             ))
           }
         </div>
@@ -459,9 +473,9 @@ class BurndownChartHome extends Component {
         <div>
           {
             record.issues.map(item => (
-              <p>
+              <div>
                 {this.renderDown(item)}
-              </p>
+              </div>
             ))
           }
         </div>
@@ -551,6 +565,7 @@ class BurndownChartHome extends Component {
                     dataSource={BurndownChartStore.getBurndownList}
                     columns={columns}
                     pagination={false}
+                    rowKey={record => `${record.date}-${record.type}`}
                   />
                 </div>
               ) : (
