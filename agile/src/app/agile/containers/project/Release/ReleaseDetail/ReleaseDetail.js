@@ -7,6 +7,7 @@ import { Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip } from 
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 import './ReleaseDetail.scss';
 import PublicRelease from '../ReleaseComponent/PublicRelease';
+import ReportStore from "../../../../stores/project/Report";
 
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -156,10 +157,24 @@ class ReleaseDetail extends Component {
     }
   }
   renderTabTables(columns) {
+    const urlParams = AppState.currentMenuType;
     return (
       <div>
         <div style={{ padding: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <p>{`共${ReleaseStore.getVersionStatusIssues.length}个`}</p>
+          <p
+            style={{
+              color: '#3F51B5',
+              cursor: 'pointer',
+            }}
+            role="none"
+            onClick={() => {
+              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${ReleaseStore.getVersionDetail.name}下的问题&paramUrl=reporthost/sprintreport`);
+            }}
+          >
+            在“问题管理中”查看
+            <Icon style={{ fontSize: 13 }} type="open_in_new" />
+          </p>
         </div>
         <Table
           dataSource={ReleaseStore.getVersionStatusIssues}
