@@ -2422,10 +2422,10 @@ class CreateSprint extends Component {
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                     <UserHead
                                       user={{
-                                        id: user.id,
-                                        loginName: user.loginName,
-                                        realName: user.realName,
-                                        avatar: user.imageUrl,
+                                        id: user&&user.id,
+                                        loginName: user&&user.loginName,
+                                        realName: user&&user.realName,
+                                        avatar: user&&user.imageUrl,
                                       }}
                                     />
                                   </div>
@@ -2457,7 +2457,7 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
-                            指派给我
+                            分配给我
                           </span>
                         </div>
                       </div>
@@ -2527,10 +2527,10 @@ class CreateSprint extends Component {
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                     <UserHead
                                       user={{
-                                        id: user.id,
-                                        loginName: user.loginName,
-                                        realName: user.realName,
-                                        avatar: user.imageUrl,
+                                        id: user&&user.id,
+                                        loginName: user&&user.loginName,
+                                        realName: user&&user.realName,
+                                        avatar: user&&user.imageUrl,
                                       }}
                                     />
                                   </div>
@@ -2562,7 +2562,7 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
-                            指派给我
+                            分配给我
                           </span>
                         </div>
                       </div>
