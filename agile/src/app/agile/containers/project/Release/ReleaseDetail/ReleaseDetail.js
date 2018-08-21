@@ -177,6 +177,8 @@ class ReleaseDetail extends Component {
           </p>
         </div>
         <Table
+          ref={(node) => { this.Table = node; }}
+          // pagination={ReleaseStore.getVersionStatusIssues.length > 10 ? '' : false}
           dataSource={ReleaseStore.getVersionStatusIssues}
           columns={columns}
           onRow={record => ({
@@ -322,6 +324,7 @@ class ReleaseDetail extends Component {
             padding: '4px 6px',
             color: 'white',
             background: record.statusColor,
+            borderRadius: 2,
           }}
         >
           {text}

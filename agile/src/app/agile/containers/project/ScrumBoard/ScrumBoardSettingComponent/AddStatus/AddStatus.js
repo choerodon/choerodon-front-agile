@@ -81,9 +81,12 @@ class AddStatus extends Component {
         }
         result.push(
           <Option value={data[index].valueCode}>
-            <div style={{ width: 15, height: 15, borderRadius: 2, marginLeft: 5, background: color }} />
-            {data[index].name}
-            </Option>,
+            <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <div style={{ width: 15, height: 15, borderRadius: 2, marginRight: 5, background: color }} />
+              <span> {data[index].name}</span>
+            </div>
+
+          </Option>,
         );
       }
     }

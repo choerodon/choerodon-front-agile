@@ -300,7 +300,7 @@ class ReleaseHome extends Component {
               funcType="flat"
               onClick={this.handleCombineRelease.bind(this)}
             >
-              <Icon type="device_hub" />版本合并
+              <Icon type="merge_type" />版本合并
             </Button>
           </Permission>
           <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, this.state.pagination)}>

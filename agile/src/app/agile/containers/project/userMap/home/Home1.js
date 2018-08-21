@@ -383,11 +383,11 @@ class Home2 extends Component {
                 <div className="swimlane" style={{ height: `calc(100vh - ${document.getElementById('autoRouter').offsetTop + 48 + 48 + 10 + 98 + 58}px)`}}>
                   {this.renderColumn()}
                 </div>
-              </React.Fragment> : <div style={{ display: 'flex', justifyContent: 'center' }}>
+              </React.Fragment> : <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
                 <img src={epicPic} alt="" width="200" />
-                <div style={{ marginLeft: 50 }}>
+                <div style={{ marginLeft: 50, width: 390 }}>
                   <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
-                  <p style={{ fontSize: 20 }}>
+                  <p style={{ fontSize: 20, marginTop: 10 }}>
                     用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击 <a role={'none'} onClick={this.handleCreateEpic}>创建史诗</a> 进入用户故事地图。
                   </p>
                 </div>

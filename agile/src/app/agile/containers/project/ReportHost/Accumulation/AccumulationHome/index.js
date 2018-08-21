@@ -161,6 +161,7 @@ class AccumulationHome extends Component {
         stack: true,
         areaStyle: { normal: {
           color: data[index].color,
+          opacity: 0.1,
         } },
         lineStyle: { normal: {
           color: data[index].color,
@@ -226,6 +227,15 @@ class AccumulationHome extends Component {
           {
             name: '日期',
             type: 'category',
+            splitLine: {
+              show: true,
+              lineStyle: {
+                // 使用深浅的间隔色
+                color: 'rgba(116,59,231,0.10)',
+                opacity: 0.9,
+                // type: 'dashed',
+              },
+            },
             boundaryGap: false,
             data: newxAxis,
             axisLabel: {
@@ -239,6 +249,15 @@ class AccumulationHome extends Component {
         ],
         yAxis: [
           {
+            splitLine: {
+              show: true,
+              lineStyle: {
+                // 使用深浅的间隔色
+                color: 'rgba(116,59,231,0.10)',
+                opacity: 0.9,
+                // type: 'dashed',
+              },
+            },
             name: '问题数',
             type: 'value',
             minInterval: 1,

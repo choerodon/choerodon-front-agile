@@ -109,7 +109,7 @@ class BurndownChartHome extends Component {
           res.coordinate[nowKey] = res.coordinate[beforeKey];
         }
       }
-      const sliceDate = _.map(allDate, item => item.slice(5));
+      const sliceDate = _.map(allDate, item => item.slice(5).replace('-', '/'));
       this.setState({
         xAxis: sliceDate,
         yAxis: allDateValues,
@@ -264,24 +264,44 @@ class BurndownChartHome extends Component {
         type: 'category',
         boundaryGap: false,
         data: this.state.xAxis,
+        splitLine: {
+          show: true,
+          lineStyle: {
+            // 使用深浅的间隔色
+            color: 'rgba(116,59,231,0.10)',
+            opacity: 0.9,
+            // type: 'dashed',
+          },
+        },
       },
       yAxis: {
         type: 'value',
+        splitLine: {
+          show: true,
+          lineStyle: {
+            // 使用深浅的间隔色
+            color: 'rgba(116,59,231,0.10)',
+            opacity: 0.9,
+            // type: 'dashed',
+          },
+        },
       },
       series: [
         {
+          symbol: 'none',
           name: '期望值',
           type: 'line',
-          data: [[this.state.startDate.split(' ')[0].slice(5), this.state.expectCount], [this.state.endDate.split(' ')[0].slice(5), 0]],
+          data: [[this.state.startDate.split(' ')[0].slice(5).replace('-', '/'), this.state.expectCount], [this.state.endDate.split(' ')[0].slice(5).replace('-', '/'), 0]],
           itemStyle: {
             color: 'grey',
           },
           lineStyle: {
-            type: 'dashed',
+            type: 'dotted',
             color: 'grey',
           },
         },
         {
+          symbol: 'none',
           name: '剩余值',
           type: 'line',
           itemStyle: {
