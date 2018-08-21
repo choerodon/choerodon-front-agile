@@ -19,6 +19,7 @@ class StatusCard extends Component {
       visible: false,
     };
   }
+
   getStatusNumber() {
     const data = ScrumBoardStore.getBoardData;
     let length = 0;
@@ -27,6 +28,7 @@ class StatusCard extends Component {
     }
     return length;
   }
+
   handleDeleteStatus() {
     const originData = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
     const data = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
@@ -43,6 +45,7 @@ class StatusCard extends Component {
       ScrumBoardStore.setBoardData(originData);
     });
   }
+
   renderCloseDisplay() {
     if (this.props.columnId === 'unset') {
       if (this.props.data.issues.length === 0) {
@@ -53,6 +56,7 @@ class StatusCard extends Component {
     }
     return 'none';
   }
+
   renderBackground() {
     const data = this.props.data.categoryCode;
     if (data === 'todo') {
@@ -64,6 +68,7 @@ class StatusCard extends Component {
     }
     return '#d8d8d8';
   }
+
   render() {
     this.getStatusNumber();
     const menu = AppState.currentMenuType;
@@ -75,88 +80,92 @@ class StatusCard extends Component {
         index={this.props.index}
         type="status"
       >
-        {(provided, snapshot) => 
-          (
-            <div>
-              <div 
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                style={{
-                  cursor: 'move',
-                  userSelect: 'none',
-                  ...provided.draggableProps.style,
-                }}
-                className="c7n-scrumsetting-card"
-              >
-                <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.deleteStatus']}>
-                  <Icon 
-                    style={{ 
-                      position: 'absolute', 
-                      right: 12,
-                      display: this.renderCloseDisplay(),
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                    }} 
-                    role="none"
-                    onClick={this.handleDeleteStatus.bind(this)}
-                    type="close"
-                  />
-                </Permission>
-                <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.updateStatus']}>
-                  <Icon
-                    style={{ 
-                      position: 'absolute', 
-                      right: 30,
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                    }} 
-                    type="settings"
-                    role="none"
-                    onClick={() => {
-                      if (JSON.stringify(ScrumBoardStore.getStatusCategory) === '{}') {
-                        ScrumBoardStore.axiosGetStatusCategory().then((data) => {
-                          ScrumBoardStore.setStatusCategory(data);
-                          this.setState({
-                            visible: true,
-                          });
-                        }).catch((error) => {
-                        });
-                      } else {
+        {(provided, snapshot) => (
+          <div>
+            <div 
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              style={{
+                cursor: 'move',
+                userSelect: 'none',
+                ...provided.draggableProps.style,
+              }}
+              className="c7n-scrumsetting-card"
+            >
+              <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.deleteStatus']}>
+                <Icon 
+                  style={{ 
+                    position: 'absolute', 
+                    right: 12,
+                    display: this.renderCloseDisplay(),
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }} 
+                  role="none"
+                  onClick={this.handleDeleteStatus.bind(this)}
+                  type="close"
+                />
+              </Permission>
+              <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.updateStatus']}>
+                <Icon
+                  style={{ 
+                    position: 'absolute', 
+                    right: 12,
+                    top: '15px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }} 
+                  type="settings"
+                  role="none"
+                  onClick={() => {
+                    if (JSON.stringify(ScrumBoardStore.getStatusCategory) === '{}') {
+                      ScrumBoardStore.axiosGetStatusCategory().then((data) => {
+                        ScrumBoardStore.setStatusCategory(data);
                         this.setState({
                           visible: true,
                         });
-                      }
-                    }}
-                  />
-                </Permission>
-                <EditStatus
-                  visible={this.state.visible}
-                  onChangeVisible={(data) => {
-                    this.setState({
-                      visible: data,
-                    });
+                      }).catch((error) => {
+                      });
+                    } else {
+                      this.setState({
+                        visible: true,
+                      });
+                    }
                   }}
-                  data={this.props.data}
-                  refresh={this.props.refresh.bind(this)}
                 />
-                <span
-                  className="c7n-scrumsetting-cardStatus"
-                  style={{
-                    background: this.props.data.categoryCode ? this.renderBackground() : '',
-                    color: 'white',
-                  }}
-                >
-                  {this.props.data.status ? this.props.data.status : this.props.data.name}
-                </span>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
-                  <p className="textDisplayOneColumn">
-                    {this.props.data.issues ? `${this.props.data.issues.length} issues` : ''}
-                  </p>
-                  <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.updateStatus']}>
-                    <Radio
-                      checked={this.props.data.completed ? this.props.data.completed : false}
-                      onClick={() => {
+              </Permission>
+              <EditStatus
+                visible={this.state.visible}
+                onChangeVisible={(data) => {
+                  this.setState({
+                    visible: data,
+                  });
+                }}
+                data={this.props.data}
+                refresh={this.props.refresh.bind(this)}
+              />
+              <span
+                className="c7n-scrumsetting-cardStatus"
+                style={{
+                  background: this.props.data.categoryCode ? this.renderBackground() : '',
+                  color: 'white',
+                }}
+              >
+                {this.props.data.status ? this.props.data.status : this.props.data.name}
+              </span>
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', marginTop: 10, flexWrap: 'wrap', 
+              }}
+              >
+                <p className="textDisplayOneColumn">
+                  {this.props.data.issues ? `${this.props.data.issues.length} issues` : ''}
+                </p>
+                <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.updateStatus']}>
+                  <Radio
+                    style={{ marginRight: 0 }}
+                    checked={this.props.data.completed ? this.props.data.completed : false}
+                    onClick={() => {
                         const data = {
                           id: this.props.data.id,
                           objectVersionNumber: this.props.data.objectVersionNumber,
@@ -164,18 +173,28 @@ class StatusCard extends Component {
                           projectId: AppState.currentMenuType.id,
                         };
                         ScrumBoardStore.axiosUpdateIssueStatus(
-                          this.props.data.id, data).then((res) => {
+                          this.props.data.id, data,
+                        ).then((res) => {
                           this.props.refresh();
                         }).catch((error) => {
                         });
                       }}
-                    >设置已完成</Radio>
-                  </Permission>
-                </div>
+                  >
+
+
+
+
+
+
+设置已完成
+
+                                    </Radio>
+                </Permission>
               </div>
-              {provided.placeholder}
             </div>
-          )
+            {provided.placeholder}
+          </div>
+        )
         }
       </Draggable>
     );
@@ -183,4 +202,3 @@ class StatusCard extends Component {
 }
 
 export default StatusCard;
-

@@ -20,12 +20,14 @@ class SettingColumn extends Component {
       editMin: false,
     };
   }
+
   handleDeleteColumn() {
     ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
       this.props.refresh();
     }).catch((err) => {
     });
   }
+
   updateColumnMaxMin(type, value) {
     let totalIssues = 0;
     for (let index = 0, len = this.props.data.subStatuses.length; index < len; index += 1) {
@@ -74,11 +76,13 @@ class SettingColumn extends Component {
       ...maxminObj,
     };
     ScrumBoardStore.axiosUpdateMaxMinNum(
-      this.props.data.columnId, data).then((res) => {
+      this.props.data.columnId, data,
+    ).then((res) => {
       this.props.refresh();
     }).catch((error) => {
     });
   }
+
   handleSaveColumnName(name) {
     const data = {
       columnId: this.props.data.columnId,
@@ -88,7 +92,8 @@ class SettingColumn extends Component {
       boardId: ScrumBoardStore.getSelectedBoard,
     };
     ScrumBoardStore.axiosUpdateColumn(
-      this.props.data.columnId, data, ScrumBoardStore.getSelectedBoard).then((res) => {
+      this.props.data.columnId, data, ScrumBoardStore.getSelectedBoard,
+    ).then((res) => {
       const originData = ScrumBoardStore.getBoardData;
       originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
       originData[this.props.index].name = res.name;
@@ -96,6 +101,7 @@ class SettingColumn extends Component {
     }).catch((error) => {
     });
   }
+
   renderStatus() {
     const list = this.props.data.subStatuses;
     const result = [];
@@ -107,11 +113,13 @@ class SettingColumn extends Component {
           data={list[index]}
           index={index}
           refresh={this.props.refresh.bind(this)}
+         
         />,
       );
     }
     return result;
   }
+
   render() {
     if (this.props.disabled) {
       return (
@@ -153,7 +161,7 @@ class SettingColumn extends Component {
               <div className="c7n-scrumsetting-columnStatus">
                 {this.props.data.name}
               </div>
-              <div style={{ borderBottom: '3px solid black' }} className="c7n-scrumsetting-columnBottom">
+              <div style={{ borderBottom: '3px solid rgba(0,0,0,0.26)' }} className="c7n-scrumsetting-columnBottom">
                 {
                   this.props.data.columnId === 'unset' ? (
                     <div>
@@ -161,8 +169,18 @@ class SettingColumn extends Component {
                     </div>
                   ) : (
                     <div>
-                      <span style={{ cursor: 'pointer' }}>最大值：{this.props.data.maxNum}</span>
-                      <span style={{ cursor: 'pointer' }}>最小值：{this.props.data.maxNum}</span>
+                      <span style={{ cursor: 'pointer' }}>
+
+
+最大值：
+{this.props.data.maxNum}
+                      </span>
+                      <span style={{ cursor: 'pointer' }}>
+
+
+最小值：
+{this.props.data.maxNum}
+                      </span>
                     </div>
                   )
                 }
@@ -249,7 +267,7 @@ class SettingColumn extends Component {
                   <div
                     className="c7n-scrumsetting-columnBottom"
                     style={{
-                      borderBottom: this.props.data.color ? `3px solid ${this.props.data.color}` : '3px solid black',
+                      borderBottom: this.props.data.color ? `3px solid ${this.props.data.color}` : '3px solid rgba(0,0,0,0.26)',
                     }}
                   >
                     {
@@ -261,33 +279,66 @@ class SettingColumn extends Component {
                         <div
                           style={{
                             visibility: ScrumBoardStore.getCurrentConstraint === 'constraint_none' ? 'hidden' : 'visible',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
                           }}
                         >
                           <EasyEdit
                             className="editSpan"
                             type="input"
-                            defaultValue={this.props.data.maxNum ? 
-                              this.props.data.maxNum : null}
+                            defaultValue={this.props.data.maxNum 
+                              ? this.props.data.maxNum : null}
                             enterOrBlur={(value) => {
                               this.updateColumnMaxMin('maxNum', value);
                             }}
                           >
                             <span
-                              style={{ cursor: 'pointer' }}
-                            >最大值：{this.props.data.maxNum}</span>
+                              style={{ cursor: 'pointer', minWidth: '110px' }}
+                            >
+
+
+
+
+
+
+
+
+
+
+
+最大值：
+{this.props.data.maxNum || '没有最大'}
+
+                            </span>
                           </EasyEdit>
                           <EasyEdit
                             className="editSpan"
                             type="input"
-                            defaultValue={this.props.data.minNum ? 
-                              this.props.data.minNum : null}
+                            defaultValue={this.props.data.minNum 
+                              ? this.props.data.minNum : null}
                             enterOrBlur={(value) => {
                               this.updateColumnMaxMin('minNum', value);
                             }}
                           >
                             <span
-                              style={{ cursor: 'pointer' }}
-                            >最小值：{this.props.data.minNum}</span>
+                              style={{ cursor: 'pointer', minWidth: '110px' }}
+                            >
+
+
+
+
+
+
+
+
+
+
+
+最小值：
+{this.props.data.minNum || '没有最小'}
+
+                            </span>
                           </EasyEdit>
                         </div>
                       )
@@ -303,8 +354,8 @@ class SettingColumn extends Component {
                       <div
                         ref={provided.innerRef}
                         style={{
-                          background: snapshot.isDraggingOver ? 
-                            'rgba(26,177,111,0.08)' : 'unset',
+                          background: snapshot.isDraggingOver 
+                            ? 'rgba(26,177,111,0.08)' : 'unset',
                           height: '100%',
                         }}
                       >
@@ -325,4 +376,3 @@ class SettingColumn extends Component {
 }
 
 export default SettingColumn;
-
