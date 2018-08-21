@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Content, stores, Permission } from 'choerodon-front-boot';
-import { Button, Select, Icon, message } from 'choerodon-ui';
+import {
+  Button, Select, Icon, message, 
+} from 'choerodon-ui';
 import _ from 'lodash';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import SettingColumn from '../SettingColumn/SettingColumn';
@@ -22,6 +24,7 @@ class ColumnPage extends Component {
       addColumn: false,
     };
   }
+
   handleAddStatus() {
     this.setState({
       addStatus: true,
@@ -57,7 +60,8 @@ class ColumnPage extends Component {
         objectVersionNumber: JSON.parse(result.draggableId).objectVersionNumber,
       };
       ScrumBoardStore.axiosUpdateColumnSequence(
-        ScrumBoardStore.getSelectedBoard, data).then((res) => {
+        ScrumBoardStore.getSelectedBoard, data,
+      ).then((res) => {
         this.props.refresh();
       }).catch((error) => {
         ScrumBoardStore.setBoardData(originState2);
@@ -207,6 +211,7 @@ class ColumnPage extends Component {
       }
     }
   }
+
   handleAddColumn() {
     this.setState({
       addColumn: true,
@@ -218,6 +223,7 @@ class ColumnPage extends Component {
       });
     }
   }
+
   renderColumn(data) {
     const result = [];
     for (let index = 0, len = data.length; index < len; index += 1) {
@@ -232,6 +238,7 @@ class ColumnPage extends Component {
     }
     return result;
   }
+
   renderUnsetColumn() {
     const BoardData = ScrumBoardStore.getBoardData;
     if (BoardData.length > 0) {
@@ -248,6 +255,7 @@ class ColumnPage extends Component {
     }
     return '';
   }
+
   render() {
     const BoardData = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
     if (BoardData.length > 0) {
@@ -402,4 +410,3 @@ class ColumnPage extends Component {
 }
 
 export default ColumnPage;
-
