@@ -1,3 +1,14 @@
 .c7n-component {
   background: #fff;
+  td {
+    div {
+      height: 24px;
+    }
+    .ant-btn-circle.ant-btn-flat {
+      width: 24px;
+      height: 24px;
+      font-size: 18px;
+      line-height: 24px;
+    }
+  }
 }
