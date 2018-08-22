@@ -1,4 +1,6 @@
-import { observable, action, computed, toJS } from 'mobx';
+import {
+  observable, action, computed, toJS, 
+} from 'mobx';
 import axios from 'axios';
 import _ from 'lodash';
 import { store, stores } from 'choerodon-front-boot';
@@ -9,29 +11,45 @@ const { AppState } = stores;
 class UserMapStore {
   @observable
   epics = [];
+
+  @observable
+  showDoneEpic=false;
+
+  @observable
+  isApplyToEpic=false;
+
   @observable
   filters = [];
+
   @observable
   currentFilters = [];
+
   // @observable
   // currentBacklogFilters = [[], []];
   @observable
   sprints = [];
+
   @observable
   versions = [];
+
   @observable
   issues = [];
+
   @observable
   backlogIssues = [];
+
   @observable
   mode = 'none';
+
   @observable
   createEpic = false;
+
   @observable
   backlogExpand = [];
 
   @observable
   createVOS = false;
+
   @observable
   createVOSType='';
 
@@ -39,11 +57,28 @@ class UserMapStore {
   setEpics(data) {
     this.epics = data;
   }
+
   @observable currentBacklogFilters = [];
 
   @computed
   get getEpics() {
     return this.epics;
+  }
+
+  @action setShowDoneEpic(data) {
+    this.showDoneEpic = data;
+  }
+
+  @computed get getShowDoneEpic() {
+    return this.showDoneEpic;
+  }
+
+  @action setIsApplyToEpic(data) {
+    this.isApplyToEpic = data;
+  }
+
+  @computed get getIsApplyToEpic() {
+    return this.isApplyToEpic;
   }
 
   @action
@@ -55,6 +90,7 @@ class UserMapStore {
   get getFilters() {
     return this.filters;
   }
+  
 
   @action
   setCurrentFilter(data) {
@@ -75,6 +111,7 @@ class UserMapStore {
   get getSprints() {
     return this.sprints;
   }
+
   @action
   setVersions(data) {
     this.versions = data;
@@ -144,26 +181,39 @@ class UserMapStore {
   setBacklogExpand(data) {
     this.backlogExpand = data;
   }
+
   @action
   setCurrentBacklogFilters(type, data) {
     this.currentBacklogFilters[type] = data;
   }
+
   @action setCurrentBacklogFilter(data) {
     this.currentBacklogFilters = data;
   }
 
-  loadEpic = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`)
-    .then((epics) => {
-      this.setEpics(epics);
-    })
-    .catch((error) => {
-    
-    });
+  loadEpic = () => {
+    let url = '';
+    if (this.currentFilters.includes('mine')) {
+      url += `&assigneeId=${AppState.getUserId}`;
+    } 
+    if (this.currentFilters.includes('userStory')) {
+      url += '&onlyStory=true';
+    }
+    url += `&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}`;
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}${this.isApplyToEpic ? url : ''}`)
+      .then((epics) => {
+        this.setEpics(epics);
+      })
+      .catch((error) => {
+        Choerodon.handleResponseError(error);
+      });
+  };
 
   loadFilters = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
     .then((filters) => {
       this.setFilters(filters);
     });
+
   loadIssues = (pageType) => {
     // const url = `/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}&assigneeId=${this.currentFilters.includes('mime') ? AppState.getUserId : null}&onlyStory=${this.currentFilters.includes('userStory')}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mime' || item !== 'userStory')}`;
     let url = '';
@@ -184,32 +234,30 @@ class UserMapStore {
       this.setSprints(sprints);
     });
 
-  loadVersions = () =>
-    axios
-      .get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version`)
-      .then((versions) => {
-        this.setVersions(versions);
-      });
+  loadVersions = () => axios
+    .get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version`)
+    .then((versions) => {
+      this.setVersions(versions);
+    });
 
-  initData = (type = 'none', pageType = 'usermap') =>
-    axios
-      .all([
-        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`),
-        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
-        axios.get(
-          `/agile/v1/projects/${
-            AppState.currentMenuType.id
-          }/issues/storymap/issues?type=${type}&pageType=${pageType}`,
-        ),
-      ])
-      .then(
-        axios.spread((epics, filters, issues) => {
-          this.setFilters(filters);
-          this.setEpics(epics);
-          this.setIssues(issues);
-          // 两个请求现在都执行完成
-        }),
-      );
+  initData = (type = 'none', pageType = 'usermap') => axios
+    .all([
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`),
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
+      axios.get(
+        `/agile/v1/projects/${
+          AppState.currentMenuType.id
+        }/issues/storymap/issues?type=${type}&pageType=${pageType}`,
+      ),
+    ])
+    .then(
+      axios.spread((epics, filters, issues) => {
+        this.setFilters(filters);
+        this.setEpics(epics);
+        this.setIssues(issues);
+        // 两个请求现在都执行完成
+      }),
+    );
 
   getFiltersObj = (type = 'currentBacklogFilters') => {
     const filters = this[type];
@@ -272,6 +320,7 @@ class UserMapStore {
         this.setBacklogExpand([]);
       });
   };
+
   modifyEpic(issueId, objectVersionNumber) {
     const index = this.epics.findIndex(epic => epic.issueId === issueId);
     this.epics[index].objectVersionNumber = objectVersionNumber;

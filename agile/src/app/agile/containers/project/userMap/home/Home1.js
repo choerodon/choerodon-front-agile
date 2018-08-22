@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
-import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
-import { Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon, Card, Checkbox } from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, axios, 
+} from 'choerodon-front-boot';
+import {
+  Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon, Card, Checkbox, 
+} from 'choerodon-ui';
 import './test.scss';
 import CreateEpic from '../component/CreateEpic';
 import Backlog from '../component/Backlog/Backlog.js';
@@ -11,6 +15,7 @@ import IssueCard from '../component/IssueCard/IssueCard.js';
 import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
+import userMapStore from '../../../../stores/project/userMap/UserMapStore';
 
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
@@ -27,6 +32,7 @@ class Home2 extends Component {
       showBackLog: false,
     };
   }
+
   componentDidMount() {
     this.initData();
     const timer = setInterval(() => {
@@ -42,9 +48,11 @@ class Home2 extends Component {
     // window.addEventListener('scroll', this.handleScroll, true);
     // window.onscroll = this.handleScroll;
   }
+
   componentWillUnmount() {
     this.props.UserMapStore.setCurrentFilter([]);
   }
+
   initData =() => {
     this.setState({ loading: true });
     this.props.UserMapStore.initData();
@@ -61,22 +69,27 @@ class Home2 extends Component {
     this.props.UserMapStore.loadIssues(options.key, 'usermap');
     this.props.UserMapStore.loadBacklogIssues();
   };
+
   handleCreateEpic = () => {
     this.props.UserMapStore.setCreateEpic(true);
   }
 
   addFilter =(filter) => {
-    const { currentFilters } = this.props.UserMapStore;
-    const arr = _.cloneDeep(currentFilters);
+    const { UserMapStore } = this.props;
+    const arr = _.cloneDeep(UserMapStore.currentFilters);
     const value = filter;
-    const index = currentFilters.indexOf(value);
+    const index = UserMapStore.currentFilters.indexOf(value);
     if (index !== -1) {
       arr.splice(index, 1);
     } else {
       arr.push(value);
     }
-    this.props.UserMapStore.setCurrentFilter(arr);
-    this.props.UserMapStore.loadIssues('usermap');
+    UserMapStore.setCurrentFilter(arr);
+    UserMapStore.loadIssues('usermap');
+
+    if (UserMapStore.isApplyToEpic) {
+      UserMapStore.loadEpic();
+    }
   };
 
   changeMenuShow =(options) => {
@@ -84,16 +97,17 @@ class Home2 extends Component {
     this.setState({ moreMenuShow: !moreMenuShow });
   };
 
-  filterEpic =(e) => {
+  handleShowDoneEpic =(e) => {
     const { UserMapStore } = this.props;
-    const epicData = UserMapStore.getEpics;
-    if (e.target.checked) {
-      const sourceData = epicData.filter(item => item.statusCode === 'doing');
-      UserMapStore.setEpics(sourceData);
-    } else {
-      this.initData();
-    }
+    UserMapStore.setShowDoneEpic(e.target.checked);
+    userMapStore.loadEpic();
   };
+
+  handleFilterEpic =(e) => {
+    const { UserMapStore } = this.props;
+    UserMapStore.setIsApplyToEpic(e.target.checked);
+    userMapStore.loadEpic();
+  }
 
   expandColumn =(id) => {
     const { expandColumns } = this.state;
@@ -105,6 +119,7 @@ class Home2 extends Component {
     }
     this.setState({ expandColumns });
   };
+
   showBackLog =() => {
     this.setState({ showBackLog: !this.state.showBackLog });
   };
@@ -117,7 +132,6 @@ class Home2 extends Component {
   handleCreateOk=() => {
     const UserMapStore = this.props.UserMapStore;
     UserMapStore.setCreateVOS(false);
-    // UserMapStore.loadIssues("userMap");
     UserMapStore.getCreateVOSType === 'version' ? UserMapStore.loadVersions() : UserMapStore.loadSprints();
   }
 
@@ -177,40 +191,59 @@ class Home2 extends Component {
             </div>
           </div>
           <div style={{ display: this.state.expandColumns.includes(vos[id]) ? 'none' : 'flex' }}>
-            {epicData.map((epic, index) => (<div className="swimlane-column">
-              <React.Fragment>
-                {_.filter(issues, issue => issue.epicId === epic.issueId && issue[id] === vos[id]).map(item => (
-                  <IssueCard
-                    key={item.issueId}
-                    issue={item}
-                  />
-                ))}
-                <div
-                  onMouseOut={() => { this.setState({ hoverId: '', hoverVOSId: '', createIssue: false }); }}
-                  style={{ background: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] ? '#f5f5f5' : '', minHeight: 142 }}
-                  onMouseOver={this.handleMouseColumn.bind(this, epic.issueId, vos[id])}
-                >
-                  <div style={{ display: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && !this.state.createIssue ? 'block' : 'none' }}>add <a role="none" onClick={this.showCreateIssue}>new</a> or <a role="none" onClick={this.showBackLog}>existing</a></div>
-                  <CreateIssue
-                    data={{ epicId: epic.issueId, [id]: vos[id] }}
-                    style={{ display: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && this.state.createIssue ? 'block' : 'none' }}
-                  />
-                </div>
-              </React.Fragment>
-            </div>))}
+            {epicData.map((epic, index) => (
+              <div className="swimlane-column">
+                <React.Fragment>
+                  {_.filter(issues, issue => issue.epicId === epic.issueId && issue[id] === vos[id]).map(item => (
+                    <IssueCard
+                      key={item.issueId}
+                      issue={item}
+                    />
+                  ))}
+                  <div
+                    onMouseOut={() => { this.setState({ hoverId: '', hoverVOSId: '', createIssue: false }); }}
+                    style={{ background: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] ? '#f5f5f5' : '', minHeight: 142 }}
+                    onMouseOver={this.handleMouseColumn.bind(this, epic.issueId, vos[id])}
+                  >
+                    <div style={{ display: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && !this.state.createIssue ? 'block' : 'none' }}>
+
+
+add
+                      {' '}
+                      <a role="none" onClick={this.showCreateIssue}>new</a>
+                      {' '}
+
+
+or
+                      {' '}
+                      <a role="none" onClick={this.showBackLog}>existing</a>
+                    </div>
+                    <CreateIssue
+                      data={{ epicId: epic.issueId, [id]: vos[id] }}
+                      style={{ display: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && this.state.createIssue ? 'block' : 'none' }}
+                    />
+                  </div>
+                </React.Fragment>
+              </div>
+            ))}
           </div>
-        </React.Fragment>);
+                 </React.Fragment>);
       });
       dom.push(
-        <React.Fragment key={'no-sprint'}>
+        <React.Fragment key="no-sprint">
           <div className="swimlane-title">
             <p>
               {mode === 'none' ? 'issue' : '未计划的' }
               {mode === 'none' ? null
-                : <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
-                  <Icon type="playlist_add" />
-                  创建{mode === 'sprint' ? '冲刺' : '版本'}
-                </Button> }
+                : (
+                  <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                    <Icon type="playlist_add" />
+
+
+                  创建
+                    {mode === 'sprint' ? '冲刺' : '版本'}
+                  </Button>
+                ) }
 
             </p>
             <div style={{ display: 'flex' }}>
@@ -248,27 +281,41 @@ class Home2 extends Component {
             </div>
           </div>
           <div style={{ display: this.state.expandColumns.includes(`-1-${mode}`) ? 'none' : 'flex' }}>
-            {epicData.map((epic, index) => (<div className="swimlane-column">
-              <React.Fragment>
-                {_.filter(issues, issue => issue.epicId === epic.issueId && (issue.sprintId == null || issue.versionId == null)).map(item => (
-                  <IssueCard
-                    key={item.issueId}
-                    issue={item}
-                  />
-                ))}
-                <div
-                  onMouseLeave={() => { this.setState({ hoverId: '',createIssue: false  }); }}
-                  style={{ background: this.state.hoverId === epic.issueId ? '#f5f5f5' : '', minHeight: 142 }}
-                  onMouseOver={this.handleMouseColumn.bind(this, epic.issueId)}
-                >
-                  <div style={{ display: this.state.hoverId === epic.issueId && !this.state.createIssue ? 'block' : 'none' }}>add <a role="none" onClick={this.showCreateIssue}>new</a> or <a role="none" onClick={this.showBackLog}>existing</a></div>
-                  <CreateIssue
-                    data={{ epicId: epic.issueId, versionId: null, sprintId: null }}
-                    style={{ display: this.state.hoverId === epic.issueId && this.state.createIssue ? 'block' : 'none' }}
-                  />
-                </div>
-              </React.Fragment>
-            </div>))}
+            {epicData.map((epic, index) => (
+              <div className="swimlane-column">
+                <React.Fragment>
+                  {_.filter(issues, issue => issue.epicId === epic.issueId && (issue.sprintId == null || issue.versionId == null)).map(item => (
+                    <IssueCard
+                      key={item.issueId}
+                      issue={item}
+                    />
+                  ))}
+                  <div
+                    onMouseLeave={() => { this.setState({ hoverId: '', createIssue: false }); }}
+                    style={{ background: this.state.hoverId === epic.issueId ? '#f5f5f5' : '', minHeight: 142 }}
+                    onMouseOver={this.handleMouseColumn.bind(this, epic.issueId)}
+                  >
+                    <div style={{ display: this.state.hoverId === epic.issueId && !this.state.createIssue ? 'block' : 'none' }}>
+
+
+add
+                      {' '}
+                      <a role="none" onClick={this.showCreateIssue}>new</a>
+                      {' '}
+
+
+or
+                      {' '}
+                      <a role="none" onClick={this.showBackLog}>existing</a>
+                    </div>
+                    <CreateIssue
+                      data={{ epicId: epic.issueId, versionId: null, sprintId: null }}
+                      style={{ display: this.state.hoverId === epic.issueId && this.state.createIssue ? 'block' : 'none' }}
+                    />
+                  </div>
+                </React.Fragment>
+              </div>
+            ))}
           </div>
         </React.Fragment>,
       );
@@ -282,7 +329,9 @@ class Home2 extends Component {
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
     _.sortBy(epicData, 'rink');
-    const { filters, mode, issues, createEpic, currentFilters, sprints, versions } = UserMapStore;
+    const {
+ filters, mode, issues, createEpic, currentFilters, sprints, versions 
+} = UserMapStore;
     const swimlanMenu = (
       <Menu onClick={this.changeMode} selectable>
         <Menu.Item key="none">无泳道</Menu.Item>
@@ -297,8 +346,11 @@ class Home2 extends Component {
       >
         <Header title="用户故事地图">
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
-            <Icon type="playlist_add" />创建史诗
-          </Button>
+            <Icon type="playlist_add" />
+
+
+创建史诗
+</Button>
           <Dropdown overlay={swimlanMenu} trigger={['click']}>
             <Button>
               {mode === 'none' && '无泳道'}
@@ -309,37 +361,57 @@ class Home2 extends Component {
           </Dropdown>
           <div style={{ marginLeft: 8 }}>
             <Popover
-              overlayClassName={'moreMenuPopover'}
+              overlayClassName="moreMenuPopover"
               arrowPointAtCenter={false}
               placement="bottomLeft"
-              trigger={'click'}
-              content={<div>
-                <div className="menu-title">史诗过滤器</div>
-                <div style={{ height: 22, marginBottom: 20 }}>
-                  <Checkbox onChange={this.filterEpic}>已完成的史诗</Checkbox>
+              trigger="click"
+              content={(
+                <div>
+                  <div className="menu-title">史诗过滤器</div>
+                  <div style={{ height: 22, marginBottom: 20 }}>
+                    <Checkbox onChange={this.handleShowDoneEpic}>已完成的史诗</Checkbox>
+                  </div>
+                  <div style={{ height: 22, marginBottom: 32 }}>
+                    <Checkbox onChange={this.handleFilterEpic}>应用快速搜索到史诗</Checkbox>
+                  </div>
+                  <div className="menu-title">导出</div>
+                  <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div>
+                  <div style={{ height: 22, marginLeft: 26 }}>导出为图片</div>
                 </div>
-                <div style={{ height: 22, marginBottom: 32 }} >
-                  <Checkbox>应用快速搜索到史诗</Checkbox>
-                </div>
-                <div className="menu-title">导出</div>
-                <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div>
-                <div style={{ height: 22, marginLeft: 26 }}>导出为图片</div>
-              </div>}
+)}
             >
-              <div style={{ cursor: 'pointer', color: 'rgb(63, 81, 181)', fontWeight: 500, marginTop: 6 }}>
-                更多 <Icon type="arrow_drop_down" style={{ marginTop: -3 }} />
+              <div style={{
+                cursor: 'pointer', color: 'rgb(63, 81, 181)', fontWeight: 500, marginTop: 6, 
+              }}
+              >
+
+
+                更多
+{' '}
+                <Icon type="arrow_drop_down" style={{ marginTop: -3 }} />
               </div>
             </Popover>
           </div>
 
-          <Button style={{ color: 'white', fontSize: 12, position: 'absolute', right: 24 }} type="primary" funcType="raised" onClick={this.showBackLog}>
-            <Icon type="layers" />需求池
-          </Button>
+          <Button
+            style={{
+              color: 'white', fontSize: 12, position: 'absolute', right: 24, 
+            }}
+            type="primary"
+            funcType="raised"
+            onClick={this.showBackLog}
+          >
+            <Icon type="layers" />
+
+
+需求池
+</Button>
         </Header>
         <div className="c7n-userMap-content">
-          <div className="userMap-right" style={{ width: `${showBackLog ? 'calc(100% - 372px)' : 'calc(100% - 24px)'}` }} >
+          <div className="userMap-right" style={{ width: `${showBackLog ? 'calc(100% - 372px)' : 'calc(100% - 24px)'}` }}>
             <Spin spinning={false}>
-              {epicData.length ? <React.Fragment>
+              {epicData.length ? (
+<React.Fragment>
                 <div className="toolbar">
                   <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
                     <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
@@ -383,7 +455,9 @@ class Home2 extends Component {
                 <div className="swimlane" style={{ height: `calc(100vh - ${document.getElementById('autoRouter').offsetTop + 48 + 48 + 10 + 98 + 58}px)`}}>
                   {this.renderColumn()}
                 </div>
-              </React.Fragment> : <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
+              </React.Fragment>
+) : (
+<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
                 <img src={epicPic} alt="" width="200" />
                 <div style={{ marginLeft: 50, width: 390 }}>
                   <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
@@ -391,11 +465,9 @@ class Home2 extends Component {
                     用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击 <a role={'none'} onClick={this.handleCreateEpic}>创建史诗</a> 进入用户故事地图。
                   </p>
                 </div>
-
-              </div> }
-
+              </div>
+) }
             </Spin>
-
           </div>
           <div className="usermap-left" style={{ display: this.state.showBackLog ? 'block' : 'none' }}>
             <Backlog />
@@ -410,7 +482,7 @@ class Home2 extends Component {
           visible={UserMapStore.createVOS}
           // onOk={() => {UserMapStore.setCreateVOS(false)}}
           onOk={this.handleCreateOk}
-          onCancel={ () => {UserMapStore.setCreateVOS(false)}}
+          onCancel={() => { UserMapStore.setCreateVOS(false); }}
           type={UserMapStore.getCreateVOSType}
         />
       </Page>
