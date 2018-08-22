@@ -51,4 +51,9 @@
         sort: 8
         permission:
           - 'agile-service.quick-filter.create'
-    
+    - "userStoryMap":
+        icon: usermap
+        Routes: /agile/usermap
+        sort: 9
+        permission:
+          - 'agile-service.issue.listEpic'

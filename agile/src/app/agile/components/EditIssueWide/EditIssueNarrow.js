@@ -77,6 +77,8 @@ import TransformFromSubIssue from '../TransformFromSubIssue';
 import CreateBranch from '../CreateBranch';
 import Commits from '../Commits';
 import MergeRequest from '../MergeRequest';
+import Assignee from '../Assignee';
+import ChangeParent from '../ChangeParent';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -139,6 +141,8 @@ class CreateSprint extends Component {
       editDesShow: false,
       commitShow: false,
       mergeRequestShow: false,
+      assigneeShow: false,
+      changeParentShow: false,
       origin: {},
       loading: true,
       nav: 'detail',
@@ -837,6 +841,10 @@ class CreateSprint extends Component {
       this.setState({ transformFromSubIssueShow: true });
     } else if (e.key === '6') {
       this.setState({ createBranchShow: true });
+    } else if (e.key === '7') {
+      this.setState({ assigneeShow: true });
+    } else if (e.key === '8') {
+      this.setState({ changeParentShow: true });
     }
   }
 
@@ -1233,15 +1241,43 @@ class CreateSprint extends Component {
         >
           <Menu.Item key="1">删除</Menu.Item>
         </Permission>
-        {this.state.typeCode !== 'sub_task' && <Menu.Item key="2">创建子任务</Menu.Item>}
-        <Menu.Item key="3">复制问题</Menu.Item>
-        {this.state.typeCode !== 'sub_task'
-          && this.state.origin.subIssueDTOList
-          && this.state.origin.subIssueDTOList.length === 0 && (
-            <Menu.Item key="4">转化为子任务</Menu.Item>
-        )}
-        {this.state.typeCode === 'sub_task' && <Menu.Item key="5">转化为任务</Menu.Item>}
-        <Menu.Item key="6">创建分支</Menu.Item>
+        {
+          this.state.typeCode !== 'sub_task' && (
+            <Menu.Item key="2">
+              创建子任务
+            </Menu.Item>
+          )
+        }
+        <Menu.Item key="3">
+          复制问题
+        </Menu.Item>
+        {
+          this.state.typeCode !== 'sub_task' && this.state.origin.subIssueDTOList && this.state.origin.subIssueDTOList.length === 0 && (
+            <Menu.Item key="4">
+              转化为子任务
+            </Menu.Item>
+          )
+        }
+        {
+          this.state.typeCode === 'sub_task' && (
+            <Menu.Item key="5">
+              转化为任务
+            </Menu.Item>
+          )
+        }
+        <Menu.Item key="6">
+          创建分支
+        </Menu.Item>
+        <Menu.Item key="7">
+          分配问题
+        </Menu.Item>
+        {
+          this.state.typeCode === 'sub_task' && (
+            <Menu.Item key="8">
+              修改父级
+            </Menu.Item>
+          )
+        }
       </Menu>
     );
     const callback = (value) => {
@@ -3221,100 +3257,147 @@ h
             onCancel={() => this.setState({ dailyLogShow: false })}
             onOk={() => {
               loadWorklogs(this.state.issueId).then((res) => {
-                this.setState({
-                  worklogs: res,
-                });
-              });
-              loadIssue(this.state.issueId).then((res) => {
-                this.setAnIssueToState(res);
-              });
-              this.setState({ dailyLogShow: false });
+                this.setState({ worklogs: res });
+                this.setState({ dailyLogShow: false });
+              })
             }}
           />
-        ) : null}
-        {this.state.createSubTaskShow ? (
-          <CreateSubTask
-            issueId={this.state.origin.issueId}
-            visible={this.state.createSubTaskShow}
-            onCancel={() => this.setState({ createSubTaskShow: false })}
-            onOk={this.handleCreateSubIssue.bind(this)}
-          />
-        ) : null}
-        {this.state.createLinkTaskShow ? (
-          <CreateLinkTask
-            issueId={this.state.origin.issueId}
-            visible={this.state.createLinkTaskShow}
-            onCancel={() => this.setState({ createLinkTaskShow: false })}
-            onOk={this.handleCreateLinkIssue.bind(this)}
-          />
-        ) : null}
-        {this.state.copyIssueShow ? (
-          <CopyIssue
-            issueId={this.state.origin.issueId}
-            issueNum={this.state.origin.issueNum}
-            issue={this.state.origin}
-            issueLink={this.state.linkIssues}
-            issueSummary={this.state.origin.summary}
-            visible={this.state.copyIssueShow}
-            onCancel={() => this.setState({ copyIssueShow: false })}
-            onOk={this.handleCopyIssue.bind(this)}
-          />
-        ) : null}
-        {this.state.transformSubIssueShow ? (
-          <TransformSubIssue
-            visible={this.state.transformSubIssueShow}
-            issueId={this.state.origin.issueId}
-            issueNum={this.state.origin.issueNum}
-            ovn={this.state.origin.objectVersionNumber}
-            onCancel={() => this.setState({ transformSubIssueShow: false })}
-            onOk={this.handleTransformSubIssue.bind(this)}
-          />
-        ) : null}
-        {this.state.transformFromSubIssueShow ? (
-          <TransformFromSubIssue
-            visible={this.state.transformFromSubIssueShow}
-            issueId={this.state.origin.issueId}
-            issueNum={this.state.origin.issueNum}
-            ovn={this.state.origin.objectVersionNumber}
-            onCancel={() => this.setState({ transformFromSubIssueShow: false })}
-            onOk={this.handleTransformFromSubIssue.bind(this)}
-          />
-        ) : null}
-        {this.state.createBranchShow ? (
-          <CreateBranch
-            issueId={this.state.origin.issueId}
-            typeCode={this.state.origin.typeCode}
-            issueNum={this.state.origin.issueNum}
-            onOk={() => {
-              this.setState({ createBranchShow: false });
-              this.reloadIssue();
-            }}
-            onCancel={() => this.setState({ createBranchShow: false })}
-            visible={this.state.createBranchShow}
-          />
-        ) : null}
-        {this.state.commitShow ? (
-          <Commits
-            issueId={this.state.origin.issueId}
-            issueNum={this.state.origin.issueNum}
-            time={this.state.branchs.commitUpdateTime}
-            onCancel={() => {
-              this.setState({ commitShow: false });
-            }}
-            visible={this.state.commitShow}
-          />
-        ) : null}
-        {this.state.mergeRequestShow ? (
-          <MergeRequest
-            issueId={this.state.origin.issueId}
-            issueNum={this.state.origin.issueNum}
-            num={this.state.branchs.totalMergeRequest}
-            onCancel={() => {
-              this.setState({ mergeRequestShow: false });
-            }}
-            visible={this.state.mergeRequestShow}
-          />
-        ) : null}
+          ) : null
+        }
+        {
+          this.state.createSubTaskShow ? (
+            <CreateSubTask
+              issueId={this.state.origin.issueId}
+              visible={this.state.createSubTaskShow}
+              onCancel={() => this.setState({ createSubTaskShow: false })}
+              onOk={this.handleCreateSubIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.createLinkTaskShow ? (
+            <CreateLinkTask
+              issueId={this.state.origin.issueId}
+              visible={this.state.createLinkTaskShow}
+              onCancel={() => this.setState({ createLinkTaskShow: false })}
+              onOk={this.handleCreateLinkIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.copyIssueShow ? (
+            <CopyIssue
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              issue={this.state.origin}
+              issueLink={this.state.linkIssues}
+              issueSummary={this.state.origin.summary}
+              visible={this.state.copyIssueShow}
+              onCancel={() => this.setState({ copyIssueShow: false })}
+              onOk={this.handleCopyIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.transformSubIssueShow ? (
+            <TransformSubIssue
+              visible={this.state.transformSubIssueShow}
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              ovn={this.state.origin.objectVersionNumber}
+              onCancel={() => this.setState({ transformSubIssueShow: false })}
+              onOk={this.handleTransformSubIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.transformFromSubIssueShow ? (
+            <TransformFromSubIssue
+              visible={this.state.transformFromSubIssueShow}
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              ovn={this.state.origin.objectVersionNumber}
+              onCancel={() => this.setState({ transformFromSubIssueShow: false })}
+              onOk={this.handleTransformFromSubIssue.bind(this)}
+            />
+          ) : null
+        }
+        {
+          this.state.createBranchShow ? (
+            <CreateBranch
+              issueId={this.state.origin.issueId}
+              typeCode={this.state.origin.typeCode}
+              issueNum={this.state.origin.issueNum}
+              onOk={() => {
+                this.setState({ createBranchShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => this.setState({ createBranchShow: false })}
+              visible={this.state.createBranchShow}
+            />
+          ) : null
+        }
+        {
+          this.state.commitShow ? (
+            <Commits
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              time={this.state.branchs.commitUpdateTime}
+              onCancel={() => {
+                this.setState({ commitShow: false });
+              }}
+              visible={this.state.commitShow}
+            />
+          ) : null
+        }
+        {
+          this.state.mergeRequestShow ? (
+            <MergeRequest
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              num={this.state.branchs.totalMergeRequest}
+              onCancel={() => {
+                this.setState({ mergeRequestShow: false });
+              }}
+              visible={this.state.mergeRequestShow}
+            />
+          ) : null
+        }
+        {
+          this.state.assigneeShow ? (
+            <Assignee
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              visible={this.state.assigneeShow}
+              assigneeId={this.state.assigneeId}
+              objectVersionNumber={this.state.origin.objectVersionNumber}
+              onOk={() => {
+                this.setState({ assigneeShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => {
+                this.setState({ assigneeShow: false });
+              }}
+            />
+          ) : null
+        }
+        {
+          this.state.changeParentShow ? (
+            <ChangeParent
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              visible={this.state.changeParentShow}
+              objectVersionNumber={this.state.origin.objectVersionNumber}
+              onOk={() => {
+                this.setState({ changeParentShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => {
+                this.setState({ changeParentShow: false });
+              }}
+            />
+          ) : null
+        }
       </div>
     );
   }

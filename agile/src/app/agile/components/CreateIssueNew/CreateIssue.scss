@@ -1,10 +1,18 @@
 .c7n-createIssue {
+  .ant-form-item {
+    margin-bottom: 12px !important;
+
+    .ant-input-length-info {
+      margin-bottom: -18px !important;
+    }
+  }
+
   input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0px 1000px #fff inset;
   }
 
   .clear-p-mw {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 
     p {
       max-width: inherit !important;

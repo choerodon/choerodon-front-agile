@@ -5,6 +5,9 @@ import _ from 'lodash';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import { Button, Tabs, Table, Select, Icon, Tooltip, Spin } from 'choerodon-ui';
 import pic from './no_version.svg';
+import finish from './legend/finish.svg';
+import total from './legend/total.svg';
+import noEstimated from './legend/noEstimated.svg';
 import SwithChart from '../../Component/switchChart';
 import StatusTag from '../../../../../components/StatusTag';
 import PriorityTag from '../../../../../components/PriorityTag';
@@ -50,32 +53,32 @@ class EpicReport extends Component {
         data: [
           ...[
             VS.beforeCurrentUnit === 'issue_count' ? {} : {
-              name: `已完成 ${VS.getChartYAxisName}`,
-              icon: 'rectangle',
+              name: `总计 ${VS.getChartYAxisName}`,
+              icon: `image://${total}`,
             },
           ],
           ...[
             VS.beforeCurrentUnit === 'issue_count' ? {} : {
-              name: `总计 ${VS.getChartYAxisName}`,
-              icon: 'rectangle',
+              name: `已完成 ${VS.getChartYAxisName}`,
+              icon: `image://${finish}`,
             },
           ],
           ...[
             VS.beforeCurrentUnit === 'issue_count' ? {
               name: '问题数量',
-              icon: 'line',
+              icon: `image://${total}`,
             } : {},
           ],
           ...[
             VS.beforeCurrentUnit === 'issue_count' ? {} : {
               name: '未预估问题百分比',
-              icon: 'line',
+              icon: `image://${noEstimated}`,
             },
           ],
           ...[
             VS.beforeCurrentUnit === 'issue_count' ? {
               name: '已完成问题数',
-              icon: 'line',
+              icon: `image://${finish}`,
             } : {},
           ],
         ],
@@ -288,12 +291,12 @@ class EpicReport extends Component {
                 fontSize: 12,
                 fontStyle: 'normal',
               },
-              formatter(value, index) {
-                if (value && VS.beforeCurrentUnit !== 'issue_count') {
-                  return `${value}%`;
-                }
-                return value;
-              },
+              // formatter(value, index) {
+              //   if (value && VS.beforeCurrentUnit !== 'issue_count') {
+              //     return `${value}%`;
+              //   }
+              //   return value;
+              // },
             },
             splitLine: {
               show: false,
@@ -554,7 +557,7 @@ class EpicReport extends Component {
                 <div style={{ display: 'flex' }}>
                   <Select
                     style={{ width: 244 }}
-                    label="版本选择"
+                    label="版本"
                     value={VS.currentVersionId}
                     onChange={this.handleChangeCurrentVersion.bind(this)}
                   >
@@ -566,7 +569,7 @@ class EpicReport extends Component {
                   </Select>
                   <Select
                     style={{ width: 244, marginLeft: 24 }}
-                    label="单位选择"
+                    label="单位"
                     value={VS.currentUnit}
                     onChange={this.handleChangeCurrentUnit.bind(this)}
                   >

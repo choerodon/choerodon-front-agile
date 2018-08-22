@@ -27,6 +27,7 @@ import TransformFromSubIssue from '../TransformFromSubIssue';
 import CreateBranch from '../CreateBranch';
 import Commits from '../Commits';
 import MergeRequest from '../MergeRequest';
+import Assignee from '../Assignee';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -58,6 +59,7 @@ class CreateSprint extends Component {
       createSubTaskShow: false,
       createLinkTaskShow: false,
       createBranchShow: false,
+      assigneeShow: false,
       editDesShow: false,
       copyIssueShow: false,
       transformSubIssueShow: false,
@@ -758,7 +760,9 @@ class CreateSprint extends Component {
       this.setState({ transformFromSubIssueShow: true });
     } else if (e.key === '6') {
       this.setState({ createBranchShow: true });
-    }
+    } else if (e.key === '7') {
+      this.setState({ assigneeShow: true });
+    } 
   }
 
   handleChangeType({ key }) {
@@ -1136,6 +1140,9 @@ class CreateSprint extends Component {
         }
         <Menu.Item key="6">
           创建分支
+        </Menu.Item>
+        <Menu.Item key="7">
+          分配问题
         </Menu.Item>
       </Menu>
     );
@@ -2858,6 +2865,24 @@ class CreateSprint extends Component {
                 this.setState({ mergeRequestShow: false });
               }}
               visible={this.state.mergeRequestShow}
+            />
+          ) : null
+        }
+        {
+          this.state.assigneeShow ? (
+            <Assignee
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              visible={this.state.assigneeShow}
+              assigneeId={this.state.assigneeId}
+              objectVersionNumber={this.state.origin.objectVersionNumber}
+              onOk={() => {
+                this.setState({ assigneeShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => {
+                this.setState({ assigneeShow: false });
+              }}
             />
           ) : null
         }

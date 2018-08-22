@@ -17,6 +17,8 @@ import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 import userMapStore from '../../../../stores/project/userMap/UserMapStore';
 
+const FileSaver = require('file-saver');
+
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -142,6 +144,16 @@ class Home2 extends Component {
   showCreateIssue = () => {
     this.setState({ createIssue: true });
   };
+
+  exportExcel() {
+    const projectId = AppState.currentMenuType.id;
+    axios.post('url', { responseType: 'arraybuffer' })
+      .then((data) => {
+        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const fileName = `${AppState.currentMenuType.name}.xls`;
+        FileSaver.saveAs(blob, fileName);
+      });
+  }
 
   renderColumn = () => {
     const { UserMapStore } = this.props;

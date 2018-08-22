@@ -2,16 +2,13 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import {
-  Input, Icon, Popover, Menu, Checkbox,
+  Input, Icon, Popover, Checkbox,
 } from 'choerodon-ui';
-import { stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import './Backlog.scss';
 import '../../../../Agile.scss';
 import US from '../../../../../stores/project/userMap/UserMapStore';
 import TypeTag from '../../../../../components/TypeTag';
-
-const { AppState } = stores;
 
 @observer
 class Backlog extends Component {
@@ -69,7 +66,9 @@ class Backlog extends Component {
   }
 
   /**
-   * load issues, 1. mode none then render issue list 2. mode not none render issue group
+   * load issues,
+   * 1. mode none then render issue list 
+   * 2. mode not none render issue group, sprint||version
    */
   renderIssues() {
     const { mode, backlogExpand } = US;
@@ -90,7 +89,7 @@ class Backlog extends Component {
             {backlogExpand.includes(0) ? null : (
               <ul className="issue-block">
                 {
-                  _.map(group, (issue, i) => this.renderIssue(issue, i))
+                  _.map(group, issue => this.renderIssue(issue))
                 }
               </ul>
             )}
@@ -131,7 +130,7 @@ class Backlog extends Component {
         {backlogExpand.includes(group[`${mode}Id`]) ? null : (
           <ul className="issue-block">
             {
-              _.map(issues, (issue, index) => this.renderIssue(issue, index))
+              _.map(issues, issue => this.renderIssue(issue))
             }
           </ul>
         )}
@@ -157,7 +156,7 @@ class Backlog extends Component {
         {backlogExpand.includes('Unscheduled') ? null : (
           <ul className="issue-block">
             {
-              _.map(issues, (issue, index) => this.renderIssue(issue, index))
+              _.map(issues, issue => this.renderIssue(issue))
             }
           </ul>
         )}
@@ -165,7 +164,7 @@ class Backlog extends Component {
     );
   }
 
-  renderIssue(issue, i) {
+  renderIssue(issue) {
     return (
       <li
         key={issue.issueId}

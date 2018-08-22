@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
 import { Button, Tabs, Table, Select, Icon, Tooltip, Spin } from 'choerodon-ui';
 import pic from './no_epic.svg';
+import finish from './legend/finish.svg';
 import SwithChart from '../../Component/switchChart';
 import StatusTag from '../../../../../components/StatusTag';
 import PriorityTag from '../../../../../components/PriorityTag';
@@ -47,11 +48,12 @@ class EpicReport extends Component {
         y: 0,
         padding: [0, 50, 0, 0],
         itemWidth: 14,
+        itemGap: 30,
         data: [
           ...[
             ES.beforeCurrentUnit === 'issue_count' ? {} : {
               name: `已完成 ${ES.getChartYAxisName}`,
-              icon: 'rectangle',
+              icon: `image://${finish}`,
             },
           ],
           ...[
