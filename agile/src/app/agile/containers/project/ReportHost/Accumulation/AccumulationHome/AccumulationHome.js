@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Icon, DatePicker, Popover, Dropdown, Menu, Modal, Form, Select, Checkbox, Spin } from 'choerodon-ui';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import {
+  Button, Icon, DatePicker, Popover, Dropdown, Menu, Modal, Form, Select, Checkbox, Spin, 
+} from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, 
+} from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
 import ReactEcharts from 'echarts-for-react';
@@ -39,6 +43,7 @@ class AccumulationHome extends Component {
       loading: false,
     };
   }
+
   componentWillMount() {
     AccumulationStore.axiosGetFilterList().then((data) => {
       const newData = _.clone(data);
@@ -65,6 +70,7 @@ class AccumulationHome extends Component {
     }).catch((error) => {
     });
   }
+
   getColumnData(id, type) {
     ScrumBoardStore.axiosGetBoardData(id, 0, false, []).then((res2) => {
       const data2 = res2.columnsData.columns;
@@ -86,6 +92,7 @@ class AccumulationHome extends Component {
     }).catch((error) => {
     });
   }
+
   getData() {
     this.setState({
       loading: true,
@@ -130,10 +137,11 @@ class AccumulationHome extends Component {
       });
     });
   }
+
   getOption() {
     let data = _.clone(AccumulationStore.getAccumulationData);
     const sorceColors = [];
-    const colors = ['#743BE7', '#F953BA',  '#4090FE',  '#FF555', '#FFB100', '#00BFA5'];
+    const colors = ['#743BE7', '#F953BA', '#4090FE', '#FF555', '#FFB100', '#00BFA5'];
     _.map(data, (item, index) => {
       if (sorceColors.includes(item.color)) {
         item.color = colors[index % 6];
@@ -167,17 +175,22 @@ class AccumulationHome extends Component {
         name: data[index].name,
         type: 'line',
         stack: true,
-        areaStyle: { normal: {
+        areaStyle: {
+          normal: {
             color: data[index].color,
             opacity: 0.1,
-          } },
-        lineStyle: { normal: {
+          }, 
+        },
+        lineStyle: {
+          normal: {
             color: data[index].color,
-          } },
+          }, 
+        },
         itemStyle: {
           normal: { color: data[index].color },
         },
         data: [],
+        symbol: 'circle',
       });
       for (let index2 = 0, len2 = newxAxis.length; index2 < len2; index2 += 1) {
         let date = '';
@@ -214,12 +227,17 @@ class AccumulationHome extends Component {
           // },
         },
         legend: {
-          right: '0%',
+          right: '1%',
           data: legendData,
+          top: '3%',
+          itemGap: 30,
+          itemWidth: 14,
+          itemHeight: 14,
         },
         grid: {
-          left: '3%',
-          right: '3%',
+          left: '0%',
+          right: '16px',
+          top: '8%',
           containLabel: true,
         },
         // toolbox: {
@@ -291,6 +309,7 @@ class AccumulationHome extends Component {
       optionsVisible: false,
     });
   }
+
   getTimeType(data, type, array) {
     let result;
     if (array) {
@@ -325,6 +344,7 @@ class AccumulationHome extends Component {
     }
     return newData;
   }
+
   getFilterData() {
     return [{
       data: AccumulationStore.getBoardList,
@@ -355,6 +375,7 @@ class AccumulationHome extends Component {
       text: '快速搜索',
     }];
   }
+
   // handleOnBrushSelected(params) {
   // }
   render() {
@@ -457,19 +478,21 @@ class AccumulationHome extends Component {
                 ) : ''
               }
             </div>
-            {AccumulationStore.getAccumulationData.length ? <React.Fragment>
-              <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
-                <ReactEcharts
-                  ref={(e) => { this.echarts_react = e; }}
-                  option={this.state.options}
-                  style={{
-                    height: '600px',
-                  }}
-                  notMerge
-                  lazyUpdate
-                />
-              </div>
-            </React.Fragment> : <NoDataComponent title={'问题'} links={[{ name: '问题管理', link: '/agile/issue' }]} img={pic} /> }
+            {AccumulationStore.getAccumulationData.length ? (
+              <React.Fragment>
+                <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
+                  <ReactEcharts
+                    ref={(e) => { this.echarts_react = e; }}
+                    option={this.state.options}
+                    style={{
+                      height: '600px',
+                    }}
+                    notMerge
+                    lazyUpdate
+                  />
+                </div>
+              </React.Fragment>
+            ) : <NoDataComponent title="问题" links={[{ name: '问题管理', link: '/agile/issue' }]} img={pic} /> }
           </Spin>
         </Content>
       </Page>
@@ -478,4 +501,3 @@ class AccumulationHome extends Component {
 }
 
 export default Form.create()(AccumulationHome);
-
