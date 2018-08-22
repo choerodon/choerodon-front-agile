@@ -672,15 +672,21 @@ class ScrumBoardHome extends Component {
       _.map(data.columnsData.columns, (columns) => {
         _.map(columns.subStatuses, (status) => {
           count = _.reduce(status.issues, (sum, item) => {
-            if (!item[key]) {
-              sum += 1;
-              return sum;
+            if (key === '') {
+              return sum += 1;
             } else {
-              return sum += 0;
+              if (item[key] === 0 || item[key] === null) {
+                return sum += 1;
+              } else {
+                return sum += 0;
+              }
             }
           }, count);
         });
       });
+      if (key === 'parentIssueId') {
+        count -= data.parentIds.length;
+      }
     }
     return count;
   }
@@ -690,11 +696,13 @@ class ScrumBoardHome extends Component {
 
     const data = this.state.dataSource || {};
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
-      result = `其他问题(${this.getIssueCount(data, 'parentId')}个问题)`;
+      result = `其他问题(${this.getIssueCount(data, 'parentIssueId')}个问题)`;
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       result = `未分配的问题(${this.getIssueCount(data, 'assigneeId')}个问题)`;
-    } else {
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
       result = `所有问题(${this.getIssueCount(data, 'epicId')}个问题)`;
+    } else {
+      result = `所有问题(${this.getIssueCount(data, '')}个问题)`;
     }
     return result;
   }
