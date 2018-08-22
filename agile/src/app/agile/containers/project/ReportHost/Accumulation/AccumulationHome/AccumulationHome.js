@@ -215,7 +215,7 @@ class AccumulationHome extends Component {
         },
         legend: {
           right: '0%',
-          // data: legendData,
+          data: legendData,
         },
         grid: {
           left: '3%',
