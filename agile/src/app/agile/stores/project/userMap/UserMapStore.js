@@ -242,7 +242,7 @@ class UserMapStore {
 
   initData = (type = 'none', pageType = 'usermap') => axios
     .all([
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics`),
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}`),
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
       axios.get(
         `/agile/v1/projects/${
@@ -331,6 +331,20 @@ class UserMapStore {
     if (index === -1) return;
     this.issues[index].objectVersionNumber = objectVersionNumber;
   }
+
+  handleEpicDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data)
+    .then((res) => {
+      this.loadEpic();
+    })
+    .catch((error) => {
+      this.loadEpic();
+    });
+
+  handleMoveIssue = data => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/move`, data)
+    .then((res) => {
+      this.initData();
+    })
+    .catch(error => this.initData())
 }
 
 const userMapStore = new UserMapStore();

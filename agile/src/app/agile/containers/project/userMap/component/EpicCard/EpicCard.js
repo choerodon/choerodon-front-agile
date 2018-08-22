@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Input } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
 import './EpicCard.scss';
 import StatusTag from '../../../../../components/StatusTag';
 import { updateIssue } from '../../../../../api/NewIssueApi';
 import US from '../../../../../stores/project/userMap/UserMapStore';
+import BacklogStore from "../../../../../stores/project/backlog/BacklogStore";
 
 const { AppState } = stores;
 const { TextArea } = Input;
@@ -78,58 +80,76 @@ class EpicCard extends Component {
     const { epic } = this.props;
     const progress = !epic.issueCount ? 0 : epic.doneIssueCount / epic.issueCount;
     return (
-      <div className="c7n-userMap-epicCard">
-        <div className="c7n-progress">
+      <Draggable draggableId={this.props.index} index={this.props.index}>
+        {(provided1, snapshot1) => (
           <div
-            className="c7n-bar"
+            ref={provided1.innerRef}
+            {...provided1.draggableProps}
+            {...provided1.dragHandleProps}
             style={{
-              background: epic.color,
-              width: `${progress * 100}%`,
+              marginRight: 10,
+              background: 'white',
+              paddingLeft: 0,
+              cursor: 'move',
+              ...provided1.draggableProps.style,
             }}
-          />
-          <div
-            className="c7n-bar-bg"
-            style={{
-              background: epic.color,
-              width: `${100 - progress * 100}%`,
-            }}
-          />
-        </div>
-        <div className="c7n-content">
-          <TextArea
-            className="c7n-textArea"
-            autosize={{ minRows: 1, maxRows: 2 }}
-            value={this.state.epicName}
-            onChange={this.handleEpicNameChange.bind(this)}
-            onPressEnter={this.handlePressEnter}
-            onFocus={e => e.target.select()}
-            onBlur={this.updateEpicName}
-          />
-        </div>
-        <div className="c7n-footer">
-          <div className="c7n-footer-left">
-            <StatusTag name={epic.statusName} color={epic.statusColor} />
-            <span className="c7n-issueCount">{epic.totalEstimate}</span>
-          </div>
-          <span
-            className="c7n-issueNum"
             role="none"
-            onClick={() => {
-              const { history } = this.props;
-              const urlParams = AppState.currentMenuType;
-              history.push(
-                `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
-                  urlParams.name
-                }&organizationId=${urlParams.organizationId}&paramName=${
-                  epic.issueNum
-                }&paramIssueId=${epic.issueId}&paramUrl=usermap`,
-              );
-            }}
           >
+            <div className="c7n-userMap-epicCard">
+              <div className="c7n-progress">
+                <div
+                  className="c7n-bar"
+                  style={{
+                    background: epic.color,
+                    width: '30%',
+                  }}
+                />
+                <div
+                  className="c7n-bar-bg"
+                  style={{
+                    background: epic.color,
+                    width: `${100 - progress * 100}%`,
+                  }}
+                />
+              </div>
+              <div className="c7n-content">
+                <TextArea
+                  className="c7n-textArea"
+                  autosize={{ minRows: 1, maxRows: 2 }}
+                  value={this.state.epicName}
+                  onChange={this.handleEpicNameChange.bind(this)}
+                  onPressEnter={this.handlePressEnter}
+                  onFocus={e => e.target.select()}
+                  onBlur={this.updateEpicName}
+                />
+              </div>
+              <div className="c7n-footer">
+                <div className="c7n-footer-left">
+                  <StatusTag name={epic.statusName} color={epic.statusColor} />
+                  <span className="c7n-issueCount">{epic.totalEstimate}</span>
+                </div>
+                <span
+                  className="c7n-issueNum"
+                  role="none"
+                  onClick={() => {
+                    const { history } = this.props;
+                    const urlParams = AppState.currentMenuType;
+                    history.push(
+                      `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
+                        urlParams.name
+                        }&organizationId=${urlParams.organizationId}&paramName=${
+                        epic.issueNum
+                        }&paramIssueId=${epic.issueId}&paramUrl=usermap`,
+                    );
+                  }}
+                >
             {epic.issueNum}
           </span>
-        </div>
-      </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </Draggable>
     );
   }
 }
