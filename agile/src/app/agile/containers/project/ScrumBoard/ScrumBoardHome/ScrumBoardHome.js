@@ -672,15 +672,19 @@ class ScrumBoardHome extends Component {
       _.map(data.columnsData.columns, (columns) => {
         _.map(columns.subStatuses, (status) => {
           count = _.reduce(status.issues, (sum, item) => {
-            if (!item[key]) {
-              sum += 1;
-              return sum;
+            if (key === '') {
+              return sum += 1;
+            } else if (item[key] === 0 || item[key] === null) {
+              return sum += 1;
             } else {
               return sum += 0;
             }
           }, count);
         });
       });
+      if (key === 'parentIssueId') {
+        count -= data.parentIds.length;
+      }
     }
     return count;
   }
@@ -692,46 +696,24 @@ class ScrumBoardHome extends Component {
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       result = (
         <span>
-
 其他问题
-<span className="c7n-scrumboard-otherHeader-issueCount">
-
-(
-    {this.getIssueCount(data, 'parentId')}
-
-&nbsp;问题)
-    </span>
-                </span>
+<span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, 'parentId')}&nbsp;问题)</span>
+        </span>
       );
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       result = (
         <span>
-
-
 未分配的问题
-<span className="c7n-scrumboard-otherHeader-issueCount">
-
-(
-    {this.getIssueCount(data, 'assigneeId')}
-
-&nbsp;问题)
-    </span>
-                </span>
+<span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, 'assigneeId')}&nbsp;问题)</span>
+        </span>
       );
     } else {
       result = (
         <span>
-
-
 所有问题
-<span className="c7n-scrumboard-otherHeader-issueCount">
-
-(
-    {this.getIssueCount(data, 'epicId')}
-
-&nbsp;问题)
-    </span>
-                </span>
+{' '}
+<span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, 'epicId')}&nbsp;问题)</span>
+        </span>
       );
     }
     return result;
@@ -914,6 +896,8 @@ class ScrumBoardHome extends Component {
 
 
 
+
+
 仅我的问题
 
                                         </p>
@@ -926,6 +910,8 @@ class ScrumBoardHome extends Component {
                       role="none"
                       onClick={this.filterOnlyStory.bind(this)}
                     >
+
+
 
 
 
@@ -1056,8 +1042,12 @@ class ScrumBoardHome extends Component {
 
 
 
+
+
 在
 <span style={{ color: '#3f51b5' }}>待办事项</span>
+
+
 
 
 
@@ -1117,8 +1107,12 @@ class ScrumBoardHome extends Component {
 
 
 
+
+
 任务
 {this.state.judgeUpdateParent.issueNumber}
+
+
 
 
 
