@@ -104,6 +104,8 @@ class SwimLaneContext extends Component {
             </span>
             <div className="c7n-parentIssue-status">{item.status}</div>
             {item.summary}
+            <span>{`  (${item.count}子任务)`}</span>
+
           </div>
           <Button
             type="primary"
@@ -145,6 +147,7 @@ class SwimLaneContext extends Component {
             }
           </Avatar>
           {item.assigneeName}
+          <span>{`  (${item.count}问题)`}</span>
         </div>
       );
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
@@ -161,6 +164,7 @@ class SwimLaneContext extends Component {
             }}
           />
           {item.epicName}
+          <span>{`  (${item.count}问题)`}</span>
         </div>
       );
     }
