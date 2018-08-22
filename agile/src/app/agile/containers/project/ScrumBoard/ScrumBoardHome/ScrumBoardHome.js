@@ -697,7 +697,7 @@ class ScrumBoardHome extends Component {
       result = (
         <span>
 其他问题
-<span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, 'parentId')}&nbsp;问题)</span>
+<span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, 'parentIssueId')}&nbsp;问题)</span>
         </span>
       );
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
