@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Modal, Form, Radio, Select, DatePicker } from 'choerodon-ui';
+import { Modal, Form, Radio, Select, DatePicker, Icon } from 'choerodon-ui';
 import moment from 'moment';
 import { withRouter } from 'react-router-dom';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -78,13 +78,13 @@ class PublicRelease extends Component {
                 {
                   ReleaseStore.getPublicVersionDetail.fixIssueCount ? (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <div className="c7n-release-icon">!</div>
+                      <Icon type="error" style={{ color: 'red' }} />
                     还有
                       <span 
                         style={{ color: '#3F51B5', cursor: 'pointer' }}
                         role="none"
                         onClick={this.goIssue.bind(this)}
-                      >{ReleaseStore.getPublicVersionDetail.fixIssueCount}个</span>这个版本仍然没有解决的问题。
+                      >{ReleaseStore.getPublicVersionDetail.fixIssueCount} 这个版本仍然没有解决的问题。</span>
                     </div>
                   ) : ''
                 }

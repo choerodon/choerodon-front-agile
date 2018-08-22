@@ -144,7 +144,7 @@ class IssueItem extends Component {
                 </div>
                 <div
                   style={{
-                    marginTop: this.props.epicVisible || this.props.versionVisible || JSON.stringify(this.props.store.getClickIssueDetail) !== '{}' ? 0 : 0,
+                    marginTop: this.props.epicVisible || this.props.versionVisible || JSON.stringify(this.props.store.getClickIssueDetail) !== '{}' ? 6 : 0,
                     justifyContent: this.renderIssueDisplay() ? 'space-between' : 'flex-end',
                     // width: this.props.renderIssueDisplay() ? 'unset' : 0,
                     // flex: 2,

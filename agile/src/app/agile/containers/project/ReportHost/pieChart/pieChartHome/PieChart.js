@@ -13,6 +13,7 @@ import SwitchChart from '../../Component/switchChart';
 import VersionReportStore from '../../../../../stores/project/versionReport/VersionReport';
 import NoDataComponent from '../../Component/noData';
 import pic from '../../../../../assets/image/问题管理－空.png';
+import ReleaseStore from "../../../../../stores/project/release/ReleaseStore";
 
 const Option = Select.Option;
 const { AppState } = stores;
@@ -113,7 +114,7 @@ class ReleaseDetail extends Component {
           name: '',
           type: 'pie',
           // radius: '55%',
-          hoverAnimation: false,
+          // hoverAnimation: false,
           center: ['50%', '50%'],
           data: datas,
           label: {
@@ -237,7 +238,13 @@ class ReleaseDetail extends Component {
                               <div className="pie-legend-text" >{item.name ? item.name : '未分配'}</div>
                             </Tooltip>
                           </td>
-                          <td>{item.value}</td>
+                          <td>
+                            <a
+                              role="none"
+                              onClick={() => {
+                                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=${this.state.type}&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${item.name}下的问题&paramUrl=reporthost/sprintreport`);
+                              }}
+                            >{item.value}</a></td>
                           <td style={{ paddingTop: 12 }}>{`${((item.value / total) * 100).toFixed(2)} %`}</td>
                         </tr>
                       ))}

@@ -737,7 +737,7 @@ class SprintItem extends Component {
                                 <div>
                                   <p>{ass2.assigneeName}</p>
                                   <p>
-{ass2.totalStoryPoints}
+{ass2.totalStoryPoints || 0}
 {' '}
 故事点
 </p>

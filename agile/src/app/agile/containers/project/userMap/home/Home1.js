@@ -10,6 +10,7 @@ import EpicCard from '../component/EpicCard/EpicCard.js';
 import IssueCard from '../component/IssueCard/IssueCard.js';
 import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
+import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
@@ -280,6 +281,7 @@ class Home2 extends Component {
     const { showBackLog } = this.state;
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
+    _.sortBy(epicData, 'rink');
     const { filters, mode, issues, createEpic, currentFilters, sprints, versions } = UserMapStore;
     const swimlanMenu = (
       <Menu onClick={this.changeMode} selectable>
@@ -336,49 +338,64 @@ class Home2 extends Component {
         </Header>
         <div className="c7n-userMap-content">
           <div className="userMap-right" style={{ width: `${showBackLog ? 'calc(100% - 372px)' : 'calc(100% - 24px)'}` }} >
-            <div className="toolbar">
-              <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
-                <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
-                <p
-                  role="none"
-                  style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                  onClick={this.addFilter.bind(this,'mine')}
-                >仅我的问题</p>
-                <p
-                  role="none"
-                  style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                  onClick={this.addFilter.bind(this,'userStory')}
-                >仅用户故事</p>
-                {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`, marginBottom: 3}} onClick={this.addFilter.bind(this,filter.filterId)}>{filter.name}</p>) }
-              </div>
-              <div
-                style={{
-                  display: this.state.more ? 'block' : 'none',
-                  color: 'rgb(63, 81, 181)',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                }}
-                role="none"
-                onClick={() => {
-                  this.setState({
-                    expand: !this.state.expand,
-                  });
-                }}
-              >
-                {this.state.expand ? '...收起' : '...展开'}
-              </div>
-            </div>
-            <div className="epic">
-              {epicData.map(epic => (
-                <EpicCard
-                  key={epic.issueId}
-                  epic={epic}
-                />
-              ))}
-            </div>
-            <div className="swimlane" style={{ height: `calc(100vh - ${document.getElementById('autoRouter').offsetTop + 48 + 48 + 10 + 98 + 58}px)`}}>
-              {this.renderColumn()}
-            </div>
+            <Spin spinning={false}>
+              {epicData.length ? <React.Fragment>
+                <div className="toolbar">
+                  <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
+                    <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
+                    <p
+                      role="none"
+                      style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                      onClick={this.addFilter.bind(this,'mine')}
+                    >仅我的问题</p>
+                    <p
+                      role="none"
+                      style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                      onClick={this.addFilter.bind(this,'userStory')}
+                    >仅用户故事</p>
+                    {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`, marginBottom: 3}} onClick={this.addFilter.bind(this,filter.filterId)}>{filter.name}</p>) }
+                  </div>
+                  <div
+                    style={{
+                      display: this.state.more ? 'block' : 'none',
+                      color: 'rgb(63, 81, 181)',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                    role="none"
+                    onClick={() => {
+                      this.setState({
+                        expand: !this.state.expand,
+                      });
+                    }}
+                  >
+                    {this.state.expand ? '...收起' : '...展开'}
+                  </div>
+                </div>
+                <div className="epic">
+                  {epicData.map(epic => (
+                    <EpicCard
+                      key={epic.issueId}
+                      epic={epic}
+                    />
+                  ))}
+                </div>
+                <div className="swimlane" style={{ height: `calc(100vh - ${document.getElementById('autoRouter').offsetTop + 48 + 48 + 10 + 98 + 58}px)`}}>
+                  {this.renderColumn()}
+                </div>
+              </React.Fragment> : <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
+                <img src={epicPic} alt="" width="200" />
+                <div style={{ marginLeft: 50, width: 390 }}>
+                  <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+                  <p style={{ fontSize: 20, marginTop: 10 }}>
+                    用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击 <a role={'none'} onClick={this.handleCreateEpic}>创建史诗</a> 进入用户故事地图。
+                  </p>
+                </div>
+
+              </div> }
+
+            </Spin>
+
           </div>
           <div className="usermap-left" style={{ display: this.state.showBackLog ? 'block' : 'none' }}>
             <Backlog />
