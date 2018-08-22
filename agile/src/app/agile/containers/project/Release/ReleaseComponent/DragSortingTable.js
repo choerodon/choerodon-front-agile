@@ -115,6 +115,7 @@ class DragSortingTable extends Component {
       sourceData: props.dataSource,
     };
   }
+
   components = {
     body: {
       row: BodyRow,
@@ -140,7 +141,9 @@ class DragSortingTable extends Component {
     }
     const versionId = data[dragIndex].versionId;
     const { objectVersionNumber } = data[dragIndex];
-    const postData = { afterSequence, beforeSequence, versionId, objectVersionNumber };
+    const postData = {
+      afterSequence, beforeSequence, versionId, objectVersionNumber, 
+    };
     this.setState(
       update(this.state, {
         data: {
@@ -150,10 +153,11 @@ class DragSortingTable extends Component {
     );
     this.props.handleDrag(result, postData);
   };
+
   render() {
     return (
       <Table
-        rowClassName={'table-row'}
+        rowClassName="table-row"
         columns={this.props.columns}
         dataSource={this.props.dataSource}
         pagination={this.props.pagination}
@@ -173,4 +177,3 @@ class DragSortingTable extends Component {
 }
 
 export default DragSortingTable;
-

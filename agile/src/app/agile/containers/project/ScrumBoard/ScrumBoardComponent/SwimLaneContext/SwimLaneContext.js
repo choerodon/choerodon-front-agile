@@ -15,6 +15,7 @@ class SwimLaneContext extends Component {
       expand: true,
     };
   }
+
   getFirst(str) {
     if (!str) {
       return '';
@@ -27,6 +28,7 @@ class SwimLaneContext extends Component {
     }
     return str[0];
   }
+
   /**
    *类型
    *
@@ -60,6 +62,7 @@ class SwimLaneContext extends Component {
       );
     }
   }
+
   /**
    *泳道名称
    *
@@ -100,11 +103,13 @@ class SwimLaneContext extends Component {
                 ScrumBoardStore.setClickIssueDetail(item);
               }}
             >
-            #{item.issueNum}
+
+            #
+{item.issueNum}
             </span>
             <div className="c7n-parentIssue-status">{item.status}</div>
             {item.summary}
-            <span>{`  (${item.count}子任务)`}</span>
+            <span className="c7n-parentIssue-count">{`  (${item.count} 子任务)`}</span>
 
           </div>
           <Button
@@ -121,8 +126,9 @@ class SwimLaneContext extends Component {
               });
             }}
           >
+
         移动到done
-          </Button>
+</Button>
         </div>
       );
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
@@ -147,7 +153,7 @@ class SwimLaneContext extends Component {
             }
           </Avatar>
           {item.assigneeName}
-          <span>{`  (${item.count}问题)`}</span>
+          <span className="c7n-parentIssue-count">{`  (${item.count} 问题)`}</span>
         </div>
       );
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
@@ -164,12 +170,13 @@ class SwimLaneContext extends Component {
             }}
           />
           {item.epicName}
-          <span>{`  (${item.count}问题)`}</span>
+          <span className="c7n-parentIssue-count">{`  (${item.count} 问题)`}</span>
         </div>
       );
     }
     return result;
   }
+
   render() {
     const item = this.props.data;
     let id;
@@ -207,4 +214,3 @@ class SwimLaneContext extends Component {
 }
 
 export default SwimLaneContext;
-

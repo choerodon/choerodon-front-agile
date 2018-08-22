@@ -18,6 +18,11 @@
         padding: 12px 0;
         display: flex;
         align-items: center;
+        .c7n-scrumboard-otherHeader-issueCount{
+          padding-left: 11px;
+          font-size: 12px;
+          color: rgba(0,0,0,0.54);
+        }
       }
 
       .c7n-scrumboard-otherContent {
