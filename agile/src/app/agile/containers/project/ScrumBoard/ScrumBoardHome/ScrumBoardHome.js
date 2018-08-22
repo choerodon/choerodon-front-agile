@@ -113,6 +113,7 @@ class ScrumBoardHome extends Component {
         this.state.onlyMe ? AppState.getUserId : 0,
         this.state.recent,
         this.state.quickFilter).then((data) => {
+        this.setState({ dataSource: data });
         ScrumBoardStore.axiosGetAllEpicData().then((data2) => {
           const parentIds = [];
           const assigneeIds = [];
@@ -124,11 +125,26 @@ class ScrumBoardHome extends Component {
               for (let index3 = 0, len3 = data.columnsData.columns[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
                 if (data.parentIds.indexOf(parseInt(data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId, 10)) !== -1) {
                   if (parentIds.indexOf(data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId) === -1) {
+                    const parentId = data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId;
+                    let count = 0;
+                    _.map(data.columnsData.columns, (columns) => {
+                      _.map(columns.subStatuses, (status) => {
+                        count = _.reduce(status.issues, (sum, item) => {
+                          if (item.parentIssueId && item.parentIssueId === parentId) {
+                            sum += 1;
+                            return sum;
+                          } else {
+                            return sum += 0;
+                          }
+                        }, count);
+                      });
+                    });
                     parentIds.push(data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId);
                     storeParentIds.push({
                       status: data.columnsData.columns[index].subStatuses[index2].name,
                       categoryCode: data.columnsData.columns[index].subStatuses[index2].categoryCode,
                       ...data.columnsData.columns[index].subStatuses[index2].issues[index3],
+                      count,
                     });
                   }
                 }
@@ -136,7 +152,22 @@ class ScrumBoardHome extends Component {
                   if (assigneeIds.indexOf(data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId) === -1) {
                     if (data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId) {
                       assigneeIds.push(data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId);
+                      const assigneeId = data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId;
+                      let count = 0
+                      _.map(data.columnsData.columns, (columns) => {
+                        _.map(columns.subStatuses, (status) => {
+                          count = _.reduce(status.issues, (sum, item) => {
+                            if (item.assigneeId && item.assigneeId === assigneeId) {
+                              sum += 1;
+                              return sum;
+                            } else {
+                              return sum += 0;
+                            }
+                          }, count);
+                        });
+                      });
                       storeAssignee.push({
+                        count,
                         assigneeId: data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId,
                         assigneeName: data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeName,
                         imageUrl: data.columnsData.columns[index].subStatuses[index2].issues[index3].imageUrl,
@@ -150,6 +181,20 @@ class ScrumBoardHome extends Component {
           for (let index = 0, len = epicData.length; index < len; index += 1) {
             for (let index2 = 0, len2 = data2.length; index2 < len2; index2 += 1) {
               if (String(epicData[index].epicId) === String(data2[index2].issueId)) {
+                let count = 0;
+                _.map(data.columnsData.columns, (columns) => {
+                  _.map(columns.subStatuses, (status) => {
+                    count = _.reduce(status.issues, (sum, item) => {
+                      if (epicData[index].epicId === item.epicId) {
+                        sum += 1;
+                        return sum;
+                      } else {
+                        return sum += 0;
+                      }
+                    }, count);
+                  });
+                });
+                epicData[index].count = count;
                 epicData[index].color = data2[index2].color;
               }
             }
@@ -621,14 +666,35 @@ class ScrumBoardHome extends Component {
     return undefined;
   }
 
+  getIssueCount = (data, key) => {
+    let count = 0;
+    if (JSON.stringify(data) !== '{}') {
+      _.map(data.columnsData.columns, (columns) => {
+        _.map(columns.subStatuses, (status) => {
+          count = _.reduce(status.issues, (sum, item) => {
+            if (!item[key]) {
+              sum += 1;
+              return sum;
+            } else {
+              return sum += 0;
+            }
+          }, count);
+        });
+      });
+    }
+    return count;
+  }
+
   renderOthersTitle() {
     let result = '';
+
+    const data = this.state.dataSource || {};
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
-      result = '其他问题';
+      result = `其他问题(${this.getIssueCount(data, 'parentId')}个问题)`;
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
-      result = '未分配的问题';
+      result = `未分配的问题(${this.getIssueCount(data, 'assigneeId')}个问题)`;
     } else {
-      result = '所有问题';
+      result = `所有问题(${this.getIssueCount(data, 'epicId')}个问题)`;
     }
     return result;
   }
