@@ -680,7 +680,7 @@ class Issue extends Component {
                   style={{
                     userSelect: 'none',
                     background: 'white',  
-                    padding: '12px 0 12px 20px',
+                    padding: '12px 0 12px 19px',
                     fontSize: 13,
                     display: 'flex',
                     alignItems: 'center',

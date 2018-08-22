@@ -254,7 +254,7 @@ class CreateSubIssue extends Component {
             </FormItem>
 
             <div>
-              <div style={{ display: 'flex', marginBottom: 13, alignItems: 'center' }}>
+              <div style={{ display: 'flex', marginBottom: 3, alignItems: 'center' }}>
                 <div style={{ fontWeight: 'bold' }}>描述</div>
                 <div style={{ marginLeft: 80 }}>
                   <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
@@ -388,7 +388,7 @@ class CreateSubIssue extends Component {
             </FormItem>
           </Form>
           
-          <div className="sign-upload" style={{ marginTop: 38 }}>
+          <div className="sign-upload" style={{ marginTop: 20 }}>
             <div style={{ display: 'flex', marginBottom: 13, alignItems: 'center' }}>
               <div style={{ fontWeight: 'bold' }}>附件</div>
             </div>

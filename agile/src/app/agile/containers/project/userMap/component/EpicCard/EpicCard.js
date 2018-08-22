@@ -76,6 +76,7 @@ class EpicCard extends Component {
 
   render() {
     const { epic } = this.props;
+    const progress = !epic.issueCount ? 0 : epic.doneIssueCount / epic.issueCount;
     return (
       <div className="c7n-userMap-epicCard">
         <div className="c7n-progress">
@@ -83,14 +84,14 @@ class EpicCard extends Component {
             className="c7n-bar"
             style={{
               background: epic.color,
-              width: '30%',
+              width: `${progress * 100}%`,
             }}
           />
           <div
             className="c7n-bar-bg"
             style={{
               background: epic.color,
-              width: '70%',
+              width: `${100 - progress * 100}%`,
             }}
           />
         </div>
