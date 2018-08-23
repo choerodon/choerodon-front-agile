@@ -76,11 +76,18 @@ class IssueCard extends Component {
         US.freshIssue(issueId, res.objectVersionNumber);
       });
   }
+  onIssueClick = (id) => {
+    this.props.handleClickIssue(id);
+  };
 
   render() {
     const { issue } = this.props;
+    const { selectIssueIds, currentDraggableId } = US;
     return (
-      <div className="c7n-userMap-issueCard">
+      <div role="none" style={{ background: selectIssueIds.includes(issue.issueId) ? 'rgb(235, 242, 249)' : '' }} className="c7n-userMap-issueCard" onClick={this.onIssueClick.bind(this, issue.issueId, issue.epicId)}>
+        <div style={{ display: currentDraggableId === issue.issueId ? 'block' : 'none', width: 15, height: 15, color: 'white', background: '#F44336', borderRadius: '50%', textAlign: 'center' }}>
+          {selectIssueIds.length}
+        </div>
         <div
           className="c7n-mask"
           style={{
