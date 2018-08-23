@@ -307,7 +307,22 @@ class Backlog extends Component {
           </Popover>
         </div>
         <div className="body">
-          {this.renderIssues()}
+          <Droppable droppableId="backlog">
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                className="epic"
+                style={{
+                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                  padding: 'grid',
+                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                }}
+              >
+                {this.renderIssues()}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
         </div>
       </div>
     );
