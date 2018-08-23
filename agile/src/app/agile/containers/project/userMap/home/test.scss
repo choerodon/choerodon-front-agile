@@ -56,37 +56,36 @@
           height: 42px;
           display: flex;
           justify-content: space-between;
-          background: rgba(0,0,0,0.02);
-          border-bottom: 1px solid rgba(0,0,0,0.12);
-          border-top: 1px solid rgba(0,0,0,0.12);
+          background: rgba(0, 0, 0, 0.02);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+          border-top: 1px solid rgba(0, 0, 0, 0.12);
 
-          .createSpringBtn,.createVersionBtn{
-            padding-left:12px;
-            padding-right:12px;
+          .createSpringBtn,
+          .createVersionBtn {
+            padding-left: 12px;
+            padding-right: 12px;
             font-size: 13px;
-            color: #3F51B5;
+            color: #3f51b5;
             line-height: 15px;
           }
-          
+
           .point-span {
             text-align: center;
             border-radius: 100px;
             margin-right: 13px;
             width: 27px;
-            height: 20px
+            height: 20px;
           }
-
         }
 
         .swimlane-column {
           padding-top: 10px;
-          background: rgba(0,0,0,0.02);
+          background: rgba(0, 0, 0, 0.02);
           border-radius: 2px;
           width: 220px;
           min-width: 220px;
           margin-right: 10px;
           min-height: 142px;
-
         }
       }
     }
@@ -99,14 +98,13 @@
       right: 0;
     }
   }
-
 }
 
 .moreMenuPopover {
-  background: #FFFFFF;
+  background: #ffffff;
   width: 214px;
-  height:262px;
-  padding: 0!important;
+  height: 262px;
+  padding: 0 !important;
   //left: 510px!important;
   //top: 100px!important;
 
@@ -124,4 +122,51 @@
     text-align: left;
     margin-bottom: 12px;
   }
+}
+.fixHead {
+  margin: 0 auto;
+  width: 1000px;
+}
+
+.fixHead-line {
+  // margin-top: -21px;
+  width: 100%;
+}
+
+.fixHead-line-content {
+  display: flex;
+}
+
+.fixHead-line-title {
+  padding-left: 10px;
+  border-left: 20px solid #8bc34a;
+  background: lightblue;
+  width: 100%;
+}
+
+.fixHead-head-note {
+  padding-left: 10px;
+  border-left: 20px solid #2196f3;
+  background: lightblue;
+}
+
+.fixHead-block {
+  flex-shrink: 0;
+  width: 500px;
+  border: 1px solid #eee;
+}
+
+.fixHead-head {
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.fixHead-head .fixHead-block {
+  // height: 150px;
+}
+
+.fixHead-body {
+  margin-top: -19px;
+  height: 350px;
+  overflow: scroll;
 }
