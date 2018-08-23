@@ -509,13 +509,37 @@ handleClickIssue = (issueId, epicId) => {
   };
 
   handleDragBacklog = (res) => {
-
+    const { UserMapStore } = this.props;
+    const { backlogIssues, mode, selectIssueIds } = UserMapStore;
+    const key = `${mode}Id`;
+    const value = parseInt(res.destination.droppableId.split('-')[1], 10);
+    const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
+    const before = res.destination.index === 0;
+    const rankIndex = res.source.index > res.destination.index;
+    let postData = {};
+    const issueData = _.cloneDeep(backlogIssues);
+    _.map(issueIds, (issueId) => {
+      const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
+      if (mode === 'none') {
+        postData = { epicId: value, issueIds, before, rankIndex };
+        sourceIssue.epicId = null;
+        // sourceIssue[key] = value;
+      } else {
+        postData = { issueIds, before, rankIndex, [key]: value };
+        sourceIssue.epicId = null;
+        value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
+      }
+      UserMapStore.setBacklogIssues(issueData);
+    });
+    UserMapStore.handleMoveIssue(postData);
+    UserMapStore.setSelectIssueIds([]);
+    UserMapStore.setCurrentDraggableId(null);
   };
 
   handleEpicOrIssueDrag = (res) => {
     if (res.destination.droppableId === 'epic') {
       this.handleEpicDrag(res);
-    } else if (res.destination.droppableId === 'backlog') {
+    } else if (res.destination.droppableId.includes('backlog')) {
       this.handleDragBacklog(res);
     } else {
       this.handleDragIssues(res);
