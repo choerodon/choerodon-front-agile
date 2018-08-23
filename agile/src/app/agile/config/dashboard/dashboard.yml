@@ -5,3 +5,15 @@ dashboard:
     description: "敏捷文档"
     level: project
     sort: 1
+  - code: "UncompleteTask"
+    icon: assignment
+    title: "当前项目未完成的任务数"
+    description: "当前项目未完成的任务数"
+    level: project
+    sort: 2
+  - code: "VersionProgress"
+    icon: menu
+    title: "版本进度"
+    description: "版本进度"
+    level: project
+    sort: 3
