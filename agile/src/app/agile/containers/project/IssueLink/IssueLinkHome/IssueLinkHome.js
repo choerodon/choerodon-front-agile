@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Table, Spin, Popover, Tooltip, Icon } from 'choerodon-ui';
-import { Page, Header, Content, stores, axios, Permission } from 'choerodon-front-boot';
+import {
+  Button, Table, Spin, Popover, Tooltip, Icon, 
+} from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, axios, Permission, 
+} from 'choerodon-front-boot';
 import CreateLink from './Component/CreateLink';
 import EditLink from './Component/EditLink';
 import DeleteLink from './Component/DeleteLink';
+import './IssueLinkHome.scss';
 
 const { AppState } = stores;
 
@@ -56,15 +61,15 @@ class Link extends Component {
     this.setState({
       loading: true,
     });
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types`)
+    axios
+      .get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types`)
       .then((res) => {
         this.setState({
           links: res,
           loading: false,
         });
       })
-      .catch((error) => {
-      });
+      .catch((error) => {});
   }
 
   render() {
@@ -78,7 +83,14 @@ class Link extends Component {
         render: linkName => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={linkName}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: 0,
+                }}
+              >
                 {linkName}
               </p>
             </Tooltip>
@@ -92,7 +104,14 @@ class Link extends Component {
         render: outWard => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={outWard}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: 0,
+                }}
+              >
                 {outWard}
               </p>
             </Tooltip>
@@ -106,7 +125,14 @@ class Link extends Component {
         render: inWard => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={inWard}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: 0,
+                }}
+              >
                 {inWard}
               </p>
             </Tooltip>
@@ -119,18 +145,44 @@ class Link extends Component {
         width: '15%',
         render: (linkTypeId, record) => (
           <div>
-            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-link-type.updateIssueLinkType']}>
-              <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>详情</span></div>}>
-                <Button shape="circle" onClick={this.showLinkType.bind(this, record)}>
-                  <Icon type="mode_edit" />
-                </Button>
+            <Permission
+              type={type}
+              projectId={projectId}
+              organizationId={orgId}
+              service={['agile-service.issue-link-type.updateIssueLinkType']}
+            >
+              <Popover
+                placement="bottom"
+                mouseEnterDelay={0.5}
+                content={(
+                  <div>
+                    <span>详情</span>
+                  </div>
+)}
+              >
+                {/* <Button shape="circle" onClick={this.showLinkType.bind(this, record)}> */}
+                <Icon type="mode_edit" onClick={this.showLinkType.bind(this, record)} />
+                {/* </Button> */}
               </Popover>
             </Permission>
-            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-link-type.deleteIssueLinkType']}>
-              <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>删除</span></div>}>
-                <Button shape="circle" onClick={this.clickDeleteLink.bind(this, record)}>
-                  <Icon type="delete_forever" />
-                </Button>
+            <Permission
+              type={type}
+              projectId={projectId}
+              organizationId={orgId}
+              service={['agile-service.issue-link-type.deleteIssueLinkType']}
+            >
+              <Popover
+                placement="bottom"
+                mouseEnterDelay={0.5}
+                content={(
+                  <div>
+                    <span>删除</span>
+                  </div>
+)}
+              >
+                {/* <Button shape="circle" onClick={this.clickDeleteLink.bind(this, record)}> */}
+                <Icon type="delete_forever" onClick={this.clickDeleteLink.bind(this, record)} />
+                {/* </Button> */}
               </Popover>
             </Permission>
           </div>
@@ -144,9 +196,15 @@ class Link extends Component {
           'agile-service.issue-link-type.deleteIssueLinkType',
           'agile-service.issue-link-type.createIssueLinkType',
         ]}
+        className="c7n-issue-link"
       >
         <Header title="问题链接">
-          <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-link-type.createIssueLinkType']}>
+          <Permission
+            type={type}
+            projectId={projectId}
+            organizationId={orgId}
+            service={['agile-service.issue-link-type.createIssueLinkType']}
+          >
             <Button funcType="flat" onClick={() => this.setState({ createLinkShow: true })}>
               <Icon type="playlist_add icon" />
               <span>创建链接</span>
@@ -170,41 +228,34 @@ class Link extends Component {
                 dataSource={this.state.links}
                 scroll={{ x: true }}
               />
-          
             </Spin>
-            {
-              this.state.createLinkShow ? (
-                <CreateLink
-                  onOk={() => {
-                    this.setState({ createLinkShow: false });
-                    this.loadLinks();
-                  }}
-                  onCancel={() => this.setState({ createLinkShow: false })}
-                />
-              ) : null
-            }
-            {
-              this.state.editLinkShow ? (
-                <EditLink
-                  linkTypeId={this.state.currentLinkTypeId}
-                  onOk={() => {
-                    this.setState({ editLinkShow: false });
-                    this.loadLinks();
-                  }}
-                  onCancel={() => this.setState({ editLinkShow: false })}
-                />
-              ) : null
-            }
-            {
-              this.state.confirmShow ? (
-                <DeleteLink
-                  visible={this.state.confirmShow}
-                  link={this.state.link}
-                  onCancel={() => this.setState({ confirmShow: false })}
-                  onOk={this.deleteLink.bind(this)}
-                />
-              ) : null
-            }
+            {this.state.createLinkShow ? (
+              <CreateLink
+                onOk={() => {
+                  this.setState({ createLinkShow: false });
+                  this.loadLinks();
+                }}
+                onCancel={() => this.setState({ createLinkShow: false })}
+              />
+            ) : null}
+            {this.state.editLinkShow ? (
+              <EditLink
+                linkTypeId={this.state.currentLinkTypeId}
+                onOk={() => {
+                  this.setState({ editLinkShow: false });
+                  this.loadLinks();
+                }}
+                onCancel={() => this.setState({ editLinkShow: false })}
+              />
+            ) : null}
+            {this.state.confirmShow ? (
+              <DeleteLink
+                visible={this.state.confirmShow}
+                link={this.state.link}
+                onCancel={() => this.setState({ confirmShow: false })}
+                onOk={this.deleteLink.bind(this)}
+              />
+            ) : null}
           </div>
         </Content>
       </Page>

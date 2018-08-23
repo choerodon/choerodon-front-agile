@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Table, Spin, Popover, Tooltip, Icon } from 'choerodon-ui';
-import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
+import {
+  Button, Table, Spin, Popover, Tooltip, Icon, 
+} from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, Permission, 
+} from 'choerodon-front-boot';
 import './ComponentHome.scss';
 import pic from '../../../../assets/image/模块管理－空.png';
 import { loadComponents } from '../../../../api/ComponentApi';
@@ -10,7 +14,6 @@ import EditComponent from '../ComponentComponent/EditComponent';
 import DeleteComponent from '../ComponentComponent/DeleteComponent';
 import EmptyBlock from '../../../../components/EmptyBlock';
 import UserHead from '../../../../components/UserHead';
-
 
 const { AppState } = stores;
 
@@ -65,8 +68,7 @@ class ComponentHome extends Component {
           loading: false,
         });
       })
-      .catch((error) => {
-      });
+      .catch((error) => {});
   }
 
   render() {
@@ -81,7 +83,14 @@ class ComponentHome extends Component {
         render: name => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={name}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: 0,
+                }}
+              >
                 {name}
               </p>
             </Tooltip>
@@ -94,13 +103,38 @@ class ComponentHome extends Component {
         width: '10%',
         render: (issueCount, record) => (
           <div
-            style={{ width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center', cursor: 'pointer', color: '#3f51b5' }}
+            style={{
+              width: '100%',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              color: '#3f51b5',
+            }}
             role="none"
             onClick={() => {
-              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=component&paramId=${record.componentId}&paramName=模块"${record.name}"下的问题&paramUrl=component`);
+              this.props.history.push(
+                `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
+                  urlParams.name
+                }&organizationId=${urlParams.organizationId}&paramType=component&paramId=${
+                  record.componentId
+                }&paramName=模块"${record.name}"下的问题&paramUrl=component`,
+              );
             }}
           >
-            <span style={{ display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>{issueCount || 0} issues</span>
+            <span
+              style={{
+                display: 'inline-block',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                textAlign: 'left',
+              }}
+            >
+              {issueCount || 0}
+              {' '}
+issues
+            </span>
             {/* <span>{issueCount}issues</span> */}
           </div>
         ),
@@ -133,7 +167,14 @@ class ComponentHome extends Component {
         render: description => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={description}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: 0,
+                }}
+              >
                 {description}
               </p>
             </Tooltip>
@@ -151,18 +192,47 @@ class ComponentHome extends Component {
         width: '10%',
         render: (componentId, record) => (
           <div>
-            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-component.updateComponent']}>
-              <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>详情</span></div>}>
-                <Button shape="circle" onClick={this.showComponent.bind(this, record)}>
-                  <Icon type="mode_edit" />
-                </Button>
+            <Permission
+              type={type}
+              projectId={projectId}
+              organizationId={orgId}
+              service={['agile-service.issue-component.updateComponent']}
+            >
+              <Popover
+                placement="bottom"
+                mouseEnterDelay={0.5}
+                content={(
+                  <div>
+                    <span>详情</span>
+                  </div>
+)}
+              >
+                {/* <Button shape="circle" onClick={this.showComponent.bind(this, record)}> */}
+                <Icon type="mode_edit" onClick={this.showComponent.bind(this, record)} />
+                {/* </Button> */}
               </Popover>
             </Permission>
-            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-component.deleteComponent']}>
-              <Popover placement="bottom" mouseEnterDelay={0.5} content={<div><span>删除</span></div>}>
-                <Button shape="circle" onClick={this.clickDeleteComponent.bind(this, record)}>
-                  <Icon type="delete_forever" />
-                </Button>
+            <Permission
+              type={type}
+              projectId={projectId}
+              organizationId={orgId}
+              service={['agile-service.issue-component.deleteComponent']}
+            >
+              <Popover
+                placement="bottom"
+                mouseEnterDelay={0.5}
+                content={(
+                  <div>
+                    <span>删除</span>
+                  </div>
+)}
+              >
+                {/* <Button shape="circle" onClick={this.clickDeleteComponent.bind(this, record)}> */}
+                <Icon
+                  type="delete_forever"
+                  onClick={this.clickDeleteComponent.bind(this, record)}
+                />
+                {/* </Button> */}
               </Popover>
             </Permission>
           </div>
@@ -180,7 +250,12 @@ class ComponentHome extends Component {
         ]}
       >
         <Header title="模块管理">
-          <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-component.createComponent']}>
+          <Permission
+            type={type}
+            projectId={projectId}
+            organizationId={orgId}
+            service={['agile-service.issue-component.createComponent']}
+          >
             <Button funcType="flat" onClick={() => this.setState({ createComponentShow: true })}>
               <Icon type="playlist_add icon" />
               <span>创建模块</span>
@@ -197,64 +272,52 @@ class ComponentHome extends Component {
           link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/component/"
         >
           <Spin spinning={this.state.loading}>
-            {
-              this.state.components.length === 0 && !this.state.loading ? (
-                <EmptyBlock
-                  style={{ marginTop: 50 }}
-                  border
-                  pic={pic}
-                  title="您尚未添加任何组件到此项目"
-                  des="组成部分是一个项目的分节。在一个项目内用它们把问题分成较小部分的组。"
-                />
-              ) : (
-                <Table
-                  columns={column}
-                  dataSource={this.state.components}
-                  scroll={{ x: true }}
-                />
-              )
-            }
+            {this.state.components.length === 0 && !this.state.loading ? (
+              <EmptyBlock
+                style={{ marginTop: 50 }}
+                border
+                pic={pic}
+                title="您尚未添加任何组件到此项目"
+                des="组成部分是一个项目的分节。在一个项目内用它们把问题分成较小部分的组。"
+              />
+            ) : (
+              <Table columns={column} dataSource={this.state.components} scroll={{ x: true }} />
+            )}
           </Spin>
-          {
-            this.state.createComponentShow ? (
-              <CreateComponent 
-                visible={this.state.createComponentShow}
-                onCancel={() => this.setState({ createComponentShow: false })}
-                onOk={() => {
-                  this.loadComponents();
-                  this.setState({
-                    createComponentShow: false,
-                  });
-                }}
-              />
-            ) : null
-          }
-          {
-            this.state.editComponentShow ? (
-              <EditComponent
-                componentId={this.state.currentComponentId}
-                visible={this.state.editComponentShow}
-                onCancel={() => this.setState({ editComponentShow: false })}
-                onOk={() => {
-                  this.loadComponents();
-                  this.setState({
-                    editComponentShow: false,
-                  });
-                }}
-              />
-            ) : null
-          }
-          {
-            this.state.confirmShow ? (
-              <DeleteComponent
-                visible={this.state.confirmShow}
-                component={this.state.component}
-                onCancel={() => this.setState({ confirmShow: false })}
-                onOk={this.deleteComponent.bind(this)}
-                history={this.props.history}
-              />
-            ) : null
-          }
+          {this.state.createComponentShow ? (
+            <CreateComponent
+              visible={this.state.createComponentShow}
+              onCancel={() => this.setState({ createComponentShow: false })}
+              onOk={() => {
+                this.loadComponents();
+                this.setState({
+                  createComponentShow: false,
+                });
+              }}
+            />
+          ) : null}
+          {this.state.editComponentShow ? (
+            <EditComponent
+              componentId={this.state.currentComponentId}
+              visible={this.state.editComponentShow}
+              onCancel={() => this.setState({ editComponentShow: false })}
+              onOk={() => {
+                this.loadComponents();
+                this.setState({
+                  editComponentShow: false,
+                });
+              }}
+            />
+          ) : null}
+          {this.state.confirmShow ? (
+            <DeleteComponent
+              visible={this.state.confirmShow}
+              component={this.state.component}
+              onCancel={() => this.setState({ confirmShow: false })}
+              onOk={this.deleteComponent.bind(this)}
+              history={this.props.history}
+            />
+          ) : null}
         </Content>
       </Page>
     );
