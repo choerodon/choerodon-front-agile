@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Table, Spin, Popover, Tooltip, Icon, Modal } from 'choerodon-ui';
-import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
+import {
+  Button, Table, Spin, Popover, Tooltip, Icon, Modal, 
+} from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, axios, 
+} from 'choerodon-front-boot';
 import Filter from './Component/Filter';
 import EditFilter from './Component/EditFilter';
 import DeleteFilter from './Component/DeleteFilter';
 import SortTable from './Component/SortTable';
+import './FastSearchHome.scss';
+
 const { AppState } = stores;
 const confirm = Modal.confirm;
 
@@ -65,28 +71,29 @@ class Search extends Component {
       })
       .catch((error) => {});
   }
+
   handleDrag = (data, postData) => {
     this.setState({
       filters: data,
     });
-    axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/drag`, postData)
+    axios
+      .put(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/drag`, postData)
       .then(() => {
-        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
-          .then((res) => {
-            this.setState({
-              filters: res,
-            });
+        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`).then((res) => {
+          this.setState({
+            filters: res,
           });
+        });
       })
       .catch(() => {
-        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
-          .then((ress) => {
-            this.setState({
-              filters: ress,
-            });
+        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`).then((ress) => {
+          this.setState({
+            filters: ress,
           });
+        });
       });
   };
+
   render() {
     const column = [
       {
@@ -162,35 +169,35 @@ class Search extends Component {
             <Popover
               placement="bottom"
               mouseEnterDelay={0.5}
-              content={
+              content={(
                 <div>
                   <span>详情</span>
                 </div>
-              }
+)}
             >
-              <Button shape="circle" onClick={this.showFilter.bind(this, record)}>
-                <Icon type="mode_edit" />
-              </Button>
+              {/* <Button shape="circle" onClick={this.showFilter.bind(this, record)}> */}
+              <Icon type="mode_edit" onClick={this.showFilter.bind(this, record)} />
+              {/* </Button> */}
             </Popover>
             <Popover
               placement="bottom"
               mouseEnterDelay={0.5}
-              content={
+              content={(
                 <div>
                   <span>删除</span>
                 </div>
-              }
+)}
             >
-              <Button shape="circle" onClick={this.clickDeleteFilter.bind(this, record)}>
-                <Icon type="delete_forever" />
-              </Button>
+              {/* <Button shape="circle" onClick={this.clickDeleteFilter.bind(this, record)}> */}
+              <Icon type="delete_forever" onClick={this.clickDeleteFilter.bind(this, record)} />
+              {/* </Button> */}
             </Popover>
           </div>
         ),
       },
     ];
     return (
-      <Page>
+      <Page className="c7n-fast-search">
         <Header title="快速搜索">
           <Button funcType="flat" onClick={() => this.setState({ createFileterShow: true })}>
             <Icon type="playlist_add icon" />
@@ -214,7 +221,6 @@ class Search extends Component {
                 columns={column}
                 dataSource={this.state.filters}
                 scroll={{ x: true }}
-
               />
             </Spin>
             {this.state.createFileterShow ? (
