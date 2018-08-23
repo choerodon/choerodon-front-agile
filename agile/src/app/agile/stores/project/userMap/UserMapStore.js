@@ -53,6 +53,20 @@ class UserMapStore {
   @observable
   createVOSType='';
 
+  @observable selectIssueIds = [];
+
+  @observable currentDraggableId = null;
+
+  @action
+  setSelectIssueIds(data) {
+    this.selectIssueIds = data;
+  }
+
+  @action
+  setCurrentDraggableId(data) {
+    this.currentDraggableId = data;
+  }
+
   @action
   setEpics(data) {
     this.epics = data;
@@ -231,7 +245,7 @@ class UserMapStore {
 
   loadSprints = (data = []) => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, data)
     .then((sprints) => {
-      this.setSprints(sprints);
+      this.setSprints(_.filter(sprints, item => !item.endDate));
     });
 
   loadVersions = () => axios
@@ -240,14 +254,14 @@ class UserMapStore {
       this.setVersions(versions);
     });
 
-  initData = (type = 'none', pageType = 'usermap') => axios
+  initData = (pageType = 'usermap') => axios
     .all([
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}`),
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
       axios.get(
         `/agile/v1/projects/${
           AppState.currentMenuType.id
-        }/issues/storymap/issues?type=${type}&pageType=${pageType}`,
+        }/issues/storymap/issues?type=${this.mode}&pageType=${pageType}`,
       ),
     ])
     .then(

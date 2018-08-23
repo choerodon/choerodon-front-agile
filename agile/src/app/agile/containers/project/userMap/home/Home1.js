@@ -16,7 +16,6 @@ import IssueCard from '../component/IssueCard/IssueCard.js';
 import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
-import userMapStore from '../../../../stores/project/userMap/UserMapStore';
 
 const FileSaver = require('file-saver');
 
@@ -37,6 +36,8 @@ class Home2 extends Component {
   }
 
   componentDidMount() {
+    window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('keyup', this.onKeyUp);
     this.initData();
     const timer = setInterval(() => {
       if (document.getElementsByClassName('filter').length > 0) {
@@ -54,7 +55,59 @@ class Home2 extends Component {
 
   componentWillUnmount() {
     this.props.UserMapStore.setCurrentFilter([]);
+    window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('keyup', this.onKeyUp);
   }
+
+  /**
+   *键盘按起事件
+   *
+   * @param {*} event
+   * @memberof Sprint
+   */
+  onKeyUp=(event) => {
+    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
+      this.setState({
+        keydown: '',
+      });
+    }
+  }
+
+  /**
+   *键盘按下事件
+   *
+   * @param {*} event
+   * @memberof Sprint
+   */
+  onKeyDown=(event) => {
+    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
+      if (event.keyCode !== this.state.keydown) {
+        this.setState({
+          keydown: event.keyCode,
+        });
+      }
+    }
+  }
+handleClickIssue = (issueId, epicId) => {
+  const { UserMapStore } = this.props;
+  const { selectIssueIds } = UserMapStore;
+  let arr = _.cloneDeep(selectIssueIds);
+  const index = arr.indexOf(issueId);
+  const { keydown } = this.state;
+  // command ctrl shift
+  if (keydown === 91 || keydown === 17 || keydown === 16) {
+    if (index === -1) {
+      arr.push(issueId);
+    } else {
+      arr.splice(index, 1);
+    }
+  } else {
+    arr = [];
+    // arr.push(issueId);
+  }
+  UserMapStore.setSelectIssueIds(arr);
+  window.console.log(arr);
+};
 
   initData =() => {
     this.setState({ loading: true });
@@ -103,13 +156,13 @@ class Home2 extends Component {
   handleShowDoneEpic =(e) => {
     const { UserMapStore } = this.props;
     UserMapStore.setShowDoneEpic(e.target.checked);
-    userMapStore.loadEpic();
+    UserMapStore.loadEpic();
   };
 
   handleFilterEpic =(e) => {
     const { UserMapStore } = this.props;
     UserMapStore.setIsApplyToEpic(e.target.checked);
-    userMapStore.loadEpic();
+    UserMapStore.loadEpic();
   }
 
   expandColumn =(id) => {
@@ -133,10 +186,10 @@ class Home2 extends Component {
   };  
 
   handleCreateOk=() => {
-    const UserMapStore = this.props.UserMapStore;
+    const { UserMapStore } = this.props;
     UserMapStore.setCreateVOS(false);
     UserMapStore.getCreateVOSType === 'version' ? UserMapStore.loadVersions() : UserMapStore.loadSprints();
-  }
+  };
 
   handleMouseColumn = (epicId, vosId) => {
     this.setState({ hoverId: epicId, hoverVOSId: vosId });
@@ -163,9 +216,9 @@ class Home2 extends Component {
     const { issues, sprints, versions } = UserMapStore;
     const { mode } = UserMapStore;
     const vosData = UserMapStore[`${mode}s`] || [];
+    const id = `${mode}Id`;
     if (epicData.length) {
       vosData.map((vos) => {
-        const id = `${mode}Id`;
         const name = mode === 'sprint' ? `${mode}Name` : 'name';
         dom.push(<React.Fragment key={vos[id]}>
           <div className="swimlane-title">
@@ -205,42 +258,74 @@ class Home2 extends Component {
           </div>
           <div style={{ display: this.state.expandColumns.includes(vos[id]) ? 'none' : 'flex' }}>
             {epicData.map((epic, index) => (
-              <div className="swimlane-column">
-                <React.Fragment>
-                  {_.filter(issues, issue => issue.epicId === epic.issueId && issue[id] === vos[id]).map(item => (
-                    <IssueCard
-                      key={item.issueId}
-                      issue={item}
-                    />
-                  ))}
+              <Droppable droppableId={`epic-${epic.issueId}_${vos[id]}`}>
+                {(provided, snapshot) => (
                   <div
-                    onMouseOut={() => { this.setState({ hoverId: '', hoverVOSId: '', createIssue: false }); }}
-                    style={{ background: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] ? '#f5f5f5' : '', minHeight: 142 }}
-                    onMouseOver={this.handleMouseColumn.bind(this, epic.issueId, vos[id])}
+                    ref={provided.innerRef}
+                    className="swimlane-column"
+                    style={{
+                      background: snapshot.isDraggingOver ? '#e9e9e9' : 'rgba(0,0,0,0.02)',
+                      padding: 'grid',
+                      // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                    }}
                   >
-                    <div style={{ display: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && !this.state.createIssue ? 'block' : 'none' }}>
+                    <React.Fragment>
+                      {vos[id]}
+                      {_.filter(issues, issue => issue.epicId === epic.issueId && issue[id] === vos[id]).map((item, indexs) => (
+                        <Draggable draggableId={`${mode}-${item.issueId}`} index={indexs}>
+                          {(provided1, snapshot1) => (
+                            <div
+                              ref={provided1.innerRef}
+                              {...provided1.draggableProps}
+                              {...provided1.dragHandleProps}
+                              style={{
+                                cursor: 'move',
+                                ...provided1.draggableProps.style,
+                              }}
+                              role="none"
+                            >
+                              {/*{item.issueId}*/}
+                              <IssueCard
+                                handleClickIssue={this.handleClickIssue}
+                                key={item.issueId}
+                                issue={item}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      <div
+                        onMouseOut={() => { this.setState({ hoverId: '', hoverVOSId: '', createIssue: false }); }}
+                        style={{ background: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] ? '#f5f5f5' : '', minHeight: 142 }}
+                        onMouseOver={this.handleMouseColumn.bind(this, epic.issueId, vos[id])}
+                      >
+                        <div style={{ display: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && !this.state.createIssue ? 'block' : 'none' }}>
 
 
-add
-                      {' '}
-                      <a role="none" onClick={this.showCreateIssue}>new</a>
-                      {' '}
+                          add
+                          {' '}
+                          <a role="none" onClick={this.showCreateIssue}>new</a>
+                          {' '}
 
 
-or
-                      {' '}
-                      <a role="none" onClick={this.showBackLog}>existing</a>
-                    </div>
-                    <CreateIssue
-                      data={{ epicId: epic.issueId, [id]: vos[id] }}
-                      style={{ display: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && this.state.createIssue ? 'block' : 'none' }}
-                    />
+                          or
+                          {' '}
+                          <a role="none" onClick={this.showBackLog}>existing</a>
+                        </div>
+                        <CreateIssue
+                          data={{ epicId: epic.issueId, [id]: vos[id] }}
+                          style={{ display: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && this.state.createIssue ? 'block' : 'none' }}
+                        />
+                      </div>
+                    </React.Fragment>
+                    {provided.placeholder}
                   </div>
-                </React.Fragment>
-              </div>
+                )}
+              </Droppable>
+
             ))}
           </div>
-                 </React.Fragment>);
+        </React.Fragment>);
       });
       dom.push(
         <React.Fragment key="no-sprint">
@@ -295,7 +380,7 @@ or
           </div>
           <div style={{ display: this.state.expandColumns.includes(`-1-${mode}`) ? 'none' : 'flex' }}>
             {epicData.map((epic, index) => (
-              <Droppable droppableId={`epic-${epic.issueId}`}>
+              <Droppable droppableId={`epic-${epic.issueId}_0`}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
@@ -307,7 +392,7 @@ or
                     }}
                   >
                     <React.Fragment>
-                      {_.filter(issues, issue => issue.epicId === epic.issueId && (issue.sprintId == null || issue.versionId == null)).map((item, indexs) => (
+                      {_.filter(issues, issue => issue.epicId === epic.issueId && (mode !== 'none' && issue[id] == null || mode === 'none')).map((item, indexs) => (
                         <Draggable draggableId={`none-${item.issueId}`} index={indexs}>
                           {(provided1, snapshot1) => (
                             <div
@@ -320,7 +405,9 @@ or
                               }}
                               role="none"
                             >
+                              {/*{item.issueId}*/}
                               <IssueCard
+                                handleClickIssue={this.handleClickIssue}
                                 key={item.issueId}
                                 issue={item}
                               />
@@ -330,10 +417,10 @@ or
                       ))}
                       <div
                         onMouseLeave={() => { this.setState({ hoverId: '', createIssue: false }); }}
-                        style={{ background: this.state.hoverId === epic.issueId ? '#f5f5f5' : '', minHeight: 142 }}
+                        style={{ background: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId ? '#f5f5f5' : '', minHeight: 142 }}
                         onMouseOver={this.handleMouseColumn.bind(this, epic.issueId)}
                       >
-                        <div style={{ display: this.state.hoverId === epic.issueId && !this.state.createIssue ? 'block' : 'none' }}>
+                        <div style={{ display: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId && !this.state.createIssue ? 'block' : 'none' }}>
 
 
                           add
@@ -394,13 +481,52 @@ or
 
   handleDragIssues =(res) => {
     const { UserMapStore } = this.props;
-    const data = UserMapStore.getEpics;
-    const epicId = res.destination.droppableId.split('-')[1];
-    const issueId = res.draggableId.split('-')[1];
+    const { issues, mode, selectIssueIds } = UserMapStore;
+    const epicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
+    const key = `${mode}Id`;
+    const value = parseInt(res.destination.droppableId.split('_')[1], 10);
+    const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
     const before = res.destination.index === 0;
     const rankIndex = res.source.index > res.destination.index;
-    const postData = { epicId, issueIds: [issueId], before, rankIndex };
-    userMapStore.handleMoveIssue(postData);
+    let postData = {};
+    const issueData = _.cloneDeep(issues);
+    _.map(issueIds, (issueId) => {
+      const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
+      if (mode === 'none') {
+        postData = { epicId, issueIds, before, rankIndex };
+        sourceIssue.epicId = epicId;
+        sourceIssue[key] = null;
+      } else {
+        postData = { epicId, issueIds, before, rankIndex, [key]: value };
+        sourceIssue.epicId = epicId;
+        value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
+      }
+      UserMapStore.setIssues(issueData);
+    });
+    UserMapStore.handleMoveIssue(postData);
+    UserMapStore.setSelectIssueIds([]);
+    UserMapStore.setCurrentDraggableId(null);
+  };
+
+  handleDragBacklog = (res) => {
+
+  };
+
+  handleEpicOrIssueDrag = (res) => {
+    if (res.destination.droppableId === 'epic') {
+      this.handleEpicDrag(res);
+    } else if (res.destination.droppableId === 'backlog') {
+      this.handleDragBacklog(res);
+    } else {
+      this.handleDragIssues(res);
+    }
+  };
+
+  handleEpicOrIssueDragStart =(res) => {
+    const { UserMapStore } = this.props;
+    if (!(res.source.droppableId === 'epic') && UserMapStore.selectIssueIds.length) {
+      UserMapStore.setCurrentDraggableId(parseInt(res.draggableId.split('-')[1], 10));
+    }
   };
   
   render() {
@@ -487,43 +613,43 @@ or
 </Button>
         </Header>
         <div className="c7n-userMap-content">
-          <div className="userMap-right" style={{ width: `${showBackLog ? 'calc(100% - 372px)' : 'calc(100% - 24px)'}` }}>
-            <Spin spinning={false}>
-              {epicData.length ? (<React.Fragment>
-                <div className="toolbar">
-                  <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
-                    <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
-                    <p
+          <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
+            <div className="userMap-right" style={{ width: `${showBackLog ? 'calc(100% - 372px)' : 'calc(100% - 24px)'}` }}>
+              <Spin spinning={false}>
+                {epicData.length ? (<React.Fragment>
+                  <div className="toolbar">
+                    <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
+                      <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
+                      <p
+                        role="none"
+                        style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                        onClick={this.addFilter.bind(this,'mine')}
+                      >仅我的问题</p>
+                      <p
+                        role="none"
+                        style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                        onClick={this.addFilter.bind(this,'userStory')}
+                      >仅用户故事</p>
+                      {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`, marginBottom: 3}} onClick={this.addFilter.bind(this,filter.filterId)}>{filter.name}</p>) }
+                    </div>
+                    <div
+                      style={{
+                        display: this.state.more ? 'block' : 'none',
+                        color: 'rgb(63, 81, 181)',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                      }}
                       role="none"
-                      style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                      onClick={this.addFilter.bind(this,'mine')}
-                    >仅我的问题</p>
-                    <p
-                      role="none"
-                      style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                      onClick={this.addFilter.bind(this,'userStory')}
-                    >仅用户故事</p>
-                    {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`, marginBottom: 3}} onClick={this.addFilter.bind(this,filter.filterId)}>{filter.name}</p>) }
+                      onClick={() => {
+                        this.setState({
+                          expand: !this.state.expand,
+                        });
+                      }}
+                    >
+                      {this.state.expand ? '...收起' : '...展开'}
+                    </div>
                   </div>
-                  <div
-                    style={{
-                      display: this.state.more ? 'block' : 'none',
-                      color: 'rgb(63, 81, 181)',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                    }}
-                    role="none"
-                    onClick={() => {
-                      this.setState({
-                        expand: !this.state.expand,
-                      });
-                    }}
-                  >
-                    {this.state.expand ? '...收起' : '...展开'}
-                  </div>
-                </div>
-                <div className="epic">
-                  <DragDropContext onDragEnd={this.handleEpicDrag}>
+                  <div className="epic">
                     <Droppable droppableId="epic" direction="horizontal">
                       {(provided, snapshot) => (
                         <div
@@ -536,41 +662,41 @@ or
                           }}
                         >
                           {epicData.map((epic, index) => (
-                            <EpicCard
-                              index={index}
-                              key={epic.issueId}
-                              epic={epic}
-                            />
+                            <div>
+                              {/*{epic.issueId}*/}
+                              <EpicCard
+                                index={index}
+                                key={epic.issueId}
+                                epic={epic}
+                              />
+                            </div>
                           ))}
                           {provided.placeholder}
                         </div>
                       )}
                     </Droppable>
-                  </DragDropContext>
-
-                </div>
-                <div className="swimlane" style={{ height: `calc(100vh - ${document.getElementById('autoRouter').offsetTop + 48 + 48 + 10 + 98 + 58}px)`}}>
-                  <DragDropContext onDragEnd={this.handleDragIssues}>
-                    {this.renderColumn()}
-                  </DragDropContext>
-                </div>
-              </React.Fragment>
-  ) : (
-  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
-                  <img src={epicPic} alt="" width="200" />
-                  <div style={{ marginLeft: 50, width: 390 }}>
-                    <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
-                    <p style={{ fontSize: 20, marginTop: 10 }}>
-                      用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击 <a role={'none'} onClick={this.handleCreateEpic}>创建史诗</a> 进入用户故事地图。
-                    </p>
                   </div>
-                </div>
-) }
-            </Spin>
-          </div>
-          <div className="usermap-left" style={{ display: this.state.showBackLog ? 'block' : 'none' }}>
-            <Backlog />
-          </div>
+                  <div className="swimlane" style={{ height: `calc(100vh - ${document.getElementById('autoRouter').offsetTop + 48 + 48 + 10 + 98 + 58}px)`}}>
+                    {this.renderColumn()}
+                  </div>
+                </React.Fragment>
+                ) : (
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
+                    <img src={epicPic} alt="" width="200" />
+                    <div style={{ marginLeft: 50, width: 390 }}>
+                      <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+                      <p style={{ fontSize: 20, marginTop: 10 }}>
+                        用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击 <a role={'none'} onClick={this.handleCreateEpic}>创建史诗</a> 进入用户故事地图。
+                      </p>
+                    </div>
+                  </div>
+                ) }
+              </Spin>
+            </div>
+            <div className="usermap-left" style={{ display: this.state.showBackLog ? 'block' : 'none' }}>
+              <Backlog />
+            </div>
+          </DragDropContext>
         </div>
         <CreateEpic
           visible={createEpic}
