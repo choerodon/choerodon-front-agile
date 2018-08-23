@@ -1,0 +1,26 @@
+.c7n-unCompleteTaskHome{
+    text-align: center;
+    .ant-progress{
+        display: inline-block;
+        margin-top: 16px;
+        margin-bottom: 36px;
+        .ant-progress-circle-trail {
+            stroke: rgba(255,177,0,0.30);
+        }
+        .ant-progress-circle-path {
+            stroke: #FFB100;
+        }
+        .c7n-unCompleteTaskHome-inner{
+            .c7n-unCompleteTaskHome-innerNum{
+                font-size: 26px;
+                color: #FFB100;
+            }
+            .c7n-unCompleteTaskHome-innerUnit{
+                font-size: 12px;
+                color: rgba(0,0,0,0.65);
+                vertical-align: 3px;
+                padding-left: 4px;
+            }
+        }
+    }
+}
