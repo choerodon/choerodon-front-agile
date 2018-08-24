@@ -3,6 +3,7 @@ import {
 } from 'mobx';
 import { store, stores, axios } from 'choerodon-front-boot';
 import Item from 'choerodon-ui/lib/list/Item';
+import _ from 'lodash';
 
 const { AppState } = stores;
 
@@ -39,13 +40,13 @@ class VersionReportStore {
 
     @observable pieData = [];
 
+    @observable sourceData=[];
+
     @observable reportData = {};
 
     @observable colors = [];
 
     @observable pieLoading = false;
-
-    @observable pieSmallData=[];
 
     @observable otherData= {
       name: '其它', typeName: null, value: 0, percent: 0, 
@@ -59,17 +60,31 @@ class VersionReportStore {
   @action setPieData(data) {
     this.pieData = data;
   }
+  
+  @action setSourceData(data) {
+    this.sourceData = data;
+  } 
 
   @action setColors(data) {
     this.colors = data;
   }
 
-  @computed get getPieSmallData() {
-    return this.pieSmallData;
+  @action setOtherData(percent, value) {
+    this.otherData.value += parseFloat(value);
+    this.otherData.percent += parseFloat(percent);
+  }
+
+  @action setOtherDataEmpty() {
+    this.otherData.value = 0;
+    this.otherData.percent = 0;
   }
 
   @computed get getPieData() {
     return this.pieData;
+  }
+
+  @computed get getSourceData() {
+    return this.sourceData;
   }
 
   @computed get getColors() {
@@ -117,6 +132,7 @@ class VersionReportStore {
       axios.get(`/agile/v1/projects/${projectId}/reports/pie_chart?fieldName=${type}`)
         .then((data) => {
           if (data.length) {
+            // debugger;
             const colors = ['#9665E2', '#F0657D', '#FAD352', '#FF9915', '#45A3FC', '#3F51B5', '#47CBCA', '#59CB79', '#F953BA', '#D3D3D3'];
             const length = data.length;
             if (length > 10) {
@@ -125,18 +141,16 @@ class VersionReportStore {
               }
             }
             this.setColors(colors);
-
-            data.forEach((item, index, arr) => {
-              if (item.percent < 2) {
-                data.splice(index, 1);
-                this.pieSmallData.push(item);
-                this.otherData.value += item.value;
-                this.otherData.percent += item.percent;
-              }
+            this.setSourceData(data);
+            const smallData = data.filter((item, index, arr) => item.percent < 2);
+            smallData.forEach((item) => {
+              item.percent = (item.percent).toFixed(2);
+              this.setOtherData(item.percent, item.value);
             });
-
-            data.push(this.otherData);
-            // console.log(JSON.stringify(this.data));
+            if (this.otherData.value > 0) {
+              data.push(this.otherData);
+            }
+            console.log(`otherData:${JSON.stringify(this.otherData)}`);
             this.setPieData(data);
           }
           this.changePieLoading(false);

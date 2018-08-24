@@ -108,7 +108,7 @@ class ReleaseDetail extends Component {
         formatter: value => (
           `<div>
               <span>问题：${value.data.value}</span><br/>
-              <span>百分比：${(value.data.percent).toFixed(2)}%</span>
+              <span>百分比：${(value.data.percent.toFixed(2))}%</span>
             </div>`
         ),
         padding: 10,
@@ -173,11 +173,12 @@ class ReleaseDetail extends Component {
     // VersionReportStore.setPieData([]);
     this.setState({ type: option.key, value });
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
+    VersionReportStore.setOtherDataEmpty();
   };
 
   render() {
     const data = VersionReportStore.getPieData;
-    const pieSmallData = VersionReportStore.getPieSmallData;
+    const sourceData = VersionReportStore.getSourceData;
     let total = 0;
     for (let i = 0; i < data.length; i += 1) {
       total += data[i].value;
@@ -187,10 +188,10 @@ class ReleaseDetail extends Component {
     const type = [
       { title: '经办人', value: 'assignee' },
       { title: '模块', value: 'component' },
-      { title: '问题类型', value: 'issueType' },
-      { title: '修复版本', value: 'fixVersion' },
-      { title: '优先级', value: 'priority' },
-      { title: '状态', value: 'status' },
+      { title: '问题类型', value: 'typeCode' },
+      { title: '修复版本', value: 'version' },
+      { title: '优先级', value: 'priorityCode' },
+      { title: '状态', value: 'statusCode' },
       { title: '冲刺', value: 'sprint' },
       { title: '史诗', value: 'epic' },
       { title: '解决结果', value: 'resolution' },
@@ -209,9 +210,8 @@ class ReleaseDetail extends Component {
             <Icon type="refresh" />
 
 
-
 刷新
-</Button>
+                    </Button>
         </Header>
         <Content
           title={data.length ? `项目"${AppState.currentMenuType.name}"下的问题统计图` : '无问题的统计图'}
@@ -258,30 +258,29 @@ class ReleaseDetail extends Component {
                       </thead>
                       <tbody>
                         {
-                        data.concat(pieSmallData).map((item, index) => (
-                          item.name !== '其它' ? (
-                            <tr>
-                              <td>
-                                <div className="pie-legend-icon" style={{ background: colors[index] }} />
-                                <Tooltip title={item && item.name}>
-                                  <div className="pie-legend-text">{item.name ? item.name : '未分配'}</div>
-                                </Tooltip>
-                              </td>
-                              <td>
-                                <a
-                                  role="none"
-                                  onClick={() => {
-                                    this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=${item.typeName}&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${item.name}下的问题&paramUrl=reporthost/sprintreport`);
-                                  }}
-                                >
-                                  {item.value}
+                        sourceData.map((item, index) => (
+                          <tr>
+                            <td>
+                              <div className="pie-legend-icon" style={{ background: colors[index] }} />
+                              <Tooltip title={item && item.name}>
+                                <div className="pie-legend-text">{item.name ? item.name : '未分配'}</div>
+                              </Tooltip>
+                            </td>
+                            <td>
+                              <a
+                                role="none"
+                                onClick={() => {
+                                  console.log('this.state.value');
+                                  this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=${this.state.value}&paramId=${item.typeName}&paramName=${item.name}下的问题&paramUrl=reporthost/piechart`);
+                                }}
+                              >
+                                {item.value}
       
-                                </a>
+                              </a>
       
-                              </td>
-                              <td style={{ paddingTop: 12 }}>{`${((item.value / total) * 100).toFixed(2)} %`}</td>
-                            </tr>
-                          ) : ''
+                            </td>
+                            <td style={{ paddingTop: 12 }}>{`${(item.percent).toFixed(2)} %`}</td>
+                          </tr>
                         ))
                       }
                       </tbody>
