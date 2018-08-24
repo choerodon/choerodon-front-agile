@@ -1,19 +1,37 @@
 dashboard:
-  - code: "AgileDoc"
-    icon: agile
-    title: "敏捷文档"
-    description: "敏捷文档"
+  - code: "BurnDown"
+    icon: tune
+    title: "燃尽图"
+    description: "燃尽图"
     level: project
-    sort: 1
+    sort: 2
   - code: "UncompleteTask"
     icon: assignment
     title: "当前项目未完成的任务数"
     description: "当前项目未完成的任务数"
     level: project
-    sort: 2
+    sort: 1
   - code: "VersionProgress"
     icon: menu
     title: "版本进度"
     description: "版本进度"
     level: project
     sort: 3
+  - code: "EpicProgress"
+    icon: sort
+    title: "史诗进度"
+    description: "史诗进度"
+    level: project
+    sort: 4
+  - code: "MineUnDone"
+    icon: ballot
+    title: "我的未完成问题"
+    description: "我的未完成问题"
+    level: project
+    sort: 5
+  - code: "Undistributed"
+    icon: ballot
+    title: "未分配的问题"
+    description: "未分配的问题"
+    level: project
+    sort: 6
