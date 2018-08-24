@@ -80,8 +80,8 @@ class UserMapStore {
     this.epics = data;
   }
 
-  @action changeShowBackLog(flag) {
-    this.showBackLog = flag;
+  @action changeShowBackLog() {
+    this.showBackLog = !this.showBackLog;
   }
 
   @computed
