@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Spin, message, Icon, Select, Table, Menu, Dropdown, Tabs, Tooltip } from 'choerodon-ui';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import {
+  Button, Spin, message, Icon, Select, Table, Menu, Dropdown, Tabs, Tooltip, 
+} from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, 
+} from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import moment from 'moment';
@@ -37,10 +41,12 @@ class SprintReport extends Component {
       startDate: '',
     };
   }
+
   componentWillMount() {
     this.getSprintData();
     ReportStore.init();
   }
+
   getBetweenDateStr(start, end) {
     const result = [];
     const beginDay = start.split('-');
@@ -67,6 +73,7 @@ class SprintReport extends Component {
     }
     return result;
   }
+
   getSprintData() {
     BurndownChartStore.axiosGetSprintList().then((res) => {
       BurndownChartStore.setSprintList(res);
@@ -81,6 +88,7 @@ class SprintReport extends Component {
     }).catch((error) => {
     });
   }
+
   getChartCoordinate() {
     BurndownChartStore.axiosGetBurndownCoordinate(this.state.defaultSprint, this.state.select).then((res) => {
       this.setState({ expectCount: res.expectCount });
@@ -124,6 +132,7 @@ class SprintReport extends Component {
       });
     });
   }
+
   getChartData() {
     this.setState({
       loading: true,
@@ -189,6 +198,7 @@ class SprintReport extends Component {
       }).catch((error) => {
       });
   }
+
   getMaxY() {
     const data = this.state.yAxis;
     let max = 0;
@@ -199,6 +209,7 @@ class SprintReport extends Component {
     }
     return max;
   }
+
   getOption() {
     return {
       title: {
@@ -287,6 +298,7 @@ class SprintReport extends Component {
       ],
     };
   }
+
   callback(key) {
     ReportStore.setActiveKey(key);
     const ARRAY = {
@@ -298,6 +310,7 @@ class SprintReport extends Component {
       ReportStore[ARRAY[key]]();
     }
   }
+
   renderDoneIssue(column) {
     return (
       <div>
@@ -378,7 +391,12 @@ class SprintReport extends Component {
               const urlParams = AppState.currentMenuType;
               history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/sprintreport`);
             }}
-          >{issueNum} {record.addIssue ? '*' : ''}</span>
+          >
+            {issueNum} 
+            {' '}
+            {record.addIssue ? '*' : ''}
+
+          </span>
         ),
       }, {
         width: '30%',
@@ -486,6 +504,7 @@ class SprintReport extends Component {
                       label="迭代冲刺"
                       value={this.state.defaultSprint}
                       onChange={(value) => {
+                        ReportStore.changeCurrentSprint(value);
                         let endDate;
                         let startDate;
                         for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
@@ -504,17 +523,28 @@ class SprintReport extends Component {
                         });
                       }}
                     >
-                      {BurndownChartStore.getSprintList.length > 0 ?
-                        BurndownChartStore.getSprintList.map(item => (
+                      {BurndownChartStore.getSprintList.length > 0
+                        ? BurndownChartStore.getSprintList.map(item => (
                           <Option value={item.sprintId}>{item.sprintName}</Option>
                         )) : ''}
                     </Select>
                     <div className="c7n-sprintMessage">
                       <div className="c7n-sprintContent">
                         <span>
-                          {ReportStore.getCurrentSprintStatus.status}冲刺,
-                          共 {ReportStore.currentSprint.issueCount || 0} 个问题
-                        </span>
+                          {ReportStore.getCurrentSprintStatus.status}
+
+
+
+冲刺,
+                          共
+                          {' '}
+                          {ReportStore.currentSprint.issueCount || 0}
+                          {' '}
+
+
+
+个问题
+                                                </span>
                         <span>
                           {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
                         </span>
@@ -526,9 +556,14 @@ class SprintReport extends Component {
                         }}
                         role="none"
                         onClick={() => {
+                          console.log(`paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}`);
                           this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题&paramUrl=reporthost/sprintreport`);
                         }}
                       >
+
+
+
+
                         在“问题管理中”查看
                         <Icon style={{ fontSize: 13 }} type="open_in_new" />
                       </p>
@@ -548,7 +583,7 @@ class SprintReport extends Component {
                   </Tabs>
                 </div>
               ) : (
-                <NoDataComponent title={'冲刺'} links={[{ name: '待办事项', link: '/agile/backlog' }]} img={epicSvg} />
+                <NoDataComponent title="冲刺" links={[{ name: '待办事项', link: '/agile/backlog' }]} img={epicSvg} />
               )
             }
           </Spin>
@@ -559,4 +594,3 @@ class SprintReport extends Component {
 }
 
 export default SprintReport;
-
