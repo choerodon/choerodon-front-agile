@@ -1,0 +1,17 @@
+.c7n-agile-dashboard-burndown {
+  .loading-wrap {
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.c7n-agile-dashboard-burndown-select {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 15px;
+  cursor: pointer;
+  color: #3f51b5;
+}
