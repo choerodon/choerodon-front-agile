@@ -1,11 +1,15 @@
-import { observable, action, computed, toJS } from 'mobx';
+import {
+  observable, action, computed, toJS, 
+} from 'mobx';
 import { store, stores, axios } from 'choerodon-front-boot';
+import Item from 'choerodon-ui/lib/list/Item';
 
 const { AppState } = stores;
 
 @store('VersionReportStore')
 class VersionReportStore {
     @observable versionList = [];
+
     @observable issues = {
       done: {
         data: [],
@@ -32,64 +36,81 @@ class VersionReportStore {
         },
       },
     }
+
     @observable pieData = [];
+
     @observable reportData = {};
+
     @observable colors = [];
+
     @observable pieLoading = false;
+
+    @observable pieSmallData=[];
+
+    @observable otherData= {
+      name: '其它', typeName: null, value: 0, percent: 0, 
+    };
 
 
   @action changePieLoading(flag) {
       this.pieLoading = flag;
     }
+
   @action setPieData(data) {
-      this.pieData = data;
-    }
+    this.pieData = data;
+  }
+
   @action setColors(data) {
-      this.colors = data;
-    }
+    this.colors = data;
+  }
+
+  @computed get getPieSmallData() {
+    return this.pieSmallData;
+  }
+
   @computed get getPieData() {
-      return this.pieData;
-    }
+    return this.pieData;
+  }
 
   @computed get getColors() {
-      return this.colors;
-    }
+    return this.colors;
+  }
 
   @computed get getReportData() {
-      return toJS(this.reportData);
-    }
+    return toJS(this.reportData);
+  }
 
   @action setReportData(data) {
-      this.reportData = data;
-    }
+    this.reportData = data;
+  }
 
-    axiosGetReportData(versionId, type) {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${versionId}?type=${type}`);
-    }
+  axiosGetReportData(versionId, type) {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${versionId}?type=${type}`);
+  }
 
   @computed get getIssues() {
-      return toJS(this.issues);
-    }
+    return toJS(this.issues);
+  }
 
   @action setIssues(type, type2, data) {
-      this.issues[type][type2] = data;
-    }
+    this.issues[type][type2] = data;
+  }
 
-    axiosGetIssues(versionId, data, util) {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${versionId}/issues?status=${data.status}&type=${util}&page=${data.page}&size=${data.size}`);
-    }
+  axiosGetIssues(versionId, data, util) {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${versionId}/issues?status=${data.status}&type=${util}&page=${data.page}&size=${data.size}`);
+  }
 
   @computed get getVersionList() {
-      return toJS(this.versionList);
-    }
+    return toJS(this.versionList);
+  }
 
   @action setVersionList(data) {
-      this.versionList = data;
-    }
+    this.versionList = data;
+  }
 
-    axiosGetVersionList() {
-      return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`, ['version_planning', 'released']);
-    }
+  axiosGetVersionList() {
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`, ['version_planning', 'released']);
+  }
 
     getPieDatas = (projectId, type) => {
       this.changePieLoading(true);
@@ -100,10 +121,22 @@ class VersionReportStore {
             const length = data.length;
             if (length > 10) {
               for (let i = 10; i < length; i += 1) {
-                colors.push('#'+('00000'+((Math.random()*16777215+0.5)>>0).toString(16)).slice(-6));
+                colors.push(`#${(`00000${((Math.random() * 16777215 + 0.5) >> 0).toString(16)}`).slice(-6)}`);
               }
             }
             this.setColors(colors);
+
+            data.forEach((item, index, arr) => {
+              if (item.percent < 2) {
+                data.splice(index, 1);
+                this.pieSmallData.push(item);
+                this.otherData.value += item.value;
+                this.otherData.percent += item.percent;
+              }
+            });
+
+            data.push(this.otherData);
+            // console.log(JSON.stringify(this.data));
             this.setPieData(data);
           }
           this.changePieLoading(false);
