@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
-import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
-import { Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon } from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, axios, 
+} from 'choerodon-front-boot';
+import {
+  Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon, 
+} from 'choerodon-ui';
 import './Issue.scss';
 
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
@@ -39,6 +43,7 @@ class Issue extends Component {
       createLoading: false,
     };
   }
+
   componentDidMount() {
     window.console.warn('above is not mine');
     this.getInit();
@@ -46,7 +51,9 @@ class Issue extends Component {
 
   getInit() {
     const Request = this.GetRequest(this.props.location.search);
-    const { paramType, paramId, paramName, paramStatus, paramIssueId, paramUrl } = Request;
+    const {
+      paramType, paramId, paramName, paramStatus, paramIssueId, paramUrl, 
+    } = Request;
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
     IssueStore.setParamName(paramName);
@@ -211,7 +218,10 @@ class Issue extends Component {
       searchArgs: {},
     };
     const { statusCode, priorityCode, typeCode } = filters;
-    const { issueNum, summary, assignee, sprint, version, component, epic } = filters;
+    const {
+      issueNum, summary, assignee, sprint, version, component, epic, 
+    } = filters;
+    console.log(`filters: ${JSON.stringify(filters)}`);
     obj.advancedSearchArgs.statusCode = statusCode || [];
     obj.advancedSearchArgs.priorityCode = priorityCode || [];
     obj.advancedSearchArgs.typeCode = typeCode || [];
@@ -240,7 +250,10 @@ class Issue extends Component {
 
   renderWideIssue(issue) {
     return (
-      <div style={{ display: 'flex', flex: 1, marginTop: '3px', marginBottom: '3px', cursor: 'pointer' }}>
+      <div style={{
+        display: 'flex', flex: 1, marginTop: '3px', marginBottom: '3px', cursor: 'pointer', 
+      }}
+      >
         <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[issue.typeCode]}`}>
           <div>
             <TypeTag
@@ -249,13 +262,19 @@ class Issue extends Component {
           </div>
         </Tooltip>
         <Tooltip mouseEnterDelay={0.5} title={`任务编号： ${issue.issueNum}`}>
-          <a style={{ paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <a style={{
+            paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
+          }}
+          >
             {issue.issueNum}
           </a>
         </Tooltip>
         <div style={{ overflow: 'hidden', flex: 1 }}>
           <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务概要： ${issue.summary}`}>
-            <p style={{ paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset' }}>
+            <p style={{
+              paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset', 
+            }}
+            >
               {issue.summary}
             </p>
           </Tooltip>
@@ -305,7 +324,10 @@ class Issue extends Component {
   renderNarrowIssue(issue) {
     return (
       <div style={{ marginTop: '5px', marginBottom: '5px', cursor: 'pointer' }}>
-        <div style={{ display: 'flex', marginBottom: '5px', width: '100%', flex: 1 }}>
+        <div style={{
+          display: 'flex', marginBottom: '5px', width: '100%', flex: 1, 
+        }}
+        >
           <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[issue.typeCode]}`}>
             <div>
               <TypeTag
@@ -314,13 +336,19 @@ class Issue extends Component {
             </div>
           </Tooltip>
           <Tooltip mouseEnterDelay={0.5} title={`任务编号： ${issue.issueNum}`}>
-            <a style={{ paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <a style={{
+              paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
+            }}
+            >
               {issue.issueNum}
             </a>
           </Tooltip>
           <div style={{ overflow: 'hidden', flex: 1 }}>
             <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务概要： ${issue.summary}`}>
-              <p style={{ paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset' }}>
+              <p style={{
+                paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset', 
+              }}
+              >
                 {issue.summary}
               </p>
             </Tooltip>
@@ -625,9 +653,22 @@ class Issue extends Component {
               />
             </section>
             <section className="c7n-count">
-              <span className="c7n-span-count">共{IssueStore.pagination.total}条任务</span>
+              <span className="c7n-span-count">
+
+
+
+共
+                {IssueStore.pagination.total}
+
+
+
+条任务
+                            </span>
               <Dropdown overlay={sort} trigger={['click']}>
-                <div style={{ display: 'flex', alignItems: 'center', fontSize: '13px', lineHeight: '20px', cursor: 'pointer', position: 'absolute', right: 25, bottom: 28 }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', fontSize: '13px', lineHeight: '20px', cursor: 'pointer', position: 'absolute', right: 25, bottom: 28, 
+                }}
+                >
                   <Icon type="swap_vert" style={{ fontSize: '16px', marginRight: '5px' }} />
                   <span>排序</span>
                 </div>
@@ -742,12 +783,24 @@ class Issue extends Component {
                               createIssue: false,
                             });
                           }}
-                        >取消</Button>
+                        >
+
+
+
+取消
+
+</Button>
                         <Button
                           type="primary"
                           loading={this.state.createLoading}
                           onClick={this.handleBlurCreateIssue.bind(this)}
-                        >确定</Button>
+                        >
+
+
+
+确定
+
+</Button>
                       </div>
                     </div>
                   ) : (
@@ -785,7 +838,10 @@ class Issue extends Component {
               </div>
               {
                 IssueStore.issues.length !== 0 ? (
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16, marginBottom: 16 }}>
+                  <div style={{
+                    display: 'flex', justifyContent: 'flex-end', marginTop: 16, marginBottom: 16, 
+                  }}
+                  >
                     <Pagination
                       current={IssueStore.pagination.current}
                       defaultCurrent={1}
