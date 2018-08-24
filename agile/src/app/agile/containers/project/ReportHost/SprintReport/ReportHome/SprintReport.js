@@ -533,18 +533,14 @@ class SprintReport extends Component {
                         <span>
                           {ReportStore.getCurrentSprintStatus.status}
 
-
-
 冲刺,
                           共
-                          {' '}
+{' '}
                           {ReportStore.currentSprint.issueCount || 0}
                           {' '}
 
-
-
 个问题
-                                                </span>
+</span>
                         <span>
                           {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
                         </span>
@@ -561,11 +557,8 @@ class SprintReport extends Component {
                         }}
                       >
 
-
-
-
                         在“问题管理中”查看
-                        <Icon style={{ fontSize: 13 }} type="open_in_new" />
+<Icon style={{ fontSize: 13 }} type="open_in_new" />
                       </p>
                     </div>
                   </div>
