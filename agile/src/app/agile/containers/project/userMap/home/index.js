@@ -2,6 +2,6 @@
 
 // export default Home;
 
-import Home from './Home1';
+import Home from './Home';
 
 export default Home;
