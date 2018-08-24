@@ -72,7 +72,7 @@ class Backlog extends Component {
    * 2. mode not none render issue group, sprint||version
    */
   renderIssues() {
-    const { mode, backlogExpand } = US;
+    const { mode, backlogExpand, selectIssueIds, currentDraggableId } = US;
     const { keyword } = this.state;
     let group = [];
     if (mode === 'none') {
@@ -207,43 +207,59 @@ class Backlog extends Component {
   }
 
   renderIssue(issue, index) {
-    const { mode } = US;
+    const { mode, selectIssueIds, currentDraggableId } = US;
     return (
       <Draggable draggableId={`${mode}-${issue.issueId}`} index={index}>
         {(provided1, snapshot1) => (
-          <li
+          <div
             ref={provided1.innerRef}
             {...provided1.draggableProps}
             {...provided1.dragHandleProps}
-            role="none"
-            key={issue.issueId}
-            className="issue"
+            onClick={this.onIssueClick.bind(this, issue.issueId)}
             style={{
-              background: issue.statusCode === 'done' ? 'rgba(0, 0, 0, 0.06)' : '#fff',
               cursor: 'move',
               ...provided1.draggableProps.style,
+              background: selectIssueIds.includes(issue.issueId) ? 'rgb(235, 242, 249)' : '',
             }}
+            role={'none'}
           >
+            <li
+              role="none"
+              key={issue.issueId}
+              className="issue"
+              style={{
+                background: issue.statusCode === 'done' ? 'rgba(0, 0, 0, 0.06)' : '#fff',
+              }}
+            >
+              <div style={{ display: currentDraggableId === issue.issueId ? 'block' : 'none', width: 15, height: 15, color: 'white', background: '#F44336', borderRadius: '50%', textAlign: 'center' }}>
+                {selectIssueIds.length}
+              </div>
               <span className="type">
                 <TypeTag typeCode={issue.typeCode} />
               </span>
-            <span className="summary text-overflow-hidden">
+              <span className="summary text-overflow-hidden">
                 {issue.summary}
               </span>
-            <span
-              className="issueNum"
-              style={{
-                textDecoration: issue.statusCode === 'done' ? 'line-through' : 'unset',
-              }}
-            >
+              <span
+                className="issueNum"
+                style={{
+                  textDecoration: issue.statusCode === 'done' ? 'line-through' : 'unset',
+                }}
+              >
                 {issue.issueNum}
               </span>
-          </li>
+            </li>
+          </div>
+
         )}
       </Draggable>
 
     );
   }
+
+  onIssueClick = (id) => {
+    this.props.handleClickIssue(id);
+  };
 
   render() {
     return (
@@ -307,22 +323,7 @@ class Backlog extends Component {
           </Popover>
         </div>
         <div className="body">
-          <Droppable droppableId="backlog">
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                className="epic"
-                style={{
-                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                  padding: 'grid',
-                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                }}
-              >
-                {this.renderIssues()}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
+          {this.renderIssues()}
         </div>
       </div>
     );

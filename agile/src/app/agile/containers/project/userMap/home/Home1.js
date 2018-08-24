@@ -4,9 +4,7 @@ import _ from 'lodash';
 import {
   Page, Header, Content, stores, axios, 
 } from 'choerodon-front-boot';
-import {
-  Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon, Card, Checkbox, 
-} from 'choerodon-ui';
+import { Button, Select, Popover, Tabs, Dropdown, Menu, Spin, Icon, Checkbox } from 'choerodon-ui';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import './test.scss';
 import CreateEpic from '../component/CreateEpic';
@@ -177,7 +175,8 @@ handleClickIssue = (issueId, epicId) => {
   };
 
   showBackLog =() => {
-    this.setState({ showBackLog: !this.state.showBackLog });
+    const { UserMapStore } = this.props;
+    UserMapStore.changeShowBackLog(!UserMapStore.showBackLog);
   };
 
   handleCreateVOS=(type) => {
@@ -270,7 +269,7 @@ handleClickIssue = (issueId, epicId) => {
                     }}
                   >
                     <React.Fragment>
-                      {vos[id]}
+                      {/*{vos[id]}*/}
                       {_.filter(issues, issue => issue.epicId === epic.issueId && issue[id] === vos[id]).map((item, indexs) => (
                         <Draggable draggableId={`${mode}-${item.issueId}`} index={indexs}>
                           {(provided1, snapshot1) => (
@@ -479,7 +478,7 @@ handleClickIssue = (issueId, epicId) => {
     UserMapStore.handleEpicDrap(postData);
   };
 
-  handleDragIssues =(res) => {
+  handleDragToMainBoard =(res) => {
     const { UserMapStore } = this.props;
     const { issues, mode, selectIssueIds } = UserMapStore;
     const epicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
@@ -490,14 +489,17 @@ handleClickIssue = (issueId, epicId) => {
     const rankIndex = res.source.index > res.destination.index;
     let postData = {};
     const issueData = _.cloneDeep(issues);
+    let outsetIssueId = null;
     _.map(issueIds, (issueId) => {
       const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
+      const sourceIndex = _.indexOf(issueData, sourceIssue);
+      before ? outsetIssueId = issueData[sourceIndex + 1].issueId : outsetIssueId = issueData[sourceIndex - 1].issueId;
       if (mode === 'none') {
-        postData = { epicId, issueIds, before, rankIndex };
+        postData = { epicId, issueIds, before, rankIndex, outsetIssueId };
         sourceIssue.epicId = epicId;
         sourceIssue[key] = null;
       } else {
-        postData = { epicId, issueIds, before, rankIndex, [key]: value };
+        postData = { epicId, issueIds, before, rankIndex, [key]: value, outsetIssueId };
         sourceIssue.epicId = epicId;
         value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
       }
@@ -508,30 +510,51 @@ handleClickIssue = (issueId, epicId) => {
     UserMapStore.setCurrentDraggableId(null);
   };
 
-  handleDragBacklog = (res) => {
+  handleDragToBacklog = (res) => {
     const { UserMapStore } = this.props;
-    const { backlogIssues, mode, selectIssueIds } = UserMapStore;
+    const { backlogIssues, mode, selectIssueIds, issues } = UserMapStore;
     const key = `${mode}Id`;
     const value = parseInt(res.destination.droppableId.split('-')[1], 10);
     const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
     const before = res.destination.index === 0;
     const rankIndex = res.source.index > res.destination.index;
+    const tarIndex = res.destination.index;
+    const BacklogIssueData =  _.cloneDeep(backlogIssues);
     let postData = {};
-    const issueData = _.cloneDeep(backlogIssues);
-    _.map(issueIds, (issueId) => {
-      const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
-      if (mode === 'none') {
-        postData = { epicId: value, issueIds, before, rankIndex };
-        sourceIssue.epicId = null;
-        // sourceIssue[key] = value;
-      } else {
-        postData = { issueIds, before, rankIndex, [key]: value };
-        sourceIssue.epicId = null;
+    // backlog to backlog
+    let outsetIssueId = null;
+    if (res.source.droppableId.includes('backlog')) {
+      const issueData = _.cloneDeep(backlogIssues);
+      _.map(issueIds, (issueId) => {
+        const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
+        const sourceIndex = _.indexOf(issueData, sourceIssue);
+        before ? outsetIssueId = issueData[sourceIndex + 1].issueId : outsetIssueId = issueData[sourceIndex - 1].issueId;
         value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
-      }
-      UserMapStore.setBacklogIssues(issueData);
-    });
-    UserMapStore.handleMoveIssue(postData);
+        issueData.splice(sourceIndex, 1);
+        issueData.splice(res.destination.index, 0, sourceIssue);
+        postData = { issueIds, before, rankIndex, [key]: value, outsetIssueId };
+        // UserMapStore.setBacklogIssues(issueData);
+        // UserMapStore.setIssues(issueData);
+      });
+    } else {
+      const issueData = _.cloneDeep(issues);
+      _.map(issueIds, (issueId) => {
+        const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
+        const sourceIndex = _.indexOf(issueData, sourceIssue);
+        sourceIssue.epicId = null;
+        BacklogIssueData.splice(res.destination.index, 0, sourceIssue);
+        issueData.splice(sourceIndex, 1);
+        if (mode === 'none') {
+          postData = { epicId: 0, issueIds, before, rankIndex, outsetIssueId };
+        } else {
+          postData = { issueIds, before, rankIndex, [key]: value, epicId: 0, outsetIssueId };
+          value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
+        }
+        // UserMapStore.setBacklogIssues(issueData);
+        // UserMapStore.setIssues(issueData);
+      });
+    }
+    UserMapStore.handleMoveIssue(postData, res.source.droppableId.includes('backlog') ? 'backlog' : 'userMap');
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
   };
@@ -540,9 +563,9 @@ handleClickIssue = (issueId, epicId) => {
     if (res.destination.droppableId === 'epic') {
       this.handleEpicDrag(res);
     } else if (res.destination.droppableId.includes('backlog')) {
-      this.handleDragBacklog(res);
+      this.handleDragToBacklog(res);
     } else {
-      this.handleDragIssues(res);
+      this.handleDragToMainBoard(res);
     }
   };
 
@@ -554,13 +577,10 @@ handleClickIssue = (issueId, epicId) => {
   };
   
   render() {
-    const { showBackLog } = this.state;
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
     _.sortBy(epicData, 'rink');
-    const {
- filters, mode, issues, createEpic, currentFilters, sprints, versions 
-} = UserMapStore;
+    const { filters, mode, createEpic, currentFilters, showBackLog } = UserMapStore;
     const swimlanMenu = (
       <Menu onClick={this.changeMode} selectable>
         <Menu.Item key="none">无泳道</Menu.Item>
@@ -717,8 +737,8 @@ handleClickIssue = (issueId, epicId) => {
                 ) }
               </Spin>
             </div>
-            <div className="usermap-left" style={{ display: this.state.showBackLog ? 'block' : 'none' }}>
-              <Backlog />
+            <div className="usermap-left" style={{ display: showBackLog ? 'block' : 'none' }}>
+              <Backlog handleClickIssue={this.handleClickIssue} />
             </div>
           </DragDropContext>
         </div>

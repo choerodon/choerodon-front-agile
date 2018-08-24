@@ -53,9 +53,17 @@ class UserMapStore {
   @observable
   createVOSType='';
 
-  @observable selectIssueIds = [];
+  @observable
+  selectIssueIds = [];
 
-  @observable currentDraggableId = null;
+  @observable
+  currentDraggableId = null;
+
+  @observable
+  showBackLog = false;
+
+  @observable
+  currentBacklogFilters = [];
 
   @action
   setSelectIssueIds(data) {
@@ -72,7 +80,9 @@ class UserMapStore {
     this.epics = data;
   }
 
-  @observable currentBacklogFilters = [];
+  @action changeShowBackLog(flag) {
+    this.showBackLog = flag;
+  }
 
   @computed
   get getEpics() {
@@ -354,11 +364,27 @@ class UserMapStore {
       this.loadEpic();
     });
 
-  handleMoveIssue = data => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/move`, data)
+  handleMoveIssue = (data, type = 'userMap') => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/move`, data)
     .then((res) => {
-      this.initData();
+      if (type === 'userMap' && this.showBackLog) {
+        this.initData();
+        this.loadBacklogIssues();
+      } else if (type === 'userMap' && !this.showBackLog) {
+        this.initData();
+      } else {
+        this.loadBacklogIssues();
+      }
     })
-    .catch(error => this.initData())
+    .catch((error) => {
+      if (type === 'userMap' && this.showBackLog) {
+        this.initData();
+        this.loadBacklogIssues();
+      } else if (type === 'userMap' && !this.showBackLog) {
+        this.initData();
+      } else {
+        this.loadBacklogIssues();
+      }
+    })
 }
 
 const userMapStore = new UserMapStore();
