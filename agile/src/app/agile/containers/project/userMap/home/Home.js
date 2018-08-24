@@ -1,273 +1,147 @@
-{mode === 'none' && (<React.Fragment>
-  <div className="swimlane-title">
-    <p>issue</p>
-    <div style={{ display: 'flex' }}>
-      <p className="point-span" style={{ background: '#4D90FE' }}>
-        {_.reduce(issues, (sum, issue) => {
-          if (issue.statusCode === 'todo') {
-            return sum + issue.storyPoints;
-          } else {
-            return sum;
-          }
-        }, 0)}
-      </p>
-      <p className="point-span" style={{ background: '#FFB100' }}>
-        {_.reduce(issues, (sum, issue) => {
-          if (issue.statusCode === 'doing') {
-            return sum + issue.storyPoints;
-          } else {
-            return sum;
-          }
-        }, 0)}
-      </p>
-      <p className="point-span" style={{ background: '#00BFA5' }}>
-        {_.reduce(issues, (sum, issue) => {
-          if (issue.statusCode === 'done') {
-            return sum + issue.storyPoints;
-          } else {
-            return sum;
-          }
-        }, 0)}
-      </p>
-      <p onClick={this.expandColumn.bind(this, '-1-none')} role="none">
-        <Icon type={`${this.state.expandColumns.includes('-1-none') ? 'baseline-arrow_right' : 'baseline-arrow_drop_down'}`} />
-      </p>
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import _ from 'lodash';
+import { Page, Header, Content } from 'choerodon-front-boot';
+import {
+  Button, Popover, Dropdown, Menu, Icon, Checkbox,
+} from 'choerodon-ui';
+import './test.scss';
+import CreateEpic from '../component/CreateEpic';
+import Backlog from '../component/Backlog/Backlog.js';
+import EpicCard from '../component/EpicCard/EpicCard.js';
+import IssueCard from '../component/IssueCard/IssueCard.js';
+import CreateVOS from '../component/CreateVOS';
+import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 
-    </div>
-  </div>
-  <div style={{ display: this.state.expandColumns.includes('-1-none') ? 'none' : 'flex' }}>
-    {epicData.map((epic, index) => (<div className="swimlane-column">
-      {_.filter(issues, issue => issue.epicId === epic.issueId).map(item => (
-        <IssueCard
-          key={item.issueId}
-          issue={item}
-        />
-      ))}
-      <div style={{ background: this.state.hoverId === epic.issueId ? '#f5f5f5' : 'rgba(0, 0, 0, 0.02)' }} onMouseOver={this.handleMouseColumn.bind(this, epic.issueId)}>
-        <div style={{ display: this.state.hoverId === epic.issueId ? 'block' : 'none' }}>add <a role="none" onClick={this.showCreateIssue}>new</a>or <a role="none" onClick={this.showBackLog}>existing</a></div>
-        <CreateIssue visibile={this.state.createIssue} />
-      </div>
-    </div>))}
+@observer
+class Home3 extends Component {
+  constructor(props) {
+    super(props);
+    this.fixbody = React.createRef();
+    this.state = {
+      more: false,
+      expand: false,
+      expandColumns: [],
+      showBackLog: false,
+      row: [...new Array(50).keys()],
+      col: [...new Array(50).keys()],
+      con: [...new Array(10).keys()],
+      left: 0,
+      title: '',
+    };
+  }
 
-  </div>
-</React.Fragment>)
+  componentDidMount() {
+    // this.fixbody.current.addEventListener('scroll', this.handleScroll, {
+    //   passive: true,
+    // });
+    const timer = setInterval(() => {
+      if (document.getElementById('fixHead-body')) {
+        document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll);
+        clearInterval(timer);
+      }
+    }, 20);
+  }
+
+  handleScroll = (e) => {
+    console.dir(
+      document.getElementsByClassName('fixHead-line-title')[0].getBoundingClientRect().top - 350,
+    );
+    console.dir(
+      document.getElementsByClassName('fixHead-line-title')[28].getBoundingClientRect().bottom,
+    );
+    const left = e.target.scrollLeft;
+    const top = e.target.scrollTop;
+    const title = this.state.row[Math.floor(top / 202)];
+    this.setState({
+      left,
+    });
+    document.getElementById('fixHead-head').scrollLeft = left;
+    const lines = document.getElementsByClassName('fixHead-line-title');
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].getBoundingClientRect().top - 350 >= -55) {
+        console.log(i);
+        this.setState({
+          title: lines[i - 1].dataset.title,
+        });
+        break;
+      }
+    }
+  };
+
+  render() {
+    const { showBackLog } = this.state;
+    const { UserMapStore } = this.props;
+    const epicData = UserMapStore.getEpics;
+    _.sortBy(epicData, 'rink');
+    const {
+      filters, mode, issues, createEpic, currentFilters, sprints, versions
+    } = UserMapStore;
+    return (
+      <Page
+        className="c7n-userMap"
+        service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
+      >
+        <Header title="用户故事地图">
+          <Button className="leftBtn" functyp="flat">
+            <Icon type="playlist_add" />
+
+            创建史诗
+          </Button>
+        </Header>
+        <Content>
+          <div id="qqq" className="fixHead">
+            <div className="fixHead-head" id="fixHead-head">
+              <div className="fixHead-line">
+                <div className="fixHead-line-content">
+                  {this.state.col.map(e => (
+                    <div className="fixHead-block" key={e}>
+                      <h1>{`i am epic${e}`}</h1>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div
+                className="fixHead-line fixHead-line-2"
+                style={{
+                  transform: `translateX(${`${this.state.left}px`})`,
+                }}
+              >
+                <div className="fixHead-head-note">
+
+                  1111
+                  {this.state.title}
+                </div>
+              </div>
+            </div>
+            <div className="fixHead-body" id="fixHead-body">
+              {this.state.row.map(e => (
+                <div className="fixHead-line" key={e}>
+                  <div
+                    className="fixHead-line-title"
+                    style={{
+                      marginLeft: `${this.state.left}px`,
+                    }}
+                    data-title={e}
+                  >
+                    {e}
+                  </div>
+                  <div className="fixHead-line-content">
+                    {this.state.col.map(e => (
+                      <div className="fixHead-block" key={e}>
+                        {this.state.con.map(ee => (
+                          <h1>{ee}</h1>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Content>
+      </Page>
+    );
+  }
 }
-{mode === 'sprint' && issues.length &&
-<React.Fragment>
-  {sprints.map(sprint => (<React.Fragment key={sprint.sprintId}>
-    <div className="swimlane-title">
-      <p>{sprint.sprintName}</p>
-      <div style={{ display: 'flex' }}>
-        <p className="point-span" style={{ background: '#4D90FE' }}>
-          {_.reduce(_.filter(issues, issue => issue.sprintId === sprint.sprintId), (sum, issue) => {
-            if (issue.statusCode === 'todo') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p className="point-span" style={{ background: '#FFB100' }}>
-          {_.reduce(_.filter(issues, issue => issue.sprintId === sprint.sprintId), (sum, issue) => {
-            if (issue.statusCode === 'doing') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p className="point-span" style={{ background: '#00BFA5' }}>
-          {_.reduce(_.filter(issues, issue => issue.sprintId === sprint.sprintId), (sum, issue) => {
-            if (issue.statusCode === 'done') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p onClick={this.expandColumn.bind(this, sprint.sprintId)} role="none">
-          <Icon type={`${this.state.expandColumns.includes(sprint.sprintId) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
-        </p>
-
-      </div>
-    </div>
-    <div style={{ display: this.state.expandColumns.includes(sprint.sprintId) ? 'none' : 'flex' }}>
-      {epicData.map((epic, index) => (<div className="swimlane-column">
-        <React.Fragment>
-          {_.filter(issues, issue => issue.epicId === epic.issueId && issue.sprintId === sprint.sprintId).map(item => (
-            <IssueCard
-              key={item.issueId}
-              issue={item}
-            />
-          ))}
-        </React.Fragment>
-      </div>))}
-    </div>
-  </React.Fragment>))}
-  <React.Fragment key={'no-sprint'}>
-    <div className="swimlane-title">
-      <p>
-        未计划的
-        <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, 'sprint')}>
-          <Icon type="playlist_add" />
-          创建冲刺
-        </Button>
-      </p>
-      <div style={{ display: 'flex' }}>
-        <p className="point-span" style={{ background: '#4D90FE' }}>
-          {_.reduce(_.filter(issues, issue => issue.sprintId == null), (sum, issue) => {
-            if (issue.statusCode === 'todo') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p className="point-span" style={{ background: '#FFB100' }}>
-          {_.reduce(_.filter(issues, issue => issue.sprintId == null), (sum, issue) => {
-            if (issue.statusCode === 'doing') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p className="point-span" style={{ background: '#00BFA5' }}>
-          {_.reduce(_.filter(issues, issue => issue.sprintId == null), (sum, issue) => {
-            if (issue.statusCode === 'done') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p onClick={this.expandColumn.bind(this, '-1-sprint')} role="none">
-          <Icon type={`${this.state.expandColumns.includes('-1-sprint') ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
-        </p>
-
-      </div>
-    </div>
-    <div style={{ display: this.state.expandColumns.includes('-1-sprint') ? 'none' : 'flex' }}>
-      {epicData.map((epic, index) => (<div className="swimlane-column">
-        <React.Fragment>
-          {_.filter(issues, issue => issue.epicId === epic.issueId && issue.sprintId == null).map(item => (
-            <IssueCard
-              key={item.issueId}
-              issue={item}
-            />
-          ))}
-        </React.Fragment>
-      </div>))}
-    </div>
-  </React.Fragment>
-</React.Fragment>
-}
-{mode === 'version' && issues.length && <React.Fragment>
-  {versions.map(version => (<React.Fragment key={version.versionId}>
-    <div className="swimlane-title">
-      <p>{version.name}</p>
-      <div style={{ display: 'flex' }}>
-        <p className="point-span" style={{ background: '#4D90FE' }}>
-          {_.reduce(_.filter(issues, issue => issue.versionId === version.versionId), (sum, issue) => {
-            if (issue.statusCode === 'todo') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p className="point-span" style={{ background: '#FFB100' }}>
-          {_.reduce(_.filter(issues, issue => issue.versionId === version.versionId), (sum, issue) => {
-            if (issue.statusCode === 'doing') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p className="point-span" style={{ background: '#00BFA5' }}>
-          {_.reduce(_.filter(issues, issue => issue.versionId === version.versionId), (sum, issue) => {
-            if (issue.statusCode === 'done') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p onClick={this.expandColumn.bind(this, version.versionId)} role="none">
-          <Icon type={`${this.state.expandColumns.includes(version.versionId) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
-        </p>
-
-      </div>
-    </div>
-    <div style={{ display: this.state.expandColumns.includes(version.versionId) ? 'none' : 'flex' }}>
-      {epicData.map((epic, index) => (<div className="swimlane-column">
-        <React.Fragment>
-          {_.filter(issues, issue => issue.epicId === epic.issueId && issue.versionId === version.versionId).map(item => (
-            <IssueCard
-              key={item.issueId}
-              issue={item}
-            />
-          ))}
-        </React.Fragment>
-      </div>))}
-    </div>
-  </React.Fragment>))}
-  <React.Fragment key={'no-version'}>
-    <div className="swimlane-title">
-      <p>
-        未计划的
-        <Button className="createVersionBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, 'version')}>
-          <Icon type="playlist_add" />
-          创建版本
-        </Button>
-      </p>
-      <div style={{ display: 'flex' }}>
-        <p className="point-span" style={{ background: '#4D90FE' }}>
-          {_.reduce(_.filter(issues, issue => issue.versionId == null), (sum, issue) => {
-            if (issue.statusCode === 'todo') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p className="point-span" style={{ background: '#FFB100' }}>
-          {_.reduce(_.filter(issues, issue => issue.versionId == null), (sum, issue) => {
-            if (issue.statusCode === 'doing') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p className="point-span" style={{ background: '#00BFA5' }}>
-          {_.reduce(_.filter(issues, issue => issue.versionId == null), (sum, issue) => {
-            if (issue.statusCode === 'done') {
-              return sum + issue.storyPoints;
-            } else {
-              return sum;
-            }
-          }, 0)}
-        </p>
-        <p onClick={this.expandColumn.bind(this, '-1-version')} role="none">
-          <Icon type={`${this.state.expandColumns.includes('-1-version') ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
-        </p>
-
-      </div>
-    </div>
-    <div style={{ display: this.state.expandColumns.includes('-1-version') ? 'none' : 'flex' }}>
-      {epicData.map((epic, index) => (<div className="swimlane-column">
-        <React.Fragment>
-          {_.filter(issues, issue => issue.epicId === epic.issueId && issue.versionId == null).map(item => (
-            <IssueCard
-              key={item.isssueId}
-              issue={item}
-            />
-          ))}
-        </React.Fragment>
-      </div>))}
-    </div>
-  </React.Fragment>
-</React.Fragment>
-}
+export default Home3;

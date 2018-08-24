@@ -7,7 +7,6 @@ import './EpicCard.scss';
 import StatusTag from '../../../../../components/StatusTag';
 import { updateIssue } from '../../../../../api/NewIssueApi';
 import US from '../../../../../stores/project/userMap/UserMapStore';
-import BacklogStore from "../../../../../stores/project/backlog/BacklogStore";
 
 const { AppState } = stores;
 const { TextArea } = Input;

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import {
   Input, Icon, Popover, Checkbox,
 } from 'choerodon-ui';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import './Backlog.scss';
 import '../../../../Agile.scss';
@@ -78,22 +79,33 @@ class Backlog extends Component {
       group = this.getIssuesByKeyword(keyword, US.backlogIssues);
       return (
         <div className="issues">
-          <div>
-            <div className="title">
-              <h4 className="word">Issues</h4>
-              <Icon
-                type={backlogExpand.includes(0) ? 'expand_less' : 'expand_more'}
-                onClick={this.handleClickExpand.bind(this, 0)}
-              />
-            </div>
-            {backlogExpand.includes(0) ? null : (
-              <ul className="issue-block">
-                {
-                  _.map(group, issue => this.renderIssue(issue))
-                }
-              </ul>
+          <Droppable droppableId="backlog-0">
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                className="epic"
+                style={{
+                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                  padding: 'grid',
+                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                }}
+              >
+                <div className="title">
+                  <h4 className="word">Issues</h4>
+                  <Icon
+                    type={backlogExpand.includes(0) ? 'expand_less' : 'expand_more'}
+                    onClick={this.handleClickExpand.bind(this, 0)}
+                  />
+                </div>
+                <ul className="issue-block">
+                  {
+                    _.map(group, issue => this.renderIssue(issue))
+                  }
+                </ul>
+                {provided.placeholder}
+              </div>
             )}
-          </div>
+          </Droppable>
         </div>
       );
     } else {
@@ -117,24 +129,41 @@ class Backlog extends Component {
     const { keyword } = this.state;
     const issues = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v[`${mode}Id`] === group[`${mode}Id`]));
     return (
-      <div key={i}>
-        <div className="title">
-          <h4 className="word text-overflow-hidden">
-            {group.name || group.sprintName}
-          </h4>
-          <Icon
-            type={backlogExpand.includes(group[`${mode}Id`]) ? 'expand_less' : 'expand_more'}
-            onClick={this.handleClickExpand.bind(this, group[`${mode}Id`])}
-          />
-        </div>
-        {backlogExpand.includes(group[`${mode}Id`]) ? null : (
-          <ul className="issue-block">
-            {
-              _.map(issues, issue => this.renderIssue(issue))
-            }
-          </ul>
+      <Droppable droppableId={`backlog-${group[`${mode}Id`]}`}>
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            className="epic"
+            style={{
+              background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+              padding: 'grid',
+              // borderBottom: '1px solid rgba(0,0,0,0.12)'
+            }}
+          >
+            <div key={i}>
+
+              <div className="title">
+                <h4 className="word text-overflow-hidden">
+                  {group.name || group.sprintName}
+                </h4>
+                <Icon
+                  type={backlogExpand.includes(group[`${mode}Id`]) ? 'expand_less' : 'expand_more'}
+                  onClick={this.handleClickExpand.bind(this, group[`${mode}Id`])}
+                />
+              </div>
+              {backlogExpand.includes(group[`${mode}Id`]) ? null : (
+                <ul className="issue-block">
+                  {
+                    _.map(issues, (issue, index) => this.renderIssue(issue, index))
+                  }
+                </ul>
+              )}
+            </div>
+            {provided.placeholder}
+          </div>
         )}
-      </div>
+      </Droppable>
+
     );
   }
 
@@ -143,51 +172,76 @@ class Backlog extends Component {
     const { keyword } = this.state;
     const issues = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v[`${mode}Id`] === null));
     return (
-      <div>
-        <div className="title">
-          <h4 className="word">
-            {'Unscheduled'}
-          </h4>
-          <Icon
-            type={backlogExpand.includes('Unscheduled') ? 'expand_less' : 'expand_more'}
-            onClick={this.handleClickExpand.bind(this, 'Unscheduled')}
-          />
-        </div>
-        {backlogExpand.includes('Unscheduled') ? null : (
-          <ul className="issue-block">
-            {
-              _.map(issues, issue => this.renderIssue(issue))
-            }
-          </ul>
+      <Droppable droppableId="backlog-0">
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            className="epic"
+            style={{
+              background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+              padding: 'grid',
+              // borderBottom: '1px solid rgba(0,0,0,0.12)'
+            }}
+          >
+            <div className="title">
+              <h4 className="word">
+                {'Unscheduled'}
+              </h4>
+              <Icon
+                type={backlogExpand.includes('Unscheduled') ? 'expand_less' : 'expand_more'}
+                onClick={this.handleClickExpand.bind(this, 'Unscheduled')}
+              />
+            </div>
+            {backlogExpand.includes('Unscheduled') ? null : (
+              <ul className="issue-block">
+                {
+                  _.map(issues, (issue, index) => this.renderIssue(issue, index))
+                }
+              </ul>
+            )}
+            {provided.placeholder}
+          </div>
         )}
-      </div>
+      </Droppable>
     );
   }
 
-  renderIssue(issue) {
+  renderIssue(issue, index) {
+    const { mode } = US;
     return (
-      <li
-        key={issue.issueId}
-        className="issue"
-        style={{
-          background: issue.statusCode === 'done' ? 'rgba(0, 0, 0, 0.06)' : '#fff',
-        }}
-      >
-        <span className="type">
-          <TypeTag typeCode={issue.typeCode} />
-        </span>
-        <span className="summary text-overflow-hidden">
-          {issue.summary}
-        </span>
-        <span
-          className="issueNum"
-          style={{
-            textDecoration: issue.statusCode === 'done' ? 'line-through' : 'unset',
-          }}
-        >
-          {issue.issueNum}
-        </span>
-      </li>
+      <Draggable draggableId={`${mode}-${issue.issueId}`} index={index}>
+        {(provided1, snapshot1) => (
+          <li
+            ref={provided1.innerRef}
+            {...provided1.draggableProps}
+            {...provided1.dragHandleProps}
+            role="none"
+            key={issue.issueId}
+            className="issue"
+            style={{
+              background: issue.statusCode === 'done' ? 'rgba(0, 0, 0, 0.06)' : '#fff',
+              cursor: 'move',
+              ...provided1.draggableProps.style,
+            }}
+          >
+              <span className="type">
+                <TypeTag typeCode={issue.typeCode} />
+              </span>
+            <span className="summary text-overflow-hidden">
+                {issue.summary}
+              </span>
+            <span
+              className="issueNum"
+              style={{
+                textDecoration: issue.statusCode === 'done' ? 'line-through' : 'unset',
+              }}
+            >
+                {issue.issueNum}
+              </span>
+          </li>
+        )}
+      </Draggable>
+
     );
   }
 
@@ -253,7 +307,22 @@ class Backlog extends Component {
           </Popover>
         </div>
         <div className="body">
-          {this.renderIssues()}
+          <Droppable droppableId="backlog">
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                className="epic"
+                style={{
+                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                  padding: 'grid',
+                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                }}
+              >
+                {this.renderIssues()}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
         </div>
       </div>
     );
