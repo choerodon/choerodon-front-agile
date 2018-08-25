@@ -1,20 +1,26 @@
 .pie-chart {
-  .pie-title {
-    // position: absolute;
+  .pie-title{
+    position: absolute;
+    right: 0;
     background: #FFFFFF;
     box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
     // top: 20%;
-    min-width: 326px;
+    // min-width: 326px;
     padding: 24px;
-    max-height: 376px;
-    overflow: auto;
-
+    padding-right:10px; 
+    max-width: 380px;
 
     .pie-legend-title {
       font-size: 18px;
       margin-bottom: 20px;
     }
 
+    .pie-legend-tbody{
+      display: block;
+      max-height: 250px;
+      overflow-y: scroll;
+      margin-bottom: 41px;
+    }
 
     .pie-legend-icon {
       float: left;
@@ -29,18 +35,14 @@
       display: inline-block;
       float: left;
       line-height: 15px;
-      overflow: hidden;
+      max-Width: 100px;
       white-space: nowrap;
+      overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 200px;
     }
-
-
-  }
- 
+    td{
+      padding-bottom: 12px;
+      padding-right: 35px;
+    }
+  } 
 }
-
-// .toolTip{
-//   border-radius: 0;
-//   color: red($color: #000000)
-// }
