@@ -52,6 +52,8 @@ class VersionReportStore {
       name: '其它', typeName: null, value: 0, percent: 0, 
     };
 
+    @observable smallData= [];
+
 
   @action changePieLoading(flag) {
       this.pieLoading = flag;
@@ -95,8 +97,16 @@ class VersionReportStore {
     return toJS(this.reportData);
   }
 
+  @computed get getSmallData() {
+    return this.smallData;
+  }
+
   @action setReportData(data) {
     this.reportData = data;
+  }
+
+  @action setSmallData(data) {
+    this.smallData = data;
   }
 
   axiosGetReportData(versionId, type) {
@@ -142,16 +152,17 @@ class VersionReportStore {
             }
             this.setColors(colors);
             this.setSourceData(data);
-            const smallData = data.filter((item, index, arr) => item.percent < 2);
-            smallData.forEach((item) => {
+            this.setSmallData(data.filter((item, index, arr) => item.percent < 2));
+            const bigData = data.filter((item, index, arr) => item.percent >= 2);
+            this.smallData.forEach((item) => {
               item.percent = (item.percent).toFixed(2);
               this.setOtherData(item.percent, item.value);
             });
             if (this.otherData.value > 0) {
-              data.push(this.otherData);
+              bigData.push(this.otherData);
             }
             console.log(`otherData:${JSON.stringify(this.otherData)}`);
-            this.setPieData(data);
+            this.setPieData(bigData);
           }
           this.changePieLoading(false);
         })

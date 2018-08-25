@@ -13,6 +13,7 @@ import {
   Button, Select, Icon, Spin, Tooltip, 
 } from 'choerodon-ui';
 import './pie.scss';
+import { reduce } from 'zrender/lib/core/util';
 import SwitchChart from '../../Component/switchChart';
 import VersionReportStore from '../../../../../stores/project/versionReport/VersionReport';
 import NoDataComponent from '../../Component/noData';
@@ -37,46 +38,77 @@ class ReleaseDetail extends Component {
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, 'assignee');
   }
 
-  getRich = () => {
-    const data = VersionReportStore.getPieData;
-    const rich = {
-      border: {
-        width: 18,
-        height: 18,
-        borderRadius: 18,
-      },
+  // getRich = () => {
+  //   const data = VersionReportStore.getPieData;
+  //   const rich = {
+  //     border: {
+  //       width: 18,
+  //       height: 18,
+  //       borderRadius: 18,
+  //     },
+  //   };
+  //   if (data.length) {
+  //     data.map((item, index) => {
+  //       // if (item.jsonObject && item.jsonObject.assigneeImageUrl === 'null') {
+  //       //   rich[index] = {
+  //       //     // width: 18,
+  //       //     height: 18,
+  //       //     borderRadius: 18,
+  //       //     backgroundColor: {
+  //       //       image: item.jsonObject.assigneeImageUrl,
+  //       //     },
+  //       //
+  //       //   };
+  //       // } else if (item.jsonObject && !item.jsonObject.assigneeImageUrl) {
+  //       if (item.jsonObject) {
+  //         rich[index] = {
+  //           width: 18,
+  //           height: 18,
+  //           borderRadius: 18,
+  //           borderWidth: 1,
+  //           align: 'center',
+  //           backgroundColor: '#c5cbe8',
+  //           color: '#3f51b5',
+  //         };
+  //       }
+
+  //       return rich;
+  //     });
+  //   }
+
+  //   return rich;
+  // };
+  // 定义一个函数
+  compare(pro) { 
+    return function (obj1, obj2) { 
+      const val1 = obj1[pro]; 
+      const val2 = obj2[pro]; 
+      if (val1 < val2) { 
+        return 1; 
+      } else if (val1 > val2) { 
+        return -1; 
+      } else { 
+        return 0; 
+      } 
+    }; 
+  } 
+
+  getDataName() {
+    const datas = VersionReportStore.pieData;
+    const smallData = VersionReportStore.getSmallData;
+    smallData.sort(this.compare('percent'));
+    const objSmallData = {
+      percent: [],
+      name: [],
+      // percent: '20%',
+      // name: 'lwf',
     };
-    if (data.length) {
-      data.map((item, index) => {
-        // if (item.jsonObject && item.jsonObject.assigneeImageUrl === 'null') {
-        //   rich[index] = {
-        //     // width: 18,
-        //     height: 18,
-        //     borderRadius: 18,
-        //     backgroundColor: {
-        //       image: item.jsonObject.assigneeImageUrl,
-        //     },
-        //
-        //   };
-        // } else if (item.jsonObject && !item.jsonObject.assigneeImageUrl) {
-        if (item.jsonObject) {
-          rich[index] = {
-            width: 18,
-            height: 18,
-            borderRadius: 18,
-            borderWidth: 1,
-            align: 'center',
-            backgroundColor: '#c5cbe8',
-            color: '#3f51b5',
-          };
-        }
-
-        return rich;
-      });
+    for (let i = 0; i < smallData.length; i++) {
+      objSmallData.percent.push(`{dataPercent|${smallData[i].percent}%}`);
+      objSmallData.name.push(`{dataName|${smallData[i].name}}`);
     }
-
-    return rich;
-  };
+    return objSmallData;
+  }
 
   getFirstName = (str) => {
     if (!str) {
@@ -128,26 +160,61 @@ class ReleaseDetail extends Component {
           type: 'pie',
           // radius: '55%',
           // hoverAnimation: false,
+          startAngle: 220,
           center: ['50%', '50%'],
           data: datas,
+          // labelLine: {
+          //   length: 100,
+          //   length2: 200,
+          // },
           label: {
+            fontSize: '13px',
+            color: 'rgba(0,0,0,0.65)',
+            position: 'outside',
 
             formatter: (value) => {
               if (value.data.name === null) {
                 return '未分配';
-              } else {
-                // if (this.state.type === '经办人' && value.data.jsonObject.assigneeImageUrl) {
-                //   return `{${value.dataIndex}|}${value.data.name}`;
-                // } else if (this.state.type === '经办人' && !value.data.jsonObject.assigneeImageUrl) {
-                if (this.state.type === '经办人') {
-                  // return `{${value.dataIndex}|${this.getFirstName(value.data.name)}}${value.data.name}`;
-                  return value.data.name;
-                } else {
-                  return value.data.name;
-                }
+              } 
+              if (value.data.name === '其它') {
+                return [
+                  '{title|其它}',
+                  `${this.getDataName().percent.join('')}`,
+                  `${this.getDataName().name.join('')}`,
+                ].join('\n');
               }
+              // else {
+              //   // if (this.state.type === '经办人' && value.data.jsonObject.assigneeImageUrl) {
+              //   //   return `{${value.dataIndex}|}${value.data.name}`;
+              //   // } else if (this.state.type === '经办人' && !value.data.jsonObject.assigneeImageUrl) {
+              //   if (this.state.type === '经办人') {
+              //     // return `{${value.dataIndex}|${this.getFirstName(value.data.name)}}${value.data.name}`;
+              //     return value.data.name;
+              //   } else {
+              //     return value.data.name;
+              //   }
+              // }
             },
-            rich: this.state.type === '经办人' ? this.getRich() : {},
+            // rich: this.state.type === '经办人' ? this.getRich() : {},
+            rich: {
+              title: {
+                fontSize: '13px',
+                color: 'rgba(0,0,0,0.65)',
+              },
+              dataPercent: {
+                fontSize: '13px',
+                color: 'rgba(0,0,0,0.65)',
+                padding: [5, 10],
+                align: 'center',
+                backgroundColor: 'rgba(250,211,82,0.90)',
+              },
+              dataName: {
+                fontSize: '13px',
+                color: 'rgba(0,0,0,0.65)',
+                padding: [5, 10],
+                align: 'center',
+              },
+            },
           },
           itemStyle: {
             normal: {
@@ -209,9 +276,8 @@ class ReleaseDetail extends Component {
           <Button onClick={this.handelRefresh}>
             <Icon type="refresh" />
 
-
 刷新
-                    </Button>
+</Button>
         </Header>
         <Content
           title={data.length ? `项目"${AppState.currentMenuType.name}"下的问题统计图` : '无问题的统计图'}
@@ -251,27 +317,28 @@ class ReleaseDetail extends Component {
                     <table>
                       <thead>
                         <tr>
-                          <td style={{ paddingRight: 106 }}>{this.state.type}</td>
-                          <td style={{ paddingRight: 68 }}>问题</td>
-                          <td>百分比</td>
+                          <td style={{ width: '158px' }}>{this.state.type}</td>
+                          <td style={{ width: '62px' }}>问题</td>
+                          <td style={{ paddingRight: 35 }}>百分比</td>
                         </tr>
                       </thead>
-                      <tbody>
-                        {
+                    </table>
+                    <table className="pie-legend-tbody">
+                      {
                         sourceData.map((item, index) => (
                           <tr>
-                            <td>
+                            <td style={{ width: '158px' }}>
                               <div className="pie-legend-icon" style={{ background: colors[index] }} />
                               <Tooltip title={item && item.name}>
                                 <div className="pie-legend-text">{item.name ? item.name : '未分配'}</div>
                               </Tooltip>
                             </td>
-                            <td>
+                            <td style={{ width: '62px' }}>
                               <a
                                 role="none"
                                 onClick={() => {
                                   console.log('this.state.value');
-                                  this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=${this.state.value}&paramId=${item.typeName}&paramName=${item.name}下的问题&paramUrl=reporthost/piechart`);
+                                  this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=${this.state.value}&paramId=${item.typeName === null ? '0' : item.typeName}&paramName=${item.name === null ? '未分配' : item.name}下的问题&paramUrl=reporthost/piechart`);
                                 }}
                               >
                                 {item.value}
@@ -279,12 +346,11 @@ class ReleaseDetail extends Component {
                               </a>
       
                             </td>
-                            <td style={{ paddingTop: 12 }}>{`${(item.percent).toFixed(2)} %`}</td>
+                            <td style={{ width: '62px', paddingRight: 15 }}>{`${(item.percent).toFixed(2)} %`}</td>
                           </tr>
                         ))
                       }
-                      </tbody>
-                    </table>
+                    </table>        
                   </div>
                 </div>
               </React.Fragment>
