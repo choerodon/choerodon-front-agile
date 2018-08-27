@@ -13,14 +13,20 @@
     position: relative;
     .echarts-for-react {
       div{
-        margin-top: -50px !important;
+        // margin-top: -50px !important;
       }
     }
 
     .charts-inner{
+      width: 64px;
+      height: 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       position: absolute;
-      top: 48%;
-      left: 20%;
+      top: calc(50% - 32px);
+      left: calc(35% - 32px);
     }
   }   
 }

@@ -28,6 +28,18 @@ class EpicProgress extends Component {
     return {
       tooltip: {
         trigger: 'axis',
+        backgroundColor: '#fff',
+        textStyle: {
+          color: '#000',
+        },
+        formatter(params) {
+          window.console.log(params);
+          const epic = params.find(v => v.value !== undefined);
+          const res = `${epic.name}:</br>${epic.value}%`;
+          return res;
+        },
+        extraCssText: 
+          'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
       },
       legend: {
         orient: 'vertical',
@@ -148,16 +160,23 @@ class EpicProgress extends Component {
         itemStyle: {
           normal: {
             barBorderRadius: 2,
-            color(params) {
-              const colorList = [
+            barBorderWidth: 1,
+            barBorderColor:
+              [
                 '#ffb100', '#303f9f', '#ff7043',
                 '#f44336', '#f953ba', '#00bfa5',
+              ][i],
+            color(params) {
+              const colorList = [
+                'rgba(255, 177, 0, 0.4)', 'rgba(48, 63, 159, 0.4)',
+                'rgba(255, 112, 67, 0.4)', 'rgba(244, 67, 54, 0.4)',
+                'rgba(249, 83, 186, 0.4)', 'rgba(0, 191, 165, 0.4)',
               ];
               return colorList[i];
             },
           },
         },
-        data: data.map((x, y) => (y === i ? x.progress : 0)),
+        data: data.map((x, y) => (y === i ? x.progress : undefined)),
       })),
     };
   }

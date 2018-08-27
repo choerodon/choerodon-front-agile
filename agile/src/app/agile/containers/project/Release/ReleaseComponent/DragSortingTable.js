@@ -162,6 +162,7 @@ class DragSortingTable extends Component {
         dataSource={this.props.dataSource}
         pagination={this.props.pagination}
         onChange={this.props.onChange}
+        filterBarPlaceholder="过滤表"
         components={this.components}
         onRow={(record, index) => ({
           index,

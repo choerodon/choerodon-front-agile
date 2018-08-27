@@ -225,7 +225,7 @@ class ProjectSetting extends Component {
         </Header>
         <Content
           title="项目设置"
-          description="根据项目需求，用户可自行修改项目code、默认优先级以及默认经办人策略。修改项目code后，所有的问题编号前缀将发生改变。通过设置项目的默认优先级后，在项目里创建问题时会默认给问题赋值一个优先级，用户可自行修改。默认经办人策略为问题的创建提供便利，可根据用户需求选择策略。"
+          description="可修改项目code、默认优先级和默认经办人策略，修改项目设置后，项目中所有的问题编号前缀、优先级、经办人将随之改变。"
           link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/setup/project-setting/"
         >
           <div style={{ marginTop: 8 }}>
