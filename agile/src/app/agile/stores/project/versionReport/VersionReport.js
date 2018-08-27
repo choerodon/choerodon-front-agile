@@ -48,13 +48,6 @@ class VersionReportStore {
 
     @observable pieLoading = false;
 
-    @observable otherData= {
-      name: '其它', typeName: null, value: 0, percent: 0, 
-    };
-
-    @observable smallData= [];
-
-
   @action changePieLoading(flag) {
       this.pieLoading = flag;
     }
@@ -69,16 +62,6 @@ class VersionReportStore {
 
   @action setColors(data) {
     this.colors = data;
-  }
-
-  @action setOtherData(percent, value) {
-    this.otherData.value += parseFloat(value);
-    this.otherData.percent += parseFloat(percent);
-  }
-
-  @action setOtherDataEmpty() {
-    this.otherData.value = 0;
-    this.otherData.percent = 0;
   }
 
   @computed get getPieData() {
@@ -97,16 +80,8 @@ class VersionReportStore {
     return toJS(this.reportData);
   }
 
-  @computed get getSmallData() {
-    return this.smallData;
-  }
-
   @action setReportData(data) {
     this.reportData = data;
-  }
-
-  @action setSmallData(data) {
-    this.smallData = data;
   }
 
   axiosGetReportData(versionId, type) {
@@ -152,16 +127,13 @@ class VersionReportStore {
             }
             this.setColors(colors);
             this.setSourceData(data);
-            this.setSmallData(data.filter((item, index, arr) => item.percent < 2));
             const bigData = data.filter((item, index, arr) => item.percent >= 2);
-            this.smallData.forEach((item) => {
-              item.percent = (item.percent).toFixed(2);
-              this.setOtherData(item.percent, item.value);
-            });
-            if (this.otherData.value > 0) {
-              bigData.push(this.otherData);
+            const otherData = {
+              name: '其它', typeName: null, value: _.reduce(_.filter(data, item => item.percent < 2), (sum, item) => sum += item.value, 0), percent: _.reduce(_.filter(data, item => item.percent < 2), (sum, item) => sum += item.percent, 0).toFixed(2),
+            };
+            if (otherData.value > 0) {
+              bigData.unshift(otherData);
             }
-            console.log(`otherData:${JSON.stringify(this.otherData)}`);
             this.setPieData(bigData);
           }
           this.changePieLoading(false);

@@ -31,54 +31,24 @@ class ReleaseDetail extends Component {
       colors: [],
       type: '经办人',
       value: 'assignee',
+      showOtherTooltip: false,
     };
   }
 
   componentDidMount() {
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, 'assignee');
+    console.log(document.getElementsByTagName('canvas'));
+    // const pieChart = echarts.init(document.getElementsByTagName('canvas')[0]);
+    // // console.log(pieChart);
+    // pieChart.on('mouseover', (params) => {
+    //   console.log(`params: ${JSON.stringify(params)}`);
+    //   alert(1);
+    // });
+    // pieChart.onMouseoer = function (params) {
+    //   console.log(`params: ${JSON.stringify(params)}`);
+    // };
   }
 
-  // getRich = () => {
-  //   const data = VersionReportStore.getPieData;
-  //   const rich = {
-  //     border: {
-  //       width: 18,
-  //       height: 18,
-  //       borderRadius: 18,
-  //     },
-  //   };
-  //   if (data.length) {
-  //     data.map((item, index) => {
-  //       // if (item.jsonObject && item.jsonObject.assigneeImageUrl === 'null') {
-  //       //   rich[index] = {
-  //       //     // width: 18,
-  //       //     height: 18,
-  //       //     borderRadius: 18,
-  //       //     backgroundColor: {
-  //       //       image: item.jsonObject.assigneeImageUrl,
-  //       //     },
-  //       //
-  //       //   };
-  //       // } else if (item.jsonObject && !item.jsonObject.assigneeImageUrl) {
-  //       if (item.jsonObject) {
-  //         rich[index] = {
-  //           width: 18,
-  //           height: 18,
-  //           borderRadius: 18,
-  //           borderWidth: 1,
-  //           align: 'center',
-  //           backgroundColor: '#c5cbe8',
-  //           color: '#3f51b5',
-  //         };
-  //       }
-
-  //       return rich;
-  //     });
-  //   }
-
-  //   return rich;
-  // };
-  // 定义一个函数
   compare(pro) { 
     return function (obj1, obj2) { 
       const val1 = obj1[pro]; 
@@ -93,23 +63,6 @@ class ReleaseDetail extends Component {
     }; 
   } 
 
-  getDataName() {
-    const datas = VersionReportStore.pieData;
-    const smallData = VersionReportStore.getSmallData;
-    smallData.sort(this.compare('percent'));
-    const objSmallData = {
-      percent: [],
-      name: [],
-      // percent: '20%',
-      // name: 'lwf',
-    };
-    for (let i = 0; i < smallData.length; i++) {
-      objSmallData.percent.push(`{dataPercent|${smallData[i].percent}%}`);
-      objSmallData.name.push(`{dataName|${smallData[i].name}}`);
-    }
-    return objSmallData;
-  }
-
   getFirstName = (str) => {
     if (!str) {
       return '';
@@ -122,6 +75,20 @@ class ReleaseDetail extends Component {
     }
     return str[0].toUpperCase();
   };
+
+  isShowOtherToolTip(e) {
+    this.setState({
+      showOtherTooltip: true,
+    });
+    const otherTooptipItem = document.getElementsByClassName('pie-otherTooptip-item-percent');
+    let opacity = 0.9;
+    for (let i = 0; i < otherTooptipItem.length; i++) {
+      opacity = 1 - i * 0.1 > 0 ? 1 - i * 0.1 : 0.9;
+      otherTooptipItem[i].style.backgroundColor = `rgba(250,211,82,${opacity})`;
+      console.log(otherTooptipItem[i].style.backgroundColor);
+    }
+    // e.stopPropageation();
+  }
 
   getOption() {
     const colors = VersionReportStore.colors;
@@ -137,12 +104,22 @@ class ReleaseDetail extends Component {
       tooltip: {
         trigger: 'item',
         // formatter: '问题: {c} {a} <br/>{b} : {d}%',
-        formatter: value => (
-          `<div>
-              <span>问题：${value.data.value}</span><br/>
-              <span>百分比：${(value.data.percent.toFixed(2))}%</span>
-            </div>`
-        ),
+        // formatter: value => (
+        //   `<div>
+        //       <span>问题：${value.data.value}</span><br/>
+        //       <span>百分比：${(value.data.percent.toFixed(2))}%</span>
+        //     </div>`
+        // ),
+        formatter: (value) => {
+          // console.log(`pieLog: ${JSON.stringify(value)}`);
+          if (value.data.name !== '其它') {
+            this.setState({ showOtherTooltip: false });
+            return `<div><span>问题：${value.data.value}</span><br/><span>百分比：${(value.data.percent.toFixed(2))}%</span></div>`;
+          } else {
+            this.isShowOtherToolTip(); 
+            return '';
+          }
+        },
         padding: 10,
         textStyle: {
           color: '#000',
@@ -160,15 +137,15 @@ class ReleaseDetail extends Component {
           type: 'pie',
           // radius: '55%',
           // hoverAnimation: false,
-          startAngle: 220,
-          center: ['50%', '50%'],
+          startAngle: 245,
+          center: ['50%', '47%'],
           data: datas,
           // labelLine: {
           //   length: 100,
           //   length2: 200,
           // },
           label: {
-            fontSize: '13px',
+            // fontSize: '13px',
             color: 'rgba(0,0,0,0.65)',
             position: 'outside',
 
@@ -176,44 +153,6 @@ class ReleaseDetail extends Component {
               if (value.data.name === null) {
                 return '未分配';
               } 
-              if (value.data.name === '其它') {
-                return [
-                  '{title|其它}',
-                  `${this.getDataName().percent.join('')}`,
-                  `${this.getDataName().name.join('')}`,
-                ].join('\n');
-              }
-              // else {
-              //   // if (this.state.type === '经办人' && value.data.jsonObject.assigneeImageUrl) {
-              //   //   return `{${value.dataIndex}|}${value.data.name}`;
-              //   // } else if (this.state.type === '经办人' && !value.data.jsonObject.assigneeImageUrl) {
-              //   if (this.state.type === '经办人') {
-              //     // return `{${value.dataIndex}|${this.getFirstName(value.data.name)}}${value.data.name}`;
-              //     return value.data.name;
-              //   } else {
-              //     return value.data.name;
-              //   }
-              // }
-            },
-            // rich: this.state.type === '经办人' ? this.getRich() : {},
-            rich: {
-              title: {
-                fontSize: '13px',
-                color: 'rgba(0,0,0,0.65)',
-              },
-              dataPercent: {
-                fontSize: '13px',
-                color: 'rgba(0,0,0,0.65)',
-                padding: [5, 10],
-                align: 'center',
-                backgroundColor: 'rgba(250,211,82,0.90)',
-              },
-              dataName: {
-                fontSize: '13px',
-                color: 'rgba(0,0,0,0.65)',
-                padding: [5, 10],
-                align: 'center',
-              },
             },
           },
           itemStyle: {
@@ -240,7 +179,6 @@ class ReleaseDetail extends Component {
     // VersionReportStore.setPieData([]);
     this.setState({ type: option.key, value });
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
-    VersionReportStore.setOtherDataEmpty();
   };
 
   render() {
@@ -275,9 +213,8 @@ class ReleaseDetail extends Component {
           />
           <Button onClick={this.handelRefresh}>
             <Icon type="refresh" />
-
-刷新
-</Button>
+            {'刷新'}
+          </Button>
         </Header>
         <Content
           title={data.length ? `项目"${AppState.currentMenuType.name}"下的问题统计图` : '无问题的统计图'}
@@ -292,7 +229,6 @@ class ReleaseDetail extends Component {
                   label="统计类型"
                   style={{
                     width: 512,
-                    marginBottom: 32,
                   }}
                   onChange={this.changeType}
                 >
@@ -303,7 +239,7 @@ class ReleaseDetail extends Component {
                 }
                 </Select>
                 <div style={{
-                  marginTop: 30, display: 'flex', justifyContent: 'flex-start', alignItems: 'center', 
+                  display: 'flex', justifyContent: 'flex-start', alignItems: 'center', 
                 }}
                 >
                   <ReactEchartsCore
@@ -312,6 +248,26 @@ class ReleaseDetail extends Component {
                     echarts={echarts}
                     option={this.getOption()}
                   />
+                 
+                  <div className="pie-otherTooltip">
+                    { this.state.showOtherTooltip ? <div className="pie-otherTooltip-wrap" /> : ''}
+                    <div className="pie-otherTooltip-item-wrap">
+                      { this.state.showOtherTooltip 
+                        ? sourceData.filter(item => item.percent < 2).sort(this.compare('percent')).map(item => (
+                          <div className="pie-otherTooptip-item">
+                            <p className="pie-otherTooptip-item-percent">
+                              <span>{`${item.percent.toFixed(2)}%`}</span>
+                            </p>
+                            <p>
+                              <Tooltip title={item.name} placement="bottom">
+                                <span>{item.name}</span>
+                              </Tooltip>
+                            </p>
+                          </div>
+                        )) : ''}
+                    </div>
+                   
+                  </div>
                   <div className="pie-title">
                     <p className="pie-legend-title">数据统计</p>
                     <table>
@@ -342,9 +298,7 @@ class ReleaseDetail extends Component {
                                 }}
                               >
                                 {item.value}
-      
                               </a>
-      
                             </td>
                             <td style={{ width: '62px', paddingRight: 15 }}>{`${(item.percent).toFixed(2)} %`}</td>
                           </tr>
