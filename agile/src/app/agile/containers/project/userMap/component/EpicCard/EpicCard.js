@@ -100,7 +100,7 @@ class EpicCard extends Component {
                   className="c7n-bar"
                   style={{
                     background: epic.color,
-                    width: '30%',
+                    width: `${progress * 100}%`,
                   }}
                 />
                 <div

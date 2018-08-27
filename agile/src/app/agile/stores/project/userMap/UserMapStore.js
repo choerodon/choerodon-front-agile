@@ -226,7 +226,7 @@ class UserMapStore {
     url += `&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}`;
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}${this.isApplyToEpic ? url : ''}`)
       .then((epics) => {
-        this.setEpics(epics);
+        this.setEpics(_.sortBy(epics, 'epicSequence'));
       })
       .catch((error) => {
         Choerodon.handleResponseError(error);
@@ -277,7 +277,7 @@ class UserMapStore {
     .then(
       axios.spread((epics, filters, issues) => {
         this.setFilters(filters);
-        this.setEpics(epics);
+        this.setEpics(_.sortBy(epics, 'epicSequence'));
         this.setIssues(issues);
         // 两个请求现在都执行完成
       }),

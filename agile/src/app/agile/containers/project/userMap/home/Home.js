@@ -38,6 +38,13 @@ class Home3 extends Component {
     // });
     this.initData();
     const timer = setInterval(() => {
+      if (document.getElementsByClassName('filter').length > 0) {
+        if (document.getElementsByClassName('filter')[0].scrollHeight > document.getElementsByClassName('filter')[0].clientHeight) {
+          this.setState({
+            more: true,
+          });
+        }
+      }
       if (document.getElementById('fixHead-body')) {
         document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll);
         clearInterval(timer);
@@ -69,13 +76,21 @@ class Home3 extends Component {
     this.setState({
       left,
     });
-    document.getElementById('fixHead-head').scrollLeft = left;
-    const lines = document.getElementsByClassName('fixHead-line-title');
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].getBoundingClientRect().top - 350 >= -55) {
+    const tarElement = document.getElementById('fixHead-head');
+    tarElement.scrollLeft = left;
+    const lines = document.getElementsByClassName('fixHead-line-content');
+    for (let i = 1; i < lines.length - 1; i += 1) {
+      if (lines[i].getBoundingClientRect().top < 288 && lines[i + 1].getBoundingClientRect().top > 288) {
+        const titleText = lines[i].dataset.title;
+        const dom = lines[i].lastElementChild;
+        const vosId = parseInt(lines[i].dataset.id, 10);
+        // tarElement.replaceChild(dom, tarElement.lastElementChild);
         this.setState({
-          title: lines[i - 1].dataset.title,
+          title: titleText,
+          vosId,
+          // dom: dom,
         });
+        // document.getElementById('fixHead-head').lastElementChild.appendChild(dom);
         break;
       }
     }
@@ -140,6 +155,7 @@ class Home3 extends Component {
   changeMode =(options) => {
     this.props.UserMapStore.setMode(options.key);
     const mode = options.key;
+    this.setState({ title: undefined, vosId: null });
     if (mode === 'sprint') {
       this.props.UserMapStore.loadSprints();
     } else if (mode === 'version') {
@@ -188,7 +204,7 @@ class Home3 extends Component {
     UserMapStore.loadEpic();
   }
 
-  expandColumn =(id) => {
+  handleExpandColumn =(id) => {
     const { expandColumns } = this.state;
     const index = expandColumns.indexOf(id);
     if (index === -1) {
@@ -274,13 +290,13 @@ class Home3 extends Component {
     _.map(issueIds, (issueId) => {
       const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
       const sourceIndex = _.indexOf(issueData, sourceIssue);
-      before ? outsetIssueId = issueData[sourceIndex + 1].issueId : outsetIssueId = issueData[sourceIndex - 1].issueId;
+      // before ? outsetIssueId = issueData[sourceIndex + 1].issueId || 0 : outsetIssueId = issueData[sourceIndex - 1].issueId || 0;
       if (mode === 'none') {
-        postData = { epicId, issueIds, before, rankIndex, outsetIssueId };
+        postData = { epicId, issueIds, before, rankIndex, outsetIssueId: 0 };
         sourceIssue.epicId = epicId;
         sourceIssue[key] = null;
       } else {
-        postData = { epicId, issueIds, before, rankIndex, [key]: value, outsetIssueId };
+        postData = { epicId, issueIds, before, rankIndex, [key]: value, outsetIssueId: 0 };
         sourceIssue.epicId = epicId;
         value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
       }
@@ -313,7 +329,7 @@ class Home3 extends Component {
         value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
         issueData.splice(sourceIndex, 1);
         issueData.splice(res.destination.index, 0, sourceIssue);
-        postData = { issueIds, before, rankIndex, [key]: value, outsetIssueId };
+        postData = { issueIds, before, rankIndex, [key]: value, outsetIssueId: 0 };
         // UserMapStore.setBacklogIssues(issueData);
         // UserMapStore.setIssues(issueData);
       });
@@ -326,9 +342,9 @@ class Home3 extends Component {
         BacklogIssueData.splice(res.destination.index, 0, sourceIssue);
         issueData.splice(sourceIndex, 1);
         if (mode === 'none') {
-          postData = { epicId: 0, issueIds, before, rankIndex, outsetIssueId };
+          postData = { epicId: 0, issueIds, before, rankIndex, outsetIssueId: 0 };
         } else {
-          postData = { issueIds, before, rankIndex, [key]: value, epicId: 0, outsetIssueId };
+          postData = { issueIds, before, rankIndex, [key]: value, epicId: 0, outsetIssueId: 0 };
           value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
         }
         // UserMapStore.setBacklogIssues(issueData);
@@ -444,14 +460,19 @@ class Home3 extends Component {
     const vosData = UserMapStore[`${mode}s`] || [];
     const id = `${mode}Id`;
     if (epicData.length) {
-      vosData.map((vos) => {
+      vosData.map((vos, vosIndex) => {
         const name = mode === 'sprint' ? `${mode}Name` : 'name';
-        dom.push(<div key={vos[id]} className="fixHead-line">
-          <div className="fixHead-line-title">
-            <p>{vos[name]}</p>
+        dom.push(<div key={vos[id]} className="fixHead-line" style={{ height: '100%' }}>
+          <div
+            className={`fixHead-line-title ${vosIndex === 0 ? 'firstLine-title' : ''}`}
+            style={{ marginLeft: this.state.left }}
+            data-title={vos[name]}
+            data-id={vos[id]}
+          >
+            <div>{vos[name]}</div>
             <div style={{ display: 'flex' }}>
               <p className="point-span" style={{ background: '#4D90FE' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id]), (sum, issue) => {
+                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
                   if (issue.statusCode === 'todo') {
                     return sum + issue.storyPoints;
                   } else {
@@ -460,7 +481,7 @@ class Home3 extends Component {
                 }, 0)}
               </p>
               <p className="point-span" style={{ background: '#FFB100' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id]), (sum, issue) => {
+                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
                   if (issue.statusCode === 'doing') {
                     return sum + issue.storyPoints;
                   } else {
@@ -469,7 +490,7 @@ class Home3 extends Component {
                 }, 0)}
               </p>
               <p className="point-span" style={{ background: '#00BFA5' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id]), (sum, issue) => {
+                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
                   if (issue.statusCode === 'done') {
                     return sum + issue.storyPoints;
                   } else {
@@ -477,20 +498,25 @@ class Home3 extends Component {
                   }
                 }, 0)}
               </p>
-              <p onClick={this.expandColumn.bind(this, vos[id])} role="none">
+              <p onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
                 <Icon type={`${this.state.expandColumns.includes(vos[id]) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
               </p>
             </div>
           </div>
-          <div className="fixHead-line-content" style={{ display: this.state.expandColumns.includes(vos[id]) ? 'none' : 'flex' }}>
+          <div
+            className="fixHead-line-content"
+            style={{ display: this.state.expandColumns.includes(vos[id]) ? 'none' : 'flex', height: '100%' }}
+            data-title={vos[name]}
+            data-id={vos[id]}
+          >
             {epicData.map((epic, index) => (
               <Droppable droppableId={`epic-${epic.issueId}_${vos[id]}`}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
-                    className="swimlane-column"
+                    className="swimlane-column fixHead-block"
                     style={{
-                      background: snapshot.isDraggingOver ? '#e9e9e9' : 'rgba(0,0,0,0.02)',
+                      background: snapshot.isDraggingOver ? '#e9e9e9' : '',
                       padding: 'grid',
                       // borderBottom: '1px solid rgba(0,0,0,0.12)'
                     }}
@@ -554,65 +580,77 @@ class Home3 extends Component {
         </div>);
       });
       dom.push(
-        <div key="no-sprint" className="fixHead-line">
-          <div className="fixHead-line-title">
-            <p>
-              {mode === 'none' ? 'issue' : '未计划的' }
-              {mode === 'none' ? null
-                : (
-                  <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
-                    <Icon type="playlist_add" />
+        <div key="no-sprint" className="fixHead-line" style={{ height: '100%' }}>
+          <div style={{ transform: `translateX(${`${this.state.left}px`})` }}>
+            <div
+              className={`fixHead-line-title ${vosData.length ? '' : 'firstLine-title'}`}
+              title={mode === 'none' ? 'issue' : '未计划的'}
+              data-id={-1}
+            >
+              <div>
+                {mode === 'none' ? 'issue' : '未计划的' }
+                {mode === 'none' ? null
+                  : (
+                    <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                      <Icon type="playlist_add" />
 
 
-                    创建
-                    {mode === 'sprint' ? '冲刺' : '版本'}
-                  </Button>
-                ) }
+                      创建
+                      {mode === 'sprint' ? '冲刺' : '版本'}
+                    </Button>
+                  ) }
 
-            </p>
-            <div style={{ display: 'flex' }}>
-              <p className="point-span" style={{ background: '#4D90FE' }}>
-                {_.reduce(_.filter(issues, issue => issue.sprintId == null || issue.versionId == null), (sum, issue) => {
-                  if (issue.statusCode === 'todo') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#FFB100' }}>
-                {_.reduce(_.filter(issues, issue => issue.sprintId == null || issue.versionId == null), (sum, issue) => {
-                  if (issue.statusCode === 'doing') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#00BFA5' }}>
-                {_.reduce(_.filter(issues, issue => issue.sprintId == null || issue.versionId == null), (sum, issue) => {
-                  if (issue.statusCode === 'done') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p onClick={this.expandColumn.bind(this, `-1-${mode}`)} role="none">
-                <Icon type={`${this.state.expandColumns.includes(`-1-${mode}`) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
-              </p>
+              </div>
+              <div style={{ display: 'flex' }}>
+                <p className="point-span" style={{ background: '#4D90FE' }}>
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0), (sum, issue) => {
+                    if (issue.statusCode === 'todo') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+                <p className="point-span" style={{ background: '#FFB100' }}>
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0), (sum, issue) => {
+                    if (issue.statusCode === 'doing') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+                <p className="point-span" style={{ background: '#00BFA5' }}>
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0), (sum, issue) => {
+                    if (issue.statusCode === 'done') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+                <p onClick={this.handleExpandColumn.bind(this, `-1-${mode}`)} role="none">
+                  <Icon type={`${this.state.expandColumns.includes(`-1-${mode}`) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
+                </p>
 
+              </div>
             </div>
           </div>
-          <div className="fixHead-line-content" style={{ display: this.state.expandColumns.includes(`-1-${mode}`) ? 'none' : 'flex' }}>
+
+          <div
+            className="fixHead-line-content"
+            style={{ display: this.state.expandColumns.includes(`-1-${mode}`) ? 'none' : 'flex', height: '100%' }}
+            title={mode === 'none' ? 'issue' : '未计划的'}
+            data-id={-1}
+          >
             {epicData.map((epic, index) => (
               <Droppable droppableId={`epic-${epic.issueId}_0`}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
-                    className="fixHead-block"
+                    className="fixHead-block swimlane-column"
                     style={{
-                      background: snapshot.isDraggingOver ? '#e9e9e9' : 'rgba(0,0,0,0.02)',
+                      background: snapshot.isDraggingOver ? '#e9e9e9' : '',
                       padding: 'grid',
                       // borderBottom: '1px solid rgba(0,0,0,0.12)'
                     }}
@@ -675,17 +713,68 @@ class Home3 extends Component {
         </div>,
       );
     }
-
     return dom;
   }
+
+  getHistoryCount = (id) => {
+    const { UserMapStore } = this.props;
+    const { issues, mode } = UserMapStore;
+    const count = {};
+    let issuesData = issues;
+    if (mode !== 'none') {
+      issuesData = _.filter(issues, issue => issue[`${mode}Id`] === id && issue.epicId !== 0);
+    } else {
+      issuesData = _.filter(issues, issue => issue.epicId !== 0);
+    }
+    count.todoCount = _.reduce(issuesData, (sum, issue) => {
+      if (issue.statusCode === 'todo') {
+        return sum + issue.storyPoints;
+      } else {
+        return sum;
+      }
+    }, 0);
+    count.doneCount = _.reduce(issuesData, (sum, issue) => {
+      if (issue.statusCode === 'done') {
+        return sum + issue.storyPoints;
+      } else {
+        return sum;
+      }
+    }, 0);
+    count.doingCount = _.reduce(issuesData, (sum, issue) => {
+      if (issue.statusCode === 'doing') {
+        return sum + issue.storyPoints;
+      } else {
+        return sum;
+      }
+    }, 0);
+    return count;
+  };
 
   render() {
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
-    _.sortBy(epicData, 'rink');
     const {
       filters, mode, issues, createEpic, currentFilters, sprints, versions, showBackLog,
     } = UserMapStore;
+    let firstTitle = '';
+    let count = '';
+    let vosId = `-1-${mode}`;
+    if (mode === 'sprint' && sprints.length) {
+      firstTitle = sprints[0].name;
+      count = this.getHistoryCount(sprints[0].sprintId);
+      vosId = sprints[0].sprintId;
+    } else if (mode === 'version' && versions.length) {
+      firstTitle = versions[0].name;
+      count = this.getHistoryCount(versions[0].versionId);
+      vosId = versions[0].versionId;
+    } else {
+      firstTitle = mode === 'none' ? 'issue' : '未计划的';
+      count = this.getHistoryCount(-1);
+    }
+    if (this.state.vosId) {
+      count = this.getHistoryCount(this.state.vosId);
+      vosId = this.state.vosId;
+    }
     return (
       <Page
         // className="c7n-userMap"
@@ -695,13 +784,13 @@ class Home3 extends Component {
         <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
           <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
             <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
-              <div className="toolbar">
+              <div className="toolbar" style={{ minHeight: 48 }}>
                 <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
                   <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
                   <p
                     role="none"
                     style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                    onClick={this.addFilter.bind(this,'mine')}
+                    onClick={this.addFilter.bind(this, 'mine')}
                   >仅我的问题</p>
                   <p
                     role="none"
@@ -710,8 +799,26 @@ class Home3 extends Component {
                   >仅用户故事</p>
                   {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`, marginBottom: 3}} onClick={this.addFilter.bind(this,filter.filterId)}>{filter.name}</p>) }
                 </div>
+                <div
+                  style={{
+                    display: this.state.more ? 'block' : 'none',
+                    color: 'rgb(63, 81, 181)',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                  role="none"
+                  onClick={() => {
+                    this.setState({
+                      expand: !this.state.expand,
+                    }, () => {
+                      document.getElementsByClassName('fixHead')[0].style.height = `calc(100% - ${document.getElementsByClassName('fixHead')[0].offsetTop}px)`;
+                    });
+                  }}
+                >
+                  {this.state.expand ? '...收起' : '...展开'}
+                </div>
               </div>
-              <div id="qqq" className="fixHead">
+              <div id="qqq" className="fixHead" style={{ height: `calc(100% - ${48}px)`, background: '#f2f2f2' }}>
                 <div className="fixHead-head" id="fixHead-head">
                   <div className="fixHead-line">
                     <Droppable droppableId="epic" direction="horizontal">
@@ -720,7 +827,7 @@ class Home3 extends Component {
                           className="fixHead-line-content"
                           ref={provided.innerRef}
                           style={{
-                            background: snapshot.isDraggingOver ? '#e9e9e9' : '#f2f2f2',
+                            background: snapshot.isDraggingOver ? '#e9e9e9' : '',
                             padding: 'grid',
                             // borderBottom: '1px solid rgba(0,0,0,0.12)'
                           }}
@@ -747,13 +854,25 @@ class Home3 extends Component {
                     }}
                   >
                     <div className="fixHead-head-note">
-
-                      1111
-                      {this.state.title}
+                      {this.state.title || firstTitle}
+                      <div style={{ display: 'flex', float: 'right' }}>
+                        <p className="point-span" style={{ background: '#4D90FE' }}>
+                          {count.todoCount}
+                        </p>
+                        <p className="point-span" style={{ background: '#FFB100' }}>
+                          {count.doingCount}
+                        </p>
+                        <p className="point-span" style={{ background: '#00BFA5' }}>
+                          {count.doneCount}
+                        </p>
+                        <p onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
+                          <Icon type={`${this.state.expandColumns.includes(vosId) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="fixHead-body" id="fixHead-body" style={{ flex: 1 }}>
+                <div className="fixHead-body" id="fixHead-body" style={{ flex: 1, background: '#f2f2f2' }}>
                   {this.renderBody()}
                 </div>
               </div>
