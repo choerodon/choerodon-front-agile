@@ -46,6 +46,12 @@ class BurnDown extends Component {
     return {
       tooltip: {
         trigger: 'axis',
+        backgroundColor: '#fff',
+        textStyle: {
+          color: '#000',
+        },
+        extraCssText: 
+          'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
       },
       legend: {
         top: '0',
@@ -143,11 +149,11 @@ class BurnDown extends Component {
             [endDate.split(' ')[0].slice(5).replace('-', '/'), 0],
           ],
           itemStyle: {
-            color: 'rgba(0, 0, 0, 0.65)',
+            color: '#00BFA5',
           },
           lineStyle: {
             type: 'dotted',
-            color: 'rgba(0, 0, 0, 0.65)',
+            color: '#00BFA5',
           },
         },
         {

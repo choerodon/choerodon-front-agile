@@ -39,9 +39,9 @@ class Undistributed extends Component {
             typeCode={issue.typeCode}
           />
         </div>
-        <a className="issueNum text-overflow-hidden">
+        <span className="issueNum text-overflow-hidden">
           {issue.issueNum}
-        </a>
+        </span>
         <div className="issueSummary-wrap">
           <p className="issueSummary text-overflow-hidden">
             {issue.summary}

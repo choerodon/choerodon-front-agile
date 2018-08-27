@@ -164,6 +164,7 @@ class SortTable extends Component {
         pagination={this.props.pagination}
         onChange={this.props.onChange}
         components={this.components}
+        filterBarPlaceholder="过滤表"
         onRow={(record, index) => ({
           index,
           moveRow: this.moveRow,

@@ -281,7 +281,12 @@ issues
                 des="组成部分是一个项目的分节。在一个项目内用它们把问题分成较小部分的组。"
               />
             ) : (
-              <Table columns={column} dataSource={this.state.components} scroll={{ x: true }} />
+              <Table
+                columns={column}
+                dataSource={this.state.components}
+                scroll={{ x: true }}
+                filterBarPlaceholder="过滤表"
+              />
             )}
           </Spin>
           {this.state.createComponentShow ? (

@@ -226,6 +226,7 @@ class Link extends Component {
                 rowKey={record => record.linkTypeId}
                 columns={column}
                 dataSource={this.state.links}
+                filterBarPlaceholder="过滤表"
                 scroll={{ x: true }}
               />
             </Spin>

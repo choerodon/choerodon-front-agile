@@ -41,7 +41,7 @@ class VersionProgress extends Component {
             // name: '访问来源',
             color: ['#FFB100', '#4D90FE', '#00BFA5'],
             type: 'pie',
-            radius: ['30%', '50%'],
+            radius: ['45px', '75px'],
             avoidLabelOverlap: false,
             hoverAnimation: false,
             // legendHoverLink: false,
@@ -114,9 +114,10 @@ class VersionProgress extends Component {
           <ReactEcharts
             option={this.state.option}
           />
-          {/* <div className="charts-inner">
-                版本v0.9.0
-          </div> */}
+          <div className="charts-inner">
+            <span>版本</span>
+            <span>V0.9.5</span>
+          </div> 
         </div>
         <DashBoardNavBar>
           <a target="choerodon" href="http://choerodon.io/zh/docs/">转至发布版本</a>

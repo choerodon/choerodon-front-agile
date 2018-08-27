@@ -8,8 +8,8 @@ const PRIORITY_MAP = {
     name: '中',
   },
   high: {
-    color: '#ffb100',
-    bgColor: 'rgba(255, 177, 0, 0.12)',
+    color: '#f44336',
+    bgColor: 'rgba(244, 67, 54, 0.2)',
     name: '高',
   },
   low: {
