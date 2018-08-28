@@ -35,3 +35,9 @@ dashboard:
     description: "未分配的问题"
     level: project
     sort: 6
+  - code: "SprintProgress"
+    icon: directions_run
+    title: "活跃冲刺"
+    description: "活跃冲刺"
+    level: project
+    sort: 7

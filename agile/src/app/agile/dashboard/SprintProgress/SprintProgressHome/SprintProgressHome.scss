@@ -1,0 +1,50 @@
+.c7n-SprintProgressHome{
+    padding-left: 52px;
+    padding-bottom: 50px;
+    .c7n-SprintStage{
+        padding-top: 6px;
+        font-size: 13px;
+        color: rgba(0,0,0,0.87);
+        margin-bottom: 10px;
+    }
+    .c7n-SprintPastDay{
+        font-size: 13px;
+        color: rgba(0,0,0,0.64);
+        .c7n-pastDay{
+            font-size: 20px;
+            color: #F7667F;
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+        margin-bottom: 10px;
+    }
+    .c7n-progress{
+        position: relative;
+        // padding-right: 98px;
+        .ant-progress-outer{
+            width: 80%;
+            .ant-progress-inner{
+                width: 100%;
+                background-color: rgba(247,102,127,0.30);
+                .ant-progress-bg{
+                    background-color: #F7667F;
+                }
+            }
+          
+        }
+        .c7n-sprintStart,.c7n-sprintEnd{
+            font-size: 13px;
+            color: rgba(0,0,0,0.64);
+        }
+        .c7n-sprintStart{
+            display: inline-block;
+            padding-top: 0;
+        }
+        .c7n-sprintEnd{
+            position: absolute;
+            top: 18px;
+            right: 20%;
+        }
+    }
+   
+}
