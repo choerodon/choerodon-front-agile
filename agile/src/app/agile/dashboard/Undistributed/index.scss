@@ -9,6 +9,13 @@
     flex-shrink: 0;
   }
 
+  .loading-wrap {
+    height: 235px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .lists {
     padding-left: 28px;
     padding-right: 28px;

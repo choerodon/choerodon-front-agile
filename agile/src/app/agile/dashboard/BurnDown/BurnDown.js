@@ -12,6 +12,8 @@ import {
 import TypeTag from '../../components/TypeTag';
 import PriorityTag from '../../components/PriorityTag';
 import StatusTag from '../../components/StatusTag';
+import EmptyBlockDashboard from '../../components/EmptyBlockDashboard';
+import pic from './no_sprint.svg';
 import './index.scss';
 
 const { AppState } = stores;
@@ -240,6 +242,35 @@ class BurnDown extends Component {
     this.loadChartData(sprintId, key);
   }
 
+  renderContent() {
+    const { loading, sprint: { sprintId } } = this.state;
+    if (loading) {
+      return (
+        <div className="loading-wrap">
+          <Spin />
+        </div>
+      );
+    }
+    if (!sprintId) {
+      return (
+        <div className="loading-wrap">
+          <EmptyBlockDashboard
+            pic={pic}
+            des="当前没有冲刺"
+          />
+        </div>
+      );
+    }
+    return (
+      <ReactEcharts
+        style={{
+          height: 200,
+        }}
+        option={this.getOption()}
+      />
+    );
+  }
+
   render() {
     const { loading } = this.state;
     const { history } = this.props;
@@ -261,25 +292,12 @@ class BurnDown extends Component {
             </div>
           </Dropdown>
         </DashBoardToolBar>
-        {
-          loading ? (
-            <div className="loading-wrap">
-              <Spin />
-            </div>
-          ) : (
-            <ReactEcharts
-              style={{
-                height: 200,
-              }}
-              option={this.getOption()}
-            />
-          )
-        }
+        {this.renderContent()}
         <DashBoardNavBar>
           <a
             role="none"
             onClick={() => {
-              history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+              history.push(`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
               return false;
             }}
           >

@@ -6,6 +6,8 @@ import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';
 import TypeTag from '../../components/TypeTag';
 import PriorityTag from '../../components/PriorityTag';
 import StatusTag from '../../components/StatusTag';
+import EmptyBlockDashboard from '../../components/EmptyBlockDashboard';
+import pic from './no_epic.svg';
 import './index.scss';
 
 const { AppState } = stores;
@@ -206,21 +208,37 @@ class EpicProgress extends Component {
     return ((doneCount / count).toFixed(2) * 100).toFixed(0);
   }
 
+  renderContent() {
+    const { loading, data } = this.state;
+    if (loading) {
+      return (
+        <div className="loading-wrap">
+          <Spin />
+        </div>
+      );
+    }
+    if (data && !data.length) {
+      return (
+        <div className="loading-wrap">
+          <EmptyBlockDashboard
+            pic={pic}
+            des="当前没有史诗"
+          />
+        </div>
+      );
+    }
+    return (
+      <ReactEcharts className="c7n-chart" option={this.getOption()} />
+    );
+  }
+
   render() {
     const { loading } = this.state;
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     return (
       <div className="c7n-agile-dashboard-epicProgress">
-        {
-          loading ? (
-            <div className="loading-wrap">
-              <Spin />
-            </div>
-          ) : (
-            <ReactEcharts className="c7n-chart" option={this.getOption()} />
-          )
-        }
+        {this.renderContent()}
         <DashBoardNavBar>
           <a
             role="none"

@@ -243,7 +243,7 @@ class Issue extends Component {
     axios.post(`/zuul/agile/v1/projects/${projectId}/issues/export`, searchParam, { responseType: 'arraybuffer' })
       .then((data) => {
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const fileName = `${AppState.currentMenuType.name}.xls`;
+        const fileName = `${AppState.currentMenuType.name}.xlsx`;
         FileSaver.saveAs(blob, fileName);
       });
   }

@@ -58,11 +58,13 @@
     .ant-input:focus {
       border-color: #3F51B5;
       box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+      cursor: text !important;
     }
 
     .c7n-textArea {
       resize: none;
       height: 48px !important;
+      cursor: pointer;
     }
 
     .ant-input-focus {
