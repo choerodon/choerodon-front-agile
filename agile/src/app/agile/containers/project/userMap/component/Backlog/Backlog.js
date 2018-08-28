@@ -99,7 +99,7 @@ class Backlog extends Component {
                 </div>
                 <ul className="issue-block">
                   {
-                    _.map(group, issue => this.renderIssue(issue))
+                    _.map(group, (issue, index) => this.renderIssue(issue, index))
                   }
                 </ul>
                 {provided.placeholder}
