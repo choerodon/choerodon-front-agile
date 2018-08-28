@@ -926,6 +926,7 @@ class CreateSprint extends Component {
                 });
               }}
               handleSave={() => this.handleCreateCommit()}
+              handleClickOutSide={() => this.handleCreateCommit()}
             />
           </div>
         )}
@@ -1062,6 +1063,13 @@ class CreateSprint extends Component {
               });
             }}
             handleSave={() => {
+              this.setState({
+                editDesShow: false,
+                description: this.state.editDes || '',
+              });
+              this.updateIssue('editDes');
+            }}
+            handleClickOutSide={() => {
               this.setState({
                 editDesShow: false,
                 description: this.state.editDes || '',

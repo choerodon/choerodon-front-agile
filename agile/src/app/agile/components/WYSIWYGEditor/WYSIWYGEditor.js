@@ -3,6 +3,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ImageDrop from './ImageDrop';
 import './WYSIWYGEditor.scss';
+import cls from '../CommonComponent/ClickOutSide';
 import { Button } from 'choerodon-ui';
 
 Quill.register('modules/imageDrop', ImageDrop);
@@ -69,6 +70,13 @@ class WYSIWYGEditor extends Component {
     this.props.onChange(undefined);
   }
 
+  handleClickOutside = evt => {
+    const { handleClickOutSide } = this.props;
+    if (handleClickOutSide) {
+      handleClickOutSide();
+    }
+  };
+
   render() {
     const { placeholder, value } = this.props;
     const style = { ...this.defaultStyle, ...this.props.style };
@@ -112,4 +120,4 @@ class WYSIWYGEditor extends Component {
   }
 }
 
-export default WYSIWYGEditor;
+export default cls(WYSIWYGEditor);
