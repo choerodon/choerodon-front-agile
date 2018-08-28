@@ -76,7 +76,7 @@ class Backlog extends Component {
     const { keyword } = this.state;
     let group = [];
     if (mode === 'none') {
-      group = this.getIssuesByKeyword(keyword, US.backlogIssues);
+      group = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v.statusCode !== 'done'));
       return (
         <div className="issues">
           <Droppable droppableId="backlog-0">
@@ -170,7 +170,7 @@ class Backlog extends Component {
   renderUnscheduledIssue() {
     const { mode, backlogExpand } = US;
     const { keyword } = this.state;
-    const issues = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v[`${mode}Id`] === null));
+    const issues = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v[`${mode}Id`] === null && v.statusCode !== 'done'));
     return (
       <Droppable droppableId="backlog-0">
         {(provided, snapshot) => (

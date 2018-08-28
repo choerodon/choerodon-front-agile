@@ -111,7 +111,10 @@ class EpicCard extends Component {
                   }}
                 />
               </div>
-              <div className="c7n-content">
+              <div
+                className="c7n-content"
+                
+              >
                 <TextArea
                   className="c7n-textArea"
                   autosize={{ minRows: 1, maxRows: 2 }}
@@ -119,6 +122,7 @@ class EpicCard extends Component {
                   onChange={this.handleEpicNameChange.bind(this)}
                   onPressEnter={this.handlePressEnter}
                   onFocus={e => e.target.select()}
+                  role="none"
                   onBlur={this.updateEpicName}
                 />
               </div>

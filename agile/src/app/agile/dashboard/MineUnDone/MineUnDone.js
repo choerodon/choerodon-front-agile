@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';
+import { Spin } from 'choerodon-ui';
 import TypeTag from '../../components/TypeTag';
 import PriorityTag from '../../components/PriorityTag';
 import StatusTag from '../../components/StatusTag';
+import EmptyBlockDashboard from '../../components/EmptyBlockDashboard';
+import pic from './empty.png';
 import './index.scss';
 
 const { AppState } = stores;
@@ -13,6 +16,7 @@ class MineUnDone extends Component {
     super(props);
     this.state = {
       issues: [],
+      loading: false,
     };
   }
 
@@ -22,12 +26,16 @@ class MineUnDone extends Component {
 
   loadData() {
     const projectId = AppState.currentMenuType.id;
+    this.setState({ loading: true });
     axios.post(`/agile/v1/projects/${projectId}/issues/no_sub?page=0&size=6`, {
       advancedSearchArgs: {},
       searchArgs: {},
     })
       .then((res) => {
-        this.setState({ issues: res.content });
+        this.setState({
+          issues: res.content,
+          loading: false,
+        });
       });
   }
 
@@ -66,17 +74,41 @@ class MineUnDone extends Component {
     );
   }
 
+  renderContent() {
+    const { loading, issues } = this.state;
+    if (loading) {
+      return (
+        <div className="loading-wrap">
+          <Spin />
+        </div>
+      );
+    }
+    if (issues && !issues.length) {
+      return (
+        <div className="loading-wrap">
+          <EmptyBlockDashboard
+            pic={pic}
+            des="当前没有我的未完成的任务"
+          />
+        </div>
+      );
+    }
+    return (
+      <div className="lists">
+        {
+          issues.map(issue => this.renderIssue(issue))
+        }
+      </div>
+    );
+  }
+
   render() {
     const { issues } = this.state;
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     return (
       <div className="c7n-agile-dashboard-mineUndone">
-        <div className="lists">
-          {
-            issues.map(issue => this.renderIssue(issue))
-          }
-        </div>
+        {this.renderContent()}
         <DashBoardNavBar>
           <a
             role="none"
