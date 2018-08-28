@@ -65,6 +65,50 @@ class UserMapStore {
   @observable
   currentBacklogFilters = [];
 
+  @observable left = 0;
+
+  @observable top = 0;
+
+  @observable offsetTops = [];
+
+  @observable currentIndex = 0;
+
+  @computed get getTitle() {
+    if (this.mode === 'sprint') {
+      if (this.sprints[this.currentIndex]) return this.sprints[this.currentIndex].sprintName;
+    }
+    if (this.mode === 'version') {
+      if (this.versions[this.currentIndex]) return this.versions[this.currentIndex].name;
+    }
+    return 'issue';
+  }
+
+  @computed get getVosId() {
+    if (this.mode === 'sprint') {
+      if (this.sprints[this.currentIndex]) return this.sprints[this.currentIndex].sprintId;
+    }
+    if (this.mode === 'version') {
+      if (this.versions[this.currentIndex]) return this.versions[this.currentIndex].versionId;
+    }
+    return 0;
+  }
+
+  @action setOffsetTops(data) {
+    this.offsetTops = data;
+  }
+
+  @action setCurrentIndex(data) {
+    this.currentIndex = data;
+  }
+
+  @action setLeft(data) {
+    this.left = data;
+  }
+
+  @action setTop(data) {
+    this.t = data;
+  }
+
   @action
   setSelectIssueIds(data) {
     this.selectIssueIds = data;
@@ -226,7 +270,7 @@ class UserMapStore {
     url += `&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}`;
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}${this.isApplyToEpic ? url : ''}`)
       .then((epics) => {
-        this.setEpics(_.sortBy(epics, 'epicSequence'));
+        this.setEpics(epics);
       })
       .catch((error) => {
         Choerodon.handleResponseError(error);
@@ -253,9 +297,9 @@ class UserMapStore {
       });
   }
 
-  loadSprints = (data = []) => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, data)
+  loadSprints = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/unclosed`)
     .then((sprints) => {
-      this.setSprints(_.filter(sprints, item => !item.endDate));
+      this.setSprints(sprints);
     });
 
   loadVersions = () => axios
@@ -277,7 +321,7 @@ class UserMapStore {
     .then(
       axios.spread((epics, filters, issues) => {
         this.setFilters(filters);
-        this.setEpics(_.sortBy(epics, 'epicSequence'));
+        this.setEpics(epics);
         this.setIssues(issues);
         // 两个请求现在都执行完成
       }),

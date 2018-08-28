@@ -19,14 +19,14 @@ class IssueItem extends Component {
       if (item.priorityCode === 'medium') {
         return 'rgb(53, 117, 223)';
       } else if (item.priorityCode === 'high') {
-        return 'rgb(255, 177, 0)';
+        return '#f44336';
       } else {
         return 'rgba(0, 0, 0, 0.36)';
       }
     } else if (item.priorityCode === 'medium') {
       return 'rgba(77, 144, 254, 0.2)';
     } else if (item.priorityCode === 'high') {
-      return 'rgba(255, 177, 0, 0.12)';
+      return 'rgba(244, 67, 54, 0.2)';
     } else {
       return 'rgba(0, 0, 0, 0.08)';
     }

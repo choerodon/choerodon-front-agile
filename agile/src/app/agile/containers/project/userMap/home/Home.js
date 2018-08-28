@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import _ from 'lodash';
+import { toJS } from 'mobx';
 import { Page, Header, Content } from 'choerodon-front-boot';
 import {
   Button, Popover, Dropdown, Menu, Icon, Checkbox,
 } from 'choerodon-ui';
-import './test.scss';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import './test.scss';
 import CreateEpic from '../component/CreateEpic';
 import Backlog from '../component/Backlog/Backlog.js';
 import EpicCard from '../component/EpicCard/EpicCard.js';
@@ -18,24 +19,17 @@ import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 class Home3 extends Component {
   constructor(props) {
     super(props);
-    this.fixbody = React.createRef();
     this.state = {
       more: false,
       expand: false,
       expandColumns: [],
       showBackLog: false,
-      row: [...new Array(50).keys()],
-      col: [...new Array(50).keys()],
-      con: [...new Array(10).keys()],
-      left: 0,
-      title: '',
     };
   }
 
   componentDidMount() {
-    // this.fixbody.current.addEventListener('scroll', this.handleScroll, {
-    //   passive: true,
-    // });
+    window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('keyup', this.onKeyUp);
     this.initData();
     const timer = setInterval(() => {
       if (document.getElementsByClassName('filter').length > 0) {
@@ -46,12 +40,12 @@ class Home3 extends Component {
         }
       }
       if (document.getElementById('fixHead-body')) {
-        document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll);
+        document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll, { passive: true });
+        this.getPrepareOffsetTops();
         clearInterval(timer);
       }
     }, 20);
   }
-
   componentWillUnmount() {
     this.props.UserMapStore.setCurrentFilter([]);
     window.removeEventListener('keydown', this.onKeyDown);
@@ -62,36 +56,33 @@ class Home3 extends Component {
     this.setState({ loading: true });
     this.props.UserMapStore.initData();
   };
+  getPrepareOffsetTops = () => {
+    const lines = document.getElementsByClassName('fixHead-line-content');
+    const offsetTops = [];
+    for (let i = 1; i < lines.length - 1; i += 1) {
+      offsetTops.push(lines[i].offsetTop);
+    }
+    // const ot = offsetTops.map(v => v);
+    this.props.UserMapStore.setOffsetTops(offsetTops);
+    window.console.log(offsetTops);
+  };
 
   handleScroll = (e) => {
-    // console.dir(
-    //   document.getElementsByClassName('fixHead-line-title')[0].getBoundingClientRect().top - 350,
-    // );
-    // console.dir(
-    //   document.getElementsByClassName('fixHead-line-title')[28].getBoundingClientRect().bottom,
-    // );
-    const left = e.target.scrollLeft;
-    const top = e.target.scrollTop;
-    const title = this.state.row[Math.floor(top / 202)];
-    this.setState({
-      left,
-    });
-    const tarElement = document.getElementById('fixHead-head');
-    tarElement.scrollLeft = left;
-    const lines = document.getElementsByClassName('fixHead-line-content');
-    for (let i = 1; i < lines.length - 1; i += 1) {
-      if (lines[i].getBoundingClientRect().top < 288 && lines[i + 1].getBoundingClientRect().top > 288) {
-        const titleText = lines[i].dataset.title;
-        const dom = lines[i].lastElementChild;
-        const vosId = parseInt(lines[i].dataset.id, 10);
-        // tarElement.replaceChild(dom, tarElement.lastElementChild);
-        this.setState({
-          title: titleText,
-          vosId,
-          // dom: dom,
-        });
-        // document.getElementById('fixHead-head').lastElementChild.appendChild(dom);
-        break;
+    const { scrollLeft, scrollTop } = e.target;
+    const { UserMapStore } = this.props;
+    const { left, top } = UserMapStore;
+    const header = document.getElementById('fixHead-head');
+    if (scrollLeft !== left) {
+      UserMapStore.setLeft(scrollLeft);
+      header.scrollLeft = scrollLeft;
+    }
+    if (scrollTop !== top) {
+      const { offsetTops, currentIndex } = UserMapStore;
+      UserMapStore.setTop(scrollTop);
+      const index = _.findLastIndex(offsetTops, v => v < scrollTop);
+      if (currentIndex !== index) {
+        UserMapStore.setCurrentIndex(index);
+        window.console.log(index);
       }
     }
   };
@@ -104,7 +95,7 @@ class Home3 extends Component {
    * @memberof Sprint
    */
   onKeyUp=(event) => {
-    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
+    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       this.setState({
         keydown: '',
       });
@@ -118,7 +109,7 @@ class Home3 extends Component {
    * @memberof Sprint
    */
   onKeyDown=(event) => {
-    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
+    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       if (event.keyCode !== this.state.keydown) {
         this.setState({
           keydown: event.keyCode,
@@ -162,7 +153,11 @@ class Home3 extends Component {
       this.props.UserMapStore.loadVersions();
     }
     this.props.UserMapStore.loadIssues(options.key, 'usermap');
-    this.props.UserMapStore.loadBacklogIssues();
+    setTimeout(() => {
+      this.getPrepareOffsetTops();
+    }, 500);
+
+    // this.props.UserMapStore.loadBacklogIssues();
   };
 
   handleCreateEpic = () => {
@@ -185,11 +180,6 @@ class Home3 extends Component {
     if (UserMapStore.isApplyToEpic) {
       UserMapStore.loadEpic();
     }
-  };
-
-  changeMenuShow =(options) => {
-    const { moreMenuShow } = this.state;
-    this.setState({ moreMenuShow: !moreMenuShow });
   };
 
   handleShowDoneEpic =(e) => {
@@ -239,15 +229,6 @@ class Home3 extends Component {
     this.setState({ createIssue: true });
   };
 
-  exportExcel() {
-    const projectId = AppState.currentMenuType.id;
-    axios.post('url', { responseType: 'arraybuffer' })
-      .then((data) => {
-        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const fileName = `${AppState.currentMenuType.name}.xls`;
-        FileSaver.saveAs(blob, fileName);
-      });
-  }
 
   handleEpicDrag =(res) => {
     const { UserMapStore } = this.props;
@@ -275,33 +256,55 @@ class Home3 extends Component {
     UserMapStore.handleEpicDrap(postData);
   };
 
-  handleDragToMainBoard =(res) => {
+  handelDragToBoard = (res) => {
     const { UserMapStore } = this.props;
-    const { issues, mode, selectIssueIds } = UserMapStore;
-    const epicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
+    const { mode, issues, backlogIssues, selectIssueIds } = UserMapStore;
+    const sourceIndex = res.source.index;
+    const tarIndex = res.destination.index;
+    const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
     const key = `${mode}Id`;
-    const value = parseInt(res.destination.droppableId.split('_')[1], 10);
-    const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
+    const value = parseInt(res.destination.droppableId.split('_')[1], 10);// 目标id;
+    const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
     const before = res.destination.index === 0;
-    const rankIndex = res.source.index > res.destination.index;
-    let postData = {};
+    const rankIndex = null;
     const issueData = _.cloneDeep(issues);
+    const backlogData = _.cloneDeep(backlogIssues);
+    let postData = {};
     let outsetIssueId = null;
-    _.map(issueIds, (issueId) => {
-      const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
-      const sourceIndex = _.indexOf(issueData, sourceIssue);
-      // before ? outsetIssueId = issueData[sourceIndex + 1].issueId || 0 : outsetIssueId = issueData[sourceIndex - 1].issueId || 0;
-      if (mode === 'none') {
-        postData = { epicId, issueIds, before, rankIndex, outsetIssueId: 0 };
-        sourceIssue.epicId = epicId;
-        sourceIssue[key] = null;
-      } else {
-        postData = { epicId, issueIds, before, rankIndex, [key]: value, outsetIssueId: 0 };
-        sourceIssue.epicId = epicId;
-        value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
+    let tarBacklogData = backlogIssues;
+    _.map(issueIds, (id) => {
+      const tarIssue = _.filter(issueData, item => item.issueId === id)[0];
+      const vosId = value === 0 ? null : value;
+      let tarData = _.filter(issues, item => item.epicId === tarEpicId);
+      if (mode !== 'none') {
+        tarData = _.filter(issues, item => item.epicId === tarEpicId && item[key] === vosId);
       }
-      UserMapStore.setIssues(issueData);
+      if (before && tarData.length) {
+        outsetIssueId = tarData[0].issueId;
+      } else if (before && !tarData.length) {
+        outsetIssueId = 0;
+      } else {
+        outsetIssueId = tarData[tarIndex - 1].issueId;
+      }
+      tarIssue.epicId = tarEpicId;
+      if (mode !== 'none') {
+        tarIssue[key] = vosId;
+      }
+      postData = { before, epicId: tarEpicId, outsetIssueId, rankIndex, issueIds };
+      if (res.source.droppableId.includes('backlog')) {
+        tarBacklogData = _.filter(backlogData, item => item.issueId === id)[0];
+        const index = backlogData.indexOf(tarBacklogData);
+        backlogData.splice(index, 1);
+      }
+      if (mode !== 'none') {
+        postData[key] = value;
+      }
     });
+    if (res.source.droppableId.includes('backlog')) {
+      UserMapStore.setBacklogIssues(backlogData);
+    }
+    UserMapStore.setIssues(issueData);
+    window.console.log(postData);
     UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
@@ -314,55 +317,62 @@ class Home3 extends Component {
     const value = parseInt(res.destination.droppableId.split('-')[1], 10);
     const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
     const before = res.destination.index === 0;
-    const rankIndex = res.source.index > res.destination.index;
-    const tarIndex = res.destination.index;
-    const BacklogIssueData =  _.cloneDeep(backlogIssues);
+    const rankIndex = null;
+    let backlogData = _.cloneDeep(backlogIssues);
+    const issueData = _.cloneDeep(issues);
     let postData = {};
-    // backlog to backlog
+    const tarIndex = res.destination.index;
     let outsetIssueId = null;
-    if (res.source.droppableId.includes('backlog')) {
-      const issueData = _.cloneDeep(backlogIssues);
-      _.map(issueIds, (issueId) => {
-        const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
-        const sourceIndex = _.indexOf(issueData, sourceIssue);
-        before ? outsetIssueId = issueData[sourceIndex + 1].issueId : outsetIssueId = issueData[sourceIndex - 1].issueId;
-        value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
-        issueData.splice(sourceIndex, 1);
-        issueData.splice(res.destination.index, 0, sourceIssue);
-        postData = { issueIds, before, rankIndex, [key]: value, outsetIssueId: 0 };
-        // UserMapStore.setBacklogIssues(issueData);
-        // UserMapStore.setIssues(issueData);
-      });
-    } else {
-      const issueData = _.cloneDeep(issues);
-      _.map(issueIds, (issueId) => {
-        const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
-        const sourceIndex = _.indexOf(issueData, sourceIssue);
-        sourceIssue.epicId = null;
-        BacklogIssueData.splice(res.destination.index, 0, sourceIssue);
-        issueData.splice(sourceIndex, 1);
-        if (mode === 'none') {
-          postData = { epicId: 0, issueIds, before, rankIndex, outsetIssueId: 0 };
-        } else {
-          postData = { issueIds, before, rankIndex, [key]: value, epicId: 0, outsetIssueId: 0 };
-          value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
+    _.map(issueIds, (id) => {
+      const vosId = value === 0 ? null : value;
+      let tarData = _.filter(backlogIssues, item => item[key] === vosId);
+      if (mode === 'none') {
+        tarData = backlogData;
+      }
+      if (before && tarData.length) {
+        outsetIssueId = tarData[0].issueId;
+      } else if (before && !tarData.length) {
+        outsetIssueId = 0;
+      } else {
+        outsetIssueId = tarData[tarIndex - 1].issueId;
+      }
+      let tarIssue = null;
+      if (res.source.droppableId.includes('backlog')) {
+        tarIssue = _.filter(backlogData, item => item.issueId === id)[0];
+        postData = { before, outsetIssueId, rankIndex, issueIds, [key]: vosId };
+        // const index = backlogIssues.indexOf(tarIssue);
+      } else {
+        tarIssue = _.filter(issueData, item => item.issueId === id)[0];
+        tarIssue.epicId = 0;
+        postData = { before, outsetIssueId, rankIndex, issueIds, epicId: 0 };
+        tarData.splice(tarIndex, 0, tarIssue);
+        if (mode !== 'none') {
+          backlogData = backlogData.filter(item => item[key] !== vosId).concat(tarData);
         }
-        // UserMapStore.setBacklogIssues(issueData);
-        // UserMapStore.setIssues(issueData);
-      });
+      }
+      if (mode !== 'none') {
+        tarIssue[key] = vosId;
+        postData[key] = value;
+      }
+    });
+    if (!res.source.droppableId.includes('backlog')) {
+      UserMapStore.setIssues(issueData);
     }
-    UserMapStore.handleMoveIssue(postData, res.source.droppableId.includes('backlog') ? 'backlog' : 'userMap');
+    UserMapStore.setBacklogIssues(backlogData);
+    UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
+    window.console.log(postData);
   };
 
   handleEpicOrIssueDrag = (res) => {
+    if (!res.destination || res.destination.droppableId === res.source.droppableId) return;
     if (res.destination.droppableId === 'epic') {
       this.handleEpicDrag(res);
     } else if (res.destination.droppableId.includes('backlog')) {
       this.handleDragToBacklog(res);
     } else {
-      this.handleDragToMainBoard(res);
+      this.handelDragToBoard(res);
     }
   };
 
@@ -373,10 +383,44 @@ class Home3 extends Component {
     }
   };
 
+  getHistoryCount = (id) => {
+    const { UserMapStore } = this.props;
+    const { issues, mode } = UserMapStore;
+    const count = {};
+    let issuesData = issues;
+    if (mode !== 'none') {
+      issuesData = _.filter(issues, issue => issue[`${mode}Id`] === id && issue.epicId !== 0);
+    } else {
+      issuesData = _.filter(issues, issue => issue.epicId !== 0);
+    }
+    count.todoCount = _.reduce(issuesData, (sum, issue) => {
+      if (issue.statusCode === 'todo') {
+        return sum + issue.storyPoints;
+      } else {
+        return sum;
+      }
+    }, 0);
+    count.doneCount = _.reduce(issuesData, (sum, issue) => {
+      if (issue.statusCode === 'done') {
+        return sum + issue.storyPoints;
+      } else {
+        return sum;
+      }
+    }, 0);
+    count.doingCount = _.reduce(issuesData, (sum, issue) => {
+      if (issue.statusCode === 'doing') {
+        return sum + issue.storyPoints;
+      } else {
+        return sum;
+      }
+    }, 0);
+    return count;
+  };
+
   renderHeader = () => {
     const { UserMapStore } = this.props;
     const {
-      filters, mode, issues, createEpic, currentFilters, sprints, versions
+      mode,
     } = UserMapStore;
     const swimlanMenu = (
       <Menu onClick={this.changeMode} selectable>
@@ -389,8 +433,6 @@ class Home3 extends Component {
       <Header title="用户故事地图">
         <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
           <Icon type="playlist_add" />
-
-
           创建史诗
         </Button>
         <Dropdown overlay={swimlanMenu} trigger={['click']}>
@@ -422,12 +464,7 @@ class Home3 extends Component {
               </div>
             )}
           >
-            <div style={{
-              cursor: 'pointer', color: 'rgb(63, 81, 181)', fontWeight: 500, marginTop: 6,
-            }}
-            >
-
-
+            <div style={{ cursor: 'pointer', color: 'rgb(63, 81, 181)', fontWeight: 500, marginTop: 2 }}>
               更多
               {' '}
               <Icon type="arrow_drop_down" style={{ marginTop: -3 }} />
@@ -455,19 +492,19 @@ class Home3 extends Component {
     const { UserMapStore } = this.props;
     const dom = [];
     const epicData = UserMapStore.getEpics;
-    const { issues, sprints, versions } = UserMapStore;
+    const { issues, sprints, versions, left } = UserMapStore;
     const { mode } = UserMapStore;
     const vosData = UserMapStore[`${mode}s`] || [];
     const id = `${mode}Id`;
     if (epicData.length) {
       vosData.map((vos, vosIndex) => {
         const name = mode === 'sprint' ? `${mode}Name` : 'name';
-        dom.push(<div key={vos[id]} className="fixHead-line" style={{ height: '100%' }}>
+        dom.push(<div key={vos[id]} className="fixHead-line">
           <div
             className={`fixHead-line-title ${vosIndex === 0 ? 'firstLine-title' : ''}`}
-            style={{ marginLeft: this.state.left }}
-            data-title={vos[name]}
-            data-id={vos[id]}
+            style={{ marginLeft: left }}
+            // data-title={vos[name]}
+            // data-id={vos[id]}
           >
             <div>{vos[name]}</div>
             <div style={{ display: 'flex' }}>
@@ -505,12 +542,12 @@ class Home3 extends Component {
           </div>
           <div
             className="fixHead-line-content"
-            style={{ display: this.state.expandColumns.includes(vos[id]) ? 'none' : 'flex', height: '100%' }}
+            style={{ display: this.state.expandColumns.includes(vos[id]) ? 'none' : 'flex' }}
             data-title={vos[name]}
             data-id={vos[id]}
           >
             {epicData.map((epic, index) => (
-              <Droppable droppableId={`epic-${epic.issueId}_${vos[id]}`}>
+              <Droppable droppableId={`epic-${epic.issueId}_${vos[id]}`} key={epic.issueId}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
@@ -524,7 +561,7 @@ class Home3 extends Component {
                     <React.Fragment>
                       {/*{vos[id]}*/}
                       {_.filter(issues, issue => issue.epicId === epic.issueId && issue[id] === vos[id]).map((item, indexs) => (
-                        <Draggable draggableId={`${mode}-${item.issueId}`} index={indexs}>
+                        <Draggable draggableId={`${mode}-${item.issueId}`} index={indexs} key={item.issueId}>
                           {(provided1, snapshot1) => (
                             <div
                               ref={provided1.innerRef}
@@ -581,7 +618,7 @@ class Home3 extends Component {
       });
       dom.push(
         <div key="no-sprint" className="fixHead-line" style={{ height: '100%' }}>
-          <div style={{ transform: `translateX(${`${this.state.left}px`})` }}>
+          <div style={{ transform: `translateX(${`${left}px`})` }}>
             <div
               className={`fixHead-line-title ${vosData.length ? '' : 'firstLine-title'}`}
               title={mode === 'none' ? 'issue' : '未计划的'}
@@ -603,7 +640,7 @@ class Home3 extends Component {
               </div>
               <div style={{ display: 'flex' }}>
                 <p className="point-span" style={{ background: '#4D90FE' }}>
-                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0), (sum, issue) => {
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                     if (issue.statusCode === 'todo') {
                       return sum + issue.storyPoints;
                     } else {
@@ -612,7 +649,7 @@ class Home3 extends Component {
                   }, 0)}
                 </p>
                 <p className="point-span" style={{ background: '#FFB100' }}>
-                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0), (sum, issue) => {
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                     if (issue.statusCode === 'doing') {
                       return sum + issue.storyPoints;
                     } else {
@@ -621,7 +658,7 @@ class Home3 extends Component {
                   }, 0)}
                 </p>
                 <p className="point-span" style={{ background: '#00BFA5' }}>
-                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0), (sum, issue) => {
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                     if (issue.statusCode === 'done') {
                       return sum + issue.storyPoints;
                     } else {
@@ -639,12 +676,12 @@ class Home3 extends Component {
 
           <div
             className="fixHead-line-content"
-            style={{ display: this.state.expandColumns.includes(`-1-${mode}`) ? 'none' : 'flex', height: '100%' }}
-            title={mode === 'none' ? 'issue' : '未计划的'}
+            style={{ display: this.state.expandColumns.includes(`-1-${mode}`) ? 'none' : 'flex' }}
+            data-title={mode === 'none' ? 'issue' : '未计划的'}
             data-id={-1}
           >
             {epicData.map((epic, index) => (
-              <Droppable droppableId={`epic-${epic.issueId}_0`}>
+              <Droppable droppableId={`epic-${epic.issueId}_0`} key={epic.issueId}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
@@ -657,7 +694,7 @@ class Home3 extends Component {
                   >
                     <React.Fragment>
                       {_.filter(issues, issue => issue.epicId === epic.issueId && (mode !== 'none' && issue[id] == null || mode === 'none')).map((item, indexs) => (
-                        <Draggable draggableId={`none-${item.issueId}`} index={indexs}>
+                        <Draggable draggableId={`none-${item.issueId}`} index={indexs} key={item.issueId}>
                           {(provided1, snapshot1) => (
                             <div
                               ref={provided1.innerRef}
@@ -716,65 +753,24 @@ class Home3 extends Component {
     return dom;
   }
 
-  getHistoryCount = (id) => {
-    const { UserMapStore } = this.props;
-    const { issues, mode } = UserMapStore;
-    const count = {};
-    let issuesData = issues;
-    if (mode !== 'none') {
-      issuesData = _.filter(issues, issue => issue[`${mode}Id`] === id && issue.epicId !== 0);
-    } else {
-      issuesData = _.filter(issues, issue => issue.epicId !== 0);
-    }
-    count.todoCount = _.reduce(issuesData, (sum, issue) => {
-      if (issue.statusCode === 'todo') {
-        return sum + issue.storyPoints;
-      } else {
-        return sum;
-      }
-    }, 0);
-    count.doneCount = _.reduce(issuesData, (sum, issue) => {
-      if (issue.statusCode === 'done') {
-        return sum + issue.storyPoints;
-      } else {
-        return sum;
-      }
-    }, 0);
-    count.doingCount = _.reduce(issuesData, (sum, issue) => {
-      if (issue.statusCode === 'doing') {
-        return sum + issue.storyPoints;
-      } else {
-        return sum;
-      }
-    }, 0);
-    return count;
-  };
 
   render() {
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
     const {
-      filters, mode, issues, createEpic, currentFilters, sprints, versions, showBackLog,
+      filters, mode, issues, createEpic, currentFilters, sprints, versions, showBackLog, left, currentIndex,
     } = UserMapStore;
     let firstTitle = '';
-    let count = '';
-    let vosId = `-1-${mode}`;
-    if (mode === 'sprint' && sprints.length) {
-      firstTitle = sprints[0].name;
-      count = this.getHistoryCount(sprints[0].sprintId);
-      vosId = sprints[0].sprintId;
-    } else if (mode === 'version' && versions.length) {
-      firstTitle = versions[0].name;
-      count = this.getHistoryCount(versions[0].versionId);
-      vosId = versions[0].versionId;
-    } else {
-      firstTitle = mode === 'none' ? 'issue' : '未计划的';
-      count = this.getHistoryCount(-1);
-    }
-    if (this.state.vosId) {
-      count = this.getHistoryCount(this.state.vosId);
-      vosId = this.state.vosId;
-    }
+    const count = this.getHistoryCount(UserMapStore.getVosId);
+    const vosId = UserMapStore.getVosId === 0 ? '-1-none' : UserMapStore.getVosId;
+
+    // if (mode === 'sprint' && sprints.length) {
+    //   count = this.getHistoryCount(sprints[currentIndex].sprintId);
+    // } else if (mode === 'version' && versions.length) {
+    //   count = this.getHistoryCount(versions[currentIndex].versionId);
+    // } else {
+    //   count = this.getHistoryCount(-1);
+    // }
     return (
       <Page
         // className="c7n-userMap"
@@ -797,7 +793,17 @@ class Home3 extends Component {
                     style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
                     onClick={this.addFilter.bind(this,'userStory')}
                   >仅用户故事</p>
-                  {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`, marginBottom: 3}} onClick={this.addFilter.bind(this,filter.filterId)}>{filter.name}</p>) }
+                  {filters.map(filter => (
+                    <p
+                      key={filter.filterId}
+                      role="none"
+                      style={{
+                        background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`,
+                        color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`,
+                        marginBottom: 3,
+                      }}
+                      onClick={this.addFilter.bind(this,filter.filterId)}
+                    >{filter.name}</p>)) }
                 </div>
                 <div
                   style={{
@@ -818,7 +824,7 @@ class Home3 extends Component {
                   {this.state.expand ? '...收起' : '...展开'}
                 </div>
               </div>
-              <div id="qqq" className="fixHead" style={{ height: `calc(100% - ${48}px)`, background: '#f2f2f2' }}>
+              <div className="fixHead" style={{ height: `calc(100% - ${48}px)`, background: '#f2f2f2' }}>
                 <div className="fixHead-head" id="fixHead-head">
                   <div className="fixHead-line">
                     <Droppable droppableId="epic" direction="horizontal">
@@ -850,11 +856,11 @@ class Home3 extends Component {
                     className="fixHead-line fixHead-line-2"
                     style={{
                       height: 42,
-                      transform: `translateX(${`${this.state.left}px`})`,
+                      transform: `translateX(${`${left}px`})`,
                     }}
                   >
                     <div className="fixHead-head-note">
-                      {this.state.title || firstTitle}
+                      { UserMapStore.getTitle}
                       <div style={{ display: 'flex', float: 'right' }}>
                         <p className="point-span" style={{ background: '#4D90FE' }}>
                           {count.todoCount}
@@ -872,7 +878,7 @@ class Home3 extends Component {
                     </div>
                   </div>
                 </div>
-                <div className="fixHead-body" id="fixHead-body" style={{ flex: 1, background: '#f2f2f2' }}>
+                <div className="fixHead-body" id="fixHead-body" style={{ flex: 1, background: '#f2f2f2', position: 'relative' }}>
                   {this.renderBody()}
                 </div>
               </div>
@@ -881,7 +887,21 @@ class Home3 extends Component {
               <Backlog handleClickIssue={this.handleClickIssue} />
             </div>
           </DragDropContext>
-
+          <CreateEpic
+            visible={createEpic}
+            onOk={() => {
+              UserMapStore.setCreateEpic(false);
+              UserMapStore.loadEpic();
+            }}
+            onCancel={() => UserMapStore.setCreateEpic(false)}
+          />
+          <CreateVOS
+            visible={UserMapStore.createVOS}
+            // onOk={() => {UserMapStore.setCreateVOS(false)}}
+            onOk={this.handleCreateOk}
+            onCancel={() => { UserMapStore.setCreateVOS(false); }}
+            type={UserMapStore.getCreateVOSType}
+          />
 
         </Content>
       </Page>

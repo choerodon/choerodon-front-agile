@@ -105,8 +105,8 @@
   width: 214px;
   height: 262px;
   padding: 0 !important;
-  //left: 510px!important;
-  //top: 100px!important;
+  left: 40% !important;
+  top: 93px!important;
 
   .ant-popover-arrow {
     display: none;
@@ -212,12 +212,12 @@
   .filter {
     // position: fixed;
     flex-wrap: wrap;
-    // overflow: hidden;
+    overflow: hidden;
     display: flex;
 
     p {
       cursor: pointer;
-      padding: 6px 8px;
+      padding: 4px 8px;
       margin-right: 18px;
       border-radius: 2px;
       white-space: nowrap;
