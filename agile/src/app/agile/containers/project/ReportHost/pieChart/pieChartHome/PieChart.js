@@ -14,11 +14,13 @@ import {
 } from 'choerodon-ui';
 import './pie.scss';
 import { reduce } from 'zrender/lib/core/util';
+import util from 'util';
 import SwitchChart from '../../Component/switchChart';
 import VersionReportStore from '../../../../../stores/project/versionReport/VersionReport';
 import NoDataComponent from '../../Component/noData';
 import pic from '../../../../../assets/image/问题管理－空.png';
 import ReleaseStore from '../../../../../stores/project/release/ReleaseStore';
+
 
 const Option = Select.Option;
 const { AppState } = stores;
@@ -35,18 +37,18 @@ class ReleaseDetail extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, 'assignee');
-    console.log(document.getElementsByTagName('canvas'));
-    // const pieChart = echarts.init(document.getElementsByTagName('canvas')[0]);
-    // // console.log(pieChart);
-    // pieChart.on('mouseover', (params) => {
-    //   console.log(`params: ${JSON.stringify(params)}`);
-    //   alert(1);
-    // });
-    // pieChart.onMouseoer = function (params) {
-    //   console.log(`params: ${JSON.stringify(params)}`);
-    // };
+    setTimeout(() => {
+      const pieChart = this.pie.getEchartsInstance();
+      pieChart.on('mouseout', (params) => {
+        if (params.data.name === '其它') {
+          this.setState({
+            showOtherTooltip: false,
+          });
+        }
+      });
+    }, 0);
   }
 
   compare(pro) { 
@@ -85,7 +87,6 @@ class ReleaseDetail extends Component {
     for (let i = 0; i < otherTooptipItem.length; i++) {
       opacity = 1 - i * 0.1 > 0 ? 1 - i * 0.1 : 0.9;
       otherTooptipItem[i].style.backgroundColor = `rgba(250,211,82,${opacity})`;
-      console.log(otherTooptipItem[i].style.backgroundColor);
     }
     // e.stopPropageation();
   }
@@ -153,6 +154,9 @@ class ReleaseDetail extends Component {
               if (value.data.name === null) {
                 return '未分配';
               } 
+              // if (value.data.name === '其它') {
+              //   return '';
+              // }
             },
           },
           itemStyle: {

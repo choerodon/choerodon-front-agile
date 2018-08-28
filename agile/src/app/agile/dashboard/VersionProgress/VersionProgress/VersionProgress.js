@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Progress, Select, Tooltip, Menu, Dropdown, Icon, 
+  Progress, Select, Tooltip, Menu, Dropdown, Icon, Spin,
 } from 'choerodon-ui';
 import { withRouter } from 'react-router-dom';
 import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';
@@ -17,6 +17,7 @@ class VersionProgress extends Component {
       versionList: [],
       currentVersionId: 0,
       currentVersion: {},
+      loading: true,
     };
   }
 
@@ -33,16 +34,21 @@ class VersionProgress extends Component {
         this.setState({
           versionList: res,
           currentVersionId: latestVersionId,
+          loading: false,
         });
       });  
   }
 
   loadSelectData(versionId) {
     const projectId = AppState.currentMenuType.id;
+    this.setState({
+      loading: true,
+    });
     axios.get(`agile/v1/projects/${projectId}/product_version/${versionId}/issue_count`)
       .then((res) => {
         this.setState({
           currentVersion: res,
+          loading: false,
         });
       });  
   }
@@ -55,7 +61,7 @@ class VersionProgress extends Component {
         x: 'right',
         // right: '4%',
         // top: '115',
-        padding: [90, 75],
+        padding: [50, 75],
         align: 'right',
         data: ['待处理', '处理中', '已完成'],
         itemWidth: '20',
@@ -74,7 +80,7 @@ class VersionProgress extends Component {
           avoidLabelOverlap: false,
           hoverAnimation: false,
           // legendHoverLink: false,
-          center: ['35%', '50%'],
+          center: ['35%', '35%'],
           label: {
             normal: {
               show: false,
@@ -112,7 +118,9 @@ class VersionProgress extends Component {
   }
 
   render() {
-    const { versionList, currentVersion, history } = this.state;
+    const {
+      versionList, currentVersion, history, loading, 
+    } = this.state;
     const urlParams = AppState.currentMenuType;
     console.log(`renderCurrentVersion: ${JSON.stringify(currentVersion)}`);
     const menu = (
@@ -133,15 +141,23 @@ class VersionProgress extends Component {
             </a>
           </Dropdown>
         </div>
-        <div className="charts">
-          <ReactEcharts
-            option={this.getOption()}
-          />
-          <div className="charts-inner">
-            <span>版本</span>
-            <span>{currentVersion && currentVersion.name}</span>
-          </div> 
-        </div>
+        {
+         loading ? (
+           <div className="c7n-loadWrap">
+             <Spin />
+           </div>
+         ) : (
+           <div className="charts">
+             <ReactEcharts
+               option={this.getOption()}
+             />
+             <div className="charts-inner">
+               <span>版本</span>
+               <span>{currentVersion && currentVersion.name}</span>
+             </div> 
+           </div>
+         )
+       }
         <DashBoardNavBar>
           <a target="choerodon" onClick={() => this.props.history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`)}>转至发布版本</a>
         </DashBoardNavBar>

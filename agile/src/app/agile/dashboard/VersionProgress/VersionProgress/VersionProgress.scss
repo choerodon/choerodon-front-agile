@@ -9,13 +9,16 @@
       line-height: 15px;
     }
   }
+  .c7n-loadWrap{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 220px;
+
+  }
   .charts{
     position: relative;
-    .echarts-for-react {
-      div{
-        // margin-top: -50px !important;
-      }
-    }
+    margin-bottom: -80px;
     .charts-inner{
       width: 64px;
       height: 64px;
@@ -24,7 +27,7 @@
       justify-content: center;
       align-items: center;
       position: absolute;
-      top: calc(50% - 32px);
+      top: calc(35% - 30px);
       left: calc(35% - 32px);
     }
   }   

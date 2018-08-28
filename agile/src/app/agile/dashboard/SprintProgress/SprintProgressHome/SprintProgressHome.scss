@@ -1,6 +1,11 @@
 .c7n-SprintProgressHome{
     padding-left: 52px;
     padding-bottom: 50px;
+    .c7n-loadWrap{
+        display: flex;
+        justify-content: center;
+        margin-right: 52px;
+    }
     .c7n-SprintStage{
         padding-top: 6px;
         font-size: 13px;
@@ -47,5 +52,4 @@
             right: 20%;
         }
     }
-   
 }
