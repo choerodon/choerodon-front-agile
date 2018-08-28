@@ -1,0 +1,31 @@
+.c7n-VersionProgress{
+  .switchVersion{
+     position: absolute;
+      top: 25px;
+      right: 16px;
+    .ant-dropdown-link{
+      font-size: 13px;
+      // color: #3F51B5;
+      line-height: 15px;
+    }
+  }
+  .charts{
+    position: relative;
+    .echarts-for-react {
+      div{
+        // margin-top: -50px !important;
+      }
+    }
+    .charts-inner{
+      width: 64px;
+      height: 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: calc(50% - 32px);
+      left: calc(35% - 32px);
+    }
+  }   
+}

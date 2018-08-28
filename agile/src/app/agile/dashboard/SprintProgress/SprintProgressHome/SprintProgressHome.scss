@@ -7,10 +7,10 @@
         color: rgba(0,0,0,0.87);
         margin-bottom: 10px;
     }
-    .c7n-SprintPastDay{
+    .c7n-SprintRemainDay{
         font-size: 13px;
         color: rgba(0,0,0,0.64);
-        .c7n-pastDay{
+        .c7n-remainDay{
             font-size: 20px;
             color: #F7667F;
             padding-left: 2px;
@@ -27,6 +27,7 @@
                 width: 100%;
                 background-color: rgba(247,102,127,0.30);
                 .ant-progress-bg{
+                    // width: 100%;
                     background-color: #F7667F;
                 }
             }
