@@ -103,12 +103,12 @@
         .issue {
           display: flex;
           flex-direction: row;
-          padding: 5px 4px;
+          padding: 8px;
           border: 1px solid rgba(151, 151, 151, 0.2);
           border-top: none;
 
           .type {
-            margin-right: 4px;
+            margin-right: 8px;
           }
 
           .summary {

@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { Input, Icon, Popover, Menu, Checkbox, Dropdown } from 'choerodon-ui';
+import {
+  Input, Icon, Menu, Dropdown,
+} from 'choerodon-ui';
 import _ from 'lodash';
 import './CreateIssue.scss';
-import { TYPE, ICON, TYPE_NAME } from '../../../../../common/Constant';
-import US from '../../../../../stores/project/userMap/UserMapStore';
-import PriorityTag from '../../../../../components/PriorityTag';
-import StatusTag from '../../../../../components/StatusTag';
 import TypeTag from '../../../../../components/TypeTag';
-import UserHead from '../../../../../components/UserHead';
+import clickOutSide from '../../../../../components/CommonComponent/ClickOutSide';
+import { createIssue } from '../../../../../api/NewIssueApi';
 
 const { TextArea } = Input;
 
@@ -16,16 +15,50 @@ class CreateIssue extends Component {
     super(props);
     this.state = {
       selectIssueType: 'task',
+      summary: '',
     };
   }
 
+  handleClickOutside = (e) => {
+    const { summary, selectIssueType } = this.state;
+    const { handleCancel, onOk } = this.props;
+    if (!summary && handleCancel) {
+      handleCancel();
+    } else {
+      // const issue = {
+      //   epicId: values.epicId || 0,
+      //   parentIssueId: 0,
+      //   priorityCode: 'medium',
+      //   sprintId: values.sprintId || 0,
+      //   summary,
+      //   typeCode: selectIssueType,
+      //   versionIssueRelDTOList: fixVersionIssueRelDTOList,
+      // };
+      // createIssue(issue)
+      //   .then((res) => {
+      //     onOk();
+      //   })
+      //   .catch((error) => {
+      //   });
+    }
+    // 判空
+    // 空，直接退出编辑handleCancel
+    // 发请求创建
+    // 成功则回调handleSuccuss
+    // 失败则提示
+  };
+
+  handleChangeSummary = (e) => {
+    this.setState({ summary: e.target.value });
+  };
+
   handleChangeType({ key }) {
-    this.setState({
-      selectIssueType: key,
-    });
+    this.setState({ selectIssueType: key });
   }
 
   render() {
+    const { style } = this.props;
+    const { selectIssueType, summary } = this.state;
     const typeList = (
       <Menu
         style={{
@@ -50,11 +83,12 @@ class CreateIssue extends Component {
       </Menu>
     );
     return (
-      <div className="c7n-userMap-createIssue" style={{ ...this.props.style }}>
+      <div className="c7n-userMap-createIssue" style={{ ...style }}>
         <div className="c7n-content">
           <TextArea
             autoFocus
-            onClick={e => e.target.select()}
+            value={summary}
+            onChange={this.handleChangeSummary.bind(this)}
             className="c7n-textArea"
             autosize={{ minRows: 3, maxRows: 3 }}
             placeholder="在此创建新内容"
@@ -65,7 +99,7 @@ class CreateIssue extends Component {
             <div style={{ display: 'flex', alignItem: 'center' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
-                  typeCode={this.state.selectIssueType}
+                  typeCode={selectIssueType}
                   showName
                 />
               </div>
@@ -80,4 +114,4 @@ class CreateIssue extends Component {
     );
   }
 }
-export default CreateIssue;
+export default clickOutSide(CreateIssue);

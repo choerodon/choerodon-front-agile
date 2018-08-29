@@ -76,9 +76,15 @@ class IssueCard extends Component {
         US.freshIssue(issueId, res.objectVersionNumber);
       });
   }
+
   onIssueClick = (id) => {
     this.props.handleClickIssue(id);
   };
+
+  handleClickDelete() {
+    const { issue: { issueId } } = this.state;
+    US.deleteIssue(issueId);
+  }
 
   render() {
     const { issue } = this.props;
@@ -125,7 +131,11 @@ class IssueCard extends Component {
               priority={this.state.issue.priorityCode}
             />
           </div>
-          <Icon className="c7n-delete" type="delete" />
+          <Icon
+            className="c7n-delete"
+            type="delete"
+            onClick={this.handleClickDelete.bind(this)}
+          />
         </div>
         
         <div className="c7n-content">

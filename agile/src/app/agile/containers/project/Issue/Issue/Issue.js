@@ -52,12 +52,14 @@ class Issue extends Component {
   getInit() {
     const Request = this.GetRequest(this.props.location.search);
     const {
-      paramType, paramId, paramName, paramStatus, paramIssueId, paramUrl, 
+      paramType, paramId, paramName, paramStatus, paramPriority, paramIssueType, paramIssueId, paramUrl, 
     } = Request;
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
     IssueStore.setParamName(paramName);
     IssueStore.setParamStatus(paramStatus);
+    IssueStore.setParamPriority(paramPriority);
+    IssueStore.setParamIssueType(paramIssueType);
     IssueStore.setParamIssueId(paramIssueId);
     IssueStore.setParamUrl(paramUrl);
     const arr = [];
@@ -74,6 +76,28 @@ class Issue extends Component {
       IssueStore.setBarFilters(arr);
       IssueStore.setFilter(obj);
       IssueStore.setFilteredInfo({ statusCode: [paramStatus] });
+      IssueStore.loadIssues();
+    } else if (paramPriority) {
+      const obj = {
+        advancedSearchArgs: {},
+        searchArgs: {},
+      };
+      const a = [paramPriority];
+      obj.advancedSearchArgs.priorityCode = a || [];
+      IssueStore.setBarFilters(arr);
+      IssueStore.setFilter(obj);
+      IssueStore.setFilteredInfo({ priorityCode: [paramPriority] });
+      IssueStore.loadIssues();
+    } else if (paramIssueType) {
+      const obj = {
+        advancedSearchArgs: {},
+        searchArgs: {},
+      };
+      const a = [paramIssueType];
+      obj.advancedSearchArgs.typeCode = a || [];
+      IssueStore.setBarFilters(arr);
+      IssueStore.setFilter(obj);
+      IssueStore.setFilteredInfo({ typeCode: [paramIssueType] });
       IssueStore.loadIssues();
     } else if (paramIssueId) {
       IssueStore.setBarFilters(arr);

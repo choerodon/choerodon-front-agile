@@ -134,10 +134,14 @@ class Backlog extends Component {
           <h4 className="word text-overflow-hidden">
             {group.name || group.sprintName}
           </h4>
-          <Icon
-            type={backlogExpand.includes(group[`${mode}Id`]) ? 'expand_less' : 'expand_more'}
-            onClick={this.handleClickExpand.bind(this, group[`${mode}Id`])}
-          />
+          {
+            issues.length ? (
+              <Icon
+                type={backlogExpand.includes(group[`${mode}Id`]) ? 'expand_less' : 'expand_more'}
+                onClick={this.handleClickExpand.bind(this, group[`${mode}Id`])}
+              />
+            ) : null
+          }
         </div>
         <Droppable droppableId={`backlog-${group[`${mode}Id`]}`}>
           {(provided, snapshot) => (
@@ -212,7 +216,7 @@ class Backlog extends Component {
   renderIssue(issue, index) {
     const { mode, selectIssueIds, currentDraggableId } = US;
     return (
-      <Draggable draggableId={`${mode}-${issue.issueId}`} index={index}>
+      <Draggable draggableId={`${mode}-${issue.issueId}`} index={index} key={issue.issueId}>
         {(provided1, snapshot1) => (
           <div
             ref={provided1.innerRef}
@@ -230,23 +234,29 @@ class Backlog extends Component {
               role="none"
               key={issue.issueId}
               className="issue"
-              style={{
-                background: issue.statusCode === 'done' ? 'rgba(0, 0, 0, 0.06)' : '#fff',
-              }}
             >
               <div style={{ display: currentDraggableId === issue.issueId ? 'block' : 'none', width: 15, height: 15, color: 'white', background: '#F44336', borderRadius: '50%', textAlign: 'center' }}>
                 {selectIssueIds.length}
               </div>
               <span className="type">
-                <TypeTag typeCode={issue.typeCode} />
+                <TypeTag
+                  typeCode={issue.typeCode}
+                  isDone={issue.statusCode === 'done'}
+                />
               </span>
-              <span className="summary text-overflow-hidden">
+              <span
+                className="summary text-overflow-hidden"
+                style={{
+                  color: issue.statusCode === 'done' ? 'rgba(0, 0, 0, 0.6)' : '#000',
+                }}
+              >
                 {issue.summary}
               </span>
               <span
                 className="issueNum"
                 style={{
                   textDecoration: issue.statusCode === 'done' ? 'line-through' : 'unset',
+                  color: issue.statusCode === 'done' ? 'rgba(63, 81, 181, 0.6)' : '#3f51b5',
                 }}
               >
                 {issue.issueNum}

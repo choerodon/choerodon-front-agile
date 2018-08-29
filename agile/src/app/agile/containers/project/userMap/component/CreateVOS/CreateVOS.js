@@ -94,6 +94,7 @@ class CreateVOS extends Component {
               <Input
                 label={`${type === 'sprint' ? '冲刺' : '版本'}名称`}
                 // defaultValue={this.state.nextSprintName}
+                onPressEnter={this.handleCreate}
                 maxLength={30}
               />,
             )}

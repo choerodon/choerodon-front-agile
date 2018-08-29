@@ -185,6 +185,37 @@ class ReleaseDetail extends Component {
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
   };
 
+  getQueryString(type, value) {
+    const QUERY = {
+      assignee: 'paramType=assigneeId&paramId=',
+      component: 'paramType=component&paramId=',
+      typeCode: 'paramIssueType=',
+      version: 'paramType=fixVersion&paramId=',
+      priorityCode: 'paramPriority=',
+      statusCode: 'paramType=statusId&paramId=',
+      sprint: 'paramType=sprint&paramId=',
+      epic: 'paramType=epic&paramId=',
+      resolution: 'paramType=resolution&paramId=',
+    };
+    if (!QUERY[type]) return null;
+    return `${QUERY[type]}${value === null ? '0' : value}`;
+  }
+
+  handleLinkToIssue(item) {
+    const urlParams = AppState.currentMenuType;
+    const {
+      type, id, organizationId,
+    } = urlParams;
+    const { history } = this.props;
+    const { value } = this.state;
+    const { typeName, name } = item;
+    const queryString = this.getQueryString(value, typeName);
+    if (!queryString) return;
+    history.push(
+      `/agile/issue?type=${type}&id=${id}&name=${urlParams.name}&organizationId=${organizationId}&${queryString}&paramName=${name || '未分配'}下的问题&paramUrl=reporthost/pieReport`,
+    );
+  }
+
   render() {
     const data = VersionReportStore.getPieData;
     const sourceData = VersionReportStore.getSourceData;
@@ -296,10 +327,7 @@ class ReleaseDetail extends Component {
                             <td style={{ width: '62px' }}>
                               <a
                                 role="none"
-                                onClick={() => {
-                                  console.log('this.state.value');
-                                  this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=${this.state.value}&paramId=${item.typeName === null ? '0' : item.typeName}&paramName=${item.name === null ? '未分配' : item.name}下的问题&paramUrl=reporthost/piechart`);
-                                }}
+                                onClick={this.handleLinkToIssue.bind(this, item)}
                               >
                                 {item.value}
                               </a>

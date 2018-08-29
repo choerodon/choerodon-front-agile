@@ -44,7 +44,6 @@
     }
 
     .c7n-delete {
-      color: #3f51b5;
       display: none;
     }
   }
@@ -126,6 +125,7 @@
   &:hover {
     .c7n-delete {
       color: #3f51b5;
+      cursor: pointer;
       display: inline-block;
     }
 
