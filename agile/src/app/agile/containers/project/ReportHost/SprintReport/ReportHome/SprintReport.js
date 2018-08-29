@@ -491,7 +491,7 @@ class SprintReport extends Component {
         <Content
           title={sprintName ? `迭代冲刺“${sprintName}”的冲刺报告` : '无冲刺迭代的冲刺报告'}
           description="了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。"
-          link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
+          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
           <Spin spinning={this.state.loading}>
             {

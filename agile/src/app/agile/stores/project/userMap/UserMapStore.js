@@ -73,7 +73,13 @@ class UserMapStore {
 
   @observable currentIndex = 0;
 
-  @observable currentNewObj = {epicId: 0, sprintId: 0, versionId: 0};
+  @observable currentNewObj = { epicId: 0, sprintId: 0, versionId: 0 };
+
+  @observable isLoading = false;
+
+  @action setIsLoading(flag) {
+    this.isLoading = flag;
+  }
 
   @action setCurrentNewObj(data) {
     this.currentNewObj = data;
@@ -120,6 +126,9 @@ class UserMapStore {
     this.selectIssueIds = data;
   }
 
+  @computed get getSelectIssueIds() {
+    return this.selectIssueIds;
+  }
   @action
   setCurrentDraggableId(data) {
     this.currentDraggableId = data;
@@ -314,20 +323,25 @@ class UserMapStore {
       this.setVersions(versions);
     });
 
-  initData = (pageType = 'usermap') => {
-    axios.all([
+  initData = (flag, pageType = 'usermap') => {
+    this.setIsLoading(flag);
+    return axios.all([
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}`),
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}`),
     ])
       .then(
         axios.spread((epics, filters, issues) => {
+          this.setIsLoading(false);
           this.setFilters(filters);
           this.setEpics(epics);
           this.setIssues(issues);
           // 两个请求现在都执行完成
         }),
-      );
+      )
+      .catch(() => {
+        this.setIsLoading(false);
+      });
     if (this.showBackLog) {
       this.loadBacklogIssues();
     }
@@ -416,20 +430,20 @@ class UserMapStore {
   handleMoveIssue = (data, type = 'userMap') => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/move`, data)
     .then((res) => {
       if (type === 'userMap' && this.showBackLog) {
-        this.initData();
+        this.initData(false);
         this.loadBacklogIssues();
       } else if (type === 'userMap' && !this.showBackLog) {
-        this.initData();
+        this.initData(false);
       } else {
         this.loadBacklogIssues();
       }
     })
     .catch((error) => {
       if (type === 'userMap' && this.showBackLog) {
-        this.initData();
+        this.initData(false);
         this.loadBacklogIssues();
       } else if (type === 'userMap' && !this.showBackLog) {
-        this.initData();
+        this.initData(false);
       } else {
         this.loadBacklogIssues();
       }

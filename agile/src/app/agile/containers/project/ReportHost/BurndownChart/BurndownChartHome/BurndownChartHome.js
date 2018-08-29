@@ -532,7 +532,7 @@ class BurndownChartHome extends Component {
         <Content
           title={sprintName ? `迭代冲刺“${sprintName}”的燃尽图` : '无冲刺迭代的燃尽图'}
           description="跟踪记录所有问题的剩余工作工作时间，预估完成冲刺任务的可能性，回顾总结迭代过程中的经验与不足。这有助于在团队管理方面取得更进一步的掌控与把握。"
-          link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/burn-down/"
+          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/burn-down/"
         >
           <Spin spinning={this.state.loading}>
             {

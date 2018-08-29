@@ -235,8 +235,8 @@ class Backlog extends Component {
               key={issue.issueId}
               className="issue"
             >
-              <div style={{ display: currentDraggableId === issue.issueId ? 'block' : 'none', width: 15, height: 15, color: 'white', background: '#F44336', borderRadius: '50%', textAlign: 'center' }}>
-                {selectIssueIds.length}
+              <div style={{ display: selectIssueIds.length > 1 && currentDraggableId === issue.issueId ? 'block' : 'none', width: 20, height: 20, color: 'white', background: '#F44336', borderRadius: '50%', textAlign: 'center', float: 'right' }}>
+                {selectIssueIds.length > 1 ? selectIssueIds.length : null}
               </div>
               <span className="type">
                 <TypeTag

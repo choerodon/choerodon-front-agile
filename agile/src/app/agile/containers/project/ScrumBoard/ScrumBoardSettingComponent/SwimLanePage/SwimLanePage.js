@@ -45,7 +45,7 @@ class SwimLanePage extends Component {
           padding: 0,
           height: '100%',
         }}
-        link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
+        link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
       >
         <Select
           style={{ width: 512 }} 
