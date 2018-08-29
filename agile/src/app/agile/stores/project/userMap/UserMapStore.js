@@ -346,6 +346,7 @@ class UserMapStore {
       this.loadBacklogIssues();
     }
   }
+  
   getFiltersObj = (type = 'currentBacklogFilters') => {
     const filters = this[type];
     let [userId, onlyStory, filterIds] = [null, null, []];

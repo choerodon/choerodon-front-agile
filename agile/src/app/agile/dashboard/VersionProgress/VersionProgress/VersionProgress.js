@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Progress, Select, Tooltip, Menu, Dropdown, Icon, Spin,
+  Select, Menu, Dropdown, Icon, Spin,
 } from 'choerodon-ui';
 import { withRouter } from 'react-router-dom';
 import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';
@@ -8,7 +8,7 @@ import ReactEcharts from 'echarts-for-react';
 import './VersionProgress.scss';
 
 const { AppState } = stores;
-const Option = Select.Option;
+const { Option } = Select;
 
 class VersionProgress extends Component {
   constructor(props) {
@@ -122,7 +122,6 @@ class VersionProgress extends Component {
       versionList, currentVersion, history, loading, 
     } = this.state;
     const urlParams = AppState.currentMenuType;
-    console.log(`renderCurrentVersion: ${JSON.stringify(currentVersion)}`);
     const menu = (
       <Menu onClick={this.handleMenuClick}>
         {
@@ -135,10 +134,10 @@ class VersionProgress extends Component {
       <div className="c7n-VersionProgress">
         <div className="switchVersion">
           <Dropdown overlay={menu} trigger={['click']}>
-            <a className="ant-dropdown-link" href="#">
+            <div className="ant-dropdown-link c7n-agile-dashboard-versionProgress-select">
               {' 切换版本 '}
               <Icon type="arrow_drop_down" />
-            </a>
+            </div>
           </Dropdown>
         </div>
         {

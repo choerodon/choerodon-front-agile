@@ -67,6 +67,10 @@ class Home3 extends Component {
     }, 500);
   };
 
+  // debounceHandleScroll = _.debounce((e) => {
+  //   this.handleScroll(e);
+  // }, 16);
+
   handleScroll = (e) => {
     const { scrollLeft, scrollTop } = e.target;
     const { UserMapStore } = this.props;
@@ -587,10 +591,20 @@ class Home3 extends Component {
                           )}
                         </Draggable>
                       ))}
-                      <CreateIssue
-                        data={{ epicId: epic.issueId, [id]: vos[id] }}
-                        style={{ display: epicId === epic.issueId && currentNewObj[id] === vos[id] ? 'block' : 'none' }}
-                      />
+                      {
+                        epicId === epic.issueId && currentNewObj[id] === vos[id] ? (
+                          <CreateIssue
+                            data={{ epicId: epic.issueId, [id]: vos[id] }}
+                            onOk={() => {
+                              this.handleAddIssue(0, 0);
+                              this.initData();
+                            }}
+                            onCancel={() => {
+                              this.handleAddIssue(0, 0);
+                            }}
+                          />
+                        ) : null
+                      }
                       <div
                         className={'maskIssue'}
                         onMouseLeave={() => { this.setState({ showChild: null }); }}
@@ -717,10 +731,20 @@ class Home3 extends Component {
                           )}
                         </Draggable>
                       ))}
-                      <CreateIssue
-                        data={{ epicId: epic.issueId, [`${mode}Id`]: 0 }}
-                        style={{ display: epicId === epic.issueId && currentNewObj[id] === 0 ? 'block' : 'none' }}
-                      />
+                      {
+                        epicId === epic.issueId && currentNewObj[id] === 0 ? (
+                          <CreateIssue
+                            data={{ epicId: epic.issueId, [`${mode}Id`]: 0 }}
+                            onOk={() => {
+                              this.handleAddIssue(0, 0);
+                              this.initData();
+                            }}
+                            onCancel={() => {
+                              this.handleAddIssue(0, 0);
+                            }}
+                          />
+                        ) : null
+                      }
                       <div
                         className={'maskIssue'}
                         // style={{ background: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? '' : '' }}
