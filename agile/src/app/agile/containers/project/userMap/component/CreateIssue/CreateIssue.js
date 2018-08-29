@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Input, Icon, Menu, Dropdown,
+  Input, Icon, Menu, Dropdown, Spin,
 } from 'choerodon-ui';
 import _ from 'lodash';
 import './CreateIssue.scss';
@@ -16,37 +16,52 @@ class CreateIssue extends Component {
     this.state = {
       selectIssueType: 'task',
       summary: '',
+      loading: false,
     };
+    this.couldCreate = true;
   }
 
   handleClickOutside = (e) => {
-    const { summary, selectIssueType } = this.state;
-    const { handleCancel, onOk } = this.props;
-    if (!summary && handleCancel) {
-      handleCancel();
-    } else {
-      // const issue = {
-      //   epicId: values.epicId || 0,
-      //   parentIssueId: 0,
-      //   priorityCode: 'medium',
-      //   sprintId: values.sprintId || 0,
-      //   summary,
-      //   typeCode: selectIssueType,
-      //   versionIssueRelDTOList: fixVersionIssueRelDTOList,
-      // };
-      // createIssue(issue)
-      //   .then((res) => {
-      //     onOk();
-      //   })
-      //   .catch((error) => {
-      //   });
-    }
-    // 判空
-    // 空，直接退出编辑handleCancel
-    // 发请求创建
-    // 成功则回调handleSuccuss
-    // 失败则提示
+    this.handleCreateIssue();
   };
+
+  handlePresEnter = (e) => {
+    e.preventDefault();
+    this.handleCreateIssue();
+  }
+
+  handleCreateIssue = () => {
+    const { summary, selectIssueType, loading } = this.state;
+    const { onCancel, onOk, data } = this.props;
+    if (!summary && onCancel) {
+      onCancel();
+    } else if (this.couldCreate) {
+      this.couldCreate = false;
+      const issue = {
+        epicId: data.epicId,
+        parentIssueId: 0,
+        priorityCode: 'medium',
+        sprintId: data.sprintId,
+        summary,
+        typeCode: selectIssueType,
+        versionIssueRelDTOList: data.versionId ? {
+          relationType: 'fix',
+          versionId: data.versionId,
+        } : undefined,
+      };
+      this.setState({ loading: true });
+      createIssue(issue)
+        .then((res) => {
+          onOk();
+        })
+        .catch((error) => {
+          this.setState({ loading: false });
+          this.couldCreate = true;
+        });
+    } else {
+      // waiting
+    }
+  }
 
   handleChangeSummary = (e) => {
     this.setState({ summary: e.target.value });
@@ -58,7 +73,7 @@ class CreateIssue extends Component {
 
   render() {
     const { style } = this.props;
-    const { selectIssueType, summary } = this.state;
+    const { selectIssueType, summary, loading } = this.state;
     const typeList = (
       <Menu
         style={{
@@ -84,32 +99,35 @@ class CreateIssue extends Component {
     );
     return (
       <div className="c7n-userMap-createIssue" style={{ ...style }}>
-        <div className="c7n-content">
-          <TextArea
-            autoFocus
-            value={summary}
-            onChange={this.handleChangeSummary.bind(this)}
-            className="c7n-textArea"
-            autosize={{ minRows: 3, maxRows: 3 }}
-            placeholder="在此创建新内容"
-          />
-        </div>
-        <div className="c7n-footer">
-          <Dropdown overlay={typeList} trigger={['click']}>
-            <div style={{ display: 'flex', alignItem: 'center' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <TypeTag
-                  typeCode={selectIssueType}
-                  showName
+        <Spin spinning={loading}>
+          <div className="c7n-content">
+            <TextArea
+              autoFocus
+              value={summary}
+              onChange={this.handleChangeSummary}
+              onPressEnter={this.handlePresEnter}
+              className="c7n-textArea"
+              autosize={{ minRows: 3, maxRows: 3 }}
+              placeholder="在此创建新内容"
+            />
+          </div>
+          <div className="c7n-footer">
+            <Dropdown overlay={typeList} trigger={['click']}>
+              <div style={{ display: 'flex', alignItem: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <TypeTag
+                    typeCode={selectIssueType}
+                    showName
+                  />
+                </div>
+                <Icon
+                  type="arrow_drop_down"
+                  style={{ fontSize: 16 }}
                 />
               </div>
-              <Icon
-                type="arrow_drop_down"
-                style={{ fontSize: 16 }}
-              />
-            </div>
-          </Dropdown>
-        </div>
+            </Dropdown>
+          </div>
+        </Spin>
       </div>
     );
   }

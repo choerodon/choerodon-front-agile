@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';
-import { Spin } from 'choerodon-ui';
+import { Spin, Tooltip } from 'choerodon-ui';
 import TypeTag from '../../components/TypeTag';
 import PriorityTag from '../../components/PriorityTag';
 import StatusTag from '../../components/StatusTag';
@@ -26,14 +26,12 @@ class MineUnDone extends Component {
 
   loadData() {
     const projectId = AppState.currentMenuType.id;
+    const userId = AppState.getUserId;
     this.setState({ loading: true });
-    axios.post(`/agile/v1/projects/${projectId}/issues/no_sub?page=0&size=6`, {
-      advancedSearchArgs: {},
-      searchArgs: {},
-    })
+    axios.get(`/agile/v1/projects/${projectId}/issues/unfinished/${userId}`)
       .then((res) => {
         this.setState({
-          issues: res.content,
+          issues: res,
           loading: false,
         });
       });
@@ -41,7 +39,7 @@ class MineUnDone extends Component {
 
   renderIssue(issue) {
     return (
-      <div className="list">
+      <div className="list" key={issue.issueNum}>
         <div>
           <TypeTag
             typeCode={issue.typeCode}
@@ -51,9 +49,11 @@ class MineUnDone extends Component {
           {issue.issueNum}
         </span>
         <div className="issueSummary-wrap">
-          <p className="issueSummary text-overflow-hidden">
-            {issue.summary}
-          </p>
+          <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={issue.summary}>
+            <p className="issueSummary text-overflow-hidden">
+              {issue.summary}
+            </p>
+          </Tooltip>
         </div>
         <div className="flex-shrink">
           <div className="priority">

@@ -35,7 +35,6 @@ class EpicProgress extends Component {
           color: '#000',
         },
         formatter(params) {
-          window.console.log(params);
           const epic = params.find(v => v.value !== undefined);
           const res = `${epic.name}:</br>${epic.value}%`;
           return res;
