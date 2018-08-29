@@ -518,7 +518,7 @@ class SprintReport extends Component {
                           endDate,
                           startDate,
                         }, () => {
-                          this.getChartData();
+                          // this.getChartData();
                           this.getChartCoordinate();
                         });
                       }}

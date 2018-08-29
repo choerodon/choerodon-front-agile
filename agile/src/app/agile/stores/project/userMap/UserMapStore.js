@@ -13,10 +13,10 @@ class UserMapStore {
   epics = [];
 
   @observable
-  showDoneEpic=false;
+  showDoneEpic = false;
 
   @observable
-  isApplyToEpic=false;
+  isApplyToEpic = false;
 
   @observable
   filters = [];
@@ -51,7 +51,7 @@ class UserMapStore {
   createVOS = false;
 
   @observable
-  createVOSType='';
+  createVOSType = '';
 
   @observable
   selectIssueIds = [];
@@ -72,6 +72,12 @@ class UserMapStore {
   @observable offsetTops = [];
 
   @observable currentIndex = 0;
+
+  @observable currentNewObj = {epicId: 0, sprintId: 0, versionId: 0};
+
+  @action setCurrentNewObj(data) {
+    this.currentNewObj = data;
+  }
 
   @computed get getTitle() {
     if (this.mode === 'sprint') {
@@ -158,7 +164,7 @@ class UserMapStore {
   get getFilters() {
     return this.filters;
   }
-  
+
 
   @action
   setCurrentFilter(data) {
@@ -239,7 +245,7 @@ class UserMapStore {
   get getCreateVOSType() {
     return this.createVOSType;
   }
-  
+
   @action
   setBacklogIssues(data) {
     this.backlogIssues = data;
@@ -263,7 +269,7 @@ class UserMapStore {
     let url = '';
     if (this.currentFilters.includes('mine')) {
       url += `&assigneeId=${AppState.getUserId}`;
-    } 
+    }
     if (this.currentFilters.includes('userStory')) {
       url += '&onlyStory=true';
     }
@@ -287,7 +293,7 @@ class UserMapStore {
     let url = '';
     if (this.currentFilters.includes('mine')) {
       url += `&assigneeId=${AppState.getUserId}`;
-    } 
+    }
     if (this.currentFilters.includes('userStory')) {
       url += '&onlyStory=true';
     }
@@ -308,25 +314,24 @@ class UserMapStore {
       this.setVersions(versions);
     });
 
-  initData = (pageType = 'usermap') => axios
-    .all([
+  initData = (pageType = 'usermap') => {
+    axios.all([
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}`),
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
-      axios.get(
-        `/agile/v1/projects/${
-          AppState.currentMenuType.id
-        }/issues/storymap/issues?type=${this.mode}&pageType=${pageType}`,
-      ),
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}`),
     ])
-    .then(
-      axios.spread((epics, filters, issues) => {
-        this.setFilters(filters);
-        this.setEpics(epics);
-        this.setIssues(issues);
-        // 两个请求现在都执行完成
-      }),
-    );
-
+      .then(
+        axios.spread((epics, filters, issues) => {
+          this.setFilters(filters);
+          this.setEpics(epics);
+          this.setIssues(issues);
+          // 两个请求现在都执行完成
+        }),
+      );
+    if (this.showBackLog) {
+      this.loadBacklogIssues();
+    }
+  }
   getFiltersObj = (type = 'currentBacklogFilters') => {
     const filters = this[type];
     let [userId, onlyStory, filterIds] = [null, null, []];

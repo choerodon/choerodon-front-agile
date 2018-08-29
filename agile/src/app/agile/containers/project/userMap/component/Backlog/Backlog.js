@@ -79,6 +79,13 @@ class Backlog extends Component {
       group = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v.statusCode !== 'done'));
       return (
         <div className="issues">
+          <div className="title">
+            <h4 className="word">Issues</h4>
+            <Icon
+              type={backlogExpand.includes(0) ? 'expand_less' : 'expand_more'}
+              onClick={this.handleClickExpand.bind(this, 0)}
+            />
+          </div>
           <Droppable droppableId="backlog-0">
             {(provided, snapshot) => (
               <div
@@ -90,13 +97,6 @@ class Backlog extends Component {
                   // borderBottom: '1px solid rgba(0,0,0,0.12)'
                 }}
               >
-                <div className="title">
-                  <h4 className="word">Issues</h4>
-                  <Icon
-                    type={backlogExpand.includes(0) ? 'expand_less' : 'expand_more'}
-                    onClick={this.handleClickExpand.bind(this, 0)}
-                  />
-                </div>
                 <ul className="issue-block">
                   {
                     _.map(group, (issue, index) => this.renderIssue(issue, index))
@@ -129,40 +129,41 @@ class Backlog extends Component {
     const { keyword } = this.state;
     const issues = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v[`${mode}Id`] === group[`${mode}Id`]));
     return (
-      <Droppable droppableId={`backlog-${group[`${mode}Id`]}`}>
-        {(provided, snapshot) => (
-          <div
-            ref={provided.innerRef}
-            className="epic"
-            style={{
-              background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-              padding: 'grid',
-              // borderBottom: '1px solid rgba(0,0,0,0.12)'
-            }}
-          >
-            <div key={i}>
-
-              <div className="title">
-                <h4 className="word text-overflow-hidden">
-                  {group.name || group.sprintName}
-                </h4>
-                <Icon
-                  type={backlogExpand.includes(group[`${mode}Id`]) ? 'expand_less' : 'expand_more'}
-                  onClick={this.handleClickExpand.bind(this, group[`${mode}Id`])}
-                />
+      <React.Fragment>
+        <div className="title">
+          <h4 className="word text-overflow-hidden">
+            {group.name || group.sprintName}
+          </h4>
+          <Icon
+            type={backlogExpand.includes(group[`${mode}Id`]) ? 'expand_less' : 'expand_more'}
+            onClick={this.handleClickExpand.bind(this, group[`${mode}Id`])}
+          />
+        </div>
+        <Droppable droppableId={`backlog-${group[`${mode}Id`]}`}>
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              className="epic"
+              style={{
+                background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                padding: 'grid',
+                // borderBottom: '1px solid rgba(0,0,0,0.12)'
+              }}
+            >
+              <div key={i}>
+                {backlogExpand.includes(group[`${mode}Id`]) ? null : (
+                  <ul className="issue-block">
+                    {
+                      _.map(issues, (issue, index) => this.renderIssue(issue, index))
+                    }
+                  </ul>
+                )}
               </div>
-              {backlogExpand.includes(group[`${mode}Id`]) ? null : (
-                <ul className="issue-block">
-                  {
-                    _.map(issues, (issue, index) => this.renderIssue(issue, index))
-                  }
-                </ul>
-              )}
+              {provided.placeholder}
             </div>
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+          )}
+        </Droppable>
+      </React.Fragment>
 
     );
   }
@@ -172,37 +173,39 @@ class Backlog extends Component {
     const { keyword } = this.state;
     const issues = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v[`${mode}Id`] === null && v.statusCode !== 'done'));
     return (
-      <Droppable droppableId="backlog-0">
-        {(provided, snapshot) => (
-          <div
-            ref={provided.innerRef}
-            className="epic"
-            style={{
-              background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-              padding: 'grid',
-              // borderBottom: '1px solid rgba(0,0,0,0.12)'
-            }}
-          >
-            <div className="title">
-              <h4 className="word">
-                {'Unscheduled'}
-              </h4>
-              <Icon
-                type={backlogExpand.includes('Unscheduled') ? 'expand_less' : 'expand_more'}
-                onClick={this.handleClickExpand.bind(this, 'Unscheduled')}
-              />
+      <React.Fragment>
+        <div className="title">
+          <h4 className="word">
+            {'Unscheduled'}
+          </h4>
+          <Icon
+            type={backlogExpand.includes('Unscheduled') ? 'expand_less' : 'expand_more'}
+            onClick={this.handleClickExpand.bind(this, 'Unscheduled')}
+          />
+        </div>
+        <Droppable droppableId="backlog-0">
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              className="epic"
+              style={{
+                background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                padding: 'grid',
+                // borderBottom: '1px solid rgba(0,0,0,0.12)'
+              }}
+            >
+              {backlogExpand.includes('Unscheduled') ? null : (
+                <ul className="issue-block">
+                  {
+                    _.map(issues, (issue, index) => this.renderIssue(issue, index))
+                  }
+                </ul>
+              )}
+              {provided.placeholder}
             </div>
-            {backlogExpand.includes('Unscheduled') ? null : (
-              <ul className="issue-block">
-                {
-                  _.map(issues, (issue, index) => this.renderIssue(issue, index))
-                }
-              </ul>
-            )}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+          )}
+        </Droppable>
+      </React.Fragment>
     );
   }
 

@@ -18,10 +18,10 @@ class SwimLanePage extends Component {
   }
   handleSave(select) {
     const data = {
-      objectVersionNumber: select.objectVersionNumber,
+      // objectVersionNumber: select.objectVersionNumber,
       boardId: select.boardId,
-      swimlaneBasedCode: this.state.selectValue ? this.state.selectValue : select.swimlaneBasedCode,
-      projectId: AppState.currentMenuType.id,
+      swimlaneBasedCode: this.state.selectValue ? this.state.selectValue : ScrumBoardStore.getSwimLaneCode,
+      // projectId: AppState.currentMenuType.id,
     };
     ScrumBoardStore.axiosUpdateBoard(data).then((res) => {
       message.success('保存成功');
@@ -50,7 +50,7 @@ class SwimLanePage extends Component {
         <Select
           style={{ width: 512 }} 
           label="基础泳道在" 
-          defaultValue={defaultSelect.swimlaneBasedCode || 'parent_child'}
+          defaultValue={ScrumBoardStore.getSwimLaneCode || 'parent_child'}
           onChange={(value) => {
             this.setState({
               selectValue: value,

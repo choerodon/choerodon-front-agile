@@ -6,6 +6,7 @@ import {
 import {
   Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip, 
 } from 'choerodon-ui';
+import axios from 'axios';
 import _ from 'lodash';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { withRouter } from 'react-router-dom';
@@ -82,9 +83,11 @@ class ScrumBoardHome extends Component {
       if (!index) {
         index = 0;
       }
-      ScrumBoardStore.setBoardList(data);
+      axios.get(`/agile/v1/projects/${AppState.menuType.id}/board/user_setting/${data[index].boardId}`).then((columnDat) => {
+        ScrumBoardStore.setSwimLaneCode(columnDat.swimlaneBasedCode);
+      });
       ScrumBoardStore.setCurrentConstraint(data[index].columnConstraint);
-      ScrumBoardStore.setSwimLaneCode(data[index].swimlaneBasedCode);
+      ScrumBoardStore.setBoardList(data);
       ScrumBoardStore.setSelectedBoard(data[index].boardId);
       this.refresh(data[index].boardId);
     }).catch((error) => {
