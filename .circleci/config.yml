@@ -11,8 +11,7 @@ jobs:
       CI_PROJECT_PATH: $CIRCLE_PROJECT_REPONAME
     steps:
       - checkout
-      - run: | 
-            export CI_COMMIT_TAG=$CIRCLE_TAG
+      - run: |
             cd agile && npm install -registry https://nexus.choerodon.com.cn/repository/choerodon-npm/ && cd ..
             python ./agile/node_modules/choerodon-front-boot/structure/configAuto.py agile
             cd agile
@@ -47,6 +46,7 @@ jobs:
       - run: |
           CHART_PATH=`find . -name Chart.yaml`
           yq w -i ${CHART_PATH%/*}/Chart.yaml appVersion ${CIRCLE_TAG}
+          yq w -i ${CHART_PATH%/*}/values.yaml image.repository ${DOCKER_GROUP_NAME}/${CIRCLE_PROJECT_REPONAME}
           helm repo add choerodon "${CHART_REPOSITORY}/${CHART_ORGANIZATION}/${CHART_PROJECT}/"
           helm push --username ${HELM_USER} --password ${HELM_PASSWORD} ${CHART_PATH%/*} --version ${CIRCLE_TAG} choerodon
 workflows:
