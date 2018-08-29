@@ -14,6 +14,7 @@ import EpicCard from '../component/EpicCard/EpicCard.js';
 import IssueCard from '../component/IssueCard/IssueCard.js';
 import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
+import ScrumBoardStore from "../../../../stores/project/scrumBoard/ScrumBoardStore";
 
 @observer
 class Home3 extends Component {
@@ -150,7 +151,10 @@ class Home3 extends Component {
     } else if (mode === 'version') {
       this.props.UserMapStore.loadVersions();
     }
-    this.props.UserMapStore.loadIssues(options.key, 'usermap');
+    this.props.UserMapStore.loadIssues('usermap');
+    if (this.props.UserMapStore.showBackLog) {
+      this.props.UserMapStore.loadBacklogIssues();
+    }
     setTimeout(() => {
       this.getPrepareOffsetTops();
     }, 500);
@@ -219,12 +223,13 @@ class Home3 extends Component {
     UserMapStore.getCreateVOSType === 'version' ? UserMapStore.loadVersions() : UserMapStore.loadSprints();
   };
 
-  handleMouseColumn = (epicId, vosId) => {
-    this.setState({ hoverId: epicId, hoverVOSId: vosId });
-  };
-
-  showCreateIssue = () => {
-    this.setState({ createIssue: true });
+  handleAddIssue = (epicId, vosId) => {
+    const { UserMapStore } = this.props;
+    const { mode } = UserMapStore;
+    const obj = { epicId, [`${mode}Id`]: vosId };
+    this.setState({ showChild: null });
+    window.console.log(obj);
+    UserMapStore.setCurrentNewObj(obj);
   };
 
 
@@ -431,7 +436,7 @@ class Home3 extends Component {
           <Icon type="playlist_add" />
           创建史诗
         </Button>
-        <Dropdown overlay={swimlanMenu} trigger={['click']}>
+        <Dropdown overlay={swimlanMenu} trigger={['click']} overlayClassName="modeMenu" placement="bottomCenter">
           <Button>
             {mode === 'none' && '无泳道'}
             {mode === 'version' && '版本泳道'}
@@ -439,34 +444,35 @@ class Home3 extends Component {
             <Icon type="arrow_drop_down" />
           </Button>
         </Dropdown>
-        <div style={{ marginLeft: 8 }}>
-          <Popover
-            overlayClassName="moreMenuPopover"
-            arrowPointAtCenter={false}
-            placement="bottomLeft"
-            trigger="click"
-            content={(
-              <div>
-                <div className="menu-title">史诗过滤器</div>
-                <div style={{ height: 22, marginBottom: 20 }}>
-                  <Checkbox onChange={this.handleShowDoneEpic}>已完成的史诗</Checkbox>
-                </div>
-                <div style={{ height: 22, marginBottom: 32 }}>
-                  <Checkbox onChange={this.handleFilterEpic}>应用快速搜索到史诗</Checkbox>
-                </div>
-                <div className="menu-title">导出</div>
-                <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div>
-                <div style={{ height: 22, marginLeft: 26 }}>导出为图片</div>
+        <Popover
+          overlayClassName="moreMenuPopover"
+          arrowPointAtCenter={false}
+          placement="bottomCenter"
+          trigger="click"
+          content={(
+            <div>
+              <div className="menu-title">史诗过滤器</div>
+              <div style={{ height: 22, marginBottom: 20 }}>
+                <Checkbox onChange={this.handleShowDoneEpic}>已完成的史诗</Checkbox>
               </div>
-            )}
-          >
-            <div style={{ cursor: 'pointer', color: 'rgb(63, 81, 181)', fontWeight: 500, marginTop: 2 }}>
-              更多
-              {' '}
-              <Icon type="arrow_drop_down" style={{ marginTop: -3 }} />
+              <div style={{ height: 22, marginBottom: 32 }}>
+                <Checkbox onChange={this.handleFilterEpic}>应用快速搜索到史诗</Checkbox>
+              </div>
+              <div className="menu-title">导出</div>
+              <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div>
+              <div style={{ height: 22, marginLeft: 26 }}>导出为图片</div>
             </div>
-          </Popover>
-        </div>
+          )}
+        >
+          <Button>
+            更多
+            <Icon type="arrow_drop_down" />
+          </Button>
+        </Popover>
+        <Button className="leftBtn2" funcType="flat" onClick={this.initData}>
+          <Icon type="refresh icon" />
+          <span>刷新</span>
+        </Button>
 
         <Button
           style={{
@@ -488,7 +494,8 @@ class Home3 extends Component {
     const { UserMapStore } = this.props;
     const dom = [];
     const epicData = UserMapStore.getEpics;
-    const { issues, sprints, versions, left } = UserMapStore;
+    const { issues, sprints, versions, currentNewObj, left } = UserMapStore;
+    const { epicId, versionId, sprintId } = currentNewObj;
     const { mode } = UserMapStore;
     const vosData = UserMapStore[`${mode}s`] || [];
     const id = `${mode}Id`;
@@ -497,7 +504,7 @@ class Home3 extends Component {
         const name = mode === 'sprint' ? `${mode}Name` : 'name';
         dom.push(<div key={vos[id]} className="fixHead-line">
           <div
-            className={`fixHead-line-title ${vosIndex === 0 ? 'firstLine-title' : ''}`}
+            className={`fixHead-line-title column-title ${vosIndex === 0 ? 'firstLine-title' : ''}`}
             style={{ marginLeft: left }}
             // data-title={vos[name]}
             // data-id={vos[id]}
@@ -531,9 +538,9 @@ class Home3 extends Component {
                   }
                 }, 0)}
               </p>
-              <p onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
+              <Button shape={'circle'} className="expand-btn" onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
                 <Icon type={`${this.state.expandColumns.includes(vos[id]) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
-              </p>
+              </Button>
             </div>
           </div>
           <div
@@ -579,28 +586,25 @@ class Home3 extends Component {
                           )}
                         </Draggable>
                       ))}
+                      <CreateIssue
+                        data={{ epicId: epic.issueId, [id]: vos[id] }}
+                        style={{ display: epicId === epic.issueId && currentNewObj[id] === vos[id] ? 'block' : 'none' }}
+                      />
                       <div
-                        onMouseOut={() => { this.setState({ hoverId: '', hoverVOSId: '', createIssue: false }); }}
-                        style={{ background: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] ? '#f5f5f5' : '', minHeight: 142 }}
-                        onMouseOver={this.handleMouseColumn.bind(this, epic.issueId, vos[id])}
+                        className={'maskIssue'}
+                        onMouseLeave={() => { this.setState({ showChild: null }); }}
+                        onMouseEnter={() => {
+                          if (snapshot.isDraggingOver) return;
+                          this.setState({ showChild: `${epic.issueId}-${vos[id]}` });
+                        }}
                       >
-                        <div style={{ display: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && !this.state.createIssue ? 'block' : 'none' }}>
-
-
+                        <div style={{ display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
                           add
                           {' '}
-                          <a role="none" onClick={this.showCreateIssue}>new</a>
-                          {' '}
-
-
-                          or
-                          {' '}
+                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, vos[id])}>new</a>
+                          {' '}or{' '}
                           <a role="none" onClick={this.showBackLog}>existing</a>
                         </div>
-                        <CreateIssue
-                          data={{ epicId: epic.issueId, [id]: vos[id] }}
-                          style={{ display: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && this.state.createIssue ? 'block' : 'none' }}
-                        />
                       </div>
                     </React.Fragment>
                     {provided.placeholder}
@@ -616,7 +620,7 @@ class Home3 extends Component {
         <div key="no-sprint" className="fixHead-line" style={{ height: '100%' }}>
           <div style={{ transform: `translateX(${`${left}px`})` }}>
             <div
-              className={`fixHead-line-title ${vosData.length ? '' : 'firstLine-title'}`}
+              className={`fixHead-line-title column-title ${vosData.length ? '' : 'firstLine-title'}`}
               title={mode === 'none' ? 'issue' : '未计划的'}
               data-id={-1}
             >
@@ -662,9 +666,9 @@ class Home3 extends Component {
                     }
                   }, 0)}
                 </p>
-                <p onClick={this.handleExpandColumn.bind(this, `-1-${mode}`)} role="none">
+                <Button className="expand-btn" shape={'circle'} onClick={this.handleExpandColumn.bind(this, `-1-${mode}`)} role="none">
                   <Icon type={`${this.state.expandColumns.includes(`-1-${mode}`) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
-                </p>
+                </Button>
 
               </div>
             </div>
@@ -712,28 +716,26 @@ class Home3 extends Component {
                           )}
                         </Draggable>
                       ))}
+                      <CreateIssue
+                        data={{ epicId: epic.issueId, versionId: null, sprintId: null }}
+                        style={{ display: epicId === epic.issueId && currentNewObj[id] === 0 ? 'block' : 'none' }}
+                      />
                       <div
-                        onMouseLeave={() => { this.setState({ hoverId: '', createIssue: false }); }}
-                        style={{ background: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId ? '#f5f5f5' : '', minHeight: 142 }}
-                        onMouseOver={this.handleMouseColumn.bind(this, epic.issueId)}
+                        className={'maskIssue'}
+                        // style={{ background: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? '' : '' }}
+                        onMouseLeave={() => { this.setState({ showChild: null }); }}
+                        onMouseEnter={() => {
+                          if (snapshot.isDraggingOver) return;
+                          this.setState({ showChild: epic.issueId });
+                        }}
                       >
-                        <div style={{ display: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId && !this.state.createIssue ? 'block' : 'none' }}>
-
-
+                        <div style={{ display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
                           add
                           {' '}
-                          <a role="none" onClick={this.showCreateIssue}>new</a>
-                          {' '}
-
-
-                          or
-                          {' '}
+                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>new</a>
+                          {' '}or{' '}
                           <a role="none" onClick={this.showBackLog}>existing</a>
                         </div>
-                        <CreateIssue
-                          data={{ epicId: epic.issueId, versionId: null, sprintId: null }}
-                          style={{ display: this.state.hoverId === epic.issueId && this.state.createIssue ? 'block' : 'none' }}
-                        />
                       </div>
                     </React.Fragment>
                     {provided.placeholder}
@@ -758,25 +760,18 @@ class Home3 extends Component {
     } = UserMapStore;
     let firstTitle = '';
     const count = this.getHistoryCount(UserMapStore.getVosId);
-    const vosId = UserMapStore.getVosId === 0 ? '-1-none' : UserMapStore.getVosId;
+    const vosId = UserMapStore.getVosId === 0 ? `-1-${mode}` : UserMapStore.getVosId;
 
-    // if (mode === 'sprint' && sprints.length) {
-    //   count = this.getHistoryCount(sprints[currentIndex].sprintId);
-    // } else if (mode === 'version' && versions.length) {
-    //   count = this.getHistoryCount(versions[currentIndex].versionId);
-    // } else {
-    //   count = this.getHistoryCount(-1);
-    // }
     return (
       <Page
-        // className="c7n-userMap"
+        className="c7n-userMap"
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
       >
         {this.renderHeader()}
         <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
           <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
             <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
-              <div className="toolbar" style={{ minHeight: 48 }}>
+              <div className="toolbar" style={{ minHeight: 52 }}>
                 <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
                   <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
                   <p
@@ -820,7 +815,7 @@ class Home3 extends Component {
                   {this.state.expand ? '...收起' : '...展开'}
                 </div>
               </div>
-              <div className="fixHead" style={{ height: `calc(100% - ${48}px)`, background: '#f2f2f2' }}>
+              <div className="fixHead" style={{ height: `calc(100% - ${52}px)` }}>
                 <div className="fixHead-head" id="fixHead-head">
                   <div className="fixHead-line">
                     <Droppable droppableId="epic" direction="horizontal">
@@ -856,8 +851,10 @@ class Home3 extends Component {
                     }}
                   >
                     <div className="fixHead-head-note">
-                      { UserMapStore.getTitle}
-                      <div style={{ display: 'flex', float: 'right' }}>
+                      <span className="column-title">
+                        { UserMapStore.getTitle}
+                      </span>
+                      <div style={{ display: 'flex', float: 'right', justifyContent: 'baseline' }}>
                         <p className="point-span" style={{ background: '#4D90FE' }}>
                           {count.todoCount}
                         </p>
@@ -867,14 +864,14 @@ class Home3 extends Component {
                         <p className="point-span" style={{ background: '#00BFA5' }}>
                           {count.doneCount}
                         </p>
-                        <p onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
+                        <Button className="expand-btn" shape="circle" onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
                           <Icon type={`${this.state.expandColumns.includes(vosId) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
-                        </p>
+                        </Button>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="fixHead-body" id="fixHead-body" style={{ flex: 1, background: '#f2f2f2', position: 'relative' }}>
+                <div className="fixHead-body" id="fixHead-body" style={{ flex: 1, position: 'relative' }}>
                   {this.renderBody()}
                 </div>
               </div>

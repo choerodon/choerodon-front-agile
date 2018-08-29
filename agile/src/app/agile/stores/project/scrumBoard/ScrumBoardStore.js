@@ -157,7 +157,7 @@ class ScrumBoardStore {
   }
 
   axiosUpdateBoard(data) {
-    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${this.selectedBoard}`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board/user_setting/${data.boardId}?swimlaneBasedCode=${data.swimlaneBasedCode}`, {});
   }
 
   @computed get getCurrentConstraint() {
