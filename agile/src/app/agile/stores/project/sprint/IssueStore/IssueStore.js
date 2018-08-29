@@ -22,6 +22,8 @@ class SprintCommonStore {
   @observable paramId = undefined;
   @observable paramName = undefined;
   @observable paramStatus = undefined;
+  @observable paramPriority = undefined;
+  @observable paramIssueType = undefined;
   @observable paramIssueId = undefined;
   @observable paramUrl = undefined;
   @observable barFilters = undefined;
@@ -101,6 +103,14 @@ class SprintCommonStore {
 
   @action setParamStatus(data) {
     this.paramStatus = data;
+  }
+
+  @action setParamPriority(data) {
+    this.paramPriority = data;
+  }
+
+  @action setParamIssueType(data) {
+    this.paramIssueType = data;
   }
 
   @action setParamIssueId(data) {

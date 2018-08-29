@@ -434,6 +434,33 @@ class UserMapStore {
         this.loadBacklogIssues();
       }
     })
+  
+  deleteIssue(issueId) {
+    const obj = {
+      before: false,
+      epicId: 0,
+      rankIndex: null,
+      issueIds: [issueId],
+    };
+    let issues;
+    let len;
+    if (this.mode === 'none') {
+      issues = this.backlogIssues;
+      len = issues.length;
+      if (issues && !len) {
+        obj.before = true;
+        obj.outsetIssueId = 0;
+      } else {
+        obj.outsetIssueId = issues[len - 1].issueId;
+      }
+    } else {
+      obj[`${this.mode}Id`] = 0;
+      issues = this.backlogIssues.filter(v => v[`${this.mode}Id`] === null);
+      len = issues.length;
+      obj.outsetIssueId = issues[len - 1].issueId;
+    }
+    this.handleMoveIssue(obj);
+  }
 }
 
 const userMapStore = new UserMapStore();
