@@ -64,7 +64,6 @@ class Home3 extends Component {
     }
     // const ot = offsetTops.map(v => v);
     this.props.UserMapStore.setOffsetTops(offsetTops);
-    window.console.log(offsetTops);
   };
 
   handleScroll = (e) => {
@@ -82,7 +81,6 @@ class Home3 extends Component {
       const index = _.findLastIndex(offsetTops, v => v < scrollTop);
       if (currentIndex !== index) {
         UserMapStore.setCurrentIndex(index);
-        window.console.log(index);
       }
     }
   };
@@ -120,7 +118,7 @@ class Home3 extends Component {
   handleClickIssue = (issueId, epicId) => {
     const { UserMapStore } = this.props;
     const { selectIssueIds } = UserMapStore;
-    let arr = _.cloneDeep(selectIssueIds);
+    let arr = _.cloneDeep(toJS(selectIssueIds));
     const index = arr.indexOf(issueId);
     const { keydown } = this.state;
     // command ctrl shift
@@ -166,7 +164,7 @@ class Home3 extends Component {
 
   addFilter =(filter) => {
     const { UserMapStore } = this.props;
-    const arr = _.cloneDeep(UserMapStore.currentFilters);
+    const arr = _.cloneDeep(toJS(UserMapStore.currentFilters));
     const value = filter;
     const index = UserMapStore.currentFilters.indexOf(value);
     if (index !== -1) {
@@ -267,8 +265,8 @@ class Home3 extends Component {
     const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
     const before = res.destination.index === 0;
     const rankIndex = null;
-    const issueData = _.cloneDeep(issues);
-    const backlogData = _.cloneDeep(backlogIssues);
+    const issueData = _.cloneDeep(toJS(issues));
+    const backlogData = _.cloneDeep(toJS(backlogIssues));
     let postData = {};
     let outsetIssueId = null;
     let tarBacklogData = backlogIssues;
@@ -304,7 +302,6 @@ class Home3 extends Component {
       UserMapStore.setBacklogIssues(backlogData);
     }
     UserMapStore.setIssues(issueData);
-    window.console.log(postData);
     UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
@@ -318,8 +315,8 @@ class Home3 extends Component {
     const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
     const before = res.destination.index === 0;
     const rankIndex = null;
-    let backlogData = _.cloneDeep(backlogIssues);
-    const issueData = _.cloneDeep(issues);
+    let backlogData = _.cloneDeep(toJS(backlogIssues));
+    const issueData = _.cloneDeep(toJS(issues));
     let postData = {};
     const tarIndex = res.destination.index;
     let outsetIssueId = null;
@@ -362,7 +359,6 @@ class Home3 extends Component {
     UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
-    window.console.log(postData);
   };
 
   handleEpicOrIssueDrag = (res) => {
