@@ -531,7 +531,7 @@ class EpicReport extends Component {
         <Content
           title="史诗报告"
           description="随时了解一个史诗的完成进度。这有助于您跟踪未完成或未分配问题来管理团队的开发进度。"
-          // link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
+          // link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
           {
             !(!ES.epics.length && ES.epicFinishLoading) ? (

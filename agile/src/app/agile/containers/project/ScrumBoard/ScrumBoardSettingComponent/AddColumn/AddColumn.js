@@ -131,7 +131,7 @@ class AddColumn extends Component {
           style={{ padding: 0 }}
           title={`添加看板“${name}”的列`}
           description="请在下面输入列名，选择列的类别。可以添加、删除、重新排序和重命名一个列，同时可以通过设置最大最小值来控制每列中的问题数量。"
-          link="http://v0-8.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
+          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
         >
           <Form style={{ width: 512 }}>
             <FormItem>

@@ -88,11 +88,12 @@ class IssueCard extends Component {
 
   render() {
     const { issue } = this.props;
-    const { selectIssueIds, currentDraggableId } = US;
+    const { currentDraggableId } = US;
+    const selectIssueIds = US.getSelectIssueIds;
     return (
       <div role="none" style={{ background: selectIssueIds.includes(issue.issueId) ? 'rgb(235, 242, 249)' : '' }} className="c7n-userMap-issueCard" onClick={this.onIssueClick.bind(this, issue.issueId, issue.epicId)}>
-        <div style={{ display: currentDraggableId === issue.issueId ? 'block' : 'none', width: 15, height: 15, color: 'white', background: '#F44336', borderRadius: '50%', textAlign: 'center' }}>
-          {selectIssueIds.length}
+        <div style={{ display: selectIssueIds.length > 1 && currentDraggableId === issue.issueId ? 'block' : 'none', width: 20, height: 20, color: 'white', background: '#F44336', borderRadius: '50%', textAlign: 'center', float: 'right' }}>
+          {selectIssueIds.length > 1 ? selectIssueIds.length : null}
         </div>
         <div
           className="c7n-mask"

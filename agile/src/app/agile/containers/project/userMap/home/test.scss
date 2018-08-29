@@ -7,7 +7,7 @@
 .moreMenuPopover {
   background: #ffffff;
   width: 214px;
-  height: 262px;
+  height: 150px;
   padding: 0 !important;
   left: 40% !important;
   top: 93px!important;
@@ -17,7 +17,7 @@
   }
 
   .ant-popover-inner {
-    height: 262px;
+    height: 150px;
   }
 
   .menu-title {
@@ -45,6 +45,7 @@
 .fixHead-line-content {
   display: flex;
   align-items: stretch;
+  padding-left: 1px;
   // background: #f2f2f2;
 }
 
@@ -126,7 +127,7 @@
 
     p {
       cursor: pointer;
-      padding: 4px 8px;
+      padding: 2px 8px;
       margin-right: 18px;
       border-radius: 2px;
       white-space: nowrap;
@@ -145,9 +146,7 @@
   margin-right: 10px;
   min-height: 142px;
 
-  .c7n-userMap-issueCard:not(:first-child){
-    border-top: none;
-  }
+
 }
 
 .firstLine-title {
@@ -162,6 +161,9 @@
 
 .maskIssue {
   min-height: 142px;
+  text-align: center;
+  font-size: 13px;
+  margin-top: 3px;
 
   &:hover {
     background: #f5f5f5;
@@ -187,12 +189,18 @@
   top: 93px!important;
   .ant-dropdown-menu {
     height: 150px!important;
-    width: 214px!important;
+    width: 160px!important;
     border-right: none!important;
 
     .ant-dropdown-menu-item {
       height: 48px!important;
     }
   }
+}
+
+.createSpringBtn {
+  font-size: 13px;
+  color: #3F51B5;
+  line-height: 15px;
 }
 
