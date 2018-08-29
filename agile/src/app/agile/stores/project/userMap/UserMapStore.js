@@ -197,7 +197,7 @@ class UserMapStore {
 
   @computed
   get getIssues() {
-    return this.issues;
+    return toJS(this.issues);
   }
 
   @action
