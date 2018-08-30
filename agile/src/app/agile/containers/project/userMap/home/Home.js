@@ -104,29 +104,30 @@ class Home3 extends Component {
   handleScroll = (e) => {
     const { scrollLeft, scrollTop } = e.target;
     const { UserMapStore } = this.props;
-    const { left, top } = UserMapStore;
+    const { left, top, offsetTops, currentIndex } = UserMapStore;
     const header = document.getElementById('fixHead-head');
     if (scrollLeft !== left) {
       UserMapStore.setLeft(scrollLeft);
       header.scrollLeft = scrollLeft;
-    }
-    if (scrollTop !== top) {
-      let s;
-      const { offsetTops, currentIndex } = UserMapStore;
-      s = scrollTop <=9 ? 0 : scrollTop;
-      UserMapStore.setTop(s);
-      // window.console.log('when scroll v, the top is: ' + s);
-      const index = _.findLastIndex(offsetTops, v => v <= s + 42);
+    } else {
+      UserMapStore.setTop(scrollTop);
+      const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
       if (currentIndex !== index && index !== -1) {
         UserMapStore.setCurrentIndex(index);
       }
+      window.console.log(scrollTop);
     }
-
-    if (scrollLeft !== left) {
-      this.setState({ position: 'fixed' });
-    } else {
-      this.setState({ position: 'absolute' });
-    }
+    // if (scrollTop !== top) {
+    //   let s;
+    //   const { offsetTops, currentIndex } = UserMapStore;
+    //   // s = scrollTop <=9 ? 0 : scrollTop;
+    //   // UserMapStore.setTop(s);
+    //   // // window.console.log('when scroll v, the top is: ' + s);
+    //   // const index = _.findLastIndex(offsetTops, v => v <= s + 42);
+    //   // if (currentIndex !== index && index !== -1) {
+    //   //   UserMapStore.setCurrentIndex(index);
+    //   // }
+    // }
   };
 
 
