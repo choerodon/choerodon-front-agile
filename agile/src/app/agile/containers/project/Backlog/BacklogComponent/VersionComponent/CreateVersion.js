@@ -45,16 +45,20 @@ class CreateVersion extends Component {
           this.setState({
             loading: false,
           });
-          this.props.form.resetFields();
-          this.props.onCancel();
-          this.props.store.axiosGetVersion().then((data2) => {
-            const newVersion = [...data2];
-            for (let index = 0, len = newVersion.length; index < len; index += 1) {
-              newVersion[index].expand = false;
-            }
-            this.props.store.setVersionData(newVersion);
-          }).catch((error) => {
-          });
+          if (res.failed) {
+            Choerodon.prompt(res.message);
+          } else {
+            this.props.form.resetFields();
+            this.props.onCancel();
+            this.props.store.axiosGetVersion().then((data2) => {
+              const newVersion = [...data2];
+              for (let index = 0, len = newVersion.length; index < len; index += 1) {
+                newVersion[index].expand = false;
+              }
+              this.props.store.setVersionData(newVersion);
+            }).catch((error) => {
+            });
+          }
         }).catch((error) => {
           this.setState({
             loading: false,

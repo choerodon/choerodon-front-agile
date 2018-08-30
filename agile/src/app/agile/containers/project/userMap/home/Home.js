@@ -95,7 +95,7 @@ class Home3 extends Component {
       const { offsetTops, currentIndex } = UserMapStore;
       UserMapStore.setTop(scrollTop);
       const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
-      if (currentIndex !== index) {
+      if (currentIndex !== index && index !== -1) {
         UserMapStore.setCurrentIndex(index);
       }
     }
