@@ -591,7 +591,7 @@ class Home3 extends Component {
           </div>
           <div
             className="fixHead-line-content"
-            style={{ display: 'flex', height: 1, overflow: this.state.expandColumns.includes(vos[id]) ? 'hidden' : 'visible' }}
+            style={{ display: 'flex', height: this.state.expandColumns.includes(vos[id]) ? 1 : '', overflow: this.state.expandColumns.includes(vos[id]) ? 'hidden' : 'visible' }}
             data-title={vos[name]}
             data-id={vos[id]}
           >
@@ -722,7 +722,7 @@ class Home3 extends Component {
 
           <div
             className="fixHead-line-content"
-            style={{ display: 'flex', height: 1, overflow: this.state.expandColumns.includes(`-1-${mode}`) ? 'hidden' : 'visible' }}
+            style={{ display: 'flex', height: this.state.expandColumns.includes(`-1-${mode}`) ? 1 : '', overflow: this.state.expandColumns.includes(`-1-${mode}`) ? 'hidden' : 'visible' }}
             data-title={mode === 'none' ? 'issue' : '未计划部分'}
             data-id={-1}
           >
