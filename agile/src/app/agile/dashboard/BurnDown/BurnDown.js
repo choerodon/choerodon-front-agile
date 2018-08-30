@@ -284,6 +284,14 @@ class BurnDown extends Component {
     );
     return (
       <div className="c7n-agile-dashboard-burndown">
+        <div className="switch">
+          <Dropdown overlay={menu} trigger={['click']}>
+            <div className="ant-dropdown-link c7n-agile-dashboard-burndown-select">
+              {'单位选择'}
+              <Icon type="arrow_drop_down" />
+            </div>
+          </Dropdown>
+        </div>
         {this.renderContent()}
         <DashBoardNavBar>
           <a

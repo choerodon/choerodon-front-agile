@@ -1,4 +1,10 @@
 .c7n-agile-dashboard-burndown {
+  .switch{
+    position: absolute;
+    top: 25px;
+    right: 16px;
+  }
+
   .loading-wrap {
     height: 200px;
     display: flex;

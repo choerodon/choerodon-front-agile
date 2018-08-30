@@ -59,8 +59,12 @@ class CreateVOS extends Component {
           };
           axios.post(`/agile/v1/projects/${projectId}/product_version`, versionCreateDTO)
             .then((res) => {
+              if (!res.failed) {
+                this.props.onOk();
+              } else {
+                Choerodon.promt(res.message);
+              }
               this.setState({ loading: false });
-              this.props.onOk();
             })
             .catch((error) => {
               this.setState({ loading: false });
