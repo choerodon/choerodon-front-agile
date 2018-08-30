@@ -308,7 +308,11 @@ class UserMapStore {
     }
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}${url}`)
       .then((issues) => {
-        this.setIssues(issues);
+        if (this.mode === 'version') {
+          this.setIssues(_.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId'));
+        } else {
+          this.setIssues(issues);
+        }
       });
   }
 
@@ -420,7 +424,7 @@ class UserMapStore {
     this.issues[index].objectVersionNumber = objectVersionNumber;
   }
 
-  handleEpicDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data)
+  handleEpicDrag = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data)
     .then((res) => {
       this.loadEpic();
     })

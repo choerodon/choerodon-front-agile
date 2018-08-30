@@ -226,7 +226,7 @@ class Backlog extends Component {
             style={{
               cursor: 'move',
               ...provided1.draggableProps.style,
-              background: selectIssueIds.includes(issue.issueId) ? 'rgb(235, 242, 249)' : '',
+              background: selectIssueIds.includes(issue.issueId) ? 'rgb(235, 242, 249)' : 'white',
             }}
             role={'none'}
           >
