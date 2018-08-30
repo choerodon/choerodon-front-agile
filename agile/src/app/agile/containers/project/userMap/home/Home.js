@@ -61,21 +61,41 @@ class Home3 extends Component {
   getPrepareOffsetTops = (isExpand = false) => {
     setTimeout(() => {
       const lines = document.getElementsByClassName('fixHead-line-content');
+      const body = document.getElementById('fixHead-body');
       const offsetTops = [];
       for (let i = 1; i < lines.length - 1; i += 1) {
         offsetTops.push(lines[i].offsetTop);
       }
-      // const ot = offsetTops.map(v => v);
       this.props.UserMapStore.setOffsetTops(offsetTops);
-      if (isExpand) {
+      window.console.log('when change mode, the offsetTops is: ' + offsetTops);
+      if (!isExpand) {
         const { UserMapStore } = this.props;
-        const { left, top, currentIndex } = UserMapStore;
+        const bodyTop = body.scrollTop;
+        if (bodyTop) {
+          body.scrollTop = 0;
+          UserMapStore.setTop(0);
+        }
+        const { top, currentIndex } = UserMapStore;
+        // window.console.log('when change mode, the top is: ' + top);
+        const index = _.findLastIndex(offsetTops, v => v <=  0 + 42);
+        if (currentIndex !== index && index !== -1) {
+          UserMapStore.setCurrentIndex(index);
+        }
+      } else {
+        const { UserMapStore } = this.props;
+        // const bodyTop = body.scrollTop;
+        // if (bodyTop) {
+        //   body.scrollTop = 0;
+        //   UserMapStore.setTop(0);
+        // }
+        const { top, currentIndex } = UserMapStore;
+        window.console.log('when change mode, the top is: ' + top);
         const index = _.findLastIndex(offsetTops, v => v <=  top + 42);
-        if (currentIndex !== index) {
+        if (currentIndex !== index && index !== -1) {
           UserMapStore.setCurrentIndex(index);
         }
       }
-    }, 500);
+    }, 1000);
   };
 
   // debounceHandleScroll = _.debounce((e) => {
@@ -94,6 +114,7 @@ class Home3 extends Component {
     if (scrollTop !== top) {
       const { offsetTops, currentIndex } = UserMapStore;
       UserMapStore.setTop(scrollTop);
+      window.console.log('when scroll v, the top is: ' + scrollTop);
       const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
       if (currentIndex !== index && index !== -1) {
         UserMapStore.setCurrentIndex(index);

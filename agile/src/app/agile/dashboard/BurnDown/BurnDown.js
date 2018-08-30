@@ -200,11 +200,14 @@ class BurnDown extends Component {
 
   loadSprints() {
     const projectId = AppState.currentMenuType.id;
+    this.setState({ loading: true });
     axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, ['started', 'closed'])
       .then((res) => {
         if (res && res.length) {
           this.setState({ sprint: res[0] });
           this.loadChartData(res[0].sprintId);
+        } else {
+          this.setState({ loading: false });
         }
       });
   }
