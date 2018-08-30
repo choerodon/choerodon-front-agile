@@ -6,6 +6,7 @@
   box-shadow: 0 -1px 6px 0 rgba(0, 0, 0, 0.12);
   border-radius: 2px;
   // margin-right: 10px;
+  position: relative;
 
   .c7n-progress {
     height: 4px;
@@ -13,17 +14,16 @@
     border-radius: 2px;
     display: flex;
     flex-direction: row;
+    position: relative;
+    opacity: 0.3;
+  }
 
-    .c7n-bar {
-      border-radius: 2px;
-      height: 4px;
-    }
-
-    .c7n-bar-bg {
-      border-radius: 2px;
-      height: 4px;
-      opacity: 0.3;
-    }
+  .c7n-bar {
+    border-radius: 2px;
+    height: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
   .c7n-content {

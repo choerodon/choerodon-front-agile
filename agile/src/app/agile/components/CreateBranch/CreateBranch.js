@@ -103,6 +103,7 @@ class CreateBranch extends Component {
           }}
           title={`对问题“${this.props.issueNum}”创建分支`}
           description="您可以在此选择应用、分支来源，可以修改默认的分支类型及分支名称，即可为该问题创建关联的分支。"
+          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/issue/manage-branch/"
         >
           <Form layout="vertical" className="c7n-sidebar-form">
             <div className="branch-formItem-icon">

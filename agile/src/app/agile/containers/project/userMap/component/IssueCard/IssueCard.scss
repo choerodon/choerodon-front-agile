@@ -1,7 +1,9 @@
 .c7n-userMap-issueCard {
   width: 220px;
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 2px;
   padding: 6px;
   position: relative;

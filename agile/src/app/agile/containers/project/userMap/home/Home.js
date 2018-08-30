@@ -64,11 +64,11 @@ class Home3 extends Component {
       const lines = document.getElementsByClassName('fixHead-line-content');
       const body = document.getElementById('fixHead-body');
       const offsetTops = [];
-      for (let i = 1; i < lines.length - 1; i += 1) {
+      for (let i = 0; i < lines.length; i += 1) {
         offsetTops.push(lines[i].offsetTop);
       }
       this.props.UserMapStore.setOffsetTops(offsetTops);
-      window.console.log('when change mode, the offsetTops is: ' + offsetTops);
+      // window.console.log('when change mode, the offsetTops is: ' + offsetTops);
       if (!isExpand) {
         const { UserMapStore } = this.props;
         const bodyTop = body.scrollTop;
@@ -84,13 +84,10 @@ class Home3 extends Component {
         }
       } else {
         const { UserMapStore } = this.props;
-        // const bodyTop = body.scrollTop;
-        // if (bodyTop) {
-        //   body.scrollTop = 0;
-        //   UserMapStore.setTop(0);
-        // }
+        const bodyTop = body.scrollTop;
+        UserMapStore.setTop(bodyTop);
         const { top, currentIndex } = UserMapStore;
-        window.console.log('when change mode, the top is: ' + top);
+        // window.console.log('when change mode, the top is: ' + bodyTop);
         const index = _.findLastIndex(offsetTops, v => v <=  top + 42);
         if (currentIndex !== index && index !== -1) {
           UserMapStore.setCurrentIndex(index);
@@ -113,10 +110,12 @@ class Home3 extends Component {
       header.scrollLeft = scrollLeft;
     }
     if (scrollTop !== top) {
+      let s;
       const { offsetTops, currentIndex } = UserMapStore;
-      UserMapStore.setTop(scrollTop);
-      window.console.log('when scroll v, the top is: ' + scrollTop);
-      const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
+      s = scrollTop <=9 ? 0 : scrollTop;
+      UserMapStore.setTop(s);
+      // window.console.log('when scroll v, the top is: ' + s);
+      const index = _.findLastIndex(offsetTops, v => v <= s + 42);
       if (currentIndex !== index && index !== -1) {
         UserMapStore.setCurrentIndex(index);
       }
@@ -556,7 +555,7 @@ class Home3 extends Component {
             // data-id={vos[id]}
           >
             <div>{vos[name]}</div>
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex',alignItems: 'center' }}>
               <p className="point-span" style={{ background: '#4D90FE' }}>
                 {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
                   if (issue.statusCode === 'todo') {
@@ -627,6 +626,7 @@ class Home3 extends Component {
                                 handleClickIssue={this.handleClickIssue}
                                 key={item.issueId}
                                 issue={item}
+                                borderTop={indexs === 0}
                               />
                             </div>
                           )}
@@ -654,8 +654,8 @@ class Home3 extends Component {
                           this.setState({ showChild: `${epic.issueId}-${vos[id]}` });
                         }}
                       >
-                        <div style={{ display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
-                          add
+                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
+                          Add
                           {' '}
                           <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, vos[id])}>new</a>
                           {' '}or{' '}
@@ -694,7 +694,7 @@ class Home3 extends Component {
                   ) }
 
               </div>
-              <div style={{ display: 'flex' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <p className="point-span" style={{ background: '#4D90FE' }}>
                   {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                     if (issue.statusCode === 'todo') {
@@ -759,6 +759,7 @@ class Home3 extends Component {
                                 handleClickIssue={this.handleClickIssue}
                                 key={item.issueId}
                                 issue={item}
+                                borderTop={indexs === 0}
                               />
                             </div>
                           )}
@@ -787,8 +788,8 @@ class Home3 extends Component {
                           this.setState({ showChild: epic.issueId });
                         }}
                       >
-                        <div style={{ display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
-                          add
+                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
+                          Add
                           {' '}
                           <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>new</a>
                           {' '}or{' '}
@@ -883,7 +884,7 @@ class Home3 extends Component {
                       <Droppable droppableId="epic" direction="horizontal">
                         {(provided, snapshot) => (
                           <div
-                            className="fixHead-line-content"
+                            className="fixHead-line-epic"
                             ref={provided.innerRef}
                             style={{
                               background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
@@ -916,7 +917,7 @@ class Home3 extends Component {
                         <span className="column-title">
                           { UserMapStore.getTitle}
                         </span>
-                        <div style={{ display: 'flex', float: 'right', justifyContent: 'baseline' }}>
+                        <div style={{ display: 'flex', float: 'right', justifyContent: 'baseline', alignItems: 'center' }}>
                           <p className="point-span" style={{ background: '#4D90FE' }}>
                             {count.todoCount}
                           </p>
