@@ -44,39 +44,44 @@ class VersionProgress extends Component {
     this.setState({
       loading: true,
     });
-    axios.get(`agile/v1/projects/${projectId}/product_version/${versionId}/issue_count`)
-      .then((res) => {
-        this.setState({
-          currentVersion: res,
-          loading: false,
-        });
-      });  
+    if (Number.isFinite(versionId)) {
+      axios.get(`agile/v1/projects/${projectId}/product_version/${versionId}/issue_count`)
+        .then((res) => {
+          this.setState({
+            currentVersion: res,
+            loading: false,
+          });
+        });  
+    }
   }
 
   getOption() {
     const currentVersion = this.state.currentVersion;
     const option = {
-      legend: {
-        orient: 'vertical',
-        x: 'right',
-        // right: '4%',
-        // top: '115',
-        padding: [50, 75],
-        align: 'right',
-        data: ['待处理', '处理中', '已完成'],
-        itemWidth: '20',
-        itemHeight: '20',
-        itemGap: 29,
-        textStyle: {
-          fontSize: '13',
-        },
-      },
+      // legend: {
+      //   orient: 'vertical',
+      //   // x: 'right',
+      //   x: 'left',
+      //   // left: 30,
+
+      //   // x: 'left',
+      //   // x: 120,
+      //   padding: [50, 75],
+      //   align: 'left',
+      //   data: ['待处理', '处理中', '已完成'],
+      //   itemWidth: '20',
+      //   itemHeight: '20',
+      //   itemGap: 29,
+      //   textStyle: {
+      //     fontSize: '13',
+      //   },
+      // },
       series: [
         {
           // name: '访问来源',
           color: ['#FFB100', '#4D90FE', '#00BFA5'],
           type: 'pie',
-          radius: ['45px', '75px'],
+          radius: ['38px', '65px'],
           avoidLabelOverlap: false,
           hoverAnimation: false,
           // legendHoverLink: false,
@@ -125,7 +130,7 @@ class VersionProgress extends Component {
     const menu = (
       <Menu onClick={this.handleMenuClick}>
         {
-          versionList.map(item => <Menu.Item key={item.versionId}>{item.name}</Menu.Item>)
+          versionList.map(item => <Menu.Item key={item.versionId}><Tooltip title={item.name} placement="topRight"><span className="c7n-menuItem">{item.name}</span></Tooltip></Menu.Item>)
         }
       </Menu>
     );
@@ -152,8 +157,25 @@ class VersionProgress extends Component {
              />
              <div className="charts-inner">
                <span>版本</span>
-               <span>{currentVersion && currentVersion.name}</span>
+               {/* <span></span> */}
+               <Tooltip title={currentVersion && currentVersion.name} placement="bottom">
+                 <span className="charts-inner-versionName">{currentVersion && currentVersion.name}</span>
+               </Tooltip>
              </div> 
+             <ul className="charts-legend">
+               <li>
+                 <div />
+                 {'待处理'}
+               </li>
+               <li>
+                 <div />
+                 {'处理中'}
+               </li>
+               <li>
+                 <div />
+                 {'已完成'}
+               </li>
+             </ul>
            </div>
          )
        }

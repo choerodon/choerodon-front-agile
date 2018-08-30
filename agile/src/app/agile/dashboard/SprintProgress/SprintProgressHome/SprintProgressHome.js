@@ -54,7 +54,7 @@ class SprintProgressHome extends Component {
         ) : (
           <React.Fragment>
             <p className="c7n-SprintStage">
-              {`${sprint.startDate !== undefined && sprint.startDate !== null && sprint.startDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${sprint.startDate !== undefined && sprint.startDate !== null && sprint.startDate.substr(8, 2)}-${sprint.endDate !== undefined && sprint.endDate !== undefined && sprint.endDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${sprint.endDate !== undefined && sprint.endDate !== null && sprint.endDate.substr(8, 2)} ${sprint.sprintName}`}
+              {`${(sprint.startDate != undefined && sprint.startDate !== null) && sprint.startDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.startDate != undefined && sprint.startDate != null) && sprint.startDate.substr(8, 2)}-${(sprint.endDate != undefined && sprint.endDate != undefined) && sprint.endDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.endDate != undefined && sprint.endDate != null) && sprint.endDate.substr(8, 2)} ${sprint.sprintName}`}
             </p>
             <p className="c7n-SprintRemainDay">
               {'剩余'}
