@@ -95,22 +95,19 @@ class EpicCard extends Component {
             role="none"
           >
             <div className="c7n-userMap-epicCard">
-              <div className="c7n-progress">
-                <div
-                  className="c7n-bar"
-                  style={{
-                    background: epic.color,
-                    width: `${progress * 100}%`,
-                  }}
-                />
-                <div
-                  className="c7n-bar-bg"
-                  style={{
-                    background: epic.color,
-                    width: `${100 - progress * 100}%`,
-                  }}
-                />
-              </div>
+              <div
+                className="c7n-progress"
+                style={{
+                  background: epic.color,
+                }}
+              />
+              <div
+                className="c7n-bar"
+                style={{
+                  background: epic.color,
+                  width: `${progress * 100}%`,
+                }}
+              />
               <div
                 className="c7n-content"
                 

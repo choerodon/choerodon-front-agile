@@ -120,6 +120,7 @@ class StatusHome extends Component {
         <Content
           title="状态"
           description="这里可以对项目的状态进行修改、配置，但是不建议您频繁的修改、删除项目状态。警告：对状态的配置的修改可能会对关联的issue、报告等造成不可逆的影响，操作需谨慎！"
+          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
         >
           <Spin spinning={this.state.loading}>
             <Table

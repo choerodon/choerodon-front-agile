@@ -254,6 +254,7 @@ class ReleaseDetail extends Component {
         <Content
           title={data.length ? `项目"${AppState.currentMenuType.name}"下的问题统计图` : '无问题的统计图'}
           description="根据指定字段以统计图呈现项目或筛选器下的问题，这可以使您一目了然地了解问题详情。"
+          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/statistical/"
         >
           <Spin spinning={VersionReportStore.pieLoading}>
             {data.length ? (

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import { stores } from 'choerodon-front-boot';
 import { observer } from 'mobx-react';
 import {
   Input, Icon, Popover, Checkbox,
@@ -11,6 +12,8 @@ import './Backlog.scss';
 import '../../../../Agile.scss';
 import US from '../../../../../stores/project/userMap/UserMapStore';
 import TypeTag from '../../../../../components/TypeTag';
+
+const { AppState } = stores;
 
 @observer
 class Backlog extends Component {
@@ -258,6 +261,18 @@ class Backlog extends Component {
                 style={{
                   textDecoration: issue.statusCode === 'done' ? 'line-through' : 'unset',
                   color: issue.statusCode === 'done' ? 'rgba(63, 81, 181, 0.6)' : '#3f51b5',
+                }}
+                role="none"
+                onClick={() => {
+                  const { history } = this.props;
+                  const urlParams = AppState.currentMenuType;
+                  history.push(
+                    `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
+                      urlParams.name
+                      }&organizationId=${urlParams.organizationId}&paramName=${
+                      issue.issueNum
+                      }&paramIssueId=${issue.issueId}&paramUrl=usermap`,
+                  );
                 }}
               >
                 {issue.issueNum}

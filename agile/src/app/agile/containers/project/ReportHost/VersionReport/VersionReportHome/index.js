@@ -600,6 +600,7 @@ class VersionReport extends Component {
         <Content
           title="版本报告"
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
+          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/version-report/"
         >
           <Spin spinning={this.state.loading}>
             {VersionReportStore.getVersionList.length ? <React.Fragment>

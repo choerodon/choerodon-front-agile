@@ -556,7 +556,7 @@ class Home3 extends Component {
             // data-id={vos[id]}
           >
             <div>{vos[name]}</div>
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex',alignItems: 'center' }}>
               <p className="point-span" style={{ background: '#4D90FE' }}>
                 {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
                   if (issue.statusCode === 'todo') {
@@ -653,8 +653,8 @@ class Home3 extends Component {
                           this.setState({ showChild: `${epic.issueId}-${vos[id]}` });
                         }}
                       >
-                        <div style={{ display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
-                          add
+                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
+                          Add
                           {' '}
                           <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, vos[id])}>new</a>
                           {' '}or{' '}
@@ -693,7 +693,7 @@ class Home3 extends Component {
                   ) }
 
               </div>
-              <div style={{ display: 'flex' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <p className="point-span" style={{ background: '#4D90FE' }}>
                   {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                     if (issue.statusCode === 'todo') {
@@ -785,8 +785,8 @@ class Home3 extends Component {
                           this.setState({ showChild: epic.issueId });
                         }}
                       >
-                        <div style={{ display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
-                          add
+                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
+                          Add
                           {' '}
                           <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>new</a>
                           {' '}or{' '}
@@ -914,7 +914,7 @@ class Home3 extends Component {
                         <span className="column-title">
                           { UserMapStore.getTitle}
                         </span>
-                        <div style={{ display: 'flex', float: 'right', justifyContent: 'baseline' }}>
+                        <div style={{ display: 'flex', float: 'right', justifyContent: 'baseline', alignItems: 'center' }}>
                           <p className="point-span" style={{ background: '#4D90FE' }}>
                             {count.todoCount}
                           </p>
