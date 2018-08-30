@@ -184,7 +184,7 @@ class Backlog extends Component {
       <React.Fragment>
         <div className="title">
           <h4 className="word">
-            {'Unscheduled'}
+            {'未规划'}
           </h4>
           <Icon
             type={backlogExpand.includes('Unscheduled') ? 'expand_less' : 'expand_more'}

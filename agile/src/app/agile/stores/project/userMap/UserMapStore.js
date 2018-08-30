@@ -88,9 +88,11 @@ class UserMapStore {
   @computed get getTitle() {
     if (this.mode === 'sprint') {
       if (this.sprints[this.currentIndex]) return this.sprints[this.currentIndex].sprintName;
+      else return '未规划部分';
     }
     if (this.mode === 'version') {
       if (this.versions[this.currentIndex]) return this.versions[this.currentIndex].name;
+      else return '未规划部分';
     }
     return 'issue';
   }
