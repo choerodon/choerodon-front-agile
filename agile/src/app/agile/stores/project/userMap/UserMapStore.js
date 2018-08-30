@@ -333,13 +333,15 @@ class UserMapStore {
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}`),
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}`),
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/swim_lane`),
     ])
       .then(
-        axios.spread((epics, filters, issues) => {
+        axios.spread((epics, filters, issues, mode) => {
           this.setIsLoading(false);
           this.setFilters(filters);
           this.setEpics(epics);
           this.setIssues(issues);
+          this.setMode(mode);
           // 两个请求现在都执行完成
         }),
       )

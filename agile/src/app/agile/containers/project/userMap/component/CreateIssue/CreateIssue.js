@@ -44,10 +44,10 @@ class CreateIssue extends Component {
         sprintId: data.sprintId,
         summary,
         typeCode: selectIssueType,
-        versionIssueRelDTOList: data.versionId ? {
+        versionIssueRelDTOList: data.versionId ? [{
           relationType: 'fix',
           versionId: data.versionId,
-        } : undefined,
+        }] : undefined,
       };
       this.setState({ loading: true });
       createIssue(issue)
@@ -76,6 +76,7 @@ class CreateIssue extends Component {
     const { selectIssueType, summary, loading } = this.state;
     const typeList = (
       <Menu
+        className="ignore-react-onclickoutside"
         style={{
           background: '#fff',
           boxShadow: '0 5px 5px -3px rgba(0, 0, 0, 0.20), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12)',
@@ -98,7 +99,7 @@ class CreateIssue extends Component {
       </Menu>
     );
     return (
-      <div className="c7n-userMap-createIssue" style={{ ...style }}>
+      <div className="c7n-userMap-createIssue" style={{ ...style }} disableOnClickOutside>
         <Spin spinning={loading}>
           <div className="c7n-content">
             <TextArea

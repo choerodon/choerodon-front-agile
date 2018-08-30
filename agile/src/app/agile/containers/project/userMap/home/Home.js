@@ -95,7 +95,7 @@ class Home3 extends Component {
       const { offsetTops, currentIndex } = UserMapStore;
       UserMapStore.setTop(scrollTop);
       const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
-      if (currentIndex !== index) {
+      if (currentIndex !== index && index !== -1) {
         UserMapStore.setCurrentIndex(index);
       }
     }
@@ -615,7 +615,7 @@ class Home3 extends Component {
                             data={{ epicId: epic.issueId, [id]: vos[id] }}
                             onOk={() => {
                               this.handleAddIssue(0, 0);
-                              this.initData();
+                              UserMapStore.initData(false);
                             }}
                             onCancel={() => {
                               this.handleAddIssue(0, 0);
@@ -755,7 +755,7 @@ class Home3 extends Component {
                             data={{ epicId: epic.issueId, [`${mode}Id`]: 0 }}
                             onOk={() => {
                               this.handleAddIssue(0, 0);
-                              this.initData();
+                              UserMapStore.initData(false);
                             }}
                             onCancel={() => {
                               this.handleAddIssue(0, 0);
