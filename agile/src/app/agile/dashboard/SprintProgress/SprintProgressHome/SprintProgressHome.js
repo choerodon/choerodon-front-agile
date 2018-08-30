@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
 import { Progress, Spin } from 'choerodon-ui';
+import EmptyBlockDashboard from '../../../components/EmptyBlockDashboard';
 import './SprintProgressHome.scss';
+import pic from './no_sprint.svg';
 
 const { AppState } = stores;
 
@@ -43,34 +45,39 @@ class SprintProgressHome extends Component {
 
   render() {
     const { sprint, loading } = this.state;
-    const totalDay = this.getTotalDay(sprint.startDate, sprint.end);
+    const totalDay = this.getTotalDay(sprint.startDate, sprint.endDate);
     return (
-      <div className="c7n-SprintProgressHome">
-        {
-        loading ? (
-          <div className="c7n-loadWrap">
-            <Spin />
-          </div>
-        ) : (
-          <React.Fragment>
-            <p className="c7n-SprintStage">
-              {`${(sprint.startDate != undefined && sprint.startDate !== null) && sprint.startDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.startDate != undefined && sprint.startDate != null) && sprint.startDate.substr(8, 2)}-${(sprint.endDate != undefined && sprint.endDate != undefined) && sprint.endDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.endDate != undefined && sprint.endDate != null) && sprint.endDate.substr(8, 2)} ${sprint.sprintName}`}
-            </p>
-            <p className="c7n-SprintRemainDay">
-              {'剩余'}
-              <span className="c7n-remainDay">{sprint.dayRemain > 0 ? sprint.dayRemain : 0}</span>
-              {'天'}
-            </p>
-            <div className="c7n-progress">
-              <Progress percent={(sprint.dayRemain > 0 ? totalDay - sprint.dayRemain : totalDay) / totalDay * 100} showInfo={false} />
-              <span className="c7n-sprintStart">{`${(sprint.startDate !== undefined && sprint.startDate !== null) && sprint.startDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${sprint.startDate !== undefined && sprint.startDate !== null && sprint.startDate.substr(8, 2)}`}</span>
-              <span className="c7n-sprintEnd">{`${(sprint.endDate !== undefined && sprint.endDate !== null) && sprint.endDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.endDate !== undefined && sprint.endDate !== null) && sprint.endDate.substr(8, 2)}`}</span>
+      sprint.sprintId ? (
+        <div className="c7n-SprintProgressHome">
+          {
+          loading ? (
+            <div className="c7n-loadWrap">
+              <Spin />
             </div>
-          </React.Fragment>
-        )
-      }
-        
-      </div>
+          ) : (
+            <React.Fragment>
+              <p className="c7n-SprintStage">
+                {`${(sprint.startDate != undefined && sprint.startDate != null) && sprint.startDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.startDate != undefined && sprint.startDate != null) && sprint.startDate.substr(8, 2)}-${(sprint.endDate != undefined && sprint.endDate != undefined) && sprint.endDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.endDate != undefined && sprint.endDate != null) && sprint.endDate.substr(8, 2)} ${sprint.sprintName}`}
+              </p>
+              <p className="c7n-SprintRemainDay">
+                {'剩余'}
+                <span className="c7n-remainDay">{sprint.dayRemain > 0 ? sprint.dayRemain : 0}</span>
+                {'天'}
+              </p>
+              <div className="c7n-progress">
+                <Progress percent={(sprint.dayRemain > 0 ? totalDay - sprint.dayRemain : totalDay) / totalDay * 100} showInfo={false} />
+                <span className="c7n-sprintStart">{`${(sprint.startDate !== undefined && sprint.startDate !== null) && sprint.startDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${sprint.startDate !== undefined && sprint.startDate !== null && sprint.startDate.substr(8, 2)}`}</span>
+                <span className="c7n-sprintEnd">{`${(sprint.endDate !== undefined && sprint.endDate !== null) && sprint.endDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.endDate !== undefined && sprint.endDate !== null) && sprint.endDate.substr(8, 2)}`}</span>
+              </div>
+            </React.Fragment>
+          )
+          }
+        </div>
+      ) : (
+        <div className="c7n-emptySprint">
+          <EmptyBlockDashboard pic={pic} des="当前没有冲刺" />
+        </div>
+      )
     );
   }
 }
