@@ -5,7 +5,6 @@ import {
 import { withRouter } from 'react-router-dom';
 import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
-import { Tooltip } from 'choerodon-ui';
 import EmptyBlockDashboard from '../../../components/EmptyBlockDashboard';
 import pic from './no_version.svg';
 import './VersionProgress.scss';
