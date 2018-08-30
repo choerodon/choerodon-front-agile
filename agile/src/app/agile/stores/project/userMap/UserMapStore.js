@@ -308,10 +308,14 @@ class UserMapStore {
     }
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}${url}`)
       .then((issues) => {
-        if (this.mode === 'version') {
-          this.setIssues(_.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId'));
+        if (issues.failed) {
+          this.setIssues([]);
         } else {
-          this.setIssues(issues);
+          if (this.mode === 'version') {
+            this.setIssues(_.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId'));
+          } else {
+            this.setIssues(issues);
+          }
         }
       });
   }
@@ -329,28 +333,30 @@ class UserMapStore {
 
   initData = (flag, pageType = 'usermap') => {
     this.setIsLoading(flag);
-    return axios.all([
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}`),
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}`),
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/swim_lane`),
-    ])
-      .then(
-        axios.spread((epics, filters, issues, mode) => {
-          this.setIsLoading(false);
-          this.setFilters(filters);
-          this.setEpics(epics);
-          this.setIssues(issues);
-          this.setMode(mode);
-          // 两个请求现在都执行完成
-        }),
-      )
-      .catch(() => {
-        this.setIsLoading(false);
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/swim_lane`)
+      .then((res) => {
+        this.setMode(res);
+        axios.all([
+          axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}`),
+          axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
+          axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}`),
+        ])
+          .then(
+            axios.spread((epics, filters, issues) => {
+              this.setIsLoading(false);
+              this.setFilters(filters);
+              this.setEpics(epics);
+              this.setIssues(issues);
+              // 两个请求现在都执行完成
+            }),
+          )
+          .catch(() => {
+            this.setIsLoading(false);
+          });
+        if (this.showBackLog) {
+          this.loadBacklogIssues();
+        }
       });
-    if (this.showBackLog) {
-      this.loadBacklogIssues();
-    }
   }
   
   getFiltersObj = (type = 'currentBacklogFilters') => {
@@ -410,7 +416,11 @@ class UserMapStore {
     const query = this.getQueryString(filters);
     axios.get(`/agile/v1/projects/${projectId}/issues/storymap/issues?type=${type}&pageType=backlog${query}`)
       .then((res) => {
-        this.setBacklogIssues(res);
+        if (res.failed) {
+          this.setBacklogIssues([]);
+        } else {
+          this.setBacklogIssues(res);
+        }
         this.setBacklogExpand([]);
       });
   };

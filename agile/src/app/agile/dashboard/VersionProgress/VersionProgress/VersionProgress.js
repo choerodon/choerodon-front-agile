@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Select, Menu, Dropdown, Icon, Spin,
+  Select, Menu, Dropdown, Icon, Spin, Tooltip,
 } from 'choerodon-ui';
 import { withRouter } from 'react-router-dom';
 import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';

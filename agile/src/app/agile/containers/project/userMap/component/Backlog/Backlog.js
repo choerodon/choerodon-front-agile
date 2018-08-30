@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import {
   Input, Icon, Popover, Checkbox,
 } from 'choerodon-ui';
+import { toJS } from 'mobx';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import './Backlog.scss';
@@ -76,7 +77,7 @@ class Backlog extends Component {
     const { keyword } = this.state;
     let group = [];
     if (mode === 'none') {
-      group = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v.statusCode !== 'done'));
+      group = this.getIssuesByKeyword(keyword, toJS(US.backlogIssues).filter(v => v.statusCode !== 'done'));
       return (
         <div className="issues">
           <div className="title">
@@ -92,7 +93,7 @@ class Backlog extends Component {
                 ref={provided.innerRef}
                 className="epic"
                 style={{
-                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                  background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
                   padding: 'grid',
                   // borderBottom: '1px solid rgba(0,0,0,0.12)'
                 }}
@@ -127,7 +128,7 @@ class Backlog extends Component {
   renderGroupIssue(group, i) {
     const { mode, backlogExpand } = US;
     const { keyword } = this.state;
-    const issues = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v[`${mode}Id`] === group[`${mode}Id`]));
+    const issues = this.getIssuesByKeyword(keyword, toJS(US.backlogIssues).filter(v => v[`${mode}Id`] === group[`${mode}Id`]));
     return (
       <React.Fragment>
         <div className="title">
@@ -149,7 +150,7 @@ class Backlog extends Component {
               ref={provided.innerRef}
               className="epic"
               style={{
-                background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
                 padding: 'grid',
                 // borderBottom: '1px solid rgba(0,0,0,0.12)'
               }}
@@ -175,7 +176,7 @@ class Backlog extends Component {
   renderUnscheduledIssue() {
     const { mode, backlogExpand } = US;
     const { keyword } = this.state;
-    const issues = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v[`${mode}Id`] === null && v.statusCode !== 'done'));
+    const issues = this.getIssuesByKeyword(keyword, toJS(US.backlogIssues).filter(v => v[`${mode}Id`] === null && v.statusCode !== 'done'));
     return (
       <React.Fragment>
         <div className="title">
@@ -193,7 +194,7 @@ class Backlog extends Component {
               ref={provided.innerRef}
               className="epic"
               style={{
-                background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
                 padding: 'grid',
                 // borderBottom: '1px solid rgba(0,0,0,0.12)'
               }}

@@ -14,6 +14,7 @@ import EpicCard from '../component/EpicCard/EpicCard.js';
 import IssueCard from '../component/IssueCard/IssueCard.js';
 import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
+import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
 @observer
 class Home3 extends Component {
@@ -448,7 +449,7 @@ class Home3 extends Component {
       mode,
     } = UserMapStore;
     const swimlanMenu = (
-      <Menu onClick={this.changeMode} selectable defaultSelectedKeys={['none']}>
+      <Menu onClick={this.changeMode} selectable defaultSelectedKeys={[mode]}>
         <Menu.Item key="none">无泳道</Menu.Item>
         <Menu.Item key="version">版本泳道</Menu.Item>
         <Menu.Item key="sprint">冲刺泳道</Menu.Item>
@@ -569,7 +570,7 @@ class Home3 extends Component {
           </div>
           <div
             className="fixHead-line-content"
-            style={{ display: this.state.expandColumns.includes(vos[id]) ? 'none' : 'flex' }}
+            style={{ display: 'flex', height: 1, overflow: this.state.expandColumns.includes(vos[id]) ? 'hidden' : 'visible' }}
             data-title={vos[name]}
             data-id={vos[id]}
           >
@@ -580,7 +581,7 @@ class Home3 extends Component {
                     ref={provided.innerRef}
                     className="swimlane-column fixHead-block"
                     style={{
-                      background: snapshot.isDraggingOver ? '#e9e9e9' : '',
+                      background: snapshot.isDraggingOver ? '#f0f0f0' : '',
                       padding: 'grid',
                       // borderBottom: '1px solid rgba(0,0,0,0.12)'
                     }}
@@ -690,15 +691,6 @@ class Home3 extends Component {
                     }
                   }, 0)}
                 </p>
-                <p className="point-span" style={{ background: '#00BFA5' }}>
-                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
-                    if (issue.statusCode === 'done') {
-                      return sum + issue.storyPoints;
-                    } else {
-                      return sum;
-                    }
-                  }, 0)}
-                </p>
                 <Button className="expand-btn" shape={'circle'} onClick={this.handleExpandColumn.bind(this, `-1-${mode}`)} role="none">
                   <Icon type={`${this.state.expandColumns.includes(`-1-${mode}`) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
                 </Button>
@@ -709,7 +701,7 @@ class Home3 extends Component {
 
           <div
             className="fixHead-line-content"
-            style={{ display: this.state.expandColumns.includes(`-1-${mode}`) ? 'none' : 'flex' }}
+            style={{ display: 'flex', height: 1, overflow: this.state.expandColumns.includes(`-1-${mode}`) ? 'hidden' : 'visible' }}
             data-title={mode === 'none' ? 'issue' : '未计划部分'}
             data-id={-1}
           >
@@ -720,7 +712,7 @@ class Home3 extends Component {
                     ref={provided.innerRef}
                     className="fixHead-block swimlane-column"
                     style={{
-                      background: snapshot.isDraggingOver ? '#e9e9e9' : '',
+                      background: snapshot.isDraggingOver ? '#f0f0f0' : '',
                       padding: 'grid',
                       // borderBottom: '1px solid rgba(0,0,0,0.12)'
                     }}
@@ -811,7 +803,7 @@ class Home3 extends Component {
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
       >
         {this.renderHeader()}
-        <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
+        { epicData.length ? <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
           {isLoading ? <Spin spinning={isLoading} style={{ marginLeft: '40%', marginTop: '30%' }} size={'large'} />
             : <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
               <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
@@ -859,6 +851,9 @@ class Home3 extends Component {
                     {this.state.expand ? '...收起' : '...展开'}
                   </div>
                 </div>
+                { showBackLog ? <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
+                  <Backlog handleClickIssue={this.handleClickIssue} />
+                </div> : null }
                 <div className="fixHead" style={{ height: `calc(100% - ${52}px)` }}>
                   <div className="fixHead-head" id="fixHead-head">
                     <div className="fixHead-line">
@@ -868,7 +863,7 @@ class Home3 extends Component {
                             className="fixHead-line-content"
                             ref={provided.innerRef}
                             style={{
-                              background: snapshot.isDraggingOver ? '#e9e9e9' : '',
+                              background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
                               padding: 'grid',
                               // borderBottom: '1px solid rgba(0,0,0,0.12)'
                             }}
@@ -905,9 +900,9 @@ class Home3 extends Component {
                           <p className="point-span" style={{ background: '#FFB100' }}>
                             {count.doingCount}
                           </p>
-                          <p className="point-span" style={{ background: '#00BFA5' }}>
+                          {mode !== 'none' && <p className="point-span" style={{ background: '#00BFA5' }}>
                             {count.doneCount}
-                          </p>
+                          </p>}
                           <Button className="expand-btn" shape="circle" onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
                             <Icon type={`${this.state.expandColumns.includes(vosId) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
                           </Button>
@@ -919,9 +914,6 @@ class Home3 extends Component {
                     {this.renderBody()}
                   </div>
                 </div>
-              </div>
-              <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
-                <Backlog handleClickIssue={this.handleClickIssue} />
               </div>
             </DragDropContext>}
           <CreateEpic
@@ -940,7 +932,15 @@ class Home3 extends Component {
             type={UserMapStore.getCreateVOSType}
           />
 
-        </Content>
+        </Content> : (<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
+          <img src={epicPic} alt="" width="200" />
+          <div style={{ marginLeft: 50, width: 390 }}>
+            <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+            <p style={{ fontSize: 20, marginTop: 10 }}>
+              用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击 <a role={'none'} onClick={this.handleCreateEpic}>创建史诗</a> 进入用户故事地图。
+            </p>
+          </div>
+        </div>)}
       </Page>
     );
   }
