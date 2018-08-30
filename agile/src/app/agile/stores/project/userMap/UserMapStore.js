@@ -356,6 +356,12 @@ class UserMapStore {
         if (this.showBackLog) {
           this.loadBacklogIssues();
         }
+        if (this.mode === 'version') {
+          this.loadVersions();
+        }
+        if (this.mode === 'sprint') {
+          this.loadSprints();
+        }
       });
   }
   

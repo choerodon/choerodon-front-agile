@@ -623,6 +623,7 @@ class Home3 extends Component {
                             >
                               {/*{item.issueId}*/}
                               <IssueCard
+                                borderTop={index === 0}
                                 handleClickIssue={this.handleClickIssue}
                                 key={item.issueId}
                                 issue={item}
@@ -754,6 +755,7 @@ class Home3 extends Component {
                             >
                               {/*{item.issueId}*/}
                               <IssueCard
+                                borderTop={index === 0}
                                 handleClickIssue={this.handleClickIssue}
                                 key={item.issueId}
                                 issue={item}
