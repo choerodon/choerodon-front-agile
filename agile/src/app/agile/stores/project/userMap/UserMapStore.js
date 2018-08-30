@@ -427,7 +427,11 @@ class UserMapStore {
         if (res.failed) {
           this.setBacklogIssues([]);
         } else {
-          this.setBacklogIssues(res);
+          if (this.mode === 'version') {
+            this.setBacklogIssues(_.uniqBy(_.orderBy(res, ['versionId'], ['desc']), 'issueId'));
+          } else {
+            this.setBacklogIssues(res);
+          }
         }
         this.setBacklogExpand([]);
       });

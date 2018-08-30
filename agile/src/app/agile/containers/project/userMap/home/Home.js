@@ -25,6 +25,7 @@ class Home3 extends Component {
       expand: false,
       expandColumns: [],
       showBackLog: false,
+      position: 'absolute',
     };
   }
 
@@ -119,6 +120,12 @@ class Home3 extends Component {
       if (currentIndex !== index && index !== -1) {
         UserMapStore.setCurrentIndex(index);
       }
+    }
+
+    if (scrollLeft !== left) {
+      this.setState({ position: 'fixed' });
+    } else {
+      this.setState({ position: 'absolute' });
     }
   };
 
@@ -539,7 +546,7 @@ class Home3 extends Component {
     const { UserMapStore } = this.props;
     const dom = [];
     const epicData = UserMapStore.getEpics;
-    const { issues, sprints, versions, currentNewObj, left } = UserMapStore;
+    const { issues, sprints, versions, currentNewObj, left, top } = UserMapStore;
     const { epicId, versionId, sprintId } = currentNewObj;
     const { mode } = UserMapStore;
     const vosData = UserMapStore[`${mode}s`] || [];
@@ -550,7 +557,8 @@ class Home3 extends Component {
         dom.push(<div key={vos[id]} className="fixHead-line">
           <div
             className={`fixHead-line-title column-title ${vosIndex === 0 ? 'firstLine-title' : ''}`}
-            style={{ transform: `translateX(${`${left}px`})` }}
+            // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
+            style={{ marginLeft: left }}
             // data-title={vos[name]}
             // data-id={vos[id]}
           >
@@ -674,7 +682,7 @@ class Home3 extends Component {
       });
       dom.push(
         <div key="no-sprint" className="fixHead-line" style={{ height: '100%' }}>
-          <div style={{ transform: `translateX(${`${left}px`})` }}>
+          <div style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}>
             <div
               className={`fixHead-line-title column-title ${vosData.length ? '' : 'firstLine-title'}`}
               title={mode === 'none' ? 'issue' : '未计划部分'}
