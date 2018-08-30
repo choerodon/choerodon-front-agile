@@ -51,11 +51,14 @@ class Home3 extends Component {
     this.props.UserMapStore.setMode('none');
     this.props.UserMapStore.setIssues([]);
     this.props.UserMapStore.setEpics([]);
+    this.props.UserMapStore.setTop(0);
+    this.props.UserMapStore.setLeft(0);
+    this.props.UserMapStore.setCurrentIndex(0);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
   }
 
-  getPrepareOffsetTops = () => {
+  getPrepareOffsetTops = (isExpand = false) => {
     setTimeout(() => {
       const lines = document.getElementsByClassName('fixHead-line-content');
       const offsetTops = [];
@@ -64,6 +67,14 @@ class Home3 extends Component {
       }
       // const ot = offsetTops.map(v => v);
       this.props.UserMapStore.setOffsetTops(offsetTops);
+      if (isExpand) {
+        const { UserMapStore } = this.props;
+        const { left, top, currentIndex } = UserMapStore;
+        const index = _.findLastIndex(offsetTops, v => v <=  top + 42);
+        if (currentIndex !== index) {
+          UserMapStore.setCurrentIndex(index);
+        }
+      }
     }, 500);
   };
 
@@ -83,7 +94,7 @@ class Home3 extends Component {
     if (scrollTop !== top) {
       const { offsetTops, currentIndex } = UserMapStore;
       UserMapStore.setTop(scrollTop);
-      const index = _.findLastIndex(offsetTops, v => v < scrollTop);
+      const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
       if (currentIndex !== index) {
         UserMapStore.setCurrentIndex(index);
       }
@@ -206,7 +217,8 @@ class Home3 extends Component {
       expandColumns.splice(index, 1);
     }
     this.setState({ expandColumns });
-    this.getPrepareOffsetTops();
+    this.getPrepareOffsetTops(true);
+    // this.handleScroll();
   };
 
   showBackLog =() => {
@@ -257,7 +269,7 @@ class Home3 extends Component {
     const { objectVersionNumber } = data[sourceIndex];
     const postData = { afterSequence, beforeSequence, epicId, objectVersionNumber };
     UserMapStore.setEpics(result);
-    UserMapStore.handleEpicDrap(postData);
+    UserMapStore.handleEpicDrag(postData);
   };
 
   handelDragToBoard = (res) => {
@@ -289,6 +301,13 @@ class Home3 extends Component {
         outsetIssueId = 0;
       } else {
         outsetIssueId = tarData[tarIndex - 1].issueId;
+      }
+      // 拖到冲刺泳道的未规划时outIssueId取值
+      const data = issues.filter(item => item.sprintId === 0 || item.sprintId === null);
+      if (mode === 'sprint' && before && outsetIssueId === 0 && value === 0) {
+        if (data.length) {
+          outsetIssueId = data[0].issueId;
+        }
       }
       tarIssue.epicId = tarEpicId;
       if (mode !== 'none') {
@@ -368,7 +387,7 @@ class Home3 extends Component {
   };
 
   handleEpicOrIssueDrag = (res) => {
-    if (!res.destination || res.destination.droppableId === res.source.droppableId) {
+    if (!res.destination || (res.destination.droppableId === res.source.droppableId && res.destination.droppableId !== 'epic')) {
       this.props.UserMapStore.setSelectIssueIds([]);
       this.props.UserMapStore.setCurrentDraggableId(null);
       return;
@@ -510,7 +529,7 @@ class Home3 extends Component {
         dom.push(<div key={vos[id]} className="fixHead-line">
           <div
             className={`fixHead-line-title column-title ${vosIndex === 0 ? 'firstLine-title' : ''}`}
-            style={{ marginLeft: left }}
+            style={{ transform: `translateX(${`${left}px`})` }}
             // data-title={vos[name]}
             // data-id={vos[id]}
           >
@@ -567,7 +586,6 @@ class Home3 extends Component {
                     }}
                   >
                     <React.Fragment>
-                      {/*{vos[id]}*/}
                       {_.filter(issues, issue => issue.epicId === epic.issueId && issue[id] === vos[id]).map((item, indexs) => (
                         <Draggable draggableId={`${mode}-${item.issueId}`} index={indexs} key={item.issueId}>
                           {(provided1, snapshot1) => (
