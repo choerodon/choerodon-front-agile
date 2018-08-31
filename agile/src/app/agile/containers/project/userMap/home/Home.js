@@ -16,8 +16,8 @@ import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
-let scrollL;
-let isFirstScroll = false;
+// let scrollL;
+// let isFirstScroll = false;
 
 @observer
 class Home3 extends Component {
@@ -104,31 +104,31 @@ class Home3 extends Component {
   //   this.handleScroll(e);
   // }, 16);
 
-  checkIsFirstLeftScroll() {
-    if (!isFirstScroll) {
-      isFirstScroll = true;
-      // do someting
-    }
-  }
+  // checkIsFirstLeftScroll() {
+  //   if (!isFirstScroll) {
+  //     isFirstScroll = true;
+  //     // do someting
+  //   }
+  // }
 
-  debounceSetLeft = _.debounce((left) => {
-    const { UserMapStore } = this.props;
-    window.console.log(left);
-    UserMapStore.setLeft(left);
-    // do other thing
-    isFirstScroll = false;
-  }, 300);
+  // debounceSetLeft = _.debounce((left) => {
+  //   const { UserMapStore } = this.props;
+  //   window.console.log(left);
+  //   UserMapStore.setLeft(left);
+  //   // do other thing
+  //   isFirstScroll = false;
+  // }, 300);
 
   handleScroll = (e) => {
     const { scrollLeft, scrollTop } = e.target;
     const { UserMapStore } = this.props;
     const { left, top, offsetTops, currentIndex } = UserMapStore;
     const header = document.getElementById('fixHead-head');
-    if (scrollLeft !== scrollL) {
-      scrollL = scrollLeft;
-      this.checkIsFirstLeftScroll();
-      this.debounceSetLeft(scrollLeft);
-      // UserMapStore.setLeft(scrollLeft);
+    if (scrollLeft !== left) {
+      // scrollL = scrollLeft;
+      // this.checkIsFirstLeftScroll();
+      // this.debounceSetLeft(scrollLeft);
+      UserMapStore.setLeft(scrollLeft);
       header.scrollLeft = scrollLeft;
     } else {
       // UserMapStore.setTop(scrollTop);
@@ -683,8 +683,8 @@ class Home3 extends Component {
                         className={'maskIssue'}
                         onMouseLeave={() => { this.setState({ showChild: null }); }}
                         onMouseEnter={() => {
-                          this.handleClickIssue(0);
                           if (snapshot.isDraggingOver) return;
+                          this.handleClickIssue(0);
                           this.setState({ showChild: `${epic.issueId}-${vos[id]}` });
                         }}
                       >
@@ -824,8 +824,8 @@ class Home3 extends Component {
                         // style={{ background: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? '' : '' }}
                         onMouseLeave={() => { this.setState({ showChild: null }); }}
                         onMouseEnter={() => {
-                          this.handleClickIssue(0);
                           if (snapshot.isDraggingOver) return;
+                          this.handleClickIssue(0);
                           this.setState({ showChild: epic.issueId });
                         }}
                       >
