@@ -40,6 +40,7 @@ class EasyEdit extends Component {
     if (this.props.type === 'input') {
       return (
         <Input
+          style={{ width: this.props.width ? this.props.width : '' }}
           maxLength={this.props.maxLength}
           defaultValue={this.props.defaultValue}
           autoFocus

@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import _ from 'lodash';
 import { toJS } from 'mobx';
-import { Page, Header, Content } from 'choerodon-front-boot';
+import { Page, Header, Content, Permission } from 'choerodon-front-boot';
 import {
-  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin
+  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin,
 } from 'choerodon-ui';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import './test.scss';
@@ -698,13 +698,21 @@ class Home3 extends Component {
                 {mode === 'none' ? 'issue' : '未计划部分' }
                 {mode === 'none' ? null
                   : (
-                    <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
-                      <Icon type="playlist_add" />
+                    <React.Fragment>
+                      {mode === 'version' ?  <Permission service={['agile-service.product-version.createVersion']}>
+                        <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                          <Icon type="playlist_add" />
+                          创建
+                          {mode === 'sprint' ? '冲刺' : '版本'}
+                        </Button>
+                      </Permission>
+                        : <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                          <Icon type="playlist_add" />
+                          创建
+                          {mode === 'sprint' ? '冲刺' : '版本'}
+                        </Button>}
+                    </React.Fragment>
 
-
-                      创建
-                      {mode === 'sprint' ? '冲刺' : '版本'}
-                    </Button>
                   ) }
 
               </div>
@@ -727,10 +735,6 @@ class Home3 extends Component {
                     }
                   }, 0)}
                 </p>
-                <Button className="expand-btn" shape={'circle'} onClick={this.handleExpandColumn.bind(this, `-1-${mode}`)} role="none">
-                  <Icon type={`${this.state.expandColumns.includes(`-1-${mode}`) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
-                </Button>
-
               </div>
             </div>
           </div>
@@ -917,7 +921,7 @@ class Home3 extends Component {
                               <div className="fixHead-block" key={epic.issueId}>
                                 <EpicCard
                                   index={index}
-                                  // key={epic.issueId}
+                                  key={epic.issueId}
                                   epic={epic}
                                 />
                               </div>
@@ -948,9 +952,10 @@ class Home3 extends Component {
                           {showDone && <p className="point-span" style={{ background: '#00BFA5' }}>
                             {count.doneCount}
                           </p>}
-                          <Button className="expand-btn" shape="circle" onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
+                          {showDone && <Button className="expand-btn" shape="circle" onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
                             <Icon type={`${this.state.expandColumns.includes(vosId) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
-                          </Button>
+                          </Button>}
+
                         </div>
                       </div>
                     </div>

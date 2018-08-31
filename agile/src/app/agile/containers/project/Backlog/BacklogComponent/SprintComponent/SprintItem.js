@@ -870,6 +870,7 @@ class SprintItem extends Component {
                       <p>冲刺目标：</p>
                       <EasyEdit
                         type="input"
+                        width={200}
                         defaultValue={item.sprintGoal}
                         enterOrBlur={this.handleBlurGoal.bind(this, item)}
                       >
