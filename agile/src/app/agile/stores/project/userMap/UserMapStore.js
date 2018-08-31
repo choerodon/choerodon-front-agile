@@ -88,9 +88,11 @@ class UserMapStore {
   @computed get getTitle() {
     if (this.mode === 'sprint') {
       if (this.sprints[this.currentIndex]) return this.sprints[this.currentIndex].sprintName;
+      else return '未规划部分';
     }
     if (this.mode === 'version') {
       if (this.versions[this.currentIndex]) return this.versions[this.currentIndex].name;
+      else return '未规划部分';
     }
     return 'issue';
   }
@@ -308,10 +310,14 @@ class UserMapStore {
     }
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}${url}`)
       .then((issues) => {
-        if (this.mode === 'version') {
-          this.setIssues(_.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId'));
+        if (issues.failed) {
+          this.setIssues([]);
         } else {
-          this.setIssues(issues);
+          if (this.mode === 'version') {
+            this.setIssues(_.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId'));
+          } else {
+            this.setIssues(issues);
+          }
         }
       });
   }
@@ -329,28 +335,37 @@ class UserMapStore {
 
   initData = (flag, pageType = 'usermap') => {
     this.setIsLoading(flag);
-    return axios.all([
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}`),
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}`),
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/swim_lane`),
-    ])
-      .then(
-        axios.spread((epics, filters, issues, mode) => {
-          this.setIsLoading(false);
-          this.setFilters(filters);
-          this.setEpics(epics);
-          this.setIssues(issues);
-          this.setMode(mode);
-          // 两个请求现在都执行完成
-        }),
-      )
-      .catch(() => {
-        this.setIsLoading(false);
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/swim_lane`)
+      .then((res) => {
+        this.setMode(res);
+        axios.all([
+          axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}`),
+          axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
+          axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}`),
+        ])
+          .then(
+            axios.spread((epics, filters, issues) => {
+              this.setIsLoading(false);
+              this.setFilters(filters);
+              this.setEpics(epics);
+              this.setIssues(issues);
+              this.setCurrentNewObj({ epicId: 0, [`${this.mode}Id`]: 0 });
+              // 两个请求现在都执行完成
+            }),
+          )
+          .catch(() => {
+            this.setIsLoading(false);
+          });
+        if (this.showBackLog) {
+          this.loadBacklogIssues();
+        }
+        if (this.mode === 'version') {
+          this.loadVersions();
+        }
+        if (this.mode === 'sprint') {
+          this.loadSprints();
+        }
       });
-    if (this.showBackLog) {
-      this.loadBacklogIssues();
-    }
   }
   
   getFiltersObj = (type = 'currentBacklogFilters') => {
@@ -410,7 +425,15 @@ class UserMapStore {
     const query = this.getQueryString(filters);
     axios.get(`/agile/v1/projects/${projectId}/issues/storymap/issues?type=${type}&pageType=backlog${query}`)
       .then((res) => {
-        this.setBacklogIssues(res);
+        if (res.failed) {
+          this.setBacklogIssues([]);
+        } else {
+          if (this.mode === 'version') {
+            this.setBacklogIssues(_.uniqBy(_.orderBy(res, ['versionId'], ['desc']), 'issueId'));
+          } else {
+            this.setBacklogIssues(res);
+          }
+        }
         this.setBacklogExpand([]);
       });
   };
@@ -420,10 +443,11 @@ class UserMapStore {
     this.epics[index].objectVersionNumber = objectVersionNumber;
   }
 
-  freshIssue = (issueId, objectVersionNumber) => {
+  freshIssue = (issueId, objectVersionNumber, summary) => {
     const index = this.issues.findIndex(issue => issue.issueId === issueId);
     if (index === -1) return;
     this.issues[index].objectVersionNumber = objectVersionNumber;
+    this.issues[index].summary = summary;
   }
 
   handleEpicDrag = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data)
@@ -456,7 +480,7 @@ class UserMapStore {
       }
     })
   
-  deleteIssue(issueId) {
+  deleteIssue = (issueId) => {
     const obj = {
       before: false,
       epicId: 0,
@@ -465,6 +489,8 @@ class UserMapStore {
     };
     let issues;
     let len;
+    const tarData = _.cloneDeep(toJS(this.issues));
+    const index = _.findIndex(tarData, issue => issue.issueId === issueId);
     if (this.mode === 'none') {
       issues = this.backlogIssues;
       len = issues.length;
@@ -474,12 +500,16 @@ class UserMapStore {
       } else {
         obj.outsetIssueId = issues[len - 1].issueId;
       }
+      tarData[index].epicId = 0;
     } else {
       obj[`${this.mode}Id`] = 0;
       issues = this.backlogIssues.filter(v => v[`${this.mode}Id`] === null);
       len = issues.length;
       obj.outsetIssueId = issues[len - 1].issueId;
+      tarData[index].epicId = 0;
+      tarData[`${this.mode}Id`] = 0;
     }
+    this.setIssues(tarData);
     this.handleMoveIssue(obj);
   }
 }

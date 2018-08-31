@@ -200,11 +200,14 @@ class BurnDown extends Component {
 
   loadSprints() {
     const projectId = AppState.currentMenuType.id;
+    this.setState({ loading: true });
     axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, ['started', 'closed'])
       .then((res) => {
         if (res && res.length) {
           this.setState({ sprint: res[0] });
           this.loadChartData(res[0].sprintId);
+        } else {
+          this.setState({ loading: false });
         }
       });
   }
@@ -272,7 +275,7 @@ class BurnDown extends Component {
   }
 
   render() {
-    const { loading } = this.state;
+    const { loading, sprint: { sprintId } } = this.state;
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     const menu = (
@@ -284,7 +287,7 @@ class BurnDown extends Component {
     );
     return (
       <div className="c7n-agile-dashboard-burndown">
-        <div className="switch">
+        <div className="switch" style={{ display: !loading && !sprintId ? 'none' : 'block' }}>
           <Dropdown overlay={menu} trigger={['click']}>
             <div className="ant-dropdown-link c7n-agile-dashboard-burndown-select">
               {'单位选择'}

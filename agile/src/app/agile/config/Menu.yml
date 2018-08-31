@@ -11,7 +11,7 @@
     - "scrumboard":
         icon: directions_run
         Routes: /agile/scrumboard
-        sort: 3
+        sort: 2
         permission:
           - 'agile-service.board.queryByProjectId'
           - 'agile-service.board.queryByOptions'
@@ -54,6 +54,6 @@
     - "userStoryMap":
         icon: usermap
         Routes: /agile/usermap
-        sort: 2
+        sort: 3
         permission:
           - 'agile-service.issue.listEpic'

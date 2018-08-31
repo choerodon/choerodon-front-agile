@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import { stores } from 'choerodon-front-boot';
 import { observer } from 'mobx-react';
 import {
   Input, Icon, Popover, Checkbox,
 } from 'choerodon-ui';
+import { toJS } from 'mobx';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import './Backlog.scss';
 import '../../../../Agile.scss';
 import US from '../../../../../stores/project/userMap/UserMapStore';
 import TypeTag from '../../../../../components/TypeTag';
+
+const { AppState } = stores;
 
 @observer
 class Backlog extends Component {
@@ -76,7 +80,7 @@ class Backlog extends Component {
     const { keyword } = this.state;
     let group = [];
     if (mode === 'none') {
-      group = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v.statusCode !== 'done'));
+      group = this.getIssuesByKeyword(keyword, toJS(US.backlogIssues).filter(v => v.statusCode !== 'done'));
       return (
         <div className="issues">
           <div className="title">
@@ -92,16 +96,20 @@ class Backlog extends Component {
                 ref={provided.innerRef}
                 className="epic"
                 style={{
-                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                  background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
                   padding: 'grid',
                   // borderBottom: '1px solid rgba(0,0,0,0.12)'
                 }}
               >
-                <ul className="issue-block">
-                  {
-                    _.map(group, (issue, index) => this.renderIssue(issue, index))
-                  }
-                </ul>
+                {
+                  backlogExpand.includes(0) ? null : (
+                    <ul className="issue-block">
+                      {
+                        _.map(group, (issue, index) => this.renderIssue(issue, index))
+                      }
+                    </ul>
+                  )
+                }
                 {provided.placeholder}
               </div>
             )}
@@ -127,7 +135,7 @@ class Backlog extends Component {
   renderGroupIssue(group, i) {
     const { mode, backlogExpand } = US;
     const { keyword } = this.state;
-    const issues = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v[`${mode}Id`] === group[`${mode}Id`]));
+    const issues = this.getIssuesByKeyword(keyword, toJS(US.backlogIssues).filter(v => v[`${mode}Id`] === group[`${mode}Id`]));
     return (
       <React.Fragment>
         <div className="title">
@@ -149,7 +157,7 @@ class Backlog extends Component {
               ref={provided.innerRef}
               className="epic"
               style={{
-                background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
                 padding: 'grid',
                 // borderBottom: '1px solid rgba(0,0,0,0.12)'
               }}
@@ -175,12 +183,12 @@ class Backlog extends Component {
   renderUnscheduledIssue() {
     const { mode, backlogExpand } = US;
     const { keyword } = this.state;
-    const issues = this.getIssuesByKeyword(keyword, US.backlogIssues.filter(v => v[`${mode}Id`] === null && v.statusCode !== 'done'));
+    const issues = this.getIssuesByKeyword(keyword, toJS(US.backlogIssues).filter(v => v[`${mode}Id`] === null && v.statusCode !== 'done'));
     return (
       <React.Fragment>
         <div className="title">
           <h4 className="word">
-            {'Unscheduled'}
+            {'未规划'}
           </h4>
           <Icon
             type={backlogExpand.includes('Unscheduled') ? 'expand_less' : 'expand_more'}
@@ -193,7 +201,7 @@ class Backlog extends Component {
               ref={provided.innerRef}
               className="epic"
               style={{
-                background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
                 padding: 'grid',
                 // borderBottom: '1px solid rgba(0,0,0,0.12)'
               }}
@@ -257,6 +265,18 @@ class Backlog extends Component {
                 style={{
                   textDecoration: issue.statusCode === 'done' ? 'line-through' : 'unset',
                   color: issue.statusCode === 'done' ? 'rgba(63, 81, 181, 0.6)' : '#3f51b5',
+                }}
+                role="none"
+                onClick={() => {
+                  const { history } = this.props;
+                  const urlParams = AppState.currentMenuType;
+                  history.push(
+                    `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
+                      urlParams.name
+                      }&organizationId=${urlParams.organizationId}&paramName=${
+                      issue.issueNum
+                      }&paramIssueId=${issue.issueId}&paramUrl=usermap`,
+                  );
                 }}
               >
                 {issue.issueNum}

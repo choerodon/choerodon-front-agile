@@ -87,30 +87,27 @@ class EpicCard extends Component {
             {...provided1.dragHandleProps}
             style={{
               marginRight: 10,
-              background: 'white',
               paddingLeft: 0,
               cursor: 'move',
+              background: 'white',
               ...provided1.draggableProps.style,
             }}
             role="none"
           >
             <div className="c7n-userMap-epicCard">
-              <div className="c7n-progress">
-                <div
-                  className="c7n-bar"
-                  style={{
-                    background: epic.color,
-                    width: `${progress * 100}%`,
-                  }}
-                />
-                <div
-                  className="c7n-bar-bg"
-                  style={{
-                    background: epic.color,
-                    width: `${100 - progress * 100}%`,
-                  }}
-                />
-              </div>
+              <div
+                className="c7n-progress"
+                style={{
+                  background: epic.color,
+                }}
+              />
+              <div
+                className="c7n-bar"
+                style={{
+                  background: epic.color,
+                  width: `${progress * 100}%`,
+                }}
+              />
               <div
                 className="c7n-content"
                 
@@ -124,6 +121,7 @@ class EpicCard extends Component {
                   onFocus={e => e.target.select()}
                   role="none"
                   onBlur={this.updateEpicName}
+                  spellCheck="false"
                 />
               </div>
               <div className="c7n-footer">

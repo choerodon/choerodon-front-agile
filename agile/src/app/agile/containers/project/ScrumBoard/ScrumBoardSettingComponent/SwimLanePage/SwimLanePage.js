@@ -23,7 +23,7 @@ class SwimLanePage extends Component {
       swimlaneBasedCode: this.state.selectValue ? this.state.selectValue : ScrumBoardStore.getSwimLaneCode,
       // projectId: AppState.currentMenuType.id,
     };
-    ScrumBoardStore.axiosUpdateBoard(data).then((res) => {
+    ScrumBoardStore.axiosUpdateBoardDefault(data).then((res) => {
       message.success('保存成功');
     }).catch((error) => {
       message.success('保存失败');

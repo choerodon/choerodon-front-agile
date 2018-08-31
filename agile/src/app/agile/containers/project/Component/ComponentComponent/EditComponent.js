@@ -152,6 +152,7 @@ class EditComponent extends Component {
           }}
           title={`在项目“${AppState.currentMenuType.name}”中查看模块`}
           description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，修改模版。"
+          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/component/"
         >
           <Form>
             <FormItem>

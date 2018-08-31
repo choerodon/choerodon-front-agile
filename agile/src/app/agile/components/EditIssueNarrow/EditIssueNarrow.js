@@ -28,6 +28,7 @@ import CreateBranch from '../CreateBranch';
 import Commits from '../Commits';
 import MergeRequest from '../MergeRequest';
 import Assignee from '../Assignee';
+import ChangeParent from '../ChangeParent';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -60,6 +61,7 @@ class CreateSprint extends Component {
       createLinkTaskShow: false,
       createBranchShow: false,
       assigneeShow: false,
+      changeParentShow: false,
       editDesShow: false,
       copyIssueShow: false,
       transformSubIssueShow: false,
@@ -762,7 +764,9 @@ class CreateSprint extends Component {
       this.setState({ createBranchShow: true });
     } else if (e.key === '7') {
       this.setState({ assigneeShow: true });
-    } 
+    } else if (e.key === '8') {
+      this.setState({ changeParentShow: true });
+    }
   }
 
   handleChangeType({ key }) {
@@ -1152,6 +1156,13 @@ class CreateSprint extends Component {
         <Menu.Item key="7">
           分配问题
         </Menu.Item>
+        {
+          this.state.typeCode === 'sub_task' && (
+            <Menu.Item key="8">
+              修改父级
+            </Menu.Item>
+          )
+        }
       </Menu>
     );
     const callback = (value) => {
@@ -2890,6 +2901,23 @@ class CreateSprint extends Component {
               }}
               onCancel={() => {
                 this.setState({ assigneeShow: false });
+              }}
+            />
+          ) : null
+        }
+        {
+          this.state.changeParentShow ? (
+            <ChangeParent
+              issueId={this.state.origin.issueId}
+              issueNum={this.state.origin.issueNum}
+              visible={this.state.changeParentShow}
+              objectVersionNumber={this.state.origin.objectVersionNumber}
+              onOk={() => {
+                this.setState({ changeParentShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => {
+                this.setState({ changeParentShow: false });
               }}
             />
           ) : null

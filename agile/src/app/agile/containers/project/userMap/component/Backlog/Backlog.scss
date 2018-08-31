@@ -118,6 +118,7 @@
           .issueNum {
             color: #3f51b5;
             text-align: right;
+            cursor: pointer;
           }
         }
       }
@@ -142,5 +143,9 @@
 
   .ant-checkbox-wrapper:last-child {
     margin-bottom: 0;
+  }
+
+  .ant-checkbox-inner {
+    border-color: rgba(0, 0, 0, 0.54);
   }
 }

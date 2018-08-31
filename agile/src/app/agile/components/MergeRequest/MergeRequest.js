@@ -158,6 +158,7 @@ class MergeRequest extends Component {
           }}
           title={`查看问题“${this.props.issueNum}”关联的合并请求`}
           description="您可以在此查看该问题关联的所有合并请求相关信息，及查看合并请求详情。"
+          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/issue/manage-branch/"
         >
           <Table
             filterBar={false}

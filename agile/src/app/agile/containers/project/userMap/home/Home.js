@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import _ from 'lodash';
 import { toJS } from 'mobx';
-import { Page, Header, Content } from 'choerodon-front-boot';
+import { Page, Header, Content, Permission } from 'choerodon-front-boot';
 import {
-  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin
+  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin,
 } from 'choerodon-ui';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import './test.scss';
@@ -14,6 +14,10 @@ import EpicCard from '../component/EpicCard/EpicCard.js';
 import IssueCard from '../component/IssueCard/IssueCard.js';
 import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
+import epicPic from '../../../../assets/image/用户故事地图－空.svg';
+
+// let scrollL;
+// let isFirstScroll = false;
 
 @observer
 class Home3 extends Component {
@@ -24,6 +28,7 @@ class Home3 extends Component {
       expand: false,
       expandColumns: [],
       showBackLog: false,
+      position: 'absolute',
     };
   }
 
@@ -61,44 +66,89 @@ class Home3 extends Component {
   getPrepareOffsetTops = (isExpand = false) => {
     setTimeout(() => {
       const lines = document.getElementsByClassName('fixHead-line-content');
+      const body = document.getElementById('fixHead-body');
       const offsetTops = [];
-      for (let i = 1; i < lines.length - 1; i += 1) {
+      for (let i = 0; i < lines.length; i += 1) {
         offsetTops.push(lines[i].offsetTop);
       }
-      // const ot = offsetTops.map(v => v);
       this.props.UserMapStore.setOffsetTops(offsetTops);
-      if (isExpand) {
+      // window.console.log('when change mode, the offsetTops is: ' + offsetTops);
+      if (!isExpand) {
         const { UserMapStore } = this.props;
-        const { left, top, currentIndex } = UserMapStore;
+        const bodyTop = body.scrollTop;
+        if (bodyTop) {
+          body.scrollTop = 0;
+          UserMapStore.setTop(0);
+        }
+        const { top, currentIndex } = UserMapStore;
+        // window.console.log('when change mode, the top is: ' + top);
+        const index = _.findLastIndex(offsetTops, v => v <=  0 + 42);
+        if (currentIndex !== index && index !== -1) {
+          UserMapStore.setCurrentIndex(index);
+        }
+      } else {
+        const { UserMapStore } = this.props;
+        const bodyTop = body.scrollTop;
+        UserMapStore.setTop(bodyTop);
+        const { top, currentIndex } = UserMapStore;
+        // window.console.log('when change mode, the top is: ' + bodyTop);
         const index = _.findLastIndex(offsetTops, v => v <=  top + 42);
-        if (currentIndex !== index) {
+        if (currentIndex !== index && index !== -1) {
           UserMapStore.setCurrentIndex(index);
         }
       }
-    }, 500);
+    }, 1000);
   };
 
   // debounceHandleScroll = _.debounce((e) => {
   //   this.handleScroll(e);
   // }, 16);
 
+  // checkIsFirstLeftScroll() {
+  //   if (!isFirstScroll) {
+  //     isFirstScroll = true;
+  //     // do someting
+  //   }
+  // }
+
+  // debounceSetLeft = _.debounce((left) => {
+  //   const { UserMapStore } = this.props;
+  //   window.console.log(left);
+  //   UserMapStore.setLeft(left);
+  //   // do other thing
+  //   isFirstScroll = false;
+  // }, 300);
+
   handleScroll = (e) => {
     const { scrollLeft, scrollTop } = e.target;
     const { UserMapStore } = this.props;
-    const { left, top } = UserMapStore;
+    const { left, top, offsetTops, currentIndex } = UserMapStore;
     const header = document.getElementById('fixHead-head');
     if (scrollLeft !== left) {
+      // scrollL = scrollLeft;
+      // this.checkIsFirstLeftScroll();
+      // this.debounceSetLeft(scrollLeft);
       UserMapStore.setLeft(scrollLeft);
       header.scrollLeft = scrollLeft;
-    }
-    if (scrollTop !== top) {
-      const { offsetTops, currentIndex } = UserMapStore;
-      UserMapStore.setTop(scrollTop);
+    } else {
+      // UserMapStore.setTop(scrollTop);
       const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
       if (currentIndex !== index && index !== -1) {
         UserMapStore.setCurrentIndex(index);
       }
+      // window.console.log(scrollTop);
     }
+    // if (scrollTop !== top) {
+    //   let s;
+    //   const { offsetTops, currentIndex } = UserMapStore;
+    //   // s = scrollTop <=9 ? 0 : scrollTop;
+    //   // UserMapStore.setTop(s);
+    //   // // window.console.log('when scroll v, the top is: ' + s);
+    //   // const index = _.findLastIndex(offsetTops, v => v <= s + 42);
+    //   // if (currentIndex !== index && index !== -1) {
+    //   //   UserMapStore.setCurrentIndex(index);
+    //   // }
+    // }
   };
 
 
@@ -148,6 +198,9 @@ class Home3 extends Component {
     } else {
       arr = [issueId];
       // arr.push(issueId);
+    }
+    if (issueId === 0) {
+      arr = [];
     }
     UserMapStore.setSelectIssueIds(arr);
   };
@@ -448,7 +501,7 @@ class Home3 extends Component {
       mode,
     } = UserMapStore;
     const swimlanMenu = (
-      <Menu onClick={this.changeMode} selectable defaultSelectedKeys={['none']}>
+      <Menu onClick={this.changeMode} selectable defaultSelectedKeys={[mode]}>
         <Menu.Item key="none">无泳道</Menu.Item>
         <Menu.Item key="version">版本泳道</Menu.Item>
         <Menu.Item key="sprint">冲刺泳道</Menu.Item>
@@ -518,7 +571,7 @@ class Home3 extends Component {
     const { UserMapStore } = this.props;
     const dom = [];
     const epicData = UserMapStore.getEpics;
-    const { issues, sprints, versions, currentNewObj, left } = UserMapStore;
+    const { issues, sprints, versions, currentNewObj, left, top } = UserMapStore;
     const { epicId, versionId, sprintId } = currentNewObj;
     const { mode } = UserMapStore;
     const vosData = UserMapStore[`${mode}s`] || [];
@@ -529,12 +582,13 @@ class Home3 extends Component {
         dom.push(<div key={vos[id]} className="fixHead-line">
           <div
             className={`fixHead-line-title column-title ${vosIndex === 0 ? 'firstLine-title' : ''}`}
-            style={{ transform: `translateX(${`${left}px`})` }}
+            // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
+            style={{ marginLeft: left }}
             // data-title={vos[name]}
             // data-id={vos[id]}
           >
             <div>{vos[name]}</div>
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex',alignItems: 'center' }}>
               <p className="point-span" style={{ background: '#4D90FE' }}>
                 {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
                   if (issue.statusCode === 'todo') {
@@ -569,7 +623,7 @@ class Home3 extends Component {
           </div>
           <div
             className="fixHead-line-content"
-            style={{ display: this.state.expandColumns.includes(vos[id]) ? 'none' : 'flex' }}
+            style={{ display: 'flex', height: this.state.expandColumns.includes(vos[id]) ? 1 : '', overflow: this.state.expandColumns.includes(vos[id]) ? 'hidden' : 'visible' }}
             data-title={vos[name]}
             data-id={vos[id]}
           >
@@ -580,7 +634,7 @@ class Home3 extends Component {
                     ref={provided.innerRef}
                     className="swimlane-column fixHead-block"
                     style={{
-                      background: snapshot.isDraggingOver ? '#e9e9e9' : '',
+                      background: snapshot.isDraggingOver ? '#f0f0f0' : '',
                       padding: 'grid',
                       // borderBottom: '1px solid rgba(0,0,0,0.12)'
                     }}
@@ -602,8 +656,8 @@ class Home3 extends Component {
                               {/*{item.issueId}*/}
                               <IssueCard
                                 handleClickIssue={this.handleClickIssue}
-                                key={item.issueId}
                                 issue={item}
+                                borderTop={indexs === 0}
                               />
                             </div>
                           )}
@@ -613,7 +667,9 @@ class Home3 extends Component {
                         epicId === epic.issueId && currentNewObj[id] === vos[id] ? (
                           <CreateIssue
                             data={{ epicId: epic.issueId, [id]: vos[id] }}
-                            onOk={() => {
+                            onOk={(res) => {
+                              const data = _.cloneDeep(issues).push(res);
+                              UserMapStore.setIssues(data);
                               this.handleAddIssue(0, 0);
                               UserMapStore.initData(false);
                             }}
@@ -628,11 +684,12 @@ class Home3 extends Component {
                         onMouseLeave={() => { this.setState({ showChild: null }); }}
                         onMouseEnter={() => {
                           if (snapshot.isDraggingOver) return;
+                          this.handleClickIssue(0);
                           this.setState({ showChild: `${epic.issueId}-${vos[id]}` });
                         }}
                       >
-                        <div style={{ display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
-                          add
+                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
+                          Add
                           {' '}
                           <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, vos[id])}>new</a>
                           {' '}or{' '}
@@ -651,7 +708,7 @@ class Home3 extends Component {
       });
       dom.push(
         <div key="no-sprint" className="fixHead-line" style={{ height: '100%' }}>
-          <div style={{ transform: `translateX(${`${left}px`})` }}>
+          <div style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}>
             <div
               className={`fixHead-line-title column-title ${vosData.length ? '' : 'firstLine-title'}`}
               title={mode === 'none' ? 'issue' : '未计划部分'}
@@ -661,17 +718,25 @@ class Home3 extends Component {
                 {mode === 'none' ? 'issue' : '未计划部分' }
                 {mode === 'none' ? null
                   : (
-                    <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
-                      <Icon type="playlist_add" />
+                    <React.Fragment>
+                      {mode === 'version' ?  <Permission service={['agile-service.product-version.createVersion']}>
+                        <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                          <Icon type="playlist_add" />
+                          创建
+                          {mode === 'sprint' ? '冲刺' : '版本'}
+                        </Button>
+                      </Permission>
+                        : <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                          <Icon type="playlist_add" />
+                          创建
+                          {mode === 'sprint' ? '冲刺' : '版本'}
+                        </Button>}
+                    </React.Fragment>
 
-
-                      创建
-                      {mode === 'sprint' ? '冲刺' : '版本'}
-                    </Button>
                   ) }
 
               </div>
-              <div style={{ display: 'flex' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <p className="point-span" style={{ background: '#4D90FE' }}>
                   {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                     if (issue.statusCode === 'todo') {
@@ -690,26 +755,13 @@ class Home3 extends Component {
                     }
                   }, 0)}
                 </p>
-                <p className="point-span" style={{ background: '#00BFA5' }}>
-                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
-                    if (issue.statusCode === 'done') {
-                      return sum + issue.storyPoints;
-                    } else {
-                      return sum;
-                    }
-                  }, 0)}
-                </p>
-                <Button className="expand-btn" shape={'circle'} onClick={this.handleExpandColumn.bind(this, `-1-${mode}`)} role="none">
-                  <Icon type={`${this.state.expandColumns.includes(`-1-${mode}`) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
-                </Button>
-
               </div>
             </div>
           </div>
 
           <div
             className="fixHead-line-content"
-            style={{ display: this.state.expandColumns.includes(`-1-${mode}`) ? 'none' : 'flex' }}
+            style={{ display: 'flex', height: this.state.expandColumns.includes(`-1-${mode}`) ? 1 : '', overflow: this.state.expandColumns.includes(`-1-${mode}`) ? 'hidden' : 'visible' }}
             data-title={mode === 'none' ? 'issue' : '未计划部分'}
             data-id={-1}
           >
@@ -720,7 +772,7 @@ class Home3 extends Component {
                     ref={provided.innerRef}
                     className="fixHead-block swimlane-column"
                     style={{
-                      background: snapshot.isDraggingOver ? '#e9e9e9' : '',
+                      background: snapshot.isDraggingOver ? '#f0f0f0' : '',
                       padding: 'grid',
                       // borderBottom: '1px solid rgba(0,0,0,0.12)'
                     }}
@@ -744,6 +796,7 @@ class Home3 extends Component {
                                 handleClickIssue={this.handleClickIssue}
                                 key={item.issueId}
                                 issue={item}
+                                borderTop={indexs === 0}
                               />
                             </div>
                           )}
@@ -753,9 +806,12 @@ class Home3 extends Component {
                         epicId === epic.issueId && currentNewObj[id] === 0 ? (
                           <CreateIssue
                             data={{ epicId: epic.issueId, [`${mode}Id`]: 0 }}
-                            onOk={() => {
-                              this.handleAddIssue(0, 0);
+                            onOk={(res) => {
+                              const data = _.cloneDeep(issues).push(res);
+                              // UserMapStore.setIssues(data);
                               UserMapStore.initData(false);
+                              this.setState({ showChild: null });
+                              // this.handleAddIssue(0, 0);
                             }}
                             onCancel={() => {
                               this.handleAddIssue(0, 0);
@@ -769,11 +825,12 @@ class Home3 extends Component {
                         onMouseLeave={() => { this.setState({ showChild: null }); }}
                         onMouseEnter={() => {
                           if (snapshot.isDraggingOver) return;
+                          this.handleClickIssue(0);
                           this.setState({ showChild: epic.issueId });
                         }}
                       >
-                        <div style={{ display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
-                          add
+                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
+                          Add
                           {' '}
                           <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>new</a>
                           {' '}or{' '}
@@ -804,6 +861,10 @@ class Home3 extends Component {
     let firstTitle = '';
     const count = this.getHistoryCount(UserMapStore.getVosId);
     const vosId = UserMapStore.getVosId === 0 ? `-1-${mode}` : UserMapStore.getVosId;
+    let showDone = true;
+    if (UserMapStore.getVosId === 0) {
+      showDone = false;
+    }
 
     return (
       <Page
@@ -811,7 +872,7 @@ class Home3 extends Component {
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
       >
         {this.renderHeader()}
-        <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
+        { epicData.length ? <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
           {isLoading ? <Spin spinning={isLoading} style={{ marginLeft: '40%', marginTop: '30%' }} size={'large'} />
             : <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
               <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
@@ -859,16 +920,19 @@ class Home3 extends Component {
                     {this.state.expand ? '...收起' : '...展开'}
                   </div>
                 </div>
+                { showBackLog ? <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
+                  <Backlog handleClickIssue={this.handleClickIssue} />
+                </div> : null }
                 <div className="fixHead" style={{ height: `calc(100% - ${52}px)` }}>
                   <div className="fixHead-head" id="fixHead-head">
                     <div className="fixHead-line">
                       <Droppable droppableId="epic" direction="horizontal">
                         {(provided, snapshot) => (
                           <div
-                            className="fixHead-line-content"
+                            className="fixHead-line-epic"
                             ref={provided.innerRef}
                             style={{
-                              background: snapshot.isDraggingOver ? '#e9e9e9' : '',
+                              background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
                               padding: 'grid',
                               // borderBottom: '1px solid rgba(0,0,0,0.12)'
                             }}
@@ -877,7 +941,7 @@ class Home3 extends Component {
                               <div className="fixHead-block" key={epic.issueId}>
                                 <EpicCard
                                   index={index}
-                                  // key={epic.issueId}
+                                  key={epic.issueId}
                                   epic={epic}
                                 />
                               </div>
@@ -898,19 +962,20 @@ class Home3 extends Component {
                         <span className="column-title">
                           { UserMapStore.getTitle}
                         </span>
-                        <div style={{ display: 'flex', float: 'right', justifyContent: 'baseline' }}>
+                        <div style={{ display: 'flex', float: 'right', justifyContent: 'baseline', alignItems: 'center' }}>
                           <p className="point-span" style={{ background: '#4D90FE' }}>
                             {count.todoCount}
                           </p>
                           <p className="point-span" style={{ background: '#FFB100' }}>
                             {count.doingCount}
                           </p>
-                          <p className="point-span" style={{ background: '#00BFA5' }}>
+                          {showDone && <p className="point-span" style={{ background: '#00BFA5' }}>
                             {count.doneCount}
-                          </p>
-                          <Button className="expand-btn" shape="circle" onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
+                          </p>}
+                          {showDone && <Button className="expand-btn" shape="circle" onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
                             <Icon type={`${this.state.expandColumns.includes(vosId) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
-                          </Button>
+                          </Button>}
+
                         </div>
                       </div>
                     </div>
@@ -919,9 +984,6 @@ class Home3 extends Component {
                     {this.renderBody()}
                   </div>
                 </div>
-              </div>
-              <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
-                <Backlog handleClickIssue={this.handleClickIssue} />
               </div>
             </DragDropContext>}
           <CreateEpic
@@ -940,7 +1002,15 @@ class Home3 extends Component {
             type={UserMapStore.getCreateVOSType}
           />
 
-        </Content>
+        </Content> : (<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
+          <img src={epicPic} alt="" width="200" />
+          <div style={{ marginLeft: 50, width: 390 }}>
+            <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+            <p style={{ fontSize: 20, marginTop: 10 }}>
+              用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击 <a role={'none'} onClick={this.handleCreateEpic}>创建史诗</a> 进入用户故事地图。
+            </p>
+          </div>
+        </div>)}
       </Page>
     );
   }
