@@ -29,6 +29,13 @@ class IssueCard extends Component {
   componentDidMount() {
     this.setIssueInState();
   }
+  shouldComponentUpdate(nextProps, nextState) {
+    // if (nextProps.issue.issueId === this.props.issueId
+    //   && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber) {
+    //   return false;
+    // }
+    return true;
+  }
 
   setIssueInState() {
     const { issue } = this.props;
@@ -73,7 +80,7 @@ class IssueCard extends Component {
         if (this.props.handleUpdateIssueName) {
           this.props.handleUpdateIssueName();
         }
-        US.freshIssue(issueId, res.objectVersionNumber);
+        US.freshIssue(issueId, res.objectVersionNumber, res.summary);
       });
   }
 
@@ -152,6 +159,7 @@ class IssueCard extends Component {
             className="c7n-textArea"
             autosize={{ minRows: 1, maxRows: 10 }}
             value={this.state.summary}
+            spellcheck={false}
             onChange={this.handleIssueNameChange.bind(this)}
             onPressEnter={this.handlePressEnter}
             onFocus={(e) => {

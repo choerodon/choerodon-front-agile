@@ -83,10 +83,11 @@ class ScrumBoardHome extends Component {
       if (!index) {
         index = 0;
       }
-      axios.get(`/agile/v1/projects/${AppState.menuType.id}/board/user_setting/${data[index].boardId}`).then((columnDat) => {
-        ScrumBoardStore.setSwimLaneCode(columnDat.swimlaneBasedCode);
-      });
+      // axios.get(`/agile/v1/projects/${AppState.menuType.id}/board/user_setting/${data[index].boardId}`).then((columnDat) => {
+      //
+      // });
       ScrumBoardStore.setCurrentConstraint(data[index].columnConstraint);
+      ScrumBoardStore.setSwimLaneCode(data[index].userDefaultBoard);
       ScrumBoardStore.setBoardList(data);
       ScrumBoardStore.setSelectedBoard(data[index].boardId);
       this.refresh(data[index].boardId);
@@ -845,7 +846,7 @@ class ScrumBoardHome extends Component {
               for (let index = 0, len = ScrumBoardStore.getBoardList.length; index < len; index += 1) {
                 if (ScrumBoardStore.getBoardList[index].boardId === value) {
                   ScrumBoardStore.setCurrentConstraint(ScrumBoardStore.getBoardList[index].columnConstraint);
-                  newCode = ScrumBoardStore.getBoardList[index].swimlaneBasedCode;
+                  newCode = ScrumBoardStore.getBoardList[index].userDefaultBoard;
                 }
               }
               ScrumBoardStore.setSelectedBoard(value);

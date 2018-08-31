@@ -349,6 +349,7 @@ class UserMapStore {
               this.setFilters(filters);
               this.setEpics(epics);
               this.setIssues(issues);
+              this.setCurrentNewObj({ epicId: 0, [`${this.mode}Id`]: 0 });
               // 两个请求现在都执行完成
             }),
           )
@@ -442,10 +443,11 @@ class UserMapStore {
     this.epics[index].objectVersionNumber = objectVersionNumber;
   }
 
-  freshIssue = (issueId, objectVersionNumber) => {
+  freshIssue = (issueId, objectVersionNumber, summary) => {
     const index = this.issues.findIndex(issue => issue.issueId === issueId);
     if (index === -1) return;
     this.issues[index].objectVersionNumber = objectVersionNumber;
+    this.issues[index].summary = summary;
   }
 
   handleEpicDrag = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data)
@@ -478,7 +480,7 @@ class UserMapStore {
       }
     })
   
-  deleteIssue(issueId) {
+  deleteIssue = (issueId) => {
     const obj = {
       before: false,
       epicId: 0,
@@ -487,6 +489,8 @@ class UserMapStore {
     };
     let issues;
     let len;
+    const tarData = _.cloneDeep(toJS(this.issues));
+    const index = _.findIndex(tarData, issue => issue.issueId === issueId);
     if (this.mode === 'none') {
       issues = this.backlogIssues;
       len = issues.length;
@@ -496,12 +500,16 @@ class UserMapStore {
       } else {
         obj.outsetIssueId = issues[len - 1].issueId;
       }
+      tarData[index].epicId = 0;
     } else {
       obj[`${this.mode}Id`] = 0;
       issues = this.backlogIssues.filter(v => v[`${this.mode}Id`] === null);
       len = issues.length;
       obj.outsetIssueId = issues[len - 1].issueId;
+      tarData[index].epicId = 0;
+      tarData[`${this.mode}Id`] = 0;
     }
+    this.setIssues(tarData);
     this.handleMoveIssue(obj);
   }
 }

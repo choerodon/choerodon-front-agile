@@ -16,6 +16,7 @@ import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
+
 @observer
 class Home3 extends Component {
   constructor(props) {
@@ -177,6 +178,9 @@ class Home3 extends Component {
     } else {
       arr = [issueId];
       // arr.push(issueId);
+    }
+    if (issueId === 0) {
+      arr = [];
     }
     UserMapStore.setSelectIssueIds(arr);
   };
@@ -631,9 +635,7 @@ class Home3 extends Component {
                             >
                               {/*{item.issueId}*/}
                               <IssueCard
-                                borderTop={index === 0}
                                 handleClickIssue={this.handleClickIssue}
-                                key={item.issueId}
                                 issue={item}
                                 borderTop={indexs === 0}
                               />
@@ -645,7 +647,9 @@ class Home3 extends Component {
                         epicId === epic.issueId && currentNewObj[id] === vos[id] ? (
                           <CreateIssue
                             data={{ epicId: epic.issueId, [id]: vos[id] }}
-                            onOk={() => {
+                            onOk={(res) => {
+                              const data = _.cloneDeep(issues).push(res);
+                              UserMapStore.setIssues(data);
                               this.handleAddIssue(0, 0);
                               UserMapStore.initData(false);
                             }}
@@ -659,6 +663,7 @@ class Home3 extends Component {
                         className={'maskIssue'}
                         onMouseLeave={() => { this.setState({ showChild: null }); }}
                         onMouseEnter={() => {
+                          this.handleClickIssue(0);
                           if (snapshot.isDraggingOver) return;
                           this.setState({ showChild: `${epic.issueId}-${vos[id]}` });
                         }}
@@ -764,7 +769,6 @@ class Home3 extends Component {
                             >
                               {/*{item.issueId}*/}
                               <IssueCard
-                                borderTop={index === 0}
                                 handleClickIssue={this.handleClickIssue}
                                 key={item.issueId}
                                 issue={item}
@@ -778,9 +782,12 @@ class Home3 extends Component {
                         epicId === epic.issueId && currentNewObj[id] === 0 ? (
                           <CreateIssue
                             data={{ epicId: epic.issueId, [`${mode}Id`]: 0 }}
-                            onOk={() => {
-                              this.handleAddIssue(0, 0);
+                            onOk={(res) => {
+                              const data = _.cloneDeep(issues).push(res);
+                              // UserMapStore.setIssues(data);
                               UserMapStore.initData(false);
+                              this.setState({ showChild: null });
+                              // this.handleAddIssue(0, 0);
                             }}
                             onCancel={() => {
                               this.handleAddIssue(0, 0);
@@ -793,6 +800,7 @@ class Home3 extends Component {
                         // style={{ background: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? '' : '' }}
                         onMouseLeave={() => { this.setState({ showChild: null }); }}
                         onMouseEnter={() => {
+                          this.handleClickIssue(0);
                           if (snapshot.isDraggingOver) return;
                           this.setState({ showChild: epic.issueId });
                         }}
@@ -829,6 +837,10 @@ class Home3 extends Component {
     let firstTitle = '';
     const count = this.getHistoryCount(UserMapStore.getVosId);
     const vosId = UserMapStore.getVosId === 0 ? `-1-${mode}` : UserMapStore.getVosId;
+    let showDone = true;
+    if (UserMapStore.getVosId === 0) {
+      showDone = false;
+    }
 
     return (
       <Page
@@ -933,7 +945,7 @@ class Home3 extends Component {
                           <p className="point-span" style={{ background: '#FFB100' }}>
                             {count.doingCount}
                           </p>
-                          {mode !== 'none' && <p className="point-span" style={{ background: '#00BFA5' }}>
+                          {showDone && <p className="point-span" style={{ background: '#00BFA5' }}>
                             {count.doneCount}
                           </p>}
                           <Button className="expand-btn" shape="circle" onClick={this.handleExpandColumn.bind(this, vosId)} role="none">

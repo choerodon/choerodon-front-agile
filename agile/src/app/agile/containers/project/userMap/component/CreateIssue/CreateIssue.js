@@ -52,7 +52,7 @@ class CreateIssue extends Component {
       this.setState({ loading: true });
       createIssue(issue)
         .then((res) => {
-          onOk();
+          onOk(res);
         })
         .catch((error) => {
           this.setState({ loading: false });
