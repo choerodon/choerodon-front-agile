@@ -16,6 +16,8 @@ import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
+let scrollL;
+let isFirstScroll = false;
 
 @observer
 class Home3 extends Component {
@@ -102,21 +104,39 @@ class Home3 extends Component {
   //   this.handleScroll(e);
   // }, 16);
 
+  checkIsFirstLeftScroll() {
+    if (!isFirstScroll) {
+      isFirstScroll = true;
+      // do someting
+    }
+  }
+
+  debounceSetLeft = _.debounce((left) => {
+    const { UserMapStore } = this.props;
+    window.console.log(left);
+    UserMapStore.setLeft(left);
+    // do other thing
+    isFirstScroll = false;
+  }, 300);
+
   handleScroll = (e) => {
     const { scrollLeft, scrollTop } = e.target;
     const { UserMapStore } = this.props;
     const { left, top, offsetTops, currentIndex } = UserMapStore;
     const header = document.getElementById('fixHead-head');
-    if (scrollLeft !== left) {
-      UserMapStore.setLeft(scrollLeft);
+    if (scrollLeft !== scrollL) {
+      scrollL = scrollLeft;
+      this.checkIsFirstLeftScroll();
+      this.debounceSetLeft(scrollLeft);
+      // UserMapStore.setLeft(scrollLeft);
       header.scrollLeft = scrollLeft;
     } else {
-      UserMapStore.setTop(scrollTop);
+      // UserMapStore.setTop(scrollTop);
       const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
       if (currentIndex !== index && index !== -1) {
         UserMapStore.setCurrentIndex(index);
       }
-      window.console.log(scrollTop);
+      // window.console.log(scrollTop);
     }
     // if (scrollTop !== top) {
     //   let s;

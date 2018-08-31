@@ -101,11 +101,15 @@ class Backlog extends Component {
                   // borderBottom: '1px solid rgba(0,0,0,0.12)'
                 }}
               >
-                <ul className="issue-block">
-                  {
-                    _.map(group, (issue, index) => this.renderIssue(issue, index))
-                  }
-                </ul>
+                {
+                  backlogExpand.includes(0) ? null : (
+                    <ul className="issue-block">
+                      {
+                        _.map(group, (issue, index) => this.renderIssue(issue, index))
+                      }
+                    </ul>
+                  )
+                }
                 {provided.placeholder}
               </div>
             )}

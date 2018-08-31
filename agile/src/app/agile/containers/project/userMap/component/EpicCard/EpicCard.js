@@ -121,6 +121,7 @@ class EpicCard extends Component {
                   onFocus={e => e.target.select()}
                   role="none"
                   onBlur={this.updateEpicName}
+                  spellCheck="false"
                 />
               </div>
               <div className="c7n-footer">

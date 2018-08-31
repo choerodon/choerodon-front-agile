@@ -30,10 +30,10 @@ class IssueCard extends Component {
     this.setIssueInState();
   }
   shouldComponentUpdate(nextProps, nextState) {
-    // if (nextProps.issue.issueId === this.props.issueId
-    //   && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber) {
-    //   return false;
-    // }
+    if (nextProps.issue.issueId === this.props.issueId
+      && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber) {
+      return false;
+    }
     return true;
   }
 
@@ -167,6 +167,7 @@ class IssueCard extends Component {
               this.setState({ isFocus: true });
             }}
             onBlur={this.updateIssueName}
+            spellCheck="false"
           />
         </div>
         <div className="c7n-footer">

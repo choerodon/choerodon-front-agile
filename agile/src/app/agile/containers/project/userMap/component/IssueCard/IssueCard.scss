@@ -119,11 +119,14 @@
     padding-right: 4px;
 
     .c7n-issueCard-storyPoints {
+      width: 28px;
       margin-left: 8px;
       margin-right: 8px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
       background-color: #6586d6;
       border-radius: 100px;
-      padding: 0 10px;
       color: #fff;
     }
   }

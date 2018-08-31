@@ -275,7 +275,7 @@ class BurnDown extends Component {
   }
 
   render() {
-    const { loading } = this.state;
+    const { loading, sprint: { sprintId } } = this.state;
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     const menu = (
@@ -287,7 +287,7 @@ class BurnDown extends Component {
     );
     return (
       <div className="c7n-agile-dashboard-burndown">
-        <div className="switch">
+        <div className="switch" style={{ display: !loading && !sprintId ? 'none' : 'block' }}>
           <Dropdown overlay={menu} trigger={['click']}>
             <div className="ant-dropdown-link c7n-agile-dashboard-burndown-select">
               {'单位选择'}
