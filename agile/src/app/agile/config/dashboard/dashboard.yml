@@ -24,7 +24,7 @@ dashboard:
     level: project
     sort: 4
   - code: "MineUnDone"
-    icon: outstanding_tasks
+    icon: ballot
     title: "我的未完成问题"
     description: "我的未完成问题"
     level: project
