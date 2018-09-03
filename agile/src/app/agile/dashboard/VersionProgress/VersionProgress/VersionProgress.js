@@ -80,7 +80,7 @@ class VersionProgress extends Component {
     } = this.state;
 
     const menu = (
-      <Menu onClick={this.handleMenuClick} className="menu">
+      <Menu forceSubMenuRender onClick={this.handleMenuClick} className="menu">
         {
           versionList.map(item => <Menu.Item key={item.versionId}><Tooltip title={item.name} placement="topRight"><span className="c7n-menuItem">{item.name}</span></Tooltip></Menu.Item>)
         }
@@ -98,7 +98,7 @@ class VersionProgress extends Component {
       return (
         <React.Fragment>
           <div className="switchVersion">
-            <Dropdown overlay={menu} trigger={['click']}>
+            <Dropdown overlay={menu} trigger={['click']} getPopupContainer={triggerNode => triggerNode.parentNode}>
               <a className="ant-dropdown-link c7n-agile-dashboard-versionProgress-select">
                 {' 切换版本 '}
                 <Icon type="arrow_drop_down" />

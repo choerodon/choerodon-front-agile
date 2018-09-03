@@ -1,15 +1,20 @@
-.menu{
-  right: 28px;
-  .ant-dropdown-menu-item{
-    .c7n-menuItem{
-      display: inline-block;
-      max-width: 90px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+.ant-dropdown{
+  // position: relative;
+  .menu{
+    right: -15px;
+    top: 0;
+    .ant-dropdown-menu-item{
+      .c7n-menuItem{
+        display: inline-block;
+        max-width: 90px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
     }
   }
 }
+
 .c7n-VersionProgress{
   .switchVersion{
      position: absolute;
