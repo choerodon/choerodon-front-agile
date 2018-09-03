@@ -145,12 +145,12 @@ class VersionProgress extends Component {
     const { projectId } = AppState.currentMenuType;
     axios.get(`agile/v1/projects/${projectId}/product_version/versions`)
       .then((res) => {
-        const latestVersionId = Math.max(...res.map((item => item.versionId)));
+        const latestVersionId = Math.max(...res.filter(item => item.statusCode !== 'archived').map((item => item.versionId)));
         if (latestVersionId !== -Infinity) {
           this.loadSelectData(latestVersionId);
         }
         this.setState({
-          versionList: res,
+          versionList: res.filter(item => item.statusCode !== 'archived'),
           currentVersionId: latestVersionId,
           loading: false,
         });
