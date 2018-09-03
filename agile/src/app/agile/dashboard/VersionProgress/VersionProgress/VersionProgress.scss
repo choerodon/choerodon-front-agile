@@ -18,8 +18,12 @@
     
     .ant-dropdown-link{
       font-size: 13px;
-      color: #3F51B5;
+      // color: #3F51B5;
+      // font-weight: 600;
       line-height: 15px;
+    }
+    .ant-dropdown-link:hover{
+      color: #000;
     }
   }
   .c7n-loadWrap{
@@ -31,7 +35,7 @@
   }
   .charts{
     position: relative;
-    margin-bottom: -80px;
+    // margin-bottom: -120px;
     .charts-inner{
       width: 64px;
       height: 64px;
@@ -40,7 +44,7 @@
       justify-content: center;
       align-items: center;
       position: absolute;
-      top: calc(35% - 30px);
+      top: calc(42% - 30px);
       left: calc(35% - 32px);
       .charts-inner-versionName{
         max-width: 64px;
@@ -53,7 +57,7 @@
       list-style: none;
       position: absolute;
       right: 15%;
-      top: 50px;
+      top: 28px;
       li{
         margin-bottom: 29px;
         display: flex;
@@ -85,7 +89,7 @@
   }   
   .c7n-emptyVersion{
       margin-top: 40px;
-      margin-bottom: 40px;
+      margin-bottom: 33px;
   }
 }
 .c7n-agile-dashboard-versionProgress-select {

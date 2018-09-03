@@ -33,11 +33,11 @@ class VersionProgress extends Component {
         {
           color: ['#FFB100', '#4D90FE', '#00BFA5'],
           type: 'pie',
-          radius: ['38px', '65px'],
+          radius: ['38px', '68px'],
           avoidLabelOverlap: false,
           hoverAnimation: false,
           // legendHoverLink: false,
-          center: ['35%', '35%'],
+          center: ['35%', '42%'],
           label: {
             normal: {
               show: false,
@@ -107,6 +107,7 @@ class VersionProgress extends Component {
           </div>
           <div className="charts">
             <ReactEcharts
+              style={{ height: 200 }}
               option={this.getOption()}
             />
             <div className="charts-inner">
