@@ -21,15 +21,73 @@ class SprintProgressHome extends Component {
   }
   
   getTotalDay(startDate, endDate) {
-    if (startDate !== undefined && startDate !== null && endDate !== undefined && endDate !== null) {
-      startDate = startDate.substr(0, 10);
-      endDate = endDate.substr(0, 10);
-      const aStartDate = startDate.split('-');
-      const aEndDate = endDate.split('-');
-      startDate = new Date(`${aStartDate[1]}-${aStartDate[2]}-${aStartDate[0]}`);
-      endDate = new Date(`${aEndDate[1]}-${aEndDate[2]}-${aEndDate[0]}`);
-      return (parseInt(Math.abs(startDate - endDate) / 1000 / 60 / 60 / 24) + 1);
+    if (!startDate) return '';
+    if (!endDate) return '';
+    let sd = startDate.substr(0, 10);
+    let ed = endDate.substr(0, 10);
+    const aStartDate = sd.split('-');
+    const aEndDate = ed.split('-');
+    sd = new Date(`${aStartDate[1]}-${aStartDate[2]}-${aStartDate[0]}`);
+    ed = new Date(`${aEndDate[1]}-${aEndDate[2]}-${aEndDate[0]}`);
+    return (parseInt(Math.abs(sd - ed) / 1000 / 60 / 60 / 24, 10) + 1);
+  }
+
+  renderContent = () => {
+    const { sprint, loading } = this.state;
+    const totalDay = this.getTotalDay(sprint.startDate, sprint.endDate);
+    if (loading) {
+      return (
+        <div className="c7n-loadWrap">
+          <Spin />
+        </div>
+      );
     }
+
+    if (!sprint.sprintId) {
+      return (
+        <div className="c7n-emptySprint">
+          <EmptyBlockDashboard pic={pic} des="当前没有冲刺" />
+        </div>
+      );
+    }
+
+    return (
+      <div className="c7n-SprintProgressHome">
+        <p className="c7n-SprintStage">
+          {`${this.transformDateStr(sprint.startDate)}-${this.transformDateStr(sprint.endDate)} ${sprint.sprintName}`}
+        </p>
+        <p className="c7n-SprintRemainDay">
+          {'剩余'}
+          <span className="c7n-remainDay">
+            {sprint.dayRemain > 0 ? sprint.dayRemain : 0}
+          </span>
+          {'天'}
+        </p>
+        <div className="c7n-progress">
+          <Progress
+            percent={(sprint.dayRemain > 0 ? totalDay - sprint.dayRemain : totalDay)
+                / totalDay * 100}
+            showInfo={false}
+          />
+          <span className="c7n-sprintStart">
+            {`${this.transformDateStr(sprint.startDate)}`}
+          </span>
+          <span className="c7n-sprintEnd">
+            {`${this.transformDateStr(sprint.endDate)}`}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+ 
+  /**
+   * 'MM/DD' format
+   * @param {*} date 
+   */
+  transformDateStr(date) {
+    if (!date) return '';
+    return `${date.substr(5, 2).replace(/\b(0+)/gi, '')}/${date.substr(8, 2)}`;
   }
 
   loadData() {
@@ -47,37 +105,9 @@ class SprintProgressHome extends Component {
     const { sprint, loading } = this.state;
     const totalDay = this.getTotalDay(sprint.startDate, sprint.endDate);
     return (
-      sprint.sprintId ? (
-        <div className="c7n-SprintProgressHome">
-          {
-          loading ? (
-            <div className="c7n-loadWrap">
-              <Spin />
-            </div>
-          ) : (
-            <React.Fragment>
-              <p className="c7n-SprintStage">
-                {`${(sprint.startDate != undefined && sprint.startDate != null) && sprint.startDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.startDate != undefined && sprint.startDate != null) && sprint.startDate.substr(8, 2)}-${(sprint.endDate != undefined && sprint.endDate != undefined) && sprint.endDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.endDate != undefined && sprint.endDate != null) && sprint.endDate.substr(8, 2)} ${sprint.sprintName}`}
-              </p>
-              <p className="c7n-SprintRemainDay">
-                {'剩余'}
-                <span className="c7n-remainDay">{sprint.dayRemain > 0 ? sprint.dayRemain : 0}</span>
-                {'天'}
-              </p>
-              <div className="c7n-progress">
-                <Progress percent={(sprint.dayRemain > 0 ? totalDay - sprint.dayRemain : totalDay) / totalDay * 100} showInfo={false} />
-                <span className="c7n-sprintStart">{`${(sprint.startDate !== undefined && sprint.startDate !== null) && sprint.startDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${sprint.startDate !== undefined && sprint.startDate !== null && sprint.startDate.substr(8, 2)}`}</span>
-                <span className="c7n-sprintEnd">{`${(sprint.endDate !== undefined && sprint.endDate !== null) && sprint.endDate.substr(5, 2).replace(/\b(0+)/gi, '')}/${(sprint.endDate !== undefined && sprint.endDate !== null) && sprint.endDate.substr(8, 2)}`}</span>
-              </div>
-            </React.Fragment>
-          )
-          }
-        </div>
-      ) : (
-        <div className="c7n-emptySprint">
-          <EmptyBlockDashboard pic={pic} des="当前没有冲刺" />
-        </div>
-      )
+      <React.Fragment>
+        { this.renderContent() }
+      </React.Fragment>
     );
   }
 }
