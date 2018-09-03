@@ -4,7 +4,9 @@ import {
   Switch,
 } from 'react-router-dom';
 import { inject } from 'mobx-react';
-import { asyncRouter, asyncLocaleProvider, stores, nomatch } from 'choerodon-front-boot';
+import {
+  asyncRouter, asyncLocaleProvider, stores, nomatch, 
+} from 'choerodon-front-boot';
 
 const Home = asyncRouter(() => import('./Home'));
 const RELEASEINDEX = asyncRouter(() => import('./project/Release'));
@@ -18,6 +20,7 @@ const REPORTHOSTINDEX = asyncRouter(() => import('./project/ReportHost'));
 const ISSUELINKINDEX = asyncRouter(() => import('./project/IssueLink'));
 const STATUSINDEX = asyncRouter(() => import('./project/Status'));
 const USERMAPINDEX = asyncRouter(() => import('./project/userMap'));
+const INERATIONBOARDINDEX = asyncRouter(() => import('./project/IterationBoard'));
 
 class AGILEIndex extends React.Component {
   render() {
@@ -51,7 +54,9 @@ class AGILEIndex extends React.Component {
           {/* 状态 */}
           <Route path={`${match.url}/status`} component={STATUSINDEX} />
           <Route path={`${match.url}/userMap`} component={USERMAPINDEX} />
-          <Route path={'*'} component={nomatch} />
+          {/* 迭代工作台 */}
+          <Route path={`${match.url}/iterationBoard`} component={INERATIONBOARDINDEX} />
+          <Route path="*" component={nomatch} />
         </Switch>
       </IntlProviderAsync>
     );
