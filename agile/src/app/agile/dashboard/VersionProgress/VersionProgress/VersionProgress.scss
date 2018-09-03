@@ -1,9 +1,13 @@
-.ant-dropdown-menu-item{
-  .c7n-menuItem{
-    max-width: 90px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+.menu{
+  right: 28px;
+  .ant-dropdown-menu-item{
+    .c7n-menuItem{
+      display: inline-block;
+      max-width: 90px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 }
 .c7n-VersionProgress{
