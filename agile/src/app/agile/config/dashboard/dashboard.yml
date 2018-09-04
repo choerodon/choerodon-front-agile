@@ -6,7 +6,7 @@ dashboard:
     level: project
     sort: 2
   - code: "UncompleteTask"
-    icon: assignment
+    icon: test_planning
     title: "当前项目未完成的任务数"
     description: "当前项目未完成的任务数"
     level: project

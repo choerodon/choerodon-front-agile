@@ -1,0 +1,48 @@
+.c7n-IssueType{
+    padding:20px 33px 30px 25px;
+    .c7n-IssueType-nav{
+        display: flex;
+        justify-content: space-between;
+        span{
+            font-size: 18px;
+            color: rgba(0,0,0,0.87);
+        }
+    }
+    .c7n-IssueType-chart{
+        position: relative;
+        
+        .c7n-IssueType-chart-legend{
+            list-style: none;
+            position: absolute;
+            right: 0;
+            top: 28px;
+            li{
+              margin-bottom: 40px;
+              display: flex;
+              div{
+                width: 14px;
+                height: 14px;
+                // background-color: aquamarine;
+                border-radius: 2px;
+                margin-right: 6px;
+              }
+              font-size: 13px;
+            }
+            li:first-child{
+              div{
+                background-color: #FFB100;
+              }
+            }
+            li:nth-child(2){
+              div{
+                background-color: #4D90FE;
+              }
+            }
+            li:last-child{
+              div{
+                background-color: #00BFA5;
+              }
+            }
+          }
+    }
+}
