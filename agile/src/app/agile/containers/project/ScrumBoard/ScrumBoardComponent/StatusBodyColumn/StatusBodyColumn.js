@@ -520,7 +520,8 @@ class StatusBodyColumn extends Component {
                 borderBottom: JSON.stringify(dragStartData) === '{}' ? 
                   'unset' : this.renderBorder(data, index, 'bottom', snapshot.isDraggingOver),
                 visibility: this.renderDisplay(data[index], 'visibility'),
-                height: this.renderDisplay(data[index], 'height'),
+                // height: this.renderDisplay(data[index], 'height'),
+                height: 'auto',
                 position: 'relative',
               }}
             >
