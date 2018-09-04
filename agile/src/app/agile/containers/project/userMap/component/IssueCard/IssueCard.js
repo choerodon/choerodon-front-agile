@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Input, Icon, Popover, Menu, Checkbox } from 'choerodon-ui';
+import { Input, Icon, Menu } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import './IssueCard.scss';
@@ -29,9 +29,12 @@ class IssueCard extends Component {
   componentDidMount() {
     this.setIssueInState();
   }
+
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.issue.issueId === this.props.issueId
-      && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber) {
+    if (nextProps.issue.issueId === this.props.issue.issueId
+      && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber
+      && nextState.summary === this.state.summary
+    ) {
       return false;
     }
     return true;
@@ -94,7 +97,7 @@ class IssueCard extends Component {
   }
 
   render() {
-    const { issue, borderTop } = this.props;
+    const { issue, borderTop, history } = this.props;
     const { currentDraggableId } = US;
     const selectIssueIds = US.getSelectIssueIds;
     return (
@@ -131,12 +134,10 @@ class IssueCard extends Component {
             <span
               className="c7n-issueNum"
               style={{ 
-                cursor: 'pointer',
                 textDecoration: this.state.issue.statusCode === 'done' ? 'line-through' : 'unset',
               }}
               role="none"
               onClick={() => {
-                const { history } = this.props;
                 const urlParams = AppState.currentMenuType;
                 history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${this.state.issue.issueNum}&paramIssueId=${this.state.issue.issueId}&paramUrl=usermap`);
               }}
@@ -159,7 +160,6 @@ class IssueCard extends Component {
             className="c7n-textArea"
             autosize={{ minRows: 1, maxRows: 10 }}
             value={this.state.summary}
-            spellcheck={false}
             onChange={this.handleIssueNameChange.bind(this)}
             onPressEnter={this.handlePressEnter}
             onFocus={(e) => {
@@ -174,7 +174,9 @@ class IssueCard extends Component {
           <TypeTag
             typeCode={this.state.issue.typeCode}
           />
-          <span className="c7n-issueCard-storyPoints">{this.state.issue.storyPoints}</span>
+          <span className="c7n-issueCard-storyPoints">
+            {this.state.issue.storyPoints}
+          </span>
           <StatusTag
             name={this.state.issue.statusName}
             color={this.state.issue.statusColor}

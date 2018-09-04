@@ -63,9 +63,3 @@
         sort: 1
         permission:
           - 'agile-service.issue.listEpic'
-     - "iterationBoard":
-        icon: 
-        Routes: /agile/iterationBoard
-        sort: 10
-        permission:
-          - 'agile-service.issue.listEpic'

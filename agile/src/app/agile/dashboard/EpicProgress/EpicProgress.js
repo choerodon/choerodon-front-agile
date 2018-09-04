@@ -104,7 +104,7 @@ class EpicProgress extends Component {
           },
           formatter(value, index) {
             if (value.length > 5) {
-              return `${value.slice(0, 5)}...`;
+              return `${value.slice(0, 4)}...`;
             } else {
               return value;
             }

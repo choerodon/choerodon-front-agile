@@ -17,9 +17,10 @@
   }
 
   .lists {
-    padding-left: 28px;
+    padding-left: 16px;
     padding-right: 28px;
-    padding-bottom: 7px;
+    padding-top: 2px;
+    padding-bottom: 12px;
 
     .list {
       display: flex;
@@ -28,7 +29,7 @@
       // cursor: pointer;
 
       .issueNum {
-        padding-left: 8px;
+        padding-left: 18px;
       }
 
       .issueSummary-wrap {
@@ -44,12 +45,7 @@
       }
 
       .priority {
-        margin-right: 6px;
-      }
-
-      .status {
-        display: flex;
-        justify-content: flex-end;
+        // margin-right: 6px;
       }
     }
   }

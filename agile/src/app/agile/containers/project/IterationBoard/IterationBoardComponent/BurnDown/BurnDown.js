@@ -9,10 +9,7 @@ import {
 import {
   DashBoardNavBar, stores, axios,
 } from 'choerodon-front-boot';
-import TypeTag from '../../components/TypeTag';
-import PriorityTag from '../../components/PriorityTag';
-import StatusTag from '../../components/StatusTag';
-import EmptyBlockDashboard from '../../components/EmptyBlockDashboard';
+import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 import pic from './no_sprint.svg';
 import './index.scss';
 
@@ -274,7 +271,7 @@ class BurnDown extends Component {
     return (
       <ReactEcharts
         style={{
-          height: 200,
+          height: 400,
         }}
         option={this.getOption()}
       />
@@ -294,26 +291,15 @@ class BurnDown extends Component {
     );
     return (
       <div className="c7n-agile-dashboard-burndown">
-        <div className="switch" style={{ display: !loading && !sprintId ? 'none' : 'block' }}>
-          <Dropdown overlay={menu} trigger={['click']} getPopupContainer={triggerNode => triggerNode.parentNode}>
+        {/* <div className="switch" style={{ display: !loading && !sprintId ? 'none' : 'block' }}>
+          <Dropdown overlay={menu} trigger={['click']}>
             <div className="ant-dropdown-link c7n-agile-dashboard-burndown-select">
               {'单位选择'}
               <Icon type="arrow_drop_down" />
             </div>
           </Dropdown>
-        </div>
+        </div> */}
         {this.renderContent()}
-        <DashBoardNavBar>
-          <a
-            role="none"
-            onClick={() => {
-              history.push(`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-              return false;
-            }}
-          >
-            {'转至报告'}
-          </a>
-        </DashBoardNavBar>
       </div>
 
     );
