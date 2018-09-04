@@ -13,7 +13,7 @@ class Progress extends Component {
 
   render() {
     const {
-      percent, title,
+      percent, title, unit
     } = this.props;
     return (
       <div className="c7n-agile-dashboard-progress">
@@ -30,7 +30,7 @@ class Progress extends Component {
         <div className="tip">
           <div>
             <span className="count">{title}</span>
-            <span className="unit">个</span>
+            <span className="unit">{unit}</span>
           </div>
         </div>
       </div>

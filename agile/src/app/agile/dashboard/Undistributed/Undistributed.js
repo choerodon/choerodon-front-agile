@@ -61,14 +61,6 @@ class Undistributed extends Component {
             />
           </div>
         </div>
-        <div className="status flex-shrink">
-          <div>
-            <StatusTag
-              name={issue.statusName}
-              color={issue.statusColor}
-            />
-          </div>
-        </div>
       </div>
     );
   }

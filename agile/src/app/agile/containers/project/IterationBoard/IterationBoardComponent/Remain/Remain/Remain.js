@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { axios, stores } from 'choerodon-front-boot';
-import './UncompleteTaskHome.scss';
+import './Remain.scss';
 import { Spin } from 'choerodon-ui';
-import Progress from '../../../components/Progress';
+import Progress from '../../../../../../components/Progress';
 
 const { AppState } = stores;
-class UncompleteTaskHome extends Component {
+class Remain extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -32,22 +32,27 @@ class UncompleteTaskHome extends Component {
   render() {
     const { completeInfo, loading } = this.state;
     return (
-      <div className="c7n-unCompleteTaskHome">
+      <div className="c7n-sprintDashboard-remainDay">
         {
          loading ? (
            <div className="c7n-loadWrap">
              <Spin />
            </div>
          ) : (
-           <Progress
-             percent={completeInfo.unresolved / completeInfo.all * 100}
-             title={completeInfo.unresolved}
-             unit={'个'}
-           />
+           <div className="wrap">
+              <span className="word">剩余</span>
+              <div className="progress">
+                <Progress
+                  percent={completeInfo.unresolved / completeInfo.all * 100}
+                  title={completeInfo.unresolved}
+                />
+              </div>
+              <span className="word">天</span>
+           </div>
          )
        }
       </div>
     );
   }
 }
-export default UncompleteTaskHome;
+export default Remain;

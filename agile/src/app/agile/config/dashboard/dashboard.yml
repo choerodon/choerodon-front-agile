@@ -1,12 +1,12 @@
 dashboard:
   - code: "BurnDown"
-    icon: tune
+    icon: burnout_map
     title: "燃尽图"
     description: "燃尽图"
     level: project
     sort: 2
   - code: "UncompleteTask"
-    icon: test_planning
+    icon: outstanding_tasks
     title: "当前项目未完成的任务数"
     description: "当前项目未完成的任务数"
     level: project
@@ -24,13 +24,13 @@ dashboard:
     level: project
     sort: 4
   - code: "MineUnDone"
-    icon: ballot
+    icon: unfinished_question
     title: "我的未完成问题"
     description: "我的未完成问题"
     level: project
     sort: 5
   - code: "Undistributed"
-    icon: ballot
+    icon: unallocated_question
     title: "未分配的问题"
     description: "未分配的问题"
     level: project
