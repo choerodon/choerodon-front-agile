@@ -20,7 +20,9 @@ const REPORTHOSTINDEX = asyncRouter(() => import('./project/ReportHost'));
 const ISSUELINKINDEX = asyncRouter(() => import('./project/IssueLink'));
 const STATUSINDEX = asyncRouter(() => import('./project/Status'));
 const USERMAPINDEX = asyncRouter(() => import('./project/userMap'));
-const INERATIONBOARDINDEX = asyncRouter(() => import('./project/IterationBoard'));
+// const INERATIONBOARDINDEX = asyncRouter(() => import('./project/IterationBoard'));
+const ISSUETYPE = asyncRouter(() => import('./project/IterationBoard/IterationBoardComponent/IssueTypeComponent/IssueType'));
+const SPRINTTDETAIIL = asyncRouter(() => import('./project/IterationBoard/IterationBoardComponent/SprintDetailsComponent/SprintDetails'));
 
 class AGILEIndex extends React.Component {
   render() {
@@ -55,7 +57,12 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/status`} component={STATUSINDEX} />
           <Route path={`${match.url}/userMap`} component={USERMAPINDEX} />
           {/* 迭代工作台 */}
-          <Route path={`${match.url}/iterationBoard`} component={INERATIONBOARDINDEX} />
+          {/* <Route path={`${match.url}/iterationBoard`} component={INERATIONBOARDINDEX} /> */}
+
+          {/* 迭代工作台/迭代问题类型分布 */}
+          <Route path={`${match.url}/iterationBoard/issueType`} component={ISSUETYPE} />
+          <Route path={`${match.url}/iterationBoard/sprintDetail`} component={SPRINTTDETAIIL} />
+
           <Route path="*" component={nomatch} />
         </Switch>
       </IntlProviderAsync>
