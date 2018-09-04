@@ -93,25 +93,11 @@ class StatusCard extends Component {
               }}
               className="c7n-scrumsetting-card"
             >
-              <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.deleteStatus']}>
-                <Icon 
-                  style={{ 
-                    position: 'absolute', 
-                    right: 12,
-                    display: this.renderCloseDisplay(),
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                  }} 
-                  role="none"
-                  onClick={this.handleDeleteStatus.bind(this)}
-                  type="close"
-                />
-              </Permission>
               <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.updateStatus']}>
                 <Icon
                   style={{ 
                     position: 'absolute', 
-                    right: 12,
+                    right: this.renderCloseDisplay() === 'block' ? 32 : 12,
                     top: '15px',
                     cursor: 'pointer',
                     fontSize: '14px',
@@ -133,6 +119,21 @@ class StatusCard extends Component {
                       });
                     }
                   }}
+                />
+              </Permission>
+              <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.deleteStatus']}>
+                <Icon
+                  style={{
+                    position: 'absolute',
+                    top: 15,
+                    right: 12,
+                    display: this.renderCloseDisplay(),
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                  role="none"
+                  onClick={this.handleDeleteStatus.bind(this)}
+                  type="delete"
                 />
               </Permission>
               <EditStatus

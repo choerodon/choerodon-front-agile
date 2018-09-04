@@ -54,6 +54,8 @@ class AssigneeModal extends Component {
       }
     }
     const total = { totalIssue, totalStoryPoints, totalTime };
+    const noAssign = this.props.data.assigneeIssues.filter(item => !item.assigneeName);
+    const dataSource = this.props.data.assigneeIssues.filter(item => item.assigneeName).concat(noAssign);
     return (
       <Sidebar
         title="经办人工作量"
@@ -71,7 +73,7 @@ class AssigneeModal extends Component {
           description="您可以在这里查看当前冲刺中问题的分配情况，包括每位成员的问题数量、故事点数总和、剩余预估时间总和等信息。"
         >
           <Table
-            dataSource={_.concat(this.props.data.assigneeIssues, {
+            dataSource={_.concat(dataSource, {
               assigneeName: '合计',
               issueCount: total.totalIssue,
               totalStoryPoints: total.totalStoryPoints,

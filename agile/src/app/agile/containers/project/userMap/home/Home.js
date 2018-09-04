@@ -719,7 +719,7 @@ class Home3 extends Component {
                 {mode === 'none' ? null
                   : (
                     <React.Fragment>
-                      {mode === 'version' ?  <Permission service={['agile-service.product-version.createVersion']}>
+                      {mode === 'version' ? <Permission service={['agile-service.product-version.createVersion']}>
                         <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
                           <Icon type="playlist_add" />
                           创建
