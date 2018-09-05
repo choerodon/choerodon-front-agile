@@ -20,11 +20,11 @@ class IssueType extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.nextProps.currentSprint.sprintId === this.props.currentSprint.sprintId) {
-      return false;
-    }
-    this.state.currentSprint = this.nextProps.currentSprint;
-    return true;
+    // if (this.nextProps.currentSprint.sprintId === this.props.currentSprint.sprintId) {
+    //   return false;
+    // }
+    // this.state.currentSprint = this.nextProps.currentSprint;
+    // return true;
   }
 
   getOption() {

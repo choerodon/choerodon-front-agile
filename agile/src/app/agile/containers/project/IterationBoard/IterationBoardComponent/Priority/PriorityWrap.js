@@ -8,7 +8,7 @@ class Priority extends Component {
 
     return (
       <Card
-        title={'优先级分布'}
+        title="优先级分布"
         link={link}
       >
         <Prio
