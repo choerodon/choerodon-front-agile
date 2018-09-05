@@ -21,25 +21,14 @@ class VersionProgress extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.sprintId !== this.props.sprintId) {
-      const sprintId = nextProps.sprintId;
+    const { sprintId } = this.props;
+    if (nextProps.sprintId !== sprintId) {
+      const newSprintId = nextProps.sprintId;
       this.setState({
-        sprintId,
+        sprintId: newSprintId,
       });
-      this.loadAssignee(sprintId);
+      this.loadAssignee(newSprintId);
     }
-  }
-
-  loadAssignee(sprintId) {
-    const projectId = AppState.currentMenuType.id;
-    this.setState({ loading: true });
-    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/assignee_id?sprintId=${sprintId}`)
-      .then((res) => {
-        this.setState({
-          loading: false,
-          assigneeInfo: res,
-        });
-      });
   }
 
   getOption() {
@@ -57,8 +46,7 @@ class VersionProgress extends Component {
           color: '#000',
         },
         formatter(params) {
-          let res;
-          res = `${params.name}：${params.value}<br/>占比：
+          const res = `${params.name}：${params.value}<br/>占比：
             ${((params.value / allCount).toFixed(2) * 100).toFixed(0)}%`;
           return res;
         },
@@ -72,17 +60,29 @@ class VersionProgress extends Component {
           radius: '60px',
           hoverAnimation: false,
           center: ['50%', '50%'],
-          data: data,
+          data,
           itemStyle: {
             normal: {
               borderWidth: 2,
               borderColor: '#fff',
             },
-        }
+          },
         },
       ],
     };
     return option;
+  }
+
+  loadAssignee(sprintId) {
+    const projectId = AppState.currentMenuType.id;
+    this.setState({ loading: true });
+    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/assignee_id?sprintId=${sprintId}`)
+      .then((res) => {
+        this.setState({
+          loading: false,
+          assigneeInfo: res,
+        });
+      });
   }
 
   renderContent() {

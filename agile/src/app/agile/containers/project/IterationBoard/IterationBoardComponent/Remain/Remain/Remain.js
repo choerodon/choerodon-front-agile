@@ -10,18 +10,15 @@ class Remain extends Component {
     super(props);
     this.state = {
       loading: true,
-      sprintId: undefined,
       sprintInfo: {},
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.sprintId !== this.props.sprintId) {
-      const sprintId = nextProps.sprintId;
-      this.setState({
-        sprintId,
-      });
-      this.loadSprintInfo(sprintId,);
+    const { sprintId } = this.props;
+    if (nextProps.sprintId !== sprintId) {
+      const newSprintId = nextProps.sprintId;
+      this.loadSprintInfo(newSprintId);
     }
   }
 

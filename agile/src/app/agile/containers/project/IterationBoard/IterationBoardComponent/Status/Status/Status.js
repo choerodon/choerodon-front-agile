@@ -21,38 +21,14 @@ class Status extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.sprintId !== this.props.sprintId) {
-      const sprintId = nextProps.sprintId;
+    const { sprintId } = this.props;
+    if (nextProps.sprintId !== sprintId) {
+      const newSprintId = nextProps.sprintId;
       this.setState({
-        sprintId,
+        sprintId: newSprintId,
       });
-      this.loadStatus(sprintId);
+      this.loadStatus(newSprintId);
     }
-  }
-
-  loadStatus(sprintId) {
-    const projectId = AppState.currentMenuType.id;
-    this.setState({ loading: true });
-    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/status?sprintId=${sprintId}`)
-      .then((res) => {
-        const statusInfo = this.transformStatus(res);
-        this.setState({
-          loading: false,
-          statusInfo,
-        });
-      });
-  }
-
-  transformStatus(statusArr) {
-    let todo = statusArr.find(v => v.categoryCode === 'todo');
-    let doing = statusArr.find(v => v.categoryCode === 'doing');
-    let done = statusArr.find(v => v.categoryCode === 'done');
-    const result = [
-      todo ? todo.issueNum : 0,
-      doing ? doing.issueNum : 0,
-      done ? done.issueNum : 0,
-    ];
-    return result;
   }
 
   getOption() {
@@ -75,7 +51,7 @@ class Status extends Component {
           {
             name: '已完成',
             icon: 'circle',
-          }
+          },
         ],
         itemWidth: 12,
         itemHeight: 12,
@@ -91,8 +67,7 @@ class Status extends Component {
           color: '#000',
         },
         formatter(params) {
-          let res;
-          res = `${params.name}：${params.value}<br/>占比：
+          const res = `${params.name}：${params.value}<br/>占比：
             ${((params.value / allCount).toFixed(2) * 100).toFixed(0)}%`;
           return res;
         },
@@ -134,6 +109,31 @@ class Status extends Component {
       ],
     };
     return option;
+  }
+
+  loadStatus(sprintId) {
+    const projectId = AppState.currentMenuType.id;
+    this.setState({ loading: true });
+    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/status?sprintId=${sprintId}`)
+      .then((res) => {
+        const statusInfo = this.transformStatus(res);
+        this.setState({
+          loading: false,
+          statusInfo,
+        });
+      });
+  }
+
+  transformStatus(statusArr) {
+    const todo = statusArr.find(v => v.categoryCode === 'todo');
+    const doing = statusArr.find(v => v.categoryCode === 'doing');
+    const done = statusArr.find(v => v.categoryCode === 'done');
+    const result = [
+      todo ? todo.issueNum : 0,
+      doing ? doing.issueNum : 0,
+      done ? done.issueNum : 0,
+    ];
+    return result;
   }
 
   renderContent() {

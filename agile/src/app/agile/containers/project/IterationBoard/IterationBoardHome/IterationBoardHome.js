@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
-import { Row, Col, Select, Tooltip } from 'choerodon-ui';
+import {
+  Page, Header, Content,
+} from 'choerodon-front-boot';
+import {
+  Row, Col, Select, Tooltip,
+} from 'choerodon-ui';
 import _ from 'lodash';
 import { loadSprints } from '../../../../api/NewIssueApi';
 import Assignee from '../IterationBoardComponent/Assignee';
@@ -10,12 +14,9 @@ import Sprint from '../IterationBoardComponent/Sprint';
 import Status from '../IterationBoardComponent/Status';
 import Remain from '../IterationBoardComponent/Remain';
 import Priority from '../IterationBoardComponent/Priority';
-import IssueTypeComponent from '../IterationBoardComponent/IssueType';
-import SprintDetailsComponent from '../IterationBoardComponent/SprintDetails';
 
 import './IterationBoardHome.scss';
 
-const { AppState } = stores;
 const { Option } = Select;
 
 @observer
@@ -45,14 +46,15 @@ class IterationBoardHome extends Component {
             sprintId: undefined,
             sprintName: undefined,
           });
+        } else {
+          this.setState({
+            loading: false,
+            sprints: res,
+            sprintId: res[0].sprintId,
+            sprintName: res[0].sprintName,
+          });
         }
-        this.setState({
-          loading: false,
-          sprints: res,
-          sprintId: res[0].sprintId,
-          sprintName: res[0].sprintName,
-        });
-      })
+      });
   }
 
   handleChangeSprint(sprintId) {
@@ -65,11 +67,13 @@ class IterationBoardHome extends Component {
   }
 
   renderContent() {
-    const { loading, sprints, sprintId, sprintName } = this.state;
+    const {
+      loading, sprints, sprintId, sprintName,
+    } = this.state;
     if (!loading && sprints && !sprints.length) {
       return (
         <div>
-          当前项目下无冲刺
+          {'当前项目下无冲刺'}
         </div>
       );
     }
@@ -80,7 +84,7 @@ class IterationBoardHome extends Component {
             <Sprint
               sprintId={sprintId}
               sprintName={sprintName}
-              link='backlog'
+              link="backlog"
             />
           </Col>
           <Col span={8}>
@@ -92,7 +96,7 @@ class IterationBoardHome extends Component {
           <Col span={8}>
             <Remain
               sprintId={sprintId}
-              link='backlog'
+              link="backlog"
             />
           </Col>
         </Row>
