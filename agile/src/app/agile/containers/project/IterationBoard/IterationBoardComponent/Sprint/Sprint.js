@@ -18,12 +18,13 @@ class Sprint extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.sprintId !== this.props.sprintId) {
-      const sprintId = nextProps.sprintId;
+    const { sprintId } = this.props;
+    if (nextProps.sprintId !== sprintId) {
+      const newSprintId = nextProps.sprintId;
       this.setState({
-        sprintId,
+        sprintId: newSprintId,
       });
-      this.loadSprintInfo(sprintId);
+      this.loadSprintInfo(newSprintId);
     }
   }
 
@@ -68,9 +69,15 @@ class Sprint extends Component {
     return (
       <div>
         {this.renderUserHead()}
-        <div className="count">{sprintInfo.issueCount || '0'}个问题可见</div>
-        <div className="goal text-overflow-hidden">冲刺目标：{sprintInfo.sprintGoal || ''}</div>
-        <div className="time">{sprintInfo.startDate} ~ {sprintInfo.endDate}</div>
+        <div className="count">
+          {`${sprintInfo.issueCount || '0'}个问题可见`}
+        </div>
+        <div className="goal text-overflow-hidden">
+          {`冲刺目标：${sprintInfo.sprintGoal || ''}`}
+        </div>
+        <div className="time">
+          {`${sprintInfo.startDate} ~ ${sprintInfo.endDate}`}
+        </div>
       </div>
     );
   }
@@ -81,15 +88,17 @@ class Sprint extends Component {
       <div className="users">
         {
           assigneeIssueDTOList && assigneeIssueDTOList.map(user => (
-            <UserHead
-              user={{
-                id: user.assigneeId,
-                loginName: '',
-                realName:  user.assigneeName,
-                avatar: user.imageUrl,
-              }}
-              hiddenText
-            />
+            <div key={user.assigneeId}>
+              <UserHead
+                user={{
+                  id: user.assigneeId,
+                  loginName: '',
+                  realName: user.assigneeName,
+                  avatar: user.imageUrl,
+                }}
+                hiddenText
+              />
+            </div>
           ))
         }
       </div>

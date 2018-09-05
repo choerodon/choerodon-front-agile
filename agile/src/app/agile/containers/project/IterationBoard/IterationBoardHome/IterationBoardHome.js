@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Page, Header, Content, stores, axios, 
+  Page, Header, Content,
 } from 'choerodon-front-boot';
 import {
-  Row, Col, Select, Tooltip, 
+  Row, Col, Select, Tooltip,
 } from 'choerodon-ui';
 import _ from 'lodash';
 import { loadSprints } from '../../../../api/NewIssueApi';
@@ -19,7 +19,6 @@ import SprintDetails from '../IterationBoardComponent/SprintDetails';
 
 import './IterationBoardHome.scss';
 
-const { AppState } = stores;
 const { Option } = Select;
 
 @observer
@@ -71,7 +70,7 @@ class IterationBoardHome extends Component {
 
   renderContent() {
     const {
-      loading, sprints, sprintId, sprintName, 
+      loading, sprints, sprintId, sprintName,
     } = this.state;
     if (!loading && sprints && !sprints.length) {
       return (
