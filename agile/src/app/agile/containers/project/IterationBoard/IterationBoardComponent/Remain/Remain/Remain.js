@@ -9,28 +9,46 @@ class Remain extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      completeInfo: {},
       loading: true,
+      sprintId: undefined,
+      sprintInfo: {},
     };
   }
 
   componentDidMount() {
-    this.loadDate();
   }
 
-  loadDate() {
-    const projectId = AppState.currentMenuType.id;
-    axios.get(`agile/v1/projects/${projectId}/issues/count`)
-      .then((res) => {
-        this.setState({
-          completeInfo: res,
-          loading: false,
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.sprintId !== this.props.sprintId) {
+      const sprintId = nextProps.sprintId;
+      this.setState({
+        sprintId,
+      });
+      this.loadSprintInfo(sprintId,);
+    }
+  }
+
+  loadSprintInfo(sprintId) {
+    if (!sprintId) {
+      this.setState({
+        loading: false,
+        sprintInfo: {},
+      });
+    } else {
+      this.setState({ loading: true });
+      const projectId = AppState.currentMenuType.id;
+      axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/sprint?sprintId=${sprintId}`)
+        .then((res) => {
+          this.setState({
+            sprintInfo: res,
+            loading: false,
+          });
         });
-      });  
+    }
   }
 
   render() {
-    const { completeInfo, loading } = this.state;
+    const { sprintInfo, loading } = this.state;
     return (
       <div className="c7n-sprintDashboard-remainDay">
         {
@@ -43,8 +61,8 @@ class Remain extends Component {
               <span className="word">剩余</span>
               <div className="progress">
                 <Progress
-                  percent={completeInfo.unresolved / completeInfo.all * 100}
-                  title={completeInfo.unresolved}
+                  percent={50}
+                  title={sprintInfo.dayRemain < 0 ? 0 : sprintInfo.dayRemain}
                 />
               </div>
               <span className="word">天</span>
