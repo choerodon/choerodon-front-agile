@@ -6,6 +6,7 @@ class SprintWrap extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      sprintName: '',
     };
   }
 
@@ -13,11 +14,15 @@ class SprintWrap extends Component {
   }
 
   render() {
+    const { sprintId, sprintName } = this.props;
+
     return (
       <Card
-        title={'燃尽图冲刺1'}
+        title={sprintName}
       >
-        <Sprint />
+        <Sprint
+          sprintId={sprintId}
+        />
       </Card>
     );
   }

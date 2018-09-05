@@ -13,11 +13,15 @@ class StatusWrap extends Component {
   }
 
   render() {
+    const { sprintId } = this.props;
+
     return (
       <Card
         title={'状态分布'}
       >
-        <Status />
+        <Status
+          sprintId={sprintId}
+        />
       </Card>
     );
   }

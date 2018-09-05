@@ -13,11 +13,15 @@ class RemainWrap extends Component {
   }
 
   render() {
+    const { sprintId, sprintName } = this.props;
+    
     return (
       <Card
         title={'距离冲刺结束'}
       >
-        <Remain />
+        <Remain
+          sprintId={sprintId}
+        />
       </Card>
     );
   }

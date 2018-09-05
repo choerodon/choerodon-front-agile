@@ -15,13 +15,43 @@ class VersionProgress extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      sprintId: undefined,
+      loading: true,
+      assigneeInfo: [],
     };
   }
 
   componentDidMount() {
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.sprintId !== this.props.sprintId) {
+      const sprintId = nextProps.sprintId;
+      this.setState({
+        sprintId,
+      });
+      this.loadAssignee(sprintId);
+    }
+  }
+
+  loadAssignee(sprintId) {
+    const projectId = AppState.currentMenuType.id;
+    this.setState({ loading: true });
+    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/assignee_id?sprintId=${sprintId}`)
+      .then((res) => {
+        this.setState({
+          loading: false,
+          assigneeInfo: res,
+        });
+      });
+  }
+
   getOption() {
+    const { assigneeInfo } = this.state;
+    const data = assigneeInfo.map(v => ({
+      name: v.assigneeName,
+      value: v.issueNum,
+    }));
     const option = {
       tooltip: {
         trigger: 'item',
@@ -44,11 +74,7 @@ class VersionProgress extends Component {
           radius: '60px',
           hoverAnimation: false,
           center: ['50%', '50%'],
-          data: [
-            { value: 10, name: '15085 祁煌' },
-            { value: 20, name: '12345 黄芪' },
-            { value: 30, name: '66666 齐王' },
-          ],
+          data: data,
           itemStyle: {
             normal: {
               borderWidth: 2,

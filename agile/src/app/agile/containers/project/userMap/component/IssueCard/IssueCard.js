@@ -30,15 +30,15 @@ class IssueCard extends Component {
     this.setIssueInState();
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.issue.issueId === this.props.issue.issueId
-      && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber
-      && nextState.summary === this.state.summary
-    ) {
-      return false;
-    }
-    return true;
-  }
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   if (nextProps.issue.issueId === this.props.issue.issueId
+  //     && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber
+  //     && nextState.summary === this.state.summary
+  //   ) {
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
   setIssueInState() {
     const { issue } = this.props;

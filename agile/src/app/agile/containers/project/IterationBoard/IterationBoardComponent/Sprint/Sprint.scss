@@ -1,4 +1,10 @@
 .c7n-sprintDashboard-sprint {
+  .text-overflow-hidden {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .users {
     display: flex;
     flex-direction: row;
