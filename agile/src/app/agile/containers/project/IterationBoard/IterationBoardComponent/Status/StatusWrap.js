@@ -3,21 +3,13 @@ import Card from '../Card';
 import Status from './Status';
 
 class StatusWrap extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
-  componentDidMount() {
-  }
-
   render() {
-    const { sprintId } = this.props;
+    const { sprintId, link } = this.props;
 
     return (
       <Card
         title={'状态分布'}
+        link={link}
       >
         <Status
           sprintId={sprintId}
@@ -26,4 +18,5 @@ class StatusWrap extends Component {
     );
   }
 }
+
 export default StatusWrap;

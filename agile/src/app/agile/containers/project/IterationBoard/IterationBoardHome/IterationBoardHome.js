@@ -23,7 +23,7 @@ class IterationBoardHome extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
+      loading: true,
       sprints: [],
       sprintId: undefined,
       sprintName: undefined,
@@ -35,6 +35,7 @@ class IterationBoardHome extends Component {
   }
 
   loadSprints() {
+    this.setState({ loading: true });
     loadSprints(['started', 'closed'])
       .then((res) => {
         if (res && !res.length) {
@@ -61,6 +62,64 @@ class IterationBoardHome extends Component {
       sprintId,
       sprintName: sprint.sprintName,
     });
+  }
+
+  renderContent() {
+    const { loading, sprints, sprintId, sprintName } = this.state;
+    if (!loading && sprints && !sprints.length) {
+      return (
+        <div>
+          当前项目下无冲刺
+        </div>
+      );
+    }
+    return (
+      <div>
+        <Row gutter={20}>
+          <Col span={8}>
+            <Sprint
+              sprintId={sprintId}
+              sprintName={sprintName}
+              link='backlog'
+            />
+          </Col>
+          <Col span={8}>
+            <Status
+              sprintId={sprintId}
+              link="reporthost/pieReport"
+            />
+          </Col>
+          <Col span={8}>
+            <Remain
+              sprintId={sprintId}
+              link='backlog'
+            />
+          </Col>
+        </Row>
+        <Row gutter={20}>
+          <Col span={24}>
+            <BurnDown
+              sprintId={sprintId}
+              link="reporthost/burndownchart"
+            />
+          </Col>
+        </Row>
+        <Row gutter={20}>
+          <Col span={8}>
+            <Priority
+              sprintId={sprintId}
+              link="reporthost/pieReport"
+            />
+          </Col>
+          <Col span={8}>
+            <Assignee
+              sprintId={sprintId}
+              link="reporthost/pieReport"
+            />
+          </Col>
+        </Row>
+      </div>
+    );
   }
 
   render() {
@@ -92,51 +151,11 @@ class IterationBoardHome extends Component {
           </Select>
         </Header>
         <Content>
-          <Row gutter={20}>
-            <Col span={8}>
-              <Sprint
-                sprintId={sprintId}
-                sprintName={sprintName}
-              />
-            </Col>
-            <Col span={8}>
-              <Status
-                sprintId={sprintId}
-              />
-            </Col>
-            <Col span={8}>
-              <Remain
-                sprintId={sprintId}
-              />
-            </Col>
-          </Row>
-          <Row gutter={20}>
-            <Col span={24}>
-              <BurnDown
-                sprintId={sprintId}
-              />
-            </Col>
-          </Row>
-          <Row gutter={20}>
-            <Col span={8}>
-              <Priority
-                sprintId={sprintId}
-              />
-            </Col>
-            <Col span={8}>
-              <Assignee
-                sprintId={sprintId}
-              />
-            </Col>
-          </Row>
-          <Row gutter={20}>
-            <Col span={24}>
-              <SprintDetailsComponent />
-            </Col>
-          </Row>
+          {this.renderContent()}
         </Content>
       </Page>
     );
   }
 }
+
 export default IterationBoardHome;

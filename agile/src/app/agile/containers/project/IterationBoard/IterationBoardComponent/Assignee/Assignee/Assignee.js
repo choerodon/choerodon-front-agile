@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import {
-  Select, Menu, Dropdown, Icon, Spin, Tooltip,
-} from 'choerodon-ui';
-import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';
+import { Spin } from 'choerodon-ui';
+import { stores, axios } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
+import _ from 'lodash';
 import EmptyBlockDashboard from '../../../../../../components/EmptyBlockDashboard';
-import pic from './no_version.svg';
+import pic from '../../EmptyPics/no_sprint.svg';
+import pic2 from '../../EmptyPics/no_version.svg';
 import './Assignee.scss';
 
 const { AppState } = stores;
-const { Option } = Select;
 
 class VersionProgress extends Component {
   constructor(props) {
@@ -19,9 +18,6 @@ class VersionProgress extends Component {
       loading: true,
       assigneeInfo: [],
     };
-  }
-
-  componentDidMount() {
   }
 
   componentWillReceiveProps(nextProps) {
@@ -52,6 +48,7 @@ class VersionProgress extends Component {
       name: v.assigneeName,
       value: v.issueNum,
     }));
+    const allCount = _.reduce(assigneeInfo, (sum, n) => sum + n.issueNum, 0);
     const option = {
       tooltip: {
         trigger: 'item',
@@ -61,7 +58,8 @@ class VersionProgress extends Component {
         },
         formatter(params) {
           let res;
-          res = `${params.name}：${params.value}<br/>占比： ${params.value}%`;
+          res = `${params.name}：${params.value}<br/>占比：
+            ${((params.value / allCount).toFixed(2) * 100).toFixed(0)}%`;
           return res;
         },
         extraCssText: 
@@ -87,19 +85,51 @@ class VersionProgress extends Component {
     return option;
   }
 
+  renderContent() {
+    const { loading, sprintId, assigneeInfo } = this.state;
+    if (loading) {
+      return (
+        <div className="c7n-loadWrap">
+          <Spin />
+        </div>
+      );
+    }
+    if (!sprintId) {
+      return (
+        <div className="c7n-loadWrap">
+          <EmptyBlockDashboard
+            pic={pic}
+            des="当前项目下无活跃或结束冲刺"
+          />
+        </div>
+      );
+    }
+    if (assigneeInfo.every(v => v.issueNum === 0)) {
+      return (
+        <div className="c7n-loadWrap">
+          <EmptyBlockDashboard
+            pic={pic2}
+            des="当前冲刺下无问题"
+          />
+        </div>
+      );
+    }
+    return (
+      <ReactEcharts
+        option={this.getOption()}
+        style={{ height: 232 }}
+      />
+    );
+  }
+
+
   render() {
-    const {
-      loading, 
-    } = this.state;
-    const urlParams = AppState.currentMenuType;
     return (
       <div className="c7n-sprintDashboard-assignee">
-          <ReactEcharts
-            option={this.getOption()}
-            style={{ height: 232 }}
-          />
+        {this.renderContent()}
       </div>
     );
   }
 }
+
 export default VersionProgress;

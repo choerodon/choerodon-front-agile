@@ -15,9 +15,6 @@ class Remain extends Component {
     };
   }
 
-  componentDidMount() {
-  }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.sprintId !== this.props.sprintId) {
       const sprintId = nextProps.sprintId;
@@ -47,30 +44,36 @@ class Remain extends Component {
     }
   }
 
-  render() {
+  renderContent() {
     const { sprintInfo, loading } = this.state;
+    if (loading) {
+      return (
+        <div className="c7n-loadWrap">
+          <Spin />
+        </div>
+      );
+    }
+    return (
+      <div className="wrap">
+        <span className="word">剩余</span>
+        <div className="progress">
+          <Progress
+            percent={50}
+            title={sprintInfo.dayRemain < 0 ? 0 : sprintInfo.dayRemain}
+          />
+        </div>
+        <span className="word">天</span>
+      </div>
+    );
+  }
+
+  render() {
     return (
       <div className="c7n-sprintDashboard-remainDay">
-        {
-         loading ? (
-           <div className="c7n-loadWrap">
-             <Spin />
-           </div>
-         ) : (
-           <div className="wrap">
-              <span className="word">剩余</span>
-              <div className="progress">
-                <Progress
-                  percent={50}
-                  title={sprintInfo.dayRemain < 0 ? 0 : sprintInfo.dayRemain}
-                />
-              </div>
-              <span className="word">天</span>
-           </div>
-         )
-       }
+        {this.renderContent()}
       </div>
     );
   }
 }
+
 export default Remain;

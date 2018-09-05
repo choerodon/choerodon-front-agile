@@ -3,8 +3,9 @@ import { stores, axios } from 'choerodon-front-boot';
 import { Spin } from 'choerodon-ui';
 import PriorityTag from '../../../../../components/PriorityTag';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
-import pic from './empty.png';
-import './index.scss';
+import pic from '../EmptyPics/no_sprint.svg';
+import pic2 from '../EmptyPics/no_version.svg';
+import './Priority.scss';
 
 const { AppState } = stores;
 const PRIORITY_MAP = {
@@ -30,16 +31,14 @@ const PRIORITY_MAP = {
   },
 };
 
-class MineUnDone extends Component {
+class Priority extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      sprintId: undefined,
       loading: true,
       priorityInfo: [],
     };
-  }
-
-  componentDidMount() {
   }
 
   componentWillReceiveProps(nextProps) {
@@ -81,7 +80,7 @@ class MineUnDone extends Component {
   }
 
   renderContent() {
-    const { loading, priorityInfo } = this.state;
+    const { loading, priorityInfo, sprintId } = this.state;
     if (loading) {
       return (
         <div className="loading-wrap">
@@ -89,16 +88,26 @@ class MineUnDone extends Component {
         </div>
       );
     }
-    // if (issues && !issues.length) {
-    //   return (
-    //     <div className="loading-wrap">
-    //       <EmptyBlockDashboard
-    //         pic={pic}
-    //         des="当前没有我的未完成的任务"
-    //       />
-    //     </div>
-    //   );
-    // }
+    if (!sprintId) {
+      return (
+        <div className="loading-wrap">
+          <EmptyBlockDashboard
+            pic={pic}
+            des="当前项目下无活跃或结束冲刺"
+          />
+        </div>
+      );
+    }
+    if (!priorityInfo.high.totalNum && !priorityInfo.medium.totalNum && !priorityInfo.low.totalNum) {
+      return (
+        <div className="loading-wrap">
+          <EmptyBlockDashboard
+            pic={pic2}
+            des="当前冲刺下无问题"
+          />
+        </div>
+      );
+    }
     return (
       <div className="lists">
         <h3 className="title">已完成/总计数</h3>
@@ -140,11 +149,11 @@ class MineUnDone extends Component {
 
   render() {
     return (
-      <div className="c7n-agile-dashboard-mineUndone">
+      <div className="c7n-agile-sprintDashboard-priority">
         {this.renderContent()}
       </div>
     );
   }
 }
 
-export default MineUnDone;
+export default Priority;
