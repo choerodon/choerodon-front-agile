@@ -42,12 +42,13 @@ class Priority extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.sprintId !== this.props.sprintId) {
-      const sprintId = nextProps.sprintId;
+    const { sprintId } = this.props;
+    if (nextProps.sprintId !== sprintId) {
+      const newSprintId = nextProps.sprintId;
       this.setState({
-        sprintId,
+        sprintId: newSprintId,
       });
-      this.loadPriorityInfo(sprintId);
+      this.loadPriorityInfo(newSprintId);
     }
   }
 
@@ -98,7 +99,11 @@ class Priority extends Component {
         </div>
       );
     }
-    if (!priorityInfo.high.totalNum && !priorityInfo.medium.totalNum && !priorityInfo.low.totalNum) {
+    if (
+      !priorityInfo.high.totalNum
+      && !priorityInfo.medium.totalNum
+      && !priorityInfo.low.totalNum
+    ) {
       return (
         <div className="loading-wrap">
           <EmptyBlockDashboard
@@ -121,8 +126,10 @@ class Priority extends Component {
   renderList(priority) {
     const { priorityInfo } = this.state;
     return (
-      <div className="list">
-        <div className="tip">{priorityInfo[priority].completedNum}/{priorityInfo[priority].totalNum}</div>
+      <div className="list" key={priority}>
+        <div className="tip">
+          {`${priorityInfo[priority].completedNum}/${priorityInfo[priority].totalNum}`}
+        </div>
         <div className="body">
           <div>
             <PriorityTag
