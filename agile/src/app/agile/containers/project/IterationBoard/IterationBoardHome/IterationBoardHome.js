@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Page, Header, stores, Content } from 'choerodon-front-boot';
+import {
+  Page, Header, stores, Content, 
+} from 'choerodon-front-boot';
 import { Row, Col } from 'choerodon-ui';
 import _ from 'lodash';
 import Assignee from '../IterationBoardComponent/Assignee';
@@ -9,6 +11,8 @@ import Sprint from '../IterationBoardComponent/Sprint';
 import Status from '../IterationBoardComponent/Status';
 import Remain from '../IterationBoardComponent/Remain';
 import Priority from '../IterationBoardComponent/Priority';
+import IssueTypeComponent from '../IterationBoardComponent/IssueType';
+import SprintDetailsComponent from '../IterationBoardComponent/SprintDetails';
 
 import './IterationBoardHome.scss';
 
@@ -39,10 +43,18 @@ class IterationBoardHome extends Component {
           </Row>
           <Row gutter={20}>
             <Col span={8}>
+              <IssueTypeComponent />
+            </Col>
+            <Col span={8}>
               <Priority />
             </Col>
             <Col span={8}>
               <Assignee />
+            </Col>
+          </Row>
+          <Row gutter={20}>
+            <Col span={24}>
+              <SprintDetailsComponent />
             </Col>
           </Row>
         </Content>

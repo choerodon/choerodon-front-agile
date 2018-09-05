@@ -3,7 +3,7 @@ import { stores } from 'choerodon-front-boot';
 import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import {
-  Icon, Table, Tabs, Spin, Tooltip,
+  Icon, Table, Tabs, Spin, Tooltip, Pagination,
 } from 'choerodon-ui';
 import TypeTag from '../../../../../components/TypeTag';
 import PriorityTag from '../../../../../components/PriorityTag';
@@ -12,6 +12,7 @@ import IterationBoardStore from '../../../../../stores/project/IterationBoard/It
 import './SprintDetails.scss';
 
 const TabPane = Tabs.TabPane;
+@observer
 class SprintDetails extends Component {
   constructor(props) {
     super(props);
@@ -26,22 +27,43 @@ class SprintDetails extends Component {
   }
   
   componentWillMount() {
-    this.loadData();
+    // this.loadData();
   }
-    loadData = (pagination) =>{
+
+    loadData = (pagination) => {
+      this.setState({
+        loading: true,
+      });
+      IterationBoardStore.axiosGetSprintDetailData({
+        page: pagination.current - 1,
+        size: pagination.pageSize,
+      }).then((data) => {
+        IterationBoardStore.setSpintDetailData(data);
         this.setState({
-            loading:true,
+          loading: false,
+          pagination: {
+            current: pagination.current,
+            pageSize: Pagination.pageSize,
+            total: data.totalElements,
+          },
         });
-        IterationBoardStore.
-
+      }).catch((error) => {
+        this.setState({
+          loading: false,
+        });
+        Choerodon.handleResponseError(error);
+      });
     }
 
-    handleTableChange = () => {
-        
+    handleTableChange = (pagination) => {
+      this.loadData({
+        current: pagination.current,
+        pageSize: pagination.pageSize,
+      });
     }
 
-    renderTable() {
-    // const dataSource =
+    renderTable(dataType) {
+      const spintDetailData = IterationBoardStore.getSprintDetailData;// 边界,空对象或数组
       const columns = [{
         title: '关键字',
         dataIndex: 'keyword',
@@ -130,19 +152,39 @@ class SprintDetails extends Component {
         ),
       }];
       return (
-        <Table
-          columns={columns}
-          dataSource={spintDetailData}
-          onChange={this.handleTableChange}
-        />
+        this.state.loading ? (
+          <div className="c7n-SprintDetails-loading">
+            <Spin />
+          </div>
+        ) : (
+          <Table
+            columns={columns}
+            dataSource={`${dataType}Data`}
+            pagination={this.state.pagination}
+            onChange={this.handleTableChange}
+          />
+        )
+        
       );
     }
 
     renderTabPane() {
-      const tabs = ['已完成的问题', '未完成的问题', '未完成的预估问题'];
-      const tabPanes = tabs.map((item, index) => (
-        <TabPane tab={item} key={index}>
-          {this.renderTable()}
+      // const tabs = ['已完成的问题', '未完成的问题', '未完成的预估问题'];
+      const tabs = [
+        { 
+          key: 'done',
+          tab: '已完成的问题',
+        }, {
+          key: 'undo',
+          tab: '未完成的问题',
+        }, {
+          key: 'undoAndNotEstimated',
+          tab: '未完成的未预估问题',
+        }];
+
+      const tabPanes = tabs.map(item => (
+        <TabPane tab={item.tab} key={item.key}>
+          {this.renderTable(item.key)}
         </TabPane>
       ));
       return tabPanes;    
@@ -151,14 +193,10 @@ class SprintDetails extends Component {
     render() {
       return (
         <div className="c7n-SprintDetails">
-          <div className="c7n-SprintDetails-nav">
-            <span>冲刺详情</span>
-            <Icon type="arrow_forward" />
-          </div>
           <div className="c7n-SprintDetails-tabs">
-            <Tabs>
+            {/* <Tabs>
               {this.renderTabPane()}
-            </Tabs>
+            </Tabs> */}
           </div>
         </div>
       );

@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
-import { Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin, Tooltip } from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, Permission, 
+} from 'choerodon-front-boot';
+import {
+  Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin, Tooltip, 
+} from 'choerodon-ui';
 import { Action } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import DragSortingTable from '../ReleaseComponent/DragSortingTable';
@@ -48,9 +52,11 @@ class ReleaseHome extends Component {
       sourceList: [],
     };
   }
+
   componentWillMount() {
     this.refresh(this.state.pagination);
   }
+
   refresh(pagination) {
     this.setState({
       loading: true,
@@ -71,6 +77,7 @@ class ReleaseHome extends Component {
     }).catch((error) => {
     });
   }
+
   handleClickMenu(record, e) {
     const that = this;
     if (e.key.indexOf('0') !== -1) {
@@ -84,7 +91,8 @@ class ReleaseHome extends Component {
           });
       } else {
         ReleaseStore.axiosUnPublicRelease(
-          record.versionId).then((res2) => {
+          record.versionId,
+        ).then((res2) => {
           this.refresh(this.state.pagination);
         }).catch((error) => {
         });
@@ -140,12 +148,14 @@ class ReleaseHome extends Component {
       }
     }
   }
+
   handleChangeTable(pagination, filters, sorter) {
     this.refresh({
       current: pagination.current,
       pageSize: pagination.pageSize,
     });
   }
+
   handleCombineRelease() {
     ReleaseStore.axiosGetVersionListWithoutPage().then((res) => {
       this.setState({
@@ -162,9 +172,10 @@ class ReleaseHome extends Component {
       .then(() => {
         this.refresh(this.state.pagination);
       }).catch((error) => {
-      this.refresh(this.state.pagination);
+        this.refresh(this.state.pagination);
       });
   };
+
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -175,18 +186,21 @@ class ReleaseHome extends Component {
       key: 'name',
       width: '94px',
       render: (text, record) => (
-       <Tooltip title={ text }>
-         <div
+        <Tooltip title={text}>
+          <div
             role="none"
-            style={{maxWidth: '94px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}
-        >
+            style={{ 
+              maxWidth: '94px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            }}
+          >
             <a
-              role={"none"}
+              role="none"
               onClick={() => {
-              const { history } = this.props;
-              const urlParams = AppState.currentMenuType;
-              history.push(`/agile/release/detail/${record.versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-            }}>
+                const { history } = this.props;
+                const urlParams = AppState.currentMenuType;
+                history.push(`/agile/release/detail/${record.versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+              }}
+            >
               {text}
             </a>
           </div>
@@ -291,7 +305,8 @@ class ReleaseHome extends Component {
               className="leftBtn"
               funcType="flat"
             >
-              <Icon type="playlist_add" />创建发布版本
+              <Icon type="playlist_add" />
+              {'创建发布版本'}
             </Button>
           </Permission>
           <Permission service={['agile-service.product-version.mergeVersion']} type={type} projectId={projectId} organizationId={orgId}>
@@ -300,11 +315,13 @@ class ReleaseHome extends Component {
               funcType="flat"
               onClick={this.handleCombineRelease.bind(this)}
             >
-              <Icon type="merge_type" />版本合并
+              <Icon type="merge_type" />
+              {'版本合并'}
             </Button>
           </Permission>
           <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, this.state.pagination)}>
-            <Icon type="refresh" />刷新
+            <Icon type="refresh" />
+            {'刷新'}
           </Button>
         </Header>
         <Content
@@ -337,7 +354,15 @@ class ReleaseHome extends Component {
                     <img style={{ width: 237, height: 200 }} src={emptyVersion} alt="emptyVersion" />
                     <div style={{ marginLeft: 50 }}>
                       <p style={{ color: 'rgba(0,0,0,0.65)' }}>您还没有为此项目添加任何版本</p>
-                      <p style={{ fontSize: '20px', lineHeight: '34px' }}>版本是一个项目的时间点，并帮助<br />您组织和安排工作</p>
+                      <p style={{ fontSize: '20px', lineHeight: '34px' }}>
+
+
+                        {'版本是一个项目的时间点，并帮助'}
+                        <br />
+
+
+                        {'您组织和安排工作'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -438,4 +463,3 @@ class ReleaseHome extends Component {
 }
 
 export default withRouter(ReleaseHome);
-

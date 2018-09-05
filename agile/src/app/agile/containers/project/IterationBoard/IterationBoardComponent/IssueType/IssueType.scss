@@ -1,21 +1,12 @@
 .c7n-IssueType{
-    padding:20px 33px 30px 25px;
-    .c7n-IssueType-nav{
-        display: flex;
-        justify-content: space-between;
-        span{
-            font-size: 18px;
-            color: rgba(0,0,0,0.87);
-        }
-    }
     .c7n-IssueType-chart{
         position: relative;
         
         .c7n-IssueType-chart-legend{
             list-style: none;
             position: absolute;
-            right: 0;
-            top: 28px;
+            right: 17px;
+            top: 42px;
             li{
               margin-bottom: 40px;
               display: flex;

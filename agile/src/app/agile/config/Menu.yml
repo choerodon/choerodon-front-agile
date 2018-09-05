@@ -5,61 +5,55 @@
     - "backlog":
         icon: baseline-list_alt
         Routes: /agile/backlog
-        sort: 2
+        sort: 1
         permission:
           - 'agile-service.sprint.queryByProjectId'
     - "scrumboard":
         icon: directions_run
         Routes: /agile/scrumboard
-        sort: 3
+        sort: 2
         permission:
           - 'agile-service.board.queryByProjectId'
           - 'agile-service.board.queryByOptions'
     - "issue":
         icon: assignment
         Routes: /agile/issue
-        sort: 5
+        sort: 4
         permission:
           - 'agile-service.issue.listIssueWithoutSub'
     - "release":
         icon: publish2
         Routes: /agile/release
-        sort: 6
+        sort: 5
         permission:
           - 'agile-service.product-version.listByProjectId'
     - "component":
         icon: extension
         Routes: /agile/component
-        sort: 7
+        sort: 6
         permission:
           - 'agile-service.issue-component.listByProjectId'
     - "reporthost":
         icon: application_model
         Routes: /agile/reporthost
-        sort: 8
+        sort: 7
         permission:
           - 'agile-service.sprint.queryNameByOptions'
     - "projectsetting":
         icon: folder_shared
         Routes: /agile/projectSetting
-        sort: 9
+        sort: 8
         permission:
           - 'agile-service.project-info.updateProjectInfo'
     - "fastsearch":
         icon: youtube_searched_for
         Routes: /agile/fastSearch
-        sort: 10
+        sort: 9
         permission:
           - 'agile-service.quick-filter.create'
     - "userStoryMap":
         icon: usermap
         Routes: /agile/usermap
-        sort: 4
-        permission:
-          - 'agile-service.issue.listEpic'
-    - "iterationBoard":
-        icon: usermap
-        Routes: /agile/iterationBoard
-        sort: 1
+        sort: 3
         permission:
           - 'agile-service.issue.listEpic'

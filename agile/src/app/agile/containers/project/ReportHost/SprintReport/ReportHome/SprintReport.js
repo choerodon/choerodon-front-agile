@@ -532,15 +532,11 @@ class SprintReport extends Component {
                       <div className="c7n-sprintContent">
                         <span>
                           {ReportStore.getCurrentSprintStatus.status}
-
-冲刺,
-                          共
-{' '}
+                          {'冲刺,'}
+                          {'共'}
                           {ReportStore.currentSprint.issueCount || 0}
-                          {' '}
-
-个问题
-</span>
+                          {'个问题'}
+                        </span>
                         <span>
                           {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
                         </span>
@@ -556,9 +552,8 @@ class SprintReport extends Component {
                           this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题&paramUrl=reporthost/sprintreport`);
                         }}
                       >
-
-                        在“问题管理中”查看
-<Icon style={{ fontSize: 13 }} type="open_in_new" />
+                        {'在“问题管理中”查看'}
+                        <Icon style={{ fontSize: 13 }} type="open_in_new" />
                       </p>
                     </div>
                   </div>
