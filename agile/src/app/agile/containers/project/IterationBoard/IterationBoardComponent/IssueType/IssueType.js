@@ -2,12 +2,31 @@ import React, { Component } from 'react';
 import { stores } from 'choerodon-front-boot';
 import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
-import { Icon } from 'choerodon-ui';
+import { Icon, Spin } from 'choerodon-ui';
+import pic from './no_issue.png';
+import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 
 import './IssueType.scss';
+import Sprint from '../Sprint/Sprint';
 // import { AppState } = stores;
 
 class IssueType extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: true,
+      currentSprint: {},
+    };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.nextProps.currentSprint.sprintId === this.props.currentSprint.sprintId) {
+      return false;
+    }
+    this.state.currentSprint = this.nextProps.currentSprint;
+    return true;
+  }
+
   getOption() {
     const option = {
       tooltip: {
@@ -22,8 +41,8 @@ class IssueType extends Component {
       grid: {
         left: '0%',
         top: '26px',
-        // right: '4%',
-        // bottom: '3%',
+        right: '28%',
+        bottom: '8%',
         containLabel: true,
       },
       xAxis: {
@@ -58,13 +77,17 @@ class IssueType extends Component {
         {
           name: '处理中',
           type: 'bar',
-          stack: '总量',
-          label: {
-            normal: {
-              show: true,
-              position: 'insideRight',
-            },
-          },
+          stack: '计数',
+          //   barWidth: '24px',
+          // barGap: 0,
+          barCategoryGap: '28px',
+          
+          //   label: {
+          //     normal: {
+          //     //   show: true,
+          //     //   position: 'insideRight',
+          //     },
+          //   },
           data: [
             {
               value: 50,
@@ -95,13 +118,16 @@ class IssueType extends Component {
         {
           name: '待处理',
           type: 'bar',
-          stack: '总量',
-          label: {
-            normal: {
-              show: true,
-              position: 'insideRight',
-            },
-          },
+          stack: '计数',
+          //   barWidth: '24px',
+          //   barGap: '117%',
+          //   barCategoryGap:'117%',
+          //   label: {
+          //     normal: {
+          //       show: true,
+          //       position: 'insideRight',
+          //     },
+          //   },
           data: [
             {
               value: 20,
@@ -132,13 +158,16 @@ class IssueType extends Component {
         {
           name: '已完成',
           type: 'bar',
-          stack: '总量',
-          label: {
-            normal: {
-              show: true,
-              position: 'insideRight',
-            },
-          },
+          stack: '计数',
+          //   barWidth: '24px',
+          //      barGap: '117%',
+          //   barCategoryGap:'117%',
+          //   label: {
+          //     normal: {
+          //       show: true,
+          //       position: 'insideRight',
+          //     },
+          //   },
           data: [
             {
               value: 40,
@@ -171,16 +200,29 @@ class IssueType extends Component {
     return option;
   }
 
+  renderContent() {
+    const { loading } = this.state;
+    if (loading) {
+      return (
+        <div className="c7n-IssueType-loading">
+          <Spin />
+        </div>
+      );
+    }
+    if (!currentSprint || !currentSprint.sprintId) {
+      this.setState({
+        loading: false,
+          
+      });
+    }
+  }
+
   render() {
     return (
       <div className="c7n-IssueType">
-        <div className="c7n-IssueType-nav">
-          <span>迭代问题类型分布</span>
-          <Icon type="arrow_forward" />
-        </div>
         <div className="c7n-IssueType-chart">
           <ReactEcharts
-            // style={{ height: 200 }}
+            style={{ height: 230 }}
             option={this.getOption()}
           />
           <ul className="c7n-IssueType-chart-legend">

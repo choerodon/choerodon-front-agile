@@ -10,6 +10,8 @@ import Sprint from '../IterationBoardComponent/Sprint';
 import Status from '../IterationBoardComponent/Status';
 import Remain from '../IterationBoardComponent/Remain';
 import Priority from '../IterationBoardComponent/Priority';
+import IssueTypeComponent from '../IterationBoardComponent/IssueType';
+import SprintDetailsComponent from '../IterationBoardComponent/SprintDetails';
 
 import './IterationBoardHome.scss';
 
@@ -125,6 +127,11 @@ class IterationBoardHome extends Component {
               <Assignee
                 sprintId={sprintId}
               />
+            </Col>
+          </Row>
+          <Row gutter={20}>
+            <Col span={24}>
+              <SprintDetailsComponent />
             </Col>
           </Row>
         </Content>
