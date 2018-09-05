@@ -7,12 +7,17 @@ class IssueTypeWrap extends Component {
     super(props);
   }
 
+
   render() {
+    const { sprintId, link } = this.props;
     return (
       <Card
         title="迭代问题类型分布"
+        link={link}
       >
-        <IssueType />
+        <IssueType 
+          sprintId={sprintId}
+        />
       </Card>
     );
   }

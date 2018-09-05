@@ -219,7 +219,7 @@ class BurnDown extends Component {
       .then((res) => {
         if (res && res.length) {
           const sprint = res.find(v => v.sprintId === sprintId);
-          this.setState({ sprint: sprint });
+          this.setState({ sprint });
           this.loadChartData(sprintId);
         } else {
           this.setState({ loading: false });
@@ -236,7 +236,6 @@ class BurnDown extends Component {
         const sprintMaxDate = endDate.split(' ')[0];
         const maxDate = moment(dataMaxDate).isBefore(moment(sprintMaxDate))
           ? sprintMaxDate : dataMaxDate;
-        debugger;
         const xData = this.getBetweenDateStr(dataMinDate, maxDate);
         const xDataFormat = _.map(xData, item => item.slice(5).replace('-', '/'));
         const yAxis = xData.map((data, index) => {

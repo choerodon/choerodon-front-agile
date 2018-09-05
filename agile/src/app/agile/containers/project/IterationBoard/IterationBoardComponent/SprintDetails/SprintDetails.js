@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import { stores } from 'choerodon-front-boot';
-import { observer } from 'mobx-react';
-import ReactEcharts from 'echarts-for-react';
 import {
-  Icon, Table, Tabs, Spin, Tooltip, Pagination,
+  Table, Tabs, Spin, Tooltip, Pagination,
 } from 'choerodon-ui';
 import TypeTag from '../../../../../components/TypeTag';
 import PriorityTag from '../../../../../components/PriorityTag';
 import StatusTag from '../../../../../components/StatusTag';
-import IterationBoardStore from '../../../../../stores/project/IterationBoard/IterationBoardStore';
+import { loadSprintIssues } from '../../../../../api/NewIssueApi';
+
 import './SprintDetails.scss';
 
-const TabPane = Tabs.TabPane;
-@observer
+const { TabPane } = Tabs;
+const { AppState } = stores;
 class SprintDetails extends Component {
   constructor(props) {
     super(props);
@@ -20,183 +19,289 @@ class SprintDetails extends Component {
       loading: true,
       pagination: {
         current: 1,
-        total: 0,
         pageSize: 10,
       },
+      sprintId: undefined,
+      doneIssues: [],
+      undoIssues: [],
+      undoAndNotEstimatedIssues: [],
+      activeKey: 'done',
     };
   }
   
-  componentWillMount() {
-    // this.loadData();
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.sprintId !== this.props.sprintId) {
+      const { sprintId } = nextProps;
+      this.setState({
+        sprintId,
+      });
+      this.loadDoneIssues(sprintId);
+    }
   }
 
-    loadData = (pagination) => {
+    handleTableChange = (pagination) => {
+      const { activeKey, sprintId } = this.state;
+      const ARRAY = {
+        done: 'loadDoneIssues',
+        undo: 'loadUndoIssues',
+        undoAndNotEstimated: 'loadUndoAndNotEstimatedIssues',
+      };
+      this.setState({
+        pagination,
+      });
+      this[ARRAY[activeKey]](sprintId, {
+        page: pagination.current - 1,
+        size: pagination.pageSize,
+      });
+    }
+
+    handleTabChange = (key) => {
+      const { sprintId } = this.state;
+      this.setState({
+        activeKey: key,
+      });
+      const ARRAY = {
+        done: 'loadDoneIssues',
+        undo: 'loadUndoIssues',
+        undoAndNotEstimated: 'loadUndoAndNotEstimatedIssues',
+      };
+      this[ARRAY[key]](sprintId);
+    }
+
+    loadDoneIssues(sprintId) {
       this.setState({
         loading: true,
       });
-      IterationBoardStore.axiosGetSprintDetailData({
-        page: pagination.current - 1,
-        size: pagination.pageSize,
-      }).then((data) => {
-        IterationBoardStore.setSpintDetailData(data);
-        this.setState({
-          loading: false,
-          pagination: {
-            current: pagination.current,
-            pageSize: Pagination.pageSize,
-            total: data.totalElements,
-          },
+      loadSprintIssues(sprintId, 'done')
+        .then((res) => {
+          this.setState({
+            doneIssues: res.content,
+            loading: false,
+          });
+        })
+        .catch((e) => {
+          this.setState({
+            loading: false,
+          });
+          Choerodon.handleResponseError(e);
         });
-      }).catch((error) => {
-        this.setState({
-          loading: false,
-        });
-        Choerodon.handleResponseError(error);
+    }
+  
+    loadUndoIssues(sprintId) {
+      this.setState({
+        loading: true,
       });
+      loadSprintIssues(sprintId, 'unfinished')
+        .then((res) => {
+          this.setState({
+            undoIssues: res.content,
+            loading: false,
+          });
+        })
+        .catch((e) => {
+          this.setState({
+            loading: false,
+          });
+          Choerodon.handleResponseError(e);
+        });
     }
 
-    handleTableChange = (pagination) => {
-      this.loadData({
-        current: pagination.current,
-        pageSize: pagination.pageSize,
+    loadUndoAndNotEstimatedIssues(sprintId) {
+      this.setState({
+        loading: true,
       });
+      loadSprintIssues(sprintId, 'unfinished')
+        .then((res) => {
+          this.setState({
+            undoAndNotEstimatedIssues: res.content.filter(item => (item.storyPoints === 0 && item.typeCode === 'story') || (item.remainTime === null && item.typeCode === 'task')),
+            loading: false,
+          });
+        })
+        .catch((e) => {
+          this.setState({
+            loading: false,
+          });
+          Choerodon.handleResponseError(e);
+        });
     }
 
-    renderTable(dataType) {
-      const spintDetailData = IterationBoardStore.getSprintDetailData;// 边界,空对象或数组
-      const columns = [{
+    renderDoneIssues(column) {
+      const { loading, doneIssues, pagination } = this.state;
+      return (
+        <div>
+          <Table
+            rowKey={record => record.issueId}
+            dataSource={doneIssues}
+            columns={column}
+            filterBar={false}
+            pagination={pagination}
+            scroll={{ x: true }}
+            loading={loading}
+            onChange={this.handleTableChange}
+          />
+        </div>
+      );
+    }
+
+    renderUndoIssues(column) {
+      const { loading, undoIssues, pagination } = this.state;
+      return (
+        <div>
+          <Table
+            rowKey={record => record.issueId}
+            dataSource={undoIssues}
+            columns={column}
+            filterBar={false}
+            pagination={pagination}
+            scroll={{ x: true }}
+            loading={loading}
+            onChange={this.handleTableChange}
+          />
+        </div>
+      );
+    }
+
+    renderUndoAndNotEstimatedIssues(column) {
+      const { loading, undoAndNotEstimatedIssues, pagination } = this.state;
+      return (
+        <div>
+          <Table
+            rowKey={record => record.issueId}
+            dataSource={undoAndNotEstimatedIssues}
+            columns={column}
+            filterBar={false}
+            pagination={pagination}
+            scroll={{ x: true }}
+            loading={loading}
+            onChange={this.handleTableChange}
+          />
+        </div>
+      );
+    }
+  
+    render() {
+      const { activeKey } = this.state;
+      const column = [{
         title: '关键字',
-        dataIndex: 'keyword',
+        dataIndex: 'issueNum',
         key: 'keyword',
         // width: '94px',
-        render: (text, record) => (
-          <Tooltip title={text}>
-            <div
-              role="none"
-              style={{ 
-                maxWidth: '94px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              }}
-            >
-              <a>
-                {text}
-              </a>
-            </div>
-          </Tooltip>
+        render: (issueNum, record) => (
+          <span
+            style={{
+              color: '#3f51b5',
+              cursor: 'pointer',
+            }}
+            role="none"
+            onClick={() => {
+              const { history } = this.props;
+              const urlParams = AppState.currentMenuType;
+              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/sprintreport`);
+            }}
+          >
+            {issueNum} 
+            {' '}
+            {record.addIssue ? '*' : ''}
+
+          </span>
         ),
       }, {
         title: '概要',
         dataIndex: 'summary',
         key: 'summary',
-        render: text => (
-          <Tooltip title={text}>
+        render: summary => (
+          <Tooltip title={summary}>
             <div
               role="none"
               style={{ 
-                maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
             >
               <a>
-                {text}
+                {summary}
               </a>
             </div>
           </Tooltip>
         ),
       }, {
         title: '问题类型',
-        dataIndex: 'issueType',
-        key: 'issueType',
-        render: (text, recode) => (
-          <TypeTag
-            typeCode={text}
-          />
+        dataIndex: 'typeCode',
+        key: 'typeCode',
+        render: (typeCode, record) => (
+          <div>
+            <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.typeCode}`}>
+              <div>
+                <TypeTag
+                  typeCode={record.typeCode}
+                  showName
+                />
+              </div>
+            </Tooltip>
+          </div>
         ),
       }, {
         title: '优先级',
         dataIndex: 'priority',
         key: 'priority',
-        render: (text, recode) => (
-          <PriorityTag
-            priority={text}
-          />
+        render: (text, record) => (
+          <div>
+            <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityName}`}>
+              <div style={{ marginRight: 12 }}>
+                <PriorityTag
+                  priority={record.priorityCode}
+                />
+              </div>
+            </Tooltip>
+          </div>
         ),
       }, {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        render: (text, recode) => (
-          <StatusTag
-            name={statusName}
-            color={statusColor}
-          />
+        render: (text, record) => (
+          <div>
+            <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusName}`}>
+              <div>
+                <StatusTag
+                  style={{ display: 'inline-block' }}
+                  name={record.statusName}
+                  color={record.statusColor}
+                />
+              </div>
+            </Tooltip>
+          </div>
         ), 
       }, {
         title: '剩余时间',
-        dataIndex: 'restTime',
-        key: 'restTime',
-        render: (text, record) => (
-          <span>{`${text}h`}</span>
+        dataIndex: 'remainingTime',
+        key: 'remainingTime',
+        render: (remainingTime, record) => (
+          <span>{`${remainingTime === null ? '0' : (`${remainingTime}h`)}`}</span>
         ),
       }, {
         title: '故事点',
-        dataIndex: 'storyPoint',
-        key: 'storyPoint',
-        render: (text, record) => (
-          <span>{text}</span>
-        ),
-      }, {
-        title: '问题计数',
-        dataIndex: 'problemCount',
-        key: 'problemCount',
-        render: (text, record) => (
-          <span>{text}</span>
+        dataIndex: 'storyPoints',
+        key: 'storyPoints',
+        render: (storyPoints, record) => (
+          <div>
+            {record.typeCode === 'story' ? storyPoints || '0' : ''}
+          </div>
         ),
       }];
       return (
-        this.state.loading ? (
-          <div className="c7n-SprintDetails-loading">
-            <Spin />
-          </div>
-        ) : (
-          <Table
-            columns={columns}
-            dataSource={`${dataType}Data`}
-            pagination={this.state.pagination}
-            onChange={this.handleTableChange}
-          />
-        )
-        
-      );
-    }
-
-    renderTabPane() {
-      // const tabs = ['已完成的问题', '未完成的问题', '未完成的预估问题'];
-      const tabs = [
-        { 
-          key: 'done',
-          tab: '已完成的问题',
-        }, {
-          key: 'undo',
-          tab: '未完成的问题',
-        }, {
-          key: 'undoAndNotEstimated',
-          tab: '未完成的未预估问题',
-        }];
-
-      const tabPanes = tabs.map(item => (
-        <TabPane tab={item.tab} key={item.key}>
-          {this.renderTable(item.key)}
-        </TabPane>
-      ));
-      return tabPanes;    
-    }
-
-    render() {
-      return (
         <div className="c7n-SprintDetails">
           <div className="c7n-SprintDetails-tabs">
-            {/* <Tabs>
-              {this.renderTabPane()}
-            </Tabs> */}
+            <Tabs activeKey={activeKey} onChange={this.handleTabChange}>
+              <TabPane tab="已完成的问题" key="done">
+                {this.renderDoneIssues(column)}
+              </TabPane>
+              <TabPane tab="未完成的问题" key="undo">
+                {this.renderUndoIssues(column)}
+              </TabPane>
+              <TabPane tab="从Sprint中删除的问题" key="undoAndNotEstimated">
+                {this.renderUndoAndNotEstimatedIssues(column)}
+              </TabPane>
+            </Tabs>
           </div>
         </div>
       );

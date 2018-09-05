@@ -8,11 +8,15 @@ class SprintDetailsWrap extends Component {
   }
 
   render() {
+    const { sprintId, link } = this.props;
     return (
       <Card
         title="冲刺详情"
+        link={link}
       >
-        <SprintDetails />
+        <SprintDetails 
+          sprintId={sprintId}
+        />
       </Card>
     );
   }
