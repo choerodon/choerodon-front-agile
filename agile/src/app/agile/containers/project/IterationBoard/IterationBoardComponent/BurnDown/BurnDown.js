@@ -10,8 +10,8 @@ import {
   DashBoardNavBar, stores, axios,
 } from 'choerodon-front-boot';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
-import pic from './no_sprint.svg';
-import './index.scss';
+import pic from '../EmptyPics/no_sprint.svg';
+import './BurnDown.scss';
 
 const { AppState } = stores;
 
@@ -27,7 +27,6 @@ class BurnDown extends Component {
   }
 
   componentDidMount() {
-    // this.loadSprints();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -237,6 +236,7 @@ class BurnDown extends Component {
         const sprintMaxDate = endDate.split(' ')[0];
         const maxDate = moment(dataMaxDate).isBefore(moment(sprintMaxDate))
           ? sprintMaxDate : dataMaxDate;
+        debugger;
         const xData = this.getBetweenDateStr(dataMinDate, maxDate);
         const xDataFormat = _.map(xData, item => item.slice(5).replace('-', '/'));
         const yAxis = xData.map((data, index) => {
@@ -275,16 +275,14 @@ class BurnDown extends Component {
         <div className="loading-wrap">
           <EmptyBlockDashboard
             pic={pic}
-            des="当前没有冲刺"
+            des="当前项目下无活跃或结束冲刺"
           />
         </div>
       );
     }
     return (
       <ReactEcharts
-        style={{
-          height: 400,
-        }}
+        style={{ height: 400 }}
         option={this.getOption()}
       />
     );

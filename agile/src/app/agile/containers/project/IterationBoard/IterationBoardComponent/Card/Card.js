@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { stores } from 'choerodon-front-boot';
 import { Icon } from 'choerodon-ui';
 import './Card.scss';
 
-class Card extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      loading: true,
-    };
-  }
+const { AppState } = stores;
 
-  componentDidMount() {
+class Card extends Component {
+  handleClick() {
+    const { link, history } = this.props;
+    const urlParams = AppState.currentMenuType;
+    history.push(`/agile/${link}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
   }
 
   render() {
@@ -27,9 +27,17 @@ class Card extends Component {
               </span>
             </h1>
             <span className="center" />
-            <span>
-              <Icon type="arrow_forward" />
-            </span>
+            {
+              link ? (
+                <span>
+                  <Icon
+                    type="arrow_forward"
+                    style={{ cursor: 'pointer' }}
+                    onClick={this.handleClick.bind(this)}
+                  />
+                </span>
+              ) : null
+            }
           </header>
           <section style={{ padding: '0 16px 1px' }}>
             {children}
@@ -39,4 +47,4 @@ class Card extends Component {
     );
   }
 }
-export default Card;
+export default withRouter(Card);

@@ -3,21 +3,13 @@ import Card from '../Card';
 import Prio from './Priority';
 
 class Priority extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
-  componentDidMount() {
-  }
-
   render() {
-    const { sprintId } = this.props;
+    const { sprintId, link } = this.props;
 
     return (
       <Card
         title={'优先级分布'}
+        link={link}
       >
         <Prio
           sprintId={sprintId}
@@ -26,4 +18,5 @@ class Priority extends Component {
     );
   }
 }
+
 export default Priority;

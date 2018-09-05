@@ -1,26 +1,15 @@
 import React, { Component } from 'react';
-import { stores } from 'choerodon-front-boot';
 import Card from '../Card';
 import Assignee from './Assignee';
 
-const { AppState } = stores;
-
 class AssigneeWrap extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
-  componentDidMount() {
-  }
-
   render() {
-    const { sprintId } = this.props;
+    const { sprintId, link } = this.props;
 
     return (
       <Card
         title={'经办人分布'}
+        link={link}
       >
         <Assignee
           sprintId={sprintId}
@@ -29,4 +18,5 @@ class AssigneeWrap extends Component {
     );
   }
 }
+
 export default AssigneeWrap;

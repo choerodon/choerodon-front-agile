@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
+import { Spin } from 'choerodon-ui';
 import _ from 'lodash';
 import EmptyBlockDashboard from '../../../../../../components/EmptyBlockDashboard';
-import pic from './no_version.svg';
+import pic from '../../EmptyPics/no_sprint.svg';
+import pic2 from '../../EmptyPics/no_version.svg';
 import './Status.scss';
 
 const { AppState } = stores;
@@ -16,9 +18,6 @@ class Status extends Component {
       loading: true,
       statusInfo: [],
     };
-  }
-
-  componentDidMount() {
   }
 
   componentWillReceiveProps(nextProps) {
@@ -137,18 +136,50 @@ class Status extends Component {
     return option;
   }
 
-  render() {
-    const {
-      versionList, currentVersion, currentVersionId, loading, 
-    } = this.state;
+  renderContent() {
+    const { statusInfo, loading, sprintId } = this.state;
+    if (loading) {
+      return (
+        <div className="c7n-loadWrap">
+          <Spin />
+        </div>
+      );
+    }
+    if (!sprintId) {
+      return (
+        <div className="c7n-loadWrap">
+          <EmptyBlockDashboard
+            pic={pic}
+            des="当前项目下无活跃或结束冲刺"
+          />
+        </div>
+      );
+    }
+    if (statusInfo.every(v => v === 0)) {
+      return (
+        <div className="c7n-loadWrap">
+          <EmptyBlockDashboard
+            pic={pic2}
+            des="当前冲刺下无问题"
+          />
+        </div>
+      );
+    }
     return (
-      <div className="c7n-VersionProgress">
-        <ReactEcharts
-          option={this.getOption()}
-          style={{ height: 144 }}
-        />
+      <ReactEcharts
+        option={this.getOption()}
+        style={{ height: 144 }}
+      />
+    );
+  }
+
+  render() {
+    return (
+      <div className="c7n-agile-srpintDashboard-status">
+        {this.renderContent()}
       </div>
     );
   }
 }
+
 export default Status;

@@ -3,21 +3,13 @@ import Card from '../Card';
 import Remain from './Remain';
 
 class RemainWrap extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
-  componentDidMount() {
-  }
-
   render() {
-    const { sprintId, sprintName } = this.props;
+    const { sprintId, link } = this.props;
     
     return (
       <Card
         title={'距离冲刺结束'}
+        link={link}
       >
         <Remain
           sprintId={sprintId}
@@ -26,4 +18,5 @@ class RemainWrap extends Component {
     );
   }
 }
+
 export default RemainWrap;

@@ -3,22 +3,13 @@ import Card from '../Card';
 import Sprint from './Sprint';
 
 class SprintWrap extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      sprintName: '',
-    };
-  }
-
-  componentDidMount() {
-  }
-
   render() {
-    const { sprintId, sprintName } = this.props;
+    const { sprintId, sprintName, link } = this.props;
 
     return (
       <Card
         title={sprintName}
+        link={link}
       >
         <Sprint
           sprintId={sprintId}
@@ -27,4 +18,5 @@ class SprintWrap extends Component {
     );
   }
 }
+
 export default SprintWrap;
