@@ -34,15 +34,54 @@ class MineUnDone extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
+      loading: true,
+      priorityInfo: [],
     };
   }
 
   componentDidMount() {
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.sprintId !== this.props.sprintId) {
+      const sprintId = nextProps.sprintId;
+      this.setState({
+        sprintId,
+      });
+      this.loadPriorityInfo(sprintId);
+    }
+  }
+
+  loadPriorityInfo(sprintId) {
+    if (!sprintId) {
+      this.setState({
+        loading: false,
+        priorityInfo: {},
+      });
+    } else {
+      this.setState({ loading: true });
+      const projectId = AppState.currentMenuType.id;
+      axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/priority?sprintId=${sprintId}`)
+        .then((res) => {
+          const priorityInfo = this.transformPriority(res);
+          this.setState({
+            priorityInfo,
+            loading: false,
+          });
+        });
+    }
+  }
+
+  transformPriority(priorityArr) {
+    const result = {};
+    priorityArr.forEach((v, i) => {
+      result[v.priorityCode] = v;
+    });
+    return result;
+  }
+
   renderContent() {
-    const { loading, issues } = this.state;
+    const { loading, priorityInfo } = this.state;
     if (loading) {
       return (
         <div className="loading-wrap">
@@ -50,16 +89,16 @@ class MineUnDone extends Component {
         </div>
       );
     }
-    if (issues && !issues.length) {
-      return (
-        <div className="loading-wrap">
-          <EmptyBlockDashboard
-            pic={pic}
-            des="当前没有我的未完成的任务"
-          />
-        </div>
-      );
-    }
+    // if (issues && !issues.length) {
+    //   return (
+    //     <div className="loading-wrap">
+    //       <EmptyBlockDashboard
+    //         pic={pic}
+    //         des="当前没有我的未完成的任务"
+    //       />
+    //     </div>
+    //   );
+    // }
     return (
       <div className="lists">
         <h3 className="title">已完成/总计数</h3>
@@ -71,9 +110,10 @@ class MineUnDone extends Component {
   }
 
   renderList(priority) {
+    const { priorityInfo } = this.state;
     return (
       <div className="list">
-        <div className="tip">30/60</div>
+        <div className="tip">{priorityInfo[priority].completedNum}/{priorityInfo[priority].totalNum}</div>
         <div className="body">
           <div>
             <PriorityTag
@@ -89,7 +129,7 @@ class MineUnDone extends Component {
               className="progress-inner"
               style={{
                 background: PRIORITY_MAP[priority].color,
-                width: '50%',
+                width: `${priorityInfo[priority].completedNum / priorityInfo[priority].totalNum * 100}%`,
               }}
             />
           </div>

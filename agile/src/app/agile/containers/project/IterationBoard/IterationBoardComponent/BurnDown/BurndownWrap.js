@@ -16,11 +16,14 @@ class BurndownWrap extends Component {
   }
 
   render() {
+    const { sprintId } = this.props;
     return (
       <Card
         title={'燃尽图'}
       >
-        <Burndown />
+        <Burndown
+          sprintId={sprintId}
+        />
       </Card>
     );
   }

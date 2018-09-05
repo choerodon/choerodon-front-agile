@@ -9,24 +9,56 @@ class Sprint extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
+      loading: true,
+      sprintId: undefined,
+      sprintInfo: {},
     };
   }
 
   componentDidMount() {
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.sprintId !== this.props.sprintId) {
+      const sprintId = nextProps.sprintId;
+      this.setState({
+        sprintId,
+      });
+      this.loadSprintInfo(sprintId);
+    }
+  }
+
+  loadSprintInfo(sprintId) {
+    if (!sprintId) {
+      this.setState({
+        loading: false,
+        sprintInfo: {},
+      });
+    } else {
+      this.setState({ loading: true });
+      const projectId = AppState.currentMenuType.id;
+      axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/sprint?sprintId=${sprintId}`)
+        .then((res) => {
+          this.setState({
+            sprintInfo: res,
+            loading: false,
+          });
+        });
+    }
+  }
+
   renderUserHead() {
+    const { sprintInfo: { assigneeIssueDTOList } } = this.state;
     return (
       <div className="users">
         {
-          [1, 2, 3].map(user => (
+          assigneeIssueDTOList && assigneeIssueDTOList.map(user => (
             <UserHead
               user={{
-                id:1,
-                loginName: '1',
-                realName:  '1',
-                avatar: '',
+                id: user.assigneeId,
+                loginName: '',
+                realName:  user.assigneeName,
+                avatar: user.imageUrl,
               }}
               hiddenText
             />
@@ -37,7 +69,7 @@ class Sprint extends Component {
   }
 
   render() {
-    const { completeInfo, loading } = this.state;
+    const { completeInfo, loading, sprintInfo } = this.state;
     return (
       <div className="c7n-sprintDashboard-sprint">
         {
@@ -48,9 +80,9 @@ class Sprint extends Component {
          ) : (
            <div>
               {this.renderUserHead()}
-              <div className="count">25个问题可见</div>
-              <div className="goal">冲刺目标：功能完善+修复缺陷</div>
-              <div className="time">2018年6月23日 ~ 2018年10月30日</div>
+              <div className="count">{sprintInfo.issueCount || '0'}个问题可见</div>
+              <div className="goal text-overflow-hidden">冲刺目标：{sprintInfo.sprintGoal || ''}</div>
+              <div className="time">{sprintInfo.startDate} ~ {sprintInfo.endDate}</div>
            </div>
          )
        }

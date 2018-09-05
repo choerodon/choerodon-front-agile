@@ -13,11 +13,15 @@ class Priority extends Component {
   }
 
   render() {
+    const { sprintId } = this.props;
+
     return (
       <Card
         title={'优先级分布'}
       >
-        <Prio />
+        <Prio
+          sprintId={sprintId}
+        />
       </Card>
     );
   }

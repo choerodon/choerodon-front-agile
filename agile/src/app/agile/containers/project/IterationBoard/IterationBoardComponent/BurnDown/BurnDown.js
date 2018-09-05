@@ -19,6 +19,7 @@ class BurnDown extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      sprintId: undefined,
       sprint: {},
       unit: 'remainingEstimatedTime',
       loading: true,
@@ -26,7 +27,17 @@ class BurnDown extends Component {
   }
 
   componentDidMount() {
-    this.loadSprints();
+    // this.loadSprints();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.sprintId !== this.props.sprintId) {
+      const sprintId = nextProps.sprintId;
+      this.setState({
+        sprintId,
+      });
+      this.loadSprints(sprintId);
+    }
   }
 
   getyAxisName(unit) {
@@ -202,14 +213,15 @@ class BurnDown extends Component {
     return result;
   }
 
-  loadSprints() {
+  loadSprints(sprintId) {
     const projectId = AppState.currentMenuType.id;
     this.setState({ loading: true });
     axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, ['started', 'closed'])
       .then((res) => {
         if (res && res.length) {
-          this.setState({ sprint: res[0] });
-          this.loadChartData(res[0].sprintId);
+          const sprint = res.find(v => v.sprintId === sprintId);
+          this.setState({ sprint: sprint });
+          this.loadChartData(sprintId);
         } else {
           this.setState({ loading: false });
         }

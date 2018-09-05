@@ -16,11 +16,15 @@ class AssigneeWrap extends Component {
   }
 
   render() {
+    const { sprintId } = this.props;
+
     return (
       <Card
         title={'经办人分布'}
       >
-        <Assignee />
+        <Assignee
+          sprintId={sprintId}
+        />
       </Card>
     );
   }

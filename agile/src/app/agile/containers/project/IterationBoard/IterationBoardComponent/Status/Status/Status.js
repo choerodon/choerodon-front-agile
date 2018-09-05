@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
+import _ from 'lodash';
 import EmptyBlockDashboard from '../../../../../../components/EmptyBlockDashboard';
 import pic from './no_version.svg';
 import './Status.scss';
@@ -11,15 +12,53 @@ class Status extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
+      sprintId: undefined,
+      loading: true,
+      statusInfo: [],
     };
   }
 
   componentDidMount() {
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.sprintId !== this.props.sprintId) {
+      const sprintId = nextProps.sprintId;
+      this.setState({
+        sprintId,
+      });
+      this.loadStatus(sprintId);
+    }
+  }
+
+  loadStatus(sprintId) {
+    const projectId = AppState.currentMenuType.id;
+    this.setState({ loading: true });
+    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/status?sprintId=${sprintId}`)
+      .then((res) => {
+        const statusInfo = this.transformStatus(res);
+        this.setState({
+          loading: false,
+          statusInfo,
+        });
+      });
+  }
+
+  transformStatus(statusArr) {
+    let todo = statusArr.find(v => v.categoryCode === 'todo');
+    let doing = statusArr.find(v => v.categoryCode === 'doing');
+    let done = statusArr.find(v => v.categoryCode === 'done');
+    const result = [
+      todo ? todo.issueNum : 0,
+      doing ? doing.issueNum : 0,
+      done ? done.issueNum : 0,
+    ];
+    return result;
+  }
+
   getOption() {
-    const currentVersion = this.state.currentVersion;
+    const { statusInfo } = this.state;
+    const allCount = _.reduce(statusInfo, (sum, n) => sum + n, 0);
     const option = {
       legend: {
         orient: 'vertical',
@@ -54,7 +93,8 @@ class Status extends Component {
         },
         formatter(params) {
           let res;
-          res = `${params.name}：${params.value}<br/>占比： ${params.value}%`;
+          res = `${params.name}：${params.value}<br/>占比：
+            ${((params.value / allCount).toFixed(2) * 100).toFixed(0)}%`;
           return res;
         },
         extraCssText: 
@@ -62,13 +102,11 @@ class Status extends Component {
       },
       series: [
         {
-          // name: '访问来源',
           color: ['#FFB100', '#4D90FE', '#00BFA5'],
           type: 'pie',
           radius: '60px',
           avoidLabelOverlap: false,
           hoverAnimation: false,
-          // legendHoverLink: false,
           center: ['35%', '50%'],
           label: {
             normal: {
@@ -84,9 +122,9 @@ class Status extends Component {
             },
           },
           data: [
-            { value: 10, name: '待处理' },
-            { value: 20, name: '处理中' },
-            { value: 30, name: '已完成' },
+            { value: statusInfo[0] || 0, name: '待处理' },
+            { value: statusInfo[1] || 0, name: '处理中' },
+            { value: statusInfo[2] || 0, name: '已完成' },
           ],
           itemStyle: { 
             normal: { 
