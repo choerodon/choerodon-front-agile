@@ -1,33 +1,55 @@
 import React, { Component } from 'react';
-import { stores } from 'choerodon-front-boot';
-import { observer } from 'mobx-react';
+import { stores, axios } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import { Icon, Spin } from 'choerodon-ui';
 import pic from './no_issue.png';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
-
 import './IssueType.scss';
-import Sprint from '../Sprint/Sprint';
-// import { AppState } = stores;
+
+const { AppState } = stores;
 
 class IssueType extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
-      currentSprint: {},
+      sprintId: undefined,
+      issueTypeInfo: [],
     };
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    // if (this.nextProps.currentSprint.sprintId === this.props.currentSprint.sprintId) {
-    //   return false;
-    // }
-    // this.state.currentSprint = this.nextProps.currentSprint;
-    // return true;
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.sprintId !== this.state.sprintId) {
+      this.setState({
+        sprintId: nextProps.sprintId,
+      });
+    }
+    this.loadIssueTypeData(nextProps.sprintId);
   }
 
+  getCategoryCount(code) {
+    const { issueTypeInfo } = this.state;
+    const datas = [];
+    const typeCodes = ['story', 'bug', 'task', 'sub_task'];
+    for (let i = 0; i < typeCodes.length; i++) {
+      const typeIndex = issueTypeInfo.findIndex(item => item.typeCode === typeCodes[i]);
+      if (typeIndex === -1) {
+        datas[i] = 0;
+      } else {
+        const statusIndex = issueTypeInfo[typeIndex].issueStatus.findIndex(status => status.categoryCode === code);
+        if (statusIndex === -1) {
+          datas[i] = 0;
+        } else {
+          datas[i] = issueTypeInfo[typeIndex].issueStatus[statusIndex].issueNum;
+        }
+      }
+    }
+    return datas;
+  }
+  
+
   getOption() {
+    const { issueTypeInfo } = this.state;
     const option = {
       tooltip: {
         trigger: 'axis',
@@ -78,130 +100,58 @@ class IssueType extends Component {
           name: '处理中',
           type: 'bar',
           stack: '计数',
-          //   barWidth: '24px',
-          // barGap: 0,
           barCategoryGap: '28px',
-          
-          //   label: {
-          //     normal: {
-          //     //   show: true,
-          //     //   position: 'insideRight',
-          //     },
-          //   },
-          data: [
-            {
-              value: 50,
-              itemStyle: {
-                color: '#45A3FC',
-              }, 
-            },
-            {
-              value: 30,
-              itemStyle: {
-                color: '#45A3FC',
-              }, 
-            },
-            {
-              value: 50,
-              itemStyle: {
-                color: '#45A3FC',
-              }, 
-            },
-            {
-              value: 25,
-              itemStyle: {
-                color: '#45A3FC',
-              }, 
-            },
-          ],
+          data: this.getCategoryCount('doing'),
+          itemStyle: {
+            color: '#45A3FC',
+          }, 
         },
         {
           name: '待处理',
           type: 'bar',
           stack: '计数',
-          //   barWidth: '24px',
-          //   barGap: '117%',
-          //   barCategoryGap:'117%',
-          //   label: {
-          //     normal: {
-          //       show: true,
-          //       position: 'insideRight',
-          //     },
-          //   },
-          data: [
-            {
-              value: 20,
-              itemStyle: {
-                color: ' #FFB100',
-              }, 
-            },
-            {
-              value: 30,
-              itemStyle: {
-                color: '#FFB100',
-              }, 
-            },
-            {
-              value: 10,
-              itemStyle: {
-                color: '#FFB100',
-              }, 
-            },
-            {
-              value: 25,
-              itemStyle: {
-                color: '#FFB100',
-              }, 
-            },
-          ],
+          data: this.getCategoryCount('todo'),
+          itemStyle: {
+            color: ' #FFB100',
+          },
         },
         {
           name: '已完成',
           type: 'bar',
           stack: '计数',
-          //   barWidth: '24px',
-          //      barGap: '117%',
-          //   barCategoryGap:'117%',
-          //   label: {
-          //     normal: {
-          //       show: true,
-          //       position: 'insideRight',
-          //     },
-          //   },
-          data: [
-            {
-              value: 40,
-              itemStyle: {
-                color: '#00BFA5',
-              }, 
-            },
-            {
-              value: 30,
-              itemStyle: {
-                color: ' #00BFA5',
-              }, 
-            },
-            {
-              value: 20,
-              itemStyle: {
-                color: ' #00BFA5',
-              }, 
-            },
-            {
-              value: 25,
-              itemStyle: {
-                color: ' #00BFA5',
-              }, 
-            },
-          ],
+          data: this.getCategoryCount('done'),
+          itemStyle: {
+            color: '#00BFA5',
+          },
         },
       ],
     };
     return option;
   }
 
+  loadIssueTypeData(sprintId) {
+    const projectId = AppState.currentMenuType.id;
+    this.setState({
+      loading: true,
+    });
+    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/issue_type?sprintId=${sprintId}`)
+      .then((res) => {
+        if (res && res.length) {
+          this.setState({
+            loading: false,
+            issueTypeInfo: res,
+          });
+        } else {
+          this.setState({
+            loading: false,
+          });
+        }
+      });
+  }
+
+  
   renderContent() {
-    const { loading } = this.state;
+    const { loading, sprintId } = this.state;
     if (loading) {
       return (
         <div className="c7n-IssueType-loading">
@@ -209,37 +159,47 @@ class IssueType extends Component {
         </div>
       );
     }
-    if (!currentSprint || !currentSprint.sprintId) {
+    if (!sprintId) {
       this.setState({
-        loading: false,
-          
+        loading: false,    
       });
+      return (
+        <div className="c7n-IssueType-empty">
+          <EmptyBlockDashboard
+            pic={pic}
+            des="当前冲刺下没有问题"
+          />
+        </div>
+      );
     }
+    return (
+      <div className="c7n-IssueType-chart">
+        <ReactEcharts
+          style={{ height: 230 }}
+          option={this.getOption()}
+        />
+        <ul className="c7n-IssueType-chart-legend">
+          <li>
+            <div />
+            {'待处理'}
+          </li>
+          <li>
+            <div />
+            {'处理中'}
+          </li>
+          <li>
+            <div />
+            {'已完成'}
+          </li>
+        </ul>
+      </div>
+    );
   }
 
   render() {
     return (
       <div className="c7n-IssueType">
-        <div className="c7n-IssueType-chart">
-          <ReactEcharts
-            style={{ height: 230 }}
-            option={this.getOption()}
-          />
-          <ul className="c7n-IssueType-chart-legend">
-            <li>
-              <div />
-              {'待处理'}
-            </li>
-            <li>
-              <div />
-              {'处理中'}
-            </li>
-            <li>
-              <div />
-              {'已完成'}
-            </li>
-          </ul>
-        </div>
+        {this.renderContent()}
       </div>
     );
   }
