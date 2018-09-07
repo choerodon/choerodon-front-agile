@@ -2,11 +2,15 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import _ from 'lodash';
 import { toJS } from 'mobx';
-import { Page, Header, Content, Permission } from 'choerodon-front-boot';
+import {
+  Page, Header, Content, Permission, 
+} from 'choerodon-front-boot';
 import {
   Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin,
 } from 'choerodon-ui';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import html2canvas from 'html2canvas';
+import Canvas2Image from '../../../../../../../node_modules/canvas2image/canvas2image';
 import './test.scss';
 import CreateEpic from '../component/CreateEpic';
 import Backlog from '../component/Backlog/Backlog.js';
@@ -51,6 +55,7 @@ class Home3 extends Component {
       }
     }, 20);
   }
+
   componentWillUnmount() {
     this.props.UserMapStore.setCurrentFilter([]);
     this.props.UserMapStore.setMode('none');
@@ -82,7 +87,7 @@ class Home3 extends Component {
         }
         const { top, currentIndex } = UserMapStore;
         // window.console.log('when change mode, the top is: ' + top);
-        const index = _.findLastIndex(offsetTops, v => v <=  0 + 42);
+        const index = _.findLastIndex(offsetTops, v => v <= 0 + 42);
         if (currentIndex !== index && index !== -1) {
           UserMapStore.setCurrentIndex(index);
         }
@@ -92,7 +97,7 @@ class Home3 extends Component {
         UserMapStore.setTop(bodyTop);
         const { top, currentIndex } = UserMapStore;
         // window.console.log('when change mode, the top is: ' + bodyTop);
-        const index = _.findLastIndex(offsetTops, v => v <=  top + 42);
+        const index = _.findLastIndex(offsetTops, v => v <= top + 42);
         if (currentIndex !== index && index !== -1) {
           UserMapStore.setCurrentIndex(index);
         }
@@ -122,7 +127,9 @@ class Home3 extends Component {
   handleScroll = (e) => {
     const { scrollLeft, scrollTop } = e.target;
     const { UserMapStore } = this.props;
-    const { left, top, offsetTops, currentIndex } = UserMapStore;
+    const {
+      left, top, offsetTops, currentIndex, 
+    } = UserMapStore;
     const header = document.getElementById('fixHead-head');
     if (scrollLeft !== left) {
       // scrollL = scrollLeft;
@@ -182,6 +189,7 @@ class Home3 extends Component {
       }
     }
   }
+
   handleClickIssue = (issueId, epicId) => {
     const { UserMapStore } = this.props;
     const { selectIssueIds } = UserMapStore;
@@ -320,14 +328,18 @@ class Home3 extends Component {
     }
     const epicId = data[sourceIndex].issueId;
     const { objectVersionNumber } = data[sourceIndex];
-    const postData = { afterSequence, beforeSequence, epicId, objectVersionNumber };
+    const postData = {
+      afterSequence, beforeSequence, epicId, objectVersionNumber, 
+    };
     UserMapStore.setEpics(result);
     UserMapStore.handleEpicDrag(postData);
   };
 
   handelDragToBoard = (res) => {
     const { UserMapStore } = this.props;
-    const { mode, issues, backlogIssues, selectIssueIds } = UserMapStore;
+    const {
+      mode, issues, backlogIssues, selectIssueIds, 
+    } = UserMapStore;
     const sourceIndex = res.source.index;
     const tarIndex = res.destination.index;
     const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
@@ -366,7 +378,9 @@ class Home3 extends Component {
       if (mode !== 'none') {
         tarIssue[key] = vosId;
       }
-      postData = { before, epicId: tarEpicId, outsetIssueId, rankIndex, issueIds };
+      postData = {
+        before, epicId: tarEpicId, outsetIssueId, rankIndex, issueIds, 
+      };
       if (res.source.droppableId.includes('backlog')) {
         tarBacklogData = _.filter(backlogData, item => item.issueId === id)[0];
         const index = backlogData.indexOf(tarBacklogData);
@@ -387,7 +401,9 @@ class Home3 extends Component {
 
   handleDragToBacklog = (res) => {
     const { UserMapStore } = this.props;
-    const { backlogIssues, mode, selectIssueIds, issues } = UserMapStore;
+    const {
+      backlogIssues, mode, selectIssueIds, issues, 
+    } = UserMapStore;
     const key = `${mode}Id`;
     const value = parseInt(res.destination.droppableId.split('-')[1], 10);
     const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
@@ -414,12 +430,16 @@ class Home3 extends Component {
       let tarIssue = null;
       if (res.source.droppableId.includes('backlog')) {
         tarIssue = _.filter(backlogData, item => item.issueId === id)[0];
-        postData = { before, outsetIssueId, rankIndex, issueIds, [key]: vosId };
+        postData = {
+          before, outsetIssueId, rankIndex, issueIds, [key]: vosId, 
+        };
         // const index = backlogIssues.indexOf(tarIssue);
       } else {
         tarIssue = _.filter(issueData, item => item.issueId === id)[0];
         tarIssue.epicId = 0;
-        postData = { before, outsetIssueId, rankIndex, issueIds, epicId: 0 };
+        postData = {
+          before, outsetIssueId, rankIndex, issueIds, epicId: 0, 
+        };
         tarData.splice(tarIndex, 0, tarIssue);
         if (mode !== 'none') {
           backlogData = backlogData.filter(item => item[key] !== vosId).concat(tarData);
@@ -460,6 +480,38 @@ class Home3 extends Component {
       UserMapStore.setCurrentDraggableId(parseInt(res.draggableId.split('-')[1], 10));
     }
   };
+
+  handleSaveAsImage = () => {
+    const shareContent = document.querySelector('.fixHead');// 需要截图的包裹的（原生的）DOM 对象
+    const opts = {
+      useCORS: true, // 【重要】开启跨域配置
+    };
+    shareContent.style.width = `${Math.max(document.querySelector('.fixHead-head').scrollWidth, document.querySelector('.fixHead-body').scrollWidth)}px`;
+    html2canvas(shareContent, opts)
+      .then((canvas) => {
+        this.downLoadImage(canvas, '用户故事地图.png');
+      });
+  }
+
+  /**
+   * 
+   * @param {canvas} canvas 
+   * @param {filename} name 
+   */
+  downLoadImage(canvas, name) {
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL();
+    a.download = name;
+    a.click();
+  }
+
+  getStyle(element, attr) {
+    if (window.getComputedStyle) {
+      return window.getComputedStyle(element, null)[attr];
+    } else {
+      return element.currentStyle[attr];
+    }
+  }
 
   getHistoryCount = (id) => {
     const { UserMapStore } = this.props;
@@ -511,7 +563,7 @@ class Home3 extends Component {
       <Header title="用户故事地图">
         <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
           <Icon type="playlist_add" />
-          创建史诗
+          {'创建史诗'}
         </Button>
         <Dropdown overlay={swimlanMenu} trigger={['click']} overlayClassName="modeMenu" placement="bottomCenter">
           <Button>
@@ -532,17 +584,17 @@ class Home3 extends Component {
               <div style={{ height: 22, marginBottom: 20 }}>
                 <Checkbox onChange={this.handleShowDoneEpic}>已完成的史诗</Checkbox>
               </div>
-              <div style={{ height: 22, marginBottom: 32 }}>
+              <div style={{ height: 22, marginBottom: 20 }}>
                 <Checkbox onChange={this.handleFilterEpic}>应用快速搜索到史诗</Checkbox>
               </div>
-              {/* <div className="menu-title">导出</div> */}
+              <div className="menu-title">导出</div>
               {/* <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div> */}
-              {/* <div style={{ height: 22, marginLeft: 26 }}>导出为图片</div> */}
+              <div onClick={this.handleSaveAsImage} role="none" style={{ height: 22, marginLeft: 26, cursor: 'pointer' }}>导出为图片</div>
             </div>
           )}
         >
           <Button>
-            更多
+            {'更多'}
             <Icon type="arrow_drop_down" />
           </Button>
         </Popover>
@@ -560,9 +612,7 @@ class Home3 extends Component {
           onClick={this.showBackLog}
         >
           <Icon type="layers" />
-
-
-          需求池
+          {'需求池'}
         </Button>
       </Header>);
   }
@@ -571,7 +621,9 @@ class Home3 extends Component {
     const { UserMapStore } = this.props;
     const dom = [];
     const epicData = UserMapStore.getEpics;
-    const { issues, sprints, versions, currentNewObj, left, top } = UserMapStore;
+    const {
+      issues, sprints, versions, currentNewObj, left, top, 
+    } = UserMapStore;
     const { epicId, versionId, sprintId } = currentNewObj;
     const { mode } = UserMapStore;
     const vosData = UserMapStore[`${mode}s`] || [];
@@ -588,7 +640,7 @@ class Home3 extends Component {
             // data-id={vos[id]}
           >
             <div>{vos[name]}</div>
-            <div style={{ display: 'flex',alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <p className="point-span" style={{ background: '#4D90FE' }}>
                 {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
                   if (issue.statusCode === 'todo') {
@@ -616,7 +668,7 @@ class Home3 extends Component {
                   }
                 }, 0)}
               </p>
-              <Button shape={'circle'} className="expand-btn" onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
+              <Button shape="circle" className="expand-btn" onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
                 <Icon type={`${this.state.expandColumns.includes(vos[id]) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
               </Button>
             </div>
@@ -653,7 +705,7 @@ class Home3 extends Component {
                               }}
                               role="none"
                             >
-                              {/*{item.issueId}*/}
+                              {/* {item.issueId} */}
                               <IssueCard
                                 handleClickIssue={this.handleClickIssue}
                                 issue={item}
@@ -680,7 +732,7 @@ class Home3 extends Component {
                         ) : null
                       }
                       <div
-                        className={'maskIssue'}
+                        className="maskIssue"
                         onMouseLeave={() => { this.setState({ showChild: null }); }}
                         onMouseEnter={() => {
                           if (snapshot.isDraggingOver) return;
@@ -689,10 +741,14 @@ class Home3 extends Component {
                         }}
                       >
                         <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
-                          Add
-                          {' '}
+
+                          
+                          {'Add'}
                           <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, vos[id])}>new</a>
-                          {' '}or{' '}
+                          {' '}
+
+
+                          {'or '}
                           <a role="none" onClick={this.showBackLog}>existing</a>
                         </div>
                       </div>
@@ -704,7 +760,7 @@ class Home3 extends Component {
 
             ))}
           </div>
-        </div>);
+                 </div>);
       });
       dom.push(
         <div key="no-sprint" className="fixHead-line" style={{ height: '100%' }}>
@@ -719,18 +775,26 @@ class Home3 extends Component {
                 {mode === 'none' ? null
                   : (
                     <React.Fragment>
-                      {mode === 'version' ? <Permission service={['agile-service.product-version.createVersion']}>
-                        <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
-                          <Icon type="playlist_add" />
-                          创建
-                          {mode === 'sprint' ? '冲刺' : '版本'}
-                        </Button>
-                      </Permission>
-                        : <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
-                          <Icon type="playlist_add" />
-                          创建
-                          {mode === 'sprint' ? '冲刺' : '版本'}
-                        </Button>}
+                      {mode === 'version' ? (
+                        <Permission service={['agile-service.product-version.createVersion']}>
+                          <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                            <Icon type="playlist_add" />
+
+
+                            {'创建'}
+                            {mode === 'sprint' ? '冲刺' : '版本'}
+                          </Button>
+                        </Permission>
+                      )
+                        : (
+                          <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                            <Icon type="playlist_add" />
+
+
+                            {'创建'}
+                            {mode === 'sprint' ? '冲刺' : '版本'}
+                          </Button>
+                        )}
                     </React.Fragment>
 
                   ) }
@@ -791,7 +855,7 @@ class Home3 extends Component {
                               }}
                               role="none"
                             >
-                              {/*{item.issueId}*/}
+                              {/* {item.issueId} */}
                               <IssueCard
                                 handleClickIssue={this.handleClickIssue}
                                 key={item.issueId}
@@ -820,7 +884,7 @@ class Home3 extends Component {
                         ) : null
                       }
                       <div
-                        className={'maskIssue'}
+                        className="maskIssue"
                         // style={{ background: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? '' : '' }}
                         onMouseLeave={() => { this.setState({ showChild: null }); }}
                         onMouseEnter={() => {
@@ -830,10 +894,14 @@ class Home3 extends Component {
                         }}
                       >
                         <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
-                          Add
-                          {' '}
+
+                          
+                          {'Add'}
                           <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>new</a>
-                          {' '}or{' '}
+                          {' '}
+
+
+                          {'or '}
                           <a role="none" onClick={this.showBackLog}>existing</a>
                         </div>
                       </div>
@@ -851,14 +919,13 @@ class Home3 extends Component {
     return dom;
   }
 
-
   render() {
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
     const {
       filters, mode, createEpic, currentFilters, selectIssueIds, showBackLog, left, isLoading,
     } = UserMapStore;
-    let firstTitle = '';
+    const firstTitle = '';
     const count = this.getHistoryCount(UserMapStore.getVosId);
     const vosId = UserMapStore.getVosId === 0 ? `-1-${mode}` : UserMapStore.getVosId;
     let showDone = true;
@@ -872,145 +939,172 @@ class Home3 extends Component {
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
       >
         {this.renderHeader()}
-        { epicData.length ? <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
-          {isLoading ? <Spin spinning={isLoading} style={{ marginLeft: '40%', marginTop: '30%' }} size={'large'} />
-            : <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
-              <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
-                <div className="toolbar" style={{ minHeight: 52 }}>
-                  <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
-                    <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
-                    <p
-                      role="none"
-                      style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                      onClick={this.addFilter.bind(this, 'mine')}
-                    >仅我的问题</p>
-                    <p
-                      role="none"
-                      style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                      onClick={this.addFilter.bind(this,'userStory')}
-                    >仅用户故事</p>
-                    {filters.map(filter => (
-                      <p
-                        key={filter.filterId}
-                        role="none"
-                        style={{
-                          background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`,
-                          color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`,
-                          marginBottom: 3,
-                        }}
-                        onClick={this.addFilter.bind(this,filter.filterId)}
-                      >{filter.name}</p>)) }
-                  </div>
-                  <div
-                    style={{
-                      display: this.state.more ? 'block' : 'none',
-                      color: 'rgb(63, 81, 181)',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                    }}
-                    role="none"
-                    onClick={() => {
-                      this.setState({
-                        expand: !this.state.expand,
-                      }, () => {
-                        document.getElementsByClassName('fixHead')[0].style.height = `calc(100% - ${document.getElementsByClassName('fixHead')[0].offsetTop}px)`;
-                      });
-                    }}
-                  >
-                    {this.state.expand ? '...收起' : '...展开'}
-                  </div>
-                </div>
-                { showBackLog ? <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
-                  <Backlog handleClickIssue={this.handleClickIssue} />
-                </div> : null }
-                <div className="fixHead" style={{ height: `calc(100% - ${52}px)` }}>
-                  <div className="fixHead-head" id="fixHead-head">
-                    <div className="fixHead-line">
-                      <Droppable droppableId="epic" direction="horizontal">
-                        {(provided, snapshot) => (
-                          <div
-                            className="fixHead-line-epic"
-                            ref={provided.innerRef}
-                            style={{
-                              background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
-                              padding: 'grid',
-                              // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                            }}
-                          >
-                            {epicData.map((epic, index) => (
-                              <div className="fixHead-block" key={epic.issueId}>
-                                <EpicCard
-                                  index={index}
-                                  key={epic.issueId}
-                                  epic={epic}
-                                />
-                              </div>
-                            ))}
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </div>
-                    <div
-                      className="fixHead-line fixHead-line-2"
-                      style={{
-                        height: 42,
-                        transform: `translateX(${`${left}px`})`,
-                      }}
-                    >
-                      <div className="fixHead-head-note">
-                        <span className="column-title">
-                          { UserMapStore.getTitle}
-                        </span>
-                        <div style={{ display: 'flex', float: 'right', justifyContent: 'baseline', alignItems: 'center' }}>
-                          <p className="point-span" style={{ background: '#4D90FE' }}>
-                            {count.todoCount}
-                          </p>
-                          <p className="point-span" style={{ background: '#FFB100' }}>
-                            {count.doingCount}
-                          </p>
-                          {showDone && <p className="point-span" style={{ background: '#00BFA5' }}>
-                            {count.doneCount}
-                          </p>}
-                          {showDone && <Button className="expand-btn" shape="circle" onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
-                            <Icon type={`${this.state.expandColumns.includes(vosId) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
-                          </Button>}
+        { epicData.length ? (
+          <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
+            {isLoading ? <Spin spinning={isLoading} style={{ marginLeft: '40%', marginTop: '30%' }} size="large" />
+              : (
+                <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
+                  <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
+                    <div className="toolbar" style={{ minHeight: 52 }}>
+                      <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
+                        <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
+                        <p
+                          role="none"
+                          style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                          onClick={this.addFilter.bind(this, 'mine')}
+                        >
+                          {'仅我的问题'}
+                        </p>
+                        <p
+                          role="none"
+                          style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                          onClick={this.addFilter.bind(this, 'userStory')}
+                        >
+                          {'仅用户故事'}
 
+                        </p>
+                        {filters.map(filter => (
+                          <p
+                            key={filter.filterId}
+                            role="none"
+                            style={{
+                              background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`,
+                              color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`,
+                              marginBottom: 3,
+                            }}
+                            onClick={this.addFilter.bind(this, filter.filterId)}
+                          >
+                            {filter.name}
+
+                          </p>)) }
+                      </div>
+                      <div
+                        style={{
+                          display: this.state.more ? 'block' : 'none',
+                          color: 'rgb(63, 81, 181)',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                        }}
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            expand: !this.state.expand,
+                          }, () => {
+                            document.getElementsByClassName('fixHead')[0].style.height = `calc(100% - ${document.getElementsByClassName('fixHead')[0].offsetTop}px)`;
+                          });
+                        }}
+                      >
+                        {this.state.expand ? '...收起' : '...展开'}
+                      </div>
+                    </div>
+                    { showBackLog ? (
+                      <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
+                        <Backlog handleClickIssue={this.handleClickIssue} />
+                      </div>
+                    ) : null }
+                    <div className="fixHead" style={{ height: `calc(100% - ${52}px)` }}>
+                      <div className="fixHead-head" id="fixHead-head">
+                        <div className="fixHead-line">
+                          <Droppable droppableId="epic" direction="horizontal">
+                            {(provided, snapshot) => (
+                              <div
+                                className="fixHead-line-epic"
+                                ref={provided.innerRef}
+                                style={{
+                                  background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
+                                  padding: 'grid',
+                                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                                }}
+                              >
+                                {epicData.map((epic, index) => (
+                                  <div className="fixHead-block" key={epic.issueId}>
+                                    <EpicCard
+                                      index={index}
+                                      key={epic.issueId}
+                                      epic={epic}
+                                    />
+                                  </div>
+                                ))}
+                                {provided.placeholder}
+                              </div>
+                            )}
+                          </Droppable>
                         </div>
+                        <div
+                          className="fixHead-line fixHead-line-2"
+                          style={{
+                            height: 42,
+                            transform: `translateX(${`${left}px`})`,
+                          }}
+                        >
+                          <div className="fixHead-head-note">
+                            <span className="column-title">
+                              { UserMapStore.getTitle}
+                            </span>
+                            <div style={{
+                              display: 'flex', float: 'right', justifyContent: 'baseline', alignItems: 'center', 
+                            }}
+                            >
+                              <p className="point-span" style={{ background: '#4D90FE' }}>
+                                {count.todoCount}
+                              </p>
+                              <p className="point-span" style={{ background: '#FFB100' }}>
+                                {count.doingCount}
+                              </p>
+                              {showDone && (
+                              <p className="point-span" style={{ background: '#00BFA5' }}>
+                                {count.doneCount}
+                              </p>
+                              )}
+                              {showDone && (
+                              <Button className="expand-btn" shape="circle" onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
+                                <Icon type={`${this.state.expandColumns.includes(vosId) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
+                              </Button>
+                              )}
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="fixHead-body" id="fixHead-body" style={{ flex: 1, position: 'relative' }}>
+                        {this.renderBody()}
                       </div>
                     </div>
                   </div>
-                  <div className="fixHead-body" id="fixHead-body" style={{ flex: 1, position: 'relative' }}>
-                    {this.renderBody()}
-                  </div>
-                </div>
-              </div>
-            </DragDropContext>}
-          <CreateEpic
-            visible={createEpic}
-            onOk={() => {
-              UserMapStore.setCreateEpic(false);
-              UserMapStore.loadEpic();
-            }}
-            onCancel={() => UserMapStore.setCreateEpic(false)}
-          />
-          <CreateVOS
-            visible={UserMapStore.createVOS}
+                </DragDropContext>
+              )}
+            <CreateEpic
+              visible={createEpic}
+              onOk={() => {
+                UserMapStore.setCreateEpic(false);
+                UserMapStore.loadEpic();
+              }}
+              onCancel={() => UserMapStore.setCreateEpic(false)}
+            />
+            <CreateVOS
+              visible={UserMapStore.createVOS}
             // onOk={() => {UserMapStore.setCreateVOS(false)}}
-            onOk={this.handleCreateOk}
-            onCancel={() => { UserMapStore.setCreateVOS(false); }}
-            type={UserMapStore.getCreateVOSType}
-          />
-
-        </Content> : (<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
-          <img src={epicPic} alt="" width="200" />
-          <div style={{ marginLeft: 50, width: 390 }}>
-            <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
-            <p style={{ fontSize: 20, marginTop: 10 }}>
-              用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击 <a role={'none'} onClick={this.handleCreateEpic}>创建史诗</a> 进入用户故事地图。
-            </p>
+              onOk={this.handleCreateOk}
+              onCancel={() => { UserMapStore.setCreateVOS(false); }}
+              type={UserMapStore.getCreateVOSType}
+            />
+          </Content>
+        ) : (
+          <div style={{
+            display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%', 
+          }}
+          >
+            <img src={epicPic} alt="" width="200" />
+            <div style={{ marginLeft: 50, width: 390 }}>
+              <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+              <p style={{ fontSize: 20, marginTop: 10 }}>
+                {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
+                <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
+                {'进入用户故事地图。'}
+              </p>
+            </div>
           </div>
-        </div>)}
+        )}
       </Page>
     );
   }
