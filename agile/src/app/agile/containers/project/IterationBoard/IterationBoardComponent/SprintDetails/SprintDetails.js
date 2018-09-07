@@ -3,11 +3,11 @@ import { stores } from 'choerodon-front-boot';
 import {
   Table, Tabs, Spin, Tooltip, Pagination,
 } from 'choerodon-ui';
+import _ from 'lodash';
 import TypeTag from '../../../../../components/TypeTag';
 import PriorityTag from '../../../../../components/PriorityTag';
 import StatusTag from '../../../../../components/StatusTag';
 import { loadSprintIssues } from '../../../../../api/NewIssueApi';
-
 import './SprintDetails.scss';
 
 const { TabPane } = Tabs;
@@ -17,15 +17,15 @@ class SprintDetails extends Component {
     super(props);
     this.state = {
       loading: true,
-      pagination: {
-        current: 1,
-        pageSize: 10,
-      },
+      pagination: undefined,
       sprintId: undefined,
       doneIssues: [],
       undoIssues: [],
       undoAndNotEstimatedIssues: [],
       activeKey: 'done',
+      done: false,
+      undo: false,
+      undoAndNotEstimated: false, // 用来判断是否已经加载过数据，如果为true，说明已经load，不再重新load
     };
   }
   
@@ -34,8 +34,19 @@ class SprintDetails extends Component {
       const { sprintId } = nextProps;
       this.setState({
         sprintId,
+        done: false,
+        undo: false,
+        undoAndNotEstimated: false,
       });
       this.loadDoneIssues(sprintId);
+    }
+  }
+
+  getPagination = (pagination, res) => { // 注意：pagination
+    if (pagination == undefined) {
+      return res.content.length > 10 ? { current: 1, pageSize: 10 } : false;
+    } else {
+      return { current: pagination.page + 1, pageSize: pagination.size };
     }
   }
 
@@ -59,24 +70,33 @@ class SprintDetails extends Component {
       const { sprintId } = this.state;
       this.setState({
         activeKey: key,
+        // pagination: { current: 1, pageSize: 10 }, // 注意每次tab切换要重设pagination,否则current可能是上一个tab的值
       });
       const ARRAY = {
         done: 'loadDoneIssues',
         undo: 'loadUndoIssues',
         undoAndNotEstimated: 'loadUndoAndNotEstimatedIssues',
       };
-      this[ARRAY[key]](sprintId);
+      if (!this.state[key]) {
+        this[ARRAY[key]](sprintId);
+      } else {
+        this.setState({
+          pagination: this.state[_.lowerFirst(_.trim(ARRAY[key], 'load'))].length > 10 ? { current: 1, pageSize: 10 } : false,
+        });
+      }
     }
 
-    loadDoneIssues(sprintId) {
+    loadDoneIssues(sprintId, pagination) {
       this.setState({
         loading: true,
+        done: true,
       });
       loadSprintIssues(sprintId, 'done')
         .then((res) => {
           this.setState({
             doneIssues: res.content,
             loading: false,
+            pagination: this.getPagination(pagination, res),
           });
         })
         .catch((e) => {
@@ -87,15 +107,18 @@ class SprintDetails extends Component {
         });
     }
   
-    loadUndoIssues(sprintId) {
+
+    loadUndoIssues(sprintId, pagination) {
       this.setState({
         loading: true,
+        undo: true,
       });
       loadSprintIssues(sprintId, 'unfinished')
         .then((res) => {
           this.setState({
             undoIssues: res.content,
             loading: false,
+            pagination: this.getPagination(pagination, res),
           });
         })
         .catch((e) => {
@@ -106,15 +129,17 @@ class SprintDetails extends Component {
         });
     }
 
-    loadUndoAndNotEstimatedIssues(sprintId) {
+    loadUndoAndNotEstimatedIssues(sprintId, pagination) {
       this.setState({
         loading: true,
+        undoAndNotEstimated: true,
       });
       loadSprintIssues(sprintId, 'unfinished')
         .then((res) => {
           this.setState({
             undoAndNotEstimatedIssues: res.content.filter(item => (item.storyPoints === 0 && item.typeCode === 'story') || (item.remainTime === null && item.typeCode === 'task')),
             loading: false,
+            pagination: this.getPagination(pagination, res),
           });
         })
         .catch((e) => {
@@ -178,9 +203,10 @@ class SprintDetails extends Component {
         </div>
       );
     }
-  
+    
+
     render() {
-      const { activeKey } = this.state;
+      const { activeKey, pagination } = this.state;
       const column = [{
         title: '关键字',
         dataIndex: 'issueNum',
@@ -298,7 +324,7 @@ class SprintDetails extends Component {
               <TabPane tab="未完成的问题" key="undo">
                 {this.renderUndoIssues(column)}
               </TabPane>
-              <TabPane tab="从Sprint中删除的问题" key="undoAndNotEstimated">
+              <TabPane tab="未完成的未预估问题" key="undoAndNotEstimated">
                 {this.renderUndoAndNotEstimatedIssues(column)}
               </TabPane>
             </Tabs>

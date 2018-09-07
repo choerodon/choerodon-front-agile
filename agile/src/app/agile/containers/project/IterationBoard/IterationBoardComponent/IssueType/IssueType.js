@@ -24,7 +24,9 @@ class IssueType extends Component {
         sprintId: nextProps.sprintId,
       });
     }
-    this.loadIssueTypeData(nextProps.sprintId);
+    if (nextProps.sprintId != undefined) {
+      this.loadIssueTypeData(nextProps.sprintId); 
+    }
   }
 
   getCategoryCount(code) {
