@@ -1,0 +1,144 @@
+.c7n-epicReport {
+  .icon-show {
+    margin-left: 4px;
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 3px;
+  }
+
+  .c7n-report {
+    display: flex;
+    flex-direction: row;
+    width: '100%';
+
+    .c7n-chart {
+      flex: 1;
+      height: 400px !important;
+      margin-top: 16px;
+      margin-bottom: 36px;
+    }
+
+    .c7n-toolbar {
+      width: 274px;
+      // padding-top: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .toolbar-cannot-forcast {
+        width: 275px;
+        box-shadow: 0 1px 3px 0 rgba(14, 15, 16, 0.24);
+        border-radius: 2px;
+        padding: 36px 32px;
+
+        .title {
+          font-size: 14px;
+          color: #000;
+          line-height: 20px;
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+
+        .word {
+          font-size: 14px;
+          color: #000;
+          line-height: 20px;
+        }
+      }
+
+      .toolbar-complete {
+        width: 275px;
+        box-shadow: 0 1px 3px 0 rgba(14, 15, 16, 0.24);
+        border-radius: 2px;
+        padding: 46px 53px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .pic {
+          width: 65px;
+          height: 67px;
+          display: inline-block;
+          background: #ddd;
+          margin-bottom: 23px;
+        }
+
+        .word {
+          font-size: 14px;
+          color: #000;
+          line-height: 20px;
+        }
+      }
+
+      .toolbar-forcast {
+        width: 275px;
+        box-shadow: 0 1px 3px 0 rgba(14, 15, 16, 0.24);
+        border-radius: 2px;
+        padding: 27px 22px 7px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .title {
+          font-size: 14px;
+          color: #000;
+          line-height: 20px;
+          margin-bottom: 20px;
+        }
+
+        .word {
+          height: 20px;
+          line-height: 20px;
+          font-size: 14px;
+          color: #000;
+          margin-bottom: 20px;
+          padding-left: 55px;
+          display: flex;
+          align-items: center;
+
+          .icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ddd;
+            margin-right: 8px;
+          }
+        }
+      }
+
+      h2 {
+        font-size: 18px;
+        line-height: 25px;
+        
+        margin-bottom: 24px;
+      }
+
+      h4 {
+        font-size: 14px;
+        line-height: 20px;
+        margin-top: 24px;
+        margin-bottom: 16px;
+        font-weight: 600;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        
+        li {
+          margin-bottom: 12px;
+
+          .c7n-tip {
+            display: inline-block;
+            width: 99px;
+          }
+        }
+      }
+
+      p {
+        margin-top: 24px;
+      }
+    }
+  }
+}
