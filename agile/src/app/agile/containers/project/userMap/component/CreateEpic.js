@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Modal, Form, Select, Icon, Input } from 'choerodon-ui';
+import { Modal, Form, Input } from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
-const Option = Select.Option;
 const { TextArea } = Input;
 
 @observer
@@ -19,8 +18,9 @@ class CreateEpic extends Component {
   }
 
   handleCreateEpic =(e) => {
+    const { form, onOk } = this.props;
     e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, value) => {
+    form.validateFieldsAndScroll((err, value) => {
       if (!err) {
         const data = {
           priorityCode: 'medium',
@@ -37,7 +37,7 @@ class CreateEpic extends Component {
             this.setState({
               loading: false,
             });
-            this.props.onOk();
+            onOk();
           })
           .catch((error) => {
             this.setState({
@@ -47,25 +47,30 @@ class CreateEpic extends Component {
       }
     });
   }
+
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { loading } = this.state;
+    const {
+      getContainer, form, visible, onCancel,
+    } = this.props;
+    const { getFieldDecorator } = form;
+
     return (
       <Sidebar
         title="创建史诗"
-        visible={this.props.visible}
+        getContainer={getContainer}
+        visible={visible}
         okText="新建"
         cancelText="取消"
         onCancel={() => {
-          this.props.form.resetFields();
-          this.props.onCancel();
+          form.resetFields();
+          onCancel();
         }}
-        confirmLoading={this.state.loading}
+        confirmLoading={loading}
         onOk={this.handleCreateEpic}
       >
         <Content
-          style={{
-            padding: 0,
-          }}
+          style={{ padding: 0 }}
           title={`创建项目“${AppState.currentMenuType.name}”的史诗`}
           description="请在下面输入史诗名称、概要，创建新史诗。"
           link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/backlog/epic/"
@@ -99,4 +104,3 @@ class CreateEpic extends Component {
 }
 
 export default Form.create()(CreateEpic);
-

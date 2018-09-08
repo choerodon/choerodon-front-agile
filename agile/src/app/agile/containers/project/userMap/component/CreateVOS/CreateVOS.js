@@ -75,12 +75,13 @@ class CreateVOS extends Component {
   };
 
   render() {
-    const { visible, onCancel, onOk, type } = this.props;
+    const { visible, onCancel, onOk, type, getContainer } = this.props;
     const { getFieldDecorator } = this.props.form;
   
     return (
       <Modal
         className="c7n-createVOS"
+        getContainer={getContainer}
         title={`创建${type === 'sprint' ? '冲刺' : '版本'}`}
         visible={visible || false}
         onOk={this.handleCreate}

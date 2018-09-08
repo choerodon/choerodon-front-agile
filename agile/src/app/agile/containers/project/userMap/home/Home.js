@@ -23,6 +23,30 @@ import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 // let scrollL;
 // let isFirstScroll = false;
 
+function toFullScreen(dom) {
+  if (dom.requestFullscreen) {
+    return dom.requestFullScreen();
+  } else if (dom.webkitRequestFullScreen) {
+    return dom.webkitRequestFullScreen();
+  } else if (dom.mozRequestFullScreen) {
+    return dom.mozRequestFullScreen();
+  } else {
+    return dom.msRequestFullscreen();
+  }
+}
+
+function exitFullScreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen();
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+}
+
 @observer
 class Home3 extends Component {
   constructor(props) {
@@ -33,6 +57,7 @@ class Home3 extends Component {
       expandColumns: [],
       showBackLog: false,
       position: 'absolute',
+      isFullScreen: false,
     };
   }
 
@@ -54,6 +79,10 @@ class Home3 extends Component {
         clearInterval(timer);
       }
     }, 20);
+    document.addEventListener('fullscreenchange', this.handleChangeFullScreen);
+    document.addEventListener('webkitfullscreenchange', this.handleChangeFullScreen);
+    document.addEventListener('mozfullscreenchange', this.handleChangeFullScreen);
+    document.addEventListener('MSFullscreenChange', this.handleChangeFullScreen);
   }
 
   componentWillUnmount() {
@@ -66,6 +95,16 @@ class Home3 extends Component {
     this.props.UserMapStore.setCurrentIndex(0);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
+  }
+
+  handleChangeFullScreen = (e) => {
+    // const node = e.target;
+    const isFullScreen = document.webkitFullscreenElement
+      || document.mozFullScreenElement
+      || document.msFullscreenElement;
+    this.setState({
+      isFullScreen: !isFullScreen ? false : true,
+    });
   }
 
   getPrepareOffsetTops = (isExpand = false) => {
@@ -217,6 +256,26 @@ class Home3 extends Component {
     this.props.UserMapStore.initData(true);
   };
 
+  handleFullScreen = () => {
+    const isFullScreen = document.webkitFullscreenElement
+      || document.mozFullScreenElement
+      || document.msFullscreenElement;
+    if (!isFullScreen) {
+      this.fullScreen();
+    } else {
+      this.exitFullScreen();
+    }
+  }
+
+  fullScreen = () => {
+    const target = document.querySelector('.content');
+    toFullScreen(target);
+  };
+
+  exitFullScreen = () => {
+    exitFullScreen();
+  }
+
   changeMode =(options) => {
     this.props.UserMapStore.setMode(options.key);
     const mode = options.key;
@@ -335,7 +394,75 @@ class Home3 extends Component {
     UserMapStore.handleEpicDrag(postData);
   };
 
-  handelDragToBoard = (res) => {
+  getSprintIdAndEpicId(str) {
+    const epicId = parseInt(str.split('_')[0].split('-')[1], 10);
+    const modeId = parseInt(str.split('_')[1], 10);// [sprint || version]id;
+    return { epicId, modeId };
+  }
+
+  // handelDragToBoard = (res) => {
+  //   const { UserMapStore } = this.props;
+  //   const {
+  //     mode, issues, backlogIssues, selectIssueIds,
+  //   } = UserMapStore;
+  //   const sourceIndex = res.source.index;
+  //   const tarIndex = res.destination.index;
+  //   const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
+  //   const key = `${mode}Id`;
+  //   const value = parseInt(res.destination.droppableId.split('_')[1], 10);// 目标id;
+  //   const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
+  //   const before = res.destination.index === 0;
+  //   const rankIndex = null;
+  //   const issueData = _.cloneDeep(toJS(issues));
+  //   const backlogData = _.cloneDeep(toJS(backlogIssues));
+  //   let postData = {};
+  //   let outsetIssueId = null;
+  //   let tarBacklogData = backlogIssues;
+  //   _.map(issueIds, (id) => {
+  //     const tarIssue = _.filter(issueData, item => item.issueId === id)[0];
+  //     const vosId = value === 0 ? null : value;
+  //     let tarData = _.filter(issues, item => item.epicId === tarEpicId);
+  //     if (mode !== 'none') {
+  //       tarData = _.filter(issues, item => item.epicId === tarEpicId && item[key] === vosId);
+  //     }
+  //     if (before && tarData.length) {
+  //       outsetIssueId = tarData[0].issueId;
+  //     } else if (before && !tarData.length) {
+  //       outsetIssueId = 0;
+  //     } else {
+  //       outsetIssueId = tarData[tarIndex - 1].issueId;
+  //     }
+  //     // 拖到冲刺泳道的未规划时outIssueId取值
+  //     const data = issues.filter(item => item.sprintId === 0 || item.sprintId === null);
+  //     if (mode === 'sprint' && before && outsetIssueId === 0 && value === 0) {
+  //       if (data.length) {
+  //         outsetIssueId = data[0].issueId;
+  //       }
+  //     }
+  //     tarIssue.epicId = tarEpicId;
+  //     if (mode !== 'none') {
+  //       tarIssue[key] = vosId;
+  //     }
+  //     postData = { before, epicId: tarEpicId, outsetIssueId, rankIndex, issueIds };
+  //     if (res.source.droppableId.includes('backlog')) {
+  //       tarBacklogData = _.filter(backlogData, item => item.issueId === id)[0];
+  //       const index = backlogData.indexOf(tarBacklogData);
+  //       backlogData.splice(index, 1);
+  //     }
+  //     if (mode !== 'none') {
+  //       postData[key] = value;
+  //     }
+  //   });
+  //   if (res.source.droppableId.includes('backlog')) {
+  //     UserMapStore.setBacklogIssues(backlogData);
+  //   }
+  //   UserMapStore.setIssues(issueData);
+  //   UserMapStore.handleMoveIssue(postData);
+  //   UserMapStore.setSelectIssueIds([]);
+  //   UserMapStore.setCurrentDraggableId(null);
+  // };
+
+  handleMultipleDragToBoard = (res) => {
     const { UserMapStore } = this.props;
     const {
       mode, issues, backlogIssues, selectIssueIds, 
@@ -344,50 +471,132 @@ class Home3 extends Component {
     const tarIndex = res.destination.index;
     const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
     const key = `${mode}Id`;
-    const value = parseInt(res.destination.droppableId.split('_')[1], 10);// 目标id;
-    const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
-    const before = res.destination.index === 0;
-    const rankIndex = null;
+    const desIndex = res.destination.index;
+    const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
+    const desModeId = this.getSprintIdAndEpicId(res.destination.droppableId).modeId;
+    const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
+    const souEpicId = this.getSprintIdAndEpicId(res.source.droppableId).epicId;
+    const issueIds = toJS(selectIssueIds);
     const issueData = _.cloneDeep(toJS(issues));
     const backlogData = _.cloneDeep(toJS(backlogIssues));
-    let postData = {};
-    let outsetIssueId = null;
-    let tarBacklogData = backlogIssues;
-    _.map(issueIds, (id) => {
-      const tarIssue = _.filter(issueData, item => item.issueId === id)[0];
-      const vosId = value === 0 ? null : value;
-      let tarData = _.filter(issues, item => item.epicId === tarEpicId);
-      if (mode !== 'none') {
-        tarData = _.filter(issues, item => item.epicId === tarEpicId && item[key] === vosId);
-      }
-      if (before && tarData.length) {
-        outsetIssueId = tarData[0].issueId;
-      } else if (before && !tarData.length) {
+    let desEpicAndModeIssues;
+    if (desModeId === 0) {
+      const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
+      desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0 
+        || issue[key] === null);
+    } else {
+      desEpicAndModeIssues = _.filter(issueData, issue => issue.epicId === desEpicId
+        && issue[key] === desModeId);
+    }
+    let before;
+    let outsetIssueId;
+    if (desEpicAndModeIssues.length) {
+      if (desEpicAndModeIssues.every(v => issueIds.includes(v.issueId))) {
+        before = true;
         outsetIssueId = 0;
-      } else {
-        outsetIssueId = tarData[tarIndex - 1].issueId;
-      }
-      // 拖到冲刺泳道的未规划时outIssueId取值
-      const data = issues.filter(item => item.sprintId === 0 || item.sprintId === null);
-      if (mode === 'sprint' && before && outsetIssueId === 0 && value === 0) {
-        if (data.length) {
-          outsetIssueId = data[0].issueId;
+      } else if (true) {
+        if (!desEpicAndModeIssues.every(v => !issueIds.includes(v.issueId))) {
+          if (desIndex === desEpicAndModeIssues.length - 1) {
+            before = false;
+            outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+          } else {
+            before = true;
+            if (desIndex > res.source.index) {
+              outsetIssueId = desEpicAndModeIssues[desIndex + 1].issueId;
+            } else {
+              outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+            }
+          }
+        } else if (true) {
+          if (desIndex === desEpicAndModeIssues.length) {
+            before = false;
+            outsetIssueId = desEpicAndModeIssues[desEpicAndModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+          }
         }
       }
-      tarIssue.epicId = tarEpicId;
+    } else {
+      let desModeIssues;
+      if (desModeId === 0) {
+        desModeIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+      } else {
+        desModeIssues = _.filter(issueData, issue => issue[key] === desModeId);
+      }
+      if (!desModeIssues.length) {
+        outsetIssueId = 0;
+        if (souModeId && desModeId) {
+          const modeData = UserMapStore[`${mode}s`] || [];
+          const souModeIndex = _.findIndex(modeData, v => v[key] === souModeId);
+          const desModeIndex = _.findIndex(modeData, v => v[key] === desModeId);
+          before = desModeIndex < souModeIndex;
+        } else if (!souModeId) {
+          before = true;
+        } else {
+          before = false;
+        }
+      } else {
+        if (desModeIssues.every(v => issueIds.includes(v.issueId))) {
+          before = true;
+          outsetIssueId = 0;
+        } else {
+          before = true;
+          outsetIssueId = desModeIssues.find(v => !issueIds.includes(v.issueId)).issueId;
+        }
+      }
+
+      // if (desModeId === souModeId) {
+      //   // 同行之间移动
+      //   if (desModeIssues.length === 1) {
+      //     // 长度为1，该行只有一张卡，就是移动的卡
+      //     before = true;
+      //     outsetIssueId = 0;
+      //   } else {
+      //     // 该行有除了移动卡的卡，放在之前
+      //     before = true;
+      //     outsetIssueId = desModeIssues[0].issueId === parseInt(res.draggableId.split('-')[1], 10)
+      //       ? desModeIssues[1].issueId : desModeIssues[0].issueId;
+      //   }
+      // } else if (true) {
+      //   if (desModeIssues.length) {
+      //     before = true;
+      //     outsetIssueId = desModeIssues[0].issueId;
+      //   } else {
+      //     outsetIssueId = 0;
+      //     if (souModeId && desModeId) {
+      //       const modeData = UserMapStore[`${mode}s`] || [];
+      //       const souModeIndex = _.findIndex(modeData, v => v[key] === souModeId);
+      //       const desModeIndex = _.findIndex(modeData, v => v[key] === desModeId);
+      //       before = desModeIndex < souModeIndex;
+      //     } else if (!souModeId) {
+      //       before = true;
+      //     } else {
+      //       before = false;
+      //     }
+      //   }
+      // }
+    }
+    const rankIndex = null;
+    let postData = {};
+    let tarBacklogData = backlogIssues;
+    _.map(issueIds, (id) => {
+      const currentIssue = _.find(issueData, item => item.issueId === id);
+      const vosId = desModeId === 0 ? null : desModeId;
+      currentIssue.epicId = desEpicId;
       if (mode !== 'none') {
-        tarIssue[key] = vosId;
+        currentIssue[key] = vosId;
       }
       postData = {
-        before, epicId: tarEpicId, outsetIssueId, rankIndex, issueIds, 
+        before, epicId: desEpicId, outsetIssueId, rankIndex, issueIds,
       };
       if (res.source.droppableId.includes('backlog')) {
-        tarBacklogData = _.filter(backlogData, item => item.issueId === id)[0];
+        tarBacklogData = _.find(backlogData, item => item.issueId === id);
         const index = backlogData.indexOf(tarBacklogData);
         backlogData.splice(index, 1);
       }
       if (mode !== 'none') {
-        postData[key] = value;
+        postData[key] = desModeId;
       }
     });
     if (res.source.droppableId.includes('backlog')) {
@@ -397,6 +606,133 @@ class Home3 extends Component {
     UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
+  }
+
+  handelDragToBoard = (res) => {
+    const { UserMapStore } = this.props;
+    const {
+      mode, issues, backlogIssues, selectIssueIds,
+    } = UserMapStore;
+    if (!selectIssueIds.length) {
+      const key = `${mode}Id`;
+      const desIndex = res.destination.index;
+      const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
+      const desModeId = this.getSprintIdAndEpicId(res.destination.droppableId).modeId;
+      const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
+      const souEpicId = this.getSprintIdAndEpicId(res.source.droppableId).epicId;
+      const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
+      const issueData = _.cloneDeep(toJS(issues));
+      const backlogData = _.cloneDeep(toJS(backlogIssues));
+      let desEpicAndModeIssues;
+      if (desModeId === 0) {
+        const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
+        desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0 
+          || issue[key] === null);
+      } else {
+        desEpicAndModeIssues = _.filter(issueData, issue => issue.epicId === desEpicId
+          && issue[key] === desModeId);
+      }
+      let before;
+      let outsetIssueId;
+      if (desEpicAndModeIssues.length) {
+        // 目的地块中有卡，判断所放位置是否为0
+        if (!desIndex) {
+          before = true;
+          outsetIssueId = desEpicAndModeIssues[0].issueId;
+        } else if (desEpicId === souEpicId && desModeId === souModeId) {
+          // 同块之间移动，判断是否放在最后
+          if (desIndex === desEpicAndModeIssues.length - 1) {
+            before = false;
+            outsetIssueId = desEpicAndModeIssues[desEpicAndModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            if (desIndex > res.source.index) {
+              outsetIssueId = desEpicAndModeIssues[desIndex + 1].issueId;
+            } else {
+              outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+            }
+          }
+        } else if (true) {
+          // 不同块之间移动，判断是否放在最后
+          if (desIndex === desEpicAndModeIssues.length) {
+            before = false;
+            outsetIssueId = desEpicAndModeIssues[desEpicAndModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+          }
+        }
+      } else {
+        // 目的地块中无卡，判断同行是否为空
+        let desModeIssues;
+        if (desModeId === 0) {
+          desModeIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+        } else {
+          desModeIssues = _.filter(issueData, issue => issue[key] === desModeId);
+        }
+        if (desModeId === souModeId) {
+          // 同行之间移动
+          if (desModeIssues.length === 1) {
+            // 长度为1，该行只有一张卡，就是移动的卡
+            before = true;
+            outsetIssueId = 0;
+          } else {
+            // 该行有除了移动卡的卡，放在之前
+            before = true;
+            outsetIssueId = desModeIssues[0].issueId === parseInt(res.draggableId.split('-')[1], 10)
+              ? desModeIssues[1].issueId : desModeIssues[0].issueId;
+          }
+        } else if (true) {
+          if (desModeIssues.length) {
+            before = true;
+            outsetIssueId = desModeIssues[0].issueId;
+          } else {
+            outsetIssueId = 0;
+            if (souModeId && desModeId) {
+              const modeData = UserMapStore[`${mode}s`] || [];
+              const souModeIndex = _.findIndex(modeData, v => v[key] === souModeId);
+              const desModeIndex = _.findIndex(modeData, v => v[key] === desModeId);
+              before = desModeIndex < souModeIndex;
+            } else if (!souModeId) {
+              before = true;
+            } else {
+              before = false;
+            }
+          }
+        }
+      }
+      const rankIndex = null;
+      let postData = {};
+      let tarBacklogData = backlogIssues;
+      _.map(issueIds, (id) => {
+        const currentIssue = _.find(issueData, item => item.issueId === id);
+        const vosId = desModeId === 0 ? null : desModeId;
+        currentIssue.epicId = desEpicId;
+        if (mode !== 'none') {
+          currentIssue[key] = vosId;
+        }
+        postData = {
+          before, epicId: desEpicId, outsetIssueId, rankIndex, issueIds,
+        };
+        if (res.source.droppableId.includes('backlog')) {
+          tarBacklogData = _.find(backlogData, item => item.issueId === id);
+          const index = backlogData.indexOf(tarBacklogData);
+          backlogData.splice(index, 1);
+        }
+        if (mode !== 'none') {
+          postData[key] = desModeId;
+        }
+      });
+      if (res.source.droppableId.includes('backlog')) {
+        UserMapStore.setBacklogIssues(backlogData);
+      }
+      UserMapStore.setIssues(issueData);
+      UserMapStore.handleMoveIssue(postData);
+      UserMapStore.setSelectIssueIds([]);
+      UserMapStore.setCurrentDraggableId(null);
+    } else {
+      this.handleMultipleDragToBoard(res);
+    }
   };
 
   handleDragToBacklog = (res) => {
@@ -460,7 +796,7 @@ class Home3 extends Component {
   };
 
   handleEpicOrIssueDrag = (res) => {
-    if (!res.destination || (res.destination.droppableId === res.source.droppableId && res.destination.droppableId !== 'epic')) {
+    if (!res.destination) {
       this.props.UserMapStore.setSelectIssueIds([]);
       this.props.UserMapStore.setCurrentDraggableId(null);
       return;
@@ -565,7 +901,13 @@ class Home3 extends Component {
           <Icon type="playlist_add" />
           {'创建史诗'}
         </Button>
-        <Dropdown overlay={swimlanMenu} trigger={['click']} overlayClassName="modeMenu" placement="bottomCenter">
+        <Dropdown
+          overlay={swimlanMenu}
+          trigger={['click']}
+          overlayClassName="modeMenu"
+          placement="bottomCenter"
+          getPopupContainer={triggerNode => triggerNode}
+        >
           <Button>
             {mode === 'none' && '无泳道'}
             {mode === 'version' && '版本泳道'}
@@ -574,6 +916,7 @@ class Home3 extends Component {
           </Button>
         </Dropdown>
         <Popover
+          getPopupContainer={triggerNode => triggerNode}
           overlayClassName="moreMenuPopover"
           arrowPointAtCenter={false}
           placement="bottomLeft"
@@ -602,7 +945,10 @@ class Home3 extends Component {
           <Icon type="refresh icon" />
           <span>刷新</span>
         </Button>
-
+        <Button className="leftBtn2" funcType="flat" onClick={this.handleFullScreen.bind(this)}>
+          <Icon type="refresh icon" />
+          <span>{this.state.isFullScreen ? '退出全屏' : '全屏'}</span>
+        </Button>
         <Button
           style={{
             color: 'white', fontSize: 12, position: 'absolute', right: 24,
@@ -705,7 +1051,7 @@ class Home3 extends Component {
                               }}
                               role="none"
                             >
-                              {/* {item.issueId} */}
+                              {item.issueId}
                               <IssueCard
                                 handleClickIssue={this.handleClickIssue}
                                 issue={item}
@@ -855,7 +1201,7 @@ class Home3 extends Component {
                               }}
                               role="none"
                             >
-                              {/* {item.issueId} */}
+                              {item.issueId}
                               <IssueCard
                                 handleClickIssue={this.handleClickIssue}
                                 key={item.issueId}
@@ -1074,6 +1420,7 @@ class Home3 extends Component {
                 </DragDropContext>
               )}
             <CreateEpic
+              getContainer={() => document.querySelector('.c7n-userMap')}
               visible={createEpic}
               onOk={() => {
                 UserMapStore.setCreateEpic(false);
@@ -1082,6 +1429,7 @@ class Home3 extends Component {
               onCancel={() => UserMapStore.setCreateEpic(false)}
             />
             <CreateVOS
+              getContainer={() => document.querySelector('.c7n-userMap')}
               visible={UserMapStore.createVOS}
             // onOk={() => {UserMapStore.setCreateVOS(false)}}
               onOk={this.handleCreateOk}

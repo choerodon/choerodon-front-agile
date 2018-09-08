@@ -314,9 +314,14 @@ class UserMapStore {
           this.setIssues([]);
         } else {
           if (this.mode === 'version') {
-            this.setIssues(_.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId'));
+            const uniqIssues = _.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId');
+            const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
+            // this.setIssues(_.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId'));
+            this.setIssues(sortedUniqIssues);
           } else {
-            this.setIssues(issues);
+            const sortedIssues = _.orderBy(issues, 'mapRank', 'asc');
+            // this.setIssues(issues);
+            this.setIssues(sortedIssues);
           }
         }
       });
@@ -348,7 +353,15 @@ class UserMapStore {
               this.setIsLoading(false);
               this.setFilters(filters);
               this.setEpics(epics);
-              this.setIssues(issues);
+              // this.setIssues(issues);
+              if (this.mode === 'version') {
+                const uniqIssues = _.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId');
+                const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
+                this.setIssues(sortedUniqIssues);
+              } else {
+                const sortedIssues = _.orderBy(issues, 'mapRank', 'asc');
+                this.setIssues(sortedIssues);
+              }
               this.setCurrentNewObj({ epicId: 0, [`${this.mode}Id`]: 0 });
               // 两个请求现在都执行完成
             }),
