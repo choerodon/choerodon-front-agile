@@ -216,3 +216,6 @@
   line-height: 15px;
 }
 
+.transform-left {
+  transform: translateX(var(--left));
+}
