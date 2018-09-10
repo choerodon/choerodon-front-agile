@@ -1,4 +1,6 @@
-import { observable, action, computed, toJS } from 'mobx';
+import {
+  observable, action, computed, toJS, 
+} from 'mobx';
 import { store, stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
 
@@ -43,7 +45,7 @@ function getChartDataFromServerData(data) {
     } = epicData;
     completed.push(start >= done ? done : start);
     remaining.push(start >= done ? start - done : 0);
-    added.push(start >= done ? add : start);
+    added.push(start >= done ? add : add - (done - start));
     completedAgain.push(start >= done ? 0 : done - start);
   });
 
@@ -66,15 +68,25 @@ function getChartDataFromServerData(data) {
 @store('EpicReportStore')
 class EpicReportStore {
   @observable tableLoading = false;
+
   @observable tableData = [];
+
   @observable chartLoading = false;
+
   @observable chartDataOrigin = [];
+
   @observable chartData = [[], [], [], [], []];
+
   @observable beforeCurrentUnit = 'story_point';
+
   @observable currentUnit = 'story_point';
+
   @observable epics = [];
+
   @observable epicFinishLoading = false;
+
   @observable currentEpicId = undefined;
+
   @observable reload = false;
 
   loadEpicAndChartAndTableData() {
