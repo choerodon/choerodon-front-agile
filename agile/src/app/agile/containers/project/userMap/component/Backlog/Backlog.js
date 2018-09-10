@@ -90,7 +90,7 @@ class Backlog extends Component {
               onClick={this.handleClickExpand.bind(this, 0)}
             />
           </div>
-          <Droppable droppableId="backlog-0">
+          <Droppable droppableId="backlog-0_0">
             {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}
@@ -151,7 +151,7 @@ class Backlog extends Component {
             ) : null
           }
         </div>
-        <Droppable droppableId={`backlog-${group[`${mode}Id`]}`}>
+        <Droppable droppableId={`backlog-0_${group[`${mode}Id`]}`}>
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
@@ -195,7 +195,7 @@ class Backlog extends Component {
             onClick={this.handleClickExpand.bind(this, 'Unscheduled')}
           />
         </div>
-        <Droppable droppableId="backlog-0">
+        <Droppable droppableId="backlog-0_0">
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
