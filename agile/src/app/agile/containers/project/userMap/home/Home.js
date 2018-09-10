@@ -174,6 +174,7 @@ class Home3 extends Component {
       // scrollL = scrollLeft;
       // this.checkIsFirstLeftScroll();
       // this.debounceSetLeft(scrollLeft);
+      document.querySelector('.fixHead-line-2').style.setProperty('--left', `${scrollLeft}px`);
       UserMapStore.setLeft(scrollLeft);
       header.scrollLeft = scrollLeft;
     } else {
@@ -482,8 +483,12 @@ class Home3 extends Component {
     let desEpicAndModeIssues;
     if (desModeId === 0) {
       const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
-      desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0 
-        || issue[key] === null);
+      if (mode === 'none') {
+        desEpicAndModeIssues = desEpicIssues.slice();
+      } else {
+        desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0 
+          || issue[key] === null);
+      }
     } else {
       desEpicAndModeIssues = _.filter(issueData, issue => issue.epicId === desEpicId
         && issue[key] === desModeId);
@@ -520,7 +525,11 @@ class Home3 extends Component {
     } else {
       let desModeIssues;
       if (desModeId === 0) {
-        desModeIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+        if (mode === 'none') {
+          desModeIssues = issueData;
+        } else {
+          desModeIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+        }
       } else {
         desModeIssues = _.filter(issueData, issue => issue[key] === desModeId);
       }
@@ -613,7 +622,7 @@ class Home3 extends Component {
     const {
       mode, issues, backlogIssues, selectIssueIds,
     } = UserMapStore;
-    if (!selectIssueIds.length) {
+    if (selectIssueIds.length < 2) {
       const key = `${mode}Id`;
       const desIndex = res.destination.index;
       const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
@@ -626,8 +635,12 @@ class Home3 extends Component {
       let desEpicAndModeIssues;
       if (desModeId === 0) {
         const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
-        desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0 
-          || issue[key] === null);
+        if (mode === 'none') {
+          desEpicAndModeIssues = desEpicIssues.slice();
+        } else {
+          desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0 
+            || issue[key] === null);
+        }
       } else {
         desEpicAndModeIssues = _.filter(issueData, issue => issue.epicId === desEpicId
           && issue[key] === desModeId);
@@ -666,7 +679,11 @@ class Home3 extends Component {
         // 目的地块中无卡，判断同行是否为空
         let desModeIssues;
         if (desModeId === 0) {
-          desModeIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+          if (mode === 'none') {
+            desModeIssues = issueData;
+          } else {
+            desModeIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+          }
         } else {
           desModeIssues = _.filter(issueData, issue => issue[key] === desModeId);
         }
@@ -1377,10 +1394,10 @@ class Home3 extends Component {
                           </Droppable>
                         </div>
                         <div
-                          className="fixHead-line fixHead-line-2"
+                          className="fixHead-line fixHead-line-2 transform-left"
                           style={{
                             height: 42,
-                            transform: `translateX(${`${left}px`})`,
+                            // transform: `translateX(${`${left}px`})`,
                           }}
                         >
                           <div className="fixHead-head-note">
