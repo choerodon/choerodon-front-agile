@@ -225,33 +225,32 @@ class SprintReport extends Component {
 
   getOption() {
     return {
-      title: {
-        text: this.renderChartTitle(),
-        textStyle: {
-          fontSize: 12,
-        },
-        top: '24px',
-      },
       tooltip: {
         trigger: 'axis',
+        backgroundColor: '#fff',
+        textStyle: {
+          color: '#000',
+        },
+        extraCssText:
+          'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
       },
       legend: {
         top: '24px',
         right: '0%',
         data: [{
           name: '期望值',
-          icon: `image://${hopeSvg}`,
+          icon: 'line',
         }, {
           name: '剩余值',
-          icon: `image://${restSvg}`,
+          icon: 'line',
         }],
       },
       grid: {
-        left: '3%',
-        right: '3%',
-        // bottom: '3%',
+        y2: 30,
+        top: '60',
+        left: '20',
+        right: '40',
         containLabel: true,
-        show: true,
       },
       // toolbox: {
       //   feature: {
@@ -259,13 +258,32 @@ class SprintReport extends Component {
       //   },
       // },
       xAxis: {
-        splitLine: {
+        axisTick: { show: false },
+        axisLine: {
           show: true,
           lineStyle: {
-            // 使用深浅的间隔色
-            color: 'rgba(116,59,231,0.10)',
-            opacity: 0.9,
-            // type: 'dashed',
+            color: '#eee',
+            type: 'solid',
+            width: 2,
+          },
+        },
+        axisLabel: {
+          show: true,
+          interval: parseInt(this.state.xAxis.length / 7) ? parseInt(this.state.xAxis.length / 7) - 1 : 0,
+          textStyle: {
+            color: 'rgba(0, 0, 0, 0.65)',
+            fontSize: 12,
+            fontStyle: 'normal',
+          },
+        },
+        splitLine: {
+          show: true,
+          onGap: false,
+          interval: 0,
+          lineStyle: {
+            color: ['#eee'],
+            width: 1,
+            type: 'solid',
           },
         },
         type: 'category',
@@ -273,14 +291,39 @@ class SprintReport extends Component {
         data: this.state.xAxis,
       },
       yAxis: {
+        name: '问题计数',
+        nameTextStyle: {
+          color: '#000',
+        },
+        nameGap: 22,
         type: 'value',
-        splitLine: {
+        axisTick: { show: false },
+        axisLine: {
           show: true,
           lineStyle: {
-            // 使用深浅的间隔色
-            color: 'rgba(116,59,231,0.10)',
-            opacity: 0.9,
-            // type: 'dashed',
+            color: '#eee',
+            type: 'solid',
+            width: 2,
+          },
+        },
+        axisLabel: {
+          show: true,
+          interval: 'auto',
+          margin: 18,
+          textStyle: {
+            color: 'rgba(0, 0, 0, 0.65)',
+            fontSize: 12,
+            fontStyle: 'normal',
+          },
+        },
+        splitLine: {
+          show: true,
+          onGap: false,
+          interval: 0,
+          lineStyle: {
+            color: ['#eee'],
+            width: 1,
+            type: 'solid',
           },
         },
       },
@@ -291,11 +334,11 @@ class SprintReport extends Component {
           type: 'line',
           data: [[this.state.startDate.split(' ')[0].slice(5).replace('-', '/'), this.state.expectCount], [this.state.endDate.split(' ')[0].slice(5).replace('-', '/'), 0]],
           itemStyle: {
-            color: 'grey',
+            color: 'rgba(0,0,0,0.65)',
           },
           lineStyle: {
             type: 'dotted',
-            color: 'grey',
+            color: 'rgba(0,0,0,0.65)',
           },
         },
         {
@@ -303,7 +346,7 @@ class SprintReport extends Component {
           name: '剩余值',
           type: 'line',
           itemStyle: {
-            color: 'red',
+            color: '#4f9bff',
           },
           // stack: '总量',
           data: this.state.yAxis,
