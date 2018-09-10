@@ -442,9 +442,12 @@ class UserMapStore {
           this.setBacklogIssues([]);
         } else {
           if (this.mode === 'version') {
-            this.setBacklogIssues(_.uniqBy(_.orderBy(res, ['versionId'], ['desc']), 'issueId'));
+            const uniqIssues = _.uniqBy(_.orderBy(res, ['versionId'], ['desc']), 'issueId');
+            const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
+            this.setBacklogIssues(sortedUniqIssues);
           } else {
-            this.setBacklogIssues(res);
+            const sortedUniqIssues = _.orderBy(res, 'mapRank', 'asc');
+            this.setBacklogIssues(sortedUniqIssues);
           }
         }
         this.setBacklogExpand([]);

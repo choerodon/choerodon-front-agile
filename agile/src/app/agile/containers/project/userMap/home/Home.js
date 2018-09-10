@@ -473,6 +473,7 @@ class Home3 extends Component {
     const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
     const key = `${mode}Id`;
     const desIndex = res.destination.index;
+    const dragIssueId = parseInt(res.draggableId.split('-')[1], 10);
     const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
     const desModeId = this.getSprintIdAndEpicId(res.destination.droppableId).modeId;
     const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
@@ -493,26 +494,58 @@ class Home3 extends Component {
       desEpicAndModeIssues = _.filter(issueData, issue => issue.epicId === desEpicId
         && issue[key] === desModeId);
     }
+    let desModeIssues;
+    if (desModeId === 0) {
+      if (mode === 'none') {
+        desModeIssues = issueData;
+      } else {
+        desModeIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+      }
+    } else {
+      desModeIssues = _.filter(issueData, issue => issue[key] === desModeId);
+    }
     let before;
     let outsetIssueId;
     if (desEpicAndModeIssues.length) {
+      // 移到有卡的块中
       if (desEpicAndModeIssues.every(v => issueIds.includes(v.issueId))) {
-        before = true;
-        outsetIssueId = 0;
+        // 该块中所有卡均被选中
+        if (desModeIssues.every(v => issueIds.includes(v.issueId))) {
+          // 该行中所有卡均被选中
+          before = true;
+          outsetIssueId = 0;
+        } else {
+          // 该行中有未被选中的卡
+          before = true;
+          outsetIssueId = desModeIssues.find(v => !issueIds.includes(v.issueId)).issueId;
+        }
       } else if (true) {
+        // 该块中有未被选中的卡
         if (!desEpicAndModeIssues.every(v => !issueIds.includes(v.issueId))) {
-          if (desIndex === desEpicAndModeIssues.length - 1) {
-            before = false;
-            outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
-          } else {
-            before = true;
-            if (desIndex > res.source.index) {
-              outsetIssueId = desEpicAndModeIssues[desIndex + 1].issueId;
+          // 该块中存在有块被选中
+          if (desEpicAndModeIssues.includes(dragIssueId)) {
+            if (desIndex === desEpicAndModeIssues.length - 1) {
+              before = false;
+              outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
             } else {
+              before = true;
+              if (desIndex > res.source.index) {
+                outsetIssueId = desEpicAndModeIssues[desIndex + 1].issueId;
+              } else {
+                outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+              }
+            }
+          } else if (true) {
+            if (desIndex === desEpicAndModeIssues.length) {
+              before = false;
+              outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            } else {
+              before = true;
               outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
             }
           }
         } else if (true) {
+          // 该块中所有块都未被选中
           if (desIndex === desEpicAndModeIssues.length) {
             before = false;
             outsetIssueId = desEpicAndModeIssues[desEpicAndModeIssues.length - 1].issueId;
@@ -522,18 +555,10 @@ class Home3 extends Component {
           }
         }
       }
-    } else {
-      let desModeIssues;
-      if (desModeId === 0) {
-        if (mode === 'none') {
-          desModeIssues = issueData;
-        } else {
-          desModeIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
-        }
-      } else {
-        desModeIssues = _.filter(issueData, issue => issue[key] === desModeId);
-      }
+    } else if (true) {
+      // 移到无卡的块中
       if (!desModeIssues.length) {
+        // 同行长度为0
         outsetIssueId = 0;
         if (souModeId && desModeId) {
           const modeData = UserMapStore[`${mode}s`] || [];
@@ -545,46 +570,18 @@ class Home3 extends Component {
         } else {
           before = false;
         }
-      } else {
+      } else if (true) {
+        // 同行长度不为0
         if (desModeIssues.every(v => issueIds.includes(v.issueId))) {
+          // 所有选中都在同行中
           before = true;
           outsetIssueId = 0;
         } else {
+          // 同行中有未被选中的
           before = true;
           outsetIssueId = desModeIssues.find(v => !issueIds.includes(v.issueId)).issueId;
         }
       }
-
-      // if (desModeId === souModeId) {
-      //   // 同行之间移动
-      //   if (desModeIssues.length === 1) {
-      //     // 长度为1，该行只有一张卡，就是移动的卡
-      //     before = true;
-      //     outsetIssueId = 0;
-      //   } else {
-      //     // 该行有除了移动卡的卡，放在之前
-      //     before = true;
-      //     outsetIssueId = desModeIssues[0].issueId === parseInt(res.draggableId.split('-')[1], 10)
-      //       ? desModeIssues[1].issueId : desModeIssues[0].issueId;
-      //   }
-      // } else if (true) {
-      //   if (desModeIssues.length) {
-      //     before = true;
-      //     outsetIssueId = desModeIssues[0].issueId;
-      //   } else {
-      //     outsetIssueId = 0;
-      //     if (souModeId && desModeId) {
-      //       const modeData = UserMapStore[`${mode}s`] || [];
-      //       const souModeIndex = _.findIndex(modeData, v => v[key] === souModeId);
-      //       const desModeIndex = _.findIndex(modeData, v => v[key] === desModeId);
-      //       before = desModeIndex < souModeIndex;
-      //     } else if (!souModeId) {
-      //       before = true;
-      //     } else {
-      //       before = false;
-      //     }
-      //   }
-      // }
     }
     const rankIndex = null;
     let postData = {};
@@ -612,6 +609,146 @@ class Home3 extends Component {
       UserMapStore.setBacklogIssues(backlogData);
     }
     UserMapStore.setIssues(issueData);
+    UserMapStore.handleMoveIssue(postData);
+    UserMapStore.setSelectIssueIds([]);
+    UserMapStore.setCurrentDraggableId(null);
+  }
+
+  handleMultipleDragToBacklog = (res) => {
+    const { UserMapStore } = this.props;
+    const {
+      mode, issues, backlogIssues, selectIssueIds, 
+    } = UserMapStore;
+    const sourceIndex = res.source.index;
+    const tarIndex = res.destination.index;
+    const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
+    const key = `${mode}Id`;
+    const desIndex = res.destination.index;
+    const dragIssueId = parseInt(res.draggableId.split('-')[1], 10);
+    const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
+    const desModeId = this.getSprintIdAndEpicId(res.destination.droppableId).modeId;
+    const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
+    const souEpicId = this.getSprintIdAndEpicId(res.source.droppableId).epicId;
+    const issueIds = toJS(selectIssueIds);
+    const issueData = _.cloneDeep(toJS(issues));
+    const backlogData = _.cloneDeep(toJS(backlogIssues));
+    let desModeIssues;
+    if (desModeId === 0) {
+      // const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
+      if (mode === 'none') {
+        desModeIssues = backlogData.slice();
+        // desEpicAndModeIssues = desEpicIssues.slice();
+      } else {
+        desModeIssues = _.filter(backlogData, issue => issue[key] === 0 
+          || issue[key] === null);
+      }
+    } else {
+      desModeIssues = _.filter(backlogData, issue => issue[key] === desModeId);
+    }
+    let desModeIssuesAll;
+    if (desModeId === 0) {
+      if (mode === 'none') {
+        desModeIssuesAll = issueData;
+      } else {
+        desModeIssuesAll = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+      }
+    } else {
+      desModeIssuesAll = _.filter(issueData, issue => issue[key] === desModeId);
+    }
+    let before;
+    let outsetIssueId;
+    if (desModeIssues.length) {
+      // 移到有卡的块中
+      if (desModeIssues.every(v => issueIds.includes(v.issueId))) {
+        // 该块中所有卡均被选中
+        if (desModeIssuesAll.every(v => issueIds.includes(v.issueId))) {
+          // 该行中所有卡均被选中
+          before = true;
+          outsetIssueId = 0;
+        } else {
+          // 该行中有未被选中的卡
+          before = true;
+          outsetIssueId = desModeIssuesAll.find(v => !issueIds.includes(v.issueId)).issueId;
+        }
+      } else if (true) {
+        // 该块中有未被选中的卡
+        if (!desModeIssues.every(v => !issueIds.includes(v.issueId))) {
+          // 该块中存在有卡被选中，也有卡未被选中
+          if (desModeIssues.includes(dragIssueId)) {
+            if (desIndex === desModeIssues.length - 1) {
+              before = false;
+              outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            } else {
+              before = true;
+              if (desIndex > res.source.index) {
+                outsetIssueId = desModeIssues[desIndex + 1].issueId;
+              } else {
+                outsetIssueId = desModeIssues[desIndex].issueId;
+              }
+            }
+          } else if (true) {
+            if (desIndex === desModeIssues.length) {
+              before = false;
+              outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            } else {
+              before = true;
+              outsetIssueId = desModeIssues[desIndex].issueId;
+            }
+          }
+        } else if (true) {
+          // 该块中所有块都未被选中
+          if (desIndex === desModeIssues.length) {
+            before = false;
+            outsetIssueId = desModeIssues[desModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            outsetIssueId = desModeIssues[desIndex].issueId;
+          }
+        }
+      }
+    } else if (true) {
+      // 移到无卡的块中
+      if (!desModeIssuesAll.length) {
+        // 同行长度为0
+        outsetIssueId = 0;
+        if (souModeId && desModeId) {
+          const modeData = UserMapStore[`${mode}s`] || [];
+          const souModeIndex = _.findIndex(modeData, v => v[key] === souModeId);
+          const desModeIndex = _.findIndex(modeData, v => v[key] === desModeId);
+          before = desModeIndex < souModeIndex;
+        } else if (!souModeId) {
+          before = true;
+        } else {
+          before = false;
+        }
+      } else if (true) {
+        // 同行长度不为0
+        if (desModeIssuesAll.every(v => issueIds.includes(v.issueId))) {
+          // 同行中均被选中
+          before = true;
+          outsetIssueId = 0;
+        } else {
+          // 同行中有未被选中的
+          before = true;
+          outsetIssueId = desModeIssuesAll.find(v => !issueIds.includes(v.issueId)).issueId;
+        }
+      }
+    }
+    const rankIndex = null;
+    let postData = {};
+    let tarBacklogData = backlogIssues;
+    _.map(issueIds, (id) => {
+      const currentIssue = _.find(issueData, item => item.issueId === id);
+      const vosId = desModeId === 0 ? null : desModeId;
+      currentIssue.epicId = 0;
+      if (mode !== 'none') {
+        currentIssue[key] = vosId;
+      }
+      postData = {
+        before, epicId: souEpicId ? 0 : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
+      };
+    });
+    window.console.log(postData);
     UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
@@ -755,62 +892,209 @@ class Home3 extends Component {
   handleDragToBacklog = (res) => {
     const { UserMapStore } = this.props;
     const {
-      backlogIssues, mode, selectIssueIds, issues, 
+      mode, issues, backlogIssues, selectIssueIds,
     } = UserMapStore;
-    const key = `${mode}Id`;
-    const value = parseInt(res.destination.droppableId.split('-')[1], 10);
-    const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
-    const before = res.destination.index === 0;
-    const rankIndex = null;
-    let backlogData = _.cloneDeep(toJS(backlogIssues));
-    const issueData = _.cloneDeep(toJS(issues));
-    let postData = {};
-    const tarIndex = res.destination.index;
-    let outsetIssueId = null;
-    _.map(issueIds, (id) => {
-      const vosId = value === 0 ? null : value;
-      let tarData = _.filter(backlogIssues, item => item[key] === vosId);
+    if (selectIssueIds.length < 2) {
+      const key = `${mode}Id`;
+      const desIndex = res.destination.index;
+      // const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
+      const desModeId = this.getSprintIdAndEpicId(res.destination.droppableId).modeId;
+      const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
+      const souEpicId = this.getSprintIdAndEpicId(res.source.droppableId).epicId;
+      const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
+      const issueData = _.cloneDeep(toJS(issues));
+      const backlogData = _.cloneDeep(toJS(backlogIssues));
+      // let desEpicAndModeIssues;
+      let desModeIssues;
       if (mode === 'none') {
-        tarData = backlogData;
-      }
-      if (before && tarData.length) {
-        outsetIssueId = tarData[0].issueId;
-      } else if (before && !tarData.length) {
-        outsetIssueId = 0;
-      } else {
-        outsetIssueId = tarData[tarIndex - 1].issueId;
-      }
-      let tarIssue = null;
-      if (res.source.droppableId.includes('backlog')) {
-        tarIssue = _.filter(backlogData, item => item.issueId === id)[0];
-        postData = {
-          before, outsetIssueId, rankIndex, issueIds, [key]: vosId, 
-        };
-        // const index = backlogIssues.indexOf(tarIssue);
-      } else {
-        tarIssue = _.filter(issueData, item => item.issueId === id)[0];
-        tarIssue.epicId = 0;
-        postData = {
-          before, outsetIssueId, rankIndex, issueIds, epicId: 0, 
-        };
-        tarData.splice(tarIndex, 0, tarIssue);
-        if (mode !== 'none') {
-          backlogData = backlogData.filter(item => item[key] !== vosId).concat(tarData);
+        desModeIssues = backlogData.slice()
+      } else if (true) {
+        if (desModeId === 0) {
+          desModeIssues = _.filter(backlogData, issue => issue[key] === 0 || issue[key] === null);
+        } else {
+          desModeIssues = _.filter(backlogData, issue => issue[key] === desModeId);
         }
       }
-      if (mode !== 'none') {
-        tarIssue[key] = vosId;
-        postData[key] = value;
+      // if (desModeId === 0) {
+      //   const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
+      //   if (mode === 'none') {
+      //     desEpicAndModeIssues = desEpicIssues.slice();
+      //   } else {
+      //     desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0 
+      //       || issue[key] === null);
+      //   }
+      // } else {
+      //   desEpicAndModeIssues = _.filter(issueData, issue => issue.epicId === desEpicId
+      //     && issue[key] === desModeId);
+      // }
+      let before;
+      let outsetIssueId;
+      if (desModeIssues.length) {
+        // 目的地块中有卡，判断所放位置是否为0
+        if (!desIndex) {
+          before = true;
+          outsetIssueId = desModeIssues[0].issueId;
+        } else if (desModeId === souModeId) {
+          // 同块之间移动，判断是否放在最后
+          if (desIndex === desModeIssues.length - 1) {
+            before = false;
+            outsetIssueId = desModeIssues[desModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            if (desIndex > res.source.index) {
+              outsetIssueId = desModeIssues[desIndex + 1].issueId;
+            } else {
+              outsetIssueId = desModeIssues[desIndex].issueId;
+            }
+          }
+        } else if (true) {
+          // 不同块之间移动，判断是否放在最后
+          if (desIndex === desModeIssues.length) {
+            before = false;
+            outsetIssueId = desModeIssues[desModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            outsetIssueId = desModeIssues[desIndex].issueId;
+          }
+        }
+      } else {
+        // 目的地块中无卡，判断同行是否为空
+        let desModeAllIssues;
+        if (desModeId === 0) {
+          if (mode === 'none') {
+            desModeAllIssues = issueData;
+          } else {
+            desModeAllIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+          }
+        } else {
+          desModeAllIssues = _.filter(issueData, issue => issue[key] === desModeId);
+        }
+        if (desModeId === souModeId) {
+          // 同行之间移动
+          if (desModeAllIssues.length === 1) {
+            // 长度为1，该行只有一张卡，就是移动的卡
+            before = true;
+            outsetIssueId = 0;
+          } else {
+            // 该行有除了移动卡的卡，放在之前
+            before = true;
+            outsetIssueId = desModeAllIssues[0].issueId === parseInt(res.draggableId.split('-')[1], 10)
+              ? desModeAllIssues[1].issueId : desModeAllIssues[0].issueId;
+          }
+        } else if (true) {
+          // 不同行之间移动，放到空块里
+          if (desModeAllIssues.length) {
+            before = true;
+            outsetIssueId = desModeAllIssues[0].issueId;
+          } else {
+            outsetIssueId = 0;
+            if (souModeId && desModeId) {
+              const modeData = UserMapStore[`${mode}s`] || [];
+              const souModeIndex = _.findIndex(modeData, v => v[key] === souModeId);
+              const desModeIndex = _.findIndex(modeData, v => v[key] === desModeId);
+              before = desModeIndex < souModeIndex;
+            } else if (!souModeId) {
+              before = true;
+            } else {
+              before = false;
+            }
+          }
+        }
       }
-    });
-    if (!res.source.droppableId.includes('backlog')) {
-      UserMapStore.setIssues(issueData);
+      const rankIndex = null;
+      let postData = {};
+      let tarBacklogData = backlogIssues;
+      _.map(issueIds, (id) => {
+        const currentIssue = _.find(issueData, item => item.issueId === id);
+        const vosId = desModeId === 0 ? null : desModeId;
+        currentIssue.epicId = 0;
+        if (mode !== 'none') {
+          currentIssue[key] = vosId;
+        }
+        postData = {
+          before, epicId: souEpicId ? 0 : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
+        };
+        // if (res.source.droppableId.includes('backlog')) {
+        //   tarBacklogData = _.find(backlogData, item => item.issueId === id);
+        //   const index = backlogData.indexOf(tarBacklogData);
+        //   backlogData.splice(index, 1);
+        // }
+        // if (mode !== 'none') {
+        //   postData[key] = desModeId;
+        // }
+      });
+      // if (res.source.droppableId.includes('backlog')) {
+      //   UserMapStore.setBacklogIssues(backlogData);
+      // }
+      // UserMapStore.setIssues(issueData);
+      window.console.log(postData);
+      UserMapStore.handleMoveIssue(postData);
+      UserMapStore.setSelectIssueIds([]);
+      UserMapStore.setCurrentDraggableId(null);
+    } else {
+      this.handleMultipleDragToBacklog(res);
     }
-    UserMapStore.setBacklogIssues(backlogData);
-    UserMapStore.handleMoveIssue(postData);
-    UserMapStore.setSelectIssueIds([]);
-    UserMapStore.setCurrentDraggableId(null);
   };
+
+  // handleDragToBacklog = (res) => {
+  //   const { UserMapStore } = this.props;
+  //   const {
+  //     backlogIssues, mode, selectIssueIds, issues, 
+  //   } = UserMapStore;
+  //   const key = `${mode}Id`;
+  //   const value = parseInt(res.destination.droppableId.split('-')[1], 10);
+  //   const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
+  //   const before = res.destination.index === 0;
+  //   const rankIndex = null;
+  //   let backlogData = _.cloneDeep(toJS(backlogIssues));
+  //   const issueData = _.cloneDeep(toJS(issues));
+  //   let postData = {};
+  //   const tarIndex = res.destination.index;
+  //   let outsetIssueId = null;
+  //   _.map(issueIds, (id) => {
+  //     const vosId = value === 0 ? null : value;
+  //     let tarData = _.filter(backlogIssues, item => item[key] === vosId);
+  //     if (mode === 'none') {
+  //       tarData = backlogData;
+  //     }
+  //     if (before && tarData.length) {
+  //       outsetIssueId = tarData[0].issueId;
+  //     } else if (before && !tarData.length) {
+  //       outsetIssueId = 0;
+  //     } else {
+  //       outsetIssueId = tarData[tarIndex - 1].issueId;
+  //     }
+  //     let tarIssue = null;
+  //     if (res.source.droppableId.includes('backlog')) {
+  //       tarIssue = _.filter(backlogData, item => item.issueId === id)[0];
+  //       postData = {
+  //         before, outsetIssueId, rankIndex, issueIds, [key]: vosId, 
+  //       };
+  //       // const index = backlogIssues.indexOf(tarIssue);
+  //     } else {
+  //       tarIssue = _.filter(issueData, item => item.issueId === id)[0];
+  //       tarIssue.epicId = 0;
+  //       postData = {
+  //         before, outsetIssueId, rankIndex, issueIds, epicId: 0, 
+  //       };
+  //       tarData.splice(tarIndex, 0, tarIssue);
+  //       if (mode !== 'none') {
+  //         backlogData = backlogData.filter(item => item[key] !== vosId).concat(tarData);
+  //       }
+  //     }
+  //     if (mode !== 'none') {
+  //       tarIssue[key] = vosId;
+  //       postData[key] = value;
+  //     }
+  //   });
+  //   if (!res.source.droppableId.includes('backlog')) {
+  //     UserMapStore.setIssues(issueData);
+  //   }
+  //   UserMapStore.setBacklogIssues(backlogData);
+  //   UserMapStore.handleMoveIssue(postData);
+  //   UserMapStore.setSelectIssueIds([]);
+  //   UserMapStore.setCurrentDraggableId(null);
+  // };
 
   handleEpicOrIssueDrag = (res) => {
     if (!res.destination) {
