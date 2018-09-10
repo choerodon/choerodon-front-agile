@@ -228,7 +228,16 @@ class BurnDown extends Component {
         const sprintMaxDate = endDate.split(' ')[0];
         const maxDate = moment(dataMaxDate).isBefore(moment(sprintMaxDate))
           ? sprintMaxDate : dataMaxDate;
-        const xData = this.getBetweenDateStr(dataMinDate, maxDate);
+        let allDate;
+        if (moment(maxDate).isBefore(sprintMaxDate)) {
+          allDate = this.getBetweenDateStr(dataMinDate, sprintMaxDate);
+        } else if (moment(dataMinDate).isSame(maxDate)) {
+          allDate = [dataMinDate];
+        } else {
+          allDate = this.getBetweenDateStr(dataMinDate, maxDate);
+        }
+        const xData = allDate;
+        // const xData = this.getBetweenDateStr(dataMinDate, maxDate);
         const xDataFormat = _.map(xData, item => item.slice(5).replace('-', '/'));
         const yAxis = xData.map((data, index) => {
           if (dataDates.includes(data)) return res.coordinate[data];
