@@ -13,6 +13,7 @@ class SprintDetailsWrap extends Component {
       <Card
         title="冲刺详情"
         link={link}
+        sprintId={sprintId}
       >
         <SprintDetails 
           sprintId={sprintId}

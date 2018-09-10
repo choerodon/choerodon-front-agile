@@ -8,9 +8,9 @@ const { AppState } = stores;
 
 class Card extends Component {
   handleClick() {
-    const { link, history } = this.props;
+    const { link, history, sprintId } = this.props;
     const urlParams = AppState.currentMenuType;
-    history.push(`/agile/${link}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    history.push(`/agile/${link}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}${sprintId != undefined ? (`&sprintId=${sprintId}`) : ''}`);
   }
 
   render() {

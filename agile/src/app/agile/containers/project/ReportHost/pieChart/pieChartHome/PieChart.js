@@ -12,6 +12,7 @@ import {
 import {
   Button, Select, Icon, Spin, Tooltip, 
 } from 'choerodon-ui';
+import _ from 'lodash';
 import './pie.scss';
 import { reduce } from 'zrender/lib/core/util';
 import util from 'util';
@@ -31,14 +32,15 @@ class ReleaseDetail extends Component {
     super(props);
     this.state = {
       colors: [],
-      type: '经办人',
-      value: 'assignee',
+      type: '',
+      value: '',
       showOtherTooltip: false,
     };
   }
 
   componentDidMount = () => {
-    VersionReportStore.getPieDatas(AppState.currentMenuType.id, 'assignee');
+    const value = this.getSelectDefaultValue();
+    VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
     setTimeout(() => {
       const pieChart = this.pie.getEchartsInstance();
       pieChart.on('mouseout', (params) => {
@@ -50,20 +52,7 @@ class ReleaseDetail extends Component {
       });
     }, 0);
   }
-
-  compare(pro) { 
-    return function (obj1, obj2) { 
-      const val1 = obj1[pro]; 
-      const val2 = obj2[pro]; 
-      if (val1 < val2) { 
-        return 1; 
-      } else if (val1 > val2) { 
-        return -1; 
-      } else { 
-        return 0; 
-      } 
-    }; 
-  } 
+ 
 
   getFirstName = (str) => {
     if (!str) {
@@ -89,6 +78,30 @@ class ReleaseDetail extends Component {
       otherTooptipItem[i].style.backgroundColor = `rgba(250,211,82,${opacity})`;
     }
     // e.stopPropageation();
+  }
+
+  getSelectDefaultValue = () => {
+    const { pathname } = this.props.location;
+    const quaryLinks = [
+      { title: '经办人', value: 'assignee' },
+      { title: '问题类型', value: 'typeCode' },
+      { title: '优先级', value: 'priorityCode' },
+      { title: '状态', value: 'statusCode' },
+    ];
+    const quaryLink = pathname.slice(pathname.lastIndexOf('/') + 1, pathname.length);
+    if (quaryLinks.filter(item => item.value === quaryLink).length === 0) {
+      this.setState({
+        type: '经办人',
+        value: 'assignee',
+      });
+      return 'assignee';
+    } else {
+      this.setState({ 
+        type: quaryLinks.filter(item => item.value === quaryLink)[0].title, 
+        value: quaryLink, 
+      });
+      return quaryLink;
+    }
   }
 
   getOption() {
@@ -185,6 +198,20 @@ class ReleaseDetail extends Component {
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
   };
 
+  compare(pro) { 
+    return function (obj1, obj2) { 
+      const val1 = obj1[pro]; 
+      const val2 = obj2[pro]; 
+      if (val1 < val2) { 
+        return 1; 
+      } else if (val1 > val2) { 
+        return -1; 
+      } else { 
+        return 0; 
+      } 
+    }; 
+  } 
+
   getQueryString(type, value) {
     const QUERY = {
       assignee: 'paramType=assigneeId&paramId=',
@@ -217,6 +244,7 @@ class ReleaseDetail extends Component {
   }
 
   render() {
+    const { value } = this.state;
     const data = VersionReportStore.getPieData;
     const sourceData = VersionReportStore.getSourceData;
     let total = 0;
@@ -261,7 +289,8 @@ class ReleaseDetail extends Component {
               <React.Fragment>
                 <Select
                   getPopupContainer={triggerNode => triggerNode.parentNode}
-                  defaultValue="assignee"
+                  defaultValue={value}
+                  value={value}
                   label="统计类型"
                   style={{
                     width: 512,

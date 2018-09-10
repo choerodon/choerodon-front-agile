@@ -92,7 +92,7 @@ class IterationBoardHome extends Component {
           <Col span={8}>
             <Status
               sprintId={sprintId}
-              link="reporthost/pieReport"
+              link="reporthost/pieReport/statusCode"
             />
           </Col>
           <Col span={8}>
@@ -114,20 +114,20 @@ class IterationBoardHome extends Component {
           <Col span={8}>
             <IssueType 
               sprintId={sprintId}
-              link="reporthost/pieReport"
+              link="reporthost/pieReport/typeCode"
             />
           </Col>
 
           <Col span={8}>
             <Priority
               sprintId={sprintId}
-              link="reporthost/pieReport"
+              link="reporthost/pieReport/priorityCode"
             />
           </Col>
           <Col span={8}>
             <Assignee
               sprintId={sprintId}
-              link="reporthost/pieReport"
+              link="reporthost/pieReport/assignee"
             />
           </Col>
         </Row>
