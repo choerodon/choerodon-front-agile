@@ -23,7 +23,7 @@ const ReportHostIndex = ({ match }) => (
     <Route path={`${match.url}/EpicReport`} component={EpicReport} />
     <Route path={`${match.url}/pieReport`} component={PieChartReport} />
     <Route path={`${match.url}/versionReport`} component={VersionReportNew} />
-    <Route path={'*'} component={nomatch} />
+    <Route path="*" component={nomatch} />
   </Switch>
 );
 export default ReportHostIndex;

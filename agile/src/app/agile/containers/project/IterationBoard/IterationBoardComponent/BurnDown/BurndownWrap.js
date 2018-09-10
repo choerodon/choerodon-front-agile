@@ -7,8 +7,9 @@ class BurndownWrap extends Component {
     const { sprintId, link } = this.props;
     return (
       <Card
-        title={'燃尽图'}
+        title="燃尽图"
         link={link}
+        sprintId={sprintId}
       >
         <Burndown
           sprintId={sprintId}

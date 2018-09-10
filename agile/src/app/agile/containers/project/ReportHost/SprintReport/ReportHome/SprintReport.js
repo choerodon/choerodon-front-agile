@@ -43,8 +43,20 @@ class SprintReport extends Component {
   }
 
   componentWillMount() {
+    this.getDefaultSprintId();
     this.getSprintData();
     ReportStore.init();
+  }
+
+  getDefaultSprintId() {
+    const { search } = this.props.location;
+    if (search.lastIndexOf('sprintId') !== -1) {
+      const arr = search.split('&');
+      const sprintId = arr[arr.length - 1].split('=')[1];
+      this.setState({
+        defaultSprint: _.parseInt(sprintId),
+      });
+    }
   }
 
   getBetweenDateStr(start, end) {
@@ -76,11 +88,12 @@ class SprintReport extends Component {
 
   getSprintData() {
     BurndownChartStore.axiosGetSprintList().then((res) => {
+      const { defaultSprint } = this.state;
       BurndownChartStore.setSprintList(res);
       this.setState({
-        defaultSprint: res[0].sprintId,
-        endDate: res[0].endDate,
-        startDate: res[0].startDate,
+        defaultSprint: defaultSprint === '' ? res[0].sprintId : defaultSprint,
+        endDate: defaultSprint === '' ? res[0].endDate : res.filter(item => item.sprintId === defaultSprint)[0].endDate,
+        startDate: defaultSprint === '' ? res[0].startDate : res.filter(item => item.sprintId === defaultSprint)[0].startDate,
       }, () => {
         // this.getChartData();
         this.getChartCoordinate();
