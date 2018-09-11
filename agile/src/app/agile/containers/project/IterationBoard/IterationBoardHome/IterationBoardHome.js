@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Page, Header, Content,
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import {
-  Row, Col, Select, Tooltip,
+  Row, Col, Select, Tooltip, Button,
 } from 'choerodon-ui';
 import _ from 'lodash';
 import { loadSprints } from '../../../../api/NewIssueApi';
@@ -20,6 +20,7 @@ import SprintDetails from '../IterationBoardComponent/SprintDetails';
 import './IterationBoardHome.scss';
 
 const { Option } = Select;
+const { AppState } = stores;
 
 @observer
 class IterationBoardHome extends Component {
@@ -170,6 +171,9 @@ class IterationBoardHome extends Component {
               ))
             }
           </Select>
+          <Button className="leftBtn2" funcType="flat" onClick={() => { this.props.history.push(`/agile/scrumboard?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+            <span>切换至看板</span>
+          </Button>
         </Header>
         <Content>
           {this.renderContent()}
