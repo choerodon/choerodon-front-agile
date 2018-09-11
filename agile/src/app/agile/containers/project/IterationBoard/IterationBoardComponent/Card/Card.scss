@@ -4,6 +4,12 @@
   border: 0 dashed transparent;
   border-top-width: 1px;
 
+  .text-overflow-hidden {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .card-wrap {
     position: relative;
     background-color: #fff;

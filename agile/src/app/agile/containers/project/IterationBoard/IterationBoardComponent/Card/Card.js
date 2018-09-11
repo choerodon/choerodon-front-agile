@@ -21,7 +21,7 @@ class Card extends Component {
       <div className="c7n-sprintDashboard-card">
         <div className="card-wrap">
           <header>
-            <h1>
+            <h1 className="text-overflow-hidden">
               <span>
                 {title}
               </span>

@@ -47,6 +47,13 @@ function exitFullScreen() {
   }
 }
 
+function transformNull2Zero (val) {
+  if (val === null) {
+    return 0;
+  }
+  return val;
+}
+
 @observer
 class Home3 extends Component {
   constructor(props) {
@@ -401,6 +408,122 @@ class Home3 extends Component {
     return { epicId, modeId };
   }
 
+  transformDateToPostDate = (ids, originIssues, mode, targetEpicId, targetModeId) => {
+    const res = {
+      epicIssueIds: [],
+      sprintIssueIds: [],
+      versionIssueIds: [],
+    };
+    const key = `${mode}Id`;
+    ids.forEach((issueId) => {
+      const issue = originIssues.find(v => v.issueId === issueId);
+      if (transformNull2Zero(targetEpicId) !== transformNull2Zero(issue.epicId)) {
+        res.epicIssueIds.push(issueId);
+      }
+      if (mode !== 'none' && transformNull2Zero(issue[key]) !== transformNull2Zero(targetModeId)) {
+        res[`${mode}IssueIds`].push(issueId);
+      }
+    });
+    return res;
+  }
+
+  handleDataWhenMove = (ids, before, outsetIssueId, mode, desEpicId, desModeId) => {
+    const { UserMapStore } = this.props;
+    const { issues, backlogIssues } = UserMapStore;
+    const issuesCopy = _.cloneDeep(toJS(issues));
+    const backlogIssuesCopy = _.cloneDeep(toJS(backlogIssues));
+    const issuesDragged = [];
+    let resIssues = [];
+    let resBacklogIssues = [];
+    ids.forEach((issueId) => {
+      const issue = issuesCopy.find(v => v.issueId === issueId);
+      issue.epicId = desEpicId;
+      if (mode !== 'none') {
+        issue[`${mode}Id`] = desModeId;
+      }
+      issuesDragged.push(issue);
+      const issuesIssueIndex = issuesCopy.findIndex(v => v.issueId === issueId);
+      const backlogIssueIndex = backlogIssuesCopy.findIndex(v => v.issueId === issueId);
+      if (issuesIssueIndex !== -1) {
+        issuesCopy.splice(issuesIssueIndex, 1);
+      }
+      if (backlogIssueIndex !== -1) {
+        backlogIssuesCopy.splice(backlogIssueIndex, 1);
+      }
+    });
+    if (outsetIssueId === 0 && before) {
+      if (desEpicId === 0 || desEpicId === null) {
+        resIssues = issuesCopy;
+        resBacklogIssues = issuesDragged.concat(backlogIssuesCopy);
+      } else {
+        resIssues = issuesDragged.concat(issuesCopy);
+        resBacklogIssues = backlogIssuesCopy;
+      }
+    } else if (outsetIssueId === 0 && !before) {
+      if (desEpicId === 0 || desEpicId === null) {
+        resIssues = issuesCopy;
+        resBacklogIssues = backlogIssuesCopy.concat(issuesDragged);
+      } else {
+        resIssues = issuesCopy.concat(issuesDragged);
+        resBacklogIssues = backlogIssuesCopy;
+      }
+    } else if (before) {
+      if (desEpicId === 0 || desEpicId === null) {
+        resIssues = issuesCopy;
+        const backlogInsertIndex = backlogIssuesCopy.findIndex(v => v.issueId === outsetIssueId);
+        if (backlogInsertIndex !== -1) {
+          if (backlogInsertIndex === 0) {
+            resBacklogIssues = issuesDragged.concat(backlogIssuesCopy);
+          } else {
+            resBacklogIssues = [
+              ...backlogIssuesCopy.slice(0, backlogInsertIndex),
+              ...issuesDragged,
+              ...backlogIssuesCopy.slice(backlogInsertIndex),
+            ];
+          }
+        }
+      } else {
+        resBacklogIssues = backlogIssuesCopy;
+        const issuesInsertIndex = issuesCopy.findIndex(v => v.issueId === outsetIssueId);
+        if (issuesInsertIndex !== -1) {
+          if (issuesInsertIndex === 0) {
+            resIssues = issuesDragged.concat(issuesCopy);
+          } else {
+            resIssues = [
+              ...issuesCopy.slice(0, issuesInsertIndex),
+              ...issuesDragged,
+              ...issuesCopy.slice(issuesInsertIndex),
+            ];
+          }
+        }
+      }
+    } else if (true) {
+      if (desEpicId === 0 || desEpicId === null) {
+        resIssues = issuesCopy;
+        const backlogInsertIndex = issuesCopy.findIndex(v => v.issueId === outsetIssueId);
+        if (backlogInsertIndex !== -1) {
+          resBacklogIssues = [
+            ...backlogIssuesCopy.slice(0, backlogInsertIndex + 1),
+            ...issuesDragged,
+            ...backlogIssuesCopy.slice(backlogInsertIndex + 1),
+          ];
+        }
+      } else {
+        resBacklogIssues = backlogIssuesCopy;
+        const issuesInsertIndex = issuesCopy.findIndex(v => v.issueId === outsetIssueId);
+        if (issuesInsertIndex !== -1) {
+          resIssues = [
+            ...issuesCopy.slice(0, issuesInsertIndex + 1),
+            ...issuesDragged,
+            ...issuesCopy.slice(issuesInsertIndex + 1),
+          ];
+        }
+      }
+    }
+    UserMapStore.setBacklogIssues(resBacklogIssues);
+    UserMapStore.setIssues(resIssues);
+  }
+
   // handelDragToBoard = (res) => {
   //   const { UserMapStore } = this.props;
   //   const {
@@ -584,31 +707,45 @@ class Home3 extends Component {
       }
     }
     const rankIndex = null;
-    let postData = {};
-    let tarBacklogData = backlogIssues;
-    _.map(issueIds, (id) => {
-      const currentIssue = _.find(issueData, item => item.issueId === id);
-      const vosId = desModeId === 0 ? null : desModeId;
-      currentIssue.epicId = desEpicId;
-      if (mode !== 'none') {
-        currentIssue[key] = vosId;
-      }
-      postData = {
-        before, epicId: desEpicId, outsetIssueId, rankIndex, issueIds,
-      };
-      if (res.source.droppableId.includes('backlog')) {
-        tarBacklogData = _.find(backlogData, item => item.issueId === id);
-        const index = backlogData.indexOf(tarBacklogData);
-        backlogData.splice(index, 1);
-      }
-      if (mode !== 'none') {
-        postData[key] = desModeId;
-      }
-    });
-    if (res.source.droppableId.includes('backlog')) {
-      UserMapStore.setBacklogIssues(backlogData);
+    const transformData = this.transformDateToPostDate(issueIds, issues, mode, desEpicId, desModeId);
+    const postData = {
+      before,
+      epicId: transformData.epicIssueIds.length ? desEpicId : undefined,
+      outsetIssueId,
+      rankIndex,
+      issueIds,
+      versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
+      sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+      epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
+    };
+    if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
+      postData[key] = desModeId;
     }
-    UserMapStore.setIssues(issueData);
+    let tarBacklogData = backlogIssues;
+    this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, desEpicId, desModeId);
+    // _.map(issueIds, (id) => {
+    //   const currentIssue = _.find(issueData, item => item.issueId === id);
+    //   const vosId = desModeId === 0 ? null : desModeId;
+    //   currentIssue.epicId = desEpicId;
+    //   if (mode !== 'none') {
+    //     currentIssue[key] = vosId;
+    //   }
+    //   // postData = {
+    //   //   before, epicId: desEpicId, outsetIssueId, rankIndex, issueIds,
+    //   // };
+    //   if (res.source.droppableId.includes('backlog')) {
+    //     tarBacklogData = _.find(backlogData, item => item.issueId === id);
+    //     const index = backlogData.indexOf(tarBacklogData);
+    //     backlogData.splice(index, 1);
+    //   }
+    //   if (mode !== 'none') {
+    //     // postData[key] = desModeId;
+    //   }
+    // });
+    // if (res.source.droppableId.includes('backlog')) {
+    //   UserMapStore.setBacklogIssues(backlogData);
+    // }
+    // UserMapStore.setIssues(issueData);
     UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
@@ -674,7 +811,7 @@ class Home3 extends Component {
         // 该块中有未被选中的卡
         if (!desModeIssues.every(v => !issueIds.includes(v.issueId))) {
           // 该块中存在有卡被选中，也有卡未被选中
-          if (desModeIssues.includes(dragIssueId)) {
+          if (_.map(desModeIssues, 'issueId').includes(dragIssueId)) {
             if (desIndex === desModeIssues.length - 1) {
               before = false;
               outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
@@ -735,20 +872,34 @@ class Home3 extends Component {
       }
     }
     const rankIndex = null;
-    let postData = {};
+    const transformData = this.transformDateToPostDate(issueIds, issues, mode, 0, desModeId);
+    const postData = {
+      before,
+      epicId: transformData.epicIssueIds.length ? 0 : undefined,
+      outsetIssueId,
+      rankIndex,
+      issueIds,
+      versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
+      sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+      epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
+    };
+    if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
+      postData[key] = desModeId;
+    }
     let tarBacklogData = backlogIssues;
-    _.map(issueIds, (id) => {
-      const currentIssue = _.find(issueData, item => item.issueId === id);
-      const vosId = desModeId === 0 ? null : desModeId;
-      currentIssue.epicId = 0;
-      if (mode !== 'none') {
-        currentIssue[key] = vosId;
-      }
-      postData = {
-        before, epicId: souEpicId ? 0 : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
-      };
-    });
-    window.console.log(postData);
+    this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, 0, desModeId);
+    // _.map(issueIds, (id) => {
+    //   // const currentIssue = _.find(issueData, item => item.issueId === id);
+    //   // const vosId = desModeId === 0 ? null : desModeId;
+    //   // currentIssue.epicId = 0;
+    //   // if (mode !== 'none') {
+    //   //   currentIssue[key] = vosId;
+    //   // }
+    //   // postData = {
+    //   //   before, epicId: souEpicId ? 0 : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
+    //   // };
+    // });
+    // window.console.log(postData);
     UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
@@ -856,31 +1007,46 @@ class Home3 extends Component {
         }
       }
       const rankIndex = null;
-      let postData = {};
-      let tarBacklogData = backlogIssues;
-      _.map(issueIds, (id) => {
-        const currentIssue = _.find(issueData, item => item.issueId === id);
-        const vosId = desModeId === 0 ? null : desModeId;
-        currentIssue.epicId = desEpicId;
-        if (mode !== 'none') {
-          currentIssue[key] = vosId;
-        }
-        postData = {
-          before, epicId: desEpicId, outsetIssueId, rankIndex, issueIds,
-        };
-        if (res.source.droppableId.includes('backlog')) {
-          tarBacklogData = _.find(backlogData, item => item.issueId === id);
-          const index = backlogData.indexOf(tarBacklogData);
-          backlogData.splice(index, 1);
-        }
-        if (mode !== 'none') {
-          postData[key] = desModeId;
-        }
-      });
-      if (res.source.droppableId.includes('backlog')) {
-        UserMapStore.setBacklogIssues(backlogData);
+      const transformData = this.transformDateToPostDate(issueIds, issues, mode, desEpicId, desModeId);
+      const postData = {
+        before,
+        epicId: transformData.epicIssueIds.length ? desEpicId : undefined,
+        outsetIssueId,
+        rankIndex,
+        issueIds,
+        versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
+        sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+        epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
+      };
+      if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
+        postData[key] = desModeId;
       }
-      UserMapStore.setIssues(issueData);
+      let tarBacklogData = backlogIssues;
+
+      this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, desEpicId, desModeId);
+      // _.map(issueIds, (id) => {
+      //   const currentIssue = _.find(issueData, item => item.issueId === id);
+      //   const vosId = desModeId === 0 ? null : desModeId;
+      //   currentIssue.epicId = desEpicId;
+      //   if (mode !== 'none') {
+      //     currentIssue[key] = vosId;
+      //   }
+      //   // postData = {
+      //   //   before, epicId: desEpicId, outsetIssueId, rankIndex, issueIds,
+      //   // };
+      //   if (res.source.droppableId.includes('backlog')) {
+      //     tarBacklogData = _.find(backlogData, item => item.issueId === id);
+      //     const index = backlogData.indexOf(tarBacklogData);
+      //     backlogData.splice(index, 1);
+      //   }
+      //   if (mode !== 'none') {
+      //     // postData[key] = desModeId;
+      //   }
+      // });
+      // if (res.source.droppableId.includes('backlog')) {
+      //   UserMapStore.setBacklogIssues(backlogData);
+      // }
+      // UserMapStore.setIssues(issueData);
       UserMapStore.handleMoveIssue(postData);
       UserMapStore.setSelectIssueIds([]);
       UserMapStore.setCurrentDraggableId(null);
@@ -1002,32 +1168,46 @@ class Home3 extends Component {
         }
       }
       const rankIndex = null;
-      let postData = {};
+      const transformData = this.transformDateToPostDate(issueIds, issues, mode, 0, desModeId);
+      const postData = {
+        before,
+        epicId: transformData.epicIssueIds.length ? 0 : undefined,
+        outsetIssueId,
+        rankIndex,
+        issueIds,
+        versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
+        sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+        epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
+      };
+      if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
+        postData[key] = desModeId;
+      }
       let tarBacklogData = backlogIssues;
-      _.map(issueIds, (id) => {
-        const currentIssue = _.find(issueData, item => item.issueId === id);
-        const vosId = desModeId === 0 ? null : desModeId;
-        currentIssue.epicId = 0;
-        if (mode !== 'none') {
-          currentIssue[key] = vosId;
-        }
-        postData = {
-          before, epicId: souEpicId ? 0 : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
-        };
-        // if (res.source.droppableId.includes('backlog')) {
-        //   tarBacklogData = _.find(backlogData, item => item.issueId === id);
-        //   const index = backlogData.indexOf(tarBacklogData);
-        //   backlogData.splice(index, 1);
-        // }
-        // if (mode !== 'none') {
-        //   postData[key] = desModeId;
-        // }
-      });
+      this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, 0, desModeId);
+      // _.map(issueIds, (id) => {
+      //   const currentIssue = _.find(issueData, item => item.issueId === id);
+      //   const vosId = desModeId === 0 ? null : desModeId;
+      //   currentIssue.epicId = 0;
+      //   if (mode !== 'none') {
+      //     // currentIssue[key] = vosId;
+      //   }
+      //   // postData = {
+      //   //   before, epicId: souEpicId ? 0 : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
+      //   // };
+      //   // if (res.source.droppableId.includes('backlog')) {
+      //   //   tarBacklogData = _.find(backlogData, item => item.issueId === id);
+      //   //   const index = backlogData.indexOf(tarBacklogData);
+      //   //   backlogData.splice(index, 1);
+      //   // }
+      //   // if (mode !== 'none') {
+      //   //   postData[key] = desModeId;
+      //   // }
+      // });
       // if (res.source.droppableId.includes('backlog')) {
       //   UserMapStore.setBacklogIssues(backlogData);
       // }
       // UserMapStore.setIssues(issueData);
-      window.console.log(postData);
+      // window.console.log(postData);
       UserMapStore.handleMoveIssue(postData);
       UserMapStore.setSelectIssueIds([]);
       UserMapStore.setCurrentDraggableId(null);
@@ -1490,7 +1670,7 @@ class Home3 extends Component {
                     }}
                   >
                     <React.Fragment>
-                      {_.filter(issues, issue => issue.epicId === epic.issueId && (mode !== 'none' && issue[id] == null || mode === 'none')).map((item, indexs) => (
+                      {_.filter(issues, issue => issue.epicId === epic.issueId && (mode !== 'none' && (issue[id] == null || issue[id] === 0) || mode === 'none')).map((item, indexs) => (
                         <Draggable draggableId={`none-${item.issueId}`} index={indexs} key={item.issueId}>
                           {(provided1, snapshot1) => (
                             <div
