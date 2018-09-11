@@ -1,8 +1,15 @@
 .c7n-agile-dashboard-burndown {
   .loading-wrap {
-    height: 200px;
+    height: 400px;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .switch {
+    position: absolute;
+    top: 25px;
+    left: 200px;
+    cursor: pointer;
   }
 }

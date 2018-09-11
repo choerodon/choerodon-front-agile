@@ -490,7 +490,7 @@ class EpicBurndown extends Component {
         >
           <SwithChart
             history={history}
-            current="epicReport"
+            current="epicBurndown"
           />
           <Button 
             funcType="flat" 

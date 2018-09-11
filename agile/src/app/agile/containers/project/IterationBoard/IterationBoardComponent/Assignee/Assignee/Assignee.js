@@ -55,7 +55,7 @@ class VersionProgress extends Component {
       },
       series: [
         {
-          color: ['#FFB100', '#4D90FE', '#00BFA5'],
+          color: ['#9665e2', '#f7667f', '#fad352', '#45a3fc', '#56ca77'],
           type: 'pie',
           radius: '60px',
           hoverAnimation: false,
