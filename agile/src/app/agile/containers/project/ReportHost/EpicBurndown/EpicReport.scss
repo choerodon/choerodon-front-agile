@@ -1,4 +1,4 @@
-.c7n-epicReport {
+.c7n-epicBurndown {
   .c7n-epicSelectHeader{
     position: relative;
     display: inline-block;
@@ -38,6 +38,10 @@
     }
   }
  
+  .c7n-epicInfo{
+    font-size: 13px;
+    margin-top: -20px;
+  }
 
   .c7n-report {
     display: flex;
@@ -49,36 +53,6 @@
       height: 400px !important;
       margin-top: 16px;
       margin-bottom: 36px;
-      .chart-legend{
-        position: absolute;
-        right: 20px;
-        display: flex;
-        flex-direction: row;
-        list-style: none;
-        li{
-          font-size: 12px;
-          color: #000000;
-          line-height: 20px;
-          margin-right: 30px;
-        }
-        li:before{
-          content: '';
-          display: inline-block;
-          width: 14px;
-          height: 14px;
-          margin-right: 8px;
-          vertical-align: -2px;
-        }
-        li:first-child:before{
-          background:rgba(0,191,165,0.80); 
-        }
-        li:nth-child(2):before{
-          background: rgba(69,163,252,0.80);
-        }
-        li:last-child:before{
-          background: rgba(27,128,223,0.80);
-        }
-      }
       .c7n-chart-yaxixName{
         position: absolute;
         top: 35%;

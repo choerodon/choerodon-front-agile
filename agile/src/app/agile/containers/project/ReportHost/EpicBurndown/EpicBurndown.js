@@ -38,6 +38,18 @@ class EpicBurndown extends Component {
     ES.loadEpicAndChartAndTableData();
   }
   
+  getLegendData() {
+    const arr = ['工作已完成', '工作剩余', '工作增加'];
+    const legendData = [];
+    arr.forEach((item) => {
+      legendData.push({
+        name: item,
+        textStyle: { fontSize: 12 },
+      });
+    });
+    return legendData;
+  }
+
   getLabel(record) {
     if (ES.beforeCurrentUnit === 'story_point') {
       if (record.typeCode === 'story') {
@@ -53,9 +65,19 @@ class EpicBurndown extends Component {
   getOption() {
     const { inverse } = this.state;
     const { chartDataOrigin } = ES;
-    console.log(JSON.stringify(ES.chartData));
+    // 如果xAxisLabel项多于10个，则上下交错显示
+    const xAxisData = chartDataOrigin.length >= 10 ? chartDataOrigin.map((item, index) => {
+      if (index % 2 === 1) {
+        return `\n\n${item.name}`;
+      }
+      return item.name;
+    }) : chartDataOrigin.map(item => item.name);
+
+    // const xAxisData = _.map(chartDataOrigin, 'name');
+
     const option = {
       grid: {
+        x: 40,
         y2: 10,
         top: '30',
         left: '21',
@@ -66,8 +88,8 @@ class EpicBurndown extends Component {
         {
           type: 'category',
           splitLine: { show: false },
-          // data: ['史诗开始时的预估', '7/8迭代冲刺', '7/15-7/21', '7/20-7/221', '7/20-7/221'],
-          data: _.map(ES.chartDataOrigin, 'name'),
+          // data: _.map(ES.chartDataOrigin, 'name'),
+          data: xAxisData,
           itemStyle: {
             color: 'rgba(0,0,0,0.65)',
           },
@@ -81,7 +103,13 @@ class EpicBurndown extends Component {
             },
           },
           axisLabel: {
+            interval: 0,
+            // rotate: 20,
             show: true,
+            showMinLabel: true,
+            showMaxLabel: true,
+            // margin: 0,
+            agile: 'left',
             textStyle: {
               color: 'rgba(0,0,0,0.65)',
             },
@@ -112,6 +140,39 @@ class EpicBurndown extends Component {
           },
         },
       ],
+      legend: {
+        show: true,
+        data: this.getLegendData(),
+        right: 50,
+        itemWidth: 14,
+        itemHeight: 14,
+        itemGap: 30,
+        icon: 'rect',
+        // formatter(name) {
+        //   // if(name !== '辅助' && name !== 'compoleted again'){
+        //   // switch (name) {
+        //   //     case 'compoleted':
+        //   //       return '工作已完成';
+        //   //     case 'remaining':
+        //   //       return '工作剩余'
+        //   //      case 'added':
+        //   //       return '工作增加'
+        //   //     default:
+        //   //         return;
+        //   // }
+        //   if (name === 'compoleted') {
+        //     return '工作已完成';
+        //   }
+        //   if (name === 'remaining') {
+        //     return '工作剩余';
+        //   }
+        //   if (name === 'added') {
+        //     return '工作增加';
+        //   }
+        //   return null;      
+        //   // }
+        // },
+      },
       tooltip: {
         show: true,
         trigger: 'axis',
@@ -126,15 +187,19 @@ class EpicBurndown extends Component {
         borderWidth: 1,
         extraCssText: 'box-shadow: 0 2px 4px 0 rgba(0,0,0,0.20);',
         formatter(params) {
+          params[0].name = _.trim(params[0].name, '\n\n');
           const sprint = chartDataOrigin.filter(item => item.name === params[0].name)[0];
           let res = params[0].name;
-          // res += `<br/>已完成: ${(params[1].value === '-' ? 0 : params[1].value) + (params[4].value === '-' ? 0 : params[4].value)}`;
-          // res += `<br/>添加至epic: ${params[3].value === '-' ? 0 : params[3].value}`;
-          // res += `<br/>剩余: ${(params[2].value === '-' ? 0 : params[2].value) + (params[3].value === '-' ? 0 : params[3].value)}`;
           res += `<br/>冲刺开始处：${sprint.start}`;
-          res += `<br/>已完成: ${sprint.done}`;
+          res += `<br/>已完成: ${(params[1].value === '-' ? 0 : params[1].value) + (params[4].value === '-' ? 0 : params[4].value)}`;
           res += `<br/>添加至epic: ${sprint.add}`;
-          res += `<br/>剩余: ${sprint.left}`;
+
+          // res += `<br/>添加至epic: ${params[3].value === '-' ? 0 : params[3].value}`;
+          res += `<br/>剩余: ${(params[2].value === '-' ? 0 : params[2].value) + (params[3].value === '-' ? 0 : params[3].value)}`;
+          // res += `<br/>冲刺开始处：${sprint.start}`;
+          // res += `<br/>已完成: ${sprint.done}`;
+          // res += `<br/>添加至epic: ${sprint.add}`;
+          // res += `<br/>剩余: ${sprint.left}`;
           return res;
         },
       },
@@ -158,7 +223,7 @@ class EpicBurndown extends Component {
           data: ES.chartData[0],
         },
         {
-          name: 'compoleted',
+          name: '工作已完成',
           type: 'bar',
           stack: '总量',
           itemStyle: {
@@ -178,7 +243,7 @@ class EpicBurndown extends Component {
           data: ES.chartData[1],
         },
         {
-          name: 'remaining',
+          name: '工作剩余',
           type: 'bar',
           stack: '总量',
           itemStyle: {
@@ -195,7 +260,7 @@ class EpicBurndown extends Component {
           data: ES.chartData[2],
         },
         {
-          name: 'added',
+          name: '工作增加',
           type: 'bar',
           stack: '总量',
           itemStyle: {
@@ -244,29 +309,14 @@ class EpicBurndown extends Component {
   
   getSprintSpeed =() => {
     const { chartData, chartDataOrigin } = ES;
-    const totalCompleted = [];
-    // const chartData1 = [];
-    // chartData1[1] = ['-', '-', 6, 3, '-'];
-    // chartData1[4] = ['-', '-', 3, '-', '-'];
-    // if (chartData1[1].length > 3) {
-    //   chartData1[1] = this.transformPlaceholder2Zero(chartData1[1]);
-    //   chartData1[4] = this.transformPlaceholder2Zero(chartData1[4]);
-    //   chartData1[1].forEach((item, i) => {
-    //     totalCompleted.push(item + chartData1[4][i]);
-    //   });
-    //   return _.floor(_.sum(totalCompleted) / totalCompleted.length);
-    // }
-   
-    
     if (chartDataOrigin.length > 3) {
-      const arrCompleted = this.transformPlaceholder2Zero(chartData[1]);
-      const arrCompletedAgain = this.transformPlaceholder2Zero(chartData[4]);
-      arrCompleted.forEach((item, i) => {
-        totalCompleted.push(item + arrCompletedAgain[i]);
+      const lastThree = chartDataOrigin.slice(chartDataOrigin.length - 3, chartDataOrigin.length);
+      const lastThreeDone = [];
+      lastThree.forEach((item) => {
+        lastThreeDone.push(item.done);
       });
-      return _.floor(_.sum(totalCompleted) / totalCompleted.length);
+      return _.floor(_.sum(lastThreeDone) / 3, 2);
     }
-
     return 0;
   }
 
@@ -280,12 +330,18 @@ class EpicBurndown extends Component {
     return 0;
   }
 
+  getSprintCount() {
+    return Math.ceil(this.getStoryPoints() / this.getSprintSpeed());
+  }
+
   getTableDta(type) {
     if (type === 'compoleted') {
-      return ES.tableData.filter(v => v.completed === 1);
+      // return ES.tableData.filter(v => v.completed === 1);
+      return ES.tableData.sprintBurnDownReportDTOS;
     }
     if (type === 'unFinish') {
-      return ES.tableData.filter(v => v.completed === 0);
+      // return ES.tableData.filter(v => v.completed === 0);
+      return ES.tableData.incompleteIssues;
     }
     return [];
   }
@@ -322,11 +378,29 @@ class EpicBurndown extends Component {
     iconShowInfo.style.display = 'none';
   }
 
-  renderTable(type) {
+  handleLinkToIssue(linkType, item) {
+    const urlParams = AppState.currentMenuType;
+    const {
+      type, id, organizationId,
+    } = urlParams;
+    const { history } = this.props;
+    let urlPush = `/agile/issue?type=${type}&id=${id}&name=${urlParams.name}&organizationId=${organizationId}`;
+    if (JSON.stringify(item) !== '{}') {
+      if (linkType === 'sprint') {
+        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reposthost/epicBurnDown`;
+      }
+      if (linkType === 'epic') {
+        urlPush += `&paramType=epic&paramId=${item.issueId}&paramName=${item.epicName || '未分配'}下的问题&paramUrl=reporthost/epicBurnDown`;
+      }
+      history.push(urlPush);
+    }
+  }
+
+  renderTable = (type) => {
     const column = [
       ...[
         {
-          width: '15%',
+          // width: '15%',
           title: '关键字',
           dataIndex: 'issueNum',
           render: (issueNum, record) => (
@@ -350,7 +424,7 @@ class EpicBurndown extends Component {
           ),
         },
         {
-          width: '30%',
+          // width: '30%',
           title: '概要',
           dataIndex: 'summary',
           render: summary => (
@@ -367,7 +441,7 @@ class EpicBurndown extends Component {
           ),
         },
         {
-          width: '15%',
+          // width: '15%',
           title: '问题类型',
           dataIndex: 'typeCode',
           render: (typeCode, record) => (
@@ -380,7 +454,7 @@ class EpicBurndown extends Component {
           ),
         },
         {
-          width: '15%',
+          // width: '15%',
           title: '优先级',
           dataIndex: 'priorityCode',
           render: (priorityCode, record) => (
@@ -392,12 +466,12 @@ class EpicBurndown extends Component {
           ),
         },
         {
-          width: '15%',
+          // width: '15%',
           title: '状态',
           dataIndex: 'statusCode',
           render: (statusCode, record) => (
             <div>
-              <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusName}`}>
+              <Tooltip mouseEnterDelay={0.5} title={`任务状态:${record.statusName}`}>
                 <div>
                   <StatusTag
                     style={{ display: 'inline-block' }}
@@ -412,7 +486,7 @@ class EpicBurndown extends Component {
       ],
       ...[
         ES.beforeCurrentUnit === 'issue_count' ? {} : {
-          width: '10%',
+          // width: '10%',
           title: ES.beforeCurrentUnit === 'story_point' ? '故事点' : '剩余时间',
           dataIndex: 'storyPoints',
           render: (storyPoints, record) => (
@@ -423,16 +497,98 @@ class EpicBurndown extends Component {
         },
       ],
     ];
+    if (type === 'unFinish') {
+      return (
+        <Table
+          rowKey={record => record.issueId}
+          dataSource={this.getTableDta(type)}
+          filterBar={false}
+          columns={column}
+          scroll={{ x: true }}
+          loading={ES.tableLoading}
+          pagination={this.getTableDta(type) && this.getTableDta(type).length > 10}
+        />
+      );
+    }
     return (
-      <Table
-        rowKey={record => record.issueId}
-        dataSource={this.getTableDta(type)}
-        filterBar={false}
-        columns={column}
-        scroll={{ x: true }}
-        loading={ES.tableLoading}
-      />
+      <div>
+        {
+          this.getTableDta('compoleted') && this.getTableDta('compoleted').length !== 0 ? (this.getTableDta('compoleted').map((item) => {
+            if (item.completeIssues.length !== 0) {
+              return (
+                <div 
+                  style={{ marginBottom: 22 }}
+                  key={item.sprintId}
+                >
+                  <p style={{ 
+                    position: 'relative',
+                    marginBottom: 12, 
+                  }}
+                  >
+                    <span 
+                      style={{ 
+                        color: '#3f51b5',
+                        cursor: 'pointer',
+                      }}
+                      role="none"
+                      onClick={() => {
+                        const { history } = this.props;
+                        const urlParams = AppState.currentMenuType;
+                        // history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicBurndown`);
+                      }
+                      }
+                    >
+                      {`${item.sprintName}`}
+                    </span>
+                    <span
+                      style={{
+                        color: 'rgba(0,0,0,0.65)',
+                        fontSize: 12,
+                        marginLeft: 12,
+                      }}
+                    >
+                      {`${item.startDate.slice(0, 11).replace(/-/g, '.')}-${item.endDate.slice(0, 11).replace(/-/g, '.')}`}
+                    </span>
+                    <span
+                      style={{ 
+                        display: 'inline-block',
+                        position: 'absolute',
+                        right: 0,
+                        color: '#3f51b5',
+                        cursor: 'pointer',
+                        fontSize: 13,
+                        flex: 1,
+                      }}
+                      role="none"
+                      onClick={this.handleLinkToIssue.bind(this, 'sprint', item)}
+                    >
+                      {'在“问题管理中”查看'}
+                    </span>
+                  </p>
+                  <Table
+                    rowKey={record => record.issueId}
+                    dataSource={item.completeIssues}
+                    filterBar={false}
+                    columns={column}
+                    scroll={{ x: true }}
+                    loading={ES.tableLoading}
+                    pagination={(item.completeIssues && item.completeIssues.length > 10)}
+                  />
+                </div>
+              );
+            }
+          })) : <p>当前下的冲刺没有未完成的问题</p>
+        }
+      </div>
     );
+  }
+
+  renderToolbarTitle = () => {
+    const { chartDataOrigin } = ES;
+    if (this.getSprintSpeed() === 0) {
+      return `根据最近${chartDataOrigin.length}次冲刺的数据，无法预估迭代次数`;
+    }
+    return `根据最近${chartDataOrigin.length}次冲刺的数据，将花费${this.getSprintCount()}个迭代来完成此史诗。`;
   }
 
   renderToolbar = () => {
@@ -455,12 +611,12 @@ class EpicBurndown extends Component {
     }
     return (
       <div className="toolbar-forcast">
-        <h3 className="title">{`根据最近${chartDataOrigin.length}次冲刺的数据，将花费${Math.ceil(this.getStoryPoints() / this.getSprintSpeed())}个迭代来完成此史诗。`}</h3>
+        <h3 className="title">{this.renderToolbarTitle()}</h3>
         <div className="word">
           <span className="icon" style={{ background: '#4D90FE' }}>
             <Icon type="cached" />
           </span>
-          <span>{`冲刺迭代：${Math.ceil(this.getStoryPoints() / this.getSprintSpeed())}`}</span>
+          <span>{`冲刺迭代：${!this.getSprintSpeed() ? '无法预估' : this.getSprintCount()}`}</span>
         </div>
         <div className="word">
           <span className="icon" style={{ background: 'rgb(255, 177, 0)' }}>
@@ -478,12 +634,34 @@ class EpicBurndown extends Component {
     );
   }
 
+  renderEpicInfo() {
+    if (ES.currentEpicId != undefined) {
+      const currentEpic = ES.epics.filter(item => item.issueId === ES.currentEpicId)[0];
+      return (
+        <p className="c7n-epicInfo">
+          <span
+            style={{ 
+              color: '#3f51b5',
+              cursor: 'pointer',
+            }}
+            role="none"
+            onClick={this.handleLinkToIssue.bind(this, 'epic', ES.currentEpicId != undefined ? ES.epics.filter(item => item.issueId === ES.currentEpicId)[0] : {})}
+          >
+            {`${currentEpic.epicName}`}
+          </span>
+          <span>{`,${currentEpic.summary}`}</span>
+        </p>
+      );
+    }
+    return '';
+  }
+
   render() {
     const { history } = this.props;
     const { checkbox } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
-      <Page className="c7n-epicReport">
+      <Page className="c7n-epicBurndown">
         <Header 
           title="史诗燃尽图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
@@ -551,6 +729,9 @@ class EpicBurndown extends Component {
                   </div>
                  
                 </div>
+                <div>
+                  {this.renderEpicInfo()}
+                </div>
                
                 <Spin spinning={ES.chartLoading}>
                   <div>
@@ -561,11 +742,6 @@ class EpicBurndown extends Component {
                             {
                               ES.reload ? null : (
                                 <div style={{ position: 'relative' }}>
-                                  <ul className="chart-legend">
-                                    <li>工作已完成</li>
-                                    <li>工作剩余</li>
-                                    <li>工作增加</li>
-                                  </ul>
                                   <div className="c7n-chart-yaxixName">
                                     {'故事点'}
                                   </div>
