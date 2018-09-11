@@ -1427,7 +1427,7 @@ class Home3 extends Component {
           <span>刷新</span>
         </Button>
         <Button className="leftBtn2" funcType="flat" onClick={this.handleFullScreen.bind(this)}>
-          <Icon type="refresh icon" />
+          <Icon type={`${this.state.isFullScreen ? 'exit_full_screen' : 'zoom_out_map'} icon`} />
           <span>{this.state.isFullScreen ? '退出全屏' : '全屏'}</span>
         </Button>
         <Button

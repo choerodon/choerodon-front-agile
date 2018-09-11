@@ -48,4 +48,18 @@ export default [
     link: '/agile/reporthost/pieReport',
     pic: 'pieReport',
   },
+  {
+    key: 'epicBurndown',
+    title: '史诗燃耗图',
+    des: '跟踪史诗完成速度预计所需冲刺数。这有助于您监控史诗能否按时发布，以便在工作落后时采取行动。',
+    link: '/agile/reporthost/epicBurndown',
+    pic: 'epicBurndown',
+  },
+  {
+    key: 'versionBurndown',
+    title: '版本燃耗图',
+    des: '跟踪版本完成速度预计发布日期。这有助于您监控版本能否按时发布，以便在工作落后时采取行动。',
+    link: '/agile/reporthost/versionBurndown',
+    pic: 'versionBurndown',
+  },
 ];
