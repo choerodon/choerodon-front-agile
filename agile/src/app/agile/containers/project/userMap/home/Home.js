@@ -1311,23 +1311,21 @@ class Home3 extends Component {
     this.setState({
       popOverVisible: false,
     });
-    message.config({
-      top: 110,
-      duration: 2,
-    });
-    message.success('导出图片成功', undefined, undefined, 'top');
-
     const shareContent = document.querySelector('.fixHead');// 需要截图的包裹的（原生的）DOM 对象
     const opts = {
       useCORS: true, // 【重要】开启跨域配置
     };
     shareContent.style.width = `${Math.max(document.querySelector('.fixHead-head').scrollWidth, document.querySelector('.fixHead-body').scrollWidth)}px`;
     shareContent.style.height = `${document.querySelector('.fixHead-head').scrollHeight + document.querySelector('.fixHead-body').scrollHeight}px`;
-    console.log(`styleHeight: ${shareContent.style.height}`);
     html2canvas(shareContent, opts)
       .then((canvas) => {
         this.downLoadImage(canvas, '用户故事地图.png');
       });
+    message.config({
+      top: 110,
+      duration: 2,
+    });
+    message.success('导出图片成功', undefined, undefined, 'top');
   }
 
   /**
