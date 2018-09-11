@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { axios, stores } from 'choerodon-front-boot';
 import { Spin } from 'choerodon-ui';
+import { withRouter } from 'react-router-dom';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 import pic from '../EmptyPics/no_sprint.svg';
 import UserHead from '../../../../../components/UserHead';
@@ -87,20 +88,25 @@ class Sprint extends Component {
     return (
       <div className="users">
         {
-          assigneeIssueDTOList && assigneeIssueDTOList.map(user => (
+          assigneeIssueDTOList.length ? assigneeIssueDTOList.slice(0, 10).map(user => (
             <div key={user.assigneeId}>
-              <UserHead
-                user={{
-                  id: user.assigneeId,
-                  loginName: '',
-                  realName: user.assigneeName,
-                  avatar: user.imageUrl,
-                }}
-                hiddenText
-              />
+              {user.assigneeId === 0 && assigneeIssueDTOList.length === 1 ?
+                <div style={{ height: 18 }} /> :
+                <UserHead
+                  user={{
+                    id: user.assigneeId,
+                    loginName: '',
+                    realName: user.assigneeName,
+                    avatar: user.imageUrl,
+                  }}
+                  hiddenText
+                />
+              }
             </div>
           ))
+            : <div style={{ height: 18, width: '100%' }} />
         }
+        {assigneeIssueDTOList.length > 10 && <a role="none" onClick={() => { this.props.history.push(`/agile/backlog?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>查看更多...</a>}
       </div>
     );
   }
@@ -114,4 +120,4 @@ class Sprint extends Component {
   }
 }
 
-export default Sprint;
+export default withRouter(Sprint);
