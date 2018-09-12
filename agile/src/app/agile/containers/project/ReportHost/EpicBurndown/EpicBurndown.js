@@ -16,7 +16,12 @@ import PriorityTag from '../../../../components/PriorityTag';
 import TypeTag from '../../../../components/TypeTag';
 import ES from '../../../../stores/project/epicBurndown';
 import EmptyBlock from '../../../../components/EmptyBlock';
-
+import seeChangeRange from './seeChangeRange.svg';
+import seeProgress from './seeProgress.svg';
+import speedIcon from './speedIcon.svg';
+import sprintIcon from './sprintIcon.svg';
+import storyPointIcon from './storyPointIcon.svg';
+import completed from './completed.svg';
 import './EpicReport.scss';
 
 const { AppState } = stores;
@@ -170,13 +175,7 @@ class EpicBurndown extends Component {
           res += `<br/>冲刺开始处：${sprint.start}`;
           res += `<br/>已完成: ${(params[1].value === '-' ? 0 : params[1].value) + (params[4].value === '-' ? 0 : params[4].value)}`;
           res += `<br/>添加至epic: ${sprint.add}`;
-
-          // res += `<br/>添加至epic: ${params[3].value === '-' ? 0 : params[3].value}`;
           res += `<br/>剩余: ${(params[2].value === '-' ? 0 : params[2].value) + (params[3].value === '-' ? 0 : params[3].value)}`;
-          // res += `<br/>冲刺开始处：${sprint.start}`;
-          // res += `<br/>已完成: ${sprint.done}`;
-          // res += `<br/>添加至epic: ${sprint.add}`;
-          // res += `<br/>剩余: ${sprint.left}`;
           return res;
         },
       },
@@ -577,7 +576,7 @@ class EpicBurndown extends Component {
       return <p>当前史诗下的冲刺没有已完成的问题</p>;
     }
      
-    return '';
+    return <p>当前史诗下的冲刺没有已完成的问题</p>;
   }
 
   renderToolbarTitle = () => {
@@ -601,7 +600,9 @@ class EpicBurndown extends Component {
     if (this.getStoryPoints() === 0) {
       return (
         <div className="toolbar-complete">
-          <div className="pic" />
+          <div className="pic">
+            <img src={completed} alt="所有预估的问题都已完成!" />
+          </div>
           <div className="word">所有预估的问题都已完成！</div>
         </div>
       );
@@ -610,21 +611,21 @@ class EpicBurndown extends Component {
       <div className="toolbar-forcast">
         <h3 className="title">{this.renderToolbarTitle()}</h3>
         <div className="word">
-          <span className="icon" style={{ background: '#4D90FE' }}>
-            <Icon type="cached" />
-          </span>
+          <div className="icon">
+            <img src={sprintIcon} alt="冲刺迭代" />
+          </div>
           <span>{`冲刺迭代：${!this.getSprintSpeed() ? '无法预估' : this.getSprintCount()}`}</span>
         </div>
         <div className="word">
-          <span className="icon" style={{ background: 'rgb(255, 177, 0)' }}>
-            <Icon type="directions_run" />
-          </span>
+          <div className="icon">
+            <img src={speedIcon} alt="冲刺速度" />
+          </div>
           <span>{`冲刺速度：${this.getSprintSpeed()}`}</span>
         </div>
         <div className="word">
-          <span className="icon" style={{ background: '#00BFA5' }}>
-            <Icon type="turned_in" />
-          </span>
+          <div className="icon">
+            <img src={storyPointIcon} alt="剩余故事点" />
+          </div>
           <span>{`剩余故事点：${this.getStoryPoints()}`}</span>
         </div>
       </div>
@@ -685,7 +686,7 @@ class EpicBurndown extends Component {
               <div>
                 <div style={{ display: 'flex' }}>
                   <Select
-                    style={{ width: 512, marginRight: 33 }}
+                    style={{ width: 512, marginRight: 33, height: 35 }}
                     label="史诗"
                     value={ES.currentEpicId}
                     onChange={this.handleChangeCurrentEpic.bind(this)}
@@ -708,15 +709,19 @@ class EpicBurndown extends Component {
                     </span>
 
                     <div className="icon-show-info" onMouseEnter={this.handleIconMouseEnter} onMouseLeave={this.handleIconMouseLeave}>
-                      <figure>
-                        <div className="icon-show-info-svg" />
+                      <figure className="icon-show-progress">
+                        <div className="icon-show-info-svg">
+                          <img src={seeProgress} alt="查看进度" />
+                        </div>
                         <figcaption className="icon-show-info-detail">
                           <p className="icon-show-info-detail-header">查看进度</p>
                           <p className="icon-show-info-detail-content">按照史诗查看冲刺进度</p>
                         </figcaption>
                       </figure>
                       <figure>
-                        <div className="icon-show-info-svg" />
+                        <div className="icon-show-info-svg">
+                          <img src={seeChangeRange} alt="查看变更范围" />
+                        </div>
                         <figcaption className="icon-show-info-detail">
                           <p className="icon-show-info-detail-header">查看变更范围</p>
                           <p className="icon-show-info-detail-content">跟踪范围的扩大和缩小，由底部条状信息显示。</p>
