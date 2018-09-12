@@ -23,9 +23,15 @@
       background: #FFFFFF;
       box-shadow: 0 1px 4px 1px rgba(0,0,0,0.20);
       border-radius: 2px;
+      
+      .icon-show-progress{
+        margin-right: 42px;
+      }
+
       .icon-show-info-svg{
         width: 178px;
         height: 132px;
+        margin-bottom: 13px;
       }
       .icon-show-info-detail-header{
         font-size: 13px;
@@ -106,7 +112,7 @@
           width: 65px;
           height: 67px;
           display: inline-block;
-          background: #ddd;
+          background: #fff;
           margin-bottom: 23px;
         }
 
@@ -114,6 +120,7 @@
           font-size: 14px;
           color: #000;
           line-height: 20px;
+          }
         }
       }
 
@@ -143,21 +150,14 @@
           display: flex;
           align-items: center;
 
-          .icon {
+          .icon{
             display: inline-block;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #ddd;
             margin-right: 8px;
-            text-align: center;
-            vertical-align: 3px;
-            i{
-              background: transparent;
-              color: #fff;
-              font-size: 12px;
+            img{
+              width: 18px;
+              height: 18px;
+              vertical-align: -3px;
             }
-          }
         }
       }
 
