@@ -72,12 +72,12 @@ class EpicBurndown extends Component {
     const { inverse } = this.state;
     const { chartDataOrigin } = ES;
     // 如果xAxisLabel项多于10个，则上下交错显示
-    const xAxisData = chartDataOrigin.length >= 10 ? chartDataOrigin.map((item, index) => {
-      if (index % 2 === 1) {
-        return `\n\n${item.name}`;
-      }
-      return item.name;
-    }) : chartDataOrigin.map(item => item.name);
+    // const xAxisData = chartDataOrigin.length >= 10 ? chartDataOrigin.map((item, index) => {
+    //   if (index % 2 === 1) {
+    //     return `\n\n${item.name}`;
+    //   }
+    //   return item.name;
+    // }) : chartDataOrigin.map(item => item.name);
 
     // const xAxisData = _.map(chartDataOrigin, 'name');
 
@@ -85,17 +85,17 @@ class EpicBurndown extends Component {
       grid: {
         x: 40,
         y2: 10,
-        top: '30',
-        left: '21',
-        right: '50',
+        top: 30,
+        left: 40,
+        right: 50,
         containLabel: true,
       },
       xAxis: [
         {
           type: 'category',
           splitLine: { show: false },
-          // data: _.map(ES.chartDataOrigin, 'name'),
-          data: xAxisData,
+          data: _.map(ES.chartDataOrigin, 'name'),
+          // data: xAxisData,
           itemStyle: {
             color: 'rgba(0,0,0,0.65)',
           },
@@ -110,7 +110,7 @@ class EpicBurndown extends Component {
           },
           axisLabel: {
             interval: 0,
-            // rotate: 20,
+            rotate: chartDataOrigin.length > 8 ? 20 : 0,
             show: true,
             showMinLabel: true,
             showMaxLabel: true,
