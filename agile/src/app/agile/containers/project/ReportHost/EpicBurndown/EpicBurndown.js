@@ -148,30 +148,6 @@ class EpicBurndown extends Component {
         itemHeight: 14,
         itemGap: 30,
         icon: 'rect',
-        // formatter(name) {
-        //   // if(name !== '辅助' && name !== 'compoleted again'){
-        //   // switch (name) {
-        //   //     case 'compoleted':
-        //   //       return '工作已完成';
-        //   //     case 'remaining':
-        //   //       return '工作剩余'
-        //   //      case 'added':
-        //   //       return '工作增加'
-        //   //     default:
-        //   //         return;
-        //   // }
-        //   if (name === 'compoleted') {
-        //     return '工作已完成';
-        //   }
-        //   if (name === 'remaining') {
-        //     return '工作剩余';
-        //   }
-        //   if (name === 'added') {
-        //     return '工作增加';
-        //   }
-        //   return null;      
-        //   // }
-        // },
       },
       tooltip: {
         show: true,

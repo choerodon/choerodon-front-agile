@@ -1312,14 +1312,28 @@ class Home3 extends Component {
       popOverVisible: false,
     });
     const shareContent = document.querySelector('.fixHead');// 需要截图的包裹的（原生的）DOM 对象
-    const opts = {
-      useCORS: true, // 【重要】开启跨域配置
-    };
     shareContent.style.width = `${Math.max(document.querySelector('.fixHead-head').scrollWidth, document.querySelector('.fixHead-body').scrollWidth)}px`;
     shareContent.style.height = `${document.querySelector('.fixHead-head').scrollHeight + document.querySelector('.fixHead-body').scrollHeight}px`;
+
+    const scaleBy = 2;
+    const canvas = document.createElement('canvas');
+    canvas.style.width = `${_.parseInt(_.trim(shareContent.style.width, 'px')) * scaleBy}px`;
+    canvas.style.height = `${_.parseInt(_.trim(shareContent.style.height, 'px')) * scaleBy}px`;
+    const context = canvas.getContext('2d');
+    context.scale(scaleBy, scaleBy);
+
+    const opts = {
+      useCORS: true, // 【重要】开启跨域配置
+      dpi: window.devicePixelRatio,
+      canvas,
+      scale: scaleBy,
+      width: _.parseInt(_.trim(shareContent.style.width, 'px')),
+      height: _.parseInt(_.trim(shareContent.style.height, 'px')),
+    };
+    
     html2canvas(shareContent, opts)
-      .then((canvas) => {
-        this.downLoadImage(canvas, '用户故事地图.png');
+      .then((pcanvas) => {
+        this.downLoadImage(pcanvas, '用户故事地图.png');
       });
     message.config({
       top: 110,
