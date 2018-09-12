@@ -22,8 +22,6 @@ const STATUSINDEX = asyncRouter(() => import('./project/Status'));
 const USERMAPINDEX = asyncRouter(() => import('./project/userMap'));
 const INERATIONBOARDINDEX = asyncRouter(() => import('./project/IterationBoard'));
 
-const EPICBURNDOWNINDE = asyncRouter(() => import('./project/ReportHost/EpicBurndown'));
-
 class AGILEIndex extends React.Component {
   render() {
     const { match } = this.props;
@@ -57,7 +55,6 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/userMap`} component={USERMAPINDEX} />
           {/* 迭代工作台 */}
           <Route path={`${match.url}/iterationBoard`} component={INERATIONBOARDINDEX} />
-          <Route path={`${match.url}/epicBurndown`} component={EPICBURNDOWNINDE} />
           <Route path="*" component={nomatch} />
         </Switch>
       </IntlProviderAsync>
