@@ -126,7 +126,7 @@ class StatusHome extends Component {
             <Table
               dataSource={StatusStore.getStatusList}
               columns={column}
-              pagination={this.state.pagination}
+              pagination={StatusStore.getStatusList.length > 10 ? this.state.pagination : false}
               onChange={this.handleChangeTable.bind(this)}
             />
           </Spin>

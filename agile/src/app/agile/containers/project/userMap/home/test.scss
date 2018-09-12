@@ -1,6 +1,11 @@
 .c7n-userMap {
+   --left: 0;
   p {
     margin-bottom: 0;
+  }
+
+  .title-transform {
+   transform: translateX(var(--left));
   }
 }
 

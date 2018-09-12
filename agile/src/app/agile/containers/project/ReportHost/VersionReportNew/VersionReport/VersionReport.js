@@ -515,6 +515,7 @@ class EpicReport extends Component {
     ];
     return (
       <Table
+        pagination={this.getTableDta(type).length > 10}
         rowKey={record => record.issueId}
         dataSource={this.getTableDta(type)}
         filterBar={false}

@@ -21,7 +21,7 @@ import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
 // let scrollL;
-// let isFirstScroll = false;
+let left = 0;
 
 function toFullScreen(dom) {
   if (dom.requestFullscreen) {
@@ -175,15 +175,17 @@ class Home3 extends Component {
     const { scrollLeft, scrollTop } = e.target;
     const { UserMapStore } = this.props;
     const {
-      left, top, offsetTops, currentIndex, 
+      top, offsetTops, currentIndex,
     } = UserMapStore;
     const header = document.getElementById('fixHead-head');
+    document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
     if (scrollLeft !== left) {
       // scrollL = scrollLeft;
       // this.checkIsFirstLeftScroll();
       // this.debounceSetLeft(scrollLeft);
-      document.querySelector('.fixHead-line-2').style.setProperty('--left', `${scrollLeft}px`);
-      UserMapStore.setLeft(scrollLeft);
+
+      // document.querySelector('.fixHead-line-2').style.setProperty('--left', `${scrollLeft}px`);
+      // UserMapStore.setLeft(scrollLeft);
       header.scrollLeft = scrollLeft;
     } else {
       // UserMapStore.setTop(scrollTop);
@@ -204,6 +206,7 @@ class Home3 extends Component {
     //   //   UserMapStore.setCurrentIndex(index);
     //   // }
     // }
+    left = scrollLeft;
   };
 
 
@@ -1402,9 +1405,9 @@ class Home3 extends Component {
         const name = mode === 'sprint' ? `${mode}Name` : 'name';
         dom.push(<div key={vos[id]} className="fixHead-line">
           <div
-            className={`fixHead-line-title column-title ${vosIndex === 0 ? 'firstLine-title' : ''}`}
+            className={`fixHead-line-title title-transform ${vosIndex === 0 ? 'firstLine-title' : ''}`}
             // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
-            style={{ marginLeft: left }}
+            // style={{ marginLeft: left }}
             // data-title={vos[name]}
             // data-id={vos[id]}
           >
@@ -1534,11 +1537,12 @@ class Home3 extends Component {
       });
       dom.push(
         <div key="no-sprint" className="fixHead-line" style={{ height: '100%' }}>
-          <div style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}>
+          <div>
             <div
-              className={`fixHead-line-title column-title ${vosData.length ? '' : 'firstLine-title'}`}
+              className={`fixHead-line-title column-title title-transform ${vosData.length ? '' : 'firstLine-title'}`}
               title={mode === 'none' ? 'issue' : '未计划部分'}
               data-id={-1}
+              // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
             >
               <div>
                 {mode === 'none' ? 'issue' : '未计划部分' }
@@ -1801,7 +1805,7 @@ class Home3 extends Component {
                           </Droppable>
                         </div>
                         <div
-                          className="fixHead-line fixHead-line-2 transform-left"
+                          className="fixHead-line fixHead-line-2 title-transform"
                           style={{
                             height: 42,
                             // transform: `translateX(${`${left}px`})`,

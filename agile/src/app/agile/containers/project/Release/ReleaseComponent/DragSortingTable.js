@@ -160,7 +160,7 @@ class DragSortingTable extends Component {
         rowClassName="table-row"
         columns={this.props.columns}
         dataSource={this.props.dataSource}
-        pagination={this.props.pagination}
+        pagination={this.props.pagination.length <= 10 ? false : this.props.pagination}
         onChange={this.props.onChange}
         filterBarPlaceholder="过滤表"
         components={this.components}

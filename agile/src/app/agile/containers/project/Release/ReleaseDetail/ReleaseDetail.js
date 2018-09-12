@@ -178,7 +178,7 @@ class ReleaseDetail extends Component {
         </div>
         <Table
           ref={(node) => { this.Table = node; }}
-          // pagination={ReleaseStore.getVersionStatusIssues.length > 10 ? '' : false}
+          pagination={ReleaseStore.getVersionStatusIssues.length > 10}
           dataSource={ReleaseStore.getVersionStatusIssues}
           columns={columns}
           onRow={record => ({

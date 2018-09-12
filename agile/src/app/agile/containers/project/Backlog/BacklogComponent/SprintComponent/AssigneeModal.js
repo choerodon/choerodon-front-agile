@@ -73,6 +73,7 @@ class AssigneeModal extends Component {
           description="您可以在这里查看当前冲刺中问题的分配情况，包括每位成员的问题数量、故事点数总和、剩余预估时间总和等信息。"
         >
           <Table
+            pagination={dataSource + 1 > 10}
             dataSource={_.concat(dataSource, {
               assigneeName: '合计',
               issueCount: total.totalIssue,
