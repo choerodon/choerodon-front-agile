@@ -12,6 +12,8 @@ const EpicReport = asyncRouter(() => (import('./EpicReport')));
 const PieChartReport = asyncRouter(() => (import('./pieChart')));
 const VersionReportNew = asyncRouter(() => (import('./VersionReportNew')));
 const EpicBurndown = asyncRouter(() => (import('./EpicBurndown')));
+const VersionBurndown = asyncRouter(() => (import('./VersionBurndown')));
+
 
 const ReportHostIndex = ({ match }) => (
   <Switch>
@@ -25,6 +27,7 @@ const ReportHostIndex = ({ match }) => (
     <Route path={`${match.url}/pieReport`} component={PieChartReport} />
     <Route path={`${match.url}/versionReport`} component={VersionReportNew} />
     <Route path={`${match.url}/epicBurndown`} component={EpicBurndown} />
+    <Route path={`${match.url}/versionBurndown`} component={VersionBurndown} />
     <Route path="*" component={nomatch} />
   </Switch>
 );

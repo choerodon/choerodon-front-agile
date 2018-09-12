@@ -8,13 +8,13 @@ import {
 import {
   Button, Tabs, Table, Select, Icon, Tooltip, Spin, Checkbox,
 } from 'choerodon-ui';
-import pic from './no_epic.svg';
+import pic from './no_version.svg';
 // import finish from './legend/finish.svg';
 import SwithChart from '../Component/switchChart';
 import StatusTag from '../../../../components/StatusTag';
 import PriorityTag from '../../../../components/PriorityTag';
 import TypeTag from '../../../../components/TypeTag';
-import ES from '../../../../stores/project/epicBurndown';
+import ES from '../../../../stores/project/versionBurndown';
 import EmptyBlock from '../../../../components/EmptyBlock';
 import seeChangeRange from './seeChangeRange.svg';
 import seeProgress from './seeProgress.svg';
@@ -22,7 +22,7 @@ import speedIcon from './speedIcon.svg';
 import sprintIcon from './sprintIcon.svg';
 import storyPointIcon from './storyPointIcon.svg';
 import completed from './completed.svg';
-import './EpicReport.scss';
+import './VersionReport.scss';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -30,7 +30,7 @@ const { TabPane } = Tabs;
 const CheckboxGroup = Checkbox.Group;
 
 @observer
-class EpicBurndown extends Component {
+class VersionBurndown extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -41,7 +41,7 @@ class EpicBurndown extends Component {
   }
 
   componentDidMount = () => {
-    ES.loadEpicAndChartAndTableData();
+    ES.loadVersionAndChartAndTableData();
   };
 
   getLegendData() {
@@ -174,7 +174,7 @@ class EpicBurndown extends Component {
           let res = params[0].name;
           res += `<br/>冲刺开始处：${sprint.start}`;
           res += `<br/>已完成: ${(params[1].value === '-' ? 0 : params[1].value) + (params[4].value === '-' ? 0 : params[4].value)}`;
-          res += `<br/>添加至epic: ${sprint.add}`;
+          res += `<br/>添加至version: ${sprint.add}`;
           res += `<br/>剩余: ${(params[2].value === '-' ? 0 : params[2].value) + (params[3].value === '-' ? 0 : params[3].value)}`;
           return res;
         },
@@ -323,8 +323,8 @@ class EpicBurndown extends Component {
   }
 
   refresh() {
-    if (!ES.currentEpicId) {
-      ES.loadEpicAndChartAndTableData();
+    if (!ES.currentVersionId) {
+      ES.loadVersionAndChartAndTableData();
     } else {
       ES.loadChartData();
       ES.loadTableData();
@@ -332,8 +332,8 @@ class EpicBurndown extends Component {
     }
   }
 
-  handleChangeCurrentEpic(epicId) {
-    ES.setCurrentEpic(epicId);
+  handleChangeCurrentVersion(versionId) {
+    ES.setCurrentVersion(versionId);
     ES.loadChartData();
     ES.loadTableData();
     this.setState({
@@ -367,10 +367,10 @@ class EpicBurndown extends Component {
     let urlPush = `/agile/issue?type=${type}&id=${id}&name=${urlParams.name}&organizationId=${organizationId}`;
     if (JSON.stringify(item) !== '{}') {
       if (linkType === 'sprint') {
-        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reposthost/epicBurnDown`;
+        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reposthost/versionBurnDown`;
       }
-      if (linkType === 'epic') {
-        urlPush += `&paramType=epic&paramId=${item.issueId}&paramName=${item.epicName || '未分配'}下的问题&paramUrl=reporthost/epicBurnDown`;
+      if (linkType === 'version') {
+        urlPush += `&paramType=version&paramId=${item.versionId}&paramName=${item.name || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
       }
       history.push(urlPush);
     }
@@ -395,7 +395,7 @@ class EpicBurndown extends Component {
               onClick={() => {
                 const { history } = this.props;
                 const urlParams = AppState.currentMenuType;
-                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicBurndown`);
+                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/VersionBurndown`);
               }}
             >
               {issueNum} 
@@ -525,7 +525,7 @@ class EpicBurndown extends Component {
                             onClick={() => {
                               const { history } = this.props;
                               const urlParams = AppState.currentMenuType;
-                            // history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicBurndown`);
+                            // history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/VersionBurndown`);
                             }
                           }
                           >
@@ -569,14 +569,14 @@ class EpicBurndown extends Component {
                     );
                   }
                 })
-              //  : <p>当前史诗下的冲刺没有已完成的问题</p>
+              //  : <p>当前版本下的冲刺没有已完成的问题</p>
             }
           </div>);
       }
-      return <p>当前史诗下的冲刺没有已完成的问题</p>;
+      return <p>当前版本下的冲刺没有已完成的问题</p>;
     }
      
-    return <p>当前史诗下的冲刺没有已完成的问题</p>;
+    return <p>当前版本下的冲刺没有已完成的问题</p>;
   }
 
   renderToolbarTitle = () => {
@@ -584,7 +584,7 @@ class EpicBurndown extends Component {
     if (this.getSprintSpeed() === 0) {
       return `根据最近${chartDataOrigin.length}次冲刺的数据，无法预估迭代次数`;
     }
-    return `根据最近${chartDataOrigin.length}次冲刺的数据，将花费${this.getSprintCount()}个迭代来完成此史诗。`;
+    return `根据最近${chartDataOrigin.length}次冲刺的数据，将花费${this.getSprintCount()}个迭代来完成此版本。`;
   }
 
   renderToolbar = () => {
@@ -632,22 +632,71 @@ class EpicBurndown extends Component {
     );
   }
 
-  renderEpicInfo() {
-    if (ES.currentEpicId != undefined) {
-      const currentEpic = ES.epics.filter(item => item.issueId === ES.currentEpicId)[0];
+  transformReleaseDate(data) {
+    const arrDate = data.split('-');
+    let month = '';
+    switch (arrDate[1]) {
+      case '01': {
+        month = '一月';
+        break;
+      }
+      case '02': {
+        month = '二月';
+        break;
+      }
+      case '03': {
+        month = '三月';
+        break;
+      }
+      case '04': {
+        month = '四月';
+        break;
+      }
+      case '05': {
+        month = '五月';
+        break;
+      }
+      case '06': {
+        month = '六月';
+        break;
+      }
+      case '07': {
+        month = '七月';
+        break;
+      }
+      case '08': {
+        month = '八月';
+        break;
+      }
+      case '09': {
+        month = '九月';
+        break;
+      }
+      case '10': {
+        month = '十月';
+        break;
+      }
+      case '11': {
+        month = '十一月';
+        break;
+      }
+      case '12': {
+        month = '十二月';
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    return `${arrDate[1]}/${month}/${arrDate[0].slice(2, 4)}`;
+  }
+
+  renderVersionInfo() {
+    if (ES.currentVersionId != undefined) {
+      const currentVersion = ES.versions.filter(item => item.versionId === ES.currentVersionId)[0];
       return (
-        <p className="c7n-epicInfo">
-          <span
-            style={{ 
-              color: '#3f51b5',
-              cursor: 'pointer',
-            }}
-            role="none"
-            onClick={this.handleLinkToIssue.bind(this, 'epic', ES.currentEpicId != undefined ? ES.epics.filter(item => item.issueId === ES.currentEpicId)[0] : {})}
-          >
-            {`${currentEpic.epicName}`}
-          </span>
-          <span>{` ${currentEpic.summary}`}</span>
+        <p className="c7n-versionInfo">
+          { `${currentVersion.releaseDate === null ? '未发布' : (`发布于 ${this.transformReleaseDate(currentVersion.releaseDate)}`)}`}
         </p>
       );
     }
@@ -659,14 +708,14 @@ class EpicBurndown extends Component {
     const { checkbox, tabActiveKey } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
-      <Page className="c7n-epicBurndown">
+      <Page className="c7n-versionBurndown">
         <Header 
-          title="史诗燃尽图"
+          title="版本燃尽图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={history}
-            current="epicBurndown"
+            current="versionBurndown"
           />
           <Button 
             funcType="flat" 
@@ -677,27 +726,27 @@ class EpicBurndown extends Component {
           </Button>
         </Header>
         <Content
-          title="史诗燃尽图"
+          title="版本燃尽图"
           description="跟踪版本的预测发布日期（优先Scrum）。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
           // link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
           {
-            !(!ES.epics.length && ES.epicFinishLoading) ? (
+            !(!ES.versions.length && ES.versionFinishLoading) ? (
               <div>
                 <div style={{ display: 'flex' }}>
                   <Select
                     style={{ width: 512, marginRight: 33, height: 35 }}
-                    label="史诗"
-                    value={ES.currentEpicId}
-                    onChange={this.handleChangeCurrentEpic.bind(this)}
+                    label="版本"
+                    value={ES.currentVersionId}
+                    onChange={this.handleChangeCurrentVersion.bind(this)}
                   >
                     {
-                      ES.epics.map(epic => (
-                        <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>
+                      ES.versions.map(version => (
+                        <Option key={version.versionId} value={version.versionId}>{version.name}</Option>
                       ))
                     }
                   </Select>
-                  <div className="c7n-epicSelectHeader">
+                  <div className="c7n-versionSelectHeader">
                     <CheckboxGroup
                       label="查看选项"
                       value={checkbox}
@@ -715,7 +764,7 @@ class EpicBurndown extends Component {
                         </div>
                         <figcaption className="icon-show-info-detail">
                           <p className="icon-show-info-detail-header">查看进度</p>
-                          <p className="icon-show-info-detail-content">按照史诗查看冲刺进度</p>
+                          <p className="icon-show-info-detail-content">按照版本查看冲刺进度</p>
                         </figcaption>
                       </figure>
                       <figure>
@@ -732,7 +781,7 @@ class EpicBurndown extends Component {
                  
                 </div>
                 <div>
-                  {this.renderEpicInfo()}
+                  {this.renderVersionInfo()}
                 </div>
                
                 <Spin spinning={ES.chartLoading}>
@@ -762,7 +811,7 @@ class EpicBurndown extends Component {
                         </div>
                       ) : (
                         <div style={{ padding: '30px 0 20px', textAlign: 'center' }}>
-                          {ES.tableData.length ? '当前单位下问题均未预估，切换单位或从下方问题列表进行预估。' : '当前史诗下没有问题。'}
+                          {ES.tableData.length ? '当前单位下问题均未预估，切换单位或从下方问题列表进行预估。' : '当前版本下没有问题。'}
                         </div>
                       )
                     }
@@ -790,7 +839,7 @@ class EpicBurndown extends Component {
                 style={{ marginTop: 40 }}
                 textWidth="auto"
                 pic={pic}
-                title="当前项目无可用史诗"
+                title="当前项目无可用版本"
                 des={(
                   <div>
                     <span>请在</span>
@@ -813,7 +862,7 @@ class EpicBurndown extends Component {
                     >
                       {'问题管理'}
                     </span>
-                    <span>中创建一个史诗</span>
+                    <span>中创建一个版本</span>
                   </div>
                 )}
               />
@@ -826,4 +875,4 @@ class EpicBurndown extends Component {
   }
 }
 
-export default EpicBurndown;
+export default VersionBurndown;
