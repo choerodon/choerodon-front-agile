@@ -1206,14 +1206,6 @@ class Home3 extends Component {
     }
   };
 
-  getStyle_2(element, attr) {
-    if (window.getComputedStyle) {
-      return window.getComputedStyle(element, null)[attr];
-    } else {
-      return element.currentStyle[attr];
-    }
-  }
-
   handleSaveAsImage = () => {
     this.setState({
       popOverVisible: false,
@@ -1259,14 +1251,6 @@ class Home3 extends Component {
     a.href = canvas.toDataURL();
     a.download = name;
     a.click();
-  }
-
-  getStyle(element, attr) {
-    if (window.getComputedStyle) {
-      return window.getComputedStyle(element, null)[attr];
-    } else {
-      return element.currentStyle[attr];
-    }
   }
 
   getHistoryCount = (id) => {
@@ -1533,7 +1517,7 @@ class Home3 extends Component {
 
             ))}
           </div>
-        </div>);
+                 </div>);
       });
       dom.push(
         <div key="no-sprint" className="fixHead-line" style={{ height: '100%' }}>
@@ -1859,13 +1843,13 @@ class Home3 extends Component {
             {
               UserMapStore.createVOS ? (
                 <CreateVOS
-                    getContainer={() => document.querySelector('.c7n-userMap')}
-                    visible={UserMapStore.createVOS}
+                  getContainer={() => document.querySelector('.c7n-userMap')}
+                  visible={UserMapStore.createVOS}
                   // onOk={() => {UserMapStore.setCreateVOS(false)}}
-                    onOk={this.handleCreateOk}
-                    onCancel={() => { UserMapStore.setCreateVOS(false); }}
-                    type={UserMapStore.getCreateVOSType}
-                  />
+                  onOk={this.handleCreateOk}
+                  onCancel={() => { UserMapStore.setCreateVOS(false); }}
+                  type={UserMapStore.getCreateVOSType}
+                />
               ) : null
             }
           </Content>
