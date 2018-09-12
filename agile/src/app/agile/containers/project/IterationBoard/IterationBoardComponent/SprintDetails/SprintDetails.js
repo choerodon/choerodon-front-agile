@@ -159,7 +159,7 @@ class SprintDetails extends Component {
             dataSource={doneIssues}
             columns={column}
             filterBar={false}
-            pagination={pagination}
+            pagination={doneIssues.length > 10 ? pagination : false}
             scroll={{ x: true }}
             loading={loading}
             onChange={this.handleTableChange}
@@ -177,7 +177,7 @@ class SprintDetails extends Component {
             dataSource={undoIssues}
             columns={column}
             filterBar={false}
-            pagination={pagination}
+            pagination={undoIssues.length > 10 ? pagination : false}
             scroll={{ x: true }}
             loading={loading}
             onChange={this.handleTableChange}
@@ -195,7 +195,7 @@ class SprintDetails extends Component {
             dataSource={undoAndNotEstimatedIssues}
             columns={column}
             filterBar={false}
-            pagination={pagination}
+            pagination={undoAndNotEstimatedIssues.length > 10 ? pagination : false}
             scroll={{ x: true }}
             loading={loading}
             onChange={this.handleTableChange}

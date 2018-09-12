@@ -532,7 +532,7 @@ class VersionReport extends Component {
         rowKey={record => record.issueId}
         dataSource={VersionReportStore.getIssues[type].data}
         columns={columns}
-        pagination={VersionReportStore.getIssues[type].pagination}
+        pagination={VersionReportStore.getIssues[type].length > 10 ? VersionReportStore.getIssues[type].pagination : false}
         onChange={(pagination, filters, sorter) => {
           const data = _.clone(this.state.datas);
           let newIndex;
