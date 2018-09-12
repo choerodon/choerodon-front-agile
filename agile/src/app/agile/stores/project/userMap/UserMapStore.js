@@ -497,36 +497,51 @@ class UserMapStore {
     })
   
   deleteIssue = (issueId) => {
-    const obj = {
+    const issue = _.find(this.issues, v => v.issueId === issueId);
+    const mode = this.mode;
+    const key = `${mode}Id`;
+    const postData = {
       before: false,
-      epicId: 0,
+      outsetIssueId: 0,
       rankIndex: null,
       issueIds: [issueId],
+      versionIssueIds: mode === 'version' && issue[key] ? [issueId] : undefined,
+      versionId: mode === 'version' && issue[key] ? 0 : undefined,
+      sprintIssueIds: mode === 'sprint' && issue[key] ? [issueId] : undefined,
+      sprintId: mode === 'sprint' && issue[key] ? 0 : undefined,
+      epicIssueIds: [issueId],
+      epicId: 0,
     };
-    let issues;
-    let len;
-    const tarData = _.cloneDeep(toJS(this.issues));
-    const index = _.findIndex(tarData, issue => issue.issueId === issueId);
-    if (this.mode === 'none') {
-      issues = this.backlogIssues;
-      len = issues.length;
-      if (issues && !len) {
-        obj.before = true;
-        obj.outsetIssueId = 0;
-      } else {
-        obj.outsetIssueId = issues[len - 1].issueId;
-      }
-      tarData[index].epicId = 0;
-    } else {
-      obj[`${this.mode}Id`] = 0;
-      issues = this.backlogIssues.filter(v => v[`${this.mode}Id`] === null);
-      len = issues.length;
-      obj.outsetIssueId = issues[len - 1].issueId;
-      tarData[index].epicId = 0;
-      tarData[`${this.mode}Id`] = 0;
+    const resIssues = _.clone(toJS(this.issues));
+    const issueIndex = resIssues.findIndex(v => v.issueId === issueId);
+    if (issueIndex) {
+      resIssues.splice(issueIndex, 1);
     }
-    this.setIssues(tarData);
-    this.handleMoveIssue(obj);
+    this.setIssues(resIssues);
+    // let issues;
+    // let len;
+    // const tarData = _.cloneDeep(toJS(this.issues));
+    // const index = _.findIndex(tarData, issue => issue.issueId === issueId);
+    // if (this.mode === 'none') {
+    //   issues = this.backlogIssues;
+    //   len = issues.length;
+    //   if (issues && !len) {
+    //     obj.before = true;
+    //     obj.outsetIssueId = 0;
+    //   } else {
+    //     obj.outsetIssueId = issues[len - 1].issueId;
+    //   }
+    //   tarData[index].epicId = 0;
+    // } else {
+    //   obj[`${this.mode}Id`] = 0;
+    //   issues = this.backlogIssues.filter(v => v[`${this.mode}Id`] === null);
+    //   len = issues.length;
+    //   obj.outsetIssueId = issues[len - 1].issueId;
+    //   tarData[index].epicId = 0;
+    //   tarData[`${this.mode}Id`] = 0;
+    // }
+    // this.setIssues(tarData);
+    this.handleMoveIssue(postData);
   }
 }
 

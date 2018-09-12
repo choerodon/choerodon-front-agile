@@ -1852,14 +1852,18 @@ class Home3 extends Component {
               }}
               onCancel={() => UserMapStore.setCreateEpic(false)}
             />
-            <CreateVOS
-              getContainer={() => document.querySelector('.c7n-userMap')}
-              visible={UserMapStore.createVOS}
-            // onOk={() => {UserMapStore.setCreateVOS(false)}}
-              onOk={this.handleCreateOk}
-              onCancel={() => { UserMapStore.setCreateVOS(false); }}
-              type={UserMapStore.getCreateVOSType}
-            />
+            {
+              UserMapStore.createVOS ? (
+                <CreateVOS
+                    getContainer={() => document.querySelector('.c7n-userMap')}
+                    visible={UserMapStore.createVOS}
+                  // onOk={() => {UserMapStore.setCreateVOS(false)}}
+                    onOk={this.handleCreateOk}
+                    onCancel={() => { UserMapStore.setCreateVOS(false); }}
+                    type={UserMapStore.getCreateVOSType}
+                  />
+              ) : null
+            }
           </Content>
         ) : (
           <div style={{
