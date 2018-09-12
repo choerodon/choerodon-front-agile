@@ -22,6 +22,14 @@ class Remain extends Component {
     }
   }
 
+  getPercent() {
+    const { sprintInfo: { dayTotal, dayRemain } } = this.state;
+    const remain = dayRemain < 0 ? 0 : dayRemain;
+    const total = dayTotal < 0 ? 0 : dayTotal;
+    const completed = total < remain ? 0 : total - remain;
+    return completed / total * 100;
+  }
+
   loadSprintInfo(sprintId) {
     if (!sprintId) {
       this.setState({
@@ -55,7 +63,7 @@ class Remain extends Component {
         <span className="word">剩余</span>
         <div className="progress">
           <Progress
-            percent={50}
+            percent={this.getPercent()}
             title={sprintInfo.dayRemain < 0 ? 0 : sprintInfo.dayRemain}
           />
         </div>

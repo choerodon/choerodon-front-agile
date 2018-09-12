@@ -484,7 +484,10 @@ class Home3 extends Component {
               ...issuesDragged,
               ...backlogIssuesCopy.slice(backlogInsertIndex),
             ];
+            window.console.log(resBacklogIssues);
           }
+        } else {
+          resBacklogIssues = issuesDragged.concat(backlogIssuesCopy);
         }
       } else {
         resBacklogIssues = backlogIssuesCopy;
@@ -511,6 +514,8 @@ class Home3 extends Component {
             ...issuesDragged,
             ...backlogIssuesCopy.slice(backlogInsertIndex + 1),
           ];
+        } else {
+          resBacklogIssues = backlogIssuesCopy.concat(issuesDragged);
         }
       } else {
         resBacklogIssues = backlogIssuesCopy;
@@ -592,25 +597,35 @@ class Home3 extends Component {
             if (desIndex === desEpicAndModeIssues.length - 1) {
               before = false;
               outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
-            } else {
-              // before = true;
-              // if (desIndex > res.source.index) {
-              //   outsetIssueId = desEpicAndModeIssues[desIndex + 1].issueId;
-              // } else {
-              //   outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
-              // }
-              const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-              const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-              if (afterDesIndex) {
-                before = true;
-                outsetIssueId = afterDesIndex.issueId;
-              } else if (beforeDesIndex) {
-                before = false;
-                outsetIssueId = beforeDesIndex.issueId;
+            } else if (true) {
+              if (sourceIndex <= desIndex) {
+                const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+                const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+                if (afterDesIndex) {
+                  before = true;
+                  outsetIssueId = afterDesIndex.issueId;
+                } else if (beforeDesIndex) {
+                  before = false;
+                  outsetIssueId = beforeDesIndex.issueId;
+                } else {
+                  before = true;
+                  outsetIssueId = 0;
+                }
               } else {
-                before = true;
-                outsetIssueId = 0;
+                const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+                const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+                if (afterDesIndex) {
+                  before = true;
+                  outsetIssueId = afterDesIndex.issueId;
+                } else if (beforeDesIndex) {
+                  before = false;
+                  outsetIssueId = beforeDesIndex.issueId;
+                } else {
+                  before = true;
+                  outsetIssueId = 0;
+                }
               }
+              
             }
           } else if (true) {
             if (desIndex === desEpicAndModeIssues.length) {
@@ -769,24 +784,33 @@ class Home3 extends Component {
             if (desIndex === desModeIssues.length - 1) {
               before = false;
               outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
-            } else {
-              // before = true;
-              // if (desIndex >= res.source.index) {
-              //   outsetIssueId = desModeIssues[desIndex + 1].issueId;
-              // } else {
-              //   outsetIssueId = desModeIssues[desIndex].issueId;
-              // }
-              const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-              const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-              if (afterDesIndex) {
-                before = true;
-                outsetIssueId = afterDesIndex.issueId;
-              } else if (beforeDesIndex) {
-                before = false;
-                outsetIssueId = beforeDesIndex.issueId;
+            } else if (true) {
+              if (sourceIndex <= desIndex) {
+                const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+                const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+                if (afterDesIndex) {
+                  before = true;
+                  outsetIssueId = afterDesIndex.issueId;
+                } else if (beforeDesIndex) {
+                  before = false;
+                  outsetIssueId = beforeDesIndex.issueId;
+                } else {
+                  before = true;
+                  outsetIssueId = 0;
+                }
               } else {
-                before = true;
-                outsetIssueId = 0;
+                const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+                const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+                if (afterDesIndex) {
+                  before = true;
+                  outsetIssueId = afterDesIndex.issueId;
+                } else if (beforeDesIndex) {
+                  before = false;
+                  outsetIssueId = beforeDesIndex.issueId;
+                } else {
+                  before = true;
+                  outsetIssueId = 0;
+                }
               }
             }
           } else if (true) {

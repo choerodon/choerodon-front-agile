@@ -183,7 +183,7 @@ class Backlog extends Component {
   renderUnscheduledIssue() {
     const { mode, backlogExpand } = US;
     const { keyword } = this.state;
-    const issues = this.getIssuesByKeyword(keyword, toJS(US.backlogIssues).filter(v => v[`${mode}Id`] === null && v.statusCode !== 'done'));
+    const issues = this.getIssuesByKeyword(keyword, toJS(US.backlogIssues).filter(v => (v[`${mode}Id`] === null || v[`${mode}Id`] === 0) && v.statusCode !== 'done'));
     return (
       <React.Fragment>
         <div className="title">
