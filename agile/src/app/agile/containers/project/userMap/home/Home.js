@@ -6,7 +6,7 @@ import {
   Page, Header, Content, Permission, 
 } from 'choerodon-front-boot';
 import {
-  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin,
+  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin, message,
 } from 'choerodon-ui';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import html2canvas from 'html2canvas';
@@ -47,7 +47,7 @@ function exitFullScreen() {
   }
 }
 
-function transformNull2Zero (val) {
+function transformNull2Zero(val) {
   if (val === null) {
     return 0;
   }
@@ -65,6 +65,7 @@ class Home3 extends Component {
       showBackLog: false,
       position: 'absolute',
       isFullScreen: false,
+      popOverVisible: false,
     };
   }
 
@@ -110,7 +111,7 @@ class Home3 extends Component {
       || document.mozFullScreenElement
       || document.msFullscreenElement;
     this.setState({
-      isFullScreen: !isFullScreen ? false : true,
+      isFullScreen: !!isFullScreen,
     });
   }
 
@@ -721,7 +722,7 @@ class Home3 extends Component {
     if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
       postData[key] = desModeId;
     }
-    let tarBacklogData = backlogIssues;
+    const tarBacklogData = backlogIssues;
     this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, desEpicId, desModeId);
     // _.map(issueIds, (id) => {
     //   const currentIssue = _.find(issueData, item => item.issueId === id);
@@ -886,7 +887,7 @@ class Home3 extends Component {
     if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
       postData[key] = desModeId;
     }
-    let tarBacklogData = backlogIssues;
+    const tarBacklogData = backlogIssues;
     this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, 0, desModeId);
     // _.map(issueIds, (id) => {
     //   // const currentIssue = _.find(issueData, item => item.issueId === id);
@@ -1021,7 +1022,7 @@ class Home3 extends Component {
       if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
         postData[key] = desModeId;
       }
-      let tarBacklogData = backlogIssues;
+      const tarBacklogData = backlogIssues;
 
       this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, desEpicId, desModeId);
       // _.map(issueIds, (id) => {
@@ -1073,7 +1074,7 @@ class Home3 extends Component {
       // let desEpicAndModeIssues;
       let desModeIssues;
       if (mode === 'none') {
-        desModeIssues = backlogData.slice()
+        desModeIssues = backlogData.slice();
       } else if (true) {
         if (desModeId === 0) {
           desModeIssues = _.filter(backlogData, issue => issue[key] === 0 || issue[key] === null);
@@ -1182,7 +1183,7 @@ class Home3 extends Component {
       if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
         postData[key] = desModeId;
       }
-      let tarBacklogData = backlogIssues;
+      const tarBacklogData = backlogIssues;
       this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, 0, desModeId);
       // _.map(issueIds, (id) => {
       //   const currentIssue = _.find(issueData, item => item.issueId === id);
@@ -1298,16 +1299,33 @@ class Home3 extends Component {
     }
   };
 
+  getStyle_2(element, attr) {
+    if (window.getComputedStyle) {
+      return window.getComputedStyle(element, null)[attr];
+    } else {
+      return element.currentStyle[attr];
+    }
+  }
+
   handleSaveAsImage = () => {
+    this.setState({
+      popOverVisible: false,
+    });
     const shareContent = document.querySelector('.fixHead');// 需要截图的包裹的（原生的）DOM 对象
     const opts = {
       useCORS: true, // 【重要】开启跨域配置
     };
     shareContent.style.width = `${Math.max(document.querySelector('.fixHead-head').scrollWidth, document.querySelector('.fixHead-body').scrollWidth)}px`;
+    shareContent.style.height = `${document.querySelector('.fixHead-head').scrollHeight + document.querySelector('.fixHead-body').scrollHeight}px`;
     html2canvas(shareContent, opts)
       .then((canvas) => {
         this.downLoadImage(canvas, '用户故事地图.png');
       });
+    message.config({
+      top: 110,
+      duration: 2,
+    });
+    message.success('导出图片成功', undefined, undefined, 'top');
   }
 
   /**
@@ -1402,6 +1420,12 @@ class Home3 extends Component {
           arrowPointAtCenter={false}
           placement="bottomLeft"
           trigger={['click']}
+          visible={this.state.popOverVisible}
+          onVisibleChange={(visible) => {
+            this.setState({
+              popOverVisible: visible,
+            });
+          }}
           content={(
             <div>
               <div className="menu-title">史诗过滤器</div>
@@ -1588,7 +1612,7 @@ class Home3 extends Component {
 
             ))}
           </div>
-                 </div>);
+        </div>);
       });
       dom.push(
         <div key="no-sprint" className="fixHead-line" style={{ height: '100%' }}>

@@ -69,7 +69,7 @@ function getChartDataFromServerData(data) {
 class EpicReportStore {
   @observable tableLoading = false;
 
-  @observable tableData = [];
+  @observable tableData = {};
 
   @observable chartLoading = false;
 
@@ -123,7 +123,7 @@ class EpicReportStore {
 
   loadTableData(epicId = this.currentEpicId) {
     this.setTableLoading(true);
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/epic_issue_list?epicId=${epicId}`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/burn_down_report_type/${epicId}?type=Epic`)
       .then((res) => {
         this.setTableData(res);
         this.setTableLoading(false);
