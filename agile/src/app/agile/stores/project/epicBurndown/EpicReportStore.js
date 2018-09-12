@@ -90,7 +90,7 @@ class EpicReportStore {
   @observable reload = false;
 
   loadEpicAndChartAndTableData() {
-    this.loadEpics()
+    return this.loadEpics()
       .then(() => {
         if (this.epics.length) {
           this.loadChartData();
@@ -230,6 +230,10 @@ class EpicReportStore {
     }
     return {};
   }
+
+  // @computed get getPaginationShow() {
+
+  // }
 }
 
 const epicReportStore = new EpicReportStore();

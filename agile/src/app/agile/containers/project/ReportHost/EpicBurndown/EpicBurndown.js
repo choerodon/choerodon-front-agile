@@ -31,13 +31,14 @@ class EpicBurndown extends Component {
     this.state = {
       checkbox: undefined,
       inverse: true,
+      tabActiveKey: 'done',
     };
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     ES.loadEpicAndChartAndTableData();
-  }
-  
+  };
+
   getLegendData() {
     const arr = ['工作已完成', '工作剩余', '工作增加'];
     const legendData = [];
@@ -328,6 +329,7 @@ class EpicBurndown extends Component {
     } else {
       ES.loadChartData();
       ES.loadTableData();
+      // this.setInitialPagination();
     }
   }
 
@@ -335,6 +337,9 @@ class EpicBurndown extends Component {
     ES.setCurrentEpic(epicId);
     ES.loadChartData();
     ES.loadTableData();
+    this.setState({
+      tabActiveKey: 'done',
+    });
   }
 
   handleChangeCheckbox(checkbox) {
@@ -373,6 +378,8 @@ class EpicBurndown extends Component {
   }
 
   renderTable = (type) => {
+    const sprintBurnDownReportDTOS = this.getTableDta('compoleted');
+    let firstCompleteIssues = 0;
     const column = [
       ...[
         {
@@ -482,81 +489,95 @@ class EpicBurndown extends Component {
           columns={column}
           scroll={{ x: true }}
           loading={ES.tableLoading}
-          pagination={this.getTableDta(type) && this.getTableDta(type).length > 10}
+          pagination={!!(this.getTableDta(type) && this.getTableDta(type).length > 10)}
         />
       );
     }
-    return (
-      <div>
-        {
-          this.getTableDta('compoleted') && this.getTableDta('compoleted').length !== 0 ? (this.getTableDta('compoleted').map((item) => {
-            if (item.completeIssues.length !== 0) {
-              return (
-                <div 
-                  style={{ marginBottom: 22 }}
-                  key={item.sprintId}
-                >
-                  <p style={{ 
-                    position: 'relative',
-                    marginBottom: 12, 
-                  }}
-                  >
-                    <span 
-                      style={{ 
-                        color: '#3f51b5',
-                        cursor: 'pointer',
-                      }}
-                      role="none"
-                      onClick={() => {
-                        const { history } = this.props;
-                        const urlParams = AppState.currentMenuType;
-                        // history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicBurndown`);
-                      }
-                      }
-                    >
-                      {`${item.sprintName}`}
-                    </span>
-                    <span
-                      style={{
-                        color: 'rgba(0,0,0,0.65)',
-                        fontSize: 12,
-                        marginLeft: 12,
-                      }}
-                    >
-                      {`${item.startDate.slice(0, 11).replace(/-/g, '.')}-${item.endDate.slice(0, 11).replace(/-/g, '.')}`}
-                    </span>
-                    <span
-                      style={{ 
-                        display: 'inline-block',
-                        position: 'absolute',
-                        right: 0,
-                        color: '#3f51b5',
-                        cursor: 'pointer',
-                        fontSize: 13,
-                        flex: 1,
-                      }}
-                      role="none"
-                      onClick={this.handleLinkToIssue.bind(this, 'sprint', item)}
-                    >
-                      {'在“问题管理中”查看'}
-                    </span>
-                  </p>
-                  <Table
-                    rowKey={record => record.issueId}
-                    dataSource={item.completeIssues}
-                    filterBar={false}
-                    columns={column}
-                    scroll={{ x: true }}
-                    loading={ES.tableLoading}
-                    pagination={(item.completeIssues && item.completeIssues.length > 10)}
-                  />
-                </div>
-              );
-            }
-          })) : <p>当前下的冲刺没有未完成的问题</p>
+    if (sprintBurnDownReportDTOS && sprintBurnDownReportDTOS.length !== 0) {
+      for (let i = 0; i < sprintBurnDownReportDTOS.length; i++) {
+        if (sprintBurnDownReportDTOS[i].completeIssues.length !== 0) {
+          firstCompleteIssues = i;
+          break;
         }
-      </div>
-    );
+        firstCompleteIssues++;
+      }
+      if (firstCompleteIssues !== sprintBurnDownReportDTOS.length) {
+        return (
+          <div>
+            {
+                sprintBurnDownReportDTOS.map((item) => {
+                  if (item.completeIssues.length !== 0) {
+                    return (
+                      <div 
+                        style={{ marginBottom: 22 }}
+                        key={item.sprintId}
+                      >
+                        <p style={{ 
+                          position: 'relative',
+                          marginBottom: 12, 
+                        }}
+                        >
+                          <span 
+                            style={{ 
+                              color: '#3f51b5',
+                              cursor: 'pointer',
+                            }}
+                            role="none"
+                            onClick={() => {
+                              const { history } = this.props;
+                              const urlParams = AppState.currentMenuType;
+                            // history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicBurndown`);
+                            }
+                          }
+                          >
+                            {`${item.sprintName}`}
+                          </span>
+                          <span
+                            style={{
+                              color: 'rgba(0,0,0,0.65)',
+                              fontSize: 12,
+                              marginLeft: 12,
+                            }}
+                          >
+                            {`${item.startDate.slice(0, 11).replace(/-/g, '.')}-${item.endDate.slice(0, 11).replace(/-/g, '.')}`}
+                          </span>
+                          <span
+                            style={{ 
+                              display: 'inline-block',
+                              position: 'absolute',
+                              right: 0,
+                              color: '#3f51b5',
+                              cursor: 'pointer',
+                              fontSize: 13,
+                              flex: 1,
+                            }}
+                            role="none"
+                            onClick={this.handleLinkToIssue.bind(this, 'sprint', item)}
+                          >
+                            {'在“问题管理中”查看'}
+                          </span>
+                        </p>
+                        <Table
+                          rowKey={record => record.issueId}
+                          dataSource={item.completeIssues}
+                          filterBar={false}
+                          columns={column}
+                          scroll={{ x: true }}
+                          loading={ES.tableLoading}
+                          pagination={!!(item.completeIssues && item.completeIssues.length > 10)}
+                        />
+                      </div>
+                    );
+                  }
+                })
+              //  : <p>当前史诗下的冲刺没有已完成的问题</p>
+            }
+          </div>);
+      }
+      return <p>当前史诗下的冲刺没有已完成的问题</p>;
+    }
+     
+    return '';
   }
 
   renderToolbarTitle = () => {
@@ -634,7 +655,7 @@ class EpicBurndown extends Component {
 
   render() {
     const { history } = this.props;
-    const { checkbox } = this.state;
+    const { checkbox, tabActiveKey } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-epicBurndown">
@@ -743,7 +764,14 @@ class EpicBurndown extends Component {
                     
                   </div>
                 </Spin>
-                <Tabs>
+                <Tabs 
+                  activeKey={tabActiveKey} 
+                  onChange={(key) => {
+                    this.setState({
+                      tabActiveKey: key,
+                    });
+                  }}
+                >
                   <TabPane tab="已完成的问题" key="done">
                     {this.renderTable('compoleted')}
                   </TabPane>
