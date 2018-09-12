@@ -525,68 +525,6 @@ class Home3 extends Component {
     UserMapStore.setIssues(resIssues);
   }
 
-  // handelDragToBoard = (res) => {
-  //   const { UserMapStore } = this.props;
-  //   const {
-  //     mode, issues, backlogIssues, selectIssueIds,
-  //   } = UserMapStore;
-  //   const sourceIndex = res.source.index;
-  //   const tarIndex = res.destination.index;
-  //   const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
-  //   const key = `${mode}Id`;
-  //   const value = parseInt(res.destination.droppableId.split('_')[1], 10);// 目标id;
-  //   const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
-  //   const before = res.destination.index === 0;
-  //   const rankIndex = null;
-  //   const issueData = _.cloneDeep(toJS(issues));
-  //   const backlogData = _.cloneDeep(toJS(backlogIssues));
-  //   let postData = {};
-  //   let outsetIssueId = null;
-  //   let tarBacklogData = backlogIssues;
-  //   _.map(issueIds, (id) => {
-  //     const tarIssue = _.filter(issueData, item => item.issueId === id)[0];
-  //     const vosId = value === 0 ? null : value;
-  //     let tarData = _.filter(issues, item => item.epicId === tarEpicId);
-  //     if (mode !== 'none') {
-  //       tarData = _.filter(issues, item => item.epicId === tarEpicId && item[key] === vosId);
-  //     }
-  //     if (before && tarData.length) {
-  //       outsetIssueId = tarData[0].issueId;
-  //     } else if (before && !tarData.length) {
-  //       outsetIssueId = 0;
-  //     } else {
-  //       outsetIssueId = tarData[tarIndex - 1].issueId;
-  //     }
-  //     // 拖到冲刺泳道的未规划时outIssueId取值
-  //     const data = issues.filter(item => item.sprintId === 0 || item.sprintId === null);
-  //     if (mode === 'sprint' && before && outsetIssueId === 0 && value === 0) {
-  //       if (data.length) {
-  //         outsetIssueId = data[0].issueId;
-  //       }
-  //     }
-  //     tarIssue.epicId = tarEpicId;
-  //     if (mode !== 'none') {
-  //       tarIssue[key] = vosId;
-  //     }
-  //     postData = { before, epicId: tarEpicId, outsetIssueId, rankIndex, issueIds };
-  //     if (res.source.droppableId.includes('backlog')) {
-  //       tarBacklogData = _.filter(backlogData, item => item.issueId === id)[0];
-  //       const index = backlogData.indexOf(tarBacklogData);
-  //       backlogData.splice(index, 1);
-  //     }
-  //     if (mode !== 'none') {
-  //       postData[key] = value;
-  //     }
-  //   });
-  //   if (res.source.droppableId.includes('backlog')) {
-  //     UserMapStore.setBacklogIssues(backlogData);
-  //   }
-  //   UserMapStore.setIssues(issueData);
-  //   UserMapStore.handleMoveIssue(postData);
-  //   UserMapStore.setSelectIssueIds([]);
-  //   UserMapStore.setCurrentDraggableId(null);
-  // };
-
   handleMultipleDragToBoard = (res) => {
     const { UserMapStore } = this.props;
     const {
@@ -647,16 +585,28 @@ class Home3 extends Component {
         // 该块中有未被选中的卡
         if (!desEpicAndModeIssues.every(v => !issueIds.includes(v.issueId))) {
           // 该块中存在有块被选中
-          if (desEpicAndModeIssues.includes(dragIssueId)) {
+          if (_.map(desEpicAndModeIssues, 'issueId').includes(dragIssueId)) {
             if (desIndex === desEpicAndModeIssues.length - 1) {
               before = false;
               outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
             } else {
-              before = true;
-              if (desIndex > res.source.index) {
-                outsetIssueId = desEpicAndModeIssues[desIndex + 1].issueId;
+              // before = true;
+              // if (desIndex > res.source.index) {
+              //   outsetIssueId = desEpicAndModeIssues[desIndex + 1].issueId;
+              // } else {
+              //   outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+              // }
+              const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+              const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+              if (afterDesIndex) {
+                before = true;
+                outsetIssueId = afterDesIndex.issueId;
+              } else if (beforeDesIndex) {
+                before = false;
+                outsetIssueId = beforeDesIndex.issueId;
               } else {
-                outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+                before = true;
+                outsetIssueId = 0;
               }
             }
           } else if (true) {
@@ -817,11 +767,23 @@ class Home3 extends Component {
               before = false;
               outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
             } else {
-              before = true;
-              if (desIndex > res.source.index) {
-                outsetIssueId = desModeIssues[desIndex + 1].issueId;
+              // before = true;
+              // if (desIndex >= res.source.index) {
+              //   outsetIssueId = desModeIssues[desIndex + 1].issueId;
+              // } else {
+              //   outsetIssueId = desModeIssues[desIndex].issueId;
+              // }
+              const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+              const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+              if (afterDesIndex) {
+                before = true;
+                outsetIssueId = afterDesIndex.issueId;
+              } else if (beforeDesIndex) {
+                before = false;
+                outsetIssueId = beforeDesIndex.issueId;
               } else {
-                outsetIssueId = desModeIssues[desIndex].issueId;
+                before = true;
+                outsetIssueId = 0;
               }
             }
           } else if (true) {
@@ -912,6 +874,7 @@ class Home3 extends Component {
       mode, issues, backlogIssues, selectIssueIds,
     } = UserMapStore;
     if (selectIssueIds.length < 2) {
+      if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
       const key = `${mode}Id`;
       const desIndex = res.destination.index;
       const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
@@ -1062,6 +1025,7 @@ class Home3 extends Component {
       mode, issues, backlogIssues, selectIssueIds,
     } = UserMapStore;
     if (selectIssueIds.length < 2) {
+      if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
       const key = `${mode}Id`;
       const desIndex = res.destination.index;
       // const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
@@ -1216,66 +1180,6 @@ class Home3 extends Component {
       this.handleMultipleDragToBacklog(res);
     }
   };
-
-  // handleDragToBacklog = (res) => {
-  //   const { UserMapStore } = this.props;
-  //   const {
-  //     backlogIssues, mode, selectIssueIds, issues, 
-  //   } = UserMapStore;
-  //   const key = `${mode}Id`;
-  //   const value = parseInt(res.destination.droppableId.split('-')[1], 10);
-  //   const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
-  //   const before = res.destination.index === 0;
-  //   const rankIndex = null;
-  //   let backlogData = _.cloneDeep(toJS(backlogIssues));
-  //   const issueData = _.cloneDeep(toJS(issues));
-  //   let postData = {};
-  //   const tarIndex = res.destination.index;
-  //   let outsetIssueId = null;
-  //   _.map(issueIds, (id) => {
-  //     const vosId = value === 0 ? null : value;
-  //     let tarData = _.filter(backlogIssues, item => item[key] === vosId);
-  //     if (mode === 'none') {
-  //       tarData = backlogData;
-  //     }
-  //     if (before && tarData.length) {
-  //       outsetIssueId = tarData[0].issueId;
-  //     } else if (before && !tarData.length) {
-  //       outsetIssueId = 0;
-  //     } else {
-  //       outsetIssueId = tarData[tarIndex - 1].issueId;
-  //     }
-  //     let tarIssue = null;
-  //     if (res.source.droppableId.includes('backlog')) {
-  //       tarIssue = _.filter(backlogData, item => item.issueId === id)[0];
-  //       postData = {
-  //         before, outsetIssueId, rankIndex, issueIds, [key]: vosId, 
-  //       };
-  //       // const index = backlogIssues.indexOf(tarIssue);
-  //     } else {
-  //       tarIssue = _.filter(issueData, item => item.issueId === id)[0];
-  //       tarIssue.epicId = 0;
-  //       postData = {
-  //         before, outsetIssueId, rankIndex, issueIds, epicId: 0, 
-  //       };
-  //       tarData.splice(tarIndex, 0, tarIssue);
-  //       if (mode !== 'none') {
-  //         backlogData = backlogData.filter(item => item[key] !== vosId).concat(tarData);
-  //       }
-  //     }
-  //     if (mode !== 'none') {
-  //       tarIssue[key] = vosId;
-  //       postData[key] = value;
-  //     }
-  //   });
-  //   if (!res.source.droppableId.includes('backlog')) {
-  //     UserMapStore.setIssues(issueData);
-  //   }
-  //   UserMapStore.setBacklogIssues(backlogData);
-  //   UserMapStore.handleMoveIssue(postData);
-  //   UserMapStore.setSelectIssueIds([]);
-  //   UserMapStore.setCurrentDraggableId(null);
-  // };
 
   handleEpicOrIssueDrag = (res) => {
     if (!res.destination) {
