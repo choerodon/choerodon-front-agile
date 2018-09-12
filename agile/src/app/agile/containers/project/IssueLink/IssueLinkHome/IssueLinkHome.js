@@ -223,6 +223,7 @@ class Link extends Component {
           <div>
             <Spin spinning={this.state.loading}>
               <Table
+                pagination={this.state.links.length > 10}
                 rowKey={record => record.linkTypeId}
                 columns={column}
                 dataSource={this.state.links}

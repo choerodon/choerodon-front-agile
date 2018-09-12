@@ -161,7 +161,7 @@ class SortTable extends Component {
         rowClassName={'table-row'}
         columns={this.props.columns}
         dataSource={this.props.dataSource}
-        pagination={this.props.pagination}
+        pagination={this.props.dataSource.length <= 10 ? false : this.props.pagination}
         onChange={this.props.onChange}
         components={this.components}
         filterBarPlaceholder="过滤表"

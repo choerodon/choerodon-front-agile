@@ -282,6 +282,7 @@ issues
               />
             ) : (
               <Table
+                pagination={this.state.components.length > 10}
                 columns={column}
                 dataSource={this.state.components}
                 scroll={{ x: true }}
