@@ -54,8 +54,12 @@ class AssigneeModal extends Component {
       }
     }
     const total = { totalIssue, totalStoryPoints, totalTime };
-    const noAssign = this.props.data.assigneeIssues.filter(item => !item.assigneeName);
-    const dataSource = this.props.data.assigneeIssues.filter(item => item.assigneeName).concat(noAssign);
+    let noAssign = [];
+    let dataSource = [];
+    if (this.props.data.assigneeIssues) {
+      noAssign = this.props.data.assigneeIssues.filter(item => !item.assigneeName);
+      dataSource = this.props.data.assigneeIssues.filter(item => item.assigneeName).concat(noAssign);
+    }
     return (
       <Sidebar
         title="经办人工作量"
@@ -64,7 +68,7 @@ class AssigneeModal extends Component {
         okText="确定"
         okCancel={false}
       >
-        <Content
+        {this.props.data.assigneeIssue && <Content
           style={{
             padding: 0,
             overflow: 'hidden',
@@ -84,7 +88,7 @@ class AssigneeModal extends Component {
             filterBar={false}
             rowKey={'assigneeName'}
           />
-        </Content>
+        </Content>}
       </Sidebar>
     );
   }

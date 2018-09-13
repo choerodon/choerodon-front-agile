@@ -1666,12 +1666,12 @@ class Home3 extends Component {
                         ) : null
                       }
                       <div
+                        role="none"
                         className="maskIssue"
-                        // style={{ background: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? '' : '' }}
+                        onClick={this.handleClickIssue.bind(this, 0)}
                         onMouseLeave={() => { this.setState({ showChild: null }); }}
                         onMouseEnter={() => {
                           if (snapshot.isDraggingOver) return;
-                          this.handleClickIssue(0);
                           this.setState({ showChild: epic.issueId });
                         }}
                       >
