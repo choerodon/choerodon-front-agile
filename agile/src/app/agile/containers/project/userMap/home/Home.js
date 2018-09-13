@@ -1499,11 +1499,9 @@ class Home3 extends Component {
                         epicId === epic.issueId && currentNewObj[id] === vos[id] ? (
                           <CreateIssue
                             data={{ epicId: epic.issueId, [id]: vos[id] }}
-                            onOk={(res) => {
-                              const data = _.cloneDeep(issues).push(res);
-                              UserMapStore.setIssues(data);
-                              this.handleAddIssue(0, 0);
+                            onOk={() => {
                               UserMapStore.initData(false);
+                              this.setState({ showChild: null });
                             }}
                             onCancel={() => {
                               this.handleAddIssue(0, 0);
@@ -1652,12 +1650,9 @@ class Home3 extends Component {
                         epicId === epic.issueId && currentNewObj[id] === 0 ? (
                           <CreateIssue
                             data={{ epicId: epic.issueId, [`${mode}Id`]: 0 }}
-                            onOk={(res) => {
-                              const data = _.cloneDeep(issues).push(res);
-                              // UserMapStore.setIssues(data);
+                            onOk={() => {
                               UserMapStore.initData(false);
                               this.setState({ showChild: null });
-                              // this.handleAddIssue(0, 0);
                             }}
                             onCancel={() => {
                               this.handleAddIssue(0, 0);
