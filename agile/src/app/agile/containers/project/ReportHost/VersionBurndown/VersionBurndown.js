@@ -525,7 +525,11 @@ class VersionBurndown extends Component {
                             onClick={() => {
                               const { history } = this.props;
                               const urlParams = AppState.currentMenuType;
-                            // history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/VersionBurndown`);
+                              if (item.statusCode === 'started') {
+                                history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+                              } else {
+                                history.push(`/agile/reporthost/sprintReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&sprintId=${item.sprintId}`);
+                              }
                             }
                           }
                           >
