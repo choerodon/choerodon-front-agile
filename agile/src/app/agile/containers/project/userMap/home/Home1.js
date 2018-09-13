@@ -1,12 +1,17 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import _ from 'lodash';
+import { toJS } from 'mobx';
 import {
-  Page, Header, Content, stores, axios, 
+  Page, Header, Content, Permission,
 } from 'choerodon-front-boot';
-import { Button, Select, Popover, Tabs, Dropdown, Menu, Spin, Icon, Checkbox } from 'choerodon-ui';
+import {
+  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin, message,
+} from 'choerodon-ui';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import './test.scss';
+import html2canvas from 'html2canvas';
+import Canvas2Image from '../../../../../../../node_modules/canvas2image/canvas2image';
+import './Home.scss';
 import CreateEpic from '../component/CreateEpic';
 import Backlog from '../component/Backlog/Backlog.js';
 import EpicCard from '../component/EpicCard/EpicCard.js';
@@ -15,14 +20,42 @@ import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
-const FileSaver = require('file-saver');
+// let scrollL;
+let left = 0;
 
-const Option = Select.Option;
-const TabPane = Tabs.TabPane;
-const { AppState } = stores;
+function toFullScreen(dom) {
+  if (dom.requestFullscreen) {
+    return dom.requestFullScreen();
+  } else if (dom.webkitRequestFullScreen) {
+    return dom.webkitRequestFullScreen();
+  } else if (dom.mozRequestFullScreen) {
+    return dom.mozRequestFullScreen();
+  } else {
+    return dom.msRequestFullscreen();
+  }
+}
+
+function exitFullScreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen();
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+}
+
+function transformNull2Zero(val) {
+  if (val === null) {
+    return 0;
+  }
+  return val;
+}
 
 @observer
-class Home2 extends Component {
+class Home3 extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -30,6 +63,9 @@ class Home2 extends Component {
       expand: false,
       expandColumns: [],
       showBackLog: false,
+      position: 'absolute',
+      isFullScreen: false,
+      popOverVisible: false,
     };
   }
 
@@ -39,23 +75,135 @@ class Home2 extends Component {
     this.initData();
     const timer = setInterval(() => {
       if (document.getElementsByClassName('filter').length > 0) {
-        if (document.getElementsByClassName('filter')[0].scrollHeight + 3 > document.getElementsByClassName('filter')[0].clientHeight) {
+        if (document.getElementsByClassName('filter')[0].scrollHeight > document.getElementsByClassName('filter')[0].clientHeight) {
           this.setState({
             more: true,
           });
         }
+      }
+      if (document.getElementById('fixHead-body')) {
+        document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll, { passive: true });
+        this.getPrepareOffsetTops();
         clearInterval(timer);
       }
-    }, 1000);
-    // window.addEventListener('scroll', this.handleScroll, true);
-    // window.onscroll = this.handleScroll;
+    }, 20);
+    document.addEventListener('fullscreenchange', this.handleChangeFullScreen);
+    document.addEventListener('webkitfullscreenchange', this.handleChangeFullScreen);
+    document.addEventListener('mozfullscreenchange', this.handleChangeFullScreen);
+    document.addEventListener('MSFullscreenChange', this.handleChangeFullScreen);
   }
 
   componentWillUnmount() {
     this.props.UserMapStore.setCurrentFilter([]);
+    this.props.UserMapStore.setMode('none');
+    this.props.UserMapStore.setIssues([]);
+    this.props.UserMapStore.setEpics([]);
+    this.props.UserMapStore.setTop(0);
+    this.props.UserMapStore.setLeft(0);
+    this.props.UserMapStore.setCurrentIndex(0);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
   }
+
+  handleChangeFullScreen = (e) => {
+    // const node = e.target;
+    const isFullScreen = document.webkitFullscreenElement
+      || document.mozFullScreenElement
+      || document.msFullscreenElement;
+    this.setState({
+      isFullScreen: !!isFullScreen,
+    });
+  }
+
+  getPrepareOffsetTops = (isExpand = false) => {
+    setTimeout(() => {
+      const lines = document.getElementsByClassName('fixHead-line-content');
+      const body = document.getElementById('fixHead-body');
+      const offsetTops = [];
+      for (let i = 0; i < lines.length; i += 1) {
+        offsetTops.push(lines[i].offsetTop);
+      }
+      this.props.UserMapStore.setOffsetTops(offsetTops);
+      // window.console.log('when change mode, the offsetTops is: ' + offsetTops);
+      if (!isExpand) {
+        const { UserMapStore } = this.props;
+        const bodyTop = body.scrollTop;
+        if (bodyTop) {
+          body.scrollTop = 0;
+          UserMapStore.setTop(0);
+        }
+        const { top, currentIndex } = UserMapStore;
+        // window.console.log('when change mode, the top is: ' + top);
+        const index = _.findLastIndex(offsetTops, v => v <= 0 + 42);
+        if (currentIndex !== index && index !== -1) {
+          UserMapStore.setCurrentIndex(index);
+        }
+      } else {
+        const { UserMapStore } = this.props;
+        const bodyTop = body.scrollTop;
+        UserMapStore.setTop(bodyTop);
+        const { top, currentIndex } = UserMapStore;
+        // window.console.log('when change mode, the top is: ' + bodyTop);
+        const index = _.findLastIndex(offsetTops, v => v <= top + 42);
+        if (currentIndex !== index && index !== -1) {
+          UserMapStore.setCurrentIndex(index);
+        }
+      }
+    }, 1000);
+  };
+
+  // debounceHandleScroll = _.debounce((e) => {
+  //   this.handleScroll(e);
+  // }, 16);
+
+  // checkIsFirstLeftScroll() {
+  //   if (!isFirstScroll) {
+  //     isFirstScroll = true;
+  //     // do someting
+  //   }
+  // }
+
+  // debounceSetLeft = _.debounce((left) => {
+  //   const { UserMapStore } = this.props;
+  //   window.console.log(left);
+  //   UserMapStore.setLeft(left);
+  //   // do other thing
+  //   isFirstScroll = false;
+  // }, 300);
+
+  handleScroll = (e) => {
+    const { scrollLeft, scrollTop } = e.target;
+    // const { UserMapStore } = this.props;
+    // const {
+    //   top, offsetTops, currentIndex,
+    // } = UserMapStore;
+    const header = document.getElementById('fixHead-head');
+    header.scrollLeft = scrollLeft;
+    // document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
+    // if (scrollLeft !== left) {
+    //
+    // } else {
+    //   // UserMapStore.setTop(scrollTop);
+    //   const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
+    //   if (currentIndex !== index && index !== -1) {
+    //     UserMapStore.setCurrentIndex(index);
+    //   }
+    //   // window.console.log(scrollTop);
+    // }
+    // if (scrollTop !== top) {
+    //   let s;
+    //   const { offsetTops, currentIndex } = UserMapStore;
+    //   // s = scrollTop <=9 ? 0 : scrollTop;
+    //   // UserMapStore.setTop(s);
+    //   // // window.console.log('when scroll v, the top is: ' + s);
+    //   // const index = _.findLastIndex(offsetTops, v => v <= s + 42);
+    //   // if (currentIndex !== index && index !== -1) {
+    //   //   UserMapStore.setCurrentIndex(index);
+    //   // }
+    // }
+    // left = scrollLeft;
+  };
+
 
   /**
    *键盘按起事件
@@ -64,7 +212,7 @@ class Home2 extends Component {
    * @memberof Sprint
    */
   onKeyUp=(event) => {
-    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
+    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       this.setState({
         keydown: '',
       });
@@ -78,50 +226,79 @@ class Home2 extends Component {
    * @memberof Sprint
    */
   onKeyDown=(event) => {
-    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
+    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       if (event.keyCode !== this.state.keydown) {
         this.setState({
           keydown: event.keyCode,
         });
+        this.props.UserMapStore.setSelectIssueIds([]);
       }
     }
   }
-handleClickIssue = (issueId, epicId) => {
-  const { UserMapStore } = this.props;
-  const { selectIssueIds } = UserMapStore;
-  let arr = _.cloneDeep(selectIssueIds);
-  const index = arr.indexOf(issueId);
-  const { keydown } = this.state;
-  // command ctrl shift
-  if (keydown === 91 || keydown === 17 || keydown === 16) {
-    if (index === -1) {
-      arr.push(issueId);
+
+  handleClickIssue = (issueId, epicId) => {
+    const { UserMapStore } = this.props;
+    const { selectIssueIds } = UserMapStore;
+    let arr = _.cloneDeep(toJS(selectIssueIds));
+    const index = arr.indexOf(issueId);
+    const { keydown } = this.state;
+    // command ctrl shift
+    if (keydown === 91 || keydown === 17 || keydown === 16) {
+      if (index === -1) {
+        arr.push(issueId);
+      } else {
+        arr.splice(index, 1);
+      }
     } else {
-      arr.splice(index, 1);
+      arr = [issueId];
+      // arr.push(issueId);
     }
-  } else {
-    arr = [];
-    // arr.push(issueId);
-  }
-  UserMapStore.setSelectIssueIds(arr);
-  window.console.log(arr);
-};
+    if (issueId === 0) {
+      arr = [];
+    }
+    UserMapStore.setSelectIssueIds(arr);
+  };
 
   initData =() => {
-    this.setState({ loading: true });
-    this.props.UserMapStore.initData();
+    this.props.UserMapStore.initData(true);
   };
+
+  handleFullScreen = () => {
+    const isFullScreen = document.webkitFullscreenElement
+      || document.mozFullScreenElement
+      || document.msFullscreenElement;
+    if (!isFullScreen) {
+      this.fullScreen();
+    } else {
+      this.exitFullScreen();
+    }
+  }
+
+  fullScreen = () => {
+    const target = document.querySelector('.content');
+    toFullScreen(target);
+  };
+
+  exitFullScreen = () => {
+    exitFullScreen();
+  }
 
   changeMode =(options) => {
     this.props.UserMapStore.setMode(options.key);
     const mode = options.key;
+    this.setState({ title: undefined, vosId: null });
     if (mode === 'sprint') {
       this.props.UserMapStore.loadSprints();
     } else if (mode === 'version') {
       this.props.UserMapStore.loadVersions();
     }
-    this.props.UserMapStore.loadIssues(options.key, 'usermap');
-    this.props.UserMapStore.loadBacklogIssues();
+    this.props.UserMapStore.loadIssues('usermap');
+    if (this.props.UserMapStore.showBackLog) {
+      this.props.UserMapStore.loadBacklogIssues();
+    }
+    this.getPrepareOffsetTops();
+
+    // this.props.UserMapStore.loadBacklogIssues();
   };
 
   handleCreateEpic = () => {
@@ -130,7 +307,7 @@ handleClickIssue = (issueId, epicId) => {
 
   addFilter =(filter) => {
     const { UserMapStore } = this.props;
-    const arr = _.cloneDeep(UserMapStore.currentFilters);
+    const arr = _.cloneDeep(toJS(UserMapStore.currentFilters));
     const value = filter;
     const index = UserMapStore.currentFilters.indexOf(value);
     if (index !== -1) {
@@ -146,11 +323,6 @@ handleClickIssue = (issueId, epicId) => {
     }
   };
 
-  changeMenuShow =(options) => {
-    const { moreMenuShow } = this.state;
-    this.setState({ moreMenuShow: !moreMenuShow });
-  };
-
   handleShowDoneEpic =(e) => {
     const { UserMapStore } = this.props;
     UserMapStore.setShowDoneEpic(e.target.checked);
@@ -163,7 +335,7 @@ handleClickIssue = (issueId, epicId) => {
     UserMapStore.loadEpic();
   }
 
-  expandColumn =(id) => {
+  handleExpandColumn =(id) => {
     const { expandColumns } = this.state;
     const index = expandColumns.indexOf(id);
     if (index === -1) {
@@ -172,17 +344,19 @@ handleClickIssue = (issueId, epicId) => {
       expandColumns.splice(index, 1);
     }
     this.setState({ expandColumns });
+    this.getPrepareOffsetTops(true);
+    // this.handleScroll();
   };
 
   showBackLog =() => {
     const { UserMapStore } = this.props;
-    UserMapStore.changeShowBackLog(!UserMapStore.showBackLog);
+    UserMapStore.changeShowBackLog();
   };
 
   handleCreateVOS=(type) => {
     this.props.UserMapStore.setCreateVOSType(type);
     this.props.UserMapStore.setCreateVOS(true);
-  };  
+  };
 
   handleCreateOk=() => {
     const { UserMapStore } = this.props;
@@ -190,267 +364,14 @@ handleClickIssue = (issueId, epicId) => {
     UserMapStore.getCreateVOSType === 'version' ? UserMapStore.loadVersions() : UserMapStore.loadSprints();
   };
 
-  handleMouseColumn = (epicId, vosId) => {
-    this.setState({ hoverId: epicId, hoverVOSId: vosId });
-  };
-
-  showCreateIssue = () => {
-    this.setState({ createIssue: true });
-  };
-
-  exportExcel() {
-    const projectId = AppState.currentMenuType.id;
-    axios.post('url', { responseType: 'arraybuffer' })
-      .then((data) => {
-        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const fileName = `${AppState.currentMenuType.name}.xls`;
-        FileSaver.saveAs(blob, fileName);
-      });
-  }
-
-  renderColumn = () => {
+  handleAddIssue = (epicId, vosId) => {
     const { UserMapStore } = this.props;
-    const dom = [];
-    const epicData = UserMapStore.getEpics;
-    const { issues, sprints, versions } = UserMapStore;
     const { mode } = UserMapStore;
-    const vosData = UserMapStore[`${mode}s`] || [];
-    const id = `${mode}Id`;
-    if (epicData.length) {
-      vosData.map((vos) => {
-        const name = mode === 'sprint' ? `${mode}Name` : 'name';
-        dom.push(<React.Fragment key={vos[id]}>
-          <div className="swimlane-title">
-            <p>{vos[name]}</p>
-            <div style={{ display: 'flex' }}>
-              <p className="point-span" style={{ background: '#4D90FE' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id]), (sum, issue) => {
-                  if (issue.statusCode === 'todo') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#FFB100' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id]), (sum, issue) => {
-                  if (issue.statusCode === 'doing') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#00BFA5' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id]), (sum, issue) => {
-                  if (issue.statusCode === 'done') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p onClick={this.expandColumn.bind(this, vos[id])} role="none">
-                <Icon type={`${this.state.expandColumns.includes(vos[id]) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
-              </p>
-            </div>
-          </div>
-          <div style={{ display: this.state.expandColumns.includes(vos[id]) ? 'none' : 'flex' }}>
-            {epicData.map((epic, index) => (
-              <Droppable droppableId={`epic-${epic.issueId}_${vos[id]}`}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    className="swimlane-column"
-                    style={{
-                      background: snapshot.isDraggingOver ? '#e9e9e9' : 'rgba(0,0,0,0.02)',
-                      padding: 'grid',
-                      // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                    }}
-                  >
-                    <React.Fragment>
-                      {/*{vos[id]}*/}
-                      {_.filter(issues, issue => issue.epicId === epic.issueId && issue[id] === vos[id]).map((item, indexs) => (
-                        <Draggable draggableId={`${mode}-${item.issueId}`} index={indexs}>
-                          {(provided1, snapshot1) => (
-                            <div
-                              ref={provided1.innerRef}
-                              {...provided1.draggableProps}
-                              {...provided1.dragHandleProps}
-                              style={{
-                                cursor: 'move',
-                                ...provided1.draggableProps.style,
-                              }}
-                              role="none"
-                            >
-                              {/*{item.issueId}*/}
-                              <IssueCard
-                                handleClickIssue={this.handleClickIssue}
-                                key={item.issueId}
-                                issue={item}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      <div
-                        onMouseOut={() => { this.setState({ hoverId: '', hoverVOSId: '', createIssue: false }); }}
-                        style={{ background: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] ? '#f5f5f5' : '', minHeight: 142 }}
-                        onMouseOver={this.handleMouseColumn.bind(this, epic.issueId, vos[id])}
-                      >
-                        <div style={{ display: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && !this.state.createIssue ? 'block' : 'none' }}>
-
-
-                          add
-                          {' '}
-                          <a role="none" onClick={this.showCreateIssue}>new</a>
-                          {' '}
-
-
-                          or
-                          {' '}
-                          <a role="none" onClick={this.showBackLog}>existing</a>
-                        </div>
-                        <CreateIssue
-                          data={{ epicId: epic.issueId, [id]: vos[id] }}
-                          style={{ display: this.state.hoverId === epic.issueId && this.state.hoverVOSId === vos[id] && this.state.createIssue ? 'block' : 'none' }}
-                        />
-                      </div>
-                    </React.Fragment>
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-
-            ))}
-          </div>
-        </React.Fragment>);
-      });
-      dom.push(
-        <React.Fragment key="no-sprint">
-          <div className="swimlane-title">
-            <p>
-              {mode === 'none' ? 'issue' : '未计划的' }
-              {mode === 'none' ? null
-                : (
-                  <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
-                    <Icon type="playlist_add" />
-
-
-                  创建
-                    {mode === 'sprint' ? '冲刺' : '版本'}
-                  </Button>
-                ) }
-
-            </p>
-            <div style={{ display: 'flex' }}>
-              <p className="point-span" style={{ background: '#4D90FE' }}>
-                {_.reduce(_.filter(issues, issue => issue.sprintId == null || issue.versionId == null), (sum, issue) => {
-                  if (issue.statusCode === 'todo') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#FFB100' }}>
-                {_.reduce(_.filter(issues, issue => issue.sprintId == null || issue.versionId == null), (sum, issue) => {
-                  if (issue.statusCode === 'doing') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#00BFA5' }}>
-                {_.reduce(_.filter(issues, issue => issue.sprintId == null || issue.versionId == null), (sum, issue) => {
-                  if (issue.statusCode === 'done') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p onClick={this.expandColumn.bind(this, `-1-${mode}`)} role="none">
-                <Icon type={`${this.state.expandColumns.includes(`-1-${mode}`) ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}`} />
-              </p>
-
-            </div>
-          </div>
-          <div style={{ display: this.state.expandColumns.includes(`-1-${mode}`) ? 'none' : 'flex' }}>
-            {epicData.map((epic, index) => (
-              <Droppable droppableId={`epic-${epic.issueId}_0`}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    className="swimlane-column"
-                    style={{
-                      background: snapshot.isDraggingOver ? '#e9e9e9' : 'rgba(0,0,0,0.02)',
-                      padding: 'grid',
-                      // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                    }}
-                  >
-                    <React.Fragment>
-                      {_.filter(issues, issue => issue.epicId === epic.issueId && (mode !== 'none' && issue[id] == null || mode === 'none')).map((item, indexs) => (
-                        <Draggable draggableId={`none-${item.issueId}`} index={indexs}>
-                          {(provided1, snapshot1) => (
-                            <div
-                              ref={provided1.innerRef}
-                              {...provided1.draggableProps}
-                              {...provided1.dragHandleProps}
-                              style={{
-                                cursor: 'move',
-                                ...provided1.draggableProps.style,
-                              }}
-                              role="none"
-                            >
-                              {/*{item.issueId}*/}
-                              <IssueCard
-                                handleClickIssue={this.handleClickIssue}
-                                key={item.issueId}
-                                issue={item}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      <div
-                        onMouseLeave={() => { this.setState({ hoverId: '', createIssue: false }); }}
-                        style={{ background: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId ? '#f5f5f5' : '', minHeight: 142 }}
-                        onMouseOver={this.handleMouseColumn.bind(this, epic.issueId)}
-                      >
-                        <div style={{ display: !snapshot.isDraggingOver && this.state.hoverId === epic.issueId && !this.state.createIssue ? 'block' : 'none' }}>
-
-
-                          add
-                          {' '}
-                          <a role="none" onClick={this.showCreateIssue}>new</a>
-                          {' '}
-
-
-                          or
-                          {' '}
-                          <a role="none" onClick={this.showBackLog}>existing</a>
-                        </div>
-                        <CreateIssue
-                          data={{ epicId: epic.issueId, versionId: null, sprintId: null }}
-                          style={{ display: this.state.hoverId === epic.issueId && this.state.createIssue ? 'block' : 'none' }}
-                        />
-                      </div>
-                    </React.Fragment>
-                    {provided.placeholder}
-                  </div>
-
-                )}
-              </Droppable>
-            ))}
-          </div>
-        </React.Fragment>,
-      );
-    }
-
-    return dom;
+    const obj = { epicId, [`${mode}Id`]: vosId };
+    this.setState({ showChild: null });
+    UserMapStore.setCurrentNewObj(obj);
   };
+
 
   handleEpicDrag =(res) => {
     const { UserMapStore } = this.props;
@@ -473,99 +394,827 @@ handleClickIssue = (issueId, epicId) => {
     }
     const epicId = data[sourceIndex].issueId;
     const { objectVersionNumber } = data[sourceIndex];
-    const postData = { afterSequence, beforeSequence, epicId, objectVersionNumber };
+    const postData = {
+      afterSequence, beforeSequence, epicId, objectVersionNumber,
+    };
     UserMapStore.setEpics(result);
-    UserMapStore.handleEpicDrap(postData);
+    UserMapStore.handleEpicDrag(postData);
   };
 
-  handleDragToMainBoard =(res) => {
-    const { UserMapStore } = this.props;
-    const { issues, mode, selectIssueIds } = UserMapStore;
-    const epicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
+  getSprintIdAndEpicId(str) {
+    const epicId = parseInt(str.split('_')[0].split('-')[1], 10);
+    const modeId = parseInt(str.split('_')[1], 10);// [sprint || version]id;
+    return { epicId, modeId };
+  }
+
+  transformDateToPostDate = (ids, originIssues, mode, targetEpicId, targetModeId) => {
+    const res = {
+      epicIssueIds: [],
+      sprintIssueIds: [],
+      versionIssueIds: [],
+    };
     const key = `${mode}Id`;
-    const value = parseInt(res.destination.droppableId.split('_')[1], 10);
-    const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
-    const before = res.destination.index === 0;
-    const rankIndex = res.source.index > res.destination.index;
-    let postData = {};
-    const issueData = _.cloneDeep(issues);
-    let outsetIssueId = null;
-    _.map(issueIds, (issueId) => {
-      const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
-      const sourceIndex = _.indexOf(issueData, sourceIssue);
-      before ? outsetIssueId = issueData[sourceIndex + 1].issueId : outsetIssueId = issueData[sourceIndex - 1].issueId;
-      if (mode === 'none') {
-        postData = { epicId, issueIds, before, rankIndex, outsetIssueId };
-        sourceIssue.epicId = epicId;
-        sourceIssue[key] = null;
-      } else {
-        postData = { epicId, issueIds, before, rankIndex, [key]: value, outsetIssueId };
-        sourceIssue.epicId = epicId;
-        value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
+    ids.forEach((issueId) => {
+      const issue = originIssues.find(v => v.issueId === issueId);
+      if (transformNull2Zero(targetEpicId) !== transformNull2Zero(issue.epicId)) {
+        res.epicIssueIds.push(issueId);
       }
-      UserMapStore.setIssues(issueData);
+      if (mode !== 'none' && transformNull2Zero(issue[key]) !== transformNull2Zero(targetModeId)) {
+        res[`${mode}IssueIds`].push(issueId);
+      }
     });
+    return res;
+  }
+
+  handleDataWhenMove = (ids, before, outsetIssueId, mode, desEpicId, desModeId) => {
+    const { UserMapStore } = this.props;
+    const { issues, backlogIssues } = UserMapStore;
+    const issuesCopy = _.cloneDeep(toJS(issues));
+    const backlogIssuesCopy = _.cloneDeep(toJS(backlogIssues));
+    const issuesDragged = [];
+    let resIssues = [];
+    let resBacklogIssues = [];
+    ids.forEach((issueId) => {
+      const issue = issuesCopy.find(v => v.issueId === issueId);
+      issue.epicId = desEpicId;
+      if (mode !== 'none') {
+        issue[`${mode}Id`] = desModeId;
+      }
+      issuesDragged.push(issue);
+      const issuesIssueIndex = issuesCopy.findIndex(v => v.issueId === issueId);
+      const backlogIssueIndex = backlogIssuesCopy.findIndex(v => v.issueId === issueId);
+      if (issuesIssueIndex !== -1) {
+        issuesCopy.splice(issuesIssueIndex, 1);
+      }
+      if (backlogIssueIndex !== -1) {
+        backlogIssuesCopy.splice(backlogIssueIndex, 1);
+      }
+    });
+    if (outsetIssueId === 0 && before) {
+      if (desEpicId === 0 || desEpicId === null) {
+        resIssues = issuesCopy;
+        resBacklogIssues = issuesDragged.concat(backlogIssuesCopy);
+      } else {
+        resIssues = issuesDragged.concat(issuesCopy);
+        resBacklogIssues = backlogIssuesCopy;
+      }
+    } else if (outsetIssueId === 0 && !before) {
+      if (desEpicId === 0 || desEpicId === null) {
+        resIssues = issuesCopy;
+        resBacklogIssues = backlogIssuesCopy.concat(issuesDragged);
+      } else {
+        resIssues = issuesCopy.concat(issuesDragged);
+        resBacklogIssues = backlogIssuesCopy;
+      }
+    } else if (before) {
+      if (desEpicId === 0 || desEpicId === null) {
+        resIssues = issuesCopy;
+        const backlogInsertIndex = backlogIssuesCopy.findIndex(v => v.issueId === outsetIssueId);
+        if (backlogInsertIndex !== -1) {
+          if (backlogInsertIndex === 0) {
+            resBacklogIssues = issuesDragged.concat(backlogIssuesCopy);
+          } else {
+            resBacklogIssues = [
+              ...backlogIssuesCopy.slice(0, backlogInsertIndex),
+              ...issuesDragged,
+              ...backlogIssuesCopy.slice(backlogInsertIndex),
+            ];
+            window.console.log(resBacklogIssues);
+          }
+        } else {
+          resBacklogIssues = issuesDragged.concat(backlogIssuesCopy);
+        }
+      } else {
+        resBacklogIssues = backlogIssuesCopy;
+        const issuesInsertIndex = issuesCopy.findIndex(v => v.issueId === outsetIssueId);
+        if (issuesInsertIndex !== -1) {
+          if (issuesInsertIndex === 0) {
+            resIssues = issuesDragged.concat(issuesCopy);
+          } else {
+            resIssues = [
+              ...issuesCopy.slice(0, issuesInsertIndex),
+              ...issuesDragged,
+              ...issuesCopy.slice(issuesInsertIndex),
+            ];
+          }
+        }
+      }
+    } else if (true) {
+      if (desEpicId === 0 || desEpicId === null) {
+        resIssues = issuesCopy;
+        const backlogInsertIndex = issuesCopy.findIndex(v => v.issueId === outsetIssueId);
+        if (backlogInsertIndex !== -1) {
+          resBacklogIssues = [
+            ...backlogIssuesCopy.slice(0, backlogInsertIndex + 1),
+            ...issuesDragged,
+            ...backlogIssuesCopy.slice(backlogInsertIndex + 1),
+          ];
+        } else {
+          resBacklogIssues = backlogIssuesCopy.concat(issuesDragged);
+        }
+      } else {
+        resBacklogIssues = backlogIssuesCopy;
+        const issuesInsertIndex = issuesCopy.findIndex(v => v.issueId === outsetIssueId);
+        if (issuesInsertIndex !== -1) {
+          resIssues = [
+            ...issuesCopy.slice(0, issuesInsertIndex + 1),
+            ...issuesDragged,
+            ...issuesCopy.slice(issuesInsertIndex + 1),
+          ];
+        }
+      }
+    }
+    UserMapStore.setBacklogIssues(resBacklogIssues);
+    UserMapStore.setIssues(resIssues);
+  }
+
+  handleMultipleDragToBoard = (res) => {
+    const { UserMapStore } = this.props;
+    const {
+      mode, issues, backlogIssues, selectIssueIds,
+    } = UserMapStore;
+    const sourceIndex = res.source.index;
+    const tarIndex = res.destination.index;
+    const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
+    const key = `${mode}Id`;
+    const desIndex = res.destination.index;
+    const dragIssueId = parseInt(res.draggableId.split('-')[1], 10);
+    const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
+    const desModeId = this.getSprintIdAndEpicId(res.destination.droppableId).modeId;
+    const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
+    const souEpicId = this.getSprintIdAndEpicId(res.source.droppableId).epicId;
+    const issueIds = toJS(selectIssueIds);
+    const issueData = _.cloneDeep(toJS(issues));
+    const backlogData = _.cloneDeep(toJS(backlogIssues));
+    let desEpicAndModeIssues;
+    if (desModeId === 0) {
+      const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
+      if (mode === 'none') {
+        desEpicAndModeIssues = desEpicIssues.slice();
+      } else {
+        desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0
+          || issue[key] === null);
+      }
+    } else {
+      desEpicAndModeIssues = _.filter(issueData, issue => issue.epicId === desEpicId
+        && issue[key] === desModeId);
+    }
+    let desModeIssues;
+    if (desModeId === 0) {
+      if (mode === 'none') {
+        desModeIssues = issueData;
+      } else {
+        desModeIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+      }
+    } else {
+      desModeIssues = _.filter(issueData, issue => issue[key] === desModeId);
+    }
+    let before;
+    let outsetIssueId;
+    if (desEpicAndModeIssues.length) {
+      // 移到有卡的块中
+      if (desEpicAndModeIssues.every(v => issueIds.includes(v.issueId))) {
+        // 该块中所有卡均被选中
+        if (desModeIssues.every(v => issueIds.includes(v.issueId))) {
+          // 该行中所有卡均被选中
+          before = true;
+          outsetIssueId = 0;
+        } else {
+          // 该行中有未被选中的卡
+          before = true;
+          outsetIssueId = desModeIssues.find(v => !issueIds.includes(v.issueId)).issueId;
+        }
+      } else if (true) {
+        // 该块中有未被选中的卡
+        if (!desEpicAndModeIssues.every(v => !issueIds.includes(v.issueId))) {
+          // 该块中存在有块被选中
+          if (_.map(desEpicAndModeIssues, 'issueId').includes(dragIssueId)) {
+            if (desIndex === desEpicAndModeIssues.length - 1) {
+              before = false;
+              outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            } else if (true) {
+              if (sourceIndex <= desIndex) {
+                const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+                const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+                if (afterDesIndex) {
+                  before = true;
+                  outsetIssueId = afterDesIndex.issueId;
+                } else if (beforeDesIndex) {
+                  before = false;
+                  outsetIssueId = beforeDesIndex.issueId;
+                } else {
+                  before = true;
+                  outsetIssueId = 0;
+                }
+              } else {
+                const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+                const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+                if (afterDesIndex) {
+                  before = true;
+                  outsetIssueId = afterDesIndex.issueId;
+                } else if (beforeDesIndex) {
+                  before = false;
+                  outsetIssueId = beforeDesIndex.issueId;
+                } else {
+                  before = true;
+                  outsetIssueId = 0;
+                }
+              }
+
+            }
+          } else if (true) {
+            if (desIndex === desEpicAndModeIssues.length) {
+              before = false;
+              outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            } else {
+              before = true;
+              outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+            }
+          }
+        } else if (true) {
+          // 该块中所有块都未被选中
+          if (desIndex === desEpicAndModeIssues.length) {
+            before = false;
+            outsetIssueId = desEpicAndModeIssues[desEpicAndModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+          }
+        }
+      }
+    } else if (true) {
+      // 移到无卡的块中
+      if (!desModeIssues.length) {
+        // 同行长度为0
+        outsetIssueId = 0;
+        if (souModeId && desModeId) {
+          const modeData = UserMapStore[`${mode}s`] || [];
+          const souModeIndex = _.findIndex(modeData, v => v[key] === souModeId);
+          const desModeIndex = _.findIndex(modeData, v => v[key] === desModeId);
+          before = desModeIndex < souModeIndex;
+        } else if (!souModeId) {
+          before = true;
+        } else {
+          before = false;
+        }
+      } else if (true) {
+        // 同行长度不为0
+        if (desModeIssues.every(v => issueIds.includes(v.issueId))) {
+          // 所有选中都在同行中
+          before = true;
+          outsetIssueId = 0;
+        } else {
+          // 同行中有未被选中的
+          before = true;
+          outsetIssueId = desModeIssues.find(v => !issueIds.includes(v.issueId)).issueId;
+        }
+      }
+    }
+    const rankIndex = null;
+    const transformData = this.transformDateToPostDate(issueIds, issues, mode, desEpicId, desModeId);
+    const postData = {
+      before,
+      epicId: transformData.epicIssueIds.length ? desEpicId : undefined,
+      outsetIssueId,
+      rankIndex,
+      issueIds,
+      versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
+      sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+      epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
+    };
+    if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
+      postData[key] = desModeId;
+    }
+    const tarBacklogData = backlogIssues;
+    this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, desEpicId, desModeId);
+    // _.map(issueIds, (id) => {
+    //   const currentIssue = _.find(issueData, item => item.issueId === id);
+    //   const vosId = desModeId === 0 ? null : desModeId;
+    //   currentIssue.epicId = desEpicId;
+    //   if (mode !== 'none') {
+    //     currentIssue[key] = vosId;
+    //   }
+    //   // postData = {
+    //   //   before, epicId: desEpicId, outsetIssueId, rankIndex, issueIds,
+    //   // };
+    //   if (res.source.droppableId.includes('backlog')) {
+    //     tarBacklogData = _.find(backlogData, item => item.issueId === id);
+    //     const index = backlogData.indexOf(tarBacklogData);
+    //     backlogData.splice(index, 1);
+    //   }
+    //   if (mode !== 'none') {
+    //     // postData[key] = desModeId;
+    //   }
+    // });
+    // if (res.source.droppableId.includes('backlog')) {
+    //   UserMapStore.setBacklogIssues(backlogData);
+    // }
+    // UserMapStore.setIssues(issueData);
     UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
+  }
+
+  handleMultipleDragToBacklog = (res) => {
+    const { UserMapStore } = this.props;
+    const {
+      mode, issues, backlogIssues, selectIssueIds,
+    } = UserMapStore;
+    const sourceIndex = res.source.index;
+    const tarIndex = res.destination.index;
+    const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
+    const key = `${mode}Id`;
+    const desIndex = res.destination.index;
+    const dragIssueId = parseInt(res.draggableId.split('-')[1], 10);
+    const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
+    const desModeId = this.getSprintIdAndEpicId(res.destination.droppableId).modeId;
+    const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
+    const souEpicId = this.getSprintIdAndEpicId(res.source.droppableId).epicId;
+    const issueIds = toJS(selectIssueIds);
+    const issueData = _.cloneDeep(toJS(issues));
+    const backlogData = _.cloneDeep(toJS(backlogIssues));
+    let desModeIssues;
+    if (desModeId === 0) {
+      // const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
+      if (mode === 'none') {
+        desModeIssues = backlogData.slice();
+        // desEpicAndModeIssues = desEpicIssues.slice();
+      } else {
+        desModeIssues = _.filter(backlogData, issue => issue[key] === 0
+          || issue[key] === null);
+      }
+    } else {
+      desModeIssues = _.filter(backlogData, issue => issue[key] === desModeId);
+    }
+    let desModeIssuesAll;
+    if (desModeId === 0) {
+      if (mode === 'none') {
+        desModeIssuesAll = issueData;
+      } else {
+        desModeIssuesAll = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+      }
+    } else {
+      desModeIssuesAll = _.filter(issueData, issue => issue[key] === desModeId);
+    }
+    let before;
+    let outsetIssueId;
+    if (desModeIssues.length) {
+      // 移到有卡的块中
+      if (desModeIssues.every(v => issueIds.includes(v.issueId))) {
+        // 该块中所有卡均被选中
+        if (desModeIssuesAll.every(v => issueIds.includes(v.issueId))) {
+          // 该行中所有卡均被选中
+          before = true;
+          outsetIssueId = 0;
+        } else {
+          // 该行中有未被选中的卡
+          before = true;
+          outsetIssueId = desModeIssuesAll.find(v => !issueIds.includes(v.issueId)).issueId;
+        }
+      } else if (true) {
+        // 该块中有未被选中的卡
+        if (!desModeIssues.every(v => !issueIds.includes(v.issueId))) {
+          // 该块中存在有卡被选中，也有卡未被选中
+          if (_.map(desModeIssues, 'issueId').includes(dragIssueId)) {
+            if (desIndex === desModeIssues.length - 1) {
+              before = false;
+              outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            } else if (true) {
+              if (sourceIndex <= desIndex) {
+                const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+                const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+                if (afterDesIndex) {
+                  before = true;
+                  outsetIssueId = afterDesIndex.issueId;
+                } else if (beforeDesIndex) {
+                  before = false;
+                  outsetIssueId = beforeDesIndex.issueId;
+                } else {
+                  before = true;
+                  outsetIssueId = 0;
+                }
+              } else {
+                const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+                const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+                if (afterDesIndex) {
+                  before = true;
+                  outsetIssueId = afterDesIndex.issueId;
+                } else if (beforeDesIndex) {
+                  before = false;
+                  outsetIssueId = beforeDesIndex.issueId;
+                } else {
+                  before = true;
+                  outsetIssueId = 0;
+                }
+              }
+            }
+          } else if (true) {
+            if (desIndex === desModeIssues.length) {
+              before = false;
+              outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            } else {
+              before = true;
+              outsetIssueId = desModeIssues[desIndex].issueId;
+            }
+          }
+        } else if (true) {
+          // 该块中所有块都未被选中
+          if (desIndex === desModeIssues.length) {
+            before = false;
+            outsetIssueId = desModeIssues[desModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            outsetIssueId = desModeIssues[desIndex].issueId;
+          }
+        }
+      }
+    } else if (true) {
+      // 移到无卡的块中
+      if (!desModeIssuesAll.length) {
+        // 同行长度为0
+        outsetIssueId = 0;
+        if (souModeId && desModeId) {
+          const modeData = UserMapStore[`${mode}s`] || [];
+          const souModeIndex = _.findIndex(modeData, v => v[key] === souModeId);
+          const desModeIndex = _.findIndex(modeData, v => v[key] === desModeId);
+          before = desModeIndex < souModeIndex;
+        } else if (!souModeId) {
+          before = true;
+        } else {
+          before = false;
+        }
+      } else if (true) {
+        // 同行长度不为0
+        if (desModeIssuesAll.every(v => issueIds.includes(v.issueId))) {
+          // 同行中均被选中
+          before = true;
+          outsetIssueId = 0;
+        } else {
+          // 同行中有未被选中的
+          before = true;
+          outsetIssueId = desModeIssuesAll.find(v => !issueIds.includes(v.issueId)).issueId;
+        }
+      }
+    }
+    const rankIndex = null;
+    const transformData = this.transformDateToPostDate(issueIds, issues, mode, 0, desModeId);
+    const postData = {
+      before,
+      epicId: transformData.epicIssueIds.length ? 0 : undefined,
+      outsetIssueId,
+      rankIndex,
+      issueIds,
+      versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
+      sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+      epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
+    };
+    if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
+      postData[key] = desModeId;
+    }
+    const tarBacklogData = backlogIssues;
+    this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, 0, desModeId);
+    // _.map(issueIds, (id) => {
+    //   // const currentIssue = _.find(issueData, item => item.issueId === id);
+    //   // const vosId = desModeId === 0 ? null : desModeId;
+    //   // currentIssue.epicId = 0;
+    //   // if (mode !== 'none') {
+    //   //   currentIssue[key] = vosId;
+    //   // }
+    //   // postData = {
+    //   //   before, epicId: souEpicId ? 0 : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
+    //   // };
+    // });
+    // window.console.log(postData);
+    UserMapStore.handleMoveIssue(postData);
+    UserMapStore.setSelectIssueIds([]);
+    UserMapStore.setCurrentDraggableId(null);
+  }
+
+  handelDragToBoard = (res) => {
+    const { UserMapStore } = this.props;
+    const {
+      mode, issues, backlogIssues, selectIssueIds,
+    } = UserMapStore;
+    if (selectIssueIds.length < 2) {
+      if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
+      const key = `${mode}Id`;
+      const desIndex = res.destination.index;
+      const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
+      const desModeId = this.getSprintIdAndEpicId(res.destination.droppableId).modeId;
+      const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
+      const souEpicId = this.getSprintIdAndEpicId(res.source.droppableId).epicId;
+      const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
+      const issueData = _.cloneDeep(toJS(issues));
+      const backlogData = _.cloneDeep(toJS(backlogIssues));
+      let desEpicAndModeIssues;
+      if (desModeId === 0) {
+        const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
+        if (mode === 'none') {
+          desEpicAndModeIssues = desEpicIssues.slice();
+        } else {
+          desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0
+            || issue[key] === null);
+        }
+      } else {
+        desEpicAndModeIssues = _.filter(issueData, issue => issue.epicId === desEpicId
+          && issue[key] === desModeId);
+      }
+      let before;
+      let outsetIssueId;
+      if (desEpicAndModeIssues.length) {
+        // 目的地块中有卡，判断所放位置是否为0
+        if (!desIndex) {
+          before = true;
+          outsetIssueId = desEpicAndModeIssues[0].issueId;
+        } else if (desEpicId === souEpicId && desModeId === souModeId) {
+          // 同块之间移动，判断是否放在最后
+          if (desIndex === desEpicAndModeIssues.length - 1) {
+            before = false;
+            outsetIssueId = desEpicAndModeIssues[desEpicAndModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            if (desIndex > res.source.index) {
+              outsetIssueId = desEpicAndModeIssues[desIndex + 1].issueId;
+            } else {
+              outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+            }
+          }
+        } else if (true) {
+          // 不同块之间移动，判断是否放在最后
+          if (desIndex === desEpicAndModeIssues.length) {
+            before = false;
+            outsetIssueId = desEpicAndModeIssues[desEpicAndModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+          }
+        }
+      } else {
+        // 目的地块中无卡，判断同行是否为空
+        let desModeIssues;
+        if (desModeId === 0) {
+          if (mode === 'none') {
+            desModeIssues = issueData;
+          } else {
+            desModeIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+          }
+        } else {
+          desModeIssues = _.filter(issueData, issue => issue[key] === desModeId);
+        }
+        if (desModeId === souModeId) {
+          // 同行之间移动
+          if (desModeIssues.length === 1) {
+            // 长度为1，该行只有一张卡，就是移动的卡
+            before = true;
+            outsetIssueId = 0;
+          } else {
+            // 该行有除了移动卡的卡，放在之前
+            before = true;
+            outsetIssueId = desModeIssues[0].issueId === parseInt(res.draggableId.split('-')[1], 10)
+              ? desModeIssues[1].issueId : desModeIssues[0].issueId;
+          }
+        } else if (true) {
+          if (desModeIssues.length) {
+            before = true;
+            outsetIssueId = desModeIssues[0].issueId;
+          } else {
+            outsetIssueId = 0;
+            if (souModeId && desModeId) {
+              const modeData = UserMapStore[`${mode}s`] || [];
+              const souModeIndex = _.findIndex(modeData, v => v[key] === souModeId);
+              const desModeIndex = _.findIndex(modeData, v => v[key] === desModeId);
+              before = desModeIndex < souModeIndex;
+            } else if (!souModeId) {
+              before = true;
+            } else {
+              before = false;
+            }
+          }
+        }
+      }
+      const rankIndex = null;
+      const transformData = this.transformDateToPostDate(issueIds, issues, mode, desEpicId, desModeId);
+      const postData = {
+        before,
+        epicId: transformData.epicIssueIds.length ? desEpicId : undefined,
+        outsetIssueId,
+        rankIndex,
+        issueIds,
+        versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
+        sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+        epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
+      };
+      if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
+        postData[key] = desModeId;
+      }
+      const tarBacklogData = backlogIssues;
+
+      this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, desEpicId, desModeId);
+      // _.map(issueIds, (id) => {
+      //   const currentIssue = _.find(issueData, item => item.issueId === id);
+      //   const vosId = desModeId === 0 ? null : desModeId;
+      //   currentIssue.epicId = desEpicId;
+      //   if (mode !== 'none') {
+      //     currentIssue[key] = vosId;
+      //   }
+      //   // postData = {
+      //   //   before, epicId: desEpicId, outsetIssueId, rankIndex, issueIds,
+      //   // };
+      //   if (res.source.droppableId.includes('backlog')) {
+      //     tarBacklogData = _.find(backlogData, item => item.issueId === id);
+      //     const index = backlogData.indexOf(tarBacklogData);
+      //     backlogData.splice(index, 1);
+      //   }
+      //   if (mode !== 'none') {
+      //     // postData[key] = desModeId;
+      //   }
+      // });
+      // if (res.source.droppableId.includes('backlog')) {
+      //   UserMapStore.setBacklogIssues(backlogData);
+      // }
+      // UserMapStore.setIssues(issueData);
+      UserMapStore.handleMoveIssue(postData);
+      UserMapStore.setSelectIssueIds([]);
+      UserMapStore.setCurrentDraggableId(null);
+    } else {
+      this.handleMultipleDragToBoard(res);
+    }
   };
 
   handleDragToBacklog = (res) => {
     const { UserMapStore } = this.props;
-    const { backlogIssues, mode, selectIssueIds, issues } = UserMapStore;
-    const key = `${mode}Id`;
-    const value = parseInt(res.destination.droppableId.split('-')[1], 10);
-    const issueIds = selectIssueIds.length ? selectIssueIds : [parseInt(res.draggableId.split('-')[1], 10)];
-    const before = res.destination.index === 0;
-    const rankIndex = res.source.index > res.destination.index;
-    const tarIndex = res.destination.index;
-    const BacklogIssueData =  _.cloneDeep(backlogIssues);
-    let postData = {};
-    // backlog to backlog
-    let outsetIssueId = null;
-    if (res.source.droppableId.includes('backlog')) {
-      const issueData = _.cloneDeep(backlogIssues);
-      _.map(issueIds, (issueId) => {
-        const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
-        const sourceIndex = _.indexOf(issueData, sourceIssue);
-        before ? outsetIssueId = issueData[sourceIndex + 1].issueId : outsetIssueId = issueData[sourceIndex - 1].issueId;
-        value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
-        issueData.splice(sourceIndex, 1);
-        issueData.splice(res.destination.index, 0, sourceIssue);
-        postData = { issueIds, before, rankIndex, [key]: value, outsetIssueId };
-        // UserMapStore.setBacklogIssues(issueData);
-        // UserMapStore.setIssues(issueData);
-      });
-    } else {
-      const issueData = _.cloneDeep(issues);
-      _.map(issueIds, (issueId) => {
-        const sourceIssue = _.filter(issueData, item => item.issueId === issueId)[0];
-        const sourceIndex = _.indexOf(issueData, sourceIssue);
-        sourceIssue.epicId = null;
-        BacklogIssueData.splice(res.destination.index, 0, sourceIssue);
-        issueData.splice(sourceIndex, 1);
-        if (mode === 'none') {
-          postData = { epicId: 0, issueIds, before, rankIndex, outsetIssueId };
+    const {
+      mode, issues, backlogIssues, selectIssueIds,
+    } = UserMapStore;
+    if (selectIssueIds.length < 2) {
+      if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
+      const key = `${mode}Id`;
+      const desIndex = res.destination.index;
+      // const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
+      const desModeId = this.getSprintIdAndEpicId(res.destination.droppableId).modeId;
+      const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
+      const souEpicId = this.getSprintIdAndEpicId(res.source.droppableId).epicId;
+      const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
+      const issueData = _.cloneDeep(toJS(issues));
+      const backlogData = _.cloneDeep(toJS(backlogIssues));
+      // let desEpicAndModeIssues;
+      let desModeIssues;
+      if (mode === 'none') {
+        desModeIssues = backlogData.slice();
+      } else if (true) {
+        if (desModeId === 0) {
+          desModeIssues = _.filter(backlogData, issue => issue[key] === 0 || issue[key] === null);
         } else {
-          postData = { issueIds, before, rankIndex, [key]: value, epicId: 0, outsetIssueId };
-          value === 0 ? sourceIssue[key] = null : sourceIssue[key] = value;
+          desModeIssues = _.filter(backlogData, issue => issue[key] === desModeId);
         }
-        // UserMapStore.setBacklogIssues(issueData);
-        // UserMapStore.setIssues(issueData);
-      });
+      }
+      // if (desModeId === 0) {
+      //   const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
+      //   if (mode === 'none') {
+      //     desEpicAndModeIssues = desEpicIssues.slice();
+      //   } else {
+      //     desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0
+      //       || issue[key] === null);
+      //   }
+      // } else {
+      //   desEpicAndModeIssues = _.filter(issueData, issue => issue.epicId === desEpicId
+      //     && issue[key] === desModeId);
+      // }
+      let before;
+      let outsetIssueId;
+      if (desModeIssues.length) {
+        // 目的地块中有卡，判断所放位置是否为0
+        if (!desIndex) {
+          before = true;
+          outsetIssueId = desModeIssues[0].issueId;
+        } else if (desModeId === souModeId) {
+          // 同块之间移动，判断是否放在最后
+          if (desIndex === desModeIssues.length - 1) {
+            before = false;
+            outsetIssueId = desModeIssues[desModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            if (desIndex > res.source.index) {
+              outsetIssueId = desModeIssues[desIndex + 1].issueId;
+            } else {
+              outsetIssueId = desModeIssues[desIndex].issueId;
+            }
+          }
+        } else if (true) {
+          // 不同块之间移动，判断是否放在最后
+          if (desIndex === desModeIssues.length) {
+            before = false;
+            outsetIssueId = desModeIssues[desModeIssues.length - 1].issueId;
+          } else {
+            before = true;
+            outsetIssueId = desModeIssues[desIndex].issueId;
+          }
+        }
+      } else {
+        // 目的地块中无卡，判断同行是否为空
+        let desModeAllIssues;
+        if (desModeId === 0) {
+          if (mode === 'none') {
+            desModeAllIssues = issueData;
+          } else {
+            desModeAllIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+          }
+        } else {
+          desModeAllIssues = _.filter(issueData, issue => issue[key] === desModeId);
+        }
+        if (desModeId === souModeId) {
+          // 同行之间移动
+          if (desModeAllIssues.length === 1) {
+            // 长度为1，该行只有一张卡，就是移动的卡
+            before = true;
+            outsetIssueId = 0;
+          } else {
+            // 该行有除了移动卡的卡，放在之前
+            before = true;
+            outsetIssueId = desModeAllIssues[0].issueId === parseInt(res.draggableId.split('-')[1], 10)
+              ? desModeAllIssues[1].issueId : desModeAllIssues[0].issueId;
+          }
+        } else if (true) {
+          // 不同行之间移动，放到空块里
+          if (desModeAllIssues.length) {
+            before = true;
+            outsetIssueId = desModeAllIssues[0].issueId;
+          } else {
+            outsetIssueId = 0;
+            if (souModeId && desModeId) {
+              const modeData = UserMapStore[`${mode}s`] || [];
+              const souModeIndex = _.findIndex(modeData, v => v[key] === souModeId);
+              const desModeIndex = _.findIndex(modeData, v => v[key] === desModeId);
+              before = desModeIndex < souModeIndex;
+            } else if (!souModeId) {
+              before = true;
+            } else {
+              before = false;
+            }
+          }
+        }
+      }
+      const rankIndex = null;
+      const transformData = this.transformDateToPostDate(issueIds, issues, mode, 0, desModeId);
+      const postData = {
+        before,
+        epicId: transformData.epicIssueIds.length ? 0 : undefined,
+        outsetIssueId,
+        rankIndex,
+        issueIds,
+        versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
+        sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+        epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
+      };
+      if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
+        postData[key] = desModeId;
+      }
+      const tarBacklogData = backlogIssues;
+      this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, 0, desModeId);
+      // _.map(issueIds, (id) => {
+      //   const currentIssue = _.find(issueData, item => item.issueId === id);
+      //   const vosId = desModeId === 0 ? null : desModeId;
+      //   currentIssue.epicId = 0;
+      //   if (mode !== 'none') {
+      //     // currentIssue[key] = vosId;
+      //   }
+      //   // postData = {
+      //   //   before, epicId: souEpicId ? 0 : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
+      //   // };
+      //   // if (res.source.droppableId.includes('backlog')) {
+      //   //   tarBacklogData = _.find(backlogData, item => item.issueId === id);
+      //   //   const index = backlogData.indexOf(tarBacklogData);
+      //   //   backlogData.splice(index, 1);
+      //   // }
+      //   // if (mode !== 'none') {
+      //   //   postData[key] = desModeId;
+      //   // }
+      // });
+      // if (res.source.droppableId.includes('backlog')) {
+      //   UserMapStore.setBacklogIssues(backlogData);
+      // }
+      // UserMapStore.setIssues(issueData);
+      // window.console.log(postData);
+      UserMapStore.handleMoveIssue(postData);
+      UserMapStore.setSelectIssueIds([]);
+      UserMapStore.setCurrentDraggableId(null);
+    } else {
+      this.handleMultipleDragToBacklog(res);
     }
-    UserMapStore.handleMoveIssue(postData, res.source.droppableId.includes('backlog') ? 'backlog' : 'userMap');
-    UserMapStore.setSelectIssueIds([]);
-    UserMapStore.setCurrentDraggableId(null);
   };
 
   handleEpicOrIssueDrag = (res) => {
+    if (!res.destination) {
+      this.props.UserMapStore.setSelectIssueIds([]);
+      this.props.UserMapStore.setCurrentDraggableId(null);
+      return;
+    }
     if (res.destination.droppableId === 'epic') {
       this.handleEpicDrag(res);
     } else if (res.destination.droppableId.includes('backlog')) {
       this.handleDragToBacklog(res);
     } else {
-      this.handleDragToMainBoard(res);
+      this.handelDragToBoard(res);
     }
   };
 
@@ -576,9 +1225,94 @@ handleClickIssue = (issueId, epicId) => {
     }
   };
 
+  handleSaveAsImage = () => {
+    this.setState({
+      popOverVisible: false,
+    });
+    const shareContent = document.querySelector('.fixHead');// 需要截图的包裹的（原生的）DOM 对象
+    shareContent.style.width = `${Math.max(document.querySelector('.fixHead-head').scrollWidth, document.querySelector('.fixHead-body').scrollWidth)}px`;
+    shareContent.style.height = `${document.querySelector('.fixHead-head').scrollHeight + document.querySelector('.fixHead-body').scrollHeight}px`;
+
+    const scaleBy = 2;
+    const canvas = document.createElement('canvas');
+    canvas.style.width = `${_.parseInt(_.trim(shareContent.style.width, 'px')) * scaleBy}px`;
+    canvas.style.height = `${_.parseInt(_.trim(shareContent.style.height, 'px')) * scaleBy}px`;
+    const context = canvas.getContext('2d');
+    context.scale(scaleBy, scaleBy);
+
+    const opts = {
+      useCORS: true, // 【重要】开启跨域配置
+      dpi: window.devicePixelRatio,
+      canvas,
+      scale: scaleBy,
+      width: _.parseInt(_.trim(shareContent.style.width, 'px')),
+      height: _.parseInt(_.trim(shareContent.style.height, 'px')),
+    };
+
+    html2canvas(shareContent, opts)
+      .then((pcanvas) => {
+        this.downLoadImage(pcanvas, '用户故事地图.png');
+      });
+    message.config({
+      top: 110,
+      duration: 2,
+    });
+    message.success('导出图片成功', undefined, undefined, 'top');
+  }
+
+  /**
+   *
+   * @param {canvas} canvas
+   * @param {filename} name
+   */
+  downLoadImage(canvas, name) {
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL();
+    a.download = name;
+    a.click();
+  }
+
+  getHistoryCount = (id) => {
+    const { UserMapStore } = this.props;
+    const { issues, mode } = UserMapStore;
+    const count = {};
+    let issuesData = issues;
+    if (mode !== 'none') {
+      issuesData = _.filter(issues, issue => issue[`${mode}Id`] === id && issue.epicId !== 0);
+    } else {
+      issuesData = _.filter(issues, issue => issue.epicId !== 0);
+    }
+    count.todoCount = _.reduce(issuesData, (sum, issue) => {
+      if (issue.statusCode === 'todo') {
+        return sum + issue.storyPoints;
+      } else {
+        return sum;
+      }
+    }, 0);
+    count.doneCount = _.reduce(issuesData, (sum, issue) => {
+      if (issue.statusCode === 'done') {
+        return sum + issue.storyPoints;
+      } else {
+        return sum;
+      }
+    }, 0);
+    count.doingCount = _.reduce(issuesData, (sum, issue) => {
+      if (issue.statusCode === 'doing') {
+        return sum + issue.storyPoints;
+      } else {
+        return sum;
+      }
+    }, 0);
+    return count;
+  };
+
   renderHeader = () => {
+    const { UserMapStore } = this.props;
+    const {
+      mode,
+    } = UserMapStore;
     const swimlanMenu = (
-      <Menu onClick={this.changeMode} selectable>
+      <Menu onClick={this.changeMode} selectable defaultSelectedKeys={[mode]}>
         <Menu.Item key="none">无泳道</Menu.Item>
         <Menu.Item key="version">版本泳道</Menu.Item>
         <Menu.Item key="sprint">冲刺泳道</Menu.Item>
@@ -588,11 +1322,15 @@ handleClickIssue = (issueId, epicId) => {
       <Header title="用户故事地图">
         <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
           <Icon type="playlist_add" />
-
-
-          创建史诗
+          {'创建史诗'}
         </Button>
-        <Dropdown overlay={swimlanMenu} trigger={['click']}>
+        <Dropdown
+          overlay={swimlanMenu}
+          trigger={['click']}
+          overlayClassName="modeMenu"
+          placement="bottomCenter"
+          getPopupContainer={triggerNode => triggerNode}
+        >
           <Button>
             {mode === 'none' && '无泳道'}
             {mode === 'version' && '版本泳道'}
@@ -600,40 +1338,46 @@ handleClickIssue = (issueId, epicId) => {
             <Icon type="arrow_drop_down" />
           </Button>
         </Dropdown>
-        <div style={{ marginLeft: 8 }}>
-          <Popover
-            overlayClassName="moreMenuPopover"
-            arrowPointAtCenter={false}
-            placement="bottomLeft"
-            trigger="click"
-            content={(
-              <div>
-                <div className="menu-title">史诗过滤器</div>
-                <div style={{ height: 22, marginBottom: 20 }}>
-                  <Checkbox onChange={this.handleShowDoneEpic}>已完成的史诗</Checkbox>
-                </div>
-                <div style={{ height: 22, marginBottom: 32 }}>
-                  <Checkbox onChange={this.handleFilterEpic}>应用快速搜索到史诗</Checkbox>
-                </div>
-                <div className="menu-title">导出</div>
-                <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div>
-                <div style={{ height: 22, marginLeft: 26 }}>导出为图片</div>
+        <Popover
+          getPopupContainer={triggerNode => triggerNode}
+          overlayClassName="moreMenuPopover"
+          arrowPointAtCenter={false}
+          placement="bottomLeft"
+          trigger={['click']}
+          visible={this.state.popOverVisible}
+          onVisibleChange={(visible) => {
+            this.setState({
+              popOverVisible: visible,
+            });
+          }}
+          content={(
+            <div>
+              <div className="menu-title">史诗过滤器</div>
+              <div style={{ height: 22, marginBottom: 20 }}>
+                <Checkbox onChange={this.handleShowDoneEpic}>已完成的史诗</Checkbox>
               </div>
-            )}
-          >
-            <div style={{
-              cursor: 'pointer', color: 'rgb(63, 81, 181)', fontWeight: 500, marginTop: 6,
-            }}
-            >
-
-
-              更多
-              {' '}
-              <Icon type="arrow_drop_down" style={{ marginTop: -3 }} />
+              <div style={{ height: 22, marginBottom: 20 }}>
+                <Checkbox onChange={this.handleFilterEpic}>应用快速搜索到史诗</Checkbox>
+              </div>
+              <div className="menu-title">导出</div>
+              {/* <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div> */}
+              <div onClick={this.handleSaveAsImage} role="none" style={{ height: 22, marginLeft: 26, cursor: 'pointer' }}>导出为图片</div>
             </div>
-          </Popover>
-        </div>
-
+          )}
+        >
+          <Button>
+            {'更多'}
+            <Icon type="arrow_drop_down" />
+          </Button>
+        </Popover>
+        <Button className="leftBtn2" funcType="flat" onClick={this.initData.bind(this, true)}>
+          <Icon type="refresh icon" />
+          <span>刷新</span>
+        </Button>
+        <Button className="leftBtn2" funcType="flat" onClick={this.handleFullScreen.bind(this)}>
+          <Icon type={`${this.state.isFullScreen ? 'exit_full_screen' : 'zoom_out_map'} icon`} />
+          <span>{this.state.isFullScreen ? '退出全屏' : '全屏'}</span>
+        </Button>
         <Button
           style={{
             color: 'white', fontSize: 12, position: 'absolute', right: 24,
@@ -643,124 +1387,470 @@ handleClickIssue = (issueId, epicId) => {
           onClick={this.showBackLog}
         >
           <Icon type="layers" />
-
-
-          需求池
+          {'需求池'}
         </Button>
       </Header>);
   }
-  
+
+  renderBody = () => {
+    const { UserMapStore } = this.props;
+    const dom = [];
+    const epicData = UserMapStore.getEpics;
+    const {
+      issues, sprints, versions, currentNewObj, left, top,
+    } = UserMapStore;
+    const { epicId, versionId, sprintId } = currentNewObj;
+    const { mode } = UserMapStore;
+    const vosData = UserMapStore[`${mode}s`] || [];
+    const id = `${mode}Id`;
+    if (epicData.length) {
+      vosData.map((vos, vosIndex) => {
+        const name = mode === 'sprint' ? `${mode}Name` : 'name';
+        dom.push(<React.Fragment key={vos[id]}>
+          <div
+            className={`fixHead-line-title title-transform ${vosIndex === 0 ? 'firstLine-titles' : ''}`}
+            // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
+            // style={{ marginLeft: left }}
+            // data-title={vos[name]}
+            // data-id={vos[id]}
+          >
+            <div>{vos[name]}</div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <p className="point-span" style={{ background: '#4D90FE' }}>
+                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
+                  if (issue.statusCode === 'todo') {
+                    return sum + issue.storyPoints;
+                  } else {
+                    return sum;
+                  }
+                }, 0)}
+              </p>
+              <p className="point-span" style={{ background: '#FFB100' }}>
+                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
+                  if (issue.statusCode === 'doing') {
+                    return sum + issue.storyPoints;
+                  } else {
+                    return sum;
+                  }
+                }, 0)}
+              </p>
+              <p className="point-span" style={{ background: '#00BFA5' }}>
+                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
+                  if (issue.statusCode === 'done') {
+                    return sum + issue.storyPoints;
+                  } else {
+                    return sum;
+                  }
+                }, 0)}
+              </p>
+              <Button shape="circle" className="expand-btn" onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
+                <Icon type={`${this.state.expandColumns.includes(vos[id]) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
+              </Button>
+            </div>
+          </div>
+          <div
+            className="fixHead-line-content"
+            style={{ display: 'flex', height: this.state.expandColumns.includes(vos[id]) ? 1 : '', overflow: this.state.expandColumns.includes(vos[id]) ? 'hidden' : 'visible' }}
+            data-title={vos[name]}
+            data-id={vos[id]}
+          >
+            {epicData.map((epic, index) => (
+              <Droppable droppableId={`epic-${epic.issueId}_${vos[id]}`} key={epic.issueId}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    className="swimlane-column fixHead-block"
+                    style={{
+                      background: snapshot.isDraggingOver ? '#f0f0f0' : '',
+                      padding: 'grid',
+                      // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                    }}
+                  >
+                    <React.Fragment>
+                      {_.filter(issues, issue => issue.epicId === epic.issueId && issue[id] === vos[id]).map((item, indexs) => (
+                        <Draggable draggableId={`${mode}-${item.issueId}`} index={indexs} key={item.issueId}>
+                          {(provided1, snapshot1) => (
+                            <div
+                              ref={provided1.innerRef}
+                              {...provided1.draggableProps}
+                              {...provided1.dragHandleProps}
+                              style={{
+                                cursor: 'move',
+                                ...provided1.draggableProps.style,
+                              }}
+                              role="none"
+                            >
+                              {item.issueId}
+                              <IssueCard
+                                handleClickIssue={this.handleClickIssue}
+                                issue={item}
+                                borderTop={indexs === 0}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {
+                        epicId === epic.issueId && currentNewObj[id] === vos[id] ? (
+                          <CreateIssue
+                            data={{ epicId: epic.issueId, [id]: vos[id] }}
+                            onOk={() => {
+                              UserMapStore.initData(false);
+                              this.setState({ showChild: null });
+                            }}
+                            onCancel={() => {
+                              this.handleAddIssue(0, 0);
+                            }}
+                          />
+                        ) : null
+                      }
+                      <div
+                        role="none"
+                        onClick={this.handleClickIssue.bind(this, 0)}
+                        className="maskIssue"
+                        onMouseLeave={() => { this.setState({ showChild: null }); }}
+                        onMouseEnter={() => {
+                          if (snapshot.isDraggingOver) return;
+                          this.setState({ showChild: `${epic.issueId}-${vos[id]}` });
+                        }}
+                      >
+                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
+
+
+                          {'Add'}
+                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, vos[id])}>new</a>
+                          {' '}
+
+
+                          {'or '}
+                          <a role="none" onClick={this.showBackLog}>existing</a>
+                        </div>
+                      </div>
+                    </React.Fragment>
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+
+            ))}
+          </div>
+        </React.Fragment>);
+      });
+      dom.push(
+        <React.Fragment key="no-sprint">
+          <div
+            className={`fixHead-line-title column-title title-transform ${vosData.length ? '' : 'firstLine-titles'}`}
+            title={mode === 'none' ? 'issue' : '未计划部分'}
+            data-id={-1}
+            // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
+          >
+            <div>
+              {mode === 'none' ? 'issue' : '未计划部分' }
+              {mode === 'none' ? null
+                : (
+                  <React.Fragment>
+                    {mode === 'version' ? (
+                        <Permission service={['agile-service.product-version.createVersion']}>
+                          <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                            <Icon type="playlist_add" />
+
+
+                            {'创建'}
+                            {mode === 'sprint' ? '冲刺' : '版本'}
+                          </Button>
+                        </Permission>
+                      )
+                      : (
+                        <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                          <Icon type="playlist_add" />
+
+
+                          {'创建'}
+                          {mode === 'sprint' ? '冲刺' : '版本'}
+                        </Button>
+                      )}
+                  </React.Fragment>
+
+                ) }
+
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <p className="point-span" style={{ background: '#4D90FE' }}>
+                {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                  if (issue.statusCode === 'todo') {
+                    return sum + issue.storyPoints;
+                  } else {
+                    return sum;
+                  }
+                }, 0)}
+              </p>
+              <p className="point-span" style={{ background: '#FFB100' }}>
+                {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                  if (issue.statusCode === 'doing') {
+                    return sum + issue.storyPoints;
+                  } else {
+                    return sum;
+                  }
+                }, 0)}
+              </p>
+            </div>
+          </div>
+          <div
+            className="fixHead-line-content"
+            style={{
+              display: 'flex',
+              height: this.state.expandColumns.includes(`-1-${mode}`) ? 1 : '',
+              overflow: this.state.expandColumns.includes(`-1-${mode}`) ? 'hidden' : 'visible',
+            }}
+            data-title={mode === 'none' ? 'issue' : '未计划部分'}
+            data-id={-1}
+          >
+            {epicData.map((epic, index) => (
+              <Droppable droppableId={`epic-${epic.issueId}_0`} key={epic.issueId}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    className="fixHead-block swimlane-column"
+                    style={{
+                      background: snapshot.isDraggingOver ? '#f0f0f0' : '',
+                      padding: 'grid',
+                      // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                    }}
+                  >
+                    <React.Fragment>
+                      {_.filter(issues, issue => issue.epicId === epic.issueId && (mode !== 'none' && (issue[id] == null || issue[id] === 0) || mode === 'none')).map((item, indexs) => (
+                        <Draggable draggableId={`none-${item.issueId}`} index={indexs} key={item.issueId}>
+                          {(provided1, snapshot1) => (
+                            <div
+                              ref={provided1.innerRef}
+                              {...provided1.draggableProps}
+                              {...provided1.dragHandleProps}
+                              style={{
+                                cursor: 'move',
+                                ...provided1.draggableProps.style,
+                              }}
+                              role="none"
+                            >
+                              {item.issueId}
+                              <IssueCard
+                                handleClickIssue={this.handleClickIssue}
+                                key={item.issueId}
+                                issue={item}
+                                borderTop={indexs === 0}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {
+                        epicId === epic.issueId && currentNewObj[id] === 0 ? (
+                          <CreateIssue
+                            data={{ epicId: epic.issueId, [`${mode}Id`]: 0 }}
+                            onOk={() => {
+                              UserMapStore.initData(false);
+                              this.setState({ showChild: null });
+                            }}
+                            onCancel={() => {
+                              this.handleAddIssue(0, 0);
+                            }}
+                          />
+                        ) : null
+                      }
+                      <div
+                        role="none"
+                        className="maskIssue"
+                        onClick={this.handleClickIssue.bind(this, 0)}
+                        onMouseLeave={() => { this.setState({ showChild: null }); }}
+                        onMouseEnter={() => {
+                          if (snapshot.isDraggingOver) return;
+                          this.setState({ showChild: epic.issueId });
+                        }}
+                      >
+                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
+
+
+                          {'Add'}
+                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>new</a>
+                          {' '}
+
+
+                          {'or '}
+                          <a role="none" onClick={this.showBackLog}>existing</a>
+                        </div>
+                      </div>
+                    </React.Fragment>
+                    {provided.placeholder}
+                  </div>
+
+                )}
+              </Droppable>
+            ))}
+          </div>
+        </React.Fragment>,
+      );
+    }
+    return dom;
+  }
+
   render() {
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
-    _.sortBy(epicData, 'rink');
-    const { filters, mode, createEpic, currentFilters, showBackLog } = UserMapStore;
+    const {
+      filters, mode, createEpic, currentFilters, selectIssueIds, showBackLog, left, isLoading,
+    } = UserMapStore;
+    const firstTitle = '';
+    const count = this.getHistoryCount(UserMapStore.getVosId);
+    const vosId = UserMapStore.getVosId === 0 ? `-1-${mode}` : UserMapStore.getVosId;
+    let showDone = true;
+    if (UserMapStore.getVosId === 0) {
+      showDone = false;
+    }
+
     return (
       <Page
         className="c7n-userMap"
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
       >
         {this.renderHeader()}
-        <div className="c7n-userMap-content">
-          <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
-            <div className="userMap-right" style={{ width: `${showBackLog ? 'calc(100% - 372px)' : 'calc(100% - 24px)'}` }}>
-              <Spin spinning={false}>
-                <div className="toolbar">
-                  <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
-                    <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
-                    <p
-                      role="none"
-                      style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                      onClick={this.addFilter.bind(this,'mine')}
-                    >仅我的问题</p>
-                    <p
-                      role="none"
-                      style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                      onClick={this.addFilter.bind(this,'userStory')}
-                    >仅用户故事</p>
-                    {filters.map(filter => <p role="none" style={{ background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`, marginBottom: 3}} onClick={this.addFilter.bind(this,filter.filterId)}>{filter.name}</p>) }
-                  </div>
-                {epicData.length ? (<React.Fragment>
-                    <div
-                      style={{
-                        display: this.state.more ? 'block' : 'none',
-                        color: 'rgb(63, 81, 181)',
-                        cursor: 'pointer',
-                        whiteSpace: 'nowrap',
-                      }}
-                      role="none"
-                      onClick={() => {
-                        this.setState({
-                          expand: !this.state.expand,
-                        });
-                      }}
-                    >
-                      {this.state.expand ? '...收起' : '...展开'}
-                    </div>
-                  </div>
-                  <div className="epic">
-                    <Droppable droppableId="epic" direction="horizontal">
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          className="epic"
-                          style={{
-                            background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                            padding: 'grid',
-                            // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                          }}
+        { epicData.length ? (
+          <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
+            {isLoading ? <Spin spinning={isLoading} style={{ marginLeft: '40%', marginTop: '30%' }} size="large" />
+              : (
+                <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
+                  <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
+                    <div className="toolbar" style={{ minHeight: 52 }}>
+                      <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
+                        <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
+                        <p
+                          role="none"
+                          style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                          onClick={this.addFilter.bind(this, 'mine')}
                         >
-                          {epicData.map((epic, index) => (
-                            <div>
-                              {/*{epic.issueId}*/}
-                              <EpicCard
-                                index={index}
-                                key={epic.issueId}
-                                epic={epic}
-                              />
-                            </div>
-                          ))}
-                          {provided.placeholder}
+                          {'仅我的问题'}
+                        </p>
+                        <p
+                          role="none"
+                          style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                          onClick={this.addFilter.bind(this, 'userStory')}
+                        >
+                          {'仅用户故事'}
+
+                        </p>
+                        {filters.map(filter => (
+                          <p
+                            key={filter.filterId}
+                            role="none"
+                            style={{
+                              background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`,
+                              color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`,
+                              marginBottom: 3,
+                            }}
+                            onClick={this.addFilter.bind(this, filter.filterId)}
+                          >
+                            {filter.name}
+
+                          </p>)) }
+                      </div>
+                      <div
+                        style={{
+                          display: this.state.more ? 'block' : 'none',
+                          color: 'rgb(63, 81, 181)',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                        }}
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            expand: !this.state.expand,
+                          }, () => {
+                            document.getElementsByClassName('fixHead')[0].style.height = `calc(100% - ${document.getElementsByClassName('fixHead')[0].offsetTop}px)`;
+                          });
+                        }}
+                      >
+                        {this.state.expand ? '...收起' : '...展开'}
+                      </div>
+                    </div>
+                    { showBackLog ? (
+                      <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
+                        <Backlog handleClickIssue={this.handleClickIssue} />
+                      </div>
+                    ) : null }
+                    <div className="fixHead" style={{ height: `calc(100% - ${52}px)` }}>
+                      <div className="fixHead-head" id="fixHead-head">
+                        <div className="fixHead-line">
+                          <Droppable droppableId="epic" direction="horizontal">
+                            {(provided, snapshot) => (
+                              <div
+                                className="fixHead-line-epic"
+                                ref={provided.innerRef}
+                                style={{
+                                  background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
+                                  padding: 'grid',
+                                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                                }}
+                              >
+                                {epicData.map((epic, index) => (
+                                  <div className="fixHead-block" key={epic.issueId}>
+                                    <EpicCard
+                                      index={index}
+                                      key={epic.issueId}
+                                      epic={epic}
+                                    />
+                                  </div>
+                                ))}
+                                {provided.placeholder}
+                              </div>
+                            )}
+                          </Droppable>
                         </div>
-                      )}
-                    </Droppable>
-                  </div>
-                  <div className="swimlane" style={{ height: `calc(100vh - ${document.getElementById('autoRouter').offsetTop + 48 + 48 + 10 + 98 + 58}px)`}}>
-                    {this.renderColumn()}
-                  </div>
-                </React.Fragment>
-                ) : (
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
-                    <img src={epicPic} alt="" width="200" />
-                    <div style={{ marginLeft: 50, width: 390 }}>
-                      <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
-                      <p style={{ fontSize: 20, marginTop: 10 }}>
-                        用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击 <a role={'none'} onClick={this.handleCreateEpic}>创建史诗</a> 进入用户故事地图。
-                      </p>
+                      </div>
+                      <div id="fixHead-body" className="fixHead-body" style={{ flex: 1, position: 'relative' }}>
+                        {this.renderBody()}
+                      </div>
                     </div>
                   </div>
-                ) }
-              </Spin>
+                </DragDropContext>
+              )}
+            <CreateEpic
+              getContainer={() => document.querySelector('.c7n-userMap')}
+              visible={createEpic}
+              onOk={() => {
+                UserMapStore.setCreateEpic(false);
+                UserMapStore.loadEpic();
+              }}
+              onCancel={() => UserMapStore.setCreateEpic(false)}
+            />
+            {
+              UserMapStore.createVOS ? (
+                <CreateVOS
+                  getContainer={() => document.querySelector('.c7n-userMap')}
+                  visible={UserMapStore.createVOS}
+                  // onOk={() => {UserMapStore.setCreateVOS(false)}}
+                  onOk={this.handleCreateOk}
+                  onCancel={() => { UserMapStore.setCreateVOS(false); }}
+                  type={UserMapStore.getCreateVOSType}
+                />
+              ) : null
+            }
+          </Content>
+        ) : (
+          <div style={{
+            display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
+          }}
+          >
+            <img src={epicPic} alt="" width="200" />
+            <div style={{ marginLeft: 50, width: 390 }}>
+              <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+              <p style={{ fontSize: 20, marginTop: 10 }}>
+                {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
+                <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
+                {'进入用户故事地图。'}
+              </p>
             </div>
-            <div className="usermap-left" style={{ display: showBackLog ? 'block' : 'none' }}>
-              <Backlog handleClickIssue={this.handleClickIssue} />
-            </div>
-          </DragDropContext>
-        </div>
-        <CreateEpic
-          visible={createEpic}
-          onOk={() => UserMapStore.setCreateEpic(false)}
-          onCancel={() => UserMapStore.setCreateEpic(false)}
-        />
-        <CreateVOS
-          visible={UserMapStore.createVOS}
-          // onOk={() => {UserMapStore.setCreateVOS(false)}}
-          onOk={this.handleCreateOk}
-          onCancel={() => { UserMapStore.setCreateVOS(false); }}
-          type={UserMapStore.getCreateVOSType}
-        />
+          </div>
+        )}
       </Page>
     );
   }
 }
-export default Home2;
+export default Home3;
