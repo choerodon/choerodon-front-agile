@@ -525,7 +525,11 @@ class EpicBurndown extends Component {
                             onClick={() => {
                               const { history } = this.props;
                               const urlParams = AppState.currentMenuType;
-                            // history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicBurndown`);
+                              if (item.statusCode === 'started') {
+                                history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+                              } else {
+                                history.push(`/agile/reporthost/sprintReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&sprintId=${item.sprintId}`);
+                              }
                             }
                           }
                           >
@@ -645,7 +649,7 @@ class EpicBurndown extends Component {
             role="none"
             onClick={this.handleLinkToIssue.bind(this, 'epic', ES.currentEpicId != undefined ? ES.epics.filter(item => item.issueId === ES.currentEpicId)[0] : {})}
           >
-            {`${currentEpic.epicName}`}
+            {`${currentEpic.issueNum}`}
           </span>
           <span>{` ${currentEpic.summary}`}</span>
         </p>
