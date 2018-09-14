@@ -99,7 +99,7 @@ class CreateIssue extends Component {
       </Menu>
     );
     return (
-      <div className="c7n-userMap-createIssue" style={{ ...style }} disableOnClickOutside>
+      <div className="c7n-userMap-createIssue" style={{ ...style }}>
         <Spin spinning={loading}>
           <div className="c7n-content">
             <TextArea

@@ -591,61 +591,116 @@ class Home3 extends Component {
         }
       } else if (true) {
         // 该块中有未被选中的卡
-        if (!desEpicAndModeIssues.every(v => !issueIds.includes(v.issueId))) {
-          // 该块中存在有块被选中
-          if (_.map(desEpicAndModeIssues, 'issueId').includes(dragIssueId)) {
-            if (desIndex === desEpicAndModeIssues.length - 1) {
-              before = false;
-              outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
-            } else if (true) {
-              if (sourceIndex <= desIndex) {
-                const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-                const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-                if (afterDesIndex) {
-                  before = true;
-                  outsetIssueId = afterDesIndex.issueId;
-                } else if (beforeDesIndex) {
-                  before = false;
-                  outsetIssueId = beforeDesIndex.issueId;
-                } else {
-                  before = true;
-                  outsetIssueId = 0;
-                }
-              } else {
-                const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-                const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-                if (afterDesIndex) {
-                  before = true;
-                  outsetIssueId = afterDesIndex.issueId;
-                } else if (beforeDesIndex) {
-                  before = false;
-                  outsetIssueId = beforeDesIndex.issueId;
-                } else {
-                  before = true;
-                  outsetIssueId = 0;
-                }
-              }
-              
-            }
+        if (_.map(desEpicAndModeIssues, 'issueId').includes(dragIssueId)) {
+          // 移动卡属于该块
+          if (desIndex === desEpicAndModeIssues.length - 1) {
+            before = false;
+            outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
           } else if (true) {
-            if (desIndex === desEpicAndModeIssues.length) {
-              before = false;
-              outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            if (sourceIndex <= desIndex) {
+              const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+              const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+              if (afterDesIndex) {
+                before = true;
+                outsetIssueId = afterDesIndex.issueId;
+              } else if (beforeDesIndex) {
+                before = false;
+                outsetIssueId = beforeDesIndex.issueId;
+              } else {
+                before = true;
+                outsetIssueId = 0;
+              }
             } else {
-              before = true;
-              outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+              const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+              const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+              if (afterDesIndex) {
+                before = true;
+                outsetIssueId = afterDesIndex.issueId;
+              } else if (beforeDesIndex) {
+                before = false;
+                outsetIssueId = beforeDesIndex.issueId;
+              } else {
+                before = true;
+                outsetIssueId = 0;
+              }
             }
           }
         } else if (true) {
-          // 该块中所有块都未被选中
+          // 移动卡不属于该块
           if (desIndex === desEpicAndModeIssues.length) {
             before = false;
-            outsetIssueId = desEpicAndModeIssues[desEpicAndModeIssues.length - 1].issueId;
+            outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
           } else {
-            before = true;
-            outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+            const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+            const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+            if (afterDesIndex) {
+              before = true;
+              outsetIssueId = afterDesIndex.issueId;
+            } else if (beforeDesIndex) {
+              before = false;
+              outsetIssueId = beforeDesIndex.issueId;
+            } else {
+              before = true;
+              outsetIssueId = 0;
+            }
           }
         }
+
+        // if (!desEpicAndModeIssues.every(v => !issueIds.includes(v.issueId))) {
+        //   // 该块中存在有块被选中
+        //   if (_.map(desEpicAndModeIssues, 'issueId').includes(dragIssueId)) {
+        //     if (desIndex === desEpicAndModeIssues.length - 1) {
+        //       before = false;
+        //       outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+        //     } else if (true) {
+        //       if (sourceIndex <= desIndex) {
+        //         const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+        //         const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+        //         if (afterDesIndex) {
+        //           before = true;
+        //           outsetIssueId = afterDesIndex.issueId;
+        //         } else if (beforeDesIndex) {
+        //           before = false;
+        //           outsetIssueId = beforeDesIndex.issueId;
+        //         } else {
+        //           before = true;
+        //           outsetIssueId = 0;
+        //         }
+        //       } else {
+        //         const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+        //         const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+        //         if (afterDesIndex) {
+        //           before = true;
+        //           outsetIssueId = afterDesIndex.issueId;
+        //         } else if (beforeDesIndex) {
+        //           before = false;
+        //           outsetIssueId = beforeDesIndex.issueId;
+        //         } else {
+        //           before = true;
+        //           outsetIssueId = 0;
+        //         }
+        //       }
+              
+        //     }
+        //   } else if (true) {
+        //     if (desIndex === desEpicAndModeIssues.length) {
+        //       before = false;
+        //       outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+        //     } else {
+        //       before = true;
+        //       outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+        //     }
+        //   }
+        // } else if (true) {
+        //   // 该块中所有块都未被选中
+        //   if (desIndex === desEpicAndModeIssues.length) {
+        //     before = false;
+        //     outsetIssueId = desEpicAndModeIssues[desEpicAndModeIssues.length - 1].issueId;
+        //   } else {
+        //     before = true;
+        //     outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
+        //   }
+        // }
       }
     } else if (true) {
       // 移到无卡的块中
@@ -692,29 +747,6 @@ class Home3 extends Component {
     }
     const tarBacklogData = backlogIssues;
     this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, desEpicId, desModeId);
-    // _.map(issueIds, (id) => {
-    //   const currentIssue = _.find(issueData, item => item.issueId === id);
-    //   const vosId = desModeId === 0 ? null : desModeId;
-    //   currentIssue.epicId = desEpicId;
-    //   if (mode !== 'none') {
-    //     currentIssue[key] = vosId;
-    //   }
-    //   // postData = {
-    //   //   before, epicId: desEpicId, outsetIssueId, rankIndex, issueIds,
-    //   // };
-    //   if (res.source.droppableId.includes('backlog')) {
-    //     tarBacklogData = _.find(backlogData, item => item.issueId === id);
-    //     const index = backlogData.indexOf(tarBacklogData);
-    //     backlogData.splice(index, 1);
-    //   }
-    //   if (mode !== 'none') {
-    //     // postData[key] = desModeId;
-    //   }
-    // });
-    // if (res.source.droppableId.includes('backlog')) {
-    //   UserMapStore.setBacklogIssues(backlogData);
-    // }
-    // UserMapStore.setIssues(issueData);
     UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
@@ -778,60 +810,114 @@ class Home3 extends Component {
         }
       } else if (true) {
         // 该块中有未被选中的卡
-        if (!desModeIssues.every(v => !issueIds.includes(v.issueId))) {
-          // 该块中存在有卡被选中，也有卡未被选中
-          if (_.map(desModeIssues, 'issueId').includes(dragIssueId)) {
-            if (desIndex === desModeIssues.length - 1) {
-              before = false;
-              outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
-            } else if (true) {
-              if (sourceIndex <= desIndex) {
-                const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-                const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-                if (afterDesIndex) {
-                  before = true;
-                  outsetIssueId = afterDesIndex.issueId;
-                } else if (beforeDesIndex) {
-                  before = false;
-                  outsetIssueId = beforeDesIndex.issueId;
-                } else {
-                  before = true;
-                  outsetIssueId = 0;
-                }
-              } else {
-                const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-                const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-                if (afterDesIndex) {
-                  before = true;
-                  outsetIssueId = afterDesIndex.issueId;
-                } else if (beforeDesIndex) {
-                  before = false;
-                  outsetIssueId = beforeDesIndex.issueId;
-                } else {
-                  before = true;
-                  outsetIssueId = 0;
-                }
-              }
-            }
+        if (_.map(desModeIssues, 'issueId').includes(dragIssueId)) {
+          if (desIndex === desModeIssues.length - 1) {
+            before = false;
+            outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
           } else if (true) {
-            if (desIndex === desModeIssues.length) {
-              before = false;
-              outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            if (sourceIndex <= desIndex) {
+              const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+              const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+              if (afterDesIndex) {
+                before = true;
+                outsetIssueId = afterDesIndex.issueId;
+              } else if (beforeDesIndex) {
+                before = false;
+                outsetIssueId = beforeDesIndex.issueId;
+              } else {
+                before = true;
+                outsetIssueId = 0;
+              }
             } else {
-              before = true;
-              outsetIssueId = desModeIssues[desIndex].issueId;
+              const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+              const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+              if (afterDesIndex) {
+                before = true;
+                outsetIssueId = afterDesIndex.issueId;
+              } else if (beforeDesIndex) {
+                before = false;
+                outsetIssueId = beforeDesIndex.issueId;
+              } else {
+                before = true;
+                outsetIssueId = 0;
+              }
             }
           }
         } else if (true) {
-          // 该块中所有块都未被选中
           if (desIndex === desModeIssues.length) {
             before = false;
-            outsetIssueId = desModeIssues[desModeIssues.length - 1].issueId;
-          } else {
-            before = true;
-            outsetIssueId = desModeIssues[desIndex].issueId;
+            outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+          } else if (true) {
+            const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+            const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+            if (afterDesIndex) {
+              before = true;
+              outsetIssueId = afterDesIndex.issueId;
+            } else if (beforeDesIndex) {
+              before = false;
+              outsetIssueId = beforeDesIndex.issueId;
+            } else {
+              before = true;
+              outsetIssueId = 0;
+            }
           }
         }
+        // -----------------
+        // if (!desModeIssues.every(v => !issueIds.includes(v.issueId))) {
+        //   // 该块中存在有卡被选中，也有卡未被选中
+        //   if (_.map(desModeIssues, 'issueId').includes(dragIssueId)) {
+        //     if (desIndex === desModeIssues.length - 1) {
+        //       before = false;
+        //       outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+        //     } else if (true) {
+        //       if (sourceIndex <= desIndex) {
+        //         const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+        //         const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+        //         if (afterDesIndex) {
+        //           before = true;
+        //           outsetIssueId = afterDesIndex.issueId;
+        //         } else if (beforeDesIndex) {
+        //           before = false;
+        //           outsetIssueId = beforeDesIndex.issueId;
+        //         } else {
+        //           before = true;
+        //           outsetIssueId = 0;
+        //         }
+        //       } else {
+        //         const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+        //         const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+        //         if (afterDesIndex) {
+        //           before = true;
+        //           outsetIssueId = afterDesIndex.issueId;
+        //         } else if (beforeDesIndex) {
+        //           before = false;
+        //           outsetIssueId = beforeDesIndex.issueId;
+        //         } else {
+        //           before = true;
+        //           outsetIssueId = 0;
+        //         }
+        //       }
+        //     }
+        //   } else if (true) {
+        //     if (desIndex === desModeIssues.length) {
+        //       before = false;
+        //       outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+        //     } else {
+        //       before = true;
+        //       outsetIssueId = desModeIssues[desIndex].issueId;
+        //     }
+        //   }
+        // } else if (true) {
+        //   // 该块中所有块都未被选中
+        //   if (desIndex === desModeIssues.length) {
+        //     before = false;
+        //     outsetIssueId = desModeIssues[desModeIssues.length - 1].issueId;
+        //   } else {
+        //     before = true;
+        //     outsetIssueId = desModeIssues[desIndex].issueId;
+        //   }
+        // }
+        // -----------------
       }
     } else if (true) {
       // 移到无卡的块中
@@ -1402,7 +1488,7 @@ class Home3 extends Component {
     const dom = [];
     const epicData = UserMapStore.getEpics;
     const {
-      issues, sprints, versions, currentNewObj, left, top, 
+      issues, sprints, versions, currentNewObj, left, top, selectIssueIds, currentDraggableId
     } = UserMapStore;
     const { epicId, versionId, sprintId } = currentNewObj;
     const { mode } = UserMapStore;
@@ -1489,6 +1575,8 @@ class Home3 extends Component {
                               <IssueCard
                                 handleClickIssue={this.handleClickIssue}
                                 issue={item}
+                                selected={selectIssueIds.includes(item.issueId)}
+                                dragged={currentDraggableId === item.issueId}
                                 borderTop={indexs === 0}
                               />
                             </div>
@@ -1638,7 +1726,8 @@ class Home3 extends Component {
                               {item.issueId}
                               <IssueCard
                                 handleClickIssue={this.handleClickIssue}
-                                key={item.issueId}
+                                selected={selectIssueIds.includes(item.issueId)}
+                                dragged={currentDraggableId === item.issueId}
                                 issue={item}
                                 borderTop={indexs === 0}
                               />
@@ -1808,9 +1897,12 @@ class Home3 extends Component {
                           </Droppable>
                         </div>
                         <div
-                          className="fixHead-line fixHead-line-2 title-transform"
+                          className="fixHead-line fixHead-line-2"
                           style={{
                             height: 42,
+                            position: 'absolute',
+                            // width: 'calc(100% - 32px)',
+                            width: showBackLog ? 'calc(100% - 382px)' : 'calc(100% - 32px)',
                             // transform: `translateX(${`${left}px`})`,
                           }}
                         >

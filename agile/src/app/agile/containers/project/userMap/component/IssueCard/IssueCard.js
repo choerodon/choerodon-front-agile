@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Input, Icon, Menu } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
+import { Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import './IssueCard.scss';
 import US from '../../../../../stores/project/userMap/UserMapStore';
@@ -30,15 +31,17 @@ class IssueCard extends Component {
     this.setIssueInState();
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   if (nextProps.issue.issueId === this.props.issue.issueId
-  //     && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber
-  //     && nextState.summary === this.state.summary
-  //   ) {
-  //     return false;
-  //   }
-  //   return true;
-  // }
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.issue.issueId === this.props.issue.issueId
+      && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber
+      && nextProps.selected === this.props.selected
+      && nextProps.dragged === this.props.dragged
+      && nextState.summary === this.state.summary
+    ) {
+      return false;
+    }
+    return true;
+  }
 
   setIssueInState() {
     const { issue } = this.props;
@@ -97,92 +100,118 @@ class IssueCard extends Component {
   }
 
   render() {
-    const { issue, borderTop, history } = this.props;
-    const { currentDraggableId } = US;
+    window.console.log('issue card render');
+    const { issue, borderTop, history, selected, dragged, draggableId, indexs } = this.props;
     const selectIssueIds = US.getSelectIssueIds;
     return (
-      <div
-        role="none"
-        style={{
-          background: selectIssueIds.includes(issue.issueId) ? 'rgb(235, 242, 249)' : '',
-          borderTop: borderTop ? '1px solid rgba(0, 0, 0, 0.2)' : 'unset',
-        }}
-        className="c7n-userMap-issueCard"
-        onClick={this.onIssueClick.bind(this, issue.issueId, issue.epicId)}
-      >
-        <div style={{ display: selectIssueIds.length > 1 && currentDraggableId === issue.issueId ? 'block' : 'none', width: 20, height: 20, color: 'white', background: '#F44336', borderRadius: '50%', textAlign: 'center', float: 'right' }}>
-          {selectIssueIds.length > 1 ? selectIssueIds.length : null}
-        </div>
-        <div
-          className="c7n-mask"
-          style={{
-            display: this.state.issue.statusCode === 'done' && !this.state.isFocus ? 'block' : 'none',
-          }}
-        />
-        <div className="c7n-header">
-          <div className="c7n-headerLeft">
-            <UserHead
-              user={{
-                id: this.state.issue.assigneeId,
-                loginName: '',
-                realName: this.state.issue.assigneeName,
-                avatar: this.state.issue.imageUrl,
-              }}
-              hiddenText
-              size={30}
-            />
-            <span
-              className="c7n-issueNum"
-              style={{ 
-                textDecoration: this.state.issue.statusCode === 'done' ? 'line-through' : 'unset',
-              }}
-              role="none"
-              onClick={() => {
-                const urlParams = AppState.currentMenuType;
-                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${this.state.issue.issueNum}&paramIssueId=${this.state.issue.issueId}&paramUrl=usermap`);
-              }}
-            >
-              {this.state.issue.issueNum}
-            </span>
-            <PriorityTag
-              priority={this.state.issue.priorityCode}
-            />
-          </div>
-          <Icon
-            className="c7n-delete"
-            type="delete"
-            onClick={this.handleClickDelete.bind(this)}
-          />
-        </div>
-        
-        <div className="c7n-content">
-          <TextArea
-            className="c7n-textArea"
-            autosize={{ minRows: 1, maxRows: 10 }}
-            value={this.state.summary}
-            onChange={this.handleIssueNameChange.bind(this)}
-            onPressEnter={this.handlePressEnter}
-            onFocus={(e) => {
-              e.target.select();
-              this.setState({ isFocus: true });
+      <Draggable draggableId={draggableId} index={indexs} key={draggableId}>
+        {(provided1, snapshot1) => (
+          <div
+            ref={provided1.innerRef}
+            {...provided1.draggableProps}
+            {...provided1.dragHandleProps}
+            style={{
+              cursor: 'move',
+              ...provided1.draggableProps.style,
             }}
-            onBlur={this.updateIssueName}
-            spellCheck="false"
-          />
-        </div>
-        <div className="c7n-footer">
-          <TypeTag
-            typeCode={this.state.issue.typeCode}
-          />
-          <span className="c7n-issueCard-storyPoints">
-            {this.state.issue.storyPoints}
-          </span>
-          <StatusTag
-            name={this.state.issue.statusName}
-            color={this.state.issue.statusColor}
-          />
-        </div>
-      </div>
+            role="none"
+          >
+            <div
+              role="none"
+              style={{
+                background: selected ? 'rgb(235, 242, 249)' : '',
+                borderTop: borderTop ? '1px solid rgba(0, 0, 0, 0.2)' : 'unset',
+              }}
+              className="c7n-userMap-issueCard"
+              onClick={this.onIssueClick.bind(this, issue.issueId, issue.epicId)}
+            >
+              <div
+                style={{
+                  display: selectIssueIds.length > 1 && dragged ? 'block' : 'none',
+                  width: 20,
+                  height: 20,
+                  color: 'white',
+                  background: '#F44336',
+                  borderRadius: '50%',
+                  textAlign: 'center',
+                  float: 'right',
+                }}
+              >
+                {selectIssueIds.length}
+              </div>
+              <div
+                className="c7n-mask"
+                style={{
+                  display: this.state.issue.statusCode === 'done' && !this.state.isFocus ? 'block' : 'none',
+                }}
+              />
+              <div className="c7n-header">
+                <div className="c7n-headerLeft">
+                  <UserHead
+                    user={{
+                      id: this.state.issue.assigneeId,
+                      loginName: '',
+                      realName: this.state.issue.assigneeName,
+                      avatar: this.state.issue.imageUrl,
+                    }}
+                    hiddenText
+                    size={30}
+                  />
+                  <span
+                    className="c7n-issueNum"
+                    style={{ 
+                      textDecoration: this.state.issue.statusCode === 'done' ? 'line-through' : 'unset',
+                    }}
+                    role="none"
+                    onClick={() => {
+                      const urlParams = AppState.currentMenuType;
+                      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${this.state.issue.issueNum}&paramIssueId=${this.state.issue.issueId}&paramUrl=usermap`);
+                    }}
+                  >
+                    {this.state.issue.issueNum}
+                  </span>
+                  <PriorityTag
+                    priority={this.state.issue.priorityCode}
+                  />
+                </div>
+                <Icon
+                  className="c7n-delete"
+                  type="delete"
+                  onClick={this.handleClickDelete.bind(this)}
+                />
+              </div>
+              
+              <div className="c7n-content">
+                <TextArea
+                  className="c7n-textArea"
+                  autosize={{ minRows: 1, maxRows: 10 }}
+                  value={this.state.summary}
+                  onChange={this.handleIssueNameChange.bind(this)}
+                  onPressEnter={this.handlePressEnter}
+                  onFocus={(e) => {
+                    e.target.select();
+                    this.setState({ isFocus: true });
+                  }}
+                  onBlur={this.updateIssueName}
+                  spellCheck="false"
+                />
+              </div>
+              <div className="c7n-footer">
+                <TypeTag
+                  typeCode={this.state.issue.typeCode}
+                />
+                <span className="c7n-issueCard-storyPoints">
+                  {this.state.issue.storyPoints}
+                </span>
+                <StatusTag
+                  name={this.state.issue.statusName}
+                  color={this.state.issue.statusColor}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </Draggable>
     );
   }
 }

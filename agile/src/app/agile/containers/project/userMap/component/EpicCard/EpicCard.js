@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Input } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Draggable } from 'react-beautiful-dnd';
 import './EpicCard.scss';
 import StatusTag from '../../../../../components/StatusTag';
 import { updateIssue } from '../../../../../api/NewIssueApi';
@@ -15,7 +15,6 @@ class EpicCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
       epicName: '',
       originEpicName: '',
     };
@@ -24,6 +23,16 @@ class EpicCard extends Component {
 
   componentDidMount() {
     this.setEpicNameInState();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.epic.issueId === this.props.epic.issueId
+      && nextProps.epic.objectVersionNumber === this.props.epic.objectVersionNumber
+      && nextState.epicName === this.state.epicName
+    ) {
+      return false;
+    }
+    return true;
   }
 
   setEpicNameInState() {
@@ -41,8 +50,9 @@ class EpicCard extends Component {
 
   handlePressEnter = (e) => {
     e.preventDefault();
-    const target = e.target;
-    if (!this.state.epicName) {
+    const { target } = e;
+    const { epicName } = this.state;
+    if (!epicName) {
       return;
     }
     target.blur();
@@ -76,6 +86,7 @@ class EpicCard extends Component {
   };
 
   render() {
+    window.console.log('epic render');
     const { epic } = this.props;
     const progress = !epic.issueCount ? 0 : epic.doneIssueCount / epic.issueCount;
     return (
@@ -135,17 +146,11 @@ class EpicCard extends Component {
                   onClick={() => {
                     const { history } = this.props;
                     const urlParams = AppState.currentMenuType;
-                    history.push(
-                      `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
-                        urlParams.name
-                        }&organizationId=${urlParams.organizationId}&paramName=${
-                        epic.issueNum
-                        }&paramIssueId=${epic.issueId}&paramUrl=usermap`,
-                    );
+                    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${epic.issueNum}&paramIssueId=${epic.issueId}&paramUrl=usermap`);
                   }}
                 >
-            {epic.issueNum}
-          </span>
+                  {epic.issueNum}
+                </span>
               </div>
             </div>
           </div>
