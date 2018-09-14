@@ -36,6 +36,7 @@ class IssueCard extends Component {
       && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber
       && nextProps.selected === this.props.selected
       && nextProps.dragged === this.props.dragged
+      && nextProps.index === this.props.index
       && nextState.summary === this.state.summary
     ) {
       return false;
@@ -101,10 +102,10 @@ class IssueCard extends Component {
 
   render() {
     window.console.log('issue card render');
-    const { issue, borderTop, history, selected, dragged, draggableId, indexs } = this.props;
+    const { issue, borderTop, history, selected, dragged, draggableId, index } = this.props;
     const selectIssueIds = US.getSelectIssueIds;
     return (
-      <Draggable draggableId={draggableId} index={indexs} key={draggableId}>
+      <Draggable draggableId={draggableId} index={index} key={draggableId}>
         {(provided1, snapshot1) => (
           <div
             ref={provided1.innerRef}
@@ -116,6 +117,7 @@ class IssueCard extends Component {
             }}
             role="none"
           >
+            {issue.issueId}
             <div
               role="none"
               style={{

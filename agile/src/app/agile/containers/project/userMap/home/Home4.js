@@ -526,6 +526,7 @@ class Home3 extends Component {
     }
     UserMapStore.setBacklogIssues(resBacklogIssues);
     UserMapStore.setIssues(resIssues);
+    window.console.log(resIssues);
   }
 
   handleMultipleDragToBoard = (res) => {
@@ -1573,6 +1574,7 @@ class Home3 extends Component {
                                 selected={selectIssueIds.includes(item.issueId)}
                                 dragged={currentDraggableId === item.issueId}
                                 handleClickIssue={this.handleClickIssue}
+                                key={item.issueId}
                                 issue={item}
                                 borderTop={indexs === 0}
                               />

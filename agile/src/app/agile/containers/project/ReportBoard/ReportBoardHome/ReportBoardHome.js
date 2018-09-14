@@ -6,6 +6,11 @@ import {
 import VersionProgress from '../ReportBoardComponent/VersionProgress';
 import IssueType from '../ReportBoardComponent/IssueType';
 import IterationType from '../ReportBoardComponent/IterationType';
+import IterationSpeed from '../ReportBoardComponent/IterationSpeed';
+import EpicProgress from '../ReportBoardComponent/EpicProgress';
+import Assignee from '../ReportBoardComponent/Assignee';
+import Status from '../ReportBoardComponent/Status';
+import Priority from '../ReportBoardComponent/Priority';
 import './ReportBoardHome.scss';
 
 class ReportBoardHome extends Component {
@@ -19,20 +24,30 @@ class ReportBoardHome extends Component {
               <Col span={24} />
             </Row>
             <Row gutter={20}>
-              <Col span={12} />
+              <Col span={12}>
+                <Assignee />
+              </Col>
               <Col span={12}><VersionProgress /></Col>
             </Row>
             <Row gutter={20}>
-              <Col span={10} />
+              <Col span={10}>
+                <EpicProgress />
+              </Col>
               <Col span={14}><IssueType /></Col>
             </Row>
             <Row gutter={20}>
-              <Col span={8} />
-              <Col span={8} />
+              <Col span={8}>
+                <Status />
+              </Col>
+              <Col span={8}>
+                <Priority />
+              </Col>
               <Col span={8}><IterationType /></Col>
             </Row>
             <Row>
-              <Col span={24} />
+              <Col span={24}>
+                <IterationSpeed />
+              </Col>
             </Row>
           </div>
         </Content>
