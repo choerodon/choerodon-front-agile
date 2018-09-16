@@ -88,7 +88,7 @@ class BurnDown extends Component {
         },
         axisLabel: {
           show: true,
-          interval: 0,
+          interval: parseInt(xAxis.length / 7) ? parseInt(xAxis.length / 7) - 1 : 0,
           textStyle: {
             color: 'rgba(0, 0, 0, 0.65)',
             fontSize: 9,
@@ -131,6 +131,13 @@ class BurnDown extends Component {
             fontSize: 12,
             fontStyle: 'normal',
           },
+          formatter(value) {
+            if (unit === 'remainingEstimatedTime' && value) {
+              return `${value}h`;
+            } else {
+              return value;
+            }
+          },
         },
         splitLine: {
           show: true,
@@ -151,11 +158,11 @@ class BurnDown extends Component {
             [endDate.split(' ')[0].slice(5).replace('-', '/'), 0],
           ],
           itemStyle: {
-            color: '#00BFA5',
+            color: 'rgba(0,0,0,0.65)',
           },
           lineStyle: {
             type: 'dotted',
-            color: '#00BFA5',
+            color: 'rgba(0,0,0,0.65)',
           },
         },
         {
@@ -163,7 +170,7 @@ class BurnDown extends Component {
           name: '剩余值',
           type: 'line',
           itemStyle: {
-            color: '#ff5555',
+            color: '#4f9bff',
           },
           data: yAxis,
         },
@@ -221,7 +228,16 @@ class BurnDown extends Component {
         const sprintMaxDate = endDate.split(' ')[0];
         const maxDate = moment(dataMaxDate).isBefore(moment(sprintMaxDate))
           ? sprintMaxDate : dataMaxDate;
-        const xData = this.getBetweenDateStr(dataMinDate, maxDate);
+        let allDate;
+        if (moment(maxDate).isBefore(sprintMaxDate)) {
+          allDate = this.getBetweenDateStr(dataMinDate, sprintMaxDate);
+        } else if (moment(dataMinDate).isSame(maxDate)) {
+          allDate = [dataMinDate];
+        } else {
+          allDate = this.getBetweenDateStr(dataMinDate, maxDate);
+        }
+        const xData = allDate;
+        // const xData = this.getBetweenDateStr(dataMinDate, maxDate);
         const xDataFormat = _.map(xData, item => item.slice(5).replace('-', '/'));
         const yAxis = xData.map((data, index) => {
           if (dataDates.includes(data)) return res.coordinate[data];
@@ -288,7 +304,7 @@ class BurnDown extends Component {
     return (
       <div className="c7n-agile-dashboard-burndown">
         <div className="switch" style={{ display: !loading && !sprintId ? 'none' : 'block' }}>
-          <Dropdown overlay={menu} trigger={['click']}>
+          <Dropdown overlay={menu} trigger={['click']} getPopupContainer={triggerNode => triggerNode.parentNode}>
             <div className="ant-dropdown-link c7n-agile-dashboard-burndown-select">
               {'单位选择'}
               <Icon type="arrow_drop_down" />
