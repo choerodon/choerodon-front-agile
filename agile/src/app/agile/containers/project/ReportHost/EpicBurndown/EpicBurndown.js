@@ -114,7 +114,7 @@ class EpicBurndown extends Component {
             showMinLabel: true,
             // showMaxLabel: true,
             // margin: 0,
-            agile: 'left',
+            agile: 'right',
             textStyle: {
               color: 'rgba(0,0,0,0.65)',
             },
