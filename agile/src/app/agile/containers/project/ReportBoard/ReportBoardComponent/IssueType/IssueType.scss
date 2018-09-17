@@ -1,0 +1,17 @@
+.c7n-reportBoard-issueType{
+    .c7n-issueType-content{
+        .c7n-issueType-loading{
+            display: flex;
+            height: 306px;
+            justify-content: center;
+            align-items: center;
+            .ant-spin-spinning{
+                margin-top: -67px;
+            }
+        }
+        .c7n-issueType-emptyBlock{
+            display: flex;
+            height: 306px;
+        }
+    }
+}
