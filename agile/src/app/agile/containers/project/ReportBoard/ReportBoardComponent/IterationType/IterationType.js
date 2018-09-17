@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import { stores, axios } from 'choerodon-front-boot';
+import _ from 'lodash';
 import { Spin } from 'choerodon-ui';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 import pic from './no_issue.png';
@@ -20,20 +21,87 @@ class IterationType extends Component {
     this.loadData();
   }
 
+  getXAxisData = () => {
+    const { iterationTypeInfo } = this.state;
+    const xAxisData = [];
+    if (iterationTypeInfo && iterationTypeInfo.length !== 0) {
+      iterationTypeInfo.forEach((item) => {
+        if (_.findIndex(xAxisData, o => o === item.name) === -1) {
+          xAxisData.push(item.name);
+        }
+      });
+      return xAxisData;
+    }
+    return '';
+  }
+
+  getIterationTypeData() {
+    const { iterationTypeInfo } = this.state;
+    const xAxisData = this.getXAxisData();
+    console.log(xAxisData);
+    const iterationTypeData = { todoData: [], doingData: [], doneData: [] };
+    const { todoData, doingData, doneData } = iterationTypeData;
+    let todoDataLength = 0; 
+    let doingDataLength = 0; 
+    let doneDataLength = 0;
+    if (iterationTypeInfo && iterationTypeInfo.length !== 0) {
+      for (let i = 0; i < xAxisData.length; i++) {
+        const iterationType = iterationTypeInfo.filter(item => item.name === xAxisData[i]);
+        todoDataLength = todoData.length;
+        doingDataLength = doingData.length;
+        doneDataLength = doneData.length;
+        iterationType.forEach((obj) => {
+          if (obj.statusName === '待办') {
+            todoData.push(obj.count);
+          }
+          if (obj.statusName === '进行中') {
+            doingData.push(obj.count);
+          }
+          if (obj.statusName === '完成') {
+            doneData.push(obj.count);
+          }
+        });
+        if (todoDataLength === todoData.length) {
+          todoData.push(0);
+        }
+        if (doingDataLength === doingData.length) {
+          doingData.push(0);
+        }
+        if (doneDataLength === doneData.length) {
+          doneData.push(0);
+        }
+      }
+      return iterationTypeData;
+    }
+    return '';
+  }
+
   getOption() {
+    const xAxisData = this.getXAxisData();
+    const iterationTypeData = this.getIterationTypeData();
     const option = {
       tooltip: {
         trigger: 'axis',
+        axisPointer: { // 坐标轴指示器，坐标轴触发有效
+          type: 'shadow', // 默认为直线，可选为：'line' | 'shadow'
+        },
+        backgroundColor: '#fff',
+        textStyle: {
+          color: 'rgba(0,0,0,0.64)',
+        },
       },
-      // legend: {
-      //   data: ['待处理', '处理中', '已完成'],
-      //   itemWidth: 14,
-      //   itemHeight: 14,
-      //   itemGap: 48,
-      //   icon: 'rect',
-      // },
+      legend: {
+        orient: 'vertical',
+        data: ['待处理', '处理中', '已完成'],
+        itemWidth: 14,
+        itemHeight: 14,
+        itemGap: 48,
+        icon: 'rect',
+        right: 0,
+        top: 25,
+      },
       grid: {
-        left: '0%',
+        left: '5px',
         top: '26px',
         right: '28%',
         bottom: 30,
@@ -42,7 +110,7 @@ class IterationType extends Component {
       xAxis: [
         {
           type: 'category',
-          data: ['故事', '故障', '任务', '子任务'],
+          data: xAxisData,
           axisLine: {
             show: false,
                 
@@ -51,6 +119,7 @@ class IterationType extends Component {
             show: false,
           },
           axisLabel: {
+            interval: 0,
             fontSize: 12,
             color: 'rgba(0,0,0,0.65)',
           },
@@ -75,6 +144,11 @@ class IterationType extends Component {
             fontSize: 12,
             color: 'rgba(0,0,0,0.65)',
           },
+          splitLine: {
+            lineStyle: {
+              color: '#eee',
+            },
+          },
         },
       ],
       series: [
@@ -82,7 +156,8 @@ class IterationType extends Component {
           name: '待处理',
           type: 'bar',
           stack: '广告',
-          data: [120, 132, 101, 134],
+          // data: [120, 132, 101, 134],
+          data: iterationTypeData.todoData,
           barCategoryGap: '28px',
           itemStyle: {
             color: '#FFB100',
@@ -92,7 +167,8 @@ class IterationType extends Component {
           name: '处理中',
           type: 'bar',
           stack: '广告',
-          data: [220, 182, 191, 234],
+          // data: [220, 182, 191, 234],
+          data: iterationTypeData.doingData,
           itemStyle: {
             color: '#45A3FC',
           },
@@ -101,7 +177,8 @@ class IterationType extends Component {
           name: '已完成',
           type: 'bar',
           stack: '广告',
-          data: [150, 232, 201, 154],
+          // data: [150, 232, 201, 154],
+          data: iterationTypeData.doneData,
           itemStyle: {
             color: ' #00BFA5',
           },
@@ -118,7 +195,7 @@ class IterationType extends Component {
     this.setState({
       loading: true,
     });
-    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/issue_type?sprintId=781`)
+    axios.get(`/agile/v1/projects/${projectId}/reports/issue_type_distribution_chart`)
       .then((res) => {
         if (res && res.length) {
           this.setState({
@@ -143,9 +220,6 @@ class IterationType extends Component {
       );
     }
     if (!iterationTypeInfo || !iterationTypeInfo.length) {
-      this.setState({
-        loading: false,
-      });
       return (
         <div className="c7n-IterationType-emptyBlock">
           <EmptyBlockDashboard
@@ -161,20 +235,6 @@ class IterationType extends Component {
           style={{ height: 226 }}
           option={this.getOption()}
         />
-        <ul className="c7n-iterationType-chart-legend">
-          <li>
-            <div />
-            {'待处理'}
-          </li>
-          <li>
-            <div />
-            {'处理中'}
-          </li>
-          <li>
-            <div />
-            {'已完成'}
-          </li>
-        </ul>
       </div>
     );
   }

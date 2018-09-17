@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import { stores, axios } from 'choerodon-front-boot';
+import { withRouter } from 'react-router-dom';
 import { Spin, Table } from 'choerodon-ui';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 import pic from './no_issue.png';
@@ -23,10 +24,11 @@ class IssueType extends Component {
   }
 
   getOption() {
+    const { issueTypeInfo } = this.state;
     const option = {
+      color: ['#9665E2', '#F7667F', '#FAD352', '#45A3FC', '#FFB100'],
       tooltip: {
         trigger: 'item',
-        formatter: '{a} <br/>{b} : {c} ({d}%)',
         backgroundColor: '#fff',
         borderColor: '#ddd',
         borderWidth: 1,
@@ -34,22 +36,25 @@ class IssueType extends Component {
           fontSize: 12,
           color: '#000',
         },
-        extraCssText: 'box-shadow: 0 2px 4px 0 rgba(0,0,0,0.20)',
+        formatter: value => `<div><span>问题：${value.data.value}</span><br/><span>百分比：${(value.data.percent.toFixed(2))}%</span></div>`,
+        padding: 10,
+        textStyle: {
+          color: '#000',
+          fontSize: 12,
+          lineHeight: 20,
+        },
+        extraCssText: 'background: #FFFFFF;\n'
+        + 'border: 1px solid #DDDDDD;\n'
+        + 'box-shadow: 0 2px 4px 0 rgba(0,0,0,0.20);\n'
+        + 'border-radius: 0',
       },
-    
       series: [
         {
-          name: '访问来源',
+          // name: '访问来源',
           type: 'pie',
-          radius: '55%',
-          center: ['50%', '60%'],
-          data: [
-            { value: 335, name: '直接访问' },
-            { value: 310, name: '邮件营销' },
-            { value: 234, name: '联盟广告' },
-            { value: 135, name: '视频广告' },
-            { value: 1548, name: '搜索引擎' },
-          ],
+          radius: '65%',
+          center: ['45%', '50%'],
+          data: issueTypeInfo,
         },
       ],
     };
@@ -77,55 +82,76 @@ class IssueType extends Component {
  
   renderContent() {
     const { loading, issueTypeInfo } = this.state;
-    const columns = [
-      {
-        
-        title: '问题类型',
-        dataIndex: 'name',
-        key: 'name',
-        render: (name, record) => {
-          <div>
-            <TypeTag />
-          </div>;
-        },
-      }, {
-        title: '问题',
-        dataIndex: 'value',
-        key: 'value',
-      }, {
-        title: '百分比',
-        dataIndex: 'percent',
-        key: 'percent,',
-      },
-    ];
-    // if (loading) {
-    //   return (
-    //     <div className="c7n-issueType-loading">
-    //       <Spin />
-    //     </div>
-    //   );
-    // }
-    // if (!issueTypeInfo && !issueTypeInfo.length) {
-    //   return (
-    //     <div className="c7n-issueType-emptyBlock">
-    //       <EmptyBlockDashboard
-    //         pic={pic}
-    //         ddes="没有问题"
-    //       />
-    //     </div>
-    //   );
-    // }
+    const colors = ['#9665E2', '#F7667F', '#FAD352', '#45A3FC', '#FFB100'];
+    if (loading) {
+      return (
+        <div className="c7n-issueType-loading">
+          <Spin />
+        </div>
+      );
+    }
+    if (!issueTypeInfo || !issueTypeInfo.length) {
+      return (
+        <div className="c7n-issueType-emptyBlock">
+          <EmptyBlockDashboard
+            pic={pic}
+            des="当前没有问题"
+          />
+        </div>
+      );
+    }
     return (
       <div className="c7n-issueType-chart">
         <ReactEcharts 
-          style={{ height: 306 }}
+          style={{ width: '60%', height: 308 }}
           option={this.getOption()}
         />
         <div className="c7n-issueType-chart-legend">
-          <table
-            columns={columns}
-            dataSource={issueTypeInfo}
-          />
+          <p>数据统计</p>
+          <table>
+            <thead>
+              <tr>
+                <td>经办人</td>
+                <td>问题</td>
+                <td>百分比</td>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                issueTypeInfo.map((item, index) => (
+                  <tr>
+                    <td style={{ width: '115px' }}>
+                      <span
+                        className="item-icon"
+                        style={{ background: colors[index] }}
+                      />
+                      {item.name}
+                    </td>
+                    <td style={{ width: '94px' }}>
+                      <a
+                        role="none"
+                        onClick={() => {
+                          const urlParams = AppState.currentMenuType;
+                          const {
+                            type, id, organizationId,
+                          } = urlParams;
+                          const { history } = this.props;
+                          history.push(
+                            `/agile/issue?type=${type}&id=${id}&name=${urlParams.name}&organizationId=${organizationId}&paramIssueType=story&paramName=${item.name || '未分配'}下的问题&paramUrl=reportBoard`,
+                          );
+                        }}
+                      >
+                        {item.value}
+                      </a>
+                    </td>
+                    <td style={{ width: '50px' }}>
+                      {`${item.percent.toFixed(2)}%`}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
         </div>
       </div>
     );
@@ -142,4 +168,4 @@ class IssueType extends Component {
   }
 }
 
-export default IssueType;
+export default withRouter(IssueType);

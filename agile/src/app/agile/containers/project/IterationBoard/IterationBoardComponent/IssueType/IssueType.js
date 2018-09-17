@@ -63,9 +63,16 @@ class IssueType extends Component {
           color: 'rgba(0,0,0,0.64)',
         },
       },
-      // legend: {
-      //     data: ['待处理', '处理中','已完成']
-      // },
+      legend: {
+        orient: 'vertical',
+        data: ['待处理', '处理中', '已完成'],
+        itemWidth: 14,
+        itemHeight: 14,
+        itemGap: 48,
+        icon: 'rect',
+        right: 0,
+        top: 35,
+      },
       grid: {
         left: '0%',
         top: '28px',
@@ -191,20 +198,6 @@ class IssueType extends Component {
           style={{ height: 230 }}
           option={this.getOption()}
         />
-        <ul className="c7n-IssueType-chart-legend">
-          <li>
-            <div />
-            {'待处理'}
-          </li>
-          <li>
-            <div />
-            {'处理中'}
-          </li>
-          <li>
-            <div />
-            {'已完成'}
-          </li>
-        </ul>
       </div>
     );
   }
