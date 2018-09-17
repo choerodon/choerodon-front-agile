@@ -21,7 +21,7 @@ import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
 // let scrollL;
-let left = 0;
+const left = 0;
 
 function toFullScreen(dom) {
   if (dom.requestFullscreen) {
@@ -1316,6 +1316,11 @@ class Home3 extends Component {
     this.setState({
       popOverVisible: false,
     });
+
+    message.config({
+      top: 110,
+      duration: 2,
+    });
     const shareContent = document.querySelector('.fixHead');// 需要截图的包裹的（原生的）DOM 对象
     shareContent.style.width = `${Math.max(document.querySelector('.fixHead-head').scrollWidth, document.querySelector('.fixHead-body').scrollWidth)}px`;
     shareContent.style.height = `${document.querySelector('.fixHead-head').scrollHeight + document.querySelector('.fixHead-body').scrollHeight}px`;
@@ -1339,12 +1344,11 @@ class Home3 extends Component {
     html2canvas(shareContent, opts)
       .then((pcanvas) => {
         this.downLoadImage(pcanvas, '用户故事地图.png');
-      });
-    message.config({
-      top: 110,
-      duration: 2,
-    });
-    message.success('导出图片成功', undefined, undefined, 'top');
+        message.success('导出图片成功', undefined, undefined, 'top');
+      })
+      .catch((error) => {
+        message.error('导出图片失败', undefined, undefined, 'top');
+      }); 
   }
 
   /**
@@ -1488,7 +1492,7 @@ class Home3 extends Component {
     const dom = [];
     const epicData = UserMapStore.getEpics;
     const {
-      issues, sprints, versions, currentNewObj, left, top, selectIssueIds, currentDraggableId
+      issues, sprints, versions, currentNewObj, left, top, selectIssueIds, currentDraggableId,
     } = UserMapStore;
     const { epicId, versionId, sprintId } = currentNewObj;
     const { mode } = UserMapStore;
@@ -1572,7 +1576,7 @@ class Home3 extends Component {
                         //       role="none"
                         //     >
                         //       {item.issueId}
-                              <IssueCard
+                        <IssueCard
                                 draggableId={`${mode}-${item.issueId}`}
                                 index={indexs}
                                 selected={selectIssueIds.includes(item.issueId)}
@@ -1626,7 +1630,7 @@ class Home3 extends Component {
 
             ))}
           </div>
-        </React.Fragment>);
+                 </React.Fragment>);
       });
       dom.push(
         <React.Fragment key="no-sprint">
@@ -1641,8 +1645,8 @@ class Home3 extends Component {
               {mode === 'none' ? null
                 : (
                   <React.Fragment>
-                    {mode === 'version' ? 
-                      (
+                    {mode === 'version' 
+                      ? (
                         <Permission service={['agile-service.product-version.createVersion']}>
                           <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
                             <Icon type="playlist_add" />
@@ -1719,7 +1723,7 @@ class Home3 extends Component {
                         //       role="none"
                         //     >
                         //       {item.issueId}
-                              <IssueCard
+                        <IssueCard
                                 draggableId={`${mode}-${item.issueId}`}
                                 index={indexs}
                                 selected={selectIssueIds.includes(item.issueId)}
