@@ -251,7 +251,7 @@ class ReleaseDetail extends Component {
     for (let i = 0; i < data.length; i += 1) {
       total += data[i].value;
     }
-    const colors = VersionReportStore.colors;
+    const colors = VersionReportStore.getColors;
     const urlParams = AppState.currentMenuType;
     const type = [
       { title: '经办人', value: 'assignee' },

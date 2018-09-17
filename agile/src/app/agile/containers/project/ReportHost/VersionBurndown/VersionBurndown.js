@@ -84,10 +84,8 @@ class VersionBurndown extends Component {
     const option = {
       animation: false,
       grid: {
-        x: 40,
-        y2: 10,
         top: 30,
-        left: 55,
+        left: 40,
         right: 50,
         containLabel: true,
       },
@@ -111,7 +109,7 @@ class VersionBurndown extends Component {
           },
           axisLabel: {
             interval: 0,
-            rotate: chartDataOrigin.length >= 8 ? 20 : 0,
+            rotate: chartDataOrigin.length >= 8 ? 45 : 0,
             show: true,
             showMinLabel: true,
             showMaxLabel: true,
@@ -839,7 +837,7 @@ class VersionBurndown extends Component {
                                   <ReactEcharts
                                     ref={(e) => { this.echarts_react = e; }}
                                     option={this.getOption()}
-                                    style={{ height: 400 }}
+                                    style={{ height: 400, left: -31 }}
                                   />
                                 </div>
                               )

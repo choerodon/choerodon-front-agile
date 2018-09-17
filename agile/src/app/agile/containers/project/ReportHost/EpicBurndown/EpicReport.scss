@@ -77,8 +77,8 @@
       margin-bottom: 36px;
       .c7n-chart-yaxixName{
         position: absolute;
-        top: 35%;
-        left: 30px;
+        top: calc(40% - 60px);
+        // left: 30px;
         width: 12px;
         font-size: 12;
         color: '#000000';

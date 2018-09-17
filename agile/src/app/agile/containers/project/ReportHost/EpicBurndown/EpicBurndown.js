@@ -788,7 +788,7 @@ class EpicBurndown extends Component {
                                   <ReactEcharts
                                     ref={(e) => { this.echarts_react = e; }}
                                     option={this.getOption()}
-                                    style={{ height: 400 }}
+                                    style={{ height: 400, left: -31 }}
                                   />
                                 </div>
                               )

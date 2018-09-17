@@ -127,12 +127,12 @@ class VersionReportStore {
             }
             this.setColors(colors);
             this.setSourceData(data);
-            const bigData = data.filter((item, index, arr) => item.percent >= 2);
+            const bigData = data.filter(item => item.percent >= 2);
             const otherData = {
               name: '其它', typeName: null, value: _.reduce(_.filter(data, item => item.percent < 2), (sum, item) => sum += item.value, 0), percent: _.reduce(_.filter(data, item => item.percent < 2), (sum, item) => sum += item.percent, 0).toFixed(2),
             };
             if (otherData.value > 0) {
-              bigData.unshift(otherData);
+              bigData.push(otherData);
             }
             this.setPieData(bigData);
           }
