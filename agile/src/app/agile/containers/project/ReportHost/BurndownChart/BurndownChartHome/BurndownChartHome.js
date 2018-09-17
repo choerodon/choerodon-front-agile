@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Spin, message, Icon, Select, Table, Menu, Dropdown } from 'choerodon-ui';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import {
+  Button, Spin, message, Icon, Select, Table, Menu, Dropdown, 
+} from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, 
+} from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import moment from 'moment';
@@ -30,9 +34,11 @@ class BurndownChartHome extends Component {
       startDate: '',
     };
   }
+
   componentWillMount() {
     this.getSprintData();
   }
+
   getBetweenDateStr(start, end) {
     const result = [];
     const beginDay = start.split('-');
@@ -59,6 +65,7 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
+
   getSprintData() {
     BurndownChartStore.axiosGetSprintList().then((res) => {
       BurndownChartStore.setSprintList(res);
@@ -73,6 +80,7 @@ class BurndownChartHome extends Component {
     }).catch((error) => {
     });
   }
+
   getChartCoordinate() {
     BurndownChartStore.axiosGetBurndownCoordinate(this.state.defaultSprint, this.state.select).then((res) => {
       this.setState({ expectCount: res.expectCount });
@@ -114,9 +122,9 @@ class BurndownChartHome extends Component {
         xAxis: sliceDate,
         yAxis: allDateValues,
       });
-  
     });
   }
+
   getChartData() {
     this.setState({
       loading: true,
@@ -209,6 +217,7 @@ class BurndownChartHome extends Component {
       }).catch((error) => {
       });
   }
+
   getMaxY() {
     // const data = this.state.yAxis;
     // let max = 0;
@@ -225,6 +234,7 @@ class BurndownChartHome extends Component {
     }
     return max;
   }
+
   getOption() {
     const { select } = this.state;
     return {
@@ -239,7 +249,7 @@ class BurndownChartHome extends Component {
       },
       legend: {
         top: '24px',
-        right: '0%',
+        right: '3.2%',
         data: [{
           name: '期望值',
           icon: 'line',
@@ -371,6 +381,7 @@ class BurndownChartHome extends Component {
       ],
     };
   }
+
   handleChangeSelect(value) {
     this.setState({
       select: value,
@@ -393,6 +404,7 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
+
   renderDetail(item, record) {
     let result = '-';
     if (record.type !== 'startSprint' && record.type !== 'endSprint') {
@@ -404,6 +416,7 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
+
   renderUp(item) {
     let result = '-';
     if (item.newValue > item.oldValue) {
@@ -413,6 +426,7 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
+
   renderDown(item) {
     let result = '-';
     if (item.newValue < item.oldValue) {
@@ -422,6 +436,7 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
+
   judgeText(text) {
     let result = '';
     if (text === 'startSprint') {
@@ -459,6 +474,7 @@ class BurndownChartHome extends Component {
     }
     return result;
   }
+
   renderTypeText(text) {
     const splitArray = text.split('-');
     return (
@@ -501,7 +517,10 @@ class BurndownChartHome extends Component {
                     history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${item.issueNum}&paramIssueId=${item.issueId}&paramUrl=reporthost/burndownchart`);
                   }
                 }}
-              >{item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}</p>
+              >
+                {item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}
+
+              </p>
             ))
           }
         </div>
@@ -621,8 +640,8 @@ class BurndownChartHome extends Component {
                         });
                       }}
                     >
-                      {BurndownChartStore.getSprintList.length > 0 ? 
-                        BurndownChartStore.getSprintList.map(item => (
+                      {BurndownChartStore.getSprintList.length > 0 
+                        ? BurndownChartStore.getSprintList.map(item => (
                           <Option value={item.sprintId}>{item.sprintName}</Option>
                         )) : ''}
                     </Select>
@@ -647,7 +666,7 @@ class BurndownChartHome extends Component {
                   />
                 </div>
               ) : (
-                <NoDataComponent title={'冲刺'} links={[{ name: '待办事项', link: '/agile/backlog' }]} img={epicSvg} />
+                <NoDataComponent title="冲刺" links={[{ name: '待办事项', link: '/agile/backlog' }]} img={epicSvg} />
               )
             }
           </Spin>
@@ -658,4 +677,3 @@ class BurndownChartHome extends Component {
 }
 
 export default BurndownChartHome;
-

@@ -2,12 +2,28 @@
   .c7n-versionSelectHeader{
     position: relative;
     display: inline-block;
+    .ant-checkbox{
+      .ant-checkbox-inner{
+        border-color: rgba(0,0,0,0.54);
+      }
+    }
+    .ant-checkbox-checked{
+      .ant-checkbox-inner{
+        border-color: transparent;
+      }
+    }
+    .ant-checkbox-group-item:last-child{
+      margin-top: 5px;
+    }
     .icon-show {
       margin-left: -5px;
       display: inline-block;
       vertical-align: 2px;
       padding-bottom:25px;
       background-color: transparent;
+      i{
+        color: rgba(0,0,0,0.65);
+      }
     }
     .icon-show-info{
       position: absolute;
@@ -47,7 +63,8 @@
  
   .c7n-versionInfo{
     font-size: 13px;
-    margin-top: -20px;
+    margin-top: -22px;
+
   }
 
   .c7n-report {
@@ -63,7 +80,7 @@
       .c7n-chart-yaxixName{
         position: absolute;
         top: 35%;
-        left: 5px;
+        left: 30px;
         width: 12px;
         font-size: 12;
         color: '#000000';
