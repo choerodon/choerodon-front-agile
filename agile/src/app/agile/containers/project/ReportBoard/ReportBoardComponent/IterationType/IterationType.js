@@ -1,15 +1,23 @@
 import React, { Component } from 'react';
 import ReactEcharts from 'echarts-for-react';
-import Card from '../Card';
+import { stores, axios } from 'choerodon-front-boot';
+import { Spin } from 'choerodon-ui';
+import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
+import pic from './no_issue.png';
 import './IterationType.scss';
 
+const { AppState } = stores;
 class IterationType extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      loading: true,
+      iterationTypeInfo: [],
+    };
   }
 
   componentDidMount() {
-
+    this.loadData();
   }
 
   getOption() {
@@ -17,17 +25,18 @@ class IterationType extends Component {
       tooltip: {
         trigger: 'axis',
       },
-      legend: {
-        data: ['待处理', '处理中', '已完成'],
-        itemWidth: 14,
-        itemHeight: 14,
-        itemGap: 48,
-        icon: 'rect',
-      },
+      // legend: {
+      //   data: ['待处理', '处理中', '已完成'],
+      //   itemWidth: 14,
+      //   itemHeight: 14,
+      //   itemGap: 48,
+      //   icon: 'rect',
+      // },
       grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
+        left: '0%',
+        top: '26px',
+        right: '28%',
+        bottom: 30,
         containLabel: true,
       },
       xAxis: [
@@ -40,6 +49,10 @@ class IterationType extends Component {
           },
           axisTick: {
             show: false,
+          },
+          axisLabel: {
+            fontSize: 12,
+            color: 'rgba(0,0,0,0.65)',
           },
         },
       ],
@@ -58,6 +71,10 @@ class IterationType extends Component {
           axisTick: {
             show: false,
           },
+          axisLabel: {
+            fontSize: 12,
+            color: 'rgba(0,0,0,0.65)',
+          },
         },
       ],
       series: [
@@ -66,6 +83,7 @@ class IterationType extends Component {
           type: 'bar',
           stack: '广告',
           data: [120, 132, 101, 134],
+          barCategoryGap: '28px',
           itemStyle: {
             color: '#FFB100',
           },
@@ -95,14 +113,77 @@ class IterationType extends Component {
     return option;
   }
 
+  loadData = () => {
+    const projectId = AppState.currentMenuType.id;
+    this.setState({
+      loading: true,
+    });
+    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/issue_type?sprintId=781`)
+      .then((res) => {
+        if (res && res.length) {
+          this.setState({
+            loading: false,
+            iterationTypeInfo: res,
+          });
+        } else {
+          this.setState({
+            loading: false,
+          });
+        }
+      });
+  }
+
+  renderContent() {
+    const { loading, iterationTypeInfo } = this.state;
+    if (loading) {
+      return (
+        <div className="c7n-IterationType-loading">
+          <Spin />
+        </div>
+      );
+    }
+    if (!iterationTypeInfo || !iterationTypeInfo.length) {
+      this.setState({
+        loading: false,
+      });
+      return (
+        <div className="c7n-IterationType-emptyBlock">
+          <EmptyBlockDashboard
+            pic={pic}
+            des="当前迭代下没有问题"
+          />
+        </div>
+      );
+    }
+    return (
+      <div className="c7n-iterationType-chart">
+        <ReactEcharts 
+          style={{ height: 226 }}
+          option={this.getOption()}
+        />
+        <ul className="c7n-iterationType-chart-legend">
+          <li>
+            <div />
+            {'待处理'}
+          </li>
+          <li>
+            <div />
+            {'处理中'}
+          </li>
+          <li>
+            <div />
+            {'已完成'}
+          </li>
+        </ul>
+      </div>
+    );
+  }
+
   render() {
     return (
       <div className="c7n-reportBoard-IterationType">
         <div className="c7n-IterationType-content">
-          <ReactEcharts 
-            style={{ height: 230 }}
-            option={this.getOption()}
-          />
+          {this.renderContent()}
         </div>
       </div>
     );

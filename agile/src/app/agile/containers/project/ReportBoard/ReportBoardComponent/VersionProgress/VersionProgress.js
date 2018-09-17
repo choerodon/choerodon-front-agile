@@ -1,23 +1,33 @@
 import React, { Component } from 'react';
+import { stores, axios } from 'choerodon-front-boot';
+import { Spin } from 'choerodon-ui';
 import ReactEcharts from 'echarts-for-react';
-import Card from '../Card';
+import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
+import pic from './no_issue.png';
 import './VersionProgress.scss';
 
+const { AppState } = stores;
 class VersionProgress extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      loading: true,
+      versionProgressInfo: [],
+    };
   }
 
   componentDidMount() {
-
-  }
-
-  loadData() {
-
+    this.loadData();
   }
 
   getOption() {
     const option = {
+      grid: {
+        left: 0,
+        right: 0,
+        bottom: 30,
+        containLabel: true,
+      },
       tooltip: {
         trigger: 'axis',
         // axisPointer : {            // 坐标轴指示器，坐标轴触发有效
@@ -25,20 +35,13 @@ class VersionProgress extends Component {
         // }
       },
       legend: {
-        orient: 'vertical',
-        top: '30%',
-        right: 30,
+        // top: ,
+        // right: 30,
         data: ['待处理', '处理中', '已完成'],
         itemWidth: 14,
         itemHeight: 14,
         itemGap: 48,
         icon: 'rect',
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true,
       },
       xAxis: [
         {
@@ -50,6 +53,10 @@ class VersionProgress extends Component {
           },
           axisTick: {
             show: false,
+          },
+          axisLabel: {
+            fontSize: 12,
+            color: 'rgba(0,0,0,0.65)',
           },
         },
       ],
@@ -67,6 +74,10 @@ class VersionProgress extends Component {
           axisTick: {
             show: false,
           },
+          axisLabel: {
+            fontSize: 12,
+            color: 'rgba(0,0,0,0.65)',
+          },
         },
       ],
       series: [
@@ -77,6 +88,7 @@ class VersionProgress extends Component {
           itemStyle: {
             color: '#FFB100',
           },
+          barCategoryGap: '30px',
         },
         {
           name: '处理中',
@@ -100,14 +112,60 @@ class VersionProgress extends Component {
     return option;
   }
 
+  loadData = () => {
+    const projectId = AppState.currentMenuType.id;
+    this.setState({
+      loading: true,
+    });
+    axios.get(`/agile/v1/projects/${projectId}/`)
+      .then((res) => {
+        if (!res.length) {
+          this.setState({
+            loading: false,
+          });
+        }
+        this.setState({
+          loading: false,
+          versionProgressInfo: res,
+        });
+      });
+  }
+
+  renderContent() {
+    const { loading, versionProgressInfo } = this.state;
+    if (loading) {
+      return (
+        <div className="c7n-versionProgress-loading">
+          <Spin />
+        </div>
+      );
+    }
+    if (!versionProgressInfo || !versionProgressInfo.length) {
+      return (
+        <div className="c7n-versionProgress-EmptyBlock">
+          <EmptyBlockDashboard
+            pic={pic}
+            des="当前版本下没有问题"
+          />
+        </div>
+      );
+    }
+    return (
+      <div className="c7n-versionProgress-chart">
+        <ReactEcharts 
+          style={{ height: 304 }}
+          option={this.getOption()}
+        />
+      </div>
+    );
+  }
+  
+
   render() {
     return (
       <div className="c7n-reportBoard-versionProgress">
         <div className="c7n-versionProgress-content">
-          <ReactEcharts 
-            style={{ height: 230 }}
-            option={this.getOption()}
-          />
+          {this.renderContent()}
         </div>
       </div>
     );
