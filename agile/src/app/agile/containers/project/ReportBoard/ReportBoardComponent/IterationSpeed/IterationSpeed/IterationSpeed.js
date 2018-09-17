@@ -61,6 +61,12 @@ class IterationSpeed extends Component {
     return {
       tooltip: {
         trigger: 'axis',
+        backgroundColor: '#fff',
+        textStyle: {
+          color: '#000',
+        },
+        extraCssText: 
+          'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
         axisPointer: {
           type: 'shadow',
         },
@@ -83,7 +89,6 @@ class IterationSpeed extends Component {
         ],
       },
       grid: {
-        // y2: 10,
         top: '30',
         left: '20',
         right: '50',

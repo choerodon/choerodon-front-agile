@@ -1465,17 +1465,21 @@ class Home3 extends Component {
           <Icon type={`${this.state.isFullScreen ? 'exit_full_screen' : 'zoom_out_map'} icon`} />
           <span>{this.state.isFullScreen ? '退出全屏' : '全屏'}</span>
         </Button>
-        <Button
-          style={{
-            color: 'white', fontSize: 12, position: 'absolute', right: 24,
-          }}
-          type="primary"
-          funcType="raised"
-          onClick={this.showBackLog}
-        >
-          <Icon type="layers" />
-          {'需求池'}
-        </Button>
+        {
+          UserMapStore.getEpics.length ? (
+            <Button
+              style={{
+                color: 'white', fontSize: 12, position: 'absolute', right: 24,
+              }}
+              type="primary"
+              funcType="raised"
+              onClick={this.showBackLog}
+            >
+              <Icon type="layers" />
+              {'需求池'}
+            </Button>
+          ) : null
+        }
       </Header>);
   }
 
@@ -1607,15 +1611,11 @@ class Home3 extends Component {
                         }}
                       >
                         <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
-
-
-                          {'Add'}
-                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, vos[id])}>new</a>
+                          {/* {'Add'} */}
+                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, vos[id])}>新建问题</a>
                           {' '}
-
-
-                          {'or '}
-                          <a role="none" onClick={this.showBackLog}>existing</a>
+                          {'或 '}
+                          <a role="none" onClick={this.showBackLog}>从需求池引入</a>
                         </div>
                       </div>
                     </React.Fragment>
@@ -1641,24 +1641,19 @@ class Home3 extends Component {
               {mode === 'none' ? null
                 : (
                   <React.Fragment>
-                    {mode === 'version' ? (
+                    {mode === 'version' ? 
+                      (
                         <Permission service={['agile-service.product-version.createVersion']}>
                           <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
                             <Icon type="playlist_add" />
-
-
-                            {'创建'}
-                            {mode === 'sprint' ? '冲刺' : '版本'}
+                            {`创建${mode === 'sprint' ? '冲刺' : '版本'}`}
                           </Button>
                         </Permission>
                       )
                       : (
                         <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
                           <Icon type="playlist_add" />
-
-
-                          {'创建'}
-                          {mode === 'sprint' ? '冲刺' : '版本'}
+                          {`创建${mode === 'sprint' ? '冲刺' : '版本'}`}
                         </Button>
                       )}
                   </React.Fragment>
@@ -1763,15 +1758,11 @@ class Home3 extends Component {
                         }}
                       >
                         <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
-
-
-                          {'Add'}
-                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>new</a>
+                          {/* {'Add'} */}
+                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>新建问题</a>
                           {' '}
-
-
-                          {'or '}
-                          <a role="none" onClick={this.showBackLog}>existing</a>
+                          {'或 '}
+                          <a role="none" onClick={this.showBackLog}>从需求池引入</a>
                         </div>
                       </div>
                     </React.Fragment>
@@ -1916,18 +1907,14 @@ class Home3 extends Component {
               }}
               onCancel={() => UserMapStore.setCreateEpic(false)}
             />
-            {
-              UserMapStore.createVOS ? (
-                <CreateVOS
-                  getContainer={() => document.querySelector('.c7n-userMap')}
-                  visible={UserMapStore.createVOS}
-                  // onOk={() => {UserMapStore.setCreateVOS(false)}}
-                  onOk={this.handleCreateOk}
-                  onCancel={() => { UserMapStore.setCreateVOS(false); }}
-                  type={UserMapStore.getCreateVOSType}
-                />
-              ) : null
-            }
+            <CreateVOS
+              container={document.querySelector('.c7n-userMap')}
+              visible={UserMapStore.createVOS}
+              // onOk={() => {UserMapStore.setCreateVOS(false)}}
+              onOk={this.handleCreateOk}
+              onCancel={() => { UserMapStore.setCreateVOS(false); }}
+              type={UserMapStore.getCreateVOSType}
+            />
           </Content>
         ) : (
           <div style={{

@@ -55,13 +55,13 @@ class Priority extends Component {
   }
 
   componentDidMount() {
-    // this.loadPriorityInfo();
+    this.loadPriorityInfo();
   }
 
   loadPriorityInfo() {
     this.setState({ loading: true });
     const projectId = AppState.currentMenuType.id;
-    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/priority`)
+    axios.get(`/agile/v1/projects/${projectId}/reports/pie_chart?fieldName=priorityCode`)
       .then((res) => {
         const priorityInfo = this.transformPriority(res);
         this.setState({
@@ -74,7 +74,7 @@ class Priority extends Component {
   transformPriority(priorityArr) {
     const result = {};
     priorityArr.forEach((v, i) => {
-      result[v.priorityCode] = v;
+      result[v.typeName] = v;
     });
     return result;
   }

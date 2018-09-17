@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Input, Icon, Menu } from 'choerodon-ui';
+import { Input, Icon } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
 import { Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
@@ -117,7 +117,7 @@ class IssueCard extends Component {
             }}
             role="none"
           >
-            {issue.issueId}
+            {/* {issue.issueId} */}
             <div
               role="none"
               style={{

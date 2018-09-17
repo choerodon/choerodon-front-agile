@@ -15,12 +15,20 @@ class CreateLink extends Component {
     };
   }
 
-  componentDidMount() {
+  checkLinkName(rule, value, callback) {
+    // ScrumBoardStore.axiosCheckRepeatName(value).then((res) => {
+    //   if (res) {
+    //     callback('问题链接名称重复');
+    //   } else {
+        callback();
+      // }
+    // });
   }
 
   handleOk(e) {
+    const { form, onOk } = this.props;
     e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, values) => {
+    form.validateFieldsAndScroll((err, values) => {
       const { name, inWard, outWard } = values;
       if (!err) {
         const obj = {
@@ -32,18 +40,19 @@ class CreateLink extends Component {
           loading: true,
         });
         axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types`, obj)
-          .then((res) => {
+          .then(() => {
             this.setState({
               loading: false,
             });
-            this.props.onOk();
+            onOk();
           });
       }
     });
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { onCancel, form: { getFieldDecorator } } = this.props;
+    const { loading } = this.state;
     return (
       <Sidebar
         className="c7n-component-component"
@@ -51,9 +60,9 @@ class CreateLink extends Component {
         okText="创建"
         cancelText="取消"
         visible
-        confirmLoading={this.state.loading}
+        confirmLoading={loading}
         onOk={this.handleOk.bind(this)}
-        onCancel={this.props.onCancel}
+        onCancel={onCancel}
       >
         <Content
           style={{
@@ -70,6 +79,8 @@ class CreateLink extends Component {
                 rules: [{
                   required: true,
                   message: '名称为必输项',
+                }, {
+                  validator: this.checkLinkName.bind(this),
                 }],
               })(
                 <Input label="名称" maxLength={30} />,

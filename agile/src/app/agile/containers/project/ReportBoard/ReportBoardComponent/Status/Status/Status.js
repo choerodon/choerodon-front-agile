@@ -19,7 +19,7 @@ class Status extends Component {
   }
 
   componentDidMount() {
-    // this.loadStatus();
+    this.loadStatus();
   }
 
   getOption() {
@@ -105,7 +105,7 @@ class Status extends Component {
   loadStatus() {
     const projectId = AppState.currentMenuType.id;
     this.setState({ loading: true });
-    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/status`)
+    axios.get(`agile/v1/projects/${projectId}/reports/issue_type_distribution_chart`)
       .then((res) => {
         const statusInfo = this.transformStatus(res);
         this.setState({
@@ -116,13 +116,16 @@ class Status extends Component {
   }
 
   transformStatus(statusArr) {
-    const todo = statusArr.find(v => v.categoryCode === 'todo');
-    const doing = statusArr.find(v => v.categoryCode === 'doing');
-    const done = statusArr.find(v => v.categoryCode === 'done');
+    // const todo = statusArr.find(v => v.categoryCode === 'todo');
+    const todo = _.reduce(statusArr, (sum, n) => sum + (n.statusName === '待办' ? n.count : 0), 0);
+    // const doing = statusArr.find(v => v.categoryCode === 'doing');
+    const doing = _.reduce(statusArr, (sum, n) => sum + (n.statusName === '进行中' ? n.count : 0), 0);
+    // const done = statusArr.find(v => v.categoryCode === 'done');
+    const done = _.reduce(statusArr, (sum, n) => sum + (n.statusName === '完成' ? n.count : 0), 0);
     const result = [
-      todo ? todo.issueNum : 0,
-      doing ? doing.issueNum : 0,
-      done ? done.issueNum : 0,
+      todo || 0,
+      doing || 0,
+      done || 0,
     ];
     return result;
   }
