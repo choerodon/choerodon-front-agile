@@ -14,34 +14,21 @@ class VersionProgress extends Component {
     super(props);
     this.state = {
       loading: false,
-      assigneeInfo: [
-        {
-          assigneeName: 'pre_user_1',
-          issueNum: 10,
-        },
-        {
-          assigneeName: 'pre_user_2',
-          issueNum: 20,
-        },
-        {
-          assigneeName: 'pre_user_3',
-          issueNum: 30,
-        },
-      ],
+      assigneeInfo: [],
     };
   }
 
   componentDidMount() {
-    // this.loadAssignee();
+    this.loadAssignee();
   }
 
   getOption() {
     const { assigneeInfo } = this.state;
     const data = assigneeInfo.map(v => ({
-      name: v.assigneeName,
-      value: v.issueNum,
+      name: v.name || '未分配',
+      value: v.value,
     }));
-    const allCount = _.reduce(assigneeInfo, (sum, n) => sum + n.issueNum, 0);
+    const allCount = _.reduce(assigneeInfo, (sum, n) => sum + n.value, 0);
     const option = {
       tooltip: {
         trigger: 'item',
@@ -80,7 +67,7 @@ class VersionProgress extends Component {
   loadAssignee() {
     const projectId = AppState.currentMenuType.id;
     this.setState({ loading: true });
-    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/assignee_id`)
+    axios.get(`agile/v1/projects/${projectId}/reports/pie_chart?fieldName=assignee`)
       .then((res) => {
         this.setState({
           loading: false,

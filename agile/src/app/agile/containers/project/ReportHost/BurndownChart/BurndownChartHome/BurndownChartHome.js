@@ -30,6 +30,8 @@ class BurndownChartHome extends Component {
       select: 'remainingEstimatedTime',
       defaultSprint: '',
       loading: false,
+      chartLoading: true,
+      tableLoading: true,
       endDate: '',
       startDate: '',
     };
@@ -82,8 +84,12 @@ class BurndownChartHome extends Component {
   }
 
   getChartCoordinate() {
+    this.setState({ chartLoading: true });
     BurndownChartStore.axiosGetBurndownCoordinate(this.state.defaultSprint, this.state.select).then((res) => {
-      this.setState({ expectCount: res.expectCount });
+      this.setState({
+        expectCount: res.expectCount,
+        chartLoading: false,
+      });
       const keys = Object.keys(res.coordinate);
       let [minDate, maxDate] = [keys[0], keys[0]];
       for (let a = 1, len = keys.length; a < len; a += 1) {
@@ -127,7 +133,7 @@ class BurndownChartHome extends Component {
 
   getChartData() {
     this.setState({
-      loading: true,
+      tableLoading: true,
     });
     BurndownChartStore
       .axiosGetBurndownChartReport(this.state.defaultSprint, this.state.select).then((res) => {
@@ -199,21 +205,8 @@ class BurndownChartHome extends Component {
         }
         BurndownChartStore.setBurndownList(newData);
         this.setState({
-          loading: false,
+          tableLoading: false,
         });
-        // if (moment(this.state.endDate).isAfter(_.map(newData, 'date')[_.map(newData, 'date').length - 1])) {
-        //   this.setState({
-        //     xAxis: [..._.map(newData, 'date'), this.state.endDate],
-        //     yAxis: _.map(newData, 'rest'),
-        //     loading: false,
-        //   });
-        // } else {
-        //   this.setState({
-        //     xAxis: _.map(newData, 'date'),
-        //     yAxis: _.map(newData, 'rest'),
-        //     loading: false,
-        //   });
-        // }
       }).catch((error) => {
       });
   }
@@ -611,65 +604,66 @@ class BurndownChartHome extends Component {
           description="跟踪记录所有问题的剩余工作工作时间，预估完成冲刺任务的可能性，回顾总结迭代过程中的经验与不足。这有助于在团队管理方面取得更进一步的掌控与把握。"
           link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/burn-down/"
         >
-          <Spin spinning={this.state.loading}>
-            {
-              BurndownChartStore.getSprintList.length > 0 ? (
+          {
+            this.state.chartLoading || this.state.tableLoading || BurndownChartStore.getSprintList.length > 0 ? (
+              <div>
                 <div>
-                  <div>
-                    <Select
-                      getPopupContainer={triggerNode => triggerNode.parentNode}
-                      style={{ width: 244 }} 
-                      label="迭代冲刺" 
-                      value={this.state.defaultSprint}
-                      onChange={(value) => {
-                        let endDate;
-                        let startDate;
-                        for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
-                          if (BurndownChartStore.getSprintList[index].sprintId === value) {
-                            endDate = BurndownChartStore.getSprintList[index].endDate;
-                            startDate = BurndownChartStore.getSprintList[index].startDate;
-                          }
+                  <Select
+                    getPopupContainer={triggerNode => triggerNode.parentNode}
+                    style={{ width: 244 }} 
+                    label="迭代冲刺" 
+                    value={this.state.defaultSprint}
+                    onChange={(value) => {
+                      let endDate;
+                      let startDate;
+                      for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
+                        if (BurndownChartStore.getSprintList[index].sprintId === value) {
+                          endDate = BurndownChartStore.getSprintList[index].endDate;
+                          startDate = BurndownChartStore.getSprintList[index].startDate;
                         }
-                        this.setState({
-                          defaultSprint: value,
-                          endDate,
-                          startDate,
-                        }, () => {
-                          this.getChartData();
-                          this.getChartCoordinate();
-                        });
-                      }}
-                    >
-                      {BurndownChartStore.getSprintList.length > 0 
-                        ? BurndownChartStore.getSprintList.map(item => (
-                          <Option value={item.sprintId}>{item.sprintName}</Option>
-                        )) : ''}
-                    </Select>
-                    <Select
-                      getPopupContainer={triggerNode => triggerNode.parentNode}
-                      style={{ width: 244, marginLeft: 24 }} 
-                      label="单位" 
-                      defaultValue={this.state.select}
-                      onChange={this.handleChangeSelect.bind(this)}
-                    >
-                      <Option value="remainingEstimatedTime">剩余时间</Option>
-                      <Option value="storyPoints">故事点</Option>
-                      <Option value="issueCount">问题计数</Option>
-                    </Select>
-                  </div>
-                  <ReactEcharts option={this.getOption()} />
-                  <Table
-                    dataSource={BurndownChartStore.getBurndownList}
-                    columns={columns}
-                    pagination={false}
-                    rowKey={record => `${record.date}-${record.type}`}
-                  />
+                      }
+                      this.setState({
+                        defaultSprint: value,
+                        endDate,
+                        startDate,
+                      }, () => {
+                        this.getChartData();
+                        this.getChartCoordinate();
+                      });
+                    }}
+                  >
+                    {BurndownChartStore.getSprintList.length > 0 ? 
+                      BurndownChartStore.getSprintList.map(item => (
+                        <Option value={item.sprintId}>{item.sprintName}</Option>
+                      )) : ''}
+                  </Select>
+                  <Select
+                    getPopupContainer={triggerNode => triggerNode.parentNode}
+                    style={{ width: 244, marginLeft: 24 }} 
+                    label="单位" 
+                    defaultValue={this.state.select}
+                    onChange={this.handleChangeSelect.bind(this)}
+                  >
+                    <Option value="remainingEstimatedTime">剩余时间</Option>
+                    <Option value="storyPoints">故事点</Option>
+                    <Option value="issueCount">问题计数</Option>
+                  </Select>
                 </div>
-              ) : (
-                <NoDataComponent title="冲刺" links={[{ name: '待办事项', link: '/agile/backlog' }]} img={epicSvg} />
-              )
-            }
-          </Spin>
+                <Spin spinning={this.state.chartLoading}>
+                  <ReactEcharts option={this.getOption()} />
+                </Spin>
+                <Table
+                  dataSource={BurndownChartStore.getBurndownList}
+                  loading={this.state.tableLoading}
+                  columns={columns}
+                  pagination={false}
+                  rowKey={record => `${record.date}-${record.type}`}
+                />
+              </div>
+            ) : (
+              <NoDataComponent title="冲刺" links={[{ name: '待办事项', link: '/agile/backlog' }]} img={epicSvg} />
+            )
+          }
         </Content>
       </Page>
     );

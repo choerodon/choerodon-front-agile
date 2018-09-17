@@ -16,15 +16,19 @@ class CreateVOS extends Component {
     };
   }
 
-  componentDidMount() {
-    const { type } = this.props;
-    if (type === 'sprint') {
-      const projectId = AppState.currentMenuType.id;
-      // 请求下一个冲刺名，置入state
-      axios.get(`/agile/v1/projects/${projectId}/sprint/current_create_name`)
-        .then((res) => {
-          this.setState({ nextSprintName: res });
-        });
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.visible) {
+      const { type } = nextProps;
+      if (type === 'sprint') {
+        const projectId = AppState.currentMenuType.id;
+        // 请求下一个冲刺名，置入state
+        axios.get(`/agile/v1/projects/${projectId}/sprint/current_create_name`)
+          .then((res) => {
+            this.setState({ nextSprintName: res });
+          });
+      } else {
+        this.setState({ nextSprintName: '' });
+      }
     }
   }
 
@@ -75,19 +79,20 @@ class CreateVOS extends Component {
   };
 
   render() {
-    const { visible, onCancel, onOk, type, getContainer } = this.props;
+    const { visible, onCancel, onOk, type, container } = this.props;
     const { getFieldDecorator } = this.props.form;
   
     return (
       <Modal
         className="c7n-createVOS"
-        getContainer={getContainer}
+        getContainer={() => container}
         title={`创建${type === 'sprint' ? '冲刺' : '版本'}`}
         visible={visible || false}
         onOk={this.handleCreate}
         onCancel={onCancel}
         okText="创建"
         cancelText="取消"
+        destroyOnClose
         confirmLoading={this.state.loading}
       >
         <Form layout="vertical">

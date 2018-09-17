@@ -5,7 +5,7 @@ import {
   Page, Header, Content, stores, axios, 
 } from 'choerodon-front-boot';
 import {
-  Table, Button, Select, Popover, Tabs, Tooltip, Input, Dropdown, Menu, Pagination, Spin, Icon, 
+  Table, Button, Tooltip, Input, Dropdown, Menu, Pagination, Icon, 
 } from 'choerodon-ui';
 import './Issue.scss';
 
@@ -21,12 +21,9 @@ import PriorityTag from '../../../../components/PriorityTag';
 import StatusTag from '../../../../components/StatusTag';
 import TypeTag from '../../../../components/TypeTag';
 import EmptyBlock from '../../../../components/EmptyBlock';
-import { ReadAndEdit } from '../../../../components/CommonComponent';
 
 const FileSaver = require('file-saver');
 
-const Option = Select.Option;
-const TabPane = Tabs.TabPane;
 const { AppState } = stores;
 
 @observer
@@ -45,14 +42,14 @@ class Issue extends Component {
   }
 
   componentDidMount() {
-    window.console.warn('above is not mine');
     this.getInit();
   }
 
   getInit() {
     const Request = this.GetRequest(this.props.location.search);
     const {
-      paramType, paramId, paramName, paramStatus, paramPriority, paramIssueType, paramIssueId, paramUrl, 
+      paramType, paramId, paramName, paramStatus,
+      paramPriority, paramIssueType, paramIssueId, paramUrl, 
     } = Request;
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
@@ -109,13 +106,6 @@ class Issue extends Component {
             expand: true,
           });
         });
-      // IssueStore.init()
-      //   .then((res) => {
-      //     this.setState({
-      //       selectedIssue: res,
-      //       expand: true,
-      //     });
-      //   });
     } else {
       IssueStore.setBarFilters(arr);
       IssueStore.init();
@@ -146,7 +136,7 @@ class Issue extends Component {
       const obj = {
         assigneeId: res.assigneeId,
         assigneeName: res.assigneeName,
-        imageUrl: res.imageUrl || '',
+        imageUrl: res.assigneeImageUrl || '',
         issueId: res.issueId,
         issueNum: res.issueNum,
         priorityCode: res.priorityCode,
@@ -187,7 +177,6 @@ class Issue extends Component {
               IssueStore.init();
               IssueStore.loadIssues();
               this.setState({
-                // createIssue: false,
                 createIssueValue: '',
                 createLoading: false,
               });
@@ -245,7 +234,6 @@ class Issue extends Component {
     const {
       issueNum, summary, assignee, sprint, version, component, epic, 
     } = filters;
-    console.log(`filters: ${JSON.stringify(filters)}`);
     obj.advancedSearchArgs.statusCode = statusCode || [];
     obj.advancedSearchArgs.priorityCode = priorityCode || [];
     obj.advancedSearchArgs.typeCode = typeCode || [];
@@ -678,16 +666,8 @@ class Issue extends Component {
             </section>
             <section className="c7n-count">
               <span className="c7n-span-count">
-
-
-
-共
-                {IssueStore.pagination.total}
-
-
-
-条任务
-                            </span>
+                {`共${IssueStore.pagination.total}条任务`}
+              </span>
               <Dropdown overlay={sort} trigger={['click']}>
                 <div style={{
                   display: 'flex', alignItems: 'center', fontSize: '13px', lineHeight: '20px', cursor: 'pointer', position: 'absolute', right: 25, bottom: 28, 
@@ -749,7 +729,6 @@ class Issue extends Component {
                     fontSize: 13,
                     display: 'flex',
                     alignItems: 'center',
-                    // height: 80,
                     borderBottom: '1px solid #e8e8e8',
                   }}
                 >
@@ -788,7 +767,6 @@ class Issue extends Component {
                             }}
                             maxLength={44}
                             onPressEnter={this.handleBlurCreateIssue.bind(this)}
-                            // onBlur={this.handleBlurCreateIssue.bind(this)}
                           />
                         </div>
                       </div>
@@ -808,23 +786,15 @@ class Issue extends Component {
                             });
                           }}
                         >
-
-
-
-取消
-
-</Button>
+                          {'取消'}
+                        </Button>
                         <Button
                           type="primary"
                           loading={this.state.createLoading}
                           onClick={this.handleBlurCreateIssue.bind(this)}
                         >
-
-
-
-确定
-
-</Button>
+                          {'确定'}
+                        </Button>
                       </div>
                     </div>
                   ) : (
@@ -843,21 +813,6 @@ class Issue extends Component {
                       <span>创建问题</span>
                     </Button>
                   )}
-                  {/* <div
-                    className="c7n-backlog-sprintIssueSide"
-                    style={{ color: '#3f51b5', cursor: 'pointer' }}
-                    role="none"
-                    onClick={() => {
-                      this.setState({
-                        createIssue: true,
-                      });
-                    }}
-                  >
-                    <Icon
-                      className="c7n-backlog-createIssue"
-                      type="playlist_add"
-                    >创建问题</Icon>
-                  </div> */}
                 </div>
               </div>
               {
@@ -918,7 +873,6 @@ class Issue extends Component {
               ) : null
             }
           </div>
-          {/* </Spin> */}
           {
             this.state.create ? (
               <CreateIssue
