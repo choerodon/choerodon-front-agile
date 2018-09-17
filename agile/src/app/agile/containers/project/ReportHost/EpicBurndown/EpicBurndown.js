@@ -82,9 +82,8 @@ class EpicBurndown extends Component {
     // const xAxisData = _.map(chartDataOrigin, 'name');
 
     const option = {
+      animation: false,
       grid: {
-        x: 40,
-        y2: 10,
         top: 30,
         left: 40,
         right: 50,
@@ -93,7 +92,7 @@ class EpicBurndown extends Component {
       xAxis: [
         {
           type: 'category',
-          splitLine: { show: false },
+          // splitLine: { show: false },
           data: _.map(ES.chartDataOrigin, 'name'),
           // data: xAxisData,
           itemStyle: {
@@ -103,17 +102,17 @@ class EpicBurndown extends Component {
           axisLine: {
             show: true,
             lineStyle: {
-              color: '#ddd',
+              color: '#eee',
               type: 'solid',
               width: 1,
             },
           },
           axisLabel: {
             interval: 0,
-            rotate: chartDataOrigin.length > 8 ? 20 : 0,
+            rotate: chartDataOrigin.length >= 8 ? 20 : 0,
             show: true,
             showMinLabel: true,
-            showMaxLabel: true,
+            // showMaxLabel: true,
             // margin: 0,
             agile: 'left',
             textStyle: {
@@ -125,12 +124,13 @@ class EpicBurndown extends Component {
       yAxis: [
         {
           type: 'value',
+          position: 'left',
           inverse,
           axisTick: { show: false },
           axisLine: {
             show: true,
             lineStyle: {
-              color: '#ddd',
+              color: '#eee',
               type: 'solid',
               width: 1,
             },
@@ -142,6 +142,39 @@ class EpicBurndown extends Component {
             },
             formatter(value, index) {
               return !value ? value : '';
+            },
+          },
+          splitLine: {
+            lineStyle: {
+              color: '#eee',
+            },
+          },
+        },
+        {
+          type: 'value',
+          position: 'right',
+          inverse,
+          axisTick: { show: false },
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: '#eee',
+              type: 'solid',
+              width: 1,
+            },
+          },
+          axisLabel: {
+            show: true,
+            textStyle: {
+              color: 'rgba(0,0,0,0.65)',
+            },
+            formatter(value, index) {
+              return !value ? value : '';
+            },
+          },
+          splitLine: {
+            lineStyle: {
+              color: '#eee',
             },
           },
         },
@@ -514,6 +547,7 @@ class EpicBurndown extends Component {
                         <p style={{ 
                           position: 'relative',
                           marginBottom: 12, 
+                          marginLeft: 15,
                         }}
                         >
                           <span 

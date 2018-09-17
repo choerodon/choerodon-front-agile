@@ -58,13 +58,17 @@ class IssueType extends Component {
         axisPointer: { // 坐标轴指示器，坐标轴触发有效
           type: 'shadow', // 默认为直线，可选为：'line' | 'shadow'
         },
+        backgroundColor: '#fff',
+        textStyle: {
+          color: 'rgba(0,0,0,0.64)',
+        },
       },
       // legend: {
       //     data: ['待处理', '处理中','已完成']
       // },
       grid: {
         left: '0%',
-        top: '26px',
+        top: '28px',
         right: '28%',
         bottom: '8%',
         containLabel: true,
@@ -76,12 +80,19 @@ class IssueType extends Component {
       yAxis: {
         name: '问题计数',
         nameTextStyle: {
-          color: 'rgba(0,0,0,0.64)',
-                
+          color: 'rgba(0,0,0,0.64)',      
         },
         type: 'value',
         itemStyle: {
           color: 'rgba(0,0,0,0.64)',
+        },
+        splitLine: {
+          // show: true, 
+          //  改变轴线颜色
+          lineStyle: {
+            // 使用深浅的间隔色
+            color: 'rgba(0,0,0,0.12)',
+          },                            
         },
       },
       axisLine: {
