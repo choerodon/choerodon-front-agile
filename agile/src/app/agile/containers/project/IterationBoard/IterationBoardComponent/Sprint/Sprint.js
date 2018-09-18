@@ -85,28 +85,32 @@ class Sprint extends Component {
 
   renderUserHead() {
     const { sprintInfo: { assigneeIssueDTOList } } = this.state;
+    const { history } = this.props;
     return (
       <div className="users">
         {
           assigneeIssueDTOList.length ? assigneeIssueDTOList.slice(0, 10).map(user => (
             <div key={user.assigneeId}>
-              {user.assigneeId === 0 && assigneeIssueDTOList.length === 1 ?
-                <div style={{ height: 18 }} /> :
-                <UserHead
-                  user={{
-                    id: user.assigneeId,
-                    loginName: '',
-                    realName: user.assigneeName,
-                    avatar: user.imageUrl,
-                  }}
-                  hiddenText
-                />
+              {
+                user.assigneeId === 0 && assigneeIssueDTOList.length === 1
+                  ? (<div style={{ height: 18 }} />)
+                  : (
+                    <UserHead
+                      user={{
+                        id: user.assigneeId,
+                        loginName: '',
+                        realName: user.assigneeName,
+                        avatar: user.imageUrl,
+                      }}
+                      hiddenText
+                    />
+                  )
               }
             </div>
           ))
             : <div style={{ height: 18, width: '100%' }} />
         }
-        {assigneeIssueDTOList.length > 10 && <a role="none" onClick={() => { this.props.history.push(`/agile/backlog?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>查看更多...</a>}
+        {assigneeIssueDTOList.length > 10 && <a role="none" onClick={() => { history.push(`/agile/backlog?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>查看更多...</a>}
       </div>
     );
   }

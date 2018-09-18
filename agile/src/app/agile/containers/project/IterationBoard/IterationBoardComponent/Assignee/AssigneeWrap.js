@@ -8,7 +8,7 @@ class AssigneeWrap extends Component {
 
     return (
       <Card
-        title={'经办人分布'}
+        title="经办人分布"
         link={link}
       >
         <Assignee

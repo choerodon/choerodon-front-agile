@@ -14,6 +14,7 @@ class Accumulation extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      newxAxis: [],
       loading: false,
       chartData: [],
     };
@@ -24,18 +25,11 @@ class Accumulation extends Component {
   }
 
   getOption() {
-    const { chartData } = this.state;
+    const { chartData, newxAxis } = this.state;
     const legendData = chartData.map(v => ({
       icon: 'rect',
       name: v.name,
     }));
-    let newxAxis = [];
-    chartData.forEach((v) => {
-      const temp = newxAxis.concat(_.map(v.coordinateDTOList, 'date'));
-      const uniq = [...new Set(temp)];
-      newxAxis = uniq;
-    });
-    newxAxis = _.orderBy(newxAxis, item => new Date(item).getTime());
 
     const legendSeries = [];
     const reverseChartData = _.cloneDeep(_.reverse(chartData));
@@ -45,12 +39,16 @@ class Accumulation extends Component {
       const dates = _.map(v.coordinateDTOList, 'date');
       data = newxAxis.map((time, i) => {
         if (dates.includes(time)) return v.coordinateDTOList.find(n => n.date === time).issueCount;
-        const { issueCount } = v.coordinateDTOList.find(n => n.date === newxAxis[i - 1]);
-        reverseChartData[index].coordinateDTOList.push({
+        const tar = v.coordinateDTOList.find(n => n.date === newxAxis[i - 1]);
+        const temp = tar ? {
           date: time,
-          issueCount,
-        });
-        return issueCount;
+          issueCount: tar.issueCount,
+        } : {
+          date: time,
+          issueCount: 0,
+        };
+        reverseChartData[index].coordinateDTOList.push(temp);
+        return temp.issueCount;
       });
       legendSeries.push({
         name: reverseChartData[index].name,
@@ -233,7 +231,15 @@ class Accumulation extends Component {
     };
     axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/cumulative_flow_diagram`, obj)
       .then((res) => {
+        let newxAxis = [];
+        res.forEach((v) => {
+          const temp = newxAxis.concat(_.map(v.coordinateDTOList, 'date'));
+          const uniq = [...new Set(temp)];
+          newxAxis = uniq;
+        });
+        newxAxis = _.orderBy(newxAxis, item => new Date(item).getTime());
         this.setState({
+          newxAxis,
           loading: false,
           chartData: res,
         });
@@ -241,7 +247,7 @@ class Accumulation extends Component {
   }
 
   renderContent() {
-    const { loading, assigneeInfo } = this.state;
+    const { loading, newxAxis } = this.state;
     if (loading) {
       return (
         <div className="c7n-loadWrap">
@@ -249,12 +255,12 @@ class Accumulation extends Component {
         </div>
       );
     }
-    if (false) {
+    if (!newxAxis.length) {
       return (
         <div className="c7n-loadWrap">
           <EmptyBlockDashboard
             pic={pic2}
-            des="当前项目下无看板或看板上无列"
+            des="未在当前看板上进行过活动"
           />
         </div>
       );

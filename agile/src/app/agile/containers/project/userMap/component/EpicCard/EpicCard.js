@@ -44,6 +44,14 @@ class EpicCard extends Component {
     });
   }
 
+  handleClickTextArea = (e) => {
+    if (e.defaultPrevented) return;
+    
+    const { target } = e;
+    target.focus();
+    target.select();
+  }
+
   handleEpicNameChange = (e) => {
     this.setState({ epicName: e.target.value });
   };
@@ -90,7 +98,7 @@ class EpicCard extends Component {
     const { epic } = this.props;
     const progress = !epic.issueCount ? 0 : epic.doneIssueCount / epic.issueCount;
     return (
-      <Draggable draggableId={this.props.index} index={this.props.index}>
+      <Draggable draggableId={this.props.index} index={this.props.index} disableInteractiveElementBlocking>
         {(provided1, snapshot1) => (
           <div
             ref={provided1.innerRef}
@@ -121,7 +129,6 @@ class EpicCard extends Component {
               />
               <div
                 className="c7n-content"
-                
               >
                 <TextArea
                   className="c7n-textArea"
@@ -129,7 +136,8 @@ class EpicCard extends Component {
                   value={this.state.epicName}
                   onChange={this.handleEpicNameChange.bind(this)}
                   onPressEnter={this.handlePressEnter}
-                  onFocus={e => e.target.select()}
+                  onClick={this.handleClickTextArea}
+                  // onFocus={e => e.target.select()}
                   role="none"
                   onBlur={this.updateEpicName}
                   spellCheck="false"

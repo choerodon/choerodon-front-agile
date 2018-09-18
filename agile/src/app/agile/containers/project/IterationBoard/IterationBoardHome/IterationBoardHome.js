@@ -3,11 +3,8 @@ import { observer } from 'mobx-react';
 import {
   Page, Header, Content, stores,
 } from 'choerodon-front-boot';
-import {
-  Row, Col, Select, Tooltip, Button,
-} from 'choerodon-ui';
-import _ from 'lodash';
-import { loadSprints } from '../../../../api/NewIssueApi';
+import { Row, Col, Button } from 'choerodon-ui';
+import { loadSprint } from '../../../../api/NewIssueApi';
 import Assignee from '../IterationBoardComponent/Assignee';
 import BurnDown from '../IterationBoardComponent/BurnDown';
 import Sprint from '../IterationBoardComponent/Sprint';
@@ -19,7 +16,6 @@ import SprintDetails from '../IterationBoardComponent/SprintDetails';
 
 import './IterationBoardHome.scss';
 
-const { Option } = Select;
 const { AppState } = stores;
 
 @observer
@@ -28,52 +24,33 @@ class IterationBoardHome extends Component {
     super(props);
     this.state = {
       loading: true,
-      sprints: [],
       sprintId: undefined,
       sprintName: undefined,
     };
   }
 
   componentDidMount() {
-    this.loadSprints();
+    this.loadSprint();
   }
 
-  loadSprints() {
+  loadSprint() {
+    const { match } = this.props;
+    const sprintId = match.params.id;
+    if (!sprintId) return;
     this.setState({ loading: true });
-    loadSprints(['started', 'closed'])
+    loadSprint(sprintId)
       .then((res) => {
-        if (res && !res.length) {
-          this.setState({
-            loading: false,
-            sprints: [],
-            sprintId: undefined,
-            sprintName: undefined,
-          });
-        } else {
-          this.setState({
-            loading: false,
-            sprints: res,
-            sprintId: res[0].sprintId,
-            sprintName: res[0].sprintName,
-          });
-        }
+        this.setState({
+          loading: false,
+          sprintId: res.sprintId,
+          sprintName: res.sprintName,
+        });
       });
   }
 
-  handleChangeSprint(sprintId) {
-    const { sprints } = this.state;
-    const sprint = sprints.find(v => v.sprintId === sprintId);
-    this.setState({
-      sprintId,
-      sprintName: sprint.sprintName,
-    });
-  }
-
   renderContent() {
-    const {
-      loading, sprints, sprintId, sprintName,
-    } = this.state;
-    if (!loading && sprints && !sprints.length) {
+    const { loading, sprintId, sprintName } = this.state;
+    if (!loading && !sprintId) {
       return (
         <div>
           {'当前项目下无冲刺'}
@@ -145,33 +122,17 @@ class IterationBoardHome extends Component {
   }
 
   render() {
-    const { sprints, sprintId, sprintName } = this.state;
+    const { history } = this.props;
     return (
       <Page className="c7n-agile-iterationBoard">
         <Header title="迭代工作台">
-          <Select 
-            className="select-without-underline"
-            value={sprintId}
-            style={{
-              maxWidth: 120, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: '28px', 
+          <Button
+            className="leftBtn2"
+            funcType="flat"
+            onClick={() => {
+              history.push(`/agile/scrumboard?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`);
             }}
-            dropdownStyle={{
-              color: '#3F51B5',
-              width: 200,
-            }}
-            onChange={this.handleChangeSprint.bind(this)}
           >
-            {
-              sprints.map(sprint => (
-                <Option key={sprint.sprintId} value={sprint.sprintId}>
-                  <Tooltip title={sprint.sprintName}>
-                    {sprint.sprintName}
-                  </Tooltip>
-                </Option>
-              ))
-            }
-          </Select>
-          <Button className="leftBtn2" funcType="flat" onClick={() => { this.props.history.push(`/agile/scrumboard?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
             <span>切换至看板</span>
           </Button>
         </Header>

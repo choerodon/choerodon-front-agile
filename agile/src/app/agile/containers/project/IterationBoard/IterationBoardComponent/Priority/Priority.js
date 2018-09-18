@@ -74,7 +74,7 @@ class Priority extends Component {
 
   transformPriority(priorityArr) {
     const result = {};
-    priorityArr.forEach((v, i) => {
+    priorityArr.forEach((v) => {
       result[v.priorityCode] = v;
     });
     return result;

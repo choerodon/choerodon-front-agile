@@ -9,7 +9,6 @@ class BurndownWrap extends Component {
       <Card
         title="燃尽图"
         link={link}
-        sprintId={sprintId}
       >
         <Burndown
           sprintId={sprintId}

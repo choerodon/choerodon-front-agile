@@ -10,7 +10,7 @@ import './Assignee.scss';
 
 const { AppState } = stores;
 
-class VersionProgress extends Component {
+class Assignee extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -132,4 +132,4 @@ class VersionProgress extends Component {
   }
 }
 
-export default VersionProgress;
+export default Assignee;

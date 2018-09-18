@@ -23,33 +23,45 @@ class ReportBoardHome extends Component {
           <div className="c7n-reportBoard">
             <Row>
               <Col span={24}>
-                <Accumulation />
+                <Accumulation
+                  link="reporthost/accumulation"
+                />
               </Col>
             </Row>
             <Row gutter={20}>
               <Col span={12}>
-                <Assignee />
+                <Assignee
+                  link="reporthost/pieReport"
+                />
               </Col>
               <Col span={12}><VersionProgress /></Col>
             </Row>
             <Row gutter={20}>
               <Col span={10}>
-                <EpicProgress />
+                <EpicProgress
+                  link="reporthost/pieReport"
+                />
               </Col>
               <Col span={14}><IssueType /></Col>
             </Row>
             <Row gutter={20}>
               <Col span={8}>
-                <Status />
+                <Status
+                  link="reporthost/pieReport"
+                />
               </Col>
               <Col span={8}>
-                <Priority />
+                <Priority
+                  link="reporthost/pieReport"
+                />
               </Col>
               <Col span={8}><IterationType /></Col>
             </Row>
             <Row>
               <Col span={24}>
-                <IterationSpeed />
+                <IterationSpeed
+                  link="reporthost/velocityChart"
+                />
               </Col>
             </Row>
           </div>

@@ -10,13 +10,11 @@ class Card extends Component {
   handleClick() {
     const { link, history, sprintId } = this.props;
     const urlParams = AppState.currentMenuType;
-    history.push(`/agile/${link}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}${sprintId != undefined ? (`&sprintId=${sprintId}`) : ''}`);
+    history.push(`/agile/${link}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}${sprintId !== undefined ? (`&sprintId=${sprintId}`) : ''}`);
   }
 
   render() {
-    const {
-      title, children, link,
-    } = this.props;
+    const { title, children, link } = this.props;
     return (
       <div className="c7n-sprintDashboard-card">
         <div className="card-wrap">
@@ -47,4 +45,5 @@ class Card extends Component {
     );
   }
 }
+
 export default withRouter(Card);

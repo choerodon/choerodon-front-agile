@@ -3,7 +3,6 @@ import { stores, axios } from 'choerodon-front-boot';
 import { Spin } from 'choerodon-ui';
 import PriorityTag from '../../../../../components/PriorityTag';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
-import pic from '../EmptyPics/no_sprint.svg';
 import pic2 from '../EmptyPics/no_version.svg';
 import './Priority.scss';
 
@@ -35,22 +34,8 @@ class Priority extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sprintId: undefined,
-      loading: false,
-      priorityInfo: {
-        high: {
-          completedNum: 10,
-          totalNum: 30,
-        },
-        medium: {
-          completedNum: 10,
-          totalNum: 20,
-        },
-        low: {
-          completedNum: 10,
-          totalNum: 50,
-        },
-      },
+      loading: true,
+      priorityInfo: {},
     };
   }
 
@@ -61,7 +46,7 @@ class Priority extends Component {
   loadPriorityInfo() {
     this.setState({ loading: true });
     const projectId = AppState.currentMenuType.id;
-    axios.get(`/agile/v1/projects/${projectId}/reports/pie_chart?fieldName=priorityCode`)
+    axios.get(`agile/v1/projects/${projectId}/reports/issue_priority_distribution_chart`)
       .then((res) => {
         const priorityInfo = this.transformPriority(res);
         this.setState({
@@ -73,14 +58,24 @@ class Priority extends Component {
 
   transformPriority(priorityArr) {
     const result = {};
-    priorityArr.forEach((v, i) => {
-      result[v.typeName] = v;
+    priorityArr.forEach((v) => {
+      result[v.priorityCode] = v;
+    });
+    ['low', 'medium', 'high'].forEach((priorityCode) => {
+      if (!result[priorityCode]) {
+        result[priorityCode] = {
+          priorityCode,
+          name: PRIORITY_MAP[priorityCode].name,
+          totalCount: 0,
+          doneCount: 0,
+        };
+      }
     });
     return result;
   }
 
   renderContent() {
-    const { loading, priorityInfo, sprintId } = this.state;
+    const { loading, priorityInfo } = this.state;
     if (loading) {
       return (
         <div className="loading-wrap">
@@ -88,26 +83,16 @@ class Priority extends Component {
         </div>
       );
     }
-    if (false) {
-      return (
-        <div className="loading-wrap">
-          <EmptyBlockDashboard
-            pic={pic}
-            des="当前项目下无活跃或结束冲刺"
-          />
-        </div>
-      );
-    }
     if (
-      !priorityInfo.high.totalNum
-      && !priorityInfo.medium.totalNum
-      && !priorityInfo.low.totalNum
+      !priorityInfo.high.totalCount
+      && !priorityInfo.medium.totalCount
+      && !priorityInfo.low.totalCount
     ) {
       return (
         <div className="loading-wrap">
           <EmptyBlockDashboard
             pic={pic2}
-            des="当前冲刺下无问题"
+            des="当前项目下无问题"
           />
         </div>
       );
@@ -127,7 +112,7 @@ class Priority extends Component {
     return (
       <div className="list" key={priority}>
         <div className="tip">
-          {`${priorityInfo[priority].completedNum}/${priorityInfo[priority].totalNum}`}
+          {`${priorityInfo[priority].doneCount}/${priorityInfo[priority].totalCount}`}
         </div>
         <div className="body">
           <div>
@@ -144,7 +129,7 @@ class Priority extends Component {
               className="progress-inner"
               style={{
                 background: PRIORITY_MAP[priority].color,
-                width: `${priorityInfo[priority].completedNum / priorityInfo[priority].totalNum * 100}%`,
+                width: `${priorityInfo[priority].doneCount / priorityInfo[priority].totalCount * 100}%`,
               }}
             />
           </div>

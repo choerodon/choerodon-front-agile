@@ -864,9 +864,13 @@ class ScrumBoardHome extends Component {
               ))
             }
           </Select>
-          <Button className="leftBtn2" funcType="flat" onClick={() => { this.props.history.push(`/agile/iterationBoard?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
-            <span>切换至工作台</span>
-          </Button>
+          {
+            this.state.dataSource && this.state.dataSource.currentSprint && this.state.dataSource.currentSprint.sprintId ? (
+              <Button className="leftBtn2" funcType="flat" onClick={() => { this.props.history.push(`/agile/iterationBoard/${this.state.dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+                <span>切换至工作台</span>
+              </Button>
+            ) : null
+          }
           <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>
             <Icon type="refresh icon" />
             <span>刷新</span>
