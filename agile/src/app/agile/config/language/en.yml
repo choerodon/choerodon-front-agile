@@ -5,6 +5,7 @@
 'agile.scrumboard':  scrumboard
 'agile.component': component
 'agile.reporthost': reportHost
+'agile.reportboard': reportboard
 'agile.projectsetting': projectSetting
 'agile.fastsearch': fastSearch
 'agile.issuelink': issueLink

@@ -56,7 +56,7 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/status`} component={STATUSINDEX} />
           <Route path={`${match.url}/userMap`} component={USERMAPINDEX} />
           {/* 迭代工作台 */}
-          <Route path={`${match.url}/iterationBoard`} component={INERATIONBOARDINDEX} />
+          <Route path={`${match.url}/iterationBoard/:id`} component={INERATIONBOARDINDEX} />
 
           <Route path={`${match.url}/reportBoard`} component={REPORTBOARD} />
           <Route path="*" component={nomatch} />

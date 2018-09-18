@@ -99,7 +99,7 @@ class EpicProgress extends Component {
             fontSize: 9,
             fontStyle: 'normal',
           },
-          formatter(value, index) {
+          formatter(value) {
             if (value.length > 5) {
               return `${value.slice(0, 4)}...`;
             } else {
@@ -137,7 +137,7 @@ class EpicProgress extends Component {
             fontSize: 12,
             fontStyle: 'normal',
           },
-          formatter(value, index) {
+          formatter(value) {
             return `${value}%`;
           },
         },
@@ -164,7 +164,7 @@ class EpicProgress extends Component {
                 '#ffb100', '#303f9f', '#ff7043',
                 '#f44336', '#f953ba', '#00bfa5',
               ][i],
-            color(params) {
+            color() {
               const colorList = [
                 'rgba(255, 177, 0, 0.4)', 'rgba(48, 63, 159, 0.4)',
                 'rgba(255, 112, 67, 0.4)', 'rgba(244, 67, 54, 0.4)',
@@ -233,9 +233,6 @@ class EpicProgress extends Component {
   }
 
   render() {
-    const { loading } = this.state;
-    const { history } = this.props;
-    const urlParams = AppState.currentMenuType;
     return (
       <div className="c7n-agile-reportBoard-epicProgress">
         {this.renderContent()}

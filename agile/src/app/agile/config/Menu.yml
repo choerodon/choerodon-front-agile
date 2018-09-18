@@ -39,16 +39,22 @@
         sort: 7
         permission:
           - 'agile-service.sprint.queryNameByOptions'
+    - "reportboard":
+        icon: whatshot
+        Routes: /agile/reportboard
+        sort: 8
+        permission:
+          - 'agile-service.sprint.queryNameByOptions'
     - "projectsetting":
         icon: folder_shared
         Routes: /agile/projectSetting
-        sort: 8
+        sort: 9
         permission:
           - 'agile-service.project-info.updateProjectInfo'
     - "fastsearch":
         icon: youtube_searched_for
         Routes: /agile/fastSearch
-        sort: 9
+        sort: 10
         permission:
           - 'agile-service.quick-filter.create'
     - "userStoryMap":

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
-import moment from 'moment';
 import {
   Dropdown, Icon, Menu, Spin,
 } from 'choerodon-ui';
@@ -124,7 +123,7 @@ class IterationSpeed extends Component {
             fontSize: 12,
             fontStyle: 'normal',
           },
-          formatter(value, index) {
+          formatter(value) {
             if (value.length > 10) {
               return `${value.slice(0, 10)}...`;
             } else {
@@ -265,8 +264,6 @@ class IterationSpeed extends Component {
 
   render() {
     const { loading } = this.state;
-    const { history } = this.props;
-    const urlParams = AppState.currentMenuType;
     const menu = (
       <Menu onClick={this.handleChangeUnit.bind(this)}>
         <Menu.Item key="remain_time">剩余时间</Menu.Item>

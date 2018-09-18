@@ -8,7 +8,7 @@ class StatusWrap extends Component {
 
     return (
       <Card
-        title={'状态分布'}
+        title="状态分布"
         link={link}
       >
         <Status

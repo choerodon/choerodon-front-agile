@@ -16,13 +16,15 @@ class CreateLink extends Component {
   }
 
   checkLinkName(rule, value, callback) {
-    // ScrumBoardStore.axiosCheckRepeatName(value).then((res) => {
-    //   if (res) {
-    //     callback('问题链接名称重复');
-    //   } else {
-        callback();
-      // }
-    // });
+    const projectId = AppState.currentMenuType.id;
+    axios.get(`agile/v1/projects/${projectId}/issue_link_types/check_name?issueLinkTypeName=${value}&issueLinkTypeId=`)
+      .then((res) => {
+        if (!res) {
+          callback('问题链接名称重复');
+        } else {
+          callback();
+        }
+      });
   }
 
   handleOk(e) {
@@ -65,15 +67,12 @@ class CreateLink extends Component {
         onCancel={onCancel}
       >
         <Content
-          style={{
-            padding: 0,
-            width: 512,
-          }}
+          style={{ padding: 0 }}
           title={`在项目“${AppState.currentMenuType.name}”中创建问题链接`}
           description="通过自定义问题链接，可以帮助您更好的对多个问题进行关联，不再局限于父子任务。"
           link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/setup/issue-link/"
         >
-          <Form layout="vertical">
+          <Form layout="vertical" style={{ width: 512 }}>
             <FormItem>
               {getFieldDecorator('name', {
                 rules: [{

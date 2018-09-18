@@ -4,7 +4,7 @@ import Prio from './Priority';
 
 class Priority extends Component {
   render() {
-    const { sprintId, link } = this.props;
+    const { link } = this.props;
 
     return (
       <Card

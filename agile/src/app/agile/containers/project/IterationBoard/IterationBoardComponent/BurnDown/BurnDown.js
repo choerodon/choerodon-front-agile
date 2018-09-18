@@ -6,9 +6,7 @@ import moment from 'moment';
 import {
   Dropdown, Icon, Menu, Spin,
 } from 'choerodon-ui';
-import {
-  DashBoardNavBar, stores, axios,
-} from 'choerodon-front-boot';
+import { stores, axios } from 'choerodon-front-boot';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 import pic from '../EmptyPics/no_sprint.svg';
 import lineLegend from './Line.svg';
@@ -27,16 +25,14 @@ class BurnDown extends Component {
     };
   }
 
-  componentDidMount() {
-  }
-
   componentWillReceiveProps(nextProps) {
-    if (nextProps.sprintId !== this.props.sprintId) {
-      const sprintId = nextProps.sprintId;
+    const { sprintId } = this.props;
+    if (nextProps.sprintId !== sprintId) {
+      const newSprintId = nextProps.sprintId;
       this.setState({
-        sprintId,
+        sprintId: newSprintId,
       });
-      this.loadSprints(sprintId);
+      this.loadSprints(newSprintId);
     }
   }
 
@@ -217,7 +213,7 @@ class BurnDown extends Component {
   loadSprints(sprintId) {
     const projectId = AppState.currentMenuType.id;
     this.setState({ loading: true });
-    axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, ['started', 'closed'])
+    axios.post(`/agile/v1/projects/${projectId}/sprint/names`, ['started', 'closed'])
       .then((res) => {
         if (res && res.length) {
           const sprint = res.find(v => v.sprintId === sprintId);
@@ -247,6 +243,9 @@ class BurnDown extends Component {
           allDate = this.getBetweenDateStr(dataMinDate, maxDate);
         }
         const xData = allDate;
+
+        // fix on 916, the crash of endless loop, when dataMinDate and maxDate is same.
+
         // const xData = this.getBetweenDateStr(dataMinDate, maxDate);
         const xDataFormat = _.map(xData, item => item.slice(5).replace('-', '/'));
         const yAxis = xData.map((data, index) => {
@@ -300,8 +299,6 @@ class BurnDown extends Component {
 
   render() {
     const { loading, sprint: { sprintId } } = this.state;
-    const { history } = this.props;
-    const urlParams = AppState.currentMenuType;
     const menu = (
       <Menu onClick={this.handleChangeUnit.bind(this)}>
         <Menu.Item key="remainingEstimatedTime">剩余时间</Menu.Item>

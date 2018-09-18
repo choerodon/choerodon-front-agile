@@ -8,7 +8,7 @@ class RemainWrap extends Component {
     
     return (
       <Card
-        title={'距离冲刺结束'}
+        title="距离冲刺结束"
         link={link}
       >
         <Remain

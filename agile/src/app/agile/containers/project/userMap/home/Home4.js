@@ -1410,7 +1410,7 @@ class Home3 extends Component {
       </Menu>
     );
     return (
-      <Header title="用户故事地图1">
+      <Header title="用户故事地图">
         <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
           <Icon type="playlist_add" />
           {'创建史诗'}

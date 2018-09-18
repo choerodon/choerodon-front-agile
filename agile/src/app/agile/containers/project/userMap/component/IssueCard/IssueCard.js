@@ -53,6 +53,16 @@ class IssueCard extends Component {
     });
   }
 
+  handleClickTextArea = (e) => {
+    if (e.defaultPrevented) return;
+
+    e.stopPropagation();
+    const { target } = e;
+    target.focus();
+    target.select();
+    this.setState({ isFocus: true });
+  }
+
   handleIssueNameChange = (e) => {
     this.setState({ summary: e.target.value });
   }
@@ -105,7 +115,7 @@ class IssueCard extends Component {
     const { issue, borderTop, history, selected, dragged, draggableId, index } = this.props;
     const selectIssueIds = US.getSelectIssueIds;
     return (
-      <Draggable draggableId={draggableId} index={index} key={draggableId}>
+      <Draggable draggableId={draggableId} index={index} key={draggableId} disableInteractiveElementBlocking>
         {(provided1, snapshot1) => (
           <div
             ref={provided1.innerRef}
@@ -190,10 +200,12 @@ class IssueCard extends Component {
                   value={this.state.summary}
                   onChange={this.handleIssueNameChange.bind(this)}
                   onPressEnter={this.handlePressEnter}
-                  onFocus={(e) => {
-                    e.target.select();
-                    this.setState({ isFocus: true });
-                  }}
+                  onClick={this.handleClickTextArea}
+                  // onFocus={(e) => {
+                  //   e.target.select();
+                  //   this.setState({ isFocus: true });
+                  // }}
+                  onClick={this.handleClickTextArea}
                   onBlur={this.updateIssueName}
                   spellCheck="false"
                 />

@@ -14,7 +14,7 @@ class Status extends Component {
     super(props);
     this.state = {
       loading: false,
-      statusInfo: [10, 20, 30],
+      statusInfo: [],
     };
   }
 
@@ -83,17 +83,17 @@ class Status extends Component {
             },
             emphasis: {
               show: false,
-              
             },
           },
           data: [
-            { value: statusInfo[0] || 0, name: '待处理' },
-            { value: statusInfo[1] || 0, name: '处理中' },
-            { value: statusInfo[2] || 0, name: '已完成' },
+            { value: statusInfo[0], name: '待处理' },
+            { value: statusInfo[1], name: '处理中' },
+            { value: statusInfo[2], name: '已完成' },
           ],
           itemStyle: { 
             normal: { 
-              borderColor: '#FFFFFF', borderWidth: 1, 
+              borderColor: '#FFFFFF',
+              borderWidth: 1, 
             },
           },
         },
@@ -116,12 +116,9 @@ class Status extends Component {
   }
 
   transformStatus(statusArr) {
-    // const todo = statusArr.find(v => v.categoryCode === 'todo');
-    const todo = _.reduce(statusArr, (sum, n) => sum + (n.statusName === '待办' ? n.count : 0), 0);
-    // const doing = statusArr.find(v => v.categoryCode === 'doing');
-    const doing = _.reduce(statusArr, (sum, n) => sum + (n.statusName === '进行中' ? n.count : 0), 0);
-    // const done = statusArr.find(v => v.categoryCode === 'done');
-    const done = _.reduce(statusArr, (sum, n) => sum + (n.statusName === '完成' ? n.count : 0), 0);
+    const todo = _.reduce(statusArr, (sum, n) => sum + (n.statusCode === 'todo' ? n.count : 0), 0);
+    const doing = _.reduce(statusArr, (sum, n) => sum + (n.statusCode === 'doing' ? n.count : 0), 0);
+    const done = _.reduce(statusArr, (sum, n) => sum + (n.statusCode === 'done' ? n.count : 0), 0);
     const result = [
       todo || 0,
       doing || 0,
