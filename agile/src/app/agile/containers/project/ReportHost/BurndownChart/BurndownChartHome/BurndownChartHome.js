@@ -254,7 +254,8 @@ class BurndownChartHome extends Component {
       grid: {
         y2: 30,
         top: '60',
-        left: '20',
+        // left: '20',
+        left: 0,
         right: '40',
         containLabel: true,
       },
@@ -632,8 +633,8 @@ class BurndownChartHome extends Component {
                       });
                     }}
                   >
-                    {BurndownChartStore.getSprintList.length > 0 ? 
-                      BurndownChartStore.getSprintList.map(item => (
+                    {BurndownChartStore.getSprintList.length > 0 
+                      ? BurndownChartStore.getSprintList.map(item => (
                         <Option value={item.sprintId}>{item.sprintName}</Option>
                       )) : ''}
                   </Select>

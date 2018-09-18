@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import {
+  Page, Header, Content, stores, 
+} from 'choerodon-front-boot';
 import './style';
 import list from './list';
 
@@ -9,7 +11,9 @@ class Home extends Component {
   handleClickItem(report) {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    const { type, id, name, organizationId } = urlParams;
+    const {
+      type, id, name, organizationId, 
+    } = urlParams;
     history.push(`${report.link}?type=${type}&id=${id}&name=${name}&organizationId=${organizationId}`);
   }
 

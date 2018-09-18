@@ -38,7 +38,7 @@ class Status extends Component {
       legend: {
         orient: 'vertical',
         x: '60%',
-        y: 'center',
+        top: '18%',
         data: [
           {
             name: '待处理',
@@ -81,7 +81,7 @@ class Status extends Component {
           radius: '60px',
           avoidLabelOverlap: false,
           hoverAnimation: false,
-          center: ['35%', '50%'],
+          center: ['35%', '42%'],
           label: {
             normal: {
               show: false,
