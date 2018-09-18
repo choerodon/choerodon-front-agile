@@ -11,6 +11,7 @@ import {
 } from 'choerodon-front-boot';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 import pic from '../EmptyPics/no_sprint.svg';
+import lineLegend from './Line.svg';
 import './BurnDown.scss';
 
 const { AppState } = stores;
@@ -65,9 +66,10 @@ class BurnDown extends Component {
       legend: {
         top: '0',
         right: '40',
+        itemHeight: 2,
         data: [{
           name: '期望值',
-          icon: 'line',
+          icon: `image://${lineLegend}`,
         }, {
           name: '剩余值',
           icon: 'line',
@@ -76,7 +78,7 @@ class BurnDown extends Component {
       grid: {
         y2: 30,
         top: '40',
-        left: '20',
+        left: 0,
         right: '40',
         containLabel: true,
       },
@@ -132,7 +134,7 @@ class BurnDown extends Component {
         axisLabel: {
           show: true,
           interval: 'auto',
-          margin: 18,
+          margin: 8,
           textStyle: {
             color: 'rgba(0, 0, 0, 0.65)',
             fontSize: 12,
@@ -310,7 +312,7 @@ class BurnDown extends Component {
     return (
       <div className="c7n-agile-dashboard-burndown">
         <div className="switch" style={{ display: !loading && !sprintId ? 'none' : 'block' }}>
-          <Dropdown overlay={menu} trigger={['click']}>
+          <Dropdown overlay={menu} trigger={['click']} getPopupContainer={triggerNode => triggerNode.parentNode}>
             <div className="ant-dropdown-link c7n-agile-dashboard-burndown-select">
               {'单位选择'}
               <Icon type="arrow_drop_down" />

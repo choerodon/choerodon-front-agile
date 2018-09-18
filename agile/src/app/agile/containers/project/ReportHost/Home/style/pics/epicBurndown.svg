@@ -1,54 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="246px" height="171px" viewBox="0 0 246 171" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="208px" height="122px" viewBox="0 0 208 122" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
-    <title>Group</title>
+    <title>Group 18</title>
     <desc>Created with Sketch.</desc>
-    <defs>
-        <rect id="path-1" x="0" y="0" width="244" height="167.820513" rx="2"></rect>
-        <filter x="-0.8%" y="-1.2%" width="101.6%" height="104.2%" filterUnits="objectBoundingBox" id="filter-2">
-            <feMorphology radius="0.5" operator="erode" in="SourceAlpha" result="shadowSpreadOuter1"></feMorphology>
-            <feOffset dx="0" dy="2" in="shadowSpreadOuter1" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="0.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.12 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
-            <feMorphology radius="0.5" operator="dilate" in="SourceAlpha" result="shadowSpreadOuter2"></feMorphology>
-            <feOffset dx="0" dy="0" in="shadowSpreadOuter2" result="shadowOffsetOuter2"></feOffset>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.12 0" type="matrix" in="shadowOffsetOuter2" result="shadowMatrixOuter2"></feColorMatrix>
-            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter3"></feOffset>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.16 0" type="matrix" in="shadowOffsetOuter3" result="shadowMatrixOuter3"></feColorMatrix>
-            <feMerge>
-                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
-                <feMergeNode in="shadowMatrixOuter2"></feMergeNode>
-                <feMergeNode in="shadowMatrixOuter3"></feMergeNode>
-            </feMerge>
-        </filter>
-    </defs>
+    <defs></defs>
     <g id="报告" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="报告－所有报表" transform="translate(-595.000000, -923.000000)">
+        <g id="报告－所有报表" transform="translate(-614.000000, -948.000000)">
             <g id="Group-5" transform="translate(274.000000, 132.000000)">
                 <g id="所有报表－史诗燃耗图" transform="translate(304.000000, 774.000000)">
                     <g id="Group" transform="translate(18.000000, 18.000000)">
                         <g id="Group-14">
-                            <g id="Rectangle-3">
-                                <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
-                                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
-                            </g>
-                            <g id="Group-17" transform="translate(18.000000, 24.000000)" stroke="#DFDFDF" stroke-linecap="square">
-                                <path d="M1.06122449,120.849057 L207.309966,120.849057" id="Line"></path>
-                                <path d="M0.875629175,90.9245283 L207.124371,90.9245283" id="Line"></path>
-                                <path d="M0.875629175,61 L207.124371,61" id="Line"></path>
-                                <path d="M0.875629175,31.0754717 L207.124371,31.0754717" id="Line"></path>
-                                <path d="M0.875629175,1.1509434 L207.124371,1.1509434" id="Line"></path>
-                            </g>
-                            <g id="Group-16" transform="translate(32.000000, 25.000000)">
-                                <g id="Group-15">
-                                    <rect id="Rectangle-8" fill="#6AB5FD" x="0" y="0" width="27" height="119.551536"></rect>
-                                    <rect id="Rectangle-8" fill="#6AB5FD" x="38.25" y="30.9948426" width="27" height="88.5566932"></rect>
-                                    <rect id="Rectangle-8-Copy-2" fill="#6AB5FD" x="76.5" y="61.9896852" width="27" height="57.5618505"></rect>
-                                    <rect id="Rectangle-8-Copy-3" fill="#6AB5FD" x="114.75" y="87.4497345" width="27" height="32.1018013"></rect>
-                                    <rect id="Rectangle-8-Copy-4" fill="#33CCB7" x="114.75" y="61.9896852" width="27" height="25.4600493"></rect>
-                                    <rect id="Rectangle-8-Copy-5" fill="#33CCB7" x="153" y="87.4497345" width="27" height="32.1018013"></rect>
-                                    <rect id="Rectangle-8-Copy-2" fill="#33CCB7" x="76.5" y="30.9948426" width="27" height="30.9948426"></rect>
-                                    <rect id="Rectangle-8-Copy" fill="#33CCB7" x="38.25" y="0" width="27" height="30.9948426"></rect>
+                            <g id="Group-18" transform="translate(18.000000, 24.000000)">
+                                <g id="Group-17" stroke="#DFDFDF" stroke-linecap="square">
+                                    <path d="M1.06122449,120.849057 L207.309966,120.849057" id="Line"></path>
+                                    <path d="M0.875629175,90.9245283 L207.124371,90.9245283" id="Line"></path>
+                                    <path d="M0.875629175,61 L207.124371,61" id="Line"></path>
+                                    <path d="M0.875629175,31.0754717 L207.124371,31.0754717" id="Line"></path>
+                                    <path d="M0.875629175,1.1509434 L207.124371,1.1509434" id="Line"></path>
+                                </g>
+                                <g id="Group-16" transform="translate(14.000000, 1.000000)">
+                                    <g id="Group-15">
+                                        <rect id="Rectangle-8" fill="#6AB5FD" x="0" y="0" width="27" height="119.551536"></rect>
+                                        <rect id="Rectangle-8" fill="#6AB5FD" x="38.25" y="30.9948426" width="27" height="88.5566932"></rect>
+                                        <rect id="Rectangle-8-Copy-2" fill="#6AB5FD" x="76.5" y="61.9896852" width="27" height="57.5618505"></rect>
+                                        <rect id="Rectangle-8-Copy-3" fill="#6AB5FD" x="114.75" y="87.4497345" width="27" height="32.1018013"></rect>
+                                        <rect id="Rectangle-8-Copy-4" fill="#33CCB7" x="114.75" y="61.9896852" width="27" height="25.4600493"></rect>
+                                        <rect id="Rectangle-8-Copy-5" fill="#33CCB7" x="153" y="87.4497345" width="27" height="32.1018013"></rect>
+                                        <rect id="Rectangle-8-Copy-2" fill="#33CCB7" x="76.5" y="30.9948426" width="27" height="30.9948426"></rect>
+                                        <rect id="Rectangle-8-Copy" fill="#33CCB7" x="38.25" y="0" width="27" height="30.9948426"></rect>
+                                    </g>
                                 </g>
                             </g>
                         </g>
