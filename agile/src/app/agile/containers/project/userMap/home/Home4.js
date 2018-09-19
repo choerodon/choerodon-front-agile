@@ -22,6 +22,7 @@ import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
 // let scrollL;
 const left = 0;
+let inWhich = undefined;
 
 function toFullScreen(dom) {
   if (dom.requestFullscreen) {
@@ -82,7 +83,10 @@ class Home3 extends Component {
         }
       }
       if (document.getElementById('fixHead-body')) {
+        document.getElementById('fixHead-head').addEventListener('scroll', this.handleScrollHead, { passive: true });
         document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll, { passive: true });
+        document.getElementById('fixHead-head').addEventListener('mouseover', this.handleMouseOverHead);
+        document.getElementById('fixHead-body').addEventListener('mouseover', this.handleMouseOverBody);
         this.getPrepareOffsetTops();
         clearInterval(timer);
       }
@@ -171,7 +175,25 @@ class Home3 extends Component {
   //   isFirstScroll = false;
   // }, 300);
 
+  handleMouseOverHead = (e) => {
+    window.console.log('in header');
+    inWhich = 'header';
+  }
+
+  handleMouseOverBody = (e) => {
+    window.console.log('in body');
+    inWhich = 'body';
+  }
+
+  handleScrollHead = (e) => {
+    if (inWhich === 'body') return;
+    const { scrollLeft } = e.target;
+    const body = document.getElementById('fixHead-body');
+    body.scrollLeft = scrollLeft;
+  }
+
   handleScroll = (e) => {
+    if (inWhich === 'header') return;
     const { scrollLeft, scrollTop } = e.target;
     // const { UserMapStore } = this.props;
     // const {
@@ -1880,7 +1902,7 @@ class Home3 extends Component {
                                   // borderBottom: '1px solid rgba(0,0,0,0.12)'
                                 }}
                               >
-                                {epicData.map((epic, index) => (
+                                {UserMapStore.epics.map((epic, index) => (
                                   <div className="fixHead-block" key={epic.issueId}>
                                     <EpicCard
                                       index={index}
