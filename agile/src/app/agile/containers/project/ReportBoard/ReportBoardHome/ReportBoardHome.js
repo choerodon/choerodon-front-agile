@@ -34,7 +34,11 @@ class ReportBoardHome extends Component {
                   link="reporthost/pieReport"
                 />
               </Col>
-              <Col span={12}><VersionProgress /></Col>
+              <Col span={12}>
+                <VersionProgress 
+                  link="reporthost/versionReport"
+                />
+              </Col>
             </Row>
             <Row gutter={20}>
               <Col span={10}>
@@ -42,20 +46,28 @@ class ReportBoardHome extends Component {
                   link="reporthost/pieReport"
                 />
               </Col>
-              <Col span={14}><IssueType /></Col>
+              <Col span={14}>
+                <IssueType 
+                  link=""
+                />
+              </Col>
             </Row>
             <Row gutter={20}>
               <Col span={8}>
                 <Status
-                  link="reporthost/pieReport"
+                  link="reporthost/pieReport/statusCode"
                 />
               </Col>
               <Col span={8}>
                 <Priority
-                  link="reporthost/pieReport"
+                  link="reporthost/pieReport/priorityCode"
                 />
               </Col>
-              <Col span={8}><IterationType /></Col>
+              <Col span={8}>
+                <IterationType 
+                  link="reporthost/pieReport/sprintRepost"
+                />
+              </Col>
             </Row>
             <Row>
               <Col span={24}>

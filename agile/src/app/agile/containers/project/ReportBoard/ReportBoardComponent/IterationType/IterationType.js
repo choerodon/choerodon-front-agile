@@ -38,7 +38,6 @@ class IterationType extends Component {
   getIterationTypeData() {
     const { iterationTypeInfo } = this.state;
     const xAxisData = this.getXAxisData();
-    console.log(xAxisData);
     const iterationTypeData = { todoData: [], doingData: [], doneData: [] };
     const { todoData, doingData, doneData } = iterationTypeData;
     let todoDataLength = 0; 

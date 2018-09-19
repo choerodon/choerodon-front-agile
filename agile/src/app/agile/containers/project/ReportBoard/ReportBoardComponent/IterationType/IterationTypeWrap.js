@@ -4,10 +4,11 @@ import IterationType from './IterationType';
 
 class IterationTypeWrap extends Component {
   render() {
+    // const { link } = this.props; 
     return (
       <Card 
-        title="迭代问题类型分布"
-        link="#"
+        title="问题类型状态分布"
+        // link={link}
       >
         <IterationType />
       </Card>
