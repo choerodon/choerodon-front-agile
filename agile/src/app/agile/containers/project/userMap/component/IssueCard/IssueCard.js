@@ -19,7 +19,6 @@ class IssueCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
       issue: {},
       summary: '',
       originSummary: '',
@@ -32,12 +31,17 @@ class IssueCard extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.issue.issueId === this.props.issue.issueId
-      && nextProps.issue.objectVersionNumber === this.props.issue.objectVersionNumber
-      && nextProps.selected === this.props.selected
-      && nextProps.dragged === this.props.dragged
-      && nextProps.index === this.props.index
-      && nextState.summary === this.state.summary
+    const {
+      selected, dragged, index, issue: { issueId, objectVersionNumber },
+    } = this.props;
+    const { summary, isFocus } = this.state;
+    if (nextProps.issue.issueId === issueId
+      && nextProps.issue.objectVersionNumber === objectVersionNumber
+      && nextProps.selected === selected
+      && nextProps.dragged === dragged
+      && nextProps.index === index
+      && nextState.summary === summary
+      && nextState.isFocus === isFocus
     ) {
       return false;
     }
@@ -57,10 +61,14 @@ class IssueCard extends Component {
     if (e.defaultPrevented) return;
 
     e.stopPropagation();
-    const { target } = e;
-    target.focus();
-    target.select();
-    this.setState({ isFocus: true });
+
+    const { isFocus } = this.state;
+    if (!isFocus) {
+      const { target } = e;
+      target.focus();
+      target.select();
+      this.setState({ isFocus: true });
+    }
   }
 
   handleIssueNameChange = (e) => {
@@ -69,40 +77,47 @@ class IssueCard extends Component {
 
   handlePressEnter = (e) => {
     e.preventDefault();
-    if (!this.state.summary) {
+
+    const { summary } = this.state;
+    if (!summary) {
       return;
     }
     e.target.blur();
   }
 
   updateIssueName = (e) => {
+    const { issue, handleUpdateIssueName } = this.props;
+    const { issueId, objectVersionNumber } = issue;
+    const { summary, originSummary } = this.state;
+
     e.preventDefault();
     this.setState({ isFocus: false });
-    const { issue } = this.props;
-    const { issueId, objectVersionNumber } = issue;
-    if (!this.state.summary) {
-      this.setState({ summary: this.state.originSummary });
+    
+    if (!summary) {
+      this.setState({ summary: originSummary });
       return;
     }
-    if (this.state.summary === this.state.originSummary) {
+    if (summary === originSummary) {
       return;
     }
+
     const obj = {
       issueId,
       objectVersionNumber,
-      summary: this.state.summary,
+      summary,
     };
     updateIssue(obj)
       .then((res) => {
-        if (this.props.handleUpdateIssueName) {
-          this.props.handleUpdateIssueName();
+        if (handleUpdateIssueName) {
+          handleUpdateIssueName();
         }
         US.freshIssue(issueId, res.objectVersionNumber, res.summary);
       });
   }
 
   onIssueClick = (id) => {
-    this.props.handleClickIssue(id);
+    const { handleClickIssue } = this.props;
+    handleClickIssue(id);
   };
 
   handleClickDelete() {
@@ -111,12 +126,36 @@ class IssueCard extends Component {
   }
 
   render() {
-    window.console.log('issue card render');
-    const { issue, borderTop, history, selected, dragged, draggableId, index } = this.props;
+    const {
+      issue, borderTop, history, selected, dragged, draggableId, index,
+    } = this.props;
+    const {
+      isFocus,
+      summary,
+      issue: {
+        issueId,
+        statusCode,
+        assigneeId,
+        assigneeName,
+        imageUrl,
+        priorityCode,
+        typeCode,
+        storyPoints,
+        statusName,
+        statusColor,
+        issueNum,
+      },
+    } = this.state;
     const selectIssueIds = US.getSelectIssueIds;
+    
     return (
-      <Draggable draggableId={draggableId} index={index} key={draggableId} disableInteractiveElementBlocking>
-        {(provided1, snapshot1) => (
+      <Draggable
+        draggableId={draggableId}
+        index={index}
+        key={draggableId}
+        disableInteractiveElementBlocking={!isFocus}
+      >
+        {provided1 => (
           <div
             ref={provided1.innerRef}
             {...provided1.draggableProps}
@@ -154,17 +193,17 @@ class IssueCard extends Component {
               <div
                 className="c7n-mask"
                 style={{
-                  display: this.state.issue.statusCode === 'done' && !this.state.isFocus ? 'block' : 'none',
+                  display: statusCode === 'done' && !isFocus ? 'block' : 'none',
                 }}
               />
               <div className="c7n-header">
                 <div className="c7n-headerLeft">
                   <UserHead
                     user={{
-                      id: this.state.issue.assigneeId,
+                      id: assigneeId,
                       loginName: '',
-                      realName: this.state.issue.assigneeName,
-                      avatar: this.state.issue.imageUrl,
+                      realName: assigneeName,
+                      avatar: imageUrl,
                     }}
                     hiddenText
                     size={30}
@@ -172,18 +211,18 @@ class IssueCard extends Component {
                   <span
                     className="c7n-issueNum"
                     style={{ 
-                      textDecoration: this.state.issue.statusCode === 'done' ? 'line-through' : 'unset',
+                      textDecoration: statusCode === 'done' ? 'line-through' : 'unset',
                     }}
                     role="none"
                     onClick={() => {
                       const urlParams = AppState.currentMenuType;
-                      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${this.state.issue.issueNum}&paramIssueId=${this.state.issue.issueId}&paramUrl=usermap`);
+                      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${issueId}&paramUrl=usermap`);
                     }}
                   >
-                    {this.state.issue.issueNum}
+                    {issueNum}
                   </span>
                   <PriorityTag
-                    priority={this.state.issue.priorityCode}
+                    priority={priorityCode}
                   />
                 </div>
                 <Icon
@@ -197,14 +236,9 @@ class IssueCard extends Component {
                 <TextArea
                   className="c7n-textArea"
                   autosize={{ minRows: 1, maxRows: 10 }}
-                  value={this.state.summary}
+                  value={summary}
                   onChange={this.handleIssueNameChange.bind(this)}
                   onPressEnter={this.handlePressEnter}
-                  onClick={this.handleClickTextArea}
-                  // onFocus={(e) => {
-                  //   e.target.select();
-                  //   this.setState({ isFocus: true });
-                  // }}
                   onClick={this.handleClickTextArea}
                   onBlur={this.updateIssueName}
                   spellCheck="false"
@@ -212,14 +246,14 @@ class IssueCard extends Component {
               </div>
               <div className="c7n-footer">
                 <TypeTag
-                  typeCode={this.state.issue.typeCode}
+                  typeCode={typeCode}
                 />
                 <span className="c7n-issueCard-storyPoints">
-                  {this.state.issue.storyPoints}
+                  {storyPoints}
                 </span>
                 <StatusTag
-                  name={this.state.issue.statusName}
-                  color={this.state.issue.statusColor}
+                  name={statusName}
+                  color={statusColor}
                 />
               </div>
             </div>

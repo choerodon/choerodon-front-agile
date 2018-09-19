@@ -17,8 +17,8 @@ class EpicCard extends Component {
     this.state = {
       epicName: '',
       originEpicName: '',
+      isEdit: false,
     };
-    this.isEnter = false;
   }
 
   componentDidMount() {
@@ -26,18 +26,27 @@ class EpicCard extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.epic.issueId === this.props.epic.issueId
-      && nextProps.epic.objectVersionNumber === this.props.epic.objectVersionNumber
-      && nextState.epicName === this.state.epicName
+    const { epic, epic: { issueId, objectVersionNumber }, index } = this.props;
+    const { epicName, isEdit } = this.state;
+    if (nextProps.epic.issueId === issueId
+      && nextProps.epic.epicName === epic.epicName
+      && nextProps.epic.objectVersionNumber === objectVersionNumber
+      && nextProps.index === index
+      && nextState.epicName === epicName
+      && nextState.isEdit === isEdit
     ) {
       return false;
     }
     return true;
   }
 
-  setEpicNameInState() {
-    const { epic } = this.props;
-    const { epicName } = epic;
+  setEpicNameInState(ep) {
+    let e = ep;
+    if (!e) {
+      const { epic } = this.props;
+      e = epic;
+    }
+    const { epicName } = e;
     this.setState({
       epicName,
       originEpicName: epicName,
@@ -47,9 +56,13 @@ class EpicCard extends Component {
   handleClickTextArea = (e) => {
     if (e.defaultPrevented) return;
     
-    const { target } = e;
-    target.focus();
-    target.select();
+    const { isEdit } = this.state;
+    if (!isEdit) {
+      const { target } = e;
+      target.focus();
+      target.select();
+      this.setState({ isEdit: true });
+    }
   }
 
   handleEpicNameChange = (e) => {
@@ -67,39 +80,47 @@ class EpicCard extends Component {
   };
 
   updateEpicName = (e) => {
-    if (!this.state.epicName) {
+    const { epicName, originEpicName } = this.state;
+    const { handleUpdateEpicName } = this.props;
+
+    this.setState({ isEdit: false });
+    if (!epicName) {
       this.setState({
-        epicName: this.state.originEpicName,
+        epicName: originEpicName,
       });
     }
-    if (this.state.epicName === this.state.originEpicName) return;
+    if (epicName === originEpicName) return;
     e.preventDefault();
     const { epic } = this.props;
     const { issueId, objectVersionNumber } = epic;
-    if (!this.state.epicName) return;
+    if (!epicName) return;
     const obj = {
       issueId,
+      epicName,
       objectVersionNumber,
-      epicName: this.state.epicName,
     };
     updateIssue(obj).then((res) => {
       this.setState({
         isEdit: false,
       });
-      US.modifyEpic(issueId, res.objectVersionNumber);
-      if (this.props.handleUpdateEpicName) {
-        this.props.handleUpdateEpicName();
+      US.modifyEpic(issueId, res.epicName, res.objectVersionNumber);
+      if (handleUpdateEpicName) {
+        handleUpdateEpicName();
       }
     });
   };
 
   render() {
-    window.console.log('epic render');
-    const { epic } = this.props;
+    const { epic, index } = this.props;
+    const { isEdit, epicName } = this.state;
     const progress = !epic.issueCount ? 0 : epic.doneIssueCount / epic.issueCount;
     return (
-      <Draggable draggableId={this.props.index} index={this.props.index} disableInteractiveElementBlocking>
-        {(provided1, snapshot1) => (
+      <Draggable
+        draggableId={index}
+        index={index}
+        disableInteractiveElementBlocking={!isEdit}
+      >
+        {provided1 => (
           <div
             ref={provided1.innerRef}
             {...provided1.draggableProps}
@@ -133,11 +154,10 @@ class EpicCard extends Component {
                 <TextArea
                   className="c7n-textArea"
                   autosize={{ minRows: 1, maxRows: 2 }}
-                  value={this.state.epicName}
+                  value={epicName}
                   onChange={this.handleEpicNameChange.bind(this)}
                   onPressEnter={this.handlePressEnter}
                   onClick={this.handleClickTextArea}
-                  // onFocus={e => e.target.select()}
                   role="none"
                   onBlur={this.updateEpicName}
                   spellCheck="false"

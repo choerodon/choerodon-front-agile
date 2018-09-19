@@ -454,9 +454,12 @@ class UserMapStore {
       });
   };
 
-  modifyEpic(issueId, objectVersionNumber) {
-    const index = this.epics.findIndex(epic => epic.issueId === issueId);
-    this.epics[index].objectVersionNumber = objectVersionNumber;
+  modifyEpic(issueId, epicName, objectVersionNumber) {
+    const epicsCopy = _.cloneDeep(toJS(this.epics));
+    const index = _.findIndex(epicsCopy, epic => epic.issueId === issueId);
+    epicsCopy[index].epicName = epicName;
+    epicsCopy[index].objectVersionNumber = objectVersionNumber;
+    this.setEpics(epicsCopy);
   }
 
   freshIssue = (issueId, objectVersionNumber, summary) => {
