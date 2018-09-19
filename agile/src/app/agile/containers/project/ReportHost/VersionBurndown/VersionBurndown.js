@@ -71,16 +71,6 @@ class VersionBurndown extends Component {
   getOption() {
     const { inverse } = this.state;
     const { chartDataOrigin } = ES;
-    // 如果xAxisLabel项多于10个，则上下交错显示
-    // const xAxisData = chartDataOrigin.length >= 10 ? chartDataOrigin.map((item, index) => {
-    //   if (index % 2 === 1) {
-    //     return `\n\n${item.name}`;
-    //   }
-    //   return item.name;
-    // }) : chartDataOrigin.map(item => item.name);
-
-    // const xAxisData = _.map(chartDataOrigin, 'name');
-
     const option = {
       animation: false,
       grid: {
@@ -94,7 +84,6 @@ class VersionBurndown extends Component {
           type: 'category',
           splitLine: { show: false },
           data: _.map(ES.chartDataOrigin, 'name'),
-          // data: xAxisData,
           itemStyle: {
             color: 'rgba(0,0,0,0.65)',
           },
@@ -108,12 +97,10 @@ class VersionBurndown extends Component {
             },
           },
           axisLabel: {
-            interval: 0,
-            rotate: chartDataOrigin.length >= 8 ? 45 : 0,
+            interval: chartDataOrigin.length <= 7 ? 0 : _.parseInt(chartDataOrigin.length / 7),
             show: true,
             showMinLabel: true,
             showMaxLabel: true,
-            // margin: 0,
             agile: 'left',
             textStyle: {
               color: 'rgba(0,0,0,0.65)',
@@ -205,10 +192,10 @@ class VersionBurndown extends Component {
           params[0].name = _.trim(params[0].name, '\n\n');
           const sprint = chartDataOrigin.filter(item => item.name === params[0].name)[0];
           let res = params[0].name;
-          res += `<br/>冲刺开始处：${sprint.start}`;
-          res += `<br/>已完成: ${(params[1].value === '-' ? 0 : params[1].value) + (params[4].value === '-' ? 0 : params[4].value)}`;
-          res += `<br/>添加至version: ${sprint.add}`;
-          res += `<br/>剩余: ${(params[2].value === '-' ? 0 : params[2].value) + (params[3].value === '-' ? 0 : params[3].value)}`;
+          res += `<br/>本迭代开始时故事点数：${sprint.start}`;
+          res += `<br/>工作已完成: ${(params[1].value === '-' ? 0 : params[1].value) + (params[4].value === '-' ? 0 : params[4].value)}`;
+          res += `<br/>工作增加: ${sprint.add}`;
+          res += `<br/>本迭代结束时剩余故事点数: ${(params[2].value === '-' ? 0 : params[2].value) + (params[3].value === '-' ? 0 : params[3].value)}`;
           return res;
         },
       },
@@ -262,7 +249,7 @@ class VersionBurndown extends Component {
                 position: 'inside',
                 color: '#fff',
               },
-              color: 'rgba(69,163,252,0.8)',
+              color: 'rgb(0, 187, 255, 0.8)',
             },
           },
           // data: [3, 3, '-', 13, 18],
@@ -282,7 +269,7 @@ class VersionBurndown extends Component {
                   return param.value === '-' ? null : `+${param.value}`;
                 },
               },
-              color: 'rgba(27,128,223,0.8)',
+              color: 'rgba(27,128,255,0.8)',
               opacity: 0.75,
             },
           },
@@ -407,6 +394,50 @@ class VersionBurndown extends Component {
       }
       history.push(urlPush);
     }
+  }
+
+  renderChart = () => {
+    if (!ES.chartDataOrigin.length) {
+      return (
+        <div style={{ padding: '30px 0 20px', textAlign: 'center' }}>
+          {'当前史诗下没有问题。'}
+        </div>
+      );
+    }
+    if (ES.chartDataOrigin.every(v => v.start === 0 
+      && v.add === 0 
+      && v.left === 0 
+      && v.done === 0)
+    ) {
+      return (
+        <div style={{ padding: '30px 0 20px', textAlign: 'center' }}>
+          {'当前单位下问题均未预估，切换单位或从下方问题列表进行预估。'}
+        </div>
+      );
+    }
+    return (
+      <div className="c7n-report">
+        <div className="c7n-chart">
+          {
+            ES.reload ? null : (
+              <div style={{ position: 'relative' }}>
+                <div className="c7n-chart-yaxixName">
+                  {'故事点'}
+                </div>
+                <ReactEcharts
+                  ref={(e) => { this.echarts_react = e; }}
+                  option={this.getOption()}
+                  style={{ height: 400, left: -31 }}
+                />
+              </div>
+            )
+          }
+        </div>
+        <div className="c7n-toolbar">
+          {this.renderToolbar()}
+        </div>
+      </div>
+    );
   }
 
   renderTable = (type) => {
@@ -777,6 +808,7 @@ class VersionBurndown extends Component {
                     label="版本"
                     value={ES.currentVersionId}
                     onChange={this.handleChangeCurrentVersion.bind(this)}
+                    getPopupContainer={(triggerNode => triggerNode.parentNode)}
                   >
                     {
                       ES.versions.map(version => (
@@ -825,33 +857,7 @@ class VersionBurndown extends Component {
                 <Spin spinning={ES.chartLoading}>
                   <div>
                     {
-                      ES.chartDataOrigin.length ? (
-                        <div className="c7n-report">
-                          <div className="c7n-chart">
-                            {
-                              ES.reload ? null : (
-                                <div style={{ position: 'relative' }}>
-                                  <div className="c7n-chart-yaxixName">
-                                    {'故事点'}
-                                  </div>
-                                  <ReactEcharts
-                                    ref={(e) => { this.echarts_react = e; }}
-                                    option={this.getOption()}
-                                    style={{ height: 400, left: -31 }}
-                                  />
-                                </div>
-                              )
-                            }
-                          </div>
-                          <div className="c7n-toolbar">
-                            {this.renderToolbar()}
-                          </div>
-                        </div>
-                      ) : (
-                        <div style={{ padding: '30px 0 20px', textAlign: 'center' }}>
-                          {ES.tableData.length ? '当前单位下问题均未预估，切换单位或从下方问题列表进行预估。' : '当前版本下没有问题。'}
-                        </div>
-                      )
+                      this.renderChart()
                     }
                     
                   </div>
