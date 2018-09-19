@@ -58,7 +58,7 @@ class Home3 extends Component {
     });
     document.getElementById('fixHead-head').scrollLeft = left;
     const lines = document.getElementsByClassName('fixHead-line-title');
-    for (let i = 0; i < lines.length; i++) {
+    for (let i = 0; i < lines.length; i += 1) {
       if (lines[i].getBoundingClientRect().top - 350 >= -55) {
         console.log(i);
         this.setState({
@@ -79,8 +79,9 @@ class Home3 extends Component {
           <Button className="leftBtn" functyp="flat">
             <Icon type="playlist_add" />
 
+
             创建史诗
-          </Button>
+</Button>
         </Header>
         <Content>
           <div id="qqq" className="fixHead">
@@ -102,8 +103,9 @@ class Home3 extends Component {
               >
                 <div className="fixHead-head-note">
 
+
                   1111
-                  {this.state.title}
+{this.state.title}
                 </div>
               </div>
             </div>

@@ -557,12 +557,12 @@ class VersionBurndown extends Component {
       );
     }
     if (sprintBurnDownReportDTOS && sprintBurnDownReportDTOS.length !== 0) {
-      for (let i = 0; i < sprintBurnDownReportDTOS.length; i++) {
+      for (let i = 0; i < sprintBurnDownReportDTOS.length; i += 1) {
         if (sprintBurnDownReportDTOS[i].completeIssues.length !== 0) {
           firstCompleteIssues = i;
           break;
         }
-        firstCompleteIssues++;
+        firstCompleteIssues += 1;
       }
       if (firstCompleteIssues !== sprintBurnDownReportDTOS.length) {
         return (
@@ -637,6 +637,7 @@ class VersionBurndown extends Component {
                       </div>
                     );
                   }
+                  return '';
                 })
               //  : <p>当前版本下的冲刺没有已完成的问题</p>
             }
@@ -702,7 +703,7 @@ class VersionBurndown extends Component {
   }
 
   transformReleaseDate(data) {
-    const arrDate = data.split('-');
+    const arrDate = data.split(' ')[0].split('-');
     let month = '';
     switch (arrDate[1]) {
       case '01': {
@@ -757,7 +758,7 @@ class VersionBurndown extends Component {
         break;
       }
     }
-    return `${arrDate[1]}/${month}/${arrDate[0].slice(2, 4)}`;
+    return `${arrDate[2]}/${month}/${arrDate[0].slice(2, 4)}`;
   }
 
   renderVersionInfo() {

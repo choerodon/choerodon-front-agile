@@ -108,9 +108,9 @@ class EpicBurndown extends Component {
       ],
       yAxis: [
         {
+          inverse,
           type: 'value',
           position: 'left',
-          inverse,
           axisTick: { show: false },
           axisLine: {
             show: true,
@@ -136,9 +136,9 @@ class EpicBurndown extends Component {
           },
         },
         {
+          inverse,
           type: 'value',
           position: 'right',
-          inverse,
           axisTick: { show: false },
           axisLine: {
             show: true,
@@ -555,12 +555,12 @@ class EpicBurndown extends Component {
       );
     }
     if (sprintBurnDownReportDTOS && sprintBurnDownReportDTOS.length !== 0) {
-      for (let i = 0; i < sprintBurnDownReportDTOS.length; i++) {
+      for (let i = 0; i < sprintBurnDownReportDTOS.length; i += 1) {
         if (sprintBurnDownReportDTOS[i].completeIssues.length !== 0) {
           firstCompleteIssues = i;
           break;
         }
-        firstCompleteIssues++;
+        firstCompleteIssues += 1;
       }
       if (firstCompleteIssues !== sprintBurnDownReportDTOS.length) {
         return (
@@ -635,6 +635,7 @@ class EpicBurndown extends Component {
                       </div>
                     );
                   }
+                  return '';
                 })
               //  : <p>当前史诗下的冲刺没有已完成的问题</p>
             }

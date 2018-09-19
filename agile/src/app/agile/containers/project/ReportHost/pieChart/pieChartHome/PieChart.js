@@ -73,7 +73,7 @@ class ReleaseDetail extends Component {
     });
     const otherTooptipItem = document.getElementsByClassName('pie-otherTooptip-item-percent');
     let opacity = 0.9;
-    for (let i = 0; i < otherTooptipItem.length; i++) {
+    for (let i = 0; i < otherTooptipItem.length; i += 1) {
       opacity = 1 - i * 0.1 > 0 ? 1 - i * 0.1 : 0.9;
       otherTooptipItem[i].style.backgroundColor = `rgba(250,211,82,${opacity})`;
     }
@@ -81,12 +81,13 @@ class ReleaseDetail extends Component {
   }
 
   getSelectDefaultValue = () => {
-    const { pathname } = this.props.location;
+    const { location: { pathname } } = this.props;
     const quaryLinks = [
       { title: '经办人', value: 'assignee' },
       { title: '问题类型', value: 'typeCode' },
       { title: '优先级', value: 'priorityCode' },
       { title: '状态', value: 'statusCode' },
+      { title: '史诗', value: 'epic' },
     ];
     const quaryLink = pathname.slice(pathname.lastIndexOf('/') + 1, pathname.length);
     if (quaryLinks.filter(item => item.value === quaryLink).length === 0) {

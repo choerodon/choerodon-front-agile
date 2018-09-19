@@ -33,12 +33,14 @@ class IssueType extends Component {
     const { issueTypeInfo } = this.state;
     const datas = [];
     const typeCodes = ['story', 'bug', 'task', 'sub_task'];
-    for (let i = 0; i < typeCodes.length; i++) {
+    for (let i = 0; i < typeCodes.length; i += 1) {
       const typeIndex = issueTypeInfo.findIndex(item => item.typeCode === typeCodes[i]);
       if (typeIndex === -1) {
         datas[i] = 0;
       } else {
-        const statusIndex = issueTypeInfo[typeIndex].issueStatus.findIndex(status => status.categoryCode === code);
+        const statusIndex = issueTypeInfo[typeIndex].issueStatus.findIndex(status => (
+          status.categoryCode === code
+        ));
         if (statusIndex === -1) {
           datas[i] = 0;
         } else {

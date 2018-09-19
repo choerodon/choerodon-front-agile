@@ -43,12 +43,12 @@ class ReportBoardHome extends Component {
             <Row gutter={20}>
               <Col span={10}>
                 <EpicProgress
-                  link="reporthost/pieReport"
+                  link="reporthost/pieReport/epic"
                 />
               </Col>
               <Col span={14}>
                 <IssueType 
-                  link=""
+                  link="reporthost/pieReport/typeCode"
                 />
               </Col>
             </Row>
@@ -64,9 +64,7 @@ class ReportBoardHome extends Component {
                 />
               </Col>
               <Col span={8}>
-                <IterationType 
-                  link="reporthost/pieReport/sprintRepost"
-                />
+                <IterationType />
               </Col>
             </Row>
             <Row>

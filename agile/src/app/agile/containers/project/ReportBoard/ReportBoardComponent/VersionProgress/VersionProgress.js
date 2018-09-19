@@ -45,7 +45,7 @@ class VersionProgress extends Component {
     let doingDataLength = 0; 
     let doneDataLength = 0;
     if (versionProgressInfo && versionProgressInfo.length !== 0) {
-      for (let i = 0; i < xAxisData.length; i++) {
+      for (let i = 0; i < xAxisData.length; i += 1) {
         const version = versionProgressInfo.filter(item => item.name === xAxisData[i]);
         todoDataLength = todoData.length;
         doingDataLength = doingData.length;
