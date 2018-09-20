@@ -259,8 +259,52 @@ class ReleaseDetail extends Component {
     );
   }
 
+  renderOtherTooltip = () => {
+    const sourceData = VersionReportStore.getSourceData;
+    const otherDates = sourceData.filter(item => item.percent < 2).sort(this.compare('percent'));
+    if (otherDates && otherDates.length > 0) {
+      if (otherDates.length <= 6) {
+        return (
+          otherDates.map(item => (
+            <div className="pie-otherTooptip-item">
+              <p className="pie-otherTooptip-item-percent">
+                <span>{`${item.percent.toFixed(2)}%`}</span>
+              </p>
+              <p>
+                <Tooltip title={item.name} placement="bottom">
+                  <span>{item.name}</span>
+                </Tooltip>
+              </p>
+            </div>
+          ))
+        );
+      } else {
+        return (
+          <React.Fragment>
+            { otherDates.slice(0, 6).map(item => ( 
+              <div className="pie-otherTooptip-item">
+                <p className="pie-otherTooptip-item-percent">
+                  <span>{`${item.percent.toFixed(2)}%`}</span>
+                </p>
+                <p>
+                  <Tooltip title={item.name} placement="bottom">
+                    <span>{item.name}</span>
+                  </Tooltip>
+                </p>
+              </div>
+            ))}
+            <div className="pie-otherTooptip-item">
+              <span className="pie-otherTooptip-item-ignore">...</span>
+            </div>
+          </React.Fragment>     
+        );
+      }
+    }    
+  }
+
+
   render() {
-    const { value, linkFromParamUrl } = this.state;
+    const { value, showOtherTooltip } = this.state;
     const data = VersionReportStore.getPieData;
     const sourceData = VersionReportStore.getSourceData;
     let total = 0;
@@ -330,22 +374,10 @@ class ReleaseDetail extends Component {
                     option={this.getOption()}
                   />
                  
-                  <div className="pie-otherTooltip">
-                    { this.state.showOtherTooltip ? <div className="pie-otherTooltip-wrap" /> : ''}
+                  <div className="pie-otherTooltip" style={{ display: `${showOtherTooltip ? 'block' : 'none'}` }}>
+                    <div className="pie-otherTooltip-wrap" />
                     <div className="pie-otherTooltip-item-wrap">
-                      { this.state.showOtherTooltip 
-                        ? sourceData.filter(item => item.percent < 2).sort(this.compare('percent')).map(item => (
-                          <div className="pie-otherTooptip-item">
-                            <p className="pie-otherTooptip-item-percent">
-                              <span>{`${item.percent.toFixed(2)}%`}</span>
-                            </p>
-                            <p>
-                              <Tooltip title={item.name} placement="bottom">
-                                <span>{item.name}</span>
-                              </Tooltip>
-                            </p>
-                          </div>
-                        )) : ''}
+                      {this.renderOtherTooltip()}
                     </div>
                    
                   </div>

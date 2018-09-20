@@ -4,7 +4,7 @@
   }
   .pie-otherTooltip{
     position: absolute;
-    bottom: -25px;
+    bottom: -37px;
     left: 0;
     // width: 100%;
     .pie-otherTooltip-wrap{
@@ -30,6 +30,10 @@
         text-align: center;
         color: rgba(0,0,0,0.65);
       }
+    }
+    .pie-otherTooptip-item-ignore{
+      display: inline-block;
+      padding: 5px 12px;
     }
    
   }
