@@ -10,6 +10,7 @@ class Priority extends Component {
       <Card
         title="优先级分布"
         link={link}
+        sprintId={sprintId}
       >
         <Prio
           sprintId={sprintId}

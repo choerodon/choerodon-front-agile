@@ -22,9 +22,9 @@ import NoDataComponent from '../../Component/noData';
 import pic from '../../../../../assets/image/问题管理－空.png';
 import ReleaseStore from '../../../../../stores/project/release/ReleaseStore';
 
-
 const Option = Select.Option;
 const { AppState } = stores;
+let backUrl;
 
 @observer
 class ReleaseDetail extends Component {
@@ -40,11 +40,9 @@ class ReleaseDetail extends Component {
   }
 
   componentDidMount = () => {
-    const { location: { search } } = this.props;
-    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
-    this.setState({
-      linkFromParamUrl: linkFromParamUrl,
-    });
+    const Request = this.GetRequest(this.props.location.search);
+    window.console.log(Request);
+    backUrl = Request.paramUrl || 'reporthost';
     const value = this.getSelectDefaultValue();
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
     setTimeout(() => {
@@ -57,6 +55,18 @@ class ReleaseDetail extends Component {
         }
       });
     }, 0);
+  }
+ 
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
   }
 
   getFirstName = (str) => {
@@ -274,7 +284,11 @@ class ReleaseDetail extends Component {
       <Page className="pie-chart">
         <Header
           title="统计图"
+<<<<<<< HEAD
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+=======
+          backPath={`/agile/${backUrl}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+>>>>>>> afd68d9093254958bf171b6441148b14f081b68a
         >
           <SwitchChart
             history={this.props.history}

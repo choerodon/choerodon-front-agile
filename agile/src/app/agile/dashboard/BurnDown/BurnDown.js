@@ -9,9 +9,6 @@ import {
 import {
   DashBoardNavBar, stores, axios,
 } from 'choerodon-front-boot';
-import TypeTag from '../../components/TypeTag';
-import PriorityTag from '../../components/PriorityTag';
-import StatusTag from '../../components/StatusTag';
 import EmptyBlockDashboard from '../../components/EmptyBlockDashboard';
 import pic from './no_sprint.svg';
 import './index.scss';
@@ -29,7 +26,28 @@ class BurnDown extends Component {
   }
 
   componentDidMount() {
-    this.loadSprints();
+    const unit = this.getUnitFromLocalStorage();
+    this.setState({ unit });
+    this.loadSprints(unit);
+  }
+
+  getUnitFromLocalStorage() {
+    if (!window.localStorage) {
+      return 'remainingEstimatedTime';
+    } else {
+      const storage = window.localStorage;
+      return storage['c7n-agile-dashboard-burndown'] || 'remainingEstimatedTime';
+    }
+  }
+
+  setUnitFromLocalStorage(unit) {
+    if (!window.localStorage) {
+      return false;
+    } else {
+      const storage = window.localStorage;
+      storage['c7n-agile-dashboard-burndown'] = unit;
+      return true;
+    }
   }
 
   getyAxisName(unit) {
@@ -111,6 +129,7 @@ class BurnDown extends Component {
         nameTextStyle: {
           color: '#000',
         },
+        minInterval: 1,
         nameGap: 22,
         type: 'value',
         axisTick: { show: false },
@@ -205,14 +224,14 @@ class BurnDown extends Component {
     return result;
   }
 
-  loadSprints() {
+  loadSprints(unit) {
     const projectId = AppState.currentMenuType.id;
     this.setState({ loading: true });
-    axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, ['started', 'closed'])
+    axios.post(`/agile/v1/projects/${projectId}/sprint/names`, ['started', 'closed'])
       .then((res) => {
         if (res && res.length) {
           this.setState({ sprint: res[0] });
-          this.loadChartData(res[0].sprintId);
+          this.loadChartData(res[0].sprintId, unit);
         } else {
           this.setState({ loading: false });
         }
@@ -258,6 +277,7 @@ class BurnDown extends Component {
     this.setState({ loading: true });
     const { sprint: { sprintId } } = this.state;
     this.setState({ unit: key });
+    this.setUnitFromLocalStorage(key);
     this.loadChartData(sprintId, key);
   }
 

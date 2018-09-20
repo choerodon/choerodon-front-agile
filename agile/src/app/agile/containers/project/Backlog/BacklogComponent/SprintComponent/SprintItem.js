@@ -768,24 +768,26 @@ class SprintItem extends Component {
                             </Tooltip>
                           ))) : ''
                     }
-                    <Icon
-                      style={{
-                        flex: 1,
-                        cursor: 'pointer',
-                        fontSize: 20,
-                        marginLeft: 8,
-                        display: item.assigneeIssues && item.assigneeIssues.length > 0 ? 'block' : 'none',
-                      }}
-                      type="more_vert"
-                      role="none"
-                      onClick={() => {
-                        this.setState({
-                          [indexs]: {
-                            visibleAssign: true,
-                          },
-                        });
-                      }}
-                    />
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                      <Icon
+                        style={{
+                          // flex: 1,
+                          cursor: 'pointer',
+                          fontSize: 20,
+                          marginLeft: 8,
+                          display: item.assigneeIssues && item.assigneeIssues.length > 0 ? 'inline-block' : 'none',
+                        }}
+                        type="more_vert"
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            [indexs]: {
+                              visibleAssign: true,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
                     <AssigneeModal
                       visible={this.state[indexs] && this.state[indexs].visibleAssign || false}
                       onCancel={() => {

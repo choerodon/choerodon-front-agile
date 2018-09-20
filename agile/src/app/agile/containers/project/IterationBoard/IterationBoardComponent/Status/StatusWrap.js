@@ -4,12 +4,12 @@ import Status from './Status';
 
 class StatusWrap extends Component {
   render() {
-    const { sprintId, link } = this.props;
+    const { sprintId } = this.props;
 
     return (
       <Card
         title="状态分布"
-        link={link}
+        sprintId={sprintId}
       >
         <Status
           sprintId={sprintId}

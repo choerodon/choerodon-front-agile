@@ -29,10 +29,31 @@ class BurnDown extends Component {
     const { sprintId } = this.props;
     if (nextProps.sprintId !== sprintId) {
       const newSprintId = nextProps.sprintId;
+      const unit = this.getUnitFromLocalStorage();
       this.setState({
+        unit,
         sprintId: newSprintId,
       });
-      this.loadSprints(newSprintId);
+      this.loadSprints(newSprintId, unit);
+    }
+  }
+
+  getUnitFromLocalStorage() {
+    if (!window.localStorage) {
+      return 'remainingEstimatedTime';
+    } else {
+      const storage = window.localStorage;
+      return storage['c7n-agile-iterationBoard-burndown'] || 'remainingEstimatedTime';
+    }
+  }
+
+  setUnitFromLocalStorage(unit) {
+    if (!window.localStorage) {
+      return false;
+    } else {
+      const storage = window.localStorage;
+      storage['c7n-agile-iterationBoard-burndown'] = unit;
+      return true;
     }
   }
 
@@ -74,7 +95,7 @@ class BurnDown extends Component {
       grid: {
         y2: 30,
         top: '40',
-        left: 0,
+        left: '10',
         right: '40',
         containLabel: true,
       },
@@ -210,7 +231,7 @@ class BurnDown extends Component {
     return result;
   }
 
-  loadSprints(sprintId) {
+  loadSprints(sprintId, unit) {
     const projectId = AppState.currentMenuType.id;
     this.setState({ loading: true });
     axios.post(`/agile/v1/projects/${projectId}/sprint/names`, ['started', 'closed'])
@@ -218,7 +239,7 @@ class BurnDown extends Component {
         if (res && res.length) {
           const sprint = res.find(v => v.sprintId === sprintId);
           this.setState({ sprint });
-          this.loadChartData(sprintId);
+          this.loadChartData(sprintId, unit);
         } else {
           this.setState({ loading: false });
         }
@@ -267,6 +288,7 @@ class BurnDown extends Component {
     this.setState({ loading: true });
     const { sprintId } = this.state;
     this.setState({ unit: key });
+    this.setUnitFromLocalStorage(key);
     this.loadChartData(sprintId, key);
   }
 
@@ -307,7 +329,7 @@ class BurnDown extends Component {
       </Menu>
     );
     return (
-      <div className="c7n-agile-dashboard-burndown">
+      <div className="c7n-agile-iterationboard-burndown">
         <div className="switch" style={{ display: !loading && !sprintId ? 'none' : 'block' }}>
           <Dropdown overlay={menu} trigger={['click']} getPopupContainer={triggerNode => triggerNode.parentNode}>
             <div className="ant-dropdown-link c7n-agile-dashboard-burndown-select">

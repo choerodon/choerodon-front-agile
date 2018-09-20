@@ -4,12 +4,12 @@ import Sprint from './Sprint';
 
 class SprintWrap extends Component {
   render() {
-    const { sprintId, sprintName, link } = this.props;
+    const { sprintId, sprintName } = this.props;
 
     return (
       <Card
         title={sprintName}
-        link={link}
+        sprintId={sprintId}
       >
         <Sprint
           sprintId={sprintId}

@@ -481,24 +481,14 @@ class UserMapStore {
   handleMoveIssue = (data, type = 'userMap') => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/move`, data)
     .then((res) => {
       if (type === 'userMap' && this.showBackLog) {
-        this.initData(false);
+        this.loadIssues('usermap');
         this.loadBacklogIssues();
       } else if (type === 'userMap' && !this.showBackLog) {
-        this.initData(false);
+        this.loadIssues('usermap');
       } else {
         this.loadBacklogIssues();
       }
-    })
-    .catch((error) => {
-      if (type === 'userMap' && this.showBackLog) {
-        this.initData(false);
-        this.loadBacklogIssues();
-      } else if (type === 'userMap' && !this.showBackLog) {
-        this.initData(false);
-      } else {
-        this.loadBacklogIssues();
-      }
-    })
+    });
   
   deleteIssue = (issueId) => {
     const issue = _.find(this.issues, v => v.issueId === issueId);
