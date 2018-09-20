@@ -14,6 +14,7 @@ class IssueTypeWrap extends Component {
       <Card
         title="迭代问题类型分布"
         link={link}
+        sprintId={sprintId}
       >
         <IssueType 
           sprintId={sprintId}

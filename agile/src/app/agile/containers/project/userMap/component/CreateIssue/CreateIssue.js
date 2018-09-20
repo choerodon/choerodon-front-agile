@@ -113,7 +113,11 @@ class CreateIssue extends Component {
             />
           </div>
           <div className="c7n-footer">
-            <Dropdown overlay={typeList} trigger={['click']}>
+            <Dropdown
+              overlay={typeList}
+              trigger={['click']}
+              getPopupContainer={triggerNode => triggerNode}
+            >
               <div style={{ display: 'flex', alignItem: 'center' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <TypeTag

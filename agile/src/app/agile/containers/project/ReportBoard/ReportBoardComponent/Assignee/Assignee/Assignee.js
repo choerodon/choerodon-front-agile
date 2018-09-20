@@ -69,11 +69,36 @@ class Assignee extends Component {
     this.setState({ loading: true });
     axios.get(`agile/v1/projects/${projectId}/reports/pie_chart?fieldName=assignee`)
       .then((res) => {
+        const assigneeInfo = this.transformAssigneeInfo(res);
         this.setState({
+          assigneeInfo,
           loading: false,
-          assigneeInfo: res,
         });
       });
+  }
+
+  transformAssigneeInfo(assigneeInfo) {
+    const res = [];
+    let other = {
+      name: '其它',
+      value: 0,
+      percent: 0,
+    };
+    assigneeInfo.forEach((v) => {
+      if (v.percent >= 3) {
+        res.push(v);
+      } else {
+        other = {
+          name: '其它',
+          value: other.value + v.value,
+          percent: other.percent + v.percent,
+        };
+      }
+    });
+    if (other.value && other.percent) {
+      res.push(other);
+    }
+    return res;
   }
 
   renderContent() {

@@ -4,12 +4,12 @@ import Remain from './Remain';
 
 class RemainWrap extends Component {
   render() {
-    const { sprintId, link } = this.props;
+    const { sprintId } = this.props;
     
     return (
       <Card
         title="距离冲刺结束"
-        link={link}
+        sprintId={sprintId}
       >
         <Remain
           sprintId={sprintId}

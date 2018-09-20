@@ -227,7 +227,7 @@ class AccumulationHome extends Component {
           // },
         },
         legend: {
-          right: '1%',
+          right: '90',
           data: legendData,
           top: '3%',
           itemGap: 30,
@@ -235,8 +235,8 @@ class AccumulationHome extends Component {
           itemHeight: 14,
         },
         grid: {
-          left: '0%',
-          right: '16px',
+          left: '50',
+          right: '90',
           top: '8%',
           containLabel: true,
         },
