@@ -41,10 +41,17 @@ class AccumulationHome extends Component {
       optionsVisible: false,
       sprintData: {},
       loading: false,
+      linkFromParamUrl: undefined,
     };
   }
 
   componentWillMount() {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    this.setState({
+      linkFromParamUrl,
+    });
+
     AccumulationStore.axiosGetFilterList().then((data) => {
       const newData = _.clone(data);
       for (let index = 0, len = newData.length; index < len; index += 1) {
@@ -380,12 +387,13 @@ class AccumulationHome extends Component {
   // }
   render() {
     const { history } = this.props;
+    const { linkFromParamUrl } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
       <Page>
         <Header
           title="累积流量图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}

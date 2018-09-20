@@ -19,7 +19,20 @@ const Option = Select.Option;
 
 @observer
 class VelocityChart extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      linkFromParamUrl: undefined,
+    };
+  }
+
   componentDidMount() {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    this.setState({
+      linkFromParamUrl,
+    });
+
     VS.setCurrentUnit('story_point');
     VS.setChartData([]);
     VS.setTableData([]);
@@ -283,12 +296,13 @@ class VelocityChart extends Component {
 
   render() {
     const { history } = this.props;
+    const { linkFromParamUrl } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-velocity">
         <Header
           title="迭代速度图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${
             urlParams.name
           }&organizationId=${urlParams.organizationId}`}
         >
@@ -313,16 +327,19 @@ class VelocityChart extends Component {
               >
                 <Option key="story_point" value="story_point">
 
+
                   故事点
-                </Option>
+</Option>
                 <Option key="issue_count" value="issue_count">
 
+
                   问题计数
-                </Option>
+</Option>
                 <Option key="remain_time" value="remain_time">
 
+
                   剩余时间
-                </Option>
+</Option>
               </Select>
               <Spin spinning={VS.chartLoading}>
                 <ReactEcharts className="c7n-chart" option={this.getOption()} />
@@ -350,8 +367,9 @@ class VelocityChart extends Component {
                     }}
                   >
 
+
                     待办事项
-                  </span>
+</span>
                   <span>中创建一个冲刺</span>
                 </div>
 )}

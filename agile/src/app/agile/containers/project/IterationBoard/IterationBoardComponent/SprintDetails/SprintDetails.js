@@ -4,6 +4,7 @@ import {
   Table, Tabs, Spin, Tooltip, Pagination,
 } from 'choerodon-ui';
 import _ from 'lodash';
+import { withRouter } from 'react-router-dom';
 import TypeTag from '../../../../../components/TypeTag';
 import PriorityTag from '../../../../../components/PriorityTag';
 import StatusTag from '../../../../../components/StatusTag';
@@ -206,7 +207,7 @@ class SprintDetails extends Component {
     
 
     render() {
-      const { activeKey, pagination } = this.state;
+      const { activeKey, pagination, sprintId } = this.state;
       const column = [{
         title: '关键字',
         dataIndex: 'issueNum',
@@ -222,7 +223,7 @@ class SprintDetails extends Component {
             onClick={() => {
               const { history } = this.props;
               const urlParams = AppState.currentMenuType;
-              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/sprintreport`);
+              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=iterationBoard/${sprintId}`);
             }}
           >
             {issueNum} 
@@ -243,9 +244,7 @@ class SprintDetails extends Component {
                 maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
             >
-              <a>
-                {summary}
-              </a>
+              {summary}
             </div>
           </Tooltip>
         ),
@@ -334,4 +333,4 @@ class SprintDetails extends Component {
     }
 }
 
-export default SprintDetails;
+export default withRouter(SprintDetails);

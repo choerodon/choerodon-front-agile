@@ -10,7 +10,6 @@ import {
 } from 'choerodon-ui';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import html2canvas from 'html2canvas';
-import Canvas2Image from '../../../../../../../node_modules/canvas2image/canvas2image';
 import './Home4.scss';
 import CreateEpic from '../component/CreateEpic';
 import Backlog from '../component/Backlog/Backlog.js';
@@ -20,9 +19,11 @@ import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
+const FileSaver = require('file-saver');
+
 // let scrollL;
 const left = 0;
-let inWhich = undefined;
+let inWhich;
 
 function toFullScreen(dom) {
   if (dom.requestFullscreen) {
@@ -176,12 +177,12 @@ class Home3 extends Component {
   // }, 300);
 
   handleMouseOverHead = (e) => {
-    window.console.log('in header');
+    // window.console.log('in header');
     inWhich = 'header';
   }
 
   handleMouseOverBody = (e) => {
-    window.console.log('in body');
+    // window.console.log('in body');
     inWhich = 'body';
   }
 
@@ -501,7 +502,7 @@ class Home3 extends Component {
               ...issuesDragged,
               ...backlogIssuesCopy.slice(backlogInsertIndex),
             ];
-            window.console.log(resBacklogIssues);
+            // window.console.log(resBacklogIssues);
           }
         } else {
           resBacklogIssues = issuesDragged.concat(backlogIssuesCopy);
@@ -548,7 +549,7 @@ class Home3 extends Component {
     }
     UserMapStore.setBacklogIssues(resBacklogIssues);
     UserMapStore.setIssues(resIssues);
-    window.console.log(resIssues);
+    // window.console.log(resIssues);
   }
 
   handleMultipleDragToBoard = (res) => {
@@ -1335,6 +1336,8 @@ class Home3 extends Component {
   };
 
   handleSaveAsImage = () => {
+    const { UserMapStore } = this.props;
+    UserMapStore.saveChangeShowBackLog();
     this.setState({
       popOverVisible: false,
     });
@@ -1344,6 +1347,8 @@ class Home3 extends Component {
       duration: 2,
     });
     const shareContent = document.querySelector('.fixHead');// 需要截图的包裹的（原生的）DOM 对象
+    const shareContentWidth = shareContent.style.width;
+    const shareContentHeight = shareContent.style.height;
     shareContent.style.width = `${Math.max(document.querySelector('.fixHead-head').scrollWidth, document.querySelector('.fixHead-body').scrollWidth)}px`;
     shareContent.style.height = `${document.querySelector('.fixHead-head').scrollHeight + document.querySelector('.fixHead-body').scrollHeight}px`;
 
@@ -1365,24 +1370,17 @@ class Home3 extends Component {
 
     html2canvas(shareContent, opts)
       .then((pcanvas) => {
-        this.downLoadImage(pcanvas, '用户故事地图.png');
+        pcanvas.toBlob((blob) => {
+          FileSaver.saveAs(blob, '用户故事地图.png');
+        });
+        shareContent.style.width = shareContentWidth;
+        shareContent.style.height = shareContentHeight;
+
         message.success('导出图片成功', undefined, undefined, 'top');
       })
       .catch((error) => {
         message.error('导出图片失败', undefined, undefined, 'top');
       }); 
-  }
-
-  /**
-   *
-   * @param {canvas} canvas
-   * @param {filename} name
-   */
-  downLoadImage(canvas, name) {
-    const a = document.createElement('a');
-    a.href = canvas.toDataURL();
-    a.download = name;
-    a.click();
   }
 
   getHistoryCount = (id) => {
@@ -1599,15 +1597,15 @@ class Home3 extends Component {
                         //     >
                         //       {item.issueId}
                         <IssueCard
-                                draggableId={`${mode}-${item.issueId}`}
-                                index={indexs}
-                                selected={selectIssueIds.includes(item.issueId)}
-                                dragged={currentDraggableId === item.issueId}
-                                handleClickIssue={this.handleClickIssue}
-                                key={item.issueId}
-                                issue={item}
-                                borderTop={indexs === 0}
-                              />
+                          draggableId={`${mode}-${item.issueId}`}
+                          index={indexs}
+                          selected={selectIssueIds.includes(item.issueId)}
+                          dragged={currentDraggableId === item.issueId}
+                          handleClickIssue={this.handleClickIssue}
+                          key={item.issueId}
+                          issue={item}
+                          borderTop={indexs === 0}
+                        />
                         //     </div>
                         //   )}
                         // </Draggable>
@@ -1746,15 +1744,15 @@ class Home3 extends Component {
                         //     >
                         //       {item.issueId}
                         <IssueCard
-                                draggableId={`${mode}-${item.issueId}`}
-                                index={indexs}
-                                selected={selectIssueIds.includes(item.issueId)}
-                                dragged={currentDraggableId === item.issueId}
-                                handleClickIssue={this.handleClickIssue}
-                                key={item.issueId}
-                                issue={item}
-                                borderTop={indexs === 0}
-                              />
+                          draggableId={`${mode}-${item.issueId}`}
+                          index={indexs}
+                          selected={selectIssueIds.includes(item.issueId)}
+                          dragged={currentDraggableId === item.issueId}
+                          handleClickIssue={this.handleClickIssue}
+                          key={item.issueId}
+                          issue={item}
+                          borderTop={indexs === 0}
+                        />
                         //     </div>
                         //   )}
                         // </Draggable>

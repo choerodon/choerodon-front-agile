@@ -35,10 +35,16 @@ class ReleaseDetail extends Component {
       type: '',
       value: '',
       showOtherTooltip: false,
+      linkFromParamUrl: undefined,
     };
   }
 
   componentDidMount = () => {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    this.setState({
+      linkFromParamUrl: linkFromParamUrl,
+    });
     const value = this.getSelectDefaultValue();
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
     setTimeout(() => {
@@ -52,7 +58,6 @@ class ReleaseDetail extends Component {
       });
     }, 0);
   }
- 
 
   getFirstName = (str) => {
     if (!str) {
@@ -245,7 +250,7 @@ class ReleaseDetail extends Component {
   }
 
   render() {
-    const { value } = this.state;
+    const { value, linkFromParamUrl } = this.state;
     const data = VersionReportStore.getPieData;
     const sourceData = VersionReportStore.getSourceData;
     let total = 0;
@@ -269,7 +274,7 @@ class ReleaseDetail extends Component {
       <Page className="pie-chart">
         <Header
           title="统计图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwitchChart
             history={this.props.history}

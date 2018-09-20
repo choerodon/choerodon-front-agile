@@ -69,8 +69,24 @@ class EpicBurndown extends Component {
   }
 
   getOption() {
-    const { inverse } = this.state;
+    const { checkbox, inverse } = this.state;
     const { chartDataOrigin } = ES;
+    const xAxisData = chartDataOrigin.length >= 10 ? chartDataOrigin.map((item, index) => {
+      if (index % 2 === 1) {
+        return `\n\n${item.name}`;
+      }
+      return item.name;
+    }) : chartDataOrigin.map(item => item.name);
+
+
+    // const xAxisData = chartDataOrigin.length > 6 ? chartDataOrigin.map((item, index) => {
+    //   if (item.name.length > 5) {
+    //   console.log(item.name,item.name.length);
+    //     // return `${item.name.silce(0, 5)}\n${item.name.silce(5, item.name.length)}`;
+    //   }
+    //   return item.name;
+    // }) : chartDataOrigin.map(item => item.name);
+
     const option = {
       animation: false,
       grid: {
@@ -82,7 +98,8 @@ class EpicBurndown extends Component {
       xAxis: [
         {
           type: 'category',
-          data: _.map(ES.chartDataOrigin, 'name'),
+          // data: _.map(ES.chartDataOrigin, 'name'),
+          data: xAxisData,
           itemStyle: {
             color: 'rgba(0,0,0,0.65)',
           },
@@ -96,7 +113,8 @@ class EpicBurndown extends Component {
             },
           },
           axisLabel: {
-            interval: chartDataOrigin.length <= 7 ? 0 : _.parseInt(chartDataOrigin.length / 7),
+            // interval: chartDataOrigin.length <= 7 ? 0 : _.parseInt(chartDataOrigin.length / 7),
+            interval: 0,
             show: true,
             showMinLabel: true,
             agile: 'right',
@@ -214,12 +232,14 @@ class EpicBurndown extends Component {
             },
           },
           // data: [0, 0, 0, 16, 19],
-          data: ES.chartData[0],
+          // data: ES.chartData[0],
+          data: (checkbox && checkbox[0] === 'checked') ? _.fill(Array(ES.chartData[0].length), 0) : ES.chartData[0],
         },
         {
           name: '工作已完成',
           type: 'bar',
           stack: '总量',
+          barMinHeight: 15,
           itemStyle: {
             normal: {
               label: {
@@ -240,6 +260,7 @@ class EpicBurndown extends Component {
           name: '工作剩余',
           type: 'bar',
           stack: '总量',
+          barMinHeight: 15,
           itemStyle: {
             normal: {
               label: {
@@ -247,7 +268,8 @@ class EpicBurndown extends Component {
                 position: 'inside',
                 color: '#fff',
               },
-              color: 'rgb(0, 187, 255, 0.8)',
+              // color: 'rgb(0, 187, 255, 0.8)',
+              color: 'rgba(69,163,252,0.80)',
             },
           },
           // data: [3, 3, '-', 13, 18],
@@ -257,6 +279,7 @@ class EpicBurndown extends Component {
           name: '工作增加',
           type: 'bar',
           stack: '总量',
+          barMinHeight: 15,
           itemStyle: {
             normal: {
               label: {
@@ -267,7 +290,8 @@ class EpicBurndown extends Component {
                   return param.value === '-' ? null : `+${param.value}`;
                 },
               },
-              color: 'rgba(27,128,255,0.8)',
+              // color: 'rgba(27,128,255,0.8)',
+              color: 'rgba(27,128,223,0.80)',
               opacity: 0.75,
             },
           },
@@ -278,6 +302,7 @@ class EpicBurndown extends Component {
           name: 'compoleted again',
           type: 'bar',
           stack: '总量',
+          barMinHeight: 15,
           itemStyle: {
             normal: {
               label: {
@@ -316,12 +341,12 @@ class EpicBurndown extends Component {
 
   getStoryPoints = () => {
     const { chartData } = ES;
-    if (chartData[2].length > 3) {
-      const lastRemain = _.last(this.transformPlaceholder2Zero(chartData[2]));
-      const lastAdd = _.last(this.transformPlaceholder2Zero(chartData[3]));
-      return lastRemain + lastAdd;
-    }
-    return 0;
+    // if (chartData[2].length > 3) {
+    const lastRemain = _.last(this.transformPlaceholder2Zero(chartData[2]));
+    const lastAdd = _.last(this.transformPlaceholder2Zero(chartData[3]));
+    return lastRemain + lastAdd;
+    // }
+    // return 0;
   }
 
   getSprintCount() {
@@ -398,18 +423,7 @@ class EpicBurndown extends Component {
     if (!ES.chartDataOrigin.length) {
       return (
         <div style={{ padding: '30px 0 20px', textAlign: 'center' }}>
-          {'当前史诗下没有问题。'}
-        </div>
-      );
-    }
-    if (ES.chartDataOrigin.every(v => v.start === 0 
-      && v.add === 0 
-      && v.left === 0 
-      && v.done === 0)
-    ) {
-      return (
-        <div style={{ padding: '30px 0 20px', textAlign: 'center' }}>
-          {'当前单位下问题均未预估，切换单位或从下方问题列表进行预估。'}
+          {'当前史诗下没有故事点'}
         </div>
       );
     }
@@ -678,24 +692,27 @@ class EpicBurndown extends Component {
     return (
       <div className="toolbar-forcast">
         <h3 className="title">{this.renderToolbarTitle()}</h3>
-        <div className="word">
-          <div className="icon">
-            <img src={sprintIcon} alt="冲刺迭代" />
+        <div className="toolbar-forcast-content">
+          <div className="word">
+            <div className="icon">
+              <img src={sprintIcon} alt="冲刺迭代" />
+            </div>
+            <span>{`冲刺迭代：${!this.getSprintSpeed() ? '无法预估' : this.getSprintCount()}`}</span>
           </div>
-          <span>{`冲刺迭代：${!this.getSprintSpeed() ? '无法预估' : this.getSprintCount()}`}</span>
-        </div>
-        <div className="word">
-          <div className="icon">
-            <img src={speedIcon} alt="冲刺速度" />
+          <div className="word">
+            <div className="icon">
+              <img src={speedIcon} alt="冲刺速度" />
+            </div>
+            <span>{`冲刺速度：${this.getSprintSpeed()}`}</span>
           </div>
-          <span>{`冲刺速度：${this.getSprintSpeed()}`}</span>
-        </div>
-        <div className="word">
-          <div className="icon">
-            <img src={storyPointIcon} alt="剩余故事点" />
+          <div className="word">
+            <div className="icon">
+              <img src={storyPointIcon} alt="剩余故事点" />
+            </div>
+            <span>{`剩余故事点：${this.getStoryPoints()}`}</span>
           </div>
-          <span>{`剩余故事点：${this.getStoryPoints()}`}</span>
         </div>
+       
       </div>
     );
   }

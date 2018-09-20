@@ -131,6 +131,7 @@ class UserMapStore {
   @computed get getSelectIssueIds() {
     return this.selectIssueIds;
   }
+
   @action
   setCurrentDraggableId(data) {
     this.currentDraggableId = data;
@@ -143,6 +144,10 @@ class UserMapStore {
 
   @action changeShowBackLog() {
     this.showBackLog = !this.showBackLog;
+  }
+
+  @action saveChangeShowBackLog() {
+    this.showBackLog = false;
   }
 
   @computed
@@ -312,8 +317,7 @@ class UserMapStore {
       .then((issues) => {
         if (issues.failed) {
           this.setIssues([]);
-        } else {
-          if (this.mode === 'version') {
+        } else if (this.mode === 'version') {
             const uniqIssues = _.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId');
             const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
             // this.setIssues(_.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId'));
@@ -323,7 +327,6 @@ class UserMapStore {
             // this.setIssues(issues);
             this.setIssues(sortedIssues);
           }
-        }
       });
   }
 
@@ -440,8 +443,7 @@ class UserMapStore {
       .then((res) => {
         if (res.failed) {
           this.setBacklogIssues([]);
-        } else {
-          if (this.mode === 'version') {
+        } else if (this.mode === 'version') {
             const uniqIssues = _.uniqBy(_.orderBy(res, ['versionId'], ['desc']), 'issueId');
             const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
             this.setBacklogIssues(sortedUniqIssues);
@@ -449,7 +451,6 @@ class UserMapStore {
             const sortedUniqIssues = _.orderBy(res, 'mapRank', 'asc');
             this.setBacklogIssues(sortedUniqIssues);
           }
-        }
         this.setBacklogExpand([]);
       });
   };

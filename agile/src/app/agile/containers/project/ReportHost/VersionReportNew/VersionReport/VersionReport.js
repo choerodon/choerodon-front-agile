@@ -2,8 +2,12 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Tabs, Table, Select, Icon, Tooltip, Spin } from 'choerodon-ui';
+import {
+ Page, Header, Content, stores 
+} from 'choerodon-front-boot';
+import {
+ Button, Tabs, Table, Select, Icon, Tooltip, Spin 
+} from 'choerodon-ui';
 import pic from './no_version.svg';
 import finish from './legend/finish.svg';
 import total from './legend/total.svg';
@@ -23,7 +27,20 @@ const MONTH = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '�
 
 @observer
 class EpicReport extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      linkFromParamUrl: undefined,
+    };
+  }
+
   componentDidMount() {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    this.setState({
+      linkFromParamUrl,
+    });
+
     VS.loadEpicAndChartAndTableData();
   }
   
@@ -439,7 +456,12 @@ class EpicReport extends Component {
                 const urlParams = AppState.currentMenuType;
                 history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
               }}
-            >{issueNum} {record.addIssue ? '*' : ''}</span>
+            >
+{issueNum} 
+{' '}
+{record.addIssue ? '*' : ''}
+
+            </span>
           ),
         },
         {
@@ -449,7 +471,9 @@ class EpicReport extends Component {
           render: summary => (
             <div style={{ width: '100%', overflow: 'hidden' }}>
               <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={summary}>
-                <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+                <p style={{
+ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 
+}}>
                   {summary}
                 </p>
               </Tooltip>
@@ -528,12 +552,13 @@ class EpicReport extends Component {
 
   render() {
     const { history } = this.props;
+    const { linkFromParamUrl } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-versionReport">
         <Header 
           title="版本报告"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}
@@ -594,8 +619,9 @@ class EpicReport extends Component {
                       this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
                     }}
                   >
+
                     在“问题管理中”查看
-                    <Icon style={{ fontSize: 13 }} type="open_in_new" />
+<Icon style={{ fontSize: 13 }} type="open_in_new" />
                   </p>
                 </div>
                 <Spin spinning={VS.chartLoading}>
@@ -639,8 +665,8 @@ class EpicReport extends Component {
                 textWidth="auto"
                 pic={pic}
                 title="当前项目无可用版本"
-                des={
-                  <div>
+                des={(
+<div>
                     <span>请在</span>
                     <span
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
@@ -653,7 +679,7 @@ class EpicReport extends Component {
                     </span>
                     <span>中创建一个版本</span>
                   </div>
-                }
+)}
               />
             )
           }

@@ -79,7 +79,7 @@
       margin-bottom: 36px;
       .c7n-chart-yaxixName{
         position: absolute;
-        top: calc(35% - 60px);
+        top: calc(43% - 60px);
         // left: 30px;
         width: 12px;
         font-size: 12;
@@ -157,6 +157,10 @@
           line-height: 20px;
           margin-bottom: 20px;
         }
+        
+        .toolbar-forcast-content{
+          margin: 0 auto;
+        }
 
         .word {
           height: 20px;
@@ -164,7 +168,6 @@
           font-size: 14px;
           color: #000;
           margin-bottom: 20px;
-          padding-left: 55px;
           display: flex;
           align-items: center;
 
