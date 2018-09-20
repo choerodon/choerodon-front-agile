@@ -284,11 +284,7 @@ class ReleaseDetail extends Component {
       <Page className="pie-chart">
         <Header
           title="统计图"
-<<<<<<< HEAD
-          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
-=======
           backPath={`/agile/${backUrl}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
->>>>>>> afd68d9093254958bf171b6441148b14f081b68a
         >
           <SwitchChart
             history={this.props.history}

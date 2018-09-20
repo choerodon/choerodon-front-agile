@@ -34,10 +34,16 @@ class BurndownChartHome extends Component {
       tableLoading: true,
       endDate: '',
       startDate: '',
+      linkFromParamUrl: undefined,
     };
   }
 
   componentWillMount() {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    this.setState({
+      linkFromParamUrl: linkFromParamUrl,
+    });
     this.getSprintData();
   }
 
@@ -584,12 +590,12 @@ class BurndownChartHome extends Component {
     }
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    
+    const { linkFromParamUrl } = this.state;
     return (
       <Page>
         <Header
           title="燃尽图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}
