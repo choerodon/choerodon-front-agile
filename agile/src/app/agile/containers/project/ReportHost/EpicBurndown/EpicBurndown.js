@@ -71,22 +71,6 @@ class EpicBurndown extends Component {
   getOption() {
     const { checkbox, inverse } = this.state;
     const { chartDataOrigin } = ES;
-    const xAxisData = chartDataOrigin.length >= 10 ? chartDataOrigin.map((item, index) => {
-      if (index % 2 === 1) {
-        return `\n\n${item.name}`;
-      }
-      return item.name;
-    }) : chartDataOrigin.map(item => item.name);
-
-
-    // const xAxisData = chartDataOrigin.length > 6 ? chartDataOrigin.map((item, index) => {
-    //   if (item.name.length > 5) {
-    //   console.log(item.name,item.name.length);
-    //     // return `${item.name.silce(0, 5)}\n${item.name.silce(5, item.name.length)}`;
-    //   }
-    //   return item.name;
-    // }) : chartDataOrigin.map(item => item.name);
-
     const option = {
       animation: false,
       grid: {
@@ -98,8 +82,8 @@ class EpicBurndown extends Component {
       xAxis: [
         {
           type: 'category',
-          // data: _.map(ES.chartDataOrigin, 'name'),
-          data: xAxisData,
+          data: _.map(ES.chartDataOrigin, 'name'),
+          // data: xAxisData,
           itemStyle: {
             color: 'rgba(0,0,0,0.65)',
           },
@@ -122,11 +106,13 @@ class EpicBurndown extends Component {
               color: 'rgba(0,0,0,0.65)',
             },
             formatter(value, index) {
-              if (value.length > 7) {
-                return `${value.slice(0, 7)}...`;
-              } else {
-                return value;
+              if (chartDataOrigin.length > 7) {
+                return value.length > 5 ? `${value.slice(0, 5)}...` : value;
               }
+              if (chartDataOrigin.length > 10) {
+                return value.length > 3 ? `${value.slice(0, 3)}...` : value;
+              }
+              return value.length > 7 ? `${value.slice(0, 7)}...` : value;
             },
           },
         },

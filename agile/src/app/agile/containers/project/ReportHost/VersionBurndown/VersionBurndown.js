@@ -97,7 +97,7 @@ class VersionBurndown extends Component {
             },
           },
           axisLabel: {
-            interval: chartDataOrigin.length <= 7 ? 0 : _.parseInt(chartDataOrigin.length / 7),
+            interval: 0,
             show: true,
             showMinLabel: true,
             showMaxLabel: true,
@@ -106,11 +106,13 @@ class VersionBurndown extends Component {
               color: 'rgba(0,0,0,0.65)',
             },
             formatter(value, index) {
-              if (value.length > 7) {
-                return `${value.slice(0, 7)}...`;
-              } else {
-                return value;
+              if (chartDataOrigin.length > 7) {
+                return value.length > 5 ? `${value.slice(0, 5)}...` : value;
               }
+              if (chartDataOrigin.length > 10) {
+                return value.length > 3 ? `${value.slice(0, 3)}...` : value;
+              }
+              return value.length > 7 ? `${value.slice(0, 7)}...` : value;
             },
           },
         },
