@@ -24,6 +24,7 @@ const TabPane = Tabs.TabPane;
 const { AppState } = stores;
 const Option = Select.Option;
 const MONTH = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'];
+let backUrl;
 
 @observer
 class EpicReport extends Component {
@@ -44,6 +45,18 @@ class EpicReport extends Component {
     VS.loadEpicAndChartAndTableData();
   }
   
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
+  }
+
   getLabel(record) {
     if (VS.beforeCurrentUnit === 'story_point') {
       if (record.typeCode === 'story') {

@@ -177,54 +177,25 @@ class Home3 extends Component {
   // }, 300);
 
   handleMouseOverHead = (e) => {
-    // window.console.log('in header');
     inWhich = 'header';
   }
 
   handleMouseOverBody = (e) => {
-    // window.console.log('in body');
     inWhich = 'body';
   }
 
   handleScrollHead = (e) => {
-    if (inWhich === 'body') return;
+    if (inWhich !== 'header') return;
     const { scrollLeft } = e.target;
     const body = document.getElementById('fixHead-body');
     body.scrollLeft = scrollLeft;
   }
 
   handleScroll = (e) => {
-    if (inWhich === 'header') return;
-    const { scrollLeft, scrollTop } = e.target;
-    // const { UserMapStore } = this.props;
-    // const {
-    //   top, offsetTops, currentIndex,
-    // } = UserMapStore;
+    if (inWhich !== 'body') return;
+    const { scrollLeft } = e.target;
     const header = document.getElementById('fixHead-head');
     header.scrollLeft = scrollLeft;
-    // document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
-    // if (scrollLeft !== left) {
-    //
-    // } else {
-    //   // UserMapStore.setTop(scrollTop);
-    //   const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
-    //   if (currentIndex !== index && index !== -1) {
-    //     UserMapStore.setCurrentIndex(index);
-    //   }
-    //   // window.console.log(scrollTop);
-    // }
-    // if (scrollTop !== top) {
-    //   let s;
-    //   const { offsetTops, currentIndex } = UserMapStore;
-    //   // s = scrollTop <=9 ? 0 : scrollTop;
-    //   // UserMapStore.setTop(s);
-    //   // // window.console.log('when scroll v, the top is: ' + s);
-    //   // const index = _.findLastIndex(offsetTops, v => v <= s + 42);
-    //   // if (currentIndex !== index && index !== -1) {
-    //   //   UserMapStore.setCurrentIndex(index);
-    //   // }
-    // }
-    // left = scrollLeft;
   };
 
 
@@ -1904,7 +1875,7 @@ class Home3 extends Component {
                                   <div className="fixHead-block" key={epic.issueId}>
                                     <EpicCard
                                       index={index}
-                                      key={epic.issueId}
+                                      // key={epic.issueId}
                                       epic={epic}
                                     />
                                   </div>

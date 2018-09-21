@@ -19,6 +19,7 @@ import SwithChart from '../../Component/switchChart';
 
 const { AppState } = stores;
 const Option = Select.Option;
+let backUrl;
 
 @observer
 class BurndownChartHome extends Component {
@@ -45,6 +46,18 @@ class BurndownChartHome extends Component {
       linkFromParamUrl: linkFromParamUrl,
     });
     this.getSprintData();
+  }
+
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
   }
 
   getBetweenDateStr(start, end) {
