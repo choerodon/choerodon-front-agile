@@ -51,14 +51,14 @@ class CreateEpic extends Component {
   render() {
     const { loading } = this.state;
     const {
-      getContainer, form, visible, onCancel,
+      container, form, visible, onCancel,
     } = this.props;
     const { getFieldDecorator } = form;
 
     return (
       <Sidebar
         title="创建史诗"
-        getContainer={getContainer}
+        getContainer={() => container}
         visible={visible}
         okText="新建"
         cancelText="取消"
@@ -66,6 +66,7 @@ class CreateEpic extends Component {
           form.resetFields();
           onCancel();
         }}
+        destroyOnClose
         confirmLoading={loading}
         onOk={this.handleCreateEpic}
       >
