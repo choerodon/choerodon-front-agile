@@ -106,13 +106,29 @@ class EpicBurndown extends Component {
               color: 'rgba(0,0,0,0.65)',
             },
             formatter(value, index) {
-              if (chartDataOrigin.length > 7) {
+              if (chartDataOrigin.length >= 7) {
                 return value.length > 5 ? `${value.slice(0, 5)}...` : value;
               }
-              if (chartDataOrigin.length > 10) {
+              if (chartDataOrigin.length >= 10) {
                 return value.length > 3 ? `${value.slice(0, 3)}...` : value;
               }
               return value.length > 7 ? `${value.slice(0, 7)}...` : value;
+
+              // if (chartDataOrigin.length >= 7) {
+              //   return value.length > 5 ? (
+              //     <Tooltip title={value}>
+              //       <span>{`${value.slice(0, 5)}...`}</span>
+              //     </Tooltip>
+              //   ) : value;
+              // }
+              // if (chartDataOrigin.length >= 10) {
+              //   return value.length > 3 ? `<Tooltip title={value}><span>{(`${value.slice(0, 5)}...`)}</span></Tooltip>` : value;
+              // }
+              // return value.length > 7 ? (
+              //   <Tooltip title={value}>
+              //     <span>{`${value.slice(0, 5)}...`}</span>
+              //   </Tooltip>
+              // ) : value;
             },
           },
         },
@@ -313,6 +329,48 @@ class EpicBurndown extends Component {
           },
           // data: ['-', '-', 3, '-', '-'],
           data: ES.chartData[4],
+        },
+        {
+          name: 'showZeroBottom',
+          type: 'bar',
+          stack: '总量',
+          barMinHeight: 2,
+          itemStyle: {
+            normal: {
+              label: {
+                show: true,
+                position: 'bottom',
+                color: '#000',
+                formatter(param) {
+                  return 0;
+                },
+              },
+              color: 'rgba(0,0,0,0.54)',
+            },
+          },
+          // data: ['-', '-', 3, 3, '-'],
+          data: ES.chartData[5],
+        },
+        {
+          name: 'showZeroTop',
+          type: 'bar',
+          stack: '总量',
+          barMinHeight: 2,
+          itemStyle: {
+            normal: {
+              label: {
+                show: true,
+                position: 'top',
+                color: '#000',
+                formatter(param) {
+                  return 0;
+                },
+              },
+              color: 'rgba(0,0,0,0.54)',
+            },
+          },
+          // data: ['-', '-', 3, 3, '-'],
+          data: ES.chartData[6],
         },
       ],
     };

@@ -106,10 +106,10 @@ class VersionBurndown extends Component {
               color: 'rgba(0,0,0,0.65)',
             },
             formatter(value, index) {
-              if (chartDataOrigin.length > 7) {
+              if (chartDataOrigin.length >= 7) {
                 return value.length > 5 ? `${value.slice(0, 5)}...` : value;
               }
-              if (chartDataOrigin.length > 10) {
+              if (chartDataOrigin.length >= 10) {
                 return value.length > 3 ? `${value.slice(0, 3)}...` : value;
               }
               return value.length > 7 ? `${value.slice(0, 7)}...` : value;
@@ -314,6 +314,48 @@ class VersionBurndown extends Component {
           },
           // data: ['-', '-', 3, '-', '-'],
           data: ES.chartData[4],
+        },
+        {
+          name: 'showZeroBottom',
+          type: 'bar',
+          stack: '总量',
+          barMinHeight: 2,
+          itemStyle: {
+            normal: {
+              label: {
+                show: true,
+                position: 'bottom',
+                color: '#000',
+                formatter(param) {
+                  return 0;
+                },
+              },
+              color: 'rgba(0,0,0,0.54)',
+            },
+          },
+          // data: ['-', '-', 3, 3, '-'],
+          data: ES.chartData[5],
+        },
+        {
+          name: 'showZeroTop',
+          type: 'bar',
+          stack: '总量',
+          barMinHeight: 2,
+          itemStyle: {
+            normal: {
+              label: {
+                show: true,
+                position: 'top',
+                color: '#000',
+                formatter(param) {
+                  return 0;
+                },
+              },
+              color: 'rgba(0,0,0,0.54)',
+            },
+          },
+          // data: ['-', '-', 3, 3, '-'],
+          data: ES.chartData[6],
         },
       ],
     };
@@ -808,7 +850,7 @@ class VersionBurndown extends Component {
       const currentVersion = ES.versions.filter(item => item.versionId === ES.currentVersionId)[0];
       return (
         <p className="c7n-versionInfo">
-          { `${currentVersion.releaseDate === null ? '未发布' : (`发布于 ${this.transformReleaseDate(currentVersion.releaseDate)}`)}`}
+          { `${currentVersion && currentVersion.releaseDate === null ? '未发布' : (`发布于 ${currentVersion && this.transformReleaseDate(currentVersion.releaseDate)}`)}`}
         </p>
       );
     }
