@@ -191,7 +191,7 @@ class EpicItem extends Component {
                 <p className="c7n-backlog-epicItemDes">
                   {_.isNull(item.summary) ? '没有描述' : item.summary}
                 </p>
-                <p className="c7n-backlog-epicItemDetail">详情</p>
+                <p className="c7n-backlog-epicItemDetail">计数详情</p>
                 <div className="c7n-backlog-epicItemParams">
                   <div className="c7n-backlog-epicItemParam">
                     <p className="c7n-backlog-epicItemParamKey">问题数</p>

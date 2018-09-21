@@ -6,7 +6,7 @@ import {
   Page, Header, Content, Permission,
 } from 'choerodon-front-boot';
 import {
-  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin, message,
+  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin, message, Tooltip,
 } from 'choerodon-ui';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import html2canvas from 'html2canvas';
@@ -88,7 +88,7 @@ class Home3 extends Component {
         document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll, { passive: true });
         document.getElementById('fixHead-head').addEventListener('mouseover', this.handleMouseOverHead);
         document.getElementById('fixHead-body').addEventListener('mouseover', this.handleMouseOverBody);
-        this.getPrepareOffsetTops();
+        // this.getPrepareOffsetTops();
         clearInterval(timer);
       }
     }, 20);
@@ -290,7 +290,7 @@ class Home3 extends Component {
     if (this.props.UserMapStore.showBackLog) {
       this.props.UserMapStore.loadBacklogIssues();
     }
-    this.getPrepareOffsetTops();
+    // this.getPrepareOffsetTops();
 
     // this.props.UserMapStore.loadBacklogIssues();
   };
@@ -338,7 +338,7 @@ class Home3 extends Component {
       expandColumns.splice(index, 1);
     }
     this.setState({ expandColumns });
-    this.getPrepareOffsetTops(true);
+    // this.getPrepareOffsetTops(true);
     // this.handleScroll();
   };
 
@@ -1424,7 +1424,7 @@ class Home3 extends Component {
           getPopupContainer={triggerNode => triggerNode}
           overlayClassName="moreMenuPopover"
           arrowPointAtCenter={false}
-          placement="bottomLeft"
+          placement="bottom"
           trigger={['click']}
           visible={this.state.popOverVisible}
           onVisibleChange={(visible) => {
@@ -1434,16 +1434,15 @@ class Home3 extends Component {
           }}
           content={(
             <div>
-              <div className="menu-title">史诗过滤器</div>
-              <div style={{ height: 22, marginBottom: 20 }}>
-                <Checkbox onChange={this.handleShowDoneEpic}>已完成的史诗</Checkbox>
+              <div className="menu-title">史诗过滤选择器</div>
+              <div style={{ height: 30, padding: '5px 12px' }}>
+                <Checkbox onChange={this.handleShowDoneEpic}>显示已完成的史诗</Checkbox>
               </div>
-              <div style={{ height: 22, marginBottom: 20 }}>
-                <Checkbox onChange={this.handleFilterEpic}>应用快速搜索到史诗</Checkbox>
+              <div style={{ height: 30, padding: '5px 12px' }}>
+                <Checkbox onChange={this.handleFilterEpic}>应用搜索到史诗</Checkbox>
               </div>
               <div className="menu-title">导出</div>
-              {/* <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div> */}
-              <div onClick={this.handleSaveAsImage} role="none" style={{ height: 22, marginLeft: 26, cursor: 'pointer' }}>导出为图片</div>
+              <div onClick={this.handleSaveAsImage} role="none" style={{ height: 30, padding: '5px 12px', marginLeft: 26, cursor: 'pointer' }}>导出为png格式</div>
             </div>
           )}
         >
@@ -1502,33 +1501,39 @@ class Home3 extends Component {
           >
             <div>{vos[name]}</div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p className="point-span" style={{ background: '#4D90FE' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
-                  if (issue.statusCode === 'todo') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#FFB100' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
-                  if (issue.statusCode === 'doing') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#00BFA5' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
-                  if (issue.statusCode === 'done') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
+              <Tooltip title="todo">
+                <p className="point-span" style={{ background: '#4D90FE' }}>
+                  {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
+                    if (issue.statusCode === 'todo') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
+              <Tooltip title="doing">
+                <p className="point-span" style={{ background: '#FFB100' }}>
+                  {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
+                    if (issue.statusCode === 'doing') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
+              <Tooltip title="done">
+                <p className="point-span" style={{ background: '#00BFA5' }}>
+                  {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
+                    if (issue.statusCode === 'done') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
               <Button shape="circle" className="expand-btn" onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
                 <Icon type={`${this.state.expandColumns.includes(vos[id]) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
               </Button>
@@ -1657,24 +1662,28 @@ class Home3 extends Component {
 
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p className="point-span" style={{ background: '#4D90FE' }}>
-                {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
-                  if (issue.statusCode === 'todo') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#FFB100' }}>
-                {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
-                  if (issue.statusCode === 'doing') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
+              <Tooltip title="todo">
+                <p className="point-span" style={{ background: '#4D90FE' }}>
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                    if (issue.statusCode === 'todo') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
+              <Tooltip title="doing">
+                <p className="point-span" style={{ background: '#FFB100' }}>
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                    if (issue.statusCode === 'doing') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
             </div>
           </div>
           <div
@@ -1894,7 +1903,7 @@ class Home3 extends Component {
                 </DragDropContext>
               )}
             <CreateEpic
-              getContainer={() => document.querySelector('.c7n-userMap')}
+              container={document.querySelector('.c7n-userMap')}
               visible={createEpic}
               onOk={() => {
                 UserMapStore.setCreateEpic(false);

@@ -70,7 +70,9 @@
 
       .c7n-backlog-epicItemDetail {
         margin-top: 8px;
-        color: #3f51b5;
+        // color: #3f51b5;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.6);
         padding-bottom: 2px;
         border-bottom: 1px solid #d3d3d3;
       }

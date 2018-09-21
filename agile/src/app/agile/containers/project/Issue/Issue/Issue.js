@@ -666,7 +666,7 @@ class Issue extends Component {
             </section>
             <section className="c7n-count">
               <span className="c7n-span-count">
-                {`共${IssueStore.pagination.total}条任务`}
+                {`共${IssueStore.pagination.total || '0'}条任务`}
               </span>
               <Dropdown overlay={sort} trigger={['click']}>
                 <div style={{

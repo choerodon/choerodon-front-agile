@@ -1,15 +1,16 @@
 .c7n-SprintProgressHome{
     padding-left: 52px;
-    padding-bottom: 50px;
+    padding-bottom: 30px;
     
     .c7n-SprintStage{
         padding-top: 5px;
-        font-size: 13px;
+        font-size: 14px;
+        line-height: 20px;
         color: rgba(0,0,0,0.87);
-        margin-bottom: 10px;
+        margin-bottom: 9px;
     }
     .c7n-SprintRemainDay{
-        font-size: 13px;
+        font-size: 12px;
         color: rgba(0,0,0,0.64);
         .c7n-remainDay{
             font-size: 20px;
@@ -17,7 +18,7 @@
             padding-left: 2px;
             padding-right: 2px;
         }
-        margin-bottom: 10px;
+        margin-bottom: 3px;
     }
     .c7n-progress{
         position: relative;
