@@ -695,7 +695,6 @@ class ScrumBoardHome extends Component {
 
   renderOthersTitle() {
     let result = '';
-
     const data = this.state.dataSource || {};
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       result = (
@@ -711,12 +710,20 @@ class ScrumBoardHome extends Component {
 <span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, 'assigneeId')}&nbsp;问题)</span>
         </span>
       );
-    } else {
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
       result = (
         <span>
 所有问题
 {' '}
 <span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, 'epicId')}&nbsp;问题)</span>
+        </span>
+      );
+    } else {
+      result = (
+        <span>
+所有问题
+{' '}
+<span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, '')}&nbsp;问题)</span>
         </span>
       );
     }

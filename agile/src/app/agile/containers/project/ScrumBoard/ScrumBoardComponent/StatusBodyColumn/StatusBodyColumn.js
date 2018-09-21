@@ -521,7 +521,7 @@ class StatusBodyColumn extends Component {
                   'unset' : this.renderBorder(data, index, 'bottom', snapshot.isDraggingOver),
                 visibility: this.renderDisplay(data[index], 'visibility'),
                 // height: this.renderDisplay(data[index], 'height'),
-                height: 'auto',
+                height: '100%',
                 position: 'relative',
               }}
             >

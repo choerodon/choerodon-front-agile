@@ -448,17 +448,27 @@ class StatusIssue extends Component {
                       </div>
                       {/* <div style={{ flexShrink: 0 }} cla
                   ssName="c7n-scrumboard-issueSide">M</div> */}
-                      <Tooltip title={`经办人: ${item.assigneeName}`}>
-                        {item.assigneeName ? <Avatar
-                          src={item.imageUrl ? item.imageUrl : undefined}
-                          style={{
-                            flexShrink: 0,
-                          }}
-                        >
-                          {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
-                        </Avatar> : <div style={{ width: 32, height: 32, flexShrink: 0 }} />}
-
-                      </Tooltip>
+                      {
+                        item.assigneeName ? (
+                          <Tooltip title={`经办人: ${item.assigneeName}`}>
+                            {
+                              item.assigneeName ? (
+                                <Avatar
+                                  src={item.imageUrl ? item.imageUrl : undefined}
+                                  style={{
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
+                                </Avatar> 
+                              ) : (
+                                <div style={{ width: 32, height: 32, flexShrink: 0 }} />
+                              )
+                            }
+                          </Tooltip>
+                        ) : null
+                      }
+                      
                     </div>
                   </div>
                   {provided.placeholder}

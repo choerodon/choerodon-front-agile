@@ -24,14 +24,27 @@ class StatusColumn extends Component {
     }
     return length;
   }
+
   render() {
     return (
       <div className="c7n-scrumboard-status">
-        {`${this.props.data.name} (${this.showIssueLength()})`}
+        <p
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            maxWidth: 'calc(100% - 50px)',
+            display: 'inline-block',
+          }}
+        >
+          {`${this.props.data.name}`}
+        </p>
+        <p style={{ display: 'inline-block' }}>
+          {`(${this.showIssueLength()})`}
+        </p>
       </div>
     );
   }
 }
 
 export default StatusColumn;
-

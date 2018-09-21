@@ -41,7 +41,6 @@ class ReleaseDetail extends Component {
 
   componentDidMount = () => {
     const Request = this.GetRequest(this.props.location.search);
-    window.console.log(Request);
     backUrl = Request.paramUrl || 'reporthost';
     const value = this.getSelectDefaultValue();
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
