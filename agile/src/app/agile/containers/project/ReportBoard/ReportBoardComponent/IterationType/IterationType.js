@@ -158,6 +158,7 @@ class IterationType extends Component {
           // data: [120, 132, 101, 134],
           data: iterationTypeData.todoData,
           barCategoryGap: '28px',
+          barWidth: '24px',
           itemStyle: {
             color: '#FFB100',
           },

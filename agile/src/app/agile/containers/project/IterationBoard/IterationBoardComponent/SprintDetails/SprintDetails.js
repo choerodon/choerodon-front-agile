@@ -301,7 +301,7 @@ class SprintDetails extends Component {
         dataIndex: 'remainingTime',
         key: 'remainingTime',
         render: (remainingTime, record) => (
-          <span>{`${remainingTime === null ? '0' : (`${remainingTime}h`)}`}</span>
+          <span>{`${remainingTime === null ? '' : (`${remainingTime}h`)}`}</span>
         ),
       }, {
         title: '故事点',

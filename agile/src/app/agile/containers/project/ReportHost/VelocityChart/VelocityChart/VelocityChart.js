@@ -326,20 +326,14 @@ class VelocityChart extends Component {
                 onChange={this.handleChangeCurrentUnit.bind(this)}
               >
                 <Option key="story_point" value="story_point">
-
-
-                  故事点
-</Option>
+                  {'故事点'}
+                </Option>
                 <Option key="issue_count" value="issue_count">
-
-
-                  问题计数
-</Option>
+                  {'问题计数'}
+                </Option>
                 <Option key="remain_time" value="remain_time">
-
-
-                  剩余时间
-</Option>
+                  {'剩余时间'}
+                </Option>
               </Select>
               <Spin spinning={VS.chartLoading}>
                 <ReactEcharts className="c7n-chart" option={this.getOption()} />
@@ -368,8 +362,9 @@ class VelocityChart extends Component {
                   >
 
 
+
                     待办事项
-</span>
+                                    </span>
                   <span>中创建一个冲刺</span>
                 </div>
 )}

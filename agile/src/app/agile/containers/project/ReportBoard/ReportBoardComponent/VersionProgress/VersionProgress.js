@@ -157,6 +157,7 @@ class VersionProgress extends Component {
             color: '#FFB100',
           },
           barCategoryGap: '30px',
+          barWidth: '14px',
         },
         {
           name: '处理中',
@@ -166,6 +167,7 @@ class VersionProgress extends Component {
           itemStyle: {
             color: '#45A3FC',
           },
+          barWidth: '14px',
         },
         {
           name: '已完成',
@@ -175,6 +177,7 @@ class VersionProgress extends Component {
           itemStyle: {
             color: ' #00BFA5',
           },
+          barWidth: '14px',
         },
       ],
     };
