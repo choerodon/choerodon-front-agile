@@ -45,7 +45,7 @@ class VersionProgress extends Component {
     let doingDataLength = 0; 
     let doneDataLength = 0;
     if (versionProgressInfo && versionProgressInfo.length !== 0) {
-      for (let i = 0; i < xAxisData.length; i++) {
+      for (let i = 0; i < xAxisData.length; i += 1) {
         const version = versionProgressInfo.filter(item => item.name === xAxisData[i]);
         todoDataLength = todoData.length;
         doingDataLength = doingData.length;
@@ -157,6 +157,7 @@ class VersionProgress extends Component {
             color: '#FFB100',
           },
           barCategoryGap: '30px',
+          barWidth: '14px',
         },
         {
           name: '处理中',
@@ -166,6 +167,7 @@ class VersionProgress extends Component {
           itemStyle: {
             color: '#45A3FC',
           },
+          barWidth: '14px',
         },
         {
           name: '已完成',
@@ -175,6 +177,7 @@ class VersionProgress extends Component {
           itemStyle: {
             color: ' #00BFA5',
           },
+          barWidth: '14px',
         },
       ],
     };

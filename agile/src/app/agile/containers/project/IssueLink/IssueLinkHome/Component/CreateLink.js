@@ -34,18 +34,14 @@ class CreateLink extends Component {
       const { name, inWard, outWard } = values;
       if (!err) {
         const obj = {
-          linkName: name,
           inWard,
           outWard,
+          linkName: name,
         };
-        this.setState({
-          loading: true,
-        });
+        this.setState({ loading: true });
         axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types`, obj)
           .then(() => {
-            this.setState({
-              loading: false,
-            });
+            this.setState({ loading: false });
             onOk();
           });
       }
@@ -106,7 +102,6 @@ class CreateLink extends Component {
               )}
             </FormItem>
           </Form>
-          
         </Content>
       </Sidebar>
     );

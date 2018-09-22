@@ -59,28 +59,18 @@ class VersionBurndown extends Component {
   getLabel(record) {
     if (ES.beforeCurrentUnit === 'story_point') {
       if (record.typeCode === 'story') {
-        return record.storyPoints === null ? '未预估' : record.storyPoints;
+        return record.storyPoints === null ? '' : record.storyPoints;
       } else {
         return '';
       }
     } else {
-      return record.remainTime === null ? '未预估' : record.remainTime; 
+      return record.remainTime === null ? '' : record.remainTime; 
     }
   }
 
   getOption() {
-    const { inverse } = this.state;
+    const { checkbox, inverse } = this.state;
     const { chartDataOrigin } = ES;
-    // 如果xAxisLabel项多于10个，则上下交错显示
-    // const xAxisData = chartDataOrigin.length >= 10 ? chartDataOrigin.map((item, index) => {
-    //   if (index % 2 === 1) {
-    //     return `\n\n${item.name}`;
-    //   }
-    //   return item.name;
-    // }) : chartDataOrigin.map(item => item.name);
-
-    // const xAxisData = _.map(chartDataOrigin, 'name');
-
     const option = {
       animation: false,
       grid: {
@@ -94,7 +84,6 @@ class VersionBurndown extends Component {
           type: 'category',
           splitLine: { show: false },
           data: _.map(ES.chartDataOrigin, 'name'),
-          // data: xAxisData,
           itemStyle: {
             color: 'rgba(0,0,0,0.65)',
           },
@@ -109,14 +98,21 @@ class VersionBurndown extends Component {
           },
           axisLabel: {
             interval: 0,
-            rotate: chartDataOrigin.length >= 8 ? 45 : 0,
             show: true,
             showMinLabel: true,
             showMaxLabel: true,
-            // margin: 0,
             agile: 'left',
             textStyle: {
               color: 'rgba(0,0,0,0.65)',
+            },
+            formatter(value, index) {
+              if (chartDataOrigin.length >= 7) {
+                return value.length > 5 ? `${value.slice(0, 5)}...` : value;
+              }
+              if (chartDataOrigin.length >= 10) {
+                return value.length > 3 ? `${value.slice(0, 3)}...` : value;
+              }
+              return value.length > 7 ? `${value.slice(0, 7)}...` : value;
             },
           },
         },
@@ -204,20 +200,22 @@ class VersionBurndown extends Component {
         formatter(params) {
           params[0].name = _.trim(params[0].name, '\n\n');
           const sprint = chartDataOrigin.filter(item => item.name === params[0].name)[0];
-          let res = params[0].name;
-          res += `<br/>冲刺开始处：${sprint.start}`;
-          res += `<br/>已完成: ${(params[1].value === '-' ? 0 : params[1].value) + (params[4].value === '-' ? 0 : params[4].value)}`;
-          res += `<br/>添加至version: ${sprint.add}`;
-          res += `<br/>剩余: ${(params[2].value === '-' ? 0 : params[2].value) + (params[3].value === '-' ? 0 : params[3].value)}`;
+          let res = `<span style="color: #3F51B5">${params[0].name}</span>`;
+          res += `<span style="display:block; margin-top: 0px; margin-bottom: 2px; color: rgba(0,0,0,0.54); font-size: 11px;">${sprint.startDate && sprint.startDate.split(' ')[0].split('-').join('/')}-${sprint.endDate && sprint.endDate.split(' ')[0].split('-').join('/')}</span>`;
+          res += `本迭代开始时故事点数：${sprint.start}`;
+          res += `<br/>工作已完成: ${(params[1].value === '-' ? 0 : params[1].value) + (params[4].value === '-' ? 0 : params[4].value)}`;
+          res += `<br/>工作增加: ${sprint.add}`;
+          res += `<br/>本迭代结束时剩余故事点数: ${(params[2].value === '-' ? 0 : params[2].value) + (params[3].value === '-' ? 0 : params[3].value)}`;
           return res;
         },
+
       },
       series: [
         {
           name: '辅助',
           type: 'bar',
           stack: '总量',
-          barWidth: 52,
+          // barWidth: 52,
           itemStyle: {
             normal: {
               barBorderColor: 'rgba(0,0,0,0)',
@@ -229,12 +227,15 @@ class VersionBurndown extends Component {
             },
           },
           // data: [0, 0, 0, 16, 19],
-          data: ES.chartData[0],
+          // data: ES.chartData[0],
+          // data: checkbox ? _.fill(Array(ES.chartData[0].length), 0) : ES.chartData[0],
+          data: (checkbox && checkbox[0] === 'checked') ? _.fill(Array(ES.chartData[0].length), 0) : ES.chartData[0],
         },
         {
           name: '工作已完成',
           type: 'bar',
           stack: '总量',
+          barMinHeight: 15,
           itemStyle: {
             normal: {
               label: {
@@ -255,6 +256,7 @@ class VersionBurndown extends Component {
           name: '工作剩余',
           type: 'bar',
           stack: '总量',
+          barMinHeight: 15,
           itemStyle: {
             normal: {
               label: {
@@ -262,7 +264,8 @@ class VersionBurndown extends Component {
                 position: 'inside',
                 color: '#fff',
               },
-              color: 'rgba(69,163,252,0.8)',
+              // color: 'rgb(0, 187, 255, 0.8)',
+              color: 'rgba(69,163,252,0.80)',
             },
           },
           // data: [3, 3, '-', 13, 18],
@@ -272,6 +275,7 @@ class VersionBurndown extends Component {
           name: '工作增加',
           type: 'bar',
           stack: '总量',
+          barMinHeight: 15,
           itemStyle: {
             normal: {
               label: {
@@ -282,7 +286,8 @@ class VersionBurndown extends Component {
                   return param.value === '-' ? null : `+${param.value}`;
                 },
               },
-              color: 'rgba(27,128,223,0.8)',
+              // color: 'rgba(27,128,255,0.8)',
+              color: 'rgba(27,128,223,0.80)',
               opacity: 0.75,
             },
           },
@@ -293,6 +298,7 @@ class VersionBurndown extends Component {
           name: 'compoleted again',
           type: 'bar',
           stack: '总量',
+          barMinHeight: 15,
           itemStyle: {
             normal: {
               label: {
@@ -308,6 +314,48 @@ class VersionBurndown extends Component {
           },
           // data: ['-', '-', 3, '-', '-'],
           data: ES.chartData[4],
+        },
+        {
+          name: 'showZeroBottom',
+          type: 'bar',
+          stack: '总量',
+          barMinHeight: 2,
+          itemStyle: {
+            normal: {
+              label: {
+                show: true,
+                position: 'bottom',
+                color: '#000',
+                formatter(param) {
+                  return 0;
+                },
+              },
+              color: 'rgba(0,0,0,0.54)',
+            },
+          },
+          // data: ['-', '-', 3, 3, '-'],
+          data: ES.chartData[5],
+        },
+        {
+          name: 'showZeroTop',
+          type: 'bar',
+          stack: '总量',
+          barMinHeight: 2,
+          itemStyle: {
+            normal: {
+              label: {
+                show: true,
+                position: 'top',
+                color: '#000',
+                formatter(param) {
+                  return 0;
+                },
+              },
+              color: 'rgba(0,0,0,0.54)',
+            },
+          },
+          // data: ['-', '-', 3, 3, '-'],
+          data: ES.chartData[6],
         },
       ],
     };
@@ -331,87 +379,24 @@ class VersionBurndown extends Component {
 
   getStoryPoints = () => {
     const { chartData } = ES;
-    if (chartData[2].length > 3) {
-      const lastRemain = _.last(this.transformPlaceholder2Zero(chartData[2]));
-      const lastAdd = _.last(this.transformPlaceholder2Zero(chartData[3]));
-      return lastRemain + lastAdd;
-    }
-    return 0;
+    // if (chartData[2].length > 3) {
+    const lastRemain = _.last(this.transformPlaceholder2Zero(chartData[2]));
+    const lastAdd = _.last(this.transformPlaceholder2Zero(chartData[3]));
+    return lastRemain + lastAdd;
+    // }
+    // return 0;
   }
 
   getSprintCount() {
     return Math.ceil(this.getStoryPoints() / this.getSprintSpeed());
   }
 
-  getTableDta(type) {
-    if (type === 'compoleted') {
-      // return ES.tableData.filter(v => v.completed === 1);
-      return ES.tableData.sprintBurnDownReportDTOS;
+  getColumn = (item) => {
+    let totalStoryPoints = 0;
+    if (item && item.length > 0) {
+      totalStoryPoints = _.sum(_.map(_.filter(item, o => o.typeCode === 'story' && o.storyPoints !== null), 'storyPoints'));
     }
-    if (type === 'unFinish') {
-      // return ES.tableData.filter(v => v.completed === 0);
-      return ES.tableData.incompleteIssues;
-    }
-    return [];
-  }
-
-  refresh() {
-    if (!ES.currentVersionId) {
-      ES.loadVersionAndChartAndTableData();
-    } else {
-      ES.loadChartData();
-      ES.loadTableData();
-      // this.setInitialPagination();
-    }
-  }
-
-  handleChangeCurrentVersion(versionId) {
-    ES.setCurrentVersion(versionId);
-    ES.loadChartData();
-    ES.loadTableData();
-    this.setState({
-      tabActiveKey: 'done',
-    });
-  }
-
-  handleChangeCheckbox(checkbox) {
-    this.setState({
-      checkbox,
-      inverse: checkbox[0] !== 'checked',
-    });
-  }
-
-  handleIconMouseEnter = () => {
-    const iconShowInfo = document.getElementsByClassName('icon-show-info')[0];
-    iconShowInfo.style.display = 'flex';
-  }
-
-  handleIconMouseLeave = () => {
-    const iconShowInfo = document.getElementsByClassName('icon-show-info')[0];
-    iconShowInfo.style.display = 'none';
-  }
-
-  handleLinkToIssue(linkType, item) {
-    const urlParams = AppState.currentMenuType;
-    const {
-      type, id, organizationId,
-    } = urlParams;
-    const { history } = this.props;
-    let urlPush = `/agile/issue?type=${type}&id=${id}&name=${urlParams.name}&organizationId=${organizationId}`;
-    if (JSON.stringify(item) !== '{}') {
-      if (linkType === 'sprint') {
-        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reposthost/versionBurnDown`;
-      }
-      if (linkType === 'version') {
-        urlPush += `&paramType=version&paramId=${item.versionId}&paramName=${item.name || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
-      }
-      history.push(urlPush);
-    }
-  }
-
-  renderTable = (type) => {
-    const sprintBurnDownReportDTOS = this.getTableDta('compoleted');
-    let firstCompleteIssues = 0;
+    
     const column = [
       ...[
         {
@@ -502,7 +487,7 @@ class VersionBurndown extends Component {
       ...[
         ES.beforeCurrentUnit === 'issue_count' ? {} : {
           // width: '10%',
-          title: ES.beforeCurrentUnit === 'story_point' ? '故事点' : '剩余时间',
+          title: ES.beforeCurrentUnit === 'story_point' ? `故事点 (${totalStoryPoints})` : '剩余时间',
           dataIndex: 'storyPoints',
           render: (storyPoints, record) => (
             <div>
@@ -512,26 +497,153 @@ class VersionBurndown extends Component {
         },
       ],
     ];
+    return column;
+  }
+
+  getTableDta(type) {
+    if (type === 'compoleted') {
+      // return ES.tableData.filter(v => v.completed === 1);
+      return ES.tableData.sprintBurnDownReportDTOS;
+    }
+    if (type === 'unFinish') {
+      // return ES.tableData.filter(v => v.completed === 0);
+      return ES.tableData.incompleteIssues;
+    }
+    return [];
+  }
+
+  refresh() {
+    if (!ES.currentVersionId) {
+      ES.loadVersionAndChartAndTableData();
+    } else {
+      ES.loadChartData();
+      ES.loadTableData();
+      // this.setInitialPagination();
+    }
+  }
+
+  handleChangeCurrentVersion(versionId) {
+    ES.setCurrentVersion(versionId);
+    ES.loadChartData();
+    ES.loadTableData();
+    this.setState({
+      tabActiveKey: 'done',
+    });
+  }
+
+  handleChangeCheckbox(checkbox) {
+    this.setState({
+      checkbox,
+      inverse: checkbox[0] !== 'checked',
+    });
+  }
+
+  handleIconMouseEnter = () => {
+    const iconShowInfo = document.getElementsByClassName('icon-show-info')[0];
+    iconShowInfo.style.display = 'flex';
+  }
+
+  handleIconMouseLeave = () => {
+    const iconShowInfo = document.getElementsByClassName('icon-show-info')[0];
+    iconShowInfo.style.display = 'none';
+  }
+
+  handleLinkToIssue(linkType, item) {
+    const urlParams = AppState.currentMenuType;
+    const {
+      type, id, organizationId,
+    } = urlParams;
+    const { history } = this.props;
+    let urlPush = `/agile/issue?type=${type}&id=${id}&name=${urlParams.name}&organizationId=${organizationId}`;
+    if (JSON.stringify(item) !== '{}') {
+      if (linkType === 'sprint') {
+        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reposthost/versionBurnDown`;
+      }
+      if (linkType === 'version') {
+        urlPush += `&paramType=version&paramId=${item.versionId}&paramName=${item.name || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
+      }
+      history.push(urlPush);
+    }
+  }
+
+  renderChart = () => {
+    if (!ES.chartDataOrigin.length) {
+      return (
+        <div style={{
+          display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '50px 0', textAlign: 'center', 
+        }}
+        >
+          <img src={pic} alt="没有预估故事点" />
+          <div style={{ textAlign: 'left', marginLeft: '50px' }}>
+            <span style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.65)' }}>报表不能显示</span>
+            <p style={{ marginTop: 10, fontSize: 20 }}>
+              {'在此版本中没有预估的故事，请在'}
+              <a
+                role="none"
+                onClick={() => {
+                  const { history } = this.props;
+                  const urlParams = AppState.currentMenuType;
+                  history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramUrl=reporthost/epicBurndown`);
+                }}
+              >
+                {'待办事项'}
+              </a>
+              {'中预估故事点。'}
+            </p>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="c7n-report">
+        <div className="c7n-chart">
+          {
+            ES.reload ? null : (
+              <div style={{ position: 'relative' }}>
+                <div className="c7n-chart-yaxixName">
+                  {'故事点'}
+                </div>
+                <ReactEcharts
+                  ref={(e) => { this.echarts_react = e; }}
+                  option={this.getOption()}
+                  style={{ height: 400, left: -31 }}
+                />
+              </div>
+            )
+          }
+        </div>
+        <div className="c7n-toolbar">
+          {this.renderToolbar()}
+        </div>
+      </div>
+    );
+  }
+
+ 
+  renderTable = (type) => {
+    const sprintBurnDownReportDTOS = this.getTableDta('compoleted');
+    let firstCompleteIssues = 0;
     if (type === 'unFinish') {
       return (
         <Table
           rowKey={record => record.issueId}
-          dataSource={this.getTableDta(type)}
+          dataSource={this.getTableDta('unFinish')}
           filterBar={false}
-          columns={column}
+          // columns={column}
+          columns={this.getColumn(this.getTableDta('unFinish'))}
           scroll={{ x: true }}
           loading={ES.tableLoading}
-          pagination={!!(this.getTableDta(type) && this.getTableDta(type).length > 10)}
+          pagination={!!(this.getTableDta('unFinish') && this.getTableDta('unFinish').length > 10)}
         />
       );
     }
     if (sprintBurnDownReportDTOS && sprintBurnDownReportDTOS.length !== 0) {
-      for (let i = 0; i < sprintBurnDownReportDTOS.length; i++) {
+      for (let i = 0; i < sprintBurnDownReportDTOS.length; i += 1) {
         if (sprintBurnDownReportDTOS[i].completeIssues.length !== 0) {
           firstCompleteIssues = i;
           break;
         }
-        firstCompleteIssues++;
+        firstCompleteIssues += 1;
       }
       if (firstCompleteIssues !== sprintBurnDownReportDTOS.length) {
         return (
@@ -576,7 +688,7 @@ class VersionBurndown extends Component {
                               marginLeft: 12,
                             }}
                           >
-                            {`${item.startDate.slice(0, 11).replace(/-/g, '.')}-${item.endDate.slice(0, 11).replace(/-/g, '.')}`}
+                            {`${item.startDate && item.startDate.slice(0, 11).replace(/-/g, '.')}-${item.endDate && item.endDate.slice(0, 11).replace(/-/g, '.')}`}
                           </span>
                           <span
                             style={{ 
@@ -598,7 +710,8 @@ class VersionBurndown extends Component {
                           rowKey={record => record.issueId}
                           dataSource={item.completeIssues}
                           filterBar={false}
-                          columns={column}
+                          // columns={column}
+                          columns={this.getColumn(item.completeIssues)}
                           scroll={{ x: true }}
                           loading={ES.tableLoading}
                           pagination={!!(item.completeIssues && item.completeIssues.length > 10)}
@@ -606,6 +719,7 @@ class VersionBurndown extends Component {
                       </div>
                     );
                   }
+                  return '';
                 })
               //  : <p>当前版本下的冲刺没有已完成的问题</p>
             }
@@ -648,30 +762,32 @@ class VersionBurndown extends Component {
     return (
       <div className="toolbar-forcast">
         <h3 className="title">{this.renderToolbarTitle()}</h3>
-        <div className="word">
-          <div className="icon">
-            <img src={sprintIcon} alt="冲刺迭代" />
+        <div className="toolbar-forcast-content">
+          <div className="word">
+            <div className="icon">
+              <img src={sprintIcon} alt="冲刺迭代" />
+            </div>
+            <span>{`冲刺迭代：${!this.getSprintSpeed() ? '无法预估' : this.getSprintCount()}`}</span>
           </div>
-          <span>{`冲刺迭代：${!this.getSprintSpeed() ? '无法预估' : this.getSprintCount()}`}</span>
-        </div>
-        <div className="word">
-          <div className="icon">
-            <img src={speedIcon} alt="冲刺速度" />
+          <div className="word">
+            <div className="icon">
+              <img src={speedIcon} alt="冲刺速度" />
+            </div>
+            <span>{`冲刺速度：${this.getSprintSpeed()}`}</span>
           </div>
-          <span>{`冲刺速度：${this.getSprintSpeed()}`}</span>
-        </div>
-        <div className="word">
-          <div className="icon">
-            <img src={storyPointIcon} alt="剩余故事点" />
+          <div className="word">
+            <div className="icon">
+              <img src={storyPointIcon} alt="剩余故事点" />
+            </div>
+            <span>{`剩余故事点：${this.getStoryPoints()}`}</span>
           </div>
-          <span>{`剩余故事点：${this.getStoryPoints()}`}</span>
         </div>
       </div>
     );
   }
 
   transformReleaseDate(data) {
-    const arrDate = data.split('-');
+    const arrDate = data.split(' ')[0].split('-');
     let month = '';
     switch (arrDate[1]) {
       case '01': {
@@ -726,7 +842,7 @@ class VersionBurndown extends Component {
         break;
       }
     }
-    return `${arrDate[1]}/${month}/${arrDate[0].slice(2, 4)}`;
+    return `${arrDate[2]}/${month}/${arrDate[0].slice(2, 4)}`;
   }
 
   renderVersionInfo() {
@@ -734,7 +850,7 @@ class VersionBurndown extends Component {
       const currentVersion = ES.versions.filter(item => item.versionId === ES.currentVersionId)[0];
       return (
         <p className="c7n-versionInfo">
-          { `${currentVersion.releaseDate === null ? '未发布' : (`发布于 ${this.transformReleaseDate(currentVersion.releaseDate)}`)}`}
+          { `${currentVersion && currentVersion.releaseDate === null ? '未发布' : (`发布于 ${currentVersion && this.transformReleaseDate(currentVersion.releaseDate)}`)}`}
         </p>
       );
     }
@@ -777,6 +893,7 @@ class VersionBurndown extends Component {
                     label="版本"
                     value={ES.currentVersionId}
                     onChange={this.handleChangeCurrentVersion.bind(this)}
+                    getPopupContainer={(triggerNode => triggerNode.parentNode)}
                   >
                     {
                       ES.versions.map(version => (
@@ -825,33 +942,7 @@ class VersionBurndown extends Component {
                 <Spin spinning={ES.chartLoading}>
                   <div>
                     {
-                      ES.chartDataOrigin.length ? (
-                        <div className="c7n-report">
-                          <div className="c7n-chart">
-                            {
-                              ES.reload ? null : (
-                                <div style={{ position: 'relative' }}>
-                                  <div className="c7n-chart-yaxixName">
-                                    {'故事点'}
-                                  </div>
-                                  <ReactEcharts
-                                    ref={(e) => { this.echarts_react = e; }}
-                                    option={this.getOption()}
-                                    style={{ height: 400, left: -31 }}
-                                  />
-                                </div>
-                              )
-                            }
-                          </div>
-                          <div className="c7n-toolbar">
-                            {this.renderToolbar()}
-                          </div>
-                        </div>
-                      ) : (
-                        <div style={{ padding: '30px 0 20px', textAlign: 'center' }}>
-                          {ES.tableData.length ? '当前单位下问题均未预估，切换单位或从下方问题列表进行预估。' : '当前版本下没有问题。'}
-                        </div>
-                      )
+                      this.renderChart()
                     }
                     
                   </div>

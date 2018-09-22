@@ -28,7 +28,8 @@ const config = {
     entryName: 'index',
     root: '/',
     routes: null, //by default, routes use main in package.json
-    server: 'http://api.staging.saas.hand-china.com',
+    // server: 'http://api.staging.saas.hand-china.com',
+    server: 'http://api.alpha.saas.hand-china.com',
     clientid: 'localhost',
     titlename: 'Choerodon', //html title
     favicon: 'favicon.ico', //page favicon

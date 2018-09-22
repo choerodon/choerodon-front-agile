@@ -64,19 +64,19 @@ class IterationBoardHome extends Component {
             <Sprint
               sprintId={sprintId}
               sprintName={sprintName}
-              link="backlog"
+              // link="backlog"
             />
           </Col>
           <Col span={8}>
             <Status
               sprintId={sprintId}
-              link="reporthost/pieReport/statusCode"
+              // link="reporthost/pieReport/statusCode"
             />
           </Col>
           <Col span={8}>
             <Remain
               sprintId={sprintId}
-              link="backlog"
+              // link="backlog"
             />
           </Col>
         </Row>
@@ -125,7 +125,7 @@ class IterationBoardHome extends Component {
     const { history } = this.props;
     return (
       <Page className="c7n-agile-iterationBoard">
-        <Header title="迭代工作台">
+        <Header title="活跃冲刺">
           <Button
             className="leftBtn2"
             funcType="flat"

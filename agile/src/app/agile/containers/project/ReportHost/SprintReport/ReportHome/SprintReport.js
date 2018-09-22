@@ -39,10 +39,16 @@ class SprintReport extends Component {
       loading: false,
       endDate: '',
       startDate: '',
+      linkFromParamUrl: undefined,
     };
   }
 
   componentWillMount() {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    this.setState({
+      linkFromParamUrl: linkFromParamUrl,
+    });
     this.getDefaultSprintId();
     this.getSprintData();
     ReportStore.init();
@@ -525,12 +531,12 @@ class SprintReport extends Component {
     }
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-
+    const { linkFromParamUrl } = this.state;
     return (
       <Page className="c7n-report">
         <Header
           title="冲刺报告"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}

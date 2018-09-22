@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-import { Modal, Table, Tooltip, Popover, Button, Icon } from 'choerodon-ui';
+import {
+  Modal, Table, Tooltip, Popover, Button, Icon, 
+} from 'choerodon-ui';
 import { stores, Content, axios } from 'choerodon-front-boot';
 import TimeAgo from 'timeago-react';
 
@@ -65,7 +67,9 @@ class Commits extends Component {
   }
 
   render() {
-    const { issueId, issueNum, time, visible, onCancel } = this.props;
+    const {
+      issueId, issueNum, time, visible, onCancel, 
+    } = this.props;
     const column = [
       {
         title: '应用名称',
@@ -74,7 +78,10 @@ class Commits extends Component {
         render: appName => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={appName}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p style={{
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, 
+              }}
+              >
                 {appName}
               </p>
             </Tooltip>
@@ -88,7 +95,10 @@ class Commits extends Component {
         render: branchName => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={branchName}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p style={{
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, 
+              }}
+              >
                 {branchName}
               </p>
             </Tooltip>
@@ -102,7 +112,10 @@ class Commits extends Component {
         render: (appId, record) => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={status}>
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p style={{
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, 
+              }}
+              >
                 {record.commits.length}
               </p>
             </Tooltip>
@@ -119,8 +132,9 @@ class Commits extends Component {
               overlayStyle={{
                 boxShadow: '0 5px 5px -3px rgba(0, 0, 0, 0), 0 8px 10px 1px rgba(0, 0, 0, 0), 0 3px 14px 2px rgba(0, 0, 0, 0)',
               }}
-              content={(<div>
-                {
+              content={(
+                <div>
+  {
                   record.mergeRequests && record.mergeRequests.length ? (
                     <ul>
                       {
@@ -134,9 +148,13 @@ class Commits extends Component {
                     </ul>
                   ) : <div>暂无相关合并请求</div>
                 }
-              </div>)}
+</div>
+)}
             >
-              <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+              <p style={{
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, 
+              }}
+              >
                 {this.getStatus(record.mergeRequests)}
               </p>
             </Popover>

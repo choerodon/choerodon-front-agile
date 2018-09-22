@@ -68,7 +68,7 @@ class AssigneeModal extends Component {
         okText="确定"
         okCancel={false}
       >
-        {this.props.data.assigneeIssue && <Content
+        {this.props.data.assigneeIssues && <Content
           style={{
             padding: 0,
             overflow: 'hidden',

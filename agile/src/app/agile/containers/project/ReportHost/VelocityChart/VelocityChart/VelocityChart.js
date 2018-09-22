@@ -16,14 +16,40 @@ import './VelocityChart.scss';
 
 const { AppState } = stores;
 const Option = Select.Option;
+let backUrl;
 
 @observer
 class VelocityChart extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      linkFromParamUrl: undefined,
+    };
+  }
+
   componentDidMount() {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    this.setState({
+      linkFromParamUrl,
+    });
+
     VS.setCurrentUnit('story_point');
     VS.setChartData([]);
     VS.setTableData([]);
     VS.loadChartAndTableData();
+  }
+
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
   }
 
   getOption() {
@@ -283,12 +309,13 @@ class VelocityChart extends Component {
 
   render() {
     const { history } = this.props;
+    const { linkFromParamUrl } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-velocity">
         <Header
           title="迭代速度图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${
             urlParams.name
           }&organizationId=${urlParams.organizationId}`}
         >
@@ -312,16 +339,13 @@ class VelocityChart extends Component {
                 onChange={this.handleChangeCurrentUnit.bind(this)}
               >
                 <Option key="story_point" value="story_point">
-
-                  故事点
+                  {'故事点'}
                 </Option>
                 <Option key="issue_count" value="issue_count">
-
-                  问题计数
+                  {'问题计数'}
                 </Option>
                 <Option key="remain_time" value="remain_time">
-
-                  剩余时间
+                  {'剩余时间'}
                 </Option>
               </Select>
               <Spin spinning={VS.chartLoading}>
@@ -350,8 +374,10 @@ class VelocityChart extends Component {
                     }}
                   >
 
+
+
                     待办事项
-                  </span>
+                                    </span>
                   <span>中创建一个冲刺</span>
                 </div>
 )}

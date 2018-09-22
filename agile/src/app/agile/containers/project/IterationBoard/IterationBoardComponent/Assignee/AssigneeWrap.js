@@ -10,6 +10,7 @@ class AssigneeWrap extends Component {
       <Card
         title="经办人分布"
         link={link}
+        sprintId={sprintId}
       >
         <Assignee
           sprintId={sprintId}

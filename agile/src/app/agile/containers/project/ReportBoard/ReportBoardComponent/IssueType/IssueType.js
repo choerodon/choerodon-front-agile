@@ -52,7 +52,7 @@ class IssueType extends Component {
         {
           // name: '访问来源',
           type: 'pie',
-          radius: '65%',
+          radius: '58%',
           center: ['45%', '50%'],
           data: issueTypeInfo,
         },
@@ -111,7 +111,7 @@ class IssueType extends Component {
           <table>
             <thead>
               <tr>
-                <td>经办人</td>
+                <td>问题类型</td>
                 <td>问题</td>
                 <td>百分比</td>
               </tr>

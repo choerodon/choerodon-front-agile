@@ -31,24 +31,25 @@ function transformZero2Placeholder(arr) {
 
 function getChartDataFromServerData(data) {
   if (!data.length) {
-    return [[], [], [], [], []];
+    return [[], [], [], [], [], [], []];
   }
   const completed = [];
   const remaining = [];
   const added = [];
   const completedAgain = [];
   const assistant = [];
-
-  data.forEach((versionData, index) => {
+  const showZero = [];
+  let showZeroBottom = [];
+  let showZeroTop = [];
+  data.forEach((epicData, index) => {
     const {
       start, add, done, left,
-    } = versionData;
+    } = epicData;
     completed.push(start >= done ? done : start);
     remaining.push(start >= done ? start - done : 0);
     added.push(start >= done ? add : add - (done - start));
     completedAgain.push(start >= done ? 0 : done - start);
   });
-
   assistant.push(0);
   const len = completed.length;
   completed.forEach((v, i) => {
@@ -56,15 +57,35 @@ function getChartDataFromServerData(data) {
       assistant.push(assistant[i] + v);
     }
   });
+  assistant.forEach((v, i) => {
+    showZero.push(
+      !completed[i]
+  && !remaining[i]
+  && !added[i]
+  && !completedAgain[i] ? 0 : '-',
+    );
+  });
+  
+  if (showZero.every(v => v === 0)) {
+    showZeroBottom = showZero;
+    showZeroTop = Array.from({ length: showZero.length });
+    showZeroTop = showZeroTop.map(v => '-');
+  } else {
+    showZero.forEach((v, i) => {
+      showZeroBottom.push(v === 0 && assistant[i] === 0 ? '0.00001' : '-'); 
+      showZeroTop.push(v === 0 && assistant[i] !== 0 ? '0.00001' : '-'); 
+    });
+  }
   return [
     assistant,
     transformZero2Placeholder(completed),
     transformZero2Placeholder(remaining),
     transformZero2Placeholder(added),
     transformZero2Placeholder(completedAgain),
+    showZeroBottom,
+    showZeroTop,
   ];
 }
-
 @store('VersionReportStore')
 class VersionReportStore {
   @observable tableLoading = false;

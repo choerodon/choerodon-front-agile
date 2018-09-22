@@ -6,11 +6,10 @@ import {
   Page, Header, Content, Permission,
 } from 'choerodon-front-boot';
 import {
-  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin, message,
+  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin, message, Tooltip,
 } from 'choerodon-ui';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import html2canvas from 'html2canvas';
-import Canvas2Image from '../../../../../../../node_modules/canvas2image/canvas2image';
 import './Home4.scss';
 import CreateEpic from '../component/CreateEpic';
 import Backlog from '../component/Backlog/Backlog.js';
@@ -20,8 +19,11 @@ import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
+const FileSaver = require('file-saver');
+
 // let scrollL;
 const left = 0;
+let inWhich;
 
 function toFullScreen(dom) {
   if (dom.requestFullscreen) {
@@ -82,8 +84,11 @@ class Home3 extends Component {
         }
       }
       if (document.getElementById('fixHead-body')) {
+        document.getElementById('fixHead-head').addEventListener('scroll', this.handleScrollHead, { passive: true });
         document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll, { passive: true });
-        this.getPrepareOffsetTops();
+        document.getElementById('fixHead-head').addEventListener('mouseover', this.handleMouseOverHead);
+        document.getElementById('fixHead-body').addEventListener('mouseover', this.handleMouseOverBody);
+        // this.getPrepareOffsetTops();
         clearInterval(timer);
       }
     }, 20);
@@ -171,37 +176,26 @@ class Home3 extends Component {
   //   isFirstScroll = false;
   // }, 300);
 
+  handleMouseOverHead = (e) => {
+    inWhich = 'header';
+  }
+
+  handleMouseOverBody = (e) => {
+    inWhich = 'body';
+  }
+
+  handleScrollHead = (e) => {
+    if (inWhich !== 'header') return;
+    const { scrollLeft } = e.target;
+    const body = document.getElementById('fixHead-body');
+    body.scrollLeft = scrollLeft;
+  }
+
   handleScroll = (e) => {
-    const { scrollLeft, scrollTop } = e.target;
-    // const { UserMapStore } = this.props;
-    // const {
-    //   top, offsetTops, currentIndex,
-    // } = UserMapStore;
+    if (inWhich !== 'body') return;
+    const { scrollLeft } = e.target;
     const header = document.getElementById('fixHead-head');
     header.scrollLeft = scrollLeft;
-    // document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
-    // if (scrollLeft !== left) {
-    //
-    // } else {
-    //   // UserMapStore.setTop(scrollTop);
-    //   const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
-    //   if (currentIndex !== index && index !== -1) {
-    //     UserMapStore.setCurrentIndex(index);
-    //   }
-    //   // window.console.log(scrollTop);
-    // }
-    // if (scrollTop !== top) {
-    //   let s;
-    //   const { offsetTops, currentIndex } = UserMapStore;
-    //   // s = scrollTop <=9 ? 0 : scrollTop;
-    //   // UserMapStore.setTop(s);
-    //   // // window.console.log('when scroll v, the top is: ' + s);
-    //   // const index = _.findLastIndex(offsetTops, v => v <= s + 42);
-    //   // if (currentIndex !== index && index !== -1) {
-    //   //   UserMapStore.setCurrentIndex(index);
-    //   // }
-    // }
-    // left = scrollLeft;
   };
 
 
@@ -296,7 +290,7 @@ class Home3 extends Component {
     if (this.props.UserMapStore.showBackLog) {
       this.props.UserMapStore.loadBacklogIssues();
     }
-    this.getPrepareOffsetTops();
+    // this.getPrepareOffsetTops();
 
     // this.props.UserMapStore.loadBacklogIssues();
   };
@@ -344,7 +338,7 @@ class Home3 extends Component {
       expandColumns.splice(index, 1);
     }
     this.setState({ expandColumns });
-    this.getPrepareOffsetTops(true);
+    // this.getPrepareOffsetTops(true);
     // this.handleScroll();
   };
 
@@ -479,7 +473,7 @@ class Home3 extends Component {
               ...issuesDragged,
               ...backlogIssuesCopy.slice(backlogInsertIndex),
             ];
-            window.console.log(resBacklogIssues);
+            // window.console.log(resBacklogIssues);
           }
         } else {
           resBacklogIssues = issuesDragged.concat(backlogIssuesCopy);
@@ -526,7 +520,7 @@ class Home3 extends Component {
     }
     UserMapStore.setBacklogIssues(resBacklogIssues);
     UserMapStore.setIssues(resIssues);
-    window.console.log(resIssues);
+    // window.console.log(resIssues);
   }
 
   handleMultipleDragToBoard = (res) => {
@@ -1313,6 +1307,8 @@ class Home3 extends Component {
   };
 
   handleSaveAsImage = () => {
+    const { UserMapStore } = this.props;
+    UserMapStore.saveChangeShowBackLog();
     this.setState({
       popOverVisible: false,
     });
@@ -1322,6 +1318,8 @@ class Home3 extends Component {
       duration: 2,
     });
     const shareContent = document.querySelector('.fixHead');// 需要截图的包裹的（原生的）DOM 对象
+    const shareContentWidth = shareContent.style.width;
+    const shareContentHeight = shareContent.style.height;
     shareContent.style.width = `${Math.max(document.querySelector('.fixHead-head').scrollWidth, document.querySelector('.fixHead-body').scrollWidth)}px`;
     shareContent.style.height = `${document.querySelector('.fixHead-head').scrollHeight + document.querySelector('.fixHead-body').scrollHeight}px`;
 
@@ -1343,24 +1341,17 @@ class Home3 extends Component {
 
     html2canvas(shareContent, opts)
       .then((pcanvas) => {
-        this.downLoadImage(pcanvas, '用户故事地图.png');
+        pcanvas.toBlob((blob) => {
+          FileSaver.saveAs(blob, '用户故事地图.png');
+        });
+        shareContent.style.width = shareContentWidth;
+        shareContent.style.height = shareContentHeight;
+
         message.success('导出图片成功', undefined, undefined, 'top');
       })
       .catch((error) => {
         message.error('导出图片失败', undefined, undefined, 'top');
       }); 
-  }
-
-  /**
-   *
-   * @param {canvas} canvas
-   * @param {filename} name
-   */
-  downLoadImage(canvas, name) {
-    const a = document.createElement('a');
-    a.href = canvas.toDataURL();
-    a.download = name;
-    a.click();
   }
 
   getHistoryCount = (id) => {
@@ -1433,7 +1424,7 @@ class Home3 extends Component {
           getPopupContainer={triggerNode => triggerNode}
           overlayClassName="moreMenuPopover"
           arrowPointAtCenter={false}
-          placement="bottomLeft"
+          placement="bottom"
           trigger={['click']}
           visible={this.state.popOverVisible}
           onVisibleChange={(visible) => {
@@ -1443,16 +1434,15 @@ class Home3 extends Component {
           }}
           content={(
             <div>
-              <div className="menu-title">史诗过滤器</div>
-              <div style={{ height: 22, marginBottom: 20 }}>
-                <Checkbox onChange={this.handleShowDoneEpic}>已完成的史诗</Checkbox>
+              <div className="menu-title">史诗过滤选择器</div>
+              <div style={{ height: 30, padding: '5px 12px' }}>
+                <Checkbox onChange={this.handleShowDoneEpic}>显示已完成的史诗</Checkbox>
               </div>
-              <div style={{ height: 22, marginBottom: 20 }}>
-                <Checkbox onChange={this.handleFilterEpic}>应用快速搜索到史诗</Checkbox>
+              <div style={{ height: 30, padding: '5px 12px' }}>
+                <Checkbox onChange={this.handleFilterEpic}>应用搜索到史诗</Checkbox>
               </div>
               <div className="menu-title">导出</div>
-              {/* <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div> */}
-              <div onClick={this.handleSaveAsImage} role="none" style={{ height: 22, marginLeft: 26, cursor: 'pointer' }}>导出为图片</div>
+              <div onClick={this.handleSaveAsImage} role="none" style={{ height: 30, padding: '5px 12px', marginLeft: 26, cursor: 'pointer' }}>导出为png格式</div>
             </div>
           )}
         >
@@ -1511,33 +1501,39 @@ class Home3 extends Component {
           >
             <div>{vos[name]}</div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p className="point-span" style={{ background: '#4D90FE' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
-                  if (issue.statusCode === 'todo') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#FFB100' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
-                  if (issue.statusCode === 'doing') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#00BFA5' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
-                  if (issue.statusCode === 'done') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
+              <Tooltip title="todo">
+                <p className="point-span" style={{ background: '#4D90FE' }}>
+                  {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
+                    if (issue.statusCode === 'todo') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
+              <Tooltip title="doing">
+                <p className="point-span" style={{ background: '#FFB100' }}>
+                  {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
+                    if (issue.statusCode === 'doing') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
+              <Tooltip title="done">
+                <p className="point-span" style={{ background: '#00BFA5' }}>
+                  {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
+                    if (issue.statusCode === 'done') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
               <Button shape="circle" className="expand-btn" onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
                 <Icon type={`${this.state.expandColumns.includes(vos[id]) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
               </Button>
@@ -1577,15 +1573,15 @@ class Home3 extends Component {
                         //     >
                         //       {item.issueId}
                         <IssueCard
-                                draggableId={`${mode}-${item.issueId}`}
-                                index={indexs}
-                                selected={selectIssueIds.includes(item.issueId)}
-                                dragged={currentDraggableId === item.issueId}
-                                handleClickIssue={this.handleClickIssue}
-                                key={item.issueId}
-                                issue={item}
-                                borderTop={indexs === 0}
-                              />
+                          draggableId={`${mode}-${item.issueId}`}
+                          index={indexs}
+                          selected={selectIssueIds.includes(item.issueId)}
+                          dragged={currentDraggableId === item.issueId}
+                          handleClickIssue={this.handleClickIssue}
+                          key={item.issueId}
+                          issue={item}
+                          borderTop={indexs === 0}
+                        />
                         //     </div>
                         //   )}
                         // </Draggable>
@@ -1666,24 +1662,28 @@ class Home3 extends Component {
 
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p className="point-span" style={{ background: '#4D90FE' }}>
-                {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
-                  if (issue.statusCode === 'todo') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#FFB100' }}>
-                {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
-                  if (issue.statusCode === 'doing') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
+              <Tooltip title="todo">
+                <p className="point-span" style={{ background: '#4D90FE' }}>
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                    if (issue.statusCode === 'todo') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
+              <Tooltip title="doing">
+                <p className="point-span" style={{ background: '#FFB100' }}>
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                    if (issue.statusCode === 'doing') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
             </div>
           </div>
           <div
@@ -1724,15 +1724,15 @@ class Home3 extends Component {
                         //     >
                         //       {item.issueId}
                         <IssueCard
-                                draggableId={`${mode}-${item.issueId}`}
-                                index={indexs}
-                                selected={selectIssueIds.includes(item.issueId)}
-                                dragged={currentDraggableId === item.issueId}
-                                handleClickIssue={this.handleClickIssue}
-                                key={item.issueId}
-                                issue={item}
-                                borderTop={indexs === 0}
-                              />
+                          draggableId={`${mode}-${item.issueId}`}
+                          index={indexs}
+                          selected={selectIssueIds.includes(item.issueId)}
+                          dragged={currentDraggableId === item.issueId}
+                          handleClickIssue={this.handleClickIssue}
+                          key={item.issueId}
+                          issue={item}
+                          borderTop={indexs === 0}
+                        />
                         //     </div>
                         //   )}
                         // </Draggable>
@@ -1880,11 +1880,11 @@ class Home3 extends Component {
                                   // borderBottom: '1px solid rgba(0,0,0,0.12)'
                                 }}
                               >
-                                {epicData.map((epic, index) => (
+                                {UserMapStore.epics.map((epic, index) => (
                                   <div className="fixHead-block" key={epic.issueId}>
                                     <EpicCard
                                       index={index}
-                                      key={epic.issueId}
+                                      // key={epic.issueId}
                                       epic={epic}
                                     />
                                   </div>
@@ -1903,7 +1903,7 @@ class Home3 extends Component {
                 </DragDropContext>
               )}
             <CreateEpic
-              getContainer={() => document.querySelector('.c7n-userMap')}
+              container={document.querySelector('.c7n-userMap')}
               visible={createEpic}
               onOk={() => {
                 UserMapStore.setCreateEpic(false);

@@ -22,9 +22,9 @@ import NoDataComponent from '../../Component/noData';
 import pic from '../../../../../assets/image/问题管理－空.png';
 import ReleaseStore from '../../../../../stores/project/release/ReleaseStore';
 
-
 const Option = Select.Option;
 const { AppState } = stores;
+let backUrl;
 
 @observer
 class ReleaseDetail extends Component {
@@ -35,10 +35,13 @@ class ReleaseDetail extends Component {
       type: '',
       value: '',
       showOtherTooltip: false,
+      linkFromParamUrl: undefined,
     };
   }
 
   componentDidMount = () => {
+    const Request = this.GetRequest(this.props.location.search);
+    backUrl = Request.paramUrl || 'reporthost';
     const value = this.getSelectDefaultValue();
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
     setTimeout(() => {
@@ -53,6 +56,17 @@ class ReleaseDetail extends Component {
     }, 0);
   }
  
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
+  }
 
   getFirstName = (str) => {
     if (!str) {
@@ -73,7 +87,7 @@ class ReleaseDetail extends Component {
     });
     const otherTooptipItem = document.getElementsByClassName('pie-otherTooptip-item-percent');
     let opacity = 0.9;
-    for (let i = 0; i < otherTooptipItem.length; i++) {
+    for (let i = 0; i < otherTooptipItem.length; i += 1) {
       opacity = 1 - i * 0.1 > 0 ? 1 - i * 0.1 : 0.9;
       otherTooptipItem[i].style.backgroundColor = `rgba(250,211,82,${opacity})`;
     }
@@ -81,12 +95,13 @@ class ReleaseDetail extends Component {
   }
 
   getSelectDefaultValue = () => {
-    const { pathname } = this.props.location;
+    const { location: { pathname } } = this.props;
     const quaryLinks = [
       { title: '经办人', value: 'assignee' },
       { title: '问题类型', value: 'typeCode' },
       { title: '优先级', value: 'priorityCode' },
       { title: '状态', value: 'statusCode' },
+      { title: '史诗', value: 'epic' },
     ];
     const quaryLink = pathname.slice(pathname.lastIndexOf('/') + 1, pathname.length);
     if (quaryLinks.filter(item => item.value === quaryLink).length === 0) {
@@ -243,8 +258,52 @@ class ReleaseDetail extends Component {
     );
   }
 
+  renderOtherTooltip = () => {
+    const sourceData = VersionReportStore.getSourceData;
+    const otherDates = sourceData.filter(item => item.percent < 2).sort(this.compare('percent'));
+    if (otherDates && otherDates.length > 0) {
+      if (otherDates.length <= 6) {
+        return (
+          otherDates.map(item => (
+            <div className="pie-otherTooptip-item">
+              <p className="pie-otherTooptip-item-percent">
+                <span>{`${item.percent.toFixed(2)}%`}</span>
+              </p>
+              <p>
+                <Tooltip title={item.name} placement="bottom">
+                  <span>{item.name}</span>
+                </Tooltip>
+              </p>
+            </div>
+          ))
+        );
+      } else {
+        return (
+          <React.Fragment>
+            { otherDates.slice(0, 6).map(item => ( 
+              <div className="pie-otherTooptip-item">
+                <p className="pie-otherTooptip-item-percent">
+                  <span>{`${item.percent.toFixed(2)}%`}</span>
+                </p>
+                <p>
+                  <Tooltip title={item.name} placement="bottom">
+                    <span>{item.name}</span>
+                  </Tooltip>
+                </p>
+              </div>
+            ))}
+            <div className="pie-otherTooptip-item">
+              <span className="pie-otherTooptip-item-ignore">...</span>
+            </div>
+          </React.Fragment>     
+        );
+      }
+    }    
+  }
+
+
   render() {
-    const { value } = this.state;
+    const { value, showOtherTooltip } = this.state;
     const data = VersionReportStore.getPieData;
     const sourceData = VersionReportStore.getSourceData;
     let total = 0;
@@ -268,7 +327,7 @@ class ReleaseDetail extends Component {
       <Page className="pie-chart">
         <Header
           title="统计图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${backUrl}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwitchChart
             history={this.props.history}
@@ -314,22 +373,10 @@ class ReleaseDetail extends Component {
                     option={this.getOption()}
                   />
                  
-                  <div className="pie-otherTooltip">
-                    { this.state.showOtherTooltip ? <div className="pie-otherTooltip-wrap" /> : ''}
+                  <div className="pie-otherTooltip" style={{ display: `${showOtherTooltip ? 'block' : 'none'}` }}>
+                    <div className="pie-otherTooltip-wrap" />
                     <div className="pie-otherTooltip-item-wrap">
-                      { this.state.showOtherTooltip 
-                        ? sourceData.filter(item => item.percent < 2).sort(this.compare('percent')).map(item => (
-                          <div className="pie-otherTooptip-item">
-                            <p className="pie-otherTooptip-item-percent">
-                              <span>{`${item.percent.toFixed(2)}%`}</span>
-                            </p>
-                            <p>
-                              <Tooltip title={item.name} placement="bottom">
-                                <span>{item.name}</span>
-                              </Tooltip>
-                            </p>
-                          </div>
-                        )) : ''}
+                      {this.renderOtherTooltip()}
                     </div>
                    
                   </div>

@@ -38,9 +38,17 @@ class VersionReport extends Component {
       }],
       type: 'storyPoints',
       loading: false,
+      linkFromParamUrl: undefined,
     };
   }
+
   componentWillMount() {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    this.setState({
+      linkFromParamUrl,
+    });
+
     VersionReportStore.axiosGetVersionList().then((res) => {
       VersionReportStore.setVersionList(res);
       this.setState({
@@ -52,6 +60,7 @@ class VersionReport extends Component {
     }).catch((error) => {
     });
   }
+
   getReportData(type) {
     this.setState({
       loading: true,
@@ -68,6 +77,7 @@ class VersionReport extends Component {
       });
     });
   }
+
   getAddIssues(date, type, string) {
     const data = VersionReportStore.getReportData.versionReport;
     let addIssues = [];
@@ -314,6 +324,7 @@ class VersionReport extends Component {
       options,
     });
   }
+
   updateIssues(data) {
     for (let index = 0, len = data.length; index < len; index += 1) {
       VersionReportStore.axiosGetIssues(this.state.chosenVersion, data[index], this.state.type).then((res2) => {
@@ -327,6 +338,7 @@ class VersionReport extends Component {
       });
     }
   }
+
   renderUnitColumn(type) {
     let result = '';
     if (this.state.type === 'storyPoints') {
@@ -344,6 +356,7 @@ class VersionReport extends Component {
     }
     return result;
   }
+
   renderLegendName(type) {
     let result;
     if (this.state.type === 'storyPoints') {
@@ -381,6 +394,7 @@ class VersionReport extends Component {
     }
     return result;
   }
+
   renderTypecode(item, type) {
     if (item.typeCode === 'story') {
       if (type === 'background') {
@@ -428,6 +442,7 @@ class VersionReport extends Component {
     }
     return '';
   }
+
   renderPriorityStyle(type, item) {
     if (type === 'color') {
       if (item.priorityCode === 'medium') {
@@ -445,6 +460,7 @@ class VersionReport extends Component {
       return 'rgba(0, 0, 0, 0.08)';
     }
   }
+  
   renderTabTable(type) {
     const columns = [{
       title: '关键字',
@@ -575,12 +591,13 @@ class VersionReport extends Component {
 
   render() {
     const { history } = this.props;
+    const { linkFromParamUrl } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
       <Page>
         <Header
           title="版本报告"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}

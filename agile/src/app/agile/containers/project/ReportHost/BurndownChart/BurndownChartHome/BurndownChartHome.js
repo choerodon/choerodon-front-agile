@@ -19,6 +19,7 @@ import SwithChart from '../../Component/switchChart';
 
 const { AppState } = stores;
 const Option = Select.Option;
+let backUrl;
 
 @observer
 class BurndownChartHome extends Component {
@@ -34,11 +35,29 @@ class BurndownChartHome extends Component {
       tableLoading: true,
       endDate: '',
       startDate: '',
+      linkFromParamUrl: undefined,
     };
   }
 
   componentWillMount() {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    this.setState({
+      linkFromParamUrl: linkFromParamUrl,
+    });
     this.getSprintData();
+  }
+
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
   }
 
   getBetweenDateStr(start, end) {
@@ -584,12 +603,12 @@ class BurndownChartHome extends Component {
     }
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    
+    const { linkFromParamUrl } = this.state;
     return (
       <Page>
         <Header
           title="燃尽图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}

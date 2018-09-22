@@ -16,6 +16,7 @@ class WYSIWYGEditor extends Component {
       msgSaving: null,
       delta: null,
       chatError: null,
+      loading: false,
     };
     this.handleChange = this.handleChange.bind(this);
   }
@@ -108,7 +109,11 @@ class WYSIWYGEditor extends Component {
               </Button>
               <Button
                 type="primary"
-                onClick={() => this.props.handleSave()}
+                loading={this.state.loading}
+                onClick={() => {
+                  this.setState({ loading: true });
+                  this.props.handleSave();
+                }}
               >
                 保存
               </Button>

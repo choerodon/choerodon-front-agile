@@ -2,8 +2,12 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Tabs, Table, Select, Icon, Tooltip, Spin } from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, 
+} from 'choerodon-front-boot';
+import {
+  Button, Tabs, Table, Select, Icon, Tooltip, Spin, 
+} from 'choerodon-ui';
 import pic from './no_epic.svg';
 import finish from './legend/finish.svg';
 import SwithChart from '../../Component/switchChart';
@@ -421,7 +425,12 @@ class EpicReport extends Component {
                 const urlParams = AppState.currentMenuType;
                 history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicReport`);
               }}
-            >{issueNum} {record.addIssue ? '*' : ''}</span>
+            >
+              {issueNum} 
+              {' '}
+              {record.addIssue ? '*' : ''}
+
+            </span>
           ),
         },
         {
@@ -431,7 +440,10 @@ class EpicReport extends Component {
           render: summary => (
             <div style={{ width: '100%', overflow: 'hidden' }}>
               <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={summary}>
-                <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 }}>
+                <p style={{
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, 
+                }}
+                >
                   {summary}
                 </p>
               </Tooltip>
@@ -589,19 +601,29 @@ class EpicReport extends Component {
                               </li>
                               {
                                 ES.beforeCurrentUnit === 'issue_count' ? (
-                                  <li><span className="c7n-tip">已完成：</span><span>{ES.getLatest.issueCompletedCount}</span></li>
+                                  <li>
+                                    <span className="c7n-tip">已完成：</span>
+                                    <span>{ES.getLatest.issueCompletedCount}</span>
+                                                                    </li>
                                 ) : null
                               }
                               {
                                 ES.beforeCurrentUnit === 'issue_count' ? null : (
-                                  <li><span className="c7n-tip">未预估：</span><span>{ES.getLatest.unEstimateIssueCount}</span></li>
+                                  <li>
+                                    <span className="c7n-tip">未预估：</span>
+                                    <span>{ES.getLatest.unEstimateIssueCount}</span>
+                                                                    </li>
                                 )
                               }
                             </ul>
                             {
                               ES.beforeCurrentUnit !== 'issue_count' ? (
                                 <div>
-                                  <h4>{`${ES.getChartYAxisName}`}汇总</h4>
+                                  <h4>
+                                    {`${ES.getChartYAxisName}`}
+
+汇总
+                                                                    </h4>
                                   <ul>
                                     <li>
                                       <span className="c7n-tip">合计：</span>
@@ -629,6 +651,8 @@ class EpicReport extends Component {
                                 this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
                               }}
                             >
+
+
                               在“问题管理”中查看
                               <Icon style={{ fontSize: 13 }} type="open_in_new" />
                             </p>
@@ -665,31 +689,33 @@ class EpicReport extends Component {
                 textWidth="auto"
                 pic={pic}
                 title="当前项目无可用史诗"
-                des={
+                des={(
                   <div>
-                    <span>请在</span>
-                    <span
+  <span>请在</span>
+  <span
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
                         history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
+
                       待办事项
-                    </span>
-                    <span>或</span>
-                    <span
+</span>
+  <span>或</span>
+  <span
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
                         history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
+
                       问题管理
-                    </span>
-                    <span>中创建一个史诗</span>
-                  </div>
-                }
+</span>
+  <span>中创建一个史诗</span>
+</div>
+)}
               />
             )
           }

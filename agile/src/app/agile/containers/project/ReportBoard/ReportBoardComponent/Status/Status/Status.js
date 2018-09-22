@@ -28,8 +28,9 @@ class Status extends Component {
     const option = {
       legend: {
         orient: 'vertical',
-        x: '60%',
-        y: 'center',
+        x: '70%',
+        // y: 'center',
+        top: '52px',
         data: [
           {
             name: '待处理',
@@ -46,7 +47,7 @@ class Status extends Component {
         ],
         itemWidth: 12,
         itemHeight: 12,
-        itemGap: 16,
+        itemGap: 30,
         textStyle: {
           fontSize: '13',
         },
@@ -69,10 +70,10 @@ class Status extends Component {
         {
           color: ['#FFB100', '#4D90FE', '#00BFA5'],
           type: 'pie',
-          radius: '60px',
+          radius: '80px',
           avoidLabelOverlap: false,
           hoverAnimation: false,
-          center: ['35%', '50%'],
+          center: ['35%', '45%'],
           label: {
             normal: {
               show: false,

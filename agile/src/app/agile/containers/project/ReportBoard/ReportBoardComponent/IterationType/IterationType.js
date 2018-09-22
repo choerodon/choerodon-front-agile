@@ -38,14 +38,13 @@ class IterationType extends Component {
   getIterationTypeData() {
     const { iterationTypeInfo } = this.state;
     const xAxisData = this.getXAxisData();
-    console.log(xAxisData);
     const iterationTypeData = { todoData: [], doingData: [], doneData: [] };
     const { todoData, doingData, doneData } = iterationTypeData;
     let todoDataLength = 0; 
     let doingDataLength = 0; 
     let doneDataLength = 0;
     if (iterationTypeInfo && iterationTypeInfo.length !== 0) {
-      for (let i = 0; i < xAxisData.length; i++) {
+      for (let i = 0; i < xAxisData.length; i += 1) {
         const iterationType = iterationTypeInfo.filter(item => item.name === xAxisData[i]);
         todoDataLength = todoData.length;
         doingDataLength = doingData.length;
@@ -159,6 +158,7 @@ class IterationType extends Component {
           // data: [120, 132, 101, 134],
           data: iterationTypeData.todoData,
           barCategoryGap: '28px',
+          barWidth: '24px',
           itemStyle: {
             color: '#FFB100',
           },

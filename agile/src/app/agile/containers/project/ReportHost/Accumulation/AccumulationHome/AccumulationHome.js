@@ -22,6 +22,7 @@ import SwithChart from '../../Component/switchChart';
 const { AppState } = stores;
 const { RangePicker } = DatePicker;
 const Option = Select.Option;
+let backUrl;
 
 @observer
 class AccumulationHome extends Component {
@@ -41,10 +42,17 @@ class AccumulationHome extends Component {
       optionsVisible: false,
       sprintData: {},
       loading: false,
+      linkFromParamUrl: undefined,
     };
   }
 
   componentWillMount() {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    this.setState({
+      linkFromParamUrl,
+    });
+
     AccumulationStore.axiosGetFilterList().then((data) => {
       const newData = _.clone(data);
       for (let index = 0, len = newData.length; index < len; index += 1) {
@@ -69,6 +77,18 @@ class AccumulationHome extends Component {
       // this.getData();
     }).catch((error) => {
     });
+  }
+
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
   }
 
   getColumnData(id, type) {
@@ -227,7 +247,7 @@ class AccumulationHome extends Component {
           // },
         },
         legend: {
-          right: '1%',
+          right: '90',
           data: legendData,
           top: '3%',
           itemGap: 30,
@@ -235,8 +255,8 @@ class AccumulationHome extends Component {
           itemHeight: 14,
         },
         grid: {
-          left: '0%',
-          right: '16px',
+          left: '50',
+          right: '90',
           top: '8%',
           containLabel: true,
         },
@@ -380,12 +400,13 @@ class AccumulationHome extends Component {
   // }
   render() {
     const { history } = this.props;
+    const { linkFromParamUrl } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
       <Page>
         <Header
           title="累积流量图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}
