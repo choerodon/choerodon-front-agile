@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
-import { Select, Form, Input, Button, Modal, Icon, Tooltip } from 'choerodon-ui';
+import {
+  Select, Form, Input, Button, Modal, Icon, Tooltip, 
+} from 'choerodon-ui';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
-import { createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics } from '../../api/NewIssueApi';
+import {
+  createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics, 
+} from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
 import { COLOR } from '../../common/Constant';
 import WYSIWYGEditor from '../WYSIWYGEditor';
@@ -204,7 +208,9 @@ class CreateIssue extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { initValue, visible, onCancel, onOk } = this.props;
+    const {
+      initValue, visible, onCancel, onOk, 
+    } = this.props;
     const callback = (value) => {
       this.setState({
         delta: value,
@@ -224,15 +230,29 @@ class CreateIssue extends Component {
         confirmLoading={this.state.createLoading}
       >
         <div>
-          <h2>在项目“{AppState.currentMenuType.name}”中创建问题</h2>
+          <h2>
+
+
+在项目“
+{AppState.currentMenuType.name}
+
+
+”中创建问题
+</h2>
           <p style={{ width: 520, marginBottom: 24 }}>
+
+
+
             请在下面输入问题的详细信息，包含详细描述、人员信息、版本信息、进度预估、优先级等等。您可以通过丰富的任务描述帮助相关人员更快更全面的理解任务，同时更好的把控问题进度。
-            <a href="http://v0-9.choerodon.io/zh/docs/user-guide/agile/issue/create-issue/" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
+<a href="http://v0-9.choerodon.io/zh/docs/user-guide/agile/issue/create-issue/" rel="nofollow me noopener noreferrer" target="_blank" className="c7n-external-link">
               <span className="c7n-external-link-content">
+
+
+
               了解详情
-              </span>
+</span>
               <Icon type="open_in_new" style={{ fontSize: '13px' }} />
-            </a>
+                        </a>
           </p>
           <Form layout="vertical">
             <FormItem label="问题类型" style={{ width: 520 }}>
@@ -252,8 +272,7 @@ class CreateIssue extends Component {
                           showName
                         />
                       </div>
-                    </Option>),
-                  )}
+                    </Option>))}
                 </Select>,
               )}
             </FormItem>
@@ -287,26 +306,28 @@ class CreateIssue extends Component {
                   label="优先级"
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
-                  {this.transformPriorityCode(this.state.originPriorities).map(type =>
-                    (<Option key={type.valueCode} value={type.valueCode}>
+                  {this.transformPriorityCode(this.state.originPriorities).map(type => (
+                    <Option key={type.valueCode} value={type.valueCode}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
-                        <div
-                          style={{ color: COLOR[type.valueCode].color, width: 20, height: 20, textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: 8 }}
+    <div
+                          style={{
+                            color: COLOR[type.valueCode].color, width: 20, height: 20, textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: 8, 
+                          }}
                         >
                           <Icon
                             type="flag"
                             style={{ fontSize: '13px' }}
                           />
                         </div>
-                        <span>{type.name}</span>
-                      </div>
-                    </Option>),
-                  )}
+    <span>{type.name}</span>
+  </div>
+                                        </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
 
-            <div>
+            <div style={{ width: 520 }}>
               <div style={{ display: 'flex', marginBottom: 3, alignItems: 'center' }}>
                 <div style={{ fontWeight: 'bold' }}>描述</div>
                 <div style={{ marginLeft: 80 }}>
@@ -342,10 +363,10 @@ class CreateIssue extends Component {
                   allowClear
                   onFilterChange={this.onFilterChange.bind(this)}
                 >
-                  {this.state.originUsers.map(user =>
-                    (<Option key={user.id} value={user.id}>
+                  {this.state.originUsers.map(user => (
+                    <Option key={user.id} value={user.id}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
-                        <UserHead
+    <UserHead
                           user={{
                             id: user.id,
                             loginName: user.loginName,
@@ -353,13 +374,13 @@ class CreateIssue extends Component {
                             avatar: user.imageUrl,
                           }}
                         />
-                      </div>
-                    </Option>),
-                  )}
+  </div>
+                                        </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
-            <Tooltip title={'可自行选择经办人，如不选择，会应用模块的默认经办人逻辑和项目的默认经办人策略'}>
+            <Tooltip title="可自行选择经办人，如不选择，会应用模块的默认经办人逻辑和项目的默认经办人策略">
               <Icon
                 type="error"
                 style={{
@@ -379,8 +400,7 @@ class CreateIssue extends Component {
                       label="史诗"
                       allowClear
                       filter
-                      filterOption={(input, option) => 
-                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                      filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                       getPopupContainer={triggerNode => triggerNode.parentNode}
                       loading={this.state.selectLoading}
                       onFocus={() => {
@@ -395,9 +415,7 @@ class CreateIssue extends Component {
                         });
                       }}
                     >
-                      {this.state.originEpics.map(epic =>
-                        <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>,
-                      )}
+                      {this.state.originEpics.map(epic => <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>)}
                     </Select>,
                   )}
                 </FormItem>
@@ -410,8 +428,7 @@ class CreateIssue extends Component {
                   label="冲刺"
                   allowClear
                   filter
-                  filterOption={(input, option) => 
-                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                  filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                   loading={this.state.selectLoading}
                   onFocus={() => {
@@ -426,11 +443,11 @@ class CreateIssue extends Component {
                     });
                   }}
                 >
-                  {this.state.originSprints.map(sprint =>
-                    (<Option key={sprint.sprintId} value={sprint.sprintId}>
+                  {this.state.originSprints.map(sprint => (
+                    <Option key={sprint.sprintId} value={sprint.sprintId}>
                       {sprint.sprintName}
-                    </Option>),
-                  )}
+                                        </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -457,9 +474,7 @@ class CreateIssue extends Component {
                     });
                   }}
                 >
-                  {this.state.originFixVersions.map(version =>
-                    <Option key={version.name} value={version.name}>{version.name}</Option>,
-                  )}
+                  {this.state.originFixVersions.map(version => <Option key={version.name} value={version.name}>{version.name}</Option>)}
                 </Select>,
               )}
             </FormItem>
@@ -486,9 +501,7 @@ class CreateIssue extends Component {
                     });
                   }}
                 >
-                  {this.state.originComponents.map(component =>
-                    <Option key={component.name} value={component.name}>{component.name}</Option>,
-                  )}
+                  {this.state.originComponents.map(component => <Option key={component.name} value={component.name}>{component.name}</Option>)}
                 </Select>,
               )}
             </FormItem>
@@ -515,11 +528,11 @@ class CreateIssue extends Component {
                     });
                   }}
                 >
-                  {this.state.originLabels.map(label =>
-                    (<Option key={label.labelName} value={label.labelName}>
+                  {this.state.originLabels.map(label => (
+                    <Option key={label.labelName} value={label.labelName}>
                       {label.labelName}
-                    </Option>),
-                  )}
+                                        </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
