@@ -231,6 +231,7 @@ class ColumnPage extends Component {
         <SettingColumn
           data={data[index]}
           refresh={this.props.refresh.bind(this)}
+          // setLoading={this.props.setLoading.bind}
           index={index}
           styleValue={`${parseFloat(parseFloat(1 / data.length) * 100)}%`}
         />,
