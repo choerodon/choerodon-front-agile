@@ -12,6 +12,7 @@ class IssueDetail extends Component {
     super(props);
     this.state = {};
   }
+  
   render() {
     // let height = '';
     // if (document.getElementsByClassName('page-content').length > 0) {

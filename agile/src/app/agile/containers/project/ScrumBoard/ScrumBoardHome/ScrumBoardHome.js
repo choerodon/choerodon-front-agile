@@ -699,31 +699,37 @@ class ScrumBoardHome extends Component {
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       result = (
         <span>
-其他问题
-<span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, 'parentIssueId')}&nbsp;问题)</span>
+          {'其他问题'}
+          <span className="c7n-scrumboard-otherHeader-issueCount">
+            {`${this.getIssueCount(data, 'parentIssueId')} 问题`}
+          </span>
         </span>
       );
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       result = (
         <span>
-未分配的问题
-<span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, 'assigneeId')}&nbsp;问题)</span>
+          {'未分配的问题'}
+          <span className="c7n-scrumboard-otherHeader-issueCount">
+            {`${this.getIssueCount(data, 'assigneeId')} 问题`}
+          </span>
         </span>
       );
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
       result = (
         <span>
-所有问题
-{' '}
-<span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, 'epicId')}&nbsp;问题)</span>
+          {' 所有问题 '}
+          <span className="c7n-scrumboard-otherHeader-issueCount">
+            {`${this.getIssueCount(data, 'epicId')} 问题`}
+          </span>
         </span>
       );
     } else {
       result = (
         <span>
-所有问题
-{' '}
-<span className="c7n-scrumboard-otherHeader-issueCount">({this.getIssueCount(data, '')}&nbsp;问题)</span>
+          {' 所有问题 '}
+          <span className="c7n-scrumboard-otherHeader-issueCount">
+            {`${this.getIssueCount(data, '')}问题`}
+          </span>
         </span>
       );
     }
@@ -906,19 +912,8 @@ class ScrumBoardHome extends Component {
                       role="none"
                       onClick={this.filterOnlyMe.bind(this)}
                     >
-
-
-
-
-
-
-
-
-
-
-仅我的问题
-
-                                        </p>
+                      {'仅我的问题'}
+                    </p>
                     <p
                       className="c7n-scrumTools-filter"
                       style={{
@@ -928,19 +923,8 @@ class ScrumBoardHome extends Component {
                       role="none"
                       onClick={this.filterOnlyStory.bind(this)}
                     >
-
-
-
-
-
-
-
-
-
-
-仅故事
-
-                                        </p>
+                      {'仅故事'}
+                    </p>
                     {
                       ScrumBoardStore.getQuickSearchList.length > 0 
                         ? ScrumBoardStore.getQuickSearchList.map(item => (
@@ -1052,30 +1036,10 @@ class ScrumBoardHome extends Component {
                         >
                           <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
                           <p style={{ fontSize: 20, lineHeight: '34px' }}>
-
-
-
-
-
-
-
-
-
-
-在
-<span style={{ color: '#3f51b5' }}>待办事项</span>
-
-
-
-
-
-
-
-
-
-
-中开始Sprint
-</p>
+                            {'在'}
+                            <span style={{ color: '#3f51b5' }}>待办事项</span>
+                            {'中开始Sprint'}
+                          </p>
                         </div>
                       </div>
                     )
@@ -1117,30 +1081,10 @@ class ScrumBoardHome extends Component {
             }}
           >
             <p>
-
-
-
-
-
-
-
-
-
-
-任务
-{this.state.judgeUpdateParent.issueNumber}
-
-
-
-
-
-
-
-
-
-
-的全部子任务为done
-</p>
+              {'任务'}
+              {this.state.judgeUpdateParent.issueNumber}
+              {'的全部子任务为done'}
+            </p>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <p style={{ marginRight: 20 }}>您是否要更新父问题进行匹配</p>
               <Select 

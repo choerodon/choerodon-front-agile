@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
-import { Form, Modal, Input, Select } from 'choerodon-ui';
+import {
+  Form, Modal, Input, Select, 
+} from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 
 const FormItem = Form.Item;
@@ -18,13 +20,15 @@ class AddStatus extends Component {
       loading: false,
     };
   }
+
   handleAddStatus(e) {
-    this.setState({
-      loading: true,
-    });
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        this.setState({
+          loading: true,
+        });
+        
         const params = {
           name: values.name,
           projectId: AppState.currentMenuType.id,
@@ -45,6 +49,7 @@ class AddStatus extends Component {
       }
     });
   }
+
   checkStatusName(rule, value, callback) {
     ScrumBoardStore.axiosCheckRepeatName(value).then((res) => {
       if (res) {
@@ -55,6 +60,7 @@ class AddStatus extends Component {
     }).catch((error) => {
     });
   }
+
   renderOptions() {
     const result = [];
     if (JSON.stringify(ScrumBoardStore.getStatusCategory) !== '{}') {
@@ -82,8 +88,14 @@ class AddStatus extends Component {
         result.push(
           <Option value={data[index].valueCode}>
             <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-              <div style={{ width: 15, height: 15, borderRadius: 2, marginRight: 5, background: color }} />
-              <span> {data[index].name}</span>
+              <div style={{
+                width: 15, height: 15, borderRadius: 2, marginRight: 5, background: color, 
+              }}
+              />
+              <span> 
+                {' '}
+                {data[index].name}
+              </span>
             </div>
 
           </Option>,
@@ -92,6 +104,7 @@ class AddStatus extends Component {
     }
     return result;
   }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     let name;
@@ -151,4 +164,3 @@ class AddStatus extends Component {
 }
 
 export default Form.create()(AddStatus);
-

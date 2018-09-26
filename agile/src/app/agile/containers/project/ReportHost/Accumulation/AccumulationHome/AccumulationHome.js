@@ -48,7 +48,7 @@ class AccumulationHome extends Component {
 
   componentWillMount() {
     const { location: { search } } = this.props;
-    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
     this.setState({
       linkFromParamUrl,
     });
