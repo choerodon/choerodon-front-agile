@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Page, Header, Content, stores, axios, Permission } from 'choerodon-front-boot';
+import {
+  Page, Header, Content, stores, axios, Permission, 
+} from 'choerodon-front-boot';
 import _ from 'lodash';
-import { Button, Spin, Modal, Form, Input, Select, Tabs, message, Icon } from 'choerodon-ui';
+import {
+  Button, Spin, Modal, Form, Input, Select, Tabs, message, Icon, 
+} from 'choerodon-ui';
 import { withRouter } from 'react-router-dom';
 import './ScrumBoardSetting.scss';
 import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
@@ -24,14 +28,22 @@ class ScrumBoardSetting extends Component {
       loading: false,
     };
   }
+
   componentDidMount() {
     this.refresh();
   }
+
   // getQueryVariable(variable) {
   //   const data = window.location.hash.split('?')[1].split('&');
   //   const result = _.find(data, o => o.indexOf(variable) !== -1).replace(/[^0-9]/ig, '');
   //   return parseInt(result, 10);
   // }
+  // setLoading = () => {
+  //   this.setState({
+  //     loading: true,
+  //   });
+  // }
+
   refresh() {
     this.setState({
       loading: true,
@@ -93,6 +105,7 @@ class ScrumBoardSetting extends Component {
       },
     });
   }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const urlParams = AppState.currentMenuType;
@@ -117,6 +130,7 @@ class ScrumBoardSetting extends Component {
             <TabPane tab="列配置" key="1">
               <Spin spinning={this.state.loading}>
                 <ColumnPage
+                  // setLoading={this.setLoading}
                   refresh={this.refresh.bind(this)}
                 />
               </Spin>
@@ -132,4 +146,3 @@ class ScrumBoardSetting extends Component {
 }
 
 export default Form.create()(withRouter(ScrumBoardSetting));
-

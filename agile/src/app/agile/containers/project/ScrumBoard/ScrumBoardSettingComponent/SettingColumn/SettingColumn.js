@@ -113,7 +113,7 @@ class SettingColumn extends Component {
           data={list[index]}
           index={index}
           refresh={this.props.refresh.bind(this)}
-         
+          // setLoading={this.props.setLoading}
         />,
       );
     }
@@ -172,14 +172,24 @@ class SettingColumn extends Component {
                       <span style={{ cursor: 'pointer' }}>
 
 
+
+
+
+
+
 最大值：
-{this.props.data.maxNum}
+                        {this.props.data.maxNum}
                       </span>
                       <span style={{ cursor: 'pointer' }}>
 
 
+
+
+
+
+
 最小值：
-{this.props.data.maxNum}
+                        {this.props.data.maxNum}
                       </span>
                     </div>
                   )
@@ -307,8 +317,13 @@ class SettingColumn extends Component {
 
 
 
+
+
+
+
+
 最大值：
-{this.props.data.maxNum || '没有最大'}
+                              {this.props.data.maxNum || '没有最大'}
 
                             </span>
                           </EasyEdit>
@@ -335,8 +350,13 @@ class SettingColumn extends Component {
 
 
 
+
+
+
+
+
 最小值：
-{this.props.data.minNum || '没有最小'}
+                              {this.props.data.minNum || '没有最小'}
 
                             </span>
                           </EasyEdit>

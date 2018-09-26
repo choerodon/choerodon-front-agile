@@ -17,6 +17,7 @@ class StatusCard extends Component {
     this.state = {
       complete: false,
       visible: false,
+      disabled: false,
     };
   }
 
@@ -164,32 +165,35 @@ class StatusCard extends Component {
                 </p>
                 <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.updateStatus']}>
                   <Radio
+                    disabled={this.state.disabled}
                     style={{ marginRight: 0 }}
                     checked={this.props.data.completed ? this.props.data.completed : false}
                     onClick={() => {
-                        const data = {
-                          id: this.props.data.id,
-                          objectVersionNumber: this.props.data.objectVersionNumber,
-                          completed: !this.props.data.completed,
-                          projectId: AppState.currentMenuType.id,
-                        };
-                        ScrumBoardStore.axiosUpdateIssueStatus(
-                          this.props.data.id, data,
-                        ).then((res) => {
-                          this.props.refresh();
-                        }).catch((error) => {
+                      const data = {
+                        id: this.props.data.id,
+                        objectVersionNumber: this.props.data.objectVersionNumber,
+                        completed: !this.props.data.completed,
+                        projectId: AppState.currentMenuType.id,
+                      };
+                      // this.props.setLoading.bind(this);
+                      this.setState({
+                        disabled: true,
+                      });
+                      ScrumBoardStore.axiosUpdateIssueStatus(
+                        this.props.data.id, data,
+                      ).then((res) => {
+                        this.props.refresh();
+                      }).then((res) => {
+                        this.setState({
+                          disabled: false,
                         });
-                      }}
+                      })
+                        .catch((error) => {
+                        });
+                    }}
                   >
-
-
-
-
-
-
-设置已完成
-
-                                    </Radio>
+                    {'设置已完成'}
+                  </Radio>
                 </Permission>
               </div>
             </div>
