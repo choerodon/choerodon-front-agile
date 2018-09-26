@@ -2,20 +2,12 @@ import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
-<<<<<<< HEAD
-  Select, Form, Input, Button, Modal, Icon, Tooltip, 
-=======
  Select, Form, Input, Button, Modal, Icon, Tooltip 
->>>>>>> [IMP]修改创建问题复选框的长度 & 配置看板点击Radio后的状态
 } from 'choerodon-ui';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
 import {
-<<<<<<< HEAD
-  createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics, 
-=======
  createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics 
->>>>>>> [IMP]修改创建问题复选框的长度 & 配置看板点击Radio后的状态
 } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
 import { COLOR } from '../../common/Constant';
@@ -210,20 +202,13 @@ class CreateIssue extends Component {
         }
         this.props.onOk();
       })
-      .catch((error) => {
-      });
+      .catch(() => {
+        });
   };
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const {
-<<<<<<< HEAD
-      initValue, visible, onCancel, onOk, 
-    } = this.props;
-=======
- initValue, visible, onCancel, onOk 
-} = this.props;
->>>>>>> [IMP]修改创建问题复选框的长度 & 配置看板点击Radio后的状态
+    const {visible, onCancel} = this.props;
     const callback = (value) => {
       this.setState({
         delta: value,
@@ -242,8 +227,6 @@ class CreateIssue extends Component {
         cancelText="取消"
         confirmLoading={this.state.createLoading}
       >
-<<<<<<< HEAD
-
         <Content
           title={`在项目“${AppState.currentMenuType.name}”中创建问题`}
           description="请在下面输入问题的详细信息，包含详细描述、人员信息、版本信息、进度预估、优先级等等。您可以通过丰富的任务描述帮助相关人员更快更全面的理解任务，同时更好的把控问题进度。"
@@ -272,38 +255,6 @@ class CreateIssue extends Component {
                   </Select>,
                 )}
               </FormItem>
-
-=======
-        <Content
-          title={`在项目“${AppState.currentMenuType.name}”中创建问题`}
-          description="请在下面输入问题的详细信息，包含详细描述、人员信息、版本信息、进度预估、优先级等等。您可以通过丰富的任务描述帮助相关人员更快更全面的理解任务，同时更好的把控问题进度。"
-          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/issue/create-issue/"
-        >
-          <div>
-            <Form layout="vertical">
-              <FormItem label="问题类型" style={{ width: 520 }}>
-                {getFieldDecorator('typeCode', {
-                  initialValue: 'story',
-                  rules: [{ required: true }],
-                })(
-                  <Select
-                    label="问题类型"
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                  >
-                    {['story', 'task', 'bug', 'issue_epic'].map(type => (
-                      <Option key={type} value={type}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                          <TypeTag
-                            typeCode={type}
-                            showName
-                          />
-                        </div>
-                      </Option>))}
-                  </Select>,
-                )}
-              </FormItem>
-
->>>>>>> [IMP]修改创建问题复选框的长度 & 配置看板点击Radio后的状态
               <FormItem label="概要" style={{ width: 520 }}>
                 {getFieldDecorator('summary', {
                   rules: [{ required: true, message: '概要为必输项' }],
@@ -442,11 +393,7 @@ class CreateIssue extends Component {
                         });
                       }}
                     >
-<<<<<<< HEAD
-                      {this.state.originEpics.map(epic => <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>)}
-=======
                       {this.state.originEpics.map(epic => <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>,)}
->>>>>>> [IMP]修改创建问题复选框的长度 & 配置看板点击Radio后的状态
                     </Select>,
                   )}
                 </FormItem>
