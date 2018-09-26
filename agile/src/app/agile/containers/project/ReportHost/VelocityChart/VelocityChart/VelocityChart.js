@@ -29,7 +29,7 @@ class VelocityChart extends Component {
 
   componentDidMount() {
     const { location: { search } } = this.props;
-    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
     this.setState({
       linkFromParamUrl,
     });
@@ -376,8 +376,9 @@ class VelocityChart extends Component {
 
 
 
+
                     待办事项
-                                    </span>
+</span>
                   <span>中创建一个冲刺</span>
                 </div>
 )}

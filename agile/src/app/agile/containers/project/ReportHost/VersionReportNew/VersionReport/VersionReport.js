@@ -3,10 +3,10 @@ import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import {
- Page, Header, Content, stores 
+  Page, Header, Content, stores, 
 } from 'choerodon-front-boot';
 import {
- Button, Tabs, Table, Select, Icon, Tooltip, Spin 
+  Button, Tabs, Table, Select, Icon, Tooltip, Spin, 
 } from 'choerodon-ui';
 import pic from './no_version.svg';
 import finish from './legend/finish.svg';
@@ -37,7 +37,7 @@ class EpicReport extends Component {
 
   componentDidMount() {
     const { location: { search } } = this.props;
-    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
     this.setState({
       linkFromParamUrl,
     });
@@ -470,9 +470,9 @@ class EpicReport extends Component {
                 history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
               }}
             >
-{issueNum} 
-{' '}
-{record.addIssue ? '*' : ''}
+              {issueNum} 
+              {' '}
+              {record.addIssue ? '*' : ''}
 
             </span>
           ),
@@ -485,8 +485,9 @@ class EpicReport extends Component {
             <div style={{ width: '100%', overflow: 'hidden' }}>
               <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={summary}>
                 <p style={{
- overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0 
-}}>
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, 
+                }}
+                >
                   {summary}
                 </p>
               </Tooltip>
@@ -633,8 +634,9 @@ class EpicReport extends Component {
                     }}
                   >
 
+
                     在“问题管理中”查看
-<Icon style={{ fontSize: 13 }} type="open_in_new" />
+                    <Icon style={{ fontSize: 13 }} type="open_in_new" />
                   </p>
                 </div>
                 <Spin spinning={VS.chartLoading}>
@@ -679,19 +681,20 @@ class EpicReport extends Component {
                 pic={pic}
                 title="当前项目无可用版本"
                 des={(
-<div>
-                    <span>请在</span>
-                    <span
+                  <div>
+  <span>请在</span>
+  <span
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
                         history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
+
                       发布版本
-                    </span>
-                    <span>中创建一个版本</span>
-                  </div>
+</span>
+  <span>中创建一个版本</span>
+</div>
 )}
               />
             )

@@ -34,6 +34,7 @@ class StatusBodyColumn extends Component {
   //     }
   //   }
   // }
+  
   renderIssues(issues, droppableId, statusName, categoryCode, clickItem) {
     let data = issues;
     data = _.orderBy(data, ['rank'], 'desc');

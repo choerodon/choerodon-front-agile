@@ -221,7 +221,7 @@ class Accumulation extends Component {
     return axios.get(`/agile/v1/projects/${projectId}/project_info`);
   }
 
-  loadChartData(boardId, startDate, columnIds, endDate = moment().format('YYYY-MM-DD HH:mm:ss'), quickFilterIds = []) {
+  loadChartData(boardId, startDate, columnIds, endDate = `${moment().format('YYYY-MM-DD')} 23:59:59`, quickFilterIds = []) {
     const obj = {
       columnIds,
       endDate,

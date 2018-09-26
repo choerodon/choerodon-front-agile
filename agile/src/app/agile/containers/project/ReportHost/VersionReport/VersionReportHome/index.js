@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { toJS } from 'mobx';
-import { Button, Icon, Select, Tabs, Table, Dropdown, Menu, Tooltip, Spin } from 'choerodon-ui';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import {
+ Button, Icon, Select, Tabs, Table, Dropdown, Menu, Tooltip, Spin 
+} from 'choerodon-ui';
+import {
+ Page, Header, Content, stores 
+} from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import moment from 'moment';
@@ -44,7 +48,7 @@ class VersionReport extends Component {
 
   componentWillMount() {
     const { location: { search } } = this.props;
-    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
     this.setState({
       linkFromParamUrl,
     });
@@ -466,7 +470,8 @@ class VersionReport extends Component {
       title: '关键字',
       dataIndex: 'issueNum',
       key: 'issueNum',
-      render: (text, record) => (<span 
+      render: (text, record) => (
+<span 
         style={{ 
           color: '#3F51B5',
           cursor: 'pointer',
@@ -477,7 +482,8 @@ class VersionReport extends Component {
           const urlParams = AppState.currentMenuType;
           history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${text}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
         }}
-      >{text}</span>),
+      >{text}</span>
+),
     }, {
       title: '概要',
       dataIndex: 'summary',
@@ -535,7 +541,10 @@ class VersionReport extends Component {
             color: 'white',
             padding: '4px 6px',
           }}
-        >{text}</span>
+        >
+{text}
+
+        </span>
       ),
     }, {
       title: this.renderUnitColumn('title'),
@@ -620,7 +629,8 @@ class VersionReport extends Component {
           link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/version-report/"
         >
           <Spin spinning={this.state.loading}>
-            {VersionReportStore.getVersionList.length ? <React.Fragment>
+            {VersionReportStore.getVersionList.length ? (
+<React.Fragment>
               <Select
                 label="版本"
                 value={this.state.chosenVersion}
@@ -717,7 +727,8 @@ class VersionReport extends Component {
                   }
                 </Tabs>
               </div>
-            </React.Fragment> : <NoDataComponent img={versionSvg} title={'版本'} links={[{ name: '发布版本', link: `/agile/release` }]} />}
+            </React.Fragment>
+) : <NoDataComponent img={versionSvg} title="版本" links={[{ name: '发布版本', link: '/agile/release' }]} />}
           </Spin>
         </Content>
       </Page>
