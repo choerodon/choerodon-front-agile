@@ -79,11 +79,11 @@ class AddStatus extends Component {
       for (let index = 0, len = data.length; index < len; index += 1) {
         let color = '';
         if (data[index].valueCode === 'doing') {
-          color = 'rgb(246, 195, 66)';
+          color = 'rgb(77, 144, 254)';
         } else if (data[index].valueCode === 'done') {
-          color = 'rgb(20, 136, 44)';
+          color = 'rgb(0, 191, 165)';
         } else {
-          color = 'rgb(74, 103, 133)';
+          color = 'rgb(255, 177, 0)';
         }
         result.push(
           <Option value={data[index].valueCode}>

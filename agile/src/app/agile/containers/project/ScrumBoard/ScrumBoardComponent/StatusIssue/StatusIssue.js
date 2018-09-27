@@ -12,6 +12,7 @@ class StatusIssue extends Component {
     super(props);
     this.state = {};
   }
+
   // shouldComponentUpdate(nextProps) {
   //   if (nextProps.ifClickMe !== this.props.ifClickMe) {
   //     return true;
@@ -43,6 +44,7 @@ class StatusIssue extends Component {
     }
     return str[0];
   }
+
   /**
    *是否有父卡
    *
@@ -72,6 +74,7 @@ class StatusIssue extends Component {
     }
     return result;
   }
+
   /**
    *获取子卡
    *
@@ -120,6 +123,7 @@ class StatusIssue extends Component {
     }
     return '';
   }
+
   /**
    *单个issue是否渲染
    *
@@ -145,6 +149,7 @@ class StatusIssue extends Component {
       }
     }
   }
+
   /**
    *issue类型
    *
@@ -161,7 +166,7 @@ class StatusIssue extends Component {
       } else {
         return (
           <Tooltip title="类型： 故事">
-            <Icon style={{ color: 'white', fontSize: '14px' }} type="class" />
+            <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
           </Tooltip>
         );
       }
@@ -195,6 +200,7 @@ class StatusIssue extends Component {
       );
     }
   }
+
   renderStatusBackground(categoryCode) {
     if (categoryCode === 'todo') {
       return 'rgb(255, 177, 0)';
@@ -206,6 +212,7 @@ class StatusIssue extends Component {
       return 'gray';
     }
   }
+
   /**
    *优先级样式
    *
@@ -318,8 +325,7 @@ class StatusIssue extends Component {
             })} 
             index={index}
           >
-            {(provided, snapshot) => 
-              (
+            {(provided, snapshot) => (
                 <div>
                   <div
                     ref={provided.innerRef}
@@ -428,7 +434,10 @@ class StatusIssue extends Component {
                                 textAlign: 'center',
                                 height: 20,
                               }}
-                            >{item.priorityName}</p>
+                            >
+{item.priorityName}
+
+                            </p>
                           </Tooltip>
                           <Tooltip title={item.summary} placement="topLeft">
                             <p
@@ -442,7 +451,10 @@ class StatusIssue extends Component {
                                 whiteSpace: 'normal',
                                 wordBreak: 'break-all',
                               }}
-                            >{item.summary}</p>
+                            >
+{item.summary}
+
+                            </p>
                           </Tooltip>
                         </div>
                       </div>
@@ -494,4 +506,3 @@ class StatusIssue extends Component {
 }
 
 export default StatusIssue;
-
