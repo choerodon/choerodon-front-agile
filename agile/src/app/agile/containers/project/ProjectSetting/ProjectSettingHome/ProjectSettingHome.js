@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
-import { stores, axios, Page, Header, Content, Permission } from 'choerodon-front-boot';
+import {
+  stores, axios, Page, Header, Content, Permission, 
+} from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Form, Input, Button, Icon, Select, Radio } from 'choerodon-ui';
+import {
+  Form, Input, Button, Icon, Select, Radio, 
+} from 'choerodon-ui';
 import { COLOR } from '../../../../common/Constant';
 import { loadPriorities } from '../../../../api/NewIssueApi';
 import { getUsers, getUser } from '../../../../api/CommonApi';
@@ -251,11 +255,13 @@ class ProjectSetting extends Component {
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     loading={this.state.selectLoading}
                   >
-                    {this.transformPriorityCode(this.state.originPriorities).map(type =>
-                      (<Option key={type.valueCode} value={type.valueCode}>
+                    {this.transformPriorityCode(this.state.originPriorities).map(type => (
+                      <Option key={type.valueCode} value={type.valueCode}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                           <div
-                            style={{ color: COLOR[type.valueCode].color, width: 20, height: 20, textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: 8 }}
+                            style={{
+                              color: COLOR[type.valueCode].color, width: 20, height: 20, textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: 8, 
+                            }}
                           >
                             <Icon
                               type="flag"
@@ -264,8 +270,8 @@ class ProjectSetting extends Component {
                           </div>
                           <span>{type.name}</span>
                         </div>
-                      </Option>),
-                    )}
+                      </Option>
+                    ))}
                   </Select>,
                 )}
               </FormItem>
@@ -276,9 +282,9 @@ class ProjectSetting extends Component {
                   initialValue: this.state.strategy || undefined,
                 })(
                   <RadioGroup label="默认经办人策略" onChange={this.onChangeStrategy}>
-                    <Radio style={radioStyle} value={'undistributed'}>无</Radio>
-                    <Radio style={radioStyle} value={'current_user'}>默认创建人</Radio>
-                    <Radio style={radioStyle} value={'default_assignee'}>指定经办人</Radio>
+                    <Radio style={radioStyle} value="undistributed">无</Radio>
+                    <Radio style={radioStyle} value="current_user">默认创建人</Radio>
+                    <Radio style={radioStyle} value="default_assignee">指定经办人</Radio>
                   </RadioGroup>,
                 )}
               </FormItem>
@@ -297,8 +303,8 @@ class ProjectSetting extends Component {
                     allowClear
                     onFilterChange={this.onFilterChange.bind(this)}
                   >
-                    {this.state.originUsers.map(user =>
-                      (<Option key={user.id} value={user.id}>
+                    {this.state.originUsers.map(user => (
+                      <Option key={user.id} value={user.id}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                           <UserHead
                             user={{
@@ -309,8 +315,8 @@ class ProjectSetting extends Component {
                             }}
                           />
                         </div>
-                      </Option>),
-                    )}
+                      </Option>
+                    ))}
                   </Select>,
                 )}
               </FormItem>
@@ -323,7 +329,7 @@ class ProjectSetting extends Component {
                   loading={this.state.loading}
                   onClick={() => this.handleUpdateProjectSetting()}
                 >
-                  保存
+                  {'保存'}
                 </Button>
               </Permission>
               <Button
@@ -331,7 +337,7 @@ class ProjectSetting extends Component {
                 style={{ marginLeft: 12 }}
                 onClick={() => this.getProjectSetting()}
               >
-                取消
+                {'重置'}
               </Button>
             </div>
           </div>
