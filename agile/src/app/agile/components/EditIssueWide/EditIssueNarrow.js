@@ -1704,8 +1704,7 @@ class CreateSprint extends Component {
                       <div
                         style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.54)', marginBottom: 4 }}
                       >
-
-                        状态
+                        {'状态'}
                       </div>
                       <div>
                         <ReadAndEdit

@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
-  Select, Form, Input, Button, Modal, Icon, Tooltip, 
+ Select, Form, Input, Button, Modal, Icon, Tooltip 
 } from 'choerodon-ui';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
 import {
-  createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics, 
+ createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics 
 } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
 import { COLOR } from '../../common/Constant';
@@ -202,15 +202,13 @@ class CreateIssue extends Component {
         }
         this.props.onOk();
       })
-      .catch((error) => {
-      });
+      .catch(() => {
+        });
   };
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const {
-      initValue, visible, onCancel, onOk, 
-    } = this.props;
+    const {visible, onCancel} = this.props;
     const callback = (value) => {
       this.setState({
         delta: value,
@@ -229,7 +227,6 @@ class CreateIssue extends Component {
         cancelText="取消"
         confirmLoading={this.state.createLoading}
       >
-
         <Content
           title={`在项目“${AppState.currentMenuType.name}”中创建问题`}
           description="请在下面输入问题的详细信息，包含详细描述、人员信息、版本信息、进度预估、优先级等等。您可以通过丰富的任务描述帮助相关人员更快更全面的理解任务，同时更好的把控问题进度。"
@@ -258,7 +255,6 @@ class CreateIssue extends Component {
                   </Select>,
                 )}
               </FormItem>
-
               <FormItem label="概要" style={{ width: 520 }}>
                 {getFieldDecorator('summary', {
                   rules: [{ required: true, message: '概要为必输项' }],
@@ -397,7 +393,7 @@ class CreateIssue extends Component {
                         });
                       }}
                     >
-                      {this.state.originEpics.map(epic => <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>)}
+                      {this.state.originEpics.map(epic => <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>,)}
                     </Select>,
                   )}
                 </FormItem>

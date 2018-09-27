@@ -484,6 +484,7 @@ class StatusIssue extends Component {
     }
     return '';
   }
+  
   render() {
     const item = this.props.data;
     const index = this.props.index;
