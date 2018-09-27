@@ -971,11 +971,12 @@ class Home3 extends Component {
     UserMapStore.setCurrentDraggableId(null);
   }
 
-  handelDragToBoard = (res) => {
+  handleDragToBoard = (res) => {
     const { UserMapStore } = this.props;
     const {
       mode, issues, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    if(res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') return;
     if (selectIssueIds.length < 2) {
       if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
       const key = `${mode}Id`;
@@ -1295,7 +1296,7 @@ class Home3 extends Component {
     } else if (res.destination.droppableId.includes('backlog')) {
       this.handleDragToBacklog(res);
     } else {
-      this.handelDragToBoard(res);
+      this.handleDragToBoard(res);
     }
   };
 
@@ -1925,6 +1926,15 @@ class Home3 extends Component {
             display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
           }}
           >
+            <CreateEpic
+              container={document.querySelector('.c7n-userMap')}
+              visible={createEpic}
+              onOk={() => {
+                UserMapStore.setCreateEpic(false);
+                UserMapStore.loadEpic();
+              }}
+              onCancel={() => UserMapStore.setCreateEpic(false)}
+            />
             <img src={epicPic} alt="" width="200" />
             <div style={{ marginLeft: 50, width: 390 }}>
               <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>

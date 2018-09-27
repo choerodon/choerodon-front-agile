@@ -126,7 +126,7 @@ class EpicCard extends Component {
             {...provided1.draggableProps}
             {...provided1.dragHandleProps}
             style={{
-              marginRight: 10,
+              // marginRight: 10,
               paddingLeft: 0,
               cursor: 'move',
               background: 'white',
