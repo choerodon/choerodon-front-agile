@@ -213,7 +213,7 @@ class ReleaseDetail extends Component {
     return (
       <div>
         <p>{name}</p>
-        <p style={{ marginTop: 3 }}>在这个 <span style={{ color: '#3575DF' }}>{type}</span> 中有{data ? data.length : 0}种状态</p>
+        <p style={{ marginTop: 3 }}>类别 <span style={{ color: '#3575DF' }}>{name}</span> 中有{data ? data.length : 0}种状态</p>
         {data ?
           data.map(item => (
             <div key={item.id} style={{ margin: '14px 0' }}>

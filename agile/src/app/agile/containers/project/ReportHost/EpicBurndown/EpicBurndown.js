@@ -412,7 +412,7 @@ class EpicBurndown extends Component {
       ...[
         {
           // width: '15%',
-          title: '关键字',
+          title: '编码',
           dataIndex: 'issueNum',
           render: (issueNum, record) => (
             <span
@@ -830,7 +830,7 @@ class EpicBurndown extends Component {
     return (
       <Page className="c7n-epicBurndown">
         <Header 
-          title="史诗燃尽图"
+          title="史诗燃耗图"
           backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
