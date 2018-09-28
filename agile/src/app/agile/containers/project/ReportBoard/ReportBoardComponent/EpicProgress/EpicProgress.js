@@ -42,14 +42,14 @@ class EpicProgress extends Component {
       legend: {
         orient: 'vertical',
         x: 'left',
-        padding: [0, 40, 0, 30],
+        padding: [0, 10, 0, 30],
         itemWidth: 14,
         itemGap: 20,
         textStyle: {
           width: 100,
         },
         formatter(name) {
-          return name.slice(0, 5);
+          return name.length > 6 ? `${name.slice(0, 6)}...` : name;
         },
         data: [
           ...[

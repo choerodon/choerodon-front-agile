@@ -1,20 +1,45 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Dropdown, Button, Menu, Icon } from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, 
+} from 'choerodon-front-boot';
+import {
+  Dropdown, Button, Menu, Icon, 
+} from 'choerodon-ui';
 import list from '../Home/list';
 
 const { AppState } = stores;
 
 class SwitchChart extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      linkFromParamUrl: undefined,
+    };
+  }
+
+  componentWillReceiveProps(nextProps, nextState) {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
+    this.setState({
+      linkFromParamUrl,
+    });
+  }
+
+
   handleClick(e) {
     const { history } = this.props;
+    const { linkFromParamUrl } = this.state;
     const urlParams = AppState.currentMenuType;
-    const { type, id, name, organizationId } = urlParams;
-    const key = e.key;
+    const {
+      type, id, name, organizationId, 
+    } = urlParams;
+    const { key } = e;
     const obj = list.find(v => v.key.toString() === key);
+    const { history: { search } } = this.props;
     if (obj) {
-      history.push(`${obj.link}?type=${type}&id=${id}&name=${name}&organizationId=${organizationId}`);
+      history.push(`${obj.link}?type=${type}&id=${id}&name=${name}&organizationId=${organizationId}&paramUrl=${linkFromParamUrl}`);
     }
   }
   
@@ -42,4 +67,4 @@ class SwitchChart extends Component {
   }
 }
 
-export default SwitchChart;
+export default withRouter(SwitchChart);

@@ -37,10 +37,16 @@ class EpicBurndown extends Component {
       checkbox: undefined,
       inverse: true,
       tabActiveKey: 'done',
+      linkFromParamUrl: undefined,
     };
   }
 
   componentDidMount = () => {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
+    this.setState({
+      linkFromParamUrl,
+    });
     ES.loadEpicAndChartAndTableData();
   };
 
@@ -825,13 +831,13 @@ class EpicBurndown extends Component {
 
   render() {
     const { history } = this.props;
-    const { checkbox, tabActiveKey } = this.state;
+    const { checkbox, tabActiveKey, linkFromParamUrl } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-epicBurndown">
         <Header 
           title="史诗燃尽图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={history}

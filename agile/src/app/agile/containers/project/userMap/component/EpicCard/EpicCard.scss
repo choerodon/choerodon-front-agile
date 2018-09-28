@@ -92,7 +92,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     // height: 18px;
     padding: 0 12px 12px;
 
@@ -100,21 +100,19 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
-
       .c7n-issueCount {
+        width: 28px;
+        margin-left: 8px;
+        margin-right: 8px;
         height: 20px;
-        min-width: 28px;
-        padding: 0 2px;
         line-height: 20px;
-        font-size: 12px;
-        margin-left: 10px;
+        text-align: center;
         background-color: #6586d6;
         border-radius: 100px;
-        text-align: center;
         color: #fff;
       }
+      
     }
-
     .c7n-issueNum {
       color: #3f51b5;
       font-size: 13px;
@@ -126,5 +124,7 @@
       white-space: nowrap;
       text-align: right;
     }
+
+    
   }
 }

@@ -993,7 +993,7 @@ class Home3 extends Component {
     const {
       mode, issues, backlogIssues, selectIssueIds,
     } = UserMapStore;
-    if(res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') return;
+    if (res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') return;
     if (selectIssueIds.length < 2) {
       if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
       const key = `${mode}Id`;
@@ -1460,7 +1460,15 @@ class Home3 extends Component {
                 <Checkbox onChange={this.handleFilterEpic}>应用搜索到史诗</Checkbox>
               </div>
               <div className="menu-title">导出</div>
-              <div onClick={this.handleSaveAsImage} role="none" style={{ height: 30, padding: '5px 12px', marginLeft: 26, cursor: 'pointer' }}>导出为png格式</div>
+              <div
+                onClick={this.handleSaveAsImage}
+                role="none"
+                style={{
+                  height: 30, padding: '5px 12px', marginLeft: 26, cursor: 'pointer', 
+                }}
+              >
+                {'导出为png格式'}
+              </div>
             </div>
           )}
         >
@@ -1644,7 +1652,7 @@ class Home3 extends Component {
 
             ))}
           </div>
-                 </React.Fragment>);
+        </React.Fragment>);
       });
       dom.push(
         <React.Fragment key="no-sprint">

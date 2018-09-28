@@ -25,7 +25,19 @@ const MONTH = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '�
 
 @observer
 class EpicReport extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      linkFromParamUrl: undefined,
+    };
+  }
+
   componentDidMount() {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
+    this.setState({
+      linkFromParamUrl,
+    });
     ES.loadEpicAndChartAndTableData();
   }
   
@@ -522,12 +534,13 @@ class EpicReport extends Component {
 
   render() {
     const { history } = this.props;
+    const { linkFromParamUrl } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-epicReport">
         <Header 
           title="史诗报告"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}
@@ -604,7 +617,7 @@ class EpicReport extends Component {
                                   <li>
                                     <span className="c7n-tip">已完成：</span>
                                     <span>{ES.getLatest.issueCompletedCount}</span>
-                                                                    </li>
+                                  </li>
                                 ) : null
                               }
                               {
@@ -612,7 +625,7 @@ class EpicReport extends Component {
                                   <li>
                                     <span className="c7n-tip">未预估：</span>
                                     <span>{ES.getLatest.unEstimateIssueCount}</span>
-                                                                    </li>
+                                  </li>
                                 )
                               }
                             </ul>
@@ -621,6 +634,8 @@ class EpicReport extends Component {
                                 <div>
                                   <h4>
                                     {`${ES.getChartYAxisName}`}
+
+
 
 汇总
                                                                     </h4>
@@ -651,6 +666,8 @@ class EpicReport extends Component {
                                 this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
                               }}
                             >
+
+
 
 
                               在“问题管理”中查看
@@ -691,30 +708,34 @@ class EpicReport extends Component {
                 title="当前项目无可用史诗"
                 des={(
                   <div>
-  <span>请在</span>
-  <span
+                    <span>请在</span>
+                    <span
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-                        history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-                      }}
+      history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }}
                     >
+
+
 
                       待办事项
 </span>
-  <span>或</span>
-  <span
+                    <span>或</span>
+                    <span
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
-                      }}
+      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+    }}
                     >
+
+
 
                       问题管理
 </span>
-  <span>中创建一个史诗</span>
-</div>
+                    <span>中创建一个史诗</span>
+                  </div>
 )}
               />
             )

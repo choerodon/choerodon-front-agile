@@ -409,7 +409,7 @@ class ReleaseDetail extends Component {
                                 {item.value}
                               </a>
                             </td>
-                            <td style={{ width: '62px', paddingRight: 15 }}>{`${(item.percent).toFixed(2)} %`}</td>
+                            <td style={{ width: '62px', paddingRight: 15 }}>{`${(item.percent).toFixed(2)}%`}</td>
                           </tr>
                         ))
                       }
