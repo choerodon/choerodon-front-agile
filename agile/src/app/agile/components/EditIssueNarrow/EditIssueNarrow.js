@@ -460,11 +460,11 @@ class CreateSprint extends Component {
           linkIssues: res,
         });
       });
-      loadDatalogs(issueId).then((res) => {
-        this.setState({
-          datalogs: res,
-        });
-      });
+      // loadDatalogs(issueId).then((res) => {
+      //   this.setState({
+      //     datalogs: res,
+      //   });
+      // });
       loadBranchs(issueId).then((res) => {
         this.setState({
           branchs: res || {},

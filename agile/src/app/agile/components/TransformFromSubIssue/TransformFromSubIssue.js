@@ -115,11 +115,11 @@ class TransformFromSubIssue extends Component {
             </FormItem>
             {
               this.props.form.getFieldValue('typeCode') === 'issue_epic' && (
-                <FormItem label="Epic名称" style={{ width: 520 }}>
+                <FormItem label="史诗名称" style={{ width: 520 }}>
                   {getFieldDecorator('epicName', {
-                    rules: [{ required: true, message: 'Epic名称为必输项' }],
+                    rules: [{ required: true, message: '史诗名称为必输项' }],
                   })(
-                    <Input label="Epic名称" maxLength={44} />,
+                    <Input label="史诗名称" maxLength={44} />,
                   )}
                 </FormItem>
               )

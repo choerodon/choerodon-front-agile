@@ -349,7 +349,7 @@ class EpicBurndown extends Component {
             },
           },
           // data: ['-', '-', 3, 3, '-'],
-          data: ES.chartData[5],
+          data: inverse ? ES.chartData[5] : [],
         },
         {
           name: 'showZeroTop',
@@ -370,7 +370,7 @@ class EpicBurndown extends Component {
             },
           },
           // data: ['-', '-', 3, 3, '-'],
-          data: ES.chartData[6],
+          data: inverse ? ES.chartData[6] : ES.chartData[7],
         },
       ],
     };
@@ -846,8 +846,8 @@ class EpicBurndown extends Component {
           </Button>
         </Header>
         <Content
-          title="史诗燃尽图"
-          description="跟踪版本的预测发布日期（优先Scrum）。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
+          title="史诗燃耗图"
+          description="跟踪史诗完成速度预计所需冲刺数。这有助于您监控史诗能否按时发布，以便在工作落后时采取行动。"
           // link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
           {

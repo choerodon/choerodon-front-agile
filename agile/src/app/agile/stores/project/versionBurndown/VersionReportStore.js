@@ -31,7 +31,7 @@ function transformZero2Placeholder(arr) {
 
 function getChartDataFromServerData(data) {
   if (!data.length) {
-    return [[], [], [], [], [], [], []];
+    return [[], [], [], [], [], [], [], []];
   }
   const completed = [];
   const remaining = [];
@@ -84,6 +84,7 @@ function getChartDataFromServerData(data) {
     transformZero2Placeholder(completedAgain),
     showZeroBottom,
     showZeroTop,
+    showZero,
   ];
 }
 @store('VersionReportStore')

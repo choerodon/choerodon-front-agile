@@ -560,7 +560,7 @@ class Issue extends Component {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  color: IssueStore.order.orderField === v.code ? 'blue' : '#000',
+                  color: IssueStore.order.orderField === v.code ? '#3f51b5' : '#000',
                 }}
               >
                 <span style={{ width: 100 }}>
