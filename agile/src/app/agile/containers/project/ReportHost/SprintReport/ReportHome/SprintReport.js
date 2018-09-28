@@ -439,7 +439,7 @@ class SprintReport extends Component {
     const column = [
       {
         width: '15%',
-        title: '关键字',
+        title: '编码',
         dataIndex: 'issueNum',
         render: (issueNum, record) => (
           <span

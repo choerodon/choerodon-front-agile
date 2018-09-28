@@ -467,7 +467,7 @@ class VersionReport extends Component {
   
   renderTabTable(type) {
     const columns = [{
-      title: '关键字',
+      title: '编码',
       dataIndex: 'issueNum',
       key: 'issueNum',
       render: (text, record) => (
