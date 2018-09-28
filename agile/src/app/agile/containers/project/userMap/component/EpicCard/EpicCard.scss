@@ -103,7 +103,8 @@
 
       .c7n-issueCount {
         height: 20px;
-        width: 28px;
+        min-width: 28px;
+        padding: 0 2px;
         line-height: 20px;
         font-size: 12px;
         margin-left: 10px;

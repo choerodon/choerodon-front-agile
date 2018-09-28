@@ -41,9 +41,10 @@ class BurndownChartHome extends Component {
 
   componentWillMount() {
     const { location: { search } } = this.props;
-    const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    // const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
     this.setState({
-      linkFromParamUrl: linkFromParamUrl,
+      linkFromParamUrl,
     });
     this.getSprintData();
   }
@@ -614,7 +615,14 @@ class BurndownChartHome extends Component {
             history={this.props.history}
             current="burndownchart"
           />
-          <Button funcType="flat" onClick={this.getChartData.bind(this)}>
+          {/* <Button funcType="flat" onClick={this.getChartData.bind(this)}> */}
+          <Button
+            funcType="flat"
+            onClick={() => {
+              this.getChartData();
+              this.getChartCoordinate();
+            }}
+          >
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>

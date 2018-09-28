@@ -10,6 +10,7 @@ class StatusColumn extends Component {
     super(props);
     this.state = {};
   }
+  
   /**
    *显示issue个数
    *

@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select } from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, 
+} from 'choerodon-front-boot';
+import {
+  Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, 
+} from 'choerodon-ui';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 
 const { Sidebar } = Modal;
@@ -20,6 +24,7 @@ class DeleteReleaseWithIssue extends Component {
       fixTargetVersionId: '',
     };
   }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.versionDelInfo.versionNames) {
       if (nextProps.versionDelInfo.versionNames.length > 0) {
@@ -35,6 +40,7 @@ class DeleteReleaseWithIssue extends Component {
       }
     }
   }
+
   handleOk() {
     const data2 = {
       projectId: AppState.currentMenuType.id,
@@ -56,6 +62,7 @@ class DeleteReleaseWithIssue extends Component {
     }).catch((error) => {
     });
   }
+
   render() {
     return (
       <Sidebar
@@ -72,7 +79,9 @@ class DeleteReleaseWithIssue extends Component {
           {
             this.props.versionDelInfo.influenceIssueCount ? (
               <div style={{ display: 'flex' }}>
-                <p style={{ flex: 1 }}>问题影响({this.props.versionDelInfo.influenceIssueCount})</p>
+                <p style={{ flex: 1 }}>
+                  {`问题影响${this.props.versionDelInfo.influenceIssueCount}`}
+                </p>
                 {
                   this.props.versionDelInfo.versionNames.length > 0 ? (
                     <div
@@ -97,7 +106,7 @@ class DeleteReleaseWithIssue extends Component {
                           }}
                           value={0}
                         >
-                将它们分配给此版本
+                          {'将它们分配给此版本'}
                           <Select
                             style={{
                               width: 250,
@@ -108,8 +117,8 @@ class DeleteReleaseWithIssue extends Component {
                                 influenceTargetVersionId: value,
                               });
                             }}
-                            defaultValue={this.props.versionDelInfo.versionNames ? 
-                              this.props.versionDelInfo.versionNames[0].versionId : undefined}
+                            defaultValue={this.props.versionDelInfo.versionNames 
+                              ? this.props.versionDelInfo.versionNames[0].versionId : undefined}
                           >
                             {this.props.versionDelInfo.versionNames ? (
                               this.props.versionDelInfo.versionNames.map(item => (
@@ -126,7 +135,7 @@ class DeleteReleaseWithIssue extends Component {
                           }}
                           value={1}
                         >
-                删除版本
+                          {'删除版本'}
                         </Radio>
                       </RadioGroup>
                     </div>
@@ -137,13 +146,14 @@ class DeleteReleaseWithIssue extends Component {
           }
           {
             this.props.versionDelInfo.fixIssueCount ? (
-              <div style={{ display: 'flex' }}>
-                <p style={{ flex: 1 }}>问题修复于({this.props.versionDelInfo.fixIssueCount})</p>
+              <div>
+                <p style={{ flex: 1 }}>
+                  {`问题修复于${this.props.versionDelInfo.fixIssueCount}`}
+                </p>
                 {
                   this.props.versionDelInfo.versionNames.length > 0 ? (
                     <div style={{ flex: 4 }}>
                       <RadioGroup
-                        style={{ marginLeft: 25 }}
                         defaultValue={0}
                         onChange={(e) => {
                           this.setState({
@@ -159,7 +169,7 @@ class DeleteReleaseWithIssue extends Component {
                           }}
                           value={0}
                         >
-                将它们分配给此版本
+                          {'将它们分配给此版本'}
                           <Select
                             style={{
                               width: 250,
@@ -170,8 +180,8 @@ class DeleteReleaseWithIssue extends Component {
                                 fixTargetVersionId: value,
                               });
                             }}
-                            defaultValue={this.props.versionDelInfo.versionNames ? 
-                              this.props.versionDelInfo.versionNames[0].versionId : undefined}
+                            defaultValue={this.props.versionDelInfo.versionNames 
+                              ? this.props.versionDelInfo.versionNames[0].versionId : undefined}
                           >
                             {this.props.versionDelInfo.versionNames ? (
                               this.props.versionDelInfo.versionNames.map(item => (
@@ -188,7 +198,7 @@ class DeleteReleaseWithIssue extends Component {
                           }}
                           value={1}
                         >
-                删除版本
+                          {'删除版本'}
                         </Radio>
                       </RadioGroup>
                     </div>
@@ -204,4 +214,3 @@ class DeleteReleaseWithIssue extends Component {
 }
 
 export default DeleteReleaseWithIssue;
-
