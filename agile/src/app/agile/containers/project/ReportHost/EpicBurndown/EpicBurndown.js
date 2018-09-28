@@ -836,7 +836,7 @@ class EpicBurndown extends Component {
     return (
       <Page className="c7n-epicBurndown">
         <Header 
-          title="史诗燃尽图"
+          title="史诗燃耗图"
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart

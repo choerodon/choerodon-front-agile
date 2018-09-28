@@ -870,7 +870,7 @@ class VersionBurndown extends Component {
     return (
       <Page className="c7n-versionBurndown">
         <Header 
-          title="版本燃尽图"
+          title="版本燃耗图"
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart

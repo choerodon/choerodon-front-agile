@@ -6,6 +6,7 @@
 
   .title-transform {
     // transform: translateX(var(--left));
+    position: -webkit-sticky;
     position: sticky;
     left: 0;
     top: 0;
@@ -102,6 +103,7 @@
   overflow-y: scroll;
   width: 100%;
   height: 100px;
+  overflow: -moz-scrollbars-none;
 }
 
 .fixHead-head .fixHead-block {

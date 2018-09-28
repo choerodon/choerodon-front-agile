@@ -1420,10 +1420,12 @@ class Home3 extends Component {
     );
     return (
       <Header title="用户故事地图">
-        <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
-          <Icon type="playlist_add" />
-          {'创建史诗'}
-        </Button>
+        {!this.state.isFullScreen ?
+          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
+            <Icon type="playlist_add" />
+            {'创建史诗'}
+          </Button> : ''
+        }
         <Dropdown
           overlay={swimlanMenu}
           trigger={['click']}
@@ -1656,62 +1658,60 @@ class Home3 extends Component {
       });
       dom.push(
         <React.Fragment key="no-sprint">
-          <div>
-            <div
-              className={`fixHead-line-title column-title title-transform ${vosData.length ? '' : 'firstLine-titles'}`}
-              title={mode === 'none' ? 'issue' : '未计划部分'}
-              data-id={-1}
-              // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
-            >
-              <div>
-                {mode === 'none' ? 'issue' : '未计划部分' }
-                {mode === 'none' ? null
-                  : (
-                    <React.Fragment>
-                      {mode === 'version'
-                        ? (
-                          <Permission service={['agile-service.product-version.createVersion']}>
-                            <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
-                              <Icon type="playlist_add" />
-                              {`创建${mode === 'sprint' ? '冲刺' : '版本'}`}
-                            </Button>
-                          </Permission>
-                        )
-                        : (
+          <div
+            className={`fixHead-line-title column-title title-transform ${vosData.length ? '' : 'firstLine-titles'}`}
+            title={mode === 'none' ? 'issue' : '未计划部分'}
+            data-id={-1}
+            // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
+          >
+            <div>
+              {mode === 'none' ? 'issue' : '未计划部分' }
+              {mode === 'none' || this.state.isFullScreen ? null
+                : (
+                  <React.Fragment>
+                    {mode === 'version'
+                      ? (
+                        <Permission service={['agile-service.product-version.createVersion']}>
                           <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
                             <Icon type="playlist_add" />
                             {`创建${mode === 'sprint' ? '冲刺' : '版本'}`}
                           </Button>
-                        )}
-                    </React.Fragment>
+                        </Permission>
+                      )
+                      : (
+                        <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                          <Icon type="playlist_add" />
+                          {`创建${mode === 'sprint' ? '冲刺' : '版本'}`}
+                        </Button>
+                      )}
+                  </React.Fragment>
 
-                  ) }
+                ) }
 
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Tooltip title="todo">
-                  <p className="point-span" style={{ background: '#4D90FE' }}>
-                    {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
-                      if (issue.statusCode === 'todo') {
-                        return sum + issue.storyPoints;
-                      } else {
-                        return sum;
-                      }
-                    }, 0)}
-                  </p>
-                </Tooltip>
-                <Tooltip title="doing">
-                  <p className="point-span" style={{ background: '#FFB100' }}>
-                    {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
-                      if (issue.statusCode === 'doing') {
-                        return sum + issue.storyPoints;
-                      } else {
-                        return sum;
-                      }
-                    }, 0)}
-                  </p>
-                </Tooltip>
-              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Tooltip title="todo">
+                <p className="point-span" style={{ background: '#4D90FE' }}>
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                    if (issue.statusCode === 'todo') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
+              <Tooltip title="doing">
+                <p className="point-span" style={{ background: '#FFB100' }}>
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                    if (issue.statusCode === 'doing') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}
+                </p>
+              </Tooltip>
             </div>
           </div>
           <div
@@ -1831,150 +1831,148 @@ class Home3 extends Component {
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
       >
         {this.renderHeader()}
-        <Spin spinning={false}>
-          { epicData.length ? (
-            <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
-              {isLoading ? <Spin spinning={isLoading} style={{ marginLeft: '40%', marginTop: '30%' }} size="large" />
-                : (
-                  <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
-                    <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
-                      <div className="toolbar" style={{ minHeight: 52 }}>
-                        <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
-                          <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
-                          <p
-                            role="none"
-                            style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                            onClick={this.addFilter.bind(this, 'mine')}
-                          >
-                            {'仅我的问题'}
-                          </p>
-                          <p
-                            role="none"
-                            style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                            onClick={this.addFilter.bind(this, 'userStory')}
-                          >
-                            {'仅用户故事'}
-
-                          </p>
-                          {filters.map(filter => (
-                            <p
-                              key={filter.filterId}
-                              role="none"
-                              style={{
-                                background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`,
-                                color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`,
-                                marginBottom: 3,
-                              }}
-                              onClick={this.addFilter.bind(this, filter.filterId)}
-                            >
-                              {filter.name}
-
-                            </p>)) }
-                        </div>
-                        <div
-                          style={{
-                            display: this.state.more ? 'block' : 'none',
-                            color: 'rgb(63, 81, 181)',
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                          }}
+        { epicData.length ? (
+          <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
+            {isLoading ? <Spin spinning={isLoading} style={{ marginLeft: '40%', marginTop: '30%' }} size="large" />
+              : (
+                <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
+                  <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
+                    <div className="toolbar" style={{ minHeight: 52 }}>
+                      <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
+                        <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
+                        <p
                           role="none"
-                          onClick={() => {
-                            this.setState({
-                              expand: !this.state.expand,
-                            }, () => {
-                              document.getElementsByClassName('fixHead')[0].style.height = `calc(100% - ${document.getElementsByClassName('fixHead')[0].offsetTop}px)`;
-                            });
-                          }}
+                          style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                          onClick={this.addFilter.bind(this, 'mine')}
                         >
-                          {this.state.expand ? '...收起' : '...展开'}
-                        </div>
+                          {'仅我的问题'}
+                        </p>
+                        <p
+                          role="none"
+                          style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                          onClick={this.addFilter.bind(this, 'userStory')}
+                        >
+                          {'仅用户故事'}
+
+                        </p>
+                        {filters.map(filter => (
+                          <p
+                            key={filter.filterId}
+                            role="none"
+                            style={{
+                              background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`,
+                              color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`,
+                              marginBottom: 3,
+                            }}
+                            onClick={this.addFilter.bind(this, filter.filterId)}
+                          >
+                            {filter.name}
+
+                          </p>)) }
                       </div>
-                      { showBackLog ? (
-                        <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
-                          <Backlog handleClickIssue={this.handleClickIssue} />
-                        </div>
-                      ) : null }
-                      <div className="fixHead" style={{ height: `calc(100% - ${52}px)` }}>
-                        <div className="fixHead-head" id="fixHead-head">
-                          <div className="fixHead-line">
-                            <Droppable droppableId="epic" direction="horizontal">
-                              {(provided, snapshot) => (
-                                <div
-                                  className="fixHead-line-epic"
-                                  ref={provided.innerRef}
-                                  style={{
-                                    background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
-                                    padding: 'grid',
-                                    // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                                  }}
-                                >
-                                  {UserMapStore.epics.map((epic, index) => (
-                                    <div className="fixHead-block" key={epic.issueId}>
-                                      <EpicCard
-                                        index={index}
-                                        // key={epic.issueId}
-                                        epic={epic}
-                                      />
-                                    </div>
-                                  ))}
-                                  {provided.placeholder}
-                                </div>
-                              )}
-                            </Droppable>
-                          </div>
-                        </div>
-                        <div id="fixHead-body" className="fixHead-body" style={{ flex: 1, position: 'relative' }}>
-                          {this.renderBody()}
-                        </div>
+                      <div
+                        style={{
+                          display: this.state.more ? 'block' : 'none',
+                          color: 'rgb(63, 81, 181)',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                        }}
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            expand: !this.state.expand,
+                          }, () => {
+                            document.getElementsByClassName('fixHead')[0].style.height = `calc(100% - ${document.getElementsByClassName('fixHead')[0].offsetTop}px)`;
+                          });
+                        }}
+                      >
+                        {this.state.expand ? '...收起' : '...展开'}
                       </div>
                     </div>
-                  </DragDropContext>
-                )}
-              <CreateEpic
-                container={document.querySelector('.c7n-userMap')}
-                visible={createEpic}
-                onOk={() => {
-                  UserMapStore.setCreateEpic(false);
-                  UserMapStore.loadEpic();
-                }}
-                onCancel={() => UserMapStore.setCreateEpic(false)}
-              />
-              <CreateVOS
-                container={document.querySelector('.c7n-userMap')}
-                visible={UserMapStore.createVOS}
-                // onOk={() => {UserMapStore.setCreateVOS(false)}}
-                onOk={this.handleCreateOk}
-                onCancel={() => { UserMapStore.setCreateVOS(false); }}
-                type={UserMapStore.getCreateVOSType}
-              />
-            </Content>
-          ) : (
-            <div style={{
-              display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
-            }}
-            >
-              <CreateEpic
-                container={document.querySelector('.c7n-userMap')}
-                visible={createEpic}
-                onOk={() => {
-                  UserMapStore.setCreateEpic(false);
-                  UserMapStore.loadEpic();
-                }}
-                onCancel={() => UserMapStore.setCreateEpic(false)}
-              />
-              <img src={epicPic} alt="" width="200" />
-              <div style={{ marginLeft: 50, width: 390 }}>
-                <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
-                <p style={{ fontSize: 20, marginTop: 10 }}>
-                  {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
-                  <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
-                  {'进入用户故事地图。'}
-                </p>
-              </div>
+                    { showBackLog ? (
+                      <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
+                        <Backlog handleClickIssue={this.handleClickIssue} />
+                      </div>
+                    ) : null }
+                    <div className="fixHead" style={{ height: `calc(100% - ${52}px)` }}>
+                      <div className="fixHead-head" id="fixHead-head">
+                        <div className="fixHead-line">
+                          <Droppable droppableId="epic" direction="horizontal">
+                            {(provided, snapshot) => (
+                              <div
+                                className="fixHead-line-epic"
+                                ref={provided.innerRef}
+                                style={{
+                                  background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
+                                  padding: 'grid',
+                                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                                }}
+                              >
+                                {UserMapStore.epics.map((epic, index) => (
+                                  <div className="fixHead-block" key={epic.issueId}>
+                                    <EpicCard
+                                      index={index}
+                                      // key={epic.issueId}
+                                      epic={epic}
+                                    />
+                                  </div>
+                                ))}
+                                {provided.placeholder}
+                              </div>
+                            )}
+                          </Droppable>
+                        </div>
+                      </div>
+                      <div id="fixHead-body" className="fixHead-body" style={{ flex: 1, position: 'relative' }}>
+                        {this.renderBody()}
+                      </div>
+                    </div>
+                  </div>
+                </DragDropContext>
+              )}
+            <CreateEpic
+              // container={document.querySelector('.c7n-userMap')}
+              visible={createEpic}
+              onOk={() => {
+                UserMapStore.setCreateEpic(false);
+                UserMapStore.loadEpic();
+              }}
+              onCancel={() => UserMapStore.setCreateEpic(false)}
+            />
+            <CreateVOS
+              // container={document.querySelector('.c7n-userMap')}
+              visible={UserMapStore.createVOS}
+              // onOk={() => {UserMapStore.setCreateVOS(false)}}
+              onOk={this.handleCreateOk}
+              onCancel={() => { UserMapStore.setCreateVOS(false); }}
+              type={UserMapStore.getCreateVOSType}
+            />
+          </Content>
+        ) : (
+          <div style={{
+            display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
+          }}
+          >
+            <CreateEpic
+              // container={document.querySelector('.c7n-userMap')}
+              visible={createEpic}
+              onOk={() => {
+                UserMapStore.setCreateEpic(false);
+                UserMapStore.loadEpic();
+              }}
+              onCancel={() => UserMapStore.setCreateEpic(false)}
+            />
+            <img src={epicPic} alt="" width="200" />
+            <div style={{ marginLeft: 50, width: 390 }}>
+              <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+              <p style={{ fontSize: 20, marginTop: 10 }}>
+                {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
+                <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
+                {'进入用户故事地图。'}
+              </p>
             </div>
-          )}
-        </Spin>
+          </div>
+        )}
       </Page>
     );
   }
