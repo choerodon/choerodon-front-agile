@@ -878,7 +878,6 @@ class CreateSprint extends Component {
         {
           this.state.worklogs.map(worklog => (
             <Log
-              className="narrowLog"
               key={worklog.logId}
               worklog={worklog}
               onDeleteLog={() => this.reloadIssue()}

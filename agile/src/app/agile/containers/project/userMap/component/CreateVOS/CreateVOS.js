@@ -85,7 +85,7 @@ class CreateVOS extends Component {
     return (
       <Modal
         className="c7n-createVOS"
-        getContainer={() => container}
+        // getContainer={() => container}
         title={`创建${type === 'sprint' ? '冲刺' : '版本'}`}
         visible={visible || false}
         onOk={this.handleCreate}

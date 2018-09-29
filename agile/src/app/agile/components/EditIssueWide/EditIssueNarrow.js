@@ -954,6 +954,7 @@ class CreateSprint extends Component {
             worklog={worklog}
             onDeleteLog={() => this.reloadIssue()}
             onUpdateLog={() => this.reloadIssue()}
+            isWide={true}
           />
         ))}
       </div>

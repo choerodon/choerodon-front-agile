@@ -97,7 +97,7 @@ class WYSIWYGEditor extends Component {
         </div>
         {
           this.props.bottomBar && (
-            <div className="CancelSaveBtn" style={{ padding: '0 8px', border: '1px solid #ccc', borderTop: 'none', display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ padding: '0 8px', border: '1px solid #ccc', borderTop: 'none', display: 'flex', justifyContent: 'flex-end' }}>
               <Button 
                 type="primary"
                 onClick={() => {
