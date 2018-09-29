@@ -136,7 +136,7 @@ class SprintReport extends Component {
         const nowKey = allDate[b];
         if (res.coordinate.hasOwnProperty(nowKey)) {
           allDateValues.push(res.coordinate[allDate[b]]);
-        } else if (moment(nowKey).isAfter(maxDate)) {
+        } else if (moment(nowKey).isAfter(moment())) {
           allDateValues.push(null);
         } else {
           const beforeKey = allDate[b - 1];

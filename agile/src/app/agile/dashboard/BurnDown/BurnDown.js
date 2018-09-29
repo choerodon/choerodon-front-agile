@@ -260,7 +260,7 @@ class BurnDown extends Component {
         const xDataFormat = _.map(xData, item => item.slice(5).replace('-', '/'));
         const yAxis = xData.map((data, index) => {
           if (dataDates.includes(data)) return res.coordinate[data];
-          if (moment(data).isAfter(dataMaxDate)) return null;
+          if (moment(data).isAfter(moment())) return null;
           res.coordinate[data] = res.coordinate[xData[index - 1]];
           return res.coordinate[xData[index - 1]];
         });
