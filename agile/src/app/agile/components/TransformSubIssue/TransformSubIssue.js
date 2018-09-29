@@ -12,9 +12,9 @@ const { Sidebar } = Modal;
 const FormItem = Form.Item;
 const { Option } = Select;
 const STATUS_COLOR = {
-  todo: 'rgb(74, 103, 133)',
-  doing: 'rgb(246, 195, 66)',
-  done: 'rgb(20, 136, 44)',
+  todo: 'rgb(255, 177, 0)',
+  doing: 'rgb(77, 144, 254)',
+  done: 'rgb(0, 191, 165)',
 };
 let sign = false;
 

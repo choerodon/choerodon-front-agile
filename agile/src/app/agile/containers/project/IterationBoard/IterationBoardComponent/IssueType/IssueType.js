@@ -76,7 +76,7 @@ class IssueType extends Component {
         top: 35,
       },
       grid: {
-        left: '0%',
+        left: '10',
         top: '28px',
         right: '28%',
         bottom: '8%',

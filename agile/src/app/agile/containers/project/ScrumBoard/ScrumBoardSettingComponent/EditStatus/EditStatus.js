@@ -67,8 +67,28 @@ class EditStatus extends Component {
         }
       });
       for (let index = 0, len = data.length; index < len; index += 1) {
+        let color = '';
+        if (data[index].valueCode === 'doing') {
+          color = 'rgb(77, 144, 254)';
+        } else if (data[index].valueCode === 'done') {
+          color = 'rgb(0, 191, 165)';
+        } else {
+          color = 'rgb(255, 177, 0)';
+        }
         result.push(
-          <Option value={data[index].valueCode}>{data[index].name}</Option>,
+          <Option value={data[index].valueCode}>
+            <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <div style={{
+                width: 15, height: 15, borderRadius: 2, marginRight: 5, background: color,
+              }}
+              />
+              <span>
+                {' '}
+                {data[index].name}
+              </span>
+            </div>
+
+          </Option>,
         );
       }
     }

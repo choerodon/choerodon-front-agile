@@ -80,7 +80,7 @@ class VersionProgress extends Component {
     const versionProgressData = this.getVersionProgressData();
     const option = {
       grid: {
-        left: 0,
+        left: 10,
         right: 0,
         bottom: 30,
         containLabel: true,
