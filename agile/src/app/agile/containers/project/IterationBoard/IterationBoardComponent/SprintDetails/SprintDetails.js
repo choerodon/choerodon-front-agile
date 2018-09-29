@@ -209,7 +209,7 @@ class SprintDetails extends Component {
     render() {
       const { activeKey, pagination, sprintId } = this.state;
       const column = [{
-        title: '关键字',
+        title: '编码',
         dataIndex: 'issueNum',
         key: 'keyword',
         // width: '94px',

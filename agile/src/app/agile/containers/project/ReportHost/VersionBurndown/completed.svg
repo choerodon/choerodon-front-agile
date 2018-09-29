@@ -10,8 +10,8 @@
         <polygon id="path-7" points="0 67 65 67 65 0 0 0"></polygon>
     </defs>
     <g id="报告" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="epic燃尽图-全部完成" transform="translate(-1231.000000, -477.000000)">
-            <g id="燃尽图" transform="translate(274.000000, 313.000000)">
+        <g id="epic燃耗图-全部完成" transform="translate(-1231.000000, -477.000000)">
+            <g id="燃耗图" transform="translate(274.000000, 313.000000)">
                 <g id="chart" transform="translate(4.000000, 30.000000)">
                     <g id="框线">
                         <g id="Metrics/Graph/Card---Slim---Green">

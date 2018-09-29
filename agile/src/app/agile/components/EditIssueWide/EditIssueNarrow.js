@@ -954,6 +954,7 @@ class CreateSprint extends Component {
             worklog={worklog}
             onDeleteLog={() => this.reloadIssue()}
             onUpdateLog={() => this.reloadIssue()}
+            isWide={true}
           />
         ))}
       </div>
@@ -964,7 +965,8 @@ class CreateSprint extends Component {
    * DataLog
    */
   renderDataLogs() {
-    return <DataLogs datalogs={this.state.datalogs} />;
+    const datalogs = _.filter(this.state.datalogs, v => v.field !== 'Version');
+    return <DataLogs datalogs={datalogs} />;
   }
 
   /**

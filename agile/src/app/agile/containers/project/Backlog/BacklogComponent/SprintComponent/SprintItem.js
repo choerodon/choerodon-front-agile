@@ -297,14 +297,38 @@ class SprintItem extends Component {
    * @param {*} e
    * @memberof SprintItem
    */
-  handleDeleteSprint =(item, e) => {
+  handleDeleteSprint = (item, e) => {
+    const that = this;
     if (e.key === '0') {
-      this.props.store.axiosDeleteSprint(item.sprintId).then((res) => {
-        this.props.refresh();
-      }).catch((error) => {
-      });
+      if (item.issueSearchDTOList.length > 0) {
+        confirm({
+          width: 560,
+          wrapClassName: 'deleteConfirm',
+          title: `删除冲刺${item.sprintName}`,
+          content: (
+            <div>
+              <p style={{ marginBottom: 10 }}>请确认您要删除这个冲刺。</p>
+              <p style={{ marginBottom: 10 }}>这个冲刺将会被彻底删除，冲刺中的任务将会被移动到待办事项中。</p>
+            </div>
+          ),
+          onOk() {
+            return that.props.store.axiosDeleteSprint(item.sprintId).then((res) => {
+              that.props.refresh();
+            }).catch((error) => {
+            });
+          },
+          onCancel() {},
+          okText: '删除',
+          okType: 'danger',
+        });
+      } else {
+        this.props.store.axiosDeleteSprint(item.sprintId).then((res) => {
+          this.props.refresh();
+        }).catch((error) => {
+        });
+      }
     }
-  }
+  };
 
   /**
    *清除过滤器

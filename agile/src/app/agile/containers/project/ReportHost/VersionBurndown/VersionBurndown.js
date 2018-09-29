@@ -37,10 +37,16 @@ class VersionBurndown extends Component {
       checkbox: undefined,
       inverse: true,
       tabActiveKey: 'done',
+      linkFromParamUrl: undefined,
     };
   }
 
   componentDidMount = () => {
+    const { location: { search } } = this.props;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
+    this.setState({
+      linkFromParamUrl,
+    });
     ES.loadVersionAndChartAndTableData();
   };
 
@@ -334,7 +340,7 @@ class VersionBurndown extends Component {
             },
           },
           // data: ['-', '-', 3, 3, '-'],
-          data: ES.chartData[5],
+          data: inverse ? ES.chartData[5] : [],
         },
         {
           name: 'showZeroTop',
@@ -355,7 +361,7 @@ class VersionBurndown extends Component {
             },
           },
           // data: ['-', '-', 3, 3, '-'],
-          data: ES.chartData[6],
+          data: inverse ? ES.chartData[6] : ES.chartData[7],
         },
       ],
     };
@@ -401,7 +407,7 @@ class VersionBurndown extends Component {
       ...[
         {
           // width: '15%',
-          title: '关键字',
+          title: '编码',
           dataIndex: 'issueNum',
           render: (issueNum, record) => (
             <span
@@ -859,13 +865,13 @@ class VersionBurndown extends Component {
 
   render() {
     const { history } = this.props;
-    const { checkbox, tabActiveKey } = this.state;
+    const { checkbox, tabActiveKey, linkFromParamUrl } = this.state;
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-versionBurndown">
         <Header 
-          title="版本燃尽图"
-          backPath={`/agile/reporthost?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          title="版本燃耗图"
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={history}
@@ -880,8 +886,8 @@ class VersionBurndown extends Component {
           </Button>
         </Header>
         <Content
-          title="版本燃尽图"
-          description="跟踪版本的预测发布日期（优先Scrum）。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
+          title="版本燃耗图"
+          description="跟踪版本完成速度预计发布日期。这有助于您监控版本能否按时发布，以便在工作落后时采取行动。"
           // link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
           {

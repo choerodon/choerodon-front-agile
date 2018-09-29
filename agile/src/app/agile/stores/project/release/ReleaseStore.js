@@ -1,4 +1,6 @@
-import { observable, action, computed, toJS } from 'mobx';
+import {
+  observable, action, computed, toJS, 
+} from 'mobx';
 import axios from 'axios';
 import { store, stores } from 'choerodon-front-boot';
 
@@ -7,8 +9,11 @@ const { AppState } = stores;
 @store('RleaseStore')
 class ReleaseStore {
   @observable versionList = [];
+
   @observable versionDetail = {};
+
   @observable versionStatusIssues = [];
+
   @observable publicVersionDetail = {};
 
   axiosFileVersion(id) {
@@ -94,7 +99,8 @@ class ReleaseStore {
   }
 
   axiosGetVersionList(pageRequest) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions?page=${pageRequest.page}&size=${pageRequest.size}`);
+    // return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions?page=${pageRequest.page}&size=${pageRequest.size}`);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions`);
   }
 
   axiosDeleteVersion(data) {
@@ -107,6 +113,7 @@ class ReleaseStore {
     }
     return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${data.versionId}?${stringData}`);
   }
+
   axiosGetVersionListWithoutPage() {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`, []);
   }

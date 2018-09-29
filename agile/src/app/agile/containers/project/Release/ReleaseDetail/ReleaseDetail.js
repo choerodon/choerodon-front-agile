@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Page, Header, Content, stores, Permission } from 'choerodon-front-boot';
+import {
+  Page, Header, Content, stores, Permission, 
+} from 'choerodon-front-boot';
 
-import { Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip } from 'choerodon-ui';
+import {
+  Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip, 
+} from 'choerodon-ui';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 import './ReleaseDetail.scss';
 import PublicRelease from '../ReleaseComponent/PublicRelease';
-import ReportStore from "../../../../stores/project/Report";
+import ReportStore from '../../../../stores/project/Report';
 
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -21,13 +25,16 @@ class ReleaseDetail extends Component {
       publicVersion: false,
     };
   }
+
   componentWillMount() {
     document.getElementById('autoRouter').style.overflow = 'scroll';
     this.refresh();
   }
+
   componentWillUnmount() {
     document.getElementById('autoRouter').style.overflow = 'unset';
   }
+
   refresh() {
     this.setState({
       loading: true,
@@ -47,6 +54,7 @@ class ReleaseDetail extends Component {
     }).catch((error2) => {
     });
   }
+
   handleChangeTab(key) {
     ReleaseStore.axiosGetVersionStatusIssues(this.props.match.params.id, key).then((res2) => {
       this.setState({
@@ -96,6 +104,7 @@ class ReleaseDetail extends Component {
     }
     return '';
   }
+
   renderBorderRadius(position) {
     let radius = {};
     if (position === 'done') {
@@ -105,8 +114,8 @@ class ReleaseDetail extends Component {
           borderBottomLeftRadius: '10px',
         };
       }
-      if (!(ReleaseStore.getVersionDetail.doingIssueCount ||
-          ReleaseStore.getVersionDetail.todoIssueCount)) {
+      if (!(ReleaseStore.getVersionDetail.doingIssueCount
+          || ReleaseStore.getVersionDetail.todoIssueCount)) {
         radius = {
           ...radius,
           borderTopRightRadius: '10px',
@@ -128,8 +137,8 @@ class ReleaseDetail extends Component {
         };
       }
     } else {
-      if (!(ReleaseStore.getVersionDetail.doneIssueCount ||
-          ReleaseStore.getVersionDetail.doingIssueCount)) {
+      if (!(ReleaseStore.getVersionDetail.doneIssueCount
+          || ReleaseStore.getVersionDetail.doingIssueCount)) {
         radius = {
           borderTopLeftRadius: '10px',
           borderBottomLeftRadius: '10px',
@@ -145,6 +154,7 @@ class ReleaseDetail extends Component {
     }
     return radius;
   }
+
   renderStatusBackground(record) {
     if (record.categoryCode === 'done' || record === '已完成') {
       return 'rgb(0, 191, 165)';
@@ -156,11 +166,15 @@ class ReleaseDetail extends Component {
       return 'gray';
     }
   }
+
   renderTabTables(columns) {
     const urlParams = AppState.currentMenuType;
     return (
       <div>
-        <div style={{ padding: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{
+          padding: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+        }}
+        >
           <p>{`共${ReleaseStore.getVersionStatusIssues.length}个`}</p>
           <p
             style={{
@@ -169,10 +183,11 @@ class ReleaseDetail extends Component {
             }}
             role="none"
             onClick={() => {
-              this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${ReleaseStore.getVersionDetail.name}下的问题&paramUrl=reporthost/sprintreport`);
+              const { history } = this.props;
+              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${ReleaseStore.getVersionDetail.name}下的问题&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
             }}
           >
-            在“问题管理中”查看
+            {'在“问题管理中”查看'}
             <Icon style={{ fontSize: 13 }} type="open_in_new" />
           </p>
         </div>
@@ -188,11 +203,12 @@ class ReleaseDetail extends Component {
               });
             },
           })}
-          rowKey={'issueId'}
+          rowKey="issueId"
         />
       </div>
     );
   }
+
   renderPopContent(type) {
     let name;
     let data;
@@ -213,7 +229,7 @@ class ReleaseDetail extends Component {
     return (
       <div>
         <p>{name}</p>
-        <p style={{ marginTop: 3 }}>在这个 <span style={{ color: '#3575DF' }}>{type}</span> 中有{data ? data.length : 0}种状态</p>
+        <p style={{ marginTop: 3 }}>类别 <span style={{ color: '#3575DF' }}>{name}</span> 中有{data ? data.length : 0}种状态</p>
         {data ?
           data.map(item => (
             <div key={item.id} style={{ margin: '14px 0' }}>
@@ -224,8 +240,14 @@ class ReleaseDetail extends Component {
                   padding: '1px 4px',
                   marginRight: 16,
                 }}
-              >{item.name}</span>
-              <span>{item.issueCount}个</span>
+              >
+                {item.name}
+
+              </span>
+              <span>
+                {item.issueCount}
+                {'个'}
+              </span>
             </div>
           )) : ''}
       </div>
@@ -264,7 +286,10 @@ class ReleaseDetail extends Component {
             color: this.renderPriorityStyle('color', record),
             background: this.renderPriorityStyle('background', record),
           }}
-        >{text}</span>
+        >
+          {text}
+
+        </span>
       ),
     }, {
       width: '10%',
@@ -337,23 +362,29 @@ class ReleaseDetail extends Component {
           title={(
             <Tooltip title={`版本${ReleaseStore.getVersionDetail.name}`}>
               <div 
-                  style={{ 
+                style={{ 
                   display: 'inline-block',
                   maxWidth: '141px', 
                   whiteSpace: 'nowrap', 
                   overflow: 'hidden', 
                   textOverflow: 'ellipsis',
-                  marginTop: '23px'
-                  }}
-                  >
-                  {`版本 ${ReleaseStore.getVersionDetail.name}`}
+                  marginTop: '23px',
+                }}
+              >
+                {`版本 ${ReleaseStore.getVersionDetail.name}`}
               </div>
-          </Tooltip>
+            </Tooltip>
  )}
           backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
         >
           
-            <div style={{ marginLeft: 12, fontSize: 13, color: '#FFB100', padding: '1px 10px', background: 'rgba(255,177,0,0.08)', height: 20, lineHeight: '20px'}}>{ReleaseStore.getVersionDetail.statusName}</div>
+          <div style={{
+            marginLeft: 12, fontSize: 13, color: '#FFB100', padding: '1px 10px', background: 'rgba(255,177,0,0.08)', height: 20, lineHeight: '20px',
+          }}
+          >
+            {ReleaseStore.getVersionDetail.statusName}
+
+          </div>
                
           {
             ReleaseStore.getVersionDetail.statusCode === 'archived' ? '' : (
@@ -366,15 +397,17 @@ class ReleaseDetail extends Component {
                   onClick={() => {
                     if (ReleaseStore.getVersionDetail.statusCode === 'version_planning') {
                       ReleaseStore.axiosGetPublicVersionDetail(
-                        ReleaseStore.getVersionDetail.versionId)
+                        ReleaseStore.getVersionDetail.versionId,
+                      )
                         .then((res) => {
                           ReleaseStore.setPublicVersionDetail(res);
                           this.setState({ publicVersion: true });
                         }).catch((error) => {
-                      });
+                        });
                     } else {
                       ReleaseStore.axiosUnPublicRelease(
-                        ReleaseStore.getVersionDetail.versionId).then((res2) => {
+                        ReleaseStore.getVersionDetail.versionId,
+                      ).then((res2) => {
                         this.refresh();
                       }).catch((error) => {
                       });
@@ -407,12 +440,12 @@ class ReleaseDetail extends Component {
             <div style={{ display: 'flex', color: 'rgba(0,0,0,0.54)' }}>
               <div className="c7n-versionTime">
                 <Icon style={{ fontSize: 20 }} type="date_range" />
-                创建日期:
+                {'创建日期:'}
                 <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.startDate ? ReleaseStore.getVersionDetail.startDate : '无'}</span>
               </div>
               <div className="c7n-versionTime" style={{ marginLeft: 80 }}>
                 <Icon style={{ fontSize: 20 }} type="date_range" />
-                更新日期:
+                {'更新日期:'}
                 <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.releaseDate ? ReleaseStore.getVersionDetail.releaseDate : '无'}</span>
               </div>
             </div>
@@ -464,47 +497,67 @@ class ReleaseDetail extends Component {
                 style={{ marginTop: 28 }}
               >
                 <TabPane
-                  tab={
+                  tab={(
                     <div className="c7n-release-tabTitle">
                       <span className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.issueCount}</span>
-                      <span>当前版本<br />个问题</span>
+                      <span>
+
+
+                        {'当前版本'}
+                        <br />
+                        {'个问题'}
+                      </span>
                     </div>
-                  }
+)}
                   key="0"
                 >
                   {this.renderTabTables(columns)}
                 </TabPane>
                 <TabPane
-                  tab={
+                  tab={(
                     <div className="c7n-release-tabTitle">
                       <span style={{ color: 'rgb(0, 191, 165)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.doneIssueCount}</span>
-                      <span>问题<br />已完成</span>
+                      <span>
+                        {'问题'}
+                        <br />
+                        {'已完成'}
+                      </span>
                     </div>
-                  }
+                    )}
                   key="done"
                 >
                   {this.renderTabTables(columns)}
 
                 </TabPane>
                 <TabPane
-                  tab={
+                  tab={(
                     <div className="c7n-release-tabTitle">
                       <span style={{ color: 'rgb(77, 144, 254)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.doingIssueCount}</span>
-                      <span>问题<br />正在处理</span>
+                      <span>
+                        {'问题'}
+                        <br />
+
+
+                        {'正在处理'}
+                      </span>
                     </div>
-                  }
+)}
                   key="doing"
                 >
                   {this.renderTabTables(columns)}
 
                 </TabPane>
                 <TabPane
-                  tab={
+                  tab={(
                     <div className="c7n-release-tabTitle">
                       <span style={{ color: 'rgb(255, 177, 0)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.todoIssueCount}</span>
-                      <span>问题<br />待处理</span>
+                      <span>
+                        {'问题'}
+                        <br />
+                        {'待处理'}
+                      </span>
                     </div>
-                  }
+                  )}
                   key="todo"
                 >
                   {this.renderTabTables(columns)}
@@ -531,4 +584,3 @@ class ReleaseDetail extends Component {
 }
 
 export default Form.create()(withRouter(ReleaseDetail));
-

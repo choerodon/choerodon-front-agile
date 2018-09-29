@@ -336,7 +336,8 @@ class ReleaseHome extends Component {
                   handleDrag={this.handleDrag}
                   columns={versionColumn}
                   dataSource={versionData}
-                  pagination={this.state.pagination}
+                  // pagination={this.state.pagination}
+                  pagination={versionData.length > 10}
                   onChange={this.handleChangeTable.bind(this)}
                 />
               ) : (
@@ -355,12 +356,8 @@ class ReleaseHome extends Component {
                     <div style={{ marginLeft: 50 }}>
                       <p style={{ color: 'rgba(0,0,0,0.65)' }}>您还没有为此项目添加任何版本</p>
                       <p style={{ fontSize: '20px', lineHeight: '34px' }}>
-
-
                         {'版本是一个项目的时间点，并帮助'}
                         <br />
-
-
                         {'您组织和安排工作'}
                       </p>
                     </div>

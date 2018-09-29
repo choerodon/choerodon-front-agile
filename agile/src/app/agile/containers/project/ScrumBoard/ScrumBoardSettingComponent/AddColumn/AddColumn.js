@@ -20,13 +20,13 @@ class AddColumn extends Component {
     };
   }
   handleAddColumn(e) {
-    this.setState({
-      loading: true,
-    });
     const that = this;
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        this.setState({
+          loading: true,
+        });
         ScrumBoardStore.axiosCheckRepeatName(values.column_name).then((res) => {
           this.setState({
             loading: false,

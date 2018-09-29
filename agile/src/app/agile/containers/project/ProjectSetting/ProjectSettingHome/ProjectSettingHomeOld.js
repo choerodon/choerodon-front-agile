@@ -113,12 +113,12 @@ class ProjectSetting extends Component {
         >
           <div style={{ marginTop: 8 }}>
             <Form layout="vertical">
-              <FormItem label="项目Code" style={{ width: 512 }}>
+              <FormItem label="项目编码" style={{ width: 512 }}>
                 {getFieldDecorator('code', {
                   rules: [{ validator: this.handleCheckSameName }],
                 })(
                   <Input
-                    label="项目Code"
+                    label="项目编码"
                     maxLength={5}
                   />,
                 )}

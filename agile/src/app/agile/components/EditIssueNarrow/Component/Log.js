@@ -63,7 +63,7 @@ class Log extends Component {
   }
 
   render() {
-    const { worklog } = this.props;
+    const { worklog, isWide } = this.props;
     const deltaEdit = text2Delta(this.state.editLog);
     return (
       <div
@@ -183,6 +183,7 @@ class Log extends Component {
                       });
                     }}
                     handleSave={this.handleUpdateLog.bind(this, worklog)}
+                    toolbarHeight={isWide ? null : 66}
                   />
                 ) : null
               }

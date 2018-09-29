@@ -58,7 +58,7 @@ class CreateEpic extends Component {
     return (
       <Sidebar
         title="创建史诗"
-        getContainer={() => container}
+        // getContainer={() => container}
         visible={visible}
         okText="新建"
         cancelText="取消"

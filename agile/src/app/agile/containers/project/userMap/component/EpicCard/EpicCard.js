@@ -5,6 +5,7 @@ import { stores } from 'choerodon-front-boot';
 import { Draggable } from 'react-beautiful-dnd';
 import './EpicCard.scss';
 import StatusTag from '../../../../../components/StatusTag';
+import TypeTag from '../../../../../components/TypeTag';
 import { updateIssue } from '../../../../../api/NewIssueApi';
 import US from '../../../../../stores/project/userMap/UserMapStore';
 
@@ -163,10 +164,27 @@ class EpicCard extends Component {
                   spellCheck="false"
                 />
               </div>
+
+              {/* <div className="c7n-footer">
+                <TypeTag
+                  typeCode={typeCode}
+                />
+                <span className="c7n-issueCard-storyPoints">
+                  {storyPoints}
+                </span>
+                <StatusTag
+                  name={statusName}
+                  color={statusColor}
+                />
+              </div> */}
+
               <div className="c7n-footer">
                 <div className="c7n-footer-left">
-                  <StatusTag name={epic.statusName} color={epic.statusColor} />
+                  <TypeTag
+                    typeCode="issue_epic"
+                  />
                   <span className="c7n-issueCount">{epic.totalEstimate}</span>
+                  <StatusTag name={epic.statusName} color={epic.statusColor} />
                 </div>
                 <span
                   className="c7n-issueNum"

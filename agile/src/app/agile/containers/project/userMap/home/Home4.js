@@ -68,6 +68,8 @@ class Home3 extends Component {
       position: 'absolute',
       isFullScreen: false,
       popOverVisible: false,
+      showDoneEpicCheckbox: false,
+      filterEpicCheckbox: false,
     };
   }
 
@@ -189,13 +191,23 @@ class Home3 extends Component {
     const { scrollLeft } = e.target;
     const body = document.getElementById('fixHead-body');
     body.scrollLeft = scrollLeft;
-  }
+    const ua = window.navigator.userAgent;
+    const isSafari = ua.indexOf("Safari") !== -1 && ua.indexOf("Version") !== -1;
+    if (isSafari) {
+      document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
+    }
+  };
 
   handleScroll = (e) => {
     if (inWhich !== 'body') return;
     const { scrollLeft } = e.target;
     const header = document.getElementById('fixHead-head');
     header.scrollLeft = scrollLeft;
+    const ua = window.navigator.userAgent;
+    const isSafari = ua.indexOf("Safari") !== -1 && ua.indexOf("Version") !== -1;
+    if (isSafari) {
+      document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
+    }
   };
 
 
@@ -254,7 +266,42 @@ class Home3 extends Component {
   };
 
   initData =() => {
-    this.props.UserMapStore.initData(true);
+    const { UserMapStore } = this.props;
+    UserMapStore.initData(true);
+    UserMapStore.setShowDoneEpic(false);
+    UserMapStore.setIsApplyToEpic(false);
+    UserMapStore.setCurrentFilter([]);
+    this.setState({
+      showDoneEpicCheckbox: false,
+      filterEpicCheckbox: false,
+    })
+    // const showDoneEpicCheckbox = document.getElementsByClassName('showDoneEpicCheckbox')[0];
+    // const filterEpicCheckbox = document.getElementsByClassName('filterEpicCheckbox')[0];
+    // if(showDoneEpicCheckbox){
+    //   console.log(showDoneEpicCheckbox);
+    //   showDoneEpicCheckbox.checked = false;
+    // }
+    // if(filterEpicCheckbox){
+    //   console.log(filterEpicCheckbox);
+    //   filterEpicCheckbox.checked = false;
+    // }
+    const timer = setInterval(() => {
+      if (document.getElementsByClassName('filter').length > 0) {
+        if (document.getElementsByClassName('filter')[0].scrollHeight > document.getElementsByClassName('filter')[0].clientHeight) {
+          this.setState({
+            more: true,
+          });
+        }
+      }
+      if (document.getElementById('fixHead-body')) {
+        document.getElementById('fixHead-head').addEventListener('scroll', this.handleScrollHead, { passive: true });
+        document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll, { passive: true });
+        document.getElementById('fixHead-head').addEventListener('mouseover', this.handleMouseOverHead);
+        document.getElementById('fixHead-body').addEventListener('mouseover', this.handleMouseOverBody);
+        // this.getPrepareOffsetTops();
+        clearInterval(timer);
+      }
+    }, 20);
   };
 
   handleFullScreen = () => {
@@ -319,12 +366,18 @@ class Home3 extends Component {
 
   handleShowDoneEpic =(e) => {
     const { UserMapStore } = this.props;
+    this.setState({
+      showDoneEpicCheckbox: e.target.checked
+    })
     UserMapStore.setShowDoneEpic(e.target.checked);
     UserMapStore.loadEpic();
   };
 
   handleFilterEpic =(e) => {
     const { UserMapStore } = this.props;
+    this.setState({
+      filterEpicCheckbox: e.target.checked
+    })
     UserMapStore.setIsApplyToEpic(e.target.checked);
     UserMapStore.loadEpic();
   }
@@ -976,7 +1029,7 @@ class Home3 extends Component {
     const {
       mode, issues, backlogIssues, selectIssueIds,
     } = UserMapStore;
-    if(res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') return;
+    if (res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') return;
     if (selectIssueIds.length < 2) {
       if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
       const key = `${mode}Id`;
@@ -1391,6 +1444,7 @@ class Home3 extends Component {
 
   renderHeader = () => {
     const { UserMapStore } = this.props;
+    const { showDoneEpicCheckbox, filterEpicCheckbox } = this.state;
     const {
       mode,
     } = UserMapStore;
@@ -1403,10 +1457,12 @@ class Home3 extends Component {
     );
     return (
       <Header title="用户故事地图">
-        <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
-          <Icon type="playlist_add" />
-          {'创建史诗'}
-        </Button>
+        {!this.state.isFullScreen ?
+          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
+            <Icon type="playlist_add" />
+            {'创建史诗'}
+          </Button> : ''
+        }
         <Dropdown
           overlay={swimlanMenu}
           trigger={['click']}
@@ -1437,13 +1493,21 @@ class Home3 extends Component {
             <div>
               <div className="menu-title">史诗过滤选择器</div>
               <div style={{ height: 30, padding: '5px 12px' }}>
-                <Checkbox onChange={this.handleShowDoneEpic}>显示已完成的史诗</Checkbox>
+                <Checkbox className="showDoneEpicCheckbox" onChange={this.handleShowDoneEpic} checked={showDoneEpicCheckbox}>显示已完成的史诗</Checkbox>
               </div>
               <div style={{ height: 30, padding: '5px 12px' }}>
-                <Checkbox onChange={this.handleFilterEpic}>应用搜索到史诗</Checkbox>
+                <Checkbox className="filterEpicCheckbox" onChange={this.handleFilterEpic} checked={filterEpicCheckbox}>应用搜索到史诗</Checkbox>
               </div>
               <div className="menu-title">导出</div>
-              <div onClick={this.handleSaveAsImage} role="none" style={{ height: 30, padding: '5px 12px', marginLeft: 26, cursor: 'pointer' }}>导出为png格式</div>
+              <div
+                onClick={this.handleSaveAsImage}
+                role="none"
+                style={{
+                  height: 30, padding: '5px 12px', marginLeft: 26, cursor: 'pointer',
+                }}
+              >
+                {'导出为png格式'}
+              </div>
             </div>
           )}
         >
@@ -1627,7 +1691,7 @@ class Home3 extends Component {
 
             ))}
           </div>
-                 </React.Fragment>);
+        </React.Fragment>);
       });
       dom.push(
         <React.Fragment key="no-sprint">
@@ -1639,10 +1703,10 @@ class Home3 extends Component {
           >
             <div>
               {mode === 'none' ? 'issue' : '未计划部分' }
-              {mode === 'none' ? null
+              {mode === 'none' || this.state.isFullScreen ? null
                 : (
                   <React.Fragment>
-                    {mode === 'version' 
+                    {mode === 'version'
                       ? (
                         <Permission service={['agile-service.product-version.createVersion']}>
                           <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
@@ -1904,7 +1968,7 @@ class Home3 extends Component {
                 </DragDropContext>
               )}
             <CreateEpic
-              container={document.querySelector('.c7n-userMap')}
+              // container={document.querySelector('.c7n-userMap')}
               visible={createEpic}
               onOk={() => {
                 UserMapStore.setCreateEpic(false);
@@ -1913,7 +1977,7 @@ class Home3 extends Component {
               onCancel={() => UserMapStore.setCreateEpic(false)}
             />
             <CreateVOS
-              container={document.querySelector('.c7n-userMap')}
+              // container={document.querySelector('.c7n-userMap')}
               visible={UserMapStore.createVOS}
               // onOk={() => {UserMapStore.setCreateVOS(false)}}
               onOk={this.handleCreateOk}
@@ -1927,7 +1991,7 @@ class Home3 extends Component {
           }}
           >
             <CreateEpic
-              container={document.querySelector('.c7n-userMap')}
+              // container={document.querySelector('.c7n-userMap')}
               visible={createEpic}
               onOk={() => {
                 UserMapStore.setCreateEpic(false);

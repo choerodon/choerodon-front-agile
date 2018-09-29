@@ -174,6 +174,7 @@ class Comment extends Component {
                       });
                     }}
                     handleSave={this.handleUpdateComment.bind(this, commit)}
+                    toolbarHeight={66}
                   />
                 ) : (
                   <IssueDescription data={delta2Html(commit.commentText)} />

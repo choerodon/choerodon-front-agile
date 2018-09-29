@@ -234,13 +234,13 @@ class ProjectSetting extends Component {
         >
           <div style={{ marginTop: 8 }}>
             <Form layout="vertical">
-              <FormItem label="项目Code" style={{ width: 512 }}>
+              <FormItem label="项目编码" style={{ width: 512 }}>
                 {getFieldDecorator('code', {
-                  rules: [{ required: true, message: '项目Code必填' }],
+                  rules: [{ required: true, message: '项目编码必填' }],
                   initialValue: this.state.code,
                 })(
                   <Input
-                    label="项目Code"
+                    label="项目编码"
                     maxLength={5}
                   />,
                 )}
