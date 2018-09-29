@@ -196,6 +196,11 @@ class Home3 extends Component {
     const { scrollLeft } = e.target;
     const header = document.getElementById('fixHead-head');
     header.scrollLeft = scrollLeft;
+    const ua = window.navigator.userAgent;
+    const isSafari = ua.indexOf("Safari") !== -1 && ua.indexOf("Version") !== -1;
+    if (isSafari) {
+      document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
+    }
   };
 
 
@@ -1466,7 +1471,7 @@ class Home3 extends Component {
                 onClick={this.handleSaveAsImage}
                 role="none"
                 style={{
-                  height: 30, padding: '5px 12px', marginLeft: 26, cursor: 'pointer', 
+                  height: 30, padding: '5px 12px', marginLeft: 26, cursor: 'pointer',
                 }}
               >
                 {'导出为png格式'}

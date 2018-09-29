@@ -11,6 +11,7 @@
     left: 0;
     top: 0;
     z-index: 888;
+    margin-left: var(--left);
   }
 }
 
@@ -104,6 +105,12 @@
   width: 100%;
   height: 100px;
   overflow: -moz-scrollbars-none;
+}
+
+.fixHead-head::-webkit-scrollbar  {
+  width: 0;
+  height: 0;
+  background-color: transparent;
 }
 
 .fixHead-head .fixHead-block {
