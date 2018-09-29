@@ -5,7 +5,6 @@
   // flex-direction: column;
   flex: 1;
   position: relative;
-
   p {
     margin-bottom: 0;
   }
@@ -463,5 +462,13 @@
 
   .ant-btn > .icon {
     margin-right: 0 !important;
+  }
+}
+
+.narrowLog{
+  #log{
+    .CancelSaveBtn{
+      margin-top: 24px;
+    }
   }
 }

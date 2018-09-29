@@ -68,6 +68,8 @@ class Home3 extends Component {
       position: 'absolute',
       isFullScreen: false,
       popOverVisible: false,
+      showDoneEpicCheckbox: false,
+      filterEpicCheckbox: false,
     };
   }
 
@@ -259,7 +261,25 @@ class Home3 extends Component {
   };
 
   initData =() => {
-    this.props.UserMapStore.initData(true);
+    const { UserMapStore } = this.props;
+    UserMapStore.initData(true);
+    UserMapStore.setShowDoneEpic(false);
+    UserMapStore.setIsApplyToEpic(false);
+    UserMapStore.setCurrentFilter([]);
+    this.setState({
+      showDoneEpicCheckbox: false,
+      filterEpicCheckbox: false,
+    })
+    // const showDoneEpicCheckbox = document.getElementsByClassName('showDoneEpicCheckbox')[0];
+    // const filterEpicCheckbox = document.getElementsByClassName('filterEpicCheckbox')[0];
+    // if(showDoneEpicCheckbox){
+    //   console.log(showDoneEpicCheckbox);
+    //   showDoneEpicCheckbox.checked = false;
+    // }
+    // if(filterEpicCheckbox){
+    //   console.log(filterEpicCheckbox);
+    //   filterEpicCheckbox.checked = false;
+    // }
     const timer = setInterval(() => {
       if (document.getElementsByClassName('filter').length > 0) {
         if (document.getElementsByClassName('filter')[0].scrollHeight > document.getElementsByClassName('filter')[0].clientHeight) {
@@ -341,12 +361,18 @@ class Home3 extends Component {
 
   handleShowDoneEpic =(e) => {
     const { UserMapStore } = this.props;
+    this.setState({
+      showDoneEpicCheckbox: e.target.checked
+    })
     UserMapStore.setShowDoneEpic(e.target.checked);
     UserMapStore.loadEpic();
   };
 
   handleFilterEpic =(e) => {
     const { UserMapStore } = this.props;
+    this.setState({
+      filterEpicCheckbox: e.target.checked
+    })
     UserMapStore.setIsApplyToEpic(e.target.checked);
     UserMapStore.loadEpic();
   }
@@ -1413,6 +1439,7 @@ class Home3 extends Component {
 
   renderHeader = () => {
     const { UserMapStore } = this.props;
+    const { showDoneEpicCheckbox, filterEpicCheckbox } = this.state;
     const {
       mode,
     } = UserMapStore;
@@ -1461,10 +1488,10 @@ class Home3 extends Component {
             <div>
               <div className="menu-title">史诗过滤选择器</div>
               <div style={{ height: 30, padding: '5px 12px' }}>
-                <Checkbox onChange={this.handleShowDoneEpic}>显示已完成的史诗</Checkbox>
+                <Checkbox className="showDoneEpicCheckbox" onChange={this.handleShowDoneEpic} checked={showDoneEpicCheckbox}>显示已完成的史诗</Checkbox>
               </div>
               <div style={{ height: 30, padding: '5px 12px' }}>
-                <Checkbox onChange={this.handleFilterEpic}>应用搜索到史诗</Checkbox>
+                <Checkbox className="filterEpicCheckbox" onChange={this.handleFilterEpic} checked={filterEpicCheckbox}>应用搜索到史诗</Checkbox>
               </div>
               <div className="menu-title">导出</div>
               <div

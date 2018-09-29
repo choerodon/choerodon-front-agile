@@ -3,12 +3,22 @@ import { stores, axios, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import TimeAgo from 'timeago-react';
-import { Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon, Popover } from 'choerodon-ui';
-import { STATUS, COLOR, TYPE, ICON, TYPE_NAME } from '../../common/Constant';
+import {
+ Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon, Popover 
+} from 'choerodon-ui';
+import {
+ STATUS, COLOR, TYPE, ICON, TYPE_NAME 
+} from '../../common/Constant';
 import './EditIssueNarrow.scss';
-import { UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription } from '../CommonComponent';
-import { delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload } from '../../common/utils';
-import { loadBranchs, loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus } from '../../api/NewIssueApi';
+import {
+ UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription 
+} from '../CommonComponent';
+import {
+ delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload 
+} from '../../common/utils';
+import {
+ loadBranchs, loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus 
+} from '../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
@@ -17,7 +27,7 @@ import CreateSubTask from '../CreateSubTask';
 import CreateLinkTask from '../CreateLinkTask';
 import UserHead from '../UserHead';
 import Comment from './Component/Comment';
-import Log from './/Component/Log';
+import Log from './Component/Log';
 import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
 import LinkList from './Component/LinkList';
@@ -238,7 +248,7 @@ class CreateSprint extends Component {
     const fixVersionsFixed = _.filter(fixVersionsTotal, { statusCode: 'archived' }) || [];
     const fixVersions = _.filter(fixVersionsTotal, v => v.statusCode !== 'archived') || [];
     const influenceVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
-    const influenceVersionsFixed =  _.filter(influenceVersionsTotal, { statusCode: 'archived' }) || [];
+    const influenceVersionsFixed = _.filter(influenceVersionsTotal, { statusCode: 'archived' }) || [];
     const influenceVersions = _.filter(influenceVersionsTotal, v => v.statusCode !== 'archived') || [];
     this.setState({
       origin: issue,
@@ -803,7 +813,7 @@ class CreateSprint extends Component {
         {
           this.state.subIssueDTOList.length ? <p style={{ color: '#d50000' }}>{`注意：问题的${this.state.subIssueDTOList.length}子任务将被删除。`}</p> : null
         }
-      </div>,
+               </div>,
       onOk() {
         return deleteIssue(issueId)
           .then((res) => {
@@ -868,6 +878,7 @@ class CreateSprint extends Component {
         {
           this.state.worklogs.map(worklog => (
             <Log
+              className="narrowLog"
               key={worklog.logId}
               worklog={worklog}
               onDeleteLog={() => this.reloadIssue()}
@@ -1024,7 +1035,9 @@ class CreateSprint extends Component {
             <div>
               {
                 [].length === 0 ? (
-                  <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <div style={{
+ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' 
+}}>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
                       <span
                         style={{ color: '#3f51b5', cursor: 'pointer' }}
@@ -1035,8 +1048,9 @@ class CreateSprint extends Component {
                           });
                         }}
                       >
-                        {this.state.branchs.totalCommit || '0'}提交
-                      </span>
+                        {this.state.branchs.totalCommit || '0'}
+提交
+</span>
                     </div>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1062,7 +1076,9 @@ class CreateSprint extends Component {
               }
               {
                 this.state.branchs.totalMergeRequest ? (
-                  <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <div style={{
+ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' 
+}}>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
                       <span
                         style={{ color: '#3f51b5', cursor: 'pointer' }}
@@ -1073,9 +1089,12 @@ class CreateSprint extends Component {
                           });
                         }}
                       >
-                        {this.state.branchs.totalMergeRequest}合并请求
-                      </span>
-                      <span style={{ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' }}>
+                        {this.state.branchs.totalMergeRequest}
+合并请求
+</span>
+                      <span style={{
+ width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center' 
+}}>
                         {['opened', 'merged', 'closed'].includes(this.state.branchs.mergeRequestStatus) ? STATUS_SHOW[this.state.branchs.mergeRequestStatus] : ''}
                       </span>
                     </div>
@@ -1103,7 +1122,9 @@ class CreateSprint extends Component {
               }
             </div>
           ) : (
-            <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+            <div style={{
+ borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' 
+}}>
               <span style={{ marginRight: 12 }}>暂无</span>
             </div>
           )
@@ -1115,52 +1136,63 @@ class CreateSprint extends Component {
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
-    const { initValue, visible, onCancel, onOk } = this.props;
+    const {
+ initValue, visible, onCancel, onOk 
+} = this.props;
     const getMenu = () => (
       <Menu onClick={this.handleClickMenu.bind(this)}>
         <Menu.Item key="0">
+
           登记工作日志
-        </Menu.Item>
+</Menu.Item>
         <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue.deleteIssue']}>
           <Menu.Item key="1">
+
             删除
-          </Menu.Item>
+</Menu.Item>
         </Permission>
         {
           this.state.typeCode !== 'sub_task' && (
             <Menu.Item key="2">
+
               创建子任务
-            </Menu.Item>
+</Menu.Item>
           )
         }
         <Menu.Item key="3">
+
           复制问题
-        </Menu.Item>
+</Menu.Item>
         {
           this.state.typeCode !== 'sub_task' && this.state.origin.subIssueDTOList && this.state.origin.subIssueDTOList.length === 0 && (
             <Menu.Item key="4">
+
               转化为子任务
-            </Menu.Item>
+</Menu.Item>
           )
         }
         {
           this.state.typeCode === 'sub_task' && (
             <Menu.Item key="5">
+
               转化为任务
-            </Menu.Item>
+</Menu.Item>
           )
         }
         <Menu.Item key="6">
+
           创建分支
-        </Menu.Item>
+</Menu.Item>
         <Menu.Item key="7">
+
           分配问题
-        </Menu.Item>
+</Menu.Item>
         {
           this.state.typeCode === 'sub_task' && (
             <Menu.Item key="8">
+
               修改父级
-            </Menu.Item>
+</Menu.Item>
           )
         }
       </Menu>
@@ -1245,10 +1277,14 @@ class CreateSprint extends Component {
         <div className="c7n-nav">
           <div>
             <Dropdown overlay={typeList} trigger={['click']} disabled={this.state.typeCode === 'sub_task'}>
-              <div style={{ height: 50, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{
+ height: 50, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' 
+}}>
                 <div
                   className="radius"
-                  style={{ background: TYPE[this.state.typeCode], color: '#fff', width: '20px', height: '20px', textAlign: 'center', fontSize: '14px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{
+ background: TYPE[this.state.typeCode], color: '#fff', width: '20px', height: '20px', textAlign: 'center', fontSize: '14px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' 
+}}
                 >
                   <Icon
                     style={{ fontSize: '14px' }}
@@ -1422,7 +1458,9 @@ class CreateSprint extends Component {
                   
                   
                   <div
-                    style={{ cursor: 'pointer', fontSize: '13px', lineHeight: '20px', display: 'flex', alignItems: 'center' }}
+                    style={{
+ cursor: 'pointer', fontSize: '13px', lineHeight: '20px', display: 'flex', alignItems: 'center' 
+}}
                     role="none"
                     onClick={() => this.props.onCancel()}
                   >
@@ -1444,9 +1482,11 @@ class CreateSprint extends Component {
                     onInit={() => this.setAnIssueToState()}
                     onOk={this.updateIssue.bind(this, 'summary')}
                     onCancel={this.resetSummary.bind(this)}
-                    readModeContent={<div className="c7n-summary">
+                    readModeContent={(
+<div className="c7n-summary">
                       {this.state.summary}
-                    </div>}
+                    </div>
+)}
                   >
                     {/* <Input
                       // maxLength="30"
@@ -1528,9 +1568,11 @@ class CreateSprint extends Component {
                             onInit={() => this.setAnIssueToState(this.state.origin)}
                             onOk={this.updateIssue.bind(this, 'storyPoints')}
                             onCancel={this.resetStoryPoints.bind(this)}
-                            readModeContent={<span>
+                            readModeContent={(
+<span>
                               {this.state.storyPoints === undefined || this.state.storyPoints === null ? '无' : `${this.state.storyPoints} 点`}
-                            </span>}
+                            </span>
+)}
                           >
                             {/* <Input
                               defaultValue={this.state.storyPoints}
@@ -1570,9 +1612,11 @@ class CreateSprint extends Component {
                             onInit={() => this.setAnIssueToState(this.state.origin)}
                             onOk={this.updateIssue.bind(this, 'remainingTime')}
                             onCancel={this.resetRemainingTime.bind(this)}
-                            readModeContent={<span>
+                            readModeContent={(
+<span>
                               {this.state.remainingTime === undefined || this.state.remainingTime === null ? '无' : `${this.state.remainingTime} 小时`}
-                            </span>}
+                            </span>
+)}
                           >
                             <NumericInput
                               maxLength="3"
@@ -1606,14 +1650,17 @@ class CreateSprint extends Component {
                         <Icon type="error_outline c7n-icon-title" />
                         <span>详情</span>
                       </div>
-                      <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                      <div style={{
+ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' 
+}} />
                     </div>
                     <div className="c7n-content-wrapper">
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+
                             状态：
-                          </span>
+</span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -1631,7 +1678,8 @@ class CreateSprint extends Component {
                                 });
                               });
                             }}
-                            readModeContent={<div>
+                            readModeContent={(
+<div>
                               {
                                 this.state.statusId ? (
                                   <div
@@ -1648,7 +1696,8 @@ class CreateSprint extends Component {
                                   </div>
                                 ) : '无'
                               }
-                            </div>}
+                            </div>
+)}
                           >
                             <Select
                               value={this.state.originStatus.length ? this.state.statusId : this.state.statusName}
@@ -1678,8 +1727,7 @@ class CreateSprint extends Component {
                                   <Option key={status.id} value={status.id}>
                                     { status.name }
                                   </Option>
-                                ),
-                                )
+                                ),)
                               }
                             </Select>
                           </ReadAndEdit>
@@ -1688,8 +1736,9 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+
                             优先级：
-                          </span>
+</span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -1707,7 +1756,8 @@ class CreateSprint extends Component {
                                 });
                               });
                             }}
-                            readModeContent={<div>
+                            readModeContent={(
+<div>
                               {
                                 this.state.priorityCode ? (
                                   <div
@@ -1724,7 +1774,8 @@ class CreateSprint extends Component {
                                   </div>
                                 ) : '无'
                               }
-                            </div>}
+                            </div>
+)}
                           >
                             <Select
                               value={this.state.originpriorities.length ? this.state.priorityCode : this.state.priorityName}
@@ -1770,8 +1821,7 @@ class CreateSprint extends Component {
                                       </div>
                                     </div>
                                   </Option>
-                                ),
-                                )
+                                ),)
                               }
                             </Select>
                           </ReadAndEdit>
@@ -1782,8 +1832,9 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
+
                                 模块：
-                              </span>
+</span>
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit
@@ -1794,11 +1845,13 @@ class CreateSprint extends Component {
                                 onInit={() => this.setAnIssueToState(this.state.origin)}
                                 onOk={this.updateIssueSelect.bind(this, 'originComponents', 'componentIssueRelDTOList')}
                                 onCancel={this.resetComponentIssueRelDTOList.bind(this)}
-                                readModeContent={<div style={{ color: '#3f51b5' }}>
+                                readModeContent={(
+<div style={{ color: '#3f51b5' }}>
                                   <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
                                     {this.transToArr(this.state.componentIssueRelDTOList, 'name')}
                                   </p>
-                                </div>}
+                                </div>
+)}
                               >
                                 <Select
                                   value={this.transToArr(this.state.componentIssueRelDTOList, 'name', 'array')}
@@ -1821,14 +1874,14 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={value => this.setState({ componentIssueRelDTOList: value })}
                                 >
-                                  {this.state.originComponents.map(component =>
-                                    (<Option
+                                  {this.state.originComponents.map(component => (
+<Option
                                       key={component.name}
                                       value={component.name}
                                     >
                                       {component.name}
-                                    </Option>),
-                                  )}
+                                    </Option>
+),)}
                                 </Select>
                               </ReadAndEdit>
                             </div>
@@ -1839,8 +1892,9 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+
                             标签：
-                          </span>
+</span>
                         </div>
                         <div className="c7n-value-wrapper">
                           
@@ -1852,7 +1906,8 @@ class CreateSprint extends Component {
                             onInit={() => this.setAnIssueToState(this.state.origin)}
                             onOk={this.updateIssueSelect.bind(this, 'originLabels', 'labelIssueRelDTOList')}
                             onCancel={this.resetlabelIssueRelDTOList.bind(this)}
-                            readModeContent={<div>
+                            readModeContent={(
+<div>
                               {
                                 this.state.labelIssueRelDTOList.length > 0 ? (
                                   <div style={{ display: 'flex', flexWrap: 'wrap' }}>
@@ -1878,7 +1933,8 @@ class CreateSprint extends Component {
                                   </div>
                                 ) : '无'
                               }
-                            </div>}
+                            </div>
+)}
                           >
                             <Select
                               value={this.transToArr(this.state.labelIssueRelDTOList, 'labelName', 'array')}
@@ -1901,14 +1957,14 @@ class CreateSprint extends Component {
                               }}
                               onChange={value => this.setState({ labelIssueRelDTOList: value })}
                             >
-                              {this.state.originLabels.map(label =>
-                                (<Option
+                              {this.state.originLabels.map(label => (
+<Option
                                   key={label.labelName}
                                   value={label.labelName}
                                 >
                                   {label.labelName}
-                                </Option>),
-                              )}
+                                </Option>
+),)}
                             </Select>
                           </ReadAndEdit>
                         </div>
@@ -1918,8 +1974,9 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
+
                                 影响的版本：
-                              </span>
+</span>
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit
@@ -1930,7 +1987,8 @@ class CreateSprint extends Component {
                                 onInit={() => this.setAnIssueToState(this.state.origin)}
                                 onOk={this.updateVersionSelect.bind(this, 'originVersions', 'influenceVersions')}
                                 onCancel={this.resetInfluenceVersions.bind(this)}
-                                readModeContent={<div style={{ color: '#3f51b5' }}>
+                                readModeContent={(
+<div style={{ color: '#3f51b5' }}>
                                   {
                                     !this.state.influenceVersionsFixed.length && !this.state.influenceVersions.length ? "无" : (
                                       <div>
@@ -1943,7 +2001,8 @@ class CreateSprint extends Component {
                                       </div>
                                     )
                                   }
-                                </div>}
+                                </div>
+)}
                               >
                                 {
                                   this.state.influenceVersionsFixed.length ? (
@@ -1977,14 +2036,14 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={value => this.setState({ influenceVersions: value })}
                                 >
-                                  {this.state.originVersions.map(version =>
-                                    (<Option
+                                  {this.state.originVersions.map(version => (
+<Option
                                       key={version.name}
                                       value={version.name}
                                     >
                                       {version.name}
-                                    </Option>),
-                                  )}
+                                    </Option>
+),)}
                                 </Select>
                               </ReadAndEdit>
                             </div>
@@ -1995,8 +2054,9 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+
                             修复的版本：
-                          </span>
+</span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -2007,7 +2067,8 @@ class CreateSprint extends Component {
                             onInit={() => this.setAnIssueToState(this.state.origin)}
                             onOk={this.updateVersionSelect.bind(this, 'originVersions', 'fixVersions')}
                             onCancel={this.resetFixVersions.bind(this)}
-                            readModeContent={<div style={{ color: '#3f51b5' }}>
+                            readModeContent={(
+<div style={{ color: '#3f51b5' }}>
                               {
                                 !this.state.fixVersionsFixed.length && !this.state.fixVersions.length ? "无" : (
                                   <div>
@@ -2020,7 +2081,8 @@ class CreateSprint extends Component {
                                   </div>
                                 )
                               }
-                            </div>}
+                            </div>
+)}
                           >
                             {
                               this.state.fixVersionsFixed.length ? (
@@ -2054,14 +2116,14 @@ class CreateSprint extends Component {
                               }}
                               onChange={value => this.setState({ fixVersions: value })}
                             >
-                              {this.state.originVersions.map(version =>
-                                (<Option
+                              {this.state.originVersions.map(version => (
+<Option
                                   key={version.name}
                                   value={version.name}
                                 >
                                   {version.name}
-                                </Option>),
-                              )}
+                                </Option>
+),)}
                             </Select>
                           </ReadAndEdit>
                         </div>
@@ -2071,8 +2133,9 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
+
                                 史诗：
-                              </span>
+</span>
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit
@@ -2090,7 +2153,8 @@ class CreateSprint extends Component {
                                     });
                                   });
                                 }}
-                                readModeContent={<div>
+                                readModeContent={(
+<div>
                                   {
                                     this.state.epicId ? (
                                       <div 
@@ -2110,7 +2174,8 @@ class CreateSprint extends Component {
                                       </div>
                                     ) : '无'
                                   }
-                                </div>}
+                                </div>
+)}
                               >
                                 <Select
                                   value={this.state.originEpics.length ? this.state.epicId || undefined : this.state.epicName || undefined}
@@ -2139,9 +2204,7 @@ class CreateSprint extends Component {
                                     });
                                   }}
                                 >
-                                  {this.state.originEpics.map(epic =>
-                                    <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>,
-                                  )}
+                                  {this.state.originEpics.map(epic => <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>,)}
                                 </Select>
                               </ReadAndEdit>
                               
@@ -2153,8 +2216,9 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+
                             冲刺：
-                          </span>
+</span>
                         </div>
                         <div className="c7n-value-wrapper">
                           {
@@ -2175,7 +2239,8 @@ class CreateSprint extends Component {
                                     });
                                   });
                                 }}
-                                readModeContent={<div>
+                                readModeContent={(
+<div>
                                   {
                                     !this.state.closeSprint.length && !this.state.activeSprint.sprintId ? '无' : (
                                       <div>
@@ -2221,7 +2286,8 @@ class CreateSprint extends Component {
                                       </div>
                                     )
                                   }
-                                </div>}
+                                </div>
+)}
                               >
                                 {
                                   this.state.closeSprint.length ? (
@@ -2261,9 +2327,7 @@ class CreateSprint extends Component {
                                     });
                                   }}
                                 >
-                                  {this.state.originSprints.map(sprint =>
-                                    <Option key={`${sprint.sprintId}`} value={sprint.sprintId}>{sprint.sprintName}</Option>,
-                                  )}
+                                  {this.state.originSprints.map(sprint => <Option key={`${sprint.sprintId}`} value={sprint.sprintId}>{sprint.sprintName}</Option>,)}
                                 </Select>
                               </ReadAndEdit>
                             ) : (
@@ -2295,23 +2359,27 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+
                             时间跟踪：
-                          </span>
+</span>
                         </div>
                         <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                           <Progress
                             style={{ width: 100 }}
                             percent={
-                              this.getWorkloads() !== 0 ?
-                                (this.getWorkloads() * 100) / (this.getWorkloads() + (this.state.origin.remainingTime || 0))
+                              this.getWorkloads() !== 0
+                                ? (this.getWorkloads() * 100) / (this.getWorkloads() + (this.state.origin.remainingTime || 0))
                                 : 0
                             }
                             size="small"
                             status="success"
                           />
                           <span>
-                            {this.getWorkloads()}h/{this.getWorkloads() + (this.state.origin.remainingTime || 0)}h
-                          </span>
+                            {this.getWorkloads()}
+h/
+{this.getWorkloads() + (this.state.origin.remainingTime || 0)}
+h
+</span>
                           <span
                             role="none"
                             style={{
@@ -2325,8 +2393,9 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
+
                             登记工作
-                          </span>
+</span>
                         </div>
                       </div>
 
@@ -2335,8 +2404,9 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
+
                                 Epic名：
-                              </span>
+</span>
                             </div>
                             <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                               <ReadAndEdit
@@ -2349,11 +2419,13 @@ class CreateSprint extends Component {
                                 onInit={() => this.setAnIssueToState()}
                                 onOk={this.updateIssue.bind(this, 'epicName')}
                                 onCancel={this.resetEpicName.bind(this)}
-                                readModeContent={<div>
+                                readModeContent={(
+<div>
                                   <p style={{ wordBreak: 'break-word', marginBottom: 0 }}>
                                     {this.state.epicName}
                                   </p>
-                                </div>}
+                                </div>
+)}
                               >
                                 <TextArea
                                   maxLength={44}
@@ -2378,8 +2450,9 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-subtitle">
+
                             人员
-                          </span>
+</span>
                         </div>
                       </div>
                       <div className="line-start mt-10 assignee">
@@ -2415,7 +2488,8 @@ class CreateSprint extends Component {
                                 });
                               }
                             }}
-                            readModeContent={<div>
+                            readModeContent={(
+<div>
                               {
                                 this.state.reporterId && this.state.reporterName ? (
                                   <UserHead
@@ -2428,7 +2502,8 @@ class CreateSprint extends Component {
                                   />
                                 ) : '无'
                               }
-                            </div>}
+                            </div>
+)}
                           >
                             <Select
                               value={this.state.flag === 'loading' ? undefined : this.state.reporterId || undefined}
@@ -2443,8 +2518,8 @@ class CreateSprint extends Component {
                                 this.setState({ reporterId: value });
                               }}
                             >
-                              {this.state.originUsers.map(user =>
-                                (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
+                              {this.state.originUsers.map(user => (
+<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                     <UserHead
                                       user={{
@@ -2455,8 +2530,8 @@ class CreateSprint extends Component {
                                       }}
                                     />
                                   </div>
-                                </Option>),
-                              )}
+                                </Option>
+),)}
                             </Select>
                           </ReadAndEdit>
                           <span
@@ -2483,8 +2558,9 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
+
                             分配给我
-                          </span>
+</span>
                         </div>
                       </div>
                       <div className="line-start mt-10 assignee">
@@ -2520,7 +2596,8 @@ class CreateSprint extends Component {
                                 });
                               }
                             }}
-                            readModeContent={<div>
+                            readModeContent={(
+<div>
                               {
                                 this.state.assigneeId && this.state.assigneeName ? (
                                   <UserHead
@@ -2533,7 +2610,8 @@ class CreateSprint extends Component {
                                   />
                                 ) : '无'
                               }
-                            </div>}
+                            </div>
+)}
                           >
                             <Select
                               value={this.state.flag === 'loading' ? undefined : this.state.assigneeId || undefined}
@@ -2548,8 +2626,8 @@ class CreateSprint extends Component {
                                 this.setState({ assigneeId: value });
                               }}
                             >
-                              {this.state.originUsers.map(user =>
-                                (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
+                              {this.state.originUsers.map(user => (
+<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                     <UserHead
                                       user={{
@@ -2560,8 +2638,8 @@ class CreateSprint extends Component {
                                       }}
                                     />
                                   </div>
-                                </Option>),
-                              )}
+                                </Option>
+),)}
                             </Select>
                           </ReadAndEdit>
                           <span
@@ -2588,8 +2666,9 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
+
                             分配给我
-                          </span>
+</span>
                         </div>
                       </div>
 
@@ -2624,7 +2703,9 @@ class CreateSprint extends Component {
                         <Icon type="subject c7n-icon-title" />
                         <span>描述</span>
                       </div>
-                      <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                      <div style={{
+ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' 
+}} />
                       <div className="c7n-title-right" style={{ marginLeft: '14px', position: 'relative' }}>
                         <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })}>
                           <Icon type="zoom_out_map icon" style={{ marginRight: 2 }} />
@@ -2655,7 +2736,9 @@ class CreateSprint extends Component {
                       <Icon type="attach_file c7n-icon-title" />
                       <span>附件</span>
                     </div>
-                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px' }} />
+                    <div style={{
+ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px' 
+}} />
                   </div>
                   <div className="c7n-content-wrapper" style={{ marginTop: '-47px' }}>
                     <UploadButtonNow
@@ -2673,7 +2756,9 @@ class CreateSprint extends Component {
                       <Icon type="sms_outline c7n-icon-title" />
                       <span>评论</span>
                     </div>
-                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                    <div style={{
+ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' 
+}} />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                       <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ addCommit: true })}>
                         <Icon type="playlist_add icon" />
@@ -2690,7 +2775,9 @@ class CreateSprint extends Component {
                       <Icon type="work_log c7n-icon-title" />
                       <span>工作日志</span>
                     </div>
-                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                    <div style={{
+ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px'
+}} />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                       <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ dailyLogShow: true })}>
                         <Icon type="playlist_add icon" />
@@ -2709,7 +2796,9 @@ class CreateSprint extends Component {
                           <Icon type="filter_none c7n-icon-title" />
                           <span>子任务</span>
                         </div>
-                        <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                        <div style={{
+ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' 
+}} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                           <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createSubTaskShow: true })}>
                             <Icon type="playlist_add icon" />
@@ -2730,7 +2819,9 @@ class CreateSprint extends Component {
                           <Icon type="link c7n-icon-title" />
                           <span>问题链接</span>
                         </div>
-                        <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                        <div style={{
+ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' 
+}} />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                           <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
                             <Icon type="relate icon" />
@@ -2749,7 +2840,9 @@ class CreateSprint extends Component {
                       <Icon type="branch c7n-icon-title" />
                       <span>开发</span>
                     </div>
-                    <div style={{ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' }} />
+                    <div style={{
+ flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px' 
+}} />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
                       <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createBranchShow: true })}>
                         <Icon type="playlist_add icon" />
