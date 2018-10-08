@@ -20,9 +20,9 @@ const REPORTHOSTINDEX = asyncRouter(() => import('./project/ReportHost'));
 const ISSUELINKINDEX = asyncRouter(() => import('./project/IssueLink'));
 const USERMAPINDEX = asyncRouter(() => import('./project/userMap'));
 const INERATIONBOARDINDEX = asyncRouter(() => import('./project/IterationBoard'));
-
 const REPORTBOARD = asyncRouter(() => import('./project/ReportBoard'));
 
+const NOTIFICATIONsCHEME = asyncRouter(() => import('./project/NotificationScheme')); 
 class AGILEIndex extends React.Component {
   render() {
     const { match } = this.props;
@@ -56,6 +56,9 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/iterationBoard/:id`} component={INERATIONBOARDINDEX} />
 
           <Route path={`${match.url}/reportBoard`} component={REPORTBOARD} />
+
+          <Route path={`${match.url}/notificationScheme`} component={NOTIFICATIONsCHEME} />
+
           <Route path="*" component={nomatch} />
         </Switch>
       </IntlProviderAsync>
