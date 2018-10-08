@@ -84,12 +84,21 @@ class ReleaseDetail extends Component {
         );
       }
     }
-    if (item.typeCode === 'task' || item.typeCode === 'sub_task') {
+    if (item.typeCode === 'task') {
       if (type === 'background') {
         return '#4D90FE';
       } else {
         return (
           <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
+        );
+      }
+    }
+    if (item.typeCode === 'sub_task') {
+      if (type === 'background') {
+        return '#4D90FE';
+      } else {
+        return (
+          <Icon style={{ color: 'white', fontSize: '14px' }} type="relation" />
         );
       }
     }
@@ -229,9 +238,15 @@ class ReleaseDetail extends Component {
     return (
       <div>
         <p>{name}</p>
-        <p style={{ marginTop: 3 }}>类别 <span style={{ color: '#3575DF' }}>{name}</span> 中有{data ? data.length : 0}种状态</p>
-        {data ?
-          data.map(item => (
+        <p style={{ marginTop: 3 }}>
+          {'类别'}
+          <span style={{ color: '#3575DF' }}>{name}</span>
+          {'中有'}
+          {data ? data.length : 0}
+          {'种状态'}
+        </p>
+        {data
+          ? data.map(item => (
             <div key={item.id} style={{ margin: '14px 0' }}>
               <span
                 style={{

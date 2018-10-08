@@ -51,6 +51,7 @@ class Issue extends Component {
       paramType, paramId, paramName, paramStatus,
       paramPriority, paramIssueType, paramIssueId, paramUrl, 
     } = Request;
+    // console.log(paramOpenIssueId);
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
     IssueStore.setParamName(paramName);
@@ -68,11 +69,14 @@ class Issue extends Component {
         advancedSearchArgs: {},
         searchArgs: {},
       };
-      const a = [paramStatus];
+      // const a = [paramStatus];
+      const a = paramStatus.split(',');
       obj.advancedSearchArgs.statusCode = a || [];
+      console.log(obj.advancedSearchArgs.statusCode);
       IssueStore.setBarFilters(arr);
       IssueStore.setFilter(obj);
-      IssueStore.setFilteredInfo({ statusCode: [paramStatus] });
+      // IssueStore.setFilteredInfo({ statusCode: [paramStatus] });
+      IssueStore.setFilteredInfo({ statusCode: paramStatus.split(',') });
       IssueStore.loadIssues();
     } else if (paramPriority) {
       const obj = {
@@ -111,6 +115,21 @@ class Issue extends Component {
       IssueStore.init();
       IssueStore.loadIssues();
     }
+
+    // if (paramOpenIssueId) {
+    //   console.log(paramOpenIssueId);
+      
+    //   IssueStore.setBarFilters(arr);
+    //   IssueStore.init();
+    //   IssueStore.loadIssues()
+    //     .then((res) => {
+    //       console.log(res.content.filter(item => item.issueId === paramOpenIssueId)[0]);
+    //       this.setState({
+    //         selectedIssue: res.content.length && res.content.filter(item => item.issueId === paramOpenIssueId)[0],
+    //         expand: true,
+    //       });
+    //     });
+    // } 
   }
 
   GetRequest(url) {
@@ -223,6 +242,10 @@ class Issue extends Component {
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
     IssueStore.setFilteredInfo(filters);
     IssueStore.setBarFilters(barFilters);
+    console.log(typeof IssueStore.barFilters);
+    if (barFilters != undefined && barFilters.length !== 0) {
+      console.log(`filters: ${JSON.stringify(filters)},barFilter: ${JSON.stringify(IssueStore.barFilters)}`);
+    }
     if (barFilters === undefined || barFilters.length === 0) {
       IssueStore.setBarFilters(undefined);
     }
@@ -244,6 +267,11 @@ class Issue extends Component {
     obj.searchArgs.version = version && version.length ? version[0] : '';
     obj.searchArgs.component = component && component.length ? component[0] : '';
     obj.searchArgs.epic = epic && epic.length ? epic[0] : '';
+
+    obj.content = barFilters && barFilters.length ? barFilters.join('') : '';
+
+    // obj.searchArgs.mohu = barFilters;
+
     IssueStore.setFilter(obj);
     const { current, pageSize } = IssueStore.pagination;
     IssueStore.loadIssues(current - 1, pageSize);
@@ -715,7 +743,7 @@ class Issue extends Component {
                     })
                     }
                     rowClassName={(record, index) => (
-                      record.issueId === this.state.selectedIssue.issueId ? 'c7n-border-visible' : 'c7n-border')}
+                      record.issueId === this.state.selectedIssue && this.state.selectedIssue.issueId ? 'c7n-border-visible' : 'c7n-border')}
                   />
                 )
               }
@@ -849,7 +877,7 @@ class Issue extends Component {
             {
               this.state.expand ? (
                 <EditIssue
-                  issueId={this.state.selectedIssue.issueId}
+                  issueId={this.state.selectedIssue && this.state.selectedIssue.issueId}
                   onCancel={() => {
                     this.setState({
                       expand: false,

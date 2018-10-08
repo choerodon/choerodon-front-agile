@@ -9,11 +9,12 @@ import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 class IssueDetail extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
   }
+
   componentDidMount() {
     this.props.onRef(this);
   }
+
   /**
    *detail有更新回调待办事项更新
    *
@@ -35,7 +36,9 @@ class IssueDetail extends Component {
       this.editIssue.refresh();
     }
   }
+
   render() {
+    // const { paramOpenIssueId } = this.state;
     return (
       <div
         className={this.props.visible ? 'c7n-issueDetail-container' : ''}
@@ -75,4 +78,3 @@ class IssueDetail extends Component {
 }
 
 export default IssueDetail;
-

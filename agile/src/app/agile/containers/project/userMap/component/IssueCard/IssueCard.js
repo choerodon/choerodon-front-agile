@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Input, Icon } from 'choerodon-ui';
+import { Input, Icon, Modal } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
 import { Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
@@ -14,6 +14,7 @@ import { updateIssue } from '../../../../../api/NewIssueApi';
 
 const { TextArea } = Input;
 const { AppState } = stores;
+const confirm = Modal.confirm;
 
 class IssueCard extends Component {
   constructor(props) {
@@ -122,7 +123,23 @@ class IssueCard extends Component {
 
   handleClickDelete() {
     const { issue: { issueId } } = this.state;
-    US.deleteIssue(issueId);
+    confirm({
+      width: 560,
+      wrapClassName: 'deleteConfirm',
+      title: '移除问题',
+      content: (
+        <div>
+          <p style={{ marginBottom: 10 }}>请确认您要取消问题与史诗的关联。</p>
+          <p style={{ marginBottom: 10 }}>这个操作将取消当前问题与史诗的关联，并从用户故事地图中移除，移除的问题将至于需求池的未规划部分</p>
+        </div>
+      ),
+      onOk() {
+        US.deleteIssue(issueId);
+      },
+      onCancel() {},
+      okText: '移除',
+      okType: 'danger',
+    });
   }
 
   render() {

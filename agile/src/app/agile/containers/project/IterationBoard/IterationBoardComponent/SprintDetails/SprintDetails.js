@@ -61,10 +61,10 @@ class SprintDetails extends Component {
       this.setState({
         pagination,
       });
-      this[ARRAY[activeKey]](sprintId, {
-        page: pagination.current - 1,
-        size: pagination.pageSize,
-      });
+      // this[ARRAY[activeKey]](sprintId, {
+      //   page: pagination.current - 1,
+      //   size: pagination.pageSize,
+      // });
     }
 
     handleTabChange = (key) => {

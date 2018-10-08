@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import { Icon, Popconfirm, Tooltip } from 'choerodon-ui';
 import { stores, Permission } from 'choerodon-front-boot';
+import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import WYSIWYGEditor from '../../WYSIWYGEditor';
 import { IssueDescription } from '../../CommonComponent';
-import { delta2Html, text2Delta, beforeTextUpload, formatDate } from '../../../common/utils';
+import {
+  delta2Html, text2Delta, beforeTextUpload, formatDate, 
+} from '../../../common/utils';
+import IssueStore from '../../../stores/project/sprint/IssueStore';
 import { deleteIssue, updateCommit } from '../../../api/NewIssueApi';
 import PriorityTag from '../../PriorityTag';
 import StatusTag from '../../StatusTag';
@@ -18,17 +22,12 @@ class IssueList extends Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
+      paramOpenIssueId: undefined,
     };
-  }
-
-  componentWillMount() {
   }
 
   confirm(issueId, e) {
     this.handleDeleteIssue(issueId);
-  }
-
-  cancel(e) {
   }
 
   handleDeleteIssue(issueId) {
@@ -36,6 +35,24 @@ class IssueList extends Component {
       .then((res) => {
         this.props.onRefresh();
       });
+  }
+
+  componentDidMount() {
+    const { location: { search } } = this.props;
+    const paramOpenIssueId = search.split('&')[search.split('&').length - 2].split('=')[0] === 'paramOpenIssueId' ? search.split('&')[search.split('&').length - 2].split('=')[1] : undefined;
+    const paramIssueId = search.split('&')[search.split('&').length - 3].split('=')[0] === 'paramIssueId' ? search.split('&')[search.split('&').length - 3].split('=')[1] : undefined;
+    this.setState({
+      paramOpenIssueId,
+    });
+    if (paramOpenIssueId && paramIssueId && paramOpenIssueId !== paramIssueId) {
+      this.props.onOpen(paramOpenIssueId);
+    }
+  }
+
+  componentWillUnmount() {
+    this.setState({
+      paramOpenIssueId: undefined,
+    });
   }
 
   render() {
@@ -64,7 +81,9 @@ class IssueList extends Component {
         <Tooltip title={`子任务编号概要： ${issue.issueNum} ${issue.summary}`}>
           <div style={{ marginLeft: 8, flex: 1, overflow: 'hidden' }}>
             <p
-              style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, color: 'rgb(63, 81, 181)' }}
+              style={{
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, color: 'rgb(63, 81, 181)', 
+              }}
               role="none"
               onClick={() => {
                 this.props.onOpen(issue);
@@ -99,7 +118,10 @@ class IssueList extends Component {
             </div>
           ) : null
         }
-        <div style={{ width: '48px', marginRight: '15px', display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{
+          width: '48px', marginRight: '15px', display: 'flex', justifyContent: 'flex-end', 
+        }}
+        >
           <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusName}`}>
             <div>
               <StatusTag
@@ -135,4 +157,4 @@ class IssueList extends Component {
   }
 }
 
-export default IssueList;
+export default withRouter(IssueList);
