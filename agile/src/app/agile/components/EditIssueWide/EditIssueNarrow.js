@@ -936,6 +936,7 @@ class CreateSprint extends Component {
             comment={comment}
             onDeleteComment={() => this.reloadIssue()}
             onUpdateComment={() => this.reloadIssue()}
+            isWide = { true }
           />
         ))}
       </div>

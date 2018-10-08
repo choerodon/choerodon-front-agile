@@ -578,10 +578,10 @@ class EpicBurndown extends Component {
     let urlPush = `/agile/issue?type=${type}&id=${id}&name=${urlParams.name}&organizationId=${organizationId}`;
     if (JSON.stringify(item) !== '{}') {
       if (linkType === 'sprint') {
-        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reposthost/epicBurnDown`;
+        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reporthost/epicBurndown`;
       }
       if (linkType === 'epic') {
-        urlPush += `&paramType=epic&paramId=${item.issueId}&paramName=${item.epicName || '未分配'}下的问题&paramUrl=reporthost/epicBurnDown`;
+        urlPush += `&paramType=epic&paramId=${item.issueId}&paramName=${item.epicName || '未分配'}下的问题&paramUrl=reporthost/epicBurndown`;
       }
       history.push(urlPush);
     }
@@ -725,6 +725,7 @@ class EpicBurndown extends Component {
                             onClick={this.handleLinkToIssue.bind(this, 'sprint', item)}
                           >
                             {'在“问题管理中”查看'}
+                            <Icon style={{ fontSize: 13 }} type="open_in_new" />
                           </span>
                         </p>
                         <Table

@@ -406,21 +406,23 @@ class StatusIssue extends Component {
                               </Tooltip>
                             </p>
                             <p>
-                              <Tooltip title={`史诗: ${this.renderEpicData('epicName')}`}>
-                                <span
-                                  className="textDisplayOneColumn"
-                                  style={{
-                                    color: this.renderEpicData('color'),
-                                    border: `1px solid ${this.renderEpicData('color')}`,
-                                    marginLeft: '10px',
-                                    padding: '0 8px',
-                                    maxWidth: '80px',
-                                    borderRadius: 2,
-                                  }}
-                                >
-                                  {this.renderEpicData('epicName')}
-                                </span>
-                              </Tooltip>
+                              {!!this.renderEpicData('epicName') ?
+                                <Tooltip title={`史诗: ${this.renderEpicData('epicName')}`}>
+                                  <span
+                                    className="textDisplayOneColumn"
+                                    style={{
+                                      color: this.renderEpicData('color'),
+                                      border: `1px solid ${this.renderEpicData('color')}`,
+                                      marginLeft: '10px',
+                                      padding: '0 8px',
+                                      maxWidth: '80px',
+                                      borderRadius: 2,
+                                    }}
+                                  >
+                                    {this.renderEpicData('epicName')}
+                                  </span>
+                                </Tooltip> : null
+                              }
                             </p>
                           </div>
                         </div>

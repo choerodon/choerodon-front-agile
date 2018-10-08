@@ -610,12 +610,11 @@ class SprintReport extends Component {
                         }}
                         role="none"
                         onClick={() => {
-                          console.log(`paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}`);
                           this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题&paramUrl=reporthost/sprintreport`);
                         }}
                       >
                         {'在“问题管理中”查看'}
-                        <Icon style={{ fontSize: 13 }} type="open_in_new" />
+                        <Icon style={{ fontSize: 13, verticalAlign: -2 }} type="open_in_new" />
                       </p>
                     </div>
                   </div>

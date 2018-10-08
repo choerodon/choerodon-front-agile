@@ -563,7 +563,7 @@ class VersionBurndown extends Component {
     let urlPush = `/agile/issue?type=${type}&id=${id}&name=${urlParams.name}&organizationId=${organizationId}`;
     if (JSON.stringify(item) !== '{}') {
       if (linkType === 'sprint') {
-        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reposthost/versionBurnDown`;
+        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
       }
       if (linkType === 'version') {
         urlPush += `&paramType=version&paramId=${item.versionId}&paramName=${item.name || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
@@ -710,6 +710,7 @@ class VersionBurndown extends Component {
                             onClick={this.handleLinkToIssue.bind(this, 'sprint', item)}
                           >
                             {'在“问题管理中”查看'}
+                            <Icon style={{ fontSize: 13 }} type="open_in_new" />
                           </span>
                         </p>
                         <Table

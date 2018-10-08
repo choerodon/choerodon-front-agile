@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Modal, Form, Radio, Select, DatePicker, Icon } from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, 
+} from 'choerodon-front-boot';
+import {
+  Modal, Form, Radio, Select, DatePicker, Icon, 
+} from 'choerodon-ui';
 import moment from 'moment';
 import { withRouter } from 'react-router-dom';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -18,6 +22,7 @@ class PublicRelease extends Component {
     super(props);
     this.state = {};
   }
+
   handlePublic(e) {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
@@ -40,11 +45,13 @@ class PublicRelease extends Component {
       }
     });
   }
+
   goIssue() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=版本${ReleaseStore.getVersionDetail.name}中的问题&paramStatus=todo&paramUrl=release`);
+    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=版本${ReleaseStore.getVersionDetail.name}中的问题&paramStatus=todo,doing&paramUrl=release`);
   }
+
   renderRadioDisabled() {
     if (ReleaseStore.getPublicVersionDetail.versionNames) {
       if (ReleaseStore.getPublicVersionDetail.versionNames.length > 0) {
@@ -53,6 +60,7 @@ class PublicRelease extends Component {
     }
     return true;
   }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -77,14 +85,18 @@ class PublicRelease extends Component {
               <div>
                 {
                   ReleaseStore.getPublicVersionDetail.fixIssueCount ? (
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ display: 'flex' }}>
                       <Icon type="error" style={{ color: 'red' }} />
-                    还有
                       <span 
                         style={{ color: '#3F51B5', cursor: 'pointer' }}
                         role="none"
                         onClick={this.goIssue.bind(this)}
-                      >{ReleaseStore.getPublicVersionDetail.fixIssueCount} 这个版本仍然没有解决的问题。</span>
+                      >
+                        {'这个版本还有'}
+                        {ReleaseStore.getPublicVersionDetail.fixIssueCount}
+                        {' '}
+                        {'个没有解决的问题。'}
+                      </span>
                     </div>
                   ) : ''
                 }
@@ -103,14 +115,14 @@ class PublicRelease extends Component {
                               label="未解决的问题"
                             >
                               <Radio style={{ display: 'block', height: 20, marginTop: 10 }} value={1}>
-                    忽略并继续发布
+                                {'忽略并继续发布'}
                               </Radio>
                               <Radio
                                 style={{ display: 'block', height: 20, marginTop: 10 }} 
                                 value={2}
                                 disabled={this.renderRadioDisabled()}
                               >
-                    移动问题到版本
+                                {'移动问题到版本'}
                               </Radio>
                             </RadioGroup>,
                           )}
@@ -118,8 +130,8 @@ class PublicRelease extends Component {
                         <FormItem>
                           {getFieldDecorator('moveVersion', {
                             initialValue: 
-                            ReleaseStore.getPublicVersionDetail.versionNames.length > 0 ?
-                              ReleaseStore.getPublicVersionDetail.versionNames[0].versionId 
+                            ReleaseStore.getPublicVersionDetail.versionNames.length > 0
+                              ? ReleaseStore.getPublicVersionDetail.versionNames[0].versionId 
                               : undefined,
                             rules: [{
                               required: this.props.form.getFieldValue('chose') === 2,
