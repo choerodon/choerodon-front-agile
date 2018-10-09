@@ -57,7 +57,7 @@
         sort: 10
         permission:
           - 'agile-service.quick-filter.create'
-    - "messagenotification":
+    - "messageNotification":
         icon: notifications
         Routes: /agile/messageNotification
         sort: 11
