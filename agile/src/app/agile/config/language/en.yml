@@ -11,3 +11,4 @@
 'agile.issuelink': issueLink
 'agile.userStoryMap': userStoryMap
 'agile.iterationBoard': iterationBoard
+'agile.messageNotification': messageNotification
