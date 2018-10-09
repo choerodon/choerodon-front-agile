@@ -22,7 +22,7 @@ const USERMAPINDEX = asyncRouter(() => import('./project/userMap'));
 const INERATIONBOARDINDEX = asyncRouter(() => import('./project/IterationBoard'));
 const REPORTBOARD = asyncRouter(() => import('./project/ReportBoard'));
 
-const NOTIFICATIONsCHEME = asyncRouter(() => import('./project/NotificationScheme')); 
+const MESSAGENOTIFICATION = asyncRouter(() => import('./project/MessageNotification')); 
 class AGILEIndex extends React.Component {
   render() {
     const { match } = this.props;
@@ -57,7 +57,7 @@ class AGILEIndex extends React.Component {
 
           <Route path={`${match.url}/reportBoard`} component={REPORTBOARD} />
 
-          <Route path={`${match.url}/notificationScheme`} component={NOTIFICATIONsCHEME} />
+          <Route path={`${match.url}/messageNotification`} component={MESSAGENOTIFICATION} />
 
           <Route path="*" component={nomatch} />
         </Switch>

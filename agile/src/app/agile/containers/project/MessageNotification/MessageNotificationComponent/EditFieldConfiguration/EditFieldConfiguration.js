@@ -50,15 +50,15 @@ class EditFieldConfiguration extends Component {
       dataSource: [{
         key: 'create',
         event: '问题已创建',
-        notificationType: notificationTypes.createType,
+        notificationType: notificationTypes[0].createType,
       }, {
         key: 'distribution',
         event: '问题已被分配',
-        notificationType: notificationTypes.distributionType,
+        notificationType: notificationTypes[1].distributionType,
       }, {
         key: 'solved',
         event: '问题已解决',
-        notificationType: notificationTypes.solvedType,
+        notificationType: notificationTypes[2].solvedType,
       }],
     });
   }
@@ -69,23 +69,36 @@ class EditFieldConfiguration extends Component {
         title: '事件',
         dataIndex: 'event',
         key: 'event',
+        width: '30%',
       },
       {
         title: '通知类型',
         dataIndex: 'notificationType',
         key: 'notificationType',
-        render: (record, text) => {
-          console.log(record, text);
-          return (record && record.length > 0 ? (
-            <ul>
-              {
+        width: '62%',
+        render: (record, text) => (record && record.length > 0 ? (
+          <ul className="notificationTypeList">
+            {
                 record.map(item => (
                   <li>{item}</li>
                 ))
              }
-            </ul>
-          ) : '-');
-        },
+          </ul>
+        ) : '-'),
+      },
+      {
+        render: (record, text) => (
+          <Icon 
+            type="mode_edit"
+            onClick={() => {
+              const { history } = this.props;
+              const { 
+                type, id, name, organizationId, 
+              } = AppState.currentMenuType;
+              history.push(`/agile/messageNotification/editnotificationtype?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}&event=${text.key}`);
+            }}
+          />
+        ),
       },
     ];
     return columns;
@@ -96,21 +109,20 @@ class EditFieldConfiguration extends Component {
     return (
       <Page>
         <Header
-         title="编辑字段配置"
-         des="测试新建通知方案"
-       />
+          title="消息通知"
+        />
         <Content 
-         className="c7n-editFieldConfiguration" 
-         title="测试新建通知方案"
-         description="测试新建通知方案描述描述描述描述描述描述描述描述描述描述描述描述描述"
-       >
-         <Table
-           dataSource={dataSource}
-           columns={this.getColumn()}
+          className="c7n-editFieldConfiguration" 
+        >
+          <Table
+            dataSource={dataSource}
+            columns={this.getColumn()}
             // loading={loading}
-           rowKey={record => record.key}
-         />
-       </Content>
+            rowKey={record => record.key}
+            pagination={false}
+            filterBar={false}
+          />
+        </Content>
       </Page>
     );
   }
