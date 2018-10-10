@@ -6,7 +6,8 @@ export function loadComponents(componentId) {
   if (componentId) {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component?componentId=${componentId}&no_issue_test=true`);
   }
-  return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component?no_issue_test=true`);
+  // return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component?no_issue_test=true`);
+  return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/component?no_issue_test=true`);
 }
 
 export function createComponent(obj) {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import {
-  Page, Header, Content, stores, Permission, 
+  Page, Header, Content, stores, Permission, axios,
 } from 'choerodon-front-boot';
 import {
   Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip, 
@@ -17,53 +17,54 @@ class EditFieldConfiguration extends Component {
     super(props);
     this.state = {
       loading: true,
-      notificationTypes: [
-        {
-          createType: [
-            '当前处理人',
-            '报告人',
-            '项目管理员',
-            '用户:王嘉嘉-jiajia.wang@google.com，林大力-dali.lin@google.com，董冬冬-dongdong.dong@google.com',
-            '用户角色:开发人员',
-          ],
-        },
-        {
-          distributionType: [
-            '当前处理人',
-            '报告人',
-            '项目管理员',
-          ],
-        },
-        {
-          solvedType: [
-  
-          ],
-        },
-      ],
+      users: [[], [], []],
       dataSource: [],
     };
   }
 
   componentDidMount() {
-    const { notificationTypes } = this.state;
-    this.setState({
-      dataSource: [{
-        key: 'create',
-        event: '问题已创建',
-        notificationType: notificationTypes[0].createType,
-      }, {
-        key: 'distribution',
-        event: '问题已被分配',
-        notificationType: notificationTypes[1].distributionType,
-      }, {
-        key: 'solved',
-        event: '问题已解决',
-        notificationType: notificationTypes[2].solvedType,
-      }],
-    });
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`)
+      .then((res) => {
+        const createType = [...(res.filter(item => item.event === 'issue_created' && item.enable === true).map(o => o.noticeName))];
+        const distributionType = [...(res.filter(item => item.event === 'issue_assigneed' && item.enable === true).map(o => o.noticeName))];
+        const solvedType = [...(res.filter(item => item.event === 'issue_solved' && item.enable === true).map(o => o.noticeName))];
+        const createUser = res.filter(item => item.event === 'issue_created' && item.noticeName === '用户')[0];
+        const distributionUser = res.filter(item => item.event === 'issue_assigneed' && item.noticeName === '用户')[0];
+        const solvedUser = res.filter(item => item.event === 'issue_solved' && item.noticeName === '用户')[0];
+        this.setState({
+          loading: false,
+          users: [
+            createUser && createUser.user && createUser.user !== 'null' ? createUser.user.split('，') : [],
+            distributionUser && distributionUser.user && distributionUser.user !== 'null' ? distributionUser.user.split('，') : [],
+            solvedUser && solvedUser.user && solvedUser.user !== 'null' ? solvedUser.user.split('，') : [],
+          ],
+          dataSource: [{
+            key: 'issue_created',
+            event: '问题已创建',
+            notificationType: createType,
+          }, {
+            key: 'issue_assigneed',
+            event: '问题已被分配',
+            notificationType: distributionType,
+          }, {
+            key: 'issue_solved',
+            event: '问题已解决',
+            notificationType: solvedType,
+          }],
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          // roleOptionsLoading: false,
+          loading: false,
+        });
+        Choerodon.prompt('获取信息失败');
+      });
   }
 
   getColumn() {
+    const { users } = this.state;
+    // console.log(users);
     const columns = [
       {
         title: '事件',
@@ -76,18 +77,28 @@ class EditFieldConfiguration extends Component {
         dataIndex: 'notificationType',
         key: 'notificationType',
         width: '62%',
-        render: (record, text) => (record && record.length > 0 ? (
-          <ul className="notificationTypeList">
-            {
-                record.map(item => (
-                  <li>{item}</li>
-                ))
-             }
-          </ul>
-        ) : '-'),
+        render: (text, record, index) => (
+          (text && text.length > 0 ? (
+            <ul className="notificationTypeList">
+              {
+                      text.map((item) => {
+                        if (item !== '用户') {
+                          return (
+                            <li>{item}</li>
+                          );
+                        } else if (item === '用户') {
+                          return (<li>{`用户: ${users && users.length && users[index].length > 0 ? users[index].join(', ') : '-'}`}</li>);
+                          // return (<li>{`用户:${users && users.length && users[index].length > 0}`}</li>);
+                        }
+                      })
+                   }
+            </ul>
+          ) : '-')
+        )
+        ,
       },
       {
-        render: (record, text) => (
+        render: (text, record, index) => (
           <Icon 
             type="mode_edit"
             onClick={() => {
@@ -117,10 +128,10 @@ class EditFieldConfiguration extends Component {
           <Table
             dataSource={dataSource}
             columns={this.getColumn()}
-            // loading={loading}
             rowKey={record => record.key}
             pagination={false}
             filterBar={false}
+            loading={loading}
           />
         </Content>
       </Page>
