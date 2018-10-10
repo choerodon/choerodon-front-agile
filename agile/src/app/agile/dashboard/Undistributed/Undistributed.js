@@ -104,7 +104,7 @@ class Undistributed extends Component {
           <a
             role="none"
             onClick={() => {
-              history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+              history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
               return false;
             }}
           >

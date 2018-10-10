@@ -193,7 +193,7 @@ class ReleaseDetail extends Component {
             role="none"
             onClick={() => {
               const { history } = this.props;
-              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${ReleaseStore.getVersionDetail.name}下的问题&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
+              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${encodeURIComponent(`${ReleaseStore.getVersionDetail.name}下的问题`)}&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
             }}
           >
             {'在“问题管理中”查看'}
@@ -390,7 +390,7 @@ class ReleaseDetail extends Component {
               </div>
             </Tooltip>
  )}
-          backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           
           <div style={{
@@ -442,7 +442,7 @@ class ReleaseDetail extends Component {
             }}
             onClick={() => {
               const { history } = this.props;
-              history.push(`/agile/release/logs/${this.props.match.params.id}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+              history.push(`/agile/release/logs/${this.props.match.params.id}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
             }}
           >
             <Icon type="find_in_page" />

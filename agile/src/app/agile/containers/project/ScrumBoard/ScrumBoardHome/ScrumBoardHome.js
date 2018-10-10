@@ -983,7 +983,7 @@ class ScrumBoardHome extends Component {
                     onClick={() => {
                       const { history } = this.props;
                       const urlParams = AppState.currentMenuType;
-                      history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&boardId=${ScrumBoardStore.getSelectedBoard}`);
+                      history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&boardId=${ScrumBoardStore.getSelectedBoard}`);
                     }}
                   >
                     <Icon type="settings icon" />

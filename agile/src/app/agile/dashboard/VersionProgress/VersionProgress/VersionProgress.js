@@ -189,7 +189,7 @@ class VersionProgress extends Component {
         <DashBoardNavBar>
           <a 
             role="none"
-            onClick={() => history.push(`/agile/release?type=${type}&id=${id}&name=${name}&organizationId=${organizationId}`)}
+            onClick={() => history.push(`/agile/release?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}`)}
           >
             {'转至发布版本'}
           </a>

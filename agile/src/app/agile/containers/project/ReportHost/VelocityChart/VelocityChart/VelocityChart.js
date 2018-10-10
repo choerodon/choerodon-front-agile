@@ -316,7 +316,7 @@ class VelocityChart extends Component {
         <Header
           title="迭代速度图"
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${
-            urlParams.name
+            encodeURIComponent(urlParams.name)
           }&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart history={this.props.history} current="velocityChart" />

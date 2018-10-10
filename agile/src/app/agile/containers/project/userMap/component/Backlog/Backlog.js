@@ -272,7 +272,7 @@ class Backlog extends Component {
                   const urlParams = AppState.currentMenuType;
                   history.push(
                     `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
-                      urlParams.name
+                      encodeURIComponent(urlParams.name)
                       }&organizationId=${urlParams.organizationId}&paramName=${
                       issue.issueNum
                       }&paramIssueId=${issue.issueId}&paramUrl=usermap`,
