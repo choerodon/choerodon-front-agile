@@ -192,7 +192,7 @@ class EpicCard extends Component {
                   onClick={() => {
                     const { history } = this.props;
                     const urlParams = AppState.currentMenuType;
-                    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${epic.issueNum}&paramIssueId=${epic.issueId}&paramUrl=usermap`);
+                    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${epic.issueNum}&paramIssueId=${epic.issueId}&paramUrl=usermap`);
                   }}
                 >
                   {epic.issueNum}

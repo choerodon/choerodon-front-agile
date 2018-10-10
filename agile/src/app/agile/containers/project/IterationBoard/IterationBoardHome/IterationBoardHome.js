@@ -130,7 +130,7 @@ class IterationBoardHome extends Component {
             className="leftBtn2"
             funcType="flat"
             onClick={() => {
-              history.push(`/agile/scrumboard?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`);
+              history.push(`/agile/scrumboard?type=project&id=${AppState.currentMenuType.id}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
             }}
           >
             <span>切换至看板</span>

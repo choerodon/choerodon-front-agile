@@ -110,7 +110,7 @@ class ReleaseLogs extends Component {
                     <a
                       role="none"
                       onClick={() => {
-                        this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}&paramUrl=release/logs/${this.props.match.params.id}`);
+                        this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}&paramUrl=release/logs/${this.props.match.params.id}`);
                         return false;
                       }}
                     >
@@ -139,7 +139,7 @@ class ReleaseLogs extends Component {
       <Page>
         <Header 
           title="版本日志"
-          backPath={`/agile/release/detail/${versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/release/detail/${versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           {/* <Button 
             funcType="flat" 

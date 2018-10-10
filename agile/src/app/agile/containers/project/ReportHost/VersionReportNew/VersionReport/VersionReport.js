@@ -467,7 +467,7 @@ class EpicReport extends Component {
               onClick={() => {
                 const { history } = this.props;
                 const urlParams = AppState.currentMenuType;
-                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
+                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
               }}
             >
               {issueNum} 
@@ -572,7 +572,7 @@ class EpicReport extends Component {
       <Page className="c7n-versionReport">
         <Header 
           title="版本报告"
-          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}
@@ -630,7 +630,7 @@ class EpicReport extends Component {
                     }}
                     role="none"
                     onClick={() => {
-                      this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
+                      this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
                     }}
                   >
 
@@ -687,7 +687,7 @@ class EpicReport extends Component {
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-                        history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+                        history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
 

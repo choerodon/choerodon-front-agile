@@ -1444,7 +1444,7 @@ class CreateSprint extends Component {
                           role="none"
                           onClick={() => {
                             const backUrl = this.props.backUrl || 'backlog';
-                            this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${this.state.origin.issueNum}&paramIssueId=${this.state.origin.issueId}&paramUrl=${backUrl}`);
+                            this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${this.state.origin.issueNum}&paramIssueId=${this.state.origin.issueId}&paramUrl=${backUrl}`);
                             return false;
                           }}
                         >

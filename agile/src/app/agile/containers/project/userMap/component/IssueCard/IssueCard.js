@@ -233,7 +233,7 @@ class IssueCard extends Component {
                     role="none"
                     onClick={() => {
                       const urlParams = AppState.currentMenuType;
-                      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${issueId}&paramUrl=usermap`);
+                      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${issueId}&paramUrl=usermap`);
                     }}
                   >
                     {issueNum}

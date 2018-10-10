@@ -435,7 +435,7 @@ class EpicReport extends Component {
               onClick={() => {
                 const { history } = this.props;
                 const urlParams = AppState.currentMenuType;
-                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicReport`);
+                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicReport`);
               }}
             >
               {issueNum} 
@@ -540,7 +540,7 @@ class EpicReport extends Component {
       <Page className="c7n-epicReport">
         <Header 
           title="史诗报告"
-          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}
@@ -663,7 +663,7 @@ class EpicReport extends Component {
                               }}
                               role="none"
                               onClick={() => {
-                                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
+                                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
                               }}
                             >
 
@@ -713,7 +713,7 @@ class EpicReport extends Component {
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-      history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+      history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
     }}
                     >
 
@@ -726,7 +726,7 @@ class EpicReport extends Component {
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
     }}
                     >
 

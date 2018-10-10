@@ -480,7 +480,7 @@ class VersionReport extends Component {
         onClick={() => {
           const { history } = this.props;
           const urlParams = AppState.currentMenuType;
-          history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramName=${text}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
+          history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${text}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
         }}
       >{text}</span>
 ),
@@ -595,7 +595,7 @@ class VersionReport extends Component {
   goIssues() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${this.state.chosenVersion}&paramName=版本${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}中的问题&paramUrl=reporthost/versionReport`);
+    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${this.state.chosenVersion}&paramName=版本${VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}中的问题&paramUrl=reporthost/versionReport`);
   }
 
   render() {
@@ -606,7 +606,7 @@ class VersionReport extends Component {
       <Page>
         <Header
           title="版本报告"
-          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`}
+          backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
             history={this.props.history}

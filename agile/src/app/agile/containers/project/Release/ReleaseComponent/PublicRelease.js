@@ -49,7 +49,7 @@ class PublicRelease extends Component {
   goIssue() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=版本${ReleaseStore.getVersionDetail.name}中的问题&paramStatus=todo,doing&paramUrl=release`);
+    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${encodeURIComponent(`版本${ReleaseStore.getVersionDetail.name}中的问题`)}&paramStatus=todo,doing&paramUrl=release`);
   }
 
   renderRadioDisabled() {
