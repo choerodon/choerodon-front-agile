@@ -178,8 +178,13 @@ class SprintItem extends Component {
           },
           // createIssueValue: '',
           loading: false,
+          selected: {
+            issueIds: [res.issueId],
+          },
         });
         this.props.refresh();
+        this.props.store.setSelectIssue([res.issueId]);
+        this.props.store.setClickIssueDetail(res);
       }).catch((error) => {
         this.setState({
           loading: false,
