@@ -62,7 +62,7 @@
         Routes: /agile/messageNotification
         sort: 11
         permission:
-          - 'agile-service.quick-filter.create'
+          - 'agile-service.notice.queryByProjectId'
     - "userStoryMap":
         icon: usermap
         Routes: /agile/usermap

@@ -34,9 +34,9 @@ class EditFieldConfiguration extends Component {
         this.setState({
           loading: false,
           users: [
-            createUser && createUser.user && createUser.user !== 'null' ? createUser.user.split('，') : [],
-            distributionUser && distributionUser.user && distributionUser.user !== 'null' ? distributionUser.user.split('，') : [],
-            solvedUser && solvedUser.user && solvedUser.user !== 'null' ? solvedUser.user.split('，') : [],
+            createUser && createUser.user && createUser.user !== 'null' ? createUser.idWithNameDTOList : [],
+            distributionUser && distributionUser.user && distributionUser.user !== 'null' ? distributionUser.idWithNameDTOList : [],
+            solvedUser && solvedUser.user && solvedUser.user !== 'null' ? solvedUser.idWithNameDTOList : [],
           ],
           dataSource: [{
             key: 'issue_created',
@@ -81,13 +81,18 @@ class EditFieldConfiguration extends Component {
           (text && text.length > 0 ? (
             <ul className="notificationTypeList">
               {
-                      text.map((item) => {
+                      text.slice(0, 20).map((item) => {
+                        // console.log(users);
                         if (item !== '用户') {
                           return (
                             <li>{item}</li>
                           );
                         } else if (item === '用户') {
-                          return (<li>{`用户: ${users && users.length && users[index].length > 0 ? users[index].join(', ') : '-'}`}</li>);
+                          return (
+                            <li>
+                              {`用户: ${users && users.length && users[index].length > 0 ? users[index].map(o => o.name).join(', ') : '-'}`}
+                            </li>
+                          );
                           // return (<li>{`用户:${users && users.length && users[index].length > 0}`}</li>);
                         }
                       })
