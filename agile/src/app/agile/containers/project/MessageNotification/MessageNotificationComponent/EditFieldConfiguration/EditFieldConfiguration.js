@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import {
   Page, Header, Content, stores, Permission, axios,
@@ -55,9 +55,8 @@ class EditFieldConfiguration extends Component {
           }],
         });
       })
-      .catch((error) => {
+      .catch(() => {
         this.setState({
-          // roleOptionsLoading: false,
           loading: false,
         });
         Choerodon.prompt('获取信息失败');
@@ -66,7 +65,6 @@ class EditFieldConfiguration extends Component {
 
   getColumn() {
     const { users } = this.state;
-    // console.log(users);
     const columns = [
       {
         title: '事件',
@@ -84,7 +82,6 @@ class EditFieldConfiguration extends Component {
             <ul className="notificationTypeList">
               {
                       text.slice(0, 20).map((item) => {
-                        // console.log(users);
                         if (item !== '用户') {
                           return (
                             <li>{item}</li>
@@ -95,7 +92,6 @@ class EditFieldConfiguration extends Component {
                               {`用户: ${users && users.length && users[index].length > 0 ? users[index].map(o => o.name).join(', ') : '-'}`}
                             </li>
                           );
-                          // return (<li>{`用户:${users && users.length && users[index].length > 0}`}</li>);
                         }
                       })
                    }
@@ -105,7 +101,7 @@ class EditFieldConfiguration extends Component {
         ,
       },
       {
-        render: (text, record, index) => (
+        render: text => (
           <Permission type={type} projectId={id} organizationId={organizationId} service={['agile-service.notice.updateNotice']}>
             <Icon 
               type="mode_edit"
