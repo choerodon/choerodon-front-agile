@@ -5,12 +5,14 @@ import {
   Page, Header, Content, stores, Permission, axios,
 } from 'choerodon-front-boot';
 import {
-  Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip, 
+  Table, Icon, 
 } from 'choerodon-ui';
 import './EditFieldConfiguration.scss';
 
 const { AppState } = stores;
-
+const { 
+  type, id, name, organizationId, 
+} = AppState.currentMenuType;
 @observer
 class EditFieldConfiguration extends Component {
   constructor(props) {
@@ -104,16 +106,15 @@ class EditFieldConfiguration extends Component {
       },
       {
         render: (text, record, index) => (
-          <Icon 
-            type="mode_edit"
-            onClick={() => {
-              const { history } = this.props;
-              const { 
-                type, id, name, organizationId, 
-              } = AppState.currentMenuType;
-              history.push(`/agile/messageNotification/editnotificationtype?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}&event=${text.key}`);
-            }}
-          />
+          <Permission type={type} projectId={id} organizationId={organizationId} service={['agile-service.notice.updateNotice']}>
+            <Icon 
+              type="mode_edit"
+              onClick={() => {
+                const { history } = this.props;
+                history.push(`/agile/messageNotification/editnotificationtype?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}&event=${text.key}`);
+              }}
+            />
+          </Permission>
         ),
       },
     ];
@@ -121,25 +122,27 @@ class EditFieldConfiguration extends Component {
   }
 
   render() {
-    const { notificationTypes, loading, dataSource } = this.state;
+    const { loading, dataSource } = this.state;
     return (
-      <Page>
-        <Header
-          title="消息通知"
-        />
-        <Content 
-          className="c7n-editFieldConfiguration" 
-        >
-          <Table
-            dataSource={dataSource}
-            columns={this.getColumn()}
-            rowKey={record => record.key}
-            pagination={false}
-            filterBar={false}
-            loading={loading}
+      <Permission type={type} projectId={id} organizationId={organizationId} service={['agile-service.notice.queryByProjectId']}>
+        <Page>
+          <Header
+            title="消息通知"
           />
-        </Content>
-      </Page>
+          <Content 
+            className="c7n-editFieldConfiguration"
+          >
+            <Table
+              dataSource={dataSource}
+              columns={this.getColumn()}
+              rowKey={record => record.key}
+              pagination={false}
+              filterBar={false}
+              loading={loading}
+            />
+          </Content>
+        </Page>
+      </Permission>
     );
   }
 }
