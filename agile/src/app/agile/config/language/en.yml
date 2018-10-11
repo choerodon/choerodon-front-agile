@@ -9,6 +9,6 @@
 'agile.projectsetting': projectSetting
 'agile.fastsearch': fastSearch
 'agile.issuelink': issueLink
-'agile.userStoryMap': userStoryMap
+'agile.userStoryMap': storyMap
 'agile.iterationBoard': iterationBoard
 'agile.messageNotification': messageNotification

@@ -49,7 +49,7 @@ class EditNotificationType extends Component {
           userOptions: [...users.content, ...noticeTypeData[3].idWithNameDTOList.filter(item => !users.content.find(o => o.id === item.userId))],
           updateData: _.map(noticeTypeData, (item) => {
             const pickItem = _.pick(item, ['id', 'event', 'noticeType', 'noticeName', 'enable', 'user', 'objectVersionNumber']);
-            console.log(`pickItem: ${JSON.stringify(pickItem)}`);
+            // console.log(`pickItem: ${JSON.stringify(pickItem)}`);
             return ({ ...pickItem, objectVersionNumber: pickItem.id ? pickItem.objectVersionNumber : null });
           }),
           selectedValue: noticeTypeUsers && noticeTypeUsers.user && noticeTypeData.filter(item => item.noticeType === 'users')[0].user.split(',').map(item => Number(item)),
@@ -90,6 +90,7 @@ class EditNotificationType extends Component {
     const {
       userOptions, userOptionsLoading, checkeds, selectedValue, idWithNameDTOList,
     } = this.state;
+    console.log(`userOptions: ${JSON.stringify(userOptions)}`);
     const columns = [
       {
         dataIndex: 'checked',
@@ -113,7 +114,7 @@ class EditNotificationType extends Component {
         render: (text, record, index) => (index > 2 ? (
           <Select
             style={{ width: 520 }}
-            onFocus={this.getUserOptions}
+            // onFocus={this.getUserOptions}
             value={selectedValue}
             // value={}
             onChange={value => this.handleSelectChange(value, index)}
@@ -125,7 +126,7 @@ class EditNotificationType extends Component {
                 .then((res) => {
                   this.setState({
                     userOptionsLoading: false,
-                    userOptions: res.content,
+                    // userOptions: res.content,
                   });
                 })
                 .catch((e) => {
@@ -138,6 +139,7 @@ class EditNotificationType extends Component {
             loading={userOptionsLoading}
             filter
             allowClear
+            autoFocus
           >
             {
               // userOptions && _.map(userOptions, item => <Option key={item.id} value={item.id}>{`${item.loginName} ${item.realName}`}</Option>)
@@ -163,7 +165,7 @@ class EditNotificationType extends Component {
           userOptionsLoading: false,
           // userOptions: res.content,
           // userOptions: [...res.content, ...userOptions],
-          userOptions: [...res.content, ...(_.filter(userOptions, item => item.userId))],
+          userOptions: [...res.content, ...(userOptions && _.filter(userOptions, item => item.userId))],
         });
       })
       .catch((error) => {
@@ -185,6 +187,30 @@ class EditNotificationType extends Component {
 
   handleSelectChange = (value, index) => {
     // console.log(value);
+    // const { userOptions, updateData } = this.state;
+    // console.log('filter:');
+    // console.log(...(userOptions && _.filter(userOptions, item => item.userId)));
+    // this.setState({
+    //   userOptionsLoading: true,
+    // });
+    // axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`)
+    //   .then((res) => {
+    //     this.setState({
+    //       userOptionsLoading: false,
+    //       // userOptions: res.content,
+    //       // userOptions: [...res.content, ...userOptions],
+    //       userOptions: [...res.content, ...(userOptions && _.filter(userOptions, item => item.userId))],
+    //       selectedValue: value,
+    //       updateData: _.map(updateData, (item, i) => (i === index ? { ...item, user: value.length > 0 ? value.join(',') : 'null' } : item)),
+    //     });
+    //   })
+    //   .catch((error) => {
+    //     this.setState({
+    //       userOptionsLoading: false,
+    //     });
+    //     Choerodon.prompt('获取用户信息失败');
+    //   });
+
     const { updateData } = this.state;
     this.setState({
       selectedValue: value,
