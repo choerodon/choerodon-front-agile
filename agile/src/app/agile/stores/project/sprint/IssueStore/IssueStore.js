@@ -25,6 +25,7 @@ class SprintCommonStore {
   @observable paramPriority = undefined;
   @observable paramIssueType = undefined;
   @observable paramIssueId = undefined;
+  @observable paramOpenIssueId = undefined;
   @observable paramUrl = undefined;
   @observable barFilters = undefined;
 
@@ -117,6 +118,10 @@ class SprintCommonStore {
     this.paramIssueId = data;
   }
 
+  @action setParamOpenIssueId(data) {
+    this.paramOpenIssueId = data;
+  }
+
   @action setParamUrl(data) {
     this.paramUrl = data;
   }
@@ -130,7 +135,7 @@ class SprintCommonStore {
     if (!this.paramUrl) {
       return undefined;
     } else if (this.paramUrl === 'backlog') {
-      return `/agile/${this.paramUrl}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramIssueId=${this.paramIssueId}`;
+      return `/agile/${this.paramUrl}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramIssueId=${this.paramIssueId}&paramOpenIssueId=${this.paramOpenIssueId}`;
     } else {
       return `/agile/${this.paramUrl}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     }

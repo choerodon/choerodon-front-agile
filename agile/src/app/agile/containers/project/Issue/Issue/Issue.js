@@ -49,7 +49,7 @@ class Issue extends Component {
     const Request = this.GetRequest(this.props.location.search);
     const {
       paramType, paramId, paramName, paramStatus,
-      paramPriority, paramIssueType, paramIssueId, paramUrl, 
+      paramPriority, paramIssueType, paramIssueId, paramUrl, paramOpenIssueId
     } = Request;
     // console.log(paramOpenIssueId);
     IssueStore.setParamId(paramId);
@@ -60,6 +60,7 @@ class Issue extends Component {
     IssueStore.setParamIssueType(paramIssueType);
     IssueStore.setParamIssueId(paramIssueId);
     IssueStore.setParamUrl(paramUrl);
+    IssueStore.setParamOpenIssueId(paramOpenIssueId);
     const arr = [];
     if (paramName) {
       arr.push(paramName);

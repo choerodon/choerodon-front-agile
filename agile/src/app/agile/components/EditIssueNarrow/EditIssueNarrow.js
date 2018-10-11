@@ -1051,6 +1051,8 @@ class CreateSprint extends Component {
                         {this.state.branchs.totalCommit || '0'}
 
 
+
+
 提交
 </span>
                     </div>
@@ -1093,6 +1095,8 @@ class CreateSprint extends Component {
                         }}
                       >
                         {this.state.branchs.totalMergeRequest}
+
+
 
 
 合并请求
@@ -1152,10 +1156,14 @@ class CreateSprint extends Component {
 
 
 
+
+
           登记工作日志
 </Menu.Item>
         <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue.deleteIssue']}>
           <Menu.Item key="1">
+
+
 
 
 
@@ -1168,6 +1176,8 @@ class CreateSprint extends Component {
 
 
 
+
+
               创建子任务
 </Menu.Item>
           )
@@ -1176,11 +1186,15 @@ class CreateSprint extends Component {
 
 
 
+
+
           复制问题
 </Menu.Item>
         {
           this.state.typeCode !== 'sub_task' && this.state.origin.subIssueDTOList && this.state.origin.subIssueDTOList.length === 0 && (
             <Menu.Item key="4">
+
+
 
 
 
@@ -1194,11 +1208,15 @@ class CreateSprint extends Component {
 
 
 
+
+
               转化为任务
 </Menu.Item>
           )
         }
         <Menu.Item key="6">
+
+
 
 
 
@@ -1208,11 +1226,15 @@ class CreateSprint extends Component {
 
 
 
+
+
           分配问题
 </Menu.Item>
         {
           this.state.typeCode === 'sub_task' && (
             <Menu.Item key="8">
+
+
 
 
 
@@ -1452,8 +1474,16 @@ class CreateSprint extends Component {
                             role="none"
                             style={{ color: 'rgb(63, 81, 181)', cursor: 'pointer' }}
                             onClick={() => {
-                              this.reloadIssue(this.state.parentIssueId);
-                            }}
+                              // this.reloadIssue(this.state.parentIssueId);
+                             
+                              // this.reloadIssue(this.state.parentIssueId);
+                              const {
+                                type, name, id, organizationId, 
+                              } = AppState.currentMenuType;
+                              const { history } = this.props; 
+                               history.push(`/agile/issue?type=${type}&id=${id}&name=${name}&organizationId=${organizationId}&paramName=${this.state.parentIssueNum}&paramIssueId=${this.state.parentIssueId}&paramOpenIssueId=${this.state.parentIssueId}`);
+                            }
+                            }
                           >
                             {this.state.parentIssueNum}
                           </span>
@@ -1511,7 +1541,7 @@ class CreateSprint extends Component {
                     readModeContent={(
                       <div className="c7n-summary">
                         {this.state.summary}
-                                            </div>
+                      </div>
 )}
                   >
                     {/* <Input
@@ -1597,7 +1627,7 @@ class CreateSprint extends Component {
                             readModeContent={(
                               <span>
                                 {this.state.storyPoints === undefined || this.state.storyPoints === null ? '无' : `${this.state.storyPoints} 点`}
-                                                            </span>
+                              </span>
 )}
                           >
                             {/* <Input
@@ -1641,7 +1671,7 @@ class CreateSprint extends Component {
                             readModeContent={(
                               <span>
                                 {this.state.remainingTime === undefined || this.state.remainingTime === null ? '无' : `${this.state.remainingTime} 小时`}
-                                                            </span>
+                              </span>
 )}
                           >
                             <NumericInput
@@ -1726,7 +1756,7 @@ class CreateSprint extends Component {
                                   </div>
                                 ) : '无'
                               }
-                            </div>
+                              </div>
 )}
                           >
                             <Select
@@ -1773,6 +1803,8 @@ class CreateSprint extends Component {
 
 
 
+
+
                             优先级：
 </span>
                         </div>
@@ -1810,7 +1842,7 @@ class CreateSprint extends Component {
                                   </div>
                                 ) : '无'
                               }
-                                                            </div>
+                              </div>
 )}
                           >
                             <Select
@@ -1871,6 +1903,8 @@ class CreateSprint extends Component {
 
 
 
+
+
                                 模块：
 </span>
                             </div>
@@ -1886,9 +1920,9 @@ class CreateSprint extends Component {
                                 readModeContent={(
                                   <div style={{ color: '#3f51b5' }}>
                                     <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
-    {this.transToArr(this.state.componentIssueRelDTOList, 'name')}
-  </p>
-                                                                    </div>
+                                      {this.transToArr(this.state.componentIssueRelDTOList, 'name')}
+                                    </p>
+                                  </div>
 )}
                               >
                                 <Select
@@ -1918,7 +1952,7 @@ class CreateSprint extends Component {
                                       value={component.name}
                                     >
                                       {component.name}
-                                                                        </Option>
+                                    </Option>
                                   ))}
                                 </Select>
                               </ReadAndEdit>
@@ -1930,6 +1964,8 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+
+
 
 
 
@@ -1973,7 +2009,7 @@ class CreateSprint extends Component {
                                   </div>
                                 ) : '无'
                               }
-                                                            </div>
+                              </div>
 )}
                           >
                             <Select
@@ -2003,7 +2039,7 @@ class CreateSprint extends Component {
                                   value={label.labelName}
                                 >
                                   {label.labelName}
-                                                                </Option>
+                                </Option>
                               ))}
                             </Select>
                           </ReadAndEdit>
@@ -2014,6 +2050,8 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
+
+
 
 
 
@@ -2043,7 +2081,7 @@ class CreateSprint extends Component {
                                       </div>
                                     )
                                   }
-                                                                    </div>
+                                  </div>
 )}
                               >
                                 {
@@ -2084,7 +2122,7 @@ class CreateSprint extends Component {
                                       value={version.name}
                                     >
                                       {version.name}
-                                                                        </Option>
+                                    </Option>
                                   ))}
                                 </Select>
                               </ReadAndEdit>
@@ -2096,6 +2134,8 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+
+
 
 
 
@@ -2125,7 +2165,7 @@ class CreateSprint extends Component {
                                   </div>
                                 )
                               }
-                                                            </div>
+                              </div>
 )}
                           >
                             {
@@ -2166,7 +2206,7 @@ class CreateSprint extends Component {
                                   value={version.name}
                                 >
                                   {version.name}
-                                                                </Option>
+                                </Option>
                               ))}
                             </Select>
                           </ReadAndEdit>
@@ -2177,6 +2217,8 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
+
+
 
 
 
@@ -2220,7 +2262,7 @@ class CreateSprint extends Component {
                                       </div>
                                     ) : '无'
                                   }
-                                                                    </div>
+                                  </div>
 )}
                               >
                                 <Select
@@ -2262,6 +2304,8 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+
+
 
 
 
@@ -2334,7 +2378,7 @@ class CreateSprint extends Component {
                                       </div>
                                     )
                                   }
-                                                                    </div>
+                                  </div>
 )}
                               >
                                 {
@@ -2410,6 +2454,8 @@ class CreateSprint extends Component {
 
 
 
+
+
                             时间跟踪：
 </span>
                         </div>
@@ -2428,8 +2474,12 @@ class CreateSprint extends Component {
                             {this.getWorkloads()}
 
 
+
+
 h/
 {this.getWorkloads() + (this.state.origin.remainingTime || 0)}
+
+
 
 
 h
@@ -2450,6 +2500,8 @@ h
 
 
 
+
+
                             登记工作
 </span>
                         </div>
@@ -2460,6 +2512,8 @@ h
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
+
+
 
 
 
@@ -2480,9 +2534,9 @@ h
                                 readModeContent={(
                                   <div>
                                     <p style={{ wordBreak: 'break-word', marginBottom: 0 }}>
-    {this.state.epicName}
-  </p>
-                                                                    </div>
+                                      {this.state.epicName}
+                                    </p>
+                                  </div>
 )}
                               >
                                 <TextArea
@@ -2508,6 +2562,8 @@ h
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-subtitle">
+
+
 
 
 
@@ -2562,7 +2618,7 @@ h
                                   />
                                 ) : '无'
                               }
-                                                            </div>
+                              </div>
 )}
                           >
                             <Select
@@ -2581,16 +2637,16 @@ h
                               {this.state.originUsers.map(user => (
                                 <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-    <UserHead
+                                    <UserHead
                                       user={{
-                                        id: user && user.id,
-                                        loginName: user && user.loginName,
-                                        realName: user && user.realName,
-                                        avatar: user && user.imageUrl,
-                                      }}
+        id: user && user.id,
+        loginName: user && user.loginName,
+        realName: user && user.realName,
+        avatar: user && user.imageUrl,
+      }}
                                     />
-  </div>
-                                                                </Option>
+                                  </div>
+                                </Option>
                               ))}
                             </Select>
                           </ReadAndEdit>
@@ -2618,6 +2674,8 @@ h
                               });
                             }}
                           >
+
+
 
 
 
@@ -2672,7 +2730,7 @@ h
                                   />
                                 ) : '无'
                               }
-                                                            </div>
+                              </div>
 )}
                           >
                             <Select
@@ -2691,16 +2749,16 @@ h
                               {this.state.originUsers.map(user => (
                                 <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-    <UserHead
+                                    <UserHead
                                       user={{
-                                        id: user && user.id,
-                                        loginName: user && user.loginName,
-                                        realName: user && user.realName,
-                                        avatar: user && user.imageUrl,
-                                      }}
+        id: user && user.id,
+        loginName: user && user.loginName,
+        realName: user && user.realName,
+        avatar: user && user.imageUrl,
+      }}
                                     />
-  </div>
-                                                                </Option>
+                                  </div>
+                                </Option>
                               ))}
                             </Select>
                           </ReadAndEdit>
@@ -2728,6 +2786,8 @@ h
                               });
                             }}
                           >
+
+
 
 
 

@@ -1569,7 +1569,10 @@ class CreateSprint extends Component {
                           role="none"
                           style={{ color: 'rgb(63, 81, 181)', cursor: 'pointer' }}
                           onClick={() => {
-                            this.reloadIssue(this.state.parentIssueId);
+                            // this.reloadIssue(this.state.parentIssueId);
+                            const { type, name, id, organizationId } = AppState.currentMenuType;
+                            const { history } = this.props; 
+                            history.push(`/agile/issue?type=${type}&id=${id}&name=${name}&organizationId=${organizationId}&paramName=${this.state.parentIssueNum}&paramIssueId=${this.state.parentIssueId}&paramOpenIssueId=${this.state.parentIssueId}`);
                           }}
                         >
                           {this.state.parentIssueNum}
