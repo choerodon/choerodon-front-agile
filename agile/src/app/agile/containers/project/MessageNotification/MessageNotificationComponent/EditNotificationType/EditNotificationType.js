@@ -126,7 +126,12 @@ class EditNotificationType extends Component {
                 .then((res) => {
                   this.setState({
                     userOptionsLoading: false,
-                    // userOptions: res.content,
+                    userOptions: res.content,
+                    // userOptions: [...res.content, ...(userOptions && _.filter(userOptions, item => item.userId))],
+
+                    // [...res.content, ...(userOptions && _.filter(userOptions, item => item.userId))]
+                  }, () => {
+                    // console.log(this.state.userOptions);
                   });
                 })
                 .catch((e) => {

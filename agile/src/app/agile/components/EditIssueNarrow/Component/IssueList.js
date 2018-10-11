@@ -37,10 +37,22 @@ class IssueList extends Component {
       });
   }
 
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
+  }
+
   componentDidMount() {
     const { location: { search } } = this.props;
-    const paramOpenIssueId = search.split('&')[search.split('&').length - 2].split('=')[0] === 'paramOpenIssueId' ? search.split('&')[search.split('&').length - 2].split('=')[1] : undefined;
-    const paramIssueId = search.split('&')[search.split('&').length - 3].split('=')[0] === 'paramIssueId' ? search.split('&')[search.split('&').length - 3].split('=')[1] : undefined;
+    const theRequest = this.GetRequest(search);
+    const { paramIssueId, paramOpenIssueId } = theRequest;
     this.setState({
       paramOpenIssueId,
     });

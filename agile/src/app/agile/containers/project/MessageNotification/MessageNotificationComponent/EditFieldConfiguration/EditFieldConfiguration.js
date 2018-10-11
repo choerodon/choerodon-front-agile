@@ -42,11 +42,11 @@ class EditFieldConfiguration extends Component {
           ],
           dataSource: [{
             key: 'issue_created',
-            event: '问题已创建',
+            event: '问题创建',
             notificationType: createType,
           }, {
             key: 'issue_assigneed',
-            event: '问题已被分配',
+            event: '问题分配',
             notificationType: distributionType,
           }, {
             key: 'issue_solved',
