@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import {
-  Page, Header, Content, stores, Permission, axios, Spin,
+  Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
-  Button, Tabs, Table, Popover, Form, Icon, Avatar, Tooltip, Checkbox, Select,
+  Button, Table, Checkbox, Select,
 } from 'choerodon-ui';
 import './EditNotificationType.scss';
 
@@ -32,7 +32,6 @@ class EditNotificationType extends Component {
 
   componentDidMount() {
     const { location: { search } } = this.props;
-    const { userOptions } = this.state;
     const noticeType = _.last(search.split('&')).split('=')[1];
     // axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`)
     axios.all([
@@ -91,8 +90,6 @@ class EditNotificationType extends Component {
     const {
       userOptions, userOptionsLoading, checkeds, selectedValue, idWithNameDTOList,
     } = this.state;
-    // console.log(userOptions.length);
-    // console.log(`userOptions： ${JSON.stringify(userOptions)}`);
     const columns = [
       {
         dataIndex: 'checked',
@@ -113,12 +110,10 @@ class EditNotificationType extends Component {
         width: '30%',  
       },
       {
-        // dataIndex: 'selections',
-        // key: 'selections',
         render: (text, record, index) => (index > 2 ? (
           <Select
             style={{ width: 520 }}
-            onClick={this.getUserOptions}
+            onFocus={this.getUserOptions}
             value={selectedValue}
             // value={}
             onChange={value => this.handleSelectChange(value, index)}
@@ -146,11 +141,8 @@ class EditNotificationType extends Component {
           >
             {
               // userOptions && _.map(userOptions, item => <Option key={item.id} value={item.id}>{`${item.loginName} ${item.realName}`}</Option>)
-              userOptions && _.map(userOptions, item => <Option key={item.id ? item.id : item.userId} value={item.id ? item.id : item.userId}>{item.loginName ? `${item.loginName} ${item.realName}` : item.name}</Option>)
+              userOptions && _.map(userOptions, item => <Option key={item.id ? item.id : item.userId} value={item.id ? item.id : item.userId}>{item.loginName ? `${item.loginName}${item.realName}` : item.name}</Option>)
             }
-            {/* {
-              specialIdWithName && specialIdWithName.length > 0 && _.map(specialIdWithName, item => <Option key={item.id} value={item.id}>{item.name}</Option>)
-            } */}
           </Select>
         ) : ''),
       },
@@ -160,8 +152,8 @@ class EditNotificationType extends Component {
 
   getUserOptions = () => {
     const { userOptions } = this.state;
-    // console.log('filter:');
-    // console.log(...(userOptions && _.filter(userOptions, item => item.userId)));
+    console.log('filter:');
+    console.log(...(userOptions && _.filter(userOptions, item => item.userId)));
     this.setState({
       userOptionsLoading: true,
     });
@@ -203,7 +195,7 @@ class EditNotificationType extends Component {
  handleSaveBtnClick = () => {
    const { history } = this.props;
    const { updateData } = this.state;
-    // console.log(`updata: ${JSON.stringify(updateData)}`);
+   // console.log(`updata: ${JSON.stringify(updateData)}`);
    axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`, updateData)
      .then((res) => {
        Choerodon.prompt('更新成功');
