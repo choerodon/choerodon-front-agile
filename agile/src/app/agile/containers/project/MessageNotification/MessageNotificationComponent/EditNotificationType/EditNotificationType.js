@@ -34,16 +34,26 @@ class EditNotificationType extends Component {
     const { location: { search } } = this.props;
     const { userOptions } = this.state;
     const noticeType = _.last(search.split('&')).split('=')[1];
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`)
-      .then((res) => {
-        const noticeTypeData = res.filter(item => item.event === noticeType);
-        // console.log(JSON.stringify(noticeTypeData));
+    // axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`)
+    axios.all([
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`),
+      axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`),
+    ])
+      .then(axios.spread((notice, users) => {
+        const noticeTypeData = notice.filter(item => item.event === noticeType);
         const noticeTypeUsers = noticeTypeData.filter(item => item.noticeType === 'users')[0];
+        // console.log(...noticeTypeData[3].idWithNameDTOList.filter(item => !users.content.find(o => o.id === item.userId)));
         this.setState({
           loading: false,
-          checkeds: noticeTypeData.map(item => item.enable),
-          updateData: _.map(noticeTypeData, item => ({ ...item, objectVersionNumber: item.id ? item.objectVersionNumber : null })),
-          selectedValue: noticeTypeUsers && noticeTypeUsers.user && noticeTypeData.filter(item => item.noticeType === 'users')[0].user.split(','),
+          // checkeds: noticeTypeData.map(item => item.enable),
+          checkeds: _.map(noticeTypeData, 'enable'),
+          userOptions: [...users.content, ...noticeTypeData[3].idWithNameDTOList.filter(item => !users.content.find(o => o.id === item.userId))],
+          updateData: _.map(noticeTypeData, (item) => {
+            const pickItem = _.pick(item, ['id', 'event', 'noticeType', 'noticeName', 'enable', 'user', 'objectVersionNumber']);
+            console.log(`pickItem: ${JSON.stringify(pickItem)}`);
+            return ({ ...pickItem, objectVersionNumber: pickItem.id ? pickItem.objectVersionNumber : null });
+          }),
+          selectedValue: noticeTypeUsers && noticeTypeUsers.user && noticeTypeData.filter(item => item.noticeType === 'users')[0].user.split(',').map(item => Number(item)),
           dataSource: [
             {
               key: 'currentProcess',
@@ -64,11 +74,10 @@ class EditNotificationType extends Component {
               key: 'user',
               checked: noticeTypeData[3].enable,
               typeName: '用户 (可多选)',
-              selections: userOptions,
             },
           ],
         });
-      })
+      }))
       .catch((error) => {
         this.setState({
           // roleOptionsLoading: false,
@@ -80,8 +89,10 @@ class EditNotificationType extends Component {
 
   getColumns() {
     const {
-      userOptions, userOptionsLoading, checkeds, selectedValue, 
+      userOptions, userOptionsLoading, checkeds, selectedValue, idWithNameDTOList,
     } = this.state;
+    // console.log(userOptions.length);
+    // console.log(`userOptions： ${JSON.stringify(userOptions)}`);
     const columns = [
       {
         dataIndex: 'checked',
@@ -102,14 +113,30 @@ class EditNotificationType extends Component {
         width: '30%',  
       },
       {
-        dataIndex: 'selections',
-        key: 'selections',
+        // dataIndex: 'selections',
+        // key: 'selections',
         render: (text, record, index) => (index > 2 ? (
           <Select
             style={{ width: 520 }}
-            onFocus={this.getUserOptions}
+            onClick={this.getUserOptions}
             value={selectedValue}
+            // value={}
             onChange={value => this.handleSelectChange(value, index)}
+            onFilterChange={(param) => {
+              this.setState({
+                userOptionsLoading: true,
+              });
+              axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?param=${param}`)
+                .then((res) => {
+                  this.setState({
+                    userOptionsLoading: false,
+                    userOptions: res.content,
+                  });
+                })
+                .catch((e) => {
+                  console.log(e);
+                });
+            }}
             mode="multiple"
             label="请选择"
             optionFilterProp="children"
@@ -118,8 +145,12 @@ class EditNotificationType extends Component {
             allowClear
           >
             {
-              userOptions && _.map(userOptions, item => <Option key={item.id} value={item.realName}>{item.realName}</Option>)
+              // userOptions && _.map(userOptions, item => <Option key={item.id} value={item.id}>{`${item.loginName} ${item.realName}`}</Option>)
+              userOptions && _.map(userOptions, item => <Option key={item.id ? item.id : item.userId} value={item.id ? item.id : item.userId}>{item.loginName ? `${item.loginName} ${item.realName}` : item.name}</Option>)
             }
+            {/* {
+              specialIdWithName && specialIdWithName.length > 0 && _.map(specialIdWithName, item => <Option key={item.id} value={item.id}>{item.name}</Option>)
+            } */}
           </Select>
         ) : ''),
       },
@@ -128,6 +159,9 @@ class EditNotificationType extends Component {
   }
 
   getUserOptions = () => {
+    const { userOptions } = this.state;
+    // console.log('filter:');
+    // console.log(...(userOptions && _.filter(userOptions, item => item.userId)));
     this.setState({
       userOptionsLoading: true,
     });
@@ -135,7 +169,9 @@ class EditNotificationType extends Component {
       .then((res) => {
         this.setState({
           userOptionsLoading: false,
-          userOptions: res.content,
+          // userOptions: res.content,
+          // userOptions: [...res.content, ...userOptions],
+          userOptions: [...res.content, ...(_.filter(userOptions, item => item.userId))],
         });
       })
       .catch((error) => {
@@ -146,12 +182,11 @@ class EditNotificationType extends Component {
       });
   }
 
-
   handleCheckboxChange = (e, index) => {
     const { checkeds, updateData } = this.state;
     this.setState({
-      checkeds: checkeds.map((item, i) => (i === index ? e.target.checked : item)),
-      updateData: updateData.map((item, i) => (i === index ? { ...item, enable: e.target.checked } : item)),
+      checkeds: _.map(checkeds, (item, i) => (i === index ? e.target.checked : item)),
+      updateData: _.map(updateData, (item, i) => (i === index ? { ...item, enable: e.target.checked } : item)),
     });
   }
 
@@ -161,14 +196,14 @@ class EditNotificationType extends Component {
     const { updateData } = this.state;
     this.setState({
       selectedValue: value,
-      updateData: updateData.map((item, i) => (i === index ? { ...item, user: value.join(',') } : item)),
+      updateData: _.map(updateData, (item, i) => (i === index ? { ...item, user: value.length > 0 ? value.join(',') : 'null' } : item)),
     });
   }
 
  handleSaveBtnClick = () => {
    const { history } = this.props;
    const { updateData } = this.state;
-   //  console.log(`updata: ${JSON.stringify(updateData)}`);
+    // console.log(`updata: ${JSON.stringify(updateData)}`);
    axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`, updateData)
      .then((res) => {
        Choerodon.prompt('更新成功');
