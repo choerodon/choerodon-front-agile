@@ -12,3 +12,6 @@
 'agile.userStoryMap': storyMap
 'agile.iterationBoard': iterationBoard
 'agile.messageNotification': messageNotification
+
+"rentsetting": "Organization Settings"
+"rentsetting.workCalendar": "Work Calendar"

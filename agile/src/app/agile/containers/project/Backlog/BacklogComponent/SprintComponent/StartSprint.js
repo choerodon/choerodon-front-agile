@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Form, Modal, Select, Input, DatePicker } from 'choerodon-ui';
+import { Form, Modal, Select, Input, DatePicker, Icon } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
+import WorkCalendar from './WorkCalendar';
 // import this.props.store from '../../../../../stores/project/backlog/this.props.store';
 
 const { Sidebar } = Modal;
@@ -19,6 +20,7 @@ class StartSprint extends Component {
     this.state = {
       startDate: null,
       endDate: null,
+      showCalendar: false,
     };
   }
   /**
@@ -47,9 +49,15 @@ class StartSprint extends Component {
         });
       }
     });
-  }
+  };
+
+  showWorkCalendar = () => {
+    this.setState({ showCalendar: !this.state.showCalendar });
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { showCalendar } = this.state;
     const data = this.props.data;
     const completeMessage = JSON.stringify(this.props.store.getOpenSprintDetail) === '{}' ? null : this.props.store.getOpenSprintDetail;
     return (
@@ -182,6 +190,18 @@ class StartSprint extends Component {
               )}
             </FormItem>
           </Form>
+          <div style={{ marginBottom: 20 }}>
+            <span style={{ marginRight: 20 }}>
+              {`此Sprint中有${12}个工作日`}
+            </span>
+            <Icon type="settings" style={{ verticalAlign: 'top' }} />
+            <a onClick={this.showWorkCalendar}>
+              设置当前冲刺工作日
+            </a>
+          </div>
+          {showCalendar ?
+            <WorkCalendar /> : null
+          }
         </Content>
       </Sidebar>
     );
