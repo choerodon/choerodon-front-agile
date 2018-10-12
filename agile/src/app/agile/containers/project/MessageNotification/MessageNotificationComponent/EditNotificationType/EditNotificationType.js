@@ -15,6 +15,8 @@ const { AppState } = stores;
 const { 
   type, id, name, organizationId, 
 } = AppState.currentMenuType;
+
+let userOptionsWithUserId = [];
 @observer
 class EditNotificationType extends Component {
   constructor(props) {
@@ -33,7 +35,6 @@ class EditNotificationType extends Component {
   componentDidMount() {
     const { location: { search } } = this.props;
     const noticeType = _.last(search.split('&')).split('=')[1];
-    // axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`)
     axios.all([
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`),
       axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`),
@@ -41,18 +42,15 @@ class EditNotificationType extends Component {
       .then(axios.spread((notice, users) => {
         const noticeTypeData = notice.filter(item => item.event === noticeType);
         const noticeTypeUsers = noticeTypeData.filter(item => item.noticeType === 'users')[0];
-        // console.log(...noticeTypeData[3].idWithNameDTOList.filter(item => !users.content.find(o => o.id === item.userId)));
         this.setState({
           loading: false,
-          // checkeds: noticeTypeData.map(item => item.enable),
           checkeds: _.map(noticeTypeData, 'enable'),
-          userOptions: [...users.content, ...noticeTypeData[3].idWithNameDTOList.filter(item => !users.content.find(o => o.id === item.userId))],
+          userOptions: [...users.content, ...noticeTypeData[3].idWithNameDTOList.filter(item => !users.content.find(o => o.id === item.userId))], // 如果后端返回的idWithNameDTOList中的用户不在20条数据之内，就拼接在后面
           updateData: _.map(noticeTypeData, (item) => {
-            const pickItem = _.pick(item, ['id', 'event', 'noticeType', 'noticeName', 'enable', 'user', 'objectVersionNumber']);
-            // console.log(`pickItem: ${JSON.stringify(pickItem)}`);
-            return ({ ...pickItem, objectVersionNumber: pickItem.id ? pickItem.objectVersionNumber : null });
+            const pickItem = _.pick(item, ['id', 'event', 'noticeType', 'noticeName', 'enable', 'user', 'objectVersionNumber']); // 去除对象中的idWithNameDTOList字段，更新时不需要
+            return ({ ...pickItem, objectVersionNumber: pickItem.id ? pickItem.objectVersionNumber : null });// 如果之前没有更新过,pickItem.id为null, 此时后端接受的objectVersionNumber为null
           }),
-          selectedValue: noticeTypeUsers && noticeTypeUsers.user && noticeTypeData.filter(item => item.noticeType === 'users')[0].user.split(',').map(item => Number(item)),
+          selectedValue: noticeTypeUsers && noticeTypeUsers.user && noticeTypeData.filter(item => item.noticeType === 'users')[0].user.split(',').map(item => Number(item)), // user字段为id拼接字符串
           dataSource: [
             {
               key: 'currentProcess',
@@ -79,7 +77,6 @@ class EditNotificationType extends Component {
       }))
       .catch((error) => {
         this.setState({
-          // roleOptionsLoading: false,
           loading: false,
         });
         Choerodon.prompt('获取信息失败');
@@ -88,9 +85,10 @@ class EditNotificationType extends Component {
 
   getColumns() {
     const {
-      userOptions, userOptionsLoading, checkeds, selectedValue, idWithNameDTOList,
+      userOptions, userOptionsLoading, checkeds, selectedValue,
     } = this.state;
-    console.log(`userOptions: ${JSON.stringify(userOptions)}`);
+    userOptionsWithUserId = (() => _.map(_.union(_.map(userOptionsWithUserId, JSON.stringify), _.map(_.filter(userOptions, 'userId'), JSON.stringify)), JSON.parse)
+    )(); // userOptions中所有有userId字段的user筛选出来，和原来的拼接，注意去重
     const columns = [
       {
         dataIndex: 'checked',
@@ -114,7 +112,6 @@ class EditNotificationType extends Component {
         render: (text, record, index) => (index > 2 ? (
           <Select
             style={{ width: 520 }}
-            // onFocus={this.getUserOptions}
             value={selectedValue}
             // value={}
             onChange={value => this.handleSelectChange(value, index)}
@@ -126,12 +123,9 @@ class EditNotificationType extends Component {
                 .then((res) => {
                   this.setState({
                     userOptionsLoading: false,
-                    userOptions: res.content,
-                    // userOptions: [...res.content, ...(userOptions && _.filter(userOptions, item => item.userId))],
-
-                    // [...res.content, ...(userOptions && _.filter(userOptions, item => item.userId))]
-                  }, () => {
-                    // console.log(this.state.userOptions);
+                    // userOptions: param ? res.content : [...(_.map(_.union(_.map(res.content, JSON.stringify), _.map(_.filter(userOptions, 'id'), JSON.stringify)), JSON.parse)), ...userOptionsWithUserId], 
+                    userOptions: param ? res.content : [...res.content, ...userOptionsWithUserId], 
+                    // 如果搜索条件为空，就把为空时搜出来的20条与之前有userId的数据进行拼接，保证已被选中但不在20条之内的数据显示出来
                   });
                 })
                 .catch((e) => {
@@ -157,30 +151,6 @@ class EditNotificationType extends Component {
     return columns;
   }
 
-  getUserOptions = () => {
-    const { userOptions } = this.state;
-    console.log('filter:');
-    console.log(...(userOptions && _.filter(userOptions, item => item.userId)));
-    this.setState({
-      userOptionsLoading: true,
-    });
-    axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`)
-      .then((res) => {
-        this.setState({
-          userOptionsLoading: false,
-          // userOptions: res.content,
-          // userOptions: [...res.content, ...userOptions],
-          userOptions: [...res.content, ...(userOptions && _.filter(userOptions, item => item.userId))],
-        });
-      })
-      .catch((error) => {
-        this.setState({
-          userOptionsLoading: false,
-        });
-        Choerodon.prompt('获取用户信息失败');
-      });
-  }
-
   handleCheckboxChange = (e, index) => {
     const { checkeds, updateData } = this.state;
     this.setState({
@@ -191,31 +161,6 @@ class EditNotificationType extends Component {
 
 
   handleSelectChange = (value, index) => {
-    // console.log(value);
-    // const { userOptions, updateData } = this.state;
-    // console.log('filter:');
-    // console.log(...(userOptions && _.filter(userOptions, item => item.userId)));
-    // this.setState({
-    //   userOptionsLoading: true,
-    // });
-    // axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users`)
-    //   .then((res) => {
-    //     this.setState({
-    //       userOptionsLoading: false,
-    //       // userOptions: res.content,
-    //       // userOptions: [...res.content, ...userOptions],
-    //       userOptions: [...res.content, ...(userOptions && _.filter(userOptions, item => item.userId))],
-    //       selectedValue: value,
-    //       updateData: _.map(updateData, (item, i) => (i === index ? { ...item, user: value.length > 0 ? value.join(',') : 'null' } : item)),
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     this.setState({
-    //       userOptionsLoading: false,
-    //     });
-    //     Choerodon.prompt('获取用户信息失败');
-    //   });
-
     const { updateData } = this.state;
     this.setState({
       selectedValue: value,
