@@ -25,6 +25,7 @@
     "moment": "^2.22.2",
     "npm": "^6.2.0",
     "quill-delta-to-html": "^0.8.2",
+    "rc-calendar": "^9.6.0",
     "rc-progress": "^2.2.5",
     "react-beautiful-dnd": "^7.1.2",
     "react-dnd": "^5.0.0",

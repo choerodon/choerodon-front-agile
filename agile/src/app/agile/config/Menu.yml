@@ -69,3 +69,15 @@
         sort: 3
         permission:
           - 'agile-service.issue.listEpic'
+
+# 组织设置
+"rentsetting":
+  icon: IAM
+  sort: 2
+  organization: # 组织层的菜单
+    - "workCalendar": # 菜单字段
+        icon: date_range  # 菜单图标
+        Routes: /agile/workCalendar # 菜单对应路由
+        sort: 8 # 菜单的次序
+        permission: # 菜单内容具有的权限
+          - 'agile-service.issue.listEpic'

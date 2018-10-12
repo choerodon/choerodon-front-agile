@@ -1,0 +1,44 @@
+.c7n-workCalendar {
+  .legend-tag {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  .legend-text {
+    margin-right: 30px;
+  }
+
+  .rc-calendar {
+    width: 512px;
+  }
+
+  .rc-calendar-date {
+    position: relative;
+    background-color: #fdf0ef;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+
+  .rc-calendar-footer-btn:after {
+    content: '';
+  }
+
+  .rc-calendar-date {
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    font-size: 14px;
+  }
+
+  .rc-calendar-header {
+    height: 40px;
+    line-height: 40px;
+  }
+
+  .rc-calendar-body {
+    height: 337px;
+  }
+}
