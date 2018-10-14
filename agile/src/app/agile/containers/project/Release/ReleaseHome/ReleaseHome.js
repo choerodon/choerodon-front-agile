@@ -149,7 +149,23 @@ class ReleaseHome extends Component {
     }
   }
 
-  handleChangeTable(pagination, filters, sorter) {
+  handleChangeTable(pagination, filters, sorter, barFilters) {
+    console.log(`filters: ${JSON.stringify(filters)}`);
+    console.log(`barfilters: ${JSON.stringify(barFilters)}`);
+
+    const searchArgs = {};
+    if (filters && filters.name && filters.name.length > 0) {
+      searchArgs.name = filters.name[0];
+    }
+    if (filters && filters.description && filters.description.length > 0) {
+      searchArgs.description = filters.description[0];
+    }
+    console.log(JSON.stringify(searchArgs));
+    ReleaseStore.setFilters({
+      advancedSearchArgs: { statusCodes: filters && filters.key && filters.key.length > 0 ? filters.key : [] },
+      searchArgs,
+      content: barFilters && barFilters.length > 0 ? barFilters.join('&') : '',
+    });
     this.refresh({
       current: pagination.current,
       pageSize: pagination.pageSize,
@@ -206,6 +222,7 @@ class ReleaseHome extends Component {
           </div>
         </Tooltip>
       ),
+      filters: [],
     }, {
       title: '版本状态',
       dataIndex: 'status',
@@ -226,6 +243,21 @@ class ReleaseHome extends Component {
           </span>
         </p>
       ),
+      filters: [
+        {
+          text: '已归档',
+          value: 'archived',
+        },
+        {
+          text: '已发布',
+          value: 'released',
+        },
+        {
+          text: '规划中',
+          value: 'version_planning',
+        },
+      ],
+      filterMultiple: true,
     }, {
       title: '开始日期',
       dataIndex: 'startDate',
@@ -240,6 +272,7 @@ class ReleaseHome extends Component {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
+      filters: [],
     }, {
       title: '',
       dataIndex: 'option',
@@ -331,39 +364,48 @@ class ReleaseHome extends Component {
         >
           <Spin spinning={this.state.loading}>
             {
-              versionData.length > 0 ? (
-                <DragSortingTable
-                  handleDrag={this.handleDrag}
-                  columns={versionColumn}
-                  dataSource={versionData}
+              // versionData.length > 0 ? (
+              //   <DragSortingTable
+              //     handleDrag={this.handleDrag}
+              //     columns={versionColumn}
+              //     dataSource={versionData}
+              //     // pagination={this.state.pagination}
+              //     pagination={versionData.length > 10}
+              //     onChange={this.handleChangeTable.bind(this)}
+              //   />
+              // ) : (
+              //   <div style={{ display: 'flex', justifyContent: 'center' }}>
+              //     <div
+              //       style={{
+              //         display: 'flex',
+              //         alignItems: 'center',
+              //         width: 800,
+              //         height: 280,
+              //         border: '1px dashed rgba(0,0,0,0.54)',
+              //         justifyContent: 'center',
+              //       }}
+              //     >
+              //       <img style={{ width: 237, height: 200 }} src={emptyVersion} alt="emptyVersion" />
+              //       <div style={{ marginLeft: 50 }}>
+              //         <p style={{ color: 'rgba(0,0,0,0.65)' }}>您还没有为此项目添加任何版本</p>
+              //         <p style={{ fontSize: '20px', lineHeight: '34px' }}>
+              //           {'版本是一个项目的时间点，并帮助'}
+              //           <br />
+              //           {'您组织和安排工作'}
+              //         </p>
+              //       </div>
+              //     </div>
+              //   </div>
+              // )
+
+              <DragSortingTable
+                handleDrag={this.handleDrag}
+                columns={versionColumn}
+                dataSource={versionData}
                   // pagination={this.state.pagination}
-                  pagination={versionData.length > 10}
-                  onChange={this.handleChangeTable.bind(this)}
-                />
-              ) : (
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      width: 800,
-                      height: 280,
-                      border: '1px dashed rgba(0,0,0,0.54)',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <img style={{ width: 237, height: 200 }} src={emptyVersion} alt="emptyVersion" />
-                    <div style={{ marginLeft: 50 }}>
-                      <p style={{ color: 'rgba(0,0,0,0.65)' }}>您还没有为此项目添加任何版本</p>
-                      <p style={{ fontSize: '20px', lineHeight: '34px' }}>
-                        {'版本是一个项目的时间点，并帮助'}
-                        <br />
-                        {'您组织和安排工作'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )
+                pagination={versionData.length > 10}
+                onChange={this.handleChangeTable.bind(this)}
+              />
             }
           </Spin>
           <AddRelease

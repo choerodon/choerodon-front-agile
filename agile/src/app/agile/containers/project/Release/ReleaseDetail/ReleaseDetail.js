@@ -289,88 +289,93 @@ class ReleaseDetail extends Component {
 
   render() {
     const urlParams = AppState.currentMenuType;
-    const columns = [{
-      width: '10%',
-      title: '优先级',
-      dataIndex: 'priorityName',
-      key: 'priorityName',
-      render: (text, record) => (
-        <span
-          style={{
-            padding: '1px 4px',
-            color: this.renderPriorityStyle('color', record),
-            background: this.renderPriorityStyle('background', record),
-          }}
-        >
-          {text}
-
-        </span>
-      ),
-    }, {
-      width: '10%',
-      title: '类型',
-      dataIndex: 'typeCode',
-      key: 'typeCode',
-      render: (text, record) => (
-        <div
-          style={{
-            width: 20,
-            height: 20,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: '50%',
-            background: this.renderTypecode(record, 'background'),
-          }}
-        >
-          {this.renderTypecode(record, 'icon')}
-        </div>
-      ),
-    }, {
-      width: '10%',
-      title: '编码',
-      dataIndex: 'issueNum',
-      key: 'issueNum',
-      render: text => <span className="textDisplayOneColumn">{text}</span>,
-    }, {
-      width: '40%',
-      title: '问题名称',
-      dataIndex: 'summary',
-      key: 'summary',
-      render: text => <span className="textDisplayOneColumn">{text}</span>,
-    }, {
-      width: '15%',
-      title: '经办人',
-      dataIndex: 'assigneeName',
-      key: 'assigneeName',
-      render: (text, record) => (text ? (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar size="small" src={record.imageUrl ? record.imageUrl : ''}>
-            {
+    const columns = [
+      {
+        width: '10%',
+        title: '编码',
+        dataIndex: 'issueNum',
+        key: 'issueNum',
+        render: text => <span className="textDisplayOneColumn">{text}</span>,
+      },
+      {
+        width: '10%',
+        title: '问题类型',
+        dataIndex: 'typeCode',
+        key: 'typeCode',
+        render: (text, record) => (
+          <div
+            style={{
+              width: 20,
+              height: 20,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: '50%',
+              background: this.renderTypecode(record, 'background'),
+            }}
+          >
+            {this.renderTypecode(record, 'icon')}
+          </div>
+        ),
+      },
+      {
+        width: '40%',
+        title: '问题名称',
+        dataIndex: 'summary',
+        key: 'summary',
+        render: text => <span className="textDisplayOneColumn">{text}</span>,
+      },
+      {
+        width: '15%',
+        title: '经办人',
+        dataIndex: 'assigneeName',
+        key: 'assigneeName',
+        render: (text, record) => (text ? (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Avatar size="small" src={record.imageUrl ? record.imageUrl : ''}>
+              {
               record.imageUrl ? '' : text.substring(0, 1)
             }
-          </Avatar>
-          <span className="textDisplayOneColumn">{text}</span>
-        </div>
-      ) : '')
-      ,
-    }, {
-      width: '15%',
-      title: '状态',
-      dataIndex: 'statusName',
-      render: (text, record) => (
-        <span
-          style={{
-            padding: '4px 6px',
-            color: 'white',
-            background: record.statusColor,
-            borderRadius: 2,
-          }}
-        >
-          {text}
-        </span>
-      ),
-    }];
+            </Avatar>
+            <span className="textDisplayOneColumn">{text}</span>
+          </div>
+        ) : '')
+        ,
+      },
+      {
+        width: '10%',
+        title: '优先级',
+        dataIndex: 'priorityName',
+        key: 'priorityName',
+        render: (text, record) => (
+          <span
+            style={{
+              padding: '1px 4px',
+              color: this.renderPriorityStyle('color', record),
+              background: this.renderPriorityStyle('background', record),
+            }}
+          >
+            {text}
+          </span>
+        ),
+      }, {
+        width: '15%',
+        title: '状态',
+        dataIndex: 'statusName',
+        render: (text, record) => (
+          <span
+            style={{
+              padding: '4px 6px',
+              color: 'white',
+              background: record.statusColor,
+              borderRadius: 2,
+            }}
+          >
+            {text}
+          </span>
+        ),
+      },
+    ];
     return (
       <Page>
         <Header
