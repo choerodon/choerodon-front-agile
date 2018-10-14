@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { observer, inject } from 'mobx-react';
 import {
   stores, axios, Page, Header, Content, Permission,
 } from 'choerodon-front-boot';
@@ -13,6 +14,7 @@ const { AppState } = stores;
 const { Option } = Select;
 const FormItem = Form.Item;
 
+@observer
 class WorkCalendarHome extends Component {
   constructor(props) {
     super(props);
@@ -25,15 +27,35 @@ class WorkCalendarHome extends Component {
   }
 
   getWorkCalendar = () => {
+    const { WorkCalendarStore } = this.props;
+    const proId = AppState.currentMenuType.id;
+    WorkCalendarStore.axiosGetCalendarData();
+    WorkCalendarStore.axiosGetHolidayData(20, 2018);
+  };
 
+  onUseHolidayChange = (e) => {
+    const { WorkCalendarStore } = this.props;
+    WorkCalendarStore.setUseHoliday(!!e.target.checked);
+  };
+
+  onSaturdayWorkChange = (e) => {
+    const { WorkCalendarStore } = this.props;
+    WorkCalendarStore.setSaturdayWork(!!e.target.checked);
+  };
+
+  onSundayWorkChange = (e) => {
+    const { WorkCalendarStore } = this.props;
+    WorkCalendarStore.setSundayWork(!!e.target.checked);
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { WorkCalendarStore, form } = this.props;
+    const { getFieldDecorator } = form;
+    const { saturdayWork, sundayWork, useHoliday, selectDays, holidayRefs } = WorkCalendarStore;
     return (
       <Page>
         <Header title="工作日历">
-          <Button funcType="flat" onClick={() => this.getWorkCalendar()}>
+          <Button funcType="flat" onClick={this.getWorkCalendar}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -43,7 +65,7 @@ class WorkCalendarHome extends Component {
           description="允许您将非工作日在报告或程序中设置为显示或隐藏。"
         >
           <Form layout="vertical">
-            <FormItem label="项目编码" style={{ width: 512 }}>
+            <FormItem style={{ width: 512 }}>
               {getFieldDecorator('region', {
                 initialValue: 'Asia',
               })(
@@ -52,7 +74,7 @@ class WorkCalendarHome extends Component {
                 </Select>,
               )}
             </FormItem>
-            <FormItem label="项目编码" style={{ width: 512 }}>
+            <FormItem style={{ width: 512 }}>
               {getFieldDecorator('timezone', {
                 initialValue: 'Asia/Shanghai',
               })(
@@ -61,24 +83,39 @@ class WorkCalendarHome extends Component {
                 </Select>,
               )}
             </FormItem>
-            <FormItem label="项目编码" style={{ width: 512 }}>
-              {getFieldDecorator('saturdayWork', {
+            <FormItem style={{ width: 512, marginBottom: 5 }}>
+              {getFieldDecorator('useHoliday', {
                 valuePropName: 'checked',
-                initialValue: false,
+                initialValue: useHoliday,
               })(
-                <Checkbox>选定周六为工作日</Checkbox>,
+                <Checkbox onChange={this.onUseHolidayChange}>自动更新每年的法定节假日</Checkbox>,
               )}
             </FormItem>
-            <FormItem label="项目编码" style={{ width: 512 }}>
+            <FormItem style={{ width: 512, marginBottom: 5 }}>
+              {getFieldDecorator('saturdayWork', {
+                valuePropName: 'checked',
+                initialValue: saturdayWork,
+              })(
+                <Checkbox onChange={this.onSaturdayWorkChange}>选定周六为工作日</Checkbox>,
+              )}
+            </FormItem>
+            <FormItem style={{ width: 512, marginBottom: 5 }}>
               {getFieldDecorator('sundayWork', {
                 valuePropName: 'checked',
-                initialValue: false,
+                initialValue: sundayWork,
               })(
-                <Checkbox>选定周日为工作日</Checkbox>,
+                <Checkbox onChange={this.onSundayWorkChange}>选定周日为工作日</Checkbox>,
               )}
             </FormItem>
           </Form>
-          <WorkCalendar />
+          <WorkCalendar
+            saturdayWork={saturdayWork}
+            sundayWork={sundayWork}
+            useHoliday={useHoliday}
+            selectDays={selectDays}
+            holidayRefs={holidayRefs}
+            store={WorkCalendarStore}
+          />
         </Content>
       </Page>
     );

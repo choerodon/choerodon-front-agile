@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 import { asyncRouter, nomatch } from 'choerodon-front-boot';
 
-const WorkCalendarHome = asyncRouter(() => (import('./WorkCalendarHome')));
+const WorkCalendarHome = asyncRouter(() => import('./WorkCalendarHome'), () => import('../../../stores/organization/workCalendar/WorkCalendarStore'));
 
 const WorkCalendarIndex = ({ match }) => (
   <Switch>
