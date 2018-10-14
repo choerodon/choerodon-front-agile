@@ -3,6 +3,7 @@ import {
 } from 'mobx';
 import axios from 'axios';
 import { store, stores } from 'choerodon-front-boot';
+import { Observable } from 'rxjs/Observable';
 
 const { AppState } = stores;
 
@@ -15,6 +16,12 @@ class ReleaseStore {
   @observable versionStatusIssues = [];
 
   @observable publicVersionDetail = {};
+
+  @observable filters = {
+    advancedSearchArgs: {},
+    searchArgs: {},
+    content: '',
+  }
 
   axiosFileVersion(id) {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${id}/archived`);
@@ -94,13 +101,17 @@ class ReleaseStore {
     this.versionList = data;
   }
 
+  @action setFilters(data) {
+    this.filters = data;
+  }
+
   axiosAddRelease(data) {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version`, data);
   }
 
   axiosGetVersionList(pageRequest) {
     // return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions?page=${pageRequest.page}&size=${pageRequest.size}`);
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions`);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions`, this.filters);
   }
 
   axiosDeleteVersion(data) {
