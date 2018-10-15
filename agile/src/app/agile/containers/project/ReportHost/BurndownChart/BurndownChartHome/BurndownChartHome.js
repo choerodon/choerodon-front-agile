@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Spin, message, Icon, Select, Table, Menu, Dropdown, 
+  Button, Spin, message, Icon, Select, Table, Menu, Checkbox,
 } from 'choerodon-ui';
 import {
   Page, Header, Content, stores, 
@@ -36,6 +36,10 @@ class BurndownChartHome extends Component {
       endDate: '',
       startDate: '',
       linkFromParamUrl: undefined,
+      restDayShow: true,
+      resetDays: [],
+      exportAxis: [],
+      markAreaData: [],
     };
   }
 
@@ -49,6 +53,7 @@ class BurndownChartHome extends Component {
     this.getSprintData();
   }
 
+  // 废弃
   GetRequest(url) {
     const theRequest = {};
     if (url.indexOf('?') !== -1) {
@@ -62,7 +67,10 @@ class BurndownChartHome extends Component {
   }
 
   getBetweenDateStr(start, end) {
+    // 是否显示非工作日
+    const { restDayShow, resetDays } = this.state;
     const result = [];
+    const rest = [];
     const beginDay = start.split('-');
     const endDay = end.split('-');
     const diffDay = new Date();
@@ -75,17 +83,22 @@ class BurndownChartHome extends Component {
     while (i == 0) {
       const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
       diffDay.setTime(countDay);
-      dateList[2] = diffDay.getDate();
-      dateList[1] = diffDay.getMonth() + 1;
-      dateList[0] = diffDay.getFullYear();
-      if (String(dateList[1]).length == 1) { dateList[1] = `0${dateList[1]}`; }
-      if (String(dateList[2]).length == 1) { dateList[2] = `0${dateList[2]}`; }
-      result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
-      if (dateList[0] == endDay[0] && dateList[1] == endDay[1] && dateList[2] == endDay[2]) {
-        i = 1;
+      if (resetDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
+        rest.push(moment(diffDay).format('YYYY-MM-DD'));
+      }
+      if (restDayShow || !resetDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
+        dateList[2] = diffDay.getDate();
+        dateList[1] = diffDay.getMonth() + 1;
+        dateList[0] = diffDay.getFullYear();
+        if (String(dateList[1]).length == 1) { dateList[1] = `0${dateList[1]}`; }
+        if (String(dateList[2]).length == 1) { dateList[2] = `0${dateList[2]}`; }
+        result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
+        if (dateList[0] == endDay[0] && dateList[1] == endDay[1] && dateList[2] == endDay[2]) {
+          i = 1;
+        }
       }
     }
-    return result;
+    return { result, rest };
   }
 
   getSprintData() {
@@ -97,11 +110,21 @@ class BurndownChartHome extends Component {
         startDate: res[0].startDate,
       }, () => {
         this.getChartData();
-        this.getChartCoordinate();
+        this.axiosGetWorkDays();
       });
     }).catch((error) => {
     });
   }
+
+  axiosGetWorkDays = () => {
+    BurndownChartStore.axiosGetWorkDays(this.state.defaultSprint).then((res) => {
+      this.setState({
+        resetDays: res.map((date) => moment(date).format('YYYY-MM-DD')),
+      }, () => {
+        this.getChartCoordinate();
+      });
+    });
+  };
 
   getChartCoordinate() {
     this.setState({ chartLoading: true });
@@ -122,17 +145,67 @@ class BurndownChartHome extends Component {
       }
       // 如果后端给的最大日期小于结束日期
       let allDate;
+      let rest = [];
       if (moment(maxDate).isBefore(this.state.endDate.split(' ')[0])) {
-        allDate = this.getBetweenDateStr(minDate, this.state.endDate.split(' ')[0]);
+        const result = this.getBetweenDateStr(minDate, this.state.endDate.split(' ')[0]);
+        allDate = result.result;
+        rest = result.rest;
       } else if (moment(minDate).isSame(maxDate)) {
         allDate = [minDate];
       } else {
-        allDate = this.getBetweenDateStr(minDate, maxDate);
+        const result = this.getBetweenDateStr(minDate, maxDate);
+        allDate = result.result;
+        rest = result.rest;
       }
       // const allDate = this.getBetweenDateStr(minDate, maxDate);
       const allDateValues = [];
+      let exportAxisData = [];
+      let markAreaData = [];
+      exportAxisData = [res.expectCount];
+      const { restDayShow } = this.state;
+      // 如果展示非工作日，期望为一条连续斜线
+      if (!restDayShow) {
+        if (allDate.length > 1) {
+          exportAxisData = [
+            [allDate[0].split(' ')[0].slice(5).replace('-', '/'), res.expectCount],
+            [allDate[allDate.length - 1].split(' ')[0].slice(5).replace('-', '/'), 0],
+          ];
+        } else {
+          exportAxisData = [
+            [allDate[0].split(' ')[0].slice(5).replace('-', '/'), res.expectCount],
+          ];
+        }
+      }
+      let minusCount = 0;
       for (let b = 0, len = allDate.length; b < len; b += 1) {
         const nowKey = allDate[b];
+        // 显示非工作日，则非工作日期望为水平线
+        if (restDayShow) {
+          // 工作日天数
+          const countWorkDay = (allDate.length - rest.length - 1) || 1;
+          // 日工作量
+          const dayAmount = res.expectCount / countWorkDay;
+          if (rest.includes(allDate[b])) {
+            // 非工作日
+            if (b < len - 1) {
+              markAreaData.push([
+                {
+                  name: '非工作日',
+                  xAxis: allDate[b].split(' ')[0].slice(5).replace('-', '/'),
+                },
+                {
+                  xAxis: allDate[b + 1].split(' ')[0].slice(5).replace('-', '/'),
+                }
+              ]);
+            }
+            exportAxisData[b + 1] = exportAxisData[b];
+          } else {
+            // 工作日
+            minusCount ++;
+            // 工作量取整
+            exportAxisData[b + 1] = parseInt(res.expectCount - (dayAmount * minusCount));
+          }
+        }
         if (res.coordinate.hasOwnProperty(nowKey)) {
           allDateValues.push(res.coordinate[allDate[b]]);
         } else if (moment(nowKey).isAfter(moment())) {
@@ -147,6 +220,8 @@ class BurndownChartHome extends Component {
       this.setState({
         xAxis: sliceDate,
         yAxis: allDateValues,
+        exportAxis: exportAxisData,
+        markAreaData,
       });
     });
   }
@@ -231,6 +306,7 @@ class BurndownChartHome extends Component {
       });
   }
 
+  // 废弃
   getMaxY() {
     // const data = this.state.yAxis;
     // let max = 0;
@@ -373,13 +449,25 @@ class BurndownChartHome extends Component {
           symbol: 'none',
           name: '期望值',
           type: 'line',
-          data: [[this.state.startDate.split(' ')[0].slice(5).replace('-', '/'), this.state.expectCount], [this.state.endDate.split(' ')[0].slice(5).replace('-', '/'), 0]],
+          data: this.state.exportAxis,
+          // data: [[this.state.startDate.split(' ')[0].slice(5).replace('-', '/'), this.state.expectCount], [this.state.endDate.split(' ')[0].slice(5).replace('-', '/'), 0]],
           itemStyle: {
             color: 'rgba(0,0,0,0.65)',
           },
           lineStyle: {
             type: 'dotted',
             color: 'rgba(0,0,0,0.65)',
+          },
+          markArea: {
+            itemStyle: {
+              color: 'rgba(235,235,235,0.65)',
+            },
+            emphasis: {
+              itemStyle: {
+                color: 'rgba(220,220,220,0.65)',
+              },
+            },
+            data: this.state.markAreaData,
           },
         },
         {
@@ -501,6 +589,14 @@ class BurndownChartHome extends Component {
       </div>
     );
   }
+
+  onCheckChange = (e) => {
+    this.setState({
+      restDayShow: e.target.checked,
+    }, () => {
+      this.getChartCoordinate();
+    });
+  };
 
   render() {
     const columns = [{
@@ -676,6 +772,13 @@ class BurndownChartHome extends Component {
                     <Option value="storyPoints">故事点</Option>
                     <Option value="issueCount">问题计数</Option>
                   </Select>
+                  <Checkbox
+                    style={{ marginLeft: 24 }}
+                    checked={this.state.restDayShow}
+                    onChange={this.onCheckChange}
+                  >
+                    显示非工作日
+                  </Checkbox>
                 </div>
                 <Spin spinning={this.state.chartLoading}>
                   <ReactEcharts option={this.getOption()} />
