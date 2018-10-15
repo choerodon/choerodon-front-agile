@@ -18,6 +18,10 @@ class BurndownChartStore {
     this.burndownCoordinate = data;
   }
 
+  axiosGetWorkDays(sprintId) {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/query_non_workdays/${sprintId}`);
+  }
+
   axiosGetBurndownCoordinate(sprintId, type) {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${type}`);
   }
