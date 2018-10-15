@@ -124,6 +124,7 @@ class DragSortingTable extends Component {
 
   moveRow = (dragIndex, hoverIndex) => {
     const data = this.props.dataSource;
+    console.log(JSON.stringify(this.props.pagination));
     const result = Array.from(data);
     const [removed] = result.splice(dragIndex, 1);
     result.splice(hoverIndex, 0, removed);
@@ -160,7 +161,8 @@ class DragSortingTable extends Component {
         rowClassName="table-row"
         columns={this.props.columns}
         dataSource={this.props.dataSource}
-        pagination={this.props.dataSource.length <= 10 ? false : this.props.pagination}
+        pagination={this.props.pagination}
+        // pagination={this.props.dataSource.length <= 10 ? false : this.props.pagination}
         onChange={this.props.onChange}
         filterBarPlaceholder="过滤表"
         components={this.components}

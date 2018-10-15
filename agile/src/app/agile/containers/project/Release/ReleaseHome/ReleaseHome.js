@@ -53,7 +53,7 @@ class ReleaseHome extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.refresh(this.state.pagination);
   }
 
@@ -398,8 +398,8 @@ class ReleaseHome extends Component {
                 handleDrag={this.handleDrag}
                 columns={versionColumn}
                 dataSource={versionData}
-                  // pagination={this.state.pagination}
-                pagination={versionData.length > 10}
+                pagination={this.state.pagination}
+                // pagination={versionData.length > 10}
                 onChange={this.handleChangeTable.bind(this)}
               />
             }

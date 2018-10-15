@@ -111,7 +111,7 @@ class ReleaseStore {
 
   axiosGetVersionList(pageRequest) {
     // return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions?page=${pageRequest.page}&size=${pageRequest.size}`);
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions`, this.filters);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions?page=${pageRequest.page}&size=${pageRequest.size}`, this.filters);
   }
 
   axiosDeleteVersion(data) {
