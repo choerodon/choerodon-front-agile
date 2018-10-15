@@ -73,7 +73,7 @@ class EditFieldConfiguration extends Component {
         width: '30%',
       },
       {
-        title: '通知类型',
+        title: '通知对象',
         dataIndex: 'notificationType',
         key: 'notificationType',
         width: '62%',

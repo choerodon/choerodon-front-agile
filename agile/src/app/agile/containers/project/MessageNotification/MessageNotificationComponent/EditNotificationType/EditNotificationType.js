@@ -103,7 +103,7 @@ class EditNotificationType extends Component {
         width: '5%',
       },
       {
-        title: '通知类型',
+        title: '通知对象',
         dataIndex: 'typeName',
         key: 'typeName',
         width: '30%',  
@@ -187,7 +187,7 @@ class EditNotificationType extends Component {
    return (
      <Page>
        <Header
-         title="编辑通知类型"
+         title="编辑通知对象"
          backPath={`/agile/messageNotification?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}`}
        />
        <Content 
