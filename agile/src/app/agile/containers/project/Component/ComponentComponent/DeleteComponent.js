@@ -86,8 +86,7 @@ class DeleteComponent extends Component {
       <div style={{ margin: '0 0 32px 20px' }}>
         <RadioGroup label="" onChange={this.onRadioChange} value={this.state.radio}>
           <Radio style={radioStyle} value={1}>
-
-            不关联到别的模块
+            {'不关联到别的模块'}
           </Radio>
           <Radio style={radioStyle} value={2}>
             <span>关联到其他模块</span>
@@ -99,7 +98,7 @@ class DeleteComponent extends Component {
               onFocus={() => {
                 loadComponents(this.state.component.componentId).then((res) => {
                   this.setState({
-                    originComponents: res,
+                    originComponents: res.Content,
                   });
                 });
               }}
@@ -133,11 +132,14 @@ class DeleteComponent extends Component {
       >
         <div style={{ margin: '20px 0', position: 'relative' }}>
           <Icon style={{ color: '#d50000', position: 'absolute', fontSize: '16px' }} type="error" />
-          <div style={{ marginLeft: 20, width: 400 ,'line-height':'26px' }}>
+          <div style={{ marginLeft: 20, width: 400, 'line-height': '26px' }}>
+
+
+
 
             如果有问题关联到这个模块，而且这个项目中已经没有其他模块可供关联
             这个模块将会从所有问题中移除。
-          </div>
+</div>
         </div>
         <ul style={{ margin: '20px 0 20px 20px', paddingLeft: '20px' }}>
           <li>
@@ -155,10 +157,16 @@ class DeleteComponent extends Component {
               }}
             >
 
+
+
+
               相关的问题（
-              {this.state.component.issueCount || 0}
+{this.state.component.issueCount || 0}
+
+
+
 ）
-            </span>
+</span>
           </li>
         </ul>
         {this.state.component.issueCount ? <div>{this.renderDelete()}</div> : null}

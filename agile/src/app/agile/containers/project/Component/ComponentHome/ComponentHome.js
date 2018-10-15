@@ -29,11 +29,18 @@ class ComponentHome extends Component {
       confirmShow: false,
       editComponentShow: false,
       createComponentShow: false,
+      filters: {
+        searchArgs: {},
+        advancedSearchArgs: {
+          defaultAssigneeRole: [],
+          content: '',
+        },
+      },
     };
   }
 
   componentDidMount() {
-    this.loadComponents();
+    this.loadComponents(this.state.filters);
   }
 
   showComponent(record) {
@@ -47,6 +54,11 @@ class ComponentHome extends Component {
     this.setState({
       component: record,
       confirmShow: true,
+      filters: {
+        advancedSearchArgs: {},
+        searchArgs: {},
+        content: '',
+      },
     });
   }
 
@@ -54,21 +66,48 @@ class ComponentHome extends Component {
     this.setState({
       confirmShow: false,
     });
-    this.loadComponents();
+    this.loadComponents(this.state.filters);
   }
 
-  loadComponents() {
+  loadComponents(filters) {
     this.setState({
       loading: true,
     });
-    loadComponents()
+    loadComponents(filters)
       .then((res) => {
         this.setState({
-          components: res,
+          components: res.content,
           loading: false,
         });
       })
       .catch((error) => {});
+  }
+
+  handleFilterChange = (pagination, filters, sorter, barFilters) => {
+    // console.log(`filters: ${JSON.stringify(filters)}`);
+    // console.log(`barFilters: ${JSON.stringify(barFilters)}`);
+    const searchArgs = {};
+    if (filters && filters.name && filters.name.length > 0) {
+      searchArgs.name = filters.name[0];
+    }
+    if (filters && filters.description && filters.description.length > 0) {
+      searchArgs.description = filters.description[0];
+    }
+    if (filters && filters.managerId && filters.managerId.length > 0) { 
+      searchArgs.manager = filters.managerId[0];
+    }
+   
+    const filtersPost = {
+      advancedSearchArgs: {
+        defaultAssigneeRole: filters && filters.defaultAssigneeRole && filters.defaultAssigneeRole.length > 0 ? filters.defaultAssigneeRole : [],
+      },
+      searchArgs,
+      content: barFilters && barFilters.length > 0 ? barFilters.join('%') : '',
+    };
+    this.setState({
+      filters: filtersPost,
+    });
+    this.loadComponents(filtersPost);
   }
 
   render() {
@@ -96,6 +135,7 @@ class ComponentHome extends Component {
             </Tooltip>
           </div>
         ),
+        filters: [],
       },
       {
         title: '问题',
@@ -132,8 +172,7 @@ class ComponentHome extends Component {
               }}
             >
               {issueCount || 0}
-              {' '}
-issues
+              {'issues'}
             </span>
             {/* <span>{issueCount}issues</span> */}
           </div>
@@ -159,6 +198,7 @@ issues
             </Tooltip>
           </div>
         ),
+        filters: [],
       },
       {
         title: '模块描述',
@@ -180,11 +220,22 @@ issues
             </Tooltip>
           </div>
         ),
+        filters: [],
       },
       {
         title: '默认经办人',
         dataIndex: 'defaultAssigneeRole',
         width: '15%',
+        filters: [
+          {
+            text: '无',
+            value: '无',
+          }, {
+            text: '模块负责人',
+            value: '模块负责人',
+          },
+        ],
+        filterMultiple: true,
       },
       {
         title: '',
@@ -261,7 +312,7 @@ issues
               <span>创建模块</span>
             </Button>
           </Permission>
-          <Button funcType="flat" onClick={() => this.loadComponents()}>
+          <Button funcType="flat" onClick={() => this.loadComponents(this.state.filters)}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -271,7 +322,7 @@ issues
           description="根据项目需求，可以分拆为多个模块，每个模块可以进行负责人划分，配置后可以将项目中的问题归类到对应的模块中。例如“后端任务”，“基础架构”等等。"
           link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/component/"
         >
-          <Spin spinning={this.state.loading}>
+          {/* <Spin spinning={this.state.loading}>
             {this.state.components.length === 0 && !this.state.loading ? (
               <EmptyBlock
                 style={{ marginTop: 50 }}
@@ -287,15 +338,25 @@ issues
                 dataSource={this.state.components}
                 scroll={{ x: true }}
                 filterBarPlaceholder="过滤表"
+                onChange={this.handleFilterChange}
               />
             )}
-          </Spin>
+          </Spin> */}
+          <Table
+            pagination={this.state.components.length > 10}
+            columns={column}
+            dataSource={this.state.components}
+            scroll={{ x: true }}
+            filterBarPlaceholder="过滤表"
+            onChange={this.handleFilterChange}
+            loading={this.state.loading}
+          />
           {this.state.createComponentShow ? (
             <CreateComponent
               visible={this.state.createComponentShow}
               onCancel={() => this.setState({ createComponentShow: false })}
               onOk={() => {
-                this.loadComponents();
+                this.loadComponents(this.state.filters);
                 this.setState({
                   createComponentShow: false,
                 });
@@ -308,7 +369,7 @@ issues
               visible={this.state.editComponentShow}
               onCancel={() => this.setState({ editComponentShow: false })}
               onOk={() => {
-                this.loadComponents();
+                this.loadComponents(this.state.filters);
                 this.setState({
                   editComponentShow: false,
                 });

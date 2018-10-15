@@ -150,9 +150,6 @@ class ReleaseHome extends Component {
   }
 
   handleChangeTable(pagination, filters, sorter, barFilters) {
-    console.log(`filters: ${JSON.stringify(filters)}`);
-    console.log(`barfilters: ${JSON.stringify(barFilters)}`);
-
     const searchArgs = {};
     if (filters && filters.name && filters.name.length > 0) {
       searchArgs.name = filters.name[0];
@@ -160,7 +157,6 @@ class ReleaseHome extends Component {
     if (filters && filters.description && filters.description.length > 0) {
       searchArgs.description = filters.description[0];
     }
-    console.log(JSON.stringify(searchArgs));
     ReleaseStore.setFilters({
       advancedSearchArgs: { statusCodes: filters && filters.key && filters.key.length > 0 ? filters.key : [] },
       searchArgs,

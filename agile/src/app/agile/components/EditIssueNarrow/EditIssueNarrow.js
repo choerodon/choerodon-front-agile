@@ -1939,14 +1939,14 @@ class CreateSprint extends Component {
                                     });
                                     loadComponents().then((res) => {
                                       this.setState({
-                                        originComponents: res,
+                                        originComponents: res.content,
                                         selectLoading: false,
                                       });
                                     });
                                   }}
                                   onChange={value => this.setState({ componentIssueRelDTOList: value })}
                                 >
-                                  {this.state.originComponents.map(component => (
+                                  {this.state.originComponents && this.state.originComponents.map(component => (
                                     <Option
                                       key={component.name}
                                       value={component.name}

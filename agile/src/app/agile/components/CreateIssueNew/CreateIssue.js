@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
- Select, Form, Input, Button, Modal, Icon, Tooltip 
+  Select, Form, Input, Button, Modal, Icon, Tooltip, 
 } from 'choerodon-ui';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
 import {
- createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics 
+  createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics, 
 } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
 import { COLOR } from '../../common/Constant';
@@ -203,12 +203,12 @@ class CreateIssue extends Component {
         this.props.onOk();
       })
       .catch(() => {
-        });
+      });
   };
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const {visible, onCancel} = this.props;
+    const { visible, onCancel } = this.props;
     const callback = (value) => {
       this.setState({
         delta: value,
@@ -393,7 +393,7 @@ class CreateIssue extends Component {
                         });
                       }}
                     >
-                      {this.state.originEpics.map(epic => <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option>,)}
+                      {this.state.originEpics.map(epic => <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option> )}
                     </Select>,
                   )}
                 </FormItem>
@@ -473,7 +473,7 @@ class CreateIssue extends Component {
                       });
                       loadComponents().then((res) => {
                         this.setState({
-                          originComponents: res,
+                          originComponents: res.content,
                           selectLoading: false,
                         });
                       });
