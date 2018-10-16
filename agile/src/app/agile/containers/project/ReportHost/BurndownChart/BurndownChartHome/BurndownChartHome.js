@@ -159,9 +159,8 @@ class BurndownChartHome extends Component {
       }
       // const allDate = this.getBetweenDateStr(minDate, maxDate);
       const allDateValues = [];
-      let exportAxisData = [];
       let markAreaData = [];
-      exportAxisData = [res.expectCount];
+      let exportAxisData = [res.expectCount];
       const { restDayShow } = this.state;
       // 如果展示非工作日，期望为一条连续斜线
       if (!restDayShow) {
