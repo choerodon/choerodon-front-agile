@@ -17,6 +17,7 @@ const {
 } = AppState.currentMenuType;
 
 let userOptionsWithUserId = [];
+let initialNoticeTypeData = [];
 @observer
 class EditNotificationType extends Component {
   constructor(props) {
@@ -41,6 +42,7 @@ class EditNotificationType extends Component {
     ])
       .then(axios.spread((notice, users) => {
         const noticeTypeData = notice.filter(item => item.event === noticeType);
+        initialNoticeTypeData = _.map(noticeTypeData, item => _.pick(item, ['id', 'event', 'noticeType', 'noticeName', 'enable', 'user', 'objectVersionNumber']));
         const noticeTypeUsers = noticeTypeData.filter(item => item.noticeType === 'users')[0];
         this.setState({
           loading: false,
@@ -171,8 +173,8 @@ class EditNotificationType extends Component {
  handleSaveBtnClick = () => {
    const { history } = this.props;
    const { updateData } = this.state;
-   // console.log(`updata: ${JSON.stringify(updateData)}`);
-   axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`, updateData)
+   const postData = _.map(_.difference(_.map(updateData, JSON.stringify), _.map(initialNoticeTypeData, JSON.stringify)), JSON.parse);
+   axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/notice`, postData)
      .then((res) => {
        Choerodon.prompt('更新成功');
        history.push(`/agile/messageNotification?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}`);
