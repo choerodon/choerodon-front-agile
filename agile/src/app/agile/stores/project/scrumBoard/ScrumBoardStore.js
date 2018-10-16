@@ -1,4 +1,6 @@
-import { observable, action, computed, toJS } from 'mobx';
+import {
+ observable, action, computed, toJS 
+} from 'mobx';
 import axios from 'axios';
 import _ from 'lodash';
 import { store, stores } from 'choerodon-front-boot';
@@ -8,24 +10,41 @@ const { AppState } = stores;
 @store('ScrumBoardStore')
 class ScrumBoardStore {
   @observable dragStartItem = {};
+
   @observable boardData = [];
+
   @observable parentIds = [];
+
   @observable statusCategory = {};
+
   @observable boardList = [];
+
   @observable selectedBoard = '';
+
   @observable unParentIds = [];
+
   @observable lookupValue = {
     constraint: [],
   }
+
   @observable currentConstraint = '';
+
   @observable currentSprint = {};
+
   @observable clickIssueDetail = {};
+
   @observable IssueNumberCount = {};
+
   @observable assigneer = [];
+
   @observable swimlaneBasedCode = '';
+
   @observable quickSearchList = [];
+
   @observable epicData = [];
+
   @observable allEpicData = [];
+
   @observable statusList = [];
 
   @computed get getStatusList() {
@@ -319,4 +338,3 @@ class ScrumBoardStore {
 
 const scrumBoardStore = new ScrumBoardStore();
 export default scrumBoardStore;
-
