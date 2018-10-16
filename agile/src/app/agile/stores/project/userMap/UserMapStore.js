@@ -9,61 +9,43 @@ const { AppState } = stores;
 
 @store('UserMapStore')
 class UserMapStore {
-  @observable
-  epics = [];
+  @observable epics = [];
 
-  @observable
-  showDoneEpic = false;
+  @observable showDoneEpic = false;
 
-  @observable
-  isApplyToEpic = false;
+  @observable isApplyToEpic = false;
 
-  @observable
-  filters = [];
+  @observable filters = [];
 
-  @observable
-  currentFilters = [];
+  @observable currentFilters = [];
 
   // @observable
   // currentBacklogFilters = [[], []];
-  @observable
-  sprints = [];
+  @observable sprints = [];
 
-  @observable
-  versions = [];
+  @observable versions = [];
 
-  @observable
-  issues = [];
+  @observable issues = [];
 
-  @observable
-  backlogIssues = [];
+  @observable backlogIssues = [];
 
-  @observable
-  mode = 'none';
+  @observable mode = 'none';
 
-  @observable
-  createEpic = false;
+  @observable createEpic = false;
 
-  @observable
-  backlogExpand = [];
+  @observable backlogExpand = [];
 
-  @observable
-  createVOS = false;
+  @observable createVOS = false;
 
-  @observable
-  createVOSType = '';
+  @observable createVOSType = '';
 
-  @observable
-  selectIssueIds = [];
+  @observable selectIssueIds = [];
 
-  @observable
-  currentDraggableId = null;
+  @observable currentDraggableId = null;
 
-  @observable
-  showBackLog = false;
+  @observable showBackLog = false;
 
-  @observable
-  currentBacklogFilters = [];
+  @observable currentBacklogFilters = [];
 
   @observable left = 0;
 
@@ -76,6 +58,12 @@ class UserMapStore {
   @observable currentNewObj = { epicId: 0, sprintId: 0, versionId: 0 };
 
   @observable isLoading = false;
+
+  @observable isFullScreen = false;
+
+  @action setIsFullScreen(data) {
+    this.isFullScreen = data;
+  }
 
   @action setIsLoading(flag) {
     this.isLoading = flag;
@@ -318,15 +306,15 @@ class UserMapStore {
         if (issues.failed) {
           this.setIssues([]);
         } else if (this.mode === 'version') {
-            const uniqIssues = _.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId');
-            const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
-            // this.setIssues(_.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId'));
-            this.setIssues(sortedUniqIssues);
-          } else {
-            const sortedIssues = _.orderBy(issues, 'mapRank', 'asc');
-            // this.setIssues(issues);
-            this.setIssues(sortedIssues);
-          }
+          const uniqIssues = _.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId');
+          const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
+          // this.setIssues(_.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId'));
+          this.setIssues(sortedUniqIssues);
+        } else {
+          const sortedIssues = _.orderBy(issues, 'mapRank', 'asc');
+          // this.setIssues(issues);
+          this.setIssues(sortedIssues);
+        }
       });
   }
 
@@ -444,13 +432,13 @@ class UserMapStore {
         if (res.failed) {
           this.setBacklogIssues([]);
         } else if (this.mode === 'version') {
-            const uniqIssues = _.uniqBy(_.orderBy(res, ['versionId'], ['desc']), 'issueId');
-            const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
-            this.setBacklogIssues(sortedUniqIssues);
-          } else {
-            const sortedUniqIssues = _.orderBy(res, 'mapRank', 'asc');
-            this.setBacklogIssues(sortedUniqIssues);
-          }
+          const uniqIssues = _.uniqBy(_.orderBy(res, ['versionId'], ['desc']), 'issueId');
+          const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
+          this.setBacklogIssues(sortedUniqIssues);
+        } else {
+          const sortedUniqIssues = _.orderBy(res, 'mapRank', 'asc');
+          this.setBacklogIssues(sortedUniqIssues);
+        }
         this.setBacklogExpand([]);
       });
   };

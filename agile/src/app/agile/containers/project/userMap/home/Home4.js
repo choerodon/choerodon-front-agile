@@ -66,7 +66,7 @@ class Home3 extends Component {
       expandColumns: [],
       showBackLog: false,
       position: 'absolute',
-      isFullScreen: false,
+      // isFullScreen: false,
       popOverVisible: false,
       showDoneEpicCheckbox: false,
       filterEpicCheckbox: false,
@@ -101,13 +101,15 @@ class Home3 extends Component {
   }
 
   componentWillUnmount() {
-    this.props.UserMapStore.setCurrentFilter([]);
-    this.props.UserMapStore.setMode('none');
-    this.props.UserMapStore.setIssues([]);
-    this.props.UserMapStore.setEpics([]);
-    this.props.UserMapStore.setTop(0);
-    this.props.UserMapStore.setLeft(0);
-    this.props.UserMapStore.setCurrentIndex(0);
+    const { UserMapStore } = this.props;
+    UserMapStore.setCurrentFilter([]);
+    UserMapStore.setMode('none');
+    UserMapStore.setIssues([]);
+    UserMapStore.setEpics([]);
+    UserMapStore.setTop(0);
+    UserMapStore.setLeft(0);
+    UserMapStore.setCurrentIndex(0);
+    UserMapStore.setIsFullScreen(false);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
   }
@@ -117,9 +119,11 @@ class Home3 extends Component {
     const isFullScreen = document.webkitFullscreenElement
       || document.mozFullScreenElement
       || document.msFullscreenElement;
-    this.setState({
-      isFullScreen: !!isFullScreen,
-    });
+    // this.setState({
+    //   isFullScreen: !!isFullScreen,
+    // });
+    const { UserMapStore } = this.props;
+    UserMapStore.setIsFullScreen(!!isFullScreen);
   }
 
   getPrepareOffsetTops = (isExpand = false) => {
@@ -192,7 +196,7 @@ class Home3 extends Component {
     const body = document.getElementById('fixHead-body');
     body.scrollLeft = scrollLeft;
     const ua = window.navigator.userAgent;
-    const isSafari = ua.indexOf("Safari") !== -1 && ua.indexOf("Version") !== -1;
+    const isSafari = ua.indexOf('Safari') !== -1 && ua.indexOf('Version') !== -1;
     if (isSafari) {
       document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
     }
@@ -204,7 +208,7 @@ class Home3 extends Component {
     const header = document.getElementById('fixHead-head');
     header.scrollLeft = scrollLeft;
     const ua = window.navigator.userAgent;
-    const isSafari = ua.indexOf("Safari") !== -1 && ua.indexOf("Version") !== -1;
+    const isSafari = ua.indexOf('Safari') !== -1 && ua.indexOf('Version') !== -1;
     if (isSafari) {
       document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
     }
@@ -274,7 +278,7 @@ class Home3 extends Component {
     this.setState({
       showDoneEpicCheckbox: false,
       filterEpicCheckbox: false,
-    })
+    });
     // const showDoneEpicCheckbox = document.getElementsByClassName('showDoneEpicCheckbox')[0];
     // const filterEpicCheckbox = document.getElementsByClassName('filterEpicCheckbox')[0];
     // if(showDoneEpicCheckbox){
@@ -367,8 +371,8 @@ class Home3 extends Component {
   handleShowDoneEpic =(e) => {
     const { UserMapStore } = this.props;
     this.setState({
-      showDoneEpicCheckbox: e.target.checked
-    })
+      showDoneEpicCheckbox: e.target.checked,
+    });
     UserMapStore.setShowDoneEpic(e.target.checked);
     UserMapStore.loadEpic();
   };
@@ -376,8 +380,8 @@ class Home3 extends Component {
   handleFilterEpic =(e) => {
     const { UserMapStore } = this.props;
     this.setState({
-      filterEpicCheckbox: e.target.checked
-    })
+      filterEpicCheckbox: e.target.checked,
+    });
     UserMapStore.setIsApplyToEpic(e.target.checked);
     UserMapStore.loadEpic();
   }
@@ -1457,11 +1461,20 @@ class Home3 extends Component {
     );
     return (
       <Header title="用户故事地图">
-        {!this.state.isFullScreen ?
+        {/* {!this.state.isFullScreen ?
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
             <Icon type="playlist_add" />
             {'创建史诗'}
           </Button> : ''
+        } */}
+
+        {!this.props.UserMapStore.isFullScreen
+          ? (
+            <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
+  <Icon type="playlist_add" />
+  {'创建史诗'}
+</Button>
+          ) : ''
         }
         <Dropdown
           overlay={swimlanMenu}
@@ -1520,9 +1533,13 @@ class Home3 extends Component {
           <Icon type="refresh icon" />
           <span>刷新</span>
         </Button>
-        <Button className="leftBtn2" funcType="flat" onClick={this.handleFullScreen.bind(this)}>
+        {/* <Button className="leftBtn2" funcType="flat" onClick={this.handleFullScreen.bind(this)}>
           <Icon type={`${this.state.isFullScreen ? 'exit_full_screen' : 'zoom_out_map'} icon`} />
           <span>{this.state.isFullScreen ? '退出全屏' : '全屏'}</span>
+        </Button> */}
+        <Button className="leftBtn2" funcType="flat" onClick={this.handleFullScreen.bind(this)}>
+          <Icon type={`${this.props.UserMapStore.isFullScreen ? 'exit_full_screen' : 'zoom_out_map'} icon`} />
+          <span>{this.props.UserMapStore.isFullScreen ? '退出全屏' : '全屏'}</span>
         </Button>
         {
           UserMapStore.getEpics.length ? (
@@ -1691,7 +1708,7 @@ class Home3 extends Component {
 
             ))}
           </div>
-        </React.Fragment>);
+                 </React.Fragment>);
       });
       dom.push(
         <React.Fragment key="no-sprint">
@@ -1703,7 +1720,8 @@ class Home3 extends Component {
           >
             <div>
               {mode === 'none' ? 'issue' : '未计划部分' }
-              {mode === 'none' || this.state.isFullScreen ? null
+              {/* {mode === 'none' || this.state.isFullScreen ? null */}
+              {mode === 'none' || this.props.UserMapStore.isFullScreen ? null
                 : (
                   <React.Fragment>
                     {mode === 'version'
