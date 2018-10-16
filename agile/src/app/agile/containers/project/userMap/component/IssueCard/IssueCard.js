@@ -274,7 +274,7 @@ class IssueCard extends Component {
                   value={summary}
                   onChange={this.handleIssueNameChange.bind(this)}
                   onPressEnter={this.handlePressEnter}
-                  onClick={this.handleClickTextArea}
+                  onDoubleClick={this.handleClickTextArea}
                   onBlur={this.updateIssueName}
                   spellCheck="false"
                 />

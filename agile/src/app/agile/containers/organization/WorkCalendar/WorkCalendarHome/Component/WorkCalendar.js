@@ -68,11 +68,11 @@ class WorkCalendar extends Component {
       holidayInfo = holidayRefs.filter(d => d.holiday === date);
     }
     // 用户自定义设置
-    const selectDay = selectDays.filter(d => d.day === date);
+    const selectDay = selectDays.filter(d => d.workDay === date);
     if (selectDay.length) {
-      dateStyle = selectDay[0].workDay === '1' ? workDayStyle : notWorkDayStyle;
+      dateStyle = selectDay[0].status === 1 ? workDayStyle : notWorkDayStyle;
     } else if (useHoliday && holidayInfo.length) {
-      return holidayInfo[0].status === '1' ? (
+      return holidayInfo[0].status === 1 ? (
           <div data-day={holidayInfo[0]} className={'rc-calendar-date workday'}>
             <span className="tag">班</span>
             {current.date()}
@@ -107,7 +107,7 @@ class WorkCalendar extends Component {
       useHoliday,
       selectDays,
       holidayRefs,
-      store,
+      updateSelete,
     } = this.props;
     const weekdays = [
       saturdayWork ? null : '六',
@@ -115,9 +115,10 @@ class WorkCalendar extends Component {
     ];
     if (date && (date.isAfter(now) || date.format(format) === now.format(format))) {
       const selectDate = date.format(format);
-      let data = selectDays;
-      if (selectDays.length && selectDays.map(d => d.day).indexOf(selectDate) !== -1) {
-        data = selectDays.filter(d => d.day !== selectDate);
+      let data = {};
+      if (selectDays.length && selectDays.map(d => d.workDay).indexOf(selectDate) !== -1) {
+        data = selectDays.filter(d => d.workDay === selectDate);
+        updateSelete(data[0]);
       } else {
         const localData = moment.localeData();
         const dayOfWeek = localData.weekdaysMin(date);
@@ -125,17 +126,16 @@ class WorkCalendar extends Component {
         if (useHoliday && holidayRefs.length) {
           _.forEach(holidayRefs, (item) => {
             if (item.holiday === selectDate) {
-              isWorkDay = item.status === '1'; // 是否是节假日及调休日期
+              isWorkDay = item.status === 1; // 是否是节假日及调休日期
             }
           });
         }
-        data.push({
-          calendarId: 1,
-          day: selectDate,
-          workDay: isWorkDay ? '0' : '1',
-        });
+        data = {
+          workDay: selectDate,
+          status: isWorkDay ? '0' : '1',
+        };
+        updateSelete(data);
       }
-      store.axiosPostCalendarData(data);
     }
   };
 

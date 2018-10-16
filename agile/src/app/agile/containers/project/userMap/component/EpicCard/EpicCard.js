@@ -158,7 +158,7 @@ class EpicCard extends Component {
                   value={epicName}
                   onChange={this.handleEpicNameChange.bind(this)}
                   onPressEnter={this.handlePressEnter}
-                  onClick={this.handleClickTextArea}
+                  onDoubleClick={this.handleClickTextArea}
                   role="none"
                   onBlur={this.updateEpicName}
                   spellCheck="false"

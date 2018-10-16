@@ -18,8 +18,8 @@ class BurndownChartStore {
     this.burndownCoordinate = data;
   }
 
-  axiosGetWorkDays(sprintId) {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/query_non_workdays/${sprintId}`);
+  axiosGetRestDays(sprintId) {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/query_non_workdays/${sprintId}/${AppState.currentMenuType.organizationId}`);
   }
 
   axiosGetBurndownCoordinate(sprintId, type) {

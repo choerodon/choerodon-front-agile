@@ -28,30 +28,56 @@ class WorkCalendarHome extends Component {
 
   getWorkCalendar = () => {
     const { WorkCalendarStore } = this.props;
-    const proId = AppState.currentMenuType.id;
-    WorkCalendarStore.axiosGetCalendarData();
-    WorkCalendarStore.axiosGetHolidayData(20, 2018);
+    const orgId = AppState.currentMenuType.organizationId;
+    WorkCalendarStore.axiosGetWorkDaySetting(orgId).then(() => {
+      const { timeZoneId } = WorkCalendarStore.getWorkDaySetting;
+      if (timeZoneId) {
+        WorkCalendarStore.axiosGetCalendarData(orgId, timeZoneId);
+      }
+    });
+    WorkCalendarStore.axiosGetHolidayData(orgId, 2018);
   };
 
-  onUseHolidayChange = (e) => {
+  onCheckChange = (e, type) => {
     const { WorkCalendarStore } = this.props;
-    WorkCalendarStore.setUseHoliday(!!e.target.checked);
+    const orgId = AppState.currentMenuType.organizationId;
+    const { timeZoneId } = WorkCalendarStore.getWorkDaySetting;
+    const data = {
+      ...WorkCalendarStore.getWorkDaySetting,
+      [type]: !!e.target.checked,
+    };
+    WorkCalendarStore.axiosUpdateSetting(orgId, timeZoneId, data).then(() => {
+      this.getWorkCalendar();
+    });
   };
 
-  onSaturdayWorkChange = (e) => {
+  updateSelete = (data) => {
     const { WorkCalendarStore } = this.props;
-    WorkCalendarStore.setSaturdayWork(!!e.target.checked);
-  };
-
-  onSundayWorkChange = (e) => {
-    const { WorkCalendarStore } = this.props;
-    WorkCalendarStore.setSundayWork(!!e.target.checked);
+    const orgId = AppState.currentMenuType.organizationId;
+    const { timeZoneId } = WorkCalendarStore.getWorkDaySetting;
+    if (data.calendarId) {
+      WorkCalendarStore.axiosDeleteCalendarData(orgId, data.calendarId).then(() => {
+        this.getWorkCalendar();
+      });
+    } else {
+      WorkCalendarStore.axiosCreateCalendarData(orgId, timeZoneId, data).then(() => {
+        this.getWorkCalendar();
+      });
+    }
   };
 
   render() {
     const { WorkCalendarStore, form } = this.props;
     const { getFieldDecorator } = form;
-    const { saturdayWork, sundayWork, useHoliday, selectDays, holidayRefs } = WorkCalendarStore;
+    const {
+      saturdayWork,
+      sundayWork,
+      useHoliday,
+      timeZoneCode,
+      areaCode,
+    } = WorkCalendarStore.getWorkDaySetting;
+    const holidayRefs = WorkCalendarStore.getHolidayRefs;
+    const selectDays = WorkCalendarStore.getSelectDays;
     return (
       <Page>
         <Header title="工作日历">
@@ -67,7 +93,7 @@ class WorkCalendarHome extends Component {
           <Form layout="vertical">
             <FormItem style={{ width: 512 }}>
               {getFieldDecorator('region', {
-                initialValue: 'Asia',
+                initialValue: areaCode,
               })(
                 <Select label="地区" placeholder="Please Select" style={{ width: 512 }}>
                   <Option value="Asia">亚洲</Option>
@@ -76,7 +102,7 @@ class WorkCalendarHome extends Component {
             </FormItem>
             <FormItem style={{ width: 512 }}>
               {getFieldDecorator('timezone', {
-                initialValue: 'Asia/Shanghai',
+                initialValue: timeZoneCode,
               })(
                 <Select label="时区" placeholder="Please Select" style={{ width: 512 }}>
                   <Option value="Asia/Shanghai">(GMT+08:00) Shanghai</Option>
@@ -88,7 +114,7 @@ class WorkCalendarHome extends Component {
                 valuePropName: 'checked',
                 initialValue: useHoliday,
               })(
-                <Checkbox onChange={this.onUseHolidayChange}>自动更新每年的法定节假日</Checkbox>,
+                <Checkbox onChange={e => this.onCheckChange(e, 'useHoliday')}>自动更新每年的法定节假日</Checkbox>,
               )}
             </FormItem>
             <FormItem style={{ width: 512, marginBottom: 5 }}>
@@ -96,7 +122,7 @@ class WorkCalendarHome extends Component {
                 valuePropName: 'checked',
                 initialValue: saturdayWork,
               })(
-                <Checkbox onChange={this.onSaturdayWorkChange}>选定周六为工作日</Checkbox>,
+                <Checkbox onChange={e => this.onCheckChange(e, 'saturdayWork')}>选定周六为工作日</Checkbox>,
               )}
             </FormItem>
             <FormItem style={{ width: 512, marginBottom: 5 }}>
@@ -104,7 +130,7 @@ class WorkCalendarHome extends Component {
                 valuePropName: 'checked',
                 initialValue: sundayWork,
               })(
-                <Checkbox onChange={this.onSundayWorkChange}>选定周日为工作日</Checkbox>,
+                <Checkbox onChange={e => this.onCheckChange(e, 'sundayWork')}>选定周日为工作日</Checkbox>,
               )}
             </FormItem>
           </Form>
@@ -114,7 +140,7 @@ class WorkCalendarHome extends Component {
             useHoliday={useHoliday}
             selectDays={selectDays}
             holidayRefs={holidayRefs}
-            store={WorkCalendarStore}
+            updateSelete={this.updateSelete}
           />
         </Content>
       </Page>
