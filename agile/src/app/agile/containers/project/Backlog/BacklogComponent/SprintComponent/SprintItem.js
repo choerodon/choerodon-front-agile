@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
 import {
- Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu 
+  Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu, 
 } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
 import _ from 'lodash';
@@ -143,6 +143,7 @@ class SprintItem extends Component {
       selectIssueType: key,
     });
   }
+
   /**
    *简易创建issue事件
    *
@@ -244,8 +245,8 @@ class SprintItem extends Component {
    */
   handleFinishSprint =(item, indexs) => {
     this.props.store.axiosGetSprintCompleteMessage(
-      item.sprintId
-).then((res) => {
+      item.sprintId,
+    ).then((res) => {
       this.props.store.setSprintCompleteMessage(res);
       let flag = 0;
       if (res.parentsDoneUnfinishedSubtasks) {
@@ -284,8 +285,8 @@ class SprintItem extends Component {
     if (!this.props.store.getSprintData.sprintData.filter(items => items.statusCode === 'started').length > 0) {
       if (item.issueSearchDTOList.length > 0) {
         this.props.store.axiosGetOpenSprintDetail(
-          item.sprintId
-).then((res) => {
+          item.sprintId,
+        ).then((res) => {
           this.props.store.setOpenSprintDetail(res);
           this.setState({
             [`${index}-startSprint`]: { startSprintVisible: true },
@@ -372,8 +373,8 @@ class SprintItem extends Component {
         });
         this.props.store.setSelectIssue([item.issueId]);
       } else if (String(
-        this.state.selected.droppableId
-) === String(sprintId)) {
+        this.state.selected.droppableId,
+      ) === String(sprintId)) {
         // 如果点击的是当前列的卡片
         const originIssueIds = _.clone(this.state.selected.issueIds);
         // 如果不存在
@@ -462,18 +463,18 @@ class SprintItem extends Component {
     if (issues) {
       if (issues.length > 0) {
         return (
-<IssueItem
-          sprintItemRef={this.sprintItemRef}
-          versionVisible={this.props.versionVisible}
-          epicVisible={this.props.epicVisible}
-          store={this.props.store}
-          sprtintId={sprintId}
-          data={issues}
-          selected={this.state.selected}
-          draggableId={this.state.draggableId}
-          handleClickIssue={this.handleClickIssue}
-        />
-);
+          <IssueItem
+  sprintItemRef={this.sprintItemRef}
+  versionVisible={this.props.versionVisible}
+  epicVisible={this.props.epicVisible}
+  store={this.props.store}
+  sprtintId={sprintId}
+  data={issues}
+  selected={this.state.selected}
+  draggableId={this.state.draggableId}
+  handleClickIssue={this.handleClickIssue}
+/>
+        );
       }
     }
     if (type !== 'backlog') {
@@ -552,8 +553,9 @@ class SprintItem extends Component {
         onClick={this.handleDeleteSprint.bind(this, item)}
       >
         <Menu.Item key="0">
+
           删除sprint
-        </Menu.Item>
+</Menu.Item>
       </Menu>
     );
     if (item.statusCode) {
@@ -571,9 +573,10 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleFinishSprint.bind(this, item, index)}
               >
+
 完成冲刺
 
-              </p>
+</p>
               {/* <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown> */}
@@ -589,9 +592,10 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleStartSprint.bind(this, item, index)}
               >
+
 开启冲刺
 
-              </p>
+</p>
               <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown>
@@ -718,7 +722,7 @@ class SprintItem extends Component {
                             style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
                             role="none"
                           >
-{item.sprintName}
+                            {item.sprintName}
 
                           </span>
                         </EasyEdit>
@@ -740,9 +744,10 @@ class SprintItem extends Component {
                         role="none"
                         onClick={this.clearFilter}
                       >
+
 清空所有筛选器
 
-                      </p>
+</p>
                     </div>
                     <div style={{ flexGrow: 1 }}>
                       {this.renderStatusCodeDom(item, indexs)}
@@ -766,20 +771,17 @@ class SprintItem extends Component {
                                 <div>
                                   <p>{ass2.assigneeName}</p>
                                   <p>
-{ass2.totalStoryPoints || 0}
-{' '}
-故事点
-</p>
+                                    {ass2.totalStoryPoints || 0}
+                                    {'故事点'}
+                                  </p>
                                   <p>
-{ass2.totalRemainingTime ? ass2.totalRemainingTime : '无'}
-{' '}
-剩余预估时间
-</p>
+                                    {ass2.totalRemainingTime ? ass2.totalRemainingTime : '无'}
+                                    {'剩余预估时间'}
+                                  </p>
                                   <p>
-{ass2.issueCount}
-{' '}
-问题
-</p>
+                                    {ass2.issueCount}
+                                    {'问题'}
+                                    </p>
                                 </div>
                               )}
                             >
@@ -873,7 +875,7 @@ class SprintItem extends Component {
                             className="c7n-backlog-sprintDataItem"
                             role="none"
                           >
-{this.renderData(item, 'startDate')}
+                            {this.renderData(item, 'startDate')}
 
                           </div>
                         </EasyEdit>
@@ -891,7 +893,7 @@ class SprintItem extends Component {
                             className="c7n-backlog-sprintDataItem"
                             role="none"
                           >
-{this.renderData(item, 'endDate')}
+                            {this.renderData(item, 'endDate')}
 
                           </div>
                         </EasyEdit>
@@ -916,7 +918,7 @@ class SprintItem extends Component {
                             });
                           }}
                         >
-{item.sprintGoal ? item.sprintGoal : '无'}
+                          {item.sprintGoal ? item.sprintGoal : '无'}
 
                         </div>
                       </EasyEdit>
@@ -988,8 +990,9 @@ class SprintItem extends Component {
                                   </div>
                                 </div>
                                 <div style={{
- marginTop: 10, display: 'flex', justifyContent: 'flex-start', paddingRight: 70 
-}}>
+                                  marginTop: 10, display: 'flex', justifyContent: 'flex-start', paddingRight: 70, 
+                                }}
+                                >
                                   <Button
                                     type="primary"
                                     onClick={() => {
@@ -1000,17 +1003,19 @@ class SprintItem extends Component {
                                       });
                                     }}
                                   >
+
 取消
 
-                                  </Button>
+</Button>
                                   <Button
                                     type="primary"
                                     loading={this.state.loading}
                                     onClick={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
                                   >
+
 确定
 
-                                  </Button>
+</Button>
                                 </div>
                               </div>
                             ) : (
@@ -1033,8 +1038,9 @@ class SprintItem extends Component {
                                   }}
                                 >
                                   <Icon type="playlist_add" />
+
 创建问题
-</Button>
+                                                                </Button>
                               </div>
                             )}
                           </div>
@@ -1061,10 +1067,12 @@ class SprintItem extends Component {
               <div style={{ marginLeft: 40 }}>
                 <p style={{ color: 'rgba(0,0,0,0.65)' }}>用问题填充您的待办事项</p>
                 <p style={{ fontSize: 16, lineHeight: '28px', marginTop: 8 }}>
+
 这是您的团队待办事项。创建并预估新的问题，并通
-<br />
+                  <br />
+
 过上下拖动来对待办事项排优先级
-</p>
+                                </p>
               </div>
             </div>
           );
@@ -1123,15 +1131,18 @@ class SprintItem extends Component {
                       type={this.state.backlogExpand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
                       role="none"
                       onClick={() => {
-                            this.setState({
-                              backlogExpand: !this.state.backlogExpand,
-                            });
-                          }}
+                        this.setState({
+                          backlogExpand: !this.state.backlogExpand,
+                        });
+                      }}
                     />
                     <span
                       style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
                       role="none"
-                    >{item.sprintName}</span>
+                    >
+{item.sprintName}
+
+                    </span>
                   </div>
                   <p className="c7n-backlog-sprintQuestion">
                     {item.issueSearchDTOList && item.issueSearchDTOList.length > 0 ? `${item.issueSearchDTOList.length}个问题可见` : '0个问题可见'}
@@ -1150,9 +1161,10 @@ class SprintItem extends Component {
                     role="none"
                     onClick={this.clearFilter}
                   >
+
 清空所有筛选器
 
-                  </p>
+</p>
                 </div>
                 <div style={{ flexGrow: 1 }}>
                   {this.renderStatusCodeDom(item)}
@@ -1225,8 +1237,9 @@ class SprintItem extends Component {
                               </div>
                             </div>
                             <div style={{
- marginTop: 10, display: 'flex', justifyContent: 'flex-start', paddingRight: 70 
-}}>
+                              marginTop: 10, display: 'flex', justifyContent: 'flex-start', paddingRight: 70, 
+                            }}
+                            >
                               <Button
                                 type="primary"
                                 onClick={() => {
@@ -1235,17 +1248,19 @@ class SprintItem extends Component {
                                   });
                                 }}
                               >
+
 取消
 
-                              </Button>
+</Button>
                               <Button
                                 type="primary"
                                 loading={this.state.loading}
                                 onClick={this.handleBlurCreateIssue.bind(this, 'backlog', item, -1)}
                               >
+
 确定
 
-                              </Button>
+</Button>
                             </div>
                           </div>
                         ) : (
@@ -1266,8 +1281,9 @@ class SprintItem extends Component {
                               }}
                             >
                               <Icon type="playlist_add" />
+
 创建问题
-</Button>
+                                                        </Button>
                           </div>
                         )}
                       </div>

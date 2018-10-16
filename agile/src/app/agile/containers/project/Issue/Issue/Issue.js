@@ -49,7 +49,7 @@ class Issue extends Component {
     const Request = this.GetRequest(this.props.location.search);
     const {
       paramType, paramId, paramName, paramStatus,
-      paramPriority, paramIssueType, paramIssueId, paramUrl, paramOpenIssueId
+      paramPriority, paramIssueType, paramIssueId, paramUrl, paramOpenIssueId,
     } = Request;
     // console.log(paramOpenIssueId);
     IssueStore.setParamId(paramId);
@@ -177,6 +177,12 @@ class Issue extends Component {
 
   handleBlurCreateIssue() {
     if (this.state.createIssueValue !== '') {
+      const { history } = this.props;
+      const {
+        type, id, name, organizationId, 
+      } = AppState.currentMenuType;
+
+
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
         .then((res) => {
           const data = {
@@ -200,6 +206,7 @@ class Issue extends Component {
                 createIssueValue: '',
                 createLoading: false,
               });
+              history.push(`/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}&paramName=${response.issueNum}&paramIssueId=${response.issueId}&paramOpenIssueId=${response.issueId}`);
             })
             .catch((error) => {
             });

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { axios, stores } from 'choerodon-front-boot';
-import { Spin } from 'choerodon-ui';
+import { Spin, Tooltip } from 'choerodon-ui';
 import { withRouter } from 'react-router-dom';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 import pic from '../EmptyPics/no_sprint.svg';
@@ -90,22 +90,45 @@ class Sprint extends Component {
       <div className="users">
         {
           assigneeIssueDTOList.length ? assigneeIssueDTOList.slice(0, 10).map(user => (
-            <div key={user.assigneeId}>
+            <div key={user.assigneeName}>
               {
-                user.assigneeId === 0 && assigneeIssueDTOList.length === 1
-                  ? (<div style={{ height: 18 }} />)
-                  : (
-                    <UserHead
-                      user={{
-                        id: user.assigneeId,
-                        loginName: '',
-                        realName: user.assigneeName,
-                        avatar: user.imageUrl,
-                      }}
-                      hiddenText
-                    />
-                  )
-              }
+                  user.assigneeId === 0 && assigneeIssueDTOList.length === 1
+                    ? (<div style={{ height: 18 }} />)
+                    : (
+                      <Tooltip
+                        placement="bottom"
+                        title={(
+                          <div>
+                            <p style={{ margin: 0 }}>{user.assigneeName}</p>
+                            <p style={{ margin: 0 }}>
+                              {user.totalStoryPoints || 0}
+                              {'故事点'}
+                            </p>
+                            <p style={{ margin: 0 }}>
+                              {user.totalRemainingTime ? user.totalRemainingTime : '无'}
+                              {'剩余预估时间'}
+                            </p>
+                            <p style={{ margin: 0 }}>
+                              {user.issueCount}
+                              {'问题'}
+                            </p>
+                          </div>
+                      )}
+                      >
+                        <div>
+                          <UserHead
+                            user={{
+                              id: user.assigneeId,
+                              loginName: '',
+                              realName: user.assigneeName,
+                              avatar: user.imageUrl,
+                            }}
+                            hiddenText
+                          />
+                        </div>
+                      </Tooltip>
+                    )
+                }
             </div>
           ))
             : <div style={{ height: 18, width: '100%' }} />
