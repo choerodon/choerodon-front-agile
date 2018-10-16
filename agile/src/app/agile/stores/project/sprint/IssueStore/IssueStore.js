@@ -7,26 +7,41 @@ const { AppState } = stores;
 @store('SprintCommonStore')
 class SprintCommonStore {
   @observable issues = [];
+
   @observable pagination = {};
+
   @observable filter = {
     advancedSearchArgs: {},
     searchArgs: {},
   };
+
   @observable filteredInfo = {};
+
   @observable order = {
     orderField: '',
     orderType: '',
   };
+
   @observable loading = true;
+
   @observable paramType = undefined;
+
   @observable paramId = undefined;
+
   @observable paramName = undefined;
+
   @observable paramStatus = undefined;
+
   @observable paramPriority = undefined;
+
   @observable paramIssueType = undefined;
+
   @observable paramIssueId = undefined;
+
   @observable paramOpenIssueId = undefined;
+
   @observable paramUrl = undefined;
+
   @observable barFilters = undefined;
 
   init() {
