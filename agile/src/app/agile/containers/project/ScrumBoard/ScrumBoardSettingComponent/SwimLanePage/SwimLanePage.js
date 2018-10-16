@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Content, stores } from 'choerodon-front-boot';
-import { Button, Select, Icon, message } from 'choerodon-ui';
+import {
+ Button, Select, Icon, message 
+} from 'choerodon-ui';
 import _ from 'lodash';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 
@@ -16,6 +18,7 @@ class SwimLanePage extends Component {
       selectValue: '',
     };
   }
+
   handleSave(select) {
     const data = {
       // objectVersionNumber: select.objectVersionNumber,
@@ -29,6 +32,7 @@ class SwimLanePage extends Component {
       message.success('保存失败');
     });
   }
+
   render() {
     const data = ScrumBoardStore.getBoardList;
     const selectBoard = ScrumBoardStore.getSelectedBoard;
@@ -78,4 +82,3 @@ class SwimLanePage extends Component {
 }
 
 export default SwimLanePage;
-

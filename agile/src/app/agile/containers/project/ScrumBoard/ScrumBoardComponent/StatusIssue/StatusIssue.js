@@ -361,13 +361,13 @@ class StatusIssue extends Component {
                         borderTop: item.parentIssueId && this.props.swimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 'unset' : '1px solid rgba(0, 0, 0, 0.20)',
                       }}
                     >
-                      <div 
+                      {/* <div 
                         className="c7n-scrumboard-issueBorder" 
                         style={{
                           background: this.renderTypeCode('background', item),
                           display: this.props.swimLaneCode === 'assignee' ? 'block' : 'none',
                         }}
-                      />
+                      /> */}
                       <div style={{ flexGrow: 1 }}>
                         <div
                           // label={ScrumBoardStore.getClickIssueDetail.issueId}
