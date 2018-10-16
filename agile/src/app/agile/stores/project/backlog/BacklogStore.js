@@ -328,6 +328,10 @@ class BacklogStore {
 
 
   handleVersionDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/drag`, data);
+
+  axiosGetWorkSetting = (orgId) => {
+    return axios.get(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/detail`);
+  };
 }
 
 const backlogStore = new BacklogStore();

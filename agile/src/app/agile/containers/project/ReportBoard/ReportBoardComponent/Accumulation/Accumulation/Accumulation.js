@@ -214,7 +214,7 @@ class Accumulation extends Component {
   }
 
   loadBoardData(boardId, recent, filter, projectId = AppState.currentMenuType.id) {
-    return axios.get(`/agile/v1/projects/${projectId}/board/${boardId}/all_data?onlyStory=${recent}&quickFilterIds=${filter}`);
+    return axios.get(`/agile/v1/projects/${projectId}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?onlyStory=${recent}&quickFilterIds=${filter}`);
   }
 
   loadProjectInfo(projectId = AppState.currentMenuType.id) {

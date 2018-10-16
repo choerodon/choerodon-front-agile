@@ -5,10 +5,14 @@ import { store, stores } from 'choerodon-front-boot';
 @store('WorkCalendarStore')
 class WorkCalendarStore {
   @observable holidayRefs = [];
-  @observable saturdayWork = false;
-  @observable sundayWork = false;
-  @observable useHoliday = false;
   @observable selectDays = [];
+  @observable workDaySetting = {
+    saturdayWork: false,
+    sundayWork: false,
+    useHoliday: false,
+    timeZoneCode: 'Asia/Shanghai',
+    areaCode: 'Asia',
+  };
 
   @computed get getHolidayRefs() {
     return this.holidayRefs;
@@ -18,28 +22,12 @@ class WorkCalendarStore {
     this.holidayRefs = data;
   }
 
-  @computed get getSaturdayWork() {
-    return this.saturdayWork;
+  @computed get getWorkDaySetting() {
+    return this.workDaySetting;
   }
 
-  @action setSaturdayWork(data) {
-    this.saturdayWork = data;
-  }
-
-  @computed get getSundayWork() {
-    return this.sundayWork;
-  }
-
-  @action setSundayWork(data) {
-    this.sundayWork = data;
-  }
-
-  @computed get getUseHoliday() {
-    return this.useHoliday;
-  }
-
-  @action setUseHoliday(data) {
-    this.useHoliday = data;
+  @action setWorkDaySetting(data) {
+    this.workDaySetting = data;
   }
 
   @computed get getSelectDays() {
@@ -50,23 +38,38 @@ class WorkCalendarStore {
     this.selectDays = data;
   }
 
-  axiosGetCalendarData = () => {
-    setTimeout(() => {
-      this.setSelectDays([]);
-      this.setSaturdayWork(false);
-      this.setSundayWork(false);
-      this.setUseHoliday(true);
-    }, 300);
-  };
-
-  axiosPostCalendarData = (data) => {
-    this.setSelectDays(data)
-  };
-
   axiosGetHolidayData = (orgId, year) => {
-    axios.get(`/agile/v1/organizations/${orgId}/work_calendar_holiday_refs?year=${year}`).then((data) => {
+    return axios.get(`/agile/v1/organizations/${orgId}/work_calendar_holiday_refs?year=${year}`).then((data) => {
       this.setHolidayRef(data);
     });
+  };
+
+  axiosGetWorkDaySetting = (orgId) => {
+    return axios.get(`/agile/v1/organizations/${orgId}/time_zone_work_calendars`).then((data) => {
+      if (data) {
+        this.setWorkDaySetting(data);
+      }
+    });
+  };
+
+  axiosGetCalendarData = (orgId, timeZoneId) => {
+    return axios.get(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/ref/${timeZoneId}`).then((data) => {
+      if (data) {
+        this.setSelectDays(data);
+      }
+    });
+  };
+
+  axiosUpdateSetting(orgId, timeZoneId, data) {
+    return axios.put(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/${timeZoneId}`, data);
+  };
+
+  axiosDeleteCalendarData(orgId, calendarId) {
+    return axios.delete(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/ref/${calendarId}`);
+  };
+
+  axiosCreateCalendarData(orgId, timeZoneId, data) {
+    return axios.post(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/ref/${timeZoneId}`, data);
   };
 }
 

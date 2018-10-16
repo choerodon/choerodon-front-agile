@@ -27,9 +27,9 @@
   }
 
   .rc-calendar-date {
-    width: 36px;
-    height: 36px;
-    line-height: 36px;
+    width: 42px;
+    height: 42px;
+    line-height: 42px;
     font-size: 14px;
   }
 
@@ -39,6 +39,121 @@
   }
 
   .rc-calendar-body {
-    height: 337px;
+    height: 397px;
+  }
+
+  .not-current-month {
+    background: transparent;
+    color: #cccccc;
+  }
+
+  .before-today {
+    background: transparent;
+    color: #cccccc;
+    cursor: not-allowed;
+  }
+
+  .rc-calendar-selected-date .rc-calendar-date:hover {
+    background: transparent;
+  }
+
+  .rc-calendar-selected-date .rc-calendar-date.restday:hover {
+    background: #FEF3F2;
+  }
+
+  .rc-calendar-selected-date .rc-calendar-date.workday:hover {
+    background: #F6F6F6;
+  }
+
+  .workday {
+    background: #F6F6F6;
+    color: #000;
+    .tag {
+      background: #000;
+    }
+  }
+
+  .restday {
+    color: #000;
+    .tag {
+      background: #E8101E;
+    }
+  }
+
+  .tag {
+    position: absolute;
+    top: 0;
+    border-radius: 2px;
+    color: #ffffff;
+    font-size: 12px;
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    left: 0;
+  }
+
+  .des {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 12px;
+    line-height: 12px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 12px;
+    transform: scale(0.83);
+  }
+
+
+  .rc-calendar-year-select:hover,
+  .rc-calendar-month-select:hover {
+    color: #108EE9;
+  }
+
+  .rc-calendar-year-panel-decade-select-content:hover,
+  .rc-calendar-month-panel-year-select-content:hover,
+  .rc-calendar-month-panel-year-select:hover,
+  .rc-calendar-year-panel-decade-select:hover,
+  .rc-calendar-decade-panel-next-century-btn:hover,
+  .rc-calendar-decade-panel-prev-century-btn:hover,
+  .rc-calendar-year-panel-next-decade-btn:hover,
+  .rc-calendar-year-panel-prev-decade-btn:hover,
+  .rc-calendar-next-month-btn:hover,
+  .rc-calendar-prev-year-btn:hover,
+  .rc-calendar-next-year-btn:hover,
+  .rc-calendar-prev-month-btn:hover,
+  .rc-calendar-month-panel-next-year-btn:hover,
+  .rc-calendar-month-panel-prev-year-btn:hover {
+    color: #56aff6;
+  }
+
+  .rc-calendar-column-header {
+    padding: 18px 0;
+  }
+
+  .rc-calendar-year-panel-selected-cell .rc-calendar-year-panel-year,
+  .rc-calendar-month-panel-selected-cell .rc-calendar-month-panel-month,
+  .rc-calendar-decade-panel-selected-cell .rc-calendar-decade-panel-decade,
+  .rc-calendar-year-panel-selected-cell .rc-calendar-year-panel-year:hover,
+  .rc-calendar-month-panel-selected-cell .rc-calendar-month-panel-month:hover,
+  .rc-calendar-decade-panel-selected-cell .rc-calendar-decade-panel-decade:hover {
+    background-color: #2196F3;
+  }
+
+  .rc-calendar-year-panel-year:hover,
+  .rc-calendar-month-panel-month:hover,
+  .rc-calendar-decade-panel-decade:hover {
+    background-color: #E6F3FC;
+  }
+
+  .rc-calendar-today-btn {
+    color: #108EE9;
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  .rc-calendar-today-btn:hover {
+    color: #108EE9;
   }
 }

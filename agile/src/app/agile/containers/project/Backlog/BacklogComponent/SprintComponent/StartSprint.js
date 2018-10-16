@@ -21,8 +21,33 @@ class StartSprint extends Component {
       startDate: null,
       endDate: null,
       showCalendar: false,
+      saturdayWork: false,
+      sundayWork: false,
+      useHoliday: false,
+      workDates: [], // 冲刺自定义设置
+      selectDays: [], // 组织层自定义设置
+      holidayRefs: [], // 法定假期
     };
   }
+
+  componentDidMount() {
+    this.init();
+  }
+
+  init = () => {
+    const { store } = this.props;
+    const orgId = AppState.currentMenuType.organizationId;
+    store.axiosGetWorkSetting(orgId).then((res) => {
+      this.setState({
+        saturdayWork: res.saturdayWork,
+        sundayWork: res.sundayWork,
+        useHoliday: res.useHoliday,
+        selectDays: res.timeZoneWorkCalendarDTOS,
+        holidayRefs: res.workHolidayCalendarDTOS,
+      });
+    });
+  };
+
   /**
    *开启冲刺事件
    *
@@ -31,6 +56,7 @@ class StartSprint extends Component {
    */
   handleStartSprint =(e) => {
     e.preventDefault();
+    const { workDates } = this.state;
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const data = {
@@ -41,6 +67,7 @@ class StartSprint extends Component {
           sprintId: this.props.data.sprintId,
           sprintName: values.name,
           objectVersionNumber: this.props.data.objectVersionNumber,
+          workDates,
         };
         this.props.store.axiosStartSprint(data).then((res) => {
           this.props.onCancel();
@@ -55,9 +82,90 @@ class StartSprint extends Component {
     this.setState({ showCalendar: !this.state.showCalendar });
   };
 
+  getWorkDays = (startDate, endDate) => {
+    // 是否显示非工作日
+    const {
+      saturdayWork,
+      sundayWork,
+      useHoliday,
+      selectDays,
+      holidayRefs,
+      workDates,
+    } = this.state;
+    const weekdays = [
+      saturdayWork ?  null : '六',
+      sundayWork ? null : '日',
+    ];
+    const format = 'YYYY-MM-DD';
+    const result = [];
+    const beginDay = moment(startDate).format(format).split('-');
+    const endDay = moment(endDate).format(format).split('-');
+    const diffDay = new Date();
+    const dateList = new Array();
+    let i = 0;
+    diffDay.setDate(beginDay[2]);
+    diffDay.setMonth(beginDay[1] - 1);
+    diffDay.setFullYear(beginDay[0]);
+    while (i === 0) {
+      const localData = moment.localeData();
+      // 周六日
+      const isWeekDay = weekdays.includes(localData.weekdaysMin(moment(diffDay)));
+      // 冲刺自定义设置
+      const workDate = workDates.filter(date => date.workDay === moment(diffDay).format('YYYY-MM-DD'));
+      // 工作日历自定义设置
+      const selectDay = selectDays.filter(date => date.workDay === moment(diffDay).format('YYYY-MM-DD'));
+      // 法定假期
+      let holiday = false;
+      if (useHoliday && holidayRefs.length) {
+        holiday = holidayRefs.filter(date => date.holiday === moment(diffDay).format('YYYY-MM-DD'));
+      }
+      if (workDate.length) {
+        if (workDate[0].status === 1) {
+          result.push(workDate.workDay);
+        }
+      } else if (selectDay.length) {
+        if (selectDay[0].status === 1) {
+          result.push(selectDay.workDay);
+        }
+      } else if (holiday && holiday.length) {
+        if (holiday[0].status === 1) {
+          result.push(holiday.holiday);
+        }
+      } else if (!isWeekDay) {
+        result.push(moment(diffDay).format('YYYY-MM-DD'));
+      }
+      dateList[2] = diffDay.getDate();
+      dateList[1] = diffDay.getMonth() + 1;
+      dateList[0] = diffDay.getFullYear();
+      if (String(dateList[1]).length === 1) { dateList[1] = `0${dateList[1]}`; }
+      if (String(dateList[2]).length === 1) { dateList[2] = `0${dateList[2]}`; }
+      if (String(dateList[0]) === endDay[0] && String(dateList[1]) === endDay[1] && String(dateList[2]) === endDay[2]) {
+        i = 1;
+      }
+      const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
+      diffDay.setTime(countDay);
+    }
+    return result.length;
+  };
+
+  onWorkDateChange = (workDates) => {
+    this.setState({
+      workDates,
+    });
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { showCalendar } = this.state;
+    const {
+      showCalendar,
+      startDate,
+      endDate,
+      saturdayWork,
+      sundayWork,
+      useHoliday,
+      selectDays,
+      holidayRefs,
+    } = this.state;
     const data = this.props.data;
     const completeMessage = JSON.stringify(this.props.store.getOpenSprintDetail) === '{}' ? null : this.props.store.getOpenSprintDetail;
     return (
@@ -190,17 +298,30 @@ class StartSprint extends Component {
               )}
             </FormItem>
           </Form>
-          <div style={{ marginBottom: 20 }}>
-            <span style={{ marginRight: 20 }}>
-              {`此Sprint中有${12}个工作日`}
-            </span>
-            <Icon type="settings" style={{ verticalAlign: 'top' }} />
-            <a onClick={this.showWorkCalendar}>
-              设置当前冲刺工作日
-            </a>
-          </div>
-          {showCalendar ?
-            <WorkCalendar /> : null
+          {startDate && endDate ?
+            <div>
+              <div style={{ marginBottom: 20 }}>
+                <span style={{ marginRight: 20 }}>
+                  {`此Sprint中有${this.getWorkDays(startDate, endDate)}个工作日`}
+                </span>
+                <Icon type="settings" style={{ verticalAlign: 'top' }} />
+                <a onClick={this.showWorkCalendar}>
+                  设置当前冲刺工作日
+                </a>
+              </div>
+              {showCalendar ?
+                <WorkCalendar
+                  startDate={startDate}
+                  endDate={endDate}
+                  saturdayWork={saturdayWork}
+                  sundayWork={sundayWork}
+                  useHoliday={useHoliday}
+                  selectDays={selectDays}
+                  holidayRefs={holidayRefs}
+                  onWorkDateChange={this.onWorkDateChange}
+                /> : null
+              }
+            </div> : null
           }
         </Content>
       </Sidebar>
