@@ -1800,13 +1800,8 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-
-
-
-
-
-                            优先级：
-</span>
+                            {'优先级：'}
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -1900,13 +1895,8 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
-
-
-
-
-
-                                模块：
-</span>
+                                {'模块：'}
+                              </span>
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit
@@ -1919,7 +1909,7 @@ class CreateSprint extends Component {
                                 onCancel={this.resetComponentIssueRelDTOList.bind(this)}
                                 readModeContent={(
                                   <div style={{ color: '#3f51b5' }}>
-                                    <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
+                                    <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginTop: 2 }}>
                                       {this.transToArr(this.state.componentIssueRelDTOList, 'name')}
                                     </p>
                                   </div>

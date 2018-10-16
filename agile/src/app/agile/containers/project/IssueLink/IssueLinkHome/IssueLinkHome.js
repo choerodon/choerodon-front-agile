@@ -142,7 +142,8 @@ class Link extends Component {
       {
         title: '',
         dataIndex: 'linkTypeId',
-        width: '15%',
+        // width: '15%',
+        width: '100px',
         render: (linkTypeId, record) => (
           <div>
             <Permission
@@ -158,7 +159,7 @@ class Link extends Component {
                   <div>
                     <span>详情</span>
                   </div>
-)}
+                )}
               >
                 {/* <Button shape="circle" onClick={this.showLinkType.bind(this, record)}> */}
                 <Icon type="mode_edit" onClick={this.showLinkType.bind(this, record)} />
