@@ -47,6 +47,8 @@ class SprintItem extends Component {
     this.props.onRef(this);
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
+    const { store } = this.props;
+    store.axiosGetWorkSetting();
   }
 
   componentWillUnmount() {

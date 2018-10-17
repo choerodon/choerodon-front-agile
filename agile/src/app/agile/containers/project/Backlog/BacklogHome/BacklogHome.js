@@ -160,7 +160,7 @@ class BacklogHome extends Component {
       //   });
       // }
       if (document.getElementById('sprint_new')) {
-        document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_new').offsetTop - 100;
+        document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_new').offsetTop - 224;
       }
     }).catch((error) => {
       this.setState({

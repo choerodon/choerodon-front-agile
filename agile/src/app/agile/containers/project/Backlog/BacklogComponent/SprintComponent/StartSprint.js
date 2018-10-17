@@ -21,32 +21,9 @@ class StartSprint extends Component {
       startDate: null,
       endDate: null,
       showCalendar: false,
-      saturdayWork: false,
-      sundayWork: false,
-      useHoliday: false,
       workDates: [], // 冲刺自定义设置
-      selectDays: [], // 组织层自定义设置
-      holidayRefs: [], // 法定假期
     };
   }
-
-  componentDidMount() {
-    this.init();
-  }
-
-  init = () => {
-    const { store } = this.props;
-    const orgId = AppState.currentMenuType.organizationId;
-    store.axiosGetWorkSetting(orgId).then((res) => {
-      this.setState({
-        saturdayWork: res.saturdayWork,
-        sundayWork: res.sundayWork,
-        useHoliday: res.useHoliday,
-        selectDays: res.timeZoneWorkCalendarDTOS,
-        holidayRefs: res.workHolidayCalendarDTOS,
-      });
-    });
-  };
 
   /**
    *开启冲刺事件
@@ -84,14 +61,15 @@ class StartSprint extends Component {
 
   getWorkDays = (startDate, endDate) => {
     // 是否显示非工作日
+    const { store } = this.props;
     const {
       saturdayWork,
       sundayWork,
       useHoliday,
       selectDays,
       holidayRefs,
-      workDates,
-    } = this.state;
+    } = store.getWorkSetting;
+    const { workDates } = this.state;
     const weekdays = [
       saturdayWork ?  null : '六',
       sundayWork ? null : '日',
@@ -155,17 +133,20 @@ class StartSprint extends Component {
   };
 
   render() {
+    const { store } = this.props;
     const { getFieldDecorator } = this.props.form;
     const {
       showCalendar,
       startDate,
       endDate,
+    } = this.state;
+    const {
       saturdayWork,
       sundayWork,
       useHoliday,
       selectDays,
       holidayRefs,
-    } = this.state;
+    } = store.getWorkSetting;
     const data = this.props.data;
     const completeMessage = JSON.stringify(this.props.store.getOpenSprintDetail) === '{}' ? null : this.props.store.getOpenSprintDetail;
     return (
