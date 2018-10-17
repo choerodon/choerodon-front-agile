@@ -386,7 +386,7 @@ class StatusIssue extends Component {
                           >
                             {this.renderTypeCode('icon', item)}
                           </div>
-                          <p style={{ marginLeft: 5, textDecoration: this.props.categoryCode === 'done' ? 'line-through' : '' }} className="textDisplayOneColumn">{item.issueNum}</p>
+                          <p style={{ marginLeft: 5, textDecoration: this.props.isCompleted ? 'line-through' : '' }} className="textDisplayOneColumn">{item.issueNum}</p>
                           <div style={{ display: 'flex', paddingLeft: ScrumBoardStore.getClickIssueDetail.issueId ? 0 : 24, alignItems: 'center' }}>
                             <p>
                               <Tooltip title={`状态: ${this.props.statusName}`}>

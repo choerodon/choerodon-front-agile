@@ -35,13 +35,15 @@ class WorkCalendar extends Component {
       endDate,
     } = this.props;
     const { workDates } = this.state;
+    const format = 'YYYY-MM-DD';
     // 渲染当前月，当前迭代可见数据
-    if (current.format('MM') !== now.format('MM') || current.isBefore(startDate) || current.isAfter(endDate)) {
+    if (current.format('MM') !== now.format('MM')
+      || moment(current.format(format)).isBefore(moment(startDate.format(format)))
+      || moment(current.format(format)).isAfter(moment(endDate.format(format)))) {
       return (<div className="rc-calendar-date not-current-month">
         {current.date()}
       </div>);
     }
-    const format = 'YYYY-MM-DD';
     const date = current.format(format);
     const weekdays = [
       saturdayWork ? null : '六',

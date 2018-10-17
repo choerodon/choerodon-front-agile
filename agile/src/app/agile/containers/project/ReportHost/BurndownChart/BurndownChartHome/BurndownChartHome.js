@@ -175,7 +175,6 @@ class BurndownChartHome extends Component {
           ];
         }
       }
-      let minusCount = 0;
       for (let b = 0, len = allDate.length; b < len; b += 1) {
         const nowKey = allDate[b];
         // 显示非工作日，则非工作日期望为水平线
@@ -189,7 +188,6 @@ class BurndownChartHome extends Component {
             if (b < len - 1) {
               markAreaData.push([
                 {
-                  name: '非工作日',
                   xAxis: allDate[b].split(' ')[0].slice(5).replace('-', '/'),
                 },
                 {
@@ -199,10 +197,8 @@ class BurndownChartHome extends Component {
             }
             exportAxisData[b + 1] = exportAxisData[b];
           } else {
-            // 工作日
-            minusCount ++;
             // 工作量取整
-            exportAxisData[b + 1] = parseInt(res.expectCount - (dayAmount * minusCount));
+            exportAxisData[b + 1] = exportAxisData[b] - dayAmount;
           }
         }
         if (res.coordinate.hasOwnProperty(nowKey)) {
@@ -334,6 +330,15 @@ class BurndownChartHome extends Component {
         },
         extraCssText:
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
+        formatter: function (params) {
+          let content = '';
+          params.forEach((item) => {
+            if (item.seriesName === '剩余值') {
+              content = `${item.axisValue}<br />${item.marker}${item.seriesName} : ${item.value || '-'}`;
+            }
+          });
+          return content;
+        }
       },
       legend: {
         top: '24px',
