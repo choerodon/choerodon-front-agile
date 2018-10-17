@@ -92,7 +92,8 @@ class SprintProgressHome extends Component {
 
   loadData() {
     const projectId = AppState.currentMenuType.id;
-    axios.get(`agile/v1/projects/${projectId}/sprint/active`)
+    const orgId = AppState.currentMenuType.organizationId;
+    axios.get(`agile/v1/projects/${projectId}/sprint/active/${orgId}`)
       .then((res) => {
         this.setState({
           sprint: res,
