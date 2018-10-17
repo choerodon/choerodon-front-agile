@@ -35,7 +35,7 @@ class StatusBodyColumn extends Component {
   //   }
   // }
   
-  renderIssues(issues, droppableId, statusName, categoryCode, clickItem) {
+  renderIssues(issues, droppableId, statusName, categoryCode, isCompleted, clickItem) {
     let data = issues;
     data = _.orderBy(data, ['rank'], 'desc');
     // data = _.sortBy(data, o => o.rank);
@@ -57,6 +57,7 @@ class StatusBodyColumn extends Component {
                   droppableId={droppableId}
                   statusName={statusName}
                   categoryCode={categoryCode}
+                  isCompleted={isCompleted}
                   statusData={this.props.data.subStatuses}
                   renderIssues={this.renderIssues.bind(this)}
                   ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
@@ -80,6 +81,7 @@ class StatusBodyColumn extends Component {
                 droppableId={droppableId}
                 statusName={statusName}
                 categoryCode={categoryCode}
+                isCompleted={isCompleted}
                 statusData={this.props.data.subStatuses}
                 renderIssues={this.renderIssues.bind(this)}
                 ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
@@ -105,6 +107,7 @@ class StatusBodyColumn extends Component {
                   droppableId={droppableId}
                   statusName={statusName}
                   categoryCode={categoryCode}
+                  isCompleted={isCompleted}
                   statusData={this.props.data.subStatuses}
                   renderIssues={this.renderIssues.bind(this)}
                   ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
@@ -128,6 +131,7 @@ class StatusBodyColumn extends Component {
                 droppableId={droppableId}
                 statusName={statusName}
                 categoryCode={categoryCode}
+                isCompleted={isCompleted}
                 statusData={this.props.data.subStatuses}
                 renderIssues={this.renderIssues.bind(this)}
                 ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
@@ -153,6 +157,7 @@ class StatusBodyColumn extends Component {
                   droppableId={droppableId}
                   statusName={statusName}
                   categoryCode={categoryCode}
+                  isCompleted={isCompleted}
                   statusData={this.props.data.subStatuses}
                   renderIssues={this.renderIssues.bind(this)}
                   ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
@@ -176,6 +181,7 @@ class StatusBodyColumn extends Component {
                 droppableId={droppableId}
                 statusName={statusName}
                 categoryCode={categoryCode}
+                isCompleted={isCompleted}
                 statusData={this.props.data.subStatuses}
                 renderIssues={this.renderIssues.bind(this)}
                 ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
@@ -198,6 +204,7 @@ class StatusBodyColumn extends Component {
             droppableId={droppableId}
             statusName={statusName}
             categoryCode={categoryCode}
+            isCompleted={isCompleted}
             statusData={this.props.data.subStatuses}
             renderIssues={this.renderIssues.bind(this)}
             ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
@@ -537,7 +544,7 @@ class StatusBodyColumn extends Component {
                 {data[index].name}
               </p>
               <div className="c7n-itemBodyColumn" style={{ minHeight: 83 }}>
-                {this.renderIssues(data[index].issues, data[index].id, data[index].name, data[index].categoryCode, clickItem)}
+                {this.renderIssues(data[index].issues, data[index].id, data[index].name, data[index].categoryCode, data[index].completed, clickItem)}
               </div>
             </div>
           )}

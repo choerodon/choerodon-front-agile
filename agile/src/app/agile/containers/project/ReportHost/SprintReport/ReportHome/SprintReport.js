@@ -101,7 +101,7 @@ class SprintReport extends Component {
       if (restDayShow || !restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
       }
-      if (String(dateList[0]) === endDay[0] && dateList[1] === endDay[1] && dateList[2] === endDay[2]) {
+      if (String(dateList[0]) === endDay[0] && String(dateList[1]) === endDay[1] && String(dateList[2]) === endDay[2]) {
         i = 1;
       }
     }
@@ -179,7 +179,6 @@ class SprintReport extends Component {
           ];
         }
       }
-      let minusCount = 0;
       for (let b = 0, len = allDate.length; b < len; b += 1) {
         const nowKey = allDate[b];
         // 显示非工作日，则非工作日期望为水平线
@@ -193,7 +192,6 @@ class SprintReport extends Component {
             if (b < len - 1) {
               markAreaData.push([
                 {
-                  name: '非工作日',
                   xAxis: allDate[b].split(' ')[0].slice(5).replace('-', '/'),
                 },
                 {
@@ -203,10 +201,8 @@ class SprintReport extends Component {
             }
             exportAxisData[b + 1] = exportAxisData[b];
           } else {
-            // 工作日
-            minusCount ++;
             // 工作量取整
-            exportAxisData[b + 1] = parseInt(res.expectCount - (dayAmount * minusCount));
+            exportAxisData[b + 1] = exportAxisData[b] - dayAmount;
           }
         }
         if (res.coordinate.hasOwnProperty(nowKey)) {
@@ -317,6 +313,15 @@ class SprintReport extends Component {
         },
         extraCssText:
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
+        formatter: function (params) {
+          let content = '';
+          params.forEach((item) => {
+            if (item.seriesName === '剩余值') {
+              content = `${item.axisValue}<br />${item.marker}${item.seriesName} : ${item.value || '-'}`;
+            }
+          });
+          return content;
+        }
       },
       legend: {
         top: '24px',
