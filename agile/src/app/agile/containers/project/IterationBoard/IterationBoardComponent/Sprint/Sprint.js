@@ -39,7 +39,7 @@ class Sprint extends Component {
       this.setState({ loading: true });
       const projectId = AppState.currentMenuType.id;
       const orgId = AppState.currentMenuType.organizationId;
-      axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/sprint/orgId?sprintId=${sprintId}`)
+      axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/sprint/${orgId}?sprintId=${sprintId}`)
         .then((res) => {
           this.setState({
             sprintInfo: res,

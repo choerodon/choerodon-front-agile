@@ -4,7 +4,7 @@ import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import moment from 'moment';
 import {
-  Dropdown, Icon, Menu, Spin,
+  Dropdown, Icon, Menu, Spin, Checkbox,
 } from 'choerodon-ui';
 import {
   DashBoardNavBar, stores, axios,
@@ -22,6 +22,10 @@ class BurnDown extends Component {
       sprint: {},
       unit: 'remainingEstimatedTime',
       loading: true,
+      restDayShow: true,
+      restDays: [],
+      exportAxis: [],
+      markAreaData: [],
     };
   }
 
@@ -72,6 +76,15 @@ class BurnDown extends Component {
         },
         extraCssText: 
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
+        formatter: function (params) {
+          let content = '';
+          params.forEach((item) => {
+            if (item.seriesName === '剩余值') {
+              content = `${item.axisValue || '冲刺结束'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value  : '-'}`;
+            }
+          });
+          return content;
+        }
       },
       legend: {
         top: '0',
@@ -172,16 +185,24 @@ class BurnDown extends Component {
           symbol: 'none',
           name: '期望值',
           type: 'line',
-          data: [
-            [startDate.split(' ')[0].slice(5).replace('-', '/'), expectCount],
-            [endDate.split(' ')[0].slice(5).replace('-', '/'), 0],
-          ],
+          data: this.state.exportAxis,
           itemStyle: {
             color: 'rgba(0,0,0,0.65)',
           },
           lineStyle: {
             type: 'dotted',
             color: 'rgba(0,0,0,0.65)',
+          },
+          markArea: {
+            itemStyle: {
+              color: 'rgba(235,235,235,0.65)',
+            },
+            emphasis: {
+              itemStyle: {
+                color: 'rgba(220,220,220,0.65)',
+              },
+            },
+            data: this.state.markAreaData,
           },
         },
         {
@@ -198,7 +219,9 @@ class BurnDown extends Component {
   }
 
   getBetweenDateStr(start, end) {
+    const { restDayShow, restDays } = this.state;
     const result = [];
+    const rest = [];
     const beginDay = start.split('-');
     const endDay = end.split('-');
     const diffDay = new Date();
@@ -211,17 +234,22 @@ class BurnDown extends Component {
     while (i == 0) {
       const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
       diffDay.setTime(countDay);
+      if (restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
+        rest.push(moment(diffDay).format('YYYY-MM-DD'));
+      }
       dateList[2] = diffDay.getDate();
       dateList[1] = diffDay.getMonth() + 1;
       dateList[0] = diffDay.getFullYear();
       if (String(dateList[1]).length == 1) { dateList[1] = `0${dateList[1]}`; }
       if (String(dateList[2]).length == 1) { dateList[2] = `0${dateList[2]}`; }
-      result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
+      if (restDayShow || !restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
+        result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
+      }
       if (dateList[0] == endDay[0] && dateList[1] == endDay[1] && dateList[2] == endDay[2]) {
         i = 1;
       }
     }
-    return result;
+    return { result, rest };
   }
 
   loadSprints(unit) {
@@ -231,12 +259,30 @@ class BurnDown extends Component {
       .then((res) => {
         if (res && res.length) {
           this.setState({ sprint: res[0] });
-          this.loadChartData(res[0].sprintId, unit);
+          this.getRestDays(res[0].sprintId, unit);
         } else {
           this.setState({ loading: false });
         }
       });
   }
+
+  getRestDays = (sprintId, unit) => {
+    const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
+    axios.get(`/agile/v1/projects/${projectId}/sprint/query_non_workdays/${sprintId}/${orgId}`).then((res) => {
+      if (res) {
+        this.setState({
+          restDays: res.map((date) => moment(date).format('YYYY-MM-DD')),
+        }, () => {
+          this.loadChartData(sprintId, unit);
+        });
+      } else {
+        this.loadChartData(sprintId, unit);
+      }
+    }).catch(() => {
+      this.loadChartData(sprintId, unit);
+    });
+  };
 
   loadChartData(sprintId, unit = 'remainingEstimatedTime') {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${unit}`)
@@ -248,27 +294,73 @@ class BurnDown extends Component {
         const maxDate = moment(dataMaxDate).isBefore(moment(sprintMaxDate))
           ? sprintMaxDate : dataMaxDate;
         let allDate;
+        let rest = [];
         if (moment(maxDate).isBefore(sprintMaxDate)) {
-          allDate = this.getBetweenDateStr(dataMinDate, sprintMaxDate);
+          const result = this.getBetweenDateStr(dataMinDate, sprintMaxDate);
+          allDate = result.result;
+          rest = result.rest;
         } else if (moment(dataMinDate).isSame(maxDate)) {
           allDate = [dataMinDate];
         } else {
-          allDate = this.getBetweenDateStr(dataMinDate, maxDate);
+          const result = this.getBetweenDateStr(dataMinDate, maxDate);
+          allDate = result.result;
+          rest = result.rest;
         }
         const xData = allDate;
+        let markAreaData = [];
+        let exportAxisData = [res.expectCount];
+        const { restDayShow } = this.state;
+        // 如果展示非工作日，期望为一条连续斜线
+        if (!restDayShow) {
+          if (allDate.length > 1) {
+            exportAxisData = [
+              [allDate[0].split(' ')[0].slice(5).replace('-', '/'), res.expectCount],
+              [allDate[allDate.length - 1].split(' ')[0].slice(5).replace('-', '/'), 0],
+            ];
+          } else {
+            exportAxisData = [
+              [allDate[0].split(' ')[0].slice(5).replace('-', '/'), res.expectCount],
+            ];
+          }
+        }
         // const xData = this.getBetweenDateStr(dataMinDate, maxDate);
         const xDataFormat = _.map(xData, item => item.slice(5).replace('-', '/'));
         const yAxis = xData.map((data, index) => {
+          // 显示非工作日，则非工作日期望为水平线
+          if (restDayShow) {
+            // 工作日天数
+            const countWorkDay = (allDate.length - rest.length) || 1;
+            // 日工作量
+            const dayAmount = res.expectCount / countWorkDay;
+            if (rest.includes(allDate[index])) {
+              // 非工作日
+              markAreaData.push([
+                {
+                  xAxis: allDate[index].split(' ')[0].slice(5).replace('-', '/'),
+                },
+                {
+                  xAxis: allDate[index + 1] ? allDate[index + 1].split(' ')[0].slice(5).replace('-', '/') : '',
+                }
+              ]);
+              exportAxisData[index + 1] = exportAxisData[index];
+            } else {
+              // 工作量取整
+              exportAxisData[index + 1] = exportAxisData[index] - dayAmount;
+            }
+          }
           if (dataDates.includes(data)) return res.coordinate[data];
           if (moment(data).isAfter(moment())) return null;
           res.coordinate[data] = res.coordinate[xData[index - 1]];
           return res.coordinate[xData[index - 1]];
         });
+        yAxis.unshift(res.expectCount);
         this.setState({
           expectCount: res.expectCount,
-          xAxis: xDataFormat,
+          xAxis: [...xDataFormat, ''],
           yAxis,
           loading: false,
+          exportAxis: exportAxisData,
+          markAreaData,
         });
       });
   }
@@ -280,6 +372,15 @@ class BurnDown extends Component {
     this.setUnitFromLocalStorage(key);
     this.loadChartData(sprintId, key);
   }
+
+  onCheckChange = (e) => {
+    this.setState({
+      restDayShow: e.target.checked,
+    }, () => {
+      const { sprint: { sprintId }, unit } = this.state;
+      this.loadChartData(sprintId, unit);
+    });
+  };
 
   renderContent() {
     const { loading, sprint: { sprintId } } = this.state;
@@ -330,6 +431,13 @@ class BurnDown extends Component {
               <Icon type="arrow_drop_down" />
             </div>
           </Dropdown>
+          <Checkbox
+            style={{ marginLeft: 24 }}
+            checked={this.state.restDayShow}
+            onChange={this.onCheckChange}
+          >
+            显示非工作日
+          </Checkbox>
         </div>
         {this.renderContent()}
         <DashBoardNavBar>
