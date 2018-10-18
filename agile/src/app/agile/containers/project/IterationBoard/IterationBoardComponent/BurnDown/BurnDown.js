@@ -321,14 +321,10 @@ class BurnDown extends Component {
 
         // 如果展示非工作日，期望为一条连续斜线
         if (!restDayShow) {
-          if (allDate.length > 1) {
+          if (allDate.length) {
             exportAxisData = [
               [allDate[0].split(' ')[0].slice(5).replace('-', '/'), res.expectCount],
-              [allDate[allDate.length - 1].split(' ')[0].slice(5).replace('-', '/'), 0],
-            ];
-          } else {
-            exportAxisData = [
-              [allDate[0].split(' ')[0].slice(5).replace('-', '/'), res.expectCount],
+              ['', 0],
             ];
           }
         }
