@@ -103,7 +103,8 @@ class EditFieldConfiguration extends Component {
       {
         render: text => (
           <Permission type={type} projectId={id} organizationId={organizationId} service={['agile-service.notice.updateNotice']}>
-            <Icon 
+            <Icon
+              style={{ cursor: 'pointer' }}
               type="mode_edit"
               onClick={() => {
                 const { history } = this.props;

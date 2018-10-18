@@ -162,7 +162,7 @@ class SprintReport extends Component {
         rest = result.rest;
       }
       // const allDate = this.getBetweenDateStr(minDate, maxDate);
-      const allDateValues = [];
+      const allDateValues = [res.expectCount];
       let markAreaData = [];
       let exportAxisData = [res.expectCount];
       const { restDayShow } = this.state;
@@ -184,18 +184,18 @@ class SprintReport extends Component {
         // 显示非工作日，则非工作日期望为水平线
         if (restDayShow) {
           // 工作日天数
-          const countWorkDay = (allDate.length - rest.length - 1) || 1;
+          const countWorkDay = (allDate.length - rest.length) || 1;
           // 日工作量
           const dayAmount = res.expectCount / countWorkDay;
           if (rest.includes(allDate[b])) {
             // 非工作日
-            if (b < len - 1) {
+            if (b <= len - 1) {
               markAreaData.push([
                 {
                   xAxis: allDate[b].split(' ')[0].slice(5).replace('-', '/'),
                 },
                 {
-                  xAxis: allDate[b + 1].split(' ')[0].slice(5).replace('-', '/'),
+                  xAxis: allDate[b + 1] ? allDate[b + 1].split(' ')[0].slice(5).replace('-', '/') : '',
                 }
               ]);
             }
@@ -217,7 +217,7 @@ class SprintReport extends Component {
       }
       const sliceDate = _.map(allDate, item => item.slice(5).replace('-', '/'));
       this.setState({
-        xAxis: sliceDate,
+        xAxis: [...sliceDate, ''],
         yAxis: allDateValues,
         exportAxis: exportAxisData,
         markAreaData,
@@ -317,7 +317,7 @@ class SprintReport extends Component {
           let content = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              content = `${item.axisValue}<br />${item.marker}${item.seriesName} : ${item.value || '-'}`;
+              content = `${item.axisValue || '冲刺结束'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value  : '-'}`;
             }
           });
           return content;
