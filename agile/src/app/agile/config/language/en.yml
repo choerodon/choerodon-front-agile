@@ -11,7 +11,7 @@
 'agile.issuelink': issueLink
 'agile.userStoryMap': storyMap
 'agile.iterationBoard': iterationBoard
-'agile.messageNotification': messageNotification
+'agile.messageNotification': notificationSetting
 
 "rentsetting": "Organization Settings"
 "rentsetting.workCalendar": "Work Calendar"
