@@ -66,8 +66,8 @@ class StartSprint extends Component {
       saturdayWork,
       sundayWork,
       useHoliday,
-      selectDays,
-      holidayRefs,
+      timeZoneWorkCalendarDTOS: selectDays,
+      workHolidayCalendarDTOS: holidayRefs,
     } = store.getWorkSetting;
     const { workDates } = this.state;
     const weekdays = [
@@ -144,8 +144,8 @@ class StartSprint extends Component {
       saturdayWork,
       sundayWork,
       useHoliday,
-      selectDays,
-      holidayRefs,
+      timeZoneWorkCalendarDTOS: selectDays,
+      workHolidayCalendarDTOS: holidayRefs,
     } = store.getWorkSetting;
     const data = this.props.data;
     const completeMessage = JSON.stringify(this.props.store.getOpenSprintDetail) === '{}' ? null : this.props.store.getOpenSprintDetail;

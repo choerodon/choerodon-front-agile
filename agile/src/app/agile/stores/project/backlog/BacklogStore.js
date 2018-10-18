@@ -28,8 +28,8 @@ class BacklogStore {
     saturdayWork: false,
     sundayWork: false,
     useHoliday: false,
-    selectDays: [],
-    holidayRefs: [],
+    timeZoneWorkCalendarDTOS: [],
+    workHolidayCalendarDTOS: [],
   };
 
 

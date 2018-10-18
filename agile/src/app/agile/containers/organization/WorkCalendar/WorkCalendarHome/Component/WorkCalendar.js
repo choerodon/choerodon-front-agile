@@ -57,7 +57,7 @@ class WorkCalendar extends Component {
       color: '#000', background: '#FFF',
     };
     const notWorkDayStyle = {
-      color: '#EF2A26', background: '#FDF0EF',
+      color: '#EF2A26', background: '#FFE7E7',
     };
     const localData = moment.localeData();
     // 通过日期缩写判断是否为周六日
