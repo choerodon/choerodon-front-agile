@@ -124,7 +124,7 @@ class EditFieldConfiguration extends Component {
       <Permission type={type} projectId={id} organizationId={organizationId} service={['agile-service.notice.queryByProjectId']}>
         <Page>
           <Header
-            title="消息通知"
+            title="通知设置"
           />
           <Content 
             className="c7n-editFieldConfiguration"

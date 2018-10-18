@@ -57,11 +57,11 @@ class WorkCalendarHome extends Component {
     const { timeZoneId } = WorkCalendarStore.getWorkDaySetting;
     if (data.calendarId) {
       WorkCalendarStore.axiosDeleteCalendarData(orgId, data.calendarId).then(() => {
-        this.getWorkCalendar();
+        WorkCalendarStore.axiosGetCalendarData(orgId, timeZoneId);
       });
     } else {
       WorkCalendarStore.axiosCreateCalendarData(orgId, timeZoneId, data).then(() => {
-        this.getWorkCalendar();
+        WorkCalendarStore.axiosGetCalendarData(orgId, timeZoneId);
       });
     }
   };
