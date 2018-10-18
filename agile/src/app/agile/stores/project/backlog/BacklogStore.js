@@ -24,6 +24,13 @@ class BacklogStore {
   @observable projectInfo = {};
   @observable quickSearchList = [];
   @observable selectIssues = [];
+  @observable workSetting = {
+    saturdayWork: false,
+    sundayWork: false,
+    useHoliday: false,
+    selectDays: [],
+    holidayRefs: [],
+  };
 
 
   @computed get asJson() {
@@ -329,9 +336,23 @@ class BacklogStore {
 
   handleVersionDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/drag`, data);
 
-  axiosGetWorkSetting = (orgId) => {
-    return axios.get(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/detail`);
-  };
+  @action setWorkSetting(data) {
+    this.workSetting = data;
+  }
+
+  @computed get getWorkSetting() {
+    return this.workSetting;
+  }
+
+  axiosGetWorkSetting() {
+    const proId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
+    axios.get(`/agile/v1/projects/${proId}/sprint/time_zone_detail/${orgId}`).then((data) => {
+      if (data) {
+        this.setWorkSetting(data);
+      }
+    });
+  }
 }
 
 const backlogStore = new BacklogStore();
