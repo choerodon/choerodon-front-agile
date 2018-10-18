@@ -69,6 +69,12 @@
         sort: 3
         permission:
           - 'agile-service.issue.listEpic'
+    - "issuelink":
+        icon: link
+        Routes: /agile/issueLink
+        sort: 12
+        permission:
+          - 'agile-service.issue-link-type.updateIssueLinkType'
 
 # 组织设置
 "rentsetting":
@@ -80,4 +86,6 @@
         Routes: /agile/workCalendar # 菜单对应路由
         sort: 8 # 菜单的次序
         permission: # 菜单内容具有的权限
-          - 'agile-service.issue.listEpic'
+          - 'agile-service.time-zone-work-calendar.queryTimeZoneWorkCalendar'
+          - 'agile-service.time-zone-work-calendar.queryTimeZoneWorkCalendarRefByTimeZoneId'
+
