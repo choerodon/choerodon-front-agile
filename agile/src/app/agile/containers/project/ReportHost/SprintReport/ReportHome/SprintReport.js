@@ -170,8 +170,8 @@ class SprintReport extends Component {
       if (!restDayShow) {
         if (allDate.length) {
           exportAxisData = [
-            [allDate[0].split(' ')[0].slice(5).replace('-', '/'), res.expectCount],
-            ['', 0],
+            ['', res.expectCount],
+            [allDate[allDate.length - 1].split(' ')[0].slice(5).replace('-', '/'), 0],
           ];
         }
       }
@@ -185,20 +185,20 @@ class SprintReport extends Component {
           const dayAmount = res.expectCount / countWorkDay;
           if (rest.includes(allDate[b])) {
             // 非工作日
-            if (b <= len - 1) {
+            if (b < len - 1) {
               markAreaData.push([
                 {
-                  xAxis: allDate[b].split(' ')[0].slice(5).replace('-', '/'),
+                  xAxis: b === 0 ? '' : allDate[b - 1].split(' ')[0].slice(5).replace('-', '/'),
                 },
                 {
-                  xAxis: allDate[b + 1] ? allDate[b + 1].split(' ')[0].slice(5).replace('-', '/') : '',
+                  xAxis: allDate[b].split(' ')[0].slice(5).replace('-', '/'),
                 }
               ]);
             }
             exportAxisData[b + 1] = exportAxisData[b];
           } else {
             // 工作量取整
-            exportAxisData[b + 1] = exportAxisData[b] - dayAmount;
+            exportAxisData[b + 1] = (exportAxisData[b] - dayAmount) < 0 ? 0 : exportAxisData[b] - dayAmount;
           }
         }
         if (res.coordinate.hasOwnProperty(nowKey)) {
@@ -213,7 +213,7 @@ class SprintReport extends Component {
       }
       const sliceDate = _.map(allDate, item => item.slice(5).replace('-', '/'));
       this.setState({
-        xAxis: [...sliceDate, ''],
+        xAxis: ['', ...sliceDate],
         yAxis: allDateValues,
         exportAxis: exportAxisData,
         markAreaData,

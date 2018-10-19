@@ -88,7 +88,7 @@ class WorkCalendarHome extends Component {
         </Header>
         <Content
           title="工作日历"
-          description="允许您将非工作日在报告或程序中设置为显示或隐藏。"
+          description="这里可以为您的组织设置全年的工作日历，该设置将应用到组织下所有项目中，每个项目也可根据实际的工作情况进行修改。勾选自动更新法定节假日后，系统会自动更新并设定法定节假日到工作日历中。"
         >
           <Form layout="vertical">
             <FormItem style={{ width: 512 }}>

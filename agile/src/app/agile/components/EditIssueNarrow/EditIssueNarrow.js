@@ -445,6 +445,9 @@ class CreateSprint extends Component {
   }
 
   reloadIssue(issueId = this.state.origin.issueId) {
+    if (this.props.onUpdate) {
+      this.props.onUpdate();
+    }
     this.setState({
       addCommit: false,
       addCommitDes: '',
