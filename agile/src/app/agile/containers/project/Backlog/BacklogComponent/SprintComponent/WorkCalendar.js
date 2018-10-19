@@ -127,8 +127,8 @@ class WorkCalendar extends Component {
         const selectDay = selectDays.filter(d => d.workDay === selectDate);
         data.push(
           {
-            status: selectDay.status ? 0 : 1,
-            workDay: selectDay.workDay,
+            status: selectDay[0].status ? 0 : 1,
+            workDay: selectDay[0].workDay,
           }
         );
       } else {

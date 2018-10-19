@@ -177,7 +177,7 @@ class CreateIssue extends Component {
           extra.description = '';
           this.handleSave(extra);
         }
-        this.props.onOk(extra);
+        // this.props.onOk(extra);
       }
     });
   };
@@ -200,9 +200,10 @@ class CreateIssue extends Component {
             handleFileUpload(this.state.fileList, callback, config);
           }
         }
-        this.props.onOk();
+        this.props.onOk(res);
       })
       .catch(() => {
+        this.props.onOk();
       });
   };
 

@@ -124,8 +124,8 @@ class WorkCalendar extends Component {
       } else if (selectDays.length && selectDays.map(d => d.workDay).indexOf(selectDate) !== -1) {
         const selectDay = selectDays.filter(d => d.workDay === selectDate);
         onWorkDateChange({
-          status: selectDay.status ? 0 : 1,
-          workDay: selectDay.workDay,
+          status: selectDay[0].status ? 0 : 1,
+          workDay: selectDay[0].workDay,
         });
       } else {
         const localData = moment.localeData();

@@ -5,6 +5,9 @@ import { Icon, Button, Avatar } from 'choerodon-ui';
 import _ from 'lodash';
 import './SwimLaneContext.scss';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
+import {
+  STATUS,
+} from '../../../../../common/Constant';
 
 @inject('AppState')
 @observer
@@ -107,7 +110,10 @@ class SwimLaneContext extends Component {
             #
 {item.issueNum}
             </span>
-            <div className="c7n-parentIssue-status">{item.status}</div>
+            <div
+              className="c7n-parentIssue-status"
+              style={{ backgroundColor: STATUS[item.categoryCode] }}
+            >{item.status}</div>
             {item.summary}
             <span className="c7n-parentIssue-count">{`  (${item.count} 子任务)`}</span>
 
@@ -147,6 +153,7 @@ class SwimLaneContext extends Component {
           <Avatar
             src={item.imageUrl ? item.imageUrl : undefined}
             size="small"
+            style={{ marginRight: 8 }}
           >
             {
               !item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''

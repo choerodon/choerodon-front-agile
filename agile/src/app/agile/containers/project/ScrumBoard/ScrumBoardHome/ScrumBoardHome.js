@@ -973,6 +973,7 @@ class ScrumBoardHome extends Component {
                   <Button
                     funcType="flat"
                     onClick={this.handleFinishSprint.bind(this)}
+                    disabled={!ScrumBoardStore.getCurrentSprint}
                   >
                     <Icon type="power_settings_new icon" />
                     <span style={{ marginLeft: 0 }}>完成Sprint</span>
