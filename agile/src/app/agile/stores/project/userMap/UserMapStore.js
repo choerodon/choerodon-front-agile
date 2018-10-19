@@ -61,6 +61,8 @@ class UserMapStore {
 
   @observable isFullScreen = false;
 
+  @observable cacheIssues = [];
+
   @action setIsFullScreen(data) {
     this.isFullScreen = data;
   }
@@ -269,6 +271,14 @@ class UserMapStore {
     this.currentBacklogFilters = data;
   }
 
+  @action setCacheIssues(data) {
+    this.cacheIssues = data;
+  }
+
+  @computed get getCacheIssues() {
+    return this.cacheIssues.slice();
+  }
+
   loadEpic = () => {
     let url = '';
     if (this.currentFilters.includes('mine')) {
@@ -349,9 +359,15 @@ class UserMapStore {
                 const uniqIssues = _.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId');
                 const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
                 this.setIssues(sortedUniqIssues);
+                if (this.cacheIssues.length === 0) {
+                  this.setCacheIssues(sortedIssues);
+                }
               } else {
                 const sortedIssues = _.orderBy(issues, 'mapRank', 'asc');
                 this.setIssues(sortedIssues);
+                if (this.cacheIssues.length === 0) {
+                  this.setCacheIssues(sortedIssues);
+                }
               }
               this.setCurrentNewObj({ epicId: 0, [`${this.mode}Id`]: 0 });
               // 两个请求现在都执行完成
