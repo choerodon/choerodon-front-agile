@@ -126,7 +126,8 @@ class EditFieldConfiguration extends Component {
           <Header
             title="通知设置"
           />
-          <Content 
+          <Content
+            title="通知设置"
             className="c7n-editFieldConfiguration"
             description="通过设置事件发生时所通知的对象，被通知者可以在右上角铃铛处及时查看消息通知，提高个人以及团队的工作效率。"
           >

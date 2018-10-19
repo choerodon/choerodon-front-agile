@@ -105,7 +105,7 @@ class DeleteComponent extends Component {
               onFocus={() => {
                 loadComponents(this.state.filters, this.state.component.componentId).then((res) => {
                   this.setState({
-                    originComponents: res.Content,
+                    originComponents: res.content,
                   });
                 });
               }}
