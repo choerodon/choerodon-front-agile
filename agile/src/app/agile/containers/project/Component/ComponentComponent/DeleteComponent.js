@@ -23,6 +23,13 @@ class DeleteComponent extends Component {
       originComponents: [],
       loading: false,
       confirmShow: false,
+      filters: {
+        searchArgs: {},
+        advancedSearchArgs: {
+          defaultAssigneeRole: [],
+          content: '',
+        },
+      },
     };
   }
 
@@ -96,9 +103,9 @@ class DeleteComponent extends Component {
               value={this.state.relatedComponentId}
               onChange={this.handleRelatedComponentChange.bind(this)}
               onFocus={() => {
-                loadComponents(this.state.component.componentId).then((res) => {
+                loadComponents(this.state.filters, this.state.component.componentId).then((res) => {
                   this.setState({
-                    originComponents: res.Content,
+                    originComponents: res.content,
                   });
                 });
               }}
@@ -131,15 +138,10 @@ class DeleteComponent extends Component {
         okType="danger"
       >
         <div style={{ margin: '20px 0', position: 'relative' }}>
-          <Icon style={{ color: '#d50000', position: 'absolute', fontSize: '16px' }} type="error" />
+          <Icon style={{ color: '#d50000', position: 'absolute', fontSize: '16px', lineHeight: '26px' }} type="error" />
           <div style={{ marginLeft: 20, width: 400, 'line-height': '26px' }}>
-
-
-
-
-            如果有问题关联到这个模块，而且这个项目中已经没有其他模块可供关联
-            这个模块将会从所有问题中移除。
-</div>
+            如果有问题关联到这个模块，而且这个项目中已经没有其他模块可供关联这个模块将会从所有问题中移除。
+          </div>
         </div>
         <ul style={{ margin: '20px 0 20px 20px', paddingLeft: '20px' }}>
           <li>
@@ -156,17 +158,8 @@ class DeleteComponent extends Component {
                 );
               }}
             >
-
-
-
-
-              相关的问题（
-{this.state.component.issueCount || 0}
-
-
-
-）
-</span>
+              相关的问题（{this.state.component.issueCount || 0}）
+            </span>
           </li>
         </ul>
         {this.state.component.issueCount ? <div>{this.renderDelete()}</div> : null}

@@ -80,7 +80,7 @@ class BurnDown extends Component {
           let content = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              content = `${item.axisValue || '冲刺结束'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value  : '-'}`;
+              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value  : '-'}`;
             }
           });
           return content;
@@ -314,8 +314,8 @@ class BurnDown extends Component {
         if (!restDayShow) {
           if (allDate.length) {
             exportAxisData = [
-              [allDate[0].split(' ')[0].slice(5).replace('-', '/'), res.expectCount],
-              ['', 0],
+              ['', res.expectCount],
+              [allDate[allDate.length - 1].split(' ')[0].slice(5).replace('-', '/'), 0],
             ];
           }
         }
@@ -332,16 +332,16 @@ class BurnDown extends Component {
               // 非工作日
               markAreaData.push([
                 {
-                  xAxis: allDate[index].split(' ')[0].slice(5).replace('-', '/'),
+                  xAxis: index === 0 ? '' : allDate[index - 1].split(' ')[0].slice(5).replace('-', '/'),
                 },
                 {
-                  xAxis: allDate[index + 1] ? allDate[index + 1].split(' ')[0].slice(5).replace('-', '/') : '',
+                  xAxis: allDate[index].split(' ')[0].slice(5).replace('-', '/'),
                 }
               ]);
               exportAxisData[index + 1] = exportAxisData[index];
             } else {
               // 工作量取整
-              exportAxisData[index + 1] = exportAxisData[index] - dayAmount;
+              exportAxisData[index + 1] = (exportAxisData[index] - dayAmount) < 0 ? 0 : exportAxisData[index] - dayAmount;
             }
           }
           if (dataDates.includes(data)) return res.coordinate[data];
@@ -352,7 +352,7 @@ class BurnDown extends Component {
         yAxis.unshift(res.expectCount);
         this.setState({
           expectCount: res.expectCount,
-          xAxis: [...xDataFormat, ''],
+          xAxis: ['', ...xDataFormat],
           yAxis,
           loading: false,
           exportAxis: exportAxisData,

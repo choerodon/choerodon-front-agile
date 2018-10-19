@@ -111,6 +111,18 @@ class EpicCard extends Component {
     });
   };
 
+  exitFullScreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+
   render() {
     const { epic, index } = this.props;
     const { isEdit, epicName } = this.state;
@@ -192,6 +204,12 @@ class EpicCard extends Component {
                   onClick={() => {
                     const { history } = this.props;
                     const urlParams = AppState.currentMenuType;
+                    const isFullScreen = document.webkitFullscreenElement
+                      || document.mozFullScreenElement
+                      || document.msFullscreenElement;
+                    if (isFullScreen) {
+                      this.exitFullScreen();
+                    }
                     history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${epic.issueNum}&paramIssueId=${epic.issueId}&paramUrl=usermap`);
                   }}
                 >

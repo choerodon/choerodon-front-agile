@@ -480,7 +480,7 @@ class Home3 extends Component {
   handleDataWhenMove = (ids, before, outsetIssueId, mode, desEpicId, desModeId) => {
     const { UserMapStore } = this.props;
     const { issues, backlogIssues } = UserMapStore;
-    const issuesCopy = _.cloneDeep(toJS(issues));
+    const issuesCopy = UserMapStore.getCacheIssues;
     const backlogIssuesCopy = _.cloneDeep(toJS(backlogIssues));
     const issuesDragged = [];
     let resIssues = [];
@@ -583,8 +583,9 @@ class Home3 extends Component {
   handleMultipleDragToBoard = (res) => {
     const { UserMapStore } = this.props;
     const {
-      mode, issues, backlogIssues, selectIssueIds, 
+      mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    const issues = UserMapStore.getCacheIssues;
     const sourceIndex = res.source.index;
     const tarIndex = res.destination.index;
     const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
@@ -802,8 +803,9 @@ class Home3 extends Component {
   handleMultipleDragToBacklog = (res) => {
     const { UserMapStore } = this.props;
     const {
-      mode, issues, backlogIssues, selectIssueIds, 
+      mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    const issues = UserMapStore.getCacheIssues;
     const sourceIndex = res.source.index;
     const tarIndex = res.destination.index;
     const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
@@ -1031,8 +1033,9 @@ class Home3 extends Component {
   handleDragToBoard = (res) => {
     const { UserMapStore } = this.props;
     const {
-      mode, issues, backlogIssues, selectIssueIds,
+      mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    const issues = UserMapStore.getCacheIssues;
     if (res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') return;
     if (selectIssueIds.length < 2) {
       if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
@@ -1183,8 +1186,9 @@ class Home3 extends Component {
   handleDragToBacklog = (res) => {
     const { UserMapStore } = this.props;
     const {
-      mode, issues, backlogIssues, selectIssueIds,
+      mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    const issues = UserMapStore.getCacheIssues;
     if (selectIssueIds.length < 2) {
       if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
       const key = `${mode}Id`;

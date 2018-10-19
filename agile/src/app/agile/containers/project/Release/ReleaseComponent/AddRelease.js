@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Modal, Form, Input, DatePicker } from 'choerodon-ui';
+import { Modal, Form, Input, DatePicker, message } from 'choerodon-ui';
 import moment from 'moment';
 import { Content, stores } from 'choerodon-front-boot';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -40,15 +40,21 @@ class AddRelease extends Component {
           this.props.refresh();
           this.setState({
             loading: false,
+            endDate: null,
+            startDate: null,
           });
         }).catch((error) => {
           this.setState({
             loading: false,
+            endDate: null,
+            startDate: null,
           });
         });
       } else {
         this.setState({
           loading: false,
+          endDate: null,
+          startDate: null,
         });
       }
     });
@@ -56,6 +62,10 @@ class AddRelease extends Component {
   handleCancel = () => {
     this.props.form.resetFields();
     this.props.onCancel();
+    this.setState({
+      endDate: null,
+      startDate: null,
+    });
   };
   render() {
     const { getFieldDecorator } = this.props.form;

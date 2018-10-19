@@ -1,6 +1,6 @@
 export const STATUS = {
   todo: '#ffb100',
-  doing: '#4d90fe ',
+  doing: '#4d90fe',
   done: '#00bfa5',
 };
 

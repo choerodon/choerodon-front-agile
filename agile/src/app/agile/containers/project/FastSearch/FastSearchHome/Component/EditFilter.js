@@ -45,8 +45,8 @@ class AddComponent extends Component {
 
   componentDidMount() {
     this.loadQuickFilterFiled();
-    this.loadFilter(this.props.filterId);
     this.loadQuickFilter();
+    this.loadFilter(this.props.filterId);
   }
 
   loadFilter(filterId = this.props.filterId) {

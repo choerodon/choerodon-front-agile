@@ -146,9 +146,16 @@ class Issue extends Component {
   }
 
   handleCreateIssue(issueObj) {
+    const { history } = this.props;
+    const {
+      type, id, name, organizationId,
+    } = AppState.currentMenuType;
     this.setState({ create: false });
     IssueStore.init();
     IssueStore.loadIssues();
+    if (issueObj) {
+      history.push(`/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}&paramName=${issueObj.issueNum}&paramIssueId=${issueObj.issueId}&paramOpenIssueId=${issueObj.issueId}`);
+    }
   }
 
   handleIssueUpdate(issueId = this.state.selectedIssue.issueId) {

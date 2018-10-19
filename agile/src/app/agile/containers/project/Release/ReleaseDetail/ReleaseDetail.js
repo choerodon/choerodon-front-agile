@@ -332,7 +332,7 @@ class ReleaseDetail extends Component {
         key: 'assigneeName',
         render: (text, record) => (text ? (
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Avatar size="small" src={record.imageUrl ? record.imageUrl : ''}>
+            <Avatar style={{ marginRight: 8 }} size="small" src={record.imageUrl ? record.imageUrl : ''}>
               {
               record.imageUrl ? '' : text.substring(0, 1)
             }
@@ -461,12 +461,12 @@ class ReleaseDetail extends Component {
               <div className="c7n-versionTime">
                 <Icon style={{ fontSize: 20 }} type="date_range" />
                 {'创建日期:'}
-                <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.startDate ? ReleaseStore.getVersionDetail.startDate : '无'}</span>
+                <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.startDate ? ReleaseStore.getVersionDetail.startDate.slice(0, 10) : '无'}</span>
               </div>
               <div className="c7n-versionTime" style={{ marginLeft: 80 }}>
                 <Icon style={{ fontSize: 20 }} type="date_range" />
                 {'更新日期:'}
-                <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.releaseDate ? ReleaseStore.getVersionDetail.releaseDate : '无'}</span>
+                <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.releaseDate ? ReleaseStore.getVersionDetail.releaseDate.slice(0, 10) : '无'}</span>
               </div>
             </div>
             <div className="c7n-release-issueClassify">

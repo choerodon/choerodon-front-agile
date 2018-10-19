@@ -47,6 +47,16 @@ class ScrumBoardStore {
 
   @observable statusList = [];
 
+  @observable workSetting = {
+    saturdayWork: false,
+    sundayWork: false,
+    useHoliday: false,
+    timeZoneWorkCalendarDTOS: [],
+    workHolidayCalendarDTOS: [],
+  };
+
+  @observable workDate = false;
+
   @computed get getStatusList() {
     return toJS(this.statusList);
   }
@@ -334,6 +344,55 @@ class ScrumBoardStore {
   @action setDragStartItem(data) {
     this.dragStartItem = data;
   }
+
+  @action setWorkSetting(data) {
+    this.workSetting = data;
+  }
+
+  @computed get getWorkSetting() {
+    return this.workSetting;
+  }
+
+  axiosGetWorkSetting() {
+    const proId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
+    return axios.get(`/agile/v1/projects/${proId}/sprint/time_zone_detail/${orgId}`).then((data) => {
+      if (data) {
+        this.setWorkSetting(data);
+      }
+    });
+  }
+
+  axiosDeleteCalendarData(calendarId) {
+    const proId = AppState.currentMenuType.id;
+    return axios.delete(`/agile/v1/projects/${proId}/sprint/work_calendar/${calendarId}`);
+  };
+
+  axiosCreateCalendarData(sprintId, data) {
+    const proId = AppState.currentMenuType.id;
+    return axios.post(`/agile/v1/projects/${proId}/sprint/work_calendar_create/${sprintId}`, data);
+  };
+
+  @action setWorkDate(data) {
+    this.workDate = data;
+  }
+
+  @computed get getWorkDate() {
+    return this.workDate;
+  }
+
+  axiosGetCalendarData = () => {
+    const proId = AppState.currentMenuType.id;
+    return axios.get(`/agile/v1/projects/${proId}/sprint/work_calendar`).then((data) => {
+      if (data) {
+        this.setWorkDate(data);
+      } else {
+        this.setWorkDate(false);
+      }
+    }).catch(() => {
+      this.setWorkDate(false);
+    });
+  };
 }
 
 const scrumBoardStore = new ScrumBoardStore();

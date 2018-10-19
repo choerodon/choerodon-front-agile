@@ -12,6 +12,7 @@ import './ScrumBoardSetting.scss';
 import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
 import ColumnPage from '../ScrumBoardSettingComponent/ColumnPage/ColumnPage';
 import SwimLanePage from '../ScrumBoardSettingComponent/SwimLanePage/SwimLanePage';
+import WorkcalendarPage from '../ScrumBoardSettingComponent/WorkCalendarPage/WorkCalendarPage';
 
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
@@ -76,6 +77,11 @@ class ScrumBoardSetting extends Component {
         ScrumBoardStore.setLookupValue(oldLookup);
       }).catch((error) => {
       });
+      ScrumBoardStore.axiosGetWorkSetting().then(() => {
+        ScrumBoardStore.axiosGetCalendarData();
+      }).catch(() => {
+        ScrumBoardStore.axiosGetCalendarData();
+      });
     }
   }
   
@@ -138,6 +144,11 @@ class ScrumBoardSetting extends Component {
             <TabPane tab="泳道" key="2">
               <SwimLanePage />
             </TabPane>
+            {ScrumBoardStore.getWorkDate ?
+              <TabPane tab="工作日历" key="3">
+                <WorkcalendarPage />
+              </TabPane> : null
+            }
           </Tabs>
         </Content>
       </Page>

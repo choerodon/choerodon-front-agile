@@ -525,6 +525,14 @@ class CreateSprint extends Component {
   };
 
   reloadIssue(issueId = this.state.origin.issueId) {
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
+    const {
+      type, id, organizationId, name,
+    } = urlParams;
+    if (!issueId) {
+      history.push(`/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}`);
+    }
     this.setState(
       {
         addCommit: false,

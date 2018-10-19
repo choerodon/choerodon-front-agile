@@ -4,7 +4,6 @@ import Calendar from 'rc-calendar';
 import _ from 'lodash';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import classNames from 'classnames';
 import zh_CN from 'rc-calendar/lib/locale/zh_CN';
 import 'rc-calendar/assets/index.css';
 import './WorkCalendar.scss';
@@ -13,9 +12,6 @@ import './WorkCalendar.scss';
 class WorkCalendar extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      workDates: [],
-    };
   }
 
   /**
@@ -33,13 +29,15 @@ class WorkCalendar extends Component {
       holidayRefs,
       startDate,
       endDate,
+      workDates,
     } = this.props;
-    const { workDates } = this.state;
     const format = 'YYYY-MM-DD';
     // 渲染当前月，当前迭代可见数据
     if (current.format('MM') !== now.format('MM')
-      || moment(current.format(format)).isBefore(moment(startDate.format(format)))
-      || moment(current.format(format)).isAfter(moment(endDate.format(format)))) {
+      || !startDate
+      || !endDate
+      || moment(current.format(format)).isBefore(moment(moment(startDate).format(format)))
+      || moment(current.format(format)).isAfter(moment(moment(endDate).format(format)))) {
       return (<div className="rc-calendar-date not-current-month">
         {current.date()}
       </div>);
@@ -112,25 +110,23 @@ class WorkCalendar extends Component {
       startDate,
       endDate,
       onWorkDateChange,
+      workDates = [],
     } = this.props;
-    const { workDates } = this.state;
     const weekdays = [
       saturdayWork ? null : '六',
       sundayWork ? null : '日',
     ];
-    if (date && date.format('MM') === now.format('MM') && date.isAfter(startDate) && date.isBefore(endDate)) {
+    if (startDate && endDate && date && date.format('MM') === now.format('MM') && date.isAfter(moment(startDate)) && date.isBefore(moment(endDate))) {
       const selectDate = date.format(format);
-      let data = workDates;
-      if (workDates.length && workDates.map(d => d.workDay).indexOf(selectDate) !== -1) {
-        data = workDates.filter(d => d.workDay !== selectDate);
+      const workDate = workDates.filter(d => d.workDay === selectDate);
+      if (workDate.length) {
+        onWorkDateChange(workDate[0]);
       } else if (selectDays.length && selectDays.map(d => d.workDay).indexOf(selectDate) !== -1) {
         const selectDay = selectDays.filter(d => d.workDay === selectDate);
-        data.push(
-          {
-            status: selectDay[0].status ? 0 : 1,
-            workDay: selectDay[0].workDay,
-          }
-        );
+        onWorkDateChange({
+          status: selectDay[0].status ? 0 : 1,
+          workDay: selectDay[0].workDay,
+        });
       } else {
         const localData = moment.localeData();
         const dayOfWeek = localData.weekdaysMin(date);
@@ -142,15 +138,11 @@ class WorkCalendar extends Component {
             }
           });
         }
-        data.push({
+        onWorkDateChange({
           workDay: selectDate,
           status: isWorkDay ? 0 : 1,
         });
       }
-      this.setState({
-        workDates: data,
-      });
-      onWorkDateChange(data);
     }
   };
 
