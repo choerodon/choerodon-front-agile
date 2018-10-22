@@ -81,7 +81,7 @@ class EditLink extends Component {
           style={{ padding: 0 }}
           title={`在项目“${AppState.currentMenuType.name}”中修改问题链接`}
           description="通过自定义问题链接，可以帮助您更好的对多个问题进行关联，不再局限于父子任务。"
-          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/setup/issue-link/"
+          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/setup/issue-link/"
         >
           <Form layout="vertical" style={{ width: 512 }}>
             <FormItem>

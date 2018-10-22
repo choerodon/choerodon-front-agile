@@ -1729,10 +1729,6 @@ class CreateSprint extends Component {
                             origin={this.state.statusId}
                             onOk={this.updateIssue.bind(this, 'statusId')}
                             onCancel={this.resetStatusId.bind(this)}
-                            // onBlur={this.props.onSave}
-                            // onBlur={() => {
-                            //   console.log(1)
-                            // }}
                             onInit={() => {
                               this.setAnIssueToState();
                               loadStatus().then((res) => {
@@ -1768,10 +1764,6 @@ class CreateSprint extends Component {
                               loading={this.state.selectLoading}
                               autoFocus
                               getPopupContainer={triggerNode => triggerNode.parentNode}
-                              onBlur={() => {
-                                console.log(0);
-                                this.props.onSave();
-                              }}
                               onFocus={() => {
                                 this.setState({
                                   selectLoading: true,

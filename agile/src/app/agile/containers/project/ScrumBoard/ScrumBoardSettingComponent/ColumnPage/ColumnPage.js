@@ -276,7 +276,7 @@ class ColumnPage extends Component {
           display: 'flex',
           flexDirection: 'column',
         }}
-        link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
+        link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
       >
         <div
           style={{

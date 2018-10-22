@@ -231,7 +231,7 @@ class CreateIssue extends Component {
         <Content
           title={`在项目“${AppState.currentMenuType.name}”中创建问题`}
           description="请在下面输入问题的详细信息，包含详细描述、人员信息、版本信息、进度预估、优先级等等。您可以通过丰富的任务描述帮助相关人员更快更全面的理解任务，同时更好的把控问题进度。"
-          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/issue/create-issue/"
+          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/issue/create-issue/"
         >
           <div>
             <Form layout="vertical">

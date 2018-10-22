@@ -155,7 +155,10 @@ class StartSprint extends Component {
         visible={this.props.visible}
         okText="开启"
         cancelText="取消"
-        onCancel={this.props.onCancel}
+        onCancel={() => {
+          this.setState({ showCalendar: false });
+          this.props.onCancel();
+        }}
         onOk={this.handleStartSprint}
       >
         <Content

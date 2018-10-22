@@ -44,12 +44,6 @@ class Home3 extends Component {
   }
 
   handleScroll = (e) => {
-    console.dir(
-      document.getElementsByClassName('fixHead-line-title')[0].getBoundingClientRect().top - 350,
-    );
-    console.dir(
-      document.getElementsByClassName('fixHead-line-title')[28].getBoundingClientRect().bottom,
-    );
     const left = e.target.scrollLeft;
     const top = e.target.scrollTop;
     const title = this.state.row[Math.floor(top / 202)];
@@ -60,7 +54,6 @@ class Home3 extends Component {
     const lines = document.getElementsByClassName('fixHead-line-title');
     for (let i = 0; i < lines.length; i += 1) {
       if (lines[i].getBoundingClientRect().top - 350 >= -55) {
-        console.log(i);
         this.setState({
           title: lines[i - 1].dataset.title,
         });
