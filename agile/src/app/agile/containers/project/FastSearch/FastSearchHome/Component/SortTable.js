@@ -148,8 +148,6 @@ class SortTable extends Component {
     const versionId = data[dragIndex].filterId;
     const { objectVersionNumber } = data[dragIndex];
     const postData = { afterSequence, beforeSequence, filterId: versionId, objectVersionNumber };
-    window.console.log(1, beforeSequence);
-    window.console.log(2, afterSequence);
 
     this.props.handleDrag(result, postData);
   };

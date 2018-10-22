@@ -479,7 +479,6 @@ class Home3 extends Component {
               ...issuesDragged,
               ...backlogIssuesCopy.slice(backlogInsertIndex),
             ];
-            window.console.log(resBacklogIssues);
           }
         } else {
           resBacklogIssues = issuesDragged.concat(backlogIssuesCopy);

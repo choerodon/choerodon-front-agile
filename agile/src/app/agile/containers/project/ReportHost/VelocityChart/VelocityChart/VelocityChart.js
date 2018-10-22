@@ -328,7 +328,7 @@ class VelocityChart extends Component {
         <Content
           title="迭代速度图"
           description="跟踪各个迭代已完成的工时量。这有助于您确定团队的开发速度并预估在未来迭代中能完成的工作量。"
-          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/iterative-chart/"
+          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/iterative-chart/"
         >
           {!(!VS.chartLoading && !VS.getChartDataX.length) ? (
             <div>

@@ -250,7 +250,7 @@ class ReleaseDetail extends Component {
         <Content
           title={ReportStore.currentSprint.sprintName ? `迭代冲刺“${ReportStore.currentSprint.sprintName}”的冲刺报告` : '无冲刺报告'}
           description="了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。"
-          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
+          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
           {ReportStore.sprints.length ? <React.Fragment>
             <Select

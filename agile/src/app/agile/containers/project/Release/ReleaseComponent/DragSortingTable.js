@@ -124,7 +124,6 @@ class DragSortingTable extends Component {
 
   moveRow = (dragIndex, hoverIndex) => {
     const data = this.props.dataSource;
-    console.log(JSON.stringify(this.props.pagination));
     const result = Array.from(data);
     const [removed] = result.splice(dragIndex, 1);
     result.splice(hoverIndex, 0, removed);
