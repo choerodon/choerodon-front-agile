@@ -73,7 +73,7 @@ class StatusIssue extends Component {
         }
       }
     }
-    return result;
+    return false;
   };
 
   /**
@@ -312,8 +312,11 @@ class StatusIssue extends Component {
    * @memberof StatusIssue
    */
   renderReturn = (item, index, type) => {
+    const clickItem = ScrumBoardStore.getClickIssueDetail;
+    const ifClickMe = String(clickItem.issueId) === String(item.issueId);
+
     const {
-      ifClickMe, isCompleted, statusName, categoryCode, swimLaneCode,
+      isCompleted, statusName, categoryCode, swimLaneCode,
     } = this.props;
     if (this.renderSubDisplay(item, type) === 'block') {
       return (
@@ -335,7 +338,7 @@ class StatusIssue extends Component {
             index={index}
           >
             {(provided, snapshot) => (
-              <div>
+              <div style={{ margin: 6 }}>
                 <div
                   ref={provided.innerRef}
                   {...provided.draggableProps}
@@ -451,6 +454,7 @@ class StatusIssue extends Component {
                                   textAlign: 'center',
                                   marginLeft: '8px',
                                   height: 20,
+                                  borderRadius: 2,
                                 }}
                               >
                                 {item.priorityName}
@@ -496,9 +500,9 @@ class StatusIssue extends Component {
             )
             }
           </Draggable>
-          <div>
-            {!type && swimLaneCode === 'assignee' ? this.getChildren() : ''}
-          </div>
+          {
+             !type && swimLaneCode === 'assignee' ? this.getChildren() : ''
+          }
         </div>
       );
     }
