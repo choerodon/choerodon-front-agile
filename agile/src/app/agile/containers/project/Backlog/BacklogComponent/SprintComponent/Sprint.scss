@@ -285,11 +285,16 @@
 }
 
 .c7n-noissue-notzero {
-  margin: 16px 20px 16px 43px;
+  // margin: 16px 20px 16px 43px;
   border: 1px dashed rgba(0, 0, 0, 0.54);
   height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
   color: rgba(0, 0, 0, 0.65);
+  background-color: white;
+}
+
+.c7n-noissue-wapper {
+  padding: 16px 20px 16px 43px;
 }
