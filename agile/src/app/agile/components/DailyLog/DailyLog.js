@@ -154,6 +154,7 @@ class DailyLog extends Component {
       display: 'block',
       height: '30px',
       lineHeight: '30px',
+      marginBottom: '20px',
     };
     const tempAlignStyle = {
       lineHeight: '21px',

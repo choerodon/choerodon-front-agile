@@ -53,12 +53,20 @@ class BacklogHome extends Component {
   /**
    * 加载选择快速搜索的冲刺数据
    */
-  getSprint =() => {
+  getSprint =(isCreate = false) => {
     this.props.BacklogStore.axiosGetSprint(this.props.BacklogStore.getSprintFilter())
       .then((data) => {
         this.props.BacklogStore.setSprintData(data);
         this.setState({
           spinIf: false,
+        }, () => {
+          if (isCreate && document.getElementById('sprint_new')) {
+            document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_new').offsetTop;
+            document.getElementById('sprint_new').style.border = '1px solid red';
+            setTimeout(() => {
+              document.getElementById('sprint_new').style.border = 'none';
+            }, 1000);
+          }
         });
       }).catch((error2) => {
       });
@@ -101,11 +109,11 @@ class BacklogHome extends Component {
     }).catch((error3) => {
     });
   };
-  refresh =() => {
+  refresh =(isCreate) => {
     this.setState({
       spinIf: true,
     });
-    this.getSprint();
+    this.getSprint(isCreate);
     const { versionVisible, epicVisible } = this.state;
     if (versionVisible) {
       this.loadVersion();
@@ -150,7 +158,7 @@ class BacklogHome extends Component {
       this.setState({
         loading: false,
       });
-      this.refresh();
+      this.refresh(true);
       message.success('创建成功');
       // const anchorElement = document.getElementById('sprint_new');
       // if (anchorElement) {
@@ -159,9 +167,9 @@ class BacklogHome extends Component {
       //     block: 'start',
       //   });
       // }
-      if (document.getElementById('sprint_new')) {
-        document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_new').offsetTop - 224;
-      }
+      // if (document.getElementById('sprint_new')) {
+      //   document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_new').offsetTop - 224;
+      // }
     }).catch((error) => {
       this.setState({
         loading: false,

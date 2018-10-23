@@ -38,7 +38,7 @@ class FullEditor extends Component {
       >
         <WYSIWYGEditor
           value={this.state.delta}
-          style={{ height: 500, width: '100%', marginTop: 20 }}
+          style={{ height: 368, width: '100%', marginTop: 20 }}
           onChange={(value) => {
             this.setState({ delta: value });
           }}
