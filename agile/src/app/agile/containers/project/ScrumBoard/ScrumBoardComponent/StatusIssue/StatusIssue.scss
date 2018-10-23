@@ -5,7 +5,8 @@
   display: flex;
   border-left: 1px solid rgba(0, 0, 0, 0.20);
   border-right: 1px solid rgba(0, 0, 0, 0.20);
-  min-height: 83px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.20);
+  min-height: 102px;
 
   .c7n-scrumboard-issueSide {
     width: 32px;
@@ -21,7 +22,7 @@
     div.c7n-scrumboard-issueIcon {
       width: 20px;
       height: 20px;
-      border-radius: 50%;
+      border-radius: 4px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -30,9 +31,21 @@
   }
 
   .c7n-scrumboard-issueBottom {
-    margin-top: 6px;
-    display: flex;
+    margin-top: 8px;
+    width: 100%;
     // margin-left: 26px;
+    .textDisplayTwoColumn {
+      flex-basis: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 20px;
+      white-space: normal;
+      word-break: break-all;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      height: 40px;
+    }
   }
 
   .c7n-scrumboard-issueBorder {
@@ -51,4 +64,7 @@
 
 .clickBackground {
   background: rgba(140, 158, 255, 0.08);
+}
+.c7n-boardIssue {
+  margin: 6px;
 }
