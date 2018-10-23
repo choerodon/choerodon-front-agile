@@ -466,27 +466,29 @@ class SprintItem extends Component {
       if (issues.length > 0) {
         return (
           <IssueItem
-  sprintItemRef={this.sprintItemRef}
-  versionVisible={this.props.versionVisible}
-  epicVisible={this.props.epicVisible}
-  store={this.props.store}
-  sprtintId={sprintId}
-  data={issues}
-  selected={this.state.selected}
-  draggableId={this.state.draggableId}
-  handleClickIssue={this.handleClickIssue}
-/>
+            sprintItemRef={this.sprintItemRef}
+            versionVisible={this.props.versionVisible}
+            epicVisible={this.props.epicVisible}
+            store={this.props.store}
+            sprtintId={sprintId}
+            data={issues}
+            selected={this.state.selected}
+            draggableId={this.state.draggableId}
+            handleClickIssue={this.handleClickIssue}
+          />
         );
       }
     }
     if (type !== 'backlog') {
       if (index === 0) {
         return (
-          <div style={{ display: 'flex', height: 100 }} className="c7n-noissue-notzero">
-            <img style={{ width: 80, height: 70 }} alt="空sprint" src={emptyPng} />
-            <div style={{ marginLeft: 20 }}>
-              <p>计划您的SPRINT</p>
-              <p>这是一个Sprint。将问题拖拽至此来计划一个Sprint。</p>
+          <div className="c7n-noissue-wapper">
+            <div style={{ display: 'flex', height: 100 }} className="c7n-noissue-notzero">
+              <img style={{ width: 80, height: 70 }} alt="空sprint" src={emptyPng} />
+              <div style={{ marginLeft: 20 }}>
+                <p>计划您的SPRINT</p>
+                <p>这是一个Sprint。将问题拖拽至此来计划一个Sprint。</p>
+              </div>
             </div>
           </div>
         );
@@ -496,7 +498,9 @@ class SprintItem extends Component {
         );
       } else {
         return (
-          <div className="c7n-noissue-notzero">要计划一次sprint, 可以拖动本次sprint页脚到某个问题的下方，或者把问题拖放到这里</div>
+          <div className="c7n-noissue-wapper">
+            <div className="c7n-noissue-notzero">要计划一次sprint, 可以拖动本次sprint页脚到某个问题的下方，或者把问题拖放到这里</div>
+          </div>
         );
       }
     }
@@ -555,9 +559,8 @@ class SprintItem extends Component {
         onClick={this.handleDeleteSprint.bind(this, item)}
       >
         <Menu.Item key="0">
-
           删除sprint
-</Menu.Item>
+        </Menu.Item>
       </Menu>
     );
     if (item.statusCode) {
@@ -699,7 +702,12 @@ class SprintItem extends Component {
           for (let indexs = 0, len = data.length; indexs < len; indexs += 1) {
             const item = data[indexs];
             result.push(
-              <div key={item ? item.sprintId : '0'} id={indexs === 1 ? 'sprint_new' : undefined}>
+              <div
+                key={item ? item.sprintId : '0'}
+                id={(indexs === 0 && item.statusCode === 'sprint_planning')
+                || (indexs === 1 && data[0].statusCode !== 'sprint_planning')
+                  ? 'sprint_new' : undefined}
+              >
                 <div className="c7n-backlog-sprintTop">
                   <div className="c7n-backlog-springTitle">
                     <div className="c7n-backlog-sprintTitleSide">
@@ -948,7 +956,6 @@ class SprintItem extends Component {
                           <div
                             style={{
                               userSelect: 'none',
-                              background: 'white',
                               padding: '10px 0 10px 33px',
                               fontSize: 13,
                               display: 'flex',
@@ -1142,8 +1149,7 @@ class SprintItem extends Component {
                       style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
                       role="none"
                     >
-{item.sprintName}
-
+                      {item.sprintName}
                     </span>
                   </div>
                   <p className="c7n-backlog-sprintQuestion">
@@ -1163,10 +1169,8 @@ class SprintItem extends Component {
                     role="none"
                     onClick={this.clearFilter}
                   >
-
-清空所有筛选器
-
-</p>
+                    清空所有筛选器
+                  </p>
                 </div>
                 <div style={{ flexGrow: 1 }}>
                   {this.renderStatusCodeDom(item)}
@@ -1195,7 +1199,6 @@ class SprintItem extends Component {
                       <div
                         style={{
                           userSelect: 'none',
-                          background: 'white',
                           padding: '10px 0 10px 33px',
                           fontSize: 13,
                           display: 'flex',

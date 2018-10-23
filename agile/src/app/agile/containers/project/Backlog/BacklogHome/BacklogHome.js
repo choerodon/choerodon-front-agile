@@ -62,10 +62,12 @@ class BacklogHome extends Component {
         }, () => {
           if (isCreate && document.getElementById('sprint_new')) {
             document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_new').offsetTop;
-            document.getElementById('sprint_new').style.border = '1px solid red';
+            document.querySelector('#sprint_new .c7n-noissue-wapper').style.backgroundColor = '#E9ECFB';
+            document.querySelector('#sprint_new .c7n-backlog-sprintIssue').style.backgroundColor = '#E9ECFB';
             setTimeout(() => {
-              document.getElementById('sprint_new').style.border = 'none';
-            }, 1000);
+              document.querySelector('#sprint_new .c7n-noissue-wapper').style.backgroundColor = 'white';
+              document.querySelector('#sprint_new .c7n-backlog-sprintIssue').style.backgroundColor = 'white';
+            }, 5000);
           }
         });
       }).catch((error2) => {
