@@ -38,6 +38,7 @@ class WorkCalendar extends Component {
     const format = 'YYYY-MM-DD';
     // 渲染当前月，当前迭代可见数据
     if (current.format('MM') !== now.format('MM')
+      || !startDate || !endDate
       || moment(current.format(format)).isBefore(moment(startDate.format(format)))
       || moment(current.format(format)).isAfter(moment(endDate.format(format)))) {
       return (<div className="rc-calendar-date not-current-month">
@@ -118,7 +119,13 @@ class WorkCalendar extends Component {
       saturdayWork ? null : '六',
       sundayWork ? null : '日',
     ];
-    if (date && date.format('MM') === now.format('MM') && date.isAfter(startDate) && date.isBefore(endDate)) {
+    // 如果不是当前冲刺
+    if (!date || !startDate || !endDate
+      || moment(date.format(format)).isBefore(moment(startDate.format(format)))
+      || moment(date.format(format)).isAfter(moment(endDate.format(format)))) {
+      return;
+    }
+    if (date) {
       const selectDate = date.format(format);
       let data = workDates;
       if (workDates.length && workDates.map(d => d.workDay).indexOf(selectDate) !== -1) {

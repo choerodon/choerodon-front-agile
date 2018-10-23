@@ -127,7 +127,7 @@ class AddStatus extends Component {
           style={{ padding: 0 }}
           title={this.props.fromStatus ? `在项目“${AppState.currentMenuType.name}”中创建状态` : `添加看板“${name}”的状态`}
           description="请在下面输入状态名称，选择状态的类别。可以添加、删除、重新排序和重命名一个状态，配置完成后，您可以通过board对问题拖拽进行状态的流转。"
-          link="http://v0-9.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
+          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
         >
           <Form style={{ width: 512 }}>
             <FormItem>

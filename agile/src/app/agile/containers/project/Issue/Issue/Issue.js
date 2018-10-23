@@ -51,7 +51,6 @@ class Issue extends Component {
       paramType, paramId, paramName, paramStatus,
       paramPriority, paramIssueType, paramIssueId, paramUrl, paramOpenIssueId,
     } = Request;
-    // console.log(paramOpenIssueId);
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
     IssueStore.setParamName(paramName);
@@ -73,7 +72,6 @@ class Issue extends Component {
       // const a = [paramStatus];
       const a = paramStatus.split(',');
       obj.advancedSearchArgs.statusCode = a || [];
-      console.log(obj.advancedSearchArgs.statusCode);
       IssueStore.setBarFilters(arr);
       IssueStore.setFilter(obj);
       // IssueStore.setFilteredInfo({ statusCode: [paramStatus] });
@@ -118,13 +116,11 @@ class Issue extends Component {
     }
 
     // if (paramOpenIssueId) {
-    //   console.log(paramOpenIssueId);
       
     //   IssueStore.setBarFilters(arr);
     //   IssueStore.init();
     //   IssueStore.loadIssues()
     //     .then((res) => {
-    //       console.log(res.content.filter(item => item.issueId === paramOpenIssueId)[0]);
     //       this.setState({
     //         selectedIssue: res.content.length && res.content.filter(item => item.issueId === paramOpenIssueId)[0],
     //         expand: true,
@@ -257,7 +253,6 @@ class Issue extends Component {
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
     IssueStore.setFilteredInfo(filters);
     IssueStore.setBarFilters(barFilters);
-    console.log(typeof IssueStore.barFilters);
     if (barFilters != undefined && barFilters.length !== 0) {
       console.log(`filters: ${JSON.stringify(filters)},barFilter: ${JSON.stringify(IssueStore.barFilters)}`);
     }

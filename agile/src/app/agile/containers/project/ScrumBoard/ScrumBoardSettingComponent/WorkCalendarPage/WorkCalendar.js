@@ -116,7 +116,13 @@ class WorkCalendar extends Component {
       saturdayWork ? null : '六',
       sundayWork ? null : '日',
     ];
-    if (startDate && endDate && date && date.format('MM') === now.format('MM') && date.isAfter(moment(startDate)) && date.isBefore(moment(endDate))) {
+    // 如果不是当前冲刺
+    if (!date || !startDate || !endDate
+      || moment(date.format(format)).isBefore(moment(moment(startDate).format(format)))
+      || moment(date.format(format)).isAfter(moment(moment(endDate).format(format)))) {
+      return;
+    }
+    if (date) {
       const selectDate = date.format(format);
       const workDate = workDates.filter(d => d.workDay === selectDate);
       if (workDate.length) {
