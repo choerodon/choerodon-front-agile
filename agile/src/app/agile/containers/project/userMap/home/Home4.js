@@ -2008,29 +2008,83 @@ class Home3 extends Component {
             />
           </Content>
         ) : (
-          <div style={{
-            display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
-          }}
-          >
-            <CreateEpic
-              // container={document.querySelector('.c7n-userMap')}
-              visible={createEpic}
-              onOk={() => {
-                UserMapStore.setCreateEpic(false);
-                UserMapStore.loadEpic();
-              }}
-              onCancel={() => UserMapStore.setCreateEpic(false)}
-            />
-            <img src={epicPic} alt="" width="200" />
-            <div style={{ marginLeft: 50, width: 390 }}>
-              <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
-              <p style={{ fontSize: 20, marginTop: 10 }}>
-                {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
-                <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
-                {'进入用户故事地图。'}
-              </p>
+          <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
+            <div className="toolbar" style={{ minHeight: 52 }}>
+              <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
+                <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
+                <p
+                  role="none"
+                  style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                  onClick={this.addFilter.bind(this, 'mine')}
+                >
+                  {'仅我的问题'}
+                </p>
+                <p
+                  role="none"
+                  style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
+                  onClick={this.addFilter.bind(this, 'userStory')}
+                >
+                  {'仅用户故事'}
+
+                </p>
+                {filters.map(filter => (
+                  <p
+                    key={filter.filterId}
+                    role="none"
+                    style={{
+                      background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`,
+                      color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`,
+                      marginBottom: 3,
+                    }}
+                    onClick={this.addFilter.bind(this, filter.filterId)}
+                  >
+                    {filter.name}
+
+                  </p>)) }
+              </div>
+              <div
+                style={{
+                  display: this.state.more ? 'block' : 'none',
+                  color: 'rgb(63, 81, 181)',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+                role="none"
+                onClick={() => {
+                  this.setState({
+                    expand: !this.state.expand,
+                  }, () => {
+                    document.getElementsByClassName('fixHead')[0].style.height = `calc(100% - ${document.getElementsByClassName('fixHead')[0].offsetTop}px)`;
+                  });
+                }}
+              >
+                {this.state.expand ? '...收起' : '...展开'}
+              </div>
             </div>
-          </div>
+            <div style={{
+              display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
+            }}
+            >
+              <CreateEpic
+                // container={document.querySelector('.c7n-userMap')}
+                visible={createEpic}
+                onOk={() => {
+                  UserMapStore.setCreateEpic(false);
+                  UserMapStore.loadEpic();
+                }}
+                onCancel={() => UserMapStore.setCreateEpic(false)}
+              />
+              <img src={epicPic} alt="" width="200" />
+              <div style={{ marginLeft: 50, width: 390 }}>
+                <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+                <p style={{ fontSize: 20, marginTop: 10 }}>
+                  {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
+                  <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
+                  {'进入用户故事地图。'}
+                </p>
+              </div>
+            </div>
+          </Content>
         )}
       </Page>
     );

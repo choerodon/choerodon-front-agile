@@ -194,7 +194,7 @@ class EditComponent extends Component {
                 </Select>,
               )}
             </FormItem>
-            <FormItem>
+            <FormItem style={{ marginBottom: 5 }}>
               {getFieldDecorator('description', {
                 initialValue: this.state.description,
               })(

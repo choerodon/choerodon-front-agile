@@ -275,7 +275,7 @@ class ProjectSetting extends Component {
                   </Select>,
                 )}
               </FormItem>
-              <FormItem label="默认经办人策略" style={{ width: 512 }}>
+              <FormItem label="默认经办人策略" style={{ width: 512, marginBottom: 0 }}>
                 {getFieldDecorator('strategy', {
                   rules: [{ required: true, message: '默认经办人策略为必选项' }],
                   // initialValue: this.state.strategy || 'undistributed',

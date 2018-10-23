@@ -154,7 +154,7 @@ class AddComponent extends Component {
                 </Select>,
               )}
             </FormItem>
-            <FormItem>
+            <FormItem style={{ marginBottom: 5 }}>
               {getFieldDecorator('description', {})(
                 <TextArea label="模块描述" autosize maxLength={30} />,
               )}
