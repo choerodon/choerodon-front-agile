@@ -33,7 +33,9 @@ export function uploadImage(data) {
  * @param {*} config
  */
 export function uploadFile(data, config) {
-  const { issueType, issueId, fileName, projectId } = config;
+  const {
+    issueType, issueId, fileName, projectId, 
+  } = config;
   const axiosConfig = {
     headers: { 'content-type': 'multipart/form-datal' },
   };

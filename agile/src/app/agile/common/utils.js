@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { DeltaOperation } from 'react-quill';
 import { uploadImage, uploadFile } from '../api/FileApi';
-import { SERVICES_URL } from '../common/Constant';
+import { SERVICES_URL } from './Constant';
 
 const QuillDeltaToHtmlConverter = require('quill-delta-to-html');
 
@@ -154,9 +154,9 @@ export function handleFileUpload(propFileList, func, config) {
 
 export function text2Delta(description) {
   if (
-    description &&
-    description.indexOf('[') === 0 &&
-    description[description.length - 1] === ']'
+    description
+    && description.indexOf('[') === 0
+    && description[description.length - 1] === ']'
   ) {
     return JSON.parse(description);
   }
@@ -203,4 +203,3 @@ export function formatDate(str) {
   }
   return `${d[2]}/${MONTH[d[1] * 1 - 1]}月/${d[0]} ${t[0] < 12 ? t[0] : t[0] * 1 - 12}:${t[1]}  ${t[0] * 1 < 12 ? ' 上' : ' 下'}午`;
 }
-
