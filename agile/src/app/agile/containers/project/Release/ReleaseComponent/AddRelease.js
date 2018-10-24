@@ -20,12 +20,14 @@ class AddRelease extends Component {
       loading: false,
     };
   }
-  handleOk(e) {
+
+  handleOk = (e) => {
     this.setState({
       loading: true,
     });
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    const { form, onCancel, refresh } = this.props;
+    form.validateFields((err, values) => {
       if (!err) {
         const data = {
           description: values.description,
@@ -35,9 +37,9 @@ class AddRelease extends Component {
           releaseDate: values.endDate ? `${moment(values.endDate).format('YYYY-MM-DD')} 00:00:00` : null,
         };
         ReleaseStore.axiosAddRelease(data).then((res) => {
-          this.props.form.resetFields();
-          this.props.onCancel();
-          this.props.refresh();
+          form.resetFields();
+          onCancel();
+          refresh();
           this.setState({
             loading: false,
             endDate: null,
@@ -58,42 +60,62 @@ class AddRelease extends Component {
         });
       }
     });
-  }
+  };
+
   handleCancel = () => {
-    this.props.form.resetFields();
-    this.props.onCancel();
+    const { form, onCancel } = this.props;
+    form.resetFields();
+    onCancel();
     this.setState({
       endDate: null,
       startDate: null,
     });
   };
+
+  checkName = (rule, value, callback) => {
+    const proId = AppState.currentMenuType.id;
+    if (value) {
+      ReleaseStore.axiosCheckName(proId, value).then((res) => {
+        if (res) {
+          callback('版本名称已存在');
+        } else {
+          callback();
+        }
+      }).catch((error) => {
+      });
+    } else {
+      callback();
+    }
+  };
+
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { loading, endDate, startDate } = this.state;
+    const { form, visible } = this.props;
+    const { getFieldDecorator } = form;
     return (
       <Sidebar
         title="创建发布版本"
-        visible={this.props.visible}
+        visible={visible}
         onCancel={this.handleCancel}
         onOk={this.handleOk.bind(this)}
         okText="创建"
         cancelText="取消"
-        confirmLoading={this.state.loading}
+        confirmLoading={loading}
       >
         <Content
-          style={{
-            padding: 0,
-            width: 512,
-          }}
+          style={{ padding: 0 }}
           title={`在项目“${AppState.currentMenuType.name}”中创建发布版本`}
           description="请在下面输入版本的名称、描述、开始和结束日期，创建新的软件版本。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/release/"
         >
-          <Form>
+          <Form style={{ width: 512 }}>
             <FormItem>
               {getFieldDecorator('name', {
                 rules: [{
                   required: true,
                   message: '版本名称必须',
+                }, {
+                  validator: this.checkName,
                 }],
               })(
                 <Input label="版本名称" maxLength={30} />,
@@ -104,7 +126,7 @@ class AddRelease extends Component {
                 <DatePicker
                   style={{ width: '100%' }} 
                   label="开始日期"
-                  disabledDate={this.state.endDate ? current => current > moment(this.state.endDate) : () => false}
+                  disabledDate={endDate ? current => current > moment(endDate) : () => false}
                   onChange={(date) => {
                     this.setState({
                       startDate: date,
@@ -123,7 +145,7 @@ class AddRelease extends Component {
                       endDate: date,
                     });
                   }}
-                  disabledDate={this.state.startDate ? current => current < moment(this.state.startDate) : () => false}
+                  disabledDate={startDate ? current => current < moment(startDate) : () => false}
                 />,
               )}
             </FormItem>

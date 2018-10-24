@@ -61,12 +61,22 @@ class BacklogHome extends Component {
           spinIf: false,
         }, () => {
           if (isCreate && document.getElementById('sprint_new')) {
+            const sprintWapper = document.querySelector('#sprint_new .c7n-noissue-wapper');
+            const sprint = document.querySelector('#sprint_new .c7n-backlog-sprintIssue');
             document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_new').offsetTop;
-            document.querySelector('#sprint_new .c7n-noissue-wapper').style.backgroundColor = '#E9ECFB';
-            document.querySelector('#sprint_new .c7n-backlog-sprintIssue').style.backgroundColor = '#E9ECFB';
+            if (sprintWapper && sprintWapper.style) {
+              sprintWapper.style.backgroundColor = '#E9ECFB';
+            }
+            if (sprint && sprint.style) {
+              sprint.style.backgroundColor = '#E9ECFB';
+            }
             setTimeout(() => {
-              document.querySelector('#sprint_new .c7n-noissue-wapper').style.backgroundColor = 'white';
-              document.querySelector('#sprint_new .c7n-backlog-sprintIssue').style.backgroundColor = 'white';
+              if (sprintWapper && sprintWapper.style) {
+                sprintWapper.style.backgroundColor = 'white';
+              }
+              if (sprint && sprint.style) {
+                sprint.style.backgroundColor = 'white';
+              }
             }, 5000);
           }
         });

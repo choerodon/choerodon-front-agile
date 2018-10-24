@@ -128,6 +128,10 @@ class ReleaseStore {
   axiosGetVersionListWithoutPage() {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`, []);
   }
+
+  axiosCheckName(proId, name) {
+    return axios.get(`/agile/v1/projects/${proId}/product_version/${name}/check`);
+  }
 }
 
 const releaseStore = new ReleaseStore();
