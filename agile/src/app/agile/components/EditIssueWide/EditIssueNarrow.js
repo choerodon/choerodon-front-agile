@@ -37,10 +37,6 @@ import {
   loadBranchs,
   loadDatalogs,
   loadLinkIssues,
-  loadSubtask,
-  updateWorklog,
-  deleteWorklog,
-  createIssue,
   loadLabels,
   loadIssue,
   loadWorklogs,
@@ -49,10 +45,6 @@ import {
   loadComponents,
   loadVersions,
   loadEpics,
-  createCommit,
-  deleteCommit,
-  updateCommit,
-  loadUsers,
   deleteIssue,
   updateIssueType,
   loadSprints,
@@ -118,8 +110,6 @@ const ICON_COLOR={
   todo:"rgba(255, 177, 0, 0.2)",
   doing:"rgba(77,144,254,0.2)",
   done:"rgba(0,191,165,0.2)"
-
-
 }
 class CreateSprint extends Component {
   constructor(props) {
@@ -164,7 +154,6 @@ class CreateSprint extends Component {
       issueNum: undefined,
       typeCode: 'story',
       parentIssueId: undefined,
-      priorityCode: undefined,
       reporterId: undefined,
       reporterImageUrl: undefined,
       sprintId: undefined,
@@ -176,6 +165,9 @@ class CreateSprint extends Component {
       lastUpdateDate: undefined,
       statusName: '',
       priorityName: '',
+      priorityId: false,
+      priorityColor: '#FFFFFF',
+      priorityDTO: {},
       reporterName: '',
       summary: '',
       description: '',
@@ -199,7 +191,7 @@ class CreateSprint extends Component {
       influenceVersionsFixed: [],
 
       originStatus: [],
-      originpriorities: [],
+      originPriorities: [],
       originComponents: [],
       originVersions: [],
       originLabels: [],
@@ -289,8 +281,7 @@ class CreateSprint extends Component {
       objectVersionNumber,
       parentIssueId,
       parentIssueNum,
-      priorityCode,
-      priorityName,
+      priorityDTO,
       projectId,
       remainingTime,
       reporterId,
@@ -344,8 +335,10 @@ class CreateSprint extends Component {
       objectVersionNumber,
       parentIssueId,
       parentIssueNum,
-      priorityCode,
-      priorityName,
+      priorityDTO,
+      priorityId: priorityDTO.id,
+      priorityName: priorityDTO.name,
+      priorityColor: priorityDTO.colour,
       projectId,
       remainingTime,
       reporterId,
@@ -483,8 +476,8 @@ class CreateSprint extends Component {
     this.setState({ epicName: value });
   }
 
-  resetPriorityCode(value) {
-    this.setState({ priorityCode: value });
+  resetPriorityId(value) {
+    this.setState({ priorityId: value });
   }
 
   resetStatusId(value) {
@@ -760,18 +753,6 @@ class CreateSprint extends Component {
       return type === 'string' ? _.map(arr, pro).join() : _.map(arr, pro);
     } else {
       return type === 'string' ? arr.join() : arr;
-    }
-  }
-
-  transformPriorityCode(originpriorityCode) {
-    if (!originpriorityCode.length) {
-      return [];
-    } else {
-      const arr = [];
-      arr[0] = _.find(originpriorityCode, { valueCode: 'high' });
-      arr[1] = _.find(originpriorityCode, { valueCode: 'medium' });
-      arr[2] = _.find(originpriorityCode, { valueCode: 'low' });
-      return arr;
     }
   }
 
@@ -1249,6 +1230,15 @@ class CreateSprint extends Component {
     const {
       initValue, visible, onCancel, onOk, 
     } = this.props;
+    const {
+      typeCode,
+      originPriorities,
+      selectLoading,
+      currentRae,
+      priorityId,
+      priorityName,
+      priorityColor,
+    } = this.state;
     const getMenu = () => (
       <Menu onClick={this.handleClickMenu.bind(this)}>
         <Menu.Item key="0">登记工作日志</Menu.Item>
@@ -1261,7 +1251,7 @@ class CreateSprint extends Component {
           <Menu.Item key="1">删除</Menu.Item>
         </Permission>
         {
-          this.state.typeCode !== 'sub_task' && (
+          typeCode !== 'sub_task' && (
             <Menu.Item key="2">
               创建子任务
             </Menu.Item>
@@ -1271,14 +1261,14 @@ class CreateSprint extends Component {
           复制问题
         </Menu.Item>
         {
-          this.state.typeCode !== 'sub_task' && this.state.origin.subIssueDTOList && this.state.origin.subIssueDTOList.length === 0 && (
+          typeCode !== 'sub_task' && this.state.origin.subIssueDTOList && this.state.origin.subIssueDTOList.length === 0 && (
             <Menu.Item key="4">
               转化为子任务
             </Menu.Item>
           )
         }
         {
-          this.state.typeCode === 'sub_task' && (
+          typeCode === 'sub_task' && (
             <Menu.Item key="5">
               转化为任务
             </Menu.Item>
@@ -1291,7 +1281,7 @@ class CreateSprint extends Component {
           分配问题
         </Menu.Item>
         {
-          this.state.typeCode === 'sub_task' && (
+          typeCode === 'sub_task' && (
             <Menu.Item key="8">
               修改父级
             </Menu.Item>
@@ -1652,41 +1642,6 @@ class CreateSprint extends Component {
                     </Dropdown>
                   </div>
                 </div>
-                {/* {
-                  this.state.typeCode === 'issue_epic' ? (
-                    <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
-                      <span style={{ flexShrink: 0 }}>名称：</span>
-                      <ReadAndEdit
-                        callback={this.changeRae.bind(this)}
-                        thisType="epicName"
-                        current={this.state.currentRae}
-                        handleEnter
-                        line
-                        origin={this.state.epicName}
-                        onInit={() => this.setAnIssueToState()}
-                        onOk={this.updateIssue.bind(this, 'epicName')}
-                        onCancel={this.resetEpicName.bind(this)}
-                        readModeContent={<div className="c7n-summary">
-                          {this.state.epicName}
-                        </div>}
-                      >
-                        <TextArea
-                          maxLength={44}
-                          value={this.state.epicName}
-                          size="small"
-                          autoFocus
-                          onChange={this.handleEpicNameChange.bind(this)}
-                          onPressEnter={() => {
-                            this.updateIssue('epicName');
-                            this.setState({
-                              currentRae: undefined,
-                            });
-                          }}
-                        />
-                      </ReadAndEdit>
-                    </div>
-                  ) : null
-                } */}
                 <div className="line-start">
                   <div style={{ display: 'flex', flex: 1, flexShrink: 0 }}>
                     <span
@@ -1817,27 +1772,26 @@ class CreateSprint extends Component {
                       <div>
                         <ReadAndEdit
                           callback={this.changeRae.bind(this)}
-                          thisType="priorityCode"
-                          current={this.state.currentRae}
-                          origin={this.state.priorityCode}
-                          onOk={this.updateIssue.bind(this, 'priorityCode')}
-                          onCancel={this.resetPriorityCode.bind(this)}
+                          thisType="priorityId"
+                          current={currentRae}
+                          origin={priorityId}
+                          onOk={this.updateIssue.bind(this, 'priorityId')}
+                          onCancel={this.resetPriorityId.bind(this)}
                           onInit={() => {
                             this.setAnIssueToState();
                             loadPriorities().then((res) => {
                               this.setState({
-                                originpriorities: res.lookupValues,
+                                originPriorities: res,
                               });
                             });
                           }}
                           readModeContent={(
                             <div>
-                              {this.state.priorityCode ? (
+                              {priorityId ? (
                                 <div
                                   className="c7n-level"
                                   style={{
-                                    // backgroundColor: COLOR[this.state.priorityCode].bgColor,
-                                    color: COLOR[this.state.priorityCode].color,
+                                    color: priorityColor,
                                     // borderRadius: '2px',
                                     // padding: '0 8px',
                                     // display: 'inline-block',
@@ -1845,7 +1799,7 @@ class CreateSprint extends Component {
                                     lineHeight: '18px',
                                   }}
                                 >
-                                  {PRIORITY[this.state.priorityCode]}
+                                  { priorityName }
                                 </div>
                               ) : (
                                 '无'
@@ -1854,13 +1808,9 @@ class CreateSprint extends Component {
 )}
                         >
                           <Select
-                            value={
-                              this.state.originpriorities.length
-                                ? this.state.priorityCode
-                                : this.state.priorityName
-                            }
+                            value={originPriorities.length ? priorityId : priorityName}
                             style={{ width: '150px' }}
-                            loading={this.state.selectLoading}
+                            loading={selectLoading}
                             autoFocus
                             // getPopupContainer={triggerNode => triggerNode.parentNode}
                             onFocus={() => {
@@ -1869,23 +1819,23 @@ class CreateSprint extends Component {
                               });
                               loadPriorities().then((res) => {
                                 this.setState({
-                                  originpriorities: res.lookupValues,
+                                  originPriorities: res,
                                   selectLoading: false,
                                 });
                               });
                             }}
                             onChange={(value) => {
-                              const priority = _.find(this.state.originpriorities, {
-                                valueCode: value,
+                              const priority = _.find(originPriorities, {
+                                id: value,
                               });
                               this.setState({
-                                priorityCode: value,
+                                priorityId: value,
                                 priorityName: priority.name,
                               });
                             }}
                           >
-                            {this.transformPriorityCode(this.state.originpriorities).map(type => (
-                              <Option key={type.valueCode} value={type.valueCode}>
+                            {originPriorities.map(priority => (
+                              <Option key={priority.id} value={priority.id}>
                                 <div
                                   style={{
                                     display: 'inline-flex',
@@ -1897,7 +1847,7 @@ class CreateSprint extends Component {
                                     className="c7n-level"
                                     style={{
                                       // backgroundColor: COLOR[type.valueCode].bgColor,
-                                      color: COLOR[type.valueCode].color,
+                                      color: priority.colour,
                                       // borderRadius: '2px',
                                       // padding: '0 8px',
                                       // display: 'inline-block',
@@ -1905,7 +1855,7 @@ class CreateSprint extends Component {
                                       lineHeight: '18px',
                                     }}
                                   >
-                                    {type.name}
+                                    {priority.name}
                                   </div>
                                 </div>
                               </Option>
@@ -1927,9 +1877,6 @@ class CreateSprint extends Component {
                         background: '#d8d8d8',
                         marginRight: 12,
                         flexShrink: 0,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',

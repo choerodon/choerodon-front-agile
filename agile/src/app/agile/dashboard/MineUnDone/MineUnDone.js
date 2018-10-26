@@ -58,7 +58,7 @@ class MineUnDone extends Component {
         <div className="flex-shrink">
           <div className="priority">
             <PriorityTag
-              priority={issue.priorityCode}
+              priority={issue.priorityDTO}
             />
           </div>
         </div>

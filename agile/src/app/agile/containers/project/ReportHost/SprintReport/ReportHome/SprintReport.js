@@ -582,13 +582,13 @@ class SprintReport extends Component {
       }, {
         width: '15%',
         title: '优先级',
-        dataIndex: 'priorityCode',
-        render: (priorityCode, record) => (
+        dataIndex: 'priorityId',
+        render: (priorityId, record) => (
           <div>
             <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityName}`}>
               <div style={{ marginRight: 12 }}>
                 <PriorityTag
-                  priority={record.priorityCode}
+                  priority={record.priorityDTO}
                 />
               </div>
             </Tooltip>

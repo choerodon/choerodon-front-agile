@@ -351,11 +351,11 @@ class ReleaseDetail extends Component {
           <span
             style={{
               padding: '1px 4px',
-              color: this.renderPriorityStyle('color', record),
-              background: this.renderPriorityStyle('background', record),
+              color: record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF',
+              background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}33`,
             }}
           >
-            {text}
+            {record.priorityDTO ? record.priorityDTO.name : ''}
           </span>
         ),
       }, {

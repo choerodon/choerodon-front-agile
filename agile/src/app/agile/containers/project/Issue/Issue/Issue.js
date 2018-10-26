@@ -12,7 +12,7 @@ import {
 import TimeAgo from 'timeago-react';
 import QuickSearch from '../../../../components/QuickSearch';
 import './Issue.scss';
-
+import { loadPriorities } from '../../../../api/NewIssueApi';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 
 import { TYPE, ICON, TYPE_NAME } from '../../../../common/Constant';
@@ -49,6 +49,8 @@ class Issue extends Component {
       selectIssueType: 'task',
       createIssueValue: '',
       createLoading: false,
+      originPriorities: [],
+      defaultPriorityId: false,
     };
   }
 
@@ -77,6 +79,20 @@ class Issue extends Component {
     if (paramName) {
       arr.push(paramName);
     }
+    loadPriorities().then((res) => {
+      if (res && res.length) {
+        const defaultPriorities = res.filter(p => p.default);
+        this.setState({
+          originPriorities: res,
+          defaultPriorityId: defaultPriorities.length ? defaultPriorities[0].id : '',
+        });
+      } else {
+        this.setState({
+          originPriorities: [],
+          defaultPriorityId: '',
+        });
+      }
+    });
     if (paramStatus) {
       const obj = {
         advancedSearchArgs: {},
@@ -96,10 +112,10 @@ class Issue extends Component {
         searchArgs: {},
       };
       const a = [paramPriority];
-      obj.advancedSearchArgs.priorityCode = a || [];
+      obj.advancedSearchArgs.priorityId = a || [];
       IssueStore.setBarFilters(arr);
       IssueStore.setFilter(obj);
-      IssueStore.setFilteredInfo({ priorityCode: [paramPriority] });
+      IssueStore.setFilteredInfo({ priorityId: [paramPriority] });
       IssueStore.loadIssues();
     } else if (paramIssueType) {
       const obj = {
@@ -169,8 +185,7 @@ class Issue extends Component {
         imageUrl: res.assigneeImageUrl || '',
         issueId: res.issueId,
         issueNum: res.issueNum,
-        priorityCode: res.priorityCode,
-        priorityName: res.priorityName,
+        priorityDTO: res.priorityDTO,
         projectId: res.projectId,
         statusCode: res.statusCode,
         statusColor: res.statusColor,

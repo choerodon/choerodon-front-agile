@@ -167,7 +167,7 @@ class IssueCard extends Component {
         assigneeId,
         assigneeName,
         imageUrl,
-        priorityCode,
+        priorityDTO,
         typeCode,
         storyPoints,
         statusName,
@@ -257,7 +257,7 @@ class IssueCard extends Component {
                     {issueNum}
                   </span>
                   <PriorityTag
-                    priority={priorityCode}
+                    priority={priorityDTO}
                   />
                 </div>
                 <Icon

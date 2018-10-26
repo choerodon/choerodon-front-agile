@@ -64,10 +64,11 @@ class ReleaseStore {
   }
 
   axiosGetVersionStatusIssues(versionId, statusCode) {
+    const orgId = AppState.currentMenuType.organizationId;
     if (statusCode && statusCode !== '0') {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}/issues?statusCode=${statusCode}`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}/issues?organizationId=${orgId}&statusCode=${statusCode}`);
     } else {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}/issues`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}/issues?organizationId=${orgId}`);
     }
   }
 

@@ -40,8 +40,9 @@ class ReleaseLogs extends Component {
 
   loadIssues() {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     const versionId = this.props.match.params.id;
-    axios.get(`/agile/v1/projects/${projectId}/product_version/${versionId}/issues`)
+    axios.get(`/agile/v1/projects/${projectId}/product_version/${versionId}/issues?organizationId=${orgId}`)
       .then((res) => {
         this.setState({ issues: res });
         this.splitIssues(res);

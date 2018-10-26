@@ -187,6 +187,7 @@ class AddComponent extends Component {
 
   getOption(filter, addEmpty) {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     const OPTION_FILTER = {
       assignee: {
         url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
@@ -195,7 +196,7 @@ class AddComponent extends Component {
         name: 'realName',
       },
       priority: {
-        url: `/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`,
+        url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
         prop: 'lookupValues',
         id: 'valueCode',
         name: 'name',
@@ -303,6 +304,7 @@ class AddComponent extends Component {
 
   tempOption = (filter, addEmpty) => {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     const OPTION_FILTER = {
       assignee: {
         url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
@@ -311,7 +313,7 @@ class AddComponent extends Component {
         name: 'realName',
       },
       priority: {
-        url: `/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`,
+        url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
         prop: 'lookupValues',
         id: 'valueCode',
         name: 'name',

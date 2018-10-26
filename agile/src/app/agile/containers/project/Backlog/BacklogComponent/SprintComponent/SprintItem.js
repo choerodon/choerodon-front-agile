@@ -159,7 +159,6 @@ class SprintItem extends Component {
         loading: true,
       });
       const data = {
-        priorityCode: this.props.store.getProjectInfo.defaultPriorityCode ? this.props.store.getProjectInfo.defaultPriorityCode : 'medium',
         projectId: AppState.currentMenuType.id,
         sprintId: type !== 'backlog' ? item.sprintId : 0,
         summary: this[`${index}-addInput`].input.value,

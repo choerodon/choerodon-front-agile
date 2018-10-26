@@ -33,7 +33,7 @@ class CreateSubIssue extends Component {
       originPriorities: [],
       originFixVersions: [],
       originUsers: [],
-      origin: {},
+      defaultPriorityId: false,
     };
   }
 
@@ -47,7 +47,6 @@ class CreateSubIssue extends Component {
       });
     });
     this.loadPriorities();
-    this.getProjectSetting();
   }
 
   onFilterChange(input) {
@@ -67,13 +66,6 @@ class CreateSubIssue extends Component {
     }
   }
 
-  getProjectSetting() {
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
-      .then((res) => {
-        this.setState({ origin: res });
-      });
-  }
-
   setFileList = (data) => {
     this.setState({ fileList: data });
   }
@@ -90,27 +82,12 @@ class CreateSubIssue extends Component {
 
   loadPriorities() {
     loadPriorities().then((res) => {
-      this.setState({ originPriorities: res.lookupValues });
+      const defaultPriorities = res.filter(p => p.default);
+      this.setState({
+        originPriorities: res,
+        defaultPriorityId: defaultPriorities.length ? defaultPriorities[0].id : '',
+      });
     });
-  }
-
-  handleFullEdit = (delta) => {
-    this.setState({
-      delta,
-      edit: false,
-    });
-  }
-
-  transformPriorityCode(originpriorityCode) {
-    if (!originpriorityCode.length) {
-      return [];
-    } else {
-      const arr = [];
-      arr[0] = _.find(originpriorityCode, { valueCode: 'high' });
-      arr[1] = _.find(originpriorityCode, { valueCode: 'medium' });
-      arr[2] = _.find(originpriorityCode, { valueCode: 'low' });
-      return arr;
-    }
   }
 
   handleCreateIssue = () => {
@@ -146,7 +123,7 @@ class CreateSubIssue extends Component {
         });
         const extra = {
           summary: values.summary,
-          priorityCode: values.priorityCode,
+          priorityId: values.priorityId,
           assigneeId: values.assigneedId,
           projectId: AppState.currentMenuType.id,
           parentIssueId: this.props.issueId,
@@ -193,6 +170,7 @@ class CreateSubIssue extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const { initValue, visible, onCancel, onOk } = this.props;
+    const { defaultPriorityId, originPriorities } = this.state;
     const callback = (value) => {
       this.setState({
         delta: value,
@@ -226,26 +204,34 @@ class CreateSubIssue extends Component {
             </FormItem>
 
             <FormItem label="优先级" style={{ width: 520 }}>
-              {getFieldDecorator('priorityCode', {
+              {getFieldDecorator('priorityId', {
                 rules: [{ required: true, message: '优先级为必选项' }],
-                initialValue: this.state.origin.defaultPriorityCode,
+                initialValue: defaultPriorityId,
               })(
                 <Select
                   label="优先级"
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
-                  {this.transformPriorityCode(this.state.originPriorities).map(type =>
-                    (<Option key={type.valueCode} value={type.valueCode}>
+                  {originPriorities.map(priority =>
+                    (<Option key={priority.id} value={priority.id}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                         <div
-                          style={{ color: COLOR[type.valueCode].color, width: 20, height: 20, textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: 8 }}
+                          style={{
+                            color: priority.colour,
+                            width: 20,
+                            height: 20,
+                            textAlign: 'center',
+                            lineHeight: '20px',
+                            borderRadius: '50%',
+                            marginRight: 8,
+                          }}
                         >
                           <Icon
                             type="flag"
                             style={{ fontSize: '13px' }}
                           />
                         </div>
-                        <span>{type.name}</span>
+                        <span>{priority.name}</span>
                       </div>
                     </Option>),
                   )}

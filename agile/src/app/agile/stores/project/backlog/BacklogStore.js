@@ -180,7 +180,7 @@ class BacklogStore {
   }
 
   axiosGetIssueDetail(issueId) {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/${issueId}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/${issueId}?organizationId=${AppState.currentMenuType.organizationId}`);
   }
 
   @computed get getOpenSprintDetail() {
@@ -350,7 +350,8 @@ class BacklogStore {
   }
 
   axiosGetSprint(data) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?quickFilterIds=${this.quickFilters}`, data);
+    const orgId = AppState.currentMenuType.organizationId;
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?organizationId=${orgId}&quickFilterIds=${this.quickFilters}`, data);
   }
 
   handleEpicDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data);

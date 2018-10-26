@@ -510,11 +510,11 @@ class EpicReport extends Component {
         {
           width: '15%',
           title: '优先级',
-          dataIndex: 'priorityCode',
-          render: (priorityCode, record) => (
+          dataIndex: 'priorityId',
+          render: (priorityId, record) => (
             <div>
               <PriorityTag
-                priority={record.priorityCode}
+                priority={record.priorityDTO}
               />
             </div>
           ),

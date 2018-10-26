@@ -26,7 +26,9 @@ const PRIORITY_MAP = {
 
 class PriorityTag extends Component {
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.priority === this.props.priority) {
+    if (nextProps.priority
+      && this.props.priority
+      && nextProps.priority.id === this.props.priority.id) {
       return false;
     }
     return true;
@@ -34,16 +36,15 @@ class PriorityTag extends Component {
 
   render() {
     const { priority } = this.props;
-    const currentPriority = PRIORITY_MAP[priority] || PRIORITY_MAP.default;
     return (
       <div
         className="c7n-priorityTag"
         style={{
-          backgroundColor: currentPriority.bgColor,
-          color: currentPriority.color,
+          backgroundColor: `${priority ? priority.colour : '#FFFFFF'}33`,
+          color: priority ? priority.colour : '#FFFFFF',
         }}
       >
-        {currentPriority.name}
+        {priority ? priority.name : ''}
       </div>
     );
   }

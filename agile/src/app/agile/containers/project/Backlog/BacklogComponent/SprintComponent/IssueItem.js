@@ -7,31 +7,6 @@ import UserHead from '../../../../../components/UserHead';
 
 class IssueItem extends Component {
   /**
-   *渲染优先级样式
-   *
-   * @param {*} type
-   * @param {*} item
-   * @returns
-   * @memberof SprintIssue
-   */
-  renderPriorityStyle =(type, item) => {
-    if (type === 'color') {
-      if (item.priorityCode === 'medium') {
-        return 'rgb(53, 117, 223)';
-      } else if (item.priorityCode === 'high') {
-        return '#f44336';
-      } else {
-        return 'rgba(0, 0, 0, 0.36)';
-      }
-    } else if (item.priorityCode === 'medium') {
-      return 'rgba(77, 144, 254, 0.2)';
-    } else if (item.priorityCode === 'high') {
-      return 'rgba(244, 67, 54, 0.2)';
-    } else {
-      return 'rgba(0, 0, 0, 0.08)';
-    }
-  }
-  /**
    *渲染issue背景色
    *
    * @param {*} item
@@ -156,21 +131,23 @@ class IssueItem extends Component {
                     <div
                       style={{
                         maxWidth: 34,
-                        marginLeft: !_.isNull(item.priorityName) && !this.renderIssueDisplay() ? '12px' : 0,
+                        marginLeft: !_.isNull(item.priorityDTO.name) && !this.renderIssueDisplay() ? '12px' : 0,
                       }}
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {!_.isNull(item.priorityName) ? (
-                        <Tooltip title={`优先级: ${item.priorityName}`}>
+                      {!_.isNull(item.priorityDTO.name) ? (
+                        <Tooltip title={`优先级: ${item.priorityDTO.name}`}>
                           <span
                             label="sprintIssue"
                             className="c7n-backlog-sprintIssuePriority"
                             style={{
-                              color: this.renderPriorityStyle('color', item),
-                              background: this.renderPriorityStyle('background', item),
+                              color: item.priorityDTO.colour,
+                              background: `${item.priorityDTO.colour}33`,
                             }}
-                          >{item.priorityName}</span>
+                          >
+                            {item.priorityDTO.name}
+                          </span>
                         </Tooltip>
                       ) : ''}
                     </div>

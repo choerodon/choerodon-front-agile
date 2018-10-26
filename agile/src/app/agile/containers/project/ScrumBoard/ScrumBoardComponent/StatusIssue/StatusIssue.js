@@ -447,19 +447,19 @@ class StatusIssue extends Component {
                                 {statusName}
                               </p>
                             </Tooltip>
-                            <Tooltip title={`优先级: ${item.priorityName}`}>
+                            <Tooltip title={`优先级: ${item.priorityDTO.name}`}>
                               <p
                                 style={{
                                   flexBasis: '20px',
-                                  background: this.renderPriorityStyle('background', item),
-                                  color: this.renderPriorityStyle('color', item),
+                                  background: `${item.priorityDTO.colour}33`,
+                                  color: item.priorityDTO.colour,
                                   textAlign: 'center',
                                   marginLeft: '8px',
                                   height: 20,
                                   borderRadius: 2,
                                 }}
                               >
-                                {item.priorityName}
+                                {item.priorityDTO.name}
                               </p>
                             </Tooltip>
                           </div>

@@ -40,7 +40,6 @@ class CreateIssue extends Component {
       const issue = {
         epicId: data.epicId,
         parentIssueId: 0,
-        priorityCode: 'medium',
         sprintId: data.sprintId,
         summary,
         typeCode: selectIssueType,

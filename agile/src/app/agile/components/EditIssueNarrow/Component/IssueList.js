@@ -109,7 +109,7 @@ class IssueList extends Component {
           <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityName}`}>
             <div style={{ marginRight: 12 }}>
               <PriorityTag
-                priority={issue.priorityCode}
+                priority={issue.priorityDTO}
               />
             </div>
           </Tooltip>
