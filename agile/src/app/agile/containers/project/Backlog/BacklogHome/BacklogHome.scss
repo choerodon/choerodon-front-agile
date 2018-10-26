@@ -2,16 +2,20 @@
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  padding: 10px 24px 5px;
+  padding: 6px 24px 5px;
   border-bottom: 1px solid #d3d3d3;
   flex-shrink: 0;
   align-items: center;
 
   .c7n-backlogTools-left {
     display: flex;
+    flex-grow: 1;
     align-items: center;
     flex-wrap: wrap;
     overflow: hidden;
+  }
+  .c7n-backlogTools-right {
+    display: flex;
   }
 }
 
@@ -50,7 +54,6 @@
   margin-right: 18px;
   border-radius: 2px;
   white-space: nowrap;
-  margin-bottom: 5px;
 }
 
 .c7n-quickfilter-more {
@@ -61,4 +64,10 @@
 
 p {
   margin-bottom: 0;
+}
+
+.c7n-agile-backlogTools-popover {
+  .ant-checkbox-group-item {
+    margin-bottom: 5px;
+  }
 }
