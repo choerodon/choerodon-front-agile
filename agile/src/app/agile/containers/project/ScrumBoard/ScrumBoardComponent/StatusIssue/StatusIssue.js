@@ -125,7 +125,7 @@ class StatusIssue extends Component {
         //   result.push(this.renderReturn(childrenList[index], `sub-${index}`, 'child'));
         // }
         return result;
-      } 
+      }
     }
     return '';
   };
@@ -181,7 +181,7 @@ class StatusIssue extends Component {
         return '#F44336';
       } else {
         return (
-          <Tooltip title="类型： 缺陷"> 
+          <Tooltip title="类型： 缺陷">
             <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
           </Tooltip>
         );
@@ -329,12 +329,12 @@ class StatusIssue extends Component {
             // display: this.renderSubDisplay(item, type),
           }}
         >
-          <Draggable 
-            key={item.issueId} 
+          <Draggable
+            key={item.issueId}
             draggableId={JSON.stringify({
               objectVersionNumber: item.objectVersionNumber,
               issueId: item.issueId,
-            })} 
+            })}
             index={index}
           >
             {(provided, snapshot) => (
@@ -463,9 +463,8 @@ class StatusIssue extends Component {
                           </div>
                         </div>
                         {
-                          item.assigneeName ? (
-                            <Tooltip title={`经办人: ${item.assigneeName}`}>
-                              {
+                          <Tooltip title={`经办人: ${item.assigneeName}`}>
+                            {
                                 item.assigneeName ? (
                                   <Avatar
                                     src={item.imageUrl ? item.imageUrl : undefined}
@@ -478,11 +477,17 @@ class StatusIssue extends Component {
                                     {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
                                   </Avatar>
                                 ) : (
-                                  <div style={{ width: 32, height: 32, flexShrink: 0 }} />
+                                  <div style={{
+                                    width: 32,
+                                    height: 32,
+                                    flexShrink: 0,
+                                    marginLeft: 8,
+                                    marginBottom: 4,
+                                  }}
+                                  />
                                 )
                               }
-                            </Tooltip>
-                          ) : null
+                          </Tooltip>
                         }
                       </div>
                       <div className="c7n-scrumboard-issueBottom">

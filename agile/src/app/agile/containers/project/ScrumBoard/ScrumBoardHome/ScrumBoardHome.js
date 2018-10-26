@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import {
-  Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip, 
+  Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip, Checkbox, Popover,
 } from 'choerodon-ui';
+import classNames from 'classnames';
 import axios from 'axios';
 import _ from 'lodash';
 import { DragDropContext } from 'react-beautiful-dnd';
@@ -20,12 +21,13 @@ import BacklogStore from '../../../../stores/project/backlog/BacklogStore';
 import CloseSprint from '../../Backlog/BacklogComponent/SprintComponent/CloseSprint';
 import EmptyScrumboard from '../../../../assets/image/emptyScrumboard.png';
 
-const Option = Select.Option;
+const { Option } = Select;
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
+const CheckboxGroup = Checkbox.Group;
 let scroll;
 const { AppState } = stores;
-const confirm = Modal.confirm;
+const { confirm } = Modal;
 
 @observer
 class ScrumBoardHome extends Component {
@@ -33,7 +35,6 @@ class ScrumBoardHome extends Component {
     super(props);
     this.state = {
       spinIf: false,
-      selectedBoard: '',
       onlyMe: false,
       recent: false,
       expand: true,
@@ -42,24 +43,19 @@ class ScrumBoardHome extends Component {
       judgeUpdateParent: {},
       updateParentStatus: null,
       quickFilter: [],
-      more: false,
       expandFilter: false,
     };
   }
 
   componentDidMount() {
+    const { location } = this.props;
     this.getBoard();
-    const url = this.GetRequest(this.props.location.search);
+    const url = this.GetRequest(location.search);
     if (url.paramIssueId) {
       ScrumBoardStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
     const timer = setInterval(() => {
       if (document.getElementsByClassName('c7n-scrumTools-left').length > 0) {
-        if (document.getElementsByClassName('c7n-scrumTools-left')[0].scrollHeight > document.getElementsByClassName('c7n-scrumTools-left')[0].clientHeight) {
-          this.setState({
-            more: true,
-          });
-        }
         if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
           document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
         }
@@ -72,6 +68,34 @@ class ScrumBoardHome extends Component {
     ScrumBoardStore.setClickIssueDetail({});
   }
 
+  getIssueCount = (data, key) => {
+    let count = 0;
+    if (JSON.stringify(data) !== '{}') {
+      _.map(data.columnsData.columns, (columns) => {
+        _.map(columns.subStatuses, (status) => {
+          count = _.reduce(status.issues, (sum, item) => {
+            let result = sum;
+            if (key === '') {
+              result += 1;
+              return result;
+            } else if (item[key] === 0 || item[key] === null) {
+              result += 1;
+              return result;
+            } else {
+              result += 0;
+              return result;
+            }
+          }, count);
+        });
+      });
+      if (key === 'parentIssueId') {
+        count -= data.parentIds.length;
+      }
+    }
+    return count;
+  }
+
+
   getBoard() {
     ScrumBoardStore.axiosGetBoardList().then((data) => {
       let index;
@@ -83,7 +107,10 @@ class ScrumBoardHome extends Component {
       if (!index) {
         index = 0;
       }
-      // axios.get(`/agile/v1/projects/${AppState.menuType.id}/board/user_setting/${data[index].boardId}`).then((columnDat) => {
+      // axios
+      // .get(`/agile/v1/projects/${AppState.menuType.id}
+      // /board/user_setting/${data[index].boardId}`)
+      // .then((columnDat) => {
       //
       // });
       ScrumBoardStore.setCurrentConstraint(data[index].columnConstraint);
@@ -95,7 +122,7 @@ class ScrumBoardHome extends Component {
     });
   }
 
-  GetRequest(url) {
+  GetRequest = (url) => {
     const theRequest = {};
     if (url.indexOf('?') !== -1) {
       const str = url.split('?')[1];
@@ -107,16 +134,17 @@ class ScrumBoardHome extends Component {
     return theRequest;
   }
 
-  refresh(boardId) {
+  refresh = (boardId) => {
+    const { onlyMe, recent, quickFilter } = this.state;
     this.setState({
       spinIf: true,
     });
     ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
       ScrumBoardStore.setQuickSearchList(res);
       ScrumBoardStore.axiosGetBoardData(boardId,
-        this.state.onlyMe ? AppState.getUserId : 0,
-        this.state.recent,
-        this.state.quickFilter).then((data) => {
+        onlyMe ? AppState.getUserId : 0,
+        recent,
+        quickFilter).then((data) => {
         this.setState({ dataSource: data });
         ScrumBoardStore.axiosGetAllEpicData().then((data2) => {
           const parentIds = [];
@@ -125,56 +153,87 @@ class ScrumBoardHome extends Component {
           const storeAssignee = [];
           const epicData = data.epicInfo ? data.epicInfo : [];
           for (let index = 0, len = data.columnsData.columns.length; index < len; index += 1) {
-            for (let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length; index2 < len2; index2 += 1) {
-              for (let index3 = 0, len3 = data.columnsData.columns[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
-                if (data.parentIds.indexOf(parseInt(data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId, 10)) !== -1) {
-                  if (parentIds.indexOf(data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId) === -1) {
-                    const parentId = data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId;
+            for (
+              let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length;
+              index2 < len2;
+              index2 += 1) {
+              for (
+                let index3 = 0, len3 = data.columnsData.columns[index]
+                  .subStatuses[index2].issues.length;
+                index3 < len3;
+                index3 += 1) {
+                if (data.parentIds
+                  .indexOf(parseInt(
+                    data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId, 10,
+                  )) !== -1) {
+                  if (parentIds.indexOf(
+                    data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId,
+                  ) === -1) {
+                    const parentId = data.columnsData
+                      .columns[index].subStatuses[index2].issues[index3].issueId;
                     let count = 0;
                     _.map(data.columnsData.columns, (columns) => {
                       _.map(columns.subStatuses, (status) => {
                         count = _.reduce(status.issues, (sum, item) => {
+                          let result = sum;
                           if (item.parentIssueId && item.parentIssueId === parentId) {
-                            sum += 1;
-                            return sum;
+                            result += 1;
+                            return result;
                           } else {
-                            return sum += 0;
+                            result += 0;
+                            return result;
                           }
                         }, count);
                       });
                     });
-                    parentIds.push(data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId);
+                    parentIds.push(data.columnsData
+                      .columns[index].subStatuses[index2].issues[index3].issueId);
                     storeParentIds.push({
-                      status: data.columnsData.columns[index].subStatuses[index2].name,
-                      categoryCode: data.columnsData.columns[index].subStatuses[index2].categoryCode,
+                      status: data.columnsData
+                        .columns[index].subStatuses[index2].name,
+                      categoryCode: data.columnsData
+                        .columns[index].subStatuses[index2].categoryCode,
                       ...data.columnsData.columns[index].subStatuses[index2].issues[index3],
                       count,
                     });
                   }
                 }
-                if (data.assigneeIds.indexOf(parseInt(data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId, 10)) !== -1) {
-                  if (assigneeIds.indexOf(data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId) === -1) {
-                    if (data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId) {
-                      assigneeIds.push(data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId);
-                      const assigneeId = data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId;
+                if (data.assigneeIds
+                  .indexOf(parseInt(
+                    data.columnsData
+                      .columns[index].subStatuses[index2].issues[index3].assigneeId, 10,
+                  )) !== -1) {
+                  if (assigneeIds.indexOf(data.columnsData
+                    .columns[index].subStatuses[index2].issues[index3].assigneeId) === -1) {
+                    if (data.columnsData
+                      .columns[index].subStatuses[index2].issues[index3].assigneeId) {
+                      assigneeIds.push(data.columnsData
+                        .columns[index].subStatuses[index2].issues[index3].assigneeId);
+                      const { assigneeId } = data.columnsData
+                        .columns[index].subStatuses[index2].issues[index3];
                       let count = 0;
                       _.map(data.columnsData.columns, (columns) => {
                         _.map(columns.subStatuses, (status) => {
                           count = _.reduce(status.issues, (sum, item) => {
+                            let result = sum;
                             if (item.assigneeId && item.assigneeId === assigneeId) {
-                              sum += 1;
-                              return sum;
+                              result += 1;
+                              return result;
                             } else {
-                              return sum += 0;
+                              result += 0;
+                              return result;
                             }
                           }, count);
                         });
                       });
                       storeAssignee.push({
                         count,
-                        assigneeId: data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeId,
-                        assigneeName: data.columnsData.columns[index].subStatuses[index2].issues[index3].assigneeName,
-                        imageUrl: data.columnsData.columns[index].subStatuses[index2].issues[index3].imageUrl,
+                        assigneeId: data.columnsData
+                          .columns[index].subStatuses[index2].issues[index3].assigneeId,
+                        assigneeName: data.columnsData
+                          .columns[index].subStatuses[index2].issues[index3].assigneeName,
+                        imageUrl: data.columnsData
+                          .columns[index].subStatuses[index2].issues[index3].imageUrl,
                       });
                     }
                   }
@@ -189,11 +248,13 @@ class ScrumBoardHome extends Component {
                 _.map(data.columnsData.columns, (columns) => {
                   _.map(columns.subStatuses, (status) => {
                     count = _.reduce(status.issues, (sum, item) => {
+                      let result = sum;
                       if (epicData[index].epicId === item.epicId) {
-                        sum += 1;
-                        return sum;
+                        result += 1;
+                        return result;
                       } else {
-                        return sum += 0;
+                        result += 0;
+                        return result;
                       }
                     }, count);
                   });
@@ -212,15 +273,22 @@ class ScrumBoardHome extends Component {
           const statusList = [];
           for (let index = 0, len = newColumnData.length; index < len; index += 1) {
             if (newColumnData[index].subStatuses) {
-              for (let index2 = 0, len2 = newColumnData[index].subStatuses.length; index2 < len2; index2 += 1) {
+              for (let index2 = 0, len2 = newColumnData[index].subStatuses.length;
+                index2 < len2; index2 += 1) {
                 statusList.push({
                   id: newColumnData[index].subStatuses[index2].id,
                   name: newColumnData[index].subStatuses[index2].name,
                 });
                 if (newColumnData[index].subStatuses[index2].issues) {
-                  for (let index3 = 0, len3 = newColumnData[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
-                    newColumnData[index].subStatuses[index2].issues[index3].statusName = newColumnData[index].subStatuses[index2].name;
-                    newColumnData[index].subStatuses[index2].issues[index3].categoryCode = newColumnData[index].subStatuses[index2].categoryCode;
+                  for (let index3 = 0, len3 = newColumnData[index]
+                    .subStatuses[index2].issues.length;
+                    index3 < len3; index3 += 1) {
+                    newColumnData[index]
+                      .subStatuses[index2].issues[index3].statusName = newColumnData[index]
+                        .subStatuses[index2].name;
+                    newColumnData[index]
+                      .subStatuses[index2].issues[index3].categoryCode = newColumnData[index]
+                        .subStatuses[index2].categoryCode;
                   }
                 }
               }
@@ -248,7 +316,7 @@ class ScrumBoardHome extends Component {
    * @returns
    * @memberof ScrumBoardHome
    */
-  handleDragEnd(result) {
+  handleDragEnd = (result) => {
     ScrumBoardStore.setDragStartItem({});
     if (!result.destination) {
       return;
@@ -257,13 +325,17 @@ class ScrumBoardHome extends Component {
     let flag = 0;
     if (ScrumBoardStore.getCurrentConstraint === 'issue') {
       // 问题计数
-      if (JSON.parse(result.source.droppableId).columnId 
+      if (JSON.parse(result.source.droppableId).columnId
       !== JSON.parse(result.destination.droppableId).columnId) {
         // 如果是拖不同列
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
-          if (String(originState[oriIndex].columnId) === String(JSON.parse(result.source.droppableId).columnId)) {
+          if (String(originState[oriIndex].columnId)
+            === String(JSON.parse(result.source.droppableId).columnId)) {
             let totalIssues = 0;
-            for (let index = 0, len2 = originState[oriIndex].subStatuses.length; index < len2; index += 1) {
+            for (
+              let index = 0, len2 = originState[oriIndex].subStatuses.length;
+              index < len2;
+              index += 1) {
               totalIssues += originState[oriIndex].subStatuses[index].issues.length;
             }
             if (originState[oriIndex].minNum >= totalIssues) {
@@ -273,10 +345,13 @@ class ScrumBoardHome extends Component {
           }
         }
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
-          if (String(originState[oriIndex].columnId) 
+          if (String(originState[oriIndex].columnId)
           === String(JSON.parse(result.destination.droppableId).columnId)) {
             let totalIssues = 0;
-            for (let index = 0, len2 = originState[oriIndex].subStatuses.length; index < len2; index += 1) {
+            for (
+              let index = 0, len2 = originState[oriIndex].subStatuses.length;
+              index < len2;
+              index += 1) {
               totalIssues += originState[oriIndex].subStatuses[index].issues.length;
             }
             if (originState[oriIndex].maxNum <= totalIssues) {
@@ -288,14 +363,21 @@ class ScrumBoardHome extends Component {
       }
     } else if (ScrumBoardStore.getCurrentConstraint === 'issue_without_sub_task') {
       // 问题计数 不包含子任务
-      if (JSON.parse(result.source.droppableId).columnId 
+      if (JSON.parse(result.source.droppableId).columnId
       !== JSON.parse(result.destination.droppableId).columnId) {
         // 如果是拖不同列
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
-          if (String(originState[oriIndex].columnId) === String(JSON.parse(result.source.droppableId).columnId)) {
+          if (String(originState[oriIndex].columnId)
+            === String(JSON.parse(result.source.droppableId).columnId)) {
             let totalIssues = 0;
-            for (let index = 0, len2 = originState[oriIndex].subStatuses.length; index < len2; index += 1) {
-              for (let index2 = 0, len3 = originState[oriIndex].subStatuses[index].issues.length; index2 < len3; index2 += 1) {
+            for (
+              let index = 0, len2 = originState[oriIndex].subStatuses.length;
+              index < len2;
+              index += 1) {
+              for (
+                let index2 = 0, len3 = originState[oriIndex].subStatuses[index].issues.length;
+                index2 < len3;
+                index2 += 1) {
                 if (originState[oriIndex].subStatuses[index].issues[index2].typeCode !== 'sub_task') {
                   totalIssues += 1;
                 }
@@ -308,11 +390,17 @@ class ScrumBoardHome extends Component {
           }
         }
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
-          if (String(originState[oriIndex].columnId) 
+          if (String(originState[oriIndex].columnId)
           === String(JSON.parse(result.destination.droppableId).columnId)) {
             let totalIssues = 0;
-            for (let index = 0, len2 = originState[oriIndex].subStatuses.length; index < len2; index += 1) {
-              for (let index2 = 0, len3 = originState[oriIndex].subStatuses[index].issues.length; index2 < len3; index2 += 1) {
+            for (
+              let index = 0, len2 = originState[oriIndex].subStatuses.length;
+              index < len2;
+              index += 1) {
+              for (
+                let index2 = 0, len3 = originState[oriIndex].subStatuses[index].issues.length;
+                index2 < len3;
+                index2 += 1) {
                 if (originState[oriIndex].subStatuses[index].issues[index2].typeCode !== 'sub_task') {
                   totalIssues += 1;
                 }
@@ -331,32 +419,44 @@ class ScrumBoardHome extends Component {
       //   spinIf: true,
       // });
       const newState = _.clone(ScrumBoardStore.getBoardData);
-      const issueId = JSON.parse(result.draggableId).issueId;
-      const objectVersionNumber = JSON.parse(result.draggableId).objectVersionNumber;
+      const { issueId } = JSON.parse(result.draggableId);
+      const { objectVersionNumber } = JSON.parse(result.draggableId);
       const statusCode = JSON.parse(result.destination.droppableId).code;
       // const splitData = result.draggableId.split(',');
       // const splitData2 = result.destination.droppableId.split(',');
       let draggableData = {};
       for (let index = 0, len = newState.length; index < len; index += 1) {
-        if (String(newState[index].columnId) === String(JSON.parse(result.source.droppableId).columnId)) {
-          for (let index2 = 0, len2 = newState[index].subStatuses.length; index2 < len2; index2 += 1) {
-            if (String(newState[index].subStatuses[index2].id) === String(JSON.parse(result.source.droppableId).code)) {
+        if (String(newState[index].columnId)
+          === String(JSON.parse(result.source.droppableId).columnId)) {
+          for (
+            let index2 = 0, len2 = newState[index].subStatuses.length;
+            index2 < len2;
+            index2 += 1) {
+            if (String(newState[index].subStatuses[index2].id)
+              === String(JSON.parse(result.source.droppableId).code)) {
               let spliceIndex = '';
-              for (let index3 = 0, len3 = newState[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
-                if (String(newState[index].subStatuses[index2].issues[index3].issueId) === String(issueId)) {
+              for (
+                let index3 = 0, len3 = newState[index].subStatuses[index2].issues.length;
+                index3 < len3;
+                index3 += 1) {
+                if (String(newState[index].subStatuses[index2].issues[index3].issueId)
+                  === String(issueId)) {
                   spliceIndex = index3;
                 }
               }
-              draggableData = newState[index].subStatuses[index2].issues.splice(spliceIndex, 1)[0];
+              [draggableData] = newState[index].subStatuses[index2].issues.splice(spliceIndex, 1);
             }
           }
         }
       }
       for (let index = 0, len = newState.length; index < len; index += 1) {
-        if (String(newState[index].columnId) 
+        if (String(newState[index].columnId)
         === String(JSON.parse(result.destination.droppableId).columnId)) {
-          for (let index2 = 0, len2 = newState[index].subStatuses.length; index2 < len2; index2 += 1) {
-            if (String(newState[index].subStatuses[index2].id) 
+          for (
+            let index2 = 0, len2 = newState[index].subStatuses.length;
+            index2 < len2;
+            index2 += 1) {
+            if (String(newState[index].subStatuses[index2].id)
             === String(JSON.parse(result.destination.droppableId).code)) {
               newState[index].subStatuses[index2].issues.splice(
                 result.destination.index, 0, draggableData,
@@ -369,7 +469,7 @@ class ScrumBoardHome extends Component {
       let destinationStatus;
       ScrumBoardStore.updateIssue(
         issueId, objectVersionNumber, statusCode, ScrumBoardStore.getSelectedBoard,
-        JSON.parse(result.source.droppableId).columnId, 
+        JSON.parse(result.source.droppableId).columnId,
         JSON.parse(result.destination.droppableId).columnId,
       ).then((data) => {
         if (data.failed) {
@@ -384,10 +484,13 @@ class ScrumBoardHome extends Component {
           draggableData.objectVersionNumber = data.objectVersionNumber;
           draggableData.categoryCode = JSON.parse(result.destination.droppableId).categoryCode;
           for (let index = 0, len = newState.length; index < len; index += 1) {
-            if (String(newState[index].columnId) 
+            if (String(newState[index].columnId)
             === String(JSON.parse(result.destination.droppableId).columnId)) {
-              for (let index2 = 0, len2 = newState[index].subStatuses.length; index2 < len2; index2 += 1) {
-                if (String(newState[index].subStatuses[index2].id) 
+              for (
+                let index2 = 0, len2 = newState[index].subStatuses.length;
+                index2 < len2;
+                index2 += 1) {
+                if (String(newState[index].subStatuses[index2].id)
                 === String(JSON.parse(result.destination.droppableId).code)) {
                   destinationStatus = newState[index].subStatuses[index2].categoryCode;
                   newState[index].subStatuses[index2].issues.splice(
@@ -403,11 +506,15 @@ class ScrumBoardHome extends Component {
               let parentIdCode;
               let parentIdNum;
               let parentObjectVersionNumber;
-              for (let index = 0, len = ScrumBoardStore.getParentIds.length; index < len; index += 1) {
+              for (
+                let index = 0, len = ScrumBoardStore.getParentIds.length;
+                index < len;
+                index += 1) {
                 if (ScrumBoardStore.getParentIds[index].issueId === draggableData.parentIssueId) {
                   parentIdCode = ScrumBoardStore.getParentIds[index].categoryCode;
                   parentIdNum = ScrumBoardStore.getParentIds[index].issueNum;
-                  parentObjectVersionNumber = ScrumBoardStore.getParentIds[index].objectVersionNumber;
+                  parentObjectVersionNumber = ScrumBoardStore
+                    .getParentIds[index].objectVersionNumber;
                 }
               }
               const judge = ScrumBoardStore.judgeMoveParentToDone(
@@ -438,12 +545,13 @@ class ScrumBoardHome extends Component {
    * @param {*} e
    * @memberof ScrumBoardHome
    */
-  handleCreateBoard(e) {
+  handleCreateBoard = (e) => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    const { form } = this.props;
+    form.validateFields((err, values) => {
       if (!err) {
         ScrumBoardStore.axiosCreateBoard(values.name).then((res) => {
-          this.props.form.resetFields();
+          form.resetFields();
           message.success('创建成功');
           this.setState({
             addBoard: false,
@@ -455,14 +563,16 @@ class ScrumBoardHome extends Component {
     });
   }
 
+
   /**
    *仅故事
    *
    * @memberof ScrumBoardHome
    */
-  filterOnlyStory() {
+  filterOnlyStory = () => {
+    const { recent } = this.state;
     this.setState({
-      recent: !this.state.recent,
+      recent: !recent,
     }, () => {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
@@ -473,9 +583,10 @@ class ScrumBoardHome extends Component {
    *
    * @memberof ScrumBoardHome
    */
-  filterOnlyMe() {
+  filterOnlyMe = () => {
+    const { onlyMe } = this.state;
     this.setState({
-      onlyMe: !this.state.onlyMe,
+      onlyMe: !onlyMe,
     }, () => {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
@@ -486,7 +597,7 @@ class ScrumBoardHome extends Component {
    *
    * @memberof ScrumBoardHome
    */
-  handleFinishSprint() {
+  handleFinishSprint = () => {
     BacklogStore.axiosGetSprintCompleteMessage(
       ScrumBoardStore.getCurrentSprint.sprintId,
     ).then((res) => {
@@ -496,7 +607,10 @@ class ScrumBoardHome extends Component {
         if (res.parentsDoneUnfinishedSubtasks.length > 0) {
           flag = 1;
           let issueNums = '';
-          for (let index = 0, len = res.parentsDoneUnfinishedSubtasks.length; index < len; index += 1) {
+          for (
+            let index = 0, len = res.parentsDoneUnfinishedSubtasks.length;
+            index < len;
+            index += 1) {
             issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
           }
           confirm({
@@ -516,28 +630,8 @@ class ScrumBoardHome extends Component {
     });
   }
 
-  /**
-   *快速搜索
-   *
-   * @param {*} item
-   * @memberof ScrumBoardHome
-   */
-  filterQuick(item) {
-    const newState = [...this.state.quickFilter];
-    if (newState.indexOf(item.filterId) === -1) {
-      newState.push(item.filterId);
-    } else {
-      newState.splice(newState.indexOf(item.filterId), 1);
-    }
-    this.setState({
-      quickFilter: newState,
-    }, () => {
-      this.refresh(ScrumBoardStore.getSelectedBoard);
-    });
-  }
-
   // 渲染状态列表头
-  renderStatusColumns() {
+  renderStatusColumns = () => {
     const data = ScrumBoardStore.getBoardData;
     const result = [];
     for (let index = 0, len = data.length; index < len; index += 1) {
@@ -554,7 +648,7 @@ class ScrumBoardHome extends Component {
   }
 
   // 渲染issue列
-  renderIssueColumns(id) {
+  renderIssueColumns = (id) => {
     const result = [];
     const data = ScrumBoardStore.getBoardData;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
@@ -613,7 +707,7 @@ class ScrumBoardHome extends Component {
    * 渲染被分配的任务列
    * @returns {Array}
    */
-  renderSwimlane() {
+  renderSwimlane = () => {
     let ids = [];
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       ids = ScrumBoardStore.getParentIds;
@@ -635,7 +729,7 @@ class ScrumBoardHome extends Component {
           renderIssueColumns={this.renderIssueColumns.bind(this)}
           changeState={(name, value) => {
             this.setState({
-              [name]: value, 
+              [name]: value,
             });
           }}
         />,
@@ -644,7 +738,7 @@ class ScrumBoardHome extends Component {
     return result;
   }
 
-  renderHeight() {
+  renderHeight = () => {
     if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
       return `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
     }
@@ -657,7 +751,7 @@ class ScrumBoardHome extends Component {
    * @returns
    * @memberof ScrumBoardHome
    */
-  renderUpdateParentDefault() {
+  renderUpdateParentDefault = () => {
     if (ScrumBoardStore.getBoardData.length > 0) {
       if (ScrumBoardStore.getBoardData[ScrumBoardStore.getBoardData.length - 1].columnId !== 'unset') {
         if (ScrumBoardStore.getBoardData[
@@ -670,32 +764,10 @@ class ScrumBoardHome extends Component {
     return undefined;
   }
 
-  getIssueCount = (data, key) => {
-    let count = 0;
-    if (JSON.stringify(data) !== '{}') {
-      _.map(data.columnsData.columns, (columns) => {
-        _.map(columns.subStatuses, (status) => {
-          count = _.reduce(status.issues, (sum, item) => {
-            if (key === '') {
-              return sum += 1;
-            } else if (item[key] === 0 || item[key] === null) {
-              return sum += 1;
-            } else {
-              return sum += 0;
-            }
-          }, count);
-        });
-      });
-      if (key === 'parentIssueId') {
-        count -= data.parentIds.length;
-      }
-    }
-    return count;
-  }
-
-  renderOthersTitle() {
+  renderOthersTitle = () => {
     let result = '';
-    const data = this.state.dataSource || {};
+    const { dataSource } = this.state;
+    const data = dataSource || {};
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       result = (
         <span>
@@ -736,9 +808,10 @@ class ScrumBoardHome extends Component {
     return result;
   }
 
-  
-  renderOtherSwimlane() {
+
+  renderOtherSwimlane = () => {
     let result = '';
+    const { expand } = this.state;
     const data = ScrumBoardStore.getBoardData;
     let flag = 0;
     // 如果没有其他任务则其他任务列就不渲染，
@@ -747,7 +820,10 @@ class ScrumBoardHome extends Component {
         if (data[index].subStatuses) {
           for (let index2 = 0, len2 = data[index].subStatuses.length; index2 < len2; index2 += 1) {
             if (data[index].subStatuses[index2].issues) {
-              for (let index3 = 0, len3 = data[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
+              for (
+                let index3 = 0, len3 = data[index].subStatuses[index2].issues.length;
+                index3 < len3;
+                index3 += 1) {
                 if (!data[index].subStatuses[index2].issues[index3].parentIssueId) {
                   flag = 1;
                 }
@@ -761,7 +837,10 @@ class ScrumBoardHome extends Component {
         if (data[index].subStatuses) {
           for (let index2 = 0, len2 = data[index].subStatuses.length; index2 < len2; index2 += 1) {
             if (data[index].subStatuses[index2].issues) {
-              for (let index3 = 0, len3 = data[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
+              for (
+                let index3 = 0, len3 = data[index].subStatuses[index2].issues.length;
+                index3 < len3;
+                index3 += 1) {
                 if (!data[index].subStatuses[index2].issues[index3].assigneeId) {
                   flag = 1;
                 }
@@ -778,13 +857,13 @@ class ScrumBoardHome extends Component {
       result = (
         <div className="c7n-scrumboard-others">
           <div className="c7n-scrumboard-otherHeader">
-            <Icon 
+            <Icon
               style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
-              type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+              type={expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
               role="none"
               onClick={() => {
                 this.setState({
-                  expand: !this.state.expand,
+                  expand: !expand,
                 });
               }}
             />
@@ -793,10 +872,10 @@ class ScrumBoardHome extends Component {
           <div
             className="c7n-scrumboard-otherContent"
             style={{
-              display: this.state.expand ? 'flex' : 'none',
+              display: expand ? 'flex' : 'none',
             }}
           >
-            <DragDropContext 
+            <DragDropContext
               onDragEnd={this.handleDragEnd.bind(this)}
               onDragStart={(start) => {
                 ScrumBoardStore.setDragStartItem(start);
@@ -810,14 +889,53 @@ class ScrumBoardHome extends Component {
     }
     // } else {
     //   result = (
-    //     
+    //
     //   );
     // }
     return result;
   }
 
+  onChangeSelect = (newState) => {
+    this.setState({
+      quickFilter: newState,
+    }, () => {
+      this.refresh(ScrumBoardStore.getSelectedBoard);
+    });
+  };
+
+  buttonRender = () => {
+    const listChildren = ScrumBoardStore.getQuickSearchList.map(item => ({
+      label: item.name,
+      value: item.filterId,
+    }));
+    const content = (
+      <CheckboxGroup className="c7n-agile-quickSearch-popover" style={{ display: 'flex', flexDirection: 'column' }} options={listChildren} onChange={this.onChangeSelect} />
+    );
+    return (
+      ScrumBoardStore.getQuickSearchList.length > 0
+        ? (
+          <Popover content={content} trigger="click">
+            <Button funcType="flat" icon="more_vert">
+              更多
+            </Button>
+          </Popover>
+        ) : ''
+    );
+  };
+
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { form: { getFieldDecorator }, history } = this.props;
+    const {
+      dataSource,
+      spinIf,
+      expandFilter,
+      onlyMe,
+      recent,
+      closeSprintVisible,
+      judgeUpdateParent,
+      addBoard,
+      updateParentStatus,
+    } = this.state;
     return (
       <Page
         className="c7n-scrumboard-page"
@@ -833,7 +951,7 @@ class ScrumBoardHome extends Component {
         ]}
       >
         <Header title="活跃冲刺">
-          <Button 
+          <Button
             funcType="flat"
             onClick={() => {
               this.setState({
@@ -844,11 +962,11 @@ class ScrumBoardHome extends Component {
             <Icon type="playlist_add icon" />
             <span>创建看板</span>
           </Button>
-          <Select 
+          <Select
             className="select-without-underline"
             value={ScrumBoardStore.getSelectedBoard}
             style={{
-              maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: '28px', 
+              maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: '28px',
             }}
             dropdownStyle={{
               color: '#3F51B5',
@@ -856,9 +974,14 @@ class ScrumBoardHome extends Component {
             }}
             onChange={(value) => {
               let newCode;
-              for (let index = 0, len = ScrumBoardStore.getBoardList.length; index < len; index += 1) {
+              for (
+                let index = 0, len = ScrumBoardStore.getBoardList.length;
+                index < len;
+                index += 1) {
                 if (ScrumBoardStore.getBoardList[index].boardId === value) {
-                  ScrumBoardStore.setCurrentConstraint(ScrumBoardStore.getBoardList[index].columnConstraint);
+                  ScrumBoardStore.setCurrentConstraint(
+                    ScrumBoardStore.getBoardList[index].columnConstraint,
+                  );
                   newCode = ScrumBoardStore.getBoardList[index].userDefaultBoard;
                 }
               }
@@ -878,14 +1001,20 @@ class ScrumBoardHome extends Component {
             }
           </Select>
           {
-            // this.state.dataSource && this.state.dataSource.currentSprint && this.state.dataSource.currentSprint.sprintId ? (
-            //   <Button className="leftBtn2" funcType="flat" onClick={() => { this.props.history.push(`/agile/iterationBoard/${this.state.dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+            // this.state.dataSource && this.state.dataSource.currentSprint
+            // && this.state.dataSource.currentSprint.sprintId ? (
+            //   <Button className="leftBtn2" funcType="flat"
+            // onClick={() => { this.props.history.push(`/agile/iterationBoard/
+            // ${this.state.dataSource.currentSprint.sprintId}?type=project&id=
+            // ${AppState.currentMenuType.id}&name=
+            // ${AppState.currentMenuType.name}&organizationId=
+            // ${AppState.currentMenuType.organizationId}`); }}>
             //     <span>切换至工作台</span>
             //   </Button>
             // ) : null
 
              (
-               <Button className="leftBtn2" disabled={!this.state.dataSource ? false : !(this.state.dataSource && this.state.dataSource.currentSprint && this.state.dataSource.currentSprint.sprintId)} funcType="flat" onClick={() => { this.props.history.push(`/agile/iterationBoard/${this.state.dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+               <Button className="leftBtn2" disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)} funcType="flat" onClick={() => { history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
                  <span>切换至工作台</span>
                </Button>
             )
@@ -897,23 +1026,22 @@ class ScrumBoardHome extends Component {
         </Header>
         <div style={{ padding: 0, display: 'flex' }}>
           <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-            <Spin spinning={this.state.spinIf}>
+            <Spin spinning={spinIf}>
               <div className="c7n-scrumTools">
                 <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-                  <div 
-                    style={{ 
-                      width: '85%',
-                      flexWrap: 'wrap',
-                      height: this.state.expandFilter ? '' : 27,
-                    }} 
+                  <div
+                    style={{
+                      width: '100%',
+                      height: 27,
+                    }}
                     className="c7n-scrumTools-left"
                   >
                     <p style={{ marginRight: 24 }}>快速搜索:</p>
                     <p
                       className="c7n-scrumTools-filter"
                       style={{
-                        background: this.state.onlyMe ? '#3F51B5' : '',
-                        color: this.state.onlyMe ? 'white' : '#3F51B5',
+                        background: onlyMe ? '#3F51B5' : '',
+                        color: onlyMe ? 'white' : '#3F51B5',
                       }}
                       role="none"
                       onClick={this.filterOnlyMe.bind(this)}
@@ -923,8 +1051,8 @@ class ScrumBoardHome extends Component {
                     <p
                       className="c7n-scrumTools-filter"
                       style={{
-                        background: this.state.recent ? '#3F51B5' : '',
-                        color: this.state.recent ? 'white' : '#3F51B5',
+                        background: recent ? '#3F51B5' : '',
+                        color: recent ? 'white' : '#3F51B5',
                       }}
                       role="none"
                       onClick={this.filterOnlyStory.bind(this)}
@@ -932,39 +1060,8 @@ class ScrumBoardHome extends Component {
                       {'仅故事'}
                     </p>
                     {
-                      ScrumBoardStore.getQuickSearchList.length > 0 
-                        ? ScrumBoardStore.getQuickSearchList.map(item => (
-                          <p
-                            key={item.filterId}
-                            className="c7n-scrumTools-filter"
-                            style={{
-                              color: this.state.quickFilter.indexOf(item.filterId) !== -1 ? 'white' : '#3F51B5',
-                              background: this.state.quickFilter.indexOf(item.filterId) !== -1 ? '#3F51B5' : '',
-                            }}
-                            role="none"
-                            onClick={this.filterQuick.bind(this, item)}
-                          >
-                            {item.name}
-                          </p>
-                        )) : ''
+                      this.buttonRender()
                     }
-                  </div>
-                  <div
-                    style={{
-                      display: this.state.more ? 'block' : 'none',
-                      color: 'rgb(63, 81, 181)',
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                      whiteSpace: 'nowrap',
-                    }}
-                    role="none"
-                    onClick={() => {
-                      this.setState({
-                        expandFilter: !this.state.expandFilter,
-                      });
-                    }}
-                  >
-                    {this.state.expandFilter ? '...收起' : '...展开'}
                   </div>
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}>
@@ -981,7 +1078,6 @@ class ScrumBoardHome extends Component {
                   <Button
                     funcType="flat"
                     onClick={() => {
-                      const { history } = this.props;
                       const urlParams = AppState.currentMenuType;
                       history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&boardId=${ScrumBoardStore.getSelectedBoard}`);
                     }}
@@ -992,10 +1088,10 @@ class ScrumBoardHome extends Component {
                 </div>
               </div>
               {
-                this.state.closeSprintVisible ? (
+                closeSprintVisible ? (
                   <CloseSprint
                     store={BacklogStore}
-                    visible={this.state.closeSprintVisible}
+                    visible={closeSprintVisible}
                     onCancel={() => {
                       this.setState({
                         closeSprintVisible: false,
@@ -1062,7 +1158,7 @@ class ScrumBoardHome extends Component {
           <Modal
             closable={false}
             title="更新父问题"
-            visible={JSON.stringify(this.state.judgeUpdateParent) !== '{}'}
+            visible={JSON.stringify(judgeUpdateParent) !== '{}'}
             onCancel={() => {
               this.setState({
                 judgeUpdateParent: {},
@@ -1071,11 +1167,10 @@ class ScrumBoardHome extends Component {
             }}
             onOk={() => {
               const data = {
-                issueId: this.state.judgeUpdateParent.id,
-                objectVersionNumber: this.state.judgeUpdateParent.objectVersionNumber,
-                statusId: this.state.updateParentStatus 
-                  ? this.state.updateParentStatus : ScrumBoardStore.getBoardData[
-                    ScrumBoardStore.getBoardData.length - 1].subStatuses[0].id,
+                issueId: judgeUpdateParent.id,
+                objectVersionNumber: judgeUpdateParent.objectVersionNumber,
+                statusId: updateParentStatus || ScrumBoardStore.getBoardData[
+                  ScrumBoardStore.getBoardData.length - 1].subStatuses[0].id,
               };
               BacklogStore.axiosUpdateIssue(data).then((res) => {
                 this.refresh(ScrumBoardStore.getSelectedBoard);
@@ -1089,12 +1184,12 @@ class ScrumBoardHome extends Component {
           >
             <p>
               {'任务'}
-              {this.state.judgeUpdateParent.issueNumber}
+              {judgeUpdateParent.issueNumber}
               {'的全部子任务为done'}
             </p>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <p style={{ marginRight: 20 }}>您是否要更新父问题进行匹配</p>
-              <Select 
+              <Select
                 style={{
                   width: 250,
                 }}
@@ -1118,7 +1213,7 @@ class ScrumBoardHome extends Component {
           </Modal>
           <Sidebar
             title="创建看板"
-            visible={this.state.addBoard}
+            visible={addBoard}
             onCancel={() => {
               this.setState({
                 addBoard: false,

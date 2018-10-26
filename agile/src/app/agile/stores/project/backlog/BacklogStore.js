@@ -1,5 +1,7 @@
 import axios from 'axios';
-import { observable, action, computed, toJS, reaction } from 'mobx';
+import {
+  observable, action, computed, toJS, reaction,
+} from 'mobx';
 import { store, stores } from 'choerodon-front-boot';
 
 const { AppState } = stores;
@@ -7,23 +9,43 @@ const { AppState } = stores;
 @store('BacklogStore')
 class BacklogStore {
   @observable sprintData = {};
+
   @observable versionData = [];
+
   @observable epicData = [];
+
   @observable chosenVersion = 'all';
+
   @observable chosenEpic = 'all';
+
   @observable onlyMe = false;
+
   @observable recent = false;
+
   @observable isDragging = false;
+
   @observable isLeaveSprint = false;
+
   @observable clickIssueDetail = {};
+
   @observable sprintCompleteMessage = {};
+
   @observable openSprintDetail = {};
+
   @observable sprintWidth;
+
   @observable colorLookupValue = [];
+
   @observable quickFilters = [];
+
   @observable projectInfo = {};
+
   @observable quickSearchList = [];
+
   @observable selectIssues = [];
+
+  @observable more = false;
+
   @observable workSetting = {
     saturdayWork: false,
     sundayWork: false,
@@ -296,7 +318,7 @@ class BacklogStore {
   @computed get getVersionData() {
     return toJS(this.versionData);
   }
-  
+
   @action setVersionData(data) {
     this.versionData = data;
   }
@@ -352,6 +374,14 @@ class BacklogStore {
         this.setWorkSetting(data);
       }
     });
+  }
+
+  @computed get getMore() {
+    return this.more;
+  }
+
+  @action setMore() {
+    this.more = !this.more;
   }
 }
 
