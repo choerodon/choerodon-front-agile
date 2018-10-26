@@ -222,20 +222,22 @@ class IssueItem extends Component {
                     <div
                       style={{
                         width: 60,
-                        marginLeft: !_.isNull(item.statusName) ? '12px' : 0,
+                        marginLeft: !_.isNull(item.statusMapDTO.name) ? '12px' : 0,
                       }}
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {!_.isNull(item.statusName) ? (
-                        <Tooltip title={`状态: ${item.statusName}`}>
+                      {!_.isNull(item.statusMapDTO.name) ? (
+                        <Tooltip title={`状态: ${item.statusMapDTO.name}`}>
                           <span
                             label="sprintIssue"
                             className="c7n-backlog-sprintIssueStatus"
                             style={{
                               background: item.statusColor ? item.statusColor : '#4d90fe',
                             }}
-                          >{item.statusName}</span>
+                          >
+                            {item.statusMapDTO.name}
+                          </span>
                         </Tooltip>
                       ) : ''}
                     </div>

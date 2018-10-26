@@ -19,6 +19,7 @@ import TypeTag from '../../../../../components/TypeTag';
 import VS from '../../../../../stores/project/versionReportNew';
 import EmptyBlock from '../../../../../components/EmptyBlock';
 import './VersionReport.scss';
+import { STATUS } from '../../../../../common/Constant';
 
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -525,12 +526,12 @@ class EpicReport extends Component {
           dataIndex: 'statusCode',
           render: (statusCode, record) => (
             <div>
-              <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusName}`}>
+              <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusMapDTO.name}`}>
                 <div>
                   <StatusTag
                     style={{ display: 'inline-block' }}
-                    name={record.statusName}
-                    color={record.statusColor}
+                    name={record.statusMapDTO.name}
+                    color={STATUS[record.statusMapDTO.type]}
                   />
                 </div>
               </Tooltip>
@@ -633,8 +634,6 @@ class EpicReport extends Component {
                       this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
                     }}
                   >
-
-
                     在“问题管理中”查看
                     <Icon style={{ fontSize: 13 }} type="open_in_new" />
                   </p>

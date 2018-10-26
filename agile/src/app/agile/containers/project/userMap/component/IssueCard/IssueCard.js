@@ -172,6 +172,7 @@ class IssueCard extends Component {
         storyPoints,
         statusName,
         statusColor,
+        statusMapDTO,
         issueNum,
       },
     } = this.state;
@@ -289,6 +290,7 @@ class IssueCard extends Component {
                 <StatusTag
                   name={statusName}
                   color={statusColor}
+                  data={statusMapDTO}
                 />
               </div>
             </div>

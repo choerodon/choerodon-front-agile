@@ -23,6 +23,7 @@ import sprintIcon from './sprintIcon.svg';
 import storyPointIcon from './storyPointIcon.svg';
 import completed from './completed.svg';
 import './VersionReport.scss';
+import { STATUS } from '../../../../common/Constant';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -477,12 +478,12 @@ class VersionBurndown extends Component {
           dataIndex: 'statusCode',
           render: (statusCode, record) => (
             <div>
-              <Tooltip mouseEnterDelay={0.5} title={`任务状态:${record.statusName}`}>
+              <Tooltip mouseEnterDelay={0.5} title={`任务状态:${record.statusMapDTO.name}`}>
                 <div>
                   <StatusTag
                     style={{ display: 'inline-block' }}
-                    name={record.statusName}
-                    color={record.statusColor}
+                    name={record.statusMapDTO.name}
+                    color={STATUS[record.statusMapDTO.type]}
                   />
                 </div>
               </Tooltip>

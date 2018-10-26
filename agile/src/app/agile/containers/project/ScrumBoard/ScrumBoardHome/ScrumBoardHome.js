@@ -647,7 +647,7 @@ class ScrumBoardHome extends Component {
   // 渲染issue列
   renderIssueColumns = (id) => {
     const result = [];
-    const data = ScrumBoardStore.getBoardData;
+    const data = ScrumBoardStore.getBoardData.filter(obj => obj.columnId !== 'unset');
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       // 故事泳道
       for (let index = 0, len = data.length; index < len; index += 1) {

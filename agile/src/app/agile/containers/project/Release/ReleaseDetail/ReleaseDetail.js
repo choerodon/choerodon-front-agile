@@ -12,6 +12,7 @@ import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 import './ReleaseDetail.scss';
 import PublicRelease from '../ReleaseComponent/PublicRelease';
 import ReportStore from '../../../../stores/project/Report';
+import { STATUS } from '../../../../common/Constant';
 
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -367,11 +368,11 @@ class ReleaseDetail extends Component {
             style={{
               padding: '4px 6px',
               color: 'white',
-              background: record.statusColor,
+              background: STATUS[record.statusMapDTO.type],
               borderRadius: 2,
             }}
           >
-            {text}
+            {record.statusMapDTO.name}
           </span>
         ),
       },
