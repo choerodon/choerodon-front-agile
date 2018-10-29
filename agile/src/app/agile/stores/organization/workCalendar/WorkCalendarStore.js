@@ -38,12 +38,14 @@ class WorkCalendarStore {
     this.selectDays = data;
   }
 
+  // 法定假日
   axiosGetHolidayData = (orgId, year) => {
     return axios.get(`/agile/v1/organizations/${orgId}/work_calendar_holiday_refs?year=${year}`).then((data) => {
       this.setHolidayRef(data);
     });
   };
 
+  // 获取时区、周六日、是否应用法定假日
   axiosGetWorkDaySetting = (orgId) => {
     return axios.get(`/agile/v1/organizations/${orgId}/time_zone_work_calendars`).then((data) => {
       if (data) {
@@ -52,8 +54,9 @@ class WorkCalendarStore {
     });
   };
 
-  axiosGetCalendarData = (orgId, timeZoneId) => {
-    return axios.get(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/ref/${timeZoneId}`).then((data) => {
+  // 获取自定义设置
+  axiosGetCalendarData = (orgId, timeZoneId, year) => {
+    return axios.get(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/ref/${timeZoneId}?year=${year}`).then((data) => {
       if (data) {
         this.setSelectDays(data);
       }

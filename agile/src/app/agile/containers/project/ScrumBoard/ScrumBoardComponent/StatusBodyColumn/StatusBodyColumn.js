@@ -16,24 +16,6 @@ class StatusBodyColumn extends Component {
     super(props);
     this.state = {};
   }
-  // judgeMinHeight(dragStartData, issues) {
-  //   if (JSON.stringify(dragStartData) === '{}') {
-  //     return true;
-  //   } else {
-  //     let flag = 0;
-  //     if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
-  //       String(this.props.source)) {
-  //       if (issues.length === 0) {
-  //         flag = 1;
-  //       }
-  //     }
-  //     if (flag === 1) {
-  //       return false;
-  //     } else {
-  //       return true;
-  //     }
-  //   }
-  // }
   
   renderIssues(issues, droppableId, statusName, categoryCode, isCompleted, clickItem) {
     let data = issues;
@@ -46,6 +28,7 @@ class StatusBodyColumn extends Component {
         parentIds.push(ScrumBoardStore.getParentIds[index].issueId);
       }
       if (!this.props.parentId) {
+        //
         for (let index = 0, len = data.length; index < len; index += 1) {
           if (!data[index].parentIssueId) {
             if (_.indexOf(parentIds, data[index].issueId) === -1) {
@@ -218,6 +201,7 @@ class StatusBodyColumn extends Component {
     }
     return result;
   }
+
   /**
    *每个droppable背景色渲染
    *
@@ -264,6 +248,7 @@ class StatusBodyColumn extends Component {
       return 'rgba(0, 0, 0, 0.04)';
     }
   }
+
   // 这里是拖动issue 不会显示同一列的其他状态drop
   renderDisplay(item, type) {
     const data = ScrumBoardStore.getDragStartItem;
@@ -315,6 +300,7 @@ class StatusBodyColumn extends Component {
       }
     }
   }
+
   /**
    *droppable的边框渲染逻辑
    *
@@ -450,6 +436,7 @@ class StatusBodyColumn extends Component {
       return '2px dashed #26348B';
     }
   }
+
   /**
    *是否显示状态名称
    *
@@ -487,6 +474,7 @@ class StatusBodyColumn extends Component {
       return 'none';
     }
   }
+
   /**
    *渲染列
    *
@@ -495,20 +483,26 @@ class StatusBodyColumn extends Component {
    */
   renderStatusColumn(clickItem) {
     const dragStartData = ScrumBoardStore.getDragStartItem;
-    const data = this.props.data.subStatuses;
+    const {
+      data,
+      source,
+      assigneeId,
+      epicId,
+    } = this.props;
+    const { subStatuses, categoryCode, columnId } = data;
     const result = [];
-    for (let index = 0, len = data.length; index < len; index += 1) {
+    for (let index = 0, len = subStatuses.length; index < len; index += 1) {
       result.push(
         <Droppable
-          key={data[index].id} 
+          key={subStatuses[index].id}
           droppableId={
             JSON.stringify({
-              columnId: this.props.data.columnId,
-              code: data[index].id,
-              parentId: this.props.source,
-              assigneeId: this.props.assigneeId,
-              epicId: this.props.epicId,
-              categoryCode: this.props.data.categoryCode,
+              columnId,
+              code: subStatuses[index].id,
+              parentId: source,
+              assigneeId,
+              epicId,
+              categoryCode,
             })
           }
         >
@@ -518,33 +512,38 @@ class StatusBodyColumn extends Component {
               style={{
                 background: this.renderBackground(snapshot.isDraggingOver),
                 padding: 'grid',
-                // border: JSON.stringify(dragStartData) === '{}' ? 'unset' : '2px dashed #26348B',
-                borderTop: JSON.stringify(dragStartData) === '{}' ? 
-                  'unset' : this.renderBorder(data, index, 'top', snapshot.isDraggingOver),
-                borderLeft: JSON.stringify(dragStartData) === '{}' ? 
-                  'unset' : this.renderBorder(data, index, 'left', snapshot.isDraggingOver),
-                borderRight: JSON.stringify(dragStartData) === '{}' ? 
-                  'unset' : this.renderBorder(data, index, 'right', snapshot.isDraggingOver),
-                borderBottom: JSON.stringify(dragStartData) === '{}' ? 
-                  'unset' : this.renderBorder(data, index, 'bottom', snapshot.isDraggingOver),
-                visibility: this.renderDisplay(data[index], 'visibility'),
-                // height: this.renderDisplay(data[index], 'height'),
+                borderTop: JSON.stringify(dragStartData) === '{}'
+                  ? 'unset' : this.renderBorder(subStatuses, index, 'top', snapshot.isDraggingOver),
+                borderLeft: JSON.stringify(dragStartData) === '{}'
+                  ? 'unset' : this.renderBorder(subStatuses, index, 'left', snapshot.isDraggingOver),
+                borderRight: JSON.stringify(dragStartData) === '{}'
+                  ? 'unset' : this.renderBorder(subStatuses, index, 'right', snapshot.isDraggingOver),
+                borderBottom: JSON.stringify(dragStartData) === '{}'
+                  ? 'unset' : this.renderBorder(subStatuses, index, 'bottom', snapshot.isDraggingOver),
+                visibility: this.renderDisplay(subStatuses[index], 'visibility'),
                 height: '100%',
                 position: 'relative',
               }}
             >
               <p
                 style={{
-                  display: this.renderStatusDisplay(dragStartData, data),
+                  display: this.renderStatusDisplay(dragStartData, subStatuses),
                   fontSize: '18px',
                   color: 'rgb(38, 52, 139)',
                   lineHeight: '26px',
                 }}
               >
-                {data[index].name}
+                {subStatuses[index].name}
               </p>
               <div className="c7n-itemBodyColumn" style={{ minHeight: 83 }}>
-                {this.renderIssues(data[index].issues, data[index].id, data[index].name, data[index].categoryCode, data[index].completed, clickItem)}
+                {this.renderIssues(
+                  subStatuses[index].issues,
+                  subStatuses[index].id,
+                  subStatuses[index].name,
+                  subStatuses[index].categoryCode,
+                  subStatuses[index].completed,
+                  clickItem,
+                )}
               </div>
             </div>
           )}
@@ -553,6 +552,7 @@ class StatusBodyColumn extends Component {
     }
     return result;
   }
+
   render() {
     const clickItem = ScrumBoardStore.getClickIssueDetail;
     return (

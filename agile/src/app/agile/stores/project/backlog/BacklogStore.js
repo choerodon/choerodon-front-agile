@@ -366,10 +366,10 @@ class BacklogStore {
     return this.workSetting;
   }
 
-  axiosGetWorkSetting() {
+  axiosGetWorkSetting(year) {
     const proId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
-    axios.get(`/agile/v1/projects/${proId}/sprint/time_zone_detail/${orgId}`).then((data) => {
+    axios.get(`/agile/v1/projects/${proId}/sprint/time_zone_detail/${orgId}?year=${year}`).then((data) => {
       if (data) {
         this.setWorkSetting(data);
       }

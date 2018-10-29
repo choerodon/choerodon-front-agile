@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import {
   Page, Header, Content, stores, axios, Permission, 
 } from 'choerodon-front-boot';
-import _ from 'lodash';
+import moment from 'moment';
 import {
   Button, Spin, Modal, Form, Input, Select, Tabs, message, Icon, 
 } from 'choerodon-ui';
@@ -77,10 +77,11 @@ class ScrumBoardSetting extends Component {
         ScrumBoardStore.setLookupValue(oldLookup);
       }).catch((error) => {
       });
-      ScrumBoardStore.axiosGetWorkSetting().then(() => {
-        ScrumBoardStore.axiosGetCalendarData();
+      const year = moment().year();
+      ScrumBoardStore.axiosGetWorkSetting(year).then(() => {
+        ScrumBoardStore.axiosGetCalendarData(year);
       }).catch(() => {
-        ScrumBoardStore.axiosGetCalendarData();
+        ScrumBoardStore.axiosGetCalendarData(year);
       });
     }
   }

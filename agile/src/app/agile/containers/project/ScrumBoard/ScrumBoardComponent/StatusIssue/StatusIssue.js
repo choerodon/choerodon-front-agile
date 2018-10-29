@@ -118,7 +118,8 @@ class StatusIssue extends Component {
       const result = [];
       if (childrenList.length > 0) {
         // const issueId = JSON.parse(JSON.stringify(ScrumBoardStore.getClickIssueDetail)).issueId;
-        childrenList.forEach((item, index) => {
+
+        childrenList.sort((a, b) => a.issueId - b.issueId).forEach((item, index) => {
           result.push(this.renderReturn(item, `sub-${index}`, 'child'));
         });
         // for (let index = 0, len = childrenList.length; index < len; index += 1) {
@@ -245,6 +246,7 @@ class StatusIssue extends Component {
     }
   };
 
+  // 控制是否显示子任务
   renderSubDisplay = (item, type, border) => {
     let result = 'block';
     const { statusData: columnData, swimLaneCode } = this.props;

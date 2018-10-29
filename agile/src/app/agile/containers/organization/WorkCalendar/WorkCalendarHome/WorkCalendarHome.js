@@ -4,7 +4,7 @@ import {
   stores, axios, Page, Header, Content, Permission,
 } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
-import _ from 'lodash';
+import moment from 'moment';
 import {
   Form, Button, Icon, Select, Checkbox,
 } from 'choerodon-ui';
@@ -27,12 +27,13 @@ class WorkCalendarHome extends Component {
   }
 
   getWorkCalendar = () => {
+    const year = moment().year();
     const { WorkCalendarStore } = this.props;
     const orgId = AppState.currentMenuType.organizationId;
     WorkCalendarStore.axiosGetWorkDaySetting(orgId).then(() => {
       const { timeZoneId } = WorkCalendarStore.getWorkDaySetting;
       if (timeZoneId) {
-        WorkCalendarStore.axiosGetCalendarData(orgId, timeZoneId);
+        WorkCalendarStore.axiosGetCalendarData(orgId, timeZoneId, year);
       }
     });
     WorkCalendarStore.axiosGetHolidayData(orgId, 2018);
@@ -52,16 +53,17 @@ class WorkCalendarHome extends Component {
   };
 
   updateSelete = (data) => {
+    const year = moment().year();
     const { WorkCalendarStore } = this.props;
     const orgId = AppState.currentMenuType.organizationId;
     const { timeZoneId } = WorkCalendarStore.getWorkDaySetting;
     if (data.calendarId) {
       WorkCalendarStore.axiosDeleteCalendarData(orgId, data.calendarId).then(() => {
-        WorkCalendarStore.axiosGetCalendarData(orgId, timeZoneId);
+        WorkCalendarStore.axiosGetCalendarData(orgId, timeZoneId, year);
       });
     } else {
       WorkCalendarStore.axiosCreateCalendarData(orgId, timeZoneId, data).then(() => {
-        WorkCalendarStore.axiosGetCalendarData(orgId, timeZoneId);
+        WorkCalendarStore.axiosGetCalendarData(orgId, timeZoneId, year);
       });
     }
   };
