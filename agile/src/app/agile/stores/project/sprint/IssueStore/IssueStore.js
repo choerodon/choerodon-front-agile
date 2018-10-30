@@ -1,19 +1,35 @@
-import { observable, action, computed } from 'mobx';
+import {
+  observable, action, computed, toJS,
+} from 'mobx';
 import { store, stores, axios } from 'choerodon-front-boot';
 import { loadIssues } from '../../../../api/NewIssueApi';
 
 const { AppState } = stores;
+
+const filter = {
+  advancedSearchArgs: {
+    statusCode: [],
+    priorityCode: [],
+    typeCode: [],
+  },
+  content: '',
+  searchArgs: {
+    assignee: '',
+    component: '',
+    epic: '',
+    issueNum: '',
+    sprint: '',
+    summary: '',
+    version: '',
+  },
+};
+
 
 @store('SprintCommonStore')
 class SprintCommonStore {
   @observable issues = [];
 
   @observable pagination = {};
-
-  @observable filter = {
-    advancedSearchArgs: {},
-    searchArgs: {},
-  };
 
   @observable filteredInfo = {};
 
@@ -53,14 +69,14 @@ class SprintCommonStore {
       advancedSearchArgs: {},
       searchArgs: {},
     });
-    this.setFilteredInfo({});
+    // this.setFilteredInfo({});
     // this.loadIssues();
   }
 
   loadIssues(page = 0, size = 10) {
     this.setLoading(true);
-    const { orderField, orderType } = this.order;
-    return loadIssues(page, size, this.getFilter, orderField, orderType)
+    const { orderField = '', orderType = '' } = this.order;
+    return loadIssues(page, size, toJS(this.getFilter), orderField, orderType)
       .then((res) => {
         this.setIssues(res.content);
         this.setPagination({
@@ -85,6 +101,10 @@ class SprintCommonStore {
     this.issues = data;
   }
 
+  @computed get getIssues() {
+    return toJS(this.issues);
+  }
+
   @action setPagination(data) {
     this.pagination = data;
   }
@@ -93,12 +113,21 @@ class SprintCommonStore {
     this.filter = data;
   }
 
-  @action setFilteredInfo(data) {
-    this.filteredInfo = data;
+  @action setAdvArg(data) {
+    if (data) {
+      Object.assign(filter.advancedSearchArgs, data);
+    }
   }
 
-  @action setOrder(data) {
-    this.order = data;
+  @action setArg(data) {
+    if (data) {
+      Object.assign(filter.searchArgs, data);
+    }
+  }
+
+  @action setOrder(orderField, orderType) {
+    this.order.orderField = orderField;
+    this.order.orderType = orderType;
   }
 
   @action setLoading(data) {
@@ -142,7 +171,11 @@ class SprintCommonStore {
   }
 
   @action setBarFilters(data) {
-    this.barFilters = data;
+    let res = '';
+    data.forEach((item) => {
+      res += item;
+    });
+    Object.assign(filter, { content: res });
   }
 
   @computed get getBackUrl() {
@@ -157,18 +190,23 @@ class SprintCommonStore {
     // if (!this.paramType) {
     //   return undefined;
     // } else if (this.paramType === 'sprint') {
-    //   return `/agile/reporthost/sprintReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
+    //   return `/agile/reporthost/sprintReport?
+    // type=${urlParams.type}&id=${urlParams.id}
+    // &name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     // } else if (this.paramType === 'component') {
-    //   return `/agile/component?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
+    //   return `/agile/component?type=${urlParams.type}&
+    // id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     // } else if (this.paramType === 'version' && this.paramStatus) {
-    //   return `/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
+    //   return `/agile/release?type=${urlParams.type}
+    // &id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     // } else if (this.paramType === 'versionReport') {
-    //   return `/agile/reporthost/versionReport?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
+    //   return `/agile/reporthost/versionReport?type=
+    // ${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}
+    // &organizationId=${urlParams.organizationId}`;
     // }
   }
 
   @computed get getFilter() {
-    const filter = this.filter;
     const otherArgs = {
       type: this.paramType,
       id: this.paramId ? [this.paramId] : undefined,
@@ -176,7 +214,7 @@ class SprintCommonStore {
     };
     return {
       ...filter,
-      otherArgs: this.barFilters ? otherArgs : undefined,
+      otherArgs: this.barFilters ? otherArgs : {},
     };
   }
 }
