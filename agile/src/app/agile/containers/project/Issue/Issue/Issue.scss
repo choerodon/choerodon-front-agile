@@ -13,7 +13,9 @@
       margin-right: unset;
     }
   }
-
+  .ant-divider-horizontal {
+    margin: 8px 0;
+  }
   .ant-pagination-options {
     margin-left: 0;
   }
@@ -21,6 +23,7 @@
   .ant-table-filter-bar {
     padding-top: 6px;
     padding-bottom: 5px;
+    padding-right: 90px;
   }
 
   .c7n-add {
@@ -100,10 +103,12 @@
     .c7n-border-visible {
       border-left: 3px solid #3f51b5;
       background: rgba(140, 158, 255, 0.08);
+      height: 36px;
     }
 
     .c7n-border {
       border-left: 3px solid transparent;
+      height: 36px;
     }
 
     .c7n-avator {
@@ -133,7 +138,6 @@
       // margin-right: 11px;
       text-align: center;
       color: #fff;
-      line-height: 21px;
       font-size: 14px;
       line-height: 16px;
     }
@@ -323,10 +327,6 @@
 
   .ant-table-thead > tr > th:focus, .ant-table-tbody > tr > td:focus {
     background-color: transparent;
-  }
-
-  .ant-table-filter-bar {
-    padding-right: 90px;
   }
 }
 

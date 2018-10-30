@@ -4,7 +4,7 @@ import './StatusTag.scss';
 class StatusTag extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     if (
-      nextProps.name === this.props.name 
+      nextProps.name === this.props.name
       && nextProps.color === this.props.color
     ) {
       return false;
@@ -13,13 +13,13 @@ class StatusTag extends Component {
   }
 
   render() {
-    const { name, color } = this.props; 
+    const { name, color, style } = this.props;
     return (
       <div
         className="c7n-statusTag"
         style={{
           background: color || 'transparent',
-          ...this.props.style,
+          ...style,
         }}
       >
         { name || '' }

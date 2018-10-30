@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import {
-  Page, Header, Content, stores, axios, 
+  Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
 import {
-  Table, Button, Tooltip, Input, Dropdown, Menu, Pagination, Icon, 
+  Table, Button, Tooltip, Input, Dropdown, Menu, Pagination, Icon, Divider, Checkbox, Popover, Modal,
 } from 'choerodon-ui';
 import './Issue.scss';
 
@@ -25,6 +25,9 @@ import EmptyBlock from '../../../../components/EmptyBlock';
 const FileSaver = require('file-saver');
 
 const { AppState } = stores;
+const { Column } = Table;
+const CheckboxGroup = Checkbox.Group;
+const { Sidebar } = Modal;
 
 @observer
 class Issue extends Component {
@@ -116,7 +119,7 @@ class Issue extends Component {
     }
 
     // if (paramOpenIssueId) {
-      
+
     //   IssueStore.setBarFilters(arr);
     //   IssueStore.init();
     //   IssueStore.loadIssues()
@@ -126,10 +129,10 @@ class Issue extends Component {
     //         expand: true,
     //       });
     //     });
-    // } 
+    // }
   }
 
-  GetRequest(url) {
+  GetRequest = (url) => {
     const theRequest = {};
     if (url.indexOf('?') !== -1) {
       const str = url.split('?')[1];
@@ -141,7 +144,7 @@ class Issue extends Component {
     return theRequest;
   }
 
-  handleCreateIssue(issueObj) {
+  handleCreateIssue = (issueObj) => {
     const { history } = this.props;
     const {
       type, id, name, organizationId,
@@ -154,7 +157,7 @@ class Issue extends Component {
     }
   }
 
-  handleIssueUpdate(issueId = this.state.selectedIssue.issueId) {
+  handleIssueUpdate = (issueId = this.state.selectedIssue.issueId) => {
     loadIssue(issueId).then((res) => {
       const obj = {
         assigneeId: res.assigneeId,
@@ -178,11 +181,11 @@ class Issue extends Component {
     });
   }
 
-  handleBlurCreateIssue() {
+  handleBlurCreateIssue = () => {
     if (this.state.createIssueValue !== '') {
       const { history } = this.props;
       const {
-        type, id, name, organizationId, 
+        type, id, name, organizationId,
       } = AppState.currentMenuType;
 
 
@@ -217,77 +220,48 @@ class Issue extends Component {
     }
   }
 
-  handleChangeType({ key }) {
+  handleChangeType = ({ key }) => {
     this.setState({
       selectIssueType: key,
     });
   }
 
-  handleSort({ key }) {
-    const currentSort = IssueStore.order;
-    const targetSort = {};
-    if (currentSort.orderField === key) {
-      targetSort.orderField = key;
-      if (currentSort.orderType !== 'desc') {
-        targetSort.orderType = 'desc';
-      } else {
-        targetSort.orderType = 'asc';
-      }
-    } else {
-      targetSort.orderField = key;
-      targetSort.orderType = 'desc';
-    }
-    IssueStore.setOrder(targetSort);
-    const { current, pageSize } = IssueStore.pagination;
-    IssueStore.loadIssues(current - 1, pageSize);
-  }
+  handlePageChange = (pagination, filters, sort, params) => {
+    this.loadRole(pagination, sort, filters, params);
+  };
 
-  handlePaginationChange(page, pageSize) {
+  handlePaginationChange = (page, pageSize) => {
     IssueStore.loadIssues(page - 1, pageSize);
-  }
+  };
 
-  handlePaginationShowSizeChange(current, size) {
+  handlePaginationShowSizeChange = (current, size) => {
     IssueStore.loadIssues(current - 1, size);
-  }
+  };
 
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
-    IssueStore.setFilteredInfo(filters);
+    Object.keys(filters).forEach((key) => {
+      if (key === 'statusCode' || key === 'priorityCode' || key === 'typeCode') {
+        IssueStore.setAdvArg(filters);
+      } else if (key === 'issueId') {
+        // 根据接口进行对象调整
+        IssueStore.setArg({ issueNum: filters[key][0] });
+      } else if (key === 'assigneeId') {
+        // 同上
+        IssueStore.setArg({ assignee: filters[key][0] });
+      } else {
+        const temp = {
+          [key]: filters[key][0],
+        };
+        IssueStore.setArg(temp);
+      }
+    });
     IssueStore.setBarFilters(barFilters);
-    if (barFilters != undefined && barFilters.length !== 0) {
-      console.log(`filters: ${JSON.stringify(filters)},barFilter: ${JSON.stringify(IssueStore.barFilters)}`);
-    }
-    if (barFilters === undefined || barFilters.length === 0) {
-      IssueStore.setBarFilters(undefined);
-    }
-    const obj = {
-      advancedSearchArgs: {},
-      searchArgs: {},
-    };
-    const { statusCode, priorityCode, typeCode } = filters;
-    const {
-      issueNum, summary, assignee, sprint, version, component, epic, 
-    } = filters;
-    obj.advancedSearchArgs.statusCode = statusCode || [];
-    obj.advancedSearchArgs.priorityCode = priorityCode || [];
-    obj.advancedSearchArgs.typeCode = typeCode || [];
-    obj.searchArgs.issueNum = issueNum && issueNum.length ? issueNum[0] : '';
-    obj.searchArgs.summary = summary && summary.length ? summary[0] : '';
-    obj.searchArgs.assignee = assignee && assignee.length ? assignee[0] : '';
-    obj.searchArgs.sprint = sprint && sprint.length ? sprint[0] : '';
-    obj.searchArgs.version = version && version.length ? version[0] : '';
-    obj.searchArgs.component = component && component.length ? component[0] : '';
-    obj.searchArgs.epic = epic && epic.length ? epic[0] : '';
-
-    obj.content = barFilters && barFilters.length ? barFilters.join('') : '';
-
-    // obj.searchArgs.mohu = barFilters;
-
-    IssueStore.setFilter(obj);
     const { current, pageSize } = IssueStore.pagination;
+    IssueStore.setOrder(sorter.columnKey, sorter.order === 'ascend' ? 'asc' : 'desc');
     IssueStore.loadIssues(current - 1, pageSize);
-  }
+  };
 
-  exportExcel() {
+  exportExcel = () => {
     const projectId = AppState.currentMenuType.id;
     const searchParam = IssueStore.getFilter;
     axios.post(`/zuul/agile/v1/projects/${projectId}/issues/export`, searchParam, { responseType: 'arraybuffer' })
@@ -296,181 +270,84 @@ class Issue extends Component {
         const fileName = `${AppState.currentMenuType.name}.xlsx`;
         FileSaver.saveAs(blob, fileName);
       });
-  }
+  };
 
-  renderWideIssue(issue) {
+  buttonRender = () => {
+    const content = (
+      <CheckboxGroup className="c7n-agile-quickSearch-popover" style={{ display: 'flex', flexDirection: 'column' }} />
+    );
     return (
-      <div style={{
-        display: 'flex', flex: 1, marginTop: '3px', marginBottom: '3px', cursor: 'pointer', 
-      }}
-      >
-        <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[issue.typeCode]}`}>
-          <div>
-            <TypeTag
-              typeCode={issue.typeCode}
-            />
-          </div>
-        </Tooltip>
-        <Tooltip mouseEnterDelay={0.5} title={`任务编号： ${issue.issueNum}`}>
-          <a style={{
-            paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
-          }}
-          >
-            {issue.issueNum}
-          </a>
-        </Tooltip>
-        <div style={{ overflow: 'hidden', flex: 1 }}>
-          <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务概要： ${issue.summary}`}>
-            <p style={{
-              paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset', 
-            }}
-            >
-              {issue.summary}
-            </p>
-          </Tooltip>
-        </div>
+      (
+        <Popover content={content} trigger="click">
+          <Button funcType="flat" icon="more_vert">
+            自定义筛选
+          </Button>
+        </Popover>
+      )
+    );
+  };
 
-        <div style={{ flexShrink: '0' }}>
-          <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityName}`}>
-            <div style={{ marginRight: 12 }}>
-              <PriorityTag
-                priority={issue.priorityCode}
-              />
-            </div>
-          </Tooltip>
-        </div>
-        <div style={{ flexShrink: '0' }}>
-          {
-            issue.assigneeId ? (
-              <Tooltip mouseEnterDelay={0.5} title={`任务经办人： ${issue.assigneeName}`}>
-                <div style={{ marginRight: 12 }}>
-                  <UserHead
-                    user={{
-                      id: issue.assigneeId,
-                      loginName: '',
-                      realName: issue.assigneeName,
-                      avatar: issue.imageUrl,
-                    }}
-                  />
-                </div>
-              </Tooltip>
-            ) : null
-          }
-        </div>
-        <div style={{ flexShrink: '0', display: 'flex', justifyContent: 'flex-end' }}>
-          <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusName}`}>
-            <div>
-              <StatusTag
-                name={issue.statusName}
-                color={issue.statusColor}
-              />
-            </div>
-          </Tooltip>
-        </div>
+  MyTable = (props) => {
+    const { expand } = this.state;
+    if (IssueStore.issues.length === 0 && !IssueStore.loading) {
+      return (
+        <EmptyBlock
+          style={{ marginTop: 40 }}
+          border
+          pic={pic}
+          title="根据当前搜索条件没有查询到问题"
+          des="尝试修改您的过滤选项或者在下面创建新的问题"
+        />
+      );
+    }
+    const renderNarrow = (
+      <div style={props.style} className={props.className}>
+        {props.children[1]}
+        {props.children[2]}
       </div>
     );
-  }
+    return expand ? renderNarrow : (<table {...props} />);
+  };
 
-  renderNarrowIssue(issue) {
-    return (
-      <div style={{ marginTop: '5px', marginBottom: '5px', cursor: 'pointer' }}>
-        <div style={{
-          display: 'flex', marginBottom: '5px', width: '100%', flex: 1, 
-        }}
-        >
-          <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[issue.typeCode]}`}>
-            <div>
-              <TypeTag
-                typeCode={issue.typeCode}
-              />
-            </div>
-          </Tooltip>
-          <Tooltip mouseEnterDelay={0.5} title={`任务编号： ${issue.issueNum}`}>
-            <a style={{
-              paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
-            }}
-            >
-              {issue.issueNum}
-            </a>
-          </Tooltip>
-          <div style={{ overflow: 'hidden', flex: 1 }}>
-            <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务概要： ${issue.summary}`}>
-              <p style={{
-                paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset', 
-              }}
-              >
-                {issue.summary}
-              </p>
-            </Tooltip>
-          </div>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+  BodyWrapper = (props) => {
+    const { expand } = this.state;
+    const renderNarrow = (
+      <div {...props} />
+    );
+    return expand ? renderNarrow : (<tbody {...props} />);
+  };
+
+  BodyRow = (props) => {
+    const { expand } = this.state;
+    // const renderWide = (<tr onClick={props.onClick}>{props.children}</tr>);
+    const renderNarrow = (
+      <div onClick={props.onClick} style={{ display: 'flex', flexDirection: 'column', margin: '10px' }} role="none">
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '7px' }}>
           <div style={{ display: 'flex' }}>
-            <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityName}`}>
-              <div style={{ marginRight: 12 }}>
-                <PriorityTag
-                  priority={issue.priorityCode}
-                />
-              </div>
-            </Tooltip>
-            <div style={{ width: '140px', flexShrink: '0' }}>
-              {
-                issue.assigneeId ? (
-                  <Tooltip mouseEnterDelay={0.5} title={`任务经办人： ${issue.assigneeName}`}>
-                    <div style={{ marginRight: 12 }}>
-                      <UserHead
-                        user={{
-                          id: issue.assigneeId,
-                          loginName: '',
-                          realName: issue.assigneeName,
-                          avatar: issue.imageUrl,
-                        }}
-                      />
-                    </div>
-                  </Tooltip>
-                ) : null
-              }
-            </div>
+            {props.children[1]}
+            {props.children[0]}
           </div>
-          <div style={{ overflow: 'hidden' }}>
-            <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusName}`}>
-              <div>
-                <StatusTag
-                  name={issue.statusName}
-                  color={issue.statusColor}
-                />
-              </div>
-            </Tooltip>
+          <div style={{ display: 'flex' }}>
+            {props.children[3]}
+            {props.children[4]}
+            {props.children[5]}
           </div>
         </div>
+        <div>{props.children[2]}</div>
+        <Divider />
       </div>
     );
-  }
+    return expand ? renderNarrow : (<tr {...props} />);
+  };
+
+  BodyCell = (props) => {
+    const { expand } = this.state;
+    return expand ? (<div {...props} style={{ marginRight: '10px' }} />) : (<td {...props} />);
+  };
 
   render() {
-    const ORDER = [
-      {
-        code: 'summary',
-        showName: '问题名称',
-      },
-      {
-        code: 'typeCode',
-        showName: '问题类型',
-      },
-      {
-        code: 'priorityCode',
-        showName: '问题优先级',
-      },
-      {
-        code: 'statusId',
-        showName: '问题状态',
-      },
-      {
-        code: 'assigneeId',
-        showName: '经办人',
-      },
-    ];
-    const filterColumns = [
+    const { expand } = this.state;
+    const columns = [
       {
         title: '类型',
         dataIndex: 'typeCode',
@@ -497,8 +374,8 @@ class Issue extends Component {
       },
       {
         title: '经办人',
-        dataIndex: 'assignee',
-        key: 'assignee',
+        dataIndex: 'assigneeName',
+        key: 'assigneeName',
         filters: [],
       },
       {
@@ -515,8 +392,8 @@ class Issue extends Component {
       },
       {
         title: '优先级',
-        dataIndex: 'priorityCode',
-        key: 'priorityCode',
+        dataIndex: 'priorityName',
+        key: 'priorityName',
         filters: [
           {
             text: '高',
@@ -535,8 +412,8 @@ class Issue extends Component {
       },
       {
         title: '状态',
-        dataIndex: 'statusCode',
-        key: 'statusCode',
+        dataIndex: 'statusName',
+        key: 'statusName',
         filters: [
           {
             text: '待处理',
@@ -553,80 +430,8 @@ class Issue extends Component {
         ],
         filterMultiple: true,
         filteredValue: IssueStore.filteredInfo.statusCode || null,
-      },
-      {
-        title: '冲刺',
-        dataIndex: 'sprint',
-        key: 'sprint',
-        filters: [],
-      },
-      {
-        title: '模块',
-        dataIndex: 'component',
-        key: 'component',
-        filters: [],
-      },
-      {
-        title: '版本',
-        dataIndex: 'version',
-        key: 'version',
-        filters: [],
-      },
-      {
-        title: '史诗',
-        dataIndex: 'epic',
-        key: 'epic',
-        filters: [],
-      },
+      }
     ];
-    const columns = [
-      {
-        title: 'summary',
-        dataIndex: 'summary',
-        render: (summary, record) => (
-          !this.state.expand ? this.renderWideIssue(record) : this.renderNarrowIssue(record)
-        ),
-      },
-    ];
-    const sort = (
-      <Menu onClick={this.handleSort.bind(this)}>
-        {
-          ORDER.map(v => (
-            <Menu.Item key={v.code}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  color: IssueStore.order.orderField === v.code ? '#3f51b5' : '#000',
-                }}
-              >
-                <span style={{ width: 100 }}>
-                  {v.showName}
-                </span>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {
-                    IssueStore.order.orderField === v.code && IssueStore.order.orderType === 'asc' && (
-                      <Icon
-                        type="arrow_upward"
-                      />
-                    )
-                  }
-                  {
-                    IssueStore.order.orderField === v.code && IssueStore.order.orderType === 'desc' && (
-                      <Icon
-                        type="arrow_downward"
-                      />
-                    )
-                  }
-                </div>
-              </div>
-            </Menu.Item>
-          ))
-        }
-        
-      </Menu>
-    );
     const typeList = (
       <Menu
         style={{
@@ -680,8 +485,8 @@ class Issue extends Component {
         </Header>
         <Content style={{ display: 'flex', padding: '0', width: '100%' }}>
           {/* <Spin spinning={IssueStore.loading}> */}
-          <div 
-            className="c7n-content-issue" 
+          <div
+            className="c7n-content-issue"
             style={{
               width: this.state.expand ? '28%' : '100%',
               display: 'block',
@@ -689,33 +494,33 @@ class Issue extends Component {
               overflowX: 'hidden',
             }}
           >
-            <section className="c7n-bar">
-              <Table
-                rowKey={record => record.id}
-                columns={filterColumns}
-                dataSource={[]}
-                filterBar
-                showHeader={false}
-                onChange={this.handleFilterChange}
-                pagination={false}
-                filters={IssueStore.barFilters || []}
-                filterBarPlaceholder="过滤表"
-              />
-            </section>
-            <section className="c7n-count">
-              <span className="c7n-span-count">
-                {`共${IssueStore.pagination.total || '0'}条任务`}
-              </span>
-              <Dropdown overlay={sort} trigger={['click']}>
-                <div style={{
-                  display: 'flex', alignItems: 'center', fontSize: '13px', lineHeight: '20px', cursor: 'pointer', position: 'absolute', right: 25, bottom: 28, 
-                }}
-                >
-                  <Icon type="swap_vert" style={{ fontSize: '16px', marginRight: '5px' }} />
-                  <span>排序</span>
-                </div>
-              </Dropdown>
-            </section>
+            {/*// <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>*/}
+            {/*//   <div*/}
+            {/*//     style={{*/}
+            {/*//       display: 'flex',*/}
+            {/*//       width: '100%',*/}
+            {/*//       height: 44,*/}
+            {/*//       padding: '12px, 24px',*/}
+            {/*//     }}*/}
+            {/*//     className="c7n-scrumTools-left"*/}
+            {/*//   >*/}
+            {/*//     <p*/}
+            {/*//       className="c7n-scrumTools-filter"*/}
+            {/*//       role="none"*/}
+            {/*//     >*/}
+            {/*//       {'全部问题'}*/}
+            {/*//     </p>*/}
+            {/*//     <p*/}
+            {/*//       className="c7n-scrumTools-filter"*/}
+            {/*//       role="none"*/}
+                {/*>*/}
+                  {/*{'我的问题'}*/}
+                {/*</p>*/}
+                {/*{*/}
+                  {/*this.buttonRender()*/}
+                {/*}*/}
+              {/*</div>*/}
+            {/*</div>*/}
             <section
               className={`c7n-table ${this.state.expand ? 'expand-sign' : ''}`}
               style={{
@@ -725,44 +530,210 @@ class Issue extends Component {
               }}
             >
               {
-                IssueStore.issues.length === 0 && !IssueStore.loading ? (
-                  <EmptyBlock
-                    style={{ marginTop: 40 }}
-                    border
-                    pic={pic}
-                    title="根据当前搜索条件没有查询到问题"
-                    des="尝试修改您的过滤选项或者在下面创建新的问题"
-                  />
-                ) : (
+                (
                   <Table
                     rowKey={record => record.issueId}
-                    columns={columns}
-                    dataSource={_.slice(IssueStore.issues)}
-                    filterBar={false}
-                    showHeader={false}
+                    // columns={columns}
+                    components={
+                      {
+                        table: this.MyTable,
+                        body: {
+                          wrapper: this.BodyWrapper,
+                          row: this.BodyRow,
+                          cell: this.BodyCell,
+                        },
+                      }
+                    }
+                    size="large"
+                    dataSource={IssueStore.getIssues}
+                    filterBar
+                    showHeader={!expand}
+                    filterBarPlaceholder="过滤表"
                     scroll={{ x: true }}
                     loading={IssueStore.loading}
                     pagination={false}
+                    onChange={this.handleFilterChange}
                     onRow={record => ({
                       onClick: () => {
                         this.setState({
                           selectedIssue: record,
                           expand: true,
+                          createIssue: true,
                         });
                       },
                     })
                     }
                     rowClassName={(record, index) => (
                       record.issueId === this.state.selectedIssue && this.state.selectedIssue.issueId ? 'c7n-border-visible' : 'c7n-border')}
-                  />
+                  >
+                    <Column
+                      title="任务编号"
+                      dataIndex="issueNum"
+                      key="issueId"
+                      render={(text, record, index) => (
+                        <Tooltip mouseEnterDelay={0.5} title={`任务编号： ${text}`}>
+                          <span>
+                            {text}
+                          </span>
+                        </Tooltip>
+                      )}
+                      sorter
+                      filters={[]}
+                    />
+                    <Column
+                      title="类型"
+                      dataIndex="typeCode"
+                      key="typeCode"
+                      align="center"
+                      render={(text, record, index) => (
+                        <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[text]}`}>
+                          <TypeTag
+                            typeCode={text}
+                            showName={expand ? null : text}
+                          />
+                        </Tooltip>
+                      )}
+                      sorter
+                      filters={
+                        [
+                          {
+                            text: '故事',
+                            value: 'story',
+                          },
+                          {
+                            text: '任务',
+                            value: 'task',
+                          },
+                          {
+                            text: '故障',
+                            value: 'bug',
+                          },
+                          {
+                            text: '史诗',
+                            value: 'issue_epic',
+                          },
+                        ]
+                      }
+                      filterMultiple
+                    />
+                    <Column
+                      title="概要"
+                      dataIndex="summary"
+                      key="summary"
+                      render={text => (
+                        <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务概要： ${text}`}>
+                          <span>
+                            {text}
+                          </span>
+                        </Tooltip>
+                      )}
+                      filters={[]}
+                    />
+                    <Column
+                      title="状态"
+                      dataIndex="statusName"
+                      key="statusCode"
+                      align="center"
+                      render={(text, record) => (
+                        <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${text}`}>
+                          <StatusTag
+                            name={text}
+                            color={record.statusColor}
+                            style={{ display: 'inline-block', verticalAlign: 'middle' }}
+                          />
+                        </Tooltip>
+                      )}
+                      sorter
+                      filters={
+                        [
+                          {
+                            text: '待处理',
+                            value: 'todo',
+                          },
+                          {
+                            text: '进行中',
+                            value: 'doing',
+                          },
+                          {
+                            text: '已完成',
+                            value: 'done',
+                          },
+                        ]
+                      }
+                      filterMultiple
+                    />
+                    <Column
+                      title="优先级"
+                      dataIndex="priorityName"
+                      key="priorityCode"
+                      align="center"
+                      render={(text, record) => (
+                        <Tooltip mouseEnterDelay={0.5} title={`优先级： ${text}`}>
+                          <PriorityTag
+                            priority={record.priorityCode}
+                          />
+                        </Tooltip>
+                      )}
+                      sorter
+                      filters={
+                        [
+                          {
+                            text: '高',
+                            value: 'high',
+                          },
+                          {
+                            text: '中',
+                            value: 'medium',
+                          },
+                          {
+                            text: '低',
+                            value: 'low',
+                          },
+                        ]
+                      }
+                      filterMultiple
+                    />
+                    <Column
+                      title="冲刺"
+                      dataIndex="sprint"
+                      key="sprint"
+                      filters={[]}
+                      hidden
+                      notDisplay
+                    />
+                    <Column
+                      title="模块"
+                      dataIndex="component"
+                      key="component"
+                      filters={[]}
+                      hidden
+                      notDisplay
+                    />
+                    <Column
+                      title="版本"
+                      dataIndex="version"
+                      key="version"
+                      filters={[]}
+                      hidden
+                      notDisplay
+                    />
+                    <Column
+                      title="史诗"
+                      dataIndex="epic"
+                      key="epic"
+                      filters={[]}
+                      hidden
+                      notDisplay
+                    />
+                  </Table>
                 )
               }
-              
+
               <div className="c7n-backlog-sprintIssue">
                 <div
                   style={{
                     userSelect: 'none',
-                    background: 'white',  
+                    background: 'white',
                     padding: '12px 0 12px 19px',
                     fontSize: 13,
                     display: 'flex',
@@ -816,7 +787,7 @@ class Issue extends Component {
                           justifyContent: !this.state.expand ? 'flex-start' : 'flex-end',
                         }}
                       >
-                        <Button 
+                        <Button
                           type="primary"
                           onClick={() => {
                             this.setState({
@@ -841,7 +812,7 @@ class Issue extends Component {
                       style={{ color: '#3f51b5' }}
                       funcType="flat"
                       onClick={() => {
-                        this.setState({ 
+                        this.setState({
                           createIssue: true,
                           createIssueValue: '',
                         });
@@ -854,9 +825,9 @@ class Issue extends Component {
                 </div>
               </div>
               {
-                IssueStore.issues.length !== 0 ? (
+                IssueStore.getIssues.length !== 0 ? (
                   <div style={{
-                    display: 'flex', justifyContent: 'flex-end', marginTop: 16, marginBottom: 16, 
+                    display: 'flex', justifyContent: 'flex-end', marginTop: 16, marginBottom: 16,
                   }}
                   >
                     <Pagination
@@ -892,6 +863,7 @@ class Issue extends Component {
                     this.setState({
                       expand: false,
                       selectedIssue: {},
+                      createIssue: false,
                     });
                   }}
                   onDeleteIssue={() => {
@@ -917,7 +889,7 @@ class Issue extends Component {
                 visible={this.state.create}
                 onCancel={() => this.setState({ create: false })}
                 onOk={this.handleCreateIssue.bind(this)}
-                
+
               />
             ) : null
           }
