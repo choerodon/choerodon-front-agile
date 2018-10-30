@@ -76,6 +76,17 @@
         permission:
           - 'agile-service.issue-link-type.updateIssueLinkType'
 
+"platform-reports":
+  icon: bar_chart
+  sort: 99
+  project:
+    - "reportboard":
+        icon: whatshot
+        Routes: /agile/reportboard
+        sort: 3
+        permission:
+          - 'agile-service.sprint.queryNameByOptions'
+
 # 组织设置
 "rentsetting":
   icon: IAM
