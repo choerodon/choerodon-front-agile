@@ -4,7 +4,7 @@
 'agile.backlog':  backlog
 'agile.scrumboard':  scrumboard
 'agile.component': component
-'agile.reporthost': reportHost
+'agile.reporthost': Agile Report
 'agile.reportboard': reportboard
 'agile.projectsetting': projectSetting
 'agile.fastsearch': fastSearch
@@ -15,3 +15,6 @@
 
 "rentsetting": "Organization Settings"
 "rentsetting.workCalendar": "Work Calendar"
+
+"platform-reports": "Reports"
+"platform-reports.reportboard": "Agile Report"

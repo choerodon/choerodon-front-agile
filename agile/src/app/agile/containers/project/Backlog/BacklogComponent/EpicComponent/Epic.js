@@ -85,34 +85,35 @@ class Epic extends Component {
     if (data.length > 0) {
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
-          <Droppable droppableId={`${index}-epic`} key={data[index].issueId.toString()}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                style={{
-                  background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                  padding: 'grid',
-                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                }}
-              >
-                <EpicItem
-                  data={data[index]}
-                  handleClickEpic={this.handleClickEpic.bind(this)}
-                  draggableIds={this.state.draggableIds}
-                  refresh={this.props.refresh.bind(this)}
-                  index={index}
-                  issueRefresh={this.props.issueRefresh.bind(this)}
-                />
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-
+          <EpicItem
+            data={data[index]}
+            handleClickEpic={this.handleClickEpic.bind(this)}
+            draggableIds={this.state.draggableIds}
+            refresh={this.props.refresh.bind(this)}
+            index={index}
+            issueRefresh={this.props.issueRefresh.bind(this)}
+          />,
         );
       }
+      return (
+        <Droppable droppableId="epic">
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              style={{
+                background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                padding: 'grid',
+              }}
+            >
+              {result}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      );
     }
     return result;
-  }
+  };
 
   /**
    * 处理史诗拖动
@@ -123,8 +124,8 @@ class Epic extends Component {
       return;
     }
     const data = BacklogStore.getEpicData;
-    const sourceIndex = parseInt(result.source.droppableId.split('-')[0], 10);
-    const tarIndex = parseInt(result.destination.droppableId, 10);
+    const sourceIndex = parseInt(result.source.index, 10);
+    const tarIndex = parseInt(result.destination.index, 10);
     let beforeSequence = null;
     let afterSequence = null;
     const res = Array.from(data);
