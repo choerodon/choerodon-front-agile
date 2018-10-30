@@ -652,6 +652,7 @@ class ScrumBoardHome extends Component {
     const result = [];
     const data = ScrumBoardStore.getBoardData;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      // 故事泳道
       for (let index = 0, len = data.length; index < len; index += 1) {
         if (data[index].subStatuses.length > 0) {
           result.push(
@@ -665,6 +666,7 @@ class ScrumBoardHome extends Component {
         }
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      // 经办人泳道
       for (let index = 0, len = data.length; index < len; index += 1) {
         if (data[index].subStatuses.length > 0) {
           result.push(
@@ -677,6 +679,7 @@ class ScrumBoardHome extends Component {
         }
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      // 史诗 泳道
       for (let index = 0, len = data.length; index < len; index += 1) {
         if (data[index].subStatuses.length > 0) {
           result.push(

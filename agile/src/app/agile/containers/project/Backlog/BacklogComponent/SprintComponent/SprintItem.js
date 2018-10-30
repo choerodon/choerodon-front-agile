@@ -44,11 +44,13 @@ class SprintItem extends Component {
   }
 
   componentDidMount() {
-    this.props.onRef(this);
+    const year = moment().year();
+    const { onRef } = this.props;
+    onRef(this);
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
     const { store } = this.props;
-    store.axiosGetWorkSetting();
+    store.axiosGetWorkSetting(year);
   }
 
   componentWillUnmount() {

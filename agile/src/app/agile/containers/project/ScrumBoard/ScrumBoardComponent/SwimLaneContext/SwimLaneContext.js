@@ -188,10 +188,13 @@ class SwimLaneContext extends Component {
     const item = this.props.data;
     let id;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      // 故事泳道
       id = item.issueId;
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      // 经办人泳道
       id = item.assigneeId;
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      // 史诗
       id = item.epicId;
     }
     return (
