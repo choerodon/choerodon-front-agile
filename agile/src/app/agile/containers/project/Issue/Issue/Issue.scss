@@ -1,4 +1,46 @@
+//临时测试
+.ant-tag-checkable {
+  &,
+  a,
+  a:hover {
+    color: #000;
+  }
+  &:active,
+  &-checked {
+    color: #fff;
+  }
+}
 .c7n-Issue {
+  &-advsearch {
+    &-title {
+      padding-left: 7px;
+    }
+    .ant-modal-content {
+      left: 818px;
+      width: calc(100% - 818px) !important;
+    }
+  }
+  &-quickSearch {
+    &-left {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 44px;
+    }
+    &-filter {
+      margin-bottom: 0;
+      font-size: 14px;
+    }
+    &-clicker {
+      white-space: nowrap;
+      padding: 0 8px;
+      line-height: 32px;
+      margin-right: 18px;
+    }
+    &-clicker:focus, &-clicker:active {
+      background-color: #3f51b5;
+    }
+  }
   .expand-sign {
     .ant-pagination-options-label {
       display: none;

@@ -13,6 +13,7 @@ const filter = {
     typeCode: [],
   },
   content: '',
+  quickFilterIds: [],
   searchArgs: {
     assignee: '',
     component: '',
@@ -21,6 +22,10 @@ const filter = {
     sprint: '',
     summary: '',
     version: '',
+    updateStartDate: null,
+    updateEndDate: null,
+    createStartDate: null,
+    createEndDate: null,
   },
 };
 
@@ -60,6 +65,8 @@ class SprintCommonStore {
 
   @observable barFilters = undefined;
 
+  @observable quickSearch = [];
+
   init() {
     this.setOrder({
       orderField: '',
@@ -76,8 +83,10 @@ class SprintCommonStore {
   loadIssues(page = 0, size = 10) {
     this.setLoading(true);
     const { orderField = '', orderType = '' } = this.order;
+    debugger;
     return loadIssues(page, size, toJS(this.getFilter), orderField, orderType)
       .then((res) => {
+        debugger;
         this.setIssues(res.content);
         this.setPagination({
           current: res.number + 1,
@@ -88,6 +97,11 @@ class SprintCommonStore {
         return Promise.resolve(res);
       });
   }
+
+  loadQuickSearch = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
+    .then((filters) => {
+      this.setQuickSearch(filters);
+    });
 
   createIssue(issueObj, projectId = AppState.currentMenuType.id) {
     const issue = {
@@ -102,7 +116,24 @@ class SprintCommonStore {
   }
 
   @computed get getIssues() {
+    debugger;
     return toJS(this.issues);
+  }
+
+  @action setQuickSearch(data) {
+    this.quickSearch = data;
+  }
+
+  @computed get getQuickSearch() {
+    return toJS(this.quickSearch);
+  }
+
+  @action setSelectedQuickSearch(data) {
+    debugger;
+    if (data) {
+      Object.assign(filter, data);
+    }
+    debugger;
   }
 
   @action setPagination(data) {
@@ -114,6 +145,7 @@ class SprintCommonStore {
   }
 
   @action setAdvArg(data) {
+    debugger;
     if (data) {
       Object.assign(filter.advancedSearchArgs, data);
     }

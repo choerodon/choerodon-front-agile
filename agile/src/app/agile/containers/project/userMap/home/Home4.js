@@ -9,10 +9,10 @@ import {
 import {
   Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin, message, Tooltip,
 } from 'choerodon-ui';
-import classNames from 'classnames';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import html2canvas from 'html2canvas';
 import './Home4.scss';
+import QuickSearch from '../../../../components/QuickSearch';
 import CreateEpic from '../component/CreateEpic';
 import Backlog from '../component/Backlog/Backlog.js';
 import EpicCard from '../component/EpicCard/EpicCard.js';
@@ -1974,6 +1974,7 @@ class Home3 extends Component {
   };
 
   onChangeSelect = (arr) => {
+    debugger;
     const { UserMapStore } = this.props;
     UserMapStore.setCurrentFilter(arr);
     UserMapStore.loadIssues('usermap');
@@ -1981,29 +1982,6 @@ class Home3 extends Component {
     if (UserMapStore.isApplyToEpic) {
       UserMapStore.loadEpic();
     }
-  };
-
-  buttonRender = () => {
-    const { UserMapStore } = this.props;
-    const {
-      filters,
-    } = UserMapStore;
-    const listChildren = filters.map(item => ({
-      label: item.name,
-      value: item.filterId,
-    }));
-    const content = (
-      <CheckboxGroup className="c7n-agile-quickSearch-popover" style={{ display: 'flex', flexDirection: 'column' }} options={listChildren} onChange={this.onChangeSelect} />
-    );
-    return (
-      (
-        <Popover content={content} trigger="click">
-          <Button funcType="flat" icon="more_vert">
-            更多
-          </Button>
-        </Popover>
-      )
-    );
   };
 
   render() {
@@ -2035,36 +2013,21 @@ class Home3 extends Component {
                   onDragStart={this.handleEpicOrIssueDragStart}
                 >
                   <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
-                    <div className="toolbar" style={{ minHeight: 52 }}>
-                      <div className="filter">
-                        <div className="filter-left">
-                          <p style={{ padding: '3px 8px 0 0' }}>快速搜索:</p>
-                          <p
-                            role="none"
-                            style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}` }}
-                            onClick={this.addFilter.bind(this, 'mine')}
-                          >
-                            {'仅我的问题'}
-                          </p>
-                          <p
-                            role="none"
-                            style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}` }}
-                            onClick={this.addFilter.bind(this, 'userStory')}
-                          >
-                            {'仅用户故事'}
-                          </p>
-                        </div>
-                        <div className="filter-right">
-                          {this.buttonRender()}
-                        </div>
-                      </div>
-                    </div>
+                    <QuickSearch
+                      title
+                      buttonName="更多"
+                      buttonIcon="more_vert"
+                      moreSelection={UserMapStore.getFilters}
+                      onChangeCheckBox={this.onChangeSelect}
+                      onlyStory={this.addFilter.bind(this, 'userStory')}
+                      onlyMe={this.addFilter.bind(this, 'mine')}
+                    />
                     { showBackLog ? (
                       <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
                         <Backlog handleClickIssue={this.handleClickIssue} />
                       </div>
                     ) : null }
-                    <div className="fixHead" style={{ height: `calc(100% - ${52}px)` }}>
+                    <div className="fixHead" style={{ height: `calc(100% - ${57}px)` }}>
                       <div className="fixHead-head" id="fixHead-head">
                         <div className="fixHead-line">
                           <Droppable droppableId="epic" direction="horizontal">
@@ -2120,29 +2083,15 @@ class Home3 extends Component {
           </Content>
         ) : (
           <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
-            <div className="toolbar" style={{ minHeight: 52 }}>
-              <div className="filter" style={{ height: 27 }}>
-                <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
-                <p
-                  role="none"
-                  style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                  onClick={this.addFilter.bind(this, 'mine')}
-                >
-                  {'仅我的问题'}
-                </p>
-                <p
-                  role="none"
-                  style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                  onClick={this.addFilter.bind(this, 'userStory')}
-                >
-                  {'仅用户故事'}
-
-                </p>
-                {
-                  this.buttonRender()
-                }
-              </div>
-            </div>
+            <QuickSearch
+              title
+              buttonName="更多"
+              buttonIcon="more_vert"
+              moreSelection={UserMapStore.getFilters}
+              onChangeCheckBox={this.onChangeSelect}
+              onlyStory={this.addFilter.bind(this, 'userStory')}
+              onlyMe={this.addFilter.bind(this, 'mine')}
+            />
             <div style={{
               display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
             }}
