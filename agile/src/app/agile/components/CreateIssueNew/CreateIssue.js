@@ -226,7 +226,7 @@ class CreateIssue extends Component {
                       <Option key={type} value={type}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                           <TypeTag
-                            typeCode={type}
+                            data=''
                             showName
                           />
                         </div>

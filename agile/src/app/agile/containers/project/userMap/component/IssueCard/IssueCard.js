@@ -169,6 +169,7 @@ class IssueCard extends Component {
         imageUrl,
         priorityDTO,
         typeCode,
+        issueTypeDTO,
         storyPoints,
         statusName,
         statusColor,
@@ -282,7 +283,7 @@ class IssueCard extends Component {
               </div>
               <div className="c7n-footer">
                 <TypeTag
-                  typeCode={typeCode}
+                  data={issueTypeDTO}
                 />
                 <span className="c7n-issueCard-storyPoints">
                   {storyPoints}

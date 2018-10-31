@@ -176,7 +176,7 @@ class SprintIssue extends Component {
                   }}
                 >
                   <Typetag
-                    typeCode={item.typeCode}
+                    data={item.issueTypeDTO}
                   />
                   <div
                     label="sprintIssue"

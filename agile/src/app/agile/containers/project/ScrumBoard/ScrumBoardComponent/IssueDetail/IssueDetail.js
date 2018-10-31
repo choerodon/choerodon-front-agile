@@ -29,6 +29,7 @@ class IssueDetail extends Component {
       >
         {this.props.visible ? (
           <EditIssue
+            store={ScrumBoardStore}
             backUrl="scrumboard"
             issueId={ScrumBoardStore.getClickIssueDetail.issueId}
             onCancel={() => {

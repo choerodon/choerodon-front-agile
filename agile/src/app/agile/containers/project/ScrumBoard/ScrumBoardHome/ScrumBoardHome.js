@@ -48,6 +48,7 @@ class ScrumBoardHome extends Component {
     const { location } = this.props;
     this.getBoard();
     const url = this.GetRequest(location.search);
+    ScrumBoardStore.axiosGetIssueTypes();
     if (url.paramIssueId) {
       ScrumBoardStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
@@ -273,7 +274,7 @@ class ScrumBoardHome extends Component {
               for (let index2 = 0, len2 = newColumnData[index].subStatuses.length;
                 index2 < len2; index2 += 1) {
                 statusList.push({
-                  id: newColumnData[index].subStatuses[index2].id,
+                  id: newColumnData[index].subStatuses[index2].statusId,
                   name: newColumnData[index].subStatuses[index2].name,
                 });
                 if (newColumnData[index].subStatuses[index2].issues) {
@@ -375,7 +376,7 @@ class ScrumBoardHome extends Component {
                 let index2 = 0, len3 = originState[oriIndex].subStatuses[index].issues.length;
                 index2 < len3;
                 index2 += 1) {
-                if (originState[oriIndex].subStatuses[index].issues[index2].typeCode !== 'sub_task') {
+                if (originState[oriIndex].subStatuses[index].issues[index2].issueTypeDTO.typeCode !== 'sub_task') {
                   totalIssues += 1;
                 }
               }
@@ -398,7 +399,7 @@ class ScrumBoardHome extends Component {
                 let index2 = 0, len3 = originState[oriIndex].subStatuses[index].issues.length;
                 index2 < len3;
                 index2 += 1) {
-                if (originState[oriIndex].subStatuses[index].issues[index2].typeCode !== 'sub_task') {
+                if (originState[oriIndex].subStatuses[index].issues[index2].issueTypeDTO.typeCode !== 'sub_task') {
                   totalIssues += 1;
                 }
               }
@@ -429,7 +430,7 @@ class ScrumBoardHome extends Component {
             let index2 = 0, len2 = newState[index].subStatuses.length;
             index2 < len2;
             index2 += 1) {
-            if (String(newState[index].subStatuses[index2].id)
+            if (String(newState[index].subStatuses[index2].statusId)
               === String(JSON.parse(result.source.droppableId).code)) {
               let spliceIndex = '';
               for (
@@ -453,7 +454,7 @@ class ScrumBoardHome extends Component {
             let index2 = 0, len2 = newState[index].subStatuses.length;
             index2 < len2;
             index2 += 1) {
-            if (String(newState[index].subStatuses[index2].id)
+            if (String(newState[index].subStatuses[index2].statusId)
             === String(JSON.parse(result.destination.droppableId).code)) {
               newState[index].subStatuses[index2].issues.splice(
                 result.destination.index, 0, draggableData,
@@ -487,7 +488,7 @@ class ScrumBoardHome extends Component {
                 let index2 = 0, len2 = newState[index].subStatuses.length;
                 index2 < len2;
                 index2 += 1) {
-                if (String(newState[index].subStatuses[index2].id)
+                if (String(newState[index].subStatuses[index2].statusId)
                 === String(JSON.parse(result.destination.droppableId).code)) {
                   destinationStatus = newState[index].subStatuses[index2].categoryCode;
                   newState[index].subStatuses[index2].issues.splice(
@@ -757,7 +758,7 @@ class ScrumBoardHome extends Component {
         if (ScrumBoardStore.getBoardData[
           ScrumBoardStore.getBoardData.length - 1].subStatuses.length > 0) {
           return ScrumBoardStore.getBoardData[
-            ScrumBoardStore.getBoardData.length - 1].subStatuses[0].id;
+            ScrumBoardStore.getBoardData.length - 1].subStatuses[0].statusId;
         }
       }
     }
@@ -1125,7 +1126,7 @@ class ScrumBoardHome extends Component {
                 issueId: judgeUpdateParent.id,
                 objectVersionNumber: judgeUpdateParent.objectVersionNumber,
                 statusId: updateParentStatus || ScrumBoardStore.getBoardData[
-                  ScrumBoardStore.getBoardData.length - 1].subStatuses[0].id,
+                  ScrumBoardStore.getBoardData.length - 1].subStatuses[0].statusId,
               };
               BacklogStore.axiosUpdateIssue(data).then((res) => {
                 this.refresh(ScrumBoardStore.getSelectedBoard);

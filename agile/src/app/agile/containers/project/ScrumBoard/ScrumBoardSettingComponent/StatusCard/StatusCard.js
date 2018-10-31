@@ -102,6 +102,7 @@ class StatusCard extends Component {
                     top: '15px',
                     cursor: 'pointer',
                     fontSize: '14px',
+                    visibility: 'hidden',
                   }} 
                   type="settings"
                   role="none"
@@ -131,6 +132,7 @@ class StatusCard extends Component {
                     display: this.renderCloseDisplay(),
                     cursor: 'pointer',
                     fontSize: '14px',
+                    visibility: 'hidden',
                   }}
                   role="none"
                   onClick={this.handleDeleteStatus.bind(this)}
@@ -170,7 +172,7 @@ class StatusCard extends Component {
                     checked={this.props.data.completed ? this.props.data.completed : false}
                     onClick={() => {
                       const data = {
-                        id: this.props.data.statusId,
+                        id: this.props.data.id,
                         objectVersionNumber: this.props.data.objectVersionNumber,
                         completed: !this.props.data.completed,
                         projectId: AppState.currentMenuType.id,
@@ -180,7 +182,7 @@ class StatusCard extends Component {
                         disabled: true,
                       });
                       ScrumBoardStore.axiosUpdateIssueStatus(
-                        this.props.data.statusId, data,
+                        this.props.data.id, data,
                       ).then((res) => {
                         this.props.refresh();
                       }).then((res) => {

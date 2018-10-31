@@ -199,7 +199,7 @@ class CreateLinkTask extends Component {
                       }}
                       >
                         <TypeTag
-                          typeCode={issue.typeCode}
+                          data={issue.issueTypeDTO}
                         />
                         <span style={{
                           paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 

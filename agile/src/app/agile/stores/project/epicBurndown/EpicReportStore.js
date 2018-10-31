@@ -122,7 +122,8 @@ class EpicReportStore {
   }
 
   loadEpics() {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`)
+    const orgId = AppState.currentMenuType.organizationId;
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics?organizationId=${orgId}`)
       .then((res) => {
         this.setEpicFinishLoading(true);
         this.setEpics(res);

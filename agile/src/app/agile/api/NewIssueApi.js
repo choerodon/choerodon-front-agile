@@ -84,10 +84,10 @@ export function loadChartData(id, type) {
   return axios.get(`/agile/v1/projects/${projectId}/reports/${id}/burn_down_report?type=${type}`);
 }
 
-export function loadStatus() {
+export function loadStatus(statusId, issueId, typeId) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(
-    `/agile/v1/projects/${projectId}/issue_status/list`,
+    `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&scheme_type=agile`,
   );
 }
 
@@ -112,6 +112,10 @@ export function updateIssue(data, projectId = AppState.currentMenuType.id) {
   //   return axios.put(`agile/v1/projects/${projectId}/issues/sub_issue`, data);
   // }
   return axios.put(`/agile/v1/projects/${projectId}/issues`, data);
+}
+
+export function updateStatus(transformId, issueId, proId = AppState.currentMenuType.id) {
+  return axios.put(`/agile/v1/projects/${proId}/issues/update_status?transformId=${transformId}&issueId=${issueId}`);
 }
 
 export function createSubIssue(issueId, obj, projectId = AppState.currentMenuType.id) {

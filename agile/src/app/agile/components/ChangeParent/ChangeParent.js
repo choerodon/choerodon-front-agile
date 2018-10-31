@@ -108,7 +108,7 @@ class ChangeParent extends Component {
                     <div className="c7n-agile-changeParent-listWrap">
                       <div>
                         <TypeTag
-                          typeCode={issue.typeCode}
+                          data={issue.issueTypeDTO}
                         />
                       </div>
                       <a className="issueNum text-overflow-hidden">

@@ -45,6 +45,7 @@ class IssueDetail extends Component {
       >
         {this.props.visible ? (
           <EditIssue
+            store={BacklogStore}
             onRef={(ref) => {
               this.editIssue = ref;
             }}

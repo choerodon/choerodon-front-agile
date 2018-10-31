@@ -288,7 +288,9 @@ class UserMapStore {
       url += '&onlyStory=true';
     }
     url += `&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}`;
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}${this.isApplyToEpic ? url : ''}`)
+    const orgId = AppState.currentMenuType.organizationId;
+    const proId = AppState.currentMenuType.id;
+    return axios.get(`/agile/v1/projects/${proId}/issues/storymap/epics?organizationId=${orgId}&showDoneEpic=${this.showDoneEpic}${this.isApplyToEpic ? url : ''}`)
       .then((epics) => {
         this.setEpics(epics);
       })
@@ -352,7 +354,7 @@ class UserMapStore {
       .then((res) => {
         this.setMode(res);
         axios.all([
-          axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?showDoneEpic=${this.showDoneEpic}`),
+          axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?organizationId=${orgId}&showDoneEpic=${this.showDoneEpic}`),
           axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
           axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?organizationId=${orgId}&type=${this.mode}&pageType=${pageType}`),
         ])
@@ -421,7 +423,7 @@ class UserMapStore {
       query += `&assigneeId=${filterObj.userId}`;
     }
     if (Array.isArray(filterObj.filterIds) && filterObj.filterIds.length) {
-      query += `&&quickFilterIds=${filterObj.filterIds.join(',')}`;
+      query += `&quickFilterIds=${filterObj.filterIds.join(',')}`;
     }
     return query;
   };

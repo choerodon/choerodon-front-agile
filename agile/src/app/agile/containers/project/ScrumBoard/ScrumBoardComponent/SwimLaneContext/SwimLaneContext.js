@@ -93,11 +93,14 @@ class SwimLaneContext extends Component {
               className="c7n-parentIssue-icon"
               style={{
                 marginLeft: 8,
-                background: this.renderTypeCode('background'),
+                background: item.issueTypeDTO ? item.issueTypeDTO.colour : '#fab614',
                 marginRight: 6,
               }}
             >
-              {this.renderTypeCode('icon')}
+              <Icon
+                className="c7n-issueType-icon"
+                type={item.issueTypeDTO ? item.issueTypeDTO.icon : 'help'}
+              />
             </div>
             <span
               style={{ cursor: 'pointer' }}
@@ -106,14 +109,15 @@ class SwimLaneContext extends Component {
                 ScrumBoardStore.setClickIssueDetail(item);
               }}
             >
-
-            #
-{item.issueNum}
+              #
+              {item.issueNum}
             </span>
             <div
               className="c7n-parentIssue-status"
               style={{ backgroundColor: STATUS[item.categoryCode] }}
-            >{item.status}</div>
+            >
+              {item.status}
+            </div>
             {item.summary}
             <span className="c7n-parentIssue-count">{`  (${item.count} 子任务)`}</span>
 
@@ -132,9 +136,8 @@ class SwimLaneContext extends Component {
               });
             }}
           >
-
-        移动到done
-</Button>
+            移动到done
+          </Button>
         </div>
       );
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {

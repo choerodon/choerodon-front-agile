@@ -573,7 +573,7 @@ class SprintReport extends Component {
             <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.typeCode}`}>
               <div>
                 <TypeTag
-                  typeCode={record.typeCode}
+                  data={record.issueTypeDTO}
                   showName
                 />
               </div>

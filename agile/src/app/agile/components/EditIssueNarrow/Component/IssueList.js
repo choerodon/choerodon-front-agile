@@ -86,7 +86,7 @@ class IssueList extends Component {
         <Tooltip mouseEnterDelay={0.5} title="任务类型: 子任务">
           <div>
             <TypeTag
-              typeCode={issue.typeCode}
+              data={issue.issueTypeDTO}
             />
           </div>
         </Tooltip>

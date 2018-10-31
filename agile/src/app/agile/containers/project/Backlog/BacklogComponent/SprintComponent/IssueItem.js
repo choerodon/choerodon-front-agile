@@ -99,7 +99,7 @@ class IssueItem extends Component {
                   }}
                 >
                   <Typetag
-                    typeCode={item.typeCode}
+                    data={item.issueTypeDTO}
                   />
                   <div
                     label="sprintIssue"
@@ -131,22 +131,22 @@ class IssueItem extends Component {
                     <div
                       style={{
                         maxWidth: 34,
-                        marginLeft: !_.isNull(item.priorityDTO.name) && !this.renderIssueDisplay() ? '12px' : 0,
+                        marginLeft: !_.isNull(item.priorityDTO && item.priorityDTO.name) && !this.renderIssueDisplay() ? '12px' : 0,
                       }}
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {!_.isNull(item.priorityDTO.name) ? (
-                        <Tooltip title={`优先级: ${item.priorityDTO.name}`}>
+                      {!_.isNull(item.priorityDTO && item.priorityDTO.name) ? (
+                        <Tooltip title={`优先级: ${item.priorityDTO ? item.priorityDTO.name : ''}`}>
                           <span
                             label="sprintIssue"
                             className="c7n-backlog-sprintIssuePriority"
                             style={{
-                              color: item.priorityDTO.colour,
-                              background: `${item.priorityDTO.colour}33`,
+                              color: item.priorityDTO ? item.priorityDTO.colour : '#FFFFFF',
+                              background: `${item.priorityDTO ? item.priorityDTO.colour : 'FFFFFF'}4C`,
                             }}
                           >
-                            {item.priorityDTO.name}
+                            {item.priorityDTO ? item.priorityDTO.name : ''}
                           </span>
                         </Tooltip>
                       ) : ''}
@@ -222,13 +222,13 @@ class IssueItem extends Component {
                     <div
                       style={{
                         width: 60,
-                        marginLeft: !_.isNull(item.statusMapDTO.name) ? '12px' : 0,
+                        marginLeft: !_.isNull(item.statusMapDTO && item.statusMapDTO.name) ? '12px' : 0,
                       }}
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {!_.isNull(item.statusMapDTO.name) ? (
-                        <Tooltip title={`状态: ${item.statusMapDTO.name}`}>
+                      {!_.isNull(item.statusMapDTO && item.statusMapDTO.name) ? (
+                        <Tooltip title={`状态: ${item.statusMapDTO ? item.statusMapDTO.name : ''}`}>
                           <span
                             label="sprintIssue"
                             className="c7n-backlog-sprintIssueStatus"
@@ -236,7 +236,7 @@ class IssueItem extends Component {
                               background: item.statusColor ? item.statusColor : '#4d90fe',
                             }}
                           >
-                            {item.statusMapDTO.name}
+                            {item.statusMapDTO ? item.statusMapDTO.name : ''}
                           </span>
                         </Tooltip>
                       ) : ''}

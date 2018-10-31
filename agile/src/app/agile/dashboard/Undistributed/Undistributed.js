@@ -41,7 +41,7 @@ class Undistributed extends Component {
       <div className="list" key={issue.issueNum}>
         <div>
           <TypeTag
-            typeCode={issue.typeCode}
+            data={issue.issueTypeDTO}
           />
         </div>
         <span className="issueNum text-overflow-hidden">

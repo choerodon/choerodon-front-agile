@@ -410,10 +410,15 @@ class StatusIssue extends Component {
                             <div
                               className="c7n-scrumboard-issueIcon"
                               style={{
-                                background: this.renderTypeCode('background', item),
+                                background: item.issueTypeDTO ? item.issueTypeDTO.colour : '#fab614',
                               }}
                             >
-                              {this.renderTypeCode('icon', item)}
+                              <Tooltip title={item.issueTypeDTO ? item.issueTypeDTO.name : ''}>
+                                <Icon
+                                  className="c7n-issueType-icon"
+                                  type={item.issueTypeDTO ? item.issueTypeDTO.icon : 'help'}
+                                />
+                              </Tooltip>
                             </div>
                             <p
                               style={{ marginLeft: 5, textDecoration: isCompleted ? 'line-through' : '' }}
@@ -451,7 +456,7 @@ class StatusIssue extends Component {
                               <p
                                 style={{
                                   flexBasis: '20px',
-                                  background: `${item.priorityDTO.colour}33`,
+                                  background: `${item.priorityDTO.colour}4C`,
                                   color: item.priorityDTO.colour,
                                   textAlign: 'center',
                                   marginLeft: '8px',

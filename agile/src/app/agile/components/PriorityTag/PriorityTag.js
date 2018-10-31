@@ -40,7 +40,7 @@ class PriorityTag extends Component {
       <div
         className="c7n-priorityTag"
         style={{
-          backgroundColor: `${priority ? priority.colour : '#FFFFFF'}33`,
+          backgroundColor: `${priority ? priority.colour : '#FFFFFF'}4C`,
           color: priority ? priority.colour : '#FFFFFF',
         }}
       >

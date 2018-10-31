@@ -91,7 +91,7 @@ class ColumnPage extends Component {
             for (let index2 = 0, len2 = newState[columnIndex].subStatuses[index].issues.length; index2 < len2; index2 += 1) {
               if (ScrumBoardStore.getCurrentConstraint === 'issue') {
                 totalNum += 1;
-              } else if (newState[columnIndex].subStatuses[index].issues[index2].typeCode !== 'sub_task') {
+              } else if (newState[columnIndex].subStatuses[index].issues[index2].issueTypeDTO.typeCode !== 'sub_task') {
                 totalNum += 1;
               }
             }
@@ -142,7 +142,7 @@ class ColumnPage extends Component {
             for (let index2 = 0, len2 = newState[columnIndex].subStatuses[index].issues.length; index2 < len2; index2 += 1) {
               if (ScrumBoardStore.getCurrentConstraint === 'issue') {
                 totalNum += 1;
-              } else if (newState[columnIndex].subStatuses[index].issues[index2].typeCode !== 'sub_task') {
+              } else if (newState[columnIndex].subStatuses[index].issues[index2].issueTypeDTO.typeCode !== 'sub_task') {
                 totalNum += 1;
               }
             }
@@ -160,7 +160,7 @@ class ColumnPage extends Component {
                 for (let index3 = 0, len3 = newState[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
                   if (ScrumBoardStore.getCurrentConstraint === 'issue') {
                     destinationTotal += 1;
-                  } else if (newState[index].subStatuses[index2].issues[index3].typeCode !== 'sub_task') {
+                  } else if (newState[index].subStatuses[index2].issues[index3].issueTypeDTO.typeCode !== 'sub_task') {
                     destinationTotal += 1;
                   }
                 }
@@ -171,7 +171,7 @@ class ColumnPage extends Component {
           for (let index = 0, len = draggableData.issues.length; index < len; index += 1) {
             if (ScrumBoardStore.getCurrentConstraint === 'issue') {
               draggableTotal += 1;
-            } else if (draggableData.issues[index].typeCode !== 'sub_task') {
+            } else if (draggableData.issues[index].issueTypeDTO.typeCode !== 'sub_task') {
               draggableTotal += 1;
             }
           }

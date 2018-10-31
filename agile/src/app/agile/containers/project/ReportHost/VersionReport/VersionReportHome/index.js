@@ -400,7 +400,7 @@ class VersionReport extends Component {
   }
 
   renderTypecode(item, type) {
-    if (item.typeCode === 'story') {
+    if (item.issueTypeDTO.typeCode === 'story') {
       if (type === 'background') {
         return '#00BFA5';
       } else {
@@ -411,7 +411,7 @@ class VersionReport extends Component {
         );
       }
     }
-    if (item.typeCode === 'task') {
+    if (item.issueTypeDTO.typeCode === 'task') {
       if (type === 'background') {
         return '#4D90FE';
       } else {
@@ -422,7 +422,7 @@ class VersionReport extends Component {
         );
       }
     }
-    if (item.typeCode === 'bug') {
+    if (item.issueTypeDTO.typeCode === 'bug') {
       if (type === 'background') {
         return '#F44336';
       } else {
@@ -433,7 +433,7 @@ class VersionReport extends Component {
         );
       }
     }
-    if (item.typeCode === 'issue_epic') {
+    if (item.issueTypeDTO.typeCode === 'issue_epic') {
       if (type === 'background') {
         return 'rgb(116, 59, 231)';
       } else {
@@ -504,7 +504,7 @@ class VersionReport extends Component {
         <span
           style={{
             color: record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF',
-            background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}33`,
+            background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}4C`,
             padding: '1px 4px',
           }}
         >

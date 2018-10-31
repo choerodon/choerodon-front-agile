@@ -57,6 +57,8 @@ class ScrumBoardStore {
 
   @observable workDate = false;
 
+  @observable issueTypes = [];
+
   @computed get getStatusList() {
     return toJS(this.statusList);
   }
@@ -74,7 +76,8 @@ class ScrumBoardStore {
   }
 
   axiosGetAllEpicData() {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`);
+    const orgId = AppState.currentMenuType.organizationId;
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics?organizationId=${orgId}`);
   }
 
   @computed get getEpicData() {
@@ -395,6 +398,25 @@ class ScrumBoardStore {
       this.setWorkDate(false);
     });
   };
+
+  @computed get getIssueTypes() {
+    return this.issueTypes.slice();
+  }
+
+  @action setIssueTypes(data) {
+    this.issueTypes = data;
+  }
+
+  axiosGetIssueTypes() {
+    const proId = AppState.currentMenuType.id;
+    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types?scheme_type=agile`).then((data) => {
+      if (data && !data.failed) {
+        this.setIssueTypes(data);
+      } else {
+        this.setIssueTypes([]);
+      }
+    });
+  }
 }
 
 const scrumBoardStore = new ScrumBoardStore();

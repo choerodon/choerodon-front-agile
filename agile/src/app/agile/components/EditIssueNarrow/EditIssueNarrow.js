@@ -17,7 +17,7 @@ import {
   delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload, 
 } from '../../common/utils';
 import {
-  loadBranchs, loadDatalogs, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus, 
+  loadBranchs, updateStatus, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus,
 } from '../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
@@ -95,6 +95,7 @@ class CreateSprint extends Component {
       epicName: '',
       issueNum: undefined,
       typeCode: 'story',
+      issueTypeDTO: {},
       parentIssueId: undefined,
       reporterId: undefined,
       reporterImageUrl: undefined,
@@ -142,6 +143,7 @@ class CreateSprint extends Component {
       originSprints: [],
       originFixVersions: [],
       originInfluenceVersions: [],
+      transformId: false,
     };
   }
 
@@ -177,7 +179,6 @@ class CreateSprint extends Component {
   onChangeFileList = (arr) => {
     if (arr.length > 0 && arr.some(one => !one.url)) {
       const config = {
-        issueType: this.state.origin.typeCode,
         issueId: this.state.origin.issueId,
         fileName: arr[0].name || 'AG_ATTACHMENT',
         projectId: AppState.currentMenuType.id,
@@ -237,6 +238,7 @@ class CreateSprint extends Component {
       storyPoints,
       summary,
       typeCode,
+      issueTypeDTO,
       versionIssueRelDTOList,
       subIssueDTOList,
     } = issue;
@@ -293,6 +295,7 @@ class CreateSprint extends Component {
       storyPoints,
       summary,
       typeCode,
+      issueTypeDTO,
       versionIssueRelDTOList,
       subIssueDTOList,
       fixVersions,
@@ -304,11 +307,12 @@ class CreateSprint extends Component {
   }
 
   getCurrentNav(e) {
+    const { issueTypeDTO } = this.state;
     let eles;
-    if (this.state.typeCode !== 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'sub_task', 'link_task', 'branch'];
-    } else {
+    if (issueTypeDTO && issueTypeDTO.typeCode === 'sub_task') {
       eles = ['detail', 'des', 'attachment', 'commit', 'log', 'branch'];
+    } else {
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'sub_task', 'link_task', 'branch'];
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
@@ -536,6 +540,15 @@ class CreateSprint extends Component {
             this.props.onUpdate();
           }
         });
+    } else if (pro === 'statusId') {
+      const { transformId, issueId } = this.state;
+      updateStatus(transformId, issueId)
+        .then((res) => {
+          this.reloadIssue();
+          if (this.props.onUpdate) {
+            this.props.onUpdate();
+          }
+        });
     } else {
       obj[pro] = this.state[pro] || 0;
       updateIssue(obj)
@@ -546,7 +559,7 @@ class CreateSprint extends Component {
           }
         });
     }
-  }
+  };
 
   updateIssueSelect = (originPros, pros) => {
     const obj = {
@@ -773,18 +786,21 @@ class CreateSprint extends Component {
     }
   }
 
-  handleChangeType({ key }) {
+  handleChangeType(type) {
+    const { issueId, summary, origin } = this.state;
+    const { issueId: id, onUpdate } = this.props;
     const issueupdateTypeDTO = {
-      epicName: key === 'issue_epic' ? this.state.summary : undefined,
-      issueId: this.state.origin.issueId,
-      objectVersionNumber: this.state.origin.objectVersionNumber,
-      typeCode: key,
+      epicName: type.key === 'issue_epic' ? summary : undefined,
+      issueId,
+      objectVersionNumber: origin.objectVersionNumber,
+      typeCode: type.key,
+      issueTypeId: type.item.props.value,
     };
     updateIssueType(issueupdateTypeDTO)
       .then((res) => {
-        loadIssue(this.props.issueId).then((response) => {
-          this.reloadIssue(this.state.origin.issueId);
-          this.props.onUpdate();
+        loadIssue(id).then((response) => {
+          this.reloadIssue(origin.issueId);
+          onUpdate();
         });
       });
   }
@@ -1130,15 +1146,48 @@ class CreateSprint extends Component {
     );
   }
 
+  loadIssueStatus = () => {
+    const {
+      issueTypeDTO,
+      issueId,
+      origin,
+    } = this.state;
+    const typeId = issueTypeDTO.id;
+    this.setAnIssueToState();
+    loadStatus(origin.statusId, issueId, typeId).then((res) => {
+      this.setState({
+        originStatus: res,
+        selectLoading: false,
+      });
+    });
+  }
+
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     const {
-      initValue, visible, onCancel, onOk, 
+      store,
     } = this.props;
     const {
-      typeCode, originPriorities, selectLoading, currentRae, priorityId, priorityName, priorityColor,
+      issueTypeDTO,
+      originPriorities,
+      selectLoading,
+      currentRae,
+      priorityId,
+      priorityName,
+      priorityColor,
+      origin,
+      issueId,
+      originStatus,
+      statusId,
+      statusCode,
+      statusName,
     } = this.state;
+    const issueTypes = store.getIssueTypes ? store.getIssueTypes : [];
+    const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
+    const typeColor = issueTypeDTO ? issueTypeDTO.colour : '#fab614';
+    const typeIcon = issueTypeDTO ? issueTypeDTO.icon : 'help';
+
     const getMenu = () => (
       <Menu onClick={this.handleClickMenu.bind(this)}>
         <Menu.Item key="0">
@@ -1210,17 +1259,17 @@ class CreateSprint extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          _.remove(['story', 'task', 'bug', 'issue_epic'], n => n !== typeCode).map(type => (
-            <Menu.Item key={type}>
+          issueTypes.filter(t => t.typeCode !== typeCode && t.typeCode !== 'sub_task').map(t => (
+            <Menu.Item key={t.typeCode} value={t.id}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div
                   style={{
-                    backgroundColor: TYPE[type],
+                    backgroundColor: t.colour,
                     marginRight: 8,
                     display: 'inline-flex',
                     width: 20,
                     height: 20,
-                    borderRadius: '50%',
+                    borderRadius: '4px',
                     textAlign: 'center',
                     color: '#fff',
                     fontSize: '14px',
@@ -1229,12 +1278,12 @@ class CreateSprint extends Component {
                   }}
                 >
                   <Icon
-                    style={{ fontSize: '14px' }}
-                    type={ICON[type]}
+                    style={{ fontSize: '16px' }}
+                    type={t.icon}
                   />
                 </div>
                 <span>
-                  {TYPE_NAME[type]}
+                  {t.name}
                 </span>
               </div>
             </Menu.Item>
@@ -1273,14 +1322,14 @@ class CreateSprint extends Component {
               }}
               >
                 <div
-                  className="radius"
+                  className="c7n-issueTpe-wapper"
                   style={{
-                    background: TYPE[typeCode], color: '#fff', width: '20px', height: '20px', textAlign: 'center', fontSize: '14px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: typeColor,
                   }}
                 >
                   <Icon
-                    style={{ fontSize: '14px' }}
-                    type={ICON[typeCode]}
+                    style={{ fontSize: '16px' }}
+                    type={typeIcon}
                   />
                 </div>
                 <Icon
@@ -1507,7 +1556,7 @@ class CreateSprint extends Component {
                 </div>
                 <div className="line-start">
                   {
-                    this.state.issueId && typeCode === 'story' ? (
+                    issueId && typeCode === 'story' ? (
                       <div style={{ display: 'flex', marginRight: 25 }}>
                         <span>故事点：</span>
                         <div>
@@ -1551,7 +1600,7 @@ class CreateSprint extends Component {
                     ) : null
                   }
                   {
-                    this.state.issueId && typeCode !== 'issue_epic' ? (
+                    issueId && typeCode !== 'issue_epic' ? (
                       <div style={{ display: 'flex' }}>
                         <span>预估时间：</span>
                         <div>
@@ -1619,24 +1668,17 @@ class CreateSprint extends Component {
                             callback={this.changeRae.bind(this)}
                             thisType="statusId"
                             current={currentRae}
-                            origin={this.state.statusId}
+                            origin={statusId}
                             onOk={this.updateIssue.bind(this, 'statusId')}
                             onCancel={this.resetStatusId.bind(this)}
-                            onInit={() => {
-                              this.setAnIssueToState();
-                              loadStatus().then((res) => {
-                                this.setState({
-                                  originStatus: res,
-                                });
-                              });
-                            }}
+                            onInit={this.loadIssueStatus}
                             readModeContent={(
                               <div>
                                 {
-                                this.state.statusId ? (
+                                statusId ? (
                                   <div
                                     style={{
-                                      background: this.state.origin.statusColor || STATUS[this.state.statusCode],
+                                      background: STATUS[statusCode],
                                       color: '#fff',
                                       borderRadius: '2px',
                                       padding: '0 8px',
@@ -1644,15 +1686,14 @@ class CreateSprint extends Component {
                                       margin: '2px auto 2px 0',
                                     }}
                                   >
-                                    { this.state.statusName }
+                                    { statusName }
                                   </div>
                                 ) : '无'
                               }
-                              </div>
-)}
+                              </div>)}
                           >
                             <Select
-                              value={this.state.originStatus.length ? this.state.statusId : this.state.statusName}
+                              value={originStatus.length ? statusId : statusName}
                               style={{ width: 150 }}
                               loading={this.state.selectLoading}
                               autoFocus
@@ -1661,23 +1702,22 @@ class CreateSprint extends Component {
                                 this.setState({
                                   selectLoading: true,
                                 });
-                                loadStatus().then((res) => {
-                                  this.setState({
-                                    originStatus: res,
-                                    selectLoading: false,
-                                  });
-                                });
+                                this.loadIssueStatus();
                               }}
-                              onChange={(value) => {
+                              onChange={(value, item) => {
+                                console.log(value, '-222');
                                 this.setState({
                                   statusId: value,
+                                  transformId: item.key,
+                                }, () => {
+                                  console.log(this.state.statusId);
                                 });
                               }}
                             >
                               {
-                                this.state.originStatus.map(status => (
-                                  <Option key={status.id} value={status.id}>
-                                    { status.name }
+                                this.state.originStatus.map(transform => (
+                                  <Option key={transform.id} value={transform.endStatusId}>
+                                    { transform.statusDTO.name }
                                   </Option>
                                 ))
                               }
@@ -1713,7 +1753,7 @@ class CreateSprint extends Component {
                                   <div
                                     className="c7n-level"
                                     style={{
-                                      backgroundColor: `${priorityColor}33`,
+                                      backgroundColor: `${priorityColor}4C`,
                                       color: priorityColor,
                                       borderRadius: '2px',
                                       padding: '0 8px',
@@ -1760,7 +1800,7 @@ class CreateSprint extends Component {
                                       <div
                                         className="c7n-level"
                                         style={{
-                                          backgroundColor: `${priority.colour}33`,
+                                          backgroundColor: `${priority.colour}4C`,
                                           color: priority.colour,
                                           borderRadius: '2px',
                                           padding: '0 8px',
@@ -2548,8 +2588,7 @@ class CreateSprint extends Component {
                                   />
                                 ) : '无'
                               }
-                              </div>
-)}
+                              </div>)}
                           >
                             <Select
                               value={this.state.flag === 'loading' ? undefined : this.state.assigneeId || undefined}
@@ -2730,7 +2769,7 @@ class CreateSprint extends Component {
                 </div>
 
                 {
-                  this.state.origin.typeCode !== 'sub_task' && (
+                  typeCode !== 'sub_task' && (
                     <div id="sub_task">
                       <div className="c7n-title-wrapper">
                         <div className="c7n-title-left">
@@ -2754,7 +2793,7 @@ class CreateSprint extends Component {
                 }
 
                 {
-                  this.state.origin.typeCode !== 'sub_task' && (
+                  typeCode !== 'sub_task' && (
                     <div id="link_task">
                       <div className="c7n-title-wrapper">
                         <div className="c7n-title-left">
@@ -2887,7 +2926,7 @@ class CreateSprint extends Component {
           this.state.createBranchShow ? (
             <CreateBranch
               issueId={this.state.origin.issueId}
-              typeCode={this.state.origin.typeCode}
+              typeCode={typeCode}
               issueNum={this.state.origin.issueNum}
               onOk={() => {
                 this.setState({ createBranchShow: false });

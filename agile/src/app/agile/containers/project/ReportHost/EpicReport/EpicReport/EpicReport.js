@@ -470,7 +470,7 @@ class EpicReport extends Component {
           render: (typeCode, record) => (
             <div>
               <TypeTag
-                typeCode={record.typeCode}
+                data={record.issueTypeDTO}
                 showName
               />
             </div>

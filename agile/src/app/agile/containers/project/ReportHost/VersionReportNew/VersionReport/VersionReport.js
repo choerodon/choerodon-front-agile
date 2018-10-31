@@ -60,7 +60,7 @@ class EpicReport extends Component {
 
   getLabel(record) {
     if (VS.beforeCurrentUnit === 'story_point') {
-      if (record.typeCode === 'story') {
+      if (record.issueTypeDTO.typeCode === 'story') {
         return record.storyPoints === null ? '未预估' : record.storyPoints;
       } else {
         return '';
@@ -502,7 +502,7 @@ class EpicReport extends Component {
           render: (typeCode, record) => (
             <div>
               <TypeTag
-                typeCode={record.typeCode}
+                data={record.issueTypeDTO}
                 showName
               />
             </div>

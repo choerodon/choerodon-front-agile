@@ -184,7 +184,8 @@ class EpicProgress extends Component {
 
   loadEpics() {
     const projectId = AppState.currentMenuType.id;
-    axios.get(`/agile/v1/projects/${projectId}/issues/epics`)
+    const orgId = AppState.currentMenuType.organizationId;
+    axios.get(`/agile/v1/projects/${projectId}/issues/epics?organizationId=${orgId}`)
       .then((res) => {
         this.handleEpics(res.slice(0, 6));
       });

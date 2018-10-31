@@ -54,6 +54,9 @@ class BacklogStore {
     workHolidayCalendarDTOS: [],
   };
 
+  @observable issueTypes = [];
+
+  @observable defaultPriority = false;
 
   @computed get asJson() {
     return {
@@ -383,6 +386,44 @@ class BacklogStore {
 
   @action setMore() {
     this.more = !this.more;
+  }
+
+  @computed get getIssueTypes() {
+    return this.issueTypes.slice();
+  }
+
+  @action setIssueTypes(data) {
+    this.issueTypes = data;
+  }
+
+  axiosGetIssueTypes() {
+    const proId = AppState.currentMenuType.id;
+    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types?scheme_type=agile`).then((data) => {
+      if (data && !data.failed) {
+        this.setIssueTypes(data);
+      } else {
+        this.setIssueTypes([]);
+      }
+    });
+  }
+
+  @computed get getDefaultPriority() {
+    return this.defaultPriority;
+  }
+
+  @action setDefaultPriority(data) {
+    this.defaultPriority = data;
+  }
+
+  axiosGetDefaultPriority() {
+    const orgId = AppState.currentMenuType.organizationId;
+    return axios.get(`/issue/v1/organizations/${orgId}/priority/default`).then((data) => {
+      if (data && !data.failed) {
+        this.setDefaultPriority(data);
+      } else {
+        this.setDefaultPriority(false);
+      }
+    });
   }
 }
 

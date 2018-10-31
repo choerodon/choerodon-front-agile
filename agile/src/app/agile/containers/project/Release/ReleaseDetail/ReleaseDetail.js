@@ -311,11 +311,14 @@ class ReleaseDetail extends Component {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              borderRadius: '50%',
-              background: this.renderTypecode(record, 'background'),
+              borderRadius: '4px',
+              background: record.issueTypeDTO ? record.issueTypeDTO.colour : '#fab614',
             }}
           >
-            {this.renderTypecode(record, 'icon')}
+            <Icon
+              style={{ color: 'white', fontSize: '16px' }}
+              type={record.issueTypeDTO ? record.issueTypeDTO.icon : 'help'}
+            />
           </div>
         ),
       },
@@ -353,7 +356,7 @@ class ReleaseDetail extends Component {
             style={{
               padding: '1px 4px',
               color: record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF',
-              background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}33`,
+              background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}4C`,
             }}
           >
             {record.priorityDTO ? record.priorityDTO.name : ''}
