@@ -82,7 +82,7 @@
   sort: 99
   project:
     - "reportboard":
-        icon: whatshot
+        icon: application_model
         Routes: /agile/reporthost
         sort: 3
         permission:
