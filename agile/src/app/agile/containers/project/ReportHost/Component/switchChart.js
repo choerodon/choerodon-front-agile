@@ -20,8 +20,9 @@ class SwitchChart extends Component {
   }
 
   componentWillReceiveProps(nextProps, nextState) {
-    const { location: { search } } = this.props;
-    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
+    const { location: { search }, current } = this.props;
+    const defaultParm = current ? `reporthost/${current}` : undefined;
+    const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : defaultParm;
     this.setState({
       linkFromParamUrl,
     });
