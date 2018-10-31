@@ -37,6 +37,7 @@
         icon: application_model
         Routes: /agile/reporthost
         sort: 7
+        delete: true
         permission:
           - 'agile-service.sprint.queryNameByOptions'
     - "reportboard":
@@ -82,7 +83,7 @@
   project:
     - "reportboard":
         icon: whatshot
-        Routes: /agile/reportboard
+        Routes: /agile/reporthost
         sort: 3
         permission:
           - 'agile-service.sprint.queryNameByOptions'
