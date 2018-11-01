@@ -6,11 +6,8 @@ import {
 import {
   Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip, Checkbox, Popover,
 } from 'choerodon-ui';
-import classNames from 'classnames';
-import axios from 'axios';
 import _ from 'lodash';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { withRouter } from 'react-router-dom';
 import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
 import StatusColumn from '../ScrumBoardComponent/StatusColumn/StatusColumn';
 import StatusBodyColumn from '../ScrumBoardComponent/StatusBodyColumn/StatusBodyColumn';
@@ -20,11 +17,11 @@ import SwimLaneContext from '../ScrumBoardComponent/SwimLaneContext/SwimLaneCont
 import BacklogStore from '../../../../stores/project/backlog/BacklogStore';
 import CloseSprint from '../../Backlog/BacklogComponent/SprintComponent/CloseSprint';
 import EmptyScrumboard from '../../../../assets/image/emptyScrumboard.png';
+import QuickSearch from '../../../../components/QuickSearch';
 
 const { Option } = Select;
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
-const CheckboxGroup = Checkbox.Group;
 let scroll;
 const { AppState } = stores;
 const { confirm } = Modal;
@@ -906,26 +903,6 @@ class ScrumBoardHome extends Component {
     });
   };
 
-  buttonRender = () => {
-    const listChildren = ScrumBoardStore.getQuickSearchList.map(item => ({
-      label: item.name,
-      value: item.filterId,
-    }));
-    const content = (
-      <CheckboxGroup className="c7n-agile-quickSearch-popover" style={{ display: 'flex', flexDirection: 'column' }} options={listChildren} onChange={this.onChangeSelect} />
-    );
-    return (
-      ScrumBoardStore.getQuickSearchList.length > 0
-        ? (
-          <Popover content={content} trigger="click">
-            <Button funcType="flat" icon="more_vert">
-              更多
-            </Button>
-          </Popover>
-        ) : ''
-    );
-  };
-
   render() {
     const { form: { getFieldDecorator }, history } = this.props;
     const {
@@ -1032,40 +1009,15 @@ class ScrumBoardHome extends Component {
             <Spin spinning={spinIf}>
               <div className="c7n-scrumTools">
                 <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-                  <div
-                    style={{
-                      width: '100%',
-                      height: 27,
-                    }}
-                    className="c7n-scrumTools-left"
-                  >
-                    <p style={{ marginRight: 24 }}>快速搜索:</p>
-                    <p
-                      className="c7n-scrumTools-filter"
-                      style={{
-                        background: onlyMe ? '#3F51B5' : '',
-                        color: onlyMe ? 'white' : '#3F51B5',
-                      }}
-                      role="none"
-                      onClick={this.filterOnlyMe.bind(this)}
-                    >
-                      {'仅我的问题'}
-                    </p>
-                    <p
-                      className="c7n-scrumTools-filter"
-                      style={{
-                        background: recent ? '#3F51B5' : '',
-                        color: recent ? 'white' : '#3F51B5',
-                      }}
-                      role="none"
-                      onClick={this.filterOnlyStory.bind(this)}
-                    >
-                      {'仅故事'}
-                    </p>
-                    {
-                      this.buttonRender()
-                    }
-                  </div>
+                  <QuickSearch
+                    title
+                    buttonName="更多"
+                    buttonIcon="more_vert"
+                    moreSelection={ScrumBoardStore.getQuickSearchList}
+                    onChangeCheckBox={this.onChangeSelect}
+                    onlyStory={this.filterOnlyStory.bind(this)}
+                    onlyMe={this.filterOnlyMe.bind(this)}
+                  />
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}>
                   <Icon type="av_timer" />

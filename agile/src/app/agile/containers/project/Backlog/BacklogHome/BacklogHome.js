@@ -4,7 +4,7 @@ import { observer, inject } from 'mobx-react';
 import { Page, Header, stores } from 'choerodon-front-boot';
 import { DragDropContext } from 'react-beautiful-dnd';
 import {
-  Button, Spin, message, Icon, TreeSelect, Popover, Checkbox,
+  Button, Spin, message, Icon,
 } from 'choerodon-ui';
 import _ from 'lodash';
 import Version from '../BacklogComponent/VersionComponent/Version';
@@ -12,9 +12,9 @@ import Epic from '../BacklogComponent/EpicComponent/Epic';
 import IssueDetail from '../BacklogComponent/IssueDetailComponent/IssueDetail';
 import './BacklogHome.scss';
 import SprintItem from '../BacklogComponent/SprintComponent/SprintItem';
+import QuickSearch from '../../../../components/QuickSearch';
 
 const { AppState } = stores;
-const CheckboxGroup = Checkbox.Group;
 
 @observer
 class BacklogHome extends Component {
@@ -485,27 +485,6 @@ class BacklogHome extends Component {
     }
   };
 
-  buttonRender = () => {
-    const { BacklogStore } = this.props;
-    const listChildren = BacklogStore.getQuickSearchList.map(item => ({
-      label: item.name,
-      value: item.filterId,
-    }));
-    const content = (
-      <CheckboxGroup className="c7n-agile-backlogTools-popover" style={{ display: 'flex', flexDirection: 'column' }} options={listChildren} onChange={this.onChangeSelect} />
-    );
-    return (
-      BacklogStore.getQuickSearchList.length > 0
-        ? (
-          <Popover content={content} trigger="click">
-            <Button funcType="flat" icon="more_vert">
-              更多
-            </Button>
-          </Popover>
-        ) : ''
-    );
-  };
-
   onChangeSelect = (checkedValues) => {
     const { BacklogStore } = this.props;
     BacklogStore.setQuickFilters(checkedValues);
@@ -543,37 +522,16 @@ class BacklogHome extends Component {
           </Button>
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
-          <div className="c7n-backlogTools">
-            <div
-              className="c7n-backlogTools-left"
-            >
-              <p style={{ marginRight: 32, whiteSpace: 'nowrap' }}>快速搜索:</p>
-              <p
-                className="c7n-backlog-filter"
-                style={{
-                  background: BacklogStore.getOnlyMe ? '#3F51B5' : '',
-                  color: BacklogStore.getOnlyMe ? 'white' : '#3F51B5',
-                }}
-                role="none"
-                onClick={this.filterOnlyMe}
-              >
-                仅我的问题
-              </p>
-              <p
-                className="c7n-backlog-filter"
-                style={{
-                  background: BacklogStore.getRecent ? '#3F51B5' : '',
-                  color: BacklogStore.getRecent ? 'white' : '#3F51B5',
-                }}
-                role="none"
-                onClick={this.filterOnlyStory}
-              >
-                仅故事
-              </p>
-            </div>
-            {
-              this.buttonRender()
-            }
+          <div className="backlogTools">
+            <QuickSearch
+              title
+              buttonName="更多"
+              buttonIcon="more_vert"
+              moreSelection={BacklogStore.getQuickSearchList}
+              onChangeCheckBox={this.onChangeSelect}
+              onlyStory={this.filterOnlyStory}
+              onlyMe={this.filterOnlyMe}
+            />
           </div>
           <div className="c7n-backlog">
             <div className="c7n-backlog-side">

@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 
 class UserHead extends Component {
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.user.id === this.props.user.id) {
+    const { user } = this.props;
+    if (nextProps.user.id === user.id) {
       return false;
     }
     return true;
@@ -23,18 +24,20 @@ class UserHead extends Component {
   }
 
   render() {
-    const { user, color, size } = this.props;
+    const {
+      user, color, size, hiddenText, style, type,
+    } = this.props;
     const s = size || 18;
     return (
       <div
         className="c7n-userHead"
         style={{
-          ...this.props.style,
+          ...style,
           display: user.id ? 'flex' : 'none',
         }}
       >
         {
-          this.props.type === 'datalog' ? (
+          type === 'datalog' ? (
             <div
               style={{
                 width: 40,
@@ -54,7 +57,10 @@ class UserHead extends Component {
                 user.avatar ? (
                   <img src={user.avatar} alt="" style={{ width: '100%' }} />
                 ) : (
-                  <span style={{ width: 40, height: 40, lineHeight: '40px', textAlign: 'center', color: '#fff', fontSize: '12px' }}>
+                  <span style={{
+                    width: 40, height: 40, lineHeight: '40px', textAlign: 'center', color: '#fff', fontSize: '12px',
+                  }}
+                  >
                     {this.getFirst(user.realName)}
                   </span>
                 )
@@ -81,7 +87,10 @@ class UserHead extends Component {
                 user.avatar ? (
                   <img src={user.avatar} alt="" style={{ width: '100%' }} />
                 ) : (
-                  <span style={{ width: s, height: s, lineHeight: `${s}px`, textAlign: 'center', color: '#6473c3' }}>
+                  <span style={{
+                    width: s, height: s, lineHeight: `${s}px`, textAlign: 'center', color: '#6473c3',
+                  }}
+                  >
                     {this.getFirst(user.realName)}
                   </span>
                 )
@@ -90,7 +99,7 @@ class UserHead extends Component {
           )
         }
         {
-          this.props.hiddenText ? null : (
+          hiddenText ? null : (
             <span
               style={{
                 overflow: 'hidden',
@@ -105,7 +114,7 @@ class UserHead extends Component {
             </span>
           )
         }
-        
+
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import {
-  observable, action, computed, toJS, 
+  observable, action, computed, toJS,
 } from 'mobx';
 import axios from 'axios';
 import _ from 'lodash';
@@ -168,7 +168,7 @@ class UserMapStore {
 
   @computed
   get getFilters() {
-    return this.filters;
+    return toJS(this.filters);
   }
 
 
@@ -303,7 +303,12 @@ class UserMapStore {
     });
 
   loadIssues = (pageType) => {
-    // const url = `/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?type=${this.mode}&pageType=${pageType}&assigneeId=${this.currentFilters.includes('mime') ? AppState.getUserId : null}&onlyStory=${this.currentFilters.includes('userStory')}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mime' || item !== 'userStory')}`;
+    // const url = `/agile/v1/projects/${AppState.currentMenuType.id}
+    // /issues/storymap/issues?type=${this.mode}&pageType=${pageType}
+    // &assigneeId=${this.currentFilters.includes('mime') ? AppState.getUserId : null}
+    // &onlyStory=${this.currentFilters.includes('userStory')}
+    // &quickFilterIds=
+    // ${this.currentFilters.filter(item => item !== 'mime' || item !== 'userStory')}`;
     let url = '';
     if (this.currentFilters.includes('mine')) {
       url += `&assigneeId=${AppState.getUserId}`;
@@ -360,7 +365,7 @@ class UserMapStore {
                 const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
                 this.setIssues(sortedUniqIssues);
                 if (this.cacheIssues.length === 0) {
-                  this.setCacheIssues(sortedIssues);
+                  this.setCacheIssues([]);
                 }
               } else {
                 const sortedIssues = _.orderBy(issues, 'mapRank', 'asc');
@@ -387,7 +392,7 @@ class UserMapStore {
         }
       });
   }
-  
+
   getFiltersObj = (type = 'currentBacklogFilters') => {
     const filters = this[type];
     let [userId, onlyStory, filterIds] = [null, null, []];
@@ -493,20 +498,19 @@ class UserMapStore {
         this.loadBacklogIssues();
       }
     });
-  
+
   deleteIssue = (issueId) => {
     const issue = _.find(this.issues, v => v.issueId === issueId);
-    const mode = this.mode;
-    const key = `${mode}Id`;
+    const key = `${this.mode}Id`;
     const postData = {
       before: false,
       outsetIssueId: 0,
       rankIndex: null,
       issueIds: [issueId],
-      versionIssueIds: mode === 'version' && issue[key] ? [issueId] : undefined,
-      versionId: mode === 'version' && issue[key] ? 0 : undefined,
-      sprintIssueIds: mode === 'sprint' && issue[key] ? [issueId] : undefined,
-      sprintId: mode === 'sprint' && issue[key] ? 0 : undefined,
+      versionIssueIds: this.mode === 'version' && issue[key] ? [issueId] : undefined,
+      versionId: this.mode === 'version' && issue[key] ? 0 : undefined,
+      sprintIssueIds: this.mode === 'sprint' && issue[key] ? [issueId] : undefined,
+      sprintId: this.mode === 'sprint' && issue[key] ? 0 : undefined,
       epicIssueIds: [issueId],
       epicId: 0,
     };

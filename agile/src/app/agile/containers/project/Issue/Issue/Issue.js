@@ -5,8 +5,12 @@ import {
   Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
 import {
-  Table, Button, Tooltip, Input, Dropdown, Menu, Pagination, Icon, Divider, Checkbox, Popover, Modal,
+  Table, Button, Tooltip, Input, Dropdown, Menu,
+  Pagination, Icon, Divider, Checkbox, Popover, Modal, Tag,
+  Form, DatePicker,
 } from 'choerodon-ui';
+import TimeAgo from 'timeago-react';
+import QuickSearch from '../../../../components/QuickSearch';
 import './Issue.scss';
 
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
@@ -25,10 +29,14 @@ import EmptyBlock from '../../../../components/EmptyBlock';
 const FileSaver = require('file-saver');
 
 const { AppState } = stores;
+const FormItem = Form.Item;
+const { RangePicker } = DatePicker;
 const { Column } = Table;
 const CheckboxGroup = Checkbox.Group;
+const { CheckableTag } = Tag;
 const { Sidebar } = Modal;
 
+@Form.create({})
 @observer
 class Issue extends Component {
   constructor(props) {
@@ -37,7 +45,7 @@ class Issue extends Component {
       expand: false,
       create: false,
       selectedIssue: {},
-      createIssue: false,
+      checkCreateIssue: false,
       selectIssueType: 'task',
       createIssueValue: '',
       createLoading: false,
@@ -49,11 +57,13 @@ class Issue extends Component {
   }
 
   getInit() {
-    const Request = this.GetRequest(this.props.location.search);
+    const { location } = this.props;
+    const Request = this.GetRequest(location.search);
     const {
       paramType, paramId, paramName, paramStatus,
       paramPriority, paramIssueType, paramIssueId, paramUrl, paramOpenIssueId,
     } = Request;
+    IssueStore.loadQuickSearch();
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
     IssueStore.setParamName(paramName);
@@ -117,19 +127,6 @@ class Issue extends Component {
       IssueStore.init();
       IssueStore.loadIssues();
     }
-
-    // if (paramOpenIssueId) {
-
-    //   IssueStore.setBarFilters(arr);
-    //   IssueStore.init();
-    //   IssueStore.loadIssues()
-    //     .then((res) => {
-    //       this.setState({
-    //         selectedIssue: res.content.length && res.content.filter(item => item.issueId === paramOpenIssueId)[0],
-    //         expand: true,
-    //       });
-    //     });
-    // }
   }
 
   GetRequest = (url) => {
@@ -142,7 +139,7 @@ class Issue extends Component {
       }
     }
     return theRequest;
-  }
+  };
 
   handleCreateIssue = (issueObj) => {
     const { history } = this.props;
@@ -155,10 +152,17 @@ class Issue extends Component {
     if (issueObj) {
       history.push(`/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}&paramName=${issueObj.issueNum}&paramIssueId=${issueObj.issueId}&paramOpenIssueId=${issueObj.issueId}`);
     }
-  }
+  };
 
-  handleIssueUpdate = (issueId = this.state.selectedIssue.issueId) => {
-    loadIssue(issueId).then((res) => {
+  handleIssueUpdate = (issueId) => {
+    const { selectedIssue } = this.state;
+    let Id;
+    if (!issueId) {
+      Id = selectedIssue.issueId;
+    } else {
+      Id = issueId;
+    }
+    loadIssue(Id).then((res) => {
       const obj = {
         assigneeId: res.assigneeId,
         assigneeName: res.assigneeName,
@@ -179,10 +183,11 @@ class Issue extends Component {
       originIssues[index] = obj;
       IssueStore.setIssues(originIssues);
     });
-  }
+  };
 
   handleBlurCreateIssue = () => {
-    if (this.state.createIssueValue !== '') {
+    const { createIssueValue, selectIssueType } = this.state;
+    if (createIssueValue !== '') {
       const { history } = this.props;
       const {
         type, id, name, organizationId,
@@ -195,10 +200,10 @@ class Issue extends Component {
             priorityCode: res.defaultPriorityCode || 'medium',
             projectId: AppState.currentMenuType.id,
             sprintId: 0,
-            summary: this.state.createIssueValue,
-            typeCode: this.state.selectIssueType,
+            summary: createIssueValue,
+            typeCode: selectIssueType,
             epicId: 0,
-            epicName: this.state.selectIssueType === 'issue_epic' ? this.state.createIssueValue : undefined,
+            epicName: selectIssueType === 'issue_epic' ? createIssueValue : undefined,
             parentIssueId: 0,
           };
           this.setState({
@@ -218,13 +223,13 @@ class Issue extends Component {
             });
         });
     }
-  }
+  };
 
   handleChangeType = ({ key }) => {
     this.setState({
       selectIssueType: key,
     });
-  }
+  };
 
   handlePageChange = (pagination, filters, sort, params) => {
     this.loadRole(pagination, sort, filters, params);
@@ -257,6 +262,7 @@ class Issue extends Component {
     });
     IssueStore.setBarFilters(barFilters);
     const { current, pageSize } = IssueStore.pagination;
+    debugger;
     IssueStore.setOrder(sorter.columnKey, sorter.order === 'ascend' ? 'asc' : 'desc');
     IssueStore.loadIssues(current - 1, pageSize);
   };
@@ -272,20 +278,6 @@ class Issue extends Component {
       });
   };
 
-  buttonRender = () => {
-    const content = (
-      <CheckboxGroup className="c7n-agile-quickSearch-popover" style={{ display: 'flex', flexDirection: 'column' }} />
-    );
-    return (
-      (
-        <Popover content={content} trigger="click">
-          <Button funcType="flat" icon="more_vert">
-            自定义筛选
-          </Button>
-        </Popover>
-      )
-    );
-  };
 
   MyTable = (props) => {
     const { expand } = this.state;
@@ -345,93 +337,28 @@ class Issue extends Component {
     return expand ? (<div {...props} style={{ marginRight: '10px' }} />) : (<td {...props} />);
   };
 
+  onlyMe = (checked) => {
+    debugger;
+    IssueStore.setSelectedQuickSearch({ assigneeId: checked ? AppState.userInfo.id : null });
+    IssueStore.loadIssues();
+  };
+
+  onlyStory = (checked) => {
+    debugger;
+    IssueStore.setSelectedQuickSearch({ onlyStory: checked });
+    IssueStore.loadIssues();
+  };
+
+  onChangeSelect = (checkedValues) => {
+    IssueStore.setSelectedQuickSearch({ quickFilterIds: checkedValues });
+    IssueStore.loadIssues();
+  };
+
   render() {
-    const { expand } = this.state;
-    const columns = [
-      {
-        title: '类型',
-        dataIndex: 'typeCode',
-        key: 'typeCode',
-        filters: [
-          {
-            text: '故事',
-            value: 'story',
-          },
-          {
-            text: '任务',
-            value: 'task',
-          },
-          {
-            text: '故障',
-            value: 'bug',
-          },
-          {
-            text: '史诗',
-            value: 'issue_epic',
-          },
-        ],
-        filterMultiple: true,
-      },
-      {
-        title: '经办人',
-        dataIndex: 'assigneeName',
-        key: 'assigneeName',
-        filters: [],
-      },
-      {
-        title: '编号',
-        dataIndex: 'issueNum',
-        key: 'issueNum',
-        filters: [],
-      },
-      {
-        title: '概要',
-        dataIndex: 'summary',
-        key: 'summary',
-        filters: [],
-      },
-      {
-        title: '优先级',
-        dataIndex: 'priorityName',
-        key: 'priorityName',
-        filters: [
-          {
-            text: '高',
-            value: 'high',
-          },
-          {
-            text: '中',
-            value: 'medium',
-          },
-          {
-            text: '低',
-            value: 'low',
-          },
-        ],
-        filterMultiple: true,
-      },
-      {
-        title: '状态',
-        dataIndex: 'statusName',
-        key: 'statusName',
-        filters: [
-          {
-            text: '待处理',
-            value: 'todo',
-          },
-          {
-            text: '进行中',
-            value: 'doing',
-          },
-          {
-            text: '已完成',
-            value: 'done',
-          },
-        ],
-        filterMultiple: true,
-        filteredValue: IssueStore.filteredInfo.statusCode || null,
-      }
-    ];
+    const {
+      expand, selectedIssue, createIssueValue,
+      selectIssueType, createLoading, create, checkCreateIssue,
+    } = this.state;
     const typeList = (
       <Menu
         style={{
@@ -484,47 +411,28 @@ class Issue extends Component {
           </Button>
         </Header>
         <Content style={{ display: 'flex', padding: '0', width: '100%' }}>
-          {/* <Spin spinning={IssueStore.loading}> */}
           <div
             className="c7n-content-issue"
             style={{
-              width: this.state.expand ? '28%' : '100%',
+              width: expand ? '28%' : '100%',
               display: 'block',
               overflowY: 'auto',
               overflowX: 'hidden',
             }}
           >
-            {/*// <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>*/}
-            {/*//   <div*/}
-            {/*//     style={{*/}
-            {/*//       display: 'flex',*/}
-            {/*//       width: '100%',*/}
-            {/*//       height: 44,*/}
-            {/*//       padding: '12px, 24px',*/}
-            {/*//     }}*/}
-            {/*//     className="c7n-scrumTools-left"*/}
-            {/*//   >*/}
-            {/*//     <p*/}
-            {/*//       className="c7n-scrumTools-filter"*/}
-            {/*//       role="none"*/}
-            {/*//     >*/}
-            {/*//       {'全部问题'}*/}
-            {/*//     </p>*/}
-            {/*//     <p*/}
-            {/*//       className="c7n-scrumTools-filter"*/}
-            {/*//       role="none"*/}
-                {/*>*/}
-                  {/*{'我的问题'}*/}
-                {/*</p>*/}
-                {/*{*/}
-                  {/*this.buttonRender()*/}
-                {/*}*/}
-              {/*</div>*/}
-            {/*</div>*/}
+            <QuickSearch
+              title={false}
+              buttonName="自定义筛选"
+              buttonIcon="more_vert"
+              moreSelection={IssueStore.getQuickSearch}
+              onChangeCheckBox={this.onChangeSelect}
+              onlyStory={this.onlyStory}
+              onlyMe={this.onlyMe}
+            />
             <section
-              className={`c7n-table ${this.state.expand ? 'expand-sign' : ''}`}
+              className={`c7n-table ${expand ? 'expand-sign' : ''}`}
               style={{
-                paddingRight: this.state.expand ? '0' : '24px',
+                paddingRight: expand ? '0' : '24px',
                 boxSizing: 'border-box',
                 width: '100%',
               }}
@@ -558,17 +466,18 @@ class Issue extends Component {
                         this.setState({
                           selectedIssue: record,
                           expand: true,
-                          createIssue: true,
+                          checkCreateIssue: true,
                         });
                       },
                     })
                     }
                     rowClassName={(record, index) => (
-                      record.issueId === this.state.selectedIssue && this.state.selectedIssue.issueId ? 'c7n-border-visible' : 'c7n-border')}
+                      record.issueId === selectedIssue && selectedIssue.issueId ? 'c7n-border-visible' : 'c7n-border')}
                   >
                     <Column
                       title="任务编号"
                       dataIndex="issueNum"
+                      width="128px"
                       key="issueId"
                       render={(text, record, index) => (
                         <Tooltip mouseEnterDelay={0.5} title={`任务编号： ${text}`}>
@@ -583,6 +492,7 @@ class Issue extends Component {
                     <Column
                       title="类型"
                       dataIndex="typeCode"
+                      width="128px"
                       key="typeCode"
                       align="center"
                       render={(text, record, index) => (
@@ -632,6 +542,7 @@ class Issue extends Component {
                     <Column
                       title="状态"
                       dataIndex="statusName"
+                      width="84px"
                       key="statusCode"
                       align="center"
                       render={(text, record) => (
@@ -665,6 +576,7 @@ class Issue extends Component {
                     <Column
                       title="优先级"
                       dataIndex="priorityName"
+                      width="96px"
                       key="priorityCode"
                       align="center"
                       render={(text, record) => (
@@ -692,6 +604,77 @@ class Issue extends Component {
                         ]
                       }
                       filterMultiple
+                    />
+                    <Column
+                      title="报告人"
+                      dataIndex="reporterName"
+                      width="128px"
+                      key="reporterId"
+                      align="center"
+                      render={(text, record) => (record.reporterId ? (
+                        <Tooltip mouseEnterDelay={0.5} title={`任务经办人： ${text}`}>
+                          <div style={{ marginRight: 12 }}>
+                            <UserHead
+                              user={{
+                                id: record.reporterId,
+                                loginName: '',
+                                realName: text,
+                                avatar: record.imageUrl,
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
+                      ) : null)}
+                      sorter
+                      filters={[]}
+                    />
+                    <Column
+                      title="任务经办人"
+                      dataIndex="assigneeName"
+                      width="128px"
+                      key="assigneeId"
+                      align="center"
+                      render={(text, record) => (record.assigneeId ? (
+                        <Tooltip mouseEnterDelay={0.5} title={`任务经办人： ${text}`}>
+                          <div style={{ marginRight: 12 }}>
+                            <UserHead
+                              user={{
+                                id: record.assigneeId,
+                                loginName: '',
+                                realName: text,
+                                avatar: record.imageUrl,
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
+                      ) : null)
+                      }
+                      sorter
+                      filters={[]}
+                    />
+                    <Column
+                      title="最后更新时间"
+                      dataIndex="lastUpdateDate"
+                      width="84px"
+                      key="lastUpdateDate"
+                      align="center"
+                      render={(text, record) => (
+                        <TimeAgo
+                          datetime={text}
+                          locale="zh_CN"
+                        />
+                      )}
+                      sorter
+                    />
+                    <Column
+                      title="版本"
+                      dataIndex="versionIssueRelDTOS"
+                      key="versionIssueRelDTOS"
+                      align="center"
+                      render={arr => arr.map(item => (
+                        <Tag color="blue">{item.name}</Tag>
+                      ))}
+                      filters={[]}
                     />
                     <Column
                       title="冲刺"
@@ -741,7 +724,7 @@ class Issue extends Component {
                     borderBottom: '1px solid #e8e8e8',
                   }}
                 >
-                  {this.state.createIssue ? (
+                  {checkCreateIssue ? (
                     <div className="c7n-add" style={{ display: 'block', width: '100%' }}>
                       <div style={{ display: 'flex' }}>
                         <Dropdown overlay={typeList} trigger={['click']}>
@@ -749,13 +732,13 @@ class Issue extends Component {
                             <div
                               className="c7n-sign"
                               style={{
-                                backgroundColor: TYPE[this.state.selectIssueType],
+                                backgroundColor: TYPE[selectIssueType],
                                 marginRight: 2,
                               }}
                             >
                               <Icon
                                 style={{ fontSize: '14px' }}
-                                type={ICON[this.state.selectIssueType]}
+                                type={ICON[selectIssueType]}
                               />
                             </div>
                             <Icon
@@ -767,7 +750,7 @@ class Issue extends Component {
                         <div style={{ marginLeft: 8, flexGrow: 1 }}>
                           <Input
                             autoFocus
-                            value={this.state.createIssueValue}
+                            value={createIssueValue}
                             placeholder="需要做什么？"
                             onChange={(e) => {
                               this.setState({
@@ -784,14 +767,14 @@ class Issue extends Component {
                           marginTop: 10,
                           display: 'flex',
                           marginLeft: 32,
-                          justifyContent: !this.state.expand ? 'flex-start' : 'flex-end',
+                          justifyContent: !expand ? 'flex-start' : 'flex-end',
                         }}
                       >
                         <Button
                           type="primary"
                           onClick={() => {
                             this.setState({
-                              createIssue: false,
+                              checkCreateIssue: false,
                             });
                           }}
                         >
@@ -799,7 +782,7 @@ class Issue extends Component {
                         </Button>
                         <Button
                           type="primary"
-                          loading={this.state.createLoading}
+                          loading={createLoading}
                           onClick={this.handleBlurCreateIssue.bind(this)}
                         >
                           {'确定'}
@@ -813,7 +796,7 @@ class Issue extends Component {
                       funcType="flat"
                       onClick={() => {
                         this.setState({
-                          createIssue: true,
+                          checkCreateIssue: true,
                           createIssueValue: '',
                         });
                       }}
@@ -849,21 +832,21 @@ class Issue extends Component {
           <div
             className="c7n-sidebar"
             style={{
-              width: this.state.expand ? '72%' : 0,
-              display: this.state.expand ? 'block' : 'none',
+              width: expand ? '72%' : 0,
+              display: expand ? 'block' : 'none',
               overflowY: 'hidden',
               overflowX: 'hidden',
             }}
           >
             {
-              this.state.expand ? (
+              expand ? (
                 <EditIssue
-                  issueId={this.state.selectedIssue && this.state.selectedIssue.issueId}
+                  issueId={selectedIssue && selectedIssue.issueId}
                   onCancel={() => {
                     this.setState({
                       expand: false,
                       selectedIssue: {},
-                      createIssue: false,
+                      checkCreateIssue: false,
                     });
                   }}
                   onDeleteIssue={() => {
@@ -884,9 +867,9 @@ class Issue extends Component {
             }
           </div>
           {
-            this.state.create ? (
+            create ? (
               <CreateIssue
-                visible={this.state.create}
+                visible={create}
                 onCancel={() => this.setState({ create: false })}
                 onOk={this.handleCreateIssue.bind(this)}
 

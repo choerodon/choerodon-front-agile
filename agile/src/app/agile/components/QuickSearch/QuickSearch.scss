@@ -1,0 +1,51 @@
+.ant-tag-checkable {
+  &,
+  a,
+  a:hover {
+    color: #000;
+  }
+  &:active,
+  &-checked {
+    color: #fff;
+  }
+}
+.c7n-agile {
+  &-quickSearch {
+    &-container {
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+      padding: 0 17px;
+      border-bottom: 1px solid #d3d3d3;
+      height: 44px;
+    }
+    &-tag {
+      font-size: 14px;
+      height: 28px;
+      line-height: 28px;
+    }
+    &-left {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    &-filter {
+      margin-bottom: 0;
+      font-size: 14px;
+    }
+    &-clicker {
+      white-space: nowrap;
+      padding: 0 8px;
+      line-height: 32px;
+      margin-right: 18px;
+    }
+    &-clicker:focus, &-clicker:active {
+      background-color: #3f51b5;
+    }
+    &-popover {
+      .ant-checkbox-group-item {
+        margin-bottom: 5px;
+      }
+    }
+  }
+}
