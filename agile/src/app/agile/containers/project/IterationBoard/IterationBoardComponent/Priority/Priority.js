@@ -56,28 +56,20 @@ class Priority extends Component {
     if (!sprintId) {
       this.setState({
         loading: false,
-        priorityInfo: {},
+        priorityInfo: [],
       });
     } else {
       this.setState({ loading: true });
       const projectId = AppState.currentMenuType.id;
-      axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/priority?sprintId=${sprintId}`)
+      const orgId = AppState.currentMenuType.organizationId;
+      axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/priority?organizationId=${orgId}&sprintId=${sprintId}`)
         .then((res) => {
-          const priorityInfo = this.transformPriority(res);
           this.setState({
-            priorityInfo,
+            priorityInfo: res,
             loading: false,
           });
         });
     }
-  }
-
-  transformPriority(priorityArr) {
-    const result = {};
-    priorityArr.forEach((v) => {
-      result[v.priorityCode] = v;
-    });
-    return result;
   }
 
   renderContent() {
@@ -99,11 +91,7 @@ class Priority extends Component {
         </div>
       );
     }
-    if (
-      !priorityInfo.high.totalNum
-      && !priorityInfo.medium.totalNum
-      && !priorityInfo.low.totalNum
-    ) {
+    if (priorityInfo.length === 0) {
       return (
         <div className="loading-wrap">
           <EmptyBlockDashboard
@@ -117,35 +105,34 @@ class Priority extends Component {
       <div className="lists">
         <h3 className="title">已完成/总计数</h3>
         {
-          ['high', 'medium', 'low'].map(priority => this.renderList(priority))
+          priorityInfo.map(priority => this.renderList(priority))
         }
       </div>
     );
   }
 
   renderList(priority) {
-    const { priorityInfo } = this.state;
     return (
-      <div className="list" key={priority}>
+      <div className="list" key={priority.priorityDTO.id}>
         <div className="tip">
-          {`${priorityInfo[priority].completedNum}/${priorityInfo[priority].totalNum}`}
+          {`${priority.completedNum}/${priority.totalNum}`}
         </div>
         <div className="body">
           <div>
             <PriorityTag
-              priority={priority}
+              priority={priority.priorityDTO}
             />
           </div>
           <div className="progress">
             <div
               className="progress-bg"
-              style={{ background: PRIORITY_MAP[priority].bgColor }}
+              style={{ background: `${priority.priorityDTO.colour}4C` }}
             />
             <div
               className="progress-inner"
               style={{
-                background: PRIORITY_MAP[priority].color,
-                width: `${priorityInfo[priority].completedNum / priorityInfo[priority].totalNum * 100}%`,
+                background: priority.priorityDTO.colour,
+                width: `${priority.completedNum / priority.totalNum * 100}%`,
               }}
             />
           </div>

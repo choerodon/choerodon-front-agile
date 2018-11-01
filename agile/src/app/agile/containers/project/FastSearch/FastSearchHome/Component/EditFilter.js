@@ -76,6 +76,7 @@ class AddComponent extends Component {
 
   loadQuickFilter() {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     const OPTION_FILTER = {
       assignee: {
         url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
@@ -84,7 +85,7 @@ class AddComponent extends Component {
         name: 'realName',
       },
       priority: {
-        url: `/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`,
+        url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
         prop: 'lookupValues',
         id: 'valueCode',
         name: 'name',
@@ -131,7 +132,7 @@ class AddComponent extends Component {
       },
     };
     axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`).then(res => this.setState({ originUsers: res.content }));
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`).then(res => this.setState({ originPriorities: res.lookupValues }));
+    axios.get(`/issue/v1/organizations/${orgId}/priority/list_by_org`).then(res => this.setState({ originPriorities: res.lookupValues }));
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`).then(res => this.setState({ originStatus: res }));
     axios.get(`/agile/v1/projects/${projectId}/issues/epics/select_data`).then(res => this.setState({ originEpics: res }));
     axios.post(`/agile/v1/projects/${projectId}/sprint/names`).then(res => this.setState({ originSprints: res }));
@@ -193,6 +194,7 @@ class AddComponent extends Component {
 
   transformInitialValue(index, filter, operation, value) {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     const OPTION_FILTER = {
       assignee: {
         url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
@@ -202,7 +204,7 @@ class AddComponent extends Component {
         state: 'originUsers',
       },
       priority: {
-        url: `/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`,
+        url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
         prop: 'lookupValues',
         id: 'valueCode',
         name: 'name',
@@ -481,6 +483,7 @@ class AddComponent extends Component {
 
   tempOption = (filter, addEmpty) => {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     const OPTION_FILTER = {
       assignee: {
         url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
@@ -490,7 +493,7 @@ class AddComponent extends Component {
         state: 'originUsers',
       },
       priority: {
-        url: `/agile/v1/projects/${AppState.currentMenuType.id}/lookup_values/priority`,
+        url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
         prop: 'lookupValues',
         id: 'valueCode',
         name: 'name',

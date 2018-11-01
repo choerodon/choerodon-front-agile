@@ -318,7 +318,7 @@ class StatusIssue extends Component {
     const ifClickMe = String(clickItem.issueId) === String(item.issueId);
 
     const {
-      isCompleted, statusName, categoryCode, swimLaneCode,
+      isCompleted, statusName, categoryCode, swimLaneCode, statusId,
     } = this.props;
     if (this.renderSubDisplay(item, type) === 'block') {
       return (
@@ -336,6 +336,8 @@ class StatusIssue extends Component {
             draggableId={JSON.stringify({
               objectVersionNumber: item.objectVersionNumber,
               issueId: item.issueId,
+              typeId: item.issueTypeDTO.id,
+              statusId,
             })}
             index={index}
           >
@@ -410,10 +412,15 @@ class StatusIssue extends Component {
                             <div
                               className="c7n-scrumboard-issueIcon"
                               style={{
-                                background: this.renderTypeCode('background', item),
+                                background: item.issueTypeDTO ? item.issueTypeDTO.colour : '#fab614',
                               }}
                             >
-                              {this.renderTypeCode('icon', item)}
+                              <Tooltip title={item.issueTypeDTO ? item.issueTypeDTO.name : ''}>
+                                <Icon
+                                  className="c7n-issueType-icon"
+                                  type={item.issueTypeDTO ? item.issueTypeDTO.icon : 'help'}
+                                />
+                              </Tooltip>
                             </div>
                             <p
                               style={{ marginLeft: 5, textDecoration: isCompleted ? 'line-through' : '' }}
@@ -447,19 +454,19 @@ class StatusIssue extends Component {
                                 {statusName}
                               </p>
                             </Tooltip>
-                            <Tooltip title={`优先级: ${item.priorityName}`}>
+                            <Tooltip title={`优先级: ${item.priorityDTO.name}`}>
                               <p
                                 style={{
                                   flexBasis: '20px',
-                                  background: this.renderPriorityStyle('background', item),
-                                  color: this.renderPriorityStyle('color', item),
+                                  background: `${item.priorityDTO.colour}4C`,
+                                  color: item.priorityDTO.colour,
                                   textAlign: 'center',
                                   marginLeft: '8px',
                                   height: 20,
                                   borderRadius: 2,
                                 }}
                               >
-                                {item.priorityName}
+                                {item.priorityDTO.name}
                               </p>
                             </Tooltip>
                           </div>

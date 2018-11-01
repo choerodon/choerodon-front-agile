@@ -122,7 +122,8 @@ class EpicReportStore {
   }
 
   loadEpics() {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`)
+    const orgId = AppState.currentMenuType.organizationId;
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics?organizationId=${orgId}`)
       .then((res) => {
         this.setEpicFinishLoading(true);
         this.setEpics(res);
@@ -145,7 +146,8 @@ class EpicReportStore {
 
   loadTableData(epicId = this.currentEpicId) {
     this.setTableLoading(true);
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/burn_down_report_type/${epicId}?type=Epic`)
+    const orgId = AppState.currentMenuType.organizationId;
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/burn_down_report_type/${epicId}?organizationId=${orgId}&type=Epic`)
       .then((res) => {
         this.setTableData(res);
         this.setTableLoading(false);

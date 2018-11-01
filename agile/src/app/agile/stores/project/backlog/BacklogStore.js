@@ -54,6 +54,9 @@ class BacklogStore {
     workHolidayCalendarDTOS: [],
   };
 
+  @observable issueTypes = [];
+
+  @observable defaultPriority = false;
 
   @computed get asJson() {
     return {
@@ -180,7 +183,7 @@ class BacklogStore {
   }
 
   axiosGetIssueDetail(issueId) {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/${issueId}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/${issueId}?organizationId=${AppState.currentMenuType.organizationId}`);
   }
 
   @computed get getOpenSprintDetail() {
@@ -350,7 +353,8 @@ class BacklogStore {
   }
 
   axiosGetSprint(data) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?quickFilterIds=${this.quickFilters}`, data);
+    const orgId = AppState.currentMenuType.organizationId;
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?organizationId=${orgId}&quickFilterIds=${this.quickFilters}`, data);
   }
 
   handleEpicDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data);
@@ -382,6 +386,44 @@ class BacklogStore {
 
   @action setMore() {
     this.more = !this.more;
+  }
+
+  @computed get getIssueTypes() {
+    return this.issueTypes.slice();
+  }
+
+  @action setIssueTypes(data) {
+    this.issueTypes = data;
+  }
+
+  axiosGetIssueTypes() {
+    const proId = AppState.currentMenuType.id;
+    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types?scheme_type=agile`).then((data) => {
+      if (data && !data.failed) {
+        this.setIssueTypes(data);
+      } else {
+        this.setIssueTypes([]);
+      }
+    });
+  }
+
+  @computed get getDefaultPriority() {
+    return this.defaultPriority;
+  }
+
+  @action setDefaultPriority(data) {
+    this.defaultPriority = data;
+  }
+
+  axiosGetDefaultPriority() {
+    const orgId = AppState.currentMenuType.organizationId;
+    return axios.get(`/issue/v1/organizations/${orgId}/priority/default`).then((data) => {
+      if (data && !data.failed) {
+        this.setDefaultPriority(data);
+      } else {
+        this.setDefaultPriority(false);
+      }
+    });
   }
 }
 

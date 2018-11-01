@@ -74,8 +74,9 @@ export function loadSprint(sprintId) {
 }
 
 export function loadSprintIssues(sprintId, status, page = 0, size = 99999) {
+  const orgId = AppState.currentMenuType.organizationId;
   const projectId = AppState.currentMenuType.id;
-  return axios.get(`/agile/v1/projects/${projectId}/sprint/${sprintId}/issues?status=${status}&page=${page}&size=${size}`);
+  return axios.get(`/agile/v1/projects/${projectId}/sprint/${sprintId}/issues?organizationId=${orgId}&status=${status}&page=${page}&size=${size}`);
 }
 
 export function loadChartData(id, type) {
@@ -83,22 +84,23 @@ export function loadChartData(id, type) {
   return axios.get(`/agile/v1/projects/${projectId}/reports/${id}/burn_down_report?type=${type}`);
 }
 
-export function loadStatus() {
+export function loadStatus(statusId, issueId, typeId) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(
-    `/agile/v1/projects/${projectId}/issue_status/list`,
+    `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&scheme_type=agile`,
   );
 }
 
+// 调用issue服务
 export function loadPriorities() {
   const projectId = AppState.currentMenuType.id;
-  return axios.get(
-    `/agile/v1/projects/${projectId}/lookup_values/priority`,
-  );
+  const orgId = AppState.currentMenuType.organizationId;
+  return axios.get(`/issue/v1/organizations/${orgId}/priority/list_by_org`);
 }
 
 export function loadIssue(issueId, projectId = AppState.currentMenuType.id) {
-  return axios.get(`/agile/v1/projects/${projectId}/issues/${issueId}`);
+  const orgId = AppState.currentMenuType.organizationId;
+  return axios.get(`/agile/v1/projects/${projectId}/issues/${issueId}?organizationId=${orgId}`);
 }
 
 export function loadSubtask(issueId, projectId = AppState.currentMenuType.id) {
@@ -110,6 +112,10 @@ export function updateIssue(data, projectId = AppState.currentMenuType.id) {
   //   return axios.put(`agile/v1/projects/${projectId}/issues/sub_issue`, data);
   // }
   return axios.put(`/agile/v1/projects/${projectId}/issues`, data);
+}
+
+export function updateStatus(transformId, issueId, objVerNum, proId = AppState.currentMenuType.id) {
+  return axios.put(`/agile/v1/projects/${proId}/issues/update_status?transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objVerNum}`);
 }
 
 export function createSubIssue(issueId, obj, projectId = AppState.currentMenuType.id) {
@@ -154,16 +160,18 @@ export function deleteWorklog(logId, projectId = AppState.currentMenuType.id) {
 }
 
 export function updateIssueType(data, projectId = AppState.currentMenuType.id) {
+  const orgId = AppState.currentMenuType.organizationId;
   const issueUpdateTypeDTO = {
     projectId,
     ...data,
   };
-  return axios.post(`/agile/v1/projects/${projectId}/issues/update_type`, issueUpdateTypeDTO);
+  return axios.post(`/agile/v1/projects/${projectId}/issues/update_type?organizationId=${orgId}`, issueUpdateTypeDTO);
 }
 
 export function loadIssues(page = 0, size = 10, searchDTO, orderField, orderType) {
+  const orgId = AppState.currentMenuType.organizationId;
   const projectId = AppState.currentMenuType.id;
-  return axios.post(`/agile/v1/projects/${projectId}/issues/include_sub?page=${page}&size=${size}`, searchDTO, {
+  return axios.post(`/agile/v1/projects/${projectId}/issues/include_sub?organizationId=${orgId}&page=${page}&size=${size}`, searchDTO, {
     params: {
       sort: `${orderField && orderType ? `${orderField},${orderType}` : ''}`,
     },

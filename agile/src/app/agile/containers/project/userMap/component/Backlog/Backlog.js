@@ -248,8 +248,7 @@ class Backlog extends Component {
               </div>
               <span className="type">
                 <TypeTag
-                  typeCode={issue.typeCode}
-                  isDone={issue.statusCode === 'done'}
+                  data={issue.issueTypeDTO}
                 />
               </span>
               <span

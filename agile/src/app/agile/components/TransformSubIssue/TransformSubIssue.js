@@ -146,7 +146,7 @@ class TransformSubIssue extends Component {
                       <div style={{ display: 'inline-flex', width: '100%', flex: 1 }}>
                         <div>
                           <TypeTag
-                            typeCode={issue.typeCode}
+                            data={issue.issueTypeDTO}
                           />
                         </div>
                         <a style={{ paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

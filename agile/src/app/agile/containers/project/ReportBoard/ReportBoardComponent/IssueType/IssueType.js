@@ -64,10 +64,11 @@ class IssueType extends Component {
 
   loadData = () => {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     this.setState({
       loading: true,
     });
-    axios.get(`/agile/v1/projects/${projectId}/reports/pie_chart?fieldName=typeCode`)
+    axios.get(`/agile/v1/projects/${projectId}/reports/pie_chart?organizationId=${orgId}&fieldName=typeCode`)
       .then((res) => {
         this.setState({
           loading: false,

@@ -1846,9 +1846,7 @@ class Home3 extends Component {
                         </Button>
                       )}
                   </React.Fragment>
-
                 ) }
-
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Tooltip title="todo">

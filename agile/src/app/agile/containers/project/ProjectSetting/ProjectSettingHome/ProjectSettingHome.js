@@ -25,18 +25,15 @@ class ProjectSetting extends Component {
       origin: {},
       loading: false,
       couldUpdate: false,
-      originPriorities: [],
       originUsers: [],
 
       code: undefined,
-      priorityCode: undefined,
       strategy: undefined,
       assignee: undefined,
     };
   }
 
   componentDidMount() {
-    this.loadPriorities();
     this.getProjectSetting();
   }
 
@@ -55,12 +52,10 @@ class ProjectSetting extends Component {
         this.setState({
           origin: res,
           code: res.projectCode,
-          priorityCode: res.defaultPriorityCode,
           strategy: res.defaultAssigneeType,
         });
         this.props.form.setFieldsValue({
           code: res.projectCode,
-          priorityCode: res.defaultPriorityCode,
           strategy: res.defaultAssigneeType,
         });
         if (res.defaultAssigneeId) {
@@ -79,7 +74,7 @@ class ProjectSetting extends Component {
   loadPriorities() {
     loadPriorities().then((res) => {
       this.setState({
-        originPriorities: res.lookupValues,
+        originPriorities: res,
       });
     });
   }
@@ -94,18 +89,6 @@ class ProjectSetting extends Component {
         assignee: assigneeId,
       });
     });
-  }
-
-  transformPriorityCode(originpriorityCode) {
-    if (!originpriorityCode.length) {
-      return [];
-    } else {
-      const arr = [];
-      arr[0] = _.find(originpriorityCode, { valueCode: 'high' });
-      arr[1] = _.find(originpriorityCode, { valueCode: 'medium' });
-      arr[2] = _.find(originpriorityCode, { valueCode: 'low' });
-      return arr;
-    }
   }
 
   onFilterChange(input) {
@@ -176,7 +159,6 @@ class ProjectSetting extends Component {
         const projectInfoDTO = {
           ...this.state.origin,
           projectCode: values.code,
-          defaultPriorityCode: values.priorityCode,
           defaultAssigneeType: values.strategy,
           defaultAssigneeId: values.assignee || 0,
         };
@@ -185,16 +167,19 @@ class ProjectSetting extends Component {
         });
         axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`, projectInfoDTO)
           .then((res) => {
-            this.setState({
-              origin: res,
-              loading: false,
-              couldUpdate: false,
-              code: res.projectCode,
-              priorityCode: res.defaultPriorityCode,
-              strategy: res.defaultAssigneeType,
-              assignee: res.defaultAssigneeId,
-            });
-            Choerodon.prompt('修改成功');
+            if (res.failed) {
+              Choerodon.prompt(res.message);
+            } else {
+              this.setState({
+                origin: res,
+                loading: false,
+                couldUpdate: false,
+                code: res.projectCode,
+                strategy: res.defaultAssigneeType,
+                assignee: res.defaultAssigneeId,
+              });
+              Choerodon.prompt('修改成功');
+            }
           })
           .catch((error) => {
             this.setState({
@@ -243,36 +228,6 @@ class ProjectSetting extends Component {
                     label="项目编码"
                     maxLength={5}
                   />,
-                )}
-              </FormItem>
-              <FormItem label="默认优先级" style={{ width: 512 }}>
-                {getFieldDecorator('priorityCode', {
-                  rules: [{ required: true, message: '优先级为必选项' }],
-                  initialValue: this.state.priorityCode,
-                })(
-                  <Select
-                    label="默认优先级"
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                    loading={this.state.selectLoading}
-                  >
-                    {this.transformPriorityCode(this.state.originPriorities).map(type => (
-                      <Option key={type.valueCode} value={type.valueCode}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
-                          <div
-                            style={{
-                              color: COLOR[type.valueCode].color, width: 20, height: 20, textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: 8, 
-                            }}
-                          >
-                            <Icon
-                              type="flag"
-                              style={{ fontSize: '13px' }}
-                            />
-                          </div>
-                          <span>{type.name}</span>
-                        </div>
-                      </Option>
-                    ))}
-                  </Select>,
                 )}
               </FormItem>
               <FormItem label="默认经办人策略" style={{ width: 512, marginBottom: 0 }}>

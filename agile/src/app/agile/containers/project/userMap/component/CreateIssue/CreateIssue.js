@@ -40,7 +40,6 @@ class CreateIssue extends Component {
       const issue = {
         epicId: data.epicId,
         parentIssueId: 0,
-        priorityCode: 'medium',
         sprintId: data.sprintId,
         summary,
         typeCode: selectIssueType,
@@ -89,7 +88,7 @@ class CreateIssue extends Component {
             <Menu.Item key={type}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
-                  typeCode={type}
+                  data=""
                   showName
                 />
               </div>
@@ -121,7 +120,7 @@ class CreateIssue extends Component {
               <div style={{ display: 'flex', alignItem: 'center' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <TypeTag
-                    typeCode={selectIssueType}
+                    data={selectIssueType}
                     showName
                   />
                 </div>

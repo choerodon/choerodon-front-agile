@@ -170,25 +170,11 @@ class SettingColumn extends Component {
                   ) : (
                     <div>
                       <span style={{ cursor: 'pointer' }}>
-
-
-
-
-
-
-
-最大值：
+                        最大值：
                         {this.props.data.maxNum}
                       </span>
                       <span style={{ cursor: 'pointer' }}>
-
-
-
-
-
-
-
-最小值：
+                        最小值：
                         {this.props.data.maxNum}
                       </span>
                     </div>
@@ -306,23 +292,7 @@ class SettingColumn extends Component {
                             <span
                               style={{ cursor: 'pointer', minWidth: '110px' }}
                             >
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-最大值：
+                              最大值：
                               {this.props.data.maxNum || '没有最大'}
 
                             </span>
@@ -339,23 +309,7 @@ class SettingColumn extends Component {
                             <span
                               style={{ cursor: 'pointer', minWidth: '110px' }}
                             >
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-最小值：
+                              最小值：
                               {this.props.data.minNum || '没有最小'}
 
                             </span>

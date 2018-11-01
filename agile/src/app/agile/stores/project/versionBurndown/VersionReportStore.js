@@ -145,7 +145,8 @@ class VersionReportStore {
 
   loadTableData(versionId = this.currentVersionId) {
     this.setTableLoading(true);
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/burn_down_report_type/${versionId}?type=Version`)
+    const orgId = AppState.currentMenuType.organizationId;
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/burn_down_report_type/${versionId}?organizationId=${orgId}&type=Version`)
       .then((res) => {
         this.setTableData(res);
         this.setTableLoading(false);

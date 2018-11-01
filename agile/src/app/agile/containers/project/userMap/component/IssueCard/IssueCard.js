@@ -167,11 +167,13 @@ class IssueCard extends Component {
         assigneeId,
         assigneeName,
         imageUrl,
-        priorityCode,
+        priorityDTO,
         typeCode,
+        issueTypeDTO,
         storyPoints,
         statusName,
         statusColor,
+        statusMapDTO,
         issueNum,
       },
     } = this.state;
@@ -257,7 +259,7 @@ class IssueCard extends Component {
                     {issueNum}
                   </span>
                   <PriorityTag
-                    priority={priorityCode}
+                    priority={priorityDTO}
                   />
                 </div>
                 <Icon
@@ -281,7 +283,7 @@ class IssueCard extends Component {
               </div>
               <div className="c7n-footer">
                 <TypeTag
-                  typeCode={typeCode}
+                  data={issueTypeDTO}
                 />
                 <span className="c7n-issueCard-storyPoints">
                   {storyPoints}
@@ -289,6 +291,7 @@ class IssueCard extends Component {
                 <StatusTag
                   name={statusName}
                   color={statusColor}
+                  data={statusMapDTO}
                 />
               </div>
             </div>

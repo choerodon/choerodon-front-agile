@@ -176,7 +176,7 @@ class ReleaseDetail extends Component {
             <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.typeCode}`}>
               <div>
                 <TypeTag
-                  typeCode={record.typeCode}
+                  data={record.issueTypeDTO}
                   showName
                 />
               </div>
@@ -192,7 +192,7 @@ class ReleaseDetail extends Component {
             <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityName}`}>
               <div style={{ marginRight: 12 }}>
                 <PriorityTag
-                  priority={record.priorityCode}
+                  priority={record.priorityDTO}
                 />
               </div>
             </Tooltip>

@@ -4,33 +4,9 @@ import { Tooltip } from 'choerodon-ui';
 import _ from 'lodash';
 import Typetag from '../../../../../components/TypeTag';
 import UserHead from '../../../../../components/UserHead';
+import { STATUS } from '../../../../../common/Constant';
 
 class IssueItem extends Component {
-  /**
-   *渲染优先级样式
-   *
-   * @param {*} type
-   * @param {*} item
-   * @returns
-   * @memberof SprintIssue
-   */
-  renderPriorityStyle =(type, item) => {
-    if (type === 'color') {
-      if (item.priorityCode === 'medium') {
-        return 'rgb(53, 117, 223)';
-      } else if (item.priorityCode === 'high') {
-        return '#f44336';
-      } else {
-        return 'rgba(0, 0, 0, 0.36)';
-      }
-    } else if (item.priorityCode === 'medium') {
-      return 'rgba(77, 144, 254, 0.2)';
-    } else if (item.priorityCode === 'high') {
-      return 'rgba(244, 67, 54, 0.2)';
-    } else {
-      return 'rgba(0, 0, 0, 0.08)';
-    }
-  }
   /**
    *渲染issue背景色
    *
@@ -124,7 +100,7 @@ class IssueItem extends Component {
                   }}
                 >
                   <Typetag
-                    typeCode={item.typeCode}
+                    data={item.issueTypeDTO}
                   />
                   <div
                     label="sprintIssue"
@@ -156,21 +132,23 @@ class IssueItem extends Component {
                     <div
                       style={{
                         maxWidth: 34,
-                        marginLeft: !_.isNull(item.priorityName) && !this.renderIssueDisplay() ? '12px' : 0,
+                        marginLeft: !_.isNull(item.priorityDTO && item.priorityDTO.name) && !this.renderIssueDisplay() ? '12px' : 0,
                       }}
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {!_.isNull(item.priorityName) ? (
-                        <Tooltip title={`优先级: ${item.priorityName}`}>
+                      {!_.isNull(item.priorityDTO && item.priorityDTO.name) ? (
+                        <Tooltip title={`优先级: ${item.priorityDTO ? item.priorityDTO.name : ''}`}>
                           <span
                             label="sprintIssue"
                             className="c7n-backlog-sprintIssuePriority"
                             style={{
-                              color: this.renderPriorityStyle('color', item),
-                              background: this.renderPriorityStyle('background', item),
+                              color: item.priorityDTO ? item.priorityDTO.colour : '#FFFFFF',
+                              background: `${item.priorityDTO ? item.priorityDTO.colour : 'FFFFFF'}4C`,
                             }}
-                          >{item.priorityName}</span>
+                          >
+                            {item.priorityDTO ? item.priorityDTO.name : ''}
+                          </span>
                         </Tooltip>
                       ) : ''}
                     </div>
@@ -245,20 +223,22 @@ class IssueItem extends Component {
                     <div
                       style={{
                         width: 60,
-                        marginLeft: !_.isNull(item.statusName) ? '12px' : 0,
+                        marginLeft: !_.isNull(item.statusMapDTO && item.statusMapDTO.name) ? '12px' : 0,
                       }}
                       label="sprintIssue"
                       className="c7n-backlog-sprintIssueRight"
                     >
-                      {!_.isNull(item.statusName) ? (
-                        <Tooltip title={`状态: ${item.statusName}`}>
+                      {!_.isNull(item.statusMapDTO && item.statusMapDTO.name) ? (
+                        <Tooltip title={`状态: ${item.statusMapDTO ? item.statusMapDTO.name : ''}`}>
                           <span
                             label="sprintIssue"
                             className="c7n-backlog-sprintIssueStatus"
                             style={{
-                              background: item.statusColor ? item.statusColor : '#4d90fe',
+                              background: item.statusMapDTO ? STATUS[item.statusMapDTO.type] : '#4d90fe',
                             }}
-                          >{item.statusName}</span>
+                          >
+                            {item.statusMapDTO ? item.statusMapDTO.name : ''}
+                          </span>
                         </Tooltip>
                       ) : ''}
                     </div>

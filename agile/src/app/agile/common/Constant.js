@@ -28,9 +28,9 @@ export const TYPE = {
 };
 
 export const ICON = {
-  story: 'turned_in',
+  story: 'book',
   bug: 'bug_report',
-  task: 'assignment',
+  task: 'check',
   issue_epic: 'priority',
   sub_task: 'relation',
 };

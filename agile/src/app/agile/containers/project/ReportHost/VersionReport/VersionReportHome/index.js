@@ -15,6 +15,7 @@ import './VersionReportHome.scss';
 import NoDataComponent from '../../Component/noData';
 import versionSvg from '../../Home/style/pics/no_version.svg';
 import SwithChart from '../../Component/switchChart';
+import { STATUS } from '../../../../../common/Constant';
 
 const { AppState } = stores;
 const Option = Select.Option;
@@ -400,7 +401,7 @@ class VersionReport extends Component {
   }
 
   renderTypecode(item, type) {
-    if (item.typeCode === 'story') {
+    if (item.issueTypeDTO.typeCode === 'story') {
       if (type === 'background') {
         return '#00BFA5';
       } else {
@@ -411,7 +412,7 @@ class VersionReport extends Component {
         );
       }
     }
-    if (item.typeCode === 'task') {
+    if (item.issueTypeDTO.typeCode === 'task') {
       if (type === 'background') {
         return '#4D90FE';
       } else {
@@ -422,7 +423,7 @@ class VersionReport extends Component {
         );
       }
     }
-    if (item.typeCode === 'bug') {
+    if (item.issueTypeDTO.typeCode === 'bug') {
       if (type === 'background') {
         return '#F44336';
       } else {
@@ -433,7 +434,7 @@ class VersionReport extends Component {
         );
       }
     }
-    if (item.typeCode === 'issue_epic') {
+    if (item.issueTypeDTO.typeCode === 'issue_epic') {
       if (type === 'background') {
         return 'rgb(116, 59, 231)';
       } else {
@@ -446,24 +447,6 @@ class VersionReport extends Component {
     }
     return '';
   }
-
-  renderPriorityStyle(type, item) {
-    if (type === 'color') {
-      if (item.priorityCode === 'medium') {
-        return 'rgb(53, 117, 223)';
-      } else if (item.priorityCode === 'high') {
-        return 'rgb(255, 177, 0)';
-      } else {
-        return 'rgba(0, 0, 0, 0.36)';
-      }
-    } else if (item.priorityCode === 'medium') {
-      return 'rgba(77, 144, 254, 0.2)';
-    } else if (item.priorityCode === 'high') {
-      return 'rgba(255, 177, 0, 0.12)';
-    } else {
-      return 'rgba(0, 0, 0, 0.08)';
-    }
-  }
   
   renderTabTable(type) {
     const columns = [{
@@ -471,7 +454,7 @@ class VersionReport extends Component {
       dataIndex: 'issueNum',
       key: 'issueNum',
       render: (text, record) => (
-<span 
+      <span
         style={{ 
           color: '#3F51B5',
           cursor: 'pointer',
@@ -482,8 +465,9 @@ class VersionReport extends Component {
           const urlParams = AppState.currentMenuType;
           history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${text}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
         }}
-      >{text}</span>
-),
+      >
+        {text}
+      </span>),
     }, {
       title: '概要',
       dataIndex: 'summary',
@@ -520,8 +504,8 @@ class VersionReport extends Component {
       render: (text, record) => (
         <span
           style={{
-            color: this.renderPriorityStyle('color', record),
-            background: this.renderPriorityStyle('background', record),
+            color: record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF',
+            background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}4C`,
             padding: '1px 4px',
           }}
         >
@@ -537,13 +521,12 @@ class VersionReport extends Component {
           label="sprintIssue" 
           className="c7n-backlog-sprintIssueStatus"
           style={{
-            background: record.statusColor ? record.statusColor : '#4d90fe',
+            background: record.statusMapDTO ? STATUS[record.statusMapDTO.type] : '#4d90fe',
             color: 'white',
             padding: '4px 6px',
           }}
         >
-{text}
-
+          {record.statusMapDTO.name}
         </span>
       ),
     }, {

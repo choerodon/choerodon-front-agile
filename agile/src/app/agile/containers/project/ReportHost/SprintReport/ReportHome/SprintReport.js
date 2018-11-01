@@ -21,6 +21,7 @@ import StatusTag from '../../../../../components/StatusTag';
 import PriorityTag from '../../../../../components/PriorityTag';
 import TypeTag from '../../../../../components/TypeTag';
 import './ReleaseDetail.scss';
+import { STATUS } from '../../../../../common/Constant';
 
 
 const { AppState } = stores;
@@ -572,7 +573,7 @@ class SprintReport extends Component {
             <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.typeCode}`}>
               <div>
                 <TypeTag
-                  typeCode={record.typeCode}
+                  data={record.issueTypeDTO}
                   showName
                 />
               </div>
@@ -582,13 +583,13 @@ class SprintReport extends Component {
       }, {
         width: '15%',
         title: '优先级',
-        dataIndex: 'priorityCode',
-        render: (priorityCode, record) => (
+        dataIndex: 'priorityId',
+        render: (priorityId, record) => (
           <div>
             <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityName}`}>
               <div style={{ marginRight: 12 }}>
                 <PriorityTag
-                  priority={record.priorityCode}
+                  priority={record.priorityDTO}
                 />
               </div>
             </Tooltip>
@@ -600,12 +601,12 @@ class SprintReport extends Component {
         dataIndex: 'statusCode',
         render: (statusCode, record) => (
           <div>
-            <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusName}`}>
+            <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusMapDTO.name}`}>
               <div>
                 <StatusTag
                   style={{ display: 'inline-block' }}
-                  name={record.statusName}
-                  color={record.statusColor}
+                  name={record.statusMapDTO.name}
+                  color={STATUS[record.statusMapDTO.type]}
                 />
               </div>
             </Tooltip>

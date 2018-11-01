@@ -23,6 +23,7 @@ import sprintIcon from './sprintIcon.svg';
 import storyPointIcon from './storyPointIcon.svg';
 import completed from './completed.svg';
 import './EpicReport.scss';
+import { STATUS } from '../../../../common/Constant';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -464,7 +465,7 @@ class EpicBurndown extends Component {
           render: (typeCode, record) => (
             <div>
               <TypeTag
-                typeCode={record.typeCode}
+                data={record.issueTypeDTO}
                 showName
               />
             </div>
@@ -473,11 +474,11 @@ class EpicBurndown extends Component {
         {
           // width: '15%',
           title: '优先级',
-          dataIndex: 'priorityCode',
-          render: (priorityCode, record) => (
+          dataIndex: 'priorityId',
+          render: (priorityId, record) => (
             <div>
               <PriorityTag
-                priority={record.priorityCode}
+                priority={record.priorityDTO}
               />
             </div>
           ),
@@ -488,12 +489,12 @@ class EpicBurndown extends Component {
           dataIndex: 'statusCode',
           render: (statusCode, record) => (
             <div>
-              <Tooltip mouseEnterDelay={0.5} title={`任务状态:${record.statusName}`}>
+              <Tooltip mouseEnterDelay={0.5} title={`任务状态:${record.statusMapDTO.name}`}>
                 <div>
                   <StatusTag
                     style={{ display: 'inline-block' }}
-                    name={record.statusName}
-                    color={record.statusColor}
+                    name={record.statusMapDTO.name}
+                    color={STATUS[record.statusMapDTO.type]}
                   />
                 </div>
               </Tooltip>

@@ -12,6 +12,7 @@ import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 import './ReleaseDetail.scss';
 import PublicRelease from '../ReleaseComponent/PublicRelease';
 import ReportStore from '../../../../stores/project/Report';
+import { STATUS } from '../../../../common/Constant';
 
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -310,11 +311,14 @@ class ReleaseDetail extends Component {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              borderRadius: '50%',
-              background: this.renderTypecode(record, 'background'),
+              borderRadius: '4px',
+              background: record.issueTypeDTO ? record.issueTypeDTO.colour : '#fab614',
             }}
           >
-            {this.renderTypecode(record, 'icon')}
+            <Icon
+              style={{ color: 'white', fontSize: '16px' }}
+              type={record.issueTypeDTO ? record.issueTypeDTO.icon : 'help'}
+            />
           </div>
         ),
       },
@@ -351,11 +355,11 @@ class ReleaseDetail extends Component {
           <span
             style={{
               padding: '1px 4px',
-              color: this.renderPriorityStyle('color', record),
-              background: this.renderPriorityStyle('background', record),
+              color: record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF',
+              background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}4C`,
             }}
           >
-            {text}
+            {record.priorityDTO ? record.priorityDTO.name : ''}
           </span>
         ),
       }, {
@@ -367,11 +371,11 @@ class ReleaseDetail extends Component {
             style={{
               padding: '4px 6px',
               color: 'white',
-              background: record.statusColor,
+              background: STATUS[record.statusMapDTO.type],
               borderRadius: 2,
             }}
           >
-            {text}
+            {record.statusMapDTO.name}
           </span>
         ),
       },

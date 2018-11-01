@@ -17,7 +17,15 @@ class StatusBodyColumn extends Component {
     this.state = {};
   }
   
-  renderIssues(issues, droppableId, statusName, categoryCode, isCompleted, clickItem) {
+  renderIssues(subStatuse, clickItem) {
+    const {
+      issues,
+      id: droppableId,
+      name: statusName,
+      categoryCode,
+      completed: isCompleted,
+      statusId,
+    } = subStatuse;
     let data = issues;
     data = _.orderBy(data, ['rank'], 'desc');
     // data = _.sortBy(data, o => o.rank);
@@ -48,6 +56,7 @@ class StatusBodyColumn extends Component {
                   epicDatas={ScrumBoardStore.getEpicData}
                   dragStartData={ScrumBoardStore.getDragStartItem}
                   swimLaneCode={ScrumBoardStore.getSwimLaneCode}
+                  statusId={statusId}
                 />,
               );
             }
@@ -72,6 +81,7 @@ class StatusBodyColumn extends Component {
                 epicDatas={ScrumBoardStore.getEpicData}
                 dragStartData={ScrumBoardStore.getDragStartItem}
                 swimLaneCode={ScrumBoardStore.getSwimLaneCode}
+                statusId={statusId}
               />,
             );
           }
@@ -98,6 +108,7 @@ class StatusBodyColumn extends Component {
                   epicDatas={ScrumBoardStore.getEpicData}
                   dragStartData={ScrumBoardStore.getDragStartItem}
                   swimLaneCode={ScrumBoardStore.getSwimLaneCode}
+                  statusId={statusId}
                 />,
               );
             }
@@ -122,6 +133,7 @@ class StatusBodyColumn extends Component {
                 epicDatas={ScrumBoardStore.getEpicData}
                 dragStartData={ScrumBoardStore.getDragStartItem}
                 swimLaneCode={ScrumBoardStore.getSwimLaneCode}
+                statusId={statusId}
               />,
             );
           }
@@ -148,6 +160,7 @@ class StatusBodyColumn extends Component {
                   epicDatas={ScrumBoardStore.getEpicData}
                   dragStartData={ScrumBoardStore.getDragStartItem}
                   swimLaneCode={ScrumBoardStore.getSwimLaneCode}
+                  statusId={statusId}
                 />,
               );
             }
@@ -172,6 +185,7 @@ class StatusBodyColumn extends Component {
                 epicDatas={ScrumBoardStore.getEpicData}
                 dragStartData={ScrumBoardStore.getDragStartItem}
                 swimLaneCode={ScrumBoardStore.getSwimLaneCode}
+                statusId={statusId}
               />,
             );
           }
@@ -195,6 +209,7 @@ class StatusBodyColumn extends Component {
             epicDatas={ScrumBoardStore.getEpicData}
             dragStartData={ScrumBoardStore.getDragStartItem}
             swimLaneCode={ScrumBoardStore.getSwimLaneCode}
+            statusId={statusId}
           />,
         );
       }
@@ -498,7 +513,7 @@ class StatusBodyColumn extends Component {
           droppableId={
             JSON.stringify({
               columnId,
-              code: subStatuses[index].id,
+              endStatusId: subStatuses[index].statusId,
               parentId: source,
               assigneeId,
               epicId,
@@ -537,11 +552,7 @@ class StatusBodyColumn extends Component {
               </p>
               <div className="c7n-itemBodyColumn" style={{ minHeight: 83 }}>
                 {this.renderIssues(
-                  subStatuses[index].issues,
-                  subStatuses[index].id,
-                  subStatuses[index].name,
-                  subStatuses[index].categoryCode,
-                  subStatuses[index].completed,
+                  subStatuses[index],
                   clickItem,
                 )}
               </div>

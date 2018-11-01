@@ -19,6 +19,7 @@ import TypeTag from '../../../../../components/TypeTag';
 import VS from '../../../../../stores/project/versionReportNew';
 import EmptyBlock from '../../../../../components/EmptyBlock';
 import './VersionReport.scss';
+import { STATUS } from '../../../../../common/Constant';
 
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -59,7 +60,7 @@ class EpicReport extends Component {
 
   getLabel(record) {
     if (VS.beforeCurrentUnit === 'story_point') {
-      if (record.typeCode === 'story') {
+      if (record.issueTypeDTO.typeCode === 'story') {
         return record.storyPoints === null ? '未预估' : record.storyPoints;
       } else {
         return '';
@@ -501,7 +502,7 @@ class EpicReport extends Component {
           render: (typeCode, record) => (
             <div>
               <TypeTag
-                typeCode={record.typeCode}
+                data={record.issueTypeDTO}
                 showName
               />
             </div>
@@ -510,11 +511,11 @@ class EpicReport extends Component {
         {
           width: '15%',
           title: '优先级',
-          dataIndex: 'priorityCode',
-          render: (priorityCode, record) => (
+          dataIndex: 'priorityId',
+          render: (priorityId, record) => (
             <div>
               <PriorityTag
-                priority={record.priorityCode}
+                priority={record.priorityDTO}
               />
             </div>
           ),
@@ -525,12 +526,12 @@ class EpicReport extends Component {
           dataIndex: 'statusCode',
           render: (statusCode, record) => (
             <div>
-              <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusName}`}>
+              <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusMapDTO.name}`}>
                 <div>
                   <StatusTag
                     style={{ display: 'inline-block' }}
-                    name={record.statusName}
-                    color={record.statusColor}
+                    name={record.statusMapDTO.name}
+                    color={STATUS[record.statusMapDTO.type]}
                   />
                 </div>
               </Tooltip>
@@ -633,8 +634,6 @@ class EpicReport extends Component {
                       this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
                     }}
                   >
-
-
                     在“问题管理中”查看
                     <Icon style={{ fontSize: 13 }} type="open_in_new" />
                   </p>

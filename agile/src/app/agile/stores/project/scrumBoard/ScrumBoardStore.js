@@ -57,6 +57,8 @@ class ScrumBoardStore {
 
   @observable workDate = false;
 
+  @observable issueTypes = [];
+
   @computed get getStatusList() {
     return toJS(this.statusList);
   }
@@ -74,7 +76,8 @@ class ScrumBoardStore {
   }
 
   axiosGetAllEpicData() {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`);
+    const orgId = AppState.currentMenuType.organizationId;
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics?organizationId=${orgId}`);
   }
 
   @computed get getEpicData() {
@@ -317,16 +320,17 @@ class ScrumBoardStore {
     return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}`);
   }
 
-  updateIssue(issueIdP, objP, codeP, boardIdP, originColumnIdP, columnIdP) {
+  updateIssue(issueId, objectVersionNumber, endStatusId, boardId, originColumnId, columnId, transformId) {
+    const proId = AppState.currentMenuType.id;
     const data = {
-      issueId: issueIdP,
-      objectVersionNumber: objP,
-      statusId: codeP,
-      boardId: boardIdP,
-      originColumnId: originColumnIdP,
-      columnId: columnIdP,
+      issueId,
+      objectVersionNumber,
+      statusId: endStatusId,
+      boardId,
+      originColumnId,
+      columnId,
     };
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board/issue/${issueIdP}/move`, data);
+    return axios.post(`/agile/v1/projects/${proId}/board/issue/${issueId}/move?transformId=${transformId}`, data);
   }
 
   moveStatusToUnset(code, data) {
@@ -395,6 +399,32 @@ class ScrumBoardStore {
       this.setWorkDate(false);
     });
   };
+
+  @computed get getIssueTypes() {
+    return this.issueTypes.slice();
+  }
+
+  @action setIssueTypes(data) {
+    this.issueTypes = data;
+  }
+
+  axiosGetIssueTypes() {
+    const proId = AppState.currentMenuType.id;
+    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types?scheme_type=agile`).then((data) => {
+      if (data && !data.failed) {
+        this.setIssueTypes(data);
+      } else {
+        this.setIssueTypes([]);
+      }
+    });
+  }
+
+  loadTransforms(statusId, issueId, typeId) {
+    const projectId = AppState.currentMenuType.id;
+    return axios.get(
+      `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&scheme_type=agile`,
+    );
+  }
 }
 
 const scrumBoardStore = new ScrumBoardStore();

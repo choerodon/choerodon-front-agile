@@ -22,6 +22,8 @@ const Option = Select.Option;
 const confirm = Modal.confirm;
 const { AppState } = stores;
 
+const filterIssueTypeCode = ['issue_epic', 'sub_task'];
+
 @observer
 class SprintItem extends Component {
   constructor(props) {
@@ -142,9 +144,9 @@ class SprintItem extends Component {
     });
   }
 
-  handleChangeType({ key }) {
+  handleChangeType(type) {
     this.setState({
-      selectIssueType: key,
+      selectIssueType: type.key,
     });
   }
 
@@ -154,16 +156,24 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   handleBlurCreateIssue = (type, item, index) => {
+    const { store } = this.props;
+    const { selectIssueType } = this.state;
+    const issueTypes = store.getIssueTypes
+      .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
+    const currentType = issueTypes.filter(t => t.typeCode === selectIssueType);
+    const priorityId = store.getDefaultPriority.id;
     if (this[`${index}-addInput`].input.value !== '') {
       this.setState({
         loading: true,
       });
       const data = {
-        priorityCode: this.props.store.getProjectInfo.defaultPriorityCode ? this.props.store.getProjectInfo.defaultPriorityCode : 'medium',
+        priorityCode: `priority-${priorityId}`,
+        priorityId,
         projectId: AppState.currentMenuType.id,
         sprintId: type !== 'backlog' ? item.sprintId : 0,
         summary: this[`${index}-addInput`].input.value,
-        typeCode: this.state.selectIssueType,
+        issueTypeId: currentType[0].id,
+        typeCode: currentType[0].typeCode,
         ...!isNaN(this.props.store.getChosenEpic) ? {
           epicId: this.props.store.getChosenEpic,
         } : {},
@@ -262,7 +272,7 @@ class SprintItem extends Component {
             issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
           }
           confirm({
-            title: 'warnning',
+            title: '警告',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
             onCancel() {
             },
@@ -580,10 +590,8 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleFinishSprint.bind(this, item, index)}
               >
-
-完成冲刺
-
-</p>
+                完成冲刺
+              </p>
               {/* <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown> */}
@@ -672,7 +680,18 @@ class SprintItem extends Component {
    * @returns
    * @memberof Sprint
    */
-  renderSprint=() => {
+  renderSprint = () => {
+    const { store } = this.props;
+    const { selectIssueType } = this.state;
+    const issueTypes = store.getIssueTypes
+      .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
+    const currentType = issueTypes.filter(t => t.typeCode === selectIssueType);
+    let currentTypeIcon = 'help';
+    let currentTypeColour = '#fab614';
+    if (currentType.length) {
+      currentTypeIcon = currentType[0].icon;
+      currentTypeColour = currentType[0].colour;
+    }
     const typeList = (
       <Menu
         style={{
@@ -683,11 +702,11 @@ class SprintItem extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          ['story', 'task', 'bug'].map(type => (
-            <Menu.Item key={type}>
+          issueTypes.map(type => (
+            <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
-                  typeCode={type}
+                  data={type}
                   showName
                 />
               </div>
@@ -756,10 +775,8 @@ class SprintItem extends Component {
                         role="none"
                         onClick={this.clearFilter}
                       >
-
-清空所有筛选器
-
-</p>
+                        清空所有筛选器
+                      </p>
                     </div>
                     <div style={{ flexGrow: 1 }}>
                       {this.renderStatusCodeDom(item, indexs)}
@@ -972,13 +989,13 @@ class SprintItem extends Component {
                                       <div
                                         className="c7n-sign"
                                         style={{
-                                          backgroundColor: TYPE[this.state.selectIssueType],
+                                          backgroundColor: currentTypeColour,
                                           marginRight: 2,
                                         }}
                                       >
                                         <Icon
                                           style={{ fontSize: '14px' }}
-                                          type={ICON[this.state.selectIssueType]}
+                                          type={currentTypeIcon}
                                         />
                                       </div>
                                       <Icon
@@ -1014,19 +1031,15 @@ class SprintItem extends Component {
                                       });
                                     }}
                                   >
-
-取消
-
-</Button>
+                                    取消
+                                  </Button>
                                   <Button
                                     type="primary"
                                     loading={this.state.loading}
                                     onClick={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
                                   >
-
-确定
-
-</Button>
+                                    确定
+                                  </Button>
                                 </div>
                               </div>
                             ) : (
@@ -1049,9 +1062,8 @@ class SprintItem extends Component {
                                   }}
                                 >
                                   <Icon type="playlist_add" />
-
-创建问题
-                                                                </Button>
+                                  创建问题
+                                </Button>
                               </div>
                             )}
                           </div>
@@ -1078,12 +1090,10 @@ class SprintItem extends Component {
               <div style={{ marginLeft: 40 }}>
                 <p style={{ color: 'rgba(0,0,0,0.65)' }}>用问题填充您的待办事项</p>
                 <p style={{ fontSize: 16, lineHeight: '28px', marginTop: 8 }}>
-
-这是您的团队待办事项。创建并预估新的问题，并通
+                  这是您的团队待办事项。创建并预估新的问题，并通
                   <br />
-
-过上下拖动来对待办事项排优先级
-                                </p>
+                  过上下拖动来对待办事项排优先级
+                </p>
               </div>
             </div>
           );
@@ -1100,6 +1110,17 @@ class SprintItem extends Component {
    * @memberof Sprint
    */
   renderBacklog=() => {
+    const { store } = this.props;
+    const issueTypes = store.getIssueTypes
+      .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
+    const { selectIssueType } = this.state;
+    const currentType = issueTypes.filter(t => t.typeCode === selectIssueType);
+    let currentTypeIcon = 'help';
+    let currentTypeColour = '#fab614';
+    if (currentType.length) {
+      currentTypeIcon = currentType[0].icon;
+      currentTypeColour = currentType[0].colour;
+    }
     const typeList = (
       <Menu
         style={{
@@ -1110,11 +1131,11 @@ class SprintItem extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          ['story', 'task', 'bug'].map(type => (
+          issueTypes.map(type => (
             <Menu.Item key={type}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
-                  typeCode={type}
+                  data={type}
                   showName
                 />
               </div>
@@ -1215,13 +1236,13 @@ class SprintItem extends Component {
                                   <div
                                     className="c7n-sign"
                                     style={{
-                                      backgroundColor: TYPE[this.state.selectIssueType],
+                                      backgroundColor: currentTypeColour,
                                       marginRight: 2,
                                     }}
                                   >
                                     <Icon
                                       style={{ fontSize: '14px' }}
-                                      type={ICON[this.state.selectIssueType]}
+                                      type={currentTypeIcon}
                                     />
                                   </div>
                                   <Icon
@@ -1255,19 +1276,15 @@ class SprintItem extends Component {
                                   });
                                 }}
                               >
-
-取消
-
-</Button>
+                                取消
+                              </Button>
                               <Button
                                 type="primary"
                                 loading={this.state.loading}
                                 onClick={this.handleBlurCreateIssue.bind(this, 'backlog', item, -1)}
                               >
-
-确定
-
-</Button>
+                                确定
+                              </Button>
                             </div>
                           </div>
                         ) : (
@@ -1288,9 +1305,8 @@ class SprintItem extends Component {
                               }}
                             >
                               <Icon type="playlist_add" />
-
-创建问题
-                                                        </Button>
+                              创建问题
+                            </Button>
                           </div>
                         )}
                       </div>

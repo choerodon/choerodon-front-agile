@@ -1,7 +1,7 @@
 .c7n-parentIssue-icon {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+  border-radius: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,4 +23,9 @@
 .c7n-parentIssue-subIssue {
   margin-left: 12px;
   color: rgba(0, 0, 0, 0.54);
+}
+
+.c7n-issueType-icon {
+  color: white;
+  font-size: 16px;
 }

@@ -34,6 +34,7 @@ class BacklogHome extends Component {
     this.refresh();
     this.loadQuickFilter();
     const url = this.handleRequest(location.search);
+    this.loadProperty();
     if (url.paramIssueId) {
       BacklogStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
@@ -44,6 +45,12 @@ class BacklogHome extends Component {
     BacklogStore.dispose();
   }
 
+  // 加载问题类型和默认优先级
+  loadProperty = () => {
+    const { BacklogStore } = this.props;
+    BacklogStore.axiosGetIssueTypes();
+    BacklogStore.axiosGetDefaultPriority();
+  };
 
   /**
    * 加载选择快速搜索的冲刺数据

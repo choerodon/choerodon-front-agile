@@ -67,6 +67,8 @@ class SprintCommonStore {
 
   @observable quickSearch = [];
 
+  @observable issueTypes = [];
+
   init() {
     this.setOrder({
       orderField: '',
@@ -83,10 +85,8 @@ class SprintCommonStore {
   loadIssues(page = 0, size = 10) {
     this.setLoading(true);
     const { orderField = '', orderType = '' } = this.order;
-    debugger;
     return loadIssues(page, size, toJS(this.getFilter), orderField, orderType)
       .then((res) => {
-        debugger;
         this.setIssues(res.content);
         this.setPagination({
           current: res.number + 1,
@@ -116,7 +116,6 @@ class SprintCommonStore {
   }
 
   @computed get getIssues() {
-    debugger;
     return toJS(this.issues);
   }
 
@@ -129,11 +128,9 @@ class SprintCommonStore {
   }
 
   @action setSelectedQuickSearch(data) {
-    debugger;
     if (data) {
       Object.assign(filter, data);
     }
-    debugger;
   }
 
   @action setPagination(data) {
@@ -145,7 +142,6 @@ class SprintCommonStore {
   }
 
   @action setAdvArg(data) {
-    debugger;
     if (data) {
       Object.assign(filter.advancedSearchArgs, data);
     }
@@ -248,6 +244,25 @@ class SprintCommonStore {
       ...filter,
       otherArgs: this.barFilters ? otherArgs : {},
     };
+  }
+
+  @computed get getIssueTypes() {
+    return this.issueTypes.slice();
+  }
+
+  @action setIssueTypes(data) {
+    this.issueTypes = data;
+  }
+
+  axiosGetIssueTypes() {
+    const proId = AppState.currentMenuType.id;
+    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types?scheme_type=agile`).then((data) => {
+      if (data && !data.failed) {
+        this.setIssueTypes(data);
+      } else {
+        this.setIssueTypes([]);
+      }
+    });
   }
 }
 const sprintCommonStore = new SprintCommonStore();

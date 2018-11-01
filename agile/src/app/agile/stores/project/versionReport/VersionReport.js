@@ -112,36 +112,36 @@ class VersionReportStore {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`, ['version_planning', 'released']);
   }
 
-    getPieDatas = (projectId, type) => {
-      this.changePieLoading(true);
-      axios.get(`/agile/v1/projects/${projectId}/reports/pie_chart?fieldName=${type}`)
-        .then((data) => {
-          if (data.length) {
-            // debugger;
-            const colors = ['#9665E2', '#F0657D', '#FAD352', '#FF9915', '#45A3FC', '#3F51B5', '#47CBCA', '#59CB79', '#F953BA', '#D3D3D3'];
-            const length = data.length;
-            if (length > 10) {
-              for (let i = 10; i < length; i += 1) {
-                colors.push(`#${(`00000${((Math.random() * 16777215 + 0.5) >> 0).toString(16)}`).slice(-6)}`);
-              }
+  getPieDatas = (projectId, type) => {
+    const orgId = AppState.currentMenuType.organizationId;
+    this.changePieLoading(true);
+    axios.get(`/agile/v1/projects/${projectId}/reports/pie_chart?organizationId=${orgId}&fieldName=${type}`)
+      .then((data) => {
+        const len = data.length;
+        if (len) {
+          const colors = ['#9665E2', '#F0657D', '#FAD352', '#FF9915', '#45A3FC', '#3F51B5', '#47CBCA', '#59CB79', '#F953BA', '#D3D3D3'];
+          if (len > 10) {
+            for (let i = 10; i < len; i += 1) {
+              colors.push(`#${(`00000${((Math.random() * 16777215 + 0.5) >> 0).toString(16)}`).slice(-6)}`);
             }
-            this.setColors(colors);
-            this.setSourceData(data);
-            const bigData = data.filter(item => item.percent >= 2);
-            const otherData = {
-              name: '其它', typeName: null, value: _.reduce(_.filter(data, item => item.percent < 2), (sum, item) => sum += item.value, 0), percent: _.reduce(_.filter(data, item => item.percent < 2), (sum, item) => sum += item.percent, 0).toFixed(2),
-            };
-            if (otherData.value > 0) {
-              bigData.push(otherData);
-            }
-            this.setPieData(bigData);
           }
-          this.changePieLoading(false);
-        })
-        .catch((error) => {
-          this.changePieLoading(false);
-        });
-    }
+          this.setColors(colors);
+          this.setSourceData(data);
+          const bigData = data.filter(item => item.percent >= 2);
+          const otherData = {
+            name: '其它', typeName: null, value: _.reduce(_.filter(data, item => item.percent < 2), (sum, item) => sum += item.value, 0), percent: _.reduce(_.filter(data, item => item.percent < 2), (sum, item) => sum += item.percent, 0).toFixed(2),
+          };
+          if (otherData.value > 0) {
+            bigData.push(otherData);
+          }
+          this.setPieData(bigData);
+        }
+        this.changePieLoading(false);
+      })
+      .catch((error) => {
+        this.changePieLoading(false);
+      });
+  }
 }
 
 const versionReportStore = new VersionReportStore();

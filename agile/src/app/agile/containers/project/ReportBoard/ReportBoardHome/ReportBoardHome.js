@@ -60,7 +60,7 @@ class ReportBoardHome extends Component {
               </Col>
               <Col span={8}>
                 <Priority
-                  link="reporthost/pieReport/priorityCode"
+                  link="reporthost/pieReport/priorityId"
                 />
               </Col>
               <Col span={8}>

@@ -20,6 +20,7 @@ class CopyIssue extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const projectId = AppState.currentMenuType.id;
+        const orgId = AppState.currentMenuType.organizationId;
         const { visible, onCancel, onOk, issueId, issueNum } = this.props;
         const { issueSummary, copySubIssue, copyLinkIssue, sprint } = values;
         const copyConditionDTO = {
@@ -31,7 +32,7 @@ class CopyIssue extends Component {
         this.setState({
           loading: true,
         });
-        axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/clone_issue`, copyConditionDTO)
+        axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/clone_issue?organizationId=${orgId}`, copyConditionDTO)
           .then((res) => {
             this.setState({
               loading: false,

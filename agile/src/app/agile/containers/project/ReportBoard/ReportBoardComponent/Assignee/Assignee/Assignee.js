@@ -66,8 +66,9 @@ class Assignee extends Component {
 
   loadAssignee() {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     this.setState({ loading: true });
-    axios.get(`agile/v1/projects/${projectId}/reports/pie_chart?fieldName=assignee`)
+    axios.get(`agile/v1/projects/${projectId}/reports/pie_chart?organizationId=${orgId}&fieldName=assignee`)
       .then((res) => {
         const assigneeInfo = this.transformAssigneeInfo(res);
         this.setState({

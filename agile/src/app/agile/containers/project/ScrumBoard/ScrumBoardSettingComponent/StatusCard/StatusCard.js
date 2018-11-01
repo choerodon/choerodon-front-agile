@@ -33,7 +33,7 @@ class StatusCard extends Component {
   handleDeleteStatus() {
     const originData = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
     const data = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
-    const deleteCode = this.props.data.id;
+    const deleteCode = this.props.data.statusId;
     let deleteIndex = '';
     for (let index = 0, len = data[data.length - 1].subStatuses.length; index < len; index += 1) {
       if (String(data[data.length - 1].subStatuses[index].id) === String(deleteCode)) {
@@ -77,7 +77,7 @@ class StatusCard extends Component {
     return (
       <Draggable 
         key={this.props.data.code}
-        draggableId={`${this.props.data.id},${this.props.data.objectVersionNumber}`}
+        draggableId={`${this.props.data.statusId},${this.props.data.objectVersionNumber}`}
         index={this.props.index}
         type="status"
       >
@@ -102,6 +102,7 @@ class StatusCard extends Component {
                     top: '15px',
                     cursor: 'pointer',
                     fontSize: '14px',
+                    visibility: 'hidden',
                   }} 
                   type="settings"
                   role="none"
@@ -131,6 +132,7 @@ class StatusCard extends Component {
                     display: this.renderCloseDisplay(),
                     cursor: 'pointer',
                     fontSize: '14px',
+                    visibility: 'hidden',
                   }}
                   role="none"
                   onClick={this.handleDeleteStatus.bind(this)}

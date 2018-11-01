@@ -30,7 +30,6 @@ class CreateEpic extends Component {
     this.props.form.validateFieldsAndScroll((err, value) => {
       if (!err) {
         const data = {
-          priorityCode: 'medium',
           projectId: AppState.currentMenuType.id,
           epicName: value.name,
           summary: value.summary,

@@ -42,7 +42,7 @@ class MineUnDone extends Component {
       <div className="list" key={issue.issueNum}>
         <div>
           <TypeTag
-            typeCode={issue.typeCode}
+            data={issue.issueTypeDTO}
           />
         </div>
         <span className="issueNum text-overflow-hidden">
@@ -58,7 +58,7 @@ class MineUnDone extends Component {
         <div className="flex-shrink">
           <div className="priority">
             <PriorityTag
-              priority={issue.priorityCode}
+              priority={issue.priorityDTO}
             />
           </div>
         </div>

@@ -12,7 +12,7 @@ import {
 import TimeAgo from 'timeago-react';
 import QuickSearch from '../../../../components/QuickSearch';
 import './Issue.scss';
-
+import { loadPriorities } from '../../../../api/NewIssueApi';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 
 import { TYPE, ICON, TYPE_NAME } from '../../../../common/Constant';
@@ -25,6 +25,7 @@ import PriorityTag from '../../../../components/PriorityTag';
 import StatusTag from '../../../../components/StatusTag';
 import TypeTag from '../../../../components/TypeTag';
 import EmptyBlock from '../../../../components/EmptyBlock';
+import { STATUS } from '../../../../common/Constant';
 
 const FileSaver = require('file-saver');
 
@@ -49,6 +50,8 @@ class Issue extends Component {
       selectIssueType: 'task',
       createIssueValue: '',
       createLoading: false,
+      originPriorities: [],
+      defaultPriorityId: false,
     };
   }
 
@@ -63,6 +66,7 @@ class Issue extends Component {
       paramType, paramId, paramName, paramStatus,
       paramPriority, paramIssueType, paramIssueId, paramUrl, paramOpenIssueId,
     } = Request;
+    IssueStore.axiosGetIssueTypes();
     IssueStore.loadQuickSearch();
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
@@ -77,6 +81,20 @@ class Issue extends Component {
     if (paramName) {
       arr.push(paramName);
     }
+    loadPriorities().then((res) => {
+      if (res && res.length) {
+        const defaultPriorities = res.filter(p => p.default);
+        this.setState({
+          originPriorities: res,
+          defaultPriorityId: defaultPriorities.length ? defaultPriorities[0].id : '',
+        });
+      } else {
+        this.setState({
+          originPriorities: [],
+          defaultPriorityId: '',
+        });
+      }
+    });
     if (paramStatus) {
       const obj = {
         advancedSearchArgs: {},
@@ -96,10 +114,10 @@ class Issue extends Component {
         searchArgs: {},
       };
       const a = [paramPriority];
-      obj.advancedSearchArgs.priorityCode = a || [];
+      obj.advancedSearchArgs.priorityId = a || [];
       IssueStore.setBarFilters(arr);
       IssueStore.setFilter(obj);
-      IssueStore.setFilteredInfo({ priorityCode: [paramPriority] });
+      IssueStore.setFilteredInfo({ priorityId: [paramPriority] });
       IssueStore.loadIssues();
     } else if (paramIssueType) {
       const obj = {
@@ -169,8 +187,7 @@ class Issue extends Component {
         imageUrl: res.assigneeImageUrl || '',
         issueId: res.issueId,
         issueNum: res.issueNum,
-        priorityCode: res.priorityCode,
-        priorityName: res.priorityName,
+        priorityDTO: res.priorityDTO,
         projectId: res.projectId,
         statusCode: res.statusCode,
         statusColor: res.statusColor,
@@ -186,8 +203,8 @@ class Issue extends Component {
   };
 
   handleBlurCreateIssue = () => {
-    const { createIssueValue, selectIssueType } = this.state;
-    if (createIssueValue !== '') {
+    const { defaultPriorityId, createIssueValue, selectIssueType } = this.state;
+    if (defaultPriorityId && createIssueValue !== '') {
       const { history } = this.props;
       const {
         type, id, name, organizationId,
@@ -197,7 +214,7 @@ class Issue extends Component {
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
         .then((res) => {
           const data = {
-            priorityCode: res.defaultPriorityCode || 'medium',
+            priorityId: defaultPriorityId,
             projectId: AppState.currentMenuType.id,
             sprintId: 0,
             summary: createIssueValue,
@@ -245,7 +262,7 @@ class Issue extends Component {
 
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
     Object.keys(filters).forEach((key) => {
-      if (key === 'statusCode' || key === 'priorityCode' || key === 'typeCode') {
+      if (key === 'statusCode' || key === 'priorityId' || key === 'typeCode') {
         IssueStore.setAdvArg(filters);
       } else if (key === 'issueId') {
         // 根据接口进行对象调整
@@ -262,15 +279,15 @@ class Issue extends Component {
     });
     IssueStore.setBarFilters(barFilters);
     const { current, pageSize } = IssueStore.pagination;
-    debugger;
     IssueStore.setOrder(sorter.columnKey, sorter.order === 'ascend' ? 'asc' : 'desc');
     IssueStore.loadIssues(current - 1, pageSize);
   };
 
   exportExcel = () => {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     const searchParam = IssueStore.getFilter;
-    axios.post(`/zuul/agile/v1/projects/${projectId}/issues/export`, searchParam, { responseType: 'arraybuffer' })
+    axios.post(`/zuul/agile/v1/projects/${projectId}/issues/export?organizationId=${orgId}`, searchParam, { responseType: 'arraybuffer' })
       .then((data) => {
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const fileName = `${AppState.currentMenuType.name}.xlsx`;
@@ -338,13 +355,11 @@ class Issue extends Component {
   };
 
   onlyMe = (checked) => {
-    debugger;
     IssueStore.setSelectedQuickSearch({ assigneeId: checked ? AppState.userInfo.id : null });
     IssueStore.loadIssues();
   };
 
   onlyStory = (checked) => {
-    debugger;
     IssueStore.setSelectedQuickSearch({ onlyStory: checked });
     IssueStore.loadIssues();
   };
@@ -358,6 +373,7 @@ class Issue extends Component {
     const {
       expand, selectedIssue, createIssueValue,
       selectIssueType, createLoading, create, checkCreateIssue,
+      originPriorities,
     } = this.state;
     const typeList = (
       <Menu
@@ -498,7 +514,7 @@ class Issue extends Component {
                       render={(text, record, index) => (
                         <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[text]}`}>
                           <TypeTag
-                            typeCode={text}
+                            data={record.issueTypeDTO}
                             showName={expand ? null : text}
                           />
                         </Tooltip>
@@ -548,8 +564,7 @@ class Issue extends Component {
                       render={(text, record) => (
                         <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${text}`}>
                           <StatusTag
-                            name={text}
-                            color={record.statusColor}
+                            data={record.statusMapDTO}
                             style={{ display: 'inline-block', verticalAlign: 'middle' }}
                           />
                         </Tooltip>
@@ -580,9 +595,9 @@ class Issue extends Component {
                       key="priorityCode"
                       align="center"
                       render={(text, record) => (
-                        <Tooltip mouseEnterDelay={0.5} title={`优先级： ${text}`}>
+                        <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityDTO ? record.priorityDTO.name : ''}`}>
                           <PriorityTag
-                            priority={record.priorityCode}
+                            priority={record.priorityDTO}
                           />
                         </Tooltip>
                       )}
@@ -841,6 +856,7 @@ class Issue extends Component {
             {
               expand ? (
                 <EditIssue
+                  store={IssueStore}
                   issueId={selectedIssue && selectedIssue.issueId}
                   onCancel={() => {
                     this.setState({
