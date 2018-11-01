@@ -55,7 +55,7 @@ class QuickSearch extends Component {
     const {
       buttonName, buttonIcon, moreSelection, onChangeCheckBox,
     } = this.props;
-    debugger;
+
     const listChildren = moreSelection.map(item => ({
       label: item.name,
       value: item.filterId,
@@ -73,7 +73,7 @@ class QuickSearch extends Component {
   render() {
     const { title, selectionGroup } = this.props;
     const { selected } = this.state;
-    debugger;
+
     return (
       <div
         className="c7n-agile-quickSearch-container"

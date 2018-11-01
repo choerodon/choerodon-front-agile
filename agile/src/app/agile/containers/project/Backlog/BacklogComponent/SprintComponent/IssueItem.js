@@ -4,6 +4,7 @@ import { Tooltip } from 'choerodon-ui';
 import _ from 'lodash';
 import Typetag from '../../../../../components/TypeTag';
 import UserHead from '../../../../../components/UserHead';
+import { STATUS } from '../../../../../common/Constant';
 
 class IssueItem extends Component {
   /**
@@ -233,7 +234,7 @@ class IssueItem extends Component {
                             label="sprintIssue"
                             className="c7n-backlog-sprintIssueStatus"
                             style={{
-                              background: item.statusColor ? item.statusColor : '#4d90fe',
+                              background: item.statusMapDTO ? STATUS[item.statusMapDTO.type] : '#4d90fe',
                             }}
                           >
                             {item.statusMapDTO ? item.statusMapDTO.name : ''}

@@ -15,6 +15,7 @@ import './VersionReportHome.scss';
 import NoDataComponent from '../../Component/noData';
 import versionSvg from '../../Home/style/pics/no_version.svg';
 import SwithChart from '../../Component/switchChart';
+import { STATUS } from '../../../../../common/Constant';
 
 const { AppState } = stores;
 const Option = Select.Option;
@@ -520,13 +521,12 @@ class VersionReport extends Component {
           label="sprintIssue" 
           className="c7n-backlog-sprintIssueStatus"
           style={{
-            background: record.statusColor ? record.statusColor : '#4d90fe',
+            background: record.statusMapDTO ? STATUS[record.statusMapDTO.type] : '#4d90fe',
             color: 'white',
             padding: '4px 6px',
           }}
         >
-{text}
-
+          {record.statusMapDTO.name}
         </span>
       ),
     }, {

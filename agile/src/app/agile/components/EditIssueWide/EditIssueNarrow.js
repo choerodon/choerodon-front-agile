@@ -49,6 +49,7 @@ import {
   updateIssueType,
   loadSprints,
   loadStatus,
+  updateStatus,
 } from '../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
@@ -201,6 +202,7 @@ class CreateSprint extends Component {
       originSprints: [],
       originFixVersions: [],
       originInfluenceVersions: [],
+      transformId: false,
     };
   }
 
@@ -585,9 +587,14 @@ class CreateSprint extends Component {
   };
 
   updateIssue = (pro) => {
+    const {
+      origin,
+      issueId,
+      transformId,
+    } = this.state;
     const obj = {
-      issueId: this.state.issueId,
-      objectVersionNumber: this.state.origin.objectVersionNumber,
+      issueId,
+      objectVersionNumber: origin.objectVersionNumber,
     };
     if (pro === 'description' || pro === 'editDes') {
       if (this.state[pro]) {
@@ -611,6 +618,14 @@ class CreateSprint extends Component {
           this.props.onUpdate();
         }
       });
+    } else if (pro === 'statusId') {
+      updateStatus(transformId, issueId, origin.objectVersionNumber)
+        .then((res) => {
+          this.reloadIssue();
+          if (this.props.onUpdate) {
+            this.props.onUpdate();
+          }
+        });
     } else {
       obj[pro] = this.state[pro] || 0;
       updateIssue(obj).then((res) => {
@@ -840,19 +855,23 @@ class CreateSprint extends Component {
     }
   }
 
-  handleChangeType({ key }) {
+  handleChangeType(type) {
+    const { issueId, summary, origin } = this.state;
+    const { issueId: id, onUpdate } = this.props;
     const issueupdateTypeDTO = {
-      epicName: key === 'issue_epic' ? this.state.summary : undefined,
-      issueId: this.state.origin.issueId,
-      objectVersionNumber: this.state.origin.objectVersionNumber,
-      typeCode: key,
+      epicName: type.key === 'issue_epic' ? summary : undefined,
+      issueId,
+      objectVersionNumber: origin.objectVersionNumber,
+      typeCode: type.key,
+      issueTypeId: type.item.props.value,
     };
-    updateIssueType(issueupdateTypeDTO).then((res) => {
-      loadIssue(this.props.issueId).then((response) => {
-        this.reloadIssue(this.state.origin.issueId);
-        this.props.onUpdate();
+    updateIssueType(issueupdateTypeDTO)
+      .then((res) => {
+        loadIssue(id).then((response) => {
+          this.reloadIssue(origin.issueId);
+          onUpdate();
+        });
       });
-    });
   }
 
   changeRae(currentRae) {
@@ -1227,11 +1246,27 @@ class CreateSprint extends Component {
     );
   }
 
+  loadIssueStatus = () => {
+    const {
+      issueTypeDTO,
+      issueId,
+      origin,
+    } = this.state;
+    const typeId = issueTypeDTO.id;
+    this.setAnIssueToState();
+    loadStatus(origin.statusId, issueId, typeId).then((res) => {
+      this.setState({
+        originStatus: res,
+        selectLoading: false,
+      });
+    });
+  }
+
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     const {
-      initValue, visible, onCancel, onOk, 
+      store,
     } = this.props;
     const {
       issueTypeDTO,
@@ -1241,11 +1276,18 @@ class CreateSprint extends Component {
       priorityId,
       priorityName,
       priorityColor,
+      origin,
+      issueId,
+      originStatus,
+      statusId,
+      statusCode,
+      statusName,
     } = this.state;
+    const issueTypes = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
     const typeColor = issueTypeDTO ? issueTypeDTO.colour : '#fab614';
-    const typeName = issueTypeDTO ? issueTypeDTO.name : '';
     const typeIcon = issueTypeDTO ? issueTypeDTO.icon : 'help';
+
     const getMenu = () => (
       <Menu onClick={this.handleClickMenu.bind(this)}>
         <Menu.Item key="0">登记工作日志</Menu.Item>
@@ -1321,20 +1363,20 @@ class CreateSprint extends Component {
         }}
         onClick={this.handleChangeType.bind(this)}
       >
-        {_.remove(['story', 'task', 'bug', 'issue_epic'], n => n !== typeCode).map(
-          type => (
-            <Menu.Item key={type}>
+        {
+          issueTypes.filter(t => t.typeCode !== typeCode && t.typeCode !== 'sub_task').map(t => (
+            <Menu.Item key={t.typeCode} value={t.id}>
               <div
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               >
                 <div
                   style={{
-                    backgroundColor: TYPE[type],
+                    backgroundColor: t.colour,
                     marginRight: 8,
                     display: 'inline-flex',
                     width: 20,
                     height: 20,
-                    borderRadius: '50%',
+                    borderRadius: '4px',
                     textAlign: 'center',
                     color: '#fff',
                     fontSize: '14px',
@@ -1342,13 +1384,16 @@ class CreateSprint extends Component {
                     alignItems: 'center',
                   }}
                 >
-                  <Icon style={{ fontSize: '14px' }} type={ICON[type]} />
+                  <Icon
+                    style={{ fontSize: '16px' }}
+                    type={t.icon}
+                  />
                 </div>
-                <span>{TYPE_NAME[type]}</span>
+                <span>{t.name}</span>
               </div>
             </Menu.Item>
-          ),
-        )}
+          ))
+        }
       </Menu>
     );
     return (
@@ -1686,68 +1731,53 @@ class CreateSprint extends Component {
                         <ReadAndEdit
                           callback={this.changeRae.bind(this)}
                           thisType="statusId"
-                          current={this.state.currentRae}
-                          origin={this.state.statusId}
+                          current={currentRae}
+                          origin={statusId}
                           onOk={this.updateIssue.bind(this, 'statusId')}
                           onCancel={this.resetStatusId.bind(this)}
-                          onInit={() => {
-                            this.setAnIssueToState();
-                            loadStatus().then((res) => {
-                              this.setState({
-                                originStatus: res,
-                              });
-                            });
-                          }}
+                          onInit={this.loadIssueStatus}
                           readModeContent={(
                             <div>
-                              {this.state.statusId ? (
+                              {statusId ? (
                                 <div
                                   style={{
-                                    color: this.state.statusColor,
+                                    color: STATUS[statusCode],
                                     fontSize: '15px',
                                     lineHeight: '18px',
                                   }}
                                 >
-                                  {this.state.statusName}
+                                  {statusName}
                                 </div>
                               ) : (
                                 '无'
                               )}
-                            </div>
-)}
+                            </div>)}
                         >
                           <Select
-                            value={
-                              this.state.originStatus.length
-                                ? this.state.statusId
-                                : this.state.statusName
-                            }
+                            value={originStatus.length ? statusId : statusName}
                             style={{ width: 150 }}
                             loading={this.state.selectLoading}
                             autoFocus
                             // getPopupContainer={triggerNode => triggerNode.parentNode}
                             onFocus={() => {
-                              this.setState({
-                                selectLoading: true,
-                              });
-                              loadStatus().then((res) => {
-                                this.setState({
-                                  originStatus: res,
-                                  selectLoading: false,
-                                });
-                              });
+                              // this.setState({
+                              //   selectLoading: true,
+                              // });
                             }}
-                            onChange={(value) => {
+                            onChange={(value, item) => {
                               this.setState({
                                 statusId: value,
+                                transformId: item.key,
                               });
                             }}
                           >
-                            {this.state.originStatus.map(status => (
-                              <Option key={status.id} value={status.id}>
-                                {status.name}
-                              </Option>
-                            ))}
+                            {
+                              originStatus.map(transform => (
+                                <Option key={transform.id} value={transform.endStatusId}>
+                                  { transform.statusDTO.name }
+                                </Option>
+                              ))
+                            }
                           </Select>
                         </ReadAndEdit>
                       </div>

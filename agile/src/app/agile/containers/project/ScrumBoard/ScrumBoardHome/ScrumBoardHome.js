@@ -417,11 +417,10 @@ class ScrumBoardHome extends Component {
       //   spinIf: true,
       // });
       const newState = _.clone(ScrumBoardStore.getBoardData);
-      const { issueId } = JSON.parse(result.draggableId);
-      const { objectVersionNumber } = JSON.parse(result.draggableId);
-      const statusCode = JSON.parse(result.destination.droppableId).code;
-      // const splitData = result.draggableId.split(',');
-      // const splitData2 = result.destination.droppableId.split(',');
+      const {
+        issueId, objectVersionNumber, typeId, statusId,
+      } = JSON.parse(result.draggableId);
+      const { endStatusId } = JSON.parse(result.destination.droppableId);
       let draggableData = {};
       for (let index = 0, len = newState.length; index < len; index += 1) {
         if (String(newState[index].columnId)
@@ -465,74 +464,83 @@ class ScrumBoardHome extends Component {
       }
       ScrumBoardStore.setBoardData(newState);
       let destinationStatus;
-      ScrumBoardStore.updateIssue(
-        issueId, objectVersionNumber, statusCode, ScrumBoardStore.getSelectedBoard,
-        JSON.parse(result.source.droppableId).columnId,
-        JSON.parse(result.destination.droppableId).columnId,
-      ).then((data) => {
-        if (data.failed) {
-          message.info(data.message);
-          ScrumBoardStore.setBoardData(originState);
-        } else {
-          for (let index = 0, len = ScrumBoardStore.getStatusList.length; index < len; index += 1) {
-            if (data.statusId === ScrumBoardStore.getStatusList[index].id) {
-              draggableData.statusName = ScrumBoardStore.getStatusList[index].name;
-            }
-          }
-          draggableData.objectVersionNumber = data.objectVersionNumber;
-          draggableData.categoryCode = JSON.parse(result.destination.droppableId).categoryCode;
-          for (let index = 0, len = newState.length; index < len; index += 1) {
-            if (String(newState[index].columnId)
-            === String(JSON.parse(result.destination.droppableId).columnId)) {
-              for (
-                let index2 = 0, len2 = newState[index].subStatuses.length;
-                index2 < len2;
-                index2 += 1) {
-                if (String(newState[index].subStatuses[index2].statusId)
-                === String(JSON.parse(result.destination.droppableId).code)) {
-                  destinationStatus = newState[index].subStatuses[index2].categoryCode;
-                  newState[index].subStatuses[index2].issues.splice(
-                    result.destination.index, 1, draggableData,
+      ScrumBoardStore.loadTransforms(statusId, issueId, typeId).then((types) => {
+        if (types && _.some(types, t => t.endStatusId === endStatusId)) {
+          const transformId = types.filter(t => t.endStatusId === endStatusId)[0].id;
+          ScrumBoardStore.updateIssue(
+            issueId, objectVersionNumber, endStatusId, ScrumBoardStore.getSelectedBoard,
+            JSON.parse(result.source.droppableId).columnId,
+            JSON.parse(result.destination.droppableId).columnId,
+            transformId,
+          ).then((data) => {
+            if (data.failed) {
+              message.info(data.message);
+              ScrumBoardStore.setBoardData(originState);
+            } else {
+              for (let index = 0, len = ScrumBoardStore.getStatusList.length;
+                index < len; index += 1) {
+                if (data.statusId === ScrumBoardStore.getStatusList[index].id) {
+                  draggableData.statusName = ScrumBoardStore.getStatusList[index].name;
+                }
+              }
+              draggableData.objectVersionNumber = data.objectVersionNumber;
+              draggableData.categoryCode = JSON.parse(result.destination.droppableId).categoryCode;
+              for (let index = 0, len = newState.length; index < len; index += 1) {
+                if (String(newState[index].columnId)
+                  === String(JSON.parse(result.destination.droppableId).columnId)) {
+                  for (
+                    let index2 = 0, len2 = newState[index].subStatuses.length;
+                    index2 < len2;
+                    index2 += 1) {
+                    if (String(newState[index].subStatuses[index2].statusId)
+                      === String(JSON.parse(result.destination.droppableId).code)) {
+                      destinationStatus = newState[index].subStatuses[index2].categoryCode;
+                      newState[index].subStatuses[index2].issues.splice(
+                        result.destination.index, 1, draggableData,
+                      );
+                    }
+                  }
+                }
+              }
+              ScrumBoardStore.setBoardData(newState);
+              if (draggableData.parentIssueId) {
+                if (destinationStatus === 'done') {
+                  let parentIdCode;
+                  let parentIdNum;
+                  let parentObjectVersionNumber;
+                  for (
+                    let index = 0, len = ScrumBoardStore.getParentIds.length;
+                    index < len;
+                    index += 1) {
+                    if (ScrumBoardStore.getParentIds[index].issueId === draggableData.parentIssueId) {
+                      parentIdCode = ScrumBoardStore.getParentIds[index].categoryCode;
+                      parentIdNum = ScrumBoardStore.getParentIds[index].issueNum;
+                      parentObjectVersionNumber = ScrumBoardStore
+                        .getParentIds[index].objectVersionNumber;
+                    }
+                  }
+                  const judge = ScrumBoardStore.judgeMoveParentToDone(
+                    parentIdCode, draggableData.parentIssueId,
                   );
+                  if (judge) {
+                    this.setState({
+                      judgeUpdateParent: {
+                        id: draggableData.parentIssueId,
+                        issueNumber: parentIdNum,
+                        code: parentIdCode,
+                        objectVersionNumber: parentObjectVersionNumber,
+                      },
+                    });
+                  }
                 }
               }
             }
-          }
-          ScrumBoardStore.setBoardData(newState);
-          if (draggableData.parentIssueId) {
-            if (destinationStatus === 'done') {
-              let parentIdCode;
-              let parentIdNum;
-              let parentObjectVersionNumber;
-              for (
-                let index = 0, len = ScrumBoardStore.getParentIds.length;
-                index < len;
-                index += 1) {
-                if (ScrumBoardStore.getParentIds[index].issueId === draggableData.parentIssueId) {
-                  parentIdCode = ScrumBoardStore.getParentIds[index].categoryCode;
-                  parentIdNum = ScrumBoardStore.getParentIds[index].issueNum;
-                  parentObjectVersionNumber = ScrumBoardStore
-                    .getParentIds[index].objectVersionNumber;
-                }
-              }
-              const judge = ScrumBoardStore.judgeMoveParentToDone(
-                parentIdCode, draggableData.parentIssueId,
-              );
-              if (judge) {
-                this.setState({
-                  judgeUpdateParent: {
-                    id: draggableData.parentIssueId,
-                    issueNumber: parentIdNum,
-                    code: parentIdCode,
-                    objectVersionNumber: parentObjectVersionNumber,
-                  },
-                });
-              }
-            }
-          }
+          }).catch((error) => {
+            ScrumBoardStore.setBoardData(JSON.parse(JSON.stringify(originState)));
+          });
+        } else {
+          ScrumBoardStore.setBoardData(JSON.parse(JSON.stringify(originState)));
         }
-      }).catch((error) => {
-        ScrumBoardStore.setBoardData(JSON.parse(JSON.stringify(originState)));
       });
     }
   }

@@ -318,7 +318,7 @@ class StatusIssue extends Component {
     const ifClickMe = String(clickItem.issueId) === String(item.issueId);
 
     const {
-      isCompleted, statusName, categoryCode, swimLaneCode,
+      isCompleted, statusName, categoryCode, swimLaneCode, statusId,
     } = this.props;
     if (this.renderSubDisplay(item, type) === 'block') {
       return (
@@ -336,6 +336,8 @@ class StatusIssue extends Component {
             draggableId={JSON.stringify({
               objectVersionNumber: item.objectVersionNumber,
               issueId: item.issueId,
+              typeId: item.issueTypeDTO.id,
+              statusId,
             })}
             index={index}
           >

@@ -511,9 +511,14 @@ class CreateSprint extends Component {
   }
 
   updateIssue = (pro) => {
+    const {
+      origin,
+      issueId,
+      transformId,
+    } = this.state;
     const obj = {
-      issueId: this.state.issueId,
-      objectVersionNumber: this.state.origin.objectVersionNumber,
+      issueId,
+      objectVersionNumber: origin.objectVersionNumber,
     };
     if ((pro === 'description') || (pro === 'editDes')) {
       if (this.state[pro]) {
@@ -541,8 +546,7 @@ class CreateSprint extends Component {
           }
         });
     } else if (pro === 'statusId') {
-      const { transformId, issueId } = this.state;
-      updateStatus(transformId, issueId)
+      updateStatus(transformId, issueId, origin.objectVersionNumber)
         .then((res) => {
           this.reloadIssue();
           if (this.props.onUpdate) {
@@ -1699,23 +1703,20 @@ class CreateSprint extends Component {
                               autoFocus
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               onFocus={() => {
-                                this.setState({
-                                  selectLoading: true,
-                                });
-                                this.loadIssueStatus();
+                                // this.setState({
+                                //   selectLoading: true,
+                                // });
+                                // this.loadIssueStatus();
                               }}
                               onChange={(value, item) => {
-                                console.log(value, '-222');
                                 this.setState({
                                   statusId: value,
                                   transformId: item.key,
-                                }, () => {
-                                  console.log(this.state.statusId);
                                 });
                               }}
                             >
                               {
-                                this.state.originStatus.map(transform => (
+                                originStatus.map(transform => (
                                   <Option key={transform.id} value={transform.endStatusId}>
                                     { transform.statusDTO.name }
                                   </Option>

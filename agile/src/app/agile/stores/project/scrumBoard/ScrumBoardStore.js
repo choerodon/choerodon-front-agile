@@ -320,16 +320,17 @@ class ScrumBoardStore {
     return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}`);
   }
 
-  updateIssue(issueIdP, objP, codeP, boardIdP, originColumnIdP, columnIdP) {
+  updateIssue(issueId, objectVersionNumber, endStatusId, boardId, originColumnId, columnId, transformId) {
+    const proId = AppState.currentMenuType.id;
     const data = {
-      issueId: issueIdP,
-      objectVersionNumber: objP,
-      statusId: codeP,
-      boardId: boardIdP,
-      originColumnId: originColumnIdP,
-      columnId: columnIdP,
+      issueId,
+      objectVersionNumber,
+      statusId: endStatusId,
+      boardId,
+      originColumnId,
+      columnId,
     };
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board/issue/${issueIdP}/move`, data);
+    return axios.post(`/agile/v1/projects/${proId}/board/issue/${issueId}/move?transformId=${transformId}`, data);
   }
 
   moveStatusToUnset(code, data) {
@@ -416,6 +417,13 @@ class ScrumBoardStore {
         this.setIssueTypes([]);
       }
     });
+  }
+
+  loadTransforms(statusId, issueId, typeId) {
+    const projectId = AppState.currentMenuType.id;
+    return axios.get(
+      `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&scheme_type=agile`,
+    );
   }
 }
 
