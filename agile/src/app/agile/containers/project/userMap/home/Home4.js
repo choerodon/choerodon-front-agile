@@ -1768,6 +1768,7 @@ class Home3 extends Component {
                             key={item.issueId}
                             issue={item}
                             borderTop={indexs === 0}
+                            showDelete={!UserMapStore.isFullScreen}
                           />
                         //     </div>
                         //   )}
@@ -1920,6 +1921,7 @@ class Home3 extends Component {
                           key={item.issueId}
                           issue={item}
                           borderTop={indexs === 0}
+                          showDelete={!UserMapStore.isFullScreen}
                         />
                         //     </div>
                         //   )}
@@ -1972,7 +1974,6 @@ class Home3 extends Component {
   };
 
   onChangeSelect = (arr) => {
-    debugger;
     const { UserMapStore } = this.props;
     UserMapStore.setCurrentFilter(arr);
     UserMapStore.loadIssues('usermap');

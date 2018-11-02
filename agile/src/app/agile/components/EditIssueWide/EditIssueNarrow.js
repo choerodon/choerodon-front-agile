@@ -72,6 +72,7 @@ import Commits from '../Commits';
 import MergeRequest from '../MergeRequest';
 import Assignee from '../Assignee';
 import ChangeParent from '../ChangeParent';
+import TypeTag from '../TypeTag';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -1283,10 +1284,18 @@ class CreateSprint extends Component {
       statusCode,
       statusName,
     } = this.state;
-    const issueTypes = store.getIssueTypes ? store.getIssueTypes : [];
+    const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
     const typeColor = issueTypeDTO ? issueTypeDTO.colour : '#fab614';
     const typeIcon = issueTypeDTO ? issueTypeDTO.icon : 'help';
+    const typeId = issueTypeDTO ? issueTypeDTO.id : '';
+    const currentType = issueTypeData.find(t => t.id === typeId);
+    let issueTypes = [];
+    if (currentType) {
+      issueTypes = issueTypeData.filter(t => (t.stateMachineId === currentType.stateMachineId
+        && t.typeCode !== typeCode && t.typeCode !== 'sub_task'
+      ));
+    }
 
     const getMenu = () => (
       <Menu onClick={this.handleClickMenu.bind(this)}>
@@ -1364,33 +1373,12 @@ class CreateSprint extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          issueTypes.filter(t => t.typeCode !== typeCode && t.typeCode !== 'sub_task').map(t => (
+          issueTypes.map(t => (
             <Menu.Item key={t.typeCode} value={t.id}>
-              <div
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-              >
-                <div
-                  style={{
-                    backgroundColor: t.colour,
-                    marginRight: 8,
-                    display: 'inline-flex',
-                    width: 20,
-                    height: 20,
-                    borderRadius: '4px',
-                    textAlign: 'center',
-                    color: '#fff',
-                    fontSize: '14px',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Icon
-                    style={{ fontSize: '16px' }}
-                    type={t.icon}
-                  />
-                </div>
-                <span>{t.name}</span>
-              </div>
+              <TypeTag
+                data={t}
+                showName
+              />
             </Menu.Item>
           ))
         }
@@ -1433,24 +1421,13 @@ class CreateSprint extends Component {
                   borderBottom: '1px solid rgba(0,0,0,0.26)',
                 }}
               >
-                <div
-                  className="radius"
-                  style={{
-                    background: typeColor,
-                    color: '#fff',
-                    width: '20px',
-                    height: '20px',
-                    textAlign: 'center',
-                    fontSize: '14px',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Icon style={{ fontSize: '14px' }} type={typeIcon} />
-                </div>
-                <Icon type="arrow_drop_down" style={{ fontSize: 16 }} />
+                <TypeTag
+                  data={issueTypeDTO}
+                />
+                <Icon
+                  type="arrow_drop_down"
+                  style={{ fontSize: 16 }}
+                />
               </div>
             </Dropdown>
           </div>

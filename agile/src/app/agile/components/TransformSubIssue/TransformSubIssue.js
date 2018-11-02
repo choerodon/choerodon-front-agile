@@ -80,7 +80,7 @@ class TransformSubIssue extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const projectId = AppState.currentMenuType.id;
-        const { initValue, visible, onCancel, onOk, issueId, issueNum, ovn } = this.props;
+        const { issueId, ovn } = this.props;
         const parentIssueId = values.issues;
         const status = values.status;
         const issueTransformSubTask = {

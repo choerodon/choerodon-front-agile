@@ -430,7 +430,7 @@ class ScrumBoardHome extends Component {
             index2 < len2;
             index2 += 1) {
             if (String(newState[index].subStatuses[index2].statusId)
-              === String(JSON.parse(result.source.droppableId).code)) {
+              === String(JSON.parse(result.source.droppableId).endStatusId)) {
               let spliceIndex = '';
               for (
                 let index3 = 0, len3 = newState[index].subStatuses[index2].issues.length;
@@ -454,7 +454,7 @@ class ScrumBoardHome extends Component {
             index2 < len2;
             index2 += 1) {
             if (String(newState[index].subStatuses[index2].statusId)
-            === String(JSON.parse(result.destination.droppableId).code)) {
+            === String(JSON.parse(result.destination.droppableId).endStatusId)) {
               newState[index].subStatuses[index2].issues.splice(
                 result.destination.index, 0, draggableData,
               );
@@ -493,7 +493,7 @@ class ScrumBoardHome extends Component {
                     index2 < len2;
                     index2 += 1) {
                     if (String(newState[index].subStatuses[index2].statusId)
-                      === String(JSON.parse(result.destination.droppableId).code)) {
+                      === String(JSON.parse(result.destination.droppableId).endStatusId)) {
                       destinationStatus = newState[index].subStatuses[index2].categoryCode;
                       newState[index].subStatuses[index2].issues.splice(
                         result.destination.index, 1, draggableData,
@@ -512,7 +512,8 @@ class ScrumBoardHome extends Component {
                     let index = 0, len = ScrumBoardStore.getParentIds.length;
                     index < len;
                     index += 1) {
-                    if (ScrumBoardStore.getParentIds[index].issueId === draggableData.parentIssueId) {
+                    if (ScrumBoardStore.getParentIds[index].issueId
+                      === draggableData.parentIssueId) {
                       parentIdCode = ScrumBoardStore.getParentIds[index].categoryCode;
                       parentIdNum = ScrumBoardStore.getParentIds[index].issueNum;
                       parentObjectVersionNumber = ScrumBoardStore

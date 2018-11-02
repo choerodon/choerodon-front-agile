@@ -1,7 +1,8 @@
 .c7n-typeTag {
   display: flex;
   justify-content: center;
-  .icon {
+  margin: -3px;
+  .icon-wapper {
     display: flex;
     width: 20px;
     height: 20px;
@@ -13,5 +14,6 @@
 
   .name {
     margin-left: 8px;
+    line-height: 25px;
   }
 }

@@ -5,6 +5,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import { Icon, Avatar, Tooltip } from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import './StatusIssue.scss';
+import TypeTag from '../../../../../components/TypeTag';
 // 单个列的issueCard
 // @observer
 class StatusIssue extends Component {
@@ -409,19 +410,24 @@ class StatusIssue extends Component {
                               marginBottom: 4,
                             }}
                           >
-                            <div
-                              className="c7n-scrumboard-issueIcon"
-                              style={{
-                                background: item.issueTypeDTO ? item.issueTypeDTO.colour : '#fab614',
-                              }}
-                            >
-                              <Tooltip title={item.issueTypeDTO ? item.issueTypeDTO.name : ''}>
-                                <Icon
-                                  className="c7n-issueType-icon"
-                                  type={item.issueTypeDTO ? item.issueTypeDTO.icon : 'help'}
-                                />
-                              </Tooltip>
-                            </div>
+                            <Tooltip title={item.issueTypeDTO ? item.issueTypeDTO.name : ''}>
+                              <TypeTag
+                                data={item.issueTypeDTO}
+                              />
+                            </Tooltip>
+                            {/*<div*/}
+                              {/*className="c7n-scrumboard-issueIcon"*/}
+                              {/*style={{*/}
+                                {/*background: item.issueTypeDTO ? item.issueTypeDTO.colour : '#fab614',*/}
+                              {/*}}*/}
+                            {/*>*/}
+                              {/*<Tooltip title={item.issueTypeDTO ? item.issueTypeDTO.name : ''}>*/}
+                                {/*<Icon*/}
+                                  {/*className="c7n-issueType-icon"*/}
+                                  {/*type={item.issueTypeDTO ? item.issueTypeDTO.icon : 'help'}*/}
+                                {/*/>*/}
+                              {/*</Tooltip>*/}
+                            {/*</div>*/}
                             <p
                               style={{ marginLeft: 5, textDecoration: isCompleted ? 'line-through' : '' }}
                               className="textDisplayOneColumn"
