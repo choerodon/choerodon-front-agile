@@ -33,7 +33,7 @@ class IssueCard extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     const {
-      selected, dragged, index, issue: { issueId, objectVersionNumber },
+      selected, dragged, index, issue: { issueId, objectVersionNumber }, showDelete,
     } = this.props;
     const { summary, isFocus } = this.state;
     if (nextProps.issue.issueId === issueId
@@ -43,6 +43,7 @@ class IssueCard extends Component {
       && nextProps.index === index
       && nextState.summary === summary
       && nextState.isFocus === isFocus
+      && nextState.showDelete === showDelete
     ) {
       return false;
     }
@@ -156,7 +157,7 @@ class IssueCard extends Component {
 
   render() {
     const {
-      issue, borderTop, history, selected, dragged, draggableId, index,
+      issue, borderTop, history, selected, dragged, draggableId, index, showDelete,
     } = this.props;
     const {
       isFocus,
@@ -262,11 +263,15 @@ class IssueCard extends Component {
                     priority={priorityDTO}
                   />
                 </div>
-                <Icon
-                  className="c7n-delete"
-                  type="delete"
-                  onClick={this.handleClickDelete.bind(this)}
-                />
+                {showDelete
+                  ? (
+                    <Icon
+                      className="c7n-delete"
+                      type="delete"
+                      onClick={this.handleClickDelete.bind(this)}
+                    />
+                  ) : ''
+                }
               </div>
               
               <div className="c7n-content">

@@ -389,7 +389,7 @@ class Issue extends Component {
             <Menu.Item key={type}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
-                  typeCode={type}
+                  data={type}
                   showName
                 />
               </div>
