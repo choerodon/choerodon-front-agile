@@ -83,16 +83,21 @@ class Issue extends Component {
     }
     loadPriorities().then((res) => {
       if (res && res.length) {
-        const defaultPriorities = res.filter(p => p.default);
+        const defaultPriority = res.find(p => p.default);
+        const defaultPriorityId = defaultPriority ? defaultPriority.id : '';
         this.setState({
           originPriorities: res,
-          defaultPriorityId: defaultPriorities.length ? defaultPriorities[0].id : '',
+          defaultPriorityId,
         });
+        IssueStore.setPriorities(res);
+        IssueStore.setDefaultPriorityId();
       } else {
         this.setState({
           originPriorities: [],
           defaultPriorityId: '',
         });
+        IssueStore.setPriorities([]);
+        IssueStore.setDefaultPriorityId('');
       }
     });
     if (paramStatus) {
