@@ -55,7 +55,9 @@ class TransformSubIssue extends Component {
     this.setState({
       selectLoading: true,
     });
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`)
+    const { typeId } = this.props;
+    const proId = AppState.currentMenuType.organizationId;
+    axios.get(`/issue/v1/projects/${proId}/schemes/query_status_by_issue_type_id?issue_type_id=${typeId}&scheme_type=agile`)
       .then((res) => {
         this.setState({
           selectLoading: false,
@@ -179,7 +181,7 @@ class TransformSubIssue extends Component {
                             style={{
                               width: 15,
                               height: 15,
-                              background: STATUS_COLOR[status.categoryCode],
+                              background: STATUS_COLOR[status.type],
                               marginRight: 6,
                               borderRadius: '2px',
                             }}

@@ -69,6 +69,10 @@ class SprintCommonStore {
 
   @observable issueTypes = [];
 
+  @observable priorities = [];
+
+  @observable defaultPriorityId = false;
+
   init() {
     this.setOrder({
       orderField: '',
@@ -263,6 +267,22 @@ class SprintCommonStore {
         this.setIssueTypes([]);
       }
     });
+  }
+
+  @computed get getPriorities() {
+    return this.priorities.slice();
+  }
+
+  @action setPriorities(data) {
+    this.priorities = data;
+  }
+
+  @computed get getDefaultPriorityId() {
+    return this.defaultPriorityId;
+  }
+
+  @action setDefaultPriorityId(data) {
+    this.defaultPriorityId = data;
   }
 }
 const sprintCommonStore = new SprintCommonStore();
