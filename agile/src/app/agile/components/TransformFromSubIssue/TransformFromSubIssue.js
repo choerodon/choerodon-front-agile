@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
-import { Modal, Form, Select, Input } from 'choerodon-ui';
+import {
+  Modal, Form, Select, Input,
+} from 'choerodon-ui';
 import { updateIssueType } from '../../api/NewIssueApi';
 import TypeTag from '../TypeTag';
 
@@ -10,66 +12,121 @@ const { AppState } = stores;
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
 const { Option } = Select;
+const STATUS_COLOR = {
+  todo: 'rgb(255, 177, 0)',
+  doing: 'rgb(77, 144, 254)',
+  done: 'rgb(0, 191, 165)',
+};
 
 class TransformFromSubIssue extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      createLoading: false,
       selectLoading: true,
-
-      originIssues: [],
+      originTypes: [],
       originStatus: [],
+      issueTypeId: false,
+      isEpicType: false,
     };
   }
 
   componentDidMount() {
-    this.getStatus();
+    this.axiosGetIssueTypes();
   }
 
   getStatus() {
     this.setState({
       selectLoading: true,
     });
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`)
-      .then((res) => {
-        this.setState({
-          selectLoading: false,
-          originStatus: res,
+    const { issueTypeId } = this.state;
+    const proId = AppState.currentMenuType.id;
+    if (issueTypeId) {
+      axios.get(`/issue/v1/projects/${proId}/schemes/query_status_by_issue_type_id?issue_type_id=${issueTypeId}&scheme_type=agile`)
+        .then((res) => {
+          this.setState({
+            selectLoading: false,
+            originStatus: res,
+          });
         });
+    } else {
+      this.setState({
+        selectLoading: false,
+        originStatus: [],
       });
+    }
   }
 
   handleTransformSubIssue = () => {
-    this.props.form.validateFields((err, values) => {
+    const {
+      issueId, ovn, form, onOk,
+    } = this.props;
+    form.validateFields((err, values) => {
       if (!err) {
-        const projectId = AppState.currentMenuType.id;
-        const { initValue, visible, onCancel, onOk, issueId, issueNum, ovn } = this.props;
-        const typeCode = values.typeCode;
-        const epicName = values.epicName;
-        const issueupdateTypeDTO = {
-          epicName: typeCode === 'issue_epic' ? epicName : undefined,
+        const { originTypes, isEpicType } = this.state;
+        const { typeCode } = originTypes.find(t => t.id === values.typeId);
+        const issueUpdateTypeDTO = {
+          epicName: isEpicType ? values.epicName : undefined,
           issueId,
           objectVersionNumber: ovn,
           typeCode,
+          issueTypeId: values.typeId,
+          statusId: values.statusId,
         };
         this.setState({
           loading: true,
         });
-        updateIssueType(issueupdateTypeDTO)
+        updateIssueType(issueUpdateTypeDTO)
           .then((res) => {
             this.setState({
               loading: false,
             });
-            this.props.onOk();
+            onOk();
           });
       }
     });
   };
 
+  onTypeChange = (typeId) => {
+    const { form } = this.props;
+    const { originTypes } = this.state;
+    form.setFieldsValue({
+      statusId: undefined,
+    });
+    const epicType = originTypes.find(t => t.typeCode === 'issue_epic');
+    this.setState({
+      issueTypeId: typeId,
+      isEpicType: epicType && epicType.id === typeId,
+    }, () => {
+      this.getStatus();
+    });
+  };
+
+  axiosGetIssueTypes() {
+    const proId = AppState.currentMenuType.id;
+    axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?scheme_type=agile`)
+      .then((data) => {
+        this.setState({
+          selectLoading: false,
+          originTypes: data,
+        });
+      });
+  }
+
   render() {
-    const { getFieldDecorator } = this.props.form;
-    const { initValue, visible, onCancel, onOk, issueId, issueNum } = this.props;
+    const {
+      form,
+      visible,
+      onCancel,
+      issueNum,
+    } = this.props;
+    const { getFieldDecorator } = form;
+    const {
+      originStatus,
+      originTypes,
+      selectLoading,
+      loading,
+      isEpicType,
+    } = this.state;
 
     return (
       <Sidebar
@@ -80,7 +137,7 @@ class TransformFromSubIssue extends Component {
         onCancel={onCancel}
         okText="转化"
         cancelText="取消"
-        confirmLoading={this.state.loading}
+        confirmLoading={loading}
       >
         <Content
           style={{
@@ -92,29 +149,57 @@ class TransformFromSubIssue extends Component {
         >
           <Form layout="vertical">
             <FormItem label="问题类型" style={{ width: 520 }}>
-              {getFieldDecorator('typeCode', {
-                initialValue: 'story',
+              {getFieldDecorator('typeId', {
                 rules: [{ required: true }],
               })(
                 <Select
                   label="问题类型"
                   getPopupContainer={triggerNode => triggerNode.parentNode}
+                  onChange={this.onTypeChange}
                 >
-                  {['story', 'task', 'bug', 'issue_epic'].map(type => (
-                    <Option key={type} value={type}>
+                  {originTypes.filter(t => t.typeCode !== 'sub_task').map(type => (
+                    <Option key={type.id} value={type.id}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                         <TypeTag
-                          data=""
+                          data={type}
                           showName
                         />
                       </div>
-                    </Option>),
-                  )}
+                    </Option>))}
+                </Select>,
+              )}
+            </FormItem>
+            <FormItem label="状态" style={{ width: 520 }}>
+              {getFieldDecorator('statusId', {
+                rules: [{ required: true, message: '请选择状态' }],
+              })(
+                <Select
+                  label="状态"
+                  loading={selectLoading}
+                >
+                  {
+                    originStatus.map(status => (
+                      <Option key={status.id} value={status.id}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                          <div
+                            style={{
+                              width: 15,
+                              height: 15,
+                              background: STATUS_COLOR[status.type],
+                              marginRight: 6,
+                              borderRadius: '2px',
+                            }}
+                          />
+                          { status.name }
+                        </div>
+                      </Option>
+                    ))
+                  }
                 </Select>,
               )}
             </FormItem>
             {
-              this.props.form.getFieldValue('typeCode') === 'issue_epic' && (
+              isEpicType && (
                 <FormItem label="史诗名称" style={{ width: 520 }}>
                   {getFieldDecorator('epicName', {
                     rules: [{ required: true, message: '史诗名称为必输项' }],

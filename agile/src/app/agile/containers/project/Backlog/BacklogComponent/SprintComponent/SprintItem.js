@@ -158,9 +158,7 @@ class SprintItem extends Component {
   handleBlurCreateIssue = (type, item, index) => {
     const { store } = this.props;
     const { selectIssueType } = this.state;
-    const issueTypes = store.getIssueTypes
-      .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
-    const currentType = issueTypes.filter(t => t.typeCode === selectIssueType);
+    const currentType = store.getIssueTypes.find(t => t.typeCode === selectIssueType);
     const priorityId = store.getDefaultPriority.id;
     if (this[`${index}-addInput`].input.value !== '') {
       this.setState({
@@ -172,8 +170,8 @@ class SprintItem extends Component {
         projectId: AppState.currentMenuType.id,
         sprintId: type !== 'backlog' ? item.sprintId : 0,
         summary: this[`${index}-addInput`].input.value,
-        issueTypeId: currentType[0].id,
-        typeCode: currentType[0].typeCode,
+        issueTypeId: currentType.id,
+        typeCode: currentType.typeCode,
         ...!isNaN(this.props.store.getChosenEpic) ? {
           epicId: this.props.store.getChosenEpic,
         } : {},
@@ -685,13 +683,7 @@ class SprintItem extends Component {
     const { selectIssueType } = this.state;
     const issueTypes = store.getIssueTypes
       .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
-    const currentType = issueTypes.filter(t => t.typeCode === selectIssueType);
-    let currentTypeIcon = 'help';
-    let currentTypeColour = '#fab614';
-    if (currentType.length) {
-      currentTypeIcon = currentType[0].icon;
-      currentTypeColour = currentType[0].colour;
-    }
+    const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
       <Menu
         style={{
@@ -986,18 +978,9 @@ class SprintItem extends Component {
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                   <Dropdown overlay={typeList} trigger={['click']}>
                                     <div style={{ display: 'flex', alignItem: 'center' }}>
-                                      <div
-                                        className="c7n-sign"
-                                        style={{
-                                          backgroundColor: currentTypeColour,
-                                          marginRight: 2,
-                                        }}
-                                      >
-                                        <Icon
-                                          style={{ fontSize: '14px' }}
-                                          type={currentTypeIcon}
-                                        />
-                                      </div>
+                                      <TypeTag
+                                        data={currentType}
+                                      />
                                       <Icon
                                         type="arrow_drop_down"
                                         style={{ fontSize: 16 }}
@@ -1114,13 +1097,7 @@ class SprintItem extends Component {
     const issueTypes = store.getIssueTypes
       .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
     const { selectIssueType } = this.state;
-    const currentType = issueTypes.filter(t => t.typeCode === selectIssueType);
-    let currentTypeIcon = 'help';
-    let currentTypeColour = '#fab614';
-    if (currentType.length) {
-      currentTypeIcon = currentType[0].icon;
-      currentTypeColour = currentType[0].colour;
-    }
+    const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
       <Menu
         style={{
@@ -1132,7 +1109,7 @@ class SprintItem extends Component {
       >
         {
           issueTypes.map(type => (
-            <Menu.Item key={type}>
+            <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
                   data={type}
@@ -1233,18 +1210,9 @@ class SprintItem extends Component {
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                               <Dropdown overlay={typeList} trigger={['click']}>
                                 <div style={{ display: 'flex', alignItem: 'center' }}>
-                                  <div
-                                    className="c7n-sign"
-                                    style={{
-                                      backgroundColor: currentTypeColour,
-                                      marginRight: 2,
-                                    }}
-                                  >
-                                    <Icon
-                                      style={{ fontSize: '14px' }}
-                                      type={currentTypeIcon}
-                                    />
-                                  </div>
+                                  <TypeTag
+                                    data={currentType}
+                                  />
                                   <Icon
                                     type="arrow_drop_down"
                                     style={{ fontSize: 16 }}
