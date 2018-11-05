@@ -415,19 +415,6 @@ class StatusIssue extends Component {
                                 data={item.issueTypeDTO}
                               />
                             </Tooltip>
-                            {/*<div*/}
-                              {/*className="c7n-scrumboard-issueIcon"*/}
-                              {/*style={{*/}
-                                {/*background: item.issueTypeDTO ? item.issueTypeDTO.colour : '#fab614',*/}
-                              {/*}}*/}
-                            {/*>*/}
-                              {/*<Tooltip title={item.issueTypeDTO ? item.issueTypeDTO.name : ''}>*/}
-                                {/*<Icon*/}
-                                  {/*className="c7n-issueType-icon"*/}
-                                  {/*type={item.issueTypeDTO ? item.issueTypeDTO.icon : 'help'}*/}
-                                {/*/>*/}
-                              {/*</Tooltip>*/}
-                            {/*</div>*/}
                             <p
                               style={{ marginLeft: 5, textDecoration: isCompleted ? 'line-through' : '' }}
                               className="textDisplayOneColumn"
@@ -454,8 +441,8 @@ class StatusIssue extends Component {
                                   color: 'white',
                                   maxWidth: 64,
                                   textAlign: 'center',
+                                  height: 20,
                                 }}
-                                className="textDisplayOneColumn"
                               >
                                 {statusName}
                               </p>
