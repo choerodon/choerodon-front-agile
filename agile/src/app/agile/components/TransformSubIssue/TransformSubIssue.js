@@ -19,10 +19,22 @@ const STATUS_COLOR = {
 let sign = false;
 
 class TransformSubIssue extends Component {
+  debounceFilterIssues = _.debounce((input) => {
+    const { issueId } = this.props;
+    this.setState({
+      selectLoading: true,
+    });
+    loadIssuesInLink(0, 20, issueId, input).then((res) => {
+      this.setState({
+        originIssues: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
+
   constructor(props) {
     super(props);
     this.state = {
-      createLoading: false,
       selectLoading: true,
 
       originIssues: [],
@@ -35,11 +47,12 @@ class TransformSubIssue extends Component {
   }
 
   onFilterChange(input) {
+    const { issueId } = this.props;
     if (!sign) {
       this.setState({
         selectLoading: true,
       });
-      loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
+      loadIssuesInLink(0, 20, issueId, input).then((res) => {
         this.setState({
           originIssues: res.content,
           selectLoading: false,
@@ -55,59 +68,67 @@ class TransformSubIssue extends Component {
     this.setState({
       selectLoading: true,
     });
-    const { typeId } = this.props;
-    const proId = AppState.currentMenuType.organizationId;
-    axios.get(`/issue/v1/projects/${proId}/schemes/query_status_by_issue_type_id?issue_type_id=${typeId}&scheme_type=agile`)
-      .then((res) => {
-        this.setState({
-          selectLoading: false,
-          originStatus: res,
+    const { store } = this.props;
+    const proId = AppState.currentMenuType.id;
+    const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
+    const subTask = issueTypeData.find(t => t.typeCode === 'sub_task');
+    if (subTask) {
+      axios.get(`/issue/v1/projects/${proId}/schemes/query_status_by_issue_type_id?issue_type_id=${subTask.id}&scheme_type=agile`)
+        .then((res) => {
+          this.setState({
+            selectLoading: false,
+            originStatus: res,
+          });
         });
+    } else {
+      this.setState({
+        selectLoading: false,
+        originStatus: [],
       });
+    }
   }
 
-  debounceFilterIssues = _.debounce((input) => {
-    this.setState({
-      selectLoading: true,
-    });
-    loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
-      this.setState({
-        originIssues: res.content,
-        selectLoading: false,
-      });
-    });
-  }, 500);
-
   handleTransformSubIssue = () => {
-    this.props.form.validateFields((err, values) => {
+    const { form, onOk } = this.props;
+    form.validateFields((err, values) => {
       if (!err) {
         const projectId = AppState.currentMenuType.id;
+        const orgId = AppState.currentMenuType.organizationId;
         const { issueId, ovn } = this.props;
-        const parentIssueId = values.issues;
-        const status = values.status;
         const issueTransformSubTask = {
           issueId,
-          parentIssueId,
-          statusId: status,
+          parentIssueId: values.issuesId,
+          statusId: values.statusId,
           objectVersionNumber: ovn,
         };
         this.setState({
           loading: true,
         });
-        axios.post(`/agile/v1/projects/${projectId}/issues/transformed_sub_task`, issueTransformSubTask)
+        axios.post(`/agile/v1/projects/${projectId}/issues/transformed_sub_task?organizationId=${orgId}`, issueTransformSubTask)
           .then((res) => {
             this.setState({
               loading: false,
             });
-            this.props.onOk();
+            onOk();
           });
       }
     });
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
-    const { initValue, visible, onCancel, onOk, issueId, issueNum } = this.props;
+    const {
+      form,
+      visible,
+      onCancel,
+      issueNum,
+    } = this.props;
+    const {
+      loading,
+      selectLoading,
+      originIssues,
+      originStatus,
+    } = this.state;
+    const { getFieldDecorator } = form;
 
     return (
       <Sidebar
@@ -118,7 +139,7 @@ class TransformSubIssue extends Component {
         onCancel={onCancel}
         okText="转化"
         cancelText="取消"
-        confirmLoading={this.state.loading}
+        confirmLoading={loading}
       >
         <Content
           style={{
@@ -130,18 +151,18 @@ class TransformSubIssue extends Component {
         >
           <Form layout="vertical">
             <FormItem label="父任务" style={{ width: 520 }}>
-              {getFieldDecorator('issues', {
+              {getFieldDecorator('issuesId', {
                 rules: [{ required: true, message: '请选择父任务' }],
               })(
                 <Select
                   label="父任务"
-                  loading={this.state.selectLoading}
+                  loading={selectLoading}
                   filter
                   filterOption={false}
                   onFilterChange={this.onFilterChange.bind(this)}
                 >
-                  {this.state.originIssues.map(issue =>
-                    (<Option
+                  {originIssues.map(issue => (
+                    <Option
                       key={issue.issueId}
                       value={issue.issueId}
                     >
@@ -151,30 +172,44 @@ class TransformSubIssue extends Component {
                             data={issue.issueTypeDTO}
                           />
                         </div>
-                        <a style={{ paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <a style={{
+                          paddingLeft: 12,
+                          paddingRight: 12,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                        >
                           {issue.issueNum}
                         </a>
                         <div style={{ overflow: 'hidden', flex: 1 }}>
-                          <p style={{ paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset' }}>
+                          <p style={{
+                            paddingRight: '25px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            marginBottom: 0,
+                            maxWidth: 'unset',
+                          }}
+                          >
                             {issue.summary}
                           </p>
                         </div>
                       </div>
-                    </Option>),
-                  )}
+                    </Option>))}
                 </Select>,
               )}
             </FormItem>
             <FormItem label="状态" style={{ width: 520 }}>
-              {getFieldDecorator('status', {
+              {getFieldDecorator('statusId', {
                 rules: [{ required: true, message: '请选择状态' }],
               })(
                 <Select
                   label="状态"
-                  loading={this.state.selectLoading}
+                  loading={selectLoading}
                 >
                   {
-                    this.state.originStatus.map(status => (
+                    originStatus.map(status => (
                       <Option key={status.id} value={status.id}>
                         <div style={{ display: 'inline-flex', alignItems: 'center' }}>
                           <div
@@ -189,8 +224,7 @@ class TransformSubIssue extends Component {
                           { status.name }
                         </div>
                       </Option>
-                    ),
-                    )
+                    ))
                   }
                 </Select>,
               )}

@@ -3284,11 +3284,11 @@ h
             <TransformSubIssue
               visible={this.state.transformSubIssueShow}
               issueId={this.state.origin.issueId}
-              typeId={this.state.origin.issueTypeDTO.id}
               issueNum={this.state.origin.issueNum}
               ovn={this.state.origin.objectVersionNumber}
               onCancel={() => this.setState({ transformSubIssueShow: false })}
               onOk={this.handleTransformSubIssue.bind(this)}
+              store={store}
             />
           ) : null
         }
@@ -3301,6 +3301,7 @@ h
               ovn={this.state.origin.objectVersionNumber}
               onCancel={() => this.setState({ transformFromSubIssueShow: false })}
               onOk={this.handleTransformFromSubIssue.bind(this)}
+              store={store}
             />
           ) : null
         }

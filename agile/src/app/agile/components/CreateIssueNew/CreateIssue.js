@@ -81,9 +81,18 @@ class CreateIssue extends Component {
   }, 500);
 
   handleCreateIssue = () => {
-    this.props.form.validateFields((err, values) => {
+    const { form, store } = this.props;
+    const {
+      originComponents,
+      originLabels,
+      originFixVersions,
+      delta,
+    } = this.state;
+    form.validateFields((err, values) => {
       if (!err) {
-        const exitComponents = this.state.originComponents;
+        const issueTypes = store.getIssueTypes;
+        const { typeCode } = issueTypes.find(t => t.id === values.typeId);
+        const exitComponents = originComponents;
         const componentIssueRelDTOList = _.map(values.componentIssueRel, (component) => {
           const target = _.find(exitComponents, { name: component });
           if (target) {
@@ -95,7 +104,7 @@ class CreateIssue extends Component {
             });
           }
         });
-        const exitLabels = this.state.originLabels;
+        const exitLabels = originLabels;
         const labelIssueRelDTOList = _.map(values.issueLink, (label) => {
           const target = _.find(exitLabels, { labelName: label });
           if (target) {
@@ -107,7 +116,7 @@ class CreateIssue extends Component {
             });
           }
         });
-        const exitFixVersions = this.state.originFixVersions;
+        const exitFixVersions = originFixVersions;
         const fixVersionIssueRelDTOList = _.map(values.fixVersionIssueRel, (version) => {
           const target = _.find(exitFixVersions, { name: version });
           if (target) {
@@ -124,9 +133,11 @@ class CreateIssue extends Component {
           }
         });
         const extra = {
-          typeCode: values.typeCode,
+          issueTypeId: values.typeId,
+          typeCode,
           summary: values.summary,
           priorityId: values.priorityId,
+          priorityCode: `priority-${values.priorityId}`,
           sprintId: values.sprintId || 0,
           epicId: values.epicId || 0,
           epicName: values.epicName,
@@ -137,7 +148,7 @@ class CreateIssue extends Component {
           componentIssueRelDTOList,
         };
         this.setState({ createLoading: true });
-        const deltaOps = this.state.delta;
+        const deltaOps = delta;
         if (deltaOps) {
           beforeTextUpload(deltaOps, extra, this.handleSave);
         } else {
@@ -150,7 +161,8 @@ class CreateIssue extends Component {
   };
 
   handleSave = (data) => {
-    const fileList = this.state.fileList;
+    const { fileList } = this.state;
+    const { onOk } = this.props;
     const callback = (newFileList) => {
       this.setState({ fileList: newFileList });
     };
@@ -164,13 +176,13 @@ class CreateIssue extends Component {
             projectId: AppState.currentMenuType.id,
           };
           if (fileList.some(one => !one.url)) {
-            handleFileUpload(this.state.fileList, callback, config);
+            handleFileUpload(fileList, callback, config);
           }
         }
-        this.props.onOk(res);
+        onOk(res);
       })
       .catch(() => {
-        this.props.onOk();
+        onOk();
       });
   };
 
@@ -185,15 +197,21 @@ class CreateIssue extends Component {
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
-    const { visible, onCancel } = this.props;
-    const { originPriorities, defaultPriority } = this.state;
+    const {
+      visible,
+      onCancel,
+      store,
+      form,
+    } = this.props;
+    const { getFieldDecorator } = form;
+    const { originPriorities, defaultPriority, createLoading } = this.state;
     const callback = (value) => {
       this.setState({
         delta: value,
         edit: false,
       });
     };
+    const issueTypes = store.getIssueTypes;
 
     return (
       <Sidebar
@@ -204,7 +222,7 @@ class CreateIssue extends Component {
         onCancel={onCancel}
         okText="创建"
         cancelText="取消"
-        confirmLoading={this.state.createLoading}
+        confirmLoading={createLoading}
       >
         <Content
           title={`在项目“${AppState.currentMenuType.name}”中创建问题`}
@@ -214,19 +232,18 @@ class CreateIssue extends Component {
           <div>
             <Form layout="vertical">
               <FormItem label="问题类型" style={{ width: 520 }}>
-                {getFieldDecorator('typeCode', {
-                  initialValue: 'story',
+                {getFieldDecorator('typeId', {
                   rules: [{ required: true }],
                 })(
                   <Select
                     label="问题类型"
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                   >
-                    {['story', 'task', 'bug', 'issue_epic'].map(type => (
-                      <Option key={type} value={type}>
+                    {issueTypes.filter(t => t.typeCode !== 'sub_task').map(type => (
+                      <Option key={type.id} value={type.id}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                           <TypeTag
-                            data=''
+                            data={type}
                             showName
                           />
                         </div>

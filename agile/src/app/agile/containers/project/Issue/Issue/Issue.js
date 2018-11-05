@@ -82,7 +82,7 @@ class Issue extends Component {
           defaultPriorityId,
         });
         IssueStore.setPriorities(res);
-        IssueStore.setDefaultPriorityId();
+        IssueStore.setDefaultPriorityId(defaultPriorityId);
       } else {
         this.setState({
           originPriorities: [],
@@ -199,21 +199,22 @@ class Issue extends Component {
 
   handleBlurCreateIssue = () => {
     const { defaultPriorityId, createIssueValue, selectIssueType } = this.state;
+    const currentType = IssueStore.getIssueTypes.find(t => t.typeCode === selectIssueType);
     if (defaultPriorityId && createIssueValue !== '') {
       const { history } = this.props;
       const {
         type, id, name, organizationId,
       } = AppState.currentMenuType;
-
-
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
+      axios.get(`/agile/v1/projects/${id}/project_info`)
         .then((res) => {
           const data = {
+            priorityCode: `priority-${defaultPriorityId}`,
             priorityId: defaultPriorityId,
-            projectId: AppState.currentMenuType.id,
+            projectId: id,
             sprintId: 0,
             summary: createIssueValue,
-            typeCode: selectIssueType,
+            issueTypeId: currentType.id,
+            typeCode: currentType.typeCode,
             epicId: 0,
             epicName: selectIssueType === 'issue_epic' ? createIssueValue : undefined,
             parentIssueId: 0,
@@ -237,9 +238,9 @@ class Issue extends Component {
     }
   };
 
-  handleChangeType = ({ key }) => {
+  handleChangeType = (type) => {
     this.setState({
-      selectIssueType: key,
+      selectIssueType: type.key,
     });
   };
 
@@ -581,7 +582,8 @@ class Issue extends Component {
         hidden: true,
       },
     ];
-
+    const issueTypes = IssueStore.getIssueTypes;
+    const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
       <Menu
         style={{
@@ -592,8 +594,8 @@ class Issue extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          ['story', 'task', 'bug', 'issue_epic'].map(type => (
-            <Menu.Item key={type}>
+          issueTypes.filter(t => t.typeCode !== 'sub_task').map(type => (
+            <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
                   data={type}
@@ -717,18 +719,9 @@ class Issue extends Component {
                     <div style={{ display: 'flex' }}>
                       <Dropdown overlay={typeList} trigger={['click']}>
                         <div style={{ display: 'flex', alignItem: 'center' }}>
-                          <div
-                            className="c7n-sign"
-                            style={{
-                              backgroundColor: TYPE[selectIssueType],
-                              marginRight: 2,
-                            }}
-                          >
-                            <Icon
-                              style={{ fontSize: '14px' }}
-                              type={ICON[selectIssueType]}
-                            />
-                          </div>
+                          <TypeTag
+                            data={currentType}
+                          />
                           <Icon
                             type="arrow_drop_down"
                             style={{ fontSize: 16 }}
@@ -860,7 +853,7 @@ class Issue extends Component {
               visible={create}
               onCancel={() => this.setState({ create: false })}
               onOk={this.handleCreateIssue.bind(this)}
-
+              store={IssueStore}
             />
           ) : null
         }
