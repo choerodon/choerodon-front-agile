@@ -60,7 +60,7 @@ class ScrumBoardStore {
   @observable issueTypes = [];
 
   @computed get getStatusList() {
-    return toJS(this.statusList);
+    return this.statusList.slice();
   }
 
   @action setStatusList(data) {
@@ -410,7 +410,7 @@ class ScrumBoardStore {
 
   axiosGetIssueTypes() {
     const proId = AppState.currentMenuType.id;
-    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?scheme_type=agile`).then((data) => {
+    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?apply_type=agile`).then((data) => {
       if (data && !data.failed) {
         this.setIssueTypes(data);
       } else {
@@ -422,9 +422,22 @@ class ScrumBoardStore {
   loadTransforms(statusId, issueId, typeId) {
     const projectId = AppState.currentMenuType.id;
     return axios.get(
-      `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&scheme_type=agile`,
+      `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&apply_type=agile`,
     );
   }
+
+  loadStatus = () => {
+    const projectId = AppState.currentMenuType.id;
+    axios.get(`/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=agile`).then((data) => {
+      if (data && !data.failed) {
+        this.setStatusList(data);
+      } else {
+        this.setStatusList([]);
+      }
+    }).catch(() => {
+      this.setStatusList([]);
+    });
+  };
 }
 
 const scrumBoardStore = new ScrumBoardStore();

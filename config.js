@@ -30,7 +30,7 @@ const config = {
     routes: null, //by default, routes use main in package.json
     server: 'http://api.staging.saas.hand-china.com',
     // server: 'http://api.alpha.saas.hand-china.com',
-    // server: 'http://10.211.101.46',
+    // server: 'http://10.211.102.55:8080',
     clientid: 'localhost',
     titlename: 'Choerodon', //html title
     favicon: 'favicon.ico', //page favicon

@@ -356,7 +356,7 @@ class ReleaseDetail extends Component {
             style={{
               padding: '1px 4px',
               color: record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF',
-              background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}4C`,
+              background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}1F`,
             }}
           >
             {record.priorityDTO ? record.priorityDTO.name : ''}

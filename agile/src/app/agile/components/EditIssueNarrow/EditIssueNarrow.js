@@ -104,6 +104,7 @@ class CreateSprint extends Component {
       sprintName: '',
       statusId: undefined,
       statusCode: undefined,
+      statusMapDTO: {},
       storyPoints: undefined,
       creationDate: undefined,
       lastUpdateDate: undefined,
@@ -236,6 +237,7 @@ class CreateSprint extends Component {
       statusId,
       statusCode,
       statusName,
+      statusMapDTO,
       storyPoints,
       summary,
       typeCode,
@@ -293,6 +295,7 @@ class CreateSprint extends Component {
       statusId,
       statusCode,
       statusName,
+      statusMapDTO,
       storyPoints,
       summary,
       typeCode,
@@ -1181,17 +1184,15 @@ class CreateSprint extends Component {
       priorityId,
       priorityName,
       priorityColor,
-      origin,
       issueId,
       originStatus,
-      statusId,
-      statusCode,
-      statusName,
+      statusMapDTO,
     } = this.state;
+    const statusCode = statusMapDTO ? statusMapDTO.type : undefined;
+    const statusName = statusMapDTO ? statusMapDTO.name : '';
+    const statusId = statusMapDTO ? statusMapDTO.id : undefined;
     const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
-    const typeColor = issueTypeDTO ? issueTypeDTO.colour : '#fab614';
-    const typeIcon = issueTypeDTO ? issueTypeDTO.icon : 'help';
     const typeId = issueTypeDTO ? issueTypeDTO.id : '';
     const currentType = issueTypeData.find(t => t.id === typeId);
     let issueTypes = [];
@@ -1734,7 +1735,7 @@ class CreateSprint extends Component {
                                   <div
                                     className="c7n-level"
                                     style={{
-                                      backgroundColor: `${priorityColor}4C`,
+                                      backgroundColor: `${priorityColor}1F`,
                                       color: priorityColor,
                                       borderRadius: '2px',
                                       padding: '0 8px',
@@ -1781,8 +1782,6 @@ class CreateSprint extends Component {
                                       <div
                                         className="c7n-level"
                                         style={{
-                                          backgroundColor: `${priority.colour}4C`,
-                                          color: priority.colour,
                                           borderRadius: '2px',
                                           padding: '0 8px',
                                           display: 'inline-block',
@@ -2888,7 +2887,7 @@ class CreateSprint extends Component {
               ovn={this.state.origin.objectVersionNumber}
               onCancel={() => this.setState({ transformSubIssueShow: false })}
               onOk={this.handleTransformSubIssue.bind(this)}
-              dtore={store}
+              store={store}
             />
           ) : null
         }

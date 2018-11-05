@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Content, stores } from 'choerodon-front-boot';
-import { Form, Modal, Input, Select } from 'choerodon-ui';
-import _ from 'lodash';
+import {
+  Form, Modal, Input, Select,
+} from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
+import { STATUS } from '../../../../../common/Constant';
 
 const FormItem = Form.Item;
 const { Sidebar } = Modal;
-const Option = Select.Option;
-const confirm = Modal.confirm;
+const { Option } = Select;
+const { confirm } = Modal;
 const { AppState } = stores;
 
 @observer
@@ -17,75 +19,93 @@ class AddColumn extends Component {
     super(props);
     this.state = {
       loading: false,
+      statusType: false,
     };
   }
+
   handleAddColumn(e) {
+    const { form } = this.props;
+    const { statusType } = this.state;
     const that = this;
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    form.validateFields((err, values) => {
       if (!err) {
-        this.setState({
-          loading: true,
-        });
-        ScrumBoardStore.axiosCheckRepeatName(values.column_name).then((res) => {
-          this.setState({
-            loading: false,
-          });
-          if (res) {
-            confirm({
-              title: '警告',
-              content: '已有重名列，如果创建该列，不会创建同名状态',
-              onOk() {
-                const categoryCode = values.column_categoryCode;
-                const data = {
-                  boardId: ScrumBoardStore.getSelectedBoard,
-                  name: values.column_name,
-                  projectId: AppState.currentMenuType.id,
-                  maxNum: 1,
-                  minNum: 1,
-                  categoryCode: values.column_categoryCode,
-                  sequence: ScrumBoardStore.getBoardData.length - 1,
-                };
-                ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
-                  that.props.onChangeVisible(false);
-                  that.props.refresh();
-                }).catch((error) => {
-                });
-              },
-              onCancel() {
-              },
-            });
-          } else {
-            const categoryCode = values.column_categoryCode;
-            const data = {
-              boardId: ScrumBoardStore.getSelectedBoard,
-              name: values.column_name,
-              projectId: AppState.currentMenuType.id,
-              maxNum: 1,
-              minNum: 1,
-              categoryCode: values.column_categoryCode,
-              sequence: ScrumBoardStore.getBoardData.length - 1,
-            };
-            ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
-              that.props.onChangeVisible(false);
-              that.props.refresh();
-              this.setState({
-                loading: false,
+        if (statusType) {
+          confirm({
+            title: '警告',
+            content: `已存在状态${values.column_name}，如果创建该列，不会创建同名状态`,
+            onOk() {
+              const categoryCode = values.column_categoryCode;
+              const data = {
+                boardId: ScrumBoardStore.getSelectedBoard,
+                name: values.column_name,
+                projectId: AppState.currentMenuType.id,
+                maxNum: 1,
+                minNum: 1,
+                categoryCode: values.column_categoryCode,
+                sequence: ScrumBoardStore.getBoardData.length - 1,
+              };
+              ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
+                that.props.onChangeVisible(false);
+                that.props.refresh();
+              }).catch((error) => {
               });
-            }).catch((error) => {
-              this.setState({
-                loading: false,
-              });
-            });
-          }
-        }).catch((error) => {
-          this.setState({
-            loading: false,
+            },
+            onCancel() {
+            },
           });
-        });
+        } else {
+          const categoryCode = values.column_categoryCode;
+          const data = {
+            boardId: ScrumBoardStore.getSelectedBoard,
+            name: values.column_name,
+            projectId: AppState.currentMenuType.id,
+            maxNum: 1,
+            minNum: 1,
+            categoryCode: values.column_categoryCode,
+            sequence: ScrumBoardStore.getBoardData.length - 1,
+          };
+          ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
+            that.props.onChangeVisible(false);
+            that.props.refresh();
+            this.setState({
+              loading: false,
+            });
+          }).catch((error) => {
+            this.setState({
+              loading: false,
+            });
+          });
+        }
       }
     });
   }
+
+  checkStatusName(rule, value, callback) {
+    const { store, form } = this.props;
+    const statusDate = store.getStatusList;
+    const status = statusDate.find(s => s.name === value);
+    if (status) {
+      this.setState({
+        statusType: status.type,
+      }, () => {
+        form.setFieldsValue({
+          categoryCode: status.type,
+        });
+      });
+      callback();
+    } else {
+      this.setState({
+        statusType: false,
+      }, () => {
+        form.setFieldsValue({
+          categoryCode: status.type,
+        });
+      });
+      callback();
+    }
+  }
+
   renderOptions() {
     const result = [];
     if (JSON.stringify(ScrumBoardStore.getStatusCategory) !== '{}') {
@@ -103,33 +123,57 @@ class AddColumn extends Component {
       });
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
-          <Option value={data[index].valueCode}>{data[index].name}</Option>,
+          <Option value={data[index].valueCode}>
+            <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <div style={{
+                width: 15,
+                height: 15,
+                borderRadius: 2,
+                marginRight: 5,
+                background: STATUS[data[index].valueCode] || 'rgb(255, 177, 0)',
+              }}
+              />
+              <span>
+                {` ${data[index].name}`}
+              </span>
+            </div>
+          </Option>,
         );
       }
     }
     return result;
   }
+
   render() {
-    const { getFieldDecorator } = this.props.form;
-    let name;
+    const {
+      form,
+      visible,
+      onChangeVisible,
+    } = this.props;
+    const {
+      loading,
+      statusType,
+    } = this.state;
+    const { getFieldDecorator } = form;
+    let kanbanName;
     for (let index = 0, len = ScrumBoardStore.getBoardList.length; index < len; index += 1) {
       if (ScrumBoardStore.getBoardList[index].boardId === ScrumBoardStore.getSelectedBoard) {
-        name = ScrumBoardStore.getBoardList[index].name;
+        kanbanName = ScrumBoardStore.getBoardList[index].name;
       }
     }
     return (
       <Sidebar
         title="添加列"
-        visible={this.props.visible}
-        onCancel={this.props.onChangeVisible.bind(this, false)}
-        confirmLoading={this.state.loading}
+        visible={visible}
+        onCancel={onChangeVisible.bind(this, false)}
+        confirmLoading={loading}
         onOk={this.handleAddColumn.bind(this)}
         okText="创建"
         cancelText="取消"
       >
         <Content
           style={{ padding: 0 }}
-          title={`添加看板“${name}”的列`}
+          title={`添加看板“${kanbanName}”的列`}
           description="请在下面输入列名，选择列的类别。可以添加、删除、重新排序和重命名一个列，同时可以通过设置最大最小值来控制每列中的问题数量。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
         >
@@ -138,6 +182,8 @@ class AddColumn extends Component {
               {getFieldDecorator('column_name', {
                 rules: [{
                   required: true, message: '列名称是必须的',
+                }, {
+                  validator: this.checkStatusName.bind(this),
                 }],
               })(
                 <Input label="列名称" placeholder="请输入列名称" />,
@@ -152,6 +198,7 @@ class AddColumn extends Component {
                 <Select
                   label="类别"
                   placeholder="请选择类别"
+                  disabled={!!statusType}
                 >
                   {this.renderOptions()}
                 </Select>,

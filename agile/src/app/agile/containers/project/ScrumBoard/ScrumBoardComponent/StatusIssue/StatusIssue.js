@@ -451,7 +451,7 @@ class StatusIssue extends Component {
                               <p
                                 style={{
                                   flexBasis: '20px',
-                                  background: `${item.priorityDTO.colour}4C`,
+                                  background: `${item.priorityDTO.colour}1F`,
                                   color: item.priorityDTO.colour,
                                   textAlign: 'center',
                                   marginLeft: '8px',

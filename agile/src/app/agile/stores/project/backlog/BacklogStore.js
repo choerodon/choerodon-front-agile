@@ -398,7 +398,7 @@ class BacklogStore {
 
   axiosGetIssueTypes() {
     const proId = AppState.currentMenuType.id;
-    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?scheme_type=agile`).then((data) => {
+    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?apply_type=agile`).then((data) => {
       if (data && !data.failed) {
         this.setIssueTypes(data);
       } else {

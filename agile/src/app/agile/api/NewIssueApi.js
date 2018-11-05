@@ -87,7 +87,7 @@ export function loadChartData(id, type) {
 export function loadStatus(statusId, issueId, typeId) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(
-    `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&scheme_type=agile`,
+    `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&apply_type=agile`,
   );
 }
 
