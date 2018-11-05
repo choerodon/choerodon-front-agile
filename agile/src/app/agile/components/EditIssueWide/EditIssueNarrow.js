@@ -103,16 +103,7 @@ const STATUS_SHOW = {
   merged: '已合并',
   closed: '关闭',
 };
-const PRIORITY = {
-  high: '高',
-  medium: '中',
-  low: '低',
-};
-const ICON_COLOR={
-  todo:"rgba(255, 177, 0, 0.2)",
-  doing:"rgba(77,144,254,0.2)",
-  done:"rgba(0,191,165,0.2)"
-}
+
 class CreateSprint extends Component {
   constructor(props) {
     super(props);
@@ -163,6 +154,7 @@ class CreateSprint extends Component {
       sprintName: '',
       statusId: undefined,
       statusCode: undefined,
+      statusMapDTO: {},
       storyPoints: undefined,
       creationDate: undefined,
       lastUpdateDate: undefined,
@@ -295,7 +287,7 @@ class CreateSprint extends Component {
       statusId,
       statusCode,
       statusName,
-      statusColor,
+      statusMapDTO,
       storyPoints,
       summary,
       typeCode,
@@ -350,10 +342,7 @@ class CreateSprint extends Component {
       reporterImageUrl,
       sprintId,
       sprintName,
-      statusId,
-      statusCode,
-      statusName,
-      statusColor,
+      statusMapDTO,
       storyPoints,
       summary,
       typeCode,
@@ -948,7 +937,7 @@ class CreateSprint extends Component {
             comment={comment}
             onDeleteComment={() => this.reloadIssue()}
             onUpdateComment={() => this.reloadIssue()}
-            isWide = { true }
+            isWide={true}
           />
         ))}
       </div>
@@ -1277,17 +1266,14 @@ class CreateSprint extends Component {
       priorityId,
       priorityName,
       priorityColor,
-      origin,
-      issueId,
       originStatus,
-      statusId,
-      statusCode,
-      statusName,
+      statusMapDTO,
     } = this.state;
+    const statusCode = statusMapDTO ? statusMapDTO.type : undefined;
+    const statusName = statusMapDTO ? statusMapDTO.name : '';
+    const statusId = statusMapDTO ? statusMapDTO.id : undefined;
     const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
-    const typeColor = issueTypeDTO ? issueTypeDTO.colour : '#fab614';
-    const typeIcon = issueTypeDTO ? issueTypeDTO.icon : 'help';
     const typeId = issueTypeDTO ? issueTypeDTO.id : '';
     const currentType = issueTypeData.find(t => t.id === typeId);
     let issueTypes = [];
@@ -1678,7 +1664,7 @@ class CreateSprint extends Component {
                         width: 30,
                         height: 30,
                         borderRadius: '50%',
-                        background: ICON_COLOR[this.state.statusCode],
+                        background: STATUS[statusCode] ? `${STATUS[statusCode]}33` : '#ffae0233',
                         marginRight: 12,
                         flexShrink: 0,
                         display: 'flex',
@@ -1688,13 +1674,13 @@ class CreateSprint extends Component {
                     >
                       <Icon
                         type={
-                          STATUS_ICON[this.state.statusCode]
-                            ? STATUS_ICON[this.state.statusCode].icon
+                          STATUS_ICON[statusCode]
+                            ? STATUS_ICON[statusCode].icon
                             : 'timelapse'
                         }
                         style={{
                           fontSize: '24px',
-                          color: this.state.statusColor || '#ffae02',
+                          color: STATUS[statusCode] || '#ffae02',
                         }}
                       />
                     </span>
@@ -1805,10 +1791,11 @@ class CreateSprint extends Component {
                                 <div
                                   className="c7n-level"
                                   style={{
+                                    backgroundColor: `${priorityColor}1F`,
                                     color: priorityColor,
-                                    // borderRadius: '2px',
-                                    // padding: '0 8px',
-                                    // display: 'inline-block',
+                                    borderRadius: '2px',
+                                    padding: '0 8px',
+                                    display: 'inline-block',
                                     fontSize: '15px',
                                     lineHeight: '18px',
                                   }}
@@ -1818,8 +1805,7 @@ class CreateSprint extends Component {
                               ) : (
                                 '无'
                               )}
-                            </div>
-)}
+                            </div>)}
                         >
                           <Select
                             value={originPriorities.length ? priorityId : priorityName}
@@ -1860,12 +1846,6 @@ class CreateSprint extends Component {
                                   <div
                                     className="c7n-level"
                                     style={{
-                                      // backgroundColor: COLOR[type.valueCode].bgColor,
-                                      color: priority.colour,
-                                      // borderRadius: '2px',
-                                      // padding: '0 8px',
-                                      // display: 'inline-block',
-                                      fontSize: '15px',
                                       lineHeight: '18px',
                                     }}
                                   >

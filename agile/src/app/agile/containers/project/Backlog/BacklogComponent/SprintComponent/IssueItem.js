@@ -144,7 +144,7 @@ class IssueItem extends Component {
                             className="c7n-backlog-sprintIssuePriority"
                             style={{
                               color: item.priorityDTO ? item.priorityDTO.colour : '#FFFFFF',
-                              background: `${item.priorityDTO ? item.priorityDTO.colour : 'FFFFFF'}4C`,
+                              background: `${item.priorityDTO ? item.priorityDTO.colour : 'FFFFFF'}1F`,
                             }}
                           >
                             {item.priorityDTO ? item.priorityDTO.name : ''}

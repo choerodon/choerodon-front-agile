@@ -100,7 +100,7 @@ class Priority extends Component {
           <div className="progress">
             <div
               className="progress-bg"
-              style={{ background: `${priority.priorityDTO.colour}4C` }}
+              style={{ background: `${priority.priorityDTO.colour}1F` }}
             />
             <div
               className="progress-inner"

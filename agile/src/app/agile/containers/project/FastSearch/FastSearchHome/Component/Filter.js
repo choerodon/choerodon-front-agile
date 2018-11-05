@@ -34,23 +34,25 @@ class AddComponent extends Component {
     this.loadQuickFilterFiled();
   }
 
-  loadQuickFilterFiled() {
+  loadQuickFilterFiled = () => {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/fields`)
       .then((res) => {
         this.setState({
           quickFilterFiled: res,
         });
       });
-  }
+  };
 
-  handleOk(e) {
+  handleOk = (e) => {
     e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, values) => {
+    const { form } = this.props;
+    const { filters, quickFilterFiled } = this.state;
+    form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const arr = [];
         const expressQueryArr = [];
         const o = [];
-        const f = this.state.filters.slice();
+        const f = filters.slice();
         f.forEach((v, i) => {
           if (this.state.delete.indexOf(i) !== -1) {
             return;
@@ -65,7 +67,7 @@ class AddComponent extends Component {
             expressQueryArr.push(values[`filter-${i}-ao`].toUpperCase());
           }
           arr.push(a);
-          expressQueryArr.push(_.find(this.state.quickFilterFiled, { fieldCode: a.fieldCode }).name);
+          expressQueryArr.push(_.find(quickFilterFiled, { fieldCode: a.fieldCode }).name);
           expressQueryArr.push(a.operation);
           expressQueryArr.push(this.getLabel(values[`filter-${i}-value`]));
         });
@@ -96,7 +98,7 @@ class AddComponent extends Component {
     });
   }
 
-  transformOperation(value) {
+  transformOperation = (value) => {
     const OPERATION = {
       '=': '=',
       '!=': '!=',
@@ -112,7 +114,7 @@ class AddComponent extends Component {
     return OPERATION[value];
   }
 
-  getValue(value, filter) {
+  getValue = (value, filter) => {
     const type = Object.prototype.toString.call(value);
     if (filter === 'priority' || filter === 'issue_type') {
       if (type === '[object Array]') {
@@ -142,7 +144,7 @@ class AddComponent extends Component {
     }
   }
 
-  getLabel(value) {
+  getLabel = (value) => {
     if (Object.prototype.toString.call(value) === '[object Array]') {
       const v = _.map(value, 'label');
       return `[${v.join(',')}]`;
@@ -190,37 +192,37 @@ class AddComponent extends Component {
     const orgId = AppState.currentMenuType.organizationId;
     const OPTION_FILTER = {
       assignee: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
+        url: `/iam/v1/projects/${projectId}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
       },
       priority: {
         url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
-        prop: 'lookupValues',
-        id: 'valueCode',
+        prop: '',
+        id: 'id',
         name: 'name',
       },
       status: {
-        url: `/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`,
+        url: `/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=agile`,
         prop: '',
         id: 'id',
         name: 'name',
       },
       reporter: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
+        url: `/iam/v1/projects/${projectId}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
       },
       created_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
+        url: `/iam/v1/projects/${projectId}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
       },
       last_updated_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
+        url: `/iam/v1/projects/${projectId}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -265,41 +267,18 @@ class AddComponent extends Component {
         name: 'name',
       },
       issue_type: {
-        url: '',
+        url: `/issue/v1/projects/${projectId}/schemes/query_issue_types?apply_type=agile`,
         prop: '',
         id: 'valueCode',
         name: 'name',
       },
     };
-    if (filter !== 'issue_type') {
-      axios[filter === 'sprint' || filter === 'influence_version' || filter === 'fix_version' ? 'post' : 'get'](OPTION_FILTER[filter].url)
-        .then((res) => {
-          this.setState({
-            temp: OPTION_FILTER[filter].prop === '' ? res : res[OPTION_FILTER[filter].prop],
-          });
+    axios[filter === 'sprint' || filter === 'influence_version' || filter === 'fix_version' ? 'post' : 'get'](OPTION_FILTER[filter].url)
+      .then((res) => {
+        this.setState({
+          temp: OPTION_FILTER[filter].prop === '' ? res : res[OPTION_FILTER[filter].prop],
         });
-    } else {
-      this.setState({
-        temp: [
-          {
-            valueCode: 'story',
-            name: '故事',
-          },
-          {
-            valueCode: 'task',
-            name: '任务',
-          },
-          {
-            valueCode: 'bug',
-            name: '故障',
-          },
-          {
-            valueCode: 'issue_epic',
-            name: '史诗',
-          },
-        ],
       });
-    }
   }
 
   tempOption = (filter, addEmpty) => {
@@ -307,37 +286,37 @@ class AddComponent extends Component {
     const orgId = AppState.currentMenuType.organizationId;
     const OPTION_FILTER = {
       assignee: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
+        url: `/iam/v1/projects/${projectId}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
       },
       priority: {
         url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
-        prop: 'lookupValues',
-        id: 'valueCode',
+        prop: '',
+        id: 'id',
         name: 'name',
       },
       status: {
-        url: `/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`,
+        url: `/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=agile`,
         prop: '',
         id: 'id',
         name: 'name',
       },
       reporter: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
+        url: `/iam/v1/projects/${projectId}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
       },
       created_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
+        url: `/iam/v1/projects/${projectId}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
       },
       last_updated_user: {
-        url: `/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`,
+        url: `/iam/v1/projects/${projectId}/users?page=0&size=9999`,
         prop: 'content',
         id: 'id',
         name: 'realName',
@@ -438,7 +417,8 @@ class AddComponent extends Component {
             labelInValue
             filter
             optionFilterProp="children"
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            filterOption={(input, option) => option.props.children.toLowerCase()
+              .indexOf(input.toLowerCase()) >= 0}
             onFocus={() => {
               this.getOption(filter, false);
             }}
@@ -454,7 +434,8 @@ class AddComponent extends Component {
             labelInValue
             filter
             optionFilterProp="children"
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            filterOption={(input, option) => option.props.children.toLowerCase()
+              .indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
               空
@@ -470,7 +451,8 @@ class AddComponent extends Component {
             mode="multiple"
             filter
             optionFilterProp="children"
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            filterOption={(input, option) => option.props.children.toLowerCase()
+              .indexOf(input.toLowerCase()) >= 0}
             onFocus={() => {
               this.getOption(filter, false);
             }}
@@ -485,21 +467,22 @@ class AddComponent extends Component {
       return (
         <DatePicker
           label="值"
-          format={'YYYY-MM-DD HH:mm:ss'}
+          format="YYYY-MM-DD HH:mm:ss"
           showTime
         />
       );
     } else {
       // story points && remainning time
       // return number input
-      if (operation === 'is' || operation ==='isNot') {
+      if (operation === 'is' || operation === 'isNot') {
         return (
           <Select
             label="值"
             labelInValue
             filter
             optionFilterProp="children"
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            filterOption={(input, option) => option.props.children.toLowerCase()
+              .indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
               空

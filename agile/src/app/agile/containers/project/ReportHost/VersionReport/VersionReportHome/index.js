@@ -505,7 +505,7 @@ class VersionReport extends Component {
         <span
           style={{
             color: record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF',
-            background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}4C`,
+            background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}1F`,
             padding: '1px 4px',
           }}
         >

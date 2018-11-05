@@ -389,6 +389,7 @@ class ColumnPage extends Component {
                 });
               }}
               refresh={this.props.refresh.bind(this)}
+              store={ScrumBoardStore}
             />
           ) : ''
         }
@@ -402,6 +403,7 @@ class ColumnPage extends Component {
                 });
               }}
               refresh={this.props.refresh.bind(this)}
+              store={ScrumBoardStore}
             />
           ) : ''
         }

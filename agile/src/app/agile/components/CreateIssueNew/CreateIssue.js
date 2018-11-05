@@ -283,16 +283,6 @@ class CreateIssue extends Component {
                     {originPriorities.map(priority => (
                       <Option key={priority.id} value={priority.id}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
-                          <div
-                            style={{
-                              color: priority.colour, width: 20, height: 20, textAlign: 'center', lineHeight: '20px', borderRadius: '50%', marginRight: 8,
-                            }}
-                          >
-                            <Icon
-                              type="flag"
-                              style={{ fontSize: '13px' }}
-                            />
-                          </div>
                           <span>{priority.name}</span>
                         </div>
                       </Option>

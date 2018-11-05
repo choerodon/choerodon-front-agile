@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Content, stores } from 'choerodon-front-boot';
-import _ from 'lodash';
 import {
   Form, Modal, Input, Select, 
 } from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
+import { STATUS } from '../../../../../common/Constant';
 
 const FormItem = Form.Item;
 const { Sidebar } = Modal;
-const Option = Select.Option;
+const { Option } = Select;
 const { AppState } = stores;
 
 @observer
@@ -18,17 +18,19 @@ class AddStatus extends Component {
     super(props);
     this.state = {
       loading: false,
+      statusType: false,
     };
   }
 
   handleAddStatus(e) {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
+    const { statusType } = this.state;
+    const { form, onChangeVisible, refresh } = this.props;
+    form.validateFields((err, values) => {
+      if (!err && !statusType) {
         this.setState({
           loading: true,
         });
-        
         const params = {
           name: values.name,
           projectId: AppState.currentMenuType.id,
@@ -36,8 +38,8 @@ class AddStatus extends Component {
           categoryCode: values.categoryCode,
         };
         ScrumBoardStore.axiosAddStatus(params).then((data) => {
-          this.props.onChangeVisible(false);
-          this.props.refresh();
+          onChangeVisible(false);
+          refresh();
           this.setState({
             loading: false,
           });
@@ -46,19 +48,36 @@ class AddStatus extends Component {
             loading: false,
           });
         });
+      } else {
+        onChangeVisible(false);
+        refresh();
       }
     });
   }
 
   checkStatusName(rule, value, callback) {
-    ScrumBoardStore.axiosCheckRepeatName(value).then((res) => {
-      if (res) {
-        callback('状态名称重复');
-      } else {
-        callback();
-      }
-    }).catch((error) => {
-    });
+    const { store, form } = this.props;
+    const statusDate = store.getStatusList;
+    const status = statusDate.find(s => s.name === value);
+    if (status) {
+      this.setState({
+        statusType: status.type,
+      }, () => {
+        form.setFieldsValue({
+          categoryCode: status.type,
+        });
+      });
+      callback();
+    } else {
+      this.setState({
+        statusType: false,
+      }, () => {
+        form.setFieldsValue({
+          categoryCode: undefined
+        });
+      });
+      callback();
+    }
   }
 
   renderOptions() {
@@ -77,27 +96,21 @@ class AddStatus extends Component {
         }
       });
       for (let index = 0, len = data.length; index < len; index += 1) {
-        let color = '';
-        if (data[index].valueCode === 'doing') {
-          color = 'rgb(77, 144, 254)';
-        } else if (data[index].valueCode === 'done') {
-          color = 'rgb(0, 191, 165)';
-        } else {
-          color = 'rgb(255, 177, 0)';
-        }
         result.push(
           <Option value={data[index].valueCode}>
             <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <div style={{
-                width: 15, height: 15, borderRadius: 2, marginRight: 5, background: color, 
+                width: 15,
+                height: 15,
+                borderRadius: 2,
+                marginRight: 5,
+                background: STATUS[data[index].valueCode] || 'rgb(255, 177, 0)',
               }}
               />
               <span> 
-                {' '}
-                {data[index].name}
+                {` ${data[index].name}`}
               </span>
             </div>
-
           </Option>,
         );
       }
@@ -106,26 +119,36 @@ class AddStatus extends Component {
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
-    let name;
+    const {
+      form,
+      visible,
+      onChangeVisible,
+      fromStatus,
+    } = this.props;
+    const {
+      loading,
+      statusType,
+    } = this.state;
+    const { getFieldDecorator } = form;
+    let kanbanName;
     for (let index = 0, len = ScrumBoardStore.getBoardList.length; index < len; index += 1) {
       if (ScrumBoardStore.getBoardList[index].boardId === ScrumBoardStore.getSelectedBoard) {
-        name = ScrumBoardStore.getBoardList[index].name;
+        kanbanName = ScrumBoardStore.getBoardList[index].name;
       }
     }
     return (
       <Sidebar
         title="添加状态"
-        visible={this.props.visible}
-        onCancel={this.props.onChangeVisible.bind(this, false)}
+        visible={visible}
+        onCancel={onChangeVisible.bind(this, false)}
         onOk={this.handleAddStatus.bind(this)}
-        confirmLoading={this.state.loading}
+        confirmLoading={loading}
         okText="创建"
         cancelText="取消"
       >
         <Content
           style={{ padding: 0 }}
-          title={this.props.fromStatus ? `在项目“${AppState.currentMenuType.name}”中创建状态` : `添加看板“${name}”的状态`}
+          title={fromStatus ? `在项目“${AppState.currentMenuType.name}”中创建状态` : `添加看板“${kanbanName}”的状态`}
           description="请在下面输入状态名称，选择状态的类别。可以添加、删除、重新排序和重命名一个状态，配置完成后，您可以通过board对问题拖拽进行状态的流转。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
         >
@@ -150,9 +173,9 @@ class AddStatus extends Component {
                 <Select
                   label="类别"
                   placeholder="请选择类别"
+                  disabled={!!statusType}
                 >
                   {this.renderOptions()}
-                  {/* <Option value="todo">todo</Option> */}
                 </Select>,
               )}
             </FormItem>

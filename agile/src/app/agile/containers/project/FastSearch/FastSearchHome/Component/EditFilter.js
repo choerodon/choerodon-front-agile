@@ -86,12 +86,12 @@ class AddComponent extends Component {
       },
       priority: {
         url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
-        prop: 'lookupValues',
-        id: 'valueCode',
+        prop: '',
+        id: 'id',
         name: 'name',
       },
       status: {
-        url: `/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`,
+        url: `/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=agile`,
         prop: '',
         id: 'id',
         name: 'name',
@@ -132,33 +132,14 @@ class AddComponent extends Component {
       },
     };
     axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`).then(res => this.setState({ originUsers: res.content }));
-    axios.get(`/issue/v1/organizations/${orgId}/priority/list_by_org`).then(res => this.setState({ originPriorities: res.lookupValues }));
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`).then(res => this.setState({ originStatus: res }));
+    axios.get(`/issue/v1/organizations/${orgId}/priority/list_by_org`).then(res => this.setState({ originPriorities: res }));
+    axios.get(`/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=agile`).then(res => this.setState({ originStatus: res }));
     axios.get(`/agile/v1/projects/${projectId}/issues/epics/select_data`).then(res => this.setState({ originEpics: res }));
     axios.post(`/agile/v1/projects/${projectId}/sprint/names`).then(res => this.setState({ originSprints: res }));
     axios.get(`/agile/v1/projects/${projectId}/issue_labels`).then(res => this.setState({ originLabels: res }));
     axios.get(`/agile/v1/projects/${projectId}/component`).then(res => this.setState({ originComponents: res }));
     axios.post(`/agile/v1/projects/${projectId}/product_version/names`).then(res => this.setState({ originVersions: res }));
-    this.setState({
-      originTypes: [
-        {
-          valueCode: 'story',
-          name: '故事',
-        },
-        {
-          valueCode: 'task',
-          name: '任务',
-        },
-        {
-          valueCode: 'bug',
-          name: '故障',
-        },
-        {
-          valueCode: 'issue_epic',
-          name: '史诗',
-        },
-      ],
-    });
+    axios.get(`/issue/v1/projects/${projectId}/schemes/query_issue_types?apply_type=agile`).then(res => this.setState({ originTypes: res }));
   }
 
   getOperation(filter) {
@@ -205,13 +186,13 @@ class AddComponent extends Component {
       },
       priority: {
         url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
-        prop: 'lookupValues',
-        id: 'valueCode',
+        prop: '',
+        id: 'id',
         name: 'name',
         state: 'originPriorities',
       },
       status: {
-        url: `/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`,
+        url: `/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=agile`,
         prop: '',
         id: 'id',
         name: 'name',
@@ -324,7 +305,7 @@ class AddComponent extends Component {
         const k = value.slice(1, -1);
         return ({
           key: k,
-          label: _.find(this.state[OPTION_FILTER[filter].state], { valueCode: k }).name,
+          label: _.find(this.state[OPTION_FILTER[filter].state], { [OPTION_FILTER[filter].id]: k * 1 }).name,
         });
       }
     } else {
@@ -443,22 +424,22 @@ class AddComponent extends Component {
         return `'${v}'`;
       }
     } else if (type === '[object Array]') {
-        const v = _.map(value, 'key');
-        return `(${  v.join(',')  })`;
-      } else if (type === '[object Object]') {
-        if (value.key) {
-          const v = value.key;
-          if (Object.prototype.toString.call(v) === '[object Number]') {
-            return v;
-          } else if (Object.prototype.toString.call(v) === '[object String]') {
-            return v;
-          }
-        } else {
-          return value.format('YYYY-MM-DD HH:mm:ss');
+      const v = _.map(value, 'key');
+      return `(${  v.join(',')  })`;
+    } else if (type === '[object Object]') {
+      if (value.key) {
+        const v = value.key;
+        if (Object.prototype.toString.call(v) === '[object Number]') {
+          return v;
+        } else if (Object.prototype.toString.call(v) === '[object String]') {
+          return v;
         }
       } else {
-        return value;
+        return value.format('YYYY-MM-DD HH:mm:ss');
       }
+    } else {
+      return value;
+    }
   }
 
   getLabel(value) {
@@ -494,13 +475,13 @@ class AddComponent extends Component {
       },
       priority: {
         url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
-        prop: 'lookupValues',
-        id: 'valueCode',
+        prop: '',
+        id: 'id',
         name: 'name',
         state: 'originPriorities',
       },
       status: {
-        url: `/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list`,
+        url: `/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=agile`,
         prop: '',
         id: 'id',
         name: 'name',
@@ -824,7 +805,6 @@ class AddComponent extends Component {
                               required: true,
                             }],
                             initialValue: this.state.arr[index].value,
-                            // initialValue: this.transformInitialValue(index, this.props.form.getFieldValue(`filter-${index}-prop`), this.props.form.getFieldValue(`filter-${index}-rule`)),
                           })(
                             this.renderValue(this.props.form.getFieldValue(`filter-${index}-prop`), this.props.form.getFieldValue(`filter-${index}-rule`)),
                           )}
