@@ -366,7 +366,7 @@ class Issue extends Component {
 
   renderSummary = (text, record) => (
     <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务概要： ${text}`}>
-      <span>
+      <span className="c7n-Issue-summary">
         {text}
       </span>
     </Tooltip>
@@ -426,9 +426,7 @@ class Issue extends Component {
     />
   );
 
-  renderVersion = arr => arr.map(item => (
-    <Tag color="blue">{item.name}</Tag>
-  ));
+  renderVersion = arr => (arr.length ? <Tag color="blue">{arr[0].name}</Tag> : null);
 
   onlyMe = (checked) => {
     IssueStore.setSelectedQuickSearch({ assigneeId: checked ? AppState.userInfo.id : null });
@@ -492,7 +490,7 @@ class Issue extends Component {
         title: '类型',
         dataIndex: 'issueTypeDTO.name',
         key: 'issueTypeId',
-        width: '128px',
+        width: '120px',
         sorter: true,
         filters: columnFilter.get('typeId'),
         filterMultiple: true,
@@ -546,7 +544,7 @@ class Issue extends Component {
       {
         title: '最后更新时间',
         dataIndex: 'lastUpdateDate',
-        width: '84px',
+        width: '138px',
         key: 'lastUpdateDate',
         sorter: true,
         render: this.renderLastUpdateTime,

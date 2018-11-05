@@ -77,6 +77,12 @@
       display: none;
     }
   }
+  &-summary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
 
   .ant-dropdown {
     background: #fff;
