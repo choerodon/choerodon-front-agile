@@ -5,12 +5,14 @@ import { store, stores, axios } from 'choerodon-front-boot';
 import { loadIssues } from '../../../../api/NewIssueApi';
 
 const { AppState } = stores;
+const proId = AppState.currentMenuType.id;
+const orgId = AppState.currentMenuType.organizationId;
 
 const filter = {
   advancedSearchArgs: {
-    statusCode: [],
-    priorityCode: [],
-    typeCode: [],
+    statusId: [],
+    priorityId: [],
+    issueTypeId: [],
   },
   content: '',
   quickFilterIds: [],
@@ -73,6 +75,10 @@ class SprintCommonStore {
 
   @observable defaultPriorityId = false;
 
+  @observable issuePriority = [];
+
+  @observable issueStatus = [];
+
   init() {
     this.setOrder({
       orderField: '',
@@ -84,35 +90,6 @@ class SprintCommonStore {
     });
     // this.setFilteredInfo({});
     // this.loadIssues();
-  }
-
-  loadIssues(page = 0, size = 10) {
-    this.setLoading(true);
-    const { orderField = '', orderType = '' } = this.order;
-    return loadIssues(page, size, toJS(this.getFilter), orderField, orderType)
-      .then((res) => {
-        this.setIssues(res.content);
-        this.setPagination({
-          current: res.number + 1,
-          pageSize: res.size,
-          total: res.totalElements,
-        });
-        this.setLoading(false);
-        return Promise.resolve(res);
-      });
-  }
-
-  loadQuickSearch = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
-    .then((filters) => {
-      this.setQuickSearch(filters);
-    });
-
-  createIssue(issueObj, projectId = AppState.currentMenuType.id) {
-    const issue = {
-      projectId: AppState.currentMenuType.id,
-      ...issueObj,
-    };
-    return axios.post(`/agile/v1/projects/${projectId}/issue`, issue);
   }
 
   @action setIssues(data) {
@@ -129,6 +106,30 @@ class SprintCommonStore {
 
   @computed get getQuickSearch() {
     return toJS(this.quickSearch);
+  }
+
+  @action setIssueTypes(data) {
+    this.issueTypes = data;
+  }
+
+  @computed get getIssueTypes() {
+    return this.issueTypes.slice();
+  }
+
+  @action setIssueStatus(data) {
+    this.issueStatus = data;
+  }
+
+  @computed get getIssueStatus() {
+    return toJS(this.issueStatus);
+  }
+
+  @action setIssuePriority(data) {
+    this.issuePriority = data;
+  }
+
+  @computed get getIssuePriority() {
+    return toJS(this.issuePriority);
   }
 
   @action setSelectedQuickSearch(data) {
@@ -178,6 +179,10 @@ class SprintCommonStore {
     this.paramName = data;
   }
 
+  @computed get getParamName() {
+    return toJS(this.paramName);
+  }
+
   @action setParamStatus(data) {
     this.paramStatus = data;
   }
@@ -203,11 +208,59 @@ class SprintCommonStore {
   }
 
   @action setBarFilters(data) {
-    let res = '';
-    data.forEach((item) => {
-      res += item;
-    });
-    Object.assign(filter, { content: res });
+    if (!this.paramName) {
+      let res = '';
+      data.forEach((item) => {
+        res += item;
+      });
+      Object.assign(filter, { content: res });
+    }
+  }
+
+  loadIssues(page = 0, size = 10) {
+    this.setLoading(true);
+    const { orderField = '', orderType = '' } = this.order;
+    return loadIssues(page, size, toJS(this.getFilter), orderField, orderType)
+      .then((res) => {
+        this.setIssues(res.content);
+        this.setPagination({
+          current: res.number + 1,
+          pageSize: res.size,
+          total: res.totalElements,
+        });
+        this.setLoading(false);
+        return Promise.resolve(res);
+      });
+  }
+
+  async loadCurrentSetting() {
+    const quickSearch = await this.loadQuickSearch();
+    this.setQuickSearch(quickSearch);
+
+    const type = await this.loadType();
+    this.setIssueTypes(type);
+
+    const status = await this.loadStatus();
+    this.setIssueStatus(status);
+
+    const priorities = await this.loadPriorities();
+    this.setIssuePriority(priorities);
+  }
+
+  loadQuickSearch = () => axios.get(`/agile/v1/projects/${proId}/quick_filter`);
+
+  loadType = () => axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types?scheme_type=agile`);
+
+  loadStatus = () => axios.get(`/issue/v1/projects/${proId}/schemes/query_status_by_project_id?scheme_type=agile`);
+
+  loadPriorities = () => axios.get(`/issue/v1/organizations/${orgId}/priority/list_by_org`);
+
+  createIssue(issueObj, projectId = AppState.currentMenuType.id) {
+    const issue = {
+      projectId: proId,
+      ...issueObj,
+    };
+    return axios.post(`/agile/v1/projects/${projectId}/issue`, issue);
   }
 
   @computed get getBackUrl() {
@@ -219,23 +272,6 @@ class SprintCommonStore {
     } else {
       return `/agile/${this.paramUrl}?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
     }
-    // if (!this.paramType) {
-    //   return undefined;
-    // } else if (this.paramType === 'sprint') {
-    //   return `/agile/reporthost/sprintReport?
-    // type=${urlParams.type}&id=${urlParams.id}
-    // &name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
-    // } else if (this.paramType === 'component') {
-    //   return `/agile/component?type=${urlParams.type}&
-    // id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
-    // } else if (this.paramType === 'version' && this.paramStatus) {
-    //   return `/agile/release?type=${urlParams.type}
-    // &id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`;
-    // } else if (this.paramType === 'versionReport') {
-    //   return `/agile/reporthost/versionReport?type=
-    // ${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}
-    // &organizationId=${urlParams.organizationId}`;
-    // }
   }
 
   @computed get getFilter() {
@@ -246,27 +282,9 @@ class SprintCommonStore {
     };
     return {
       ...filter,
-      otherArgs: this.barFilters ? otherArgs : {},
+      // otherArgs: this.barFilters ? otherArgs : {},
+      otherArgs,
     };
-  }
-
-  @computed get getIssueTypes() {
-    return this.issueTypes.slice();
-  }
-
-  @action setIssueTypes(data) {
-    this.issueTypes = data;
-  }
-
-  axiosGetIssueTypes() {
-    const proId = AppState.currentMenuType.id;
-    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?scheme_type=agile`).then((data) => {
-      if (data && !data.failed) {
-        this.setIssueTypes(data);
-      } else {
-        this.setIssueTypes([]);
-      }
-    });
   }
 
   @computed get getPriorities() {

@@ -73,7 +73,6 @@ class QuickSearch extends Component {
   render() {
     const { title, selectionGroup } = this.props;
     const { selected } = this.state;
-
     return (
       <div
         className="c7n-agile-quickSearch-container"
