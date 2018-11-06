@@ -28,6 +28,8 @@ import { STATUS } from '../../../../common/Constant';
 
 const FileSaver = require('file-saver');
 
+const storage = window.localStorage;
+
 const { AppState } = stores;
 
 @observer
@@ -50,6 +52,14 @@ class Issue extends Component {
 
   componentDidMount() {
     this.getInit();
+  }
+
+  componentDidUpdate() {
+    const selectedCard = document.getElementsByClassName('c7n-Issue-CardNarrow-clicked');
+    debugger;
+    if (selectedCard.length) {
+      selectedCard[0].scrollIntoView();
+    }
   }
 
   getInit() {
@@ -237,6 +247,17 @@ class Issue extends Component {
     }
   };
 
+  handleHidden = (column) => {
+    const filterData = storage.getItem('filterData').split(',');
+    if (filterData && filterData.length) {
+      column.map(
+        item => (
+          Object.assign(item, { hidden: filterData.indexOf(item.key) === -1 })
+        ),
+      );
+    }
+  };
+
   handleChangeType = (type) => {
     this.setState({
       selectIssueType: type.key,
@@ -328,12 +349,10 @@ class Issue extends Component {
   };
 
   BodyRow = (props) => {
-    debugger;
     const { expand, selectedIssue } = this.state;
     const isClicked = props.children.find(item => (
       selectedIssue.issueId === item.props.record.issueId
     ));
-    debugger;
     const renderNarrow = (
       <div onClick={props.onClick} style={{ }} role="none" className={isClicked ? 'c7n-Issue-CardNarrow-clicked c7n-Issue-CardNarrow' : 'c7n-Issue-CardNarrow'}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '7px' }}>
@@ -598,6 +617,7 @@ class Issue extends Component {
         hidden: true,
       },
     ];
+    this.handleHidden(columns);
     const issueTypes = IssueStore.getIssueTypes;
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
@@ -703,12 +723,14 @@ class Issue extends Component {
                 pagination={false}
                 onChange={this.handleFilterChange}
                 onColumnFilterChange={(item) => {
+                  storage.setItem('filterData', item.selectedKeys);
+                  debugger;
                 }}
                 rowClassName={(record, index) => (
                   record.issueId === selectedIssue && selectedIssue.issueId ? 'c7n-border-visible' : 'c7n-border'
                 )}
                 onRow={record => ({
-                  onClick: (e) => {
+                  onClick: () => {
                     this.setState({
                       selectedIssue: record,
                       expand: true,
