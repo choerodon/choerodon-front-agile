@@ -7,7 +7,7 @@ export function createIssue(issueObj, projectId = AppState.currentMenuType.id) {
     projectId,
     ...issueObj,
   };
-  return axios.post(`/agile/v1/projects/${projectId}/issues`, issue);
+  return axios.post(`/agile/v1/projects/${projectId}/issues?applyType=agile`, issue);
 }
 
 export function loadLabels() {
@@ -115,7 +115,7 @@ export function updateIssue(data, projectId = AppState.currentMenuType.id) {
 }
 
 export function updateStatus(transformId, issueId, objVerNum, proId = AppState.currentMenuType.id) {
-  return axios.put(`/agile/v1/projects/${proId}/issues/update_status?transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objVerNum}`);
+  return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=agile&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objVerNum}`);
 }
 
 export function createSubIssue(issueId, obj, projectId = AppState.currentMenuType.id) {

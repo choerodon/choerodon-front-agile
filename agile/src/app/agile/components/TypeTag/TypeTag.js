@@ -25,6 +25,7 @@ class TypeTag extends Component {
               className="icon-wapper"
               style={{
                 backgroundColor: data ? data.colour : '#fab614',
+                padding: '2px',
               }}
             >
               <Icon

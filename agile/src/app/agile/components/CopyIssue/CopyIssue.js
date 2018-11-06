@@ -32,7 +32,7 @@ class CopyIssue extends Component {
         this.setState({
           loading: true,
         });
-        axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/clone_issue?organizationId=${orgId}`, copyConditionDTO)
+        axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/clone_issue?organizationId=${orgId}&applyType=agile`, copyConditionDTO)
           .then((res) => {
             this.setState({
               loading: false,

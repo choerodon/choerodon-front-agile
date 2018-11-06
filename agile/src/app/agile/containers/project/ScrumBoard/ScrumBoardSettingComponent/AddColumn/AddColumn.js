@@ -90,7 +90,7 @@ class AddColumn extends Component {
         statusType: status.type,
       }, () => {
         form.setFieldsValue({
-          categoryCode: status.type,
+          column_categoryCode: status.type,
         });
       });
       callback();
@@ -99,7 +99,7 @@ class AddColumn extends Component {
         statusType: false,
       }, () => {
         form.setFieldsValue({
-          categoryCode: status.type,
+          column_categoryCode: undefined,
         });
       });
       callback();

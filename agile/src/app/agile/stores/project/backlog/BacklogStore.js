@@ -219,7 +219,7 @@ class BacklogStore {
   }
 
   axiosEasyCreateIssue(data) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues?applyType=agile`, data);
   }
 
   @computed get getOnlyMe() {

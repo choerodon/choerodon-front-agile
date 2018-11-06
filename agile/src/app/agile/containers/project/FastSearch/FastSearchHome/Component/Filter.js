@@ -24,8 +24,7 @@ class AddComponent extends Component {
         },
       ],
       quickFilterFiled: [],
-      origin: [],
-      delete: [],
+      deleteItem: [],
       temp: [],
     };
   }
@@ -34,100 +33,20 @@ class AddComponent extends Component {
     this.loadQuickFilterFiled();
   }
 
-  loadQuickFilterFiled = () => {
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/fields`)
-      .then((res) => {
-        this.setState({
-          quickFilterFiled: res,
-        });
-      });
-  };
-
-  handleOk = (e) => {
-    e.preventDefault();
-    const { form } = this.props;
-    const { filters, quickFilterFiled } = this.state;
-    form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        const arr = [];
-        const expressQueryArr = [];
-        const o = [];
-        const f = filters.slice();
-        f.forEach((v, i) => {
-          if (this.state.delete.indexOf(i) !== -1) {
-            return;
-          }
-          const a = {
-            fieldCode: values[`filter-${i}-prop`],
-            operation: this.transformOperation(values[`filter-${i}-rule`]),
-            value: this.getValue(values[`filter-${i}-value`], values[`filter-${i}-prop`]),
-          };
-          if (i) {
-            o.push(values[`filter-${i}-ao`]);
-            expressQueryArr.push(values[`filter-${i}-ao`].toUpperCase());
-          }
-          arr.push(a);
-          expressQueryArr.push(_.find(quickFilterFiled, { fieldCode: a.fieldCode }).name);
-          expressQueryArr.push(a.operation);
-          expressQueryArr.push(this.getLabel(values[`filter-${i}-value`]));
-        });
-        const json = JSON.stringify({
-          arr,
-          o,
-        });
-        const obj = {
-          childIncluded: true,
-          expressQuery: expressQueryArr.join(' '),
-          name: values.name,
-          description: `${values.description || ''}+++${json}`,
-          projectId: AppState.currentMenuType.id,
-          quickFilterValueDTOList: arr,
-          relationOperations: o,
-        };
-        this.setState({
-          loading: true,
-        });
-        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`, obj)
-          .then((res) => {
-            this.setState({
-              loading: false,
-            });
-            this.props.onOk();
-          });
-      }
-    });
-  }
-
-  transformOperation = (value) => {
-    const OPERATION = {
-      '=': '=',
-      '!=': '!=',
-      in: 'in',
-      notIn: 'not in',
-      is: 'is',
-      isNot: 'is not',
-      '<': '<',
-      '<=': '<=',
-      '>': '>',
-      '>=': '>=',
-    };
-    return OPERATION[value];
-  }
-
   getValue = (value, filter) => {
     const type = Object.prototype.toString.call(value);
     if (filter === 'priority' || filter === 'issue_type') {
       if (type === '[object Array]') {
         const v = _.map(value, 'key');
-        const vv = v.map(e => `'${e}'`);
+        const vv = v.map(e => `${e}`);
         return `(${vv.join(',')})`;
       } else {
         const v = value.key;
-        return `'${v}'`;
+        return `${v}`;
       }
     } else if (type === '[object Array]') {
       const v = _.map(value, 'key');
-      return `(${  v.join(',')  })`;
+      return `(  ${v.join(',')}  )`;
     } else if (type === '[object Object]') {
       if (value.key) {
         const v = value.key;
@@ -142,7 +61,8 @@ class AddComponent extends Component {
     } else {
       return value;
     }
-  }
+    return '';
+  };
 
   getLabel = (value) => {
     if (Object.prototype.toString.call(value) === '[object Array]') {
@@ -162,9 +82,10 @@ class AddComponent extends Component {
     } else {
       return value;
     }
-  }
+    return '';
+  };
 
-  getOperation(filter) {
+  getOperation = (filter) => {
     const OPERATION_FILTER = {
       assignee: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
       priority: ['=', '!=', 'in', 'notIn'],
@@ -185,7 +106,7 @@ class AddComponent extends Component {
       remain_time: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
     };
     return OPERATION_FILTER[filter] || [];
-  }
+  };
 
   getOption(filter, addEmpty) {
     const projectId = AppState.currentMenuType.id;
@@ -281,6 +202,86 @@ class AddComponent extends Component {
       });
   }
 
+  loadQuickFilterFiled = () => {
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/fields`)
+      .then((res) => {
+        this.setState({
+          quickFilterFiled: res,
+        });
+      });
+  };
+
+  handleOk = (e) => {
+    e.preventDefault();
+    const { form, onOk } = this.props;
+    const { filters, quickFilterFiled, deleteItem } = this.state;
+    form.validateFieldsAndScroll((err, values) => {
+      if (!err) {
+        const arr = [];
+        const expressQueryArr = [];
+        const o = [];
+        const f = filters.slice();
+        f.forEach((v, i) => {
+          if (deleteItem.indexOf(i) !== -1) {
+            return;
+          }
+          const a = {
+            fieldCode: values[`filter-${i}-prop`],
+            operation: this.transformOperation(values[`filter-${i}-rule`]),
+            value: this.getValue(values[`filter-${i}-value`], values[`filter-${i}-prop`]),
+          };
+          if (i) {
+            o.push(values[`filter-${i}-ao`]);
+            expressQueryArr.push(values[`filter-${i}-ao`].toUpperCase());
+          }
+          arr.push(a);
+          expressQueryArr.push(_.find(quickFilterFiled, { fieldCode: a.fieldCode }).name);
+          expressQueryArr.push(a.operation);
+          expressQueryArr.push(this.getLabel(values[`filter-${i}-value`]));
+        });
+        const json = JSON.stringify({
+          arr,
+          o,
+        });
+        const obj = {
+          childIncluded: true,
+          expressQuery: expressQueryArr.join(' '),
+          name: values.name,
+          description: `${values.description || ''}+++${json}`,
+          projectId: AppState.currentMenuType.id,
+          quickFilterValueDTOList: arr,
+          relationOperations: o,
+        };
+        this.setState({
+          loading: true,
+        });
+        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`, obj)
+          .then((res) => {
+            this.setState({
+              loading: false,
+            });
+            onOk();
+          });
+      }
+    });
+  }
+
+  transformOperation = (value) => {
+    const OPERATION = {
+      '=': '=',
+      '!=': '!=',
+      in: 'in',
+      notIn: 'not in',
+      is: 'is',
+      isNot: 'is not',
+      '<': '<',
+      '<=': '<=',
+      '>': '>',
+      '>=': '>=',
+    };
+    return OPERATION[value];
+  };
+
   tempOption = (filter, addEmpty) => {
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
@@ -373,9 +374,16 @@ class AddComponent extends Component {
       </Option>
     ));
     return arr;
-  }
+  };
 
+  /**
+   * 根据属性获取关系列表
+   * @param filter
+   * @param index
+   * @returns {XML}
+   */
   renderOperation(filter, index) {
+    const { form } = this.props;
     if (!filter) {
       return (
         <Select label="关系" />
@@ -384,10 +392,10 @@ class AddComponent extends Component {
       return (
         <Select
           label="关系"
-          style={['in', 'notIn'].indexOf(this.props.form.getFieldValue(`filter-${index}-prop`)) > -1 ? { marginTop: 8 } : {}}
+          style={['in', 'notIn'].indexOf(form.getFieldValue(`filter-${index}-prop`)) > -1 ? { marginTop: 8 } : {}}
           onChange={() => {
             const str = `filter-${index}-value`;
-            this.props.form.setFieldsValue({
+            form.setFieldsValue({
               [str]: undefined,
             });
           }}
@@ -501,7 +509,14 @@ class AddComponent extends Component {
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { form, onCancel } = this.props;
+    const {
+      loading,
+      filters,
+      quickFilterFiled,
+      deleteItem,
+    } = this.state;
+    const { getFieldDecorator } = form;
     return (
       <Sidebar
         className="c7n-filter"
@@ -509,9 +524,9 @@ class AddComponent extends Component {
         okText="创建"
         cancelText="取消"
         visible
-        confirmLoading={this.state.loading}
+        confirmLoading={loading}
         onOk={this.handleOk.bind(this)}
-        onCancel={this.props.onCancel}
+        onCancel={onCancel}
       >
         <Content
           style={{
@@ -537,10 +552,10 @@ class AddComponent extends Component {
               )}
             </FormItem>
             {
-              this.state.filters.map((filter, index) => (
+              filters.map((filter, index) => (
                 <div key={index.toString()}>
                   {
-                    this.state.delete.indexOf(index) === -1 && (
+                    deleteItem.indexOf(index) === -1 && (
                       <div>
                         {
                           index !== 0 && (
@@ -569,14 +584,14 @@ class AddComponent extends Component {
                             <Select
                               label="属性"
                               onChange={() => {
-                                this.props.form.setFieldsValue({
+                                form.setFieldsValue({
                                   [`filter-${index}-rule`]: undefined,
                                   [`filter-${index}-value`]: undefined,
                                 });
                               }}
                             >
                               {
-                                this.state.quickFilterFiled.map(v => (
+                                quickFilterFiled.map(v => (
                                   <Option key={v.fieldCode} value={v.fieldCode}>{v.name}</Option>
                                 ))
                               }
@@ -590,7 +605,7 @@ class AddComponent extends Component {
                               message: '关系不可为空',
                             }],
                           })(
-                            this.renderOperation(this.props.form.getFieldValue(`filter-${index}-prop`), index),
+                            this.renderOperation(form.getFieldValue(`filter-${index}-prop`), index),
                           )}
                         </FormItem>
                         <FormItem style={{ width: 300, display: 'inline-block' }}>
@@ -600,7 +615,7 @@ class AddComponent extends Component {
                               message: '值不可为空',
                             }],
                           })(
-                            this.renderValue(this.props.form.getFieldValue(`filter-${index}-prop`), this.props.form.getFieldValue(`filter-${index}-rule`)),
+                            this.renderValue(form.getFieldValue(`filter-${index}-prop`), form.getFieldValue(`filter-${index}-rule`)),
                           )}
                         </FormItem>
                         {
@@ -609,10 +624,10 @@ class AddComponent extends Component {
                               shape="circle"
                               style={{ margin: 10 }}
                               onClick={() => {
-                                const arr = this.state.delete.slice();
+                                const arr = deleteItem.slice();
                                 arr.push(index);
                                 this.setState({
-                                  delete: arr,
+                                  deleteItem: arr,
                                 });
                               }}
                             >
@@ -630,7 +645,7 @@ class AddComponent extends Component {
               type="primary"
               funcType="flat"
               onClick={() => {
-                const arr = this.state.filters.slice();
+                const arr = filters.slice();
                 arr.push({
                   prop: undefined,
                   rule: undefined,
