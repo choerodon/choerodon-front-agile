@@ -79,6 +79,10 @@ class SprintCommonStore {
 
   @observable issueStatus = [];
 
+  @observable otherArgs = {};
+
+  @observable resolution = false;
+
   init() {
     this.setOrder({
       orderField: '',
@@ -152,6 +156,10 @@ class SprintCommonStore {
     }
   }
 
+  @action setOnlyStory(data) {
+    filter.advancedSearchArgs.issueTypeId.push(data);
+  }
+
   @action setArg(data) {
     if (data) {
       Object.assign(filter.searchArgs, data);
@@ -207,14 +215,35 @@ class SprintCommonStore {
     this.paramUrl = data;
   }
 
+  @action setResolution(data) {
+    this.resolution = data;
+  }
+
   @action setBarFilters(data) {
-    if (!this.paramName) {
-      let res = '';
-      data.forEach((item) => {
+    let res = '';
+    data.forEach((item, index) => {
+      if (this.paramName) {
+        if (!(index === 0)) {
+          res += item;
+        }
+      } else {
         res += item;
-      });
-      Object.assign(filter, { content: res });
-    }
+      }
+    });
+    Object.assign(filter, { content: res });
+  }
+
+  @action setOtherArgs() {
+    this.otherArgs = {
+      type: this.paramType,
+      id: this.paramId ? [this.paramId] : undefined,
+      issueIds: this.paramIssueId ? [this.paramIssueId] : undefined,
+      resolution: this.resolution,
+    };
+  }
+
+  @action resetOtherArgs() {
+    this.otherArgs = {};
   }
 
   loadIssues(page = 0, size = 10) {
@@ -275,15 +304,9 @@ class SprintCommonStore {
   }
 
   @computed get getFilter() {
-    const otherArgs = {
-      type: this.paramType,
-      id: this.paramId ? [this.paramId] : undefined,
-      issueIds: this.paramIssueId ? [this.paramIssueId] : undefined,
-    };
     return {
       ...filter,
-      // otherArgs: this.barFilters ? otherArgs : {},
-      otherArgs,
+      otherArgs: this.otherArgs,
     };
   }
 

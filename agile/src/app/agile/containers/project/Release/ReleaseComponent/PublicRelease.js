@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import {
-  Modal, Form, Radio, Select, DatePicker, Icon, 
+  Modal, Form, Radio, Select, DatePicker, Icon,
 } from 'choerodon-ui';
 import moment from 'moment';
 import { withRouter } from 'react-router-dom';
@@ -13,7 +13,7 @@ import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-const Option = Select.Option;
+const { Option } = Select;
 const { AppState } = stores;
 
 @observer
@@ -25,7 +25,8 @@ class PublicRelease extends Component {
 
   handlePublic(e) {
     e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, values) => {
+    const { form, onCancel, refresh } = this.props;
+    form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const data = {
           projectId: AppState.currentMenuType.id,
@@ -38,8 +39,8 @@ class PublicRelease extends Component {
           }
         }
         ReleaseStore.axiosPublicRelease(data).then((res) => {
-          this.props.onCancel();
-          this.props.refresh();
+          onCancel();
+          refresh();
         }).catch((error) => {
         });
       }
@@ -49,7 +50,7 @@ class PublicRelease extends Component {
   goIssue() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${encodeURIComponent(`版本${ReleaseStore.getVersionDetail.name}中的问题`)}&paramStatus=todo,doing&paramUrl=release`);
+    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${encodeURIComponent(`版本${ReleaseStore.getVersionDetail.name}中的问题`)}&paramResolution=true&paramUrl=release`);
   }
 
   renderRadioDisabled() {
@@ -62,12 +63,13 @@ class PublicRelease extends Component {
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    // const { getFieldDecorator } = this.props.form;
+    const { form: { getFieldDecorator, getFieldValue }, visible, onCancel } = this.props;
     return (
       <Sidebar
         title="发布版本"
-        visible={this.props.visible}
-        onCancel={this.props.onCancel.bind(this)}
+        visible={visible}
+        onCancel={onCancel.bind(this)}
         onOk={this.handlePublic.bind(this)}
         okText="确定"
         cancelText="取消"
@@ -87,7 +89,7 @@ class PublicRelease extends Component {
                   ReleaseStore.getPublicVersionDetail.fixIssueCount ? (
                     <div style={{ display: 'flex' }}>
                       <Icon type="error" style={{ color: 'red' }} />
-                      <span 
+                      <span
                         style={{ color: '#3F51B5', cursor: 'pointer' }}
                         role="none"
                         onClick={this.goIssue.bind(this)}
@@ -111,14 +113,14 @@ class PublicRelease extends Component {
                               required: true, message: '该选型时必须的',
                             }],
                           })(
-                            <RadioGroup  
+                            <RadioGroup
                               label="未解决的问题"
                             >
                               <Radio style={{ display: 'block', height: 20, marginTop: 10 }} value={1}>
                                 {'忽略并继续发布'}
                               </Radio>
                               <Radio
-                                style={{ display: 'block', height: 20, marginTop: 10 }} 
+                                style={{ display: 'block', height: 20, marginTop: 10 }}
                                 value={2}
                                 disabled={this.renderRadioDisabled()}
                               >
@@ -129,22 +131,27 @@ class PublicRelease extends Component {
                         </FormItem>
                         <FormItem>
                           {getFieldDecorator('moveVersion', {
-                            initialValue: 
+                            initialValue:
                             ReleaseStore.getPublicVersionDetail.versionNames.length > 0
-                              ? ReleaseStore.getPublicVersionDetail.versionNames[0].versionId 
+                              ? ReleaseStore.getPublicVersionDetail.versionNames[0].versionId
                               : undefined,
                             rules: [{
-                              required: this.props.form.getFieldValue('chose') === 2,
+                              required: getFieldValue('chose') === 2,
                               message: '移动版本是必须的',
                             }],
                           })(
                             <Select
                               label="选择要移动到的版本"
-                              disabled={this.props.form.getFieldValue('chose') === 1}
+                              disabled={getFieldValue('chose') === 1}
                             >
                               {
                                 ReleaseStore.getPublicVersionDetail.versionNames.map(item => (
-                                  <Option key={item.versionId} value={item.versionId}>{item.name}</Option>
+                                  <Option
+                                    key={item.versionId}
+                                    value={item.versionId}
+                                  >
+                                    {item.name}
+                                  </Option>
                                 ))
                               }
                             </Select>,
