@@ -9,6 +9,7 @@ import clickOutSide from '../../../../../components/CommonComponent/ClickOutSide
 import { createIssue } from '../../../../../api/NewIssueApi';
 
 const { TextArea } = Input;
+const filterIssueTypeCode = ['issue_epic', 'sub_task'];
 
 class CreateIssue extends Component {
   constructor(props) {
@@ -32,7 +33,12 @@ class CreateIssue extends Component {
 
   handleCreateIssue = () => {
     const { summary, selectIssueType, loading } = this.state;
-    const { onCancel, onOk, data } = this.props;
+    const {
+      onCancel, onOk, data, store,
+    } = this.props;
+    const defaultPriorityId = store.getDefaultPriority ? store.getDefaultPriority.id : '';
+    const issueTypes = store.getIssueTypes || [];
+    const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     if (!summary && onCancel) {
       onCancel();
     } else if (this.couldCreate) {
@@ -43,6 +49,9 @@ class CreateIssue extends Component {
         sprintId: data.sprintId,
         summary,
         typeCode: selectIssueType,
+        issueTypeId: currentType && currentType.id,
+        priorityCode: `priority-${defaultPriorityId}`,
+        priorityId: defaultPriorityId,
         versionIssueRelDTOList: data.versionId ? [{
           relationType: 'fix',
           versionId: data.versionId,
@@ -71,8 +80,11 @@ class CreateIssue extends Component {
   }
 
   render() {
-    const { style } = this.props;
+    const { style, store } = this.props;
     const { selectIssueType, summary, loading } = this.state;
+    const issueTypes = store.getIssueTypes
+      .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
+    const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
       <Menu
         className="ignore-react-onclickoutside"
@@ -84,11 +96,11 @@ class CreateIssue extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          ['story', 'task', 'bug'].map(type => (
-            <Menu.Item key={type}>
+          issueTypes.map(type => (
+            <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
-                  data=""
+                  data={type}
                   showName
                 />
               </div>
@@ -120,13 +132,12 @@ class CreateIssue extends Component {
               <div style={{ display: 'flex', alignItem: 'center' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <TypeTag
-                    data={selectIssueType}
-                    showName
+                    data={currentType}
                   />
                 </div>
                 <Icon
                   type="arrow_drop_down"
-                  style={{ fontSize: 16 }}
+                  style={{ fontSize: 16, lineHeight: '20px' }}
                 />
               </div>
             </Dropdown>

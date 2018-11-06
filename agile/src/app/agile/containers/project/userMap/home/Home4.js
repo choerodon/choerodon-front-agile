@@ -20,7 +20,6 @@ import IssueCard from '../component/IssueCard/IssueCard.js';
 import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
-import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
 
 const FileSaver = require('file-saver');
 
@@ -389,6 +388,8 @@ class Home3 extends Component {
 
   initData =() => {
     const { UserMapStore } = this.props;
+    UserMapStore.axiosGetIssueTypes();
+    UserMapStore.axiosGetDefaultPriority();
     UserMapStore.initData(true);
     UserMapStore.setShowDoneEpic(false);
     UserMapStore.setIsApplyToEpic(false);
@@ -1777,6 +1778,7 @@ class Home3 extends Component {
                         {
                         epicId === epic.issueId && currentNewObj[id] === vos[id] ? (
                           <CreateIssue
+                            store={UserMapStore}
                             data={{ epicId: epic.issueId, [id]: vos[id] }}
                             onOk={() => {
                               UserMapStore.initData(false);
@@ -1930,6 +1932,7 @@ class Home3 extends Component {
                       {
                         epicId === epic.issueId && currentNewObj[id] === 0 ? (
                           <CreateIssue
+                            store={UserMapStore}
                             data={{ epicId: epic.issueId, [`${mode}Id`]: 0 }}
                             onOk={() => {
                               UserMapStore.initData(false);
@@ -2063,6 +2066,7 @@ class Home3 extends Component {
                 </DragDropContext>
               )}
             <CreateEpic
+              store={UserMapStore}
               // container={document.querySelector('.c7n-userMap')}
               visible={createEpic}
               onOk={() => {
@@ -2096,6 +2100,7 @@ class Home3 extends Component {
             }}
             >
               <CreateEpic
+                store={UserMapStore}
                 // container={document.querySelector('.c7n-userMap')}
                 visible={createEpic}
                 onOk={() => {

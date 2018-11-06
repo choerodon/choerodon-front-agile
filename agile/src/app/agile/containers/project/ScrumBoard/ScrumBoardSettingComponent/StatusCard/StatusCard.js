@@ -173,6 +173,7 @@ class StatusCard extends Component {
                     onClick={() => {
                       const data = {
                         id: this.props.data.id,
+                        statusId: this.props.data.statusId,
                         objectVersionNumber: this.props.data.objectVersionNumber,
                         completed: !this.props.data.completed,
                         projectId: AppState.currentMenuType.id,
