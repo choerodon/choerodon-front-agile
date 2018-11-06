@@ -38,6 +38,7 @@ class Issue extends Component {
       expand: false,
       create: false,
       selectedIssue: {},
+      filterName: [],
       checkCreateIssue: false,
       selectIssueType: 'task',
       createIssueValue: '',
@@ -57,18 +58,25 @@ class Issue extends Component {
     const {
       paramType, paramId, paramName, paramStatus,
       paramPriority, paramIssueType, paramIssueId, paramUrl, paramOpenIssueId,
+      paramResolution,
     } = Request;
     // IssueStore.loadQuickSearch();
     IssueStore.loadCurrentSetting();
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
     IssueStore.setParamName(paramName);
+    this.setState({
+      filterName: IssueStore.getParamName ? [IssueStore.getParamName] : [],
+    });
     IssueStore.setParamStatus(paramStatus);
     IssueStore.setParamPriority(paramPriority);
     IssueStore.setParamIssueType(paramIssueType);
     IssueStore.setParamIssueId(paramIssueId);
     IssueStore.setParamUrl(paramUrl);
     IssueStore.setParamOpenIssueId(paramOpenIssueId);
+    IssueStore.setResolution(paramResolution);
+
+    IssueStore.setOtherArgs();
     const arr = [];
     if (paramName) {
       arr.push(paramName);
@@ -269,7 +277,15 @@ class Issue extends Component {
         IssueStore.setArg(temp);
       }
     });
+    if (IssueStore.getParamName) {
+      if (barFilters.indexOf(IssueStore.getParamName) === -1) {
+        IssueStore.resetOtherArgs();
+      }
+    }
     IssueStore.setBarFilters(barFilters);
+    this.setState({
+      filterName: barFilters,
+    });
     const { current, pageSize } = IssueStore.pagination;
     IssueStore.setOrder(sorter.columnKey, sorter.order === 'ascend' ? 'asc' : 'desc');
     IssueStore.loadIssues(current - 1, pageSize);
@@ -430,7 +446,7 @@ class Issue extends Component {
   renderVersion = arr => (arr.length ? <Tag color="blue">{arr[0].name}</Tag> : null);
 
   onlyMe = (checked) => {
-    IssueStore.setSelectedQuickSearch({ assigneeId: checked ? AppState.userInfo.id : null });
+    IssueStore.setAdvArg({ assignee_id: checked ? AppState.userInfo.id : null });
     IssueStore.loadIssues();
   };
 
@@ -450,6 +466,8 @@ class Issue extends Component {
       selectIssueType, createLoading, create, checkCreateIssue,
       originPriorities,
     } = this.state;
+    let { filterName } = this.state;
+    filterName = filterName || [];
     const columnFilter = new Map([
       ['issueNum', []],
       [
@@ -476,6 +494,7 @@ class Issue extends Component {
       ['sprint', []],
       ['component', []],
       ['epic', []],
+      ['issueId', []],
     ]);
     const columns = [
       {
@@ -681,9 +700,8 @@ class Issue extends Component {
                 filterBar
                 showHeader={!expand}
                 filterBarPlaceholder="过滤表"
-                // filters={
-                //   IssueStore.getParamName ? [IssueStore.getParamName] : []
-                // }
+                filters={filterName}
+                noFilter
                 scroll={{ x: true }}
                 loading={IssueStore.loading}
                 pagination={false}
@@ -692,7 +710,7 @@ class Issue extends Component {
                   record.issueId === selectedIssue && selectedIssue.issueId ? 'c7n-border-visible' : 'c7n-border'
                 )}
                 onRow={record => ({
-                  onClick: () => {
+                  onClick: (e) => {
                     this.setState({
                       selectedIssue: record,
                       expand: true,

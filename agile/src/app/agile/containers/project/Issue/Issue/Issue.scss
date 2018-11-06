@@ -1,12 +1,9 @@
 //临时测试
 .ant-tag-checkable {
-  &,
-  a,
-  a:hover {
+  &, a, a:hover {
     color: #000;
   }
-  &:active,
-  &-checked {
+  &:active, &-checked {
     color: #fff;
   }
 }
