@@ -181,7 +181,10 @@ class Issue extends Component {
     IssueStore.init();
     IssueStore.loadIssues();
     if (issueObj) {
-      history.push(`/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}&paramName=${issueObj.issueNum}&paramIssueId=${issueObj.issueId}&paramOpenIssueId=${issueObj.issueId}`);
+      this.setState({
+        selectedIssue: issueObj,
+        expand: true,
+      });
     }
   };
 
@@ -273,7 +276,6 @@ class Issue extends Component {
   };
 
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
-    debugger;
     Object.keys(filters).forEach((key) => {
       if (key === 'statusId' || key === 'priorityId' || key === 'issueTypeId') {
         IssueStore.setAdvArg(filters);
@@ -330,7 +332,6 @@ class Issue extends Component {
         />
       );
     }
-    debugger;
     const renderNarrow = (
       <div style={props.style} className={props.className}>
         {props.children[1]}

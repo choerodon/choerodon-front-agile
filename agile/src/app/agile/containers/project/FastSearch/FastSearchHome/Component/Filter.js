@@ -33,8 +33,15 @@ class AddComponent extends Component {
     this.loadQuickFilterFiled();
   }
 
+  /**
+   * 根据值和属性转化值
+   * @param value
+   * @param filter
+   * @returns {*}
+   */
   getValue = (value, filter) => {
     const type = Object.prototype.toString.call(value);
+    // priority和issue_type的值存在数字和数组两种形式
     if (filter === 'priority' || filter === 'issue_type') {
       if (type === '[object Array]') {
         const v = _.map(value, 'key');
@@ -46,7 +53,7 @@ class AddComponent extends Component {
       }
     } else if (type === '[object Array]') {
       const v = _.map(value, 'key');
-      return `(  ${v.join(',')}  )`;
+      return `(${v.join(',')})`;
     } else if (type === '[object Object]') {
       if (value.key) {
         const v = value.key;
@@ -64,6 +71,11 @@ class AddComponent extends Component {
     return '';
   };
 
+  /**
+   * 根据值获取名称
+   * @param value
+   * @returns {*}
+   */
   getLabel = (value) => {
     if (Object.prototype.toString.call(value) === '[object Array]') {
       const v = _.map(value, 'label');
@@ -85,6 +97,11 @@ class AddComponent extends Component {
     return '';
   };
 
+  /**
+   * 字段的关系列表
+   * @param filter
+   * @returns {*|Array}
+   */
   getOperation = (filter) => {
     const OPERATION_FILTER = {
       assignee: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
@@ -108,6 +125,11 @@ class AddComponent extends Component {
     return OPERATION_FILTER[filter] || [];
   };
 
+  /**
+   * 调用接口，获取'属性'的值列表
+   * @param filter 属性
+   * @param addEmpty
+   */
   getOption(filter, addEmpty) {
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
@@ -190,11 +212,13 @@ class AddComponent extends Component {
       issue_type: {
         url: `/issue/v1/projects/${projectId}/schemes/query_issue_types?apply_type=agile`,
         prop: '',
-        id: 'valueCode',
+        id: 'id',
         name: 'name',
       },
     };
-    axios[filter === 'sprint' || filter === 'influence_version' || filter === 'fix_version' ? 'post' : 'get'](OPTION_FILTER[filter].url)
+    axios[filter === 'sprint'
+    || filter === 'influence_version'
+    || filter === 'fix_version' ? 'post' : 'get'](OPTION_FILTER[filter].url)
       .then((res) => {
         this.setState({
           temp: OPTION_FILTER[filter].prop === '' ? res : res[OPTION_FILTER[filter].prop],
@@ -202,6 +226,9 @@ class AddComponent extends Component {
       });
   }
 
+  /**
+   * 加载属性列表
+   */
   loadQuickFilterFiled = () => {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/fields`)
       .then((res) => {
@@ -211,15 +238,19 @@ class AddComponent extends Component {
       });
   };
 
+  /**
+   * 保存配置
+   * @param e
+   */
   handleOk = (e) => {
     e.preventDefault();
     const { form, onOk } = this.props;
     const { filters, quickFilterFiled, deleteItem } = this.state;
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        const arr = [];
-        const expressQueryArr = [];
-        const o = [];
+        const arr = []; // 属性-关系-值
+        const expressQueryArr = []; // 列表显示
+        const o = []; // 多个条件间关系
         const f = filters.slice();
         f.forEach((v, i) => {
           if (deleteItem.indexOf(i) !== -1) {
@@ -230,6 +261,7 @@ class AddComponent extends Component {
             operation: this.transformOperation(values[`filter-${i}-rule`]),
             value: this.getValue(values[`filter-${i}-value`], values[`filter-${i}-prop`]),
           };
+          // 如果不是第一项
           if (i) {
             o.push(values[`filter-${i}-ao`]);
             expressQueryArr.push(values[`filter-${i}-ao`].toUpperCase());
@@ -264,8 +296,13 @@ class AddComponent extends Component {
           });
       }
     });
-  }
+  };
 
+  /**
+   * 转化关系
+   * @param value
+   * @returns {*}
+   */
   transformOperation = (value) => {
     const OPERATION = {
       '=': '=',
@@ -282,6 +319,12 @@ class AddComponent extends Component {
     return OPERATION[value];
   };
 
+  /**
+   *
+   * @param filter
+   * @param addEmpty
+   * @returns {Array}
+   */
   tempOption = (filter, addEmpty) => {
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
@@ -364,7 +407,7 @@ class AddComponent extends Component {
       issue_type: {
         url: '',
         prop: '',
-        id: 'valueCode',
+        id: 'id',
         name: 'name',
       },
     };
@@ -377,7 +420,7 @@ class AddComponent extends Component {
   };
 
   /**
-   * 根据属性获取关系列表
+   * 根据'属性'获取'关系'列表
    * @param filter
    * @param index
    * @returns {XML}
@@ -410,13 +453,21 @@ class AddComponent extends Component {
     }
   }
 
+  /**
+   * 根据'属性'和'关系'获取'值'列表
+   * @param filter
+   * @param operation
+   * @returns {XML}
+   */
   renderValue(filter, operation) {
     if (!filter || !operation) {
       return (
         <Select label="值" />
       );
-    } else if (['assignee', 'priority', 'status', 'reporter', 'created_user', 'last_updated_user', 'epic', 'sprint', 'label', 'component', 'influence_version', 'fix_version', 'issue_type'].indexOf(filter) > -1) {
-      // select
+    } else if (
+      ['assignee', 'priority', 'status', 'reporter', 'created_user',
+        'last_updated_user', 'epic', 'sprint', 'label', 'component',
+        'influence_version', 'fix_version', 'issue_type'].indexOf(filter) > -1) {
       if (['=', '!='].indexOf(operation) > -1) {
         // return normal value
         return (
@@ -482,8 +533,8 @@ class AddComponent extends Component {
     } else {
       // story points && remainning time
       // return number input
-      if (operation === 'is' || operation === 'isNot') {
-        return (
+      return (operation === 'is' || operation === 'isNot'
+        ? (
           <Select
             label="值"
             labelInValue
@@ -495,16 +546,13 @@ class AddComponent extends Component {
             <Option key="'null'" value="'null'">
               空
             </Option>
-          </Select>
-        );
-      } else {
-        return (
+          </Select>)
+        : (
           <NumericInput
             label="值"
             style={{ lineHeight: '22px', marginBottom: 0, width: 300 }}
-          />
-        );
-      }
+          />)
+      );
     }
   }
 

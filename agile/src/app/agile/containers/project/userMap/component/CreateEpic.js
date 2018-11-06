@@ -18,15 +18,21 @@ class CreateEpic extends Component {
   }
 
   handleCreateEpic =(e) => {
-    const { form, onOk } = this.props;
+    const { form, onOk, store } = this.props;
+    const issueTypes = store.getIssueTypes || [];
+    const defaultPriorityId = store.getDefaultPriority ? store.getDefaultPriority.id : '';
     e.preventDefault();
     form.validateFieldsAndScroll((err, value) => {
       if (!err) {
+        const epicType = issueTypes.find(t => t.typeCode === 'issue_epic');
         const data = {
           projectId: AppState.currentMenuType.id,
           epicName: value.name,
           summary: value.summary,
           typeCode: 'issue_epic',
+          issueTypeId: epicType && epicType.id,
+          priorityCode: `priority-${defaultPriorityId}`,
+          priorityId: defaultPriorityId,
         };
         this.setState({
           loading: true,
