@@ -252,6 +252,7 @@ class Issue extends Component {
   };
 
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
+    debugger;
     Object.keys(filters).forEach((key) => {
       if (key === 'statusId' || key === 'priorityId' || key === 'issueTypeId') {
         IssueStore.setAdvArg(filters);
@@ -308,6 +309,7 @@ class Issue extends Component {
         />
       );
     }
+    debugger;
     const renderNarrow = (
       <div style={props.style} className={props.className}>
         {props.children[1]}
@@ -326,9 +328,14 @@ class Issue extends Component {
   };
 
   BodyRow = (props) => {
-    const { expand } = this.state;
+    debugger;
+    const { expand, selectedIssue } = this.state;
+    const isClicked = props.children.find(item => (
+      selectedIssue.issueId === item.props.record.issueId
+    ));
+    debugger;
     const renderNarrow = (
-      <div onClick={props.onClick} style={{ display: 'flex', flexDirection: 'column', margin: '10px' }} role="none">
+      <div onClick={props.onClick} style={{ }} role="none" className={isClicked ? 'c7n-Issue-CardNarrow-clicked c7n-Issue-CardNarrow' : 'c7n-Issue-CardNarrow'}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '7px' }}>
           <div style={{ display: 'flex' }}>
             {props.children[1]}
@@ -341,7 +348,6 @@ class Issue extends Component {
           </div>
         </div>
         <div>{props.children[2]}</div>
-        <Divider />
       </div>
     );
     return expand ? renderNarrow : (<tr {...props} />);
@@ -457,8 +463,10 @@ class Issue extends Component {
       selectIssueType, createLoading, create, checkCreateIssue,
       originPriorities,
     } = this.state;
+    // 获取筛选框的显示内容
     let { filterName } = this.state;
     filterName = filterName || [];
+    // 筛选器配置（服务端获取筛选数据）
     const columnFilter = new Map([
       ['issueNum', []],
       [
@@ -487,6 +495,7 @@ class Issue extends Component {
       ['epic', []],
       ['issueId', []],
     ]);
+    // 表格列配置
     const columns = [
       {
         title: '任务编号',
@@ -579,9 +588,6 @@ class Issue extends Component {
         dataIndex: 'component',
         key: 'component',
         filters: columnFilter.get('component'),
-        // filteredValue: {
-        //   component: (IssueStore.getParamName ? IssueStore.getParamName : null),
-        // },
         hidden: true,
       },
       {
@@ -658,7 +664,7 @@ class Issue extends Component {
           >
             <QuickSearch
               title={false}
-              buttonName="自定义筛选"
+              buttonName="更多"
               buttonIcon="more_vert"
               moreSelection={IssueStore.getQuickSearch}
               onChangeCheckBox={this.onChangeSelect}
@@ -688,7 +694,6 @@ class Issue extends Component {
                 }
                 size="large"
                 dataSource={IssueStore.getIssues}
-                filterBar
                 showHeader={!expand}
                 filterBarPlaceholder="过滤表"
                 filters={filterName}
@@ -697,6 +702,8 @@ class Issue extends Component {
                 loading={IssueStore.loading}
                 pagination={false}
                 onChange={this.handleFilterChange}
+                onColumnFilterChange={(item) => {
+                }}
                 rowClassName={(record, index) => (
                   record.issueId === selectedIssue && selectedIssue.issueId ? 'c7n-border-visible' : 'c7n-border'
                 )}
