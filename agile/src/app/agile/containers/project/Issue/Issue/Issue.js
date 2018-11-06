@@ -185,18 +185,9 @@ class Issue extends Component {
     }
     loadIssue(Id).then((res) => {
       const obj = {
-        assigneeId: res.assigneeId,
-        assigneeName: res.assigneeName,
+        ...res,
         imageUrl: res.assigneeImageUrl || '',
-        issueId: res.issueId,
-        issueNum: res.issueNum,
-        priorityDTO: res.priorityDTO,
-        projectId: res.projectId,
-        statusCode: res.statusCode,
-        statusColor: res.statusColor,
-        statusName: res.statusName,
-        summary: res.summary,
-        typeCode: res.typeCode,
+        versionIssueRelDTOS: res.versionIssueRelDTOList,
       };
       const originIssues = _.slice(IssueStore.issues);
       const index = _.findIndex(originIssues, { issueId: res.issueId });
@@ -346,7 +337,7 @@ class Issue extends Component {
           <div style={{ display: 'flex' }}>
             {props.children[3]}
             {props.children[4]}
-            {props.children[5]}
+            {props.children[6]}
           </div>
         </div>
         <div>{props.children[2]}</div>

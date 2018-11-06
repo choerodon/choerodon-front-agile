@@ -298,11 +298,11 @@ class AddComponent extends Component {
       if (operation === 'in' || operation === 'notIn' || operation === 'not in') {
         const arr = value.slice(1, -1).split(',');
         return arr.map(v => ({
-          key: v.slice(1, -1),
+          key: v,
           label: _.find(this.state[OPTION_FILTER[filter].state], { valueCode: v.slice(1, -1) }).name,
         }));
       } else {
-        const k = value.slice(1, -1);
+        const k = value;
         return ({
           key: k,
           label: _.find(this.state[OPTION_FILTER[filter].state], { [OPTION_FILTER[filter].id]: k * 1 }).name,

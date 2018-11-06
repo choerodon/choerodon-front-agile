@@ -73,7 +73,7 @@ class AddStatus extends Component {
         statusType: false,
       }, () => {
         form.setFieldsValue({
-          categoryCode: undefined
+          categoryCode: undefined,
         });
       });
       callback();

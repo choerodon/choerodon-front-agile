@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
-import { Select, Form, Input, Button, Modal, Icon, Tooltip } from 'choerodon-ui';
+import {
+  Select, Form, Input, Button, Modal, Icon, Tooltip,
+} from 'choerodon-ui';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
-import { loadIssue, loadLabels, loadPriorities, loadVersions, createSubIssue } from '../../api/NewIssueApi';
+import {
+  loadIssue, loadLabels, loadPriorities, loadVersions, createSubIssue,
+} from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
-import { COLOR } from '../../common/Constant';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import UserHead from '../UserHead';
-import TypeTag from '../TypeTag';
 import './CreateSubTask.scss';
 
 const { AppState } = stores;
@@ -20,6 +22,16 @@ const FormItem = Form.Item;
 let sign = false;
 
 class CreateSubIssue extends Component {
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({ selectLoading: true });
+    getUsers(input).then((res) => {
+      this.setState({
+        originUsers: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
+
   constructor(props) {
     super(props);
     this.state = {
@@ -38,7 +50,8 @@ class CreateSubIssue extends Component {
   }
 
   componentDidMount() {
-    loadIssue(this.props.issueId).then((res) => {
+    const { issueId } = this.props;
+    loadIssue(issueId).then((res) => {
       this.setState({
         sprint: {
           sprintId: res.activeSprint ? res.activeSprint.sprintId || undefined : undefined,
@@ -68,19 +81,9 @@ class CreateSubIssue extends Component {
 
   setFileList = (data) => {
     this.setState({ fileList: data });
-  }
+  };
 
-  debounceFilterIssues = _.debounce((input) => {
-    this.setState({ selectLoading: true });
-    getUsers(input).then((res) => {
-      this.setState({
-        originUsers: res.content,
-        selectLoading: false,
-      });
-    });
-  }, 500);
-
-  loadPriorities() {
+  loadPriorities = () => {
     loadPriorities().then((res) => {
       const defaultPriorities = res.filter(p => p.default);
       this.setState({
@@ -88,12 +91,18 @@ class CreateSubIssue extends Component {
         defaultPriorityId: defaultPriorities.length ? defaultPriorities[0].id : '',
       });
     });
-  }
+  };
 
   handleCreateIssue = () => {
-    this.props.form.validateFields((err, values) => {
+    const { sprint, delta } = this.state;
+    const {
+      store, form, issueId,
+    } = this.props;
+    const { originLabels, originFixVersions } = this.state;
+    form.validateFields((err, values) => {
       if (!err) {
-        const exitLabels = this.state.originLabels;
+        const subIssueType = store.getIssueTypes && store.getIssueTypes.find(t => t.typeCode === 'sub_task');
+        const exitLabels = originLabels;
         const labelIssueRelDTOList = _.map(values.issueLink, (label) => {
           const target = _.find(exitLabels, { labelName: label });
           if (target) {
@@ -105,7 +114,7 @@ class CreateSubIssue extends Component {
             });
           }
         });
-        const exitFixVersions = this.state.originFixVersions;
+        const exitFixVersions = originFixVersions;
         const fixVersionIssueRelDTOList = _.map(values.fixVersionIssueRel, (version) => {
           const target = _.find(exitFixVersions, { name: version });
           if (target) {
@@ -124,15 +133,17 @@ class CreateSubIssue extends Component {
         const extra = {
           summary: values.summary,
           priorityId: values.priorityId,
+          priorityCode: `priority-${values.priorityId}`,
           assigneeId: values.assigneedId,
           projectId: AppState.currentMenuType.id,
-          parentIssueId: this.props.issueId,
+          parentIssueId: issueId,
           labelIssueRelDTOList,
-          sprintId: this.state.sprint.sprintId || 0,
+          sprintId: sprint.sprintId || 0,
           versionIssueRelDTOList: fixVersionIssueRelDTOList,
+          issueTypeId: subIssueType && subIssueType.id,
         };
         this.setState({ createLoading: true });
-        const deltaOps = this.state.delta;
+        const deltaOps = delta;
         if (deltaOps) {
           beforeTextUpload(deltaOps, extra, this.handleSave);
         } else {
@@ -144,11 +155,12 @@ class CreateSubIssue extends Component {
   };
 
   handleSave = (data) => {
-    const fileList = this.state.fileList;
+    const { fileList } = this.state;
+    const { issueId, onOk } = this.props;
     const callback = (newFileList) => {
       this.setState({ fileList: newFileList });
     };
-    createSubIssue(this.props.issueId, data)
+    createSubIssue(issueId, data)
       .then((res) => {
         if (fileList.length > 0) {
           const config = {
@@ -158,19 +170,25 @@ class CreateSubIssue extends Component {
             projectId: AppState.currentMenuType.id,
           };
           if (fileList.some(one => !one.url)) {
-            handleFileUpload(this.state.fileList, callback, config);
+            handleFileUpload(fileList, callback, config);
           }
         }
-        this.props.onOk(res);
+        onOk(res);
       })
       .catch((error) => {
       });
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
-    const { initValue, visible, onCancel, onOk } = this.props;
-    const { defaultPriorityId, originPriorities } = this.state;
+    const {
+      visible, onCancel, form,
+    } = this.props;
+    const { getFieldDecorator } = form;
+    const {
+      defaultPriorityId,
+      originPriorities,
+      createLoading,
+    } = this.state;
     const callback = (value) => {
       this.setState({
         delta: value,
@@ -187,10 +205,14 @@ class CreateSubIssue extends Component {
         onCancel={onCancel}
         okText="创建"
         cancelText="取消"
-        confirmLoading={this.state.createLoading}
+        confirmLoading={createLoading}
       >
         <div>
-          <h2>在项目“{AppState.currentMenuType.name}”中创建子任务</h2>
+          <h2>
+            在项目“
+            {AppState.currentMenuType.name}
+            ”中创建子任务
+          </h2>
           <p style={{ width: 520, marginBottom: 24 }}>
             请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。
           </p>
@@ -212,29 +234,12 @@ class CreateSubIssue extends Component {
                   label="优先级"
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
-                  {originPriorities.map(priority =>
-                    (<Option key={priority.id} value={priority.id}>
+                  {originPriorities.map(priority => (
+                    <Option key={priority.id} value={priority.id}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
-                        <div
-                          style={{
-                            color: priority.colour,
-                            width: 20,
-                            height: 20,
-                            textAlign: 'center',
-                            lineHeight: '20px',
-                            borderRadius: '50%',
-                            marginRight: 8,
-                          }}
-                        >
-                          <Icon
-                            type="flag"
-                            style={{ fontSize: '13px' }}
-                          />
-                        </div>
                         <span>{priority.name}</span>
                       </div>
-                    </Option>),
-                  )}
+                    </Option>))}
                 </Select>,
               )}
             </FormItem>

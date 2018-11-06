@@ -284,9 +284,6 @@ class CreateSprint extends Component {
       reporterImageUrl,
       sprintId,
       sprintName,
-      statusId,
-      statusCode,
-      statusName,
       statusMapDTO,
       storyPoints,
       summary,
@@ -342,6 +339,9 @@ class CreateSprint extends Component {
       reporterImageUrl,
       sprintId,
       sprintName,
+      statusId: statusMapDTO.id,
+      statusCode: statusMapDTO.type,
+      statusName: statusMapDTO.name,
       statusMapDTO,
       storyPoints,
       summary,
@@ -1267,11 +1267,10 @@ class CreateSprint extends Component {
       priorityName,
       priorityColor,
       originStatus,
-      statusMapDTO,
+      statusId,
+      statusCode,
+      statusName,
     } = this.state;
-    const statusCode = statusMapDTO ? statusMapDTO.type : undefined;
-    const statusName = statusMapDTO ? statusMapDTO.name : '';
-    const statusId = statusMapDTO ? statusMapDTO.id : undefined;
     const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
     const typeId = issueTypeDTO ? issueTypeDTO.id : '';
@@ -3232,6 +3231,7 @@ h
               visible={this.state.createSubTaskShow}
               onCancel={() => this.setState({ createSubTaskShow: false })}
               onOk={this.handleCreateSubIssue.bind(this)}
+              store={store}
             />
           ) : null
         }
@@ -3242,6 +3242,7 @@ h
               visible={this.state.createLinkTaskShow}
               onCancel={() => this.setState({ createLinkTaskShow: false })}
               onOk={this.handleCreateLinkIssue.bind(this)}
+              store={store}
             />
           ) : null
         }

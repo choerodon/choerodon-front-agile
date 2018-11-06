@@ -31,7 +31,7 @@ class CreateEpic extends Component {
         this.setState({
           loading: true,
         });
-        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues`, data)
+        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues?applyType=agile`, data)
           .then((res) => {
             this.setState({
               loading: false,
