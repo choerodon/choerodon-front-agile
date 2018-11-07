@@ -437,11 +437,14 @@ class StatusIssue extends Component {
                                   paddingLeft: 8,
                                   paddingRight: 8,
                                   background: this.renderStatusBackground(categoryCode),
-                                  // background: '#4D90FE',
                                   color: 'white',
-                                  maxWidth: 64,
+                                  maxWidth: 76,
+                                  minWidth: 56,
                                   textAlign: 'center',
                                   height: 20,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
                                 }}
                               >
                                 {statusName}
@@ -455,6 +458,8 @@ class StatusIssue extends Component {
                                   color: item.priorityDTO.colour,
                                   textAlign: 'center',
                                   marginLeft: '8px',
+                                  minWidth: 16,
+                                  maxWidth: 28,
                                   height: 20,
                                   borderRadius: 2,
                                 }}
