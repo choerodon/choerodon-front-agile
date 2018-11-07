@@ -3034,11 +3034,13 @@ h
                 </div>
 
                 <div id="commit">
-                  <div className="c7n-title-wrapper" style={{
-                      marginBottom:2
-                    }}>
-                    <div className="c7n-title-left" 
-                    >
+                  <div
+                    className="c7n-title-wrapper"
+                    style={{
+                      marginBottom: 2,
+                    }}
+                  >
+                    <div className="c7n-title-left">
                       <Icon type="sms_outline c7n-icon-title" />
                       <span>评论</span>
                     </div>
@@ -3216,13 +3218,11 @@ h
             visible={this.state.dailyLogShow}
             onCancel={() => this.setState({ dailyLogShow: false })}
             onOk={() => {
-              loadWorklogs(this.state.issueId).then((res) => {
-                this.setState({ worklogs: res });
-                this.setState({ dailyLogShow: false });
-              })
+              this.setState({ dailyLogShow: false });
+              this.reloadIssue(this.state.origin.issueId);
             }}
           />
-          ) : null
+        ) : null
         }
         {
           this.state.createSubTaskShow ? (

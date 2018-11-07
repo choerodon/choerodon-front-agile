@@ -2,33 +2,27 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Content, stores } from 'choerodon-front-boot';
 import {
- Button, Select, Icon, message 
+  Select,
 } from 'choerodon-ui';
-import _ from 'lodash';
+import moment from 'moment';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import WorkCalendar from './WorkCalendar';
 
 const { AppState } = stores;
-const Option = Select.Option;
+const { Option } = Select;
 
 @observer
 class WorkCalendarPage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectValue: '',
-    };
-  }
-
   onWorkDateChange = (data) => {
     const { sprintId } = ScrumBoardStore.getWorkDate;
+    const year = moment().year();
     if (data.calendarId) {
       ScrumBoardStore.axiosDeleteCalendarData(data.calendarId).then(() => {
-        ScrumBoardStore.axiosGetCalendarData();
+        ScrumBoardStore.axiosGetCalendarData(year);
       });
     } else {
       ScrumBoardStore.axiosCreateCalendarData(sprintId, data).then(() => {
-        ScrumBoardStore.axiosGetCalendarData();
+        ScrumBoardStore.axiosGetCalendarData(year);
       });
     }
   };

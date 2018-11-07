@@ -26,6 +26,7 @@ class TypeTag extends Component {
               style={{
                 backgroundColor: data ? data.colour : '#fab614',
                 padding: '2px',
+                margin: '3px',
               }}
             >
               <Icon
