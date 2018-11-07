@@ -1552,7 +1552,7 @@ class Home3 extends Component {
       </Menu>
     );
     return (
-      <Header title="用户故事地图">
+      <Header title="故事地图">
         {/* {!this.state.isFullScreen ?
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
             <Icon type="playlist_add" />
