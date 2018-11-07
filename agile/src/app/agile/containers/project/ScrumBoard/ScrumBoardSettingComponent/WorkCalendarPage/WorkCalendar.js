@@ -10,9 +10,6 @@ import './WorkCalendar.scss';
 
 @observer
 class WorkCalendar extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   /**
    * 自定义渲染日期格式

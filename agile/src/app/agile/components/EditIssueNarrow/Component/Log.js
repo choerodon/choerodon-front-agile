@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, Popconfirm } from 'choerodon-ui';
 import { AppState } from 'choerodon-front-boot';
-import _ from 'lodash';
+import TimeAgo from 'timeago-react';
 import UserHead from '../../UserHead';
 import WYSIWYGEditor from '../../WYSIWYGEditor';
 import { IssueDescription } from '../../CommonComponent';
@@ -153,6 +153,10 @@ class Log extends Component {
         <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: '10px' }}>
           <span style={{ width: 70 }}>耗费时间:</span>
           <span style={{ color: '#000', fontWeight: '500' }}>{`${worklog.workTime}h` || '无'}</span>
+        </div>
+        <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: '10px' }}>
+          <span style={{ width: 70 }}>工作日期:</span>
+          <span style={{ color: '#000', fontWeight: '500' }}>{worklog.startDate || '无'}</span>
         </div>
         {
           this.state.expand && (
