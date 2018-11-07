@@ -522,6 +522,7 @@ class Issue extends Component {
         key: 'issueId',
         width: '128px',
         sorter: true,
+        fixed: 'left',
         filters: columnFilter.get('issueNum'),
         render: this.renderIssueNum,
       },
@@ -531,6 +532,7 @@ class Issue extends Component {
         key: 'issueTypeId',
         width: '120px',
         sorter: true,
+        fixed: 'left',
         filters: columnFilter.get('typeId'),
         filterMultiple: true,
         render: this.renderTypeCode,
@@ -540,6 +542,7 @@ class Issue extends Component {
         dataIndex: 'summary',
         key: 'summary',
         width: '300px',
+        fixed: 'left',
         filters: columnFilter.get('summary'),
         render: this.renderSummary,
       },
@@ -725,7 +728,7 @@ class Issue extends Component {
                 filterBarPlaceholder="过滤表"
                 filters={filterName}
                 noFilter
-                scroll={{ x: true }}
+                scroll={{ x: 1340 }}
                 loading={IssueStore.loading}
                 pagination={false}
                 onChange={this.handleFilterChange}
