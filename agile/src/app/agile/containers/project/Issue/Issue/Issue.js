@@ -56,7 +56,6 @@ class Issue extends Component {
 
   componentDidUpdate() {
     const selectedCard = document.getElementsByClassName('c7n-Issue-CardNarrow-clicked');
-    debugger;
     if (selectedCard.length) {
       selectedCard[0].scrollIntoView();
     }
@@ -251,7 +250,7 @@ class Issue extends Component {
   };
 
   handleHidden = (column) => {
-    const filterData = storage.getItem('filterData').split(',');
+    const filterData = storage.getItem('filterData') && storage.getItem('filterData').split(',');
     if (filterData && filterData.length) {
       column.map(
         item => (
@@ -725,7 +724,6 @@ class Issue extends Component {
                 onChange={this.handleFilterChange}
                 onColumnFilterChange={(item) => {
                   storage.setItem('filterData', item.selectedKeys);
-                  debugger;
                 }}
                 rowClassName={(record, index) => (
                   record.issueId === selectedIssue && selectedIssue.issueId ? 'c7n-border-visible' : 'c7n-border'
