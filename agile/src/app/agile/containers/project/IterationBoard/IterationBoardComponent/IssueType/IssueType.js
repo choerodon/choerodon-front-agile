@@ -153,10 +153,11 @@ class IssueType extends Component {
 
   loadIssueTypeData(sprintId) {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     this.setState({
       loading: true,
     });
-    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/issue_type?sprintId=${sprintId}`)
+    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/issue_type?organizationId=${orgId}&sprintId=${sprintId}`)
       .then((res) => {
         if (res && res.length) {
           this.setState({

@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { Icon, Popconfirm, Popover } from 'choerodon-ui';
 import { AppState } from 'choerodon-front-boot';
-import _ from 'lodash';
 import UserHead from '../../UserHead';
-import { formatDate } from '../../../common/utils';
-import { getUser } from '../../../api/CommonApi';
+import { DatetimeAgo } from '../../CommonComponent';
 import './DataLog.scss';
 
 const PROP = {
@@ -45,13 +43,13 @@ class DataLog extends Component {
 
   getMode1(datalog) {
     const { field, oldString, oldValue, newString, newValue, categoryCode } = datalog;
-    if (!oldValue && newValue) {
+    if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
       if (['labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child'].includes(field)) {
         return '创建';
       }
       return '更新';
-    } else if (oldValue && newValue) {
+    } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
       if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return '将';
@@ -70,7 +68,7 @@ class DataLog extends Component {
           return '置为待办';
         }
       }
-    } else if (oldValue && !newValue) {
+    } else if ((oldValue || oldValue === 0) && (!newValue && newValue !== 0)) {
       // yyy -> null
       if (['Epic Link', 'Sprint', 'assignee', 'reporter', 'labels', 'WorklogId', 'Comment', 'Component', 'Fix Version', 'Epic Child', 'resolution'].includes(field)) {
         return '移除';
@@ -131,17 +129,17 @@ class DataLog extends Component {
   // ['由', '']
   getMode3(datalog) {
     const { field, oldString, oldValue, newString, newValue } = datalog;
-    if (!oldValue && newValue) {
+    if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
       return '';
-    } else if (oldValue && newValue) {
+    } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
       if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return '由';
       } else {
         return '';
       }
-    } else if (oldValue && !newValue) {
+    } else if ((oldValue || oldValue === 0) && (!newValue && newValue !== 0)) {
       // yyy -> null
       if (['Story Points', 'timeestimate'].includes(field)) {
         return '由';
@@ -176,10 +174,10 @@ class DataLog extends Component {
   // 原值，只有移除和修改可能出现
   getMode4(datalog) {
     const { field, oldString, oldValue, newString, newValue } = datalog;
-    if (!oldValue && newValue) {
+    if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
       return '';
-    } else if (oldValue && newValue) {
+    } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
       if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return ` 【${oldString}】 `;
@@ -190,7 +188,7 @@ class DataLog extends Component {
       if (field === 'status') {
         return '';
       }
-    } else if (oldValue && !newValue) {
+    } else if ((oldValue || oldValue === 0) && (!newValue && newValue !== 0)) {
       // yyy -> null
       if (['Story Points', 'timeestimate'].includes(field)) {
         return ` 【${oldString}】 `;
@@ -233,19 +231,19 @@ class DataLog extends Component {
   // ['改变为', '为', '']
   getMode5(datalog) {
     const { field, oldString, oldValue, newString, newValue } = datalog;
-    if (!oldValue && newValue) {
+    if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
       if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
         return '为';
       }
       return '';
-    } else if (oldValue && newValue) {
+    } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
       if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return '改变为';
       }
       return '';
-    } else if (oldValue && !newValue) {
+    } else if ((oldValue || oldValue === 0) && (!newValue && newValue !== 0)) {
       // yyy -> null
       if (['Story Points', 'timeestimate'].includes(field)) {
         return '改变为';
@@ -271,7 +269,7 @@ class DataLog extends Component {
   // 新值，只有新增和修改可能出现
   getMode6(datalog) {
     const { field, oldString, oldValue, newString, newValue } = datalog;
-    if (!oldValue && newValue) {
+    if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
       if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
         return ` 【${newString}】 `;
@@ -282,7 +280,7 @@ class DataLog extends Component {
       if (['labels', 'Component', 'Fix Version', 'Epic Child'].includes(field)) {
         return ` 【${newString}】 `;
       }
-    } else if (oldValue && newValue) {
+    } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
       if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter', 'labels', 'Component', 'Fix Version', 'Epic Child'].includes(field)) {
         return ` 【${newString}】 `;
@@ -293,7 +291,7 @@ class DataLog extends Component {
       if (field === 'status') {
         return '';
       }
-    } else if (oldValue && !newValue) {
+    } else if ((oldValue || oldValue === 0) && (!newValue && newValue !== 0)) {
       // yyy -> null
       if (['Story Points', 'timeestimate'].includes(field)) {
         return ' 【未预估】 ';
@@ -445,7 +443,11 @@ class DataLog extends Component {
                     </div>
 
                   </div>
-                  <div style={{ marginTop: 5, fontSize: '12px' }}>- {formatDate(datalog.lastUpdateDate)}</div>
+                  <div style={{ marginTop: 5, fontSize: '12px' }}>
+                    <DatetimeAgo
+                      date={datalog.lastUpdateDate}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

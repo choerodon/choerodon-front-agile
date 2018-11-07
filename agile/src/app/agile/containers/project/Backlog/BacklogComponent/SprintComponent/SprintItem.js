@@ -605,10 +605,8 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleStartSprint.bind(this, item, index)}
               >
-
-开启冲刺
-
-</p>
+                开启冲刺
+              </p>
               <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown>

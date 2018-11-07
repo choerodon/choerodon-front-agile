@@ -388,7 +388,7 @@ class Issue extends Component {
   renderTypeCode = (text, record, index) => {
     const { expand } = this.state;
     return (
-      <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${TYPE_NAME[text]}`}>
+      <Tooltip mouseEnterDelay={0.5} title={`问题类型： ${TYPE_NAME[text]}`}>
         <TypeTag
           data={record.issueTypeDTO}
           showName={expand ? null : text}
@@ -423,7 +423,7 @@ class Issue extends Component {
   )
 
   renderReporterName = (text, record) => (record.reporterId ? (
-    <Tooltip mouseEnterDelay={0.5} title={`当前处理人： ${text}`}>
+    <Tooltip mouseEnterDelay={0.5} title={`报告人： ${text}`}>
       <div style={{ marginRight: 12 }}>
         <UserHead
           user={{
@@ -438,7 +438,7 @@ class Issue extends Component {
   ) : null);
 
   renderAssigneeName = (text, record) => (record.assigneeId ? (
-    <Tooltip mouseEnterDelay={0.5} title={`任务经办人： ${text}`}>
+    <Tooltip mouseEnterDelay={0.5} title={`经办人： ${text}`}>
       <div style={{ marginRight: 12 }}>
         <UserHead
           user={{
@@ -527,7 +527,7 @@ class Issue extends Component {
         render: this.renderIssueNum,
       },
       {
-        title: '类型',
+        title: '问题类型',
         dataIndex: 'issueTypeDTO.name',
         key: 'issueTypeId',
         width: '120px',
@@ -576,7 +576,7 @@ class Issue extends Component {
         render: this.renderReporterName,
       },
       {
-        title: '当前处理人',
+        title: '经办人',
         dataIndex: 'assigneeName',
         width: '128px',
         key: 'assigneeId',

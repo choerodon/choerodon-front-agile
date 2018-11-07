@@ -11,7 +11,7 @@ import {
 } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import {
-  UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription, 
+  UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription, DatetimeAgo,
 } from '../CommonComponent';
 import {
   delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload, 
@@ -2637,7 +2637,9 @@ class CreateSprint extends Component {
                           <span className="c7n-property">创建时间：</span>
                         </div>
                         <div className="c7n-value-wrapper">
-                          {formatDate(this.state.creationDate)}
+                          <DatetimeAgo
+                            date={this.state.creationDate}
+                          />
                         </div>
                       </div>
                       <div className="line-start mt-10">
@@ -2645,7 +2647,9 @@ class CreateSprint extends Component {
                           <span className="c7n-property">更新时间：</span>
                         </div>
                         <div className="c7n-value-wrapper">
-                          {formatDate(this.state.lastUpdateDate)}
+                          <DatetimeAgo
+                            date={this.state.lastUpdateDate}
+                          />
                         </div>
                       </div>
                     </div>

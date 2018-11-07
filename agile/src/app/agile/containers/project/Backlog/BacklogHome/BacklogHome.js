@@ -80,7 +80,7 @@ class BacklogHome extends Component {
               if (sprint && sprint.style) {
                 sprint.style.backgroundColor = 'white';
               }
-            }, 5000);
+            }, 2000);
           }
         });
       }).catch((error2) => {
