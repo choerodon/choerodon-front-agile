@@ -491,20 +491,20 @@ class Issue extends Component {
       [
         'typeId', IssueStore.getIssueTypes.map(item => ({
           text: item.name,
-          value: item.id,
+          value: item.id.toString(),
         })),
       ],
       ['summary', []],
       [
         'statusId', IssueStore.getIssueStatus.map(item => ({
           text: item.name,
-          value: item.id,
+          value: item.id.toString(),
         })),
       ],
       [
         'priorityId', IssueStore.getIssuePriority.map(item => ({
           text: item.name,
-          value: item.id,
+          value: item.id.toString(),
         })),
       ],
       ['reporterName', []],
@@ -539,6 +539,7 @@ class Issue extends Component {
         title: '概要',
         dataIndex: 'summary',
         key: 'summary',
+        width: '300px',
         filters: columnFilter.get('summary'),
         render: this.renderSummary,
       },
@@ -591,6 +592,7 @@ class Issue extends Component {
       {
         title: '版本',
         dataIndex: 'versionIssueRelDTOS',
+        width: '120px',
         key: 'versionIssueRelDTOS',
         filters: columnFilter.get('versionIssueRelDTOS'),
         render: this.renderVersion,
@@ -599,6 +601,7 @@ class Issue extends Component {
         title: '冲刺',
         dataIndex: 'sprint',
         key: 'sprint',
+        width: '120px',
         filters: columnFilter.get('sprint'),
         hidden: true,
       },
@@ -606,6 +609,7 @@ class Issue extends Component {
         title: '模块',
         dataIndex: 'component',
         key: 'component',
+        width: '120px',
         filters: columnFilter.get('component'),
         hidden: true,
       },
@@ -613,11 +617,14 @@ class Issue extends Component {
         title: '史诗',
         dataIndex: 'epic',
         key: 'epic',
+        width: '120px',
         filters: columnFilter.get('epic'),
         hidden: true,
       },
     ];
-    this.handleHidden(columns);
+    if (storage.getItem('filterData') && storage.getItem('filterData').length) {
+      this.handleHidden(columns);
+    }
     const issueTypes = IssueStore.getIssueTypes;
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
