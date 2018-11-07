@@ -4,7 +4,7 @@ import { AppState } from 'choerodon-front-boot';
 import _ from 'lodash';
 import UserHead from '../../UserHead';
 import WYSIWYGEditor from '../../WYSIWYGEditor';
-import { IssueDescription } from '../../CommonComponent';
+import { IssueDescription, DatetimeAgo } from '../../CommonComponent';
 import {
   delta2Html, text2Delta, beforeTextUpload, formatDate, 
 } from '../../../common/utils';
@@ -118,7 +118,7 @@ class Comment extends Component {
                 id: commit.userId,
                 loginName: '',
                 realName: commit.userName,
-                avatar: commit.imageUrl,
+                avatar: commit.userImageUrl,
               }}
               color="#3f51b5"
             />
@@ -159,8 +159,9 @@ class Comment extends Component {
           </div>
         </div>
         <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: 2 }}>
-          {'-'}
-          {formatDate(commit.lastUpdateDate)}
+          <DatetimeAgo
+            date={commit.lastUpdateDate}
+          />
         </div>
         {
           this.state.expand && (

@@ -4,7 +4,7 @@ import { AppState } from 'choerodon-front-boot';
 import TimeAgo from 'timeago-react';
 import UserHead from '../../UserHead';
 import WYSIWYGEditor from '../../WYSIWYGEditor';
-import { IssueDescription } from '../../CommonComponent';
+import { IssueDescription, DatetimeAgo } from '../../CommonComponent';
 import { delta2Html, text2Delta, beforeTextUpload, formatDate } from '../../../common/utils';
 import { deleteWorklog, updateWorklog } from '../../../api/NewIssueApi';
 import './Log.scss';
@@ -119,8 +119,10 @@ class Log extends Component {
               />
             </div>
             <span style={{ color: 'rgba(0, 0, 0, 0.65)' }}>记录了工作日志</span>
-            <span style={{ color: 'rgba(0, 0, 0, 0.65)', marginLeft: 2 }}>
-              - {formatDate(worklog.lastUpdateDate)}
+            <span style={{ color: 'rgba(0, 0, 0, 0.65)', marginLeft: 15 }}>
+              <DatetimeAgo
+                date={worklog.lastUpdateDate}
+              />
             </span>
           </div>
           <div className="c7n-action">

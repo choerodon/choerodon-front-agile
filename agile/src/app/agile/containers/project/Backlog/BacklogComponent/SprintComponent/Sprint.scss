@@ -145,6 +145,7 @@
   }
 
   .c7n-backlog-sprintIssue {
+    transition: all 1s;
     .c7n-backlog-sprintCount {
       width: 20px;
       height: 20px;
@@ -297,4 +298,5 @@
 
 .c7n-noissue-wapper {
   padding: 16px 20px 16px 43px;
+  transition: all 1s;
 }

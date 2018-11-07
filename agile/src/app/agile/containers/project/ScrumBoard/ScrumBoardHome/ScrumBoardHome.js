@@ -54,6 +54,9 @@ class ScrumBoardHome extends Component {
     }
     const timer = setInterval(() => {
       if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
+        if (document.getElementsByClassName('c7n-scrumboard-header').length > 0) {
+          document.getElementsByClassName('c7n-scrumboard-header')[0].style.paddingRight = '32px';
+        }
         document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
       }
       clearInterval(timer);

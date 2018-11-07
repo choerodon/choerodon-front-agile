@@ -113,8 +113,9 @@ class Status extends Component {
 
   loadStatus(sprintId) {
     const projectId = AppState.currentMenuType.id;
+    const orgId = AppState.currentMenuType.organizationId;
     this.setState({ loading: true });
-    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/status?sprintId=${sprintId}`)
+    axios.get(`/agile/v1/projects/${projectId}/iterative_worktable/status?organizationId=${orgId}&sprintId=${sprintId}`)
       .then((res) => {
         const statusInfo = this.transformStatus(res);
         this.setState({

@@ -23,7 +23,11 @@ import {
 } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import {
-  UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription, 
+  UploadButtonNow,
+  NumericInput,
+  ReadAndEdit,
+  IssueDescription,
+  DatetimeAgo,
 } from '../CommonComponent';
 import {
   delta2Html,
@@ -50,6 +54,7 @@ import {
   loadSprints,
   loadStatus,
   updateStatus,
+  createCommit,
 } from '../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
@@ -734,17 +739,17 @@ class CreateSprint extends Component {
     };
     const addCommitDes = this.state.addCommitDes;
     if (addCommitDes) {
-      beforeTextUpload(addCommitDes, extra, this.createCommit, 'commentText');
+      beforeTextUpload(addCommitDes, extra, this.createReply, 'commentText');
     } else {
       extra.commentText = '';
-      this.createCommit(extra);
+      this.createReply(extra);
     }
   }
 
   /**
    * Comment
    */
-  createCommit = (commit) => {
+  createReply = (commit) => {
     createCommit(commit).then((res) => {
       this.reloadIssue();
       this.setState({
@@ -1751,7 +1756,7 @@ class CreateSprint extends Component {
                         width: 30,
                         height: 30,
                         borderRadius: '50%',
-                        background: 'rgba(77, 144, 254, 0.2)',
+                        background: `${priorityColor}1F`,
                         marginRight: 12,
                         flexShrink: 0,
                         display: 'flex',
@@ -1759,13 +1764,12 @@ class CreateSprint extends Component {
                         alignItems: 'center',
                       }}
                     >
-                      <Icon type="flag" style={{ fontSize: '24px', color: '#3575df' }} />
+                      <Icon type="flag" style={{ fontSize: '24px', color: priorityColor }} />
                     </span>
                     <div>
                       <div
                         style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.54)', marginBottom: 4 }}
                       >
-
                         优先级
                       </div>
                       <div>
@@ -1952,8 +1956,7 @@ class CreateSprint extends Component {
                                       </div>
                                     </div>
                                   )}
-                              </div>
-)}
+                              </div>)}
                           >
                             <Select
                               value={this.state.sprintId || undefined}
@@ -2863,8 +2866,7 @@ h
                                   ) : (
                                     '无'
                                   )}
-                                </div>
-)}
+                                </div>)}
                             >
                               <Select
                                 value={
@@ -2948,7 +2950,9 @@ h
                             <span className="c7n-property">创建时间：</span>
                           </div>
                           <div className="c7n-value-wrapper">
-                            {formatDate(this.state.creationDate)}
+                            <DatetimeAgo
+                              date={this.state.creationDate}
+                            />
                           </div>
                         </div>
                         <div className="line-start mt-10">
@@ -2956,7 +2960,9 @@ h
                             <span className="c7n-property">更新时间：</span>
                           </div>
                           <div className="c7n-value-wrapper">
-                            {formatDate(this.state.lastUpdateDate)}
+                            <DatetimeAgo
+                              date={this.state.lastUpdateDate}
+                            />
                           </div>
                         </div>
                       </div>

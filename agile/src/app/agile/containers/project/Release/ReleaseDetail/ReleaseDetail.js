@@ -11,8 +11,9 @@ import {
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 import './ReleaseDetail.scss';
 import PublicRelease from '../ReleaseComponent/PublicRelease';
-import ReportStore from '../../../../stores/project/Report';
-import { STATUS } from '../../../../common/Constant';
+import TypeTag from '../../../../components/TypeTag';
+import StatusTag from '../../../../components/StatusTag';
+import PriorityTag from '../../../../components/PriorityTag';
 
 const TabPane = Tabs.TabPane;
 const { AppState } = stores;
@@ -293,7 +294,7 @@ class ReleaseDetail extends Component {
     const columns = [
       {
         width: '10%',
-        title: '编码',
+        title: '任务编号',
         dataIndex: 'issueNum',
         key: 'issueNum',
         render: text => <span className="textDisplayOneColumn">{text}</span>,
@@ -304,27 +305,15 @@ class ReleaseDetail extends Component {
         dataIndex: 'typeCode',
         key: 'typeCode',
         render: (text, record) => (
-          <div
-            style={{
-              width: 20,
-              height: 20,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: '4px',
-              background: record.issueTypeDTO ? record.issueTypeDTO.colour : '#fab614',
-            }}
-          >
-            <Icon
-              style={{ color: 'white', fontSize: '16px' }}
-              type={record.issueTypeDTO ? record.issueTypeDTO.icon : 'help'}
-            />
-          </div>
+          <TypeTag
+            data={record.issueTypeDTO}
+            showName
+          />
         ),
       },
       {
         width: '40%',
-        title: '问题名称',
+        title: '概要',
         dataIndex: 'summary',
         key: 'summary',
         render: text => <span className="textDisplayOneColumn">{text}</span>,
@@ -336,9 +325,9 @@ class ReleaseDetail extends Component {
         key: 'assigneeName',
         render: (text, record) => (text ? (
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Avatar style={{ marginRight: 8 }} size="small" src={record.imageUrl ? record.imageUrl : ''}>
+            <Avatar style={{ marginRight: 8 }} size="small" src={record.assigneeImageUrl ? record.assigneeImageUrl : ''}>
               {
-              record.imageUrl ? '' : text.substring(0, 1)
+              record.assigneeImageUrl ? '' : text.substring(0, 1)
             }
             </Avatar>
             <span className="textDisplayOneColumn">{text}</span>
@@ -352,31 +341,18 @@ class ReleaseDetail extends Component {
         dataIndex: 'priorityName',
         key: 'priorityName',
         render: (text, record) => (
-          <span
-            style={{
-              padding: '1px 4px',
-              color: record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF',
-              background: `${record.priorityDTO ? record.priorityDTO.colour : '#FFFFFF'}1F`,
-            }}
-          >
-            {record.priorityDTO ? record.priorityDTO.name : ''}
-          </span>
+          <PriorityTag
+            priority={record.priorityDTO}
+          />
         ),
       }, {
         width: '15%',
         title: '状态',
         dataIndex: 'statusName',
         render: (text, record) => (
-          <span
-            style={{
-              padding: '4px 6px',
-              color: 'white',
-              background: STATUS[record.statusMapDTO.type],
-              borderRadius: 2,
-            }}
-          >
-            {record.statusMapDTO.name}
-          </span>
+          <StatusTag
+            data={record.statusMapDTO}
+          />
         ),
       },
     ];
@@ -525,14 +501,11 @@ class ReleaseDetail extends Component {
                     <div className="c7n-release-tabTitle">
                       <span className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.issueCount}</span>
                       <span>
-
-
                         {'当前版本'}
                         <br />
                         {'个问题'}
                       </span>
-                    </div>
-)}
+                    </div>)}
                   key="0"
                 >
                   {this.renderTabTables(columns)}
@@ -560,12 +533,9 @@ class ReleaseDetail extends Component {
                       <span>
                         {'问题'}
                         <br />
-
-
                         {'正在处理'}
                       </span>
-                    </div>
-)}
+                    </div>)}
                   key="doing"
                 >
                   {this.renderTabTables(columns)}
