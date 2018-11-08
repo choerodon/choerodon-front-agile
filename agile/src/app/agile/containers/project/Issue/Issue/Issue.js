@@ -85,6 +85,7 @@ class Issue extends Component {
     IssueStore.setParamOpenIssueId(paramOpenIssueId);
     IssueStore.setResolution(paramResolution);
 
+    IssueStore.setSelectedQuickSearch({ quickFilterIds: [] });
     IssueStore.setOtherArgs();
     const arr = [];
     if (paramName) {
@@ -320,16 +321,22 @@ class Issue extends Component {
 
   MyTable = (props) => {
     const { expand } = this.state;
-    if (IssueStore.issues.length === 0 && !IssueStore.loading) {
-      return (
-        <EmptyBlock
-          style={{ marginTop: 40 }}
-          border
-          pic={pic}
-          title="根据当前搜索条件没有查询到问题"
-          des="尝试修改您的过滤选项或者在下面创建新的问题"
-        />
-      );
+    if (IssueStore.getIssues.length === 0 && !IssueStore.loading) {
+      // fixed 会渲染两张表，所以要判断子元素有没有这个属性
+      // 如果有的话禁止渲染，防止 Empty 重复渲染
+      if (!props.children[0].props.fixed) {
+        return (
+          <EmptyBlock
+            style={{ marginTop: 40 }}
+            border
+            pic={pic}
+            title="根据当前搜索条件没有查询到问题"
+            des="尝试修改您的过滤选项或者在下面创建新的问题"
+          />
+        );
+      } else {
+        return null;
+      }
     }
     const renderNarrow = (
       <div style={props.style} className={props.className}>
@@ -541,7 +548,7 @@ class Issue extends Component {
         title: '概要',
         dataIndex: 'summary',
         key: 'summary',
-        width: '300px',
+        width: '150px',
         fixed: expand ? false : 'left',
         filters: columnFilter.get('summary'),
         render: this.renderSummary,
@@ -550,7 +557,6 @@ class Issue extends Component {
         title: '状态',
         dataIndex: 'statusMapDTO.name',
         key: 'statusId',
-        width: '84px',
         sorter: true,
         filters: columnFilter.get('statusId'),
         filterMultiple: true,
@@ -560,7 +566,6 @@ class Issue extends Component {
         title: '优先级',
         dataIndex: 'priorityDTO.name',
         key: 'priorityId',
-        width: '96px',
         render: this.renderPriorityName,
         sorter: true,
         filters: columnFilter.get('priorityId'),
@@ -570,7 +575,6 @@ class Issue extends Component {
         title: '报告人',
         dataIndex: 'reporterName',
         key: 'reporterId',
-        width: '128px',
         sorter: true,
         filters: columnFilter.get('reporterName'),
         render: this.renderReporterName,
@@ -578,7 +582,6 @@ class Issue extends Component {
       {
         title: '经办人',
         dataIndex: 'assigneeName',
-        width: '128px',
         key: 'assigneeId',
         sorter: true,
         filters: columnFilter.get('assigneeName'),
@@ -587,7 +590,6 @@ class Issue extends Component {
       {
         title: '最后更新时间',
         dataIndex: 'lastUpdateDate',
-        width: '138px',
         key: 'lastUpdateDate',
         sorter: true,
         render: this.renderLastUpdateTime,
@@ -595,7 +597,6 @@ class Issue extends Component {
       {
         title: '版本',
         dataIndex: 'versionIssueRelDTOS',
-        width: '120px',
         key: 'versionIssueRelDTOS',
         filters: columnFilter.get('versionIssueRelDTOS'),
         render: this.renderVersion,
@@ -604,7 +605,6 @@ class Issue extends Component {
         title: '冲刺',
         dataIndex: 'sprint',
         key: 'sprint',
-        width: '120px',
         filters: columnFilter.get('sprint'),
         hidden: true,
       },
@@ -612,7 +612,6 @@ class Issue extends Component {
         title: '模块',
         dataIndex: 'component',
         key: 'component',
-        width: '120px',
         filters: columnFilter.get('component'),
         hidden: true,
       },
@@ -620,7 +619,6 @@ class Issue extends Component {
         title: '史诗',
         dataIndex: 'epic',
         key: 'epic',
-        width: '120px',
         filters: columnFilter.get('epic'),
         hidden: true,
       },
