@@ -5,7 +5,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import classNames from 'classnames';
-import zh_CN from 'rc-calendar/lib/locale/zh_CN';
+import zhCN from 'rc-calendar/lib/locale/zh_CN';
 import 'rc-calendar/assets/index.css';
 import './WorkCalendar.scss';
 
@@ -26,9 +26,11 @@ class WorkCalendar extends Component {
   dateRender = (current, now) => {
     // 渲染当前页面可见月数据
     if (current.format('MM') !== now.format('MM')) {
-      return (<div className="rc-calendar-date not-current-month">
-        {current.date()}
-      </div>);
+      return (
+        <div className="rc-calendar-date not-current-month">
+          {current.date()}
+        </div>
+      );
     }
     const format = 'YYYY-MM-DD';
     const date = current.format(format);
@@ -48,9 +50,11 @@ class WorkCalendar extends Component {
 
     // 过去的日期不可编辑
     if (isBeforeToday) {
-      return (<div className="rc-calendar-date before-today">
-        {current.date()}
-      </div>);
+      return (
+        <div className="rc-calendar-date before-today">
+          {current.date()}
+        </div>
+      );
     }
     let dateStyle;
     const workDayStyle = {
@@ -73,13 +77,13 @@ class WorkCalendar extends Component {
       dateStyle = selectDay[0].status === 1 ? workDayStyle : notWorkDayStyle;
     } else if (useHoliday && holidayInfo.length) {
       return holidayInfo[0].status === 1 ? (
-          <div data-day={holidayInfo[0]} className={'rc-calendar-date workday'}>
-            <span className="tag">班</span>
-            {current.date()}
-          </div>
-        ) :
-        (
-          <div data-day={holidayInfo[0]} className={'rc-calendar-date restday'}>
+        <div data-day={holidayInfo[0]} className="rc-calendar-date workday">
+          <span className="tag">班</span>
+          {current.date()}
+        </div>
+      )
+        : (
+          <div data-day={holidayInfo[0]} className="rc-calendar-date restday">
             <span className="tag">休</span>
             {current.date()}
             <span className="des">{holidayInfo[0].name}</span>
@@ -90,9 +94,11 @@ class WorkCalendar extends Component {
     } else {
       dateStyle = workDayStyle;
     }
-    return (<div className="rc-calendar-date" style={dateStyle}>
-      {current.date()}
-    </div>);
+    return (
+      <div className="rc-calendar-date" style={dateStyle}>
+        {current.date()}
+      </div>
+    );
   };
 
   onSelectDate = (date, source) => {
@@ -139,9 +145,9 @@ class WorkCalendar extends Component {
     }
   };
 
-  renderTag = (color='#000', fontColor='#FFF', text) => {
-    return (
-      <div
+  renderTag = (title, color = '#000', fontColor = '#FFF', text) => (
+    <div style={{ marginTop: 5, display: 'flex', alignItem: 'center' }}>
+      <span
         className="legend-tag"
         style={{
           backgroundColor: color,
@@ -149,21 +155,21 @@ class WorkCalendar extends Component {
         }}
       >
         {text}
-      </div>
-    );
-  };
+      </span>
+    </div>
+  );
 
   renderFooter = () => (
     <div>
-      <div>
-        {this.renderTag('#F5F5F5', '#000', 'N')}
-        <span className="legend-text">工作日</span>
-        {this.renderTag('#FEF3F2', '#EF2A26', 'N')}
-        <span className="legend-text">休息日</span>
-        {this.renderTag('#000', '#FFF', '班')}
-        <span className="legend-text">法定节假日补班</span>
-        {this.renderTag('#EF2A26', '#FFF', '休')}
-        <span className="legend-text">法定节假日</span>
+      <div style={{
+        display: 'flex', padding: '0 16px', flexWrap: 'wrap',
+      }}
+      >
+        {this.renderTag('起始日/结束日', '#3F51B5', '#FFF', 'N')}
+        {this.renderTag('工作日', '#F5F5F5', '#000', 'N')}
+        {this.renderTag('休息日', '#FEF3F2', '#EF2A26', 'N')}
+        {this.renderTag('法定节假日补班', '#000', '#FFF', '班')}
+        {this.renderTag('法定节假日', '#EF2A26', '#FFF', '休')}
       </div>
     </div>
   );
@@ -174,7 +180,7 @@ class WorkCalendar extends Component {
         <Calendar
           showDateInput={false}
           showToday={false}
-          locale={zh_CN}
+          locale={zhCN}
           dateRender={this.dateRender}
           onSelect={this.onSelectDate}
           renderFooter={this.renderFooter}

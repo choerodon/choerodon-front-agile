@@ -726,7 +726,7 @@ class Issue extends Component {
                 filterBarPlaceholder="过滤表"
                 filters={filterName}
                 noFilter
-                scroll={expand ? { x: true } : { x: 1340 }}
+                scroll={expand ? { x: true } : { x: 1800 }}
                 loading={IssueStore.loading}
                 pagination={false}
                 onChange={this.handleFilterChange}
