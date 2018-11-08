@@ -475,7 +475,7 @@ class ScrumBoardHome extends Component {
             transformId,
           ).then((data) => {
             if (data.failed) {
-              message.info(data.message);
+              // message.info(data.message);
               ScrumBoardStore.setBoardData(originState);
             } else {
               for (let index = 0, len = ScrumBoardStore.getStatusList.length;

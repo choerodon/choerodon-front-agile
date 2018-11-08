@@ -138,7 +138,7 @@ class IssueType extends Component {
                           } = urlParams;
                           const { history } = this.props;
                           history.push(
-                            `/agile/issue?type=${type}&id=${id}&name=${urlParams.name}&organizationId=${organizationId}&paramIssueType=story&paramName=${item.name || '未分配'}下的问题&paramUrl=reportBoard`,
+                            `/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${organizationId}&paramIssueType=story&paramName=${item.name || '未分配'}下的问题&paramUrl=reportBoard`,
                           );
                         }}
                       >

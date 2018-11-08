@@ -151,7 +151,7 @@ class DeleteComponent extends Component {
               onClick={() => {
                 this.props.history.push(
                   `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
-                    urlParams.name
+                    encodeURIComponent(urlParams.name)
                   }&organizationId=${urlParams.organizationId}&paramType=component&paramId=${
                     this.state.component.componentId
                   }&paramName=${this.state.component.name}&paramUrl=component`,

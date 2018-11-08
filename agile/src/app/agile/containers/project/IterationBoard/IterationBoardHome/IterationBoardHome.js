@@ -99,7 +99,7 @@ class IterationBoardHome extends Component {
           <Col span={8}>
             <Priority
               sprintId={sprintId}
-              link="reporthost/pieReport/priorityId"
+              link="reporthost/pieReport/priority"
             />
           </Col>
           <Col span={8}>

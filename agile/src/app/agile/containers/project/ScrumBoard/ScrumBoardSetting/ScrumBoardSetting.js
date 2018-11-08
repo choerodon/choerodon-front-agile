@@ -53,7 +53,7 @@ class ScrumBoardSetting extends Component {
     if (!boardId) {
       const { history } = this.props;
       const urlParams = AppState.currentMenuType;
-      history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+      history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
     } else {
       ScrumBoardStore.loadStatus();
       ScrumBoardStore.axiosGetBoardDataBySetting(boardId).then((data) => {
@@ -105,7 +105,7 @@ class ScrumBoardSetting extends Component {
       width: 520,
       onOk() {
         ScrumBoardStore.axiosDeleteBoard().then((res) => {
-          history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`);
+          history.push(`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
         }).catch((error) => {
         });
       },
