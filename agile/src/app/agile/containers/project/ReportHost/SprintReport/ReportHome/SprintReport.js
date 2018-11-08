@@ -733,7 +733,7 @@ class SprintReport extends Component {
                     <TabPane tab="未完成的问题" key="todo">
                       {this.renderTodoIssue(column)}
                     </TabPane>
-                    <TabPane tab="从Sprint中删除的问题" key="remove">
+                    <TabPane tab="从Sprint中移除的问题" key="remove">
                       {this.renderRemoveIssue(column)}
                     </TabPane>
                   </Tabs>

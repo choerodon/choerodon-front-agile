@@ -8,15 +8,12 @@ import TypeTag from '../../../../components/TypeTag';
 
 const FileSaver = require('file-saver');
 
-const TabPane = Tabs.TabPane;
+const { TabPane } = Tabs;
 const { Sidebar } = Modal;
 const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option } = Select;
 const { AppState } = stores;
-
-const A = ['issue_epic', 'story', 'task', 'bug', 'sub_task'];
-const Name = ['史诗', '故事', '任务', '故障', '子任务'];
 let str;
 
 @observer
@@ -31,65 +28,87 @@ class ReleaseLogs extends Component {
       task: [],
       bug: [],
       sub_task: [],
+      issueTypeData: [],
     };
   }
+
   componentDidMount() {
-    this.loadIssues();
+    this.loadIssueTypes();
     this.loadVersion();
   }
 
-  loadIssues() {
+  loadIssues = () => {
+    const { match } = this.props;
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
-    const versionId = this.props.match.params.id;
+    const versionId = match.params.id;
     axios.get(`/agile/v1/projects/${projectId}/product_version/${versionId}/issues?organizationId=${orgId}`)
       .then((res) => {
         this.setState({ issues: res });
         this.splitIssues(res);
       });
-  }
+  };
 
-  loadVersion() {
+  loadVersion = () => {
+    const { match } = this.props;
     const projectId = AppState.currentMenuType.id;
-    const versionId = this.props.match.params.id;
+    const versionId = match.params.id;
     axios.get(`/agile/v1/projects/${projectId}/product_version/${versionId}`)
       .then((res) => {
         this.setState({ version: res });
       });
-  }
+  };
 
-  splitIssues(issues) {
-    A.forEach((e) => {
-      const subset = _.filter(issues, { typeCode: e });
-      this.setState({ [e]: subset });
+  loadIssueTypes = () => {
+    const projectId = AppState.currentMenuType.id;
+    axios.get(`/issue/v1/projects/${projectId}/schemes/query_issue_types?apply_type=agile`)
+      .then((res) => {
+        if (res && !res.failed) {
+          this.setState({ issueTypeData: res });
+          this.loadIssues();
+        } else {
+          this.setState({ issueTypeData: [] });
+        }
+      }).catch(() => {
+        this.setState({ issueTypeData: [] });
+      });
+  };
+
+  splitIssues = (issues) => {
+    const { issueTypeData } = this.state;
+    issueTypeData.forEach((e) => {
+      const subset = _.filter(issues, issue => issue.typeCode === e.typeCode);
+      this.setState({ [e.typeCode]: subset });
     });
-  }
+  };
 
-  export() {
+  exportLogs = () => {
+    const { issueTypeData, version } = this.state;
     str = '';
 
     str += '# 发布日志\n\n';
-    str += `## [${this.state.version.name}]`;
-    if (this.state.version.statusCode === 'released') {
-      str += ` - ${this.state.version.releaseDate}\n`;
+    str += `## [${version.name}]`;
+    if (version.statusCode === 'released') {
+      str += ` - ${version.releaseDate}\n`;
     } else {
       str += '\n';
     }
-    A.forEach((v, i) => this.combine(v, i));
+    issueTypeData.forEach((v, i) => this.combine(v.typeCode, v.name));
     const blob = new Blob([str], { type: 'text/plain;charset=utf-8' });
-    FileSaver.saveAs(blob, `版本${this.state.version.name}的发布日志.md`);
-  }
+    FileSaver.saveAs(blob, `版本${version.name}的发布日志.md`);
+  };
 
-  combine(typeCode, i) {
+  combine(typeCode, name) {
     if (this.state[typeCode].length) {
-      str += `\n### ${Name[i]}\n`;
+      str += `\n### ${name}\n`;
       this.state[typeCode].forEach((v) => {
         str += `- [${v.issueNum}]-${v.summary}\n`;
       });
     }
   }
 
-  renderSubsetIssues(typeCode) {
+  renderSubsetIssues(issueType) {
+    const { history } = this.props;
     const menu = AppState.currentMenuType;
     const urlParams = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -97,13 +116,13 @@ class ReleaseLogs extends Component {
       <div>
         <div style={{ margin: '17px 0' }}>
           <TypeTag
-            typeCode={typeCode}
+            data={issueType}
             showName
           />
         </div>
         <ul style={{ marginBottom: 0, paddingLeft: 45 }}>
           {
-            this.state[typeCode].map(issue => (
+            this.state[issueType.typeCode].map(issue => (
               <li style={{ marginBottom: 16 }}>
                 <span>[</span>
                 {
@@ -111,7 +130,7 @@ class ReleaseLogs extends Component {
                     <a
                       role="none"
                       onClick={() => {
-                        this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}&paramUrl=release/logs/${this.props.match.params.id}`);
+                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}&paramUrl=release/logs/${this.props.match.params.id}`);
                         return false;
                       }}
                     >
@@ -134,29 +153,20 @@ class ReleaseLogs extends Component {
   }
 
   render() {
+    const { match } = this.props;
     const urlParams = AppState.currentMenuType;
-    const versionId = this.props.match.params.id;
+    const versionId = match.params.id;
+    const { issueTypeData, version } = this.state;
     return (
       <Page>
         <Header 
           title="版本日志"
           backPath={`/agile/release/detail/${versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
-          {/* <Button 
-            funcType="flat" 
-            onClick={() => {
-              // fresh
-              this.loadIssues();
-            }}
-          >
-            <Icon type="refresh" />
-            <span>刷新</span>
-          </Button> */}
           <Button 
             funcType="flat" 
             onClick={() => {
-              // fresh
-              this.export();
+              this.exportLogs();
             }}
           >
             <Icon type="library_books" />
@@ -165,11 +175,11 @@ class ReleaseLogs extends Component {
           
         </Header>
         <Content
-          title={`版本“${this.state.version.name}” 的版本日志`}
+          title={`版本“${version.name}” 的版本日志`}
           description="您可以在此查看版本的版本日志，按照问题类型来分类显示问题列表，并且可以点击到具体问题进行修改。"
         >
           {
-            A.map(e => (
+            issueTypeData.map(e => (
               <div>
                 {
                   this.renderSubsetIssues(e)
@@ -184,4 +194,3 @@ class ReleaseLogs extends Component {
 }
 
 export default ReleaseLogs;
-

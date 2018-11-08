@@ -55,12 +55,12 @@ class ReportBoardHome extends Component {
             <Row gutter={20}>
               <Col span={8}>
                 <Status
-                  link="reporthost/pieReport/statusCode"
+                  link="reporthost/pieReport/status"
                 />
               </Col>
               <Col span={8}>
                 <Priority
-                  link="reporthost/pieReport/priorityId"
+                  link="reporthost/pieReport/priority"
                 />
               </Col>
               <Col span={8}>

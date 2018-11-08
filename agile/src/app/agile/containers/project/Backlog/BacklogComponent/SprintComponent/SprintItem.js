@@ -999,7 +999,10 @@ class SprintItem extends Component {
                                   </div>
                                 </div>
                                 <div style={{
-                                  marginTop: 10, display: 'flex', justifyContent: 'flex-start', paddingRight: 70, 
+                                  margin: '10px 0 5px',
+                                  display: 'flex',
+                                  justifyContent: 'flex-start',
+                                  paddingRight: 70,
                                 }}
                                 >
                                   <Button
@@ -1231,7 +1234,7 @@ class SprintItem extends Component {
                               </div>
                             </div>
                             <div style={{
-                              marginTop: 10, display: 'flex', justifyContent: 'flex-start', paddingRight: 70, 
+                              margin: '10px 0 5px', display: 'flex', justifyContent: 'flex-start', paddingRight: 70,
                             }}
                             >
                               <Button

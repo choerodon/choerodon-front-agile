@@ -103,7 +103,7 @@ class Status extends Component {
     return option;
   }
 
-  loadStatus() {
+  loadStatus = () => {
     const projectId = AppState.currentMenuType.id;
     this.setState({ loading: true });
     axios.get(`agile/v1/projects/${projectId}/reports/issue_type_distribution_chart`)
@@ -114,19 +114,22 @@ class Status extends Component {
           statusInfo,
         });
       });
-  }
+  };
 
-  transformStatus(statusArr) {
-    const todo = _.reduce(statusArr, (sum, n) => sum + (n.statusCode === 'todo' ? n.count : 0), 0);
-    const doing = _.reduce(statusArr, (sum, n) => sum + (n.statusCode === 'doing' ? n.count : 0), 0);
-    const done = _.reduce(statusArr, (sum, n) => sum + (n.statusCode === 'done' ? n.count : 0), 0);
+  transformStatus = (statusArr) => {
+    const todo = _.reduce(statusArr,
+      (sum, n) => sum + (n.statusMapDTO && n.statusMapDTO.type === 'todo' ? n.count : 0), 0);
+    const doing = _.reduce(statusArr,
+      (sum, n) => sum + (n.statusMapDTO && n.statusMapDTO.type === 'doing' ? n.count : 0), 0);
+    const done = _.reduce(statusArr,
+      (sum, n) => sum + (n.statusMapDTO && n.statusMapDTO.type === 'done' ? n.count : 0), 0);
     const result = [
       todo || 0,
       doing || 0,
       done || 0,
     ];
     return result;
-  }
+  };
 
   renderContent() {
     const { statusInfo, loading } = this.state;

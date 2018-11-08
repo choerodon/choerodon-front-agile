@@ -35,7 +35,7 @@ class Priority extends Component {
     super(props);
     this.state = {
       loading: true,
-      priorityInfo: {},
+      priorityInfo: [],
     };
   }
 
@@ -65,7 +65,7 @@ class Priority extends Component {
         </div>
       );
     }
-    if (priorityInfo.length) {
+    if (priorityInfo.length === 0) {
       return (
         <div className="loading-wrap">
           <EmptyBlockDashboard

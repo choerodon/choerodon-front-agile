@@ -377,7 +377,9 @@ class EpicReport extends Component {
       return ES.tableData.filter(v => v.completed === 0);
     }
     if (type === 'unFinishAndunEstimate') {
-      return ES.tableData.filter(v => v.completed === 0 && ((v.storyPoints === null && v.typeCode === 'story') || (v.remainTime === null && v.typeCode === 'task')));
+      return ES.tableData.filter(v => v.completed === 0
+        && ((v.storyPoints === null && v.issueTypeDTO && v.issueTypeDTO.typeCode === 'story')
+          || (v.remainTime === null && v.issueTypeDTO && v.issueTypeDTO.typeCode === 'task')));
     }
     return [];
   }
@@ -635,11 +637,8 @@ class EpicReport extends Component {
                                 <div>
                                   <h4>
                                     {`${ES.getChartYAxisName}`}
-
-
-
-汇总
-                                                                    </h4>
+                                    汇总
+                                  </h4>
                                   <ul>
                                     <li>
                                       <span className="c7n-tip">合计：</span>
@@ -667,10 +666,6 @@ class EpicReport extends Component {
                                 this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
                               }}
                             >
-
-
-
-
                               在“问题管理”中查看
                               <Icon style={{ fontSize: 13 }} type="open_in_new" />
                             </p>
@@ -714,30 +709,23 @@ class EpicReport extends Component {
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-      history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
-    }}
+                        history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+                      }}
                     >
-
-
-
                       待办事项
-</span>
+                    </span>
                     <span>或</span>
                     <span
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
-    }}
+                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+                      }}
                     >
-
-
-
                       问题管理
-</span>
+                    </span>
                     <span>中创建一个史诗</span>
-                  </div>
-)}
+                  </div>)}
               />
             )
           }
