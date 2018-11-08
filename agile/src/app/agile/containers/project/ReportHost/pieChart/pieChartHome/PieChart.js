@@ -99,8 +99,8 @@ class ReleaseDetail extends Component {
     const quaryLinks = [
       { title: '经办人', value: 'assignee' },
       { title: '问题类型', value: 'typeCode' },
-      { title: '优先级', value: 'priorityId' },
-      { title: '状态', value: 'statusCode' },
+      { title: '优先级', value: 'priority' },
+      { title: '状态', value: 'status' },
       { title: '史诗', value: 'epic' },
     ];
     const quaryLink = pathname.slice(pathname.lastIndexOf('/') + 1, pathname.length);
@@ -232,8 +232,8 @@ class ReleaseDetail extends Component {
       component: 'paramType=component&paramId=',
       typeCode: 'paramIssueType=',
       version: 'paramType=fixVersion&paramId=',
-      priorityId: 'paramPriority=',
-      statusCode: 'paramType=statusId&paramId=',
+      priority: 'paramPriority=',
+      status: 'paramType=statusId&paramId=',
       sprint: 'paramType=sprint&paramId=',
       epic: 'paramType=epic&paramId=',
       resolution: 'paramType=resolution&paramId=',
@@ -316,8 +316,8 @@ class ReleaseDetail extends Component {
       { title: '模块', value: 'component' },
       { title: '问题类型', value: 'typeCode' },
       { title: '修复版本', value: 'version' },
-      { title: '优先级', value: 'priorityId' },
-      { title: '状态', value: 'statusCode' },
+      { title: '优先级', value: 'priority' },
+      { title: '状态', value: 'status' },
       { title: '冲刺', value: 'sprint' },
       { title: '史诗', value: 'epic' },
       { title: '解决结果', value: 'resolution' },

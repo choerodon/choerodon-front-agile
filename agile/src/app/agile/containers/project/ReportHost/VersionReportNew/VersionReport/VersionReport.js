@@ -414,7 +414,9 @@ class EpicReport extends Component {
       return VS.tableData.filter(v => v.completed === 0);
     }
     if (type === 'unFinishAndunEstimate') {
-      return VS.tableData.filter(v => v.completed === 0 && ((v.storyPoints === null && v.typeCode === 'story') || (v.remainTime === null && v.typeCode !== 'story')));
+      return VS.tableData.filter(v => v.completed === 0
+        && ((v.storyPoints === null && v.issueTypeDTO && v.issueTypeDTO.typeCode === 'story')
+          || (v.remainTime === null && v.issueTypeDTO && v.issueTypeDTO.typeCode !== 'story')));
     }
     return [];
   }
@@ -681,20 +683,18 @@ class EpicReport extends Component {
                 title="当前项目无可用版本"
                 des={(
                   <div>
-  <span>请在</span>
-  <span
+                    <span>请在</span>
+                    <span
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
                         history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
-
                       发布版本
-</span>
-  <span>中创建一个版本</span>
-</div>
-)}
+                    </span>
+                    <span>中创建一个版本</span>
+                  </div>)}
               />
             )
           }
