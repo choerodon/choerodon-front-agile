@@ -26,49 +26,42 @@ class IterationType extends Component {
     const xAxisData = [];
     if (iterationTypeInfo && iterationTypeInfo.length !== 0) {
       iterationTypeInfo.forEach((item) => {
-        if (_.findIndex(xAxisData, o => o === item.name) === -1) {
+        if (_.findIndex(xAxisData, o => o === (item.issueTypeDTO
+            && item.issueTypeDTO.name)) === -1) {
           xAxisData.push(item.name);
         }
       });
       return xAxisData;
     }
     return '';
-  }
+  };
 
   getIterationTypeData() {
     const { iterationTypeInfo } = this.state;
     const xAxisData = this.getXAxisData();
     const iterationTypeData = { todoData: [], doingData: [], doneData: [] };
     const { todoData, doingData, doneData } = iterationTypeData;
-    let todoDataLength = 0; 
-    let doingDataLength = 0; 
-    let doneDataLength = 0;
     if (iterationTypeInfo && iterationTypeInfo.length !== 0) {
       for (let i = 0; i < xAxisData.length; i += 1) {
-        const iterationType = iterationTypeInfo.filter(item => item.name === xAxisData[i]);
-        todoDataLength = todoData.length;
-        doingDataLength = doingData.length;
-        doneDataLength = doneData.length;
+        const iterationType = iterationTypeInfo.filter(item => (item.issueTypeDTO
+          && item.issueTypeDTO.name) === xAxisData[i]);
+        let todoValue = 0;
+        let doingValue = 0;
+        let doneValue = 0;
         iterationType.forEach((obj) => {
-          if (obj.statusName === '待办') {
-            todoData.push(obj.count);
+          if (obj.statusMapDTO && obj.statusMapDTO.type === 'todo') {
+            todoValue += obj.count || 0;
           }
-          if (obj.statusName === '进行中') {
-            doingData.push(obj.count);
+          if (obj.statusMapDTO && obj.statusMapDTO.type === 'doing') {
+            doingValue += obj.count || 0;
           }
-          if (obj.statusName === '完成') {
-            doneData.push(obj.count);
+          if (obj.statusMapDTO && obj.statusMapDTO.type === 'done') {
+            doneValue += obj.count || 0;
           }
         });
-        if (todoDataLength === todoData.length) {
-          todoData.push(0);
-        }
-        if (doingDataLength === doingData.length) {
-          doingData.push(0);
-        }
-        if (doneDataLength === doneData.length) {
-          doneData.push(0);
-        }
+        todoData.push(todoValue);
+        doingData.push(doingValue);
+        doneData.push(doneValue);
       }
       return iterationTypeData;
     }

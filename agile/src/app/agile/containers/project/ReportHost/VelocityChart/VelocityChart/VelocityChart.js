@@ -260,7 +260,7 @@ class VelocityChart extends Component {
               const urlParams = AppState.currentMenuType;
               history.push(
                 `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
-                  urlParams.name
+                  encodeURIComponent(urlParams.name)
                 }&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${
                   record.sprintId
                 }&paramName=${sprintName}下的问题&paramUrl=reporthost/velocityChart`,
@@ -368,7 +368,7 @@ class VelocityChart extends Component {
                     onClick={() => {
                       history.push(
                         `/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${
-                          urlParams.name
+                          encodeURIComponent(urlParams.name)
                         }&organizationId=${urlParams.organizationId}`,
                       );
                     }}

@@ -253,7 +253,7 @@ class ReleaseDetail extends Component {
     const queryString = this.getQueryString(value, typeName);
     if (!queryString) return;
     history.push(
-      `/agile/issue?type=${type}&id=${id}&name=${urlParams.name}&organizationId=${organizationId}&${queryString}&paramName=${name || '未分配'}下的问题&paramUrl=reporthost/pieReport`,
+      `/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${organizationId}&${queryString}&paramName=${name || '未分配'}下的问题&paramUrl=reporthost/pieReport`,
     );
   }
 

@@ -155,7 +155,7 @@ class ComponentHome extends Component {
             onClick={() => {
               this.props.history.push(
                 `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
-                  urlParams.name
+                  encodeURIComponent(urlParams.name)
                 }&organizationId=${urlParams.organizationId}&paramType=component&paramId=${
                   record.componentId
                 }&paramName=模块"${record.name}"下的问题&paramUrl=component`,
