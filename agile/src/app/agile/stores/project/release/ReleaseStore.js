@@ -17,11 +17,32 @@ class ReleaseStore {
 
   @observable publicVersionDetail = {};
 
+  @observable issueCountDetail = {
+    todoCount: 0,
+    todoStatusCount: 0,
+    doingStatusCount: 0,
+    doneStatusCount: 0,
+    doingCount: 0,
+    doingStatus: {},
+    doneCount: 0,
+    doneStatus: {},
+    count: 0,
+  };
+
   @observable filters = {
     advancedSearchArgs: {},
     searchArgs: {},
     content: '',
+  };
+
+  @computed get getIssueCountDetail() {
+    return this.issueCountDetail;
   }
+
+  @action setIssueCountDetail(data) {
+    this.issueCountDetail = data;
+  }
+
 
   axiosFileVersion(id) {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${id}/archived`);
@@ -111,7 +132,6 @@ class ReleaseStore {
   }
 
   axiosGetVersionList(pageRequest) {
-    // return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions?page=${pageRequest.page}&size=${pageRequest.size}`);
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/versions?page=${pageRequest.page}&size=${pageRequest.size}`, this.filters);
   }
 

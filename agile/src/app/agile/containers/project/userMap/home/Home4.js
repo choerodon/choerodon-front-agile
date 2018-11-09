@@ -1719,7 +1719,7 @@ class Home3 extends Component {
                   </p>
                 </Tooltip>
                 <Button shape="circle" className="expand-btn" onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
-                  <Icon type={`${expandColumns.includes(vos[id]) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
+                  <Icon type={`${expandColumns.includes(vos[id]) ? 'baseline-arrow_drop_up' : 'baseline-arrow_drop_down'}`} />
                 </Button>
               </div>
             </div>

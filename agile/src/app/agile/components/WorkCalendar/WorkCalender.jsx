@@ -69,10 +69,10 @@ class WorkCalendar extends Component {
     ];
     let dateStyle;
     const workDayStyle = {
-      color: '#000', background: '#FFF',
+      color: '#000', background: '#EFEFEF',
     };
     const holiadyWorkDayStyle = {
-      color: '#000', background: '#F5F5F5',
+      color: '#000', background: '#EFEFEF',
     };
     const notWorkDayStyle = {
       color: '#EF2A26', background: '#FFE7E7',
@@ -193,7 +193,6 @@ class WorkCalendar extends Component {
   scrumBoard = (
     date, weekdays, useHoliday, selectDays, holidayRefs, onWorkDateChange, workDates,
   ) => {
-    debugger;
     const selectDate = date.format(format);
     const workDate = workDates.filter(d => d.workDay === selectDate);
     if (workDate.length) {
@@ -297,7 +296,7 @@ class WorkCalendar extends Component {
       }}
       >
         {this.renderTag('起始日/结束日', '#3F51B5', '#FFF', 'N')}
-        {this.renderTag('工作日', '#F5F5F5', '#000', 'N')}
+        {this.renderTag('工作日', '#EFEFEF', '#000', 'N')}
         {this.renderTag('休息日', '#FEF3F2', '#EF2A26', 'N')}
         {this.renderTag('法定节假日补班', '#000', '#FFF', '班')}
         {this.renderTag('法定节假日', '#EF2A26', '#FFF', '休')}
