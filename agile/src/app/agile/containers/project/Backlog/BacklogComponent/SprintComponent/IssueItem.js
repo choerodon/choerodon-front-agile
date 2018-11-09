@@ -255,7 +255,7 @@ class IssueItem extends Component {
                           label="sprintIssue"
                           className="c7n-backlog-sprintIssueStoryPoint"
                           style={{
-                            visibility: item.storyPoints && item.typeCode === 'story' ? 'visible' : 'hidden',
+                            visibility: item.storyPoints && item.issueTypeDTO && item.issueTypeDTO.typeCode === 'story' ? 'visible' : 'hidden',
                           }}
                         >{item.storyPoints}</div>
                       </Tooltip>

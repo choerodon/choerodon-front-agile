@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import {
   Page, Header, Content, stores, Permission, 
 } from 'choerodon-front-boot';
-
+import _ from 'lodash';
 import {
   Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip, 
 } from 'choerodon-ui';
@@ -15,7 +15,7 @@ import TypeTag from '../../../../components/TypeTag';
 import StatusTag from '../../../../components/StatusTag';
 import PriorityTag from '../../../../components/PriorityTag';
 
-const TabPane = Tabs.TabPane;
+const { TabPane } = Tabs;
 const { AppState } = stores;
 
 @observer
@@ -38,18 +38,95 @@ class ReleaseDetail extends Component {
   }
 
   refresh() {
+    const { match } = this.props;
     this.setState({
       loading: true,
     });
-    ReleaseStore.axiosGetVersionDetail(this.props.match.params.id).then((res) => {
+    ReleaseStore.axiosGetVersionDetail(match.params.id).then((res) => {
       ReleaseStore.setVersionDetail(res);
       this.setState({
         loading: false,
       });
     }).catch((error) => {
     });
-    ReleaseStore.axiosGetVersionStatusIssues(this.props.match.params.id).then((res2) => {
-      ReleaseStore.setVersionStatusIssues(res2);
+    ReleaseStore.axiosGetVersionStatusIssues(match.params.id).then((res2) => {
+      let todoCount = 0;
+      let doingCount = 0;
+      let doneCount = 0;
+      let todoStatusCount = 0;
+      let doingStatusCount = 0;
+      let doneStatusCount = 0;
+      const todoStatus = {};
+      const doingStatus = {};
+      const doneStatus = {};
+      if (res2 && res2.length) {
+        // 按状态和状态类别统计
+        res2.forEach((issue) => {
+          if (issue.statusMapDTO) {
+            if (issue.statusMapDTO.type === 'todo') {
+              todoCount += 1;
+              if (todoStatus[issue.statusMapDTO.id]) {
+                todoStatus[issue.statusMapDTO.id].count += 1;
+              } else {
+                todoStatusCount += 1;
+                todoStatus[issue.statusMapDTO.id] = {
+                  count: 1,
+                  name: issue.statusMapDTO.name,
+                };
+              }
+            } else if (issue.statusMapDTO.type === 'doing') {
+              doingCount += 1;
+              if (doingStatus[issue.statusMapDTO.id]) {
+                doingStatus[issue.statusMapDTO.id].count += 1;
+              } else {
+                doingStatusCount += 1;
+                doingStatus[issue.statusMapDTO.id] = {
+                  count: 1,
+                  name: issue.statusMapDTO.name,
+                };
+              }
+            } else if (issue.statusMapDTO.type === 'done') {
+              doneCount += 1;
+              if (doneStatus[issue.statusMapDTO.id]) {
+                doneStatus[issue.statusMapDTO.id].count += 1;
+              } else {
+                doneStatusCount += 1;
+                doneStatus[issue.statusMapDTO.id] = {
+                  count: 1,
+                  name: issue.statusMapDTO.name,
+                };
+              }
+            }
+          }
+        });
+        ReleaseStore.setIssueCountDetail({
+          todoCount,
+          todoStatus,
+          doingCount,
+          todoStatusCount,
+          doingStatusCount,
+          doneStatusCount,
+          doingStatus,
+          doneCount,
+          doneStatus,
+          count: res2.length,
+        });
+        ReleaseStore.setVersionStatusIssues(res2);
+      } else {
+        ReleaseStore.setVersionDetail([]);
+        ReleaseStore.setIssueCountDetail({
+          todoCount,
+          todoStatus,
+          doingCount,
+          todoStatusCount,
+          doingStatusCount,
+          doneStatusCount,
+          doingStatus,
+          doneCount,
+          doneStatus,
+          count: 0,
+        });
+      }
       this.setState({
         loading: false,
       });
@@ -119,14 +196,14 @@ class ReleaseDetail extends Component {
   renderBorderRadius(position) {
     let radius = {};
     if (position === 'done') {
-      if (ReleaseStore.getVersionDetail.doneIssueCount) {
+      if (ReleaseStore.getIssueCountDetail.doneCount) {
         radius = {
           borderTopLeftRadius: '10px',
           borderBottomLeftRadius: '10px',
         };
       }
-      if (!(ReleaseStore.getVersionDetail.doingIssueCount
-          || ReleaseStore.getVersionDetail.todoIssueCount)) {
+      if (!(ReleaseStore.getIssueCountDetail.doingCount
+          || ReleaseStore.getIssueCountDetail.todoCount)) {
         radius = {
           ...radius,
           borderTopRightRadius: '10px',
@@ -134,13 +211,13 @@ class ReleaseDetail extends Component {
         };
       }
     } else if (position === 'doing') {
-      if (!ReleaseStore.getVersionDetail.doneIssueCount) {
+      if (!ReleaseStore.getIssueCountDetail.doneCount) {
         radius = {
           borderTopLeftRadius: '10px',
           borderBottomLeftRadius: '10px',
         };
       }
-      if (!ReleaseStore.getVersionDetail.todoIssueCount) {
+      if (!ReleaseStore.getIssueCountDetail.todoCount) {
         radius = {
           ...radius,
           borderTopRightRadius: '10px',
@@ -148,14 +225,14 @@ class ReleaseDetail extends Component {
         };
       }
     } else {
-      if (!(ReleaseStore.getVersionDetail.doneIssueCount
-          || ReleaseStore.getVersionDetail.doingIssueCount)) {
+      if (!(ReleaseStore.getIssueCountDetail.doneCount
+          || ReleaseStore.getIssueCountDetail.doingCount)) {
         radius = {
           borderTopLeftRadius: '10px',
           borderBottomLeftRadius: '10px',
         };
       }
-      if (ReleaseStore.getVersionDetail.todoIssueCount) {
+      if (ReleaseStore.getIssueCountDetail.todoCount) {
         radius = {
           ...radius,
           borderTopRightRadius: '10px',
@@ -223,18 +300,22 @@ class ReleaseDetail extends Component {
   renderPopContent(type) {
     let name;
     let data;
+    let count;
     let background;
     if (type === 'done') {
       name = '已完成';
-      data = ReleaseStore.getVersionDetail.doneCategoryIssueCount;
+      count = ReleaseStore.getIssueCountDetail.doneStatusCount;
+      data = ReleaseStore.getIssueCountDetail.doneStatus;
       background = 'rgb(0, 191, 165)';
     } else if (type === 'doing') {
       name = '处理中';
-      data = ReleaseStore.getVersionDetail.doingCategoryIssueCount;
+      data = ReleaseStore.getIssueCountDetail.doingStatus;
+      count = ReleaseStore.getIssueCountDetail.doingStatusCount;
       background = 'rgb(77, 144, 254)';
     } else {
       name = '待处理';
-      data = ReleaseStore.getVersionDetail.todoCategoryIssueCount;
+      data = ReleaseStore.getIssueCountDetail.todoStatus;
+      count = ReleaseStore.getIssueCountDetail.todoStatusCount;
       background = 'rgb(255, 177, 0)';
     }
     return (
@@ -244,12 +325,12 @@ class ReleaseDetail extends Component {
           {'类别'}
           <span style={{ color: '#3575DF' }}>{name}</span>
           {'中有'}
-          {data ? data.length : 0}
+          {count || 0}
           {'种状态'}
         </p>
         {data
-          ? data.map(item => (
-            <div key={item.id} style={{ margin: '14px 0' }}>
+          ? _.keys(data).map(key => (
+            <div key={key} style={{ margin: '14px 0' }}>
               <span
                 style={{
                   background,
@@ -258,15 +339,15 @@ class ReleaseDetail extends Component {
                   marginRight: 16,
                 }}
               >
-                {item.name}
-
+                {data[key].name}
               </span>
               <span>
-                {item.issueCount}
+                {data[key].count}
                 {'个'}
               </span>
-            </div>
-          )) : ''}
+            </div>))
+          : ''
+        }
       </div>
     );
   }
@@ -373,11 +454,10 @@ class ReleaseDetail extends Component {
               >
                 {`版本 ${ReleaseStore.getVersionDetail.name}`}
               </div>
-            </Tooltip>
- )}
+            </Tooltip>)}
           backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
-          
+
           <div style={{
             marginLeft: 12, fontSize: 13, color: '#FFB100', padding: '1px 10px', background: 'rgba(255,177,0,0.08)', height: 20, lineHeight: '20px',
           }}
@@ -456,7 +536,7 @@ class ReleaseDetail extends Component {
               >
                 <div
                   style={{
-                    flex: ReleaseStore.getVersionDetail.doneIssueCount,
+                    flex: ReleaseStore.getIssueCountDetail.doneCount,
                     background: '#00BFA5',
                     ...this.renderBorderRadius('done'),
                   }}
@@ -469,7 +549,7 @@ class ReleaseDetail extends Component {
               >
                 <div
                   style={{
-                    flex: ReleaseStore.getVersionDetail.doingIssueCount,
+                    flex: ReleaseStore.getIssueCountDetail.doingCount,
                     background: '#4D90FE',
                     ...this.renderBorderRadius('doing'),
                   }}
@@ -482,7 +562,7 @@ class ReleaseDetail extends Component {
               >
                 <div
                   style={{
-                    flex: ReleaseStore.getVersionDetail.todoIssueCount,
+                    flex: ReleaseStore.getIssueCountDetail.todoCount,
                     background: '#FFB100',
                     ...this.renderBorderRadius('todo'),
                   }}
@@ -499,7 +579,7 @@ class ReleaseDetail extends Component {
                 <TabPane
                   tab={(
                     <div className="c7n-release-tabTitle">
-                      <span className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.issueCount}</span>
+                      <span className="c7n-release-titleNum">{ReleaseStore.getIssueCountDetail.count}</span>
                       <span>
                         {'当前版本'}
                         <br />
@@ -513,7 +593,12 @@ class ReleaseDetail extends Component {
                 <TabPane
                   tab={(
                     <div className="c7n-release-tabTitle">
-                      <span style={{ color: 'rgb(0, 191, 165)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.doneIssueCount}</span>
+                      <span
+                        style={{ color: 'rgb(0, 191, 165)' }}
+                        className="c7n-release-titleNum"
+                      >
+                        {ReleaseStore.getIssueCountDetail.doneCount}
+                      </span>
                       <span>
                         {'问题'}
                         <br />
@@ -524,12 +609,16 @@ class ReleaseDetail extends Component {
                   key="done"
                 >
                   {this.renderTabTables(columns)}
-
                 </TabPane>
                 <TabPane
                   tab={(
                     <div className="c7n-release-tabTitle">
-                      <span style={{ color: 'rgb(77, 144, 254)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.doingIssueCount}</span>
+                      <span
+                        style={{ color: 'rgb(77, 144, 254)' }}
+                        className="c7n-release-titleNum"
+                      >
+                        {ReleaseStore.getIssueCountDetail.doingCount}
+                      </span>
                       <span>
                         {'问题'}
                         <br />
@@ -539,12 +628,16 @@ class ReleaseDetail extends Component {
                   key="doing"
                 >
                   {this.renderTabTables(columns)}
-
                 </TabPane>
                 <TabPane
                   tab={(
                     <div className="c7n-release-tabTitle">
-                      <span style={{ color: 'rgb(255, 177, 0)' }} className="c7n-release-titleNum">{ReleaseStore.getVersionDetail.todoIssueCount}</span>
+                      <span
+                        style={{ color: 'rgb(255, 177, 0)' }}
+                        className="c7n-release-titleNum"
+                      >
+                        {ReleaseStore.getIssueCountDetail.todoCount}
+                      </span>
                       <span>
                         {'问题'}
                         <br />
@@ -555,7 +648,6 @@ class ReleaseDetail extends Component {
                   key="todo"
                 >
                   {this.renderTabTables(columns)}
-
                 </TabPane>
               </Tabs>
             </div>

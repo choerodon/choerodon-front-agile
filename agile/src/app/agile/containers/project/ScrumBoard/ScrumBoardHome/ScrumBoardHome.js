@@ -1171,7 +1171,7 @@ class ScrumBoardHome extends Component {
                     ? ScrumBoardStore
                       .getBoardData[ScrumBoardStore.getBoardData.length - 1].subStatuses
                       .map(item => (
-                        <Option key={item.id} value={item.id}>{item.name}</Option>
+                        <Option key={item.statusId} value={item.statusId}>{item.name}</Option>
                       )) : ''
                 }
               </Select>
