@@ -36,7 +36,7 @@ class WorkCalendarHome extends Component {
         WorkCalendarStore.axiosGetCalendarData(orgId, timeZoneId, year);
       }
     });
-    WorkCalendarStore.axiosGetHolidayData(orgId, 2018);
+    WorkCalendarStore.axiosGetHolidayData(orgId, year);
   };
 
   onCheckChange = (e, type) => {

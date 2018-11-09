@@ -96,7 +96,6 @@ class WorkCalendar extends Component {
     const selectDay = selectDays.filter(d => d.workDay === date);
 
     let holidayTag = null;
-    debugger;
     if (startDate.includes(date) || endDate.includes(date)) {
       dateStyle = sprintDayStyle;
       if (useHoliday && holidayInfo.length) {
