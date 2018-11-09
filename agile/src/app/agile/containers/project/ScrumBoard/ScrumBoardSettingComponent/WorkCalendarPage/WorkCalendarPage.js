@@ -6,7 +6,7 @@ import {
 } from 'choerodon-ui';
 import moment from 'moment';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
-import WorkCalendar from './WorkCalendar';
+import WorkCalendar from '../../../../../components/WorkCalendar';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -53,6 +53,7 @@ class WorkCalendarPage extends Component {
         <WorkCalendar
           startDate={startDate}
           endDate={endDate}
+          mode="ScrumBoard"
           saturdayWork={saturdayWork}
           sundayWork={sundayWork}
           useHoliday={useHoliday}
