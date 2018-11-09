@@ -15,18 +15,15 @@
     width: 512px;
   }
 
-  .rc-calendar-date {
-    position: relative;
-    background-color: #FFE7E7;
-    border-radius: 2px;
-    margin-bottom: 10px;
-  }
-
   .rc-calendar-footer-btn:after {
     content: '';
   }
 
   .rc-calendar-date {
+    position: relative;
+    background-color: #ffe7e7;
+    border-radius: 2px;
+    margin-bottom: 10px;
     width: 42px;
     height: 42px;
     line-height: 42px;
@@ -57,12 +54,12 @@
 
   .not-current-month {
     background: transparent;
-    color: #cccccc;
+    color: #ccc;
   }
 
   .before-today {
     background: transparent;
-    color: #cccccc;
+    color: #ccc;
     cursor: not-allowed;
   }
 
@@ -71,38 +68,31 @@
   }
 
   .rc-calendar-selected-date .rc-calendar-date.restday:hover {
-    background: #FEF3F2;
+    background: #fef3f2;
   }
 
   .rc-calendar-selected-date .rc-calendar-date.workday:hover {
-    background: #F6F6F6;
-  }
-
-  .workday {
-    background: #EFEFEF;
-    color: #000;
-    .tag {
-      background: #000;
-    }
-  }
-
-  .restday {
-    color: #f00;
-    .tag {
-      background: #E8101E;
-    }
+    background: #f6f6f6;
   }
 
   .tag {
     position: absolute;
     top: 0;
     border-radius: 2px;
-    color: #ffffff;
+    color: #fff;
     font-size: 12px;
     width: 14px;
     height: 14px;
     line-height: 14px;
     left: 0;
+    &-notwork {
+      color: #fff;
+      background: #e8101e;
+    }
+    &-work {
+      background: #000;
+      color: #efefef;
+    }
   }
 
   .des {
@@ -132,7 +122,7 @@
 
   .rc-calendar-year-select:hover,
   .rc-calendar-month-select:hover {
-    color: #3F51B5;
+    color: #3f51b5;
   }
 
   .rc-calendar-year-panel-decade-select-content:hover,
@@ -149,7 +139,7 @@
   .rc-calendar-prev-month-btn:hover,
   .rc-calendar-month-panel-next-year-btn:hover,
   .rc-calendar-month-panel-prev-year-btn:hover {
-    color: #3F51B5;
+    color: #3f51b5;
   }
 
   .rc-calendar-column-header {
@@ -162,23 +152,23 @@
   .rc-calendar-year-panel-selected-cell .rc-calendar-year-panel-year:hover,
   .rc-calendar-month-panel-selected-cell .rc-calendar-month-panel-month:hover,
   .rc-calendar-decade-panel-selected-cell .rc-calendar-decade-panel-decade:hover {
-    background-color: #3F51B5;
+    background-color: #3f51b5;
   }
 
   .rc-calendar-year-panel-year:hover,
   .rc-calendar-month-panel-month:hover,
   .rc-calendar-decade-panel-decade:hover {
-    background-color: #E6F3FC;
+    background-color: #e6f3fc;
   }
 
   .rc-calendar-today-btn {
-    color: #3F51B5;
+    color: #3f51b5;
     font-weight: bold;
     font-size: 14px;
   }
 
   .rc-calendar-today-btn:hover {
-    color: #3F51B5;
+    color: #3f51b5;
   }
 
   .rc-calendar-today .rc-calendar-date {

@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import Calendar from 'rc-calendar';
+import Calendar from 'choerodon-ui/lib/rc-components/calendar/';
 import _ from 'lodash';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import zh_CN from 'rc-calendar/lib/locale/zh_CN';
+import zhCN from 'rc-calendar/lib/locale/zh_CN';
 import 'rc-calendar/assets/index.css';
 import './WorkCalendar.scss';
 
 @observer
 class WorkCalendar extends Component {
-
   /**
    * 自定义渲染日期格式
    * @param current
@@ -35,9 +34,11 @@ class WorkCalendar extends Component {
       || !endDate
       || moment(current.format(format)).isBefore(moment(moment(startDate).format(format)))
       || moment(current.format(format)).isAfter(moment(moment(endDate).format(format)))) {
-      return (<div className="rc-calendar-date not-current-month">
-        {current.date()}
-      </div>);
+      return (
+        <div className="rc-calendar-date not-current-month">
+          {current.date()}
+        </div>
+      );
     }
     const date = current.format(format);
     const weekdays = [
@@ -50,6 +51,9 @@ class WorkCalendar extends Component {
     };
     const notWorkDayStyle = {
       color: '#EF2A26', background: '#FFE7E7',
+    };
+    const sprintDayStyle = {
+      color: '#FFF', background: '#3F51B5',
     };
     const localData = moment.localeData();
     // 通过日期缩写判断是否为周六日
@@ -64,32 +68,51 @@ class WorkCalendar extends Component {
     // 组织自定义设置
     const selectDay = selectDays.filter(d => d.workDay === date);
 
-    if (workDate.length) {
+    let holidayTag = null;
+    if (startDate.includes(date) || endDate.includes(date)) {
+      if (useHoliday && holidayInfo.length) {
+        if (workDate.length && (workDate[0].status === 1 || holidayInfo[0].status === 1)) {
+          holidayTag = (
+            <React.Fragment>
+              <span className="tag tag-work">班</span>
+              <span className="des">{holidayInfo[0].name}</span>
+            </React.Fragment>
+          );
+        } else {
+          holidayTag = (
+            <React.Fragment>
+              <span className="tag tag-notwork">休</span>
+              <span className="des">{holidayInfo[0].name}</span>
+            </React.Fragment>
+          );
+        }
+      }
+      dateStyle = sprintDayStyle;
+    } else if (workDate.length) {
       dateStyle = workDate[0].status === 1 ? workDayStyle : notWorkDayStyle;
     } else if (selectDay.length) {
       dateStyle = selectDay[0].status === 1 ? workDayStyle : notWorkDayStyle;
     } else if (useHoliday && holidayInfo.length) {
-      return holidayInfo[0].status === 1 ? (
-          <div data-day={holidayInfo[0]} className={'rc-calendar-date workday'}>
-            <span className="tag">班</span>
-            {current.date()}
-          </div>
-        ) :
-        (
-          <div data-day={holidayInfo[0]} className={'rc-calendar-date restday'}>
-            <span className="tag">休</span>
-            {current.date()}
-            <span className="des">{holidayInfo[0].name}</span>
-          </div>
-        );
+      holidayTag = holidayInfo[0].status === 1 ? (
+        <span className="tag tag-work">班</span>
+      ) : (
+        <React.Fragment>
+          <span className="tag tag-notwork">休</span>
+          <span className="des">{holidayInfo[0].name}</span>
+        </React.Fragment>
+      );
+      dateStyle = notWorkDayStyle;
     } else if (isWeekDay) {
       dateStyle = notWorkDayStyle;
     } else {
       dateStyle = workDayStyle;
     }
-    return (<div className="rc-calendar-date" style={dateStyle}>
-      {current.date()}
-    </div>);
+    return (
+      <div className="rc-calendar-date" style={dateStyle}>
+        {holidayTag}
+        {current.date()}
+      </div>
+    );
   };
 
   onSelectDate = (date, source) => {
@@ -149,9 +172,9 @@ class WorkCalendar extends Component {
     }
   };
 
-  renderTag = (color='#000', fontColor='#FFF', text) => {
-    return (
-      <div
+  renderTag = (title, color = '#000', fontColor = '#FFF', text) => (
+    <div style={{ marginTop: 5, display: 'flex', alignItem: 'center' }}>
+      <span
         className="legend-tag"
         style={{
           backgroundColor: color,
@@ -159,21 +182,22 @@ class WorkCalendar extends Component {
         }}
       >
         {text}
-      </div>
-    );
-  };
+      </span>
+      <span className="legend-text">{title}</span>
+    </div>
+  );
 
   renderFooter = () => (
     <div>
-      <div>
-        {this.renderTag('#F5F5F5', '#000', 'N')}
-        <span className="legend-text">工作日</span>
-        {this.renderTag('#FEF3F2', '#EF2A26', 'N')}
-        <span className="legend-text">休息日</span>
-        {this.renderTag('#000', '#FFF', '班')}
-        <span className="legend-text">法定节假日补班</span>
-        {this.renderTag('#EF2A26', '#FFF', '休')}
-        <span className="legend-text">法定节假日</span>
+      <div style={{
+        display: 'flex', padding: '0 16px', flexWrap: 'wrap',
+      }}
+      >
+        {this.renderTag('起始日/结束日', '#3F51B5', '#FFF', 'N')}
+        {this.renderTag('工作日', '#F5F5F5', '#000', 'N')}
+        {this.renderTag('休息日', '#FEF3F2', '#EF2A26', 'N')}
+        {this.renderTag('法定节假日补班', '#000', '#FFF', '班')}
+        {this.renderTag('法定节假日', '#EF2A26', '#FFF', '休')}
       </div>
     </div>
   );
@@ -184,7 +208,7 @@ class WorkCalendar extends Component {
         <Calendar
           showDateInput={false}
           showToday={false}
-          locale={zh_CN}
+          locale={zhCN}
           dateRender={this.dateRender}
           onSelect={this.onSelectDate}
           renderFooter={this.renderFooter}
