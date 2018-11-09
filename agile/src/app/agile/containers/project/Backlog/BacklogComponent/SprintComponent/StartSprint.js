@@ -1,17 +1,20 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Form, Modal, Select, Input, DatePicker, Icon } from 'choerodon-ui';
+import {
+  Form, Modal, Select, Input, DatePicker, Icon,
+} from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
-import WorkCalendar from './WorkCalendar';
+import WorkCalendar from '../../../../../components/WorkCalendar';
 // import this.props.store from '../../../../../stores/project/backlog/this.props.store';
 
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
 const { TextArea } = Input;
-const Option = Select.Option;
+const { Option } = Select;
 const { AppState } = stores;
+const format = 'YYYY-MM-DD';
 
 @observer
 class StartSprint extends Component {
@@ -34,21 +37,24 @@ class StartSprint extends Component {
   handleStartSprint =(e) => {
     e.preventDefault();
     const { workDates } = this.state;
-    this.props.form.validateFields((err, values) => {
+    const {
+      form, data, store, onCancel, refresh, 
+    } = this.props;
+    form.validateFields((err, values) => {
       if (!err) {
-        const data = {
+        const newData = {
           endDate: values.endDate ? `${moment(values.endDate).format('YYYY-MM-DD HH:mm:ss')}` : null,
           startDate: values.startDate ? `${moment(values.startDate).format('YYYY-MM-DD HH:mm:ss')}` : null,
           projectId: AppState.currentMenuType.id,
           sprintGoal: values.goal,
-          sprintId: this.props.data.sprintId,
+          sprintId: data.sprintId,
           sprintName: values.name,
-          objectVersionNumber: this.props.data.objectVersionNumber,
+          objectVersionNumber: data.objectVersionNumber,
           workDates,
         };
-        this.props.store.axiosStartSprint(data).then((res) => {
-          this.props.onCancel();
-          this.props.refresh();
+        store.axiosStartSprint(newData).then((res) => {
+          onCancel();
+          refresh();
         }).catch((error) => {
         });
       }
@@ -56,7 +62,8 @@ class StartSprint extends Component {
   };
 
   showWorkCalendar = () => {
-    this.setState({ showCalendar: !this.state.showCalendar });
+    const { showCalendar } = this.state;
+    this.setState({ showCalendar: !showCalendar });
   };
 
   getWorkDays = (startDate, endDate) => {
@@ -71,15 +78,14 @@ class StartSprint extends Component {
     } = store.getWorkSetting;
     const { workDates } = this.state;
     const weekdays = [
-      saturdayWork ?  null : '六',
+      saturdayWork ? null : '六',
       sundayWork ? null : '日',
     ];
-    const format = 'YYYY-MM-DD';
     const result = [];
     const beginDay = moment(startDate).format(format).split('-');
     const endDay = moment(endDate).format(format).split('-');
     const diffDay = new Date();
-    const dateList = new Array();
+    const dateList = [];
     let i = 0;
     diffDay.setDate(beginDay[2]);
     diffDay.setMonth(beginDay[1] - 1);
@@ -117,7 +123,9 @@ class StartSprint extends Component {
       dateList[0] = diffDay.getFullYear();
       if (String(dateList[1]).length === 1) { dateList[1] = `0${dateList[1]}`; }
       if (String(dateList[2]).length === 1) { dateList[2] = `0${dateList[2]}`; }
-      if (String(dateList[0]) === endDay[0] && String(dateList[1]) === endDay[1] && String(dateList[2]) === endDay[2]) {
+      if (String(dateList[0]) === endDay[0]
+          && String(dateList[1]) === endDay[1]
+          && String(dateList[2]) === endDay[2]) {
         i = 1;
       }
       const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
@@ -133,8 +141,13 @@ class StartSprint extends Component {
   };
 
   render() {
-    const { store } = this.props;
-    const { getFieldDecorator } = this.props.form;
+    const {
+      data,
+      store,
+      visible,
+      onCancel,
+      form: { getFieldDecorator, getFieldValue, setFieldsValue },
+    } = this.props;
     const {
       showCalendar,
       startDate,
@@ -147,17 +160,16 @@ class StartSprint extends Component {
       timeZoneWorkCalendarDTOS: selectDays,
       workHolidayCalendarDTOS: holidayRefs,
     } = store.getWorkSetting;
-    const data = this.props.data;
-    const completeMessage = JSON.stringify(this.props.store.getOpenSprintDetail) === '{}' ? null : this.props.store.getOpenSprintDetail;
+    const completeMessage = JSON.stringify(store.getOpenSprintDetail) === '{}' ? null : store.getOpenSprintDetail;
     return (
       <Sidebar
         title="开启冲刺"
-        visible={this.props.visible}
+        visible={visible}
         okText="开启"
         cancelText="取消"
         onCancel={() => {
           this.setState({ showCalendar: false });
-          this.props.onCancel();
+          onCancel();
         }}
         onOk={this.handleStartSprint}
       >
@@ -168,10 +180,12 @@ class StartSprint extends Component {
           }}
           title={`开启冲刺“${data.sprintName}”`}
           description="请在下面输入冲刺名称、目标，选择冲刺的时间周期范围，开启新的冲刺。每个项目中仅能有一个活跃的冲刺，同时尽量避免在开启的冲刺中添加新的故事和任务，尽可能在开启冲刺前的迭代会议上完成冲刺的任务范围。"
-          
+
         >
           <p className="c7n-closeSprint-message">
-            <span>{!_.isNull(completeMessage) ? completeMessage.issueCount : ''}</span> 个问题 将包含在此Sprint中
+            <span>{!_.isNull(completeMessage) ? completeMessage.issueCount : ''}</span>
+            {' '}
+个问题 将包含在此Sprint中
           </p>
           <Form style={{ width: 512, marginTop: 24 }}>
             <FormItem>
@@ -200,19 +214,19 @@ class StartSprint extends Component {
                   label="周期"
                   onChange={(value) => {
                     if (parseInt(value, 10) > 0) {
-                      if (!this.props.form.getFieldValue('startDate')) {
-                        this.props.form.setFieldsValue({
+                      if (!getFieldValue('startDate')) {
+                        setFieldsValue({
                           startDate: moment(),
                         });
                         this.setState({
                           startDate: moment(),
                         });
                       }
-                      this.props.form.setFieldsValue({
-                        endDate: moment(this.props.form.getFieldValue('startDate')).add(parseInt(value, 10), 'w'),
+                      setFieldsValue({
+                        endDate: moment(getFieldValue('startDate')).add(parseInt(value, 10), 'w'),
                       });
                       this.setState({
-                        endDate: moment(this.props.form.getFieldValue('startDate')).add(parseInt(value, 10), 'w'),
+                        endDate: moment(getFieldValue('startDate')).add(parseInt(value, 10), 'w'),
                       });
                     }
                   }}
@@ -236,21 +250,21 @@ class StartSprint extends Component {
                   label="开始日期"
                   showTime
                   format="YYYY-MM-DD HH:mm:ss"
-                  disabledDate={this.state.endDate ? 
-                    current => current > moment(this.state.endDate) || current < moment().subtract(1, 'days') : current => current < moment().subtract(1, 'days')}
+                  disabledDate={endDate
+                    ? current => current > moment(endDate) || current < moment().subtract(1, 'days') : current => current < moment().subtract(1, 'days')}
                   onChange={(date, dateString) => {
-                    this.props.form.setFieldsValue({
+                    setFieldsValue({
                       startDate: date,
                     });
                     this.setState({
                       startDate: date,
                     });
-                    if (parseInt(this.props.form.getFieldValue('duration'), 10) > 0) {
-                      this.props.form.setFieldsValue({
-                        endDate: moment(this.props.form.getFieldValue('startDate')).add(parseInt(this.props.form.getFieldValue('duration'), 10), 'w'),
+                    if (parseInt(getFieldValue('duration'), 10) > 0) {
+                      setFieldsValue({
+                        endDate: moment(getFieldValue('startDate')).add(parseInt(getFieldValue('duration'), 10), 'w'),
                       });
                       this.setState({
-                        endDate: moment(this.props.form.getFieldValue('startDate')).add(parseInt(this.props.form.getFieldValue('duration'), 10), 'w'),
+                        endDate: moment(getFieldValue('startDate')).add(parseInt(getFieldValue('duration'), 10), 'w'),
                       });
                     }
                   }}
@@ -268,44 +282,49 @@ class StartSprint extends Component {
                   style={{ width: '100%' }}
                   label="结束日期"
                   format="YYYY-MM-DD HH:mm:ss"
-                  disabled={parseInt(this.props.form.getFieldValue('duration'), 10) > 0}
+                  disabled={parseInt(getFieldValue('duration'), 10) > 0}
                   showTime
                   onChange={(date) => {
                     this.setState({
                       endDate: date,
                     });
                   }}
-                  disabledDate={this.state.startDate ? 
-                    current => current < moment(this.state.startDate) || current < moment().subtract(1, 'days') : 
-                    current => current < moment().subtract(1, 'days')}
+                  disabledDate={startDate
+                    ? current => current < moment(startDate) || current < moment().subtract(1, 'days')
+                    : current => current < moment().subtract(1, 'days')}
                 />,
               )}
             </FormItem>
           </Form>
-          {startDate && endDate ?
-            <div>
-              <div style={{ marginBottom: 20 }}>
-                <span style={{ marginRight: 20 }}>
-                  {`此Sprint中有${this.getWorkDays(startDate, endDate)}个工作日`}
-                </span>
-                <Icon type="settings" style={{ verticalAlign: 'top' }} />
-                <a onClick={this.showWorkCalendar}>
+          {startDate && endDate
+            ? (
+              <div>
+                <div style={{ marginBottom: 20 }}>
+                  <span style={{ marginRight: 20 }}>
+                    {`此Sprint中有${this.getWorkDays(startDate, endDate)}个工作日`}
+                  </span>
+                  <Icon type="settings" style={{ verticalAlign: 'top' }} />
+                  <a onClick={this.showWorkCalendar} role="none">
                   设置当前冲刺工作日
-                </a>
-              </div>
-              {showCalendar ?
-                <WorkCalendar
-                  startDate={startDate}
-                  endDate={endDate}
-                  saturdayWork={saturdayWork}
-                  sundayWork={sundayWork}
-                  useHoliday={useHoliday}
-                  selectDays={selectDays}
-                  holidayRefs={holidayRefs}
-                  onWorkDateChange={this.onWorkDateChange}
-                /> : null
+                  </a>
+                </div>
+                {showCalendar
+                  ? (
+                    <WorkCalendar
+                      startDate={startDate.format(format)}
+                      endDate={endDate.format(format)}
+                      mode="BacklogComponent"
+                      saturdayWork={saturdayWork}
+                      sundayWork={sundayWork}
+                      useHoliday={useHoliday}
+                      selectDays={selectDays}
+                      holidayRefs={holidayRefs}
+                      onWorkDateChange={this.onWorkDateChange}
+                    />
+                  ) : null
               }
-            </div> : null
+              </div>
+            ) : null
           }
         </Content>
       </Sidebar>
