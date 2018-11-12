@@ -232,7 +232,7 @@ class BurnDown extends Component {
     diffDay.setMonth(beginDay[1] - 1);
     diffDay.setFullYear(beginDay[0]);
     result.push(start);
-    while (i == 0) {
+    while (i === 0) {
       const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
       diffDay.setTime(countDay);
       if (restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
@@ -241,12 +241,12 @@ class BurnDown extends Component {
       dateList[2] = diffDay.getDate();
       dateList[1] = diffDay.getMonth() + 1;
       dateList[0] = diffDay.getFullYear();
-      if (String(dateList[1]).length == 1) { dateList[1] = `0${dateList[1]}`; }
-      if (String(dateList[2]).length == 1) { dateList[2] = `0${dateList[2]}`; }
+      if (String(dateList[1]).length === 1) { dateList[1] = `0${dateList[1]}`; }
+      if (String(dateList[2]).length === 1) { dateList[2] = `0${dateList[2]}`; }
       if (restDayShow || !restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
       }
-      if (dateList[0] == endDay[0] && dateList[1] == endDay[1] && dateList[2] == endDay[2]) {
+      if (dateList[0] === endDay[0] && dateList[1] === endDay[1] && dateList[2] === endDay[2]) {
         i = 1;
       }
     }
@@ -342,7 +342,8 @@ class BurnDown extends Component {
               exportAxisData[index + 1] = exportAxisData[index];
             } else {
               // 工作量取整
-              exportAxisData[index + 1] = (exportAxisData[index] - dayAmount) < 0 ? 0 : exportAxisData[index] - dayAmount;
+              exportAxisData[index + 1] = (exportAxisData[index] - dayAmount) < 0 
+                ? 0 : exportAxisData[index] - dayAmount;
             }
           }
           if (dataDates.includes(data)) return res.coordinate[data];
