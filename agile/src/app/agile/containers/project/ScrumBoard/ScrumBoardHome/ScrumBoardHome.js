@@ -40,6 +40,7 @@ class ScrumBoardHome extends Component {
       judgeUpdateParent: {},
       updateParentStatus: null,
       quickFilter: [],
+      translateId: [],
       expandFilter: false,
     };
   }
@@ -525,6 +526,7 @@ class ScrumBoardHome extends Component {
                     parentIdCode, draggableData.parentIssueId,
                   );
                   if (judge) {
+                    this.matchStatus(types);
                     this.setState({
                       judgeUpdateParent: {
                         id: draggableData.parentIssueId,
@@ -747,33 +749,14 @@ class ScrumBoardHome extends Component {
       );
     }
     return result;
-  }
+  };
 
   renderHeight = () => {
     if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
       return `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
     }
     return '';
-  }
-
-  /**
-   *更新父任务匹配的默认选项
-   *
-   * @returns
-   * @memberof ScrumBoardHome
-   */
-  renderUpdateParentDefault = () => {
-    if (ScrumBoardStore.getBoardData.length > 0) {
-      if (ScrumBoardStore.getBoardData[ScrumBoardStore.getBoardData.length - 1].columnId !== 'unset') {
-        if (ScrumBoardStore.getBoardData[
-          ScrumBoardStore.getBoardData.length - 1].subStatuses.length > 0) {
-          return ScrumBoardStore.getBoardData[
-            ScrumBoardStore.getBoardData.length - 1].subStatuses[0].statusId;
-        }
-      }
-    }
-    return undefined;
-  }
+  };
 
   renderOthersTitle = () => {
     let result = '';
@@ -898,11 +881,6 @@ class ScrumBoardHome extends Component {
         </div>
       );
     }
-    // } else {
-    //   result = (
-    //
-    //   );
-    // }
     return result;
   }
 
@@ -912,6 +890,24 @@ class ScrumBoardHome extends Component {
     }, () => {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
+  };
+
+  matchStatus = (translate) => {
+    if (translate instanceof Array) {
+      const subStatus = ScrumBoardStore
+        .getBoardData[ScrumBoardStore.getBoardData.length - 1].subStatuses;
+      // 以 translate 的 endStatusId 组建 Set
+      const tempTranslate = new Set(translate.map(v => v.endStatusId));
+      // 以选项的 statusId 组建 Set，计算两个 Set 的公有交集
+      const intersection = new Set(
+        subStatus.map(v => v.statusId).filter(v => tempTranslate.has(v)),
+      );
+      // 选取出 translate 中有 endStatusId 的项
+      const ret = translate.filter(v => intersection.has(v.endStatusId));
+      this.setState({
+        translateId: ret,
+      });
+    }
   };
 
   render() {
@@ -926,6 +922,7 @@ class ScrumBoardHome extends Component {
       judgeUpdateParent,
       addBoard,
       updateParentStatus,
+      translateId,
     } = this.state;
     return (
       <Page
@@ -1135,8 +1132,7 @@ class ScrumBoardHome extends Component {
               const data = {
                 issueId: judgeUpdateParent.id,
                 objectVersionNumber: judgeUpdateParent.objectVersionNumber,
-                statusId: updateParentStatus || ScrumBoardStore.getBoardData[
-                  ScrumBoardStore.getBoardData.length - 1].subStatuses[0].statusId,
+                transformId: updateParentStatus,
               };
               BacklogStore.axiosUpdateIssue(data).then((res) => {
                 this.refresh(ScrumBoardStore.getSelectedBoard);
@@ -1164,15 +1160,13 @@ class ScrumBoardHome extends Component {
                     updateParentStatus: value,
                   });
                 }}
-                defaultValue={this.renderUpdateParentDefault()}
+                defaultValue={translateId && translateId.length ? translateId[0].id : undefined}
               >
                 {
                   ScrumBoardStore.getBoardData.length > 0
-                    ? ScrumBoardStore
-                      .getBoardData[ScrumBoardStore.getBoardData.length - 1].subStatuses
-                      .map(item => (
-                        <Option key={item.statusId} value={item.statusId}>{item.name}</Option>
-                      )) : ''
+                    ? translateId.map(item => (
+                      <Option key={item.id} value={item.id}>{item.statusDTO.name}</Option>
+                    )) : ''
                 }
               </Select>
             </div>
