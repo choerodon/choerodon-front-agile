@@ -15,11 +15,21 @@
   margin-left: 20px;
   margin-right: 6px;
 }
+
+.c7n-parentIssue-summary {
+  margin-left: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 400px;
+}
+
 .c7n-parentIssue-count{
   padding-left: 11px;
   font-size: 12px;
   color: rgba(0,0,0,0.54);
 }
+
 .c7n-parentIssue-subIssue {
   margin-left: 12px;
   color: rgba(0, 0, 0, 0.54);

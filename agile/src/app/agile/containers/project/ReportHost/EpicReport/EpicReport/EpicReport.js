@@ -45,7 +45,7 @@ class EpicReport extends Component {
   
   getLabel(record) {
     if (ES.beforeCurrentUnit === 'story_point') {
-      if (record.typeCode === 'story') {
+      if (record.issueTypeDTO && record.issueTypeDTO.typeCode === 'story') {
         return record.storyPoints === null ? '未预估' : record.storyPoints;
       } else {
         return '';

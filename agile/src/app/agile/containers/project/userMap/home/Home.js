@@ -1,17 +1,18 @@
+/* eslint-disable array-callback-return */
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import _ from 'lodash';
 import { toJS } from 'mobx';
 import {
-  Page, Header, Content, Permission, 
+  Page, Header, Content, Permission,
 } from 'choerodon-front-boot';
 import {
-  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin, message,
+  Button, Popover, Dropdown, Menu, Icon, Checkbox, Spin, message, Tooltip,
 } from 'choerodon-ui';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import html2canvas from 'html2canvas';
-import Canvas2Image from '../../../../../../../node_modules/canvas2image/canvas2image';
-import './test.scss';
+import './Home.scss';
+import QuickSearch from '../../../../components/QuickSearch';
 import CreateEpic from '../component/CreateEpic';
 import Backlog from '../component/Backlog/Backlog.js';
 import EpicCard from '../component/EpicCard/EpicCard.js';
@@ -20,8 +21,13 @@ import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 
+const FileSaver = require('file-saver');
+
+const CheckboxGroup = Checkbox.Group;
+
 // let scrollL;
-let left = 0;
+const left = 0;
+let inWhich;
 
 function toFullScreen(dom) {
   if (dom.requestFullscreen) {
@@ -55,17 +61,17 @@ function transformNull2Zero(val) {
 }
 
 @observer
-class Home3 extends Component {
+class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      more: false,
-      expand: false,
       expandColumns: [],
-      showBackLog: false,
-      position: 'absolute',
-      isFullScreen: false,
+      // showBackLog: false,
+      // position: 'absolute',
+      // isFullScreen: false,
       popOverVisible: false,
+      showDoneEpicCheckbox: false,
+      filterEpicCheckbox: false,
     };
   }
 
@@ -74,16 +80,12 @@ class Home3 extends Component {
     window.addEventListener('keyup', this.onKeyUp);
     this.initData();
     const timer = setInterval(() => {
-      if (document.getElementsByClassName('filter').length > 0) {
-        if (document.getElementsByClassName('filter')[0].scrollHeight > document.getElementsByClassName('filter')[0].clientHeight) {
-          this.setState({
-            more: true,
-          });
-        }
-      }
       if (document.getElementById('fixHead-body')) {
+        document.getElementById('fixHead-head').addEventListener('scroll', this.handleScrollHead, { passive: true });
         document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll, { passive: true });
-        this.getPrepareOffsetTops();
+        document.getElementById('fixHead-head').addEventListener('mouseover', this.handleMouseOverHead);
+        document.getElementById('fixHead-body').addEventListener('mouseover', this.handleMouseOverBody);
+        // this.getPrepareOffsetTops();
         clearInterval(timer);
       }
     }, 20);
@@ -94,28 +96,21 @@ class Home3 extends Component {
   }
 
   componentWillUnmount() {
-    this.props.UserMapStore.setCurrentFilter([]);
-    this.props.UserMapStore.setMode('none');
-    this.props.UserMapStore.setIssues([]);
-    this.props.UserMapStore.setEpics([]);
-    this.props.UserMapStore.setTop(0);
-    this.props.UserMapStore.setLeft(0);
-    this.props.UserMapStore.setCurrentIndex(0);
+    const { UserMapStore } = this.props;
+    UserMapStore.setCurrentFilter([]);
+    UserMapStore.setMode('none');
+    UserMapStore.setIssues([]);
+    UserMapStore.setEpics([]);
+    UserMapStore.setTop(0);
+    UserMapStore.setLeft(0);
+    UserMapStore.setCurrentIndex(0);
+    UserMapStore.setIsFullScreen(false);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
   }
 
-  handleChangeFullScreen = (e) => {
-    // const node = e.target;
-    const isFullScreen = document.webkitFullscreenElement
-      || document.mozFullScreenElement
-      || document.msFullscreenElement;
-    this.setState({
-      isFullScreen: !!isFullScreen,
-    });
-  }
-
   getPrepareOffsetTops = (isExpand = false) => {
+    const { UserMapStore } = this.props;
     setTimeout(() => {
       const lines = document.getElementsByClassName('fixHead-line-content');
       const body = document.getElementById('fixHead-body');
@@ -123,10 +118,9 @@ class Home3 extends Component {
       for (let i = 0; i < lines.length; i += 1) {
         offsetTops.push(lines[i].offsetTop);
       }
-      this.props.UserMapStore.setOffsetTops(offsetTops);
+      UserMapStore.setOffsetTops(offsetTops);
       // window.console.log('when change mode, the offsetTops is: ' + offsetTops);
       if (!isExpand) {
-        const { UserMapStore } = this.props;
         const bodyTop = body.scrollTop;
         if (bodyTop) {
           body.scrollTop = 0;
@@ -139,7 +133,6 @@ class Home3 extends Component {
           UserMapStore.setCurrentIndex(index);
         }
       } else {
-        const { UserMapStore } = this.props;
         const bodyTop = body.scrollTop;
         UserMapStore.setTop(bodyTop);
         const { top, currentIndex } = UserMapStore;
@@ -171,44 +164,6 @@ class Home3 extends Component {
   //   isFirstScroll = false;
   // }, 300);
 
-  handleScroll = (e) => {
-    const { scrollLeft, scrollTop } = e.target;
-    const { UserMapStore } = this.props;
-    const {
-      top, offsetTops, currentIndex,
-    } = UserMapStore;
-    const header = document.getElementById('fixHead-head');
-    document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
-    if (scrollLeft !== left) {
-      // scrollL = scrollLeft;
-      // this.checkIsFirstLeftScroll();
-      // this.debounceSetLeft(scrollLeft);
-
-      // document.querySelector('.fixHead-line-2').style.setProperty('--left', `${scrollLeft}px`);
-      // UserMapStore.setLeft(scrollLeft);
-      header.scrollLeft = scrollLeft;
-    } else {
-      // UserMapStore.setTop(scrollTop);
-      const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
-      if (currentIndex !== index && index !== -1) {
-        UserMapStore.setCurrentIndex(index);
-      }
-      // window.console.log(scrollTop);
-    }
-    // if (scrollTop !== top) {
-    //   let s;
-    //   const { offsetTops, currentIndex } = UserMapStore;
-    //   // s = scrollTop <=9 ? 0 : scrollTop;
-    //   // UserMapStore.setTop(s);
-    //   // // window.console.log('when scroll v, the top is: ' + s);
-    //   // const index = _.findLastIndex(offsetTops, v => v <= s + 42);
-    //   // if (currentIndex !== index && index !== -1) {
-    //   //   UserMapStore.setCurrentIndex(index);
-    //   // }
-    // }
-    left = scrollLeft;
-  };
-
 
   /**
    *键盘按起事件
@@ -231,15 +186,99 @@ class Home3 extends Component {
    * @memberof Sprint
    */
   onKeyDown=(event) => {
+    const { keydown } = this.state;
+    const { UserMapStore } = this.props;
     if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-      if (event.keyCode !== this.state.keydown) {
+      if (event.keyCode !== keydown) {
         this.setState({
           keydown: event.keyCode,
         });
-        this.props.UserMapStore.setSelectIssueIds([]);
+        UserMapStore.setSelectIssueIds([]);
       }
     }
   }
+
+  getSprintIdAndEpicId = (str) => {
+    const epicId = parseInt(str.split('_')[0].split('-')[1], 10);
+    const modeId = parseInt(str.split('_')[1], 10);// [sprint || version]id;
+    return { epicId, modeId };
+  }
+
+  changeMode = (options) => {
+    const { UserMapStore } = this.props;
+    UserMapStore.setMode(options.key);
+    const mode = options.key;
+    // this.setState({ title: undefined, vosId: null });
+    if (mode === 'sprint') {
+      UserMapStore.loadSprints();
+    } else if (mode === 'version') {
+      UserMapStore.loadVersions();
+    }
+    UserMapStore.loadIssues('usermap');
+    if (UserMapStore.showBackLog) {
+      UserMapStore.loadBacklogIssues();
+    }
+    // this.getPrepareOffsetTops();
+
+    // this.props.UserMapStore.loadBacklogIssues();
+  };
+
+  showBackLog =() => {
+    const { UserMapStore } = this.props;
+    UserMapStore.changeShowBackLog();
+  };
+
+  handleCreateVOS=(type) => {
+    const { UserMapStore } = this.props;
+    UserMapStore.setCreateVOSType(type);
+    UserMapStore.setCreateVOS(true);
+  };
+
+  handleCreateOk= () => {
+    const { UserMapStore } = this.props;
+    UserMapStore.setCreateVOS(false);
+    const a = UserMapStore.getCreateVOSType === 'version' ? UserMapStore.loadVersions() : UserMapStore.loadSprints();
+  };
+
+  handleAddIssue = (epicId, vosId) => {
+    const { UserMapStore } = this.props;
+    const { mode } = UserMapStore;
+    const obj = { epicId, [`${mode}Id`]: vosId };
+    this.setState({ showChild: null });
+    UserMapStore.setCurrentNewObj(obj);
+  };
+
+
+  handleShowDoneEpic =(e) => {
+    const { UserMapStore } = this.props;
+    this.setState({
+      showDoneEpicCheckbox: e.target.checked,
+    });
+    UserMapStore.setShowDoneEpic(e.target.checked);
+    UserMapStore.loadEpic();
+  };
+
+  handleFilterEpic =(e) => {
+    const { UserMapStore } = this.props;
+    this.setState({
+      filterEpicCheckbox: e.target.checked,
+    });
+    UserMapStore.setIsApplyToEpic(e.target.checked);
+    UserMapStore.loadEpic();
+  }
+
+  handleExpandColumn =(id) => {
+    const { expandColumns } = this.state;
+    const index = expandColumns.indexOf(id);
+    if (index === -1) {
+      expandColumns.push(id);
+    } else {
+      expandColumns.splice(index, 1);
+    }
+    this.setState({ expandColumns });
+    // this.getPrepareOffsetTops(true);
+    // this.handleScroll();
+  };
 
   handleClickIssue = (issueId, epicId) => {
     const { UserMapStore } = this.props;
@@ -264,9 +303,37 @@ class Home3 extends Component {
     UserMapStore.setSelectIssueIds(arr);
   };
 
-  initData =() => {
-    this.props.UserMapStore.initData(true);
+  handleScrollHead = (e) => {
+    if (inWhich !== 'header') return;
+    const { scrollLeft } = e.target;
+    const body = document.getElementById('fixHead-body');
+    body.scrollLeft = scrollLeft;
+    const ua = window.navigator.userAgent;
+    const isSafari = ua.indexOf('Safari') !== -1 && ua.indexOf('Version') !== -1;
+    if (isSafari) {
+      document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
+    }
   };
+
+  handleMouseOverBody = (e) => {
+    inWhich = 'body';
+  }
+
+  handleMouseOverHead = (e) => {
+    inWhich = 'header';
+  }
+
+  handleChangeFullScreen = (e) => {
+    // const node = e.target;
+    const isFullScreen = document.webkitFullscreenElement
+      || document.mozFullScreenElement
+      || document.msFullscreenElement;
+    // this.setState({
+    //   isFullScreen: !!isFullScreen,
+    // });
+    const { UserMapStore } = this.props;
+    UserMapStore.setIsFullScreen(!!isFullScreen);
+  }
 
   handleFullScreen = () => {
     const isFullScreen = document.webkitFullscreenElement
@@ -278,105 +345,6 @@ class Home3 extends Component {
       this.exitFullScreen();
     }
   }
-
-  fullScreen = () => {
-    const target = document.querySelector('.content');
-    toFullScreen(target);
-  };
-
-  exitFullScreen = () => {
-    exitFullScreen();
-  }
-
-  changeMode =(options) => {
-    this.props.UserMapStore.setMode(options.key);
-    const mode = options.key;
-    this.setState({ title: undefined, vosId: null });
-    if (mode === 'sprint') {
-      this.props.UserMapStore.loadSprints();
-    } else if (mode === 'version') {
-      this.props.UserMapStore.loadVersions();
-    }
-    this.props.UserMapStore.loadIssues('usermap');
-    if (this.props.UserMapStore.showBackLog) {
-      this.props.UserMapStore.loadBacklogIssues();
-    }
-    this.getPrepareOffsetTops();
-
-    // this.props.UserMapStore.loadBacklogIssues();
-  };
-
-  handleCreateEpic = () => {
-    this.props.UserMapStore.setCreateEpic(true);
-  }
-
-  addFilter =(filter) => {
-    const { UserMapStore } = this.props;
-    const arr = _.cloneDeep(toJS(UserMapStore.currentFilters));
-    const value = filter;
-    const index = UserMapStore.currentFilters.indexOf(value);
-    if (index !== -1) {
-      arr.splice(index, 1);
-    } else {
-      arr.push(value);
-    }
-    UserMapStore.setCurrentFilter(arr);
-    UserMapStore.loadIssues('usermap');
-
-    if (UserMapStore.isApplyToEpic) {
-      UserMapStore.loadEpic();
-    }
-  };
-
-  handleShowDoneEpic =(e) => {
-    const { UserMapStore } = this.props;
-    UserMapStore.setShowDoneEpic(e.target.checked);
-    UserMapStore.loadEpic();
-  };
-
-  handleFilterEpic =(e) => {
-    const { UserMapStore } = this.props;
-    UserMapStore.setIsApplyToEpic(e.target.checked);
-    UserMapStore.loadEpic();
-  }
-
-  handleExpandColumn =(id) => {
-    const { expandColumns } = this.state;
-    const index = expandColumns.indexOf(id);
-    if (index === -1) {
-      expandColumns.push(id);
-    } else {
-      expandColumns.splice(index, 1);
-    }
-    this.setState({ expandColumns });
-    this.getPrepareOffsetTops(true);
-    // this.handleScroll();
-  };
-
-  showBackLog =() => {
-    const { UserMapStore } = this.props;
-    UserMapStore.changeShowBackLog();
-  };
-
-  handleCreateVOS=(type) => {
-    this.props.UserMapStore.setCreateVOSType(type);
-    this.props.UserMapStore.setCreateVOS(true);
-  };
-
-  handleCreateOk=() => {
-    const { UserMapStore } = this.props;
-    UserMapStore.setCreateVOS(false);
-    UserMapStore.getCreateVOSType === 'version' ? UserMapStore.loadVersions() : UserMapStore.loadSprints();
-  };
-
-  handleAddIssue = (epicId, vosId) => {
-    const { UserMapStore } = this.props;
-    const { mode } = UserMapStore;
-    const obj = { epicId, [`${mode}Id`]: vosId };
-    this.setState({ showChild: null });
-    UserMapStore.setCurrentNewObj(obj);
-  };
-
 
   handleEpicDrag =(res) => {
     const { UserMapStore } = this.props;
@@ -400,16 +368,88 @@ class Home3 extends Component {
     const epicId = data[sourceIndex].issueId;
     const { objectVersionNumber } = data[sourceIndex];
     const postData = {
-      afterSequence, beforeSequence, epicId, objectVersionNumber, 
+      afterSequence, beforeSequence, epicId, objectVersionNumber,
     };
     UserMapStore.setEpics(result);
     UserMapStore.handleEpicDrag(postData);
   };
 
-  getSprintIdAndEpicId(str) {
-    const epicId = parseInt(str.split('_')[0].split('-')[1], 10);
-    const modeId = parseInt(str.split('_')[1], 10);// [sprint || version]id;
-    return { epicId, modeId };
+  handleScroll = (e) => {
+    if (inWhich !== 'body') return;
+    const { scrollLeft } = e.target;
+    const header = document.getElementById('fixHead-head');
+    header.scrollLeft = scrollLeft;
+    const ua = window.navigator.userAgent;
+    const isSafari = ua.indexOf('Safari') !== -1 && ua.indexOf('Version') !== -1;
+    if (isSafari) {
+      document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
+    }
+  };
+
+  initData =() => {
+    const { UserMapStore } = this.props;
+    UserMapStore.axiosGetIssueTypes();
+    UserMapStore.axiosGetDefaultPriority();
+    UserMapStore.initData(true);
+    UserMapStore.setShowDoneEpic(false);
+    UserMapStore.setIsApplyToEpic(false);
+    UserMapStore.setCurrentFilter([]);
+    this.setState({
+      showDoneEpicCheckbox: false,
+      filterEpicCheckbox: false,
+    });
+    // const showDoneEpicCheckbox = document.getElementsByClassName('showDoneEpicCheckbox')[0];
+    // const filterEpicCheckbox = document.getElementsByClassName('filterEpicCheckbox')[0];
+    // if(showDoneEpicCheckbox){
+    //   console.log(showDoneEpicCheckbox);
+    //   showDoneEpicCheckbox.checked = false;
+    // }
+    // if(filterEpicCheckbox){
+    //   console.log(filterEpicCheckbox);
+    //   filterEpicCheckbox.checked = false;
+    // }
+    const timer = setInterval(() => {
+      if (document.getElementById('fixHead-body')) {
+        document.getElementById('fixHead-head').addEventListener('scroll', this.handleScrollHead, { passive: true });
+        document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll, { passive: true });
+        document.getElementById('fixHead-head').addEventListener('mouseover', this.handleMouseOverHead);
+        document.getElementById('fixHead-body').addEventListener('mouseover', this.handleMouseOverBody);
+        // this.getPrepareOffsetTops();
+        clearInterval(timer);
+      }
+    }, 20);
+  };
+
+  handleCreateEpic = () => {
+    const { UserMapStore } = this.props;
+    UserMapStore.setCreateEpic(true);
+  }
+
+  addFilter =(filter) => {
+    const { UserMapStore } = this.props;
+    const arr = _.cloneDeep(toJS(UserMapStore.currentFilters));
+    const value = filter;
+    const index = UserMapStore.currentFilters.indexOf(value);
+    if (index !== -1) {
+      arr.splice(index, 1);
+    } else {
+      arr.push(value);
+    }
+    UserMapStore.setCurrentFilter(arr);
+    UserMapStore.loadIssues('usermap');
+
+    if (UserMapStore.isApplyToEpic) {
+      UserMapStore.loadEpic();
+    }
+  };
+
+  fullScreen = () => {
+    const target = document.querySelector('.content');
+    toFullScreen(target);
+  };
+
+  exitFullScreen = () => {
+    exitFullScreen();
   }
 
   transformDateToPostDate = (ids, originIssues, mode, targetEpicId, targetModeId) => {
@@ -434,7 +474,7 @@ class Home3 extends Component {
   handleDataWhenMove = (ids, before, outsetIssueId, mode, desEpicId, desModeId) => {
     const { UserMapStore } = this.props;
     const { issues, backlogIssues } = UserMapStore;
-    const issuesCopy = _.cloneDeep(toJS(issues));
+    const issuesCopy = UserMapStore.getCacheIssues;
     const backlogIssuesCopy = _.cloneDeep(toJS(backlogIssues));
     const issuesDragged = [];
     let resIssues = [];
@@ -484,6 +524,7 @@ class Home3 extends Component {
               ...issuesDragged,
               ...backlogIssuesCopy.slice(backlogInsertIndex),
             ];
+            // window.console.log(resBacklogIssues);
           }
         } else {
           resBacklogIssues = issuesDragged.concat(backlogIssuesCopy);
@@ -530,13 +571,15 @@ class Home3 extends Component {
     }
     UserMapStore.setBacklogIssues(resBacklogIssues);
     UserMapStore.setIssues(resIssues);
+    // window.console.log(resIssues);
   }
 
   handleMultipleDragToBoard = (res) => {
     const { UserMapStore } = this.props;
     const {
-      mode, issues, backlogIssues, selectIssueIds, 
+      mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    const issues = UserMapStore.getCacheIssues;
     const sourceIndex = res.source.index;
     const tarIndex = res.destination.index;
     const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
@@ -556,7 +599,7 @@ class Home3 extends Component {
       if (mode === 'none') {
         desEpicAndModeIssues = desEpicIssues.slice();
       } else {
-        desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0 
+        desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0
           || issue[key] === null);
       }
     } else {
@@ -594,11 +637,22 @@ class Home3 extends Component {
           // 移动卡属于该块
           if (desIndex === desEpicAndModeIssues.length - 1) {
             before = false;
-            outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            outsetIssueId = _.findLast(
+              desEpicAndModeIssues,
+              v => !issueIds.includes(v.issueId),
+            ).issueId;
           } else if (true) {
             if (sourceIndex <= desIndex) {
-              const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-              const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+              const afterDesIndex = _.find(
+                desEpicAndModeIssues,
+                v => !issueIds.includes(v.issueId),
+                desIndex + 1,
+              );
+              const beforeDesIndex = _.findLast(
+                desEpicAndModeIssues,
+                v => !issueIds.includes(v.issueId),
+                desIndex + 1,
+              );
               if (afterDesIndex) {
                 before = true;
                 outsetIssueId = afterDesIndex.issueId;
@@ -610,8 +664,16 @@ class Home3 extends Component {
                 outsetIssueId = 0;
               }
             } else {
-              const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-              const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+              const afterDesIndex = _.find(
+                desEpicAndModeIssues,
+                v => !issueIds.includes(v.issueId),
+                desIndex,
+              );
+              const beforeDesIndex = _.findLast(
+                desEpicAndModeIssues,
+                v => !issueIds.includes(v.issueId),
+                desIndex,
+              );
               if (afterDesIndex) {
                 before = true;
                 outsetIssueId = afterDesIndex.issueId;
@@ -628,10 +690,21 @@ class Home3 extends Component {
           // 移动卡不属于该块
           if (desIndex === desEpicAndModeIssues.length) {
             before = false;
-            outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+            outsetIssueId = _.findLast(
+              desEpicAndModeIssues,
+              v => !issueIds.includes(v.issueId),
+            ).issueId;
           } else {
-            const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-            const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+            const afterDesIndex = _.find(
+              desEpicAndModeIssues,
+              v => !issueIds.includes(v.issueId),
+              desIndex,
+            );
+            const beforeDesIndex = _.findLast(
+              desEpicAndModeIssues,
+              v => !issueIds.includes(v.issueId),
+              desIndex,
+            );
             if (afterDesIndex) {
               before = true;
               outsetIssueId = afterDesIndex.issueId;
@@ -650,11 +723,14 @@ class Home3 extends Component {
         //   if (_.map(desEpicAndModeIssues, 'issueId').includes(dragIssueId)) {
         //     if (desIndex === desEpicAndModeIssues.length - 1) {
         //       before = false;
-        //       outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+        //       outsetIssueId =
+        // _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
         //     } else if (true) {
         //       if (sourceIndex <= desIndex) {
-        //         const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-        //         const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+        //         const afterDesIndex =
+        // _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+        //         const beforeDesIndex =
+        // _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
         //         if (afterDesIndex) {
         //           before = true;
         //           outsetIssueId = afterDesIndex.issueId;
@@ -666,8 +742,10 @@ class Home3 extends Component {
         //           outsetIssueId = 0;
         //         }
         //       } else {
-        //         const afterDesIndex = _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-        //         const beforeDesIndex = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+        //         const afterDesIndex =
+        // _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+        //         const beforeDesIndex =
+        // _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
         //         if (afterDesIndex) {
         //           before = true;
         //           outsetIssueId = afterDesIndex.issueId;
@@ -679,12 +757,13 @@ class Home3 extends Component {
         //           outsetIssueId = 0;
         //         }
         //       }
-              
+
         //     }
         //   } else if (true) {
         //     if (desIndex === desEpicAndModeIssues.length) {
         //       before = false;
-        //       outsetIssueId = _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+        //       outsetIssueId =
+        // _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
         //     } else {
         //       before = true;
         //       outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
@@ -730,15 +809,23 @@ class Home3 extends Component {
       }
     }
     const rankIndex = null;
-    const transformData = this.transformDateToPostDate(issueIds, issues, mode, desEpicId, desModeId);
+    const transformData = this.transformDateToPostDate(
+      issueIds,
+      issues,
+      mode,
+      desEpicId,
+      desModeId,
+    );
     const postData = {
       before,
       epicId: transformData.epicIssueIds.length ? desEpicId : undefined,
       outsetIssueId,
       rankIndex,
       issueIds,
-      versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
-      sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+      versionIssueIds: transformData.versionIssueIds.length
+        ? transformData.versionIssueIds : undefined,
+      sprintIssueIds: transformData.sprintIssueIds.length
+        ? transformData.sprintIssueIds : undefined,
       epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
     };
     if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
@@ -754,8 +841,9 @@ class Home3 extends Component {
   handleMultipleDragToBacklog = (res) => {
     const { UserMapStore } = this.props;
     const {
-      mode, issues, backlogIssues, selectIssueIds, 
+      mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    const issues = UserMapStore.getCacheIssues;
     const sourceIndex = res.source.index;
     const tarIndex = res.destination.index;
     const tarEpicId = parseInt(res.destination.droppableId.split('_')[0].split('-')[1], 10);
@@ -776,7 +864,7 @@ class Home3 extends Component {
         desModeIssues = backlogData.slice();
         // desEpicAndModeIssues = desEpicIssues.slice();
       } else {
-        desModeIssues = _.filter(backlogData, issue => issue[key] === 0 
+        desModeIssues = _.filter(backlogData, issue => issue[key] === 0
           || issue[key] === null);
       }
     } else {
@@ -815,8 +903,16 @@ class Home3 extends Component {
             outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
           } else if (true) {
             if (sourceIndex <= desIndex) {
-              const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-              const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+              const afterDesIndex = _.find(
+                desModeIssues,
+                v => !issueIds.includes(v.issueId),
+                desIndex + 1,
+              );
+              const beforeDesIndex = _.findLast(
+                desModeIssues,
+                v => !issueIds.includes(v.issueId),
+                desIndex + 1,
+              );
               if (afterDesIndex) {
                 before = true;
                 outsetIssueId = afterDesIndex.issueId;
@@ -828,8 +924,16 @@ class Home3 extends Component {
                 outsetIssueId = 0;
               }
             } else {
-              const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-              const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+              const afterDesIndex = _.find(
+                desModeIssues,
+                v => !issueIds.includes(v.issueId),
+                desIndex,
+              );
+              const beforeDesIndex = _.findLast(
+                desModeIssues,
+                v => !issueIds.includes(v.issueId),
+                desIndex,
+              );
               if (afterDesIndex) {
                 before = true;
                 outsetIssueId = afterDesIndex.issueId;
@@ -847,8 +951,16 @@ class Home3 extends Component {
             before = false;
             outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
           } else if (true) {
-            const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-            const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+            const afterDesIndex = _.find(
+              desModeIssues,
+              v => !issueIds.includes(v.issueId),
+              desIndex,
+            );
+            const beforeDesIndex = _.findLast(
+              desModeIssues,
+              v => !issueIds.includes(v.issueId),
+              desIndex,
+            );
             if (afterDesIndex) {
               before = true;
               outsetIssueId = afterDesIndex.issueId;
@@ -867,11 +979,14 @@ class Home3 extends Component {
         //   if (_.map(desModeIssues, 'issueId').includes(dragIssueId)) {
         //     if (desIndex === desModeIssues.length - 1) {
         //       before = false;
-        //       outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+        //       outsetIssueId =
+        // _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
         //     } else if (true) {
         //       if (sourceIndex <= desIndex) {
-        //         const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-        //         const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+        //         const afterDesIndex =
+        // _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
+        //         const beforeDesIndex =
+        // _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
         //         if (afterDesIndex) {
         //           before = true;
         //           outsetIssueId = afterDesIndex.issueId;
@@ -883,8 +998,10 @@ class Home3 extends Component {
         //           outsetIssueId = 0;
         //         }
         //       } else {
-        //         const afterDesIndex = _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-        //         const beforeDesIndex = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+        //         const afterDesIndex =
+        // _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
+        //         const beforeDesIndex =
+        // _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
         //         if (afterDesIndex) {
         //           before = true;
         //           outsetIssueId = afterDesIndex.issueId;
@@ -900,7 +1017,8 @@ class Home3 extends Component {
         //   } else if (true) {
         //     if (desIndex === desModeIssues.length) {
         //       before = false;
-        //       outsetIssueId = _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
+        //       outsetIssueId =
+        // _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
         //     } else {
         //       before = true;
         //       outsetIssueId = desModeIssues[desIndex].issueId;
@@ -954,8 +1072,10 @@ class Home3 extends Component {
       outsetIssueId,
       rankIndex,
       issueIds,
-      versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
-      sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+      versionIssueIds: transformData.versionIssueIds.length
+        ? transformData.versionIssueIds : undefined,
+      sprintIssueIds: transformData.sprintIssueIds.length
+        ? transformData.sprintIssueIds : undefined,
       epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
     };
     if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
@@ -971,7 +1091,8 @@ class Home3 extends Component {
     //   //   currentIssue[key] = vosId;
     //   // }
     //   // postData = {
-    //   //   before, epicId: souEpicId ? 0 : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
+    //   before, epicId: souEpicId ? 0 :
+    // undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
     //   // };
     // });
     // window.console.log(postData);
@@ -980,13 +1101,16 @@ class Home3 extends Component {
     UserMapStore.setCurrentDraggableId(null);
   }
 
-  handelDragToBoard = (res) => {
+  handleDragToBoard = (res) => {
     const { UserMapStore } = this.props;
     const {
-      mode, issues, backlogIssues, selectIssueIds,
+      mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    const issues = UserMapStore.getCacheIssues;
+    if (res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') return;
     if (selectIssueIds.length < 2) {
-      if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
+      if (res.destination.droppableId === res.source.droppableId
+        && res.destination.index === res.source.index) return;
       const key = `${mode}Id`;
       const desIndex = res.destination.index;
       const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
@@ -1002,7 +1126,7 @@ class Home3 extends Component {
         if (mode === 'none') {
           desEpicAndModeIssues = desEpicIssues.slice();
         } else {
-          desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0 
+          desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0
             || issue[key] === null);
         }
       } else {
@@ -1083,15 +1207,23 @@ class Home3 extends Component {
         }
       }
       const rankIndex = null;
-      const transformData = this.transformDateToPostDate(issueIds, issues, mode, desEpicId, desModeId);
+      const transformData = this.transformDateToPostDate(
+        issueIds,
+        issues,
+        mode,
+        desEpicId,
+        desModeId,
+      );
       const postData = {
         before,
         epicId: transformData.epicIssueIds.length ? desEpicId : undefined,
         outsetIssueId,
         rankIndex,
         issueIds,
-        versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
-        sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+        versionIssueIds: transformData.versionIssueIds.length
+          ? transformData.versionIssueIds : undefined,
+        sprintIssueIds: transformData.sprintIssueIds.length
+          ? transformData.sprintIssueIds : undefined,
         epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
       };
       if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
@@ -1134,10 +1266,12 @@ class Home3 extends Component {
   handleDragToBacklog = (res) => {
     const { UserMapStore } = this.props;
     const {
-      mode, issues, backlogIssues, selectIssueIds,
+      mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    const issues = UserMapStore.getCacheIssues;
     if (selectIssueIds.length < 2) {
-      if (res.destination.droppableId === res.source.droppableId && res.destination.index === res.source.index) return;
+      if (res.destination.droppableId === res.source.droppableId
+        && res.destination.index === res.source.index) return;
       const key = `${mode}Id`;
       const desIndex = res.destination.index;
       // const desEpicId = this.getSprintIdAndEpicId(res.destination.droppableId).epicId;
@@ -1163,7 +1297,7 @@ class Home3 extends Component {
       //   if (mode === 'none') {
       //     desEpicAndModeIssues = desEpicIssues.slice();
       //   } else {
-      //     desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0 
+      //     desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0
       //       || issue[key] === null);
       //   }
       // } else {
@@ -1207,7 +1341,10 @@ class Home3 extends Component {
           if (mode === 'none') {
             desModeAllIssues = issueData;
           } else {
-            desModeAllIssues = _.filter(issueData, issue => issue[key] === 0 || issue[key] === null);
+            desModeAllIssues = _.filter(
+              issueData,
+              issue => issue[key] === 0 || issue[key] === null,
+            );
           }
         } else {
           desModeAllIssues = _.filter(issueData, issue => issue[key] === desModeId);
@@ -1252,8 +1389,10 @@ class Home3 extends Component {
         outsetIssueId,
         rankIndex,
         issueIds,
-        versionIssueIds: transformData.versionIssueIds.length ? transformData.versionIssueIds : undefined,
-        sprintIssueIds: transformData.sprintIssueIds.length ? transformData.sprintIssueIds : undefined,
+        versionIssueIds: transformData.versionIssueIds.length
+          ? transformData.versionIssueIds : undefined,
+        sprintIssueIds: transformData.sprintIssueIds.length
+          ? transformData.sprintIssueIds : undefined,
         epicIssueIds: transformData.epicIssueIds.length ? transformData.epicIssueIds : undefined,
       };
       if (mode !== 'none' && transformData[`${mode}IssueIds`].length) {
@@ -1269,7 +1408,8 @@ class Home3 extends Component {
       //     // currentIssue[key] = vosId;
       //   }
       //   // postData = {
-      //   //   before, epicId: souEpicId ? 0 : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
+      //   //   before, epicId: souEpicId ? 0
+      // : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
       //   // };
       //   // if (res.source.droppableId.includes('backlog')) {
       //   //   tarBacklogData = _.find(backlogData, item => item.issueId === id);
@@ -1294,9 +1434,10 @@ class Home3 extends Component {
   };
 
   handleEpicOrIssueDrag = (res) => {
+    const { UserMapStore } = this.props;
     if (!res.destination) {
-      this.props.UserMapStore.setSelectIssueIds([]);
-      this.props.UserMapStore.setCurrentDraggableId(null);
+      UserMapStore.setSelectIssueIds([]);
+      UserMapStore.setCurrentDraggableId(null);
       return;
     }
     if (res.destination.droppableId === 'epic') {
@@ -1304,7 +1445,7 @@ class Home3 extends Component {
     } else if (res.destination.droppableId.includes('backlog')) {
       this.handleDragToBacklog(res);
     } else {
-      this.handelDragToBoard(res);
+      this.handleDragToBoard(res);
     }
   };
 
@@ -1316,10 +1457,19 @@ class Home3 extends Component {
   };
 
   handleSaveAsImage = () => {
+    const { UserMapStore } = this.props;
+    UserMapStore.saveChangeShowBackLog();
     this.setState({
       popOverVisible: false,
     });
+
+    message.config({
+      top: 110,
+      duration: 2,
+    });
     const shareContent = document.querySelector('.fixHead');// 需要截图的包裹的（原生的）DOM 对象
+    const shareContentWidth = shareContent.style.width;
+    const shareContentHeight = shareContent.style.height;
     shareContent.style.width = `${Math.max(document.querySelector('.fixHead-head').scrollWidth, document.querySelector('.fixHead-body').scrollWidth)}px`;
     shareContent.style.height = `${document.querySelector('.fixHead-head').scrollHeight + document.querySelector('.fixHead-body').scrollHeight}px`;
 
@@ -1338,28 +1488,20 @@ class Home3 extends Component {
       width: _.parseInt(_.trim(shareContent.style.width, 'px')),
       height: _.parseInt(_.trim(shareContent.style.height, 'px')),
     };
-    
+
     html2canvas(shareContent, opts)
       .then((pcanvas) => {
-        this.downLoadImage(pcanvas, '用户故事地图.png');
-      });
-    message.config({
-      top: 110,
-      duration: 2,
-    });
-    message.success('导出图片成功', undefined, undefined, 'top');
-  }
+        pcanvas.toBlob((blob) => {
+          FileSaver.saveAs(blob, '用户故事地图.png');
+        });
+        shareContent.style.width = shareContentWidth;
+        shareContent.style.height = shareContentHeight;
 
-  /**
-   * 
-   * @param {canvas} canvas 
-   * @param {filename} name 
-   */
-  downLoadImage(canvas, name) {
-    const a = document.createElement('a');
-    a.href = canvas.toDataURL();
-    a.download = name;
-    a.click();
+        message.success('导出图片成功', undefined, undefined, 'top');
+      })
+      .catch((error) => {
+        message.error('导出图片失败', undefined, undefined, 'top');
+      });
   }
 
   getHistoryCount = (id) => {
@@ -1398,6 +1540,7 @@ class Home3 extends Component {
 
   renderHeader = () => {
     const { UserMapStore } = this.props;
+    const { showDoneEpicCheckbox, filterEpicCheckbox, popOverVisible } = this.state;
     const {
       mode,
     } = UserMapStore;
@@ -1409,11 +1552,22 @@ class Home3 extends Component {
       </Menu>
     );
     return (
-      <Header title="用户故事地图">
-        <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
-          <Icon type="playlist_add" />
-          {'创建史诗'}
-        </Button>
+      <Header title="故事地图">
+        {/* {!this.state.isFullScreen ?
+          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
+            <Icon type="playlist_add" />
+            {'创建史诗'}
+          </Button> : ''
+        } */}
+
+        {!UserMapStore.isFullScreen
+          ? (
+            <Button className="leftBtn" functyp="flat" onClick={this.handleCreateEpic}>
+              <Icon type="playlist_add" />
+              {'创建史诗'}
+            </Button>
+          ) : ''
+        }
         <Dropdown
           overlay={swimlanMenu}
           trigger={['click']}
@@ -1432,9 +1586,9 @@ class Home3 extends Component {
           getPopupContainer={triggerNode => triggerNode}
           overlayClassName="moreMenuPopover"
           arrowPointAtCenter={false}
-          placement="bottomLeft"
+          placement="bottom"
           trigger={['click']}
-          visible={this.state.popOverVisible}
+          visible={popOverVisible}
           onVisibleChange={(visible) => {
             this.setState({
               popOverVisible: visible,
@@ -1442,16 +1596,23 @@ class Home3 extends Component {
           }}
           content={(
             <div>
-              <div className="menu-title">史诗过滤器</div>
-              <div style={{ height: 22, marginBottom: 20 }}>
-                <Checkbox onChange={this.handleShowDoneEpic}>已完成的史诗</Checkbox>
+              <div className="menu-title">史诗过滤选择器</div>
+              <div style={{ height: 30, padding: '5px 12px' }}>
+                <Checkbox className="showDoneEpicCheckbox" onChange={this.handleShowDoneEpic} checked={showDoneEpicCheckbox}>显示已完成的史诗</Checkbox>
               </div>
-              <div style={{ height: 22, marginBottom: 20 }}>
-                <Checkbox onChange={this.handleFilterEpic}>应用快速搜索到史诗</Checkbox>
+              <div style={{ height: 30, padding: '5px 12px' }}>
+                <Checkbox className="filterEpicCheckbox" onChange={this.handleFilterEpic} checked={filterEpicCheckbox}>应用搜索到史诗</Checkbox>
               </div>
               <div className="menu-title">导出</div>
-              {/* <div style={{ height: 22, marginBottom: 20, marginLeft: 26 }}>导出为excel</div> */}
-              <div onClick={this.handleSaveAsImage} role="none" style={{ height: 22, marginLeft: 26, cursor: 'pointer' }}>导出为图片</div>
+              <div
+                onClick={this.handleSaveAsImage}
+                role="none"
+                style={{
+                  height: 30, padding: '5px 12px', marginLeft: 26, cursor: 'pointer',
+                }}
+              >
+                {'导出为png格式'}
+              </div>
             </div>
           )}
         >
@@ -1464,30 +1625,39 @@ class Home3 extends Component {
           <Icon type="refresh icon" />
           <span>刷新</span>
         </Button>
-        <Button className="leftBtn2" funcType="flat" onClick={this.handleFullScreen.bind(this)}>
+        {/* <Button className="leftBtn2" funcType="flat" onClick={this.handleFullScreen.bind(this)}>
           <Icon type={`${this.state.isFullScreen ? 'exit_full_screen' : 'zoom_out_map'} icon`} />
           <span>{this.state.isFullScreen ? '退出全屏' : '全屏'}</span>
+        </Button> */}
+        <Button className="leftBtn2" funcType="flat" onClick={this.handleFullScreen.bind(this)}>
+          <Icon type={`${UserMapStore.isFullScreen ? 'exit_full_screen' : 'zoom_out_map'} icon`} />
+          <span>{UserMapStore.isFullScreen ? '退出全屏' : '全屏'}</span>
         </Button>
-        <Button
-          style={{
-            color: 'white', fontSize: 12, position: 'absolute', right: 24,
-          }}
-          type="primary"
-          funcType="raised"
-          onClick={this.showBackLog}
-        >
-          <Icon type="layers" />
-          {'需求池'}
-        </Button>
+        {
+          UserMapStore.getEpics.length ? (
+            <Button
+              style={{
+                color: 'white', fontSize: 12, position: 'absolute', right: 24,
+              }}
+              type="primary"
+              funcType="raised"
+              onClick={this.showBackLog}
+            >
+              <Icon type="layers" />
+              {'需求池'}
+            </Button>
+          ) : null
+        }
       </Header>);
   }
 
   renderBody = () => {
     const { UserMapStore } = this.props;
+    const { expandColumns, showChild } = this.state;
     const dom = [];
     const epicData = UserMapStore.getEpics;
     const {
-      issues, sprints, versions, currentNewObj, left, top, selectIssueIds, currentDraggableId
+      issues, sprints, versions, currentNewObj, top, selectIssueIds, currentDraggableId,
     } = UserMapStore;
     const { epicId, versionId, sprintId } = currentNewObj;
     const { mode } = UserMapStore;
@@ -1496,95 +1666,102 @@ class Home3 extends Component {
     if (epicData.length) {
       vosData.map((vos, vosIndex) => {
         const name = mode === 'sprint' ? `${mode}Name` : 'name';
-        dom.push(<div key={vos[id]} className="fixHead-line">
-          <div
-            className={`fixHead-line-title title-transform ${vosIndex === 0 ? 'firstLine-title' : ''}`}
-            // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
-            // style={{ marginLeft: left }}
-            // data-title={vos[name]}
-            // data-id={vos[id]}
-          >
-            <div>{vos[name]}</div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p className="point-span" style={{ background: '#4D90FE' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
-                  if (issue.statusCode === 'todo') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#FFB100' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
-                  if (issue.statusCode === 'doing') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <p className="point-span" style={{ background: '#00BFA5' }}>
-                {_.reduce(_.filter(issues, issue => issue[id] === vos[id] && issue.epicId !== 0), (sum, issue) => {
-                  if (issue.statusCode === 'done') {
-                    return sum + issue.storyPoints;
-                  } else {
-                    return sum;
-                  }
-                }, 0)}
-              </p>
-              <Button shape="circle" className="expand-btn" onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
-                <Icon type={`${this.state.expandColumns.includes(vos[id]) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
-              </Button>
+        dom.push(
+          <React.Fragment key={vos[id]}>
+            <div
+              className={`fixHead-line-title title-transform ${vosIndex === 0 ? 'firstLine-titles' : ''}`}
+            >
+              <div>{vos[name]}</div>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Tooltip title="todo">
+                  <p className="point-span" style={{ background: '#4D90FE' }}>
+                    {_.reduce(_.filter(
+                      issues,
+                      issue => issue[id] === vos[id] && issue.epicId !== 0,
+                    ),
+                    (sum, issue) => {
+                      if (issue.statusMapDTO && issue.statusMapDTO.type === 'todo') {
+                        return sum + issue.storyPoints;
+                      } else {
+                        return sum;
+                      }
+                    }, 0)}
+                  </p>
+                </Tooltip>
+                <Tooltip title="doing">
+                  <p className="point-span" style={{ background: '#FFB100' }}>
+                    {_.reduce(_.filter(
+                      issues,
+                      issue => issue[id] === vos[id] && issue.epicId !== 0,
+                    ),
+                    (sum, issue) => {
+                      if (issue.statusMapDTO && issue.statusMapDTO.type === 'doing') {
+                        return sum + issue.storyPoints;
+                      } else {
+                        return sum;
+                      }
+                    }, 0)}
+                  </p>
+                </Tooltip>
+                <Tooltip title="done">
+                  <p className="point-span" style={{ background: '#00BFA5' }}>
+                    {_.reduce(_.filter(
+                      issues,
+                      issue => issue[id] === vos[id] && issue.epicId !== 0,
+                    ),
+                    (sum, issue) => {
+                      if (issue.statusMapDTO && issue.statusMapDTO.type === 'done') {
+                        return sum + issue.storyPoints;
+                      } else {
+                        return sum;
+                      }
+                    }, 0)}
+                  </p>
+                </Tooltip>
+                <Button shape="circle" className="expand-btn" onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
+                  <Icon type={`${expandColumns.includes(vos[id]) ? 'baseline-arrow_drop_up' : 'baseline-arrow_drop_down'}`} />
+                </Button>
+              </div>
             </div>
-          </div>
-          <div
-            className="fixHead-line-content"
-            style={{ display: 'flex', height: this.state.expandColumns.includes(vos[id]) ? 1 : '', overflow: this.state.expandColumns.includes(vos[id]) ? 'hidden' : 'visible' }}
-            data-title={vos[name]}
-            data-id={vos[id]}
-          >
-            {epicData.map((epic, index) => (
-              <Droppable droppableId={`epic-${epic.issueId}_${vos[id]}`} key={epic.issueId}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    className="swimlane-column fixHead-block"
-                    style={{
-                      background: snapshot.isDraggingOver ? '#f0f0f0' : '',
-                      padding: 'grid',
+            <div
+              className="fixHead-line-content"
+              style={{ display: 'flex', height: expandColumns.includes(vos[id]) ? 1 : '', overflow: expandColumns.includes(vos[id]) ? 'hidden' : 'visible' }}
+              data-title={vos[name]}
+              data-id={vos[id]}
+            >
+              {epicData.map((epic, index) => (
+                <Droppable droppableId={`epic-${epic.issueId}_${vos[id]}`} key={`epic-${epic.issueId}_${vos[id]}`}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      className="swimlane-column fixHead-block"
+                      style={{
+                        background: snapshot.isDraggingOver ? '#f0f0f0' : '',
+                        padding: 'grid',
                       // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                    }}
-                  >
-                    <React.Fragment>
-                      {_.filter(issues, issue => issue.epicId === epic.issueId && issue[id] === vos[id]).map((item, indexs) => (
-                        <Draggable draggableId={`${mode}-${item.issueId}`} index={indexs} key={item.issueId}>
-                          {(provided1, snapshot1) => (
-                            <div
-                              ref={provided1.innerRef}
-                              {...provided1.draggableProps}
-                              {...provided1.dragHandleProps}
-                              style={{
-                                cursor: 'move',
-                                ...provided1.draggableProps.style,
-                              }}
-                              role="none"
-                            >
-                              {item.issueId}
-                              <IssueCard
-                                handleClickIssue={this.handleClickIssue}
-                                issue={item}
-                                selected={selectIssueIds.includes(item.issueId)}
-                                dragged={currentDraggableId === item.issueId}
-                                borderTop={indexs === 0}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {
+                      }}
+                    >
+                      <React.Fragment>
+                        {_.filter(
+                          issues,
+                          issue => issue.epicId === epic.issueId && issue[id] === vos[id],
+                        ).map((item, indexs) => (
+                          <IssueCard
+                            draggableId={`${mode}-${item.issueId}`}
+                            index={indexs}
+                            selected={selectIssueIds.includes(item.issueId)}
+                            dragged={currentDraggableId === item.issueId}
+                            handleClickIssue={this.handleClickIssue}
+                            key={item.issueId}
+                            issue={item}
+                            borderTop={indexs === 0}
+                            showDelete={!UserMapStore.isFullScreen}
+                          />
+                        ))}
+                        {
                         epicId === epic.issueId && currentNewObj[id] === vos[id] ? (
                           <CreateIssue
+                            store={UserMapStore}
                             data={{ epicId: epic.issueId, [id]: vos[id] }}
                             onOk={() => {
                               UserMapStore.initData(false);
@@ -1596,103 +1773,100 @@ class Home3 extends Component {
                           />
                         ) : null
                       }
-                      <div
-                        role="none"
-                        onClick={this.handleClickIssue.bind(this, 0)}
-                        className="maskIssue"
-                        onMouseLeave={() => { this.setState({ showChild: null }); }}
-                        onMouseEnter={() => {
-                          if (snapshot.isDraggingOver) return;
-                          this.setState({ showChild: `${epic.issueId}-${vos[id]}` });
-                        }}
-                      >
-                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
-
-                          
-                          {'Add'}
-                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, vos[id])}>new</a>
-                          {' '}
-
-
-                          {'or '}
-                          <a role="none" onClick={this.showBackLog}>existing</a>
+                        <div
+                          role="none"
+                          onClick={this.handleClickIssue.bind(this, 0)}
+                          className="maskIssue"
+                          onMouseLeave={() => { this.setState({ showChild: null }); }}
+                          onMouseEnter={() => {
+                            if (snapshot.isDraggingOver) return;
+                            this.setState({ showChild: `${epic.issueId}-${vos[id]}` });
+                          }}
+                        >
+                          <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && showChild === `${epic.issueId}-${vos[id]}` ? 'block' : 'none' }}>
+                            {/* {'Add'} */}
+                            <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, vos[id])}>新建问题</a>
+                            {' '}
+                            {'或 '}
+                            <a role="none" onClick={this.showBackLog}>从需求池引入</a>
+                          </div>
                         </div>
-                      </div>
-                    </React.Fragment>
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
+                      </React.Fragment>
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
 
-            ))}
-          </div>
-                 </div>);
+              ))}
+            </div>
+          </React.Fragment>,
+        );
       });
       dom.push(
-        <div key="no-sprint" className="fixHead-line" style={{ height: '100%' }}>
-          <div>
-            <div
-              className={`fixHead-line-title column-title title-transform ${vosData.length ? '' : 'firstLine-title'}`}
-              title={mode === 'none' ? 'issue' : '未计划部分'}
-              data-id={-1}
-              // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
-            >
-              <div>
-                {mode === 'none' ? 'issue' : '未计划部分' }
-                {mode === 'none' ? null
-                  : (
-                    <React.Fragment>
-                      {mode === 'version' ? (
+        <React.Fragment key="no-sprint">
+          <div
+            className={`fixHead-line-title column-title title-transform ${vosData.length ? '' : 'firstLine-titles'}`}
+            title={mode === 'none' ? '问题' : '未计划部分'}
+            data-id={-1}
+            // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
+          >
+            <div>
+              {mode === 'none' ? '问题' : '未计划部分' }
+              {mode === 'none' || UserMapStore.isFullScreen ? null
+                : (
+                  <React.Fragment>
+                    {mode === 'version'
+                      ? (
                         <Permission service={['agile-service.product-version.createVersion']}>
                           <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
                             <Icon type="playlist_add" />
-
-
-                            {'创建'}
-                            {mode === 'sprint' ? '冲刺' : '版本'}
+                            {`创建${mode === 'sprint' ? '冲刺' : '版本'}`}
                           </Button>
                         </Permission>
                       )
-                        : (
-                          <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
-                            <Icon type="playlist_add" />
-
-
-                            {'创建'}
-                            {mode === 'sprint' ? '冲刺' : '版本'}
-                          </Button>
-                        )}
-                    </React.Fragment>
-
-                  ) }
-
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+                      : (
+                        <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
+                          <Icon type="playlist_add" />
+                          {`创建${mode === 'sprint' ? '冲刺' : '版本'}`}
+                        </Button>
+                      )}
+                  </React.Fragment>
+                ) }
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Tooltip title="todo">
                 <p className="point-span" style={{ background: '#4D90FE' }}>
-                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
-                    if (issue.statusCode === 'todo') {
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0
+                    && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                    if (issue.statusMapDTO && issue.statusMapDTO.type === 'todo') {
                       return sum + issue.storyPoints;
                     } else {
                       return sum;
                     }
                   }, 0)}
                 </p>
+              </Tooltip>
+              <Tooltip title="doing">
                 <p className="point-span" style={{ background: '#FFB100' }}>
-                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
-                    if (issue.statusCode === 'doing') {
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0
+                    && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                    if (issue.statusMapDTO && issue.statusMapDTO.type === 'doing') {
                       return sum + issue.storyPoints;
                     } else {
                       return sum;
                     }
                   }, 0)}
                 </p>
-              </div>
+              </Tooltip>
             </div>
           </div>
-
           <div
             className="fixHead-line-content"
-            style={{ display: 'flex', height: this.state.expandColumns.includes(`-1-${mode}`) ? 1 : '', overflow: this.state.expandColumns.includes(`-1-${mode}`) ? 'hidden' : 'visible' }}
+            style={{
+              display: 'flex',
+              height: expandColumns.includes(`-1-${mode}`) ? 1 : '',
+              overflow: expandColumns.includes(`-1-${mode}`) ? 'hidden' : 'visible',
+            }}
             data-title={mode === 'none' ? 'issue' : '未计划部分'}
             data-id={-1}
           >
@@ -1709,34 +1883,23 @@ class Home3 extends Component {
                     }}
                   >
                     <React.Fragment>
-                      {_.filter(issues, issue => issue.epicId === epic.issueId && (mode !== 'none' && (issue[id] == null || issue[id] === 0) || mode === 'none')).map((item, indexs) => (
-                        <Draggable draggableId={`none-${item.issueId}`} index={indexs} key={item.issueId}>
-                          {(provided1, snapshot1) => (
-                            <div
-                              ref={provided1.innerRef}
-                              {...provided1.draggableProps}
-                              {...provided1.dragHandleProps}
-                              style={{
-                                cursor: 'move',
-                                ...provided1.draggableProps.style,
-                              }}
-                              role="none"
-                            >
-                              {item.issueId}
-                              <IssueCard
-                                handleClickIssue={this.handleClickIssue}
-                                selected={selectIssueIds.includes(item.issueId)}
-                                dragged={currentDraggableId === item.issueId}
-                                issue={item}
-                                borderTop={indexs === 0}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
+                      {_.filter(issues, issue => issue.epicId === epic.issueId && (mode === 'none' || (issue[id] && issue[id] === 0))).map((item, indexs) => (
+                        <IssueCard
+                          draggableId={`${mode}-${item.issueId}`}
+                          index={indexs}
+                          selected={selectIssueIds.includes(item.issueId)}
+                          dragged={currentDraggableId === item.issueId}
+                          handleClickIssue={this.handleClickIssue}
+                          key={item.issueId}
+                          issue={item}
+                          borderTop={indexs === 0}
+                          showDelete={!UserMapStore.isFullScreen}
+                        />
                       ))}
                       {
                         epicId === epic.issueId && currentNewObj[id] === 0 ? (
                           <CreateIssue
+                            store={UserMapStore}
                             data={{ epicId: epic.issueId, [`${mode}Id`]: 0 }}
                             onOk={() => {
                               UserMapStore.initData(false);
@@ -1758,16 +1921,11 @@ class Home3 extends Component {
                           this.setState({ showChild: epic.issueId });
                         }}
                       >
-                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && this.state.showChild === epic.issueId ? 'block' : 'none' }}>
-
-                          
-                          {'Add'}
-                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>new</a>
+                        <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && showChild === epic.issueId ? 'block' : 'none' }}>
+                          <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>新建问题</a>
                           {' '}
-
-
-                          {'or '}
-                          <a role="none" onClick={this.showBackLog}>existing</a>
+                          {'或 '}
+                          <a role="none" onClick={this.showBackLog}>从需求池引入</a>
                         </div>
                       </div>
                     </React.Fragment>
@@ -1778,17 +1936,27 @@ class Home3 extends Component {
               </Droppable>
             ))}
           </div>
-        </div>,
+        </React.Fragment>,
       );
     }
     return dom;
-  }
+  };
+
+  onChangeSelect = (arr) => {
+    const { UserMapStore } = this.props;
+    UserMapStore.setCurrentFilter(arr);
+    UserMapStore.loadIssues('usermap');
+
+    if (UserMapStore.isApplyToEpic) {
+      UserMapStore.loadEpic();
+    }
+  };
 
   render() {
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
     const {
-      filters, mode, createEpic, currentFilters, selectIssueIds, showBackLog, left, isLoading,
+      filters, mode, createEpic, currentFilters, showBackLog, isLoading,
     } = UserMapStore;
     const firstTitle = '';
     const count = this.getHistoryCount(UserMapStore.getVosId);
@@ -1808,66 +1976,26 @@ class Home3 extends Component {
           <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
             {isLoading ? <Spin spinning={isLoading} style={{ marginLeft: '40%', marginTop: '30%' }} size="large" />
               : (
-                <DragDropContext onDragEnd={this.handleEpicOrIssueDrag} onDragStart={this.handleEpicOrIssueDragStart}>
+                <DragDropContext
+                  onDragEnd={this.handleEpicOrIssueDrag}
+                  onDragStart={this.handleEpicOrIssueDragStart}
+                >
                   <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
-                    <div className="toolbar" style={{ minHeight: 52 }}>
-                      <div className="filter" style={{ height: this.state.expand ? '' : 27 }}>
-                        <p style={{ padding: '3px 8px 3px 0' }}>快速搜索:</p>
-                        <p
-                          role="none"
-                          style={{ background: `${currentFilters.includes('mine') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('mine') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                          onClick={this.addFilter.bind(this, 'mine')}
-                        >
-                          {'仅我的问题'}
-                        </p>
-                        <p
-                          role="none"
-                          style={{ background: `${currentFilters.includes('userStory') ? 'rgb(63, 81, 181)' : 'white'}`, color: `${currentFilters.includes('userStory') ? 'white' : '#3F51B5'}`, marginBottom: 3 }}
-                          onClick={this.addFilter.bind(this, 'userStory')}
-                        >
-                          {'仅用户故事'}
-
-                        </p>
-                        {filters.map(filter => (
-                          <p
-                            key={filter.filterId}
-                            role="none"
-                            style={{
-                              background: `${currentFilters.includes(filter.filterId) ? 'rgb(63, 81, 181)' : 'white'}`,
-                              color: `${currentFilters.includes(filter.filterId) ? 'white' : '#3F51B5'}`,
-                              marginBottom: 3,
-                            }}
-                            onClick={this.addFilter.bind(this, filter.filterId)}
-                          >
-                            {filter.name}
-
-                          </p>)) }
-                      </div>
-                      <div
-                        style={{
-                          display: this.state.more ? 'block' : 'none',
-                          color: 'rgb(63, 81, 181)',
-                          cursor: 'pointer',
-                          whiteSpace: 'nowrap',
-                        }}
-                        role="none"
-                        onClick={() => {
-                          this.setState({
-                            expand: !this.state.expand,
-                          }, () => {
-                            document.getElementsByClassName('fixHead')[0].style.height = `calc(100% - ${document.getElementsByClassName('fixHead')[0].offsetTop}px)`;
-                          });
-                        }}
-                      >
-                        {this.state.expand ? '...收起' : '...展开'}
-                      </div>
-                    </div>
+                    <QuickSearch
+                      title
+                      buttonName="更多"
+                      buttonIcon="more_vert"
+                      moreSelection={UserMapStore.getFilters}
+                      onChangeCheckBox={this.onChangeSelect}
+                      onlyStory={this.addFilter.bind(this, 'userStory')}
+                      onlyMe={this.addFilter.bind(this, 'mine')}
+                    />
                     { showBackLog ? (
                       <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
                         <Backlog handleClickIssue={this.handleClickIssue} />
                       </div>
                     ) : null }
-                    <div className="fixHead" style={{ height: `calc(100% - ${52}px)` }}>
+                    <div className="fixHead" style={{ height: `calc(100% - ${57}px)` }}>
                       <div className="fixHead-head" id="fixHead-head">
                         <div className="fixHead-line">
                           <Droppable droppableId="epic" direction="horizontal">
@@ -1881,11 +2009,11 @@ class Home3 extends Component {
                                   // borderBottom: '1px solid rgba(0,0,0,0.12)'
                                 }}
                               >
-                                {epicData.map((epic, index) => (
+                                {UserMapStore.epics.map((epic, index) => (
                                   <div className="fixHead-block" key={epic.issueId}>
                                     <EpicCard
                                       index={index}
-                                      key={epic.issueId}
+                                      // key={epic.issueId}
                                       epic={epic}
                                     />
                                   </div>
@@ -1895,46 +2023,8 @@ class Home3 extends Component {
                             )}
                           </Droppable>
                         </div>
-                        <div
-                          className="fixHead-line fixHead-line-2"
-                          style={{
-                            height: 42,
-                            position: 'absolute',
-                            // width: 'calc(100% - 32px)',
-                            width: showBackLog ? 'calc(100% - 382px)' : 'calc(100% - 32px)',
-                            // transform: `translateX(${`${left}px`})`,
-                          }}
-                        >
-                          <div className="fixHead-head-note">
-                            <span className="column-title">
-                              { UserMapStore.getTitle}
-                            </span>
-                            <div style={{
-                              display: 'flex', float: 'right', justifyContent: 'baseline', alignItems: 'center', 
-                            }}
-                            >
-                              <p className="point-span" style={{ background: '#4D90FE' }}>
-                                {count.todoCount}
-                              </p>
-                              <p className="point-span" style={{ background: '#FFB100' }}>
-                                {count.doingCount}
-                              </p>
-                              {showDone && (
-                              <p className="point-span" style={{ background: '#00BFA5' }}>
-                                {count.doneCount}
-                              </p>
-                              )}
-                              {showDone && (
-                              <Button className="expand-btn" shape="circle" onClick={this.handleExpandColumn.bind(this, vosId)} role="none">
-                                <Icon type={`${this.state.expandColumns.includes(vosId) ? 'baseline-arrow_left' : 'baseline-arrow_drop_down'}`} />
-                              </Button>
-                              )}
-
-                            </div>
-                          </div>
-                        </div>
                       </div>
-                      <div className="fixHead-body" id="fixHead-body" style={{ flex: 1, position: 'relative' }}>
+                      <div id="fixHead-body" className="fixHead-body" style={{ flex: 1, position: 'relative' }}>
                         {this.renderBody()}
                       </div>
                     </div>
@@ -1942,7 +2032,8 @@ class Home3 extends Component {
                 </DragDropContext>
               )}
             <CreateEpic
-              getContainer={() => document.querySelector('.c7n-userMap')}
+              store={UserMapStore}
+              // container={document.querySelector('.c7n-userMap')}
               visible={createEpic}
               onOk={() => {
                 UserMapStore.setCreateEpic(false);
@@ -1950,37 +2041,54 @@ class Home3 extends Component {
               }}
               onCancel={() => UserMapStore.setCreateEpic(false)}
             />
-            {
-              UserMapStore.createVOS ? (
-                <CreateVOS
-                  getContainer={() => document.querySelector('.c7n-userMap')}
-                  visible={UserMapStore.createVOS}
-                  // onOk={() => {UserMapStore.setCreateVOS(false)}}
-                  onOk={this.handleCreateOk}
-                  onCancel={() => { UserMapStore.setCreateVOS(false); }}
-                  type={UserMapStore.getCreateVOSType}
-                />
-              ) : null
-            }
+            <CreateVOS
+              // container={document.querySelector('.c7n-userMap')}
+              visible={UserMapStore.createVOS}
+              // onOk={() => {UserMapStore.setCreateVOS(false)}}
+              onOk={this.handleCreateOk}
+              onCancel={() => { UserMapStore.setCreateVOS(false); }}
+              type={UserMapStore.getCreateVOSType}
+            />
           </Content>
         ) : (
-          <div style={{
-            display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%', 
-          }}
-          >
-            <img src={epicPic} alt="" width="200" />
-            <div style={{ marginLeft: 50, width: 390 }}>
-              <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
-              <p style={{ fontSize: 20, marginTop: 10 }}>
-                {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
-                <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
-                {'进入用户故事地图。'}
-              </p>
+          <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
+            <QuickSearch
+              title
+              buttonName="更多"
+              buttonIcon="more_vert"
+              moreSelection={UserMapStore.getFilters}
+              onChangeCheckBox={this.onChangeSelect}
+              onlyStory={this.addFilter.bind(this, 'userStory')}
+              onlyMe={this.addFilter.bind(this, 'mine')}
+            />
+            <div style={{
+              display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
+            }}
+            >
+              <CreateEpic
+                store={UserMapStore}
+                // container={document.querySelector('.c7n-userMap')}
+                visible={createEpic}
+                onOk={() => {
+                  UserMapStore.setCreateEpic(false);
+                  UserMapStore.loadEpic();
+                }}
+                onCancel={() => UserMapStore.setCreateEpic(false)}
+              />
+              <img src={epicPic} alt="" width="200" />
+              <div style={{ marginLeft: 50, width: 390 }}>
+                <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+                <p style={{ fontSize: 20, marginTop: 10 }}>
+                  {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
+                  <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
+                  {'进入用户故事地图。'}
+                </p>
+              </div>
             </div>
-          </div>
+          </Content>
         )}
       </Page>
     );
   }
 }
-export default Home3;
+export default Home;

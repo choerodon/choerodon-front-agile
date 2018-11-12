@@ -1,7 +1,3 @@
-// import Home from './Home1';
-
-// export default Home;
-
-import Home from './Home4';
+import Home from './Home';
 
 export default Home;
