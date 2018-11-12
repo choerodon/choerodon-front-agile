@@ -1746,20 +1746,6 @@ class Home3 extends Component {
                           issues,
                           issue => issue.epicId === epic.issueId && issue[id] === vos[id],
                         ).map((item, indexs) => (
-                        // <Draggable draggableId={`${mode}-${item.issueId}`}
-                        // index={indexs} key={item.issueId}>
-                        //   {(provided1, snapshot1) => (
-                        //     <div
-                        //       ref={provided1.innerRef}
-                        //       {...provided1.draggableProps}
-                        //       {...provided1.dragHandleProps}
-                        //       style={{
-                        //         cursor: 'move',
-                        //         ...provided1.draggableProps.style,
-                        //       }}
-                        //       role="none"
-                        //     >
-                        //       {item.issueId}
                           <IssueCard
                             draggableId={`${mode}-${item.issueId}`}
                             index={indexs}
@@ -1771,9 +1757,6 @@ class Home3 extends Component {
                             borderTop={indexs === 0}
                             showDelete={!UserMapStore.isFullScreen}
                           />
-                        //     </div>
-                        //   )}
-                        // </Draggable>
                         ))}
                         {
                         epicId === epic.issueId && currentNewObj[id] === vos[id] ? (
@@ -1823,13 +1806,12 @@ class Home3 extends Component {
         <React.Fragment key="no-sprint">
           <div
             className={`fixHead-line-title column-title title-transform ${vosData.length ? '' : 'firstLine-titles'}`}
-            title={mode === 'none' ? 'issue' : '未计划部分'}
+            title={mode === 'none' ? '问题' : '未计划部分'}
             data-id={-1}
             // style={{ transform: `translateX(${`${left}px`}) translateZ(0)` }}
           >
             <div>
-              {mode === 'none' ? 'issue' : '未计划部分' }
-              {/* {mode === 'none' || this.state.isFullScreen ? null */}
+              {mode === 'none' ? '问题' : '未计划部分' }
               {mode === 'none' || UserMapStore.isFullScreen ? null
                 : (
                   <React.Fragment>
@@ -1854,7 +1836,8 @@ class Home3 extends Component {
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Tooltip title="todo">
                 <p className="point-span" style={{ background: '#4D90FE' }}>
-                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0
+                    && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                     if (issue.statusCode === 'todo') {
                       return sum + issue.storyPoints;
                     } else {
@@ -1865,7 +1848,8 @@ class Home3 extends Component {
               </Tooltip>
               <Tooltip title="doing">
                 <p className="point-span" style={{ background: '#FFB100' }}>
-                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0 && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                  {_.reduce(_.filter(issues, issue => issue.epicId !== 0
+                    && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                     if (issue.statusCode === 'doing') {
                       return sum + issue.storyPoints;
                     } else {
@@ -1900,20 +1884,6 @@ class Home3 extends Component {
                   >
                     <React.Fragment>
                       {_.filter(issues, issue => issue.epicId === epic.issueId && (mode === 'none' || (issue[id] && issue[id] === 0))).map((item, indexs) => (
-                        // <Draggable draggableId={`none-${item.issueId}`}
-                        // index={indexs} key={item.issueId}>
-                        //   {(provided1, snapshot1) => (
-                        //     <div
-                        //       ref={provided1.innerRef}
-                        //       {...provided1.draggableProps}
-                        //       {...provided1.dragHandleProps}
-                        //       style={{
-                        //         cursor: 'move',
-                        //         ...provided1.draggableProps.style,
-                        //       }}
-                        //       role="none"
-                        //     >
-                        //       {item.issueId}
                         <IssueCard
                           draggableId={`${mode}-${item.issueId}`}
                           index={indexs}
@@ -1925,9 +1895,6 @@ class Home3 extends Component {
                           borderTop={indexs === 0}
                           showDelete={!UserMapStore.isFullScreen}
                         />
-                        //     </div>
-                        //   )}
-                        // </Draggable>
                       ))}
                       {
                         epicId === epic.issueId && currentNewObj[id] === 0 ? (
@@ -1955,7 +1922,6 @@ class Home3 extends Component {
                         }}
                       >
                         <div style={{ fontWeight: '500', display: !snapshot.isDraggingOver && showChild === epic.issueId ? 'block' : 'none' }}>
-                          {/* {'Add'} */}
                           <a role="none" onClick={this.handleAddIssue.bind(this, epic.issueId, 0)}>新建问题</a>
                           {' '}
                           {'或 '}
