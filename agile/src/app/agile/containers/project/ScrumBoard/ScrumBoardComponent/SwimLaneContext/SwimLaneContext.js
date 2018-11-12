@@ -2,12 +2,10 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { Icon, Button, Avatar } from 'choerodon-ui';
-import _ from 'lodash';
 import './SwimLaneContext.scss';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
-import {
-  STATUS,
-} from '../../../../../common/Constant';
+import StatusTag from '../../../../../components/StatusTag';
+import TypeTag from '../../../../../components/TypeTag';
 
 @inject('AppState')
 @observer
@@ -90,20 +88,17 @@ class SwimLaneContext extends Component {
               }}
             />
             <div
-              className="c7n-parentIssue-icon"
               style={{
                 marginLeft: 8,
-                background: item.issueTypeDTO ? item.issueTypeDTO.colour : '#fab614',
                 marginRight: 6,
               }}
             >
-              <Icon
-                className="c7n-issueType-icon"
-                type={item.issueTypeDTO ? item.issueTypeDTO.icon : 'help'}
+              <TypeTag
+                data={item.issueTypeDTO}
               />
             </div>
             <span
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', width: '100px' }}
               role="none"
               onClick={() => {
                 ScrumBoardStore.setClickIssueDetail(item);
@@ -112,13 +107,13 @@ class SwimLaneContext extends Component {
               #
               {item.issueNum}
             </span>
-            <div
-              className="c7n-parentIssue-status"
-              style={{ backgroundColor: STATUS[item.categoryCode] }}
-            >
-              {item.status}
-            </div>
-            {item.summary}
+            <StatusTag
+              data={{
+                type: item.categoryCode,
+                name: item.status,
+              }}
+            />
+            <span className="c7n-parentIssue-summary">{item.summary}</span>
             <span className="c7n-parentIssue-count">{`  (${item.count} 子任务)`}</span>
 
           </div>
