@@ -470,7 +470,7 @@ class StatusIssue extends Component {
                           </div>
                         </div>
                         {
-                          <Tooltip title={`经办人: ${item.assigneeName}`}>
+                          <Tooltip title={item.assigneeName ? `经办人: ${item.assigneeName}` : ''}>
                             {
                                 item.assigneeName ? (
                                   <Avatar

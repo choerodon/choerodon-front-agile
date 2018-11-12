@@ -131,7 +131,7 @@ class IssueCard extends Component {
       content: (
         <div>
           <p style={{ marginBottom: 10 }}>请确认您要取消问题与史诗的关联。</p>
-          <p style={{ marginBottom: 10 }}>这个操作将取消当前问题与史诗的关联，并从用户故事地图中移除，移除的问题将至于需求池的未规划部分</p>
+          <p style={{ marginBottom: 10 }}>这个操作将取消当前问题与史诗的关联，并从用户故事地图中移除，移除的问题将至于需求池的未规划部分。</p>
         </div>
       ),
       onOk() {

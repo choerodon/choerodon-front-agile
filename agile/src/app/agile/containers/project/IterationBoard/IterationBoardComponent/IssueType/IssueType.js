@@ -38,13 +38,13 @@ class IssueType extends Component {
       if (typeIndex === -1) {
         datas[i] = 0;
       } else {
-        const statusIndex = issueTypeInfo[typeIndex].issueStatus.findIndex(status => (
+        const statusData = issueTypeInfo[typeIndex].issueStatus.filter(status => (
           status.categoryCode === code
         ));
-        if (statusIndex === -1) {
+        if (statusData.length === 0) {
           datas[i] = 0;
         } else {
-          datas[i] = issueTypeInfo[typeIndex].issueStatus[statusIndex].issueNum;
+          datas[i] = statusData.reduce((sum, data) => sum + data.issueNum, 0);
         }
       }
     }
