@@ -195,7 +195,7 @@ class AddComponent extends Component {
       issue_type: {
         url: '',
         prop: '',
-        id: 'id',
+        id: 'typeCode',
         name: 'name',
         state: 'originTypes',
       },
@@ -249,7 +249,7 @@ class AddComponent extends Component {
 
   getValue = (value, filter) => {
     const type = Object.prototype.toString.call(value);
-    if (filter === 'priority' || filter === 'issue_type') {
+    if (filter === 'priority') {
       if (type === '[object Array]') {
         const v = _.map(value, 'key');
         const vv = v.map(e => `${e}`);
@@ -257,6 +257,15 @@ class AddComponent extends Component {
       } else {
         const v = value.key;
         return `${v}`;
+      }
+    } else if (filter === 'issue_type') {
+      if (type === '[object Array]') {
+        const v = _.map(value, 'key');
+        const vv = v.map(e => `'${e}'`);
+        return `(${vv.join(',')})`;
+      } else {
+        const v = value.key;
+        return `'${v}'`;
       }
     } else if (type === '[object Array]') {
       const v = _.map(value, 'key');
@@ -401,7 +410,7 @@ class AddComponent extends Component {
       issue_type: {
         url: '',
         prop: '',
-        id: 'id',
+        id: 'typeCode',
         name: 'name',
         state: 'originTypes',
       },
@@ -428,7 +437,7 @@ class AddComponent extends Component {
     if (filter === 'story_point' || filter === 'remain_time') {
       return value;
     }
-    if (filter === 'priority' || filter === 'issue_type') {
+    if (filter === 'priority') {
       if (operation === 'in' || operation === 'notIn' || operation === 'not in') {
         const arr = value.slice(1, -1).split(',');
         return arr.map(v => ({
@@ -442,6 +451,22 @@ class AddComponent extends Component {
           key: k,
           label: _.find(this.state[OPTION_FILTER[filter].state],
             { [OPTION_FILTER[filter].id]: k * 1 }).name,
+        });
+      }
+    } else if (filter === 'issue_type') {
+      if (operation === 'in' || operation === 'notIn' || operation === 'not in') {
+        const arr = value.slice(1, -1).split(',');
+        return arr.map(v => ({
+          key: v.slice(1, -1),
+          label: _.find(this.state[OPTION_FILTER[filter].state],
+            { [OPTION_FILTER[filter].id]: v.slice(1, -1) }).name,
+        }));
+      } else {
+        const k = value.slice(1, -1);
+        return ({
+          key: k,
+          label: _.find(this.state[OPTION_FILTER[filter].state],
+            { [OPTION_FILTER[filter].id]: k }).name,
         });
       }
     } else {
