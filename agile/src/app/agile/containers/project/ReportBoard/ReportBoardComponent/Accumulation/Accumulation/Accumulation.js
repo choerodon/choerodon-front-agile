@@ -5,7 +5,8 @@ import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import moment from 'moment';
 import EmptyBlockDashboard from '../../../../../../components/EmptyBlockDashboard';
-import pic2 from '../../EmptyPics/no_version.svg';
+// import pic2 from '../../EmptyPics/no_version.svg';
+import pic2 from '../../../../../../assets/image/emptyChart.svg';
 import './Accumulation.scss';
 
 const { AppState } = stores;

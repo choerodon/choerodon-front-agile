@@ -9,13 +9,14 @@ import {
   Pagination, Icon, Divider, Tag,
 } from 'choerodon-ui';
 import TimeAgo from 'timeago-react';
+import util from 'util';
 import QuickSearch from '../../../../components/QuickSearch';
 import './Issue.scss';
 import { loadPriorities, loadStatus } from '../../../../api/NewIssueApi';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 
 import { TYPE, ICON, TYPE_NAME } from '../../../../common/Constant';
-import pic from '../../../../assets/image/问题管理－空.png';
+import pic from '../../../../assets/image/emptyIssue.svg';
 import { loadIssue, createIssue } from '../../../../api/NewIssueApi';
 import EditIssue from '../../../../components/EditIssueWide';
 import CreateIssue from '../../../../components/CreateIssueNew';
@@ -327,7 +328,7 @@ class Issue extends Component {
       if (!props.children[0].props.fixed) {
         return (
           <EmptyBlock
-            style={{ marginTop: 40 }}
+            style={{ marginTop: 60 }}
             border
             pic={pic}
             title="根据当前搜索条件没有查询到问题"

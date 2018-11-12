@@ -19,7 +19,7 @@ import EpicCard from '../component/EpicCard/EpicCard.js';
 import IssueCard from '../component/IssueCard/IssueCard.js';
 import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
-import epicPic from '../../../../assets/image/用户故事地图－空.svg';
+import epicPic from '../../../../assets/image/emptyStory.svg';
 
 const FileSaver = require('file-saver');
 

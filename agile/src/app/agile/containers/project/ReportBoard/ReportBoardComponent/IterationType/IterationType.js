@@ -4,7 +4,8 @@ import { stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
 import { Spin } from 'choerodon-ui';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
-import pic from './no_issue.png';
+// import pic from './no_issue.png';
+import pic from '../../../../../assets/image/emptyChart.svg';
 import './IterationType.scss';
 
 const { AppState } = stores;

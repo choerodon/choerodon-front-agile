@@ -3,7 +3,8 @@ import { stores, axios } from 'choerodon-front-boot';
 import { Spin } from 'choerodon-ui';
 import PriorityTag from '../../../../../components/PriorityTag';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
-import pic2 from '../EmptyPics/no_version.svg';
+// import pic2 from '../EmptyPics/no_version.svg';
+import pic2 from '../../../../../assets/image/emptyChart.svg';
 import './Priority.scss';
 
 const { AppState } = stores;

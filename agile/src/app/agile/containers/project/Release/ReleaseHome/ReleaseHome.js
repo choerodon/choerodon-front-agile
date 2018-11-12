@@ -14,7 +14,7 @@ import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 import './ReleaseHome.scss';
 import EditRelease from '../ReleaseComponent/EditRelease';
 import PublicRelease from '../ReleaseComponent/PublicRelease';
-import emptyVersion from '../../../../assets/image/emptyVersion.png';
+import emptyVersion from '../../../../assets/image/emptyVersion.svg';
 import DeleteReleaseWithIssues from '../ReleaseComponent/DeleteReleaseWithIssues';
 import CombineRelease from '../ReleaseComponent/CombineRelease';
 
@@ -77,6 +77,34 @@ class ReleaseHome extends Component {
     }).catch((error) => {
     });
   }
+
+  MyTable = (props) => {
+    if (ReleaseStore.getVersionList.length === 0 && !this.state.loading) {
+      // fixed 会渲染两张表，所以要判断子元素有没有这个属性
+      // 如果有的话禁止渲染，防止 Empty 重复渲染
+      if (!props.children[0].props.fixed) {
+        return (
+          <EmptyBlock
+            style={{ marginTop: 60 }}
+            border
+            pic={pic}
+            title="您还没有为此项目添加任何版本"
+            des="尝试修改您
+            的过滤选项或者在下面创建新的问题"
+          />
+        );
+      } else {
+        return null;
+      }
+    }
+    const renderNarrow = (
+      <div style={props.style} className={props.className}>
+        {props.children[1]}
+        {props.children[2]}
+      </div>
+    );
+    return expand ? renderNarrow : (<table {...props} />);
+  };
 
   handleClickMenu(record, e) {
     const that = this;
@@ -365,8 +393,8 @@ class ReleaseHome extends Component {
               //     handleDrag={this.handleDrag}
               //     columns={versionColumn}
               //     dataSource={versionData}
-              //     // pagination={this.state.pagination}
-              //     pagination={versionData.length > 10}
+              //     pagination={this.state.pagination}
+              //     // pagination={versionData.length > 10}
               //     onChange={this.handleChangeTable.bind(this)}
               //   />
               // ) : (
@@ -399,7 +427,6 @@ class ReleaseHome extends Component {
                 columns={versionColumn}
                 dataSource={versionData}
                 pagination={this.state.pagination}
-                // pagination={versionData.length > 10}
                 onChange={this.handleChangeTable.bind(this)}
               />
             }

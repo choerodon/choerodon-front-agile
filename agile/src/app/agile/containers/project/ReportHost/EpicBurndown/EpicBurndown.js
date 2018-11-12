@@ -8,7 +8,8 @@ import {
 import {
   Button, Tabs, Table, Select, Icon, Tooltip, Spin, Checkbox,
 } from 'choerodon-ui';
-import pic from './no_epic.svg';
+// import pic from './no_epic.svg';
+import pic from '../../../../assets/image/emptyChart.svg';
 // import finish from './legend/finish.svg';
 import SwithChart from '../Component/switchChart';
 import StatusTag from '../../../../components/StatusTag';

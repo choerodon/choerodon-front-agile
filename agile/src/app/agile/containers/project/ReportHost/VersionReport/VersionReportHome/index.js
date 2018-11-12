@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { toJS } from 'mobx';
 import {
- Button, Icon, Select, Tabs, Table, Dropdown, Menu, Tooltip, Spin 
+  Button, Icon, Select, Tabs, Table, Dropdown, Menu, Tooltip, Spin, 
 } from 'choerodon-ui';
 import {
- Page, Header, Content, stores 
+  Page, Header, Content, stores, 
 } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
@@ -13,7 +13,8 @@ import moment from 'moment';
 import VersionReportStore from '../../../../../stores/project/versionReport/VersionReport';
 import './VersionReportHome.scss';
 import NoDataComponent from '../../Component/noData';
-import versionSvg from '../../Home/style/pics/no_version.svg';
+// import versionSvg from '../../Home/style/pics/no_version.svg';
+import versionSvg from '../../../../../assets/image/emptyChart.svg';
 import SwithChart from '../../Component/switchChart';
 import { STATUS } from '../../../../../common/Constant';
 
@@ -454,20 +455,20 @@ class VersionReport extends Component {
       dataIndex: 'issueNum',
       key: 'issueNum',
       render: (text, record) => (
-      <span
-        style={{ 
-          color: '#3F51B5',
-          cursor: 'pointer',
-        }}
-        role="none"
-        onClick={() => {
-          const { history } = this.props;
-          const urlParams = AppState.currentMenuType;
-          history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${text}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
-        }}
-      >
-        {text}
-      </span>),
+        <span
+          style={{ 
+            color: '#3F51B5',
+            cursor: 'pointer',
+          }}
+          role="none"
+          onClick={() => {
+            const { history } = this.props;
+            const urlParams = AppState.currentMenuType;
+            history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${text}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
+          }}
+        >
+          {text}
+        </span>),
     }, {
       title: '概要',
       dataIndex: 'summary',
@@ -613,45 +614,45 @@ class VersionReport extends Component {
         >
           <Spin spinning={this.state.loading}>
             {VersionReportStore.getVersionList.length ? (
-<React.Fragment>
-              <Select
-                label="版本"
-                value={this.state.chosenVersion}
-                style={{
-                  width: 244,
-                }}
-                onChange={(value) => {
-                  this.setState({
-                    chosenVersion: value,
-                  }, () => {
-                    this.updateIssues(this.state.datas);
-                    this.getReportData(this.state.type);
-                  });
-                }}
-              >
-                {
+              <React.Fragment>
+                <Select
+                  label="版本"
+                  value={this.state.chosenVersion}
+                  style={{
+      width: 244,
+    }}
+                  onChange={(value) => {
+      this.setState({
+        chosenVersion: value,
+      }, () => {
+        this.updateIssues(this.state.datas);
+        this.getReportData(this.state.type);
+      });
+    }}
+                >
+                  {
                   VersionReportStore.getVersionList.map(item => (
                     <Option value={String(item.versionId)} key={item.versionId}>{item.name}</Option>
                   ))
                 }
-              </Select>
-              <Select
-                label="单位"
-                value={this.state.type}
-                style={{
-                  width: 244,
-                  marginLeft: 24,
-                }}
-                onChange={(value) => {
-                  this.setState({
-                    type: value,
-                  }, () => {
-                    this.updateIssues(this.state.datas);
-                    this.getReportData(this.state.type);
-                  });
-                }}
-              >
-                {
+                </Select>
+                <Select
+                  label="单位"
+                  value={this.state.type}
+                  style={{
+      width: 244,
+      marginLeft: 24,
+    }}
+                  onChange={(value) => {
+      this.setState({
+        type: value,
+      }, () => {
+        this.updateIssues(this.state.datas);
+        this.getReportData(this.state.type);
+      });
+    }}
+                >
+                  {
                   [{
                     name: '故事点',
                     id: 'storyPoints',
@@ -665,21 +666,29 @@ class VersionReport extends Component {
                     <Option key={item.id} value={String(item.id)}>{item.name}</Option>
                   ))
                 }
-              </Select>
-              <div className="c7n-versionReport-versionInfo">
-                <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate ? VersionReportStore.getReportData.version.releaseDate : '未指定发布日期'}` : '未发布'}</p>
-                <p
-                  style={{
+                </Select>
+                <div className="c7n-versionReport-versionInfo">
+                  <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate ? VersionReportStore.getReportData.version.releaseDate : '未指定发布日期'}` : '未发布'}</p>
+                  <p
+      style={{
                     color: '#3F51B5',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                   }}
-                  role="none"
-                  onClick={this.goIssues.bind(this)}
-                >在“问题管理中”查看V {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}<Icon style={{ fontSize: 13 }} type="open_in_new" /></p>
-              </div>
-              {
+      role="none"
+      onClick={this.goIssues.bind(this)}
+    >
+
+
+在“问题管理中”查看V
+{' '}
+      {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}
+      <Icon style={{ fontSize: 13 }} type="open_in_new" />
+
+    </p>
+                </div>
+                {
                 JSON.stringify(this.state.options) === '{}' ? '' : (
                   <div className="c7n-versionReport-report">
                     <ReactEcharts
@@ -693,25 +702,25 @@ class VersionReport extends Component {
                   </div>
                 )
               }
-              <div className="c7n-versionReport-issues">
-                <Tabs defaultActiveKey="1">
-                  <TabPane tab="已完成的问题" key="1">
+                <div className="c7n-versionReport-issues">
+                  <Tabs defaultActiveKey="1">
+      <TabPane tab="已完成的问题" key="1">
                     {this.renderTabTable('done')}
                   </TabPane>
-                  <TabPane tab="未完成的问题" key="2">
+      <TabPane tab="未完成的问题" key="2">
                     {this.renderTabTable('unfinished')}
                   </TabPane>
-                  {
+      {
                     this.state.type === 'issueCount' ? '' : (
                       <TabPane tab="未完成的未预估问题" key="3">
                         {this.renderTabTable('unfinishedUnestimated')}
                       </TabPane>
                     )
                   }
-                </Tabs>
-              </div>
-            </React.Fragment>
-) : <NoDataComponent img={versionSvg} title="版本" links={[{ name: '发布版本', link: '/agile/release' }]} />}
+    </Tabs>
+                </div>
+              </React.Fragment>
+            ) : <NoDataComponent img={versionSvg} title="版本" links={[{ name: '发布版本', link: '/agile/release' }]} />}
           </Spin>
         </Content>
       </Page>

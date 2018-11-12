@@ -16,7 +16,7 @@ import IssueDetail from '../ScrumBoardComponent/IssueDetail/IssueDetail';
 import SwimLaneContext from '../ScrumBoardComponent/SwimLaneContext/SwimLaneContext';
 import BacklogStore from '../../../../stores/project/backlog/BacklogStore';
 import CloseSprint from '../../Backlog/BacklogComponent/SprintComponent/CloseSprint';
-import EmptyScrumboard from '../../../../assets/image/emptyScrumboard.png';
+import EmptyScrumboard from '../../../../assets/image/emptyScrumboard.svg';
 import QuickSearch from '../../../../components/QuickSearch';
 
 const { Option } = Select;

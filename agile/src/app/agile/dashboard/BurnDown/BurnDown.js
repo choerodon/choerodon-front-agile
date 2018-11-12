@@ -10,7 +10,8 @@ import {
   DashBoardNavBar, stores, axios,
 } from 'choerodon-front-boot';
 import EmptyBlockDashboard from '../../components/EmptyBlockDashboard';
-import pic from './no_sprint.svg';
+// import pic from './no_sprint.svg';
+import pic from '../../assets/image/emptyChart.svg';
 import './index.scss';
 
 const { AppState } = stores;
@@ -76,15 +77,15 @@ class BurnDown extends Component {
         },
         extraCssText: 
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
-        formatter: function (params) {
+        formatter(params) {
           let content = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value  : '-'}`;
+              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}`;
             }
           });
           return content;
-        }
+        },
       },
       legend: {
         top: '0',
@@ -119,7 +120,7 @@ class BurnDown extends Component {
         },
         axisLabel: {
           show: true,
-          interval: parseInt(xAxis.length / 7) ? parseInt(xAxis.length / 7) - 1 : 0,
+          interval: parseInt(xAxis.length / 7, 10) ? parseInt(xAxis.length / 7, 10) - 1 : 0,
           textStyle: {
             color: 'rgba(0, 0, 0, 0.65)',
             fontSize: 9,
@@ -252,7 +253,7 @@ class BurnDown extends Component {
     return { result, rest };
   }
 
-  loadSprints(unit) {
+  loadSprints = (unit) => {
     const projectId = AppState.currentMenuType.id;
     this.setState({ loading: true });
     axios.post(`/agile/v1/projects/${projectId}/sprint/names`, ['started', 'closed'])
@@ -272,7 +273,7 @@ class BurnDown extends Component {
     axios.get(`/agile/v1/projects/${projectId}/sprint/query_non_workdays/${sprintId}/${orgId}`).then((res) => {
       if (res) {
         this.setState({
-          restDays: res.map((date) => moment(date).format('YYYY-MM-DD')),
+          restDays: res.map(date => moment(date).format('YYYY-MM-DD')),
         }, () => {
           this.loadChartData(sprintId, unit);
         });
@@ -284,7 +285,7 @@ class BurnDown extends Component {
     });
   };
 
-  loadChartData(sprintId, unit = 'remainingEstimatedTime') {
+  loadChartData = (sprintId, unit = 'remainingEstimatedTime') => {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${unit}`)
       .then((res) => {
         const dataDates = Object.keys(res.coordinate);
@@ -307,7 +308,7 @@ class BurnDown extends Component {
           rest = result.rest;
         }
         const xData = allDate;
-        let markAreaData = [];
+        const markAreaData = [];
         let exportAxisData = [res.expectCount];
         const { restDayShow } = this.state;
         // 如果展示非工作日，期望为一条连续斜线
@@ -336,7 +337,7 @@ class BurnDown extends Component {
                 },
                 {
                   xAxis: allDate[index].split(' ')[0].slice(5).replace('-', '/'),
-                }
+                },
               ]);
               exportAxisData[index + 1] = exportAxisData[index];
             } else {
@@ -361,7 +362,7 @@ class BurnDown extends Component {
       });
   }
 
-  handleChangeUnit({ key }) {
+  handleChangeUnit = ({ key }) => {
     this.setState({ loading: true });
     const { sprint: { sprintId } } = this.state;
     this.setState({ unit: key });
@@ -432,7 +433,7 @@ class BurnDown extends Component {
             checked={this.state.restDayShow}
             onChange={this.onCheckChange}
           >
-            显示非工作日
+            {'显示非工作日'}
           </Checkbox>
         </div>
         {this.renderContent()}

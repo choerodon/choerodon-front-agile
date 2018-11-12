@@ -14,6 +14,7 @@ import PublicRelease from '../ReleaseComponent/PublicRelease';
 import TypeTag from '../../../../components/TypeTag';
 import StatusTag from '../../../../components/StatusTag';
 import PriorityTag from '../../../../components/PriorityTag';
+import UserHead from '../../../../components/UserHead';
 
 const { TabPane } = Tabs;
 const { AppState } = stores;
@@ -113,7 +114,7 @@ class ReleaseDetail extends Component {
         });
         ReleaseStore.setVersionStatusIssues(res2);
       } else {
-        ReleaseStore.setVersionDetail([]);
+        ReleaseStore.setVersionStatusIssues([]);
         ReleaseStore.setIssueCountDetail({
           todoCount,
           todoStatus,
@@ -404,15 +405,25 @@ class ReleaseDetail extends Component {
         title: '经办人',
         dataIndex: 'assigneeName',
         key: 'assigneeName',
+        // render: (text, record) => (text ? (
+        //   <div style={{ display: 'flex', alignItems: 'center' }}>
+        //     <Avatar style={{ marginRight: 8 }} size="small" src={record.assigneeImageUrl ? record.assigneeImageUrl : ''}>
+        //       {
+        //       record.assigneeImageUrl ? '' : text.substring(0, 1)
+        //     }
+        //     </Avatar>
+        //     <span className="textDisplayOneColumn">{text}</span>
+        //   </div>
+        // ) : '')
         render: (text, record) => (text ? (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Avatar style={{ marginRight: 8 }} size="small" src={record.assigneeImageUrl ? record.assigneeImageUrl : ''}>
-              {
-              record.assigneeImageUrl ? '' : text.substring(0, 1)
-            }
-            </Avatar>
-            <span className="textDisplayOneColumn">{text}</span>
-          </div>
+          <UserHead
+            user={{
+              id: record.assigneeId,
+              loginName: '',
+              realName: text,
+              avatar: record.imageUrl,
+            }}
+          />
         ) : '')
         ,
       },
