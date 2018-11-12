@@ -287,7 +287,9 @@ class BacklogStore {
   }
 
   axiosUpdateIssue(data) {
-    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues`, data);
+    const proId = AppState.currentMenuType.id;
+    const { issueId, objectVersionNumber, transformId } = data;
+    return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=agile&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objectVersionNumber}`);
   }
 
   @computed get getChosenVersion() {

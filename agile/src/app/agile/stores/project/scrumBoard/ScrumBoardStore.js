@@ -1,5 +1,5 @@
 import {
- observable, action, computed, toJS 
+  observable, action, computed, toJS,
 } from 'mobx';
 import axios from 'axios';
 import _ from 'lodash';
@@ -122,7 +122,11 @@ class ScrumBoardStore {
       let subTasks = [];
       for (let index = 0, len = data.length; index < len; index += 1) {
         for (let index2 = 0, len2 = data[index].subStatuses.length; index2 < len2; index2 += 1) {
-          for (let index3 = 0, len3 = data[index].subStatuses[index2].issues.length; index3 < len3; index3 += 1) {
+          for (
+            let index3 = 0, len3 = data[index].subStatuses[index2].issues.length;
+            index3 < len3;
+            index3 += 1
+          ) {
             if (data[index].subStatuses[index2].issues[index3].parentIssueId === parentId) {
               subTasks.push({
                 categoryCode: data[index].subStatuses[index2].categoryCode,
@@ -171,7 +175,7 @@ class ScrumBoardStore {
   @action setClickIssueDetail(data) {
     this.clickIssueDetail = data;
   }
-  
+
   @computed get getCurrentSprint() {
     return toJS(this.currentSprint);
   }
@@ -231,7 +235,7 @@ class ScrumBoardStore {
   @computed get getSelectedBoard() {
     return this.selectedBoard;
   }
-  
+
   @action setSelectedBoard(data) {
     this.selectedBoard = data;
   }
@@ -311,7 +315,7 @@ class ScrumBoardStore {
       return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?assigneeId=${assign}&onlyStory=${recent}`);
     }
   }
-  
+
   axiosGetUnsetData(boardId) {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list_by_options?boardId=${boardId}`);
   }
@@ -320,7 +324,9 @@ class ScrumBoardStore {
     return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}`);
   }
 
-  updateIssue(issueId, objectVersionNumber, endStatusId, boardId, originColumnId, columnId, transformId) {
+  updateIssue(
+    issueId, objectVersionNumber, endStatusId, boardId, originColumnId, columnId, transformId,
+  ) {
     const proId = AppState.currentMenuType.id;
     const data = {
       issueId,
