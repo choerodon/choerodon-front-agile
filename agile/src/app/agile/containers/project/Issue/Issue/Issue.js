@@ -528,6 +528,7 @@ class Issue extends Component {
         dataIndex: 'issueNum',
         key: 'issueId',
         width: '128px',
+        disableClick: true,
         sorter: true,
         fixed: expand ? false : 'left',
         filters: columnFilter.get('issueNum'),
@@ -538,6 +539,7 @@ class Issue extends Component {
         dataIndex: 'issueTypeDTO.name',
         key: 'issueTypeId',
         width: '120px',
+        disableClick: true,
         sorter: true,
         fixed: expand ? false : 'left',
         filters: columnFilter.get('typeId'),
@@ -548,7 +550,8 @@ class Issue extends Component {
         title: '概要',
         dataIndex: 'summary',
         key: 'summary',
-        width: '150px',
+        width: '300px',
+        disableClick: true,
         fixed: expand ? false : 'left',
         filters: columnFilter.get('summary'),
         render: this.renderSummary,
@@ -557,6 +560,7 @@ class Issue extends Component {
         title: '状态',
         dataIndex: 'statusMapDTO.name',
         key: 'statusId',
+        disableClick: true,
         sorter: true,
         filters: columnFilter.get('statusId'),
         filterMultiple: true,
@@ -566,10 +570,20 @@ class Issue extends Component {
         title: '优先级',
         dataIndex: 'priorityDTO.name',
         key: 'priorityId',
+        disableClick: true,
         render: this.renderPriorityName,
         sorter: true,
         filters: columnFilter.get('priorityId'),
         filterMultiple: true,
+      },
+      {
+        title: '经办人',
+        dataIndex: 'assigneeName',
+        key: 'assigneeId',
+        disableClick: true,
+        sorter: true,
+        filters: columnFilter.get('assigneeName'),
+        render: this.renderAssigneeName,
       },
       {
         title: '报告人',
@@ -578,14 +592,6 @@ class Issue extends Component {
         sorter: true,
         filters: columnFilter.get('reporterName'),
         render: this.renderReporterName,
-      },
-      {
-        title: '经办人',
-        dataIndex: 'assigneeName',
-        key: 'assigneeId',
-        sorter: true,
-        filters: columnFilter.get('assigneeName'),
-        render: this.renderAssigneeName,
       },
       {
         title: '最后更新时间',
@@ -726,7 +732,7 @@ class Issue extends Component {
                 filterBarPlaceholder="过滤表"
                 filters={filterName}
                 noFilter
-                scroll={expand ? { x: true } : { x: 1800 }}
+                scroll={expand ? { x: true } : { x: 1500 }}
                 loading={IssueStore.loading}
                 pagination={false}
                 onChange={this.handleFilterChange}
