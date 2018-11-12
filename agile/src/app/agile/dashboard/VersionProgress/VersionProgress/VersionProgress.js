@@ -79,7 +79,7 @@ class VersionProgress extends Component {
       versionList, currentVersionId, loading,
     } = this.state;
     const currentVersionName = versionList && versionList.length
-      && versionList.find(ver => ver.versionId === currentVersionId).name;
+      && versionList.find(ver => String(ver.versionId) === String(currentVersionId)).name;
     const menu = (
       <Menu forceSubMenuRender onClick={this.handleMenuClick} className="menu">
         {

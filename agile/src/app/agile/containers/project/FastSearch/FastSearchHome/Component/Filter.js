@@ -42,7 +42,7 @@ class AddComponent extends Component {
   getValue = (value, filter) => {
     const type = Object.prototype.toString.call(value);
     // priority和issue_type的值存在数字和数组两种形式
-    if (filter === 'priority' || filter === 'issue_type') {
+    if (filter === 'priority') {
       if (type === '[object Array]') {
         const v = _.map(value, 'key');
         const vv = v.map(e => `${e}`);
@@ -50,6 +50,15 @@ class AddComponent extends Component {
       } else {
         const v = value.key;
         return `${v}`;
+      }
+    } else if (filter === 'issue_type') {
+      if (type === '[object Array]') {
+        const v = _.map(value, 'key');
+        const vv = v.map(e => `'${e}'`);
+        return `(${vv.join(',')})`;
+      } else {
+        const v = value.key;
+        return `'${v}'`;
       }
     } else if (type === '[object Array]') {
       const v = _.map(value, 'key');
@@ -212,7 +221,7 @@ class AddComponent extends Component {
       issue_type: {
         url: `/issue/v1/projects/${projectId}/schemes/query_issue_types?apply_type=agile`,
         prop: '',
-        id: 'id',
+        id: 'typeCode',
         name: 'name',
       },
     };
@@ -407,7 +416,7 @@ class AddComponent extends Component {
       issue_type: {
         url: '',
         prop: '',
-        id: 'id',
+        id: 'typeCode',
         name: 'name',
       },
     };
