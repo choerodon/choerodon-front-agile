@@ -6,7 +6,8 @@ import TypeTag from '../../components/TypeTag';
 import PriorityTag from '../../components/PriorityTag';
 import StatusTag from '../../components/StatusTag';
 import EmptyBlockDashboard from '../../components/EmptyBlockDashboard';
-import pic from './empty.png';
+// import pic from './empty.png';
+import pic from '../../assets/image/emptyChart.svg';
 import './index.scss';
 
 const { AppState } = stores;

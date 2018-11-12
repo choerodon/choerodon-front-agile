@@ -4,7 +4,8 @@ import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import { Spin, Table } from 'choerodon-ui';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
-import pic from './no_issue.png';
+// import pic from './no_issue.png';
+import pic from '../../../../../assets/image/emptyChart.svg';
 import TypeTag from '../../../../../components/TypeTag';
 import './IssueType.scss';
 

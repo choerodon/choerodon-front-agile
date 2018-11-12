@@ -16,7 +16,7 @@ import './AccumulationHome.scss';
 import '../../BurndownChart/BurndownChartHome/BurndownChartHome.scss';
 import txt from '../test';
 import NoDataComponent from '../../Component/noData';
-import pic from '../../../../../assets/image/问题管理－空.png';
+import pic from '../../../../../assets/image/emptyChart.svg';
 import SwithChart from '../../Component/switchChart';
 
 const { AppState } = stores;

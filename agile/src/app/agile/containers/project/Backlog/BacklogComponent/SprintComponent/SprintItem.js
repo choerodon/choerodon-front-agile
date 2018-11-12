@@ -10,10 +10,10 @@ import moment from 'moment';
 import CloseSprint from './CloseSprint';
 import IssueItem from './IssueItem';
 import StartSprint from './StartSprint';
-import emptyPng from '../../../../../assets/image/emptySprint.png';
+import emptyPng from '../../../../../assets/image/emptySprint.svg';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 import AssigneeModal from './AssigneeModal';
-import EmptyBacklog from '../../../../../assets/image/emptyBacklog.png';
+import EmptyBacklog from '../../../../../assets/image/emptyBacklog.svg';
 import './Sprint.scss';
 import TypeTag from '../../../../../components/TypeTag';
 import { ICON, TYPE } from '../../../../../common/Constant';
@@ -569,8 +569,10 @@ class SprintItem extends Component {
         onClick={this.handleDeleteSprint.bind(this, item)}
       >
         <Menu.Item key="0">
+
+
           删除sprint
-        </Menu.Item>
+                </Menu.Item>
       </Menu>
     );
     if (item.statusCode) {
@@ -588,8 +590,10 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleFinishSprint.bind(this, item, index)}
               >
+
+
                 完成冲刺
-              </p>
+                            </p>
               {/* <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown> */}
@@ -605,8 +609,10 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleStartSprint.bind(this, item, index)}
               >
+
+
                 开启冲刺
-              </p>
+                            </p>
               <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown>
@@ -765,8 +771,10 @@ class SprintItem extends Component {
                         role="none"
                         onClick={this.clearFilter}
                       >
+
+
                         清空所有筛选器
-                      </p>
+                                            </p>
                     </div>
                     <div style={{ flexGrow: 1 }}>
                       {this.renderStatusCodeDom(item, indexs)}
@@ -800,7 +808,7 @@ class SprintItem extends Component {
                                   <p>
                                     {ass2.issueCount}
                                     {'问题'}
-                                    </p>
+                                  </p>
                                 </div>
                               )}
                             >
@@ -1015,15 +1023,19 @@ class SprintItem extends Component {
                                       });
                                     }}
                                   >
+
+
                                     取消
-                                  </Button>
+                                                                    </Button>
                                   <Button
                                     type="primary"
                                     loading={this.state.loading}
                                     onClick={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
                                   >
+
+
                                     确定
-                                  </Button>
+                                                                    </Button>
                                 </div>
                               </div>
                             ) : (
@@ -1046,8 +1058,10 @@ class SprintItem extends Component {
                                   }}
                                 >
                                   <Icon type="playlist_add" />
+
+
                                   创建问题
-                                </Button>
+                                                                </Button>
                               </div>
                             )}
                           </div>
@@ -1074,10 +1088,14 @@ class SprintItem extends Component {
               <div style={{ marginLeft: 40 }}>
                 <p style={{ color: 'rgba(0,0,0,0.65)' }}>用问题填充您的待办事项</p>
                 <p style={{ fontSize: 16, lineHeight: '28px', marginTop: 8 }}>
+
+
                   这是您的团队待办事项。创建并预估新的问题，并通
                   <br />
+
+
                   过上下拖动来对待办事项排优先级
-                </p>
+                                </p>
               </div>
             </div>
           );
@@ -1170,8 +1188,10 @@ class SprintItem extends Component {
                     role="none"
                     onClick={this.clearFilter}
                   >
+
+
                     清空所有筛选器
-                  </p>
+                                    </p>
                 </div>
                 <div style={{ flexGrow: 1 }}>
                   {this.renderStatusCodeDom(item)}
@@ -1245,15 +1265,19 @@ class SprintItem extends Component {
                                   });
                                 }}
                               >
+
+
                                 取消
-                              </Button>
+                                                            </Button>
                               <Button
                                 type="primary"
                                 loading={this.state.loading}
                                 onClick={this.handleBlurCreateIssue.bind(this, 'backlog', item, -1)}
                               >
+
+
                                 确定
-                              </Button>
+                                                            </Button>
                             </div>
                           </div>
                         ) : (
@@ -1274,8 +1298,10 @@ class SprintItem extends Component {
                               }}
                             >
                               <Icon type="playlist_add" />
+
+
                               创建问题
-                            </Button>
+                                                        </Button>
                           </div>
                         )}
                       </div>

@@ -8,7 +8,8 @@ import {
 import {
   Button, Tabs, Table, Select, Icon, Tooltip, Spin, 
 } from 'choerodon-ui';
-import pic from './no_version.svg';
+// import pic from './no_version.svg';
+import pic from '../../../../../assets/image/emptyChart.svg';
 import finish from './legend/finish.svg';
 import total from './legend/total.svg';
 import noEstimated from './legend/noEstimated.svg';
@@ -636,6 +637,8 @@ class EpicReport extends Component {
                       this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
                     }}
                   >
+
+
                     在“问题管理中”查看
                     <Icon style={{ fontSize: 13 }} type="open_in_new" />
                   </p>
@@ -691,8 +694,10 @@ class EpicReport extends Component {
                         history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
+
+
                       发布版本
-                    </span>
+                                        </span>
                     <span>中创建一个版本</span>
                   </div>)}
               />

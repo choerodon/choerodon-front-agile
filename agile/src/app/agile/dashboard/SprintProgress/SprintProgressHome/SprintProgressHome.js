@@ -3,7 +3,8 @@ import { stores, axios } from 'choerodon-front-boot';
 import { Progress, Spin } from 'choerodon-ui';
 import EmptyBlockDashboard from '../../../components/EmptyBlockDashboard';
 import './SprintProgressHome.scss';
-import pic from './no_sprint.svg';
+// import pic from './no_sprint.svg';
+import pic from '../../../assets/image/emptyChart.svg';
 
 const { AppState } = stores;
 

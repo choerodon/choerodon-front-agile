@@ -19,7 +19,7 @@ import util from 'util';
 import SwitchChart from '../../Component/switchChart';
 import VersionReportStore from '../../../../../stores/project/versionReport/VersionReport';
 import NoDataComponent from '../../Component/noData';
-import pic from '../../../../../assets/image/问题管理－空.png';
+import pic from '../../../../../assets/image/emptyChart.svg';
 import ReleaseStore from '../../../../../stores/project/release/ReleaseStore';
 
 const Option = Select.Option;
