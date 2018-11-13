@@ -325,16 +325,20 @@ class ColumnPage extends Component {
             }
           </Select>
           <div>
-            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.createStatus']}>
-              <Button 
-                funcType="flat"
-                type="primary"
-                onClick={this.handleAddStatus.bind(this)}
-              >
-                <Icon type="playlist_add" />
-                <span>添加状态</span>
-              </Button>
-            </Permission>
+            {
+              ScrumBoardStore.getCanAddStatus ? (
+                <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.createStatus']}>
+                  <Button 
+                    funcType="flat"
+                    type="primary"
+                    onClick={this.handleAddStatus.bind(this)}
+                  >
+                    <Icon type="playlist_add" />
+                    <span>添加状态</span>
+                  </Button>
+                </Permission>
+              ) : ''
+            }
             <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.board-column.createBoardColumn']}>
               <Button 
                 funcType="flat"
