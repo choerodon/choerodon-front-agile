@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {
   Tag, Button, Popover, Checkbox,
 } from 'choerodon-ui';
+import BacklogStore from '../../stores/project/backlog/BacklogStore';
 import './QuickSearch.scss';
 
 const { CheckableTag } = Tag;
@@ -15,6 +16,7 @@ const { Group: CheckboxGroup } = Checkbox;
 class QuickSearch extends Component {
   static defaultProps = {
     selectionGroup: ['仅我的问题', '仅故事'],
+    resetFilter: false,
   };
 
   static propTypes = {
@@ -26,6 +28,7 @@ class QuickSearch extends Component {
     onChangeCheckBox: PropTypes.func,
     onlyMe: PropTypes.func,
     onlyStory: PropTypes.func,
+    resetFilter: PropTypes.bool,
   };
 
   state = {
@@ -71,7 +74,13 @@ class QuickSearch extends Component {
   };
 
   render() {
-    const { title, selectionGroup } = this.props;
+    const { title, selectionGroup, resetFilter } = this.props;
+    if (resetFilter) {
+      this.setState({
+        selected: [],
+      });
+      BacklogStore.setQuickSearchClean(false);
+    }
     const { selected } = this.state;
     return (
       <div

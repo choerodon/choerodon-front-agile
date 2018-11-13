@@ -102,16 +102,16 @@ class Sprint extends Component {
                           <div>
                             <p style={{ margin: 0 }}>{user.assigneeName}</p>
                             <p style={{ margin: 0 }}>
+                              {'故事点: '}
                               {user.totalStoryPoints || 0}
-                              {'故事点'}
                             </p>
                             <p style={{ margin: 0 }}>
+                              {'剩余预估时间: '}
                               {user.totalRemainingTime ? user.totalRemainingTime : '无'}
-                              {'剩余预估时间'}
                             </p>
                             <p style={{ margin: 0 }}>
+                              {'问题: '}
                               {user.issueCount}
-                              {'问题'}
                             </p>
                           </div>
                       )}

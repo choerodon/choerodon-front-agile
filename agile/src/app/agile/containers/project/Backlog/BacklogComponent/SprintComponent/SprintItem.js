@@ -1,8 +1,9 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
 import {
-  Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu, 
+  Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu,
 } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
 import _ from 'lodash';
@@ -18,8 +19,8 @@ import './Sprint.scss';
 import TypeTag from '../../../../../components/TypeTag';
 import { ICON, TYPE } from '../../../../../common/Constant';
 
-const Option = Select.Option;
-const confirm = Modal.confirm;
+const { Option } = Select;
+const { confirm } = Modal;
 const { AppState } = stores;
 
 const filterIssueTypeCode = ['issue_epic', 'sub_task'];
@@ -94,8 +95,9 @@ class SprintItem extends Component {
    * @memberof Sprint
    */
   onKeyDown=(event) => {
+    const { keydown } = this.state;
     if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.className !== 'ql-editor') {
-      if (event.keyCode !== this.state.keydown) {
+      if (event.keyCode !== keydown) {
         this.setState({
           keydown: event.keyCode,
         });
@@ -132,21 +134,16 @@ class SprintItem extends Component {
    */
   updateDate =(type, date2, item) => {
     let date = date2;
+    const { store, refresh } = this.props;
     const data = {
       objectVersionNumber: item.objectVersionNumber,
       projectId: AppState.currentMenuType.id,
       sprintId: item.sprintId,
       [type]: date += ' 00:00:00',
     };
-    this.props.store.axiosUpdateSprint(data).then((res) => {
-      this.props.refresh();
+    store.axiosUpdateSprint(data).then((res) => {
+      refresh();
     }).catch((error) => {
-    });
-  }
-
-  handleChangeType(type) {
-    this.setState({
-      selectIssueType: type.key,
     });
   }
 
@@ -156,7 +153,7 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   handleBlurCreateIssue = (type, item, index) => {
-    const { store } = this.props;
+    const { store, refresh } = this.props;
     const { selectIssueType } = this.state;
     const currentType = store.getIssueTypes.find(t => t.typeCode === selectIssueType);
     const priorityId = store.getDefaultPriority.id;
@@ -172,19 +169,19 @@ class SprintItem extends Component {
         summary: this[`${index}-addInput`].input.value,
         issueTypeId: currentType.id,
         typeCode: currentType.typeCode,
-        ...!isNaN(this.props.store.getChosenEpic) ? {
-          epicId: this.props.store.getChosenEpic,
+        ...!isNaN(store.getChosenEpic) ? {
+          epicId: store.getChosenEpic,
         } : {},
-        ...!isNaN(this.props.store.getChosenVersion) ? {
+        ...!isNaN(store.getChosenVersion) ? {
           versionIssueRelDTOList: [
             {
-              versionId: this.props.store.getChosenVersion,
+              versionId: store.getChosenVersion,
             },
           ],
         } : {},
         parentIssueId: 0,
       };
-      this.props.store.axiosEasyCreateIssue(data).then((res) => {
+      store.axiosEasyCreateIssue(data).then((res) => {
         this.setState({
           [`${index}-create`]: {
             createIssue: false,
@@ -195,9 +192,9 @@ class SprintItem extends Component {
             issueIds: [res.issueId],
           },
         });
-        this.props.refresh();
-        this.props.store.setSelectIssue([res.issueId]);
-        this.props.store.setClickIssueDetail(res);
+        refresh();
+        store.setSelectIssue([res.issueId]);
+        store.setClickIssueDetail(res);
       }).catch((error) => {
         this.setState({
           loading: false,
@@ -213,17 +210,18 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   handleBlurName =(item, value) => {
+    const { store, refresh } = this.props;
     const data = {
       objectVersionNumber: item.objectVersionNumber,
       projectId: AppState.currentMenuType.id,
       sprintId: item.sprintId,
       sprintName: value,
     };
-    this.props.store.axiosUpdateSprint(data).then((res) => {
+    store.axiosUpdateSprint(data).then((res) => {
       this.setState({
         editName: false,
       });
-      this.props.refresh();
+      refresh();
     }).catch((error) => {
     });
   }
@@ -235,17 +233,18 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   handleBlurGoal =(item, value) => {
+    const { store, refresh } = this.props;
     const data = {
       objectVersionNumber: item.objectVersionNumber,
       projectId: AppState.currentMenuType.id,
       sprintId: item.sprintId,
       sprintGoal: value,
     };
-    this.props.store.axiosUpdateSprint(data).then((res) => {
+    store.axiosUpdateSprint(data).then((res) => {
       this.setState({
         editGoal: false,
       });
-      this.props.refresh();
+      refresh();
     }).catch((error) => {
     });
   }
@@ -256,10 +255,11 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   handleFinishSprint =(item, indexs) => {
-    this.props.store.axiosGetSprintCompleteMessage(
+    const { store } = this.props;
+    store.axiosGetSprintCompleteMessage(
       item.sprintId,
     ).then((res) => {
-      this.props.store.setSprintCompleteMessage(res);
+      store.setSprintCompleteMessage(res);
       let flag = 0;
       if (res.parentsDoneUnfinishedSubtasks) {
         if (res.parentsDoneUnfinishedSubtasks.length > 0) {
@@ -294,12 +294,13 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   handleStartSprint =(item, index) => {
-    if (!this.props.store.getSprintData.sprintData.filter(items => items.statusCode === 'started').length > 0) {
-      if (item.issueSearchDTOList.length > 0) {
-        this.props.store.axiosGetOpenSprintDetail(
+    const { store } = this.props;
+    if (!store.getSprintData.sprintData.filter(items => items.statusCode === 'started').length > 0) {
+      if (item.issueSearchDTOList && item.issueSearchDTOList.length > 0) {
+        store.axiosGetOpenSprintDetail(
           item.sprintId,
         ).then((res) => {
-          this.props.store.setOpenSprintDetail(res);
+          store.setOpenSprintDetail(res);
           this.setState({
             [`${index}-startSprint`]: { startSprintVisible: true },
           });
@@ -317,8 +318,9 @@ class SprintItem extends Component {
    */
   handleDeleteSprint = (item, e) => {
     const that = this;
+    const { store, refresh } = this.props;
     if (e.key === '0') {
-      if (item.issueSearchDTOList.length > 0) {
+      if (item.issueSearchDTOList && item.issueSearchDTOList.length > 0) {
         confirm({
           width: 560,
           wrapClassName: 'deleteConfirm',
@@ -340,8 +342,8 @@ class SprintItem extends Component {
           okType: 'danger',
         });
       } else {
-        this.props.store.axiosDeleteSprint(item.sprintId).then((res) => {
-          this.props.refresh();
+        store.axiosDeleteSprint(item.sprintId).then((res) => {
+          refresh();
         }).catch((error) => {
         });
       }
@@ -354,13 +356,15 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   clearFilter =() => {
-    this.props.store.setChosenEpic('all');
-    this.props.store.setChosenVersion('all');
-    this.props.store.setOnlyMe(false);
-    this.props.store.setRecent(false);
-    this.props.store.setQuickFilters([]);
-    this.props.store.axiosGetSprint(this.props.store.getSprintFilter()).then((res) => {
-      this.props.store.setSprintData(res);
+    const { store } = this.props;
+    store.setChosenEpic('all');
+    store.setChosenVersion('all');
+    store.setOnlyMe(false);
+    store.setRecent(false);
+    store.setQuickFilters([]);
+    store.setQuickSearchClean(true);
+    store.axiosGetSprint(store.getSprintFilter()).then((res) => {
+      store.setSprintData(res);
     }).catch((error) => {
     });
   }
@@ -374,46 +378,48 @@ class SprintItem extends Component {
    */
   handleClickIssue=(sprintId, item) => {
     // command ctrl shift
-    if (this.state.keydown === 91 || this.state.keydown === 17 || this.state.keydown === 16) {
+    const { keydown, selected, store } = this.state;
+    if (keydown === 91 || keydown === 17 || keydown === 16) {
       // 如果没点击
-      if (this.state.selected.droppableId === '') {
+      if (selected.droppableId === '') {
         this.setState({
           selected: {
             droppableId: sprintId,
             issueIds: [item.issueId],
           },
         });
-        this.props.store.setSelectIssue([item.issueId]);
+        store.setSelectIssue([item.issueId]);
       } else if (String(
-        this.state.selected.droppableId,
+        selected.droppableId,
       ) === String(sprintId)) {
         // 如果点击的是当前列的卡片
-        const originIssueIds = _.clone(this.state.selected.issueIds);
+        const originIssueIds = _.clone(selected.issueIds);
         // 如果不存在
         if (originIssueIds.indexOf(item.issueId) === -1) {
           // 如果不是shift 则加一条issueid
-          if (this.state.keydown !== 16) {
+          if (keydown !== 16) {
             this.setState({
               selected: {
                 droppableId: sprintId,
                 issueIds: [...originIssueIds, item.issueId],
               },
             });
-            this.props.store.setSelectIssue([...originIssueIds, item.issueId]);
+            store.setSelectIssue([...originIssueIds, item.issueId]);
           } else {
             let clickSprintDatas = [];
             const firstClick = originIssueIds[0];
             if (item.sprintId) {
               // 如果是shift 并且点击的是冲刺里的issue
-              clickSprintDatas = this.props.store.getSprintData.sprintData
+              clickSprintDatas = store.getSprintData.sprintData
                 .filter(s => s.sprintId === item.sprintId)[0].issueSearchDTOList;
             } else {
               // 如果是shift 并且点击的是backlog里的issue
-              clickSprintDatas = this.props.store.getSprintData.backlogData.backLogIssue;
+              clickSprintDatas = store.getSprintData.backlogData.backLogIssue;
             }
             const indexs = [];
             for (let index = 0, len = clickSprintDatas.length; index < len; index += 1) {
-              if (clickSprintDatas[index].issueId === firstClick || clickSprintDatas[index].issueId === item.issueId) {
+              if (clickSprintDatas[index].issueId === firstClick
+                || clickSprintDatas[index].issueId === item.issueId) {
                 indexs.push(index);
               }
             }
@@ -429,7 +435,7 @@ class SprintItem extends Component {
                 issueIds,
               },
             });
-            this.props.store.setSelectIssue(issueIds);
+            store.setSelectIssue(issueIds);
           }
         } else if (originIssueIds.length > 1) {
           // 如果存在 并且不是最后一个
@@ -440,7 +446,7 @@ class SprintItem extends Component {
               issueIds: originIssueIds,
             },
           });
-          this.props.store.setSelectIssue(originIssueIds);
+          store.setSelectIssue(originIssueIds);
         } else {
           this.setState({
             selected: {
@@ -448,7 +454,7 @@ class SprintItem extends Component {
               issueIds: [],
             },
           });
-          this.props.store.setSelectIssue([]);
+          store.setSelectIssue([]);
         }
       }
     } else {
@@ -458,8 +464,8 @@ class SprintItem extends Component {
           issueIds: [item.issueId],
         },
       });
-      this.props.store.setSelectIssue([item.issueId]);
-      this.props.store.setClickIssueDetail(item);
+      store.setSelectIssue([item.issueId]);
+      store.setClickIssueDetail(item);
     }
   }
 
@@ -472,18 +478,20 @@ class SprintItem extends Component {
    * @memberof SprintItem this.renderSprintIssue(issues, sprintId);
    */
   renderIssueOrIntro =(type, index, issues, sprintId) => {
+    const { versionVisible, epicVisible, store } = this.props;
+    const { selected, draggableId } = this.state;
     if (issues) {
       if (issues.length > 0) {
         return (
           <IssueItem
             sprintItemRef={this.sprintItemRef}
-            versionVisible={this.props.versionVisible}
-            epicVisible={this.props.epicVisible}
-            store={this.props.store}
+            versionVisible={versionVisible}
+            epicVisible={epicVisible}
+            store={store}
             sprtintId={sprintId}
             data={issues}
-            selected={this.state.selected}
-            draggableId={this.state.draggableId}
+            selected={selected}
+            draggableId={draggableId}
             handleClickIssue={this.handleClickIssue}
           />
         );
@@ -502,9 +510,11 @@ class SprintItem extends Component {
             </div>
           </div>
         );
-      } else if (this.props.store.getChosenEpic !== 'all' || this.props.store.getChosenVersion !== 'all') {
+      } else if (store.getChosenEpic !== 'all' || store.getChosenVersion !== 'all') {
         return (
-          <div className="c7n-noissue-notzero">在sprint中所有问题已筛选</div>
+          <div className="c7n-noissue-wapper">
+            <div className="c7n-noissue-notzero">在sprint中所有问题已筛选</div>
+          </div>
         );
       } else {
         return (
@@ -525,9 +535,10 @@ class SprintItem extends Component {
    * @memberof SprintItem
    */
   renderOpenColor =(item, type) => {
-    if (this.props.store.getSprintData.sprintData.filter(items => items.statusCode === 'started').length === 0) {
+    const { store } = this.props;
+    if (store.getSprintData.sprintData.filter(items => items.statusCode === 'started').length === 0) {
       if (item.issueSearchDTOList) {
-        if (item.issueSearchDTOList.length > 0) {
+        if (item.issueSearchDTOList && item.issueSearchDTOList.length > 0) {
           if (type === 'color') {
             return '#3f51b5';
           } else {
@@ -576,6 +587,7 @@ class SprintItem extends Component {
       </Menu>
     );
     if (item.statusCode) {
+      const { store, refresh } = this.props;
       return (
         <div className="c7n-backlog-sprintTitleSide">
           {item.statusCode === 'started' ? (
@@ -619,7 +631,7 @@ class SprintItem extends Component {
             </div>
           )}
           <StartSprint
-            store={this.props.store}
+            store={store}
             visible={(this.state[`${index}-startSprint`] && this.state[`${index}-startSprint`].startSprintVisible) || false}
             onCancel={() => {
               this.setState({
@@ -627,10 +639,10 @@ class SprintItem extends Component {
               });
             }}
             data={item}
-            refresh={this.props.refresh}
+            refresh={refresh}
           />
           <CloseSprint
-            store={this.props.store}
+            store={store}
             visible={(this.state[`${index}-closeSprint`] && this.state[`${index}-closeSprint`].closeSprintVisible) || false}
             onCancel={() => {
               this.setState({
@@ -638,7 +650,7 @@ class SprintItem extends Component {
               });
             }}
             data={item}
-            refresh={this.props.refresh}
+            refresh={refresh}
           />
         </div>
       );
@@ -675,6 +687,11 @@ class SprintItem extends Component {
    */
   getCurrentState=data => this.state[data];
 
+  handleChangeType(type) {
+    this.setState({
+      selectIssueType: type.key,
+    });
+  }
 
   /**
    *渲染非待办事项冲刺
@@ -684,7 +701,7 @@ class SprintItem extends Component {
    */
   renderSprint = () => {
     const { store } = this.props;
-    const { selectIssueType } = this.state;
+    const { selectIssueType, loading } = this.state;
     const issueTypes = store.getIssueTypes
       .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
@@ -712,8 +729,8 @@ class SprintItem extends Component {
       </Menu>
     );
     let result = [];
-    if (JSON.stringify(this.props.store.getSprintData) !== '{}') {
-      const data = this.props.store.getSprintData.sprintData;
+    if (JSON.stringify(store.getSprintData) !== '{}') {
+      const data = store.getSprintData.sprintData;
       if (data) {
         if (data.length > 0) {
           for (let indexs = 0, len = data.length; indexs < len; indexs += 1) {
@@ -762,19 +779,17 @@ class SprintItem extends Component {
                         className="c7n-backlog-clearFilter"
                         style={{
                           display:
-                            this.props.store.getChosenVersion !== 'all'
-                            || this.props.store.getChosenEpic !== 'all'
-                            || this.props.store.getOnlyMe
-                            || this.props.store.getRecent // 仅故事
-                            || this.props.store.getQuickFilters.length > 0 ? 'block' : 'none',
+                            store.getChosenVersion !== 'all'
+                            || store.getChosenEpic !== 'all'
+                            || store.getOnlyMe
+                            || store.getRecent // 仅故事
+                            || store.getQuickFilters.length > 0 ? 'block' : 'none',
                         }}
                         role="none"
                         onClick={this.clearFilter}
                       >
-
-
                         清空所有筛选器
-                                            </p>
+                      </p>
                     </div>
                     <div style={{ flexGrow: 1 }}>
                       {this.renderStatusCodeDom(item, indexs)}
@@ -798,16 +813,16 @@ class SprintItem extends Component {
                                 <div>
                                   <p>{ass2.assigneeName}</p>
                                   <p>
+                                    {'故事点: '}
                                     {ass2.totalStoryPoints || 0}
-                                    {'故事点'}
                                   </p>
                                   <p>
+                                    {'剩余预估时间: '}
                                     {ass2.totalRemainingTime ? ass2.totalRemainingTime : '无'}
-                                    {'剩余预估时间'}
                                   </p>
                                   <p>
+                                    {'问题: '}
                                     {ass2.issueCount}
-                                    {'问题'}
                                   </p>
                                 </div>
                               )}
@@ -955,7 +970,7 @@ class SprintItem extends Component {
                 {(this.state[`${indexs}-sprint`] && this.state[`${indexs}-sprint`].expand) || this.state[`${indexs}-sprint`] === undefined ? (
                   <Droppable
                     droppableId={item.sprintId.toString()}
-                    isDropDisabled={this.props.store.getIsLeaveSprint}
+                    isDropDisabled={store.getIsLeaveSprint}
                   >
                     {(provided, snapshot) => (
                       <div
@@ -1029,7 +1044,7 @@ class SprintItem extends Component {
                                                                     </Button>
                                   <Button
                                     type="primary"
-                                    loading={this.state.loading}
+                                    loading={loading}
                                     onClick={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
                                   >
 
@@ -1052,8 +1067,8 @@ class SprintItem extends Component {
                                         createIssue: true,
                                       },
                                     });
-                                    this.props.store.axiosGetProjectInfo().then((res) => {
-                                      this.props.store.setProjectInfo(res);
+                                    store.axiosGetProjectInfo().then((res) => {
+                                      store.setProjectInfo(res);
                                     });
                                   }}
                                 >
@@ -1115,7 +1130,7 @@ class SprintItem extends Component {
     const { store } = this.props;
     const issueTypes = store.getIssueTypes
       .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
-    const { selectIssueType } = this.state;
+    const { selectIssueType, backlogExpand, loading } = this.state;
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
       <Menu
@@ -1140,14 +1155,16 @@ class SprintItem extends Component {
         }
       </Menu>
     );
-    if (JSON.stringify(this.props.store.getSprintData) !== '{}') {
-      const data = this.props.store.getSprintData.backlogData;
+
+    if (JSON.stringify(store.getSprintData) !== '{}') {
+      const data = store.getSprintData.backlogData;
       if (data) {
         const item = {
           sprintName: '待办事项',
           issueSearchDTOList: data.backLogIssue,
           sprintId: 'backlog',
         };
+
         return (
           <div>
             <div className="c7n-backlog-sprintTop">
@@ -1156,11 +1173,11 @@ class SprintItem extends Component {
                   <div className="c7n-backlog-sprintName">
                     <Icon
                       style={{ fontSize: 20, cursor: 'pointer' }}
-                      type={this.state.backlogExpand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
+                      type={backlogExpand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
                       role="none"
                       onClick={() => {
                         this.setState({
-                          backlogExpand: !this.state.backlogExpand,
+                          backlogExpand: !backlogExpand,
                         });
                       }}
                     />
@@ -1179,11 +1196,11 @@ class SprintItem extends Component {
                     className="c7n-backlog-clearFilter"
                     style={{
                       display:
-                        this.props.store.getChosenVersion !== 'all'
-                        || this.props.store.getChosenEpic !== 'all'
-                        || this.props.store.getOnlyMe
-                        || this.props.store.getRecent // 仅故事
-                        || this.props.store.getQuickFilters.length > 0 ? 'block' : 'none',
+                        store.getChosenVersion !== 'all'
+                        || store.getChosenEpic !== 'all'
+                        || store.getOnlyMe
+                        || store.getRecent // 仅故事
+                        || store.getQuickFilters.length > 0 ? 'block' : 'none',
                     }}
                     role="none"
                     onClick={this.clearFilter}
@@ -1198,10 +1215,10 @@ class SprintItem extends Component {
                 </div>
               </div>
             </div>
-            {this.state.backlogExpand ? (
+            {backlogExpand ? (
               <Droppable
                 droppableId={item.sprintId.toString()}
-                isDropDisabled={this.props.store.getIsLeaveSprint}
+                isDropDisabled={store.getIsLeaveSprint}
               >
                 {(provided, snapshot) => (
                   <div
@@ -1271,7 +1288,7 @@ class SprintItem extends Component {
                                                             </Button>
                               <Button
                                 type="primary"
-                                loading={this.state.loading}
+                                loading={loading}
                                 onClick={this.handleBlurCreateIssue.bind(this, 'backlog', item, -1)}
                               >
 
@@ -1292,8 +1309,8 @@ class SprintItem extends Component {
                                 this.setState({
                                   '-1-create': { createIssue: true },
                                 });
-                                this.props.store.axiosGetProjectInfo().then((res) => {
-                                  this.props.store.setProjectInfo(res);
+                                store.axiosGetProjectInfo().then((res) => {
+                                  store.setProjectInfo(res);
                                 });
                               }}
                             >

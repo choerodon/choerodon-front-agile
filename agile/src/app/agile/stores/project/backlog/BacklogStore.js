@@ -58,6 +58,8 @@ class BacklogStore {
 
   @observable defaultPriority = false;
 
+  @observable cleanQuickSearch = false;
+
   @computed get asJson() {
     return {
       sprintData: this.sprintData,
@@ -121,6 +123,14 @@ class BacklogStore {
 
   @action setQuickFilters(data) {
     this.quickFilters = data;
+  }
+
+  @action setQuickSearchClean(data) {
+    this.cleanQuickSearch = data;
+  }
+
+  @computed get getQuickSearchClean() {
+    return toJS(this.cleanQuickSearch);
   }
 
   getSprintFilter() {

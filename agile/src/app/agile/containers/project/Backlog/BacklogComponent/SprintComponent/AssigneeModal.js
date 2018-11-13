@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Modal, Table } from 'choerodon-ui';
 import _ from 'lodash';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
+import {
+  Page, Header, Content, stores,
+} from 'choerodon-front-boot';
 
 const { Sidebar } = Modal;
 
@@ -12,13 +14,15 @@ class AssigneeModal extends Component {
     super(props);
     this.state = {};
   }
+
   render() {
+    const { data, visible, onCancel } = this.props;
     const columns = [{
       title: '经办人',
       dataIndex: 'assigneeName',
       key: 'assigneeName',
       render: text => (text === '合计' ? (
-        <p >{text}</p>
+        <p>{text}</p>
       ) : (<p>{text || '未分配'}</p>)),
     }, {
       title: '问题',
@@ -36,7 +40,7 @@ class AssigneeModal extends Component {
       index: 'totalRemainingTime',
       render: text => (text || '无'),
     }];
-    const assignData = this.props.data.assigneeIssues;
+    const assignData = data.assigneeIssues;
     let totalIssue = 0;
     let totalStoryPoints = 0;
     let totalTime = 0;
@@ -56,24 +60,25 @@ class AssigneeModal extends Component {
     const total = { totalIssue, totalStoryPoints, totalTime };
     let noAssign = [];
     let dataSource = [];
-    if (this.props.data.assigneeIssues) {
-      noAssign = this.props.data.assigneeIssues.filter(item => !item.assigneeName);
-      dataSource = this.props.data.assigneeIssues.filter(item => item.assigneeName).concat(noAssign);
+    if (data.assigneeIssues) {
+      noAssign = data.assigneeIssues.filter(item => !item.assigneeName);
+      dataSource = data.assigneeIssues.filter(item => item.assigneeName).concat(noAssign);
     }
     return (
       <Sidebar
         title="经办人工作量"
-        visible={this.props.visible}
-        onOk={this.props.onCancel.bind(this)}
+        visible={visible}
+        onOk={onCancel.bind(this)}
         okText="确定"
         okCancel={false}
       >
-        {this.props.data.assigneeIssues && <Content
+        {data.assigneeIssues && (
+        <Content
           style={{
             padding: 0,
             overflow: 'hidden',
           }}
-          title={`“${this.props.data.sprintName}”的经办人工作量`}
+          title={`“${data.sprintName}”的经办人工作量`}
           description="您可以在这里查看当前冲刺中问题的分配情况，包括每位成员的问题数量、故事点数总和、剩余预估时间总和等信息。"
         >
           <Table
@@ -86,13 +91,13 @@ class AssigneeModal extends Component {
             })}
             columns={columns}
             filterBar={false}
-            rowKey={'assigneeName'}
+            rowKey="assigneeName"
           />
-        </Content>}
+        </Content>
+        )}
       </Sidebar>
     );
   }
 }
 
 export default AssigneeModal;
-

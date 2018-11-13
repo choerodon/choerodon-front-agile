@@ -14,7 +14,7 @@ import { updateIssue } from '../../../../../api/NewIssueApi';
 
 const { TextArea } = Input;
 const { AppState } = stores;
-const confirm = Modal.confirm;
+const { confirm } = Modal;
 
 class IssueCard extends Component {
   constructor(props) {
@@ -94,7 +94,7 @@ class IssueCard extends Component {
 
     e.preventDefault();
     this.setState({ isFocus: false });
-    
+
     if (!summary) {
       this.setState({ summary: originSummary });
       return;
@@ -131,7 +131,7 @@ class IssueCard extends Component {
       content: (
         <div>
           <p style={{ marginBottom: 10 }}>请确认您要取消问题与史诗的关联。</p>
-          <p style={{ marginBottom: 10 }}>这个操作将取消当前问题与史诗的关联，并从用户故事地图中移除，移除的问题将至于需求池的未规划部分。</p>
+          <p style={{ marginBottom: 10 }}>这个操作将取消当前问题与史诗的关联，并从用户故事地图中移除，移除的问题将置于需求池的未规划部分。</p>
         </div>
       ),
       onOk() {
@@ -179,7 +179,7 @@ class IssueCard extends Component {
       },
     } = this.state;
     const selectIssueIds = US.getSelectIssueIds;
-    
+
     return (
       <Draggable
         draggableId={draggableId}
@@ -242,7 +242,7 @@ class IssueCard extends Component {
                   />
                   <span
                     className="c7n-issueNum"
-                    style={{ 
+                    style={{
                       textDecoration: statusCode === 'done' ? 'line-through' : 'unset',
                     }}
                     role="none"
@@ -253,7 +253,7 @@ class IssueCard extends Component {
                       || document.msFullscreenElement;
                       if (isFullScreen) {
                         this.exitFullScreen();
-                      } 
+                      }
                       history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${issueId}&paramOpenIssueId=${issueId}&paramUrl=usermap`);
                     }}
                   >
@@ -273,7 +273,7 @@ class IssueCard extends Component {
                   ) : ''
                 }
               </div>
-              
+
               <div className="c7n-content">
                 <TextArea
                   className="c7n-textArea"
