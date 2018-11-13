@@ -70,7 +70,7 @@ class ScrumBoardHome extends Component {
 
   getIssueCount = (data, key) => {
     let count = 0;
-    if (JSON.stringify(data) !== '{}') {
+    if (JSON.stringify(data) !== '{}' && data.columnsData) {
       _.map(data.columnsData.columns, (columns) => {
         _.map(columns.subStatuses, (status) => {
           count = _.reduce(status.issues, (sum, item) => {

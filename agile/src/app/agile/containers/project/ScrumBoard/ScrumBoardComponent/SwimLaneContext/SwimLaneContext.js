@@ -104,8 +104,7 @@ class SwimLaneContext extends Component {
                 ScrumBoardStore.setClickIssueDetail(item);
               }}
             >
-              #
-              {item.issueNum}
+              {`#${item.issueNum}`}
             </span>
             <StatusTag
               data={{
@@ -114,7 +113,7 @@ class SwimLaneContext extends Component {
               }}
             />
             <span className="c7n-parentIssue-summary">{item.summary}</span>
-            <span className="c7n-parentIssue-count">{`  (${item.count} 子任务)`}</span>
+            <span className="c7n-parentIssue-count" style={{ whiteSpace: 'nowrap' }}>{`  (${item.count} 子任务)`}</span>
 
           </div>
           <Button
@@ -131,8 +130,10 @@ class SwimLaneContext extends Component {
               });
             }}
           >
+
+
             移动到done
-          </Button>
+                    </Button>
         </div>
       );
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
