@@ -79,7 +79,14 @@ class SprintCommonStore {
 
   @observable issueStatus = [];
 
-  @observable otherArgs = {};
+  @observable tagData = [];
+
+  @observable otherArgs = {
+    type: null,
+    id: null,
+    issueIds: null,
+    resolution: null,
+  };
 
   @observable resolution = false;
 
@@ -92,8 +99,6 @@ class SprintCommonStore {
       advancedSearchArgs: {},
       searchArgs: {},
     });
-    // this.setFilteredInfo({});
-    // this.loadIssues();
   }
 
   @action setIssues(data) {
@@ -134,6 +139,14 @@ class SprintCommonStore {
 
   @computed get getIssuePriority() {
     return toJS(this.issuePriority);
+  }
+
+  @action setLabel(data) {
+    this.tagData = data;
+  }
+
+  @computed get getLabel() {
+    return toJS(this.tagData);
   }
 
   @action setSelectedQuickSearch(data) {
@@ -233,13 +246,19 @@ class SprintCommonStore {
     Object.assign(filter, { content: res });
   }
 
-  @action setOtherArgs() {
+  @action setParamInOtherArgs() {
     this.otherArgs = {
       type: this.paramType,
       id: this.paramId ? [this.paramId] : undefined,
       issueIds: this.paramIssueId ? [this.paramIssueId] : undefined,
       resolution: this.resolution,
     };
+  }
+
+  @action setOtherArgs(data) {
+    if (data) {
+      Object.assign(this.otherArgs, data);
+    }
   }
 
   @action resetOtherArgs() {
@@ -274,6 +293,9 @@ class SprintCommonStore {
 
     const priorities = await this.loadPriorities();
     this.setIssuePriority(priorities);
+
+    const tag = await this.loadLabel();
+    this.setLabel(tag);
   }
 
   loadQuickSearch = () => axios.get(`/agile/v1/projects/${proId}/quick_filter`);
@@ -283,6 +305,8 @@ class SprintCommonStore {
   loadStatus = () => axios.get(`/issue/v1/projects/${proId}/schemes/query_status_by_project_id?apply_type=agile`);
 
   loadPriorities = () => axios.get(`/issue/v1/organizations/${orgId}/priority/list_by_org`);
+
+  loadLabel = () => axios.get(`/agile/v1/projects/${proId}/issue_labels`);
 
   createIssue(issueObj, projectId = AppState.currentMenuType.id) {
     const issue = {

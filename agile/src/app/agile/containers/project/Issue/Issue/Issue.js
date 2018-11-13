@@ -87,7 +87,7 @@ class Issue extends Component {
     IssueStore.setResolution(paramResolution);
 
     IssueStore.setSelectedQuickSearch({ quickFilterIds: [] });
-    IssueStore.setOtherArgs();
+    IssueStore.setParamInOtherArgs();
     const arr = [];
     if (paramName) {
       arr.push(paramName);
@@ -280,6 +280,8 @@ class Issue extends Component {
     Object.keys(filters).forEach((key) => {
       if (key === 'statusId' || key === 'priorityId' || key === 'issueTypeId') {
         IssueStore.setAdvArg(filters);
+      } else if (key === 'label') {
+        IssueStore.setOtherArgs(filters);
       } else if (key === 'issueId') {
         // 根据接口进行对象调整
         IssueStore.setArg({ issueNum: filters[key][0] });
@@ -399,7 +401,7 @@ class Issue extends Component {
       <Tooltip mouseEnterDelay={0.5} title={`问题类型： ${TYPE_NAME[text]}`}>
         <TypeTag
           data={record.issueTypeDTO}
-          showName={expand ? null : text}
+          showName={expand ? null : record.issueTypeDTO.name}
         />
       </Tooltip>
     );
@@ -414,7 +416,7 @@ class Issue extends Component {
   );
 
   renderStatusName = (text, record) => (
-    <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${text}`}>
+    <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusMapDTO.name}`}>
       <StatusTag
         data={record.statusMapDTO}
         style={{ display: 'inline-block', verticalAlign: 'middle' }}
@@ -461,52 +463,82 @@ class Issue extends Component {
   ) : null);
 
   renderLastUpdateTime = (text, record) => (
-    <TimeAgo
-      datetime={text}
-      locale="zh_CN"
-    />
+    <Tooltip mouseEnterDelay={0.5} title={`日期： ${text}`}>
+      <TimeAgo
+        datetime={text}
+        locale="zh_CN"
+      />
+    </Tooltip>
   );
 
-  // renderVersion = arr => (arr.length ? <Tag color="blue">{arr[0].name}</Tag> : null);
-  renderVersion = (arr) => {
-    if (arr && arr.length) {
-      return (
-        <Tooltip mouseEnterDelay={0.5} title={`版本：${arr.map(item => `${item.name} `)}`}>
-          {/* {arr.slice(0, 2).map(item => <span>{`${item.name}, `}</span>)} */}
-          {arr.slice(0, 2).map((item, i) => {
-            if (i !== arr.slice(0, 2).length - 1) {
-              return <span>{`${item.name}, `}</span>;
-            } else {
-              return <span>{`${item.name}`}</span>;
-            }
-          })}
-          {arr.length > 2 ? '...' : ''}
-        </Tooltip>
-      );
+  renderVersion = (text, record) => {
+    if (record.versionIssueRelDTOS.length) {
+      return record.versionIssueRelDTOS.length > 1
+        ? (
+          <React.Fragment>
+            <Tag color="blue">{record.versionIssueRelDTOS[0].name}</Tag>
+            <Tag color="blue">...</Tag>
+          </React.Fragment>
+        )
+        : <Tag color="blue">{record.versionIssueRelDTOS[0].name}</Tag>;
+    } else {
+      return null;
     }
-    return '无';
-  }
+  };
 
-  renderSprint = arr => (
-    arr && arr.length ? arr[0].sprintName : '无'
-  )
-
-  renderComponent = (arr) => {
-    if (arr && arr.length) {
-      return (
-        <Tooltip mouseEnterDelay={0.5} title={`模块：${arr.map(item => `${item.name} `)}`}>
-          {arr.slice(0, 1).map((item, i) => <span>{`${item.name}`}</span>)}
-          {arr.length > 1 ? '...' : ''}
-        </Tooltip>
-      );
+  renderSprint = (text, record) => {
+    if (record.issueSprintDTOS.length) {
+      return record.issueSprintDTOS.length > 1
+        ? (
+          <React.Fragment>
+            <Tag color="blue">{record.issueSprintDTOS[0].sprintName}</Tag>
+            <Tag color="blue">...</Tag>
+          </React.Fragment>
+        )
+        : <Tag color="blue">{record.issueSprintDTOS[0].sprintName}</Tag>;
+    } else {
+      return null;
     }
-    return '无';
-  }
+  };
 
-  renderEpic = epicName => (epicName || '无')
+  renderComponent = (text, record) => {
+    if (record.issueComponentBriefDTOS.length) {
+      return record.issueComponentBriefDTOS.length > 1
+        ? (
+          <React.Fragment>
+            <Tag color="blue">{record.issueComponentBriefDTOS[0].name}</Tag>
+            <Tag color="blue">...</Tag>
+          </React.Fragment>
+        )
+        : <Tag color="blue">{record.issueComponentBriefDTOS[0].name}</Tag>;
+    } else {
+      return null;
+    }
+  };
+
+  renderEpic = (text, record) => {
+    const style = {
+      color: record.epicColor,
+      borderWidth: '1px',
+      borderStyle: 'solid',
+      borderColor: record.epicColor,
+      borderRadius: '2px',
+      fontSize: '13px',
+      lineHeight: '20px',
+      padding: '0 8px',
+      display: 'inline-block',
+    };
+    return record.epicName ? <span style={style}>{record.epicName}</span> : null;
+  };
+
+  renderTag = (text, record) => (
+    record.labelIssueRelDTOS && record.labelIssueRelDTOS.length
+      ? <Tag color="blue">{record.labelIssueRelDTOS[0].labelName}</Tag>
+      : null
+  );
 
   onlyMe = (checked) => {
-    IssueStore.setAdvArg({ assignee_id: checked ? AppState.userInfo.id : null });
+    IssueStore.setAdvArg({ assigneeIds: checked ? [AppState.userInfo.id] : null });
     IssueStore.loadIssues();
   };
 
@@ -553,10 +585,15 @@ class Issue extends Component {
       ],
       ['reporterName', []],
       ['assigneeName', []],
+      ['version', []],
       ['sprint', []],
       ['component', []],
       ['epic', []],
       ['issueId', []],
+      ['label', IssueStore.getLabel.map(item => ({
+        text: item.labelName,
+        value: item.labelId.toString(),
+      }))],
     ]);
     // 表格列配置
     const columns = [
@@ -573,7 +610,6 @@ class Issue extends Component {
       },
       {
         title: '问题类型',
-        dataIndex: 'issueTypeDTO.name',
         key: 'issueTypeId',
         width: '120px',
         disableClick: true,
@@ -595,7 +631,6 @@ class Issue extends Component {
       },
       {
         title: '状态',
-        dataIndex: 'statusMapDTO.name',
         key: 'statusId',
         disableClick: true,
         sorter: true,
@@ -605,13 +640,12 @@ class Issue extends Component {
       },
       {
         title: '优先级',
-        dataIndex: 'priorityDTO.name',
         key: 'priorityId',
         disableClick: true,
-        render: this.renderPriorityName,
         sorter: true,
         filters: columnFilter.get('priorityId'),
         filterMultiple: true,
+        render: this.renderPriorityName,
       },
       {
         title: '经办人',
@@ -639,25 +673,20 @@ class Issue extends Component {
       },
       {
         title: '版本',
-        dataIndex: 'versionIssueRelDTOS',
-        key: 'versionIssueRelDTOS',
         filters: columnFilter.get('versionIssueRelDTOS'),
-        width: 200,
+        key: 'version',
         render: this.renderVersion,
       },
       {
         title: '冲刺',
-        dataIndex: 'issueSprintDTOS',
-        key: 'issueSprintDTOS',
+        key: 'sprint',
         filters: columnFilter.get('sprint'),
         hidden: true,
-        width: 100,
         render: this.renderSprint,
       },
       {
         title: '模块',
-        dataIndex: 'issueComponentBriefDTOS',
-        key: 'issueComponentBriefDTOS',
+        key: 'component',
         filters: columnFilter.get('component'),
         hidden: true,
         render: this.renderComponent,
@@ -665,10 +694,18 @@ class Issue extends Component {
       {
         title: '史诗',
         dataIndex: 'epicName',
-        key: 'epicName',
+        key: 'epic',
         filters: columnFilter.get('epic'),
-        hidden: true,
         render: this.renderEpic,
+        hidden: true,
+      },
+      {
+        title: '标签',
+        key: 'label',
+        filters: columnFilter.get('label'),
+        filterMultiple: true,
+        render: this.renderTag,
+        hidden: true,
       },
     ];
     if (storage.getItem('filterData') && storage.getItem('filterData').length) {

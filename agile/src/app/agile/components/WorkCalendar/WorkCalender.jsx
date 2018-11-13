@@ -9,7 +9,7 @@ import zhCN from 'rc-calendar/lib/locale/zh_CN';
 import 'rc-calendar/assets/index.css';
 import './WorkCalender.scss';
 
-const format = 'YYYY-MM-DD';
+const format = 'YYYY-M-D';
 
 @observer
 class WorkCalendar extends Component {

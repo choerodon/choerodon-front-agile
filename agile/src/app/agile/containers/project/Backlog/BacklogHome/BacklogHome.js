@@ -538,6 +538,7 @@ class BacklogHome extends Component {
               onChangeCheckBox={this.onChangeSelect}
               onlyStory={this.filterOnlyStory}
               onlyMe={this.filterOnlyMe}
+              resetFilter={BacklogStore.getQuickSearchClean}
             />
           </div>
           <div className="c7n-backlog">
