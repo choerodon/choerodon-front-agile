@@ -467,7 +467,43 @@ class Issue extends Component {
     />
   );
 
-  renderVersion = arr => (arr.length ? <Tag color="blue">{arr[0].name}</Tag> : null);
+  // renderVersion = arr => (arr.length ? <Tag color="blue">{arr[0].name}</Tag> : null);
+  renderVersion = (arr) => {
+    if (arr && arr.length) {
+      return (
+        <Tooltip mouseEnterDelay={0.5} title={`版本：${arr.map(item => `${item.name} `)}`}>
+          {/* {arr.slice(0, 2).map(item => <span>{`${item.name}, `}</span>)} */}
+          {arr.slice(0, 2).map((item, i) => {
+            if (i !== arr.slice(0, 2).length - 1) {
+              return <span>{`${item.name}, `}</span>;
+            } else {
+              return <span>{`${item.name}`}</span>;
+            }
+          })}
+          {arr.length > 2 ? '...' : ''}
+        </Tooltip>
+      );
+    }
+    return '无';
+  }
+
+  renderSprint = arr => (
+    arr && arr.length ? arr[0].sprintName : '无'
+  )
+
+  renderComponent = (arr) => {
+    if (arr && arr.length) {
+      return (
+        <Tooltip mouseEnterDelay={0.5} title={`模块：${arr.map(item => `${item.name} `)}`}>
+          {arr.slice(0, 1).map((item, i) => <span>{`${item.name}`}</span>)}
+          {arr.length > 1 ? '...' : ''}
+        </Tooltip>
+      );
+    }
+    return '无';
+  }
+
+  renderEpic = epicName => (epicName || '无')
 
   onlyMe = (checked) => {
     IssueStore.setAdvArg({ assignee_id: checked ? AppState.userInfo.id : null });
@@ -606,28 +642,33 @@ class Issue extends Component {
         dataIndex: 'versionIssueRelDTOS',
         key: 'versionIssueRelDTOS',
         filters: columnFilter.get('versionIssueRelDTOS'),
+        width: 200,
         render: this.renderVersion,
       },
       {
         title: '冲刺',
-        dataIndex: 'sprint',
-        key: 'sprint',
+        dataIndex: 'issueSprintDTOS',
+        key: 'issueSprintDTOS',
         filters: columnFilter.get('sprint'),
         hidden: true,
+        width: 100,
+        render: this.renderSprint,
       },
       {
         title: '模块',
-        dataIndex: 'component',
-        key: 'component',
+        dataIndex: 'issueComponentBriefDTOS',
+        key: 'issueComponentBriefDTOS',
         filters: columnFilter.get('component'),
         hidden: true,
+        render: this.renderComponent,
       },
       {
         title: '史诗',
-        dataIndex: 'epic',
-        key: 'epic',
+        dataIndex: 'epicName',
+        key: 'epicName',
         filters: columnFilter.get('epic'),
         hidden: true,
+        render: this.renderEpic,
       },
     ];
     if (storage.getItem('filterData') && storage.getItem('filterData').length) {
@@ -733,7 +774,7 @@ class Issue extends Component {
                 filterBarPlaceholder="过滤表"
                 filters={filterName}
                 noFilter
-                scroll={expand ? { x: true } : { x: 1500 }}
+                scroll={expand ? { x: true } : { x: 2000 }}
                 loading={IssueStore.loading}
                 pagination={false}
                 onChange={this.handleFilterChange}

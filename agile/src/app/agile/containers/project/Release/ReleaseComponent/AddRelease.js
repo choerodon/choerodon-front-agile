@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Modal, Form, Input, DatePicker, message } from 'choerodon-ui';
+import {
+ Modal, Form, Input, DatePicker, message 
+} from 'choerodon-ui';
 import moment from 'moment';
 import { Content, stores } from 'choerodon-front-boot';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -118,7 +120,7 @@ class AddRelease extends Component {
                   validator: this.checkName,
                 }],
               })(
-                <Input label="版本名称" maxLength={30} />,
+                <Input label="版本名称" maxLength={10} />,
               )}
             </FormItem>
             <FormItem>
