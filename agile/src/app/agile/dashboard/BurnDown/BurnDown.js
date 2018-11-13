@@ -77,7 +77,7 @@ class BurnDown extends Component {
         },
         extraCssText: 
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
-        formatter(params) {
+        formatter: (params) => {
           let content = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
@@ -246,7 +246,9 @@ class BurnDown extends Component {
       if (restDayShow || !restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
       }
-      if (dateList[0] === endDay[0] && dateList[1] === endDay[1] && dateList[2] === endDay[2]) {
+      if (String(dateList[0]) === endDay[0]
+        && String(dateList[1]) === endDay[1]
+        && String(dateList[2]) === endDay[2]) {
         i = 1;
       }
     }

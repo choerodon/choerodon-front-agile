@@ -84,7 +84,7 @@ class Backlog extends Component {
       return (
         <div className="issues">
           <div className="title">
-            <h4 className="word">Issues</h4>
+            <h4 className="word">问题</h4>
             <Icon
               type={backlogExpand.includes(0) ? 'expand_less' : 'expand_more'}
               onClick={this.handleClickExpand.bind(this, 0)}
