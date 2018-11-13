@@ -3,7 +3,9 @@ import { observer, inject } from 'mobx-react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import { stores } from 'choerodon-front-boot';
-import { Input, message, Icon } from 'choerodon-ui';
+import {
+  Input, message, Icon, Modal, 
+} from 'choerodon-ui';
 import StatusCard from '../StatusCard/StatusCard';
 import './SettingColumn.scss';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
@@ -18,14 +20,18 @@ class SettingColumn extends Component {
     this.state = {
       editMax: false,
       editMin: false,
+      visible: false,
     };
   }
 
   handleDeleteColumn() {
-    ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
-      this.props.refresh();
-    }).catch((err) => {
+    this.setState({
+      visible: true,
     });
+    // ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
+    //   this.props.refresh();
+    // }).catch((err) => {
+    // });
   }
 
   updateColumnMaxMin(type, value) {
@@ -157,6 +163,32 @@ class SettingColumn extends Component {
                   role="none"
                   onClick={this.handleDeleteColumn.bind(this)}
                 />
+                <Modal
+                  title="删除列"
+                  visible={this.state.visible || false}
+                  onOk={() => {
+                    this.setState({
+                      visible: false,
+                    });
+                    ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
+                      this.props.refresh();
+                    }).catch((err) => {
+                    });
+                  }}
+                  onCancel={() => {
+                    this.setState({
+                      visible: false,
+                    });
+                  }}
+                  okText="确定"
+                  cancelText="取消"
+                  // confirmLoading={loading}
+                >
+                  
+                  {'确定要删除该列？'}
+
+                </Modal>
+               
               </div>
               <div className="c7n-scrumsetting-columnStatus">
                 {this.props.data.name}
@@ -170,11 +202,11 @@ class SettingColumn extends Component {
                   ) : (
                     <div>
                       <span style={{ cursor: 'pointer' }}>
-                        最大值：
+                        {'最大值：'}
                         {this.props.data.maxNum}
                       </span>
                       <span style={{ cursor: 'pointer' }}>
-                        最小值：
+                        {'最小值：'}
                         {this.props.data.maxNum}
                       </span>
                     </div>
@@ -250,6 +282,28 @@ class SettingColumn extends Component {
                       role="none"
                       onClick={this.handleDeleteColumn.bind(this)}
                     />
+                    <Modal
+                      title="删除列"
+                      visible={this.state.visible || false}
+                      onOk={() => {
+                        this.setState({
+                          visible: false,
+                        });
+                        ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
+                          this.props.refresh();
+                        }).catch((err) => {
+                        });
+                      }}
+                      onCancel={() => {
+                        this.setState({
+                          visible: false,
+                        });
+                      }}
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      {'确定要删除该列？'}
+                    </Modal>
                   </div>
                   <div className="c7n-scrumsetting-columnStatus">
                     <EasyEdit
@@ -292,8 +346,37 @@ class SettingColumn extends Component {
                             <span
                               style={{ cursor: 'pointer', minWidth: '110px' }}
                             >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                               最大值：
-                              {this.props.data.maxNum || '没有最大'}
+{this.props.data.maxNum || '没有最大'}
 
                             </span>
                           </EasyEdit>
@@ -309,8 +392,37 @@ class SettingColumn extends Component {
                             <span
                               style={{ cursor: 'pointer', minWidth: '110px' }}
                             >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                               最小值：
-                              {this.props.data.minNum || '没有最小'}
+{this.props.data.minNum || '没有最小'}
 
                             </span>
                           </EasyEdit>

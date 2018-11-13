@@ -84,6 +84,7 @@ class ScrumBoardSetting extends Component {
       }).catch(() => {
         ScrumBoardStore.axiosGetCalendarData(year);
       });
+      ScrumBoardStore.axiosCanAddStatus();
     }
   }
   

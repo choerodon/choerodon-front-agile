@@ -59,6 +59,26 @@ class ScrumBoardStore {
 
   @observable issueTypes = [];
 
+  @observable canAddStatus = true;
+
+  @computed get getCanAddStatus() {
+    return this.canAddStatus;
+  }
+
+  @action setCanAddStatus(data) {
+    this.canAddStatus = data;
+  }
+
+  axiosCanAddStatus() {
+    axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/check_create_status_for_agile`)
+      .then((data) => {
+        this.setCanAddStatus(data);
+      })
+      .catch((e) => {
+        Choerodon.prompt(e.message);
+      });
+  }
+
   @computed get getStatusList() {
     return this.statusList.slice();
   }
