@@ -1,4 +1,4 @@
-image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cifront:0.6.0
+image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cifront:0.7.0
 
 stages:
   - node_build
@@ -35,7 +35,7 @@ node_build_dev:
     - tags
 
 docker_build:
-  image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cibase:0.6.0
+  image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cibase:0.7.0
   stage: docker_build
   script:
     - docker_build
