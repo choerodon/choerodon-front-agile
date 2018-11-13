@@ -156,6 +156,7 @@ class WorkCalendar extends Component {
       >
         {text}
       </span>
+      <span className="legend-text">{title}</span>
     </div>
   );
 

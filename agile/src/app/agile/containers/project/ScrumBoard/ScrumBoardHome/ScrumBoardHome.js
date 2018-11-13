@@ -1120,6 +1120,7 @@ class ScrumBoardHome extends Component {
           />
           <Modal
             closable={false}
+            maskClosable={false}
             title="更新父问题"
             visible={JSON.stringify(judgeUpdateParent) !== '{}'}
             onCancel={() => {
@@ -1132,7 +1133,7 @@ class ScrumBoardHome extends Component {
               const data = {
                 issueId: judgeUpdateParent.id,
                 objectVersionNumber: judgeUpdateParent.objectVersionNumber,
-                transformId: updateParentStatus,
+                transformId: updateParentStatus || translateId[0].id,
               };
               BacklogStore.axiosUpdateIssue(data).then((res) => {
                 this.refresh(ScrumBoardStore.getSelectedBoard);
@@ -1150,7 +1151,7 @@ class ScrumBoardHome extends Component {
               {'的全部子任务为done'}
             </p>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p style={{ marginRight: 20 }}>您是否要更新父问题进行匹配</p>
+              <p style={{ marginRight: 20, marginBottom: 0 }}>您是否要更新父问题进行匹配</p>
               <Select
                 style={{
                   width: 250,

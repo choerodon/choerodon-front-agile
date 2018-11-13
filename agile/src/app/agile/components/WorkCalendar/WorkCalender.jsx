@@ -109,6 +109,10 @@ class WorkCalendar extends Component {
             <span className="des">{holidayInfo[0].name}</span>
           </React.Fragment>
         );
+      } else if (workDate.length) {
+        holidayTag = workDate[0].status === 0 ? null : <span className="tag tag-work">班</span>;
+      } else if (selectDay.length) {
+        holidayTag = selectDay[0].status === 0 ? null : <span className="tag tag-work">班</span>;
       }
     } else if (workDate.length) {
       dateStyle = workDate[0].status === 1 ? workDayStyle : notWorkDayStyle;
