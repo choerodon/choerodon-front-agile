@@ -438,7 +438,7 @@ class Issue extends Component {
             id: record.reporterId,
             loginName: '',
             realName: text,
-            avatar: record.imageUrl,
+            avatar: record.reporterImageUrl,
           }}
         />
       </div>
@@ -453,7 +453,7 @@ class Issue extends Component {
             id: record.assigneeId,
             loginName: '',
             realName: text,
-            avatar: record.imageUrl,
+            avatar: record.assigneeImageUrl,
           }}
         />
       </div>
