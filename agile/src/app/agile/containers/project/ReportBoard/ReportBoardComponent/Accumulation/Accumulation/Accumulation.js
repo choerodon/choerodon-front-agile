@@ -202,11 +202,17 @@ class Accumulation extends Component {
               });
           } else {
             window.console.warn('Can not get any board.');
-          }         
+          }   
+          this.setState({
+            loading: false,
+          });      
         }),
       )
       .catch(() => {
-        this.setIsLoading(false);
+        // this.setIsLoading(false);
+        this.setState({
+          loading: false,
+        });      
       });
   }
 

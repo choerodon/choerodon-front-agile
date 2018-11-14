@@ -13,7 +13,7 @@ import BurndownChartStore from '../../../../../stores/project/burndownChart/Burn
 import ReportStore from '../../../../../stores/project/Report';
 import restSvg from '../../../../../assets/image/rest.svg';
 import hopeSvg from '../../../../../assets/image/hope.svg';
-import { formatDate } from '../../../../../common/utils';
+import { commonformatDate } from '../../../../../common/utils';
 import NoDataComponent from '../../Component/noData';
 // import epicSvg from '../../Home/style/pics/no_sprint.svg';
 import epicSvg from '../../../../../assets/image/emptyChart.svg';
@@ -311,11 +311,11 @@ class SprintReport extends Component {
         },
         extraCssText:
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
-        formatter (params) {
+        formatter(params) {
           let content = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value  : '-'}`;
+              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}`;
             }
           });
           return content;
@@ -696,9 +696,8 @@ class SprintReport extends Component {
                       checked={this.state.restDayShow}
                       onChange={this.onCheckChange}
                     >
-
-                      显示非工作日
-</Checkbox>
+                      {'显示非工作日'}
+                    </Checkbox>
                     <div className="c7n-sprintMessage">
                       <div className="c7n-sprintContent">
                         <span>
@@ -709,7 +708,7 @@ class SprintReport extends Component {
                           {'个问题'}
                         </span>
                         <span>
-                          {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
+                          {`${commonformatDate(ReportStore.currentSprint.startDate)} - ${commonformatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
                         </span>
                       </div>
                       <p

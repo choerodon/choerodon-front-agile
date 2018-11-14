@@ -114,6 +114,11 @@ class Status extends Component {
           loading: false,
           statusInfo,
         });
+      })
+      .catch((e) => {
+        this.setState({
+          loading: false,
+        });
       });
   };
 

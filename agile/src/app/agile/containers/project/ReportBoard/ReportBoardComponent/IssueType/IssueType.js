@@ -79,6 +79,13 @@ class IssueType extends Component {
             issueTypeInfo: res,
           });
         }
+      })
+      .catch((e) => {
+        console.log('error');
+        this.setState({
+          loading: false,
+        });
+        Choerodon.prompt('加载数据错误');
       });
   }
  
