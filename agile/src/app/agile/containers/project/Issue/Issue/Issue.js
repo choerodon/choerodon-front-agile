@@ -48,6 +48,7 @@ class Issue extends Component {
       createLoading: false,
       originPriorities: [],
       defaultPriorityId: false,
+      tableWidth: 1450,
     };
   }
 
@@ -552,11 +553,18 @@ class Issue extends Component {
     IssueStore.loadIssues();
   };
 
+  setTableWidth = (columns) => {
+    const ret = columns.reduce((sum, column) => sum + (column.hidden ? 0 : column.width), 0);
+    this.setState({
+      tableWidth: ret,
+    });
+  };
+
   render() {
     const {
       expand, selectedIssue, createIssueValue,
       selectIssueType, createLoading, create, checkCreateIssue,
-      originPriorities,
+      originPriorities, tableWidth,
     } = this.state;
     // 获取筛选框的显示内容
     let { filterName } = this.state;
@@ -601,7 +609,7 @@ class Issue extends Component {
         title: '任务编号',
         dataIndex: 'issueNum',
         key: 'issueId',
-        width: '128px',
+        width: 128,
         disableClick: true,
         sorter: true,
         fixed: expand ? false : 'left',
@@ -611,7 +619,7 @@ class Issue extends Component {
       {
         title: '问题类型',
         key: 'issueTypeId',
-        width: '120px',
+        width: 120,
         disableClick: true,
         sorter: true,
         fixed: expand ? false : 'left',
@@ -623,7 +631,7 @@ class Issue extends Component {
         title: '概要',
         dataIndex: 'summary',
         key: 'summary',
-        width: '300px',
+        width: 300,
         disableClick: true,
         fixed: expand ? false : 'left',
         filters: columnFilter.get('summary'),
@@ -632,6 +640,7 @@ class Issue extends Component {
       {
         title: '状态',
         key: 'statusId',
+        width: 100,
         disableClick: true,
         sorter: true,
         filters: columnFilter.get('statusId'),
@@ -641,6 +650,7 @@ class Issue extends Component {
       {
         title: '优先级',
         key: 'priorityId',
+        width: 100,
         disableClick: true,
         sorter: true,
         filters: columnFilter.get('priorityId'),
@@ -651,6 +661,7 @@ class Issue extends Component {
         title: '经办人',
         dataIndex: 'assigneeName',
         key: 'assigneeId',
+        width: 200,
         disableClick: true,
         sorter: true,
         filters: columnFilter.get('assigneeName'),
@@ -660,6 +671,7 @@ class Issue extends Component {
         title: '报告人',
         dataIndex: 'reporterName',
         key: 'reporterId',
+        width: 200,
         sorter: true,
         filters: columnFilter.get('reporterName'),
         render: this.renderReporterName,
@@ -668,6 +680,7 @@ class Issue extends Component {
         title: '最后更新时间',
         dataIndex: 'lastUpdateDate',
         key: 'lastUpdateDate',
+        width: 150,
         sorter: true,
         render: this.renderLastUpdateTime,
       },
@@ -675,11 +688,13 @@ class Issue extends Component {
         title: '版本',
         filters: columnFilter.get('versionIssueRelDTOS'),
         key: 'version',
+        width: 150,
         render: this.renderVersion,
       },
       {
         title: '冲刺',
         key: 'sprint',
+        width: 150,
         filters: columnFilter.get('sprint'),
         hidden: true,
         render: this.renderSprint,
@@ -687,6 +702,7 @@ class Issue extends Component {
       {
         title: '模块',
         key: 'component',
+        width: 150,
         filters: columnFilter.get('component'),
         hidden: true,
         render: this.renderComponent,
@@ -695,6 +711,7 @@ class Issue extends Component {
         title: '史诗',
         dataIndex: 'epicName',
         key: 'epic',
+        width: 150,
         filters: columnFilter.get('epic'),
         render: this.renderEpic,
         hidden: true,
@@ -702,6 +719,7 @@ class Issue extends Component {
       {
         title: '标签',
         key: 'label',
+        width: 150,
         filters: columnFilter.get('label'),
         filterMultiple: true,
         render: this.renderTag,
@@ -811,11 +829,12 @@ class Issue extends Component {
                 filterBarPlaceholder="过滤表"
                 filters={filterName}
                 noFilter
-                scroll={expand ? { x: true } : { x: 2000 }}
+                scroll={expand ? { x: true } : { x: tableWidth }}
                 loading={IssueStore.loading}
                 pagination={false}
                 onChange={this.handleFilterChange}
                 onColumnFilterChange={(item) => {
+                  this.setTableWidth(columns);
                   storage.setItem('filterData', item.selectedKeys);
                 }}
                 rowClassName={(record, index) => (
