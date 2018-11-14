@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
@@ -161,6 +160,7 @@ class SprintItem extends Component {
       this.setState({
         loading: true,
       });
+      debugger;
       const data = {
         priorityCode: `priority-${priorityId}`,
         priorityId,
@@ -378,7 +378,8 @@ class SprintItem extends Component {
    */
   handleClickIssue=(sprintId, item) => {
     // command ctrl shift
-    const { keydown, selected, store } = this.state;
+    const { keydown, selected } = this.state;
+    const { store } = this.props;
     if (keydown === 91 || keydown === 17 || keydown === 16) {
       // 如果没点击
       if (selected.droppableId === '') {
@@ -575,15 +576,14 @@ class SprintItem extends Component {
 
 
   renderStatusCodeDom =(item, index) => {
+    const { state } = this;
     const menu = (
       <Menu
         onClick={this.handleDeleteSprint.bind(this, item)}
       >
         <Menu.Item key="0">
-
-
           删除sprint
-                </Menu.Item>
+        </Menu.Item>
       </Menu>
     );
     if (item.statusCode) {
@@ -602,10 +602,8 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleFinishSprint.bind(this, item, index)}
               >
-
-
                 完成冲刺
-                            </p>
+              </p>
               {/* <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown> */}
@@ -624,7 +622,7 @@ class SprintItem extends Component {
 
 
                 开启冲刺
-                            </p>
+              </p>
               <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown>
@@ -632,7 +630,7 @@ class SprintItem extends Component {
           )}
           <StartSprint
             store={store}
-            visible={(this.state[`${index}-startSprint`] && this.state[`${index}-startSprint`].startSprintVisible) || false}
+            visible={(state[`${index}-startSprint`] && state[`${index}-startSprint`].startSprintVisible) || false}
             onCancel={() => {
               this.setState({
                 [`${index}-startSprint`]: { startSprintVisible: false },
@@ -643,7 +641,7 @@ class SprintItem extends Component {
           />
           <CloseSprint
             store={store}
-            visible={(this.state[`${index}-closeSprint`] && this.state[`${index}-closeSprint`].closeSprintVisible) || false}
+            visible={(state[`${index}-closeSprint`] && state[`${index}-closeSprint`].closeSprintVisible) || false}
             onCancel={() => {
               this.setState({
                 [`${index}-closeSprint`]: { closeSprintVisible: false },
@@ -685,7 +683,10 @@ class SprintItem extends Component {
    * @returns
    * @memberof Sprint
    */
-  getCurrentState=data => this.state[data];
+  getCurrentState= (data) => {
+    const { state } = this;
+    return state[data];
+  };
 
   handleChangeType(type) {
     this.setState({
@@ -700,8 +701,7 @@ class SprintItem extends Component {
    * @memberof Sprint
    */
   renderSprint = () => {
-    const { store } = this.props;
-    const { selectIssueType, loading } = this.state;
+    const { state, props: { store }, state: { selectIssueType, loading } } = this;
     const issueTypes = store.getIssueTypes
       .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
@@ -748,11 +748,11 @@ class SprintItem extends Component {
                       <div className="c7n-backlog-sprintName">
                         <Icon
                           style={{ fontSize: 20, cursor: 'pointer' }}
-                          type={this.state[`${indexs}-sprint`] && !this.state[`${indexs}-sprint`].expand ? 'baseline-arrow_right' : 'baseline-arrow_drop_down'}
+                          type={state[`${indexs}-sprint`] && !state[`${indexs}-sprint`].expand ? 'baseline-arrow_right' : 'baseline-arrow_drop_down'}
                           role="none"
                           onClick={() => {
                             this.setState({
-                              [`${indexs}-sprint`]: { expand: this.state[`${indexs}-sprint`] ? !this.state[`${indexs}-sprint`].expand : false },
+                              [`${indexs}-sprint`]: { expand: state[`${indexs}-sprint`] ? !state[`${indexs}-sprint`].expand : false },
                             });
                           }}
                         />
@@ -807,7 +807,7 @@ class SprintItem extends Component {
                           .filter(ass => ass.assigneeId)
                           .map((ass2, index) => (
                             <Tooltip
-                              key={`tooltip-${index}`}
+                              key={`tooltip-${ass2.id}`}
                               placement="bottom"
                               title={(
                                 <div>
@@ -862,7 +862,7 @@ class SprintItem extends Component {
                       />
                     </div>
                     <AssigneeModal
-                      visible={this.state[indexs] && this.state[indexs].visibleAssign || false}
+                      visible={(state[indexs] && state[indexs].visibleAssign) || false}
                       onCancel={() => {
                         this.setState({
                           [indexs]: {
@@ -967,7 +967,7 @@ class SprintItem extends Component {
                     </div>
                   </div>
                 </div>
-                {(this.state[`${indexs}-sprint`] && this.state[`${indexs}-sprint`].expand) || this.state[`${indexs}-sprint`] === undefined ? (
+                {(state[`${indexs}-sprint`] && state[`${indexs}-sprint`].expand) || state[`${indexs}-sprint`] === undefined ? (
                   <Droppable
                     droppableId={item.sprintId.toString()}
                     isDropDisabled={store.getIsLeaveSprint}
@@ -994,7 +994,7 @@ class SprintItem extends Component {
                               alignItems: 'center',
                             }}
                           >
-                            {this.state[`${indexs}-create`] && this.state[`${indexs}-create`].createIssue ? (
+                            {state[`${indexs}-create`] && state[`${indexs}-create`].createIssue ? (
                               <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                   <Dropdown overlay={typeList} trigger={['click']}>
@@ -1038,19 +1038,15 @@ class SprintItem extends Component {
                                       });
                                     }}
                                   >
-
-
                                     取消
-                                                                    </Button>
+                                  </Button>
                                   <Button
                                     type="primary"
                                     loading={loading}
                                     onClick={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
                                   >
-
-
                                     确定
-                                                                    </Button>
+                                  </Button>
                                 </div>
                               </div>
                             ) : (
@@ -1076,7 +1072,7 @@ class SprintItem extends Component {
 
 
                                   创建问题
-                                                                </Button>
+                                </Button>
                               </div>
                             )}
                           </div>
@@ -1110,7 +1106,7 @@ class SprintItem extends Component {
 
 
                   过上下拖动来对待办事项排优先级
-                                </p>
+                </p>
               </div>
             </div>
           );
@@ -1127,10 +1123,9 @@ class SprintItem extends Component {
    * @memberof Sprint
    */
   renderBacklog=() => {
-    const { store } = this.props;
+    const { state, props: { store }, state: { selectIssueType, backlogExpand, loading } } = this;
     const issueTypes = store.getIssueTypes
       .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
-    const { selectIssueType, backlogExpand, loading } = this.state;
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
       <Menu
@@ -1208,7 +1203,7 @@ class SprintItem extends Component {
 
 
                     清空所有筛选器
-                                    </p>
+                  </p>
                 </div>
                 <div style={{ flexGrow: 1 }}>
                   {this.renderStatusCodeDom(item)}
@@ -1243,7 +1238,7 @@ class SprintItem extends Component {
                           alignItems: 'center',
                         }}
                       >
-                        {this.state['-1-create'] && this.state['-1-create'].createIssue ? (
+                        {state['-1-create'] && state['-1-create'].createIssue ? (
                           <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                               <Dropdown overlay={typeList} trigger={['click']}>
@@ -1285,7 +1280,7 @@ class SprintItem extends Component {
 
 
                                 取消
-                                                            </Button>
+                              </Button>
                               <Button
                                 type="primary"
                                 loading={loading}
@@ -1294,7 +1289,7 @@ class SprintItem extends Component {
 
 
                                 确定
-                                                            </Button>
+                              </Button>
                             </div>
                           </div>
                         ) : (
@@ -1318,7 +1313,7 @@ class SprintItem extends Component {
 
 
                               创建问题
-                                                        </Button>
+                            </Button>
                           </div>
                         )}
                       </div>
