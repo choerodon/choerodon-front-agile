@@ -9,7 +9,8 @@ import zhCN from 'choerodon-ui/lib/rc-components/calendar/locale/zh_CN';
 import './rc-calendar.scss';
 import './WorkCalender.scss';
 
-const format = 'YYYY-M-D';
+const format = 'YYYY-MM-DD';
+const test = 'YYYY-M-DD';
 
 @observer
 class WorkCalendar extends Component {
@@ -96,7 +97,11 @@ class WorkCalendar extends Component {
     const selectDay = selectDays.filter(d => d.workDay === date);
 
     let holidayTag = null;
-    if (startDate.includes(date) || endDate.includes(date)) {
+
+    const startDateCopy = moment(startDate).format(test);
+    const endDateCopy = moment(endDate).format(test);
+
+    if (startDateCopy === date || endDateCopy === date) {
       dateStyle = sprintDayStyle;
       if (useHoliday && holidayInfo.length) {
         holidayTag = (
@@ -113,6 +118,8 @@ class WorkCalendar extends Component {
         holidayTag = workDate[0].status === 0 ? null : <span className="tag tag-work">班</span>;
       } else if (selectDay.length) {
         holidayTag = selectDay[0].status === 0 ? null : <span className="tag tag-work">班</span>;
+      } else {
+        holidayTag = <span className="tag tag-work">班</span>;
       }
     } else if (workDate.length) {
       dateStyle = workDate[0].status === 1 ? workDayStyle : notWorkDayStyle;
