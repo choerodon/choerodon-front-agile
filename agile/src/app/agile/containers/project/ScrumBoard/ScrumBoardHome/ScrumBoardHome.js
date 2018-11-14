@@ -1132,7 +1132,7 @@ class ScrumBoardHome extends Component {
                 objectVersionNumber: judgeUpdateParent.objectVersionNumber,
                 transformId: updateParentStatus || translateId[0].id,
               };
-              BacklogStore.axiosUpdateIssue(data).then((res) => {
+              ScrumBoardStore.axiosUpdateIssue(data).then((res) => {
                 this.refresh(ScrumBoardStore.getSelectedBoard);
                 this.setState({
                   judgeUpdateParent: {},

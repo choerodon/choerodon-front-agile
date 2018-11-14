@@ -583,8 +583,8 @@ class UserMapStore {
   }
 
   axiosGetDefaultPriority() {
-    const orgId = AppState.currentMenuType.organizationId;
-    return axios.get(`/issue/v1/organizations/${orgId}/priority/default`).then((data) => {
+    const proId = AppState.currentMenuType.id;
+    return axios.get(`/issue/v1/projects/${proId}/priority/default`).then((data) => {
       if (data && !data.failed) {
         this.setDefaultPriority(data);
       } else {

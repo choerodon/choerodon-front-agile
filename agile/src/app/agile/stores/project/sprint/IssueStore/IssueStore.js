@@ -81,12 +81,7 @@ class SprintCommonStore {
 
   @observable tagData = [];
 
-  @observable otherArgs = {
-    type: null,
-    id: null,
-    issueIds: null,
-    resolution: null,
-  };
+  @observable otherArgs = {};
 
   @observable resolution = false;
 
@@ -247,12 +242,13 @@ class SprintCommonStore {
   }
 
   @action setParamInOtherArgs() {
-    this.otherArgs = {
-      type: this.paramType,
-      id: this.paramId ? [this.paramId] : undefined,
-      issueIds: this.paramIssueId ? [this.paramIssueId] : undefined,
-      resolution: this.resolution,
-    };
+    if (this.paramType) {
+      this.otherArgs[this.paramType] = this.paramId ? [this.paramId] : undefined;
+    }
+    if (this.paramIssueId) {
+      this.otherArgs.issueIds = [this.paramIssueId.toString()];
+    }
+    this.otherArgs.resolution = this.resolution;
   }
 
   @action setOtherArgs(data) {
@@ -298,15 +294,15 @@ class SprintCommonStore {
     this.setLabel(tag);
   }
 
-  loadQuickSearch = () => axios.get(`/agile/v1/projects/${proId}/quick_filter`);
+  loadQuickSearch = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`);
 
-  loadType = () => axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types?apply_type=agile`);
+  loadType = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_issue_types?apply_type=agile`);
 
-  loadStatus = () => axios.get(`/issue/v1/projects/${proId}/schemes/query_status_by_project_id?apply_type=agile`);
+  loadStatus = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_status_by_project_id?apply_type=agile`);
 
-  loadPriorities = () => axios.get(`/issue/v1/organizations/${orgId}/priority/list_by_org`);
+  loadPriorities = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/priority/list_by_org`);
 
-  loadLabel = () => axios.get(`/agile/v1/projects/${proId}/issue_labels`);
+  loadLabel = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_labels`);
 
   createIssue(issueObj, projectId = AppState.currentMenuType.id) {
     const issue = {
