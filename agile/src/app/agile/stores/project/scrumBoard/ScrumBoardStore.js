@@ -464,6 +464,12 @@ class ScrumBoardStore {
       this.setStatusList([]);
     });
   };
+
+  axiosUpdateIssue(data) {
+    const proId = AppState.currentMenuType.id;
+    const { issueId, objectVersionNumber, transformId } = data;
+    return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=agile&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objectVersionNumber}`);
+  }
 }
 
 const scrumBoardStore = new ScrumBoardStore();
