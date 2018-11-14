@@ -115,7 +115,7 @@ class AddComponent extends Component {
         state: 'originUsers',
       },
       priority: {
-        url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
+        url: `/issue/v1/projects/${projectId}/priority/list_by_org`,
         prop: '',
         id: 'id',
         name: 'name',
@@ -330,7 +330,7 @@ class AddComponent extends Component {
         state: 'originUsers',
       },
       priority: {
-        url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
+        url: `/issue/v1/projects/${projectId}/priority/list_by_org`,
         prop: '',
         id: 'id',
         name: 'name',
@@ -560,7 +560,7 @@ class AddComponent extends Component {
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
     axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`).then(res => this.setState({ originUsers: res.content }));
-    axios.get(`/issue/v1/organizations/${orgId}/priority/list_by_org`).then(res => this.setState({ originPriorities: res }));
+    axios.get(`/issue/v1/projects/${projectId}/priority/list_by_org`).then(res => this.setState({ originPriorities: res }));
     axios.get(`/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=agile`).then(res => this.setState({ originStatus: res }));
     axios.get(`/agile/v1/projects/${projectId}/issues/epics/select_data`).then(res => this.setState({ originEpics: res }));
     axios.post(`/agile/v1/projects/${projectId}/sprint/names`).then(res => this.setState({ originSprints: res }));

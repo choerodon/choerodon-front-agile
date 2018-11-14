@@ -304,7 +304,7 @@ class SprintCommonStore {
 
   loadStatus = () => axios.get(`/issue/v1/projects/${proId}/schemes/query_status_by_project_id?apply_type=agile`);
 
-  loadPriorities = () => axios.get(`/issue/v1/organizations/${orgId}/priority/list_by_org`);
+  loadPriorities = () => axios.get(`/issue/v1/projects/${proId}/priority/list_by_org`);
 
   loadLabel = () => axios.get(`/agile/v1/projects/${proId}/issue_labels`);
 
