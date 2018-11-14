@@ -79,16 +79,18 @@ class AddComponent extends Component {
     const { filterId } = this.props;
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/${id || filterId}`)
       .then((res) => {
-        const description = res.description.split('+++')[0] || '';
-        const obj = JSON.parse(res.description.split('+++')[1]);
-        this.setState({
-          arr: this.transformInit(obj.arr || []),
-          o: obj.o || [],
-          origin: {
-            ...res,
-            description,
-          },
-        });
+        if (res && res.description) {
+          const description = res.description.split('+').slice(0, -3).join('+') || '';
+          const obj = JSON.parse(res.description.split('+').slice(-1));
+          this.setState({
+            arr: this.transformInit(obj.arr || []),
+            o: obj.o || [],
+            origin: {
+              ...res,
+              description,
+            },
+          });
+        }
       });
   };
 

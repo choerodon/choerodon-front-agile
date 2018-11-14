@@ -1108,8 +1108,11 @@ class Home extends Component {
       mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
     const issues = UserMapStore.getCacheIssues;
+    // 不允许将史诗拖拽到非史诗列
     if (res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') return;
+    // 只拖拽了一个issue
     if (selectIssueIds.length < 2) {
+      // 拖拽到了同一列,不做处理
       if (res.destination.droppableId === res.source.droppableId
         && res.destination.index === res.source.index) return;
       const key = `${mode}Id`;
@@ -1119,8 +1122,9 @@ class Home extends Component {
       const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
       const souEpicId = this.getSprintIdAndEpicId(res.source.droppableId).epicId;
       const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
+      // 全部issue数据
       const issueData = _.cloneDeep(toJS(issues));
-      const backlogData = _.cloneDeep(toJS(backlogIssues));
+      // const backlogData = _.cloneDeep(toJS(backlogIssues));
       let desEpicAndModeIssues;
       if (desModeId === 0) {
         const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);

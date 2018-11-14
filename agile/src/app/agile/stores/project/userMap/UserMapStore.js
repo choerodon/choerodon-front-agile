@@ -373,7 +373,7 @@ class UserMapStore {
                 const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
                 this.setIssues(sortedUniqIssues);
                 if (this.cacheIssues.length === 0) {
-                  this.setCacheIssues([]);
+                  this.setCacheIssues(sortedUniqIssues);
                 }
               } else {
                 const sortedIssues = _.orderBy(issues, 'mapRank', 'asc');
