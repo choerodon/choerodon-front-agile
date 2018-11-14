@@ -272,7 +272,7 @@ class SprintItem extends Component {
             issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
           }
           confirm({
-            title: '警告',
+            title: '提醒',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
             onCancel() {
             },

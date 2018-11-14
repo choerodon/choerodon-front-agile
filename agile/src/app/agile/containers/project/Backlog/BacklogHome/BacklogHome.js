@@ -553,10 +553,8 @@ class BacklogHome extends Component {
                     });
                   }}
                 >
-
-
-                  版本
-                                </p>
+                  {'版本'}
+                </p>
               )}
               {epicVisible ? '' : (
                 <p
@@ -571,10 +569,8 @@ class BacklogHome extends Component {
                     });
                   }}
                 >
-
-
-                  史诗
-                                </p>
+                  {'史诗'}
+                </p>
               )}
             </div>
             <div className="c7n-backlog-content">
