@@ -53,15 +53,6 @@ class ScrumBoardHome extends Component {
     if (url.paramIssueId) {
       ScrumBoardStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
-    const timer = setInterval(() => {
-      if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-        if (document.getElementsByClassName('c7n-scrumboard-header').length > 0) {
-          document.getElementsByClassName('c7n-scrumboard-header')[0].style.paddingRight = '32px';
-        }
-        document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
-      }
-      clearInterval(timer);
-    }, 1000);
   }
 
   componentWillUnmount() {
@@ -752,10 +743,15 @@ class ScrumBoardHome extends Component {
   };
 
   renderHeight = () => {
-    if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-      return `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
-    }
-    return '';
+    const timer = setInterval(() => {
+      if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
+        if (document.getElementsByClassName('c7n-scrumboard-header').length > 0) {
+          document.getElementsByClassName('c7n-scrumboard-header')[0].style.paddingRight = '32px';
+        }
+        document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
+      }
+      clearInterval(timer);
+    }, 1000);
   };
 
   renderOthersTitle = () => {
@@ -911,6 +907,7 @@ class ScrumBoardHome extends Component {
   };
 
   render() {
+    this.renderHeight();
     const { form: { getFieldDecorator }, history } = this.props;
     const {
       dataSource,

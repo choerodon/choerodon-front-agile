@@ -5,8 +5,8 @@ import Calendar from 'choerodon-ui/lib/rc-components/calendar/';
 import _ from 'lodash';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import zhCN from 'rc-calendar/lib/locale/zh_CN';
-import 'rc-calendar/assets/index.css';
+import zhCN from 'choerodon-ui/lib/rc-components/calendar/locale/zh_CN';
+import './rc-calendar.scss';
 import './WorkCalender.scss';
 
 const format = 'YYYY-M-D';

@@ -169,6 +169,7 @@ class SprintItem extends Component {
         summary: this[`${index}-addInput`].input.value,
         issueTypeId: currentType.id,
         typeCode: currentType.typeCode,
+        /* eslint-disable */
         ...!isNaN(store.getChosenEpic) ? {
           epicId: store.getChosenEpic,
         } : {},
@@ -181,6 +182,7 @@ class SprintItem extends Component {
         } : {},
         parentIssueId: 0,
       };
+      /* eslint-enable */
       store.axiosEasyCreateIssue(data).then((res) => {
         this.setState({
           [`${index}-create`]: {
@@ -201,7 +203,7 @@ class SprintItem extends Component {
         });
       });
     }
-  }
+  };
 
   /**
    *修改冲刺名
@@ -807,7 +809,9 @@ class SprintItem extends Component {
                           .filter(ass => ass.assigneeId)
                           .map((ass2, index) => (
                             <Tooltip
-                              key={`tooltip-${ass2.id}`}
+                              /* eslint-disable */
+                              key={`tooltip-${index}`}
+                              /* eslint-enable */
                               placement="bottom"
                               title={(
                                 <div>
