@@ -6,6 +6,7 @@ import './SwimLaneContext.scss';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import StatusTag from '../../../../../components/StatusTag';
 import TypeTag from '../../../../../components/TypeTag';
+import UserHead from '../../../../../components/UserHead';
 
 @inject('AppState')
 @observer
@@ -158,15 +159,16 @@ class SwimLaneContext extends Component {
               });
             }}
           />
-          <Avatar
-            src={item.imageUrl ? item.imageUrl : undefined}
-            size="small"
-            style={{ marginRight: 8 }}
-          >
-            {
-              !item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''
-            }
-          </Avatar>
+          <UserHead 
+            hiddenText
+            size={24}
+            user={{
+              id: item.assigneeId,
+              loginName: item.assigneeName,
+              realName: item.assigneeName,
+              avatar: item.imageUrl,
+            }}
+          />
           {item.assigneeName}
           <span className="c7n-parentIssue-count">{`  (${item.count} 问题)`}</span>
         </div>

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Modal, Form, Input, DatePicker, Icon } from 'choerodon-ui';
+import {
+ Modal, Form, Input, DatePicker, Icon 
+} from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import moment from 'moment';
 import ReleaseStore from '../../../../../stores/project/release/ReleaseStore';
@@ -21,6 +23,7 @@ class CreateVersion extends Component {
       endDate: null,
     };
   }
+
   /**
    *创建版本
    *
@@ -68,6 +71,7 @@ class CreateVersion extends Component {
       }
     });
   }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     return (

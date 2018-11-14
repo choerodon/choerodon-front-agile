@@ -16,6 +16,7 @@ import AssigneeModal from './AssigneeModal';
 import EmptyBacklog from '../../../../../assets/image/emptyBacklog.svg';
 import './Sprint.scss';
 import TypeTag from '../../../../../components/TypeTag';
+import UserHead from '../../../../../components/UserHead';
 import { ICON, TYPE } from '../../../../../common/Constant';
 
 const { Option } = Select;
@@ -23,7 +24,6 @@ const { confirm } = Modal;
 const { AppState } = stores;
 
 const filterIssueTypeCode = ['issue_epic', 'sub_task'];
-
 @observer
 class SprintItem extends Component {
   constructor(props) {
@@ -160,7 +160,7 @@ class SprintItem extends Component {
       this.setState({
         loading: true,
       });
-      debugger;
+      // debugger;
       const data = {
         priorityCode: `priority-${priorityId}`,
         priorityId,
@@ -576,7 +576,6 @@ class SprintItem extends Component {
     return result;
   }
 
-
   renderStatusCodeDom =(item, index) => {
     const { state } = this;
     const menu = (
@@ -584,7 +583,7 @@ class SprintItem extends Component {
         onClick={this.handleDeleteSprint.bind(this, item)}
       >
         <Menu.Item key="0">
-          删除sprint
+          {'删除sprint'}
         </Menu.Item>
       </Menu>
     );
@@ -604,7 +603,7 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleFinishSprint.bind(this, item, index)}
               >
-                完成冲刺
+                {'完成冲刺'}
               </p>
               {/* <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
@@ -621,9 +620,7 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleStartSprint.bind(this, item, index)}
               >
-
-
-                开启冲刺
+                {'开启冲刺'}
               </p>
               <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
@@ -769,7 +766,6 @@ class SprintItem extends Component {
                             role="none"
                           >
                             {item.sprintName}
-
                           </span>
                         </EasyEdit>
                       </div>
@@ -790,7 +786,7 @@ class SprintItem extends Component {
                         role="none"
                         onClick={this.clearFilter}
                       >
-                        清空所有筛选器
+                        {'清空所有筛选器'}
                       </p>
                     </div>
                     <div style={{ flexGrow: 1 }}>
@@ -831,17 +827,18 @@ class SprintItem extends Component {
                                 </div>
                               )}
                             >
-                              {/* <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ?
-                      ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div> */}
-                              <Avatar
-                                style={{ marginRight: 8, flexShrink: 0 }}
-                                src={ass2.imageUrl ? ass2.imageUrl : undefined}
-                                size="small"
-                              >
-                                {
-                                  !ass2.imageUrl && ass2.assigneeName ? this.getFirst(ass2.assigneeName) : ''
-                                }
-                              </Avatar>
+                              <div>
+                                <UserHead
+                                  hiddenText
+                                  size={24}
+                                  user={{
+                                    id: ass2.assigneeId,
+                                    loginName: ass2.assigneeName,
+                                    realName: ass2.assigneeName,
+                                    avatar: ass2.imageUrl,
+                                  }}
+                                />
+                              </div>
                             </Tooltip>
                           ))) : ''
                     }
@@ -922,7 +919,6 @@ class SprintItem extends Component {
                             role="none"
                           >
                             {this.renderData(item, 'startDate')}
-
                           </div>
                         </EasyEdit>
                         <p>~</p>
@@ -940,7 +936,6 @@ class SprintItem extends Component {
                             role="none"
                           >
                             {this.renderData(item, 'endDate')}
-
                           </div>
                         </EasyEdit>
                       </div>
@@ -965,7 +960,6 @@ class SprintItem extends Component {
                           }}
                         >
                           {item.sprintGoal ? item.sprintGoal : '无'}
-
                         </div>
                       </EasyEdit>
                     </div>
@@ -1042,14 +1036,14 @@ class SprintItem extends Component {
                                       });
                                     }}
                                   >
-                                    取消
+                                    {'取消'}
                                   </Button>
                                   <Button
                                     type="primary"
                                     loading={loading}
                                     onClick={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
                                   >
-                                    确定
+                                    {'确定'}
                                   </Button>
                                 </div>
                               </div>
@@ -1073,9 +1067,7 @@ class SprintItem extends Component {
                                   }}
                                 >
                                   <Icon type="playlist_add" />
-
-
-                                  创建问题
+                                  {'创建问题'}
                                 </Button>
                               </div>
                             )}
@@ -1103,13 +1095,9 @@ class SprintItem extends Component {
               <div style={{ marginLeft: 40 }}>
                 <p style={{ color: 'rgba(0,0,0,0.65)' }}>用问题填充您的待办事项</p>
                 <p style={{ fontSize: 16, lineHeight: '28px', marginTop: 8 }}>
-
-
-                  这是您的团队待办事项。创建并预估新的问题，并通
+                  {'这是您的团队待办事项。创建并预估新的问题，并通'}
                   <br />
-
-
-                  过上下拖动来对待办事项排优先级
+                  {'过上下拖动来对待办事项排优先级'}
                 </p>
               </div>
             </div>
@@ -1154,7 +1142,6 @@ class SprintItem extends Component {
         }
       </Menu>
     );
-
     if (JSON.stringify(store.getSprintData) !== '{}') {
       const data = store.getSprintData.backlogData;
       if (data) {
@@ -1163,7 +1150,6 @@ class SprintItem extends Component {
           issueSearchDTOList: data.backLogIssue,
           sprintId: 'backlog',
         };
-
         return (
           <div>
             <div className="c7n-backlog-sprintTop">
@@ -1204,9 +1190,7 @@ class SprintItem extends Component {
                     role="none"
                     onClick={this.clearFilter}
                   >
-
-
-                    清空所有筛选器
+                    {'清空所有筛选器'}
                   </p>
                 </div>
                 <div style={{ flexGrow: 1 }}>
@@ -1281,18 +1265,14 @@ class SprintItem extends Component {
                                   });
                                 }}
                               >
-
-
-                                取消
+                                {'取消'}
                               </Button>
                               <Button
                                 type="primary"
                                 loading={loading}
                                 onClick={this.handleBlurCreateIssue.bind(this, 'backlog', item, -1)}
                               >
-
-
-                                确定
+                                {'确定'}
                               </Button>
                             </div>
                           </div>
@@ -1314,9 +1294,7 @@ class SprintItem extends Component {
                               }}
                             >
                               <Icon type="playlist_add" />
-
-
-                              创建问题
+                              {'创建问题'}
                             </Button>
                           </div>
                         )}

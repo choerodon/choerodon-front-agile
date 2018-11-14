@@ -514,7 +514,7 @@ class BacklogHome extends Component {
         <Header title="待办事项">
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint}>
             <Icon type="playlist_add" />
-            创建冲刺
+            {'创建冲刺'}
           </Button>
           <Button
             className="leftBtn2"
@@ -525,7 +525,7 @@ class BacklogHome extends Component {
             }}
           >
             <Icon type="refresh" />
-            刷新
+            {'刷新'}
           </Button>
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
@@ -553,8 +553,10 @@ class BacklogHome extends Component {
                     });
                   }}
                 >
+
+
                   版本
-                </p>
+                                </p>
               )}
               {epicVisible ? '' : (
                 <p
@@ -569,8 +571,10 @@ class BacklogHome extends Component {
                     });
                   }}
                 >
+
+
                   史诗
-                </p>
+                                </p>
               )}
             </div>
             <div className="c7n-backlog-content">
