@@ -574,8 +574,14 @@ class Issue extends Component {
     });
   };
 
-  widthFixCalc = tableWidth => (tableWidth > document.getElementsByClassName('ant-table-wrapper')[0].clientWidth
-    ? 'left' : false);
+  widthFixCalc = (tableWidth) => {
+    if (document.getElementsByClassName('ant-table-wrapper').length > 0) {
+      return tableWidth > document.getElementsByClassName('ant-table-wrapper')[0].clientWidth
+        ? 'left' : false;
+    } else {
+      return 'left';
+    }
+  };
 
   render() {
     const {
@@ -711,7 +717,7 @@ class Issue extends Component {
       {
         title: '冲刺',
         key: 'sprint',
-        width: 200,
+        width: 240,
         filters: columnFilter.get('sprint'),
         hidden: true,
         render: this.renderSprint,
