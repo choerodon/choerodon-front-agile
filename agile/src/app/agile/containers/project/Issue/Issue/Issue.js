@@ -678,7 +678,7 @@ class Issue extends Component {
       {
         title: '报告人',
         dataIndex: 'reporterName',
-        key: 'reporterId',
+        key: 'reporter',
         width: 200,
         sorter: true,
         filters: columnFilter.get('reporterName'),
