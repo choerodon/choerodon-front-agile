@@ -160,7 +160,6 @@ class SprintItem extends Component {
       this.setState({
         loading: true,
       });
-      // debugger;
       const data = {
         priorityCode: `priority-${priorityId}`,
         priorityId,

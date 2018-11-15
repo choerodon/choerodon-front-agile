@@ -580,7 +580,6 @@ class Issue extends Component {
       selectIssueType, createLoading, create, checkCreateIssue,
       originPriorities, tableWidth,
     } = this.state;
-    debugger;
     // 获取筛选框的显示内容
     let { filterName } = this.state;
     filterName = filterName || [];

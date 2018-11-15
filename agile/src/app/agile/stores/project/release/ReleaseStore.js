@@ -143,7 +143,7 @@ class ReleaseStore {
     if (data.influenceTargetVersionId) {
       stringData += `influenceTargetVersionId=${data.influenceTargetVersionId}`;
     }
-    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${data.versionId}?${stringData}`);
+    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/delete/${data.versionId}?${stringData}`);
   }
 
   axiosGetVersionListWithoutPage() {
