@@ -3,6 +3,10 @@
   border-right: 1px solid #d3d3d3;
   overflow: auto;
 
+  p {
+    margin-bottom: 0;
+  }
+
   .c7n-backlog-versionContent {
     padding: 8px 0;
 
@@ -57,16 +61,16 @@
           justify-content: space-between;
           cursor: move;
           align-items: baseline;
-          p{
+          p {
             word-break: break-all;
           }
         }
       }
 
       .c7n-backlog-versionItemDes {
-        white-space:normal;
-        word-break:break-all;
-        word-wrap:break-word;
+        white-space: normal;
+        word-break: break-all;
+        word-wrap: break-word;
         line-height: 13px;
         color: rgba(0, 0, 0, 0.65);
         min-height: 20px;
@@ -88,7 +92,7 @@
           .c7n-backlog-versionItemParamKey {
             color: rgba(0, 0, 0, 0.65);
           }
-          
+
           .c7n-backlog-versionItemParamValue {
             border-radius: 100px;
             background: rgba(0, 0, 0, 0.26);
@@ -97,7 +101,6 @@
             height: 16px;
             text-align: center;
             line-height: 16px;
-
           }
         }
       }
@@ -105,9 +108,6 @@
   }
 }
 
-p {
-  margin-bottom: 0;
-}
 .c7n-backlog-versionItemProgress {
   width: 100%;
   height: 5px;
