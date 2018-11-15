@@ -947,6 +947,7 @@ class SprintItem extends Component {
                         width={200}
                         defaultValue={item.sprintGoal}
                         enterOrBlur={this.handleBlurGoal.bind(this, item)}
+                        maxLength={30}
                       >
                         <div
                           role="none"
