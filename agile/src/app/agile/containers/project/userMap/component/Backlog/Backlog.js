@@ -272,9 +272,9 @@ class Backlog extends Component {
                   history.push(
                     `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
                       encodeURIComponent(urlParams.name)
-                      }&organizationId=${urlParams.organizationId}&paramName=${
+                    }&organizationId=${urlParams.organizationId}&paramName=${
                       issue.issueNum
-                      }&paramIssueId=${issue.issueId}&paramUrl=usermap`,
+                    }&paramIssueId=${issue.issueId}&paramUrl=usermap`,
                   );
                 }}
               >
