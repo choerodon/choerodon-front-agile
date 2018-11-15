@@ -253,7 +253,7 @@ class BacklogStore {
   }
 
   axiosUpdateVerison(versionId, data) {
-    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}`, data);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/update/product_version/${versionId}`, data);
   }
 
   @computed get getClickIssueDetail() {

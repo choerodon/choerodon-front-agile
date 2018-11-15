@@ -81,7 +81,7 @@ class ReleaseStore {
   }
 
   axiosUpdateVersion(versionId, data) {
-    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}`, data);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/update/${versionId}`, data);
   }
 
   axiosGetVersionStatusIssues(versionId, statusCode) {
