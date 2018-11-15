@@ -225,7 +225,7 @@ class IssueCard extends Component {
               <div
                 className="c7n-mask"
                 style={{
-                  display: statusCode === 'done' && !isFocus ? 'block' : 'none',
+                  display: statusMapDTO && statusMapDTO.type === 'done' && !isFocus ? 'block' : 'none',
                 }}
               />
               <div className="c7n-header">
@@ -243,7 +243,7 @@ class IssueCard extends Component {
                   <span
                     className="c7n-issueNum"
                     style={{
-                      textDecoration: statusCode === 'done' ? 'line-through' : 'unset',
+                      textDecoration: statusMapDTO && statusMapDTO.type === 'done' ? 'line-through' : 'unset',
                     }}
                     role="none"
                     onClick={() => {

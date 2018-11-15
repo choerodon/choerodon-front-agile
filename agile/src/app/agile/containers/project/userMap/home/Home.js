@@ -1888,18 +1888,19 @@ class Home extends Component {
                     }}
                   >
                     <React.Fragment>
-                      {_.filter(issues, issue => issue.epicId === epic.issueId && (mode === 'none' || (issue[id] && issue[id] === 0))).map((item, indexs) => (
-                        <IssueCard
-                          draggableId={`${mode}-${item.issueId}`}
-                          index={indexs}
-                          selected={selectIssueIds.includes(item.issueId)}
-                          dragged={currentDraggableId === item.issueId}
-                          handleClickIssue={this.handleClickIssue}
-                          key={item.issueId}
-                          issue={item}
-                          borderTop={indexs === 0}
-                          showDelete={!UserMapStore.isFullScreen}
-                        />
+                      {_.filter(issues, issue => issue.epicId === epic.issueId
+                        && (mode === 'none' || ((issue[id] && issue[id] === 0) || !issue[id]))).map((item, indexs) => (
+                          <IssueCard
+                            draggableId={`${mode}-${item.issueId}`}
+                            index={indexs}
+                            selected={selectIssueIds.includes(item.issueId)}
+                            dragged={currentDraggableId === item.issueId}
+                            handleClickIssue={this.handleClickIssue}
+                            key={item.issueId}
+                            issue={item}
+                            borderTop={indexs === 0}
+                            showDelete={!UserMapStore.isFullScreen}
+                          />
                       ))}
                       {
                         epicId === epic.issueId && currentNewObj[id] === 0 ? (
