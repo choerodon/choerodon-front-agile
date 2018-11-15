@@ -574,6 +574,9 @@ class Issue extends Component {
     });
   };
 
+  widthFixCalc = tableWidth => (tableWidth > document.getElementsByClassName('ant-table-wrapper')[0].clientWidth
+    ? 'left' : false);
+
   render() {
     const {
       expand, selectedIssue, createIssueValue,
@@ -623,20 +626,20 @@ class Issue extends Component {
         title: '任务编号',
         dataIndex: 'issueNum',
         key: 'issueId',
-        width: 150,
+        width: 140,
         disableClick: true,
         sorter: true,
-        fixed: expand ? false : 'left',
+        fixed: expand ? false : this.widthFixCalc(tableWidth),
         filters: columnFilter.get('issueNum'),
         render: this.renderIssueNum,
       },
       {
         title: '问题类型',
         key: 'issueTypeId',
-        width: 150,
+        width: 140,
         disableClick: true,
         sorter: true,
-        fixed: expand ? false : 'left',
+        fixed: expand ? false : this.widthFixCalc(tableWidth),
         filters: columnFilter.get('typeId'),
         filterMultiple: true,
         render: this.renderTypeCode,
@@ -647,7 +650,7 @@ class Issue extends Component {
         key: 'summary',
         width: 300,
         disableClick: true,
-        fixed: expand ? false : 'left',
+        fixed: expand ? false : this.widthFixCalc(tableWidth),
         filters: columnFilter.get('summary'),
         render: this.renderSummary,
       },

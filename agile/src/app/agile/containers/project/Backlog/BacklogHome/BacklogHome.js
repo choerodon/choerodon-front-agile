@@ -207,9 +207,15 @@ class BacklogHome extends Component {
   filterOnlyMe =() => {
     const { BacklogStore } = this.props;
     BacklogStore.setOnlyMe(!BacklogStore.getOnlyMe);
+    this.setState({
+      spinIf: true,
+    });
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
       .then((res) => {
         BacklogStore.setSprintData(res);
+        this.setState({
+          spinIf: false,
+        });
       }).catch((error) => {
       });
   }
@@ -220,9 +226,15 @@ class BacklogHome extends Component {
   filterOnlyStory =() => {
     const { BacklogStore } = this.props;
     BacklogStore.setRecent(!BacklogStore.getRecent);
+    this.setState({
+      spinIf: true,
+    });
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
       .then((res) => {
         BacklogStore.setSprintData(res);
+        this.setState({
+          spinIf: false,
+        });
       }).catch((error) => {
       });
   };
