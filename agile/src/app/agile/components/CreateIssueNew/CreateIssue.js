@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
-  Select, Form, Input, Button, Modal, Icon, Tooltip, 
+  Select, Form, Input, Button, Modal, Icon, Tooltip,
 } from 'choerodon-ui';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
 import {
-  createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics, 
+  createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics,
 } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
 import { COLOR } from '../../common/Constant';
@@ -24,6 +24,16 @@ const FormItem = Form.Item;
 let sign = false;
 
 class CreateIssue extends Component {
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({ selectLoading: true });
+    getUsers(input).then((res) => {
+      this.setState({
+        originUsers: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
+
   constructor(props) {
     super(props);
     this.state = {
@@ -68,17 +78,7 @@ class CreateIssue extends Component {
 
   setFileList = (data) => {
     this.setState({ fileList: data });
-  }
-
-  debounceFilterIssues = _.debounce((input) => {
-    this.setState({ selectLoading: true });
-    getUsers(input).then((res) => {
-      this.setState({
-        originUsers: res.content,
-        selectLoading: false,
-      });
-    });
-  }, 500);
+  };
 
   handleCreateIssue = () => {
     const { form, store } = this.props;
@@ -204,7 +204,12 @@ class CreateIssue extends Component {
       form,
     } = this.props;
     const { getFieldDecorator } = form;
-    const { originPriorities, defaultPriority, createLoading } = this.state;
+    const {
+      originPriorities, defaultPriority, createLoading,
+      edit, delta, originUsers, selectLoading,
+      originEpics, originSprints, originFixVersions, originComponents,
+      originLabels, fileList,
+    } = this.state;
     const callback = (value) => {
       this.setState({
         delta: value,
@@ -212,7 +217,6 @@ class CreateIssue extends Component {
       });
     };
     const issueTypes = store.getIssueTypes;
-
     return (
       <Sidebar
         className="c7n-createIssue"
@@ -233,7 +237,7 @@ class CreateIssue extends Component {
             <Form layout="vertical">
               <FormItem label="问题类型" style={{ width: 520 }}>
                 {getFieldDecorator('typeId', {
-                  rules: [{ required: true }],
+                  rules: [{ required: true, message: '问题类型为必输项' }],
                 })(
                   <Select
                     label="问题类型"
@@ -260,7 +264,7 @@ class CreateIssue extends Component {
               </FormItem>
 
               {
-              this.props.form.getFieldValue('typeCode') === 'issue_epic' && (
+              form.getFieldValue('typeCode') === 'issue_epic' && (
                 <FormItem label="史诗名称" style={{ width: 520 }}>
                   {getFieldDecorator('epicName', {
                     rules: [{ required: true, message: '史诗名称为必输项' }],
@@ -302,10 +306,10 @@ class CreateIssue extends Component {
                   </div>
                 </div>
                 {
-                !this.state.edit && (
+                !edit && (
                   <div className="clear-p-mw">
                     <WYSIWYGEditor
-                      value={this.state.delta}
+                      value={delta}
                       style={{ height: 200, width: '100%' }}
                       onChange={(value) => {
                         this.setState({ delta: value });
@@ -321,13 +325,13 @@ class CreateIssue extends Component {
                   <Select
                     label="经办人"
                     getPopupContainer={triggerNode => triggerNode.parentNode}
-                    loading={this.state.selectLoading}
+                    loading={selectLoading}
                     filter
                     filterOption={false}
                     allowClear
                     onFilterChange={this.onFilterChange.bind(this)}
                   >
-                    {this.state.originUsers.map(user => (
+                    {originUsers.map(user => (
                       <Option key={user.id} value={user.id}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                           <UserHead
@@ -357,16 +361,20 @@ class CreateIssue extends Component {
               </Tooltip>
 
               {
-              this.props.form.getFieldValue('typeCode') !== 'issue_epic' && (
+              form.getFieldValue('typeCode') !== 'issue_epic' && (
                 <FormItem label="史诗" style={{ width: 520 }}>
                   {getFieldDecorator('epicId', {})(
                     <Select
                       label="史诗"
                       allowClear
                       filter
-                      filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                      filterOption={
+                        (input, option) => option.props.children.toLowerCase().indexOf(
+                          input.toLowerCase(),
+                        ) >= 0
+                      }
                       getPopupContainer={triggerNode => triggerNode.parentNode}
-                      loading={this.state.selectLoading}
+                      loading={selectLoading}
                       onFocus={() => {
                         this.setState({
                           selectLoading: true,
@@ -379,7 +387,16 @@ class CreateIssue extends Component {
                         });
                       }}
                     >
-                      {this.state.originEpics.map(epic => <Option key={epic.issueId} value={epic.issueId}>{epic.epicName}</Option> )}
+                      {originEpics.map(
+                        epic => (
+                          <Option
+                            key={epic.issueId}
+                            value={epic.issueId}
+                          >
+                            {epic.epicName}
+                          </Option>
+                        ),
+                      )}
                     </Select>,
                   )}
                 </FormItem>
@@ -392,9 +409,13 @@ class CreateIssue extends Component {
                     label="冲刺"
                     allowClear
                     filter
-                    filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                    filterOption={
+                      (input, option) => option.props.children.toLowerCase().indexOf(
+                        input.toLowerCase(),
+                      ) >= 0
+                    }
                     getPopupContainer={triggerNode => triggerNode.parentNode}
-                    loading={this.state.selectLoading}
+                    loading={selectLoading}
                     onFocus={() => {
                       this.setState({
                         selectLoading: true,
@@ -407,7 +428,7 @@ class CreateIssue extends Component {
                       });
                     }}
                   >
-                    {this.state.originSprints.map(sprint => (
+                    {originSprints.map(sprint => (
                       <Option key={sprint.sprintId} value={sprint.sprintId}>
                         {sprint.sprintName}
                       </Option>
@@ -423,7 +444,7 @@ class CreateIssue extends Component {
                   <Select
                     label="修复版本"
                     mode="tags"
-                    loading={this.state.selectLoading}
+                    loading={selectLoading}
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     tokenSeparators={[',']}
                     onFocus={() => {
@@ -438,7 +459,17 @@ class CreateIssue extends Component {
                       });
                     }}
                   >
-                    {this.state.originFixVersions.map(version => <Option key={version.name} value={version.name}>{version.name}</Option>)}
+                    {
+                      originFixVersions.map(
+                        version => (
+                          <Option
+                            key={version.name}
+                            value={version.name}
+                          >
+                            {version.name}
+                          </Option>
+                        ),
+                      )}
                   </Select>,
                 )}
               </FormItem>
@@ -450,7 +481,7 @@ class CreateIssue extends Component {
                   <Select
                     label="模块"
                     mode="tags"
-                    loading={this.state.selectLoading}
+                    loading={selectLoading}
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     tokenSeparators={[',']}
                     onFocus={() => {
@@ -465,7 +496,17 @@ class CreateIssue extends Component {
                       });
                     }}
                   >
-                    {this.state.originComponents.map(component => <Option key={component.name} value={component.name}>{component.name}</Option>)}
+                    {
+                      originComponents.map(
+                        component => (
+                          <Option
+                            key={component.name}
+                            value={component.name}
+                          >
+                            {component.name}
+                          </Option>
+                        ),
+                      )}
                   </Select>,
                 )}
               </FormItem>
@@ -477,7 +518,7 @@ class CreateIssue extends Component {
                   <Select
                     label="标签"
                     mode="tags"
-                    loading={this.state.selectLoading}
+                    loading={selectLoading}
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     tokenSeparators={[',']}
                     onFocus={() => {
@@ -492,7 +533,7 @@ class CreateIssue extends Component {
                       });
                     }}
                   >
-                    {this.state.originLabels.map(label => (
+                    {originLabels.map(label => (
                       <Option key={label.labelName} value={label.labelName}>
                         {label.labelName}
                       </Option>
@@ -501,7 +542,7 @@ class CreateIssue extends Component {
                 )}
               </FormItem>
             </Form>
-          
+
             <div className="sign-upload" style={{ marginTop: 20 }}>
               <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
                 <div style={{ fontWeight: 'bold' }}>附件</div>
@@ -510,16 +551,16 @@ class CreateIssue extends Component {
                 <UploadButton
                   onRemove={this.setFileList}
                   onBeforeUpload={this.setFileList}
-                  fileList={this.state.fileList}
+                  fileList={fileList}
                 />
               </div>
             </div>
           </div>
           {
-          this.state.edit ? (
+          edit ? (
             <FullEditor
-              initValue={this.state.delta}
-              visible={this.state.edit}
+              initValue={delta}
+              visible={edit}
               onCancel={() => this.setState({ edit: false })}
               onOk={callback}
             />
