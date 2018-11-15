@@ -52,6 +52,13 @@ class Issue extends Component {
     };
   }
 
+  componentWillMount() {
+    const width = storage.getItem('columnWidth');
+    this.setState({
+      tableWidth: width || 1750,
+    });
+  }
+
   componentDidMount() {
     this.getInit();
   }
@@ -91,9 +98,6 @@ class Issue extends Component {
     IssueStore.setParamUrl(paramUrl);
     IssueStore.setParamOpenIssueId(paramOpenIssueId);
     IssueStore.setResolution(paramResolution);
-    this.setState({
-      tableWidth: storage.getItem('columnWidth') || 1550,
-    });
 
     IssueStore.setParamInOtherArgs();
     const arr = [];
@@ -372,7 +376,7 @@ class Issue extends Component {
       selectedIssue.issueId === item.props.record.issueId
     ));
     const renderNarrow = (
-      <div onClick={props.onClick} style={{ }} role="none" className={isClicked ? 'c7n-Issue-CardNarrow-clicked c7n-Issue-CardNarrow' : 'c7n-Issue-CardNarrow'}>
+      <div onClick={props.onClick} role="none" className={isClicked ? 'c7n-Issue-CardNarrow-clicked c7n-Issue-CardNarrow' : 'c7n-Issue-CardNarrow'}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '7px' }}>
           <div style={{ display: 'flex' }}>
             {props.children[1]}
@@ -472,10 +476,12 @@ class Issue extends Component {
 
   renderLastUpdateTime = (text, record) => (
     <Tooltip mouseEnterDelay={0.5} title={`日期： ${text}`}>
-      <TimeAgo
-        datetime={text}
-        locale="zh_CN"
-      />
+      <div style={{ width: '150px' }}>
+        <TimeAgo
+          datetime={text}
+          locale="zh_CN"
+        />
+      </div>
     </Tooltip>
   );
 
@@ -562,7 +568,7 @@ class Issue extends Component {
 
   setTableWidth = (columns) => {
     const ret = columns.reduce((sum, column) => sum + (column.hidden ? 0 : column.width), 0);
-    storage.setItem('columnWidth', ret);
+    storage.setItem('columnWidth', ret + 50);
     this.setState({
       tableWidth: ret,
     });
@@ -574,6 +580,7 @@ class Issue extends Component {
       selectIssueType, createLoading, create, checkCreateIssue,
       originPriorities, tableWidth,
     } = this.state;
+    debugger;
     // 获取筛选框的显示内容
     let { filterName } = this.state;
     filterName = filterName || [];
@@ -617,7 +624,7 @@ class Issue extends Component {
         title: '任务编号',
         dataIndex: 'issueNum',
         key: 'issueId',
-        width: 128,
+        width: 150,
         disableClick: true,
         sorter: true,
         fixed: expand ? false : 'left',
@@ -627,7 +634,7 @@ class Issue extends Component {
       {
         title: '问题类型',
         key: 'issueTypeId',
-        width: 120,
+        width: 150,
         disableClick: true,
         sorter: true,
         fixed: expand ? false : 'left',
@@ -648,7 +655,7 @@ class Issue extends Component {
       {
         title: '状态',
         key: 'statusId',
-        width: 100,
+        width: 120,
         disableClick: true,
         sorter: true,
         filters: columnFilter.get('statusId'),
@@ -658,7 +665,7 @@ class Issue extends Component {
       {
         title: '优先级',
         key: 'priorityId',
-        width: 100,
+        width: 150,
         disableClick: true,
         sorter: true,
         filters: columnFilter.get('priorityId'),
@@ -688,7 +695,7 @@ class Issue extends Component {
         title: '最后更新时间',
         dataIndex: 'lastUpdateDate',
         key: 'lastUpdateDate',
-        width: 150,
+        width: 200,
         sorter: true,
         render: this.renderLastUpdateTime,
       },
@@ -696,13 +703,13 @@ class Issue extends Component {
         title: '版本',
         filters: columnFilter.get('versionIssueRelDTOS'),
         key: 'version',
-        width: 150,
+        width: 200,
         render: this.renderVersion,
       },
       {
         title: '冲刺',
         key: 'sprint',
-        width: 150,
+        width: 200,
         filters: columnFilter.get('sprint'),
         hidden: true,
         render: this.renderSprint,
@@ -710,7 +717,7 @@ class Issue extends Component {
       {
         title: '模块',
         key: 'component',
-        width: 150,
+        width: 200,
         filters: columnFilter.get('component'),
         hidden: true,
         render: this.renderComponent,
@@ -719,7 +726,7 @@ class Issue extends Component {
         title: '史诗',
         dataIndex: 'epicName',
         key: 'epic',
-        width: 150,
+        width: 200,
         filters: columnFilter.get('epic'),
         render: this.renderEpic,
         hidden: true,
@@ -727,7 +734,7 @@ class Issue extends Component {
       {
         title: '标签',
         key: 'label',
-        width: 150,
+        width: 200,
         filters: columnFilter.get('label'),
         filterMultiple: true,
         render: this.renderTag,
@@ -762,7 +769,6 @@ class Issue extends Component {
         }
       </Menu>
     );
-
     return (
       <Page
         className="c7n-Issue"
@@ -837,7 +843,7 @@ class Issue extends Component {
                 filterBarPlaceholder="过滤表"
                 filters={filterName}
                 noFilter
-                scroll={expand ? { x: true } : { x: tableWidth }}
+                scroll={expand ? { x: true } : { x: parseInt(tableWidth, 10) }}
                 loading={IssueStore.loading}
                 pagination={false}
                 onChange={this.handleFilterChange}
