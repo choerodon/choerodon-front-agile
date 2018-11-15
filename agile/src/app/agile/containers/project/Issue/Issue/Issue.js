@@ -486,48 +486,51 @@ class Issue extends Component {
   );
 
   renderVersion = (text, record) => {
-    if (record.versionIssueRelDTOS.length) {
-      return record.versionIssueRelDTOS.length > 1
-        ? (
-          <React.Fragment>
-            <Tag color="blue">{record.versionIssueRelDTOS[0].name}</Tag>
-            <Tag color="blue">...</Tag>
-          </React.Fragment>
-        )
-        : <Tag color="blue">{record.versionIssueRelDTOS[0].name}</Tag>;
-    } else {
-      return null;
+    if (record.versionIssueRelDTOS) {
+      if (record.versionIssueRelDTOS.length > 0) {
+        return record.versionIssueRelDTOS.length > 1
+          ? (
+            <React.Fragment>
+              <Tag color="blue">{record.versionIssueRelDTOS[0].name}</Tag>
+              <Tag color="blue">...</Tag>
+            </React.Fragment>
+          )
+          : <Tag color="blue">{record.versionIssueRelDTOS[0].name}</Tag>;
+      }
     }
+    return null;
   };
 
   renderSprint = (text, record) => {
-    if (record.issueSprintDTOS.length) {
-      return record.issueSprintDTOS.length > 1
-        ? (
-          <React.Fragment>
-            <Tag color="blue">{record.issueSprintDTOS[0].sprintName}</Tag>
-            <Tag color="blue">...</Tag>
-          </React.Fragment>
-        )
-        : <Tag color="blue">{record.issueSprintDTOS[0].sprintName}</Tag>;
-    } else {
-      return null;
+    if (record.issueSprintDTOS) {
+      if (record.issueSprintDTOS.length > 0) {
+        return record.issueSprintDTOS.length > 1
+          ? (
+            <React.Fragment>
+              <Tag color="blue">{record.issueSprintDTOS[0].sprintName}</Tag>
+              <Tag color="blue">...</Tag>
+            </React.Fragment>
+          )
+          : <Tag color="blue">{record.issueSprintDTOS[0].sprintName}</Tag>;
+      }
     }
+    return null;
   };
 
   renderComponent = (text, record) => {
-    if (record.issueComponentBriefDTOS.length) {
-      return record.issueComponentBriefDTOS.length > 1
-        ? (
-          <React.Fragment>
-            <Tag color="blue">{record.issueComponentBriefDTOS[0].name}</Tag>
-            <Tag color="blue">...</Tag>
-          </React.Fragment>
-        )
-        : <Tag color="blue">{record.issueComponentBriefDTOS[0].name}</Tag>;
-    } else {
-      return null;
+    if (record.issueComponentBriefDTOS) {
+      if (record.issueComponentBriefDTOS.length > 0) {
+        return record.issueComponentBriefDTOS.length > 1
+          ? (
+            <React.Fragment>
+              <Tag color="blue">{record.issueComponentBriefDTOS[0].name}</Tag>
+              <Tag color="blue">...</Tag>
+            </React.Fragment>
+          )
+          : <Tag color="blue">{record.issueComponentBriefDTOS[0].name}</Tag>;
+      }
     }
+    return null;
   };
 
   renderEpic = (text, record) => {
