@@ -79,7 +79,7 @@ class IssueList extends Component {
           </div>
         </Tooltip>
         <div style={{ width: '34px', marginRight: '15px', overflow: 'hidden' }}>
-          <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityDTO.description}`}>
+          <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityDTO.name}`}>
             <div style={{ marginRight: 12 }}>
               <PriorityTag
                 priority={issue.priorityDTO}

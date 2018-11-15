@@ -126,13 +126,13 @@ class Status extends Component {
   }
 
   transformStatus(statusArr) {
-    const todo = statusArr.find(v => v.categoryCode === 'todo');
-    const doing = statusArr.find(v => v.categoryCode === 'doing');
-    const done = statusArr.find(v => v.categoryCode === 'done');
+    const todo = statusArr.filter(v => v.categoryCode === 'todo');
+    const doing = statusArr.filter(v => v.categoryCode === 'doing');
+    const done = statusArr.filter(v => v.categoryCode === 'done');
     const result = [
-      todo ? todo.issueNum : 0,
-      doing ? doing.issueNum : 0,
-      done ? done.issueNum : 0,
+      todo ? _.reduce(_.map(todo, 'issueNum'), (sum, n) => sum + n, 0) : 0,
+      doing ? _.reduce(_.map(doing, 'issueNum'), (sum, n) => sum + n, 0) : 0,
+      done ? _.reduce(_.map(done, 'issueNum'), (sum, n) => sum + n, 0) : 0,
     ];
     return result;
   }

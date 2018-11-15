@@ -4,7 +4,6 @@ import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';
 import { Spin, Tooltip } from 'choerodon-ui';
 import TypeTag from '../../components/TypeTag';
 import PriorityTag from '../../components/PriorityTag';
-import StatusTag from '../../components/StatusTag';
 import EmptyBlockDashboard from '../../components/EmptyBlockDashboard';
 // import pic from './empty.png';
 import pic from '../../assets/image/emptyChart.svg';

@@ -562,16 +562,32 @@ class SprintReport extends Component {
           </span>
         ),
       }, {
-        width: '30%',
+        // width: '30%',
         title: '概要',
         dataIndex: 'summary',
+        render: (summary, record) => {
+          return (
+            <Tooltip MouseEnterDelay={0.5} title={`问题概要：${record.summary}`}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  maxWidth: 260,
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {record.summary}
+              </div>
+            </Tooltip>
+          );
+        },
       }, {
         width: '15%',
         title: '问题类型',
         dataIndex: 'typeCode',
         render: (typeCode, record) => (
           <div>
-            <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.typeCode}`}>
+            <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.issueTypeDTO.name}`}>
               <div>
                 <TypeTag
                   data={record.issueTypeDTO}
@@ -587,7 +603,7 @@ class SprintReport extends Component {
         dataIndex: 'priorityId',
         render: (priorityId, record) => (
           <div>
-            <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityName}`}>
+            <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`优先级： ${record.priorityDTO.name}`}>
               <div style={{ marginRight: 12 }}>
                 <PriorityTag
                   priority={record.priorityDTO}
@@ -602,7 +618,7 @@ class SprintReport extends Component {
         dataIndex: 'statusCode',
         render: (statusCode, record) => (
           <div>
-            <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusMapDTO.name}`}>
+            <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务状态： ${record.statusMapDTO.name}`}>
               <div>
                 <StatusTag
                   style={{ display: 'inline-block' }}

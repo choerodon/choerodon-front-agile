@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
-import { Page, Header, Content, stores } from 'choerodon-front-boot';
-import { Button, Tabs, Table, Select, Icon, Tooltip, Dropdown, Menu } from 'choerodon-ui';
+import {
+ Page, Header, Content, stores 
+} from 'choerodon-front-boot';
+import {
+ Button, Tabs, Table, Select, Icon, Tooltip, Dropdown, Menu 
+} from 'choerodon-ui';
 import ReportStore from '../../../../../stores/project/Report';
 import './ReleaseDetail.scss';
 import StatusTag from '../../../../../components/StatusTag';
@@ -24,6 +28,7 @@ class ReleaseDetail extends Component {
     this.state = {
     };
   }
+
   componentDidMount() {
     ReportStore.init();
   }
@@ -161,7 +166,12 @@ class ReleaseDetail extends Component {
               const urlParams = AppState.currentMenuType;
               history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/sprintreport`);
             }}
-          >{issueNum} {record.addIssue ? '*' : ''}</span>
+          >
+{issueNum} 
+{' '}
+{record.addIssue ? '*' : ''}
+
+          </span>
         ),
       }, {
         width: '30%',
@@ -189,7 +199,7 @@ class ReleaseDetail extends Component {
         dataIndex: 'priorityCode',
         render: (priorityCode, record) => (
           <div>
-            <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityName}`}>
+            <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityDTO.name}`}>
               <div style={{ marginRight: 12 }}>
                 <PriorityTag
                   priority={record.priorityDTO}
@@ -252,7 +262,8 @@ class ReleaseDetail extends Component {
           description="了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
-          {ReportStore.sprints.length ? <React.Fragment>
+          {ReportStore.sprints.length ? (
+<React.Fragment>
             <Select
               value={ReportStore.currentSprint.sprintId}
               onChange={(value) => {
@@ -307,7 +318,8 @@ class ReleaseDetail extends Component {
                 {this.renderRemoveIssue(column)}
               </TabPane>
             </Tabs>
-          </React.Fragment> : <NoDataComponent title={'冲刺'} links={[{ name: '待办事项', link: '/agile/backlog' }]} img={epicSvg} /> }
+          </React.Fragment>
+) : <NoDataComponent title="冲刺" links={[{ name: '待办事项', link: '/agile/backlog' }]} img={epicSvg} /> }
 
         </Content>
       </Page>
@@ -316,4 +328,3 @@ class ReleaseDetail extends Component {
 }
 
 export default ReleaseDetail;
-

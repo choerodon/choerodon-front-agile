@@ -32,6 +32,7 @@ const config = {
     // server: 'http://api.alpha.saas.hand-china.com',
     // server: 'http://10.211.102.55:8080',
     // server: 'http://10.211.103.61:8080',
+    // server: 'http://10.211.102.55:8080',
     clientid: 'localhost',
     titlename: 'Choerodon', //html title
     favicon: 'favicon.ico', //page favicon
