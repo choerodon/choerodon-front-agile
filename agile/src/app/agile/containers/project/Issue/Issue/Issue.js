@@ -48,7 +48,7 @@ class Issue extends Component {
       createLoading: false,
       originPriorities: [],
       defaultPriorityId: false,
-      tableWidth: 1450,
+      tableWidth: null,
     };
   }
 
@@ -63,6 +63,12 @@ class Issue extends Component {
     }
   }
 
+  componentWillUnmount() {
+    IssueStore.cleanSearchArgs();
+    IssueStore.setSelectedQuickSearch({ quickFilterIds: [] });
+    IssueStore.resetOtherArgs();
+  }
+
   getInit() {
     const { location } = this.props;
     const Request = this.GetRequest(location.search);
@@ -71,7 +77,6 @@ class Issue extends Component {
       paramPriority, paramIssueType, paramIssueId, paramUrl, paramOpenIssueId,
       paramResolution,
     } = Request;
-    // IssueStore.loadQuickSearch();
     IssueStore.loadCurrentSetting();
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
@@ -86,8 +91,10 @@ class Issue extends Component {
     IssueStore.setParamUrl(paramUrl);
     IssueStore.setParamOpenIssueId(paramOpenIssueId);
     IssueStore.setResolution(paramResolution);
+    this.setState({
+      tableWidth: storage.getItem('columnWidth') || 1550,
+    });
 
-    IssueStore.setSelectedQuickSearch({ quickFilterIds: [] });
     IssueStore.setParamInOtherArgs();
     const arr = [];
     if (paramName) {
@@ -555,6 +562,7 @@ class Issue extends Component {
 
   setTableWidth = (columns) => {
     const ret = columns.reduce((sum, column) => sum + (column.hidden ? 0 : column.width), 0);
+    storage.setItem('columnWidth', ret);
     this.setState({
       tableWidth: ret,
     });

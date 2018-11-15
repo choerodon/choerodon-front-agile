@@ -8,7 +8,7 @@ const { AppState } = stores;
 const proId = AppState.currentMenuType.id;
 const orgId = AppState.currentMenuType.organizationId;
 
-const filter = {
+let filter = {
   advancedSearchArgs: {
     statusId: [],
     priorityId: [],
@@ -259,6 +259,31 @@ class SprintCommonStore {
 
   @action resetOtherArgs() {
     this.otherArgs = {};
+  }
+
+  @action cleanSearchArgs() {
+    filter = {
+      advancedSearchArgs: {
+        statusId: [],
+        priorityId: [],
+        issueTypeId: [],
+      },
+      content: '',
+      quickFilterIds: [],
+      searchArgs: {
+        assignee: '',
+        component: '',
+        epic: '',
+        issueNum: '',
+        sprint: '',
+        summary: '',
+        version: '',
+        updateStartDate: null,
+        updateEndDate: null,
+        createStartDate: null,
+        createEndDate: null,
+      },
+    };
   }
 
   loadIssues(page = 0, size = 10) {
