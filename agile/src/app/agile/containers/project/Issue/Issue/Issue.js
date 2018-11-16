@@ -490,12 +490,34 @@ class Issue extends Component {
       if (record.versionIssueRelDTOS.length > 0) {
         return record.versionIssueRelDTOS.length > 1
           ? (
-            <React.Fragment>
-              <Tag color="blue">{record.versionIssueRelDTOS[0].name}</Tag>
+            <div style={{ display: 'flex' }}>
+              <Tag
+                color="blue"
+                style={{
+                  maxWidth: 160,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {record.versionIssueRelDTOS[0].name}
+              </Tag>
               <Tag color="blue">...</Tag>
-            </React.Fragment>
+            </div>
           )
-          : <Tag color="blue">{record.versionIssueRelDTOS[0].name}</Tag>;
+          : (
+            <Tag
+              color="blue"
+              style={{
+                maxWidth: 160,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {record.versionIssueRelDTOS[0].name}
+            </Tag>
+          );
       }
     }
     return null;
@@ -506,12 +528,34 @@ class Issue extends Component {
       if (record.issueSprintDTOS.length > 0) {
         return record.issueSprintDTOS.length > 1
           ? (
-            <React.Fragment>
-              <Tag color="blue">{record.issueSprintDTOS[0].sprintName}</Tag>
+            <div style={{ display: 'flex' }}>
+              <Tag
+                color="blue"
+                style={{
+                  maxWidth: 160,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {record.issueSprintDTOS[0].sprintName}
+              </Tag>
               <Tag color="blue">...</Tag>
-            </React.Fragment>
+            </div>
           )
-          : <Tag color="blue">{record.issueSprintDTOS[0].sprintName}</Tag>;
+          : (
+            <Tag
+              color="blue"
+              style={{
+                maxWidth: 160,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {record.issueSprintDTOS[0].sprintName}
+            </Tag>
+          );
       }
     }
     return null;
@@ -522,12 +566,34 @@ class Issue extends Component {
       if (record.issueComponentBriefDTOS.length > 0) {
         return record.issueComponentBriefDTOS.length > 1
           ? (
-            <React.Fragment>
-              <Tag color="blue">{record.issueComponentBriefDTOS[0].name}</Tag>
+            <div style={{ display: 'flex' }}>
+              <Tag
+                color="blue"
+                style={{
+                  maxWidth: 160,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {record.issueComponentBriefDTOS[0].name}
+              </Tag>
               <Tag color="blue">...</Tag>
-            </React.Fragment>
+            </div>
           )
-          : <Tag color="blue">{record.issueComponentBriefDTOS[0].name}</Tag>;
+          : (
+            <Tag
+              color="blue"
+              style={{
+                maxWidth: 160,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {record.issueComponentBriefDTOS[0].name}
+            </Tag>
+          );
       }
     }
     return null;
@@ -556,11 +622,33 @@ class Issue extends Component {
     if (record.labelIssueRelDTOS && record.labelIssueRelDTOS.length) {
       return record.labelIssueRelDTOS.length > 1
         ? (
-          <React.Fragment>
-            <Tag color="blue">{record.labelIssueRelDTOS[0].labelName}</Tag>
+          <div style={{ display: 'flex' }}>
+            <Tag
+              color="blue"
+              style={{
+                maxWidth: 160,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {record.labelIssueRelDTOS[0].labelName}
+            </Tag>
             <Tag color="blue">...</Tag>
-          </React.Fragment>
-        ) : <Tag color="blue">{record.labelIssueRelDTOS[0].labelName}</Tag>;
+          </div>
+        ) : (
+          <Tag
+            color="blue"
+            style={{
+              maxWidth: 160,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {record.labelIssueRelDTOS[0].labelName}
+          </Tag>
+        );
     }
     return null;
   };

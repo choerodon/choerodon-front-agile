@@ -120,9 +120,9 @@ class WorkCalendar extends Component {
           </React.Fragment>
         );
       } else if (workDate.length) {
-        holidayTag = workDate[0].status === 0 ? null : <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
+        holidayTag = workDate[0].status === 0 ? <span className="tag tag-work" style={{ background: 'none' }}>休</span> : <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
       } else if (selectDay.length) {
-        holidayTag = selectDay[0].status === 0 ? null : <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
+        holidayTag = selectDay[0].status === 0 ? <span className="tag tag-work" style={{ background: 'none' }}>休</span> : <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
       } else {
         holidayTag = <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
       }
