@@ -108,18 +108,18 @@ class WorkCalendar extends Component {
           <React.Fragment>
             {
               workDate.length && (workDate[0].status === 1 || holidayInfo[0].status === 1)
-                ? (<span className="tag tag-work">班</span>)
+                ? (<span className="tag tag-work" style={{ background: 'none' }}>班</span>)
                 : (<span className="tag tag-notwork">休</span>)
             }
             <span className="des">{holidayInfo[0].name}</span>
           </React.Fragment>
         );
       } else if (workDate.length) {
-        holidayTag = workDate[0].status === 0 ? null : <span className="tag tag-work">班</span>;
+        holidayTag = workDate[0].status === 0 ? null : <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
       } else if (selectDay.length) {
-        holidayTag = selectDay[0].status === 0 ? null : <span className="tag tag-work">班</span>;
+        holidayTag = selectDay[0].status === 0 ? null : <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
       } else {
-        holidayTag = <span className="tag tag-work">班</span>;
+        holidayTag = <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
       }
     } else if (workDate.length) {
       dateStyle = workDate[0].status === 1 ? workDayStyle : notWorkDayStyle;

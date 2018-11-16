@@ -89,7 +89,7 @@ class QuickSearch extends Component {
         <div
           className="c7n-agile-quickSearch-left"
         >
-          {title && (<p style={{ marginRight: 24, fontSize: 14 }}>快速搜索:</p>)}
+          {title && (<p style={{ marginRight: 16, fontSize: 14, fontWeight: 600 }}>快速搜索:</p>)}
           {selectionGroup.map(tag => (
             <CheckableTag
               key={tag}

@@ -544,6 +544,10 @@ class Issue extends Component {
       lineHeight: '20px',
       padding: '0 8px',
       display: 'inline-block',
+      maxWidth: 200,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     };
     return record.epicName ? <span style={style}>{record.epicName}</span> : null;
   };
