@@ -552,11 +552,18 @@ class Issue extends Component {
     return record.epicName ? <span style={style}>{record.epicName}</span> : null;
   };
 
-  renderTag = (text, record) => (
-    record.labelIssueRelDTOS && record.labelIssueRelDTOS.length
-      ? <Tag color="blue">{record.labelIssueRelDTOS[0].labelName}</Tag>
-      : null
-  );
+  renderTag = (text, record) => {
+    if (record.labelIssueRelDTOS && record.labelIssueRelDTOS.length) {
+      return record.labelIssueRelDTOS.length > 1
+        ? (
+          <React.Fragment>
+            <Tag color="blue">{record.labelIssueRelDTOS[0].labelName}</Tag>
+            <Tag color="blue">...</Tag>
+          </React.Fragment>
+        ) : <Tag color="blue">{record.labelIssueRelDTOS[0].labelName}</Tag>;
+    }
+    return null;
+  };
 
   onlyMe = (checked) => {
     IssueStore.setAdvArg({ assigneeIds: checked ? [AppState.userInfo.id] : null });
