@@ -147,9 +147,13 @@ class ScrumBoardSetting extends Component {
             <TabPane tab="泳道" key="2">
               <SwimLanePage />
             </TabPane>
-            <TabPane tab="工作日历" key="3">
-              <WorkcalendarPage />
-            </TabPane>
+            {ScrumBoardStore.getSprintData
+              ? (
+                <TabPane tab="工作日历" key="3">
+                  <WorkcalendarPage />
+                </TabPane>
+              ) : null
+            }
           </Tabs>
         </Content>
       </Page>

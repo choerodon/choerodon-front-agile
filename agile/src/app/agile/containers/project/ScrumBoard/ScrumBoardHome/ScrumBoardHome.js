@@ -137,6 +137,11 @@ class ScrumBoardHome extends Component {
         recent,
         quickFilter).then((data) => {
         this.setState({ dataSource: data });
+        if (data) {
+          ScrumBoardStore.setSprintData(data.currentSprint);
+        } else {
+          ScrumBoardStore.setSprintData(false);
+        }
         ScrumBoardStore.axiosGetAllEpicData().then((data2) => {
           const parentIds = [];
           const assigneeIds = [];
@@ -293,6 +298,7 @@ class ScrumBoardHome extends Component {
           });
         });
       }).catch((error) => {
+        ScrumBoardStore.setSprintData(false);
       });
     }).catch((error) => {
     });

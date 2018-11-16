@@ -61,6 +61,16 @@ class ScrumBoardStore {
 
   @observable canAddStatus = true;
 
+  @observable sprintData = true;
+
+  @computed get getSprintData() {
+    return this.sprintData;
+  }
+
+  @action setSprintData(data) {
+    this.sprintData = data;
+  }
+
   @computed get getCanAddStatus() {
     return this.canAddStatus;
   }

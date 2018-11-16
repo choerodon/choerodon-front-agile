@@ -287,7 +287,7 @@ class Home extends Component {
     let arr = _.cloneDeep(toJS(selectIssueIds));
     const index = arr.indexOf(issueId);
     const { keydown } = this.state;
-    // command ctrl shift
+    // command ctrl shift 支持多选
     if (keydown === 91 || keydown === 17 || keydown === 16) {
       if (index === -1) {
         arr.push(issueId);
@@ -347,7 +347,12 @@ class Home extends Component {
     }
   }
 
+  /**
+   * 拖拽到史诗框内
+   */
   handleEpicDrag =(res) => {
+    // 不允许将非史诗拖拽到史诗列
+    if (res.source && res.source.droppableId !== 'epic') return;
     const { UserMapStore } = this.props;
     const data = UserMapStore.getEpics;
     const result = Array.from(data);
@@ -355,7 +360,6 @@ class Home extends Component {
     const tarIndex = res.destination.index;
     const [removed] = result.splice(sourceIndex, 1);
     result.splice(tarIndex, 0, removed);
-    // return result;
     let beforeSequence = null;
     let afterSequence = null;
     if (tarIndex === 0) {
@@ -1273,6 +1277,8 @@ class Home extends Component {
     const {
       mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    // 不允许将史诗拖拽到代办
+    if (res.source && res.source.droppableId === 'epic') return;
     const issues = UserMapStore.getCacheIssues;
     if (selectIssueIds.length < 2) {
       if (res.destination.droppableId === res.source.droppableId
@@ -1440,6 +1446,7 @@ class Home extends Component {
 
   handleEpicOrIssueDrag = (res) => {
     const { UserMapStore } = this.props;
+    // 拖动到可拖动范围外
     if (!res.destination) {
       UserMapStore.setSelectIssueIds([]);
       UserMapStore.setCurrentDraggableId(null);
