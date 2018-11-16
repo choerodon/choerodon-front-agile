@@ -57,7 +57,7 @@ class EditNotificationType extends Component {
             {
               key: 'currentProcess',
               checked: noticeTypeData[0].enable,
-              typeName: '当前处理人',
+              typeName: '经办人',
             },
             {
               key: 'reportor',
