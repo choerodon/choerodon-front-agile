@@ -78,7 +78,7 @@ class WorkCalendar extends Component {
     const notWorkDayStyle = {
       color: '#EF2A26', background: '#FFE7E7',
     };
-    const sprintDayStyle = {
+    let sprintDayStyle = {
       color: '#FFF', background: '#3F51B5',
     };
     const localData = moment.localeData();
@@ -102,6 +102,11 @@ class WorkCalendar extends Component {
     const endDateCopy = moment(endDate).format(test);
 
     if (startDateCopy === date || endDateCopy === date) {
+      if (now.format('DD') === moment(date).format('DD')) {
+        sprintDayStyle = {
+          color: '#FFF', background: '#3F51B5', boxShadow: 'none',
+        };
+      }
       dateStyle = sprintDayStyle;
       if (useHoliday && holidayInfo.length) {
         holidayTag = (
