@@ -14,7 +14,8 @@ import './BurndownChartHome.scss';
 import restSvg from '../../../../../assets/image/rest.svg';
 import hopeSvg from '../../../../../assets/image/hope.svg';
 import NoDataComponent from '../../Component/noData';
-import epicSvg from '../../Home/style/pics/no_sprint.svg';
+// import epicSvg from '../../Home/style/pics/no_sprint.svg';
+import epicSvg from '../../../../../assets/image/emptyChart.svg';
 import SwithChart from '../../Component/switchChart';
 
 const { AppState } = stores;
@@ -43,7 +44,8 @@ class BurndownChartHome extends Component {
     };
   }
 
-  componentWillMount() {
+  // componentWillMount() {
+  componentDidMount() {
     const { location: { search } } = this.props;
     // const linkFromParamUrl = _.last(search.split('&')).split('=')[1];
     const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
@@ -109,8 +111,11 @@ class BurndownChartHome extends Component {
         endDate: res[0].endDate,
         startDate: res[0].startDate,
       }, () => {
-        this.getChartData();
-        this.axiosGetRestDays();
+        console.log(`defaultSprint: ${this.state.defaultSprint}`);
+        if (this.state.defaultSprint) {
+          this.getChartData();
+          this.axiosGetRestDays();
+        } 
       });
     }).catch((error) => {
     });
@@ -119,7 +124,7 @@ class BurndownChartHome extends Component {
   axiosGetRestDays = () => {
     BurndownChartStore.axiosGetRestDays(this.state.defaultSprint).then((res) => {
       this.setState({
-        restDays: res.map((date) => moment(date).format('YYYY-MM-DD')),
+        restDays: res.map(date => moment(date).format('YYYY-MM-DD')),
       }, () => {
         this.getChartCoordinate();
       });
@@ -159,7 +164,7 @@ class BurndownChartHome extends Component {
       }
       // const allDate = this.getBetweenDateStr(minDate, maxDate);
       const allDateValues = [res.expectCount];
-      let markAreaData = [];
+      const markAreaData = [];
       let exportAxisData = [res.expectCount];
       const { restDayShow } = this.state;
       // 如果展示非工作日，期望为一条连续斜线
@@ -188,7 +193,7 @@ class BurndownChartHome extends Component {
                 },
                 {
                   xAxis: allDate[b].split(' ')[0].slice(5).replace('-', '/'),
-                }
+                },
               ]);
             }
             exportAxisData[b + 1] = exportAxisData[b];
@@ -326,15 +331,15 @@ class BurndownChartHome extends Component {
         },
         extraCssText:
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
-        formatter: function (params) {
+        formatter(params) {
           let content = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value  : '-'}`;
+              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}`;
             }
           });
           return content;
-        }
+        },
       },
       legend: {
         top: '24px',
@@ -729,7 +734,8 @@ class BurndownChartHome extends Component {
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/burn-down/"
         >
           {
-            this.state.chartLoading || this.state.tableLoading || BurndownChartStore.getSprintList.length > 0 ? (
+            // this.state.chartLoading || this.state.tableLoading || BurndownChartStore.getSprintList.length > 0 ? (
+            BurndownChartStore.getSprintList.length > 0 ? (
               <div>
                 <div>
                   <Select
@@ -777,8 +783,16 @@ class BurndownChartHome extends Component {
                     checked={this.state.restDayShow}
                     onChange={this.onCheckChange}
                   >
+
+
+
+
+
+
+
+
                     显示非工作日
-                  </Checkbox>
+                                    </Checkbox>
                 </div>
                 <Spin spinning={this.state.chartLoading}>
                   <ReactEcharts option={this.getOption()} />

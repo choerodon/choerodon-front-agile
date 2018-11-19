@@ -25,7 +25,9 @@
   overflow-x: auto;
   overflow-y: hidden;
   border-top: 1px solid #d3d3d3;
-
+  p {
+    margin-bottom: 0;
+  }
   .c7n-backlog-side {
     width: 24px;
     border-right: 1px solid #d3d3d3;
@@ -61,10 +63,6 @@
   white-space: nowrap;
   margin-left: 50px;
   cursor: pointer;
-}
-
-p {
-  margin-bottom: 0;
 }
 
 .c7n-agile-backlogTools-popover {

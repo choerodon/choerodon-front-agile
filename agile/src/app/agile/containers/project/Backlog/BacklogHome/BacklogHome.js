@@ -207,9 +207,15 @@ class BacklogHome extends Component {
   filterOnlyMe =() => {
     const { BacklogStore } = this.props;
     BacklogStore.setOnlyMe(!BacklogStore.getOnlyMe);
+    this.setState({
+      spinIf: true,
+    });
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
       .then((res) => {
         BacklogStore.setSprintData(res);
+        this.setState({
+          spinIf: false,
+        });
       }).catch((error) => {
       });
   }
@@ -220,9 +226,15 @@ class BacklogHome extends Component {
   filterOnlyStory =() => {
     const { BacklogStore } = this.props;
     BacklogStore.setRecent(!BacklogStore.getRecent);
+    this.setState({
+      spinIf: true,
+    });
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
       .then((res) => {
         BacklogStore.setSprintData(res);
+        this.setState({
+          spinIf: false,
+        });
       }).catch((error) => {
       });
   };
@@ -514,7 +526,7 @@ class BacklogHome extends Component {
         <Header title="待办事项">
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint}>
             <Icon type="playlist_add" />
-            创建冲刺
+            {'创建冲刺'}
           </Button>
           <Button
             className="leftBtn2"
@@ -525,7 +537,7 @@ class BacklogHome extends Component {
             }}
           >
             <Icon type="refresh" />
-            刷新
+            {'刷新'}
           </Button>
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
@@ -553,7 +565,7 @@ class BacklogHome extends Component {
                     });
                   }}
                 >
-                  版本
+                  {'版本'}
                 </p>
               )}
               {epicVisible ? '' : (
@@ -569,7 +581,7 @@ class BacklogHome extends Component {
                     });
                   }}
                 >
-                  史诗
+                  {'史诗'}
                 </p>
               )}
             </div>

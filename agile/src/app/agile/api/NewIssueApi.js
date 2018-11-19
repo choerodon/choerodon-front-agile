@@ -95,7 +95,7 @@ export function loadStatus(statusId, issueId, typeId) {
 export function loadPriorities() {
   const projectId = AppState.currentMenuType.id;
   const orgId = AppState.currentMenuType.organizationId;
-  return axios.get(`/issue/v1/organizations/${orgId}/priority/list_by_org`);
+  return axios.get(`/issue/v1/projects/${projectId}/priority/list_by_org`);
 }
 
 export function loadIssue(issueId, projectId = AppState.currentMenuType.id) {

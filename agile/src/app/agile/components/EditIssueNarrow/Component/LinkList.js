@@ -61,7 +61,10 @@ class IssueList extends Component {
           </div>
         </Tooltip>
         <Tooltip title={`编号概要： ${issue.issueNum} ${issue.summary}`}>
-          <div style={{ marginLeft: 8, flex: 1, overflow: 'hidden' }}>
+          <div style={{
+            marginLeft: 8, marginRight: 12, flex: 1, overflow: 'hidden', 
+          }}
+          >
             <p
               style={{
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, color: 'rgb(63, 81, 181)', 
@@ -76,7 +79,7 @@ class IssueList extends Component {
           </div>
         </Tooltip>
         <div style={{ width: '34px', marginRight: '15px', overflow: 'hidden' }}>
-          <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityName}`}>
+          <Tooltip mouseEnterDelay={0.5} title={`优先级： ${issue.priorityDTO.name}`}>
             <div style={{ marginRight: 12 }}>
               <PriorityTag
                 priority={issue.priorityDTO}
@@ -86,18 +89,23 @@ class IssueList extends Component {
         </div>
         {
           showAssignee ? (
-            <div style={{ marginRight: 29, display: 'flex', justifyContent: 'flex-end' }}>
-              <div>
-                <UserHead
-                  user={{
-                    id: issue.assigneeId,
-                    loginName: '',
-                    realName: issue.assigneeName,
-                    avatar: issue.imageUrl,
-                  }}
-                />
+            <Tooltip mouseEnterDelay={0.5} title={`经办人： ${issue.assigneeName}`}>
+              <div style={{
+                marginRight: 29, display: 'flex', justifyContent: 'flex-end', 
+              }}
+              >
+                <div>
+                  <UserHead
+                    user={{
+                      id: issue.assigneeId,
+                      loginName: '',
+                      realName: issue.assigneeName,
+                      avatar: issue.imageUrl,
+                    }}
+                  />
+                </div>
               </div>
-            </div>
+            </Tooltip>
           ) : null
         }
         <div style={{

@@ -318,7 +318,8 @@ class VersionItem extends Component {
                           this.updateDate('startDate', dateString);
                         }}
                       >
-                        <p>{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[2].substring(0, 2)}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[0].substring(2, 4)}` : '无'}</p>
+                        {/* <p>{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[2].substring(0, 2)}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[0].substring(2, 4)}` : '无'}</p> */}
+                        <p>{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[0]}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[0].substring(0, 2)}` : '无'}</p>
                       </EasyEdit>
                     </Permission>
 
@@ -341,7 +342,7 @@ class VersionItem extends Component {
                           this.updateDate('releaseDate', dateString);
                         }}
                       >
-                        <p>{!_.isNull(item.releaseDate) ? `${item && item.releaseDate.split('-')[2].substring(0, 2)}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[0].substring(2, 4)}` : '无'}</p>
+                        <p>{!_.isNull(item.releaseDate) ? `${item && item.releaseDate.split('-')[0]}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[2].substring(0, 2)}` : '无'}</p>
                       </EasyEdit>
                     </Permission>
                   </div>

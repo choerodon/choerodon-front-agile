@@ -13,6 +13,19 @@ const FormItem = Form.Item;
 let sign = false;
 
 class CreateLinkTask extends Component {
+  debounceFilterIssues = _.debounce((input) => {
+    const { issueId } = this.props;
+    this.setState({
+      selectLoading: true,
+    });
+    loadIssuesInLink(0, 20, issueId, input).then((res) => {
+      this.setState({
+        originIssues: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
+
   constructor(props) {
     super(props);
     this.state = {
@@ -20,8 +33,6 @@ class CreateLinkTask extends Component {
       selectLoading: true,
       originIssues: [],
       originLinks: [],
-      active: [],
-      passive: [],
       show: [],
       selected: [],
     };
@@ -32,11 +43,12 @@ class CreateLinkTask extends Component {
   }
 
   onFilterChange(input) {
+    const { issueId } = this.props;
     if (!sign) {
       this.setState({
         selectLoading: true,
       });
-      loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
+      loadIssuesInLink(0, 20, issueId, input).then((res) => {
         this.setState({
           originIssues: res.content,
           selectLoading: false,
@@ -62,7 +74,7 @@ class CreateLinkTask extends Component {
       });
   }
 
-  transform(links) {
+  transform = (links) => {
     // split active and passive
     const active = links.map(link => ({
       name: link.outWard,
@@ -78,64 +90,55 @@ class CreateLinkTask extends Component {
       }
     });
     this.setState({
-      active,
-      passive,
       show: active.concat(passive),
     });
-  }
+  };
 
-  handleSelect(value, option) {
+  handleSelect = (value, option) => {
     const selected = _.map(option.slice(), v => v.key);
     this.setState({ selected });
-  }
-
-  debounceFilterIssues = _.debounce((input) => {
-    this.setState({
-      selectLoading: true,
-    });
-    loadIssuesInLink(0, 20, this.props.issueId, input).then((res) => {
-      this.setState({
-        originIssues: res.content,
-        selectLoading: false,
-      });
-    });
-  }, 500);
+  };
 
   handleCreateIssue = () => {
-    this.props.form.validateFields((err, values) => {
+    const { form, issueId, onOk } = this.props;
+    const { selected, originLinks } = this.state;
+    form.validateFields((err, values) => {
       if (!err) {
         const { linkTypeId, issues } = values;
-        const labelIssueRelDTOList = _.map(this.state.selected, (issue) => {
-          const currentLinkType = _.find(this.state.originLinks, { linkTypeId: linkTypeId.split('+')[0] * 1 });
+        const labelIssueRelDTOList = _.map(selected, (issue) => {
+          const currentLinkType = _.find(originLinks, { linkTypeId: linkTypeId.split('+')[0] * 1 });
           if (currentLinkType.outWard === linkTypeId.split('+')[1]) {
             return ({
               linkTypeId: linkTypeId.split('+')[0] * 1,
               linkedIssueId: issue * 1,
-              issueId: this.props.issueId,
+              issueId,
             });
           } else {
             return ({
               linkTypeId: linkTypeId.split('+')[0] * 1,
               issueId: issue * 1,
-              linkedIssueId: this.props.issueId,
+              linkedIssueId: issueId,
             });
           }
         });
         this.setState({ createLoading: true });
-        createLink(this.props.issueId, labelIssueRelDTOList)
+        createLink(issueId, labelIssueRelDTOList)
           .then((res) => {
             this.setState({ createLoading: false });
-            this.props.onOk();
+            onOk();
           });
       }
     });
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
     const {
-      initValue, visible, onCancel, onOk, 
+      form, visible, onCancel,
     } = this.props;
+    const { getFieldDecorator } = form;
+    const {
+      createLoading, selectLoading, show, originIssues,
+    } = this.state;
 
     return (
       <Sidebar
@@ -146,7 +149,7 @@ class CreateLinkTask extends Component {
         onCancel={onCancel}
         okText="创建"
         cancelText="取消"
-        confirmLoading={this.state.createLoading}
+        confirmLoading={createLoading}
       >
         <Content
           style={{ padding: 0 }}
@@ -162,9 +165,9 @@ class CreateLinkTask extends Component {
               })(
                 <Select
                   label="关系"
-                  loading={this.state.selectLoading}
+                  loading={selectLoading}
                 >
-                  {this.state.show.map(link => (
+                  {show.map(link => (
                     <Option key={`${link.linkTypeId}+${link.name}`} value={`${link.linkTypeId}+${link.name}`}>
                       {link.name}
                     </Option>
@@ -182,20 +185,24 @@ class CreateLinkTask extends Component {
                 <Select
                   label="问题"
                   mode="multiple"
-                  loading={this.state.selectLoading}
+                  loading={selectLoading}
                   optionLabelProp="value"
                   filter
                   filterOption={false}
                   onFilterChange={this.onFilterChange.bind(this)}
                   onChange={this.handleSelect.bind(this)}
                 >
-                  {this.state.originIssues.map(issue => (
+                  {originIssues.map(issue => (
                     <Option
                       key={issue.issueId}
                       value={issue.issueNum}
                     >
                       <div style={{
-                        display: 'inline-flex', width: '100%', flex: 1, alignItems: 'center', 
+                        display: 'inline-flex',
+                        width: '100%',
+                        flex: 1,
+                        alignItems: 'center',
+                        verticalAlign: 'bottom',
                       }}
                       >
                         <TypeTag

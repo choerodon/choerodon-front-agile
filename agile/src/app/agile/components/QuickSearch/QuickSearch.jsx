@@ -54,11 +54,15 @@ class QuickSearch extends Component {
     this.setState({ selected: nextSelectedTags });
   };
 
-  buttonRender = () => {
+  buttonRender = (resetFilter) => {
     const {
-      buttonName, buttonIcon, moreSelection, onChangeCheckBox,
+      buttonName, buttonIcon, onChangeCheckBox,
     } = this.props;
 
+    let { moreSelection } = this.props;
+    if (resetFilter) {
+      moreSelection = [];
+    }
     const listChildren = moreSelection.map(item => ({
       label: item.name,
       value: item.filterId,
@@ -89,7 +93,7 @@ class QuickSearch extends Component {
         <div
           className="c7n-agile-quickSearch-left"
         >
-          {title && (<p style={{ marginRight: 24, fontSize: 14 }}>快速搜索:</p>)}
+          {title && (<p style={{ marginRight: 16, fontSize: 14, fontWeight: 600 }}>快速搜索:</p>)}
           {selectionGroup.map(tag => (
             <CheckableTag
               key={tag}
@@ -100,7 +104,7 @@ class QuickSearch extends Component {
               {tag}
             </CheckableTag>
           ))}
-          {this.buttonRender()}
+          {this.buttonRender(resetFilter)}
         </div>
       </div>
     );

@@ -78,9 +78,9 @@ class DeleteReleaseWithIssue extends Component {
         <div style={{ marginTop: 25 }}>
           {
             this.props.versionDelInfo.influenceIssueCount ? (
-              <div style={{ display: 'flex' }}>
+              <div style={{ marginBottom: '20px' }}>
                 <p style={{ flex: 1 }}>
-                  {`问题影响${this.props.versionDelInfo.influenceIssueCount}`}
+                  {`此版本影响问题数：${this.props.versionDelInfo.influenceIssueCount}`}
                 </p>
                 {
                   this.props.versionDelInfo.versionNames.length > 0 ? (
@@ -90,7 +90,6 @@ class DeleteReleaseWithIssue extends Component {
                       }}
                     >
                       <RadioGroup
-                        style={{ marginLeft: 25 }}
                         defaultValue={0}
                         onChange={(e) => {
                           this.setState({
@@ -148,7 +147,7 @@ class DeleteReleaseWithIssue extends Component {
             this.props.versionDelInfo.fixIssueCount ? (
               <div>
                 <p style={{ flex: 1 }}>
-                  {`问题修复于${this.props.versionDelInfo.fixIssueCount}`}
+                  {`此版本修复问题数：${this.props.versionDelInfo.fixIssueCount}`}
                 </p>
                 {
                   this.props.versionDelInfo.versionNames.length > 0 ? (

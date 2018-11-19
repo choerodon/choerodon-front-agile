@@ -61,6 +61,16 @@ class ScrumBoardStore {
 
   @observable canAddStatus = true;
 
+  @observable sprintData = true;
+
+  @computed get getSprintData() {
+    return this.sprintData;
+  }
+
+  @action setSprintData(data) {
+    this.sprintData = data;
+  }
+
   @computed get getCanAddStatus() {
     return this.canAddStatus;
   }
@@ -464,6 +474,12 @@ class ScrumBoardStore {
       this.setStatusList([]);
     });
   };
+
+  axiosUpdateIssue(data) {
+    const proId = AppState.currentMenuType.id;
+    const { issueId, objectVersionNumber, transformId } = data;
+    return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=agile&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objectVersionNumber}`);
+  }
 }
 
 const scrumBoardStore = new ScrumBoardStore();

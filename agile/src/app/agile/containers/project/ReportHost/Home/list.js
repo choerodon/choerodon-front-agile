@@ -8,7 +8,7 @@ export default [
   },
   {
     key: 'sprint',
-    title: 'Sprint报告',
+    title: '冲刺报告',
     des: '了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定团队的工作量是否超额。',
     link: '/agile/reporthost/sprintReport',
     pic: 'sprint',

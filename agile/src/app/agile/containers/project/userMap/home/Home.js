@@ -19,7 +19,8 @@ import EpicCard from '../component/EpicCard/EpicCard.js';
 import IssueCard from '../component/IssueCard/IssueCard.js';
 import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
-import epicPic from '../../../../assets/image/用户故事地图－空.svg';
+// import epicPic from '../../../../assets/image/用户故事地图－空.svg';
+import epicPic from '../../../../assets/image/emptyStory.svg';
 
 const FileSaver = require('file-saver');
 
@@ -286,7 +287,7 @@ class Home extends Component {
     let arr = _.cloneDeep(toJS(selectIssueIds));
     const index = arr.indexOf(issueId);
     const { keydown } = this.state;
-    // command ctrl shift
+    // command ctrl shift 支持多选
     if (keydown === 91 || keydown === 17 || keydown === 16) {
       if (index === -1) {
         arr.push(issueId);
@@ -346,7 +347,12 @@ class Home extends Component {
     }
   }
 
+  /**
+   * 拖拽到史诗框内
+   */
   handleEpicDrag =(res) => {
+    // 不允许将非史诗拖拽到史诗列
+    if (res.source && res.source.droppableId !== 'epic') return;
     const { UserMapStore } = this.props;
     const data = UserMapStore.getEpics;
     const result = Array.from(data);
@@ -354,7 +360,6 @@ class Home extends Component {
     const tarIndex = res.destination.index;
     const [removed] = result.splice(sourceIndex, 1);
     result.splice(tarIndex, 0, removed);
-    // return result;
     let beforeSequence = null;
     let afterSequence = null;
     if (tarIndex === 0) {
@@ -1107,8 +1112,11 @@ class Home extends Component {
       mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
     const issues = UserMapStore.getCacheIssues;
+    // 不允许将史诗拖拽到非史诗列
     if (res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') return;
+    // 只拖拽了一个issue
     if (selectIssueIds.length < 2) {
+      // 拖拽到了同一列,不做处理
       if (res.destination.droppableId === res.source.droppableId
         && res.destination.index === res.source.index) return;
       const key = `${mode}Id`;
@@ -1118,8 +1126,9 @@ class Home extends Component {
       const souModeId = this.getSprintIdAndEpicId(res.source.droppableId).modeId;
       const souEpicId = this.getSprintIdAndEpicId(res.source.droppableId).epicId;
       const issueIds = selectIssueIds.length ? toJS(selectIssueIds) : [parseInt(res.draggableId.split('-')[1], 10)];
+      // 全部issue数据
       const issueData = _.cloneDeep(toJS(issues));
-      const backlogData = _.cloneDeep(toJS(backlogIssues));
+      // const backlogData = _.cloneDeep(toJS(backlogIssues));
       let desEpicAndModeIssues;
       if (desModeId === 0) {
         const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
@@ -1268,6 +1277,8 @@ class Home extends Component {
     const {
       mode, backlogIssues, selectIssueIds,
     } = UserMapStore;
+    // 不允许将史诗拖拽到代办
+    if (res.source && res.source.droppableId === 'epic') return;
     const issues = UserMapStore.getCacheIssues;
     if (selectIssueIds.length < 2) {
       if (res.destination.droppableId === res.source.droppableId
@@ -1435,6 +1446,7 @@ class Home extends Component {
 
   handleEpicOrIssueDrag = (res) => {
     const { UserMapStore } = this.props;
+    // 拖动到可拖动范围外
     if (!res.destination) {
       UserMapStore.setSelectIssueIds([]);
       UserMapStore.setCurrentDraggableId(null);
@@ -1883,18 +1895,19 @@ class Home extends Component {
                     }}
                   >
                     <React.Fragment>
-                      {_.filter(issues, issue => issue.epicId === epic.issueId && (mode === 'none' || (issue[id] && issue[id] === 0))).map((item, indexs) => (
-                        <IssueCard
-                          draggableId={`${mode}-${item.issueId}`}
-                          index={indexs}
-                          selected={selectIssueIds.includes(item.issueId)}
-                          dragged={currentDraggableId === item.issueId}
-                          handleClickIssue={this.handleClickIssue}
-                          key={item.issueId}
-                          issue={item}
-                          borderTop={indexs === 0}
-                          showDelete={!UserMapStore.isFullScreen}
-                        />
+                      {_.filter(issues, issue => issue.epicId === epic.issueId
+                        && (mode === 'none' || ((issue[id] && issue[id] === 0) || !issue[id]))).map((item, indexs) => (
+                          <IssueCard
+                            draggableId={`${mode}-${item.issueId}`}
+                            index={indexs}
+                            selected={selectIssueIds.includes(item.issueId)}
+                            dragged={currentDraggableId === item.issueId}
+                            handleClickIssue={this.handleClickIssue}
+                            key={item.issueId}
+                            issue={item}
+                            borderTop={indexs === 0}
+                            showDelete={!UserMapStore.isFullScreen}
+                          />
                       ))}
                       {
                         epicId === epic.issueId && currentNewObj[id] === 0 ? (

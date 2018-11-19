@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
@@ -17,6 +16,7 @@ import AssigneeModal from './AssigneeModal';
 import EmptyBacklog from '../../../../../assets/image/emptyBacklog.svg';
 import './Sprint.scss';
 import TypeTag from '../../../../../components/TypeTag';
+import UserHead from '../../../../../components/UserHead';
 import { ICON, TYPE } from '../../../../../common/Constant';
 
 const { Option } = Select;
@@ -24,7 +24,6 @@ const { confirm } = Modal;
 const { AppState } = stores;
 
 const filterIssueTypeCode = ['issue_epic', 'sub_task'];
-
 @observer
 class SprintItem extends Component {
   constructor(props) {
@@ -169,6 +168,7 @@ class SprintItem extends Component {
         summary: this[`${index}-addInput`].input.value,
         issueTypeId: currentType.id,
         typeCode: currentType.typeCode,
+        /* eslint-disable */
         ...!isNaN(store.getChosenEpic) ? {
           epicId: store.getChosenEpic,
         } : {},
@@ -181,6 +181,7 @@ class SprintItem extends Component {
         } : {},
         parentIssueId: 0,
       };
+      /* eslint-enable */
       store.axiosEasyCreateIssue(data).then((res) => {
         this.setState({
           [`${index}-create`]: {
@@ -201,7 +202,7 @@ class SprintItem extends Component {
         });
       });
     }
-  }
+  };
 
   /**
    *修改冲刺名
@@ -270,7 +271,7 @@ class SprintItem extends Component {
             issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
           }
           confirm({
-            title: '警告',
+            title: '提醒',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
             onCancel() {
             },
@@ -378,7 +379,8 @@ class SprintItem extends Component {
    */
   handleClickIssue=(sprintId, item) => {
     // command ctrl shift
-    const { keydown, selected, store } = this.state;
+    const { keydown, selected } = this.state;
+    const { store } = this.props;
     if (keydown === 91 || keydown === 17 || keydown === 16) {
       // 如果没点击
       if (selected.droppableId === '') {
@@ -573,17 +575,15 @@ class SprintItem extends Component {
     return result;
   }
 
-
   renderStatusCodeDom =(item, index) => {
+    const { state } = this;
     const menu = (
       <Menu
         onClick={this.handleDeleteSprint.bind(this, item)}
       >
         <Menu.Item key="0">
-
-
-          删除sprint
-                </Menu.Item>
+          {'删除sprint'}
+        </Menu.Item>
       </Menu>
     );
     if (item.statusCode) {
@@ -602,10 +602,8 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleFinishSprint.bind(this, item, index)}
               >
-
-
-                完成冲刺
-                            </p>
+                {'完成冲刺'}
+              </p>
               {/* <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown> */}
@@ -621,10 +619,8 @@ class SprintItem extends Component {
                 role="none"
                 onClick={this.handleStartSprint.bind(this, item, index)}
               >
-
-
-                开启冲刺
-                            </p>
+                {'开启冲刺'}
+              </p>
               <Dropdown overlay={menu} trigger={['click']}>
                 <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
               </Dropdown>
@@ -632,7 +628,7 @@ class SprintItem extends Component {
           )}
           <StartSprint
             store={store}
-            visible={(this.state[`${index}-startSprint`] && this.state[`${index}-startSprint`].startSprintVisible) || false}
+            visible={(state[`${index}-startSprint`] && state[`${index}-startSprint`].startSprintVisible) || false}
             onCancel={() => {
               this.setState({
                 [`${index}-startSprint`]: { startSprintVisible: false },
@@ -643,7 +639,7 @@ class SprintItem extends Component {
           />
           <CloseSprint
             store={store}
-            visible={(this.state[`${index}-closeSprint`] && this.state[`${index}-closeSprint`].closeSprintVisible) || false}
+            visible={(state[`${index}-closeSprint`] && state[`${index}-closeSprint`].closeSprintVisible) || false}
             onCancel={() => {
               this.setState({
                 [`${index}-closeSprint`]: { closeSprintVisible: false },
@@ -685,7 +681,10 @@ class SprintItem extends Component {
    * @returns
    * @memberof Sprint
    */
-  getCurrentState=data => this.state[data];
+  getCurrentState= (data) => {
+    const { state } = this;
+    return state[data];
+  };
 
   handleChangeType(type) {
     this.setState({
@@ -700,8 +699,7 @@ class SprintItem extends Component {
    * @memberof Sprint
    */
   renderSprint = () => {
-    const { store } = this.props;
-    const { selectIssueType, loading } = this.state;
+    const { state, props: { store }, state: { selectIssueType, loading } } = this;
     const issueTypes = store.getIssueTypes
       .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
@@ -748,11 +746,11 @@ class SprintItem extends Component {
                       <div className="c7n-backlog-sprintName">
                         <Icon
                           style={{ fontSize: 20, cursor: 'pointer' }}
-                          type={this.state[`${indexs}-sprint`] && !this.state[`${indexs}-sprint`].expand ? 'baseline-arrow_right' : 'baseline-arrow_drop_down'}
+                          type={state[`${indexs}-sprint`] && !state[`${indexs}-sprint`].expand ? 'baseline-arrow_right' : 'baseline-arrow_drop_down'}
                           role="none"
                           onClick={() => {
                             this.setState({
-                              [`${indexs}-sprint`]: { expand: this.state[`${indexs}-sprint`] ? !this.state[`${indexs}-sprint`].expand : false },
+                              [`${indexs}-sprint`]: { expand: state[`${indexs}-sprint`] ? !state[`${indexs}-sprint`].expand : false },
                             });
                           }}
                         />
@@ -767,7 +765,6 @@ class SprintItem extends Component {
                             role="none"
                           >
                             {item.sprintName}
-
                           </span>
                         </EasyEdit>
                       </div>
@@ -788,7 +785,7 @@ class SprintItem extends Component {
                         role="none"
                         onClick={this.clearFilter}
                       >
-                        清空所有筛选器
+                        {'清空所有筛选器'}
                       </p>
                     </div>
                     <div style={{ flexGrow: 1 }}>
@@ -807,7 +804,9 @@ class SprintItem extends Component {
                           .filter(ass => ass.assigneeId)
                           .map((ass2, index) => (
                             <Tooltip
+                              /* eslint-disable */
                               key={`tooltip-${index}`}
+                              /* eslint-enable */
                               placement="bottom"
                               title={(
                                 <div>
@@ -827,17 +826,18 @@ class SprintItem extends Component {
                                 </div>
                               )}
                             >
-                              {/* <div className="c7n-backlog-sprintIcon">{ass2.assigneeName ?
-                      ass2.assigneeName.substring(0, 1).toUpperCase() : ''}</div> */}
-                              <Avatar
-                                style={{ marginRight: 8, flexShrink: 0 }}
-                                src={ass2.imageUrl ? ass2.imageUrl : undefined}
-                                size="small"
-                              >
-                                {
-                                  !ass2.imageUrl && ass2.assigneeName ? this.getFirst(ass2.assigneeName) : ''
-                                }
-                              </Avatar>
+                              <div>
+                                <UserHead
+                                  hiddenText
+                                  size={24}
+                                  user={{
+                                    id: ass2.assigneeId,
+                                    loginName: ass2.assigneeName,
+                                    realName: ass2.assigneeName,
+                                    avatar: ass2.imageUrl,
+                                  }}
+                                />
+                              </div>
                             </Tooltip>
                           ))) : ''
                     }
@@ -862,7 +862,7 @@ class SprintItem extends Component {
                       />
                     </div>
                     <AssigneeModal
-                      visible={this.state[indexs] && this.state[indexs].visibleAssign || false}
+                      visible={(state[indexs] && state[indexs].visibleAssign) || false}
                       onCancel={() => {
                         this.setState({
                           [indexs]: {
@@ -918,7 +918,6 @@ class SprintItem extends Component {
                             role="none"
                           >
                             {this.renderData(item, 'startDate')}
-
                           </div>
                         </EasyEdit>
                         <p>~</p>
@@ -936,7 +935,6 @@ class SprintItem extends Component {
                             role="none"
                           >
                             {this.renderData(item, 'endDate')}
-
                           </div>
                         </EasyEdit>
                       </div>
@@ -948,6 +946,7 @@ class SprintItem extends Component {
                         width={200}
                         defaultValue={item.sprintGoal}
                         enterOrBlur={this.handleBlurGoal.bind(this, item)}
+                        maxLength={30}
                       >
                         <div
                           role="none"
@@ -961,13 +960,12 @@ class SprintItem extends Component {
                           }}
                         >
                           {item.sprintGoal ? item.sprintGoal : '无'}
-
                         </div>
                       </EasyEdit>
                     </div>
                   </div>
                 </div>
-                {(this.state[`${indexs}-sprint`] && this.state[`${indexs}-sprint`].expand) || this.state[`${indexs}-sprint`] === undefined ? (
+                {(state[`${indexs}-sprint`] && state[`${indexs}-sprint`].expand) || state[`${indexs}-sprint`] === undefined ? (
                   <Droppable
                     droppableId={item.sprintId.toString()}
                     isDropDisabled={store.getIsLeaveSprint}
@@ -994,7 +992,7 @@ class SprintItem extends Component {
                               alignItems: 'center',
                             }}
                           >
-                            {this.state[`${indexs}-create`] && this.state[`${indexs}-create`].createIssue ? (
+                            {state[`${indexs}-create`] && state[`${indexs}-create`].createIssue ? (
                               <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                   <Dropdown overlay={typeList} trigger={['click']}>
@@ -1038,19 +1036,15 @@ class SprintItem extends Component {
                                       });
                                     }}
                                   >
-
-
-                                    取消
-                                                                    </Button>
+                                    {'取消'}
+                                  </Button>
                                   <Button
                                     type="primary"
                                     loading={loading}
                                     onClick={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
                                   >
-
-
-                                    确定
-                                                                    </Button>
+                                    {'确定'}
+                                  </Button>
                                 </div>
                               </div>
                             ) : (
@@ -1073,10 +1067,8 @@ class SprintItem extends Component {
                                   }}
                                 >
                                   <Icon type="playlist_add" />
-
-
-                                  创建问题
-                                                                </Button>
+                                  {'创建问题'}
+                                </Button>
                               </div>
                             )}
                           </div>
@@ -1103,14 +1095,10 @@ class SprintItem extends Component {
               <div style={{ marginLeft: 40 }}>
                 <p style={{ color: 'rgba(0,0,0,0.65)' }}>用问题填充您的待办事项</p>
                 <p style={{ fontSize: 16, lineHeight: '28px', marginTop: 8 }}>
-
-
-                  这是您的团队待办事项。创建并预估新的问题，并通
+                  {'这是您的团队待办事项。创建并预估新的问题，并通'}
                   <br />
-
-
-                  过上下拖动来对待办事项排优先级
-                                </p>
+                  {'过上下拖动来对待办事项排优先级'}
+                </p>
               </div>
             </div>
           );
@@ -1127,10 +1115,9 @@ class SprintItem extends Component {
    * @memberof Sprint
    */
   renderBacklog=() => {
-    const { store } = this.props;
+    const { state, props: { store }, state: { selectIssueType, backlogExpand, loading } } = this;
     const issueTypes = store.getIssueTypes
       .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
-    const { selectIssueType, backlogExpand, loading } = this.state;
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
       <Menu
@@ -1155,7 +1142,6 @@ class SprintItem extends Component {
         }
       </Menu>
     );
-
     if (JSON.stringify(store.getSprintData) !== '{}') {
       const data = store.getSprintData.backlogData;
       if (data) {
@@ -1164,7 +1150,6 @@ class SprintItem extends Component {
           issueSearchDTOList: data.backLogIssue,
           sprintId: 'backlog',
         };
-
         return (
           <div>
             <div className="c7n-backlog-sprintTop">
@@ -1205,10 +1190,8 @@ class SprintItem extends Component {
                     role="none"
                     onClick={this.clearFilter}
                   >
-
-
-                    清空所有筛选器
-                                    </p>
+                    {'清空所有筛选器'}
+                  </p>
                 </div>
                 <div style={{ flexGrow: 1 }}>
                   {this.renderStatusCodeDom(item)}
@@ -1243,7 +1226,7 @@ class SprintItem extends Component {
                           alignItems: 'center',
                         }}
                       >
-                        {this.state['-1-create'] && this.state['-1-create'].createIssue ? (
+                        {state['-1-create'] && state['-1-create'].createIssue ? (
                           <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                               <Dropdown overlay={typeList} trigger={['click']}>
@@ -1282,19 +1265,15 @@ class SprintItem extends Component {
                                   });
                                 }}
                               >
-
-
-                                取消
-                                                            </Button>
+                                {'取消'}
+                              </Button>
                               <Button
                                 type="primary"
                                 loading={loading}
                                 onClick={this.handleBlurCreateIssue.bind(this, 'backlog', item, -1)}
                               >
-
-
-                                确定
-                                                            </Button>
+                                {'确定'}
+                              </Button>
                             </div>
                           </div>
                         ) : (
@@ -1315,10 +1294,8 @@ class SprintItem extends Component {
                               }}
                             >
                               <Icon type="playlist_add" />
-
-
-                              创建问题
-                                                        </Button>
+                              {'创建问题'}
+                            </Button>
                           </div>
                         )}
                       </div>

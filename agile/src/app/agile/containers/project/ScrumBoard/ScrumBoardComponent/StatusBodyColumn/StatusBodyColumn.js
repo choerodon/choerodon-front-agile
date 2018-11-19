@@ -232,24 +232,24 @@ class StatusBodyColumn extends Component {
       JSON.stringify(ScrumBoardStore.getDragStartItem) !== '{}') {
       // 如果开始拖动 并且拖动的issue在当前source里
       if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
-        String(this.props.source)
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) 
+        === String(this.props.source)
         ) {
           return 'rgba(140,158,255,0.12)';
         } else {
           return 'rgba(0, 0, 0, 0.04)';
         }
       } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) === 
-        String(this.props.assigneeId)
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) 
+        === String(this.props.assigneeId)
         ) {
           return 'rgba(140,158,255,0.12)';
         } else {
           return 'rgba(0, 0, 0, 0.04)';
         }
       } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId) === 
-        String(this.props.epicId)
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId) 
+        === String(this.props.epicId)
         ) {
           return 'rgba(140,158,255,0.12)';
         } else {
@@ -328,11 +328,11 @@ class StatusBodyColumn extends Component {
    */
   renderBorder(data, index, position, drag) {
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
-      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === 
-      String(this.props.source)) {
+      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source && ScrumBoardStore.getDragStartItem.source.droppableId).parentId) 
+      === String(this.props.source)) {
         // 如果在同一个泳道
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) !== 
-        String(this.props.data.columnId)) {
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) 
+        !== String(this.props.data.columnId)) {
           let flag = 0;
           // 如果不在同一列
           if (data.length === 1) {
@@ -367,11 +367,11 @@ class StatusBodyColumn extends Component {
         return 'unset';
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
-      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) === 
-      String(this.props.assigneeId)) {
+      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) 
+      === String(this.props.assigneeId)) {
         // 如果在同一个泳道
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) !== 
-        String(this.props.data.columnId)) {
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) 
+        !== String(this.props.data.columnId)) {
           let flag = 0;
           // 如果不在同一列
           if (data.length === 1) {
@@ -406,11 +406,11 @@ class StatusBodyColumn extends Component {
         return 'unset';
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
-      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId) === 
-      String(this.props.epicId)) {
+      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId) 
+      === String(this.props.epicId)) {
         // 如果在同一个泳道
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) !== 
-        String(this.props.data.columnId)) {
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) 
+        !== String(this.props.data.columnId)) {
           let flag = 0;
           // 如果不在同一列
           if (data.length === 1) {
@@ -575,4 +575,3 @@ class StatusBodyColumn extends Component {
 }
 
 export default StatusBodyColumn;
-

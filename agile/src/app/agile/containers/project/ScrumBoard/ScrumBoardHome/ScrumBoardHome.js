@@ -53,15 +53,6 @@ class ScrumBoardHome extends Component {
     if (url.paramIssueId) {
       ScrumBoardStore.setClickIssueDetail({ issueId: url.paramIssueId });
     }
-    const timer = setInterval(() => {
-      if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-        if (document.getElementsByClassName('c7n-scrumboard-header').length > 0) {
-          document.getElementsByClassName('c7n-scrumboard-header')[0].style.paddingRight = '32px';
-        }
-        document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
-      }
-      clearInterval(timer);
-    }, 1000);
   }
 
   componentWillUnmount() {
@@ -146,6 +137,11 @@ class ScrumBoardHome extends Component {
         recent,
         quickFilter).then((data) => {
         this.setState({ dataSource: data });
+        if (data) {
+          ScrumBoardStore.setSprintData(data.currentSprint);
+        } else {
+          ScrumBoardStore.setSprintData(false);
+        }
         ScrumBoardStore.axiosGetAllEpicData().then((data2) => {
           const parentIds = [];
           const assigneeIds = [];
@@ -302,6 +298,7 @@ class ScrumBoardHome extends Component {
           });
         });
       }).catch((error) => {
+        ScrumBoardStore.setSprintData(false);
       });
     }).catch((error) => {
     });
@@ -624,7 +621,7 @@ class ScrumBoardHome extends Component {
             issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
           }
           confirm({
-            title: 'warnning',
+            title: '提醒',
             content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
             onCancel() {
             },
@@ -752,10 +749,15 @@ class ScrumBoardHome extends Component {
   };
 
   renderHeight = () => {
-    if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-      return `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
-    }
-    return '';
+    const timer = setInterval(() => {
+      if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
+        if (document.getElementsByClassName('c7n-scrumboard-header').length > 0) {
+          document.getElementsByClassName('c7n-scrumboard-header')[0].style.paddingRight = '32px';
+        }
+        document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
+      }
+      clearInterval(timer);
+    }, 1000);
   };
 
   renderOthersTitle = () => {
@@ -911,6 +913,7 @@ class ScrumBoardHome extends Component {
   };
 
   render() {
+    this.renderHeight();
     const { form: { getFieldDecorator }, history } = this.props;
     const {
       dataSource,
@@ -1002,7 +1005,7 @@ class ScrumBoardHome extends Component {
             // ) : null
 
              (
-               <Button className="leftBtn2" disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)} funcType="flat" onClick={() => { history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+               <Button className="leftBtn2" disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)} funcType="flat" onClick={() => { history.push(`/agile/iterationBoard/${dataSource && dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
                  <span>切换至工作台</span>
                </Button>
             )
@@ -1120,6 +1123,7 @@ class ScrumBoardHome extends Component {
           />
           <Modal
             closable={false}
+            maskClosable={false}
             title="更新父问题"
             visible={JSON.stringify(judgeUpdateParent) !== '{}'}
             onCancel={() => {
@@ -1132,9 +1136,9 @@ class ScrumBoardHome extends Component {
               const data = {
                 issueId: judgeUpdateParent.id,
                 objectVersionNumber: judgeUpdateParent.objectVersionNumber,
-                transformId: updateParentStatus,
+                transformId: updateParentStatus || translateId[0].id,
               };
-              BacklogStore.axiosUpdateIssue(data).then((res) => {
+              ScrumBoardStore.axiosUpdateIssue(data).then((res) => {
                 this.refresh(ScrumBoardStore.getSelectedBoard);
                 this.setState({
                   judgeUpdateParent: {},
@@ -1150,7 +1154,7 @@ class ScrumBoardHome extends Component {
               {'的全部子任务为done'}
             </p>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p style={{ marginRight: 20 }}>您是否要更新父问题进行匹配</p>
+              <p style={{ marginRight: 20, marginBottom: 0 }}>您是否要更新父问题进行匹配</p>
               <Select
                 style={{
                   width: 250,

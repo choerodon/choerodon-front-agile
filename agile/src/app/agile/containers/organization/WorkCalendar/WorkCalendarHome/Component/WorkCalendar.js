@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import Calendar from 'rc-calendar';
+import Calendar from 'choerodon-ui/lib/rc-components/calendar/';
 import _ from 'lodash';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import classNames from 'classnames';
-import zhCN from 'rc-calendar/lib/locale/zh_CN';
-import 'rc-calendar/assets/index.css';
+import zhCN from 'choerodon-ui/lib/rc-components/calendar/locale/zh_CN';
+import './rc-calendar.scss';
 import './WorkCalendar.scss';
 
 @observer
@@ -58,7 +57,7 @@ class WorkCalendar extends Component {
     }
     let dateStyle;
     const workDayStyle = {
-      color: '#000', background: '#FFF',
+      color: '#000', background: '#EFEFEF',
     };
     const notWorkDayStyle = {
       color: '#EF2A26', background: '#FFE7E7',
@@ -156,6 +155,7 @@ class WorkCalendar extends Component {
       >
         {text}
       </span>
+      <span className="legend-text">{title}</span>
     </div>
   );
 

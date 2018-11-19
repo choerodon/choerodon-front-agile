@@ -5,11 +5,12 @@ import Calendar from 'choerodon-ui/lib/rc-components/calendar/';
 import _ from 'lodash';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import zhCN from 'rc-calendar/lib/locale/zh_CN';
-import 'rc-calendar/assets/index.css';
+import zhCN from 'choerodon-ui/lib/rc-components/calendar/locale/zh_CN';
+import './rc-calendar.scss';
 import './WorkCalender.scss';
 
-const format = 'YYYY-M-D';
+const format = 'YYYY-MM-DD';
+const test = 'YYYY-M-DD';
 
 @observer
 class WorkCalendar extends Component {
@@ -77,7 +78,7 @@ class WorkCalendar extends Component {
     const notWorkDayStyle = {
       color: '#EF2A26', background: '#FFE7E7',
     };
-    const sprintDayStyle = {
+    let sprintDayStyle = {
       color: '#FFF', background: '#3F51B5',
     };
     const localData = moment.localeData();
@@ -96,19 +97,34 @@ class WorkCalendar extends Component {
     const selectDay = selectDays.filter(d => d.workDay === date);
 
     let holidayTag = null;
-    if (startDate.includes(date) || endDate.includes(date)) {
+
+    const startDateCopy = moment(startDate).format(test);
+    const endDateCopy = moment(endDate).format(test);
+
+    if (startDateCopy === date || endDateCopy === date) {
+      if (now.format('DD') === moment(date).format('DD')) {
+        sprintDayStyle = {
+          color: '#FFF', background: '#3F51B5', boxShadow: 'none',
+        };
+      }
       dateStyle = sprintDayStyle;
       if (useHoliday && holidayInfo.length) {
         holidayTag = (
           <React.Fragment>
             {
               workDate.length && (workDate[0].status === 1 || holidayInfo[0].status === 1)
-                ? (<span className="tag tag-work">班</span>)
+                ? (<span className="tag tag-work" style={{ background: 'none' }}>班</span>)
                 : (<span className="tag tag-notwork">休</span>)
             }
             <span className="des">{holidayInfo[0].name}</span>
           </React.Fragment>
         );
+      } else if (workDate.length) {
+        holidayTag = workDate[0].status === 0 ? <span className="tag tag-work" style={{ background: 'none' }}>休</span> : <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
+      } else if (selectDay.length) {
+        holidayTag = selectDay[0].status === 0 ? <span className="tag tag-work" style={{ background: 'none' }}>休</span> : <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
+      } else {
+        holidayTag = <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
       }
     } else if (workDate.length) {
       dateStyle = workDate[0].status === 1 ? workDayStyle : notWorkDayStyle;

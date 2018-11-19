@@ -405,23 +405,13 @@ class ReleaseDetail extends Component {
         title: '经办人',
         dataIndex: 'assigneeName',
         key: 'assigneeName',
-        // render: (text, record) => (text ? (
-        //   <div style={{ display: 'flex', alignItems: 'center' }}>
-        //     <Avatar style={{ marginRight: 8 }} size="small" src={record.assigneeImageUrl ? record.assigneeImageUrl : ''}>
-        //       {
-        //       record.assigneeImageUrl ? '' : text.substring(0, 1)
-        //     }
-        //     </Avatar>
-        //     <span className="textDisplayOneColumn">{text}</span>
-        //   </div>
-        // ) : '')
         render: (text, record) => (text ? (
           <UserHead
             user={{
               id: record.assigneeId,
               loginName: '',
               realName: text,
-              avatar: record.imageUrl,
+              avatar: record.assigneeImageUrl,
             }}
           />
         ) : '')

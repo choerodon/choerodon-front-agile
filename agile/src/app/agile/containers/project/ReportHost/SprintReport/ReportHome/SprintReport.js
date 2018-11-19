@@ -13,7 +13,7 @@ import BurndownChartStore from '../../../../../stores/project/burndownChart/Burn
 import ReportStore from '../../../../../stores/project/Report';
 import restSvg from '../../../../../assets/image/rest.svg';
 import hopeSvg from '../../../../../assets/image/hope.svg';
-import { formatDate } from '../../../../../common/utils';
+import { commonformatDate } from '../../../../../common/utils';
 import NoDataComponent from '../../Component/noData';
 // import epicSvg from '../../Home/style/pics/no_sprint.svg';
 import epicSvg from '../../../../../assets/image/emptyChart.svg';
@@ -311,11 +311,11 @@ class SprintReport extends Component {
         },
         extraCssText:
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
-        formatter (params) {
+        formatter(params) {
           let content = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value  : '-'}`;
+              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}`;
             }
           });
           return content;
@@ -562,16 +562,32 @@ class SprintReport extends Component {
           </span>
         ),
       }, {
-        width: '30%',
+        // width: '30%',
         title: '概要',
         dataIndex: 'summary',
+        render: (summary, record) => {
+          return (
+            <Tooltip MouseEnterDelay={0.5} title={`问题概要：${record.summary}`}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  maxWidth: 260,
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {record.summary}
+              </div>
+            </Tooltip>
+          );
+        },
       }, {
         width: '15%',
         title: '问题类型',
         dataIndex: 'typeCode',
         render: (typeCode, record) => (
           <div>
-            <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.typeCode}`}>
+            <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.issueTypeDTO.name}`}>
               <div>
                 <TypeTag
                   data={record.issueTypeDTO}
@@ -587,7 +603,7 @@ class SprintReport extends Component {
         dataIndex: 'priorityId',
         render: (priorityId, record) => (
           <div>
-            <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityName}`}>
+            <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`优先级： ${record.priorityDTO.name}`}>
               <div style={{ marginRight: 12 }}>
                 <PriorityTag
                   priority={record.priorityDTO}
@@ -602,7 +618,7 @@ class SprintReport extends Component {
         dataIndex: 'statusCode',
         render: (statusCode, record) => (
           <div>
-            <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusMapDTO.name}`}>
+            <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务状态： ${record.statusMapDTO.name}`}>
               <div>
                 <StatusTag
                   style={{ display: 'inline-block' }}
@@ -696,9 +712,8 @@ class SprintReport extends Component {
                       checked={this.state.restDayShow}
                       onChange={this.onCheckChange}
                     >
-
-                      显示非工作日
-</Checkbox>
+                      {'显示非工作日'}
+                    </Checkbox>
                     <div className="c7n-sprintMessage">
                       <div className="c7n-sprintContent">
                         <span>
@@ -709,7 +724,7 @@ class SprintReport extends Component {
                           {'个问题'}
                         </span>
                         <span>
-                          {`${formatDate(ReportStore.currentSprint.startDate)} - ${formatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
+                          {`${commonformatDate(ReportStore.currentSprint.startDate)} - ${commonformatDate(ReportStore.currentSprint.actualEndDate) || '至今'}`}
                         </span>
                       </div>
                       <p

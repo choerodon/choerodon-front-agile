@@ -25,7 +25,9 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-
+        p {
+          margin-bottom: 0;
+        }
         .c7n-backlog-sprintName {
           font-size: 13px;
           line-height: 20px;
@@ -124,7 +126,6 @@
       -ms-flex-pack: justify;
       justify-content: space-between;
       margin: 10px 20px;
-
     }
 
     .c7n-backlog-sprintGoalSide {

@@ -253,7 +253,7 @@ class BacklogStore {
   }
 
   axiosUpdateVerison(versionId, data) {
-    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}`, data);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/update/${versionId}`, data);
   }
 
   @computed get getClickIssueDetail() {
@@ -297,9 +297,7 @@ class BacklogStore {
   }
 
   axiosUpdateIssue(data) {
-    const proId = AppState.currentMenuType.id;
-    const { issueId, objectVersionNumber, transformId } = data;
-    return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=agile&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objectVersionNumber}`);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues`, data);
   }
 
   @computed get getChosenVersion() {
@@ -428,8 +426,8 @@ class BacklogStore {
   }
 
   axiosGetDefaultPriority() {
-    const orgId = AppState.currentMenuType.organizationId;
-    return axios.get(`/issue/v1/organizations/${orgId}/priority/default`).then((data) => {
+    const proId = AppState.currentMenuType.id;
+    return axios.get(`/issue/v1/projects/${proId}/priority/default`).then((data) => {
       if (data && !data.failed) {
         this.setDefaultPriority(data);
       } else {

@@ -3,6 +3,15 @@
   border-right: 1px solid #d3d3d3;
   overflow: auto;
 
+  p {
+    margin-bottom: 0;
+  }
+
+  .c7n-backlog-epicHover {
+    &:hover {
+      background: #e9e9e9;
+    }
+  }
   .c7n-backlog-epicContent {
     padding: 8px 0;
 
@@ -86,7 +95,7 @@
           .c7n-backlog-epicItemParamKey {
             color: rgba(0, 0, 0, 0.65);
           }
-          
+
           .c7n-backlog-epicItemParamValue {
             border-radius: 100px;
             background: rgba(0, 0, 0, 0.26);
@@ -131,15 +140,5 @@
   .c7n-backlog-epicItemTodo {
     background: #e5e5e5;
     height: 100%;
-  }
-}
-
-p {
-  margin-bottom: 0;
-}
-
-.c7n-backlog-epicHover {
-  &:hover {
-    background: #e9e9e9;;
   }
 }

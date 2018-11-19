@@ -48,7 +48,15 @@ class Issue extends Component {
       createLoading: false,
       originPriorities: [],
       defaultPriorityId: false,
+      tableWidth: null,
     };
+  }
+
+  componentWillMount() {
+    const width = storage.getItem('columnWidth');
+    this.setState({
+      tableWidth: width || 1750,
+    });
   }
 
   componentDidMount() {
@@ -62,6 +70,12 @@ class Issue extends Component {
     }
   }
 
+  componentWillUnmount() {
+    IssueStore.cleanSearchArgs();
+    IssueStore.setSelectedQuickSearch({ quickFilterIds: [] });
+    IssueStore.resetOtherArgs();
+  }
+
   getInit() {
     const { location } = this.props;
     const Request = this.GetRequest(location.search);
@@ -70,7 +84,6 @@ class Issue extends Component {
       paramPriority, paramIssueType, paramIssueId, paramUrl, paramOpenIssueId,
       paramResolution,
     } = Request;
-    // IssueStore.loadQuickSearch();
     IssueStore.loadCurrentSetting();
     IssueStore.setParamId(paramId);
     IssueStore.setParamType(paramType);
@@ -86,7 +99,6 @@ class Issue extends Component {
     IssueStore.setParamOpenIssueId(paramOpenIssueId);
     IssueStore.setResolution(paramResolution);
 
-    IssueStore.setSelectedQuickSearch({ quickFilterIds: [] });
     IssueStore.setParamInOtherArgs();
     const arr = [];
     if (paramName) {
@@ -364,7 +376,7 @@ class Issue extends Component {
       selectedIssue.issueId === item.props.record.issueId
     ));
     const renderNarrow = (
-      <div onClick={props.onClick} style={{ }} role="none" className={isClicked ? 'c7n-Issue-CardNarrow-clicked c7n-Issue-CardNarrow' : 'c7n-Issue-CardNarrow'}>
+      <div onClick={props.onClick} role="none" className={isClicked ? 'c7n-Issue-CardNarrow-clicked c7n-Issue-CardNarrow' : 'c7n-Issue-CardNarrow'}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '7px' }}>
           <div style={{ display: 'flex' }}>
             {props.children[1]}
@@ -464,56 +476,127 @@ class Issue extends Component {
 
   renderLastUpdateTime = (text, record) => (
     <Tooltip mouseEnterDelay={0.5} title={`日期： ${text}`}>
-      <TimeAgo
-        datetime={text}
-        locale="zh_CN"
-      />
+      <div style={{ width: '150px' }}>
+        <TimeAgo
+          datetime={text}
+          locale="zh_CN"
+        />
+      </div>
     </Tooltip>
   );
 
   renderVersion = (text, record) => {
-    if (record.versionIssueRelDTOS.length) {
-      return record.versionIssueRelDTOS.length > 1
-        ? (
-          <React.Fragment>
-            <Tag color="blue">{record.versionIssueRelDTOS[0].name}</Tag>
-            <Tag color="blue">...</Tag>
-          </React.Fragment>
-        )
-        : <Tag color="blue">{record.versionIssueRelDTOS[0].name}</Tag>;
-    } else {
-      return null;
+    if (record.versionIssueRelDTOS) {
+      if (record.versionIssueRelDTOS.length > 0) {
+        return record.versionIssueRelDTOS.length > 1
+          ? (
+            <div style={{ display: 'flex' }}>
+              <Tag
+                color="blue"
+                style={{
+                  maxWidth: 160,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {record.versionIssueRelDTOS[0].name}
+              </Tag>
+              <Tag color="blue">...</Tag>
+            </div>
+          )
+          : (
+            <Tag
+              color="blue"
+              style={{
+                maxWidth: 160,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {record.versionIssueRelDTOS[0].name}
+            </Tag>
+          );
+      }
     }
+    return null;
   };
 
   renderSprint = (text, record) => {
-    if (record.issueSprintDTOS.length) {
-      return record.issueSprintDTOS.length > 1
-        ? (
-          <React.Fragment>
-            <Tag color="blue">{record.issueSprintDTOS[0].sprintName}</Tag>
-            <Tag color="blue">...</Tag>
-          </React.Fragment>
-        )
-        : <Tag color="blue">{record.issueSprintDTOS[0].sprintName}</Tag>;
-    } else {
-      return null;
+    if (record.issueSprintDTOS) {
+      if (record.issueSprintDTOS.length > 0) {
+        return record.issueSprintDTOS.length > 1
+          ? (
+            <div style={{ display: 'flex' }}>
+              <Tag
+                color="blue"
+                style={{
+                  maxWidth: 160,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {record.issueSprintDTOS[0].sprintName}
+              </Tag>
+              <Tag color="blue">...</Tag>
+            </div>
+          )
+          : (
+            <Tag
+              color="blue"
+              style={{
+                maxWidth: 160,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {record.issueSprintDTOS[0].sprintName}
+            </Tag>
+          );
+      }
     }
+    return null;
   };
 
   renderComponent = (text, record) => {
-    if (record.issueComponentBriefDTOS.length) {
-      return record.issueComponentBriefDTOS.length > 1
-        ? (
-          <React.Fragment>
-            <Tag color="blue">{record.issueComponentBriefDTOS[0].name}</Tag>
-            <Tag color="blue">...</Tag>
-          </React.Fragment>
-        )
-        : <Tag color="blue">{record.issueComponentBriefDTOS[0].name}</Tag>;
-    } else {
-      return null;
+    if (record.issueComponentBriefDTOS) {
+      if (record.issueComponentBriefDTOS.length > 0) {
+        return record.issueComponentBriefDTOS.length > 1
+          ? (
+            <div style={{ display: 'flex' }}>
+              <Tag
+                color="blue"
+                style={{
+                  maxWidth: 160,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {record.issueComponentBriefDTOS[0].name}
+              </Tag>
+              <Tag color="blue">...</Tag>
+            </div>
+          )
+          : (
+            <Tag
+              color="blue"
+              style={{
+                maxWidth: 160,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {record.issueComponentBriefDTOS[0].name}
+            </Tag>
+          );
+      }
     }
+    return null;
   };
 
   renderEpic = (text, record) => {
@@ -527,15 +610,48 @@ class Issue extends Component {
       lineHeight: '20px',
       padding: '0 8px',
       display: 'inline-block',
+      maxWidth: 200,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     };
     return record.epicName ? <span style={style}>{record.epicName}</span> : null;
   };
 
-  renderTag = (text, record) => (
-    record.labelIssueRelDTOS && record.labelIssueRelDTOS.length
-      ? <Tag color="blue">{record.labelIssueRelDTOS[0].labelName}</Tag>
-      : null
-  );
+  renderTag = (text, record) => {
+    if (record.labelIssueRelDTOS && record.labelIssueRelDTOS.length) {
+      return record.labelIssueRelDTOS.length > 1
+        ? (
+          <div style={{ display: 'flex' }}>
+            <Tag
+              color="blue"
+              style={{
+                maxWidth: 160,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {record.labelIssueRelDTOS[0].labelName}
+            </Tag>
+            <Tag color="blue">...</Tag>
+          </div>
+        ) : (
+          <Tag
+            color="blue"
+            style={{
+              maxWidth: 160,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {record.labelIssueRelDTOS[0].labelName}
+          </Tag>
+        );
+    }
+    return null;
+  };
 
   onlyMe = (checked) => {
     IssueStore.setAdvArg({ assigneeIds: checked ? [AppState.userInfo.id] : null });
@@ -552,11 +668,28 @@ class Issue extends Component {
     IssueStore.loadIssues();
   };
 
+  setTableWidth = (columns) => {
+    const ret = columns.reduce((sum, column) => sum + (column.hidden ? 0 : column.width), 0);
+    storage.setItem('columnWidth', ret + 50);
+    this.setState({
+      tableWidth: ret,
+    });
+  };
+
+  widthFixCalc = (tableWidth) => {
+    if (document.getElementsByClassName('ant-table-wrapper').length > 0) {
+      return tableWidth > document.getElementsByClassName('ant-table-wrapper')[0].clientWidth
+        ? 'left' : false;
+    } else {
+      return 'left';
+    }
+  };
+
   render() {
     const {
       expand, selectedIssue, createIssueValue,
       selectIssueType, createLoading, create, checkCreateIssue,
-      originPriorities,
+      originPriorities, tableWidth,
     } = this.state;
     // 获取筛选框的显示内容
     let { filterName } = this.state;
@@ -601,20 +734,20 @@ class Issue extends Component {
         title: '任务编号',
         dataIndex: 'issueNum',
         key: 'issueId',
-        width: '128px',
+        width: 140,
         disableClick: true,
         sorter: true,
-        fixed: expand ? false : 'left',
+        fixed: expand ? false : this.widthFixCalc(tableWidth),
         filters: columnFilter.get('issueNum'),
         render: this.renderIssueNum,
       },
       {
         title: '问题类型',
         key: 'issueTypeId',
-        width: '120px',
+        width: 140,
         disableClick: true,
         sorter: true,
-        fixed: expand ? false : 'left',
+        fixed: expand ? false : this.widthFixCalc(tableWidth),
         filters: columnFilter.get('typeId'),
         filterMultiple: true,
         render: this.renderTypeCode,
@@ -623,15 +756,16 @@ class Issue extends Component {
         title: '概要',
         dataIndex: 'summary',
         key: 'summary',
-        width: '300px',
+        width: 300,
         disableClick: true,
-        fixed: expand ? false : 'left',
+        fixed: expand ? false : this.widthFixCalc(tableWidth),
         filters: columnFilter.get('summary'),
         render: this.renderSummary,
       },
       {
         title: '状态',
         key: 'statusId',
+        width: 120,
         disableClick: true,
         sorter: true,
         filters: columnFilter.get('statusId'),
@@ -641,6 +775,7 @@ class Issue extends Component {
       {
         title: '优先级',
         key: 'priorityId',
+        width: 150,
         disableClick: true,
         sorter: true,
         filters: columnFilter.get('priorityId'),
@@ -651,6 +786,7 @@ class Issue extends Component {
         title: '经办人',
         dataIndex: 'assigneeName',
         key: 'assigneeId',
+        width: 200,
         disableClick: true,
         sorter: true,
         filters: columnFilter.get('assigneeName'),
@@ -659,7 +795,8 @@ class Issue extends Component {
       {
         title: '报告人',
         dataIndex: 'reporterName',
-        key: 'reporterId',
+        key: 'reporter',
+        width: 200,
         sorter: true,
         filters: columnFilter.get('reporterName'),
         render: this.renderReporterName,
@@ -668,6 +805,7 @@ class Issue extends Component {
         title: '最后更新时间',
         dataIndex: 'lastUpdateDate',
         key: 'lastUpdateDate',
+        width: 200,
         sorter: true,
         render: this.renderLastUpdateTime,
       },
@@ -675,11 +813,13 @@ class Issue extends Component {
         title: '版本',
         filters: columnFilter.get('versionIssueRelDTOS'),
         key: 'version',
+        width: 200,
         render: this.renderVersion,
       },
       {
         title: '冲刺',
         key: 'sprint',
+        width: 240,
         filters: columnFilter.get('sprint'),
         hidden: true,
         render: this.renderSprint,
@@ -687,6 +827,7 @@ class Issue extends Component {
       {
         title: '模块',
         key: 'component',
+        width: 200,
         filters: columnFilter.get('component'),
         hidden: true,
         render: this.renderComponent,
@@ -695,6 +836,7 @@ class Issue extends Component {
         title: '史诗',
         dataIndex: 'epicName',
         key: 'epic',
+        width: 200,
         filters: columnFilter.get('epic'),
         render: this.renderEpic,
         hidden: true,
@@ -702,6 +844,7 @@ class Issue extends Component {
       {
         title: '标签',
         key: 'label',
+        width: 200,
         filters: columnFilter.get('label'),
         filterMultiple: true,
         render: this.renderTag,
@@ -736,7 +879,6 @@ class Issue extends Component {
         }
       </Menu>
     );
-
     return (
       <Page
         className="c7n-Issue"
@@ -811,11 +953,12 @@ class Issue extends Component {
                 filterBarPlaceholder="过滤表"
                 filters={filterName}
                 noFilter
-                scroll={expand ? { x: true } : { x: 2000 }}
+                scroll={expand ? { x: true } : { x: parseInt(tableWidth, 10) }}
                 loading={IssueStore.loading}
                 pagination={false}
                 onChange={this.handleFilterChange}
                 onColumnFilterChange={(item) => {
+                  this.setTableWidth(columns);
                   storage.setItem('filterData', item.selectedKeys);
                 }}
                 rowClassName={(record, index) => (

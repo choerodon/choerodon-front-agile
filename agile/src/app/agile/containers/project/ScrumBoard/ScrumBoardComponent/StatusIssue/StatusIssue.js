@@ -6,6 +6,7 @@ import { Icon, Avatar, Tooltip } from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import './StatusIssue.scss';
 import TypeTag from '../../../../../components/TypeTag';
+import UserHead from '../../../../../components/UserHead';
 // 单个列的issueCard
 // @observer
 class StatusIssue extends Component {
@@ -473,16 +474,29 @@ class StatusIssue extends Component {
                           <Tooltip title={item.assigneeName ? `经办人: ${item.assigneeName}` : ''}>
                             {
                                 item.assigneeName ? (
-                                  <Avatar
-                                    src={item.imageUrl ? item.imageUrl : undefined}
-                                    style={{
-                                      flexShrink: 0,
-                                      marginLeft: '8px',
-                                      marginBottom: 4,
-                                    }}
-                                  >
-                                    {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
-                                  </Avatar>
+                                // <Avatar
+                                //   src={item.imageUrl ? item.imageUrl : undefined}
+                                //   style={{
+                                //     flexShrink: 0,
+                                //     marginLeft: '8px',
+                                //     marginBottom: 4,
+                                //   }}
+                                // >
+                                //   {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
+                                // </Avatar>
+                                  
+                                  <div>
+                                    <UserHead 
+                                      hiddenText
+                                      size={32}
+                                      user={{
+                                        id: item.assigneeId,
+                                        loginName: item.assigneeName,
+                                        realName: item.assigneeName,
+                                        avatar: item.imageUrl,
+                                      }}
+                                    />
+                                  </div>
                                 ) : (
                                   <div style={{
                                     width: 32,

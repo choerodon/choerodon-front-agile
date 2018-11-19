@@ -69,7 +69,7 @@ class VelocityChart extends Component {
         itemWidth: 14,
         data: [
           {
-            name: '提交',
+            name: '预估',
             icon: 'rectangle',
           },
           {
@@ -172,7 +172,7 @@ class VelocityChart extends Component {
       },
       series: [
         {
-          name: '提交',
+          name: '预估',
           type: 'bar',
           barWidth: 34,
           barGap: '12%',
@@ -285,7 +285,7 @@ class VelocityChart extends Component {
       },
       {
         width: '33%',
-        title: '完成',
+        title: '已完成',
         dataIndex: 'completedRemainTime',
         render: (completedRemainTime, record) => (
           <span>

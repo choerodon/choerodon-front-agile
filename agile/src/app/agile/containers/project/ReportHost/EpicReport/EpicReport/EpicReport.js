@@ -70,19 +70,19 @@ class EpicReport extends Component {
         data: [
           ...[
             ES.beforeCurrentUnit === 'issue_count' ? {} : {
-              name: `已完成 ${ES.getChartYAxisName}`,
+              name: `已完成${ES.getChartYAxisName}`,
               icon: `image://${finish}`,
             },
           ],
           ...[
             ES.beforeCurrentUnit === 'issue_count' ? {} : {
-              name: `总计 ${ES.getChartYAxisName}`,
+              name: `总计${ES.getChartYAxisName}`,
               icon: 'rectangle',
             },
           ],
           ...[
             {
-              name: '问题数量',
+              name: '总问题数',
               icon: 'line',
             },
           ],
@@ -200,7 +200,7 @@ class EpicReport extends Component {
         }],
         series: [
           {
-            name: '问题数量',
+            name: '总问题数',
             type: 'line',
             step: true,
             // symbol: ES.getChartDataYIssueCountAll.length === 1 ? 'auto' : 'none',
@@ -309,7 +309,7 @@ class EpicReport extends Component {
         }],
         series: [
           {
-            name: '问题数量',
+            name: '总问题数',
             type: 'line',
             step: true,
             itemStyle: {
@@ -339,7 +339,7 @@ class EpicReport extends Component {
             data: ES.getChartDataYIssueCountUnEstimate,
           },
           {
-            name: `已完成 ${ES.getChartYAxisName}`,
+            name: `已完成${ES.getChartYAxisName}`,
             type: 'line',
             step: true,
             yAxisIndex: 0,
@@ -352,7 +352,7 @@ class EpicReport extends Component {
             },
           },
           {
-            name: `总计 ${ES.getChartYAxisName}`,
+            name: `总计${ES.getChartYAxisName}`,
             type: 'line',
             step: true,
             yAxisIndex: 0,

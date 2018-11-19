@@ -79,7 +79,7 @@ class IterationSpeed extends Component {
         itemWidth: 14,
         data: [
           {
-            name: '提交',
+            name: '预估',
             icon: 'rectangle',
           },
           {
@@ -182,7 +182,7 @@ class IterationSpeed extends Component {
       },
       series: [
         {
-          name: '提交',
+          name: '预估',
           type: 'bar',
           barWidth: 34,
           barGap: '12%',

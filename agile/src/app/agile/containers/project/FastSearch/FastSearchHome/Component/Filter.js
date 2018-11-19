@@ -150,7 +150,7 @@ class AddComponent extends Component {
         name: 'realName',
       },
       priority: {
-        url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
+        url: `/issue/v1/projects/${projectId}/priority/list_by_org`,
         prop: '',
         id: 'id',
         name: 'name',
@@ -345,7 +345,7 @@ class AddComponent extends Component {
         name: 'realName',
       },
       priority: {
-        url: `/issue/v1/organizations/${orgId}/priority/list_by_org`,
+        url: `/issue/v1/projects/${projectId}/priority/list_by_org`,
         prop: '',
         id: 'id',
         name: 'name',

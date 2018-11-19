@@ -6,6 +6,7 @@ import './SwimLaneContext.scss';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import StatusTag from '../../../../../components/StatusTag';
 import TypeTag from '../../../../../components/TypeTag';
+import UserHead from '../../../../../components/UserHead';
 
 @inject('AppState')
 @observer
@@ -112,7 +113,18 @@ class SwimLaneContext extends Component {
                 name: item.status,
               }}
             />
-            <span className="c7n-parentIssue-summary">{item.summary}</span>
+            <span 
+              className="c7n-parentIssue-summary"
+              style={JSON.stringify(ScrumBoardStore.getClickIssueDetail) !== '{}' ? { 
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                maxWidth: 235,
+              } : {}
+            }
+            >
+              {item.summary}
+            </span>
             <span className="c7n-parentIssue-count" style={{ whiteSpace: 'nowrap' }}>{`  (${item.count} 子任务)`}</span>
 
           </div>
@@ -130,10 +142,8 @@ class SwimLaneContext extends Component {
               });
             }}
           >
-
-
-            移动到done
-                    </Button>
+            {'移动到done'}
+          </Button>
         </div>
       );
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
@@ -149,15 +159,16 @@ class SwimLaneContext extends Component {
               });
             }}
           />
-          <Avatar
-            src={item.imageUrl ? item.imageUrl : undefined}
-            size="small"
-            style={{ marginRight: 8 }}
-          >
-            {
-              !item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''
-            }
-          </Avatar>
+          <UserHead 
+            hiddenText
+            size={24}
+            user={{
+              id: item.assigneeId,
+              loginName: item.assigneeName,
+              realName: item.assigneeName,
+              avatar: item.imageUrl,
+            }}
+          />
           {item.assigneeName}
           <span className="c7n-parentIssue-count">{`  (${item.count} 问题)`}</span>
         </div>
