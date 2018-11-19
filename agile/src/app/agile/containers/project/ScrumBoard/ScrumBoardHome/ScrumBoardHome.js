@@ -318,6 +318,10 @@ class ScrumBoardHome extends Component {
     if (!result.destination) {
       return;
     }
+    if (JSON.parse(result.source.droppableId).columnId
+      === JSON.parse(result.destination.droppableId).columnId) {
+      return;
+    }
     const originState = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
     let flag = 0;
     if (ScrumBoardStore.getCurrentConstraint === 'issue') {
