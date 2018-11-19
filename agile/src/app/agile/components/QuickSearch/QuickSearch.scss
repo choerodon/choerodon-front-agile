@@ -51,3 +51,27 @@
     }
   }
 }
+
+.assigneeSelect{
+  .ant-select-multiple .ant-select-selection--multiple .ant-select-selection__rendered{
+    .ant-select-selection__placeholder{
+      margin-top: 3px;
+    }
+    ul{
+      margin-top: 3px;
+    }
+   .ant-select-arrow{
+      right: 0;
+    }
+  }
+  
+  .ant-select-underline{
+    display: none;
+  }
+}
+.ant-spin-container{
+  min-width: 180px;
+  background: #fff;
+}
+
+
