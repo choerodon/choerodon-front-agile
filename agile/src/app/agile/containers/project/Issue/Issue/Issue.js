@@ -385,7 +385,7 @@ class Issue extends Component {
           <div style={{ display: 'flex' }}>
             {props.children[3]}
             {props.children[4]}
-            {props.children[6]}
+            {props.children[5]}
           </div>
         </div>
         <div>{props.children[2]}</div>
