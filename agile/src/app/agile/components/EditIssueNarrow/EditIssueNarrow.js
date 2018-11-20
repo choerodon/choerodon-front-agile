@@ -4,20 +4,24 @@ import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import TimeAgo from 'timeago-react';
 import {
-  Select, Input, DatePicker, Button, Modal, Tabs, Tooltip, Progress, Dropdown, Menu, Spin, Icon, Popover, 
+  Select, Input, DatePicker, Button, Modal, Tabs,
+  Tooltip, Progress, Dropdown, Menu, Spin, Icon, Popover,
 } from 'choerodon-ui';
 import {
-  STATUS, COLOR, TYPE, ICON, TYPE_NAME, 
+  STATUS, COLOR, TYPE, ICON, TYPE_NAME,
 } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import {
   UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription, DatetimeAgo,
 } from '../CommonComponent';
 import {
-  delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload, 
+  delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload,
 } from '../../common/utils';
 import {
-  loadBranchs, updateStatus, loadLinkIssues, loadSubtask, updateWorklog, deleteWorklog, createIssue, loadLabels, loadIssue, loadWorklogs, updateIssue, loadPriorities, loadComponents, loadVersions, loadEpics, createCommit, deleteCommit, updateCommit, loadUsers, deleteIssue, updateIssueType, loadSprints, loadStatus,
+  loadBranchs, updateStatus, loadLinkIssues, loadLabels,
+  loadIssue, loadWorklogs, updateIssue, loadPriorities,
+  loadComponents, loadVersions, loadEpics, createCommit,
+  deleteIssue, updateIssueType, loadSprints, loadStatus,
 } from '../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
@@ -42,21 +46,33 @@ import ChangeParent from '../ChangeParent';
 import TypeTag from '../TypeTag';
 
 const { AppState } = stores;
-const { Option } = Select;
+const { Option, blur } = Select;
 const { TextArea } = Input;
-const confirm = Modal.confirm;
+const { confirm } = Modal;
 let sign = true;
-let flag;
 let filterSign = false;
 const STATUS_SHOW = {
   opened: '开放',
   merged: '已合并',
   closed: '关闭',
 };
-
 class CreateSprint extends Component {
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    getUsers(input).then((res) => {
+      this.setState({
+        originUsers: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
+
   constructor(props) {
     super(props);
+    this.needBlur = true;
+    this.componentRef = React.createRef();
     this.state = {
       issueLoading: false,
       flag: undefined,
@@ -85,7 +101,6 @@ class CreateSprint extends Component {
       editLogId: undefined,
       editLog: undefined,
       currentRae: undefined,
-
       issueId: undefined,
       assigneeId: undefined,
       assigneeName: '',
@@ -120,7 +135,6 @@ class CreateSprint extends Component {
       componentIssueRelDTOList: [],
       activeSprint: {},
       closeSprint: [],
-
       worklogs: [],
       datalogs: [],
       fileList: [],
@@ -134,7 +148,6 @@ class CreateSprint extends Component {
       fixVersionsFixed: [],
       influenceVersionsFixed: [],
       branchs: {},
-
       originStatus: [],
       originPriorities: [],
       originComponents: [],
@@ -150,14 +163,16 @@ class CreateSprint extends Component {
   }
 
   componentDidMount() {
-    if (this.props.onRef) {
-      this.props.onRef(this);
+    const { onRef, issueId } = this.props;
+    const { nav } = this.state;
+    if (onRef) {
+      onRef(this);
     }
-    this.reloadIssue(this.props.issueId);
+    this.reloadIssue(issueId);
     document.getElementById('scroll-area').addEventListener('scroll', (e) => {
       if (sign) {
         const currentNav = this.getCurrentNav(e);
-        if (this.state.nav !== currentNav && currentNav) {
+        if (nav !== currentNav && currentNav) {
           this.setState({
             nav: currentNav,
           });
@@ -167,7 +182,8 @@ class CreateSprint extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.issueId !== this.props.issueId) {
+    const { issueId } = this.props;
+    if (nextProps.issueId !== issueId) {
       this.setState({
         currentRae: undefined,
       });
@@ -175,17 +191,48 @@ class CreateSprint extends Component {
     }
   }
 
-  /**
-   * Attachment
-   */
-  onChangeFileList = (arr) => {
-    if (arr.length > 0 && arr.some(one => !one.url)) {
-      const config = {
-        issueId: this.state.origin.issueId,
-        fileName: arr[0].name || 'AG_ATTACHMENT',
-        projectId: AppState.currentMenuType.id,
-      };
-      handleFileUpload(arr, this.addFileToFileList, config);
+  onFilterChange(input) {
+    if (!filterSign) {
+      this.setState({
+        selectLoading: true,
+      });
+      getUsers(input).then((res) => {
+        this.setState({
+          originUsers: res.content,
+          selectLoading: false,
+        });
+      });
+      filterSign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  getCurrentNav(e) {
+    const { issueTypeDTO } = this.state;
+    let eles;
+    if (issueTypeDTO && issueTypeDTO.typeCode === 'sub_task') {
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'branch'];
+    } else {
+      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'sub_task', 'link_task', 'branch'];
+    }
+    return _.find(eles, i => this.isInLook(document.getElementById(i)));
+  }
+
+  scrollToAnchor = (anchorName) => {
+    if (anchorName) {
+      const anchorElement = document.getElementById(anchorName);
+      if (anchorElement) {
+        sign = false;
+        anchorElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          // inline: "nearest",
+        });
+        setTimeout(() => {
+          sign = true;
+        }, 2000);
+      }
     }
   }
 
@@ -196,14 +243,9 @@ class CreateSprint extends Component {
     this.reloadIssue();
   }
 
-  /**
-   * Attachment
-   */
-  setFileList = (data) => {
-    this.setState({ fileList: data });
-  }
-  
-  setAnIssueToState = (issue = this.state.origin) => {
+  setAnIssueToState = (paramIssue) => {
+    const { origin } = this.state;
+    const issue = paramIssue || origin;
     const {
       activeSprint,
       assigneeId,
@@ -309,84 +351,316 @@ class CreateSprint extends Component {
     });
   }
 
-  getCurrentNav(e) {
-    const { issueTypeDTO } = this.state;
-    let eles;
-    if (issueTypeDTO && issueTypeDTO.typeCode === 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'branch'];
-    } else {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'sub_task', 'link_task', 'branch'];
+  /**
+   * Attachment
+   */
+  setFileList = (data) => {
+    this.setState({ fileList: data });
+  };
+
+  /**
+   * Attachment
+   */
+  onChangeFileList = (arr) => {
+    const { origin } = this.state;
+    if (arr.length > 0 && arr.some(one => !one.url)) {
+      const config = {
+        issueId: origin.issueId,
+        fileName: arr[0].name || 'AG_ATTACHMENT',
+        projectId: AppState.currentMenuType.id,
+      };
+      handleFileUpload(arr, this.addFileToFileList, config);
     }
-    return _.find(eles, i => this.isInLook(document.getElementById(i)));
+  };
+
+  /**
+   * Comment
+   */
+  createCommit = (commit) => {
+    createCommit(commit).then((res) => {
+      this.reloadIssue();
+      this.setState({
+        addCommit: false,
+        addCommitDes: '',
+      });
+    });
+  };
+
+  handleDeleteIssue = (issueId) => {
+    const that = this;
+    const { issueNum, subIssueDTOList } = this.state;
+    confirm({
+      width: 560,
+      title: `删除问题${issueNum}`,
+      content:
+        (
+          <div>
+            <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
+            <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
+            <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
+            {
+            subIssueDTOList.length ? <p style={{ color: '#d50000' }}>{`注意：问题的${subIssueDTOList.length}子任务将被删除。`}</p> : null
+            }
+          </div>
+        ),
+      onOk() {
+        return deleteIssue(issueId)
+          .then((res) => {
+            that.props.onDeleteIssue();
+          });
+      },
+      onCancel() {},
+      okText: '删除',
+      okType: 'danger',
+    });
   }
+
+  handleTitleChange = (e) => {
+    this.setState({ summary: e.target.value });
+    this.needBlur = false;
+    // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+    setTimeout(() => { this.needBlur = true; }, 100);
+  };
+
+  handleEpicNameChange = (e) => {
+    this.setState({ epicName: e.target.value });
+  };
+
+  handleStoryPointsChange = (e) => {
+    this.setState({ storyPoints: e });
+  };
+
+  handleRemainingTimeChange = (e) => {
+    this.setState({ remainingTime: e });
+  };
+
+  getWorkloads = () => {
+    const { worklogs } = this.state;
+    if (!Array.isArray(worklogs)) {
+      return 0;
+    }
+    const workTimeArr = _.reduce(worklogs, (sum, v) => sum + (v.workTime || 0), 0);
+    return workTimeArr;
+  };
+
+  refresh = () => {
+    const { origin } = this.state;
+    loadIssue(origin.issueId).then((res) => {
+      this.setAnIssueToState(res);
+    });
+    loadWorklogs(origin.issueId).then((res) => {
+      this.setState({
+        worklogs: res,
+      });
+    });
+  };
+
+  loadIssueStatus = () => {
+    const {
+      issueTypeDTO,
+      issueId,
+      origin,
+    } = this.state;
+    const typeId = issueTypeDTO.id;
+    this.setAnIssueToState();
+    loadStatus(origin.statusId, issueId, typeId).then((res) => {
+      this.setState({
+        originStatus: res,
+        selectLoading: false,
+      });
+    });
+  };
+
+  statusOnChange = (e, item) => {
+    // e.preventDefault();
+
+    const that = this;
+    setTimeout(() => {
+      if (that.needBlur) {
+        setTimeout(() => {
+          if (document.getElementsByClassName(that.state.currentRae).length) {
+            that.needBlur = false;
+            document.getElementsByClassName(that.state.currentRae)[0].click();
+          }
+        }, 10);
+      }
+    }, 10);
+  };
+
+  updateVersionSelect = (originPros, pros) => {
+    const { state } = this;
+    const { issueId, origin: { objectVersionNumber } } = this.state;
+    const { onUpdate, onCreateVersion } = this.props;
+    const obj = {
+      issueId,
+      objectVersionNumber,
+      versionType: pros === 'fixVersions' ? 'fix' : 'influence',
+    };
+    const origin = state[originPros];
+    let target;
+    let transPros;
+    let newSign = false;
+    if (!state[pros].length) {
+      transPros = [];
+    } else if (typeof state[pros][0] !== 'string') {
+      transPros = this.transToArr(state[pros], 'name', 'array');
+    } else {
+      transPros = state[pros];
+    }
+    const out = _.map(transPros, (pro) => {
+      if (origin.length && origin[0].name) {
+        target = _.find(origin, { name: pro });
+      }
+      if (target) {
+        return ({
+          ...target,
+          relationType: pros === 'fixVersions' ? 'fix' : 'influence',
+        });
+      } else {
+        newSign = true;
+        return ({
+          name: pro,
+          relationType: pros === 'fixVersions' ? 'fix' : 'influence',
+          projectId: AppState.currentMenuType.id,
+        });
+      }
+    });
+    // obj.versionIssueRelDTOList = out.concat(
+    // this.state[pros === 'fixVersions' ? 'influenceVersions' : 'fixVersions']);
+    obj.versionIssueRelDTOList = out;
+    updateIssue(obj)
+      .then((res) => {
+        this.reloadIssue();
+        if (onUpdate) {
+          onUpdate();
+        }
+        if (newSign && onCreateVersion) {
+          onCreateVersion();
+        }
+      });
+  };
+
+  updateIssue = (pro) => {
+    const { state } = this;
+    const {
+      origin,
+      issueId,
+      transformId,
+    } = this.state;
+    const { onUpdate } = this.props;
+    const obj = {
+      issueId,
+      objectVersionNumber: origin.objectVersionNumber,
+    };
+    if ((pro === 'description') || (pro === 'editDes')) {
+      if (state[pro]) {
+        returnBeforeTextUpload(state[pro], obj, updateIssue, 'description')
+          .then((res) => {
+            this.reloadIssue(state.origin.issueId);
+          });
+      }
+    } else if (pro === 'assigneeId' || pro === 'reporterId') {
+      obj[pro] = state[pro] ? JSON.parse(state[pro]).id || 0 : 0;
+      updateIssue(obj)
+        .then((res) => {
+          this.reloadIssue();
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
+    } else if (pro === 'storyPoints' || pro === 'remainingTime') {
+      obj[pro] = state[pro] === '' ? null : state[pro];
+      updateIssue(obj)
+        .then((res) => {
+          this.reloadIssue();
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
+    } else if (pro === 'statusId') {
+      updateStatus(transformId, issueId, origin.objectVersionNumber)
+        .then((res) => {
+          this.reloadIssue();
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
+    } else {
+      obj[pro] = state[pro] || 0;
+      updateIssue(obj)
+        .then((res) => {
+          this.reloadIssue();
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
+    }
+  };
+
+  updateIssueSelect = (originPros, pros) => {
+    const { state } = this;
+    const { issueId, origin: { objectVersionNumber } } = this.state;
+    const { onUpdate } = this.props;
+    const obj = {
+      issueId,
+      objectVersionNumber,
+    };
+    const origin = state[originPros];
+    let target;
+    let transPros;
+    if (originPros === 'originLabels') {
+      if (!state[pros].length) {
+        transPros = [];
+      } else if (typeof state[pros][0] !== 'string') {
+        transPros = this.transToArr(state[pros], 'labelName', 'array');
+      } else {
+        transPros = state[pros];
+      }
+    } else if (!state[pros].length) {
+      transPros = [];
+    } else if (typeof state[pros][0] !== 'string') {
+      transPros = this.transToArr(state[pros], 'name', 'array');
+    } else {
+      transPros = state[pros];
+    }
+    const out = _.map(transPros, (pro) => {
+      if (origin.length && origin[0].name) {
+        target = _.find(origin, { name: pro });
+      } else {
+        target = _.find(origin, { labelName: pro });
+      }
+      // const target = _.find(origin, { name: pro });
+      if (target) {
+        return target;
+      } else if (originPros === 'originLabels') {
+        return ({
+          labelName: pro,
+          // created: true,
+          projectId: AppState.currentMenuType.id,
+        });
+      } else {
+        return ({
+          name: pro,
+          // created: true,
+          projectId: AppState.currentMenuType.id,
+        });
+      }
+    });
+    obj[pros] = out;
+    updateIssue(obj)
+      .then((res) => {
+        this.reloadIssue();
+        if (onUpdate) {
+          onUpdate();
+        }
+      });
+  };
 
   isInLook(ele) {
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
     // return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
     return a + ele.offsetHeight > target.scrollTop;
-  }
-
-  scrollToAnchor = (anchorName) => {
-    if (anchorName) {
-      const anchorElement = document.getElementById(anchorName);
-      if (anchorElement) {
-        sign = false;
-        anchorElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-          // inline: "nearest",
-        });
-        setTimeout(() => {
-          sign = true;
-        }, 2000);
-      }
-    }
-  }
-
-  onFilterChange(input) {
-    if (!filterSign) {
-      this.setState({
-        selectLoading: true,
-      });
-      getUsers(input).then((res) => {
-        this.setState({
-          originUsers: res.content,
-          selectLoading: false,
-        });
-      });
-      filterSign = true;
-    } else {
-      this.debounceFilterIssues(input);
-    }
-  }
-
-  debounceFilterIssues = _.debounce((input) => {
-    this.setState({
-      selectLoading: true,
-    });
-    getUsers(input).then((res) => {
-      this.setState({
-        originUsers: res.content,
-        selectLoading: false,
-      });
-    });
-  }, 500);
-
-  handleTitleChange = (e) => {
-    this.setState({ summary: e.target.value });
-  }
-
-  handleEpicNameChange = (e) => {
-    this.setState({ epicName: e.target.value });
-  }
-
-  handleStoryPointsChange = (e) => {
-    this.setState({ storyPoints: e });
-  }
-
-  handleRemainingTimeChange = (e) => {
-    this.setState({ remainingTime: e });
   }
 
   resetStoryPoints(value) {
@@ -445,18 +719,12 @@ class CreateSprint extends Component {
     this.setState({ labelIssueRelDTOList: value });
   }
 
-  getWorkloads = () => {
-    const worklogs = this.state.worklogs;
-    if (!Array.isArray(worklogs)) {
-      return 0;
-    }
-    const workTimeArr = _.reduce(worklogs, (sum, v) => sum + (v.workTime || 0), 0);
-    return workTimeArr;
-  }
-
-  reloadIssue(issueId = this.state.origin.issueId) {
-    if (this.props.onUpdate) {
-      this.props.onUpdate();
+  reloadIssue(paramIssueId) {
+    const { origin } = this.state;
+    const { onUpdate } = this.props;
+    const issueId = paramIssueId || origin.issueId;
+    if (onUpdate) {
+      onUpdate();
     }
     this.setState({
       addCommit: false,
@@ -467,7 +735,6 @@ class CreateSprint extends Component {
       editComment: undefined,
       editLogId: undefined,
       editLog: undefined,
-
       issueLoading: true,
     }, () => {
       loadIssue(issueId).then((res) => {
@@ -483,11 +750,6 @@ class CreateSprint extends Component {
           linkIssues: res,
         });
       });
-      // loadDatalogs(issueId).then((res) => {
-      //   this.setState({
-      //     datalogs: res,
-      //   });
-      // });
       loadBranchs(issueId).then((res) => {
         this.setState({
           branchs: res || {},
@@ -502,204 +764,17 @@ class CreateSprint extends Component {
     // }
   }
 
-  refresh = () => {
-    loadIssue(this.state.origin.issueId).then((res) => {
-      this.setAnIssueToState(res);
-    });
-    loadWorklogs(this.state.origin.issueId).then((res) => {
-      this.setState({
-        worklogs: res,
-      });
-    });
-  }
-
-  updateIssue = (pro) => {
-    const {
-      origin,
-      issueId,
-      transformId,
-    } = this.state;
-    const obj = {
-      issueId,
-      objectVersionNumber: origin.objectVersionNumber,
-    };
-    if ((pro === 'description') || (pro === 'editDes')) {
-      if (this.state[pro]) {
-        returnBeforeTextUpload(this.state[pro], obj, updateIssue, 'description')
-          .then((res) => {
-            this.reloadIssue(this.state.origin.issueId);
-          });
-      }
-    } else if (pro === 'assigneeId' || pro === 'reporterId') {
-      obj[pro] = this.state[pro] ? JSON.parse(this.state[pro]).id || 0 : 0;
-      updateIssue(obj)
-        .then((res) => {
-          this.reloadIssue();
-          if (this.props.onUpdate) {
-            this.props.onUpdate();
-          }
-        });
-    } else if (pro === 'storyPoints' || pro === 'remainingTime') {
-      obj[pro] = this.state[pro] === '' ? null : this.state[pro];
-      updateIssue(obj)
-        .then((res) => {
-          this.reloadIssue();
-          if (this.props.onUpdate) {
-            this.props.onUpdate();
-          }
-        });
-    } else if (pro === 'statusId') {
-      updateStatus(transformId, issueId, origin.objectVersionNumber)
-        .then((res) => {
-          this.reloadIssue();
-          if (this.props.onUpdate) {
-            this.props.onUpdate();
-          }
-        });
-    } else {
-      obj[pro] = this.state[pro] || 0;
-      updateIssue(obj)
-        .then((res) => {
-          this.reloadIssue();
-          if (this.props.onUpdate) {
-            this.props.onUpdate();
-          }
-        });
-    }
-  };
-
-  updateIssueSelect = (originPros, pros) => {
-    const obj = {
-      issueId: this.state.issueId,
-      objectVersionNumber: this.state.origin.objectVersionNumber,
-    };
-    const origin = this.state[originPros];
-    let target;
-    let transPros;
-    if (originPros === 'originLabels') {
-      if (!this.state[pros].length) {
-        transPros = [];
-      } else if (typeof this.state[pros][0] !== 'string') {
-        transPros = this.transToArr(this.state[pros], 'labelName', 'array');
-      } else {
-        transPros = this.state[pros];
-      }
-    } else if (!this.state[pros].length) {
-      transPros = [];
-    } else if (typeof this.state[pros][0] !== 'string') {
-      transPros = this.transToArr(this.state[pros], 'name', 'array');
-    } else {
-      transPros = this.state[pros];
-    }
-    const out = _.map(transPros, (pro) => {
-      if (origin.length && origin[0].name) {
-        target = _.find(origin, { name: pro });
-      } else {
-        target = _.find(origin, { labelName: pro });
-      }
-      // const target = _.find(origin, { name: pro });
-      if (target) {
-        return target;
-      } else if (originPros === 'originLabels') {
-        return ({
-          labelName: pro,
-          // created: true,
-          projectId: AppState.currentMenuType.id,
-        });
-      } else {
-        return ({
-          name: pro,
-          // created: true,
-          projectId: AppState.currentMenuType.id,
-        });
-      }
-    });
-    obj[pros] = out;
-    updateIssue(obj)
-      .then((res) => {
-        this.reloadIssue();
-        if (this.props.onUpdate) {
-          this.props.onUpdate();
-        }
-      });
-  }
-
-  updateVersionSelect = (originPros, pros) => {
-    const obj = {
-      issueId: this.state.issueId,
-      objectVersionNumber: this.state.origin.objectVersionNumber,
-      versionType: pros === 'fixVersions' ? 'fix' : 'influence',
-    };
-    const origin = this.state[originPros];
-    let target;
-    let transPros;
-    let newSign = false;
-    if (!this.state[pros].length) {
-      transPros = [];
-    } else if (typeof this.state[pros][0] !== 'string') {
-      transPros = this.transToArr(this.state[pros], 'name', 'array');
-    } else {
-      transPros = this.state[pros];
-    }
-    const out = _.map(transPros, (pro) => {
-      if (origin.length && origin[0].name) {
-        target = _.find(origin, { name: pro });
-      }
-      if (target) {
-        return ({
-          ...target,
-          relationType: pros === 'fixVersions' ? 'fix' : 'influence',
-        });
-      } else {
-        newSign = true;
-        return ({
-          name: pro,
-          relationType: pros === 'fixVersions' ? 'fix' : 'influence',
-          projectId: AppState.currentMenuType.id,
-        });
-      }
-    });
-    // obj.versionIssueRelDTOList = out.concat(this.state[pros === 'fixVersions' ? 'influenceVersions' : 'fixVersions']);
-    obj.versionIssueRelDTOList = out;
-    updateIssue(obj)
-      .then((res) => {
-        this.reloadIssue();
-        if (this.props.onUpdate) {
-          this.props.onUpdate();
-        }
-        if (newSign && this.props.onCreateVersion) {
-          this.props.onCreateVersion();
-        }
-      });
-  }
-
   /**
    * Comment
    */
   handleCreateCommit() {
-    const extra = {
-      issueId: this.state.origin.issueId,
-    };
-    const addCommitDes = this.state.addCommitDes;
+    const { addCommitDes, origin: { issueId: extra } } = this.state;
     if (addCommitDes) {
       beforeTextUpload(addCommitDes, extra, this.createCommit, 'commentText');
     } else {
       extra.commentText = '';
       this.createCommit(extra);
     }
-  }
-
-  /**
-   * Comment
-   */
-  createCommit = (commit) => {
-    createCommit(commit).then((res) => {
-      this.reloadIssue();
-      this.setState({
-        addCommit: false,
-        addCommitDes: '',
-      });
-    });
   }
 
   transToArr(arr, pro, type = 'string') {
@@ -713,69 +788,75 @@ class CreateSprint extends Component {
   }
 
   handleCreateSubIssue(subIssue) {
+    const { onUpdate } = this.props;
     this.reloadIssue();
     this.setState({
       createSubTaskShow: false,
     });
-    if (this.props.onUpdate) {
-      this.props.onUpdate();
+    if (onUpdate) {
+      onUpdate();
     }
   }
 
   handleCreateLinkIssue() {
+    const { onUpdate } = this.props;
     this.reloadIssue();
     this.setState({
       createLinkTaskShow: false,
     });
-    if (this.props.onUpdate) {
-      this.props.onUpdate();
+    if (onUpdate) {
+      onUpdate();
     }
   }
 
   handleCopyIssue() {
+    const { onUpdate } = this.props;
     this.reloadIssue();
     this.setState({
       copyIssueShow: false,
     });
-    if (this.props.onUpdate) {
-      this.props.onUpdate();
+    if (onUpdate) {
+      onUpdate();
     }
-    if (this.props.onUpdate) {
-      this.props.onUpdate();
+    if (onUpdate) {
+      onUpdate();
     }
   }
 
   handleTransformSubIssue() {
+    const { onUpdate } = this.props;
     this.reloadIssue();
     this.setState({
       transformSubIssueShow: false,
     });
-    if (this.props.onUpdate) {
-      this.props.onUpdate();
+    if (onUpdate) {
+      onUpdate();
     }
-    if (this.props.onUpdate) {
-      this.props.onUpdate();
+    if (onUpdate) {
+      onUpdate();
     }
   }
 
   handleTransformFromSubIssue() {
+    const { onUpdate } = this.props;
     this.reloadIssue();
     this.setState({
       transformFromSubIssueShow: false,
     });
-    if (this.props.onUpdate) {
-      this.props.onUpdate();
+    if (onUpdate) {
+      onUpdate();
     }
-    if (this.props.onUpdate) {
-      this.props.onUpdate();
+    if (onUpdate) {
+      onUpdate();
     }
   }
 
   handleClickMenu(e) {
+    const { origin: { issueId } } = this.state;
     if (e.key === '0') {
       this.setState({ dailyLogShow: true });
     } else if (e.key === 'item_1') {
-      this.handleDeleteIssue(this.state.origin.issueId);
+      this.handleDeleteIssue(issueId);
     } else if (e.key === '2') {
       this.setState({ createSubTaskShow: true });
     } else if (e.key === '3') {
@@ -818,40 +899,16 @@ class CreateSprint extends Component {
     });
   }
 
-  handleDeleteIssue = (issueId) => {
-    const that = this;
-    confirm({
-      width: 560,
-      title: `删除问题${this.state.issueNum}`,
-      content: <div>
-        <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
-        <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
-        <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
-        {
-          this.state.subIssueDTOList.length ? <p style={{ color: '#d50000' }}>{`注意：问题的${this.state.subIssueDTOList.length}子任务将被删除。`}</p> : null
-        }
-      </div>,
-      onOk() {
-        return deleteIssue(issueId)
-          .then((res) => {
-            that.props.onDeleteIssue();
-          });
-      },
-      onCancel() {},
-      okText: '删除',
-      okType: 'danger',
-    });
-  }
-
   /**
    * Comment
    */
   renderCommits() {
-    const delta = text2Delta(this.state.addCommitDes);
+    const { addCommitDes, addCommit, issueCommentDTOList } = this.state;
+    const delta = text2Delta(addCommitDes);
     return (
       <div>
         {
-          this.state.addCommit && (
+          addCommit && (
             <div className="line-start mt-10">
               <WYSIWYGEditor
                 bottomBar
@@ -873,7 +930,7 @@ class CreateSprint extends Component {
           )
         }
         {
-          this.state.issueCommentDTOList.map(comment => (
+          issueCommentDTOList.map(comment => (
             <Comment
               key={comment.commentId}
               comment={comment}
@@ -890,10 +947,11 @@ class CreateSprint extends Component {
    * Log
    */
   renderLogs() {
+    const { worklogs } = this.state;
     return (
       <div>
         {
-          this.state.worklogs.map(worklog => (
+          worklogs.map(worklog => (
             <Log
               key={worklog.logId}
               worklog={worklog}
@@ -910,17 +968,19 @@ class CreateSprint extends Component {
    * SubIssue
    */
   renderSubIssues() {
+    const { subIssueDTOList } = this.state;
     return (
       <div className="c7n-tasks">
         {
-          this.state.subIssueDTOList.map((subIssue, i) => this.renderIssueList(subIssue, i))
+          subIssueDTOList.map((subIssue, i) => this.renderIssueList(subIssue, i))
         }
       </div>
     );
   }
 
   renderLinkIssues() {
-    const group = _.groupBy(this.state.linkIssues, 'ward');
+    const { linkIssues } = this.state;
+    const group = _.groupBy(linkIssues, 'ward');
     return (
       <div className="c7n-tasks">
         {
@@ -939,10 +999,11 @@ class CreateSprint extends Component {
 
   /**
    * IssueList
-   * @param {*} issue 
-   * @param {*} i 
+   * @param {*} issue
+   * @param {*} i
    */
   renderIssueList(issue, i) {
+    const { origin } = this.state;
     return (
       <IssueList
         key={issue.issueId}
@@ -955,13 +1016,14 @@ class CreateSprint extends Component {
           this.reloadIssue(issue.issueId);
         }}
         onRefresh={() => {
-          this.reloadIssue(this.state.origin.issueId);
+          this.reloadIssue(origin.issueId);
         }}
       />
     );
   }
 
   renderLinkList(link, i) {
+    const { origin } = this.state;
     return (
       <LinkList
         issue={{
@@ -970,13 +1032,12 @@ class CreateSprint extends Component {
         }}
         i={i}
         onOpen={(issueId, linkedIssueId) => {
-          this.reloadIssue(issueId === this.state.origin.issueId ? linkedIssueId : issueId);
+          this.reloadIssue(issueId === origin.issueId ? linkedIssueId : issueId);
         }}
         onRefresh={() => {
-          this.reloadIssue(this.state.origin.issueId);
+          this.reloadIssue(origin.issueId);
         }}
       />
-      
     );
   }
 
@@ -985,16 +1046,17 @@ class CreateSprint extends Component {
    */
   renderDes() {
     let delta;
-    if (this.state.editDesShow === undefined) {
+    const { editDesShow, description, editDes } = this.state;
+    if (editDesShow === undefined) {
       return null;
     }
-    if (!this.state.description || this.state.editDesShow) {
-      delta = text2Delta(this.state.editDes);
+    if (!description || editDesShow) {
+      delta = text2Delta(editDes);
       return (
         <div className="line-start mt-10">
           <WYSIWYGEditor
             bottomBar
-            value={text2Delta(this.state.editDes)}
+            value={text2Delta(editDes)}
             style={{ height: 200, width: '100%' }}
             onChange={(value) => {
               this.setState({ editDes: value });
@@ -1002,20 +1064,20 @@ class CreateSprint extends Component {
             handleDelete={() => {
               this.setState({
                 editDesShow: false,
-                editDes: this.state.description,
+                editDes: description,
               });
             }}
             handleSave={() => {
               this.setState({
                 editDesShow: false,
-                description: this.state.editDes || '',
+                description: editDes || '',
               });
               this.updateIssue('editDes');
             }}
             handleClickOutSide={() => {
               this.setState({
                 editDesShow: false,
-                description: this.state.editDes || '',
+                description: editDes || '',
               });
               this.updateIssue('editDes');
             }}
@@ -1023,18 +1085,12 @@ class CreateSprint extends Component {
         </div>
       );
     } else {
-      delta = delta2Html(this.state.description);
+      delta = delta2Html(description);
       return (
         <div className="c7n-content-wrapper">
           <div
             className="line-start mt-10 c7n-description"
             role="none"
-            onClick={() => {
-              this.setState({
-                // editDesShow: true,
-                // editDes: this.state.description,
-              });
-            }}
           >
             <IssueDescription data={delta} />
           </div>
@@ -1044,15 +1100,16 @@ class CreateSprint extends Component {
   }
 
   renderBranchs() {
+    const { branchs } = this.state;
     return (
       <div>
         {
-          this.state.branchs.branchCount ? (
+          branchs.branchCount ? (
             <div>
               {
                 [].length === 0 ? (
                   <div style={{
-                    borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px', 
+                    borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px',
                   }}
                   >
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
@@ -1065,26 +1122,25 @@ class CreateSprint extends Component {
                           });
                         }}
                       >
-                        {this.state.branchs.totalCommit || '0'}
-
+                        {branchs.totalCommit || '0'}
                         提交
-</span>
+                      </span>
                     </div>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
                       <span style={{ width: 60, display: 'inline-block' }}>
                         {
-                          this.state.branchs.commitUpdateTime ? (
+                          branchs.commitUpdateTime ? (
                             <Popover
                               title="提交修改时间"
-                              content={this.state.branchs.commitUpdateTime}
+                              content={branchs.commitUpdateTime}
                               placement="left"
                             >
                               <TimeAgo
-                                datetime={this.state.branchs.commitUpdateTime}
+                                datetime={branchs.commitUpdateTime}
                                 locale={Choerodon.getMessage('zh_CN', 'en')}
                               />
-                            </Popover> 
+                            </Popover>
                           ) : ''
                         }
                       </span>
@@ -1093,9 +1149,9 @@ class CreateSprint extends Component {
                 ) : null
               }
               {
-                this.state.branchs.totalMergeRequest ? (
+                branchs.totalMergeRequest ? (
                   <div style={{
-                    borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px', 
+                    borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px',
                   }}
                   >
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
@@ -1108,32 +1164,31 @@ class CreateSprint extends Component {
                           });
                         }}
                       >
-                        {this.state.branchs.totalMergeRequest}
-
+                        {branchs.totalMergeRequest}
                         合并请求
-</span>
+                      </span>
                       <span style={{
-                        width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center', 
+                        width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center',
                       }}
                       >
-                        {['opened', 'merged', 'closed'].includes(this.state.branchs.mergeRequestStatus) ? STATUS_SHOW[this.state.branchs.mergeRequestStatus] : ''}
+                        {['opened', 'merged', 'closed'].includes(branchs.mergeRequestStatus) ? STATUS_SHOW[branchs.mergeRequestStatus] : ''}
                       </span>
                     </div>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
                       <span style={{ width: 60, display: 'inline-block' }}>
                         {
-                          this.state.branchs.mergeRequestUpdateTime ? (
+                          branchs.mergeRequestUpdateTime ? (
                             <Popover
                               title="合并请求修改时间"
-                              content={this.state.branchs.mergeRequestUpdateTime}
+                              content={branchs.mergeRequestUpdateTime}
                               placement="left"
                             >
                               <TimeAgo
-                                datetime={this.state.branchs.mergeRequestUpdateTime}
+                                datetime={branchs.mergeRequestUpdateTime}
                                 locale={Choerodon.getMessage('zh_CN', 'en')}
                               />
-                            </Popover> 
+                            </Popover>
                           ) : ''
                         }
                       </span>
@@ -1144,7 +1199,7 @@ class CreateSprint extends Component {
             </div>
           ) : (
             <div style={{
-              borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px', 
+              borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px',
             }}
             >
               <span style={{ marginRight: 12 }}>暂无</span>
@@ -1155,30 +1210,38 @@ class CreateSprint extends Component {
     );
   }
 
-  loadIssueStatus = () => {
-    const {
-      issueTypeDTO,
-      issueId,
-      origin,
-    } = this.state;
-    const typeId = issueTypeDTO.id;
-    this.setAnIssueToState();
-    loadStatus(origin.statusId, issueId, typeId).then((res) => {
-      this.setState({
-        originStatus: res,
-        selectLoading: false,
-      });
-    });
-  }
-
   render() {
     const menu = AppState.currentMenuType;
+    this.needBlur = true;
     const { type, id: projectId, organizationId: orgId } = menu;
     const {
       store,
+      backUrl,
+      history,
+      onCancel,
     } = this.props;
     const {
+      activeSprint,
+      branchs,
+      closeSprint,
+      sprintId,
+      originSprints,
       issueTypeDTO,
+      flag,
+      assigneeId,
+      assigneeName,
+      assigneeImageUrl,
+      assigneeShow,
+      fileList,
+      createLinkTaskShow,
+      createSubTaskShow,
+      mergeRequestShow,
+      changeParentShow,
+      copyIssueShow,
+      editDes,
+      edit,
+      linkIssues,
+      createBranchShow,
       originPriorities,
       selectLoading,
       currentRae,
@@ -1190,6 +1253,39 @@ class CreateSprint extends Component {
       statusId,
       statusCode,
       statusName,
+      creationDate,
+      dailyLogShow,
+      lastUpdateDate,
+      reporterId,
+      reporterName,
+      reporterImageUrl,
+      epicId,
+      epicColor,
+      epicName,
+      originEpics,
+      origin,
+      description,
+      nav,
+      issueLoading,
+      transformSubIssueShow,
+      transformFromSubIssueShow,
+      commitShow,
+      issueNum,
+      parentIssueId,
+      parentIssueNum,
+      summary,
+      storyPoints,
+      remainingTime,
+      originComponents,
+      originUsers,
+      componentIssueRelDTOList,
+      labelIssueRelDTOList,
+      originLabels,
+      influenceVersions,
+      influenceVersionsFixed,
+      originVersions,
+      fixVersionsFixed,
+      fixVersions,
     } = this.state;
     const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
@@ -1201,61 +1297,51 @@ class CreateSprint extends Component {
         && t.typeCode !== typeCode && t.typeCode !== 'sub_task'
       ));
     }
-
     const getMenu = () => (
       <Menu onClick={this.handleClickMenu.bind(this)}>
         <Menu.Item key="0">
-
           登记工作日志
-</Menu.Item>
+        </Menu.Item>
         <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue.deleteIssue']}>
           <Menu.Item key="1">
-
             删除
-</Menu.Item>
+          </Menu.Item>
         </Permission>
         {
           typeCode !== 'sub_task' && (
             <Menu.Item key="2">
-
               创建子任务
-</Menu.Item>
+            </Menu.Item>
           )
         }
         <Menu.Item key="3">
-
           复制问题
-</Menu.Item>
+        </Menu.Item>
         {
-          typeCode !== 'sub_task' && this.state.origin.subIssueDTOList && this.state.origin.subIssueDTOList.length === 0 && (
+          typeCode !== 'sub_task' && origin.subIssueDTOList && origin.subIssueDTOList.length === 0 && (
             <Menu.Item key="4">
-
               转化为子任务
-</Menu.Item>
+            </Menu.Item>
           )
         }
         {
           typeCode === 'sub_task' && (
             <Menu.Item key="5">
-
               转化为任务
-</Menu.Item>
+            </Menu.Item>
           )
         }
         <Menu.Item key="6">
-
           创建分支
-</Menu.Item>
+        </Menu.Item>
         <Menu.Item key="7">
-
           分配问题
-</Menu.Item>
+        </Menu.Item>
         {
           typeCode === 'sub_task' && (
             <Menu.Item key="8">
-
               修改父级
-</Menu.Item>
+            </Menu.Item>
           )
         }
       </Menu>
@@ -1297,14 +1383,14 @@ class CreateSprint extends Component {
     return (
       <div className="choerodon-modal-editIssue">
         {
-          this.state.issueLoading ? (
+          issueLoading ? (
             <div
               style={{
                 position: 'absolute',
                 top: 0,
                 bottom: 0,
                 left: 0,
-                right: 0, 
+                right: 0,
                 background: 'rgba(255, 255, 255, 0.65)',
                 zIndex: 9999,
                 display: 'flex',
@@ -1314,7 +1400,7 @@ class CreateSprint extends Component {
             >
               <Spin />
             </div>
-          ) : null 
+          ) : null
         }
         <div className="c7n-nav">
           <div>
@@ -1340,7 +1426,7 @@ class CreateSprint extends Component {
           </div>
           <ul className="c7n-nav-ul" style={{ padding: 0 }}>
             <Tooltip placement="right" title="详情">
-              <li id="DETAILS-nav" className={`c7n-li ${this.state.nav === 'detail' ? 'c7n-li-active' : ''}`}>
+              <li id="DETAILS-nav" className={`c7n-li ${nav === 'detail' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="error_outline c7n-icon-li"
                   role="none"
@@ -1352,7 +1438,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="描述">
-              <li id="DESCRIPTION-nav" className={`c7n-li ${this.state.nav === 'des' ? 'c7n-li-active' : ''}`}>
+              <li id="DESCRIPTION-nav" className={`c7n-li ${nav === 'des' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="subject c7n-icon-li"
                   role="none"
@@ -1364,7 +1450,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="附件">
-              <li id="COMMENT-nav" className={`c7n-li ${this.state.nav === 'attachment' ? 'c7n-li-active' : ''}`}>
+              <li id="COMMENT-nav" className={`c7n-li ${nav === 'attachment' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="attach_file c7n-icon-li"
                   role="none"
@@ -1376,7 +1462,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="评论">
-              <li id="ATTACHMENT-nav" className={`c7n-li ${this.state.nav === 'commit' ? 'c7n-li-active' : ''}`}>
+              <li id="ATTACHMENT-nav" className={`c7n-li ${nav === 'commit' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="sms_outline c7n-icon-li"
                   role="none"
@@ -1388,7 +1474,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="工作日志">
-              <li id="LOG-nav" className={`c7n-li ${this.state.nav === 'log' ? 'c7n-li-active' : ''}`}>
+              <li id="LOG-nav" className={`c7n-li ${nav === 'log' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="work_log c7n-icon-li"
                   role="none"
@@ -1402,7 +1488,7 @@ class CreateSprint extends Component {
             {
               typeCode !== 'sub_task' && (
                 <Tooltip placement="right" title="子任务">
-                  <li id="SUB_TASKS-nav" className={`c7n-li ${this.state.nav === 'sub_task' ? 'c7n-li-active' : ''}`}>
+                  <li id="SUB_TASKS-nav" className={`c7n-li ${nav === 'sub_task' ? 'c7n-li-active' : ''}`}>
                     <Icon
                       type="filter_none c7n-icon-li"
                       role="none"
@@ -1418,7 +1504,7 @@ class CreateSprint extends Component {
             {
               typeCode !== 'sub_task' && (
                 <Tooltip placement="right" title="问题链接">
-                  <li id="LINK_TASKS-nav" className={`c7n-li ${this.state.nav === 'link_task' ? 'c7n-li-active' : ''}`}>
+                  <li id="LINK_TASKS-nav" className={`c7n-li ${nav === 'link_task' ? 'c7n-li-active' : ''}`}>
                     <Icon
                       type="link c7n-icon-li"
                       role="none"
@@ -1432,7 +1518,7 @@ class CreateSprint extends Component {
               )
             }
             <Tooltip placement="right" title="开发">
-              <li id="BRANCH-nav" className={`c7n-li ${this.state.nav === 'branch' ? 'c7n-li-active' : ''}`}>
+              <li id="BRANCH-nav" className={`c7n-li ${nav === 'branch' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="branch c7n-icon-li"
                   role="none"
@@ -1466,11 +1552,11 @@ class CreateSprint extends Component {
                             role="none"
                             style={{ color: 'rgb(63, 81, 181)', cursor: 'pointer' }}
                             onClick={() => {
-                              this.reloadIssue(this.state.parentIssueId);
+                              this.reloadIssue(parentIssueId);
                             }
                             }
                           >
-                            {this.state.parentIssueNum}
+                            {parentIssueNum}
                           </span>
                           <span style={{ paddingLeft: 10, paddingRight: 10 }}>/</span>
                         </span>
@@ -1479,31 +1565,28 @@ class CreateSprint extends Component {
                     {
                       typeCode === 'sub_task' ? (
                         <span>
-                          {this.state.issueNum}
+                          {issueNum}
                         </span>
                       ) : (
                         <a
                           role="none"
                           onClick={() => {
-                            const backUrl = this.props.backUrl || 'backlog';
-                            this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${this.state.origin.issueNum}&paramIssueId=${this.state.origin.issueId}&paramUrl=${backUrl}`);
+                            // const backUrl = this.props.backUrl || 'backlog';
+                            history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${origin.issueNum}&paramIssueId=${origin.issueId}&paramUrl=${backUrl || 'backlog'}`);
                             return false;
                           }}
                         >
-                          {this.state.issueNum}
+                          {issueNum}
                         </a>
                       )
                     }
-                    
                   </div>
-                  
-                  
                   <div
                     style={{
-                      cursor: 'pointer', fontSize: '13px', lineHeight: '20px', display: 'flex', alignItems: 'center', 
+                      cursor: 'pointer', fontSize: '13px', lineHeight: '20px', display: 'flex', alignItems: 'center',
                     }}
                     role="none"
-                    onClick={() => this.props.onCancel()}
+                    onClick={() => onCancel()}
                   >
                     <Icon type="last_page" style={{ fontSize: '18px', fontWeight: '500' }} />
                     <span>隐藏详情</span>
@@ -1515,31 +1598,29 @@ class CreateSprint extends Component {
                     thisType="summary"
                     line
                     current={currentRae}
-                    handleEnter
-                    origin={this.state.summary}
+                    // handleEnter
+                    origin={summary}
                     onInit={() => this.setAnIssueToState()}
                     onOk={this.updateIssue.bind(this, 'summary')}
                     onCancel={this.resetSummary.bind(this)}
                     readModeContent={(
                       <div className="c7n-summary">
-                        {this.state.summary}
+                        {summary}
                       </div>
                     )}
                   >
                     <TextArea
-                      // style={{ width: 290 }}
                       maxLength={44}
-                      value={this.state.summary}
+                      value={summary}
                       size="small"
-                      autoFocus
                       onChange={this.handleTitleChange.bind(this)}
-                      // autosize
                       onPressEnter={() => {
                         this.updateIssue('summary');
                         this.setState({
                           currentRae: undefined,
                         });
                       }}
+                      onBlur={() => this.statusOnChange()}
                     />
                   </ReadAndEdit>
                   <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
@@ -1559,27 +1640,19 @@ class CreateSprint extends Component {
                             thisType="storyPoints"
                             current={currentRae}
                             handleEnter
-                            origin={this.state.storyPoints}
-                            onInit={() => this.setAnIssueToState(this.state.origin)}
+                            origin={storyPoints}
+                            onInit={() => this.setAnIssueToState(origin)}
                             onOk={this.updateIssue.bind(this, 'storyPoints')}
                             onCancel={this.resetStoryPoints.bind(this)}
                             readModeContent={(
                               <span>
-                                {this.state.storyPoints === undefined || this.state.storyPoints === null ? '无' : `${this.state.storyPoints} 点`}
+                                {storyPoints === undefined || storyPoints === null ? '无' : `${storyPoints} 点`}
                               </span>
                             )}
                           >
-                            {/* <Input
-                              defaultValue={this.state.storyPoints}
-                              size="small"
-                              autoFocus
-                              onChange={this.handleStoryPointsChange.bind(this)}
-                            /> */}
                             <NumericInput
                               maxLength="3"
-                              value={this.state.storyPoints}
-                              // size="large"
-                              autoFocus
+                              value={storyPoints}
                               onChange={this.handleStoryPointsChange.bind(this)}
                               onPressEnter={() => {
                                 this.updateIssue('storyPoints');
@@ -1603,21 +1676,19 @@ class CreateSprint extends Component {
                             thisType="remainingTime"
                             current={currentRae}
                             handleEnter
-                            origin={this.state.remainingTime}
-                            onInit={() => this.setAnIssueToState(this.state.origin)}
+                            origin={remainingTime}
+                            onInit={() => this.setAnIssueToState(origin)}
                             onOk={this.updateIssue.bind(this, 'remainingTime')}
                             onCancel={this.resetRemainingTime.bind(this)}
                             readModeContent={(
                               <span>
-                                {this.state.remainingTime === undefined || this.state.remainingTime === null ? '无' : `${this.state.remainingTime} 小时`}
+                                {remainingTime === undefined || remainingTime === null ? '无' : `${remainingTime} 小时`}
                               </span>
                             )}
                           >
                             <NumericInput
                               maxLength="3"
-                              value={this.state.remainingTime}
-                              // size="large"
-                              autoFocus
+                              value={remainingTime}
                               onChange={this.handleRemainingTimeChange.bind(this)}
                               onPressEnter={() => {
                                 this.updateIssue('remainingTime');
@@ -1646,7 +1717,7 @@ class CreateSprint extends Component {
                         <span>详情</span>
                       </div>
                       <div style={{
-                        flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', 
+                        flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
                       }}
                       />
                     </div>
@@ -1662,6 +1733,7 @@ class CreateSprint extends Component {
                             callback={this.changeRae.bind(this)}
                             thisType="statusId"
                             current={currentRae}
+                            handleEnter
                             origin={statusId}
                             onOk={this.updateIssue.bind(this, 'statusId')}
                             onCancel={this.resetStatusId.bind(this)}
@@ -1689,20 +1761,17 @@ class CreateSprint extends Component {
                             <Select
                               value={originStatus.length ? statusId : statusName}
                               style={{ width: 150 }}
-                              loading={this.state.selectLoading}
-                              autoFocus
+                              loading={selectLoading}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
-                              onFocus={() => {
-                                // this.setState({
-                                //   selectLoading: true,
-                                // });
-                                // this.loadIssueStatus();
-                              }}
+                              onBlur={() => this.statusOnChange()}
                               onChange={(value, item) => {
                                 this.setState({
                                   statusId: value,
                                   transformId: item.key,
                                 });
+                                this.needBlur = false;
+                                // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+                                setTimeout(() => { this.needBlur = true; }, 100);
                               }}
                             >
                               {
@@ -1728,6 +1797,7 @@ class CreateSprint extends Component {
                             thisType="priorityId"
                             current={currentRae}
                             origin={priorityId}
+                            handleEnter
                             onOk={this.updateIssue.bind(this, 'priorityId')}
                             onCancel={this.resetPriorityId.bind(this)}
                             onInit={() => {
@@ -1762,7 +1832,7 @@ class CreateSprint extends Component {
                               value={originPriorities.length ? priorityId : priorityName}
                               style={{ width: '150px' }}
                               loading={selectLoading}
-                              autoFocus
+                              onBlur={() => this.statusOnChange()}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               onFocus={() => {
                                 this.setState({
@@ -1782,6 +1852,9 @@ class CreateSprint extends Component {
                                   priorityId: value,
                                   priorityName: priority.name,
                                 });
+                                // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+
+                                setTimeout(() => { this.needBlur = true; }, 10);
                               }}
                             >
                               {
@@ -1818,24 +1891,31 @@ class CreateSprint extends Component {
                               <ReadAndEdit
                                 callback={this.changeRae.bind(this)}
                                 thisType="componentIssueRelDTOList"
+                                handleEnter
                                 current={currentRae}
-                                origin={this.state.componentIssueRelDTOList}
-                                onInit={() => this.setAnIssueToState(this.state.origin)}
+                                origin={componentIssueRelDTOList}
+                                onInit={() => this.setAnIssueToState(origin)}
                                 onOk={this.updateIssueSelect.bind(this, 'originComponents', 'componentIssueRelDTOList')}
                                 onCancel={this.resetComponentIssueRelDTOList.bind(this)}
                                 readModeContent={(
                                   <div style={{ color: '#3f51b5' }}>
                                     <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginTop: 2 }}>
-                                      {this.transToArr(this.state.componentIssueRelDTOList, 'name')}
+                                      {this.transToArr(componentIssueRelDTOList, 'name')}
                                     </p>
                                   </div>
                                 )}
                               >
                                 <Select
-                                  value={this.transToArr(this.state.componentIssueRelDTOList, 'name', 'array')}
-                                  loading={this.state.selectLoading}
+                                  value={this.transToArr(componentIssueRelDTOList, 'name', 'array')}
+                                  loading={selectLoading}
+                                  ref={(e) => {
+                                    this.componentRef = e;
+                                  }}
                                   mode="tags"
-                                  autoFocus
+                                  onPopupFocus={(e) => {
+                                    this.componentRef.rcSelect.focus();
+                                  }}
+                                  onBlur={e => this.statusOnChange(e)}
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   tokenSeparators={[',']}
                                   style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
@@ -1850,9 +1930,21 @@ class CreateSprint extends Component {
                                       });
                                     });
                                   }}
-                                  onChange={value => this.setState({ componentIssueRelDTOList: value })}
+                                  onChange={(value) => {
+                                    this.setState({ componentIssueRelDTOList: value });
+                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
+                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+                                    this.needBlur = false;
+                                    if (this.changeTimer > 0) {
+                                      clearTimeout(this.changeTimer);
+                                      this.changeTimer = 0;
+                                    }
+                                    this.changeTimer = setTimeout(() => {
+                                      this.needBlur = true;
+                                    }, 1000);
+                                  }}
                                 >
-                                  {this.state.originComponents && this.state.originComponents.map(component => (
+                                  {originComponents && originComponents.map(component => (
                                     <Option
                                       key={component.name}
                                       value={component.name}
@@ -1866,30 +1958,28 @@ class CreateSprint extends Component {
                           </div>
                         ) : null
                       }
-                      
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-
                             标签：
-</span>
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
                             thisType="labelIssueRelDTOList"
                             current={currentRae}
-                            origin={this.state.labelIssueRelDTOList}
-                            onInit={() => this.setAnIssueToState(this.state.origin)}
+                            origin={labelIssueRelDTOList}
+                            onInit={() => this.setAnIssueToState(origin)}
                             onOk={this.updateIssueSelect.bind(this, 'originLabels', 'labelIssueRelDTOList')}
                             onCancel={this.resetlabelIssueRelDTOList.bind(this)}
                             readModeContent={(
                               <div>
                                 {
-                                this.state.labelIssueRelDTOList.length > 0 ? (
+                                labelIssueRelDTOList.length > 0 ? (
                                   <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                                     {
-                                      this.transToArr(this.state.labelIssueRelDTOList, 'labelName', 'array').map(label => (
+                                      this.transToArr(labelIssueRelDTOList, 'labelName', 'array').map(label => (
                                         <div
                                           key={label}
                                           style={{
@@ -1914,13 +2004,16 @@ class CreateSprint extends Component {
                             )}
                           >
                             <Select
-                              value={this.transToArr(this.state.labelIssueRelDTOList, 'labelName', 'array')}
+                              value={this.transToArr(labelIssueRelDTOList, 'labelName', 'array')}
                               mode="tags"
-                              autoFocus
-                              loading={this.state.selectLoading}
+                              loading={selectLoading}
+                              onPopupFocus={(e) => {
+                                this.componentRef.rcSelect.focus();
+                              }}
                               tokenSeparators={[',']}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
+                              onBlur={() => this.statusOnChange()}
                               onFocus={() => {
                                 this.setState({
                                   selectLoading: true,
@@ -1932,9 +2025,21 @@ class CreateSprint extends Component {
                                   });
                                 });
                               }}
-                              onChange={value => this.setState({ labelIssueRelDTOList: value })}
+                              onChange={(value) => {
+                                this.setState({ labelIssueRelDTOList: value });
+                                // 由于 OnChange 和 OnBlur 几乎同时执行，
+                                // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+                                this.needBlur = false;
+                                if (this.changeTimer > 0) {
+                                  clearTimeout(this.changeTimer);
+                                  this.changeTimer = 0;
+                                }
+                                this.changeTimer = setTimeout(() => {
+                                  this.needBlur = true;
+                                }, 1000);
+                              }}
                             >
-                              {this.state.originLabels.map(label => (
+                              {originLabels.map(label => (
                                 <Option
                                   key={label.labelName}
                                   value={label.labelName}
@@ -1951,29 +2056,28 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
-
                                 影响的版本：
-</span>
+                              </span>
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit
                                 callback={this.changeRae.bind(this)}
                                 thisType="influenceVersions"
                                 current={currentRae}
-                                origin={this.state.influenceVersions}
-                                onInit={() => this.setAnIssueToState(this.state.origin)}
+                                origin={influenceVersions}
+                                onInit={() => this.setAnIssueToState(origin)}
                                 onOk={this.updateVersionSelect.bind(this, 'originVersions', 'influenceVersions')}
                                 onCancel={this.resetInfluenceVersions.bind(this)}
                                 readModeContent={(
                                   <div style={{ color: '#3f51b5' }}>
                                     {
-                                    !this.state.influenceVersionsFixed.length && !this.state.influenceVersions.length ? '无' : (
+                                    !influenceVersionsFixed.length && !influenceVersions.length ? '无' : (
                                       <div>
                                         <div style={{ color: '#000' }}>
-                                          {_.map(this.state.influenceVersionsFixed, 'name').join(' , ')}
+                                          {_.map(influenceVersionsFixed, 'name').join(' , ')}
                                         </div>
                                         <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
-                                          {_.map(this.state.influenceVersions, 'name').join(' , ')}
+                                          {_.map(influenceVersions, 'name').join(' , ')}
                                         </p>
                                       </div>
                                     )
@@ -1982,21 +2086,24 @@ class CreateSprint extends Component {
                                 )}
                               >
                                 {
-                                  this.state.influenceVersionsFixed.length ? (
+                                  influenceVersionsFixed.length ? (
                                     <div>
                                       <span>已归档版本：</span>
                                       <span>
-                                        {_.map(this.state.influenceVersionsFixed, 'name').join(' , ')}
+                                        {_.map(influenceVersionsFixed, 'name').join(' , ')}
                                       </span>
                                     </div>
                                   ) : null
                                 }
                                 <Select
                                   label="未归档版本"
-                                  value={this.transToArr(this.state.influenceVersions, 'name', 'array')}
+                                  value={this.transToArr(influenceVersions, 'name', 'array')}
                                   mode="tags"
-                                  autoFocus
-                                  loading={this.state.selectLoading}
+                                  onBlur={() => this.statusOnChange()}
+                                  onPopupFocus={(e) => {
+                                    this.componentRef.rcSelect.focus();
+                                  }}
+                                  loading={selectLoading}
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   tokenSeparators={[',']}
                                   style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
@@ -2011,9 +2118,21 @@ class CreateSprint extends Component {
                                       });
                                     });
                                   }}
-                                  onChange={value => this.setState({ influenceVersions: value })}
+                                  onChange={(value) => {
+                                    this.setState({ influenceVersions: value });
+                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
+                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+                                    this.needBlur = false;
+                                    if (this.changeTimer > 0) {
+                                      clearTimeout(this.changeTimer);
+                                      this.changeTimer = 0;
+                                    }
+                                    this.changeTimer = setTimeout(() => {
+                                      this.needBlur = true;
+                                    }, 1000);
+                                  }}
                                 >
-                                  {this.state.originVersions.map(version => (
+                                  {originVersions.map(version => (
                                     <Option
                                       key={version.name}
                                       value={version.name}
@@ -2027,33 +2146,31 @@ class CreateSprint extends Component {
                           </div>
                         ) : null
                       }
-                      
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-
                             修复的版本：
-</span>
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
                             thisType="fixVersions"
                             current={currentRae}
-                            origin={this.state.fixVersions}
-                            onInit={() => this.setAnIssueToState(this.state.origin)}
+                            origin={fixVersions}
+                            onInit={() => this.setAnIssueToState(origin)}
                             onOk={this.updateVersionSelect.bind(this, 'originVersions', 'fixVersions')}
                             onCancel={this.resetFixVersions.bind(this)}
                             readModeContent={(
                               <div style={{ color: '#3f51b5' }}>
                                 {
-                                !this.state.fixVersionsFixed.length && !this.state.fixVersions.length ? '无' : (
+                                !fixVersionsFixed.length && !fixVersions.length ? '无' : (
                                   <div>
                                     <div style={{ color: '#000' }}>
-                                      {_.map(this.state.fixVersionsFixed, 'name').join(' , ')}
+                                      {_.map(fixVersionsFixed, 'name').join(' , ')}
                                     </div>
                                     <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
-                                      {_.map(this.state.fixVersions, 'name').join(' , ')}
+                                      {_.map(fixVersions, 'name').join(' , ')}
                                     </p>
                                   </div>
                                 )
@@ -2062,21 +2179,24 @@ class CreateSprint extends Component {
                             )}
                           >
                             {
-                              this.state.fixVersionsFixed.length ? (
+                              fixVersionsFixed.length ? (
                                 <div>
                                   <span>已归档版本：</span>
                                   <span>
-                                    {_.map(this.state.fixVersionsFixed, 'name').join(' , ')}
+                                    {_.map(fixVersionsFixed, 'name').join(' , ')}
                                   </span>
                                 </div>
                               ) : null
                             }
                             <Select
                               label="未归档版本"
-                              value={this.transToArr(this.state.fixVersions, 'name', 'array')}
+                              value={this.transToArr(fixVersions, 'name', 'array')}
                               mode="tags"
-                              autoFocus
-                              loading={this.state.selectLoading}
+                              loading={selectLoading}
+                              onBlur={() => this.statusOnChange()}
+                              onPopupFocus={(e) => {
+                                this.componentRef.rcSelect.focus();
+                              }}
                               tokenSeparators={[',']}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
@@ -2091,9 +2211,21 @@ class CreateSprint extends Component {
                                   });
                                 });
                               }}
-                              onChange={value => this.setState({ fixVersions: value })}
+                              onChange={(value) => {
+                                this.setState({ fixVersions: value });
+                                // 由于 OnChange 和 OnBlur 几乎同时执行，
+                                // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+                                this.needBlur = false;
+                                if (this.changeTimer > 0) {
+                                  clearTimeout(this.changeTimer);
+                                  this.changeTimer = 0;
+                                }
+                                this.changeTimer = setTimeout(() => {
+                                  this.needBlur = true;
+                                }, 1000);
+                              }}
                             >
-                              {this.state.originVersions.map(version => (
+                              {originVersions.map(version => (
                                 <Option
                                   key={version.name}
                                   value={version.name}
@@ -2110,20 +2242,19 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
-
                                 史诗：
-</span>
+                              </span>
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit
                                 callback={this.changeRae.bind(this)}
                                 thisType="epicId"
                                 current={currentRae}
-                                origin={this.state.epicId}
+                                origin={epicId}
                                 onOk={this.updateIssue.bind(this, 'epicId')}
                                 onCancel={this.resetEpicId.bind(this)}
                                 onInit={() => {
-                                  this.setAnIssueToState(this.state.origin);
+                                  this.setAnIssueToState(origin);
                                   loadEpics().then((res) => {
                                     this.setState({
                                       originEpics: res,
@@ -2133,13 +2264,13 @@ class CreateSprint extends Component {
                                 readModeContent={(
                                   <div>
                                     {
-                                    this.state.epicId ? (
-                                      <div 
+                                    epicId ? (
+                                      <div
                                         style={{
-                                          color: this.state.epicColor,
+                                          color: epicColor,
                                           borderWidth: '1px',
                                           borderStyle: 'solid',
-                                          borderColor: this.state.epicColor,
+                                          borderColor: epicColor,
                                           borderRadius: '2px',
                                           fontSize: '13px',
                                           lineHeight: '20px',
@@ -2147,7 +2278,7 @@ class CreateSprint extends Component {
                                           display: 'inline-block',
                                         }}
                                       >
-                                        {this.state.epicName}
+                                        {epicName}
                                       </div>
                                     ) : '无'
                                   }
@@ -2155,12 +2286,16 @@ class CreateSprint extends Component {
                                 )}
                               >
                                 <Select
-                                  value={this.state.originEpics.length ? this.state.epicId || undefined : this.state.epicName || undefined}
+                                  value={
+                                    originEpics.length
+                                      ? epicId || undefined
+                                      : epicName || undefined
+                                  }
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '150px' }}
-                                  autoFocus
+                                  onBlur={() => this.statusOnChange()}
                                   allowClear
-                                  loading={this.state.selectLoading}
+                                  loading={selectLoading}
                                   onFocus={() => {
                                     this.setState({
                                       selectLoading: true,
@@ -2173,29 +2308,30 @@ class CreateSprint extends Component {
                                     });
                                   }}
                                   onChange={(value) => {
-                                    const epic = _.find(this.state.originEpics,
+                                    const epic = _.find(originEpics,
                                       { issueId: value * 1 });
                                     this.setState({
                                       epicId: value,
                                       // epicName: epic.epicName,
                                     });
+                                    this.needBlur = false;
+                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
+                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+                                    setTimeout(() => { this.needBlur = true; }, 100);
                                   }}
                                 >
-                                  {this.state.originEpics.map(epic => <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>)}
+                                  {originEpics.map(epic => <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>)}
                                 </Select>
                               </ReadAndEdit>
-                              
                             </div>
                           </div>
                         ) : null
                       }
-                      
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-
                             冲刺：
-</span>
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           {
@@ -2204,47 +2340,29 @@ class CreateSprint extends Component {
                                 callback={this.changeRae.bind(this)}
                                 thisType="sprintId"
                                 current={currentRae}
-                                origin={this.state.activeSprint.sprintId}
+                                origin={activeSprint.sprintId}
                                 onOk={this.updateIssue.bind(this, 'sprintId')}
                                 onCancel={this.resetSprintId.bind(this)}
                                 onInit={() => {
-                                  this.setAnIssueToState(this.state.origin);
+                                  this.setAnIssueToState(origin);
                                   loadSprints(['sprint_planning', 'started']).then((res) => {
                                     this.setState({
                                       originSprints: res,
-                                      sprintId: this.state.activeSprint.sprintId,
+                                      sprintId: activeSprint.sprintId,
                                     });
                                   });
                                 }}
                                 readModeContent={(
                                   <div>
                                     {
-                                    !this.state.closeSprint.length && !this.state.activeSprint.sprintId ? '无' : (
+                                    !closeSprint.length && !activeSprint.sprintId ? '无' : (
                                       <div>
-                                        {/* {
-                                          this.state.closeSprint.map(v => (
-                                            <div 
-                                              style={{
-                                                color: 'rgba(0, 0, 0, 0.5)',
-                                                border: '1px solid rgba(0, 0, 0, 0.5)',
-                                                borderRadius: '2px',
-                                                fontSize: '13px',
-                                                lineHeight: '20px',
-                                                padding: '0 8px',
-                                                display: 'inline-block',
-                                                marginRight: 5,
-                                              }}
-                                            >
-                                              {v.sprintName}
-                                            </div>
-                                          ))
-                                        } */}
                                         <div>
-                                          {_.map(this.state.closeSprint, 'sprintName').join(' , ')}
+                                          {_.map(closeSprint, 'sprintName').join(' , ')}
                                         </div>
                                         {
-                                          this.state.activeSprint.sprintId && (
-                                            <div 
+                                          activeSprint.sprintId && (
+                                            <div
                                               style={{
                                                 color: '#4d90fe',
                                                 // border: '1px solid #4d90fe',
@@ -2256,7 +2374,7 @@ class CreateSprint extends Component {
                                                 marginTop: 5,
                                               }}
                                             >
-                                              {this.state.activeSprint.sprintName}
+                                              {activeSprint.sprintName}
                                             </div>
                                           )
                                         }
@@ -2267,23 +2385,26 @@ class CreateSprint extends Component {
                                 )}
                               >
                                 {
-                                  this.state.closeSprint.length ? (
+                                  closeSprint.length ? (
                                     <div>
                                       <span>已结束冲刺：</span>
                                       <span>
-                                        {_.map(this.state.closeSprint, 'sprintName').join(' , ')}
+                                        {_.map(closeSprint, 'sprintName').join(' , ')}
                                       </span>
                                     </div>
                                   ) : null
                                 }
                                 <Select
                                   label="活跃冲刺"
-                                  value={this.state.sprintId || undefined}
+                                  value={sprintId || undefined}
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '150px' }}
-                                  autoFocus
+                                  onBlur={() => this.statusOnChange()}
+                                  onPopupFocus={(e) => {
+                                    this.componentRef.rcSelect.focus();
+                                  }}
                                   allowClear
-                                  loading={this.state.selectLoading}
+                                  loading={selectLoading}
                                   onFocus={() => {
                                     this.setState({
                                       selectLoading: true,
@@ -2296,22 +2417,32 @@ class CreateSprint extends Component {
                                     });
                                   }}
                                   onChange={(value) => {
-                                    const sprint = _.find(this.state.originSprints,
+                                    const sprint = _.find(originSprints,
                                       { sprintId: value * 1 });
                                     this.setState({
                                       sprintId: value,
                                       // sprintName: sprint.sprintName,
                                     });
+                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
+                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+                                    this.needBlur = false;
+                                    if (this.changeTimer > 0) {
+                                      clearTimeout(this.changeTimer);
+                                      this.changeTimer = 0;
+                                    }
+                                    this.changeTimer = setTimeout(() => {
+                                      this.needBlur = true;
+                                    }, 1000);
                                   }}
                                 >
-                                  {this.state.originSprints.map(sprint => <Option key={`${sprint.sprintId}`} value={sprint.sprintId}>{sprint.sprintName}</Option>)}
+                                  {originSprints.map(sprint => <Option key={`${sprint.sprintId}`} value={sprint.sprintId}>{sprint.sprintName}</Option>)}
                                 </Select>
                               </ReadAndEdit>
                             ) : (
                               <div>
                                 {
-                                  this.state.activeSprint.sprintId ? (
-                                    <div 
+                                  activeSprint.sprintId ? (
+                                    <div
                                       style={{
                                         color: '#4d90fe',
                                         // border: '1px solid #4d90fe',
@@ -2322,7 +2453,7 @@ class CreateSprint extends Component {
                                         display: 'inline-block',
                                       }}
                                     >
-                                      {this.state.activeSprint.sprintName}
+                                      {activeSprint.sprintName}
                                     </div>
                                   ) : '无'
                                 }
@@ -2331,21 +2462,19 @@ class CreateSprint extends Component {
                           }
                         </div>
                       </div>
-
-
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-
                             时间跟踪：
-</span>
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                           <Progress
                             style={{ width: 100 }}
                             percent={
                               this.getWorkloads() !== 0
-                                ? (this.getWorkloads() * 100) / (this.getWorkloads() + (this.state.origin.remainingTime || 0))
+                                ? (this.getWorkloads() * 100)
+                                / (this.getWorkloads() + (origin.remainingTime || 0))
                                 : 0
                             }
                             size="small"
@@ -2353,12 +2482,10 @@ class CreateSprint extends Component {
                           />
                           <span>
                             {this.getWorkloads()}
-
                             h/
-{this.getWorkloads() + (this.state.origin.remainingTime || 0)}
-
+                            {this.getWorkloads() + (origin.remainingTime || 0)}
                             h
-</span>
+                          </span>
                           <span
                             role="none"
                             style={{
@@ -2372,20 +2499,17 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
-
                             登记工作
-</span>
+                          </span>
                         </div>
                       </div>
-
                       {
                         typeCode === 'issue_epic' ? (
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
-
                                 Epic名：
-</span>
+                              </span>
                             </div>
                             <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                               <ReadAndEdit
@@ -2394,14 +2518,14 @@ class CreateSprint extends Component {
                                 current={currentRae}
                                 handleEnter
                                 line
-                                origin={this.state.epicName}
+                                origin={epicName}
                                 onInit={() => this.setAnIssueToState()}
                                 onOk={this.updateIssue.bind(this, 'epicName')}
                                 onCancel={this.resetEpicName.bind(this)}
                                 readModeContent={(
                                   <div>
                                     <p style={{ wordBreak: 'break-word', marginBottom: 0 }}>
-                                      {this.state.epicName}
+                                      {epicName}
                                     </p>
                                   </div>
                                 )}
@@ -2409,9 +2533,9 @@ class CreateSprint extends Component {
                                 <TextArea
                                   maxLength={44}
                                   style={{ width: '200px' }}
-                                  value={this.state.epicName}
+                                  value={epicName}
                                   size="small"
-                                  autoFocus={{ minRows: 2, maxRows: 6 }}
+                                  autosize={{ minRows: 2, maxRows: 6 }}
                                   onChange={this.handleEpicNameChange.bind(this)}
                                   onPressEnter={() => {
                                     this.updateIssue('epicName');
@@ -2425,13 +2549,11 @@ class CreateSprint extends Component {
                           </div>
                         ) : null
                       }
-
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-subtitle">
-
                             人员
-</span>
+                          </span>
                         </div>
                       </div>
                       <div className="line-start mt-10 assignee">
@@ -2444,16 +2566,16 @@ class CreateSprint extends Component {
                             callback={this.changeRae.bind(this)}
                             thisType="reporterId"
                             current={currentRae}
-                            origin={this.state.reporterId}
+                            origin={reporterId}
                             onOk={this.updateIssue.bind(this, 'reporterId')}
                             onCancel={this.resetReporterId.bind(this)}
                             onInit={() => {
-                              this.setAnIssueToState(this.state.origin);
-                              if (this.state.reporterId) {
+                              this.setAnIssueToState(origin);
+                              if (reporterId) {
                                 this.setState({
                                   flag: 'loading',
                                 });
-                                getUser(this.state.reporterId).then((res) => {
+                                getUser(reporterId).then((res) => {
                                   this.setState({
                                     reporterId: JSON.stringify(res.content[0]),
                                     originUsers: [res.content[0]],
@@ -2470,13 +2592,13 @@ class CreateSprint extends Component {
                             readModeContent={(
                               <div>
                                 {
-                                this.state.reporterId && this.state.reporterName ? (
+                                reporterId && reporterName ? (
                                   <UserHead
                                     user={{
-                                      id: this.state.reporterId,
+                                      id: reporterId,
                                       loginName: '',
-                                      realName: this.state.reporterName,
-                                      avatar: this.state.reporterImageUrl,
+                                      realName: reporterName,
+                                      avatar: reporterImageUrl,
                                     }}
                                   />
                                 ) : '无'
@@ -2485,11 +2607,11 @@ class CreateSprint extends Component {
                             )}
                           >
                             <Select
-                              value={this.state.flag === 'loading' ? undefined : this.state.reporterId || undefined}
+                              value={flag === 'loading' ? undefined : reporterId || undefined}
                               style={{ width: 150 }}
-                              loading={this.state.selectLoading}
+                              loading={selectLoading}
+                              onBlur={() => this.statusOnChange()}
                               allowClear
-                              autoFocus
                               filter
                               onFilterChange={this.onFilterChange.bind(this)}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
@@ -2497,7 +2619,7 @@ class CreateSprint extends Component {
                                 this.setState({ reporterId: value });
                               }}
                             >
-                              {this.state.originUsers.map(user => (
+                              {originUsers.map(user => (
                                 <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                     <UserHead
@@ -2524,7 +2646,7 @@ class CreateSprint extends Component {
                             }}
                             onClick={() => {
                               getSelf().then((res) => {
-                                if (res.id !== this.state.reporterId) {
+                                if (res.id !== reporterId) {
                                   this.setState({
                                     currentRae: undefined,
                                     reporterId: JSON.stringify(res),
@@ -2537,9 +2659,8 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
-
                             分配给我
-</span>
+                          </span>
                         </div>
                       </div>
                       <div className="line-start mt-10 assignee">
@@ -2552,16 +2673,16 @@ class CreateSprint extends Component {
                             callback={this.changeRae.bind(this)}
                             thisType="assigneeId"
                             current={currentRae}
-                            origin={this.state.assigneeId}
+                            origin={assigneeId}
                             onOk={this.updateIssue.bind(this, 'assigneeId')}
                             onCancel={this.resetAssigneeId.bind(this)}
                             onInit={() => {
-                              this.setAnIssueToState(this.state.origin);
-                              if (this.state.assigneeId) {
+                              this.setAnIssueToState(origin);
+                              if (assigneeId) {
                                 this.setState({
                                   flag: 'loading',
                                 });
-                                getUser(this.state.assigneeId).then((res) => {
+                                getUser(assigneeId).then((res) => {
                                   this.setState({
                                     assigneeId: JSON.stringify(res.content[0]),
                                     originUsers: [res.content[0]],
@@ -2578,13 +2699,13 @@ class CreateSprint extends Component {
                             readModeContent={(
                               <div>
                                 {
-                                this.state.assigneeId && this.state.assigneeName ? (
+                                assigneeId && assigneeName ? (
                                   <UserHead
                                     user={{
-                                      id: this.state.assigneeId,
+                                      id: assigneeId,
                                       loginName: '',
-                                      realName: this.state.assigneeName,
-                                      avatar: this.state.assigneeImageUrl,
+                                      realName: assigneeName,
+                                      avatar: assigneeImageUrl,
                                     }}
                                   />
                                 ) : '无'
@@ -2592,11 +2713,10 @@ class CreateSprint extends Component {
                               </div>)}
                           >
                             <Select
-                              value={this.state.flag === 'loading' ? undefined : this.state.assigneeId || undefined}
+                              value={flag === 'loading' ? undefined : assigneeId || undefined}
                               style={{ width: 150 }}
-                              loading={this.state.selectLoading}
+                              loading={selectLoading}
                               allowClear
-                              autoFocus
                               filter
                               onFilterChange={this.onFilterChange.bind(this)}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
@@ -2604,7 +2724,7 @@ class CreateSprint extends Component {
                                 this.setState({ assigneeId: value });
                               }}
                             >
-                              {this.state.originUsers.map(user => (
+                              {originUsers.map(user => (
                                 <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                     <UserHead
@@ -2631,7 +2751,7 @@ class CreateSprint extends Component {
                             }}
                             onClick={() => {
                               getSelf().then((res) => {
-                                if (res.id !== this.state.assigneeId) {
+                                if (res.id !== assigneeId) {
                                   this.setState({
                                     currentRae: undefined,
                                     assigneeId: JSON.stringify(res),
@@ -2644,25 +2764,22 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
-
                             分配给我
-</span>
+                          </span>
                         </div>
                       </div>
-
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-subtitle">日期</span>
                         </div>
                       </div>
-                      
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">创建时间：</span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <DatetimeAgo
-                            date={this.state.creationDate}
+                            date={creationDate}
                           />
                         </div>
                       </div>
@@ -2672,13 +2789,12 @@ class CreateSprint extends Component {
                         </div>
                         <div className="c7n-value-wrapper">
                           <DatetimeAgo
-                            date={this.state.lastUpdateDate}
+                            date={lastUpdateDate}
                           />
                         </div>
                       </div>
                     </div>
                   </div>
-
                   <div id="des">
                     <div className="c7n-title-wrapper">
                       <div className="c7n-title-left">
@@ -2686,7 +2802,7 @@ class CreateSprint extends Component {
                         <span>描述</span>
                       </div>
                       <div style={{
-                        flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', 
+                        flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
                       }}
                       />
                       <div className="c7n-title-right" style={{ marginLeft: '14px', position: 'relative' }}>
@@ -2702,7 +2818,7 @@ class CreateSprint extends Component {
                           onClick={() => {
                             this.setState({
                               editDesShow: true,
-                              editDes: this.state.description,
+                              editDes: description,
                             });
                           }}
                         />
@@ -2710,9 +2826,7 @@ class CreateSprint extends Component {
                     </div>
                     {this.renderDes()}
                   </div>
-                  
                 </div>
-
                 <div id="attachment">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
@@ -2720,7 +2834,7 @@ class CreateSprint extends Component {
                       <span>附件</span>
                     </div>
                     <div style={{
-                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px', 
+                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px',
                     }}
                     />
                   </div>
@@ -2729,11 +2843,10 @@ class CreateSprint extends Component {
                       onRemove={this.setFileList}
                       onBeforeUpload={this.setFileList}
                       updateNow={this.onChangeFileList}
-                      fileList={this.state.fileList}
+                      fileList={fileList}
                     />
                   </div>
                 </div>
-
                 <div id="commit">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
@@ -2741,7 +2854,7 @@ class CreateSprint extends Component {
                       <span>评论</span>
                     </div>
                     <div style={{
-                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', 
+                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
                     }}
                     />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
@@ -2753,7 +2866,6 @@ class CreateSprint extends Component {
                   </div>
                   {this.renderCommits()}
                 </div>
-
                 <div id="log">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
@@ -2773,7 +2885,6 @@ class CreateSprint extends Component {
                   </div>
                   {this.renderLogs()}
                 </div>
-
                 {
                   typeCode !== 'sub_task' && (
                     <div id="sub_task">
@@ -2783,7 +2894,7 @@ class CreateSprint extends Component {
                           <span>子任务</span>
                         </div>
                         <div style={{
-                          flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', 
+                          flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
                         }}
                         />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
@@ -2797,7 +2908,6 @@ class CreateSprint extends Component {
                     </div>
                   )
                 }
-
                 {
                   typeCode !== 'sub_task' && (
                     <div id="link_task">
@@ -2807,7 +2917,7 @@ class CreateSprint extends Component {
                           <span>问题链接</span>
                         </div>
                         <div style={{
-                          flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', 
+                          flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
                         }}
                         />
                         <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
@@ -2821,7 +2931,6 @@ class CreateSprint extends Component {
                     </div>
                   )
                 }
-
                 <div id="branch">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
@@ -2829,7 +2938,7 @@ class CreateSprint extends Component {
                       <span>开发</span>
                     </div>
                     <div style={{
-                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', 
+                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
                     }}
                     />
                     <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
@@ -2839,42 +2948,41 @@ class CreateSprint extends Component {
                       </Button>
                     </div>
                   </div>
-                  {this.renderBranchs()} 
+                  {this.renderBranchs()}
                 </div>
-
               </div>
             </section>
           </div>
         </div>
         {
-          this.state.edit ? (
+          edit ? (
             <FullEditor
-              initValue={text2Delta(this.state.editDes)}
-              visible={this.state.edit}
+              initValue={text2Delta(editDes)}
+              visible={edit}
               onCancel={() => this.setState({ edit: false })}
               onOk={callback}
             />
           ) : null
         }
         {
-          this.state.dailyLogShow ? (
+          dailyLogShow ? (
             <DailyLog
-              issueId={this.state.origin.issueId}
-              issueNum={this.state.issueNum}
-              visible={this.state.dailyLogShow}
+              issueId={origin.issueId}
+              issueNum={issueNum}
+              visible={dailyLogShow}
               onCancel={() => this.setState({ dailyLogShow: false })}
               onOk={() => {
-                this.reloadIssue(this.state.origin.issueId);
+                this.reloadIssue(origin.issueId);
                 this.setState({ dailyLogShow: false });
               }}
             />
           ) : null
         }
         {
-          this.state.createSubTaskShow ? (
+          createSubTaskShow ? (
             <CreateSubTask
-              issueId={this.state.origin.issueId}
-              visible={this.state.createSubTaskShow}
+              issueId={origin.issueId}
+              visible={createSubTaskShow}
               onCancel={() => this.setState({ createSubTaskShow: false })}
               onOk={this.handleCreateSubIssue.bind(this)}
               store={store}
@@ -2882,36 +2990,36 @@ class CreateSprint extends Component {
           ) : null
         }
         {
-          this.state.createLinkTaskShow ? (
+          createLinkTaskShow ? (
             <CreateLinkTask
-              issueId={this.state.origin.issueId}
-              visible={this.state.createLinkTaskShow}
+              issueId={origin.issueId}
+              visible={createLinkTaskShow}
               onCancel={() => this.setState({ createLinkTaskShow: false })}
               onOk={this.handleCreateLinkIssue.bind(this)}
             />
           ) : null
         }
         {
-          this.state.copyIssueShow ? (
+          copyIssueShow ? (
             <CopyIssue
-              issueId={this.state.origin.issueId}
-              issueNum={this.state.origin.issueNum}
-              issue={this.state.origin}
-              issueLink={this.state.linkIssues}
-              issueSummary={this.state.origin.summary}
-              visible={this.state.copyIssueShow}
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              issue={origin}
+              issueLink={linkIssues}
+              issueSummary={origin.summary}
+              visible={copyIssueShow}
               onCancel={() => this.setState({ copyIssueShow: false })}
               onOk={this.handleCopyIssue.bind(this)}
             />
           ) : null
         }
         {
-          this.state.transformSubIssueShow ? (
+          transformSubIssueShow ? (
             <TransformSubIssue
-              visible={this.state.transformSubIssueShow}
-              issueId={this.state.origin.issueId}
-              issueNum={this.state.origin.issueNum}
-              ovn={this.state.origin.objectVersionNumber}
+              visible={transformSubIssueShow}
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              ovn={origin.objectVersionNumber}
               onCancel={() => this.setState({ transformSubIssueShow: false })}
               onOk={this.handleTransformSubIssue.bind(this)}
               store={store}
@@ -2919,12 +3027,12 @@ class CreateSprint extends Component {
           ) : null
         }
         {
-          this.state.transformFromSubIssueShow ? (
+          transformFromSubIssueShow ? (
             <TransformFromSubIssue
-              visible={this.state.transformFromSubIssueShow}
-              issueId={this.state.origin.issueId}
-              issueNum={this.state.origin.issueNum}
-              ovn={this.state.origin.objectVersionNumber}
+              visible={transformFromSubIssueShow}
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              ovn={origin.objectVersionNumber}
               onCancel={() => this.setState({ transformFromSubIssueShow: false })}
               onOk={this.handleTransformFromSubIssue.bind(this)}
               store={store}
@@ -2932,54 +3040,54 @@ class CreateSprint extends Component {
           ) : null
         }
         {
-          this.state.createBranchShow ? (
+          createBranchShow ? (
             <CreateBranch
-              issueId={this.state.origin.issueId}
+              issueId={origin.issueId}
               typeCode={typeCode}
-              issueNum={this.state.origin.issueNum}
+              issueNum={origin.issueNum}
               onOk={() => {
                 this.setState({ createBranchShow: false });
                 this.reloadIssue();
               }}
               onCancel={() => this.setState({ createBranchShow: false })}
-              visible={this.state.createBranchShow}
+              visible={createBranchShow}
             />
           ) : null
         }
         {
-          this.state.commitShow ? (
+          commitShow ? (
             <Commits
-              issueId={this.state.origin.issueId}
-              issueNum={this.state.origin.issueNum}
-              time={this.state.branchs.commitUpdateTime}
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              time={branchs.commitUpdateTime}
               onCancel={() => {
                 this.setState({ commitShow: false });
               }}
-              visible={this.state.commitShow}
+              visible={commitShow}
             />
           ) : null
         }
         {
-          this.state.mergeRequestShow ? (
+          mergeRequestShow ? (
             <MergeRequest
-              issueId={this.state.origin.issueId}
-              issueNum={this.state.origin.issueNum}
-              num={this.state.branchs.totalMergeRequest}
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              num={branchs.totalMergeRequest}
               onCancel={() => {
                 this.setState({ mergeRequestShow: false });
               }}
-              visible={this.state.mergeRequestShow}
+              visible={mergeRequestShow}
             />
           ) : null
         }
         {
-          this.state.assigneeShow ? (
+          assigneeShow ? (
             <Assignee
-              issueId={this.state.origin.issueId}
-              issueNum={this.state.origin.issueNum}
-              visible={this.state.assigneeShow}
-              assigneeId={this.state.assigneeId}
-              objectVersionNumber={this.state.origin.objectVersionNumber}
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              visible={assigneeShow}
+              assigneeId={assigneeId}
+              objectVersionNumber={origin.objectVersionNumber}
               onOk={() => {
                 this.setState({ assigneeShow: false });
                 this.reloadIssue();
@@ -2991,12 +3099,12 @@ class CreateSprint extends Component {
           ) : null
         }
         {
-          this.state.changeParentShow ? (
+          changeParentShow ? (
             <ChangeParent
-              issueId={this.state.origin.issueId}
-              issueNum={this.state.origin.issueNum}
-              visible={this.state.changeParentShow}
-              objectVersionNumber={this.state.origin.objectVersionNumber}
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              visible={changeParentShow}
+              objectVersionNumber={origin.objectVersionNumber}
               onOk={() => {
                 this.setState({ changeParentShow: false });
                 this.reloadIssue();

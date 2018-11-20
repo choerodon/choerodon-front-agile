@@ -2,20 +2,20 @@ import React, { Component } from 'react';
 import { Select, Icon } from 'choerodon-ui';
 import './ReadAndEdit.scss';
 
-const Option = Select.Option;
+const { Option } = Select;
 
 class ReadAndEdit extends Component {
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-      type: 'read',
-      origin: '',
-    };
-  }
+  // constructor(props, context) {
+  //   super(props, context);
+  //   // this.state = {
+  //   //   type: 'read',
+  //   //   origin: '',
+  //   // };
+  // }
 
-  componentWillMount() {
-    this.saveShow();
-  }
+  // componentWillMount() {
+  //   this.saveShow();
+  // }
 
   componentDidMount() {
     window.addEventListener('keyup', this.handleEnter, false);
@@ -25,63 +25,52 @@ class ReadAndEdit extends Component {
     window.removeEventListener('keyup', this.handleEnter, false);
   }
 
-  onBlur() {
-    this.setState({ type: 'read' });
-  }
 
   handleEnter = (e) => {
-    // if (this.props.handleEnter && e.keyCode === 13) {
-    //   e.stopPropagation();
-    //   this.setState({ type: 'read' });
-    //   this.props.onOk();
-    // }
+    const { handleEnter, current } = this.props;
+    if (handleEnter && e.keyCode === 13 && document.getElementsByClassName(current).length
+    ) {
+      document.getElementsByClassName(current)[0].click();
+    }
   }
 
   saveShow() {
-    this.setState({
-      origin: this.props.origin,
-    });
+    // const { origin } = this.props;
+    // this.setState({
+    //   origin,
+    // });
   }
 
   render() {
-    // const realProps = { ...this.props, user: undefined };
-    // return <Select {...realProps}>{options}</Select>;
+    const {
+      current, thisType, style, line,
+      origin, onInit, callback, children,
+      readModeContent, onOk, onCancel,
+    } = this.props;
     return (
       <div
         role="none"
-        className={`rae ${this.props.current !== this.props.thisType ? 'c7n-readAndEdit' : ''}`}
+        className={`rae ${current !== thisType ? 'c7n-readAndEdit' : ''}`}
         style={{
-          ...this.props.style,
+          ...style,
           position: 'relative',
-          width: this.props.line ? '100%' : 'auto',
+          width: line ? '100%' : 'auto',
         }}
-        // onClick={() => {
-        //  this.setState({
-        //    type: 'edit',
-        //    origin: this.props.origin,
-        //  });
-        //  if (this.props.onInit) {
-        //    this.props.onInit();
-        //  }
-        //  if (this.props.callback) {
-        //    this.props.callback(this.props.thisType);
-        //  }
-        // }}
       >
         {
-          this.props.current !== this.props.thisType && (
+          current !== thisType && (
             <div
               role="none"
               onClick={() => {
-                this.setState({
-                  type: 'edit',
-                  origin: this.props.origin,
-                });
-                if (this.props.onInit) {
-                  this.props.onInit();
+                // this.setState({
+                //   type: 'edit',
+                //   origin,
+                // });
+                if (onInit) {
+                  onInit();
                 }
-                if (this.props.callback) {
-                  this.props.callback(this.props.thisType);
+                if (callback) {
+                  callback(thisType);
                 }
               }}
             >
@@ -95,51 +84,27 @@ class ReadAndEdit extends Component {
               >
                 <Icon type="mode_edit" />
               </span>
-              {this.props.readModeContent}
+              {readModeContent}
             </div>
           )
         }
-        {/* {
-          (this.props.current !== this.props.thisType) && (
-            <span
-              className="edit"
-              style={{
-                display: 'none',
-              }}
-            >
-              <Icon type="mode_edit" />
-            </span>
-          )
-        }
-        
         {
-          (this.props.current !== this.props.thisType) && 
-            (this.props.readModeContent)
-        } */}
-        {
-          (this.props.current === this.props.thisType) && (
+          (current === thisType) && (
             <section>
-              {this.props.children}
+              {children}
             </section>
           )
         }
         {
-          (this.props.current === this.props.thisType) && (
+          (current === thisType) && (
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <div 
-                style={{ 
-                  // background: '#f0f0f0',
-                  // border: '1px solid #ccc',
-                  // borderTop: 'none',
-                  // borderRadius: '0 0 3px 3px',
-                  // outline: 'none',
-                  // padding: '3px', 
-                  // boxShadow: '0 3px 6px rgba(111,111,111,0.2)',
+              <div
+                style={{
                   backgroundColor: 'rgba(0, 0, 0, 0.08)',
                 }}
               >
                 <span
-                  className="edit-edit"
+                  className={`${current} edit-edit`}
                   style={{
                     display: 'block-inline',
                     marginRight: '4px',
@@ -150,9 +115,9 @@ class ReadAndEdit extends Component {
                   role="none"
                   onClick={(e) => {
                     e.stopPropagation();
-                    this.setState({ type: 'read' });
-                    this.props.onOk();
-                    this.props.callback(undefined);
+                    // this.setState({ type: 'read' });
+                    onOk();
+                    callback(undefined);
                   }
                   }
                 >
@@ -169,12 +134,12 @@ class ReadAndEdit extends Component {
                   role="none"
                   onClick={(e) => {
                     e.stopPropagation();
-                    this.props.onCancel(this.state.origin);
-                    this.setState({
-                      type: 'read',
-                      origin: this.props.origin,
-                    });
-                    this.props.callback(undefined);
+                    onCancel(origin);
+                    // this.setState({
+                    //   type: 'read',
+                    //   origin,
+                    // });
+                    callback(undefined);
                   }
                   }
                 >
