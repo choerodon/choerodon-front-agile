@@ -11,7 +11,7 @@ export function getUsers(param) {
   if (param) {
     return axios.get(`/iam/v1/projects/${projectId}/users?param=${param}`);
   }
-  return axios.get(`/iam/v1/projects/${projectId}/users`);
+  return axios.get(`/iam/v1/projects/${projectId}/users?size=40`);
 }
 
 export function getUser(userId) {
