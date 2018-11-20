@@ -1113,7 +1113,10 @@ class Home extends Component {
     } = UserMapStore;
     const issues = UserMapStore.getCacheIssues;
     // 不允许将史诗拖拽到非史诗列
-    if (res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') return;
+    if (res.destination.droppableId !== 'epic' && res.source.droppableId === 'epic') {
+      message.warning('无法将史诗移动到非史诗区域。');
+      return;
+    }
     // 只拖拽了一个issue
     if (selectIssueIds.length < 2) {
       // 拖拽到了同一列,不做处理
