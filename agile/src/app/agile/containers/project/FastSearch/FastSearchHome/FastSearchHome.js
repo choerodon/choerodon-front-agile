@@ -94,6 +94,26 @@ class Search extends Component {
       });
   };
 
+  transformOperation = (str) => {
+    // 注意该对象key的顺序
+    const OPERATION = {
+      '!=': '不等于',
+      'not in': '不包含',
+      in: '包含',
+      'is not': '不是',
+      is: '是',
+      '<=': '小于或等于',
+      '<': '小于',
+      '>=': '大于或等于',
+      '>': '大于',
+      '=': '等于',
+    };
+    
+    let transformKey = '';
+    transformKey = Object.keys(OPERATION).find(item => str.match(item)) && Object.keys(OPERATION).find(item => str.match(item));
+    return str.replace(transformKey, OPERATION[transformKey]);
+  };
+
   render() {
     const column = [
       {
@@ -123,7 +143,7 @@ class Search extends Component {
         // width: '50%',
         render: expressQuery => (
           <div style={{ width: '100%', overflow: 'hidden' }}>
-            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={expressQuery}>
+            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={this.transformOperation(expressQuery)}>
               <p
                 style={{
                   overflow: 'hidden',
@@ -132,7 +152,8 @@ class Search extends Component {
                   marginBottom: 0,
                 }}
               >
-                {expressQuery}
+                {/* {expressQuery} */}
+                {this.transformOperation(expressQuery)}
               </p>
             </Tooltip>
           </div>

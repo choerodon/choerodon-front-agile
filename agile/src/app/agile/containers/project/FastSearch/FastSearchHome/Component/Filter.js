@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Select, message, Icon, Button, DatePicker } from 'choerodon-ui';
+import {
+  Modal, Form, Input, Select, message, Icon, Button, DatePicker, 
+} from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
 import { NumericInput } from '../../../../../components/CommonComponent';
@@ -11,6 +13,106 @@ const { Option } = Select;
 const { AppState } = stores;
 const FormItem = Form.Item;
 
+const arrOperation1 = [
+  {
+    value: '=',
+    text: '等于',
+  },
+  {
+    value: '!=',
+    text: '不等于',
+  },
+  {
+    value: 'in',
+    text: '包含',
+  },
+  {
+    value: 'notIn',
+    text: '不包含',
+  },
+];
+const arrOperation2 = [
+  ...arrOperation1,
+  {
+    value: 'is',
+    text: '是',
+  },
+  {
+    value: 'isNot',
+    text: '不是',
+  },
+];
+
+const arrOperation3 = [
+  {
+    value: '>',
+    text: '大于',
+  },
+  {
+    value: '>=',
+    text: '大于或等于',
+  },
+  {
+    value: '<',
+    text: '小于',
+  },
+  {
+    value: '<',
+    text: '小于或等于',
+  },
+];
+const arrOperation4 = [
+  ...arrOperation3,
+  {
+    value: '=',
+    text: '等于',
+  },
+  {
+    value: 'is',
+    text: '是',
+  },
+  {
+    value: 'isNot',
+    text: '不是',
+  },
+];
+
+const OPERATION_FILTER = {
+  // assignee: [{'=', '!=', 'is', 'isNot', 'in', 'notIn'],
+  // priority: ['=', '!=', 'in', 'notIn'],
+  // issue_type: ['=', '!=', 'in', 'notIn'],
+  // status: ['=', '!=', 'in', 'notIn'],
+  // reporter: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+  // created_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+  // last_updated_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+  // epic: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+  // sprint: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+  // label: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+  // component: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+  // influence_version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+  // fix_version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+  // creation_date: ['>', '>=', '<', '<='],
+  // last_update_date: ['>', '>=', '<', '<='],
+  // story_point: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
+  // remain_time: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
+  assignee: arrOperation2,
+  priority: arrOperation1,
+  issue_type: arrOperation1,
+  status: arrOperation1,
+  reporter: arrOperation2,
+  created_user: arrOperation2,
+  last_updated_user: arrOperation2,
+  epic: arrOperation2,
+  sprint: arrOperation2,
+  label: arrOperation2,
+  component: arrOperation2,
+  influence_version: arrOperation2,
+  fix_version: arrOperation2,
+  creation_date: arrOperation3,
+  last_update_date: arrOperation3,
+  story_point: arrOperation4,
+  remain_time: arrOperation4,
+};
 class AddComponent extends Component {
   constructor(props) {
     super(props);
@@ -111,28 +213,8 @@ class AddComponent extends Component {
    * @param filter
    * @returns {*|Array}
    */
-  getOperation = (filter) => {
-    const OPERATION_FILTER = {
-      assignee: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      priority: ['=', '!=', 'in', 'notIn'],
-      issue_type: ['=', '!=', 'in', 'notIn'],
-      status: ['=', '!=', 'in', 'notIn'],
-      reporter: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      created_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      last_updated_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      epic: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      sprint: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      label: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      component: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      influence_version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      fix_version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      creation_date: ['>', '>=', '<', '<='],
-      last_update_date: ['>', '>=', '<', '<='],
-      story_point: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
-      remain_time: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
-    };
-    return OPERATION_FILTER[filter] || [];
-  };
+  getOperation = filter => _.map(OPERATION_FILTER[filter], 'value') || []
+  ;
 
   /**
    * 调用接口，获取'属性'的值列表
@@ -454,7 +536,8 @@ class AddComponent extends Component {
         >
           {
             this.getOperation(filter).map(v => (
-              <Option key={v} value={v}>{v}</Option>
+              // <Option key={v} value={v}>{v}</Option>
+              <Option key={v} value={v}>{OPERATION_FILTER[filter].find(item => item.value === v).text}</Option>
             ))
           }
         </Select>
@@ -506,7 +589,7 @@ class AddComponent extends Component {
               .indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
-              空
+              {'空'}
             </Option>
           </Select>
         );
@@ -553,7 +636,7 @@ class AddComponent extends Component {
               .indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
-              空
+              {'空'}
             </Option>
           </Select>)
         : (

@@ -1,17 +1,20 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import { stores, axios } from 'choerodon-front-boot';
 import PropTypes from 'prop-types';
 import {
-  Tag, Button, Popover, Checkbox,
+  Tag, Button, Popover, Checkbox, Select,
 } from 'choerodon-ui';
+
 import BacklogStore from '../../stores/project/backlog/BacklogStore';
 import './QuickSearch.scss';
 
+const { Option } = Select;
 const { CheckableTag } = Tag;
 const { Group: CheckboxGroup } = Checkbox;
+const { AppState } = stores;
 
-
-@inject('AppState')
+// @inject('AppState')
 @observer
 class QuickSearch extends Component {
   static defaultProps = {
@@ -31,9 +34,23 @@ class QuickSearch extends Component {
     resetFilter: PropTypes.bool,
   };
 
+
   state = {
     selected: [],
+    assignee: [],
   };
+
+  componentDidMount() {
+    axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`)
+      .then((res) => {
+        this.setState({
+          assignee: res.content,
+        });
+      })
+      .catch((e) => {
+        Choerodon.prompt('获取经办人信息失败');
+      });
+  }
 
   handleOnclickChange = (tag, checked) => {
     const { onlyStory, onlyMe } = this.props;
@@ -85,7 +102,7 @@ class QuickSearch extends Component {
       });
       BacklogStore.setQuickSearchClean(false);
     }
-    const { selected } = this.state;
+    const { selected, assignee } = this.state;
     return (
       <div
         className="c7n-agile-quickSearch-container"
@@ -104,6 +121,35 @@ class QuickSearch extends Component {
               {tag}
             </CheckableTag>
           ))}
+          {
+            <div
+              style={{
+                paddingLeft: 7,
+                paddingRight: 7,
+                marginRight: 8,
+              }}
+            >
+              <Select
+                // style={{ minWidth: 160 }}
+                className="assigneeSelect"
+                mode="multiple"
+                placeholder="经办人"
+                labelInValue
+                filter
+                optionFilterProp="children"
+                filterOption={(input, option) => option.props.children.toLowerCase()
+                  .indexOf(input.toLowerCase()) >= 0}
+              >
+                {
+                assignee && assignee.length && (
+                  assignee.map(item => (
+                    <Option key={item.id} value={item.realName}>{item.realName}</Option>
+                  ))
+                )
+              }
+              </Select>
+            </div>
+          }
           {this.buttonRender(resetFilter)}
         </div>
       </div>
