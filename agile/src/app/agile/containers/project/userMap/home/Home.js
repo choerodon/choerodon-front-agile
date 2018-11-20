@@ -1688,7 +1688,20 @@ class Home extends Component {
             >
               <div>{vos[name]}</div>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Tooltip title="todo">
+                <Tooltip title={`待处理故事点: ${
+                  _.reduce(_.filter(
+                    issues,
+                    issue => issue[id] === vos[id] && issue.epicId !== 0,
+                  ),
+                  (sum, issue) => {
+                    if (issue.statusMapDTO && issue.statusMapDTO.type === 'todo') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)
+                }`}
+                >
                   <p className="point-span" style={{ background: '#4D90FE' }}>
                     {_.reduce(_.filter(
                       issues,
@@ -1703,7 +1716,20 @@ class Home extends Component {
                     }, 0)}
                   </p>
                 </Tooltip>
-                <Tooltip title="doing">
+                <Tooltip title={`处理中故事点：${
+                  _.reduce(_.filter(
+                    issues,
+                    issue => issue[id] === vos[id] && issue.epicId !== 0,
+                  ),
+                  (sum, issue) => {
+                    if (issue.statusMapDTO && issue.statusMapDTO.type === 'doing') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}`
+                }
+                >
                   <p className="point-span" style={{ background: '#FFB100' }}>
                     {_.reduce(_.filter(
                       issues,
@@ -1718,7 +1744,20 @@ class Home extends Component {
                     }, 0)}
                   </p>
                 </Tooltip>
-                <Tooltip title="done">
+                <Tooltip title={`已完成故事点: ${
+                  _.reduce(_.filter(
+                    issues,
+                    issue => issue[id] === vos[id] && issue.epicId !== 0,
+                  ),
+                  (sum, issue) => {
+                    if (issue.statusMapDTO && issue.statusMapDTO.type === 'done') {
+                      return sum + issue.storyPoints;
+                    } else {
+                      return sum;
+                    }
+                  }, 0)}`
+                }
+                >
                   <p className="point-span" style={{ background: '#00BFA5' }}>
                     {_.reduce(_.filter(
                       issues,
@@ -1753,7 +1792,6 @@ class Home extends Component {
                       style={{
                         background: snapshot.isDraggingOver ? '#f0f0f0' : '',
                         padding: 'grid',
-                      // borderBottom: '1px solid rgba(0,0,0,0.12)'
                       }}
                     >
                       <React.Fragment>
@@ -1849,7 +1887,17 @@ class Home extends Component {
                 ) }
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Tooltip title="todo">
+              <Tooltip title={`待处理故事点：${
+                _.reduce(_.filter(issues, issue => issue.epicId !== 0
+                  && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                  if (issue.statusMapDTO && issue.statusMapDTO.type === 'todo') {
+                    return sum + issue.storyPoints;
+                  } else {
+                    return sum;
+                  }
+                }, 0)
+              }`}
+              >
                 <p className="point-span" style={{ background: '#4D90FE' }}>
                   {_.reduce(_.filter(issues, issue => issue.epicId !== 0
                     && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
@@ -1861,7 +1909,17 @@ class Home extends Component {
                   }, 0)}
                 </p>
               </Tooltip>
-              <Tooltip title="doing">
+              <Tooltip title={`处理中故事点：${
+                _.reduce(_.filter(issues, issue => issue.epicId !== 0
+                  && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
+                  if (issue.statusMapDTO && issue.statusMapDTO.type === 'doing') {
+                    return sum + issue.storyPoints;
+                  } else {
+                    return sum;
+                  }
+                }, 0)
+              }`}
+              >
                 <p className="point-span" style={{ background: '#FFB100' }}>
                   {_.reduce(_.filter(issues, issue => issue.epicId !== 0
                     && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
