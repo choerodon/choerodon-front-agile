@@ -1,17 +1,17 @@
 "agile": agile
-'agile.issue': issue
-'agile.release': release
-'agile.backlog':  backlog
-'agile.scrumboard':  scrumboard
+'agile.issue': Issue
+'agile.release': Release
+'agile.backlog': Backlog
+'agile.scrumboard': Scrumboard
 'agile.component': component
 'agile.reporthost': Agile Report
-'agile.reportboard': Report
-'agile.projectsetting': projectSetting
-'agile.fastsearch': fastSearch
-'agile.issuelink': issueLink
-'agile.userStoryMap': storyMap
-'agile.iterationBoard': iterationBoard
-'agile.messageNotification': notificationSetting
+'agile.reportboard': Report Workbench
+'agile.projectsetting': Project Setting
+'agile.fastsearch': Fast Search
+'agile.issuelink': Issue Link
+'agile.userStoryMap': Story Map
+'agile.iterationBoard': Iteration Board
+'agile.messageNotification': Notification Setting
 
 "rentsetting": "Organization Settings"
 "rentsetting.workCalendar": "Work Calendar"
