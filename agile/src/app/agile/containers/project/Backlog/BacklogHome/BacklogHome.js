@@ -204,9 +204,10 @@ class BacklogHome extends Component {
   /**
    * 筛选仅自己的故事
    */
-  filterOnlyMe =() => {
+  filterOnlyMe =(checked) => {
     const { BacklogStore } = this.props;
-    BacklogStore.setOnlyMe(!BacklogStore.getOnlyMe);
+    // BacklogStore.setOnlyMe(!BacklogStore.getOnlyMe);
+    BacklogStore.setOnlyMe(checked);
     this.setState({
       spinIf: true,
     });
@@ -223,9 +224,10 @@ class BacklogHome extends Component {
   /**
    * 筛选仅故事
    */
-  filterOnlyStory =() => {
+  filterOnlyStory =(checked) => {
     const { BacklogStore } = this.props;
-    BacklogStore.setRecent(!BacklogStore.getRecent);
+    // BacklogStore.setRecent(!BacklogStore.getRecent);
+    BacklogStore.setRecent(checked);
     this.setState({
       spinIf: true,
     });
@@ -506,9 +508,27 @@ class BacklogHome extends Component {
 
   onChangeSelect = (checkedValues) => {
     const { BacklogStore } = this.props;
-    BacklogStore.setQuickFilters(checkedValues);
+    BacklogStore.setQuickFilters(checkedValues || []);
     this.refresh();
   };
+
+  onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
+    const { BacklogStore } = this.props;
+    this.setState({
+      spinIf: true,
+    });
+    BacklogStore.setOnlyMe(onlyMeChecked);
+    BacklogStore.setRecent(onlyStoryChecked);
+    BacklogStore.setQuickFilters(moreChecked || []);
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
+      .then((res) => {
+        BacklogStore.setSprintData(res);
+        this.setState({
+          spinIf: false,
+        });
+      }).catch((error) => {
+      });
+  }
 
   render() {
     const { BacklogStore } = this.props;
@@ -541,15 +561,13 @@ class BacklogHome extends Component {
           </Button>
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
-          <div className="backlogTools">
+          <div className="backlogTools" style={{ paddingLeft: 24 }}>
             <QuickSearch
               title
               buttonName="更多"
               buttonIcon="more_vert"
               moreSelection={BacklogStore.getQuickSearchList}
-              onChangeCheckBox={this.onChangeSelect}
-              onlyStory={this.filterOnlyStory}
-              onlyMe={this.filterOnlyMe}
+              onQuickSearchChange={this.onQuickSearchChange}
               resetFilter={BacklogStore.getQuickSearchClean}
             />
           </div>

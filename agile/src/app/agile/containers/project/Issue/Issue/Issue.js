@@ -917,15 +917,18 @@ class Issue extends Component {
               overflowX: 'hidden',
             }}
           >
-            <QuickSearch
-              title={false}
-              buttonName="更多"
-              buttonIcon="more_vert"
-              moreSelection={IssueStore.getQuickSearch}
-              onChangeCheckBox={this.onChangeSelect}
-              onlyStory={this.onlyStory}
-              onlyMe={this.onlyMe}
-            />
+            <div style={{ paddingLeft: 24 }}>
+              <QuickSearch
+                title
+                buttonName="更多"
+                buttonIcon="more_vert"
+                moreSelection={IssueStore.getQuickSearch}
+                onChangeCheckBox={this.onChangeSelect}
+                onlyStory={this.onlyStory}
+                onlyMe={this.onlyMe}
+              />
+            </div>
+           
             <section
               className={`c7n-table ${expand ? 'expand-sign' : ''}`}
               style={{

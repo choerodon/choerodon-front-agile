@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { stores, axios } from 'choerodon-front-boot';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import {
   Tag, Button, Popover, Checkbox, Select,
@@ -9,7 +10,7 @@ import {
 import BacklogStore from '../../stores/project/backlog/BacklogStore';
 import './QuickSearch.scss';
 
-const { Option } = Select;
+const { Option, OptGroup } = Select;
 const { CheckableTag } = Tag;
 const { Group: CheckboxGroup } = Checkbox;
 const { AppState } = stores;
@@ -36,7 +37,7 @@ class QuickSearch extends Component {
 
 
   state = {
-    selected: [],
+    quickSearchSelected: [],
     assignee: [],
   };
 
@@ -52,106 +53,112 @@ class QuickSearch extends Component {
       });
   }
 
-  handleOnclickChange = (tag, checked) => {
-    const { onlyStory, onlyMe } = this.props;
-    switch (tag) {
-      case '仅故事':
-        onlyStory(checked);
-        break;
-      case '仅我的问题':
-        onlyMe(checked);
-        break;
-      default:
-        break;
-    }
-    const { selected } = this.state;
-    const nextSelectedTags = checked
-      ? [...selected, tag]
-      : selected.filter(t => t !== tag);
-    this.setState({ selected: nextSelectedTags });
-  };
+  handleQuickSearchChange = (value) => {
+    console.log(`stathe: ${this.state.quickSearchSelected}`)
+    console.log(JSON.stringify(value));
+    const { onQuickSearchChange } = this.props;
+    const labels = _.map(value, 'label');
+    this.setState(
+      {
+        quickSearchSelected: _.map(value, 'key'),
+      }, () => {
+        console.log(`quickSearchSelected: ${JSON.stringify(this.state.quickSearchSelected)}`);
+      }
+    )
+    onQuickSearchChange(labels.includes('仅我的问题'), labels.includes('仅故事'), _.pull(_.map(value, 'key'), '仅故事', '仅我的问题'));
+    // onQuickSearchChange(value.includes('仅我的问题'), value.includes('仅故事'), _.pull(value, '仅我的问题', '仅故事'));
+  }
 
-  buttonRender = (resetFilter) => {
+  render() {
     const {
-      buttonName, buttonIcon, onChangeCheckBox,
+      title, moreSelection,
     } = this.props;
-
-    let { moreSelection } = this.props;
-    if (resetFilter) {
-      moreSelection = [];
-    }
+    const { quickSearchSelected } = this.state;
+    const { assignee } = this.state;
     const listChildren = moreSelection.map(item => ({
       label: item.name,
       value: item.filterId,
     }));
-    const content = (
-      <CheckboxGroup className="c7n-agile-quickSearch-popover" style={{ display: 'flex', flexDirection: 'column' }} options={listChildren} onChange={onChangeCheckBox} />
-    );
-    return listChildren.length ? (
-      <Popover placement="bottomLeft" content={content} trigger="click">
-        <Button funcType="flat" icon={buttonIcon}>{buttonName}</Button>
-      </Popover>
-    ) : null;
-  };
 
-  render() {
-    const { title, selectionGroup, resetFilter } = this.props;
-    if (resetFilter) {
-      this.setState({
-        selected: [],
-      });
-      BacklogStore.setQuickSearchClean(false);
-    }
-    const { selected, assignee } = this.state;
     return (
       <div
         className="c7n-agile-quickSearch-container"
       >
+
         <div
           className="c7n-agile-quickSearch-left"
         >
-          {title && (<p style={{ marginRight: 16, fontSize: 14, fontWeight: 600 }}>快速搜索:</p>)}
-          {selectionGroup.map(tag => (
-            <CheckableTag
-              key={tag}
-              className="c7n-agile-quickSearch-tag"
-              checked={selected.indexOf(tag) > -1}
-              onChange={checked => this.handleOnclickChange(tag, checked)}
+          {title && (<p style={{ marginRight: 16, fontSize: 14, fontWeight: 600 }}>搜索:</p>)}
+          <div>
+            <Select
+              allowClear
+              key="quickSearchSelect"
+              className="quickSearchSelect"
+              style={{ minWidth: 70, marginRight: 15 }}
+              dropdownClassName="quickSearchDropDown"
+              mode="multiple"
+              labelInValue
+              placeholder="快速搜索"
+              maxTagCount={0}
+              maxTagPlaceholder={(ommittedValues) => 
+                // console.log(ommittedValues);
+                 `${_.map(ommittedValues, 'label').join(', ')}`
+                // return ommittedValues.join(', ')}
+              }
+              // value={BacklogStore.getQuickSearchClean ? `${{ key: '', value: '' }}` : JSON.stringify(quickSearchSelected[0])}
+              // value={() => {
+              //   if (BacklogStore.getQuickSearchClean) {
+              //     return `${{ key: '', value: '' }}`;
+              //   }
+              // }}
+              onChange={this.handleQuickSearchChange}
             >
-              {tag}
-            </CheckableTag>
-          ))}
-          {
-            <div
-              style={{
-                paddingLeft: 7,
-                paddingRight: 7,
-                marginRight: 8,
-              }}
-            >
-              <Select
-                // style={{ minWidth: 160 }}
-                className="assigneeSelect"
-                mode="multiple"
-                placeholder="经办人"
-                labelInValue
-                filter
-                optionFilterProp="children"
-                filterOption={(input, option) => option.props.children.toLowerCase()
-                  .indexOf(input.toLowerCase()) >= 0}
-              >
+              {
+                <OptGroup key="quickSearch">
+                  <Option key={-1} value="仅我的问题">仅我的问题</Option>
+                  <Option key={-2} value="仅故事">仅故事</Option>
+                </OptGroup>
+              }
+              <OptGroup key="more" label="更多">
                 {
+                listChildren.map(item => <Option key={item.value} value={item.value}>{item.label}</Option>)
+              }
+              </OptGroup>
+            </Select>
+          </div>
+         
+        </div>
+        {
+          <div
+            style={{
+              paddingLeft: 4,
+              paddingRight: 4,
+            }}
+          >
+            <Select
+              allowClear
+              key="assigneeSelect"
+              className="assigneeSelect"
+              mode="multiple"
+              placeholder="经办人"
+              maxTagCount={0}
+              maxTagPlaceholder={ommittedValues => `经办人：${_.map(ommittedValues, 'label').join(', ')}`}
+              labelInValue
+              filter
+              optionFilterProp="children"
+              filterOption={(input, option) => option.props.children.toLowerCase()
+                .indexOf(input.toLowerCase()) >= 0}
+            >
+              {
                 assignee && assignee.length && (
                   assignee.map(item => (
                     <Option key={item.id} value={item.realName}>{item.realName}</Option>
                   ))
                 )
               }
-              </Select>
-            </div>
+            </Select>
+          </div>
           }
-          {this.buttonRender(resetFilter)}
-        </div>
       </div>
     );
   }

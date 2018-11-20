@@ -46,4 +46,5 @@
       "pre-commit": "lint-staged"
     }
   }
+
 }

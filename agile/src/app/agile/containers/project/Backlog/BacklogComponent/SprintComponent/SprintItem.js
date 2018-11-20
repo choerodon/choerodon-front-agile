@@ -780,7 +780,7 @@ class SprintItem extends Component {
                             || store.getChosenEpic !== 'all'
                             || store.getOnlyMe
                             || store.getRecent // 仅故事
-                            || store.getQuickFilters.length > 0 ? 'block' : 'none',
+                            || (store.getQuickFilters && store.getQuickFilters.length > 0) ? 'block' : 'none',
                         }}
                         role="none"
                         onClick={this.clearFilter}
