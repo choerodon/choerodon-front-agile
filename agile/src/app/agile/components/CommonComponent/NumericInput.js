@@ -4,28 +4,22 @@ import { AppState } from 'choerodon-front-boot';
 import './NumericInput.scss';
 
 class NumericInput extends Component {
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-      users: [],
-    };
-  }
-
-  componentWillMount() {
-  }
-
   onChange = (e) => {
     const { value } = e.target;
+    const { onChange } = this.props;
     // const reg = /^-?(0|[1-9][0-9]*)(\.[0-9]*)?$/;
     const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
+    /* eslint-disable */
     if ((!isNaN(value) && reg.test(value)) || value === '') {
-      this.props.onChange(value);
+      onChange(value);
     }
+    /* eslint-enable */
   }
+
   // '.' at the end or only '-' in the input box.
   onBlur = () => {
     const { value, onBlur, onChange } = this.props;
-    if (value.charAt(value.length - 1) === '.' || value === '-') {
+    if (value.toString().charAt(value.length - 1) === '.' || value === '-') {
       onChange({ value: value.slice(0, -1) });
     }
     if (onBlur) {
@@ -33,8 +27,8 @@ class NumericInput extends Component {
     }
   }
 
-  formatNumber(value) {
-    value += '';
+  formatNumber(paramValue) {
+    const value = paramValue.toString();
     const list = value.split('.');
     const prefix = list[0].charAt(0) === '-' ? '-' : '';
     let num = prefix ? list[0].slice(1) : list[0];
@@ -51,28 +45,21 @@ class NumericInput extends Component {
 
   render() {
     const { value } = this.props;
+    debugger;
     const title = value ? (
       <span className="numeric-input-title">
         {value !== '-' ? this.formatNumber(value) : '-'}
       </span>
     ) : 'Input a number';
     return (
-      // <Tooltip
-      //   trigger={['focus']}
-      //   title={title}
-      //   placement="topLeft"
-      //   overlayClassName="numeric-input"
-      // >
       <div className="c7n-numericInput">
         <Input
           {...this.props}
           onChange={this.onChange}
           onBlur={this.onBlur}
-          // placeholder="Input a number"
           maxLength="3"
         />
       </div>
-      // </Tooltip>
     );
   }
 }

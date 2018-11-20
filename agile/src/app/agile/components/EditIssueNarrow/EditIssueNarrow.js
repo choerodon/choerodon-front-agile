@@ -71,11 +71,8 @@ class CreateSprint extends Component {
 
   constructor(props) {
     super(props);
-    this.needBlur = false;
+    this.needBlur = true;
     this.componentRef = React.createRef();
-    this.tagRef = React.createRef();
-    this.epicRef = React.createRef();
-    this.sprintRef = React.createRef();
     this.state = {
       issueLoading: false,
       flag: undefined,
@@ -661,7 +658,6 @@ class CreateSprint extends Component {
       });
   };
 
-
   isInLook(ele) {
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
@@ -1218,6 +1214,7 @@ class CreateSprint extends Component {
 
   render() {
     const menu = AppState.currentMenuType;
+    this.needBlur = true;
     const { type, id: projectId, organizationId: orgId } = menu;
     const {
       store,
@@ -1771,6 +1768,7 @@ class CreateSprint extends Component {
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               onBlur={() => this.statusOnChange()}
                               onChange={(value, item) => {
+                                debugger;
                                 this.setState({
                                   statusId: value,
                                   transformId: item.key,
@@ -2310,9 +2308,6 @@ class CreateSprint extends Component {
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '150px' }}
                                   onBlur={() => this.statusOnChange()}
-                                  onPopupFocus={(e) => {
-                                    this.componentRef.rcSelect.focus();
-                                  }}
                                   allowClear
                                   loading={selectLoading}
                                   onFocus={() => {
@@ -2333,17 +2328,10 @@ class CreateSprint extends Component {
                                       epicId: value,
                                       // epicName: epic.epicName,
                                     });
+                                    this.needBlur = false;
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    this.needBlur = false;
-                                    if (this.changeTimer > 0) {
-                                      clearTimeout(this.changeTimer);
-                                      this.changeTimer = 0;
-                                    }
-                                    this.changeTimer = setTimeout(() => {
-                                      debugger;
-                                      this.needBlur = true;
-                                    }, 1000);
+                                    setTimeout(() => { this.needBlur = true; }, 100);
                                   }}
                                 >
                                   {originEpics.map(epic => <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>)}
@@ -2644,10 +2632,6 @@ class CreateSprint extends Component {
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               onChange={(value) => {
                                 this.setState({ reporterId: value });
-                                this.needBlur = false;
-                                // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                setTimeout(() => { this.needBlur = true; }, 100);
                               }}
                             >
                               {originUsers.map(user => (
@@ -2748,16 +2732,11 @@ class CreateSprint extends Component {
                               style={{ width: 150 }}
                               loading={selectLoading}
                               allowClear
-                              onBlur={() => this.statusOnChange()}
                               filter
                               onFilterChange={this.onFilterChange.bind(this)}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               onChange={(value) => {
                                 this.setState({ assigneeId: value });
-                                this.needBlur = false;
-                                // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                setTimeout(() => { this.needBlur = true; }, 100);
                               }}
                             >
                               {originUsers.map(user => (
