@@ -289,14 +289,22 @@ class IssueCard extends Component {
               <div className="c7n-footer">
                 <TypeTag
                   data={issueTypeDTO}
+                  style={{ margin: 4, marginLeft: 0 }}
                 />
-                <span className="c7n-issueCard-storyPoints">
-                  {storyPoints}
-                </span>
+                {
+                  issueTypeDTO && issueTypeDTO.typeCode === 'story'
+                    ? (
+                      <span className="c7n-issueCard-storyPoints">
+                        {storyPoints}
+                      </span>
+                    )
+                    : null
+                }
                 <StatusTag
                   name={statusName}
                   color={statusColor}
                   data={statusMapDTO}
+                  style={{ margin: 4 }}
                 />
               </div>
             </div>
