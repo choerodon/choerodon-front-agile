@@ -45,7 +45,6 @@ class NumericInput extends Component {
 
   render() {
     const { value } = this.props;
-    debugger;
     const title = value ? (
       <span className="numeric-input-title">
         {value !== '-' ? this.formatNumber(value) : '-'}

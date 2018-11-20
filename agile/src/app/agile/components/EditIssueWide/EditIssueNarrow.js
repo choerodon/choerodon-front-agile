@@ -434,6 +434,9 @@ class CreateSprint extends Component {
 
   handleTitleChange = (e) => {
     this.setState({ summary: e.target.value });
+    this.needBlur = false;
+    // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+    setTimeout(() => { this.needBlur = true; }, 100);
   };
 
   handleEpicNameChange = (e) => {
@@ -684,12 +687,9 @@ class CreateSprint extends Component {
     // e.preventDefault();
     const that = this;
     setTimeout(() => {
-      debugger;
       if (that.needBlur) {
         setTimeout(() => {
-          debugger;
           if (document.getElementsByClassName(that.state.currentRae).length) {
-            debugger;
             that.needBlur = true;
             document.getElementsByClassName(that.state.currentRae)[0].click();
           }
@@ -1748,6 +1748,7 @@ class CreateSprint extends Component {
                           currentRae: undefined,
                         });
                       }}
+                      onBlur={() => this.statusOnChange()}
                     />
                   </ReadAndEdit>
                   <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
@@ -2332,7 +2333,6 @@ class CreateSprint extends Component {
                                     });
                                   }}
                                   onChange={(value) => {
-                                    debugger;
                                     this.setState({
                                       componentIssueRelDTOList: value,
                                     });
@@ -2344,7 +2344,6 @@ class CreateSprint extends Component {
                                       this.changeTimer = 0;
                                     }
                                     this.changeTimer = setTimeout(() => {
-                                      debugger;
                                       this.needBlur = true;
                                     }, 500);
                                   }}
@@ -2438,7 +2437,6 @@ class CreateSprint extends Component {
                                   });
                                 }}
                                 onChange={(value) => {
-                                  debugger;
                                   this.setState({
                                     labelIssueRelDTOList: value,
                                   });
@@ -2450,7 +2448,6 @@ class CreateSprint extends Component {
                                     this.changeTimer = 0;
                                   }
                                   this.changeTimer = setTimeout(() => {
-                                    debugger;
                                     this.needBlur = true;
                                   }, 500);
                                 }}
@@ -2556,7 +2553,6 @@ class CreateSprint extends Component {
                                       this.changeTimer = 0;
                                     }
                                     this.changeTimer = setTimeout(() => {
-                                      debugger;
                                       this.needBlur = true;
                                     }, 500);
                                   }}
@@ -2658,7 +2654,6 @@ class CreateSprint extends Component {
                                     this.changeTimer = 0;
                                   }
                                   this.changeTimer = setTimeout(() => {
-                                    debugger;
                                     this.needBlur = true;
                                   }, 500);
                                 }}
@@ -2761,7 +2756,6 @@ class CreateSprint extends Component {
                                       this.changeTimer = 0;
                                     }
                                     this.changeTimer = setTimeout(() => {
-                                      debugger;
                                       this.needBlur = true;
                                     }, 500);
                                   }}

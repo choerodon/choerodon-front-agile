@@ -114,7 +114,6 @@ class ReadAndEdit extends Component {
                   }}
                   role="none"
                   onClick={(e) => {
-                    debugger;
                     e.stopPropagation();
                     // this.setState({ type: 'read' });
                     onOk();
