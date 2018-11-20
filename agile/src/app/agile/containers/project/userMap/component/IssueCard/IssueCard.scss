@@ -8,12 +8,6 @@
   padding: 6px;
   position: relative;
 
-  &:hover {
-    box-shadow: 0 -1px 6px 0 rgba(0, 0, 0, 0.12);
-  }
-  // display: flex;
-  // flex-direction: column;
-
   .c7n-mask {
     position: absolute;
     top: 0;
@@ -28,7 +22,6 @@
     height: 30px;
     width: 100%;
     display: flex;
-    justify-content: row;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 6px;
@@ -79,7 +72,7 @@
     }
 
     .ant-input:focus {
-      border-color: #3F51B5;
+      border-color: #3f51b5;
       box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
     }
 
@@ -121,18 +114,18 @@
 
     .c7n-issueCard-storyPoints {
       width: 28px;
-      margin-left: 8px;
-      margin-right: 8px;
+      margin: 4px;
       height: 20px;
       line-height: 20px;
       text-align: center;
-      background-color: #6586d6;
+      background-color: rgba(0, 0, 0, 0.26);
       border-radius: 100px;
       color: #fff;
     }
   }
 
   &:hover {
+    box-shadow: 0 -1px 6px 0 rgba(0, 0, 0, 0.12);
     .c7n-delete {
       color: #3f51b5;
       cursor: pointer;

@@ -42,12 +42,12 @@
       border: 1px dashed transparent;
 
       &:hover {
-        border-color: #3F51B5;
+        border-color: #3f51b5;
       }
     }
 
     .ant-input {
-      padding:0 4px;
+      padding: 0 4px;
       border: 1px dashed transparent;
     }
 
@@ -56,7 +56,7 @@
     }
 
     .ant-input:focus {
-      border-color: #3F51B5;
+      border-color: #3f51b5;
       box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
       cursor: text !important;
     }
@@ -107,11 +107,10 @@
         height: 20px;
         line-height: 20px;
         text-align: center;
-        background-color: #6586d6;
+        background-color: rgba(0, 0, 0, 0.26);
         border-radius: 100px;
         color: #fff;
       }
-      
     }
     .c7n-issueNum {
       color: #3f51b5;
@@ -124,7 +123,5 @@
       white-space: nowrap;
       text-align: right;
     }
-
-    
   }
 }

@@ -10,7 +10,7 @@ class TypeTag extends Component {
       data, showName,
     } = this.props;
     return (
-      <div className="c7n-typeTag">
+      <div className="c7n-typeTag" {...this.props}>
         {initTypes.indexOf(data ? data.icon : '') !== -1
           ? (
             <Icon
