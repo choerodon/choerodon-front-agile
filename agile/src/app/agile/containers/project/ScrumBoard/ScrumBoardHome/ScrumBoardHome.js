@@ -573,31 +573,12 @@ class ScrumBoardHome extends Component {
       }
     });
   }
-
-
-  /**
-   *仅故事
-   *
-   * @memberof ScrumBoardHome
-   */
-  filterOnlyStory = () => {
-    const { recent } = this.state;
+ 
+  onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
     this.setState({
-      recent: !recent,
-    }, () => {
-      this.refresh(ScrumBoardStore.getSelectedBoard);
-    });
-  }
-
-  /**
-   *仅我的
-   *
-   * @memberof ScrumBoardHome
-   */
-  filterOnlyMe = () => {
-    const { onlyMe } = this.state;
-    this.setState({
-      onlyMe: !onlyMe,
+      onlyMe: onlyMeChecked,
+      recent: onlyStoryChecked,
+      quickFilter: moreChecked || [],
     }, () => {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
@@ -890,14 +871,6 @@ class ScrumBoardHome extends Component {
     return result;
   }
 
-  onChangeSelect = (newState) => {
-    this.setState({
-      quickFilter: newState,
-    }, () => {
-      this.refresh(ScrumBoardStore.getSelectedBoard);
-    });
-  };
-
   matchStatus = (translate) => {
     if (translate instanceof Array) {
       const subStatus = ScrumBoardStore
@@ -1029,9 +1002,7 @@ class ScrumBoardHome extends Component {
                     buttonName="更多"
                     buttonIcon="more_vert"
                     moreSelection={ScrumBoardStore.getQuickSearchList}
-                    onChangeCheckBox={this.onChangeSelect}
-                    onlyStory={this.filterOnlyStory.bind(this)}
-                    onlyMe={this.filterOnlyMe.bind(this)}
+                    onQuickSearchChange={this.onQuickSearchChange}
                   />
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}>

@@ -448,6 +448,44 @@ class Home extends Component {
     }
   };
 
+  onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
+    const { UserMapStore } = this.props;
+    // const arr = _.cloneDeep(toJS(UserMapStore.currentFilters));
+    const arr = [];
+    const userStoryIndex = arr.indexOf('userStory');
+    const mineIndex = arr.indexOf('mine');
+    // if (userStoryIndex === -1) {
+    //   if (onlyStoryChecked) {
+    //     arr.push('userStory');
+    //   }
+    // } else if (!onlyStoryChecked) {
+    //   arr.splice(userStoryIndex, 1);
+    // }
+
+    // if (mineIndex === -1) {
+    //   if (onlyMeChecked) {
+    //     arr.push('mine');
+    //   }
+    // } else if (!onlyMeChecked) {
+    //   arr.splice(mineIndex, 1);
+    // }
+
+    if (onlyMeChecked) {
+      arr.push('mine');
+    }
+
+    if(onlyStoryChecked){
+      arr.push('userStory');
+    }
+
+    UserMapStore.setCurrentFilter(arr, ...moreChecked);
+    UserMapStore.loadIssues('usermap');
+    if (UserMapStore.isApplyToEpic) {
+      UserMapStore.loadEpic();
+    }
+
+  }
+
   fullScreen = () => {
     const target = document.querySelector('.content');
     toFullScreen(target);
@@ -2063,6 +2101,7 @@ class Home extends Component {
                       onChangeCheckBox={this.onChangeSelect}
                       onlyStory={this.addFilter.bind(this, 'userStory')}
                       onlyMe={this.addFilter.bind(this, 'mine')}
+                      onQuickSearchChange={this.onQuickSearchChange}
                     />
                     { showBackLog ? (
                       <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
@@ -2134,6 +2173,7 @@ class Home extends Component {
               onChangeCheckBox={this.onChangeSelect}
               onlyStory={this.addFilter.bind(this, 'userStory')}
               onlyMe={this.addFilter.bind(this, 'mine')}
+              onQuickSearchChange={this.onQuickSearchChange}
             />
             <div style={{
               display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
