@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Draggable } from 'react-beautiful-dnd';
-import { Radio, Icon } from 'choerodon-ui';
+import { Radio, Icon, Tooltip } from 'choerodon-ui';
 import { stores, Permission } from 'choerodon-front-boot';
-import _ from 'lodash';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import EditStatus from '../EditStatus/EditStatus';
 import './StatusCard.scss';
@@ -15,7 +14,6 @@ class StatusCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      complete: false,
       visible: false,
       disabled: false,
     };
@@ -31,9 +29,10 @@ class StatusCard extends Component {
   }
 
   handleDeleteStatus() {
+    const { data: propData } = this.props;
     const originData = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
     const data = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
-    const deleteCode = this.props.data.statusId;
+    const deleteCode = propData.statusId;
     let deleteIndex = '';
     for (let index = 0, len = data[data.length - 1].subStatuses.length; index < len; index += 1) {
       if (String(data[data.length - 1].subStatuses[index].id) === String(deleteCode)) {
@@ -48,8 +47,9 @@ class StatusCard extends Component {
   }
 
   renderCloseDisplay() {
-    if (this.props.columnId === 'unset') {
-      if (this.props.data.issues.length === 0) {
+    const { columnId, data } = this.props;
+    if (columnId === 'unset') {
+      if (data.issues.length === 0) {
         if (this.getStatusNumber() > 1) {
           return 'block';
         }
@@ -59,12 +59,12 @@ class StatusCard extends Component {
   }
 
   renderBackground() {
-    const data = this.props.data.categoryCode;
-    if (data === 'todo') {
+    const { data: { categoryCode } } = this.props;
+    if (categoryCode === 'todo') {
       return 'rgb(255, 177, 0)';
-    } else if (data === 'doing') {
+    } else if (categoryCode === 'doing') {
       return 'rgb(77, 144, 254)';
-    } else if (data === 'done') {
+    } else if (categoryCode === 'done') {
       return 'rgb(0, 191, 165)';
     }
     return '#d8d8d8';
@@ -74,16 +74,18 @@ class StatusCard extends Component {
     this.getStatusNumber();
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
+    const { data, index, refresh } = this.props;
+    const { visible, disabled } = this.state;
     return (
-      <Draggable 
-        key={this.props.data.code}
-        draggableId={`${this.props.data.statusId},${this.props.data.objectVersionNumber}`}
-        index={this.props.index}
+      <Draggable
+        key={data.code}
+        draggableId={`${data.statusId},${data.objectVersionNumber}`}
+        index={index}
         type="status"
       >
         {(provided, snapshot) => (
           <div>
-            <div 
+            <div
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
@@ -96,20 +98,20 @@ class StatusCard extends Component {
             >
               <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.updateStatus']}>
                 <Icon
-                  style={{ 
-                    position: 'absolute', 
+                  style={{
+                    position: 'absolute',
                     right: this.renderCloseDisplay() === 'block' ? 32 : 12,
                     top: '15px',
                     cursor: 'pointer',
                     fontSize: '14px',
                     visibility: 'hidden',
-                  }} 
+                  }}
                   type="settings"
                   role="none"
                   onClick={() => {
                     if (JSON.stringify(ScrumBoardStore.getStatusCategory) === '{}') {
-                      ScrumBoardStore.axiosGetStatusCategory().then((data) => {
-                        ScrumBoardStore.setStatusCategory(data);
+                      ScrumBoardStore.axiosGetStatusCategory().then((backData) => {
+                        ScrumBoardStore.setStatusCategory(backData);
                         this.setState({
                           visible: true,
                         });
@@ -140,52 +142,51 @@ class StatusCard extends Component {
                 />
               </Permission>
               <EditStatus
-                visible={this.state.visible}
-                onChangeVisible={(data) => {
+                visible={visible}
+                onChangeVisible={(item) => {
                   this.setState({
-                    visible: data,
+                    visible: item,
                   });
                 }}
-                data={this.props.data}
-                refresh={this.props.refresh.bind(this)}
+                data={data}
+                refresh={refresh.bind(this)}
               />
               <span
                 className="c7n-scrumsetting-cardStatus"
                 style={{
-                  background: this.props.data.categoryCode ? this.renderBackground() : '',
+                  background: data.categoryCode ? this.renderBackground() : '',
                   color: 'white',
                 }}
               >
-                {this.props.data.status ? this.props.data.status : this.props.data.name}
+                {data.status ? data.status : data.name}
               </span>
               <div style={{
-                display: 'flex', justifyContent: 'space-between', marginTop: 10, flexWrap: 'wrap', 
+                display: 'flex', justifyContent: 'space-between', marginTop: 10, flexWrap: 'wrap',
               }}
               >
                 <p className="textDisplayOneColumn">
-                  {this.props.data.issues ? `${this.props.data.issues.length} issues` : ''}
+                  {data.issues ? `${data.issues.length} issues` : ''}
                 </p>
                 <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.updateStatus']}>
                   <Radio
-                    disabled={this.state.disabled}
+                    disabled={disabled}
                     style={{ marginRight: 0 }}
-                    checked={this.props.data.completed ? this.props.data.completed : false}
+                    checked={data.completed ? data.completed : false}
                     onClick={() => {
-                      const data = {
-                        id: this.props.data.id,
-                        statusId: this.props.data.statusId,
-                        objectVersionNumber: this.props.data.objectVersionNumber,
-                        completed: !this.props.data.completed,
+                      const clickData = {
+                        id: data.id,
+                        statusId: data.statusId,
+                        objectVersionNumber: data.objectVersionNumber,
+                        completed: !data.completed,
                         projectId: AppState.currentMenuType.id,
                       };
-                      // this.props.setLoading.bind(this);
                       this.setState({
                         disabled: true,
                       });
                       ScrumBoardStore.axiosUpdateIssueStatus(
-                        this.props.data.id, data,
+                        data.id, clickData,
                       ).then((res) => {
-                        this.props.refresh();
+                        refresh();
                       }).then((res) => {
                         this.setState({
                           disabled: false,
@@ -196,6 +197,14 @@ class StatusCard extends Component {
                     }}
                   >
                     {'设置已完成'}
+                    <Tooltip title="勾选后，卡片处于此状态的编号会显示为：#̶0̶0̶1̶，卡片状态视为已完成。">
+                      <Icon
+                        type="help"
+                        style={{
+                          fontSize: 14, color: '#bdbdbd', height: 20, lineHeight: 1.25, marginLeft: 2,
+                        }}
+                      />
+                    </Tooltip>
                   </Radio>
                 </Permission>
               </div>
