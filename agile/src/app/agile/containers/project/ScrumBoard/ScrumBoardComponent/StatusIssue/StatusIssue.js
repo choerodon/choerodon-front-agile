@@ -474,29 +474,17 @@ class StatusIssue extends Component {
                           <Tooltip title={item.assigneeName ? `经办人: ${item.assigneeName}` : ''}>
                             {
                                 item.assigneeName ? (
-                                // <Avatar
-                                //   src={item.imageUrl ? item.imageUrl : undefined}
-                                //   style={{
-                                //     flexShrink: 0,
-                                //     marginLeft: '8px',
-                                //     marginBottom: 4,
-                                //   }}
-                                // >
-                                //   {!item.imageUrl && item.assigneeName ? this.getFirst(item.assigneeName) : ''}
-                                // </Avatar>
-                                  
-                                  <div>
-                                    <UserHead 
-                                      hiddenText
-                                      size={32}
-                                      user={{
-                                        id: item.assigneeId,
-                                        loginName: item.assigneeName,
-                                        realName: item.assigneeName,
-                                        avatar: item.imageUrl,
-                                      }}
-                                    />
-                                  </div>
+                                  <UserHead
+                                    hiddenText
+                                    size={32}
+                                    style={{ marginLeft: 8 }}
+                                    user={{
+                                      id: item.assigneeId,
+                                      loginName: item.assigneeName,
+                                      realName: item.assigneeName,
+                                      avatar: item.imageUrl,
+                                    }}
+                                  />
                                 ) : (
                                   <div style={{
                                     width: 32,
