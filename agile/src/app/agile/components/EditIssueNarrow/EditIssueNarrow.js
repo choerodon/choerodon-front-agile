@@ -578,13 +578,15 @@ class CreateSprint extends Component {
           }
         });
     } else if (pro === 'statusId') {
-      updateStatus(transformId, issueId, origin.objectVersionNumber)
-        .then((res) => {
-          this.reloadIssue();
-          if (onUpdate) {
-            onUpdate();
-          }
-        });
+      if (transformId) {
+        updateStatus(transformId, issueId, origin.objectVersionNumber)
+          .then((res) => {
+            this.reloadIssue();
+            if (onUpdate) {
+              onUpdate();
+            }
+          });
+      }
     } else {
       obj[pro] = state[pro] || 0;
       updateIssue(obj)
@@ -1598,7 +1600,6 @@ class CreateSprint extends Component {
                     thisType="summary"
                     line
                     current={currentRae}
-                    // handleEnter
                     origin={summary}
                     onInit={() => this.setAnIssueToState()}
                     onOk={this.updateIssue.bind(this, 'summary')}
