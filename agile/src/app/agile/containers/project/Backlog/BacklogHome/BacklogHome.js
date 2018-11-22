@@ -59,6 +59,31 @@ class BacklogHome extends Component {
     const { BacklogStore } = this.props;
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
       .then((data) => {
+        let arrAssignee = [];
+        data.sprintData.forEach((sprintItem) => {
+          // const sprintDataItemAssignees = _.pick(sprintItem.assigneeIssues, ['assigneeId', 'assigneeName']);
+          const sprintDataItemAssignees = _.map(sprintItem.assigneeIssues, issueItem => _.pick(issueItem, ['assigneeId', 'assigneeName']));
+
+          _.forEach(sprintDataItemAssignees, (item) => {
+            if (item.assigneeId && item.assigneeName) {
+              arrAssignee.push({
+                id: item.assigneeId,
+                realName: item.assigneeName.replace(/[0-9]/ig, ''),
+              });
+            }
+          });
+        });
+        _.forEach(data.backlogData.backLogIssue, (item) => {
+          if (item.assigneeId && item.assigneeName) {
+            arrAssignee.push({
+              id: item.assigneeId,
+              realName: item.assigneeName.replace(/[0-9]/ig, ''),
+            });
+          }
+        });
+        
+        arrAssignee = _.map(_.uniq(_.map(arrAssignee, JSON.stringify)), JSON.parse);
+        BacklogStore.setAssigneeProps(arrAssignee);
         BacklogStore.setSprintData(data);
         this.setState({
           spinIf: false,
@@ -200,46 +225,6 @@ class BacklogHome extends Component {
       message.success('创建失败');
     });
   }
-
-  /**
-   * 筛选仅自己的故事
-   */
-  filterOnlyMe =(checked) => {
-    const { BacklogStore } = this.props;
-    // BacklogStore.setOnlyMe(!BacklogStore.getOnlyMe);
-    BacklogStore.setOnlyMe(checked);
-    this.setState({
-      spinIf: true,
-    });
-    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
-      .then((res) => {
-        BacklogStore.setSprintData(res);
-        this.setState({
-          spinIf: false,
-        });
-      }).catch((error) => {
-      });
-  }
-
-  /**
-   * 筛选仅故事
-   */
-  filterOnlyStory =(checked) => {
-    const { BacklogStore } = this.props;
-    // BacklogStore.setRecent(!BacklogStore.getRecent);
-    BacklogStore.setRecent(checked);
-    this.setState({
-      spinIf: true,
-    });
-    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
-      .then((res) => {
-        BacklogStore.setSprintData(res);
-        this.setState({
-          spinIf: false,
-        });
-      }).catch((error) => {
-      });
-  };
 
   resetSprintChose =() => {
     this.resetMuilterChose();
@@ -506,12 +491,6 @@ class BacklogHome extends Component {
     }
   };
 
-  onChangeSelect = (checkedValues) => {
-    const { BacklogStore } = this.props;
-    BacklogStore.setQuickFilters(checkedValues || []);
-    this.refresh();
-  };
-
   onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
     const { BacklogStore } = this.props;
     this.setState({
@@ -520,6 +499,18 @@ class BacklogHome extends Component {
     BacklogStore.setOnlyMe(onlyMeChecked);
     BacklogStore.setRecent(onlyStoryChecked);
     BacklogStore.setQuickFilters(moreChecked || []);
+    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
+      .then((res) => {
+        BacklogStore.setSprintData(res);
+        this.setState({
+          spinIf: false,
+        });
+      }).catch((error) => {
+      });
+  }
+
+  onAssigneeChange = () => {
+    const { BacklogStore } = this.props;
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
       .then((res) => {
         BacklogStore.setSprintData(res);
@@ -569,6 +560,9 @@ class BacklogHome extends Component {
               moreSelection={BacklogStore.getQuickSearchList}
               onQuickSearchChange={this.onQuickSearchChange}
               resetFilter={BacklogStore.getQuickSearchClean}
+              pageFlag="Backlog"
+              onAssigneeChange={this.onAssigneeChange}
+              assignee={BacklogStore.getAssigneeProps}
             />
           </div>
           <div className="c7n-backlog">

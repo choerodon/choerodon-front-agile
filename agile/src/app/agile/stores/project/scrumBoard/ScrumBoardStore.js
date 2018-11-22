@@ -67,6 +67,16 @@ class ScrumBoardStore {
 
   @observable sprintData = true;
 
+  @observable assigneeFilterIds = [];
+
+  @computed get getAssigneeFilterIds() {
+    return this.assigneeFilterIds;
+  }
+
+  @action setAssigneeFilterIds(data) {
+    this.assigneeFilterIds = data;
+  }
+
   @computed get getSprintData() {
     return this.sprintData;
   }
@@ -336,6 +346,16 @@ class ScrumBoardStore {
     this.boardData = data;
   }
 
+  @observable assigneeProps = [];
+
+  @computed get getAssigneeProps() {
+    return this.assigneeProps;
+  }
+
+  @action setAssigneeProps(data) {
+    this.assigneeProps = data;
+  }
+
   axiosUpdateColumnSequence(boardId, data) {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column/column_sort`, data);
   }
@@ -358,9 +378,9 @@ class ScrumBoardStore {
 
   axiosGetBoardData(boardId, assign, recent, filter) {
     if (assign === 0) {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?onlyStory=${recent}&quickFilterIds=${filter}`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?onlyStory=${recent}&quickFilterIds=${filter}${this.assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${this.assigneeFilterIds}` : ''}`);
     } else {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?assigneeId=${assign}&onlyStory=${recent}&quickFilterIds=${filter}`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?assigneeId=${assign}&onlyStory=${recent}&quickFilterIds=${filter}${this.assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${this.assigneeFilterIds}` : ''}`);
     }
   }
 

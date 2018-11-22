@@ -283,6 +283,27 @@ class UserMapStore {
     return this.cacheIssues.slice();
   }
 
+  @observable assigneeFilterIds = [];
+
+  @computed get getAssigneeFilterIds() {
+    return this.assigneeFilterIds;
+  }
+
+  @action setAssigneeFilterIds(data) {
+    this.assigneeFilterIds = data;
+  }
+
+  @observable assigneeProps = [];
+
+  @computed get getAssigneeProps() {
+    return this.assigneeProps;
+  }
+
+  @action setAssigneeProps(data) {
+    this.assigneeProps = data;
+  }
+
+
   loadEpic = () => {
     let url = '';
     if (this.currentFilters.includes('mine')) {
@@ -309,12 +330,6 @@ class UserMapStore {
     });
 
   loadIssues = (pageType) => {
-    // const url = `/agile/v1/projects/${AppState.currentMenuType.id}
-    // /issues/storymap/issues?type=${this.mode}&pageType=${pageType}
-    // &assigneeId=${this.currentFilters.includes('mime') ? AppState.getUserId : null}
-    // &onlyStory=${this.currentFilters.includes('userStory')}
-    // &quickFilterIds=
-    // ${this.currentFilters.filter(item => item !== 'mime' || item !== 'userStory')}`;
     let url = '';
     if (this.currentFilters.includes('mine')) {
       url += `&assigneeId=${AppState.getUserId}`;
@@ -323,7 +338,7 @@ class UserMapStore {
       url += '&onlyStory=true';
     }
     const orgId = AppState.currentMenuType.organizationId;
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?organizationId=${orgId}&type=${this.mode}&pageType=${pageType}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}${url}`)
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?organizationId=${orgId}&type=${this.mode}&pageType=${pageType}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}${url}${this.assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${this.assigneeFilterIds}` : ''}`)
       .then((issues) => {
         if (issues.failed) {
           this.setIssues([]);
@@ -337,6 +352,17 @@ class UserMapStore {
           // this.setIssues(issues);
           this.setIssues(sortedIssues);
         }
+        
+        const arrAssignee = [];
+        _.forEach(issues, (item) => {
+          if (item.assigneeId && item.assigneeName) {
+            arrAssignee.push({
+              id: item.assigneeId,
+              realName: item.assigneeName,
+            });
+          }
+        });
+        this.setAssigneeProps(_.map(_.union(_.map(arrAssignee, JSON.stringify)), JSON.parse));
       });
   }
 
@@ -382,8 +408,20 @@ class UserMapStore {
                   this.setCacheIssues(sortedIssues);
                 }
               }
+
               this.setCurrentNewObj({ epicId: 0, [`${this.mode}Id`]: 0 });
               // 两个请求现在都执行完成
+
+              const arrAssignee = [];
+              _.forEach(issues, (item) => {
+                if (item.assigneeId && item.assigneeName) {
+                  arrAssignee.push({
+                    id: item.assigneeId,
+                    realName: item.assigneeName,
+                  });
+                }
+              });
+              this.setAssigneeProps(_.map(_.union(_.map(arrAssignee, JSON.stringify)), JSON.parse));
             }),
           )
           .catch(() => {
@@ -432,25 +470,6 @@ class UserMapStore {
     return query;
   };
 
-  // loadBacklogIssues = () => {
-  //   const projectId = AppState.currentMenuType.id;
-  //   const type = this.mode;
-  //   const userId = AppState.getUserId;
-  //   const cFilter = this.currentBacklogFilters[1].join(',');
-  //   const onlyStory = this.currentBacklogFilters[0].lastIndexOf('仅用户故事') > -1;
-  //   const assigneeId = this.currentBacklogFilters[0].lastIndexOf('仅我的问题') > -1 ? userId : null;
-  //   axios
-  //     .get(
-  //       `/agile/v1/projects/${projectId}/issues/storymap/issues?type=${type}&pageType=backlog${
-  //         cFilter ? `&${`quickFilterIds=${cFilter}`}` : ''
-  //       }${assigneeId ? `&assigneeId=${assigneeId}` : ''}${onlyStory ? '&onlyStory=true' : ''}`,
-  //     )
-  //     .then((res) => {
-  //       this.setBacklogIssues(res);
-  //       this.setBacklogExpand([]);
-  //     });
-  // };
-
   loadBacklogIssues = () => {
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
@@ -470,6 +489,17 @@ class UserMapStore {
           this.setBacklogIssues(sortedUniqIssues);
         }
         this.setBacklogExpand([]);
+
+        const arrAssignee = [];
+        _.forEach(res, (item) => {
+          if (item.assigneeId && item.assigneeName) {
+            arrAssignee.push({
+              id: item.assigneeId,
+              realName: item.assigneeName,
+            });
+          }
+        });
+        this.setAssigneeProps(_.map(_.union(_.map(arrAssignee, JSON.stringify)), JSON.parse));
       });
   };
 

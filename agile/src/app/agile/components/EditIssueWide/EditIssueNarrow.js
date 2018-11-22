@@ -107,6 +107,9 @@ const STATUS_SHOW = {
   merged: '已合并',
   closed: '关闭',
 };
+
+let loginUserId;
+
 class CreateSprint extends Component {
   debounceFilterIssues = _.debounce((input) => {
     this.setState({
@@ -125,6 +128,8 @@ class CreateSprint extends Component {
     this.needBlur = true;
     this.componentRef = React.createRef();
     this.state = {
+      hasPermission: false,
+      createdById: undefined,
       issueLoading: false,
       flag: undefined,
       selectLoading: true,
@@ -230,6 +235,26 @@ class CreateSprint extends Component {
         }
       }
     });
+    axios.get('/iam/v1/users/self')
+      .then((data) => {
+        loginUserId = data.id;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+
+    axios.post('/iam/v1/permissions/checkPermission', [
+      { 
+        code: 'agile-service.project-info.updateProjectInfo',
+        organizationId: 4,
+        projectId: 28,
+        resourceType: 'project',
+      }])
+      .then((res) => {
+        this.setState({
+          hasPermission: res.find(item => item.code === 'agile-service.project-info.updateProjectInfo').approve,
+        });
+      });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -491,8 +516,10 @@ class CreateSprint extends Component {
           <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
           <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
           <p style={{ marginBottom: 10 }}>
+
+
             如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。
-          </p>
+                    </p>
           {subIssueDTOList.length ? (
             <p style={{ color: '#d50000' }}>
               {`注意：问题的 ${
@@ -517,6 +544,9 @@ class CreateSprint extends Component {
     const { origin } = this.state;
     loadIssue(origin.issueId).then((res) => {
       this.setAnIssueToState(res);
+      this.setState({
+        createdById: res.createdBy,
+      });
     });
     loadWorklogs(origin.issueId).then((res) => {
       this.setState({
@@ -828,6 +858,9 @@ class CreateSprint extends Component {
     updateIssueType(issueupdateTypeDTO)
       .then((res) => {
         loadIssue(id).then((response) => {
+          this.setState({
+            createdById: res.createdBy,
+          });
           this.reloadIssue(origin.issueId);
           onUpdate();
         });
@@ -923,6 +956,9 @@ class CreateSprint extends Component {
       () => {
         loadIssue(issueId).then((res) => {
           this.setAnIssueToState(res);
+          this.setState({
+            createdById: res.createdBy,
+          });
         });
         loadWorklogs(issueId).then((res) => {
           this.setState({
@@ -1203,8 +1239,10 @@ class CreateSprint extends Component {
                     }}
                   >
                     {branchs.totalCommit || '0'}
+
+
                     提交
-                  </span>
+                                    </span>
                 </div>
                 <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                   <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1249,8 +1287,10 @@ class CreateSprint extends Component {
                     }}
                   >
                     {branchs.totalMergeRequest}
+
+
                     合并请求
-                  </span>
+                                    </span>
                   <span
                     style={{
                       width: 36,
@@ -1393,56 +1433,64 @@ class CreateSprint extends Component {
         && t.typeCode !== typeCode && t.typeCode !== 'sub_task'
       ));
     }
-    const getMenu = () => (
-      <Menu onClick={this.handleClickMenu.bind(this)}>
-        <Menu.Item key="0">登记工作日志</Menu.Item>
-        <Permission
-          type={type}
-          projectId={projectId}
-          organizationId={orgId}
-          service={['agile-service.issue.deleteIssue']}
-        >
-          <Menu.Item key="1">删除</Menu.Item>
-        </Permission>
-        {
-          typeCode !== 'sub_task' && (
-            <Menu.Item key="2">
-              创建子任务
+    const getMenu = () => {
+      const { createdById, hasPermission } = this.state;
+      return (
+        <Menu onClick={this.handleClickMenu.bind(this)}>
+          <Menu.Item key="0">登记工作日志</Menu.Item>
+          <Permission
+            type={type}
+            projectId={projectId}
+            organizationId={orgId}
+            service={['agile-service.issue.deleteIssue']}
+          >
+            <Menu.Item 
+              key="1" 
+              disabled={loginUserId !== createdById && !hasPermission}
+            >
+              {'删除'}
             </Menu.Item>
-          )
-        }
-        <Menu.Item key="3">
-          复制问题
-        </Menu.Item>
-        {
-          typeCode !== 'sub_task' && origin.subIssueDTOList && origin.subIssueDTOList.length === 0 && (
-            <Menu.Item key="4">
-              转化为子任务
-            </Menu.Item>
-          )
-        }
-        {
-          typeCode === 'sub_task' && (
-            <Menu.Item key="5">
-              转化为任务
-            </Menu.Item>
-          )
-        }
-        <Menu.Item key="6">
-          创建分支
-        </Menu.Item>
-        <Menu.Item key="7">
-          分配问题
-        </Menu.Item>
-        {
-          typeCode === 'sub_task' && (
-            <Menu.Item key="8">
-              修改父级
-            </Menu.Item>
-          )
-        }
-      </Menu>
-    );
+          </Permission>
+          {
+            typeCode !== 'sub_task' && (
+              <Menu.Item key="2">
+                {'创建子任务'}
+              </Menu.Item>
+            )
+          }
+          <Menu.Item key="3">
+            {'复制问题'}
+          </Menu.Item>
+          {
+            typeCode !== 'sub_task' && origin.subIssueDTOList && origin.subIssueDTOList.length === 0 && (
+              <Menu.Item key="4">
+                {'转化为子任务'}
+              </Menu.Item>
+            )
+          }
+          {
+            typeCode === 'sub_task' && (
+              <Menu.Item key="5">
+                {'转化为任务'}
+              </Menu.Item>
+            )
+          }
+          <Menu.Item key="6">
+            {'创建分支'}
+          </Menu.Item>
+          <Menu.Item key="7">
+            {' 分配问题'}
+          </Menu.Item>
+          {
+            typeCode === 'sub_task' && (
+              <Menu.Item key="8">
+                {'修改父级'}
+              </Menu.Item>
+            )
+          }
+        </Menu>
+      );
+    };
     const callback = (value) => {
       this.setState(
         {
@@ -1862,8 +1910,10 @@ class CreateSprint extends Component {
                       <div
                         style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.54)', marginBottom: 4 }}
                       >
+
+
                         优先级
-                      </div>
+                                            </div>
                       <div>
                         <ReadAndEdit
                           callback={this.changeRae.bind(this)}
@@ -2135,8 +2185,10 @@ class CreateSprint extends Component {
                             marginBottom: 4,
                           }}
                         >
+
+
                           故事点
-                        </div>
+                                                </div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2203,8 +2255,10 @@ class CreateSprint extends Component {
                             marginBottom: 4,
                           }}
                         >
+
+
                           预估时间
-                        </div>
+                                                </div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2791,10 +2845,14 @@ class CreateSprint extends Component {
                             />
                             <span>
                               {this.getWorkloads()}
+
+
                               时/
                               {this.getWorkloads() + (origin.remainingTime || 0)}
+
+
                               时
-                            </span>
+                                                        </span>
                             <span
                               role="none"
                               style={{
@@ -2808,8 +2866,10 @@ class CreateSprint extends Component {
                                 });
                               }}
                             >
+
+
                               登记工作
-                            </span>
+                                                        </span>
                           </div>
                         </div>
                         {typeCode === 'issue_epic' ? (
@@ -2988,8 +3048,10 @@ class CreateSprint extends Component {
                                 });
                               }}
                             >
+
+
                               分配给我
-                            </span>
+                                                        </span>
                           </div>
                         </div>
                         <div className="line-start mt-10 assignee">
@@ -3108,8 +3170,10 @@ class CreateSprint extends Component {
                                 });
                               }}
                             >
+
+
                               分配给我
-                            </span>
+                                                        </span>
                           </div>
                         </div>
                         <div className="line-start mt-10">

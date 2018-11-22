@@ -148,7 +148,7 @@ class ScrumBoardHome extends Component {
           const storeParentIds = [];
           const storeAssignee = [];
           const epicData = data.epicInfo ? data.epicInfo : [];
-          for (let index = 0, len = data.columnsData.columns.length; index < len; index += 1) {
+          for (let index = 0, len = data.columnsData && data.columnsData.columns.length; index < len; index += 1) {
             for (
               let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length;
               index2 < len2;
@@ -262,12 +262,20 @@ class ScrumBoardHome extends Component {
           }
 
           ScrumBoardStore.setAssigneer(storeAssignee);
+          const arrAssigneeProps = [];
+          _.forEach(_.map(storeAssignee, item => _.pick(item, ['assigneeId', 'assigneeName'])), (item) => {
+            arrAssigneeProps.push({
+              id: item.assigneeId,
+              realName: item.assigneeName && item.assigneeName.replace(/[0-9]/ig, ''),
+            });
+          });
+          ScrumBoardStore.setAssigneeProps(arrAssigneeProps);
           ScrumBoardStore.setCurrentSprint(data.currentSprint);
           ScrumBoardStore.setParentIds(storeParentIds);
           ScrumBoardStore.setEpicData(epicData);
-          const newColumnData = data.columnsData.columns;
+          const newColumnData = data.columnsData && data.columnsData.columns;
           const statusList = [];
-          for (let index = 0, len = newColumnData.length; index < len; index += 1) {
+          for (let index = 0, len = newColumnData && newColumnData.length; index < len; index += 1) {
             if (newColumnData[index].subStatuses) {
               for (let index2 = 0, len2 = newColumnData[index].subStatuses.length;
                 index2 < len2; index2 += 1) {
@@ -626,7 +634,7 @@ class ScrumBoardHome extends Component {
   renderStatusColumns = () => {
     const data = ScrumBoardStore.getBoardData;
     const result = [];
-    for (let index = 0, len = data.length; index < len; index += 1) {
+    for (let index = 0, len = data && data.length; index < len; index += 1) {
       if (data[index].subStatuses.length > 0) {
         result.push(
           <StatusColumn
@@ -643,7 +651,7 @@ class ScrumBoardHome extends Component {
   renderIssueColumns = (id) => {
     // debugger;
     const result = [];
-    const data = ScrumBoardStore.getBoardData.filter(obj => obj.columnId !== 'unset');
+    const data = ScrumBoardStore.getBoardData && ScrumBoardStore.getBoardData.filter(obj => obj.columnId !== 'unset');
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       // 故事泳道
       for (let index = 0, len = data.length; index < len; index += 1) {
@@ -661,7 +669,7 @@ class ScrumBoardHome extends Component {
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       // 经办人泳道
-      for (let index = 0, len = data.length; index < len; index += 1) {
+      for (let index = 0, len = data && data.length; index < len; index += 1) {
         if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
@@ -814,7 +822,7 @@ class ScrumBoardHome extends Component {
         }
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
-      for (let index = 0, len = data.length; index < len; index += 1) {
+      for (let index = 0, len = data && data.length; index < len; index += 1) {
         if (data[index].subStatuses) {
           for (let index2 = 0, len2 = data[index].subStatuses.length; index2 < len2; index2 += 1) {
             if (data[index].subStatuses[index2].issues) {
@@ -1005,6 +1013,11 @@ class ScrumBoardHome extends Component {
                     buttonIcon="more_vert"
                     moreSelection={ScrumBoardStore.getQuickSearchList}
                     onQuickSearchChange={this.onQuickSearchChange}
+                    pageFlag="ScrumBoard"
+                    onAssigneeChange={() => {
+                      this.refresh(ScrumBoardStore.getSelectedBoard);
+                    }}
+                    assignee={ScrumBoardStore.getAssigneeProps}
                   />
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}>
@@ -1144,7 +1157,7 @@ class ScrumBoardHome extends Component {
                 defaultValue={translateId && translateId.length ? translateId[0].id : undefined}
               >
                 {
-                  ScrumBoardStore.getBoardData.length > 0
+                  ScrumBoardStore.getBoardData && ScrumBoardStore.getBoardData.length > 0
                     ? translateId.map(item => (
                       <Option key={item.id} value={item.id}>{item.statusDTO.name}</Option>
                     )) : ''
