@@ -882,7 +882,7 @@ class Issue extends Component {
     return (
       <Page
         className="c7n-Issue"
-        service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
+        service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithSub']}
       >
         <Header
           title="问题管理"
