@@ -36,7 +36,7 @@ class TransformSubIssue extends Component {
     super(props);
     this.state = {
       selectLoading: true,
-
+      selectDefaultValue: undefined,
       originIssues: [],
       originStatus: [],
     };
@@ -78,6 +78,13 @@ class TransformSubIssue extends Component {
           this.setState({
             selectLoading: false,
             originStatus: res,
+          });
+        });
+
+      axios.get(`/issue/v1/projects/${proId}/status/query_first_status?organizationId=${AppState.currentMenuType.organizationId}&applyType=agile&issueTypeId=${subTask.id}`)
+        .then((res) => {
+          this.setState({
+            selectDefaultValue: res,
           });
         });
     } else {
@@ -132,6 +139,7 @@ class TransformSubIssue extends Component {
       selectLoading,
       originIssues,
       originStatus,
+      selectDefaultValue,
     } = this.state;
     const { getFieldDecorator } = form;
 
@@ -208,6 +216,7 @@ class TransformSubIssue extends Component {
             <FormItem label="状态" style={{ width: 520 }}>
               {getFieldDecorator('statusId', {
                 rules: [{ required: true, message: '请选择状态' }],
+                initialValue: selectDefaultValue,
               })(
                 <Select
                   label="状态"
