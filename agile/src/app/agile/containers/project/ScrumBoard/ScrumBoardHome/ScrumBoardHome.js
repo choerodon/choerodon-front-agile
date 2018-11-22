@@ -573,7 +573,7 @@ class ScrumBoardHome extends Component {
       }
     });
   }
- 
+
   onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
     this.setState({
       onlyMe: onlyMeChecked,
@@ -641,11 +641,13 @@ class ScrumBoardHome extends Component {
 
   // 渲染issue列
   renderIssueColumns = (id) => {
+    // debugger;
     const result = [];
     const data = ScrumBoardStore.getBoardData.filter(obj => obj.columnId !== 'unset');
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       // 故事泳道
       for (let index = 0, len = data.length; index < len; index += 1) {
+        // debugger;
         if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
@@ -734,15 +736,12 @@ class ScrumBoardHome extends Component {
   };
 
   renderHeight = () => {
-    const timer = setInterval(() => {
-      if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-        if (document.getElementsByClassName('c7n-scrumboard-header').length > 0) {
-          document.getElementsByClassName('c7n-scrumboard-header')[0].style.paddingRight = '32px';
-        }
-        document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
+    if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
+      if (document.getElementsByClassName('c7n-scrumboard-header').length > 0) {
+        document.getElementsByClassName('c7n-scrumboard-header')[0].style.paddingRight = '32px';
       }
-      clearInterval(timer);
-    }, 1000);
+      document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
+    }
   };
 
   renderOthersTitle = () => {
@@ -754,7 +753,7 @@ class ScrumBoardHome extends Component {
         <span>
           {'其他问题'}
           <span className="c7n-scrumboard-otherHeader-issueCount">
-            {`${this.getIssueCount(data, 'parentIssueId')} 问题`}
+            {`${ScrumBoardStore.getOtherQuestionCount} 问题`}
           </span>
         </span>
       );
@@ -796,6 +795,7 @@ class ScrumBoardHome extends Component {
     const data = ScrumBoardStore.getBoardData;
     let flag = 0;
     // 如果没有其他任务则其他任务列就不渲染，
+    // debugger;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       for (let index = 0, len = data.length; index < len; index += 1) {
         if (data[index].subStatuses) {
@@ -891,6 +891,7 @@ class ScrumBoardHome extends Component {
 
   render() {
     this.renderHeight();
+    // 其他问题计数 -- 临时逻辑
     const { form: { getFieldDecorator }, history } = this.props;
     const {
       dataSource,
@@ -955,6 +956,7 @@ class ScrumBoardHome extends Component {
               }
               ScrumBoardStore.setSelectedBoard(value);
               ScrumBoardStore.setSwimLaneCode(newCode);
+              ScrumBoardStore.clearOtherQuestionCount();
               this.refresh(value);
             }}
           >

@@ -47,6 +47,10 @@ class ScrumBoardStore {
 
   @observable statusList = [];
 
+  @observable parentIssueIdData = new Set();
+
+  @observable otherQuestionCount = 0;
+
   @observable workSetting = {
     saturdayWork: false,
     sundayWork: false,
@@ -99,6 +103,28 @@ class ScrumBoardStore {
 
   @computed get getAllEpicData() {
     return toJS(this.allEpicData);
+  }
+
+  @action setBoardParentIssueId(data) {
+    data.forEach(item => item !== 0 && this.parentIssueIdData.add(item));
+  }
+
+  @computed get getBoardParentIssueId() {
+    return toJS(this.parentIssueIdData);
+  }
+
+  // 其他问题计数 -- 临时逻辑
+  @action addOtherQuestionCount() {
+    this.otherQuestionCount += 1;
+  }
+
+  @action clearOtherQuestionCount() {
+    this.otherQuestionCount = 0;
+  }
+
+  // 其他问题计数 -- 临时逻辑
+  @computed get getOtherQuestionCount() {
+    return this.otherQuestionCount;
   }
 
   @action setAllEpicData(data) {

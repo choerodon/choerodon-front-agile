@@ -16,7 +16,7 @@ class StatusBodyColumn extends Component {
     super(props);
     this.state = {};
   }
-  
+
   renderIssues(subStatuse, clickItem) {
     const {
       issues,
@@ -26,20 +26,25 @@ class StatusBodyColumn extends Component {
       completed: isCompleted,
       statusId,
     } = subStatuse;
+    const {
+      parentId, data: paramData, assigneeId, epicId,
+    } = this.props;
     let data = issues;
     data = _.orderBy(data, ['rank'], 'desc');
     // data = _.sortBy(data, o => o.rank);
     const result = [];
     const parentIds = [];
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      const parentIssueIdArray = [];
       for (let index = 0, len = ScrumBoardStore.getParentIds.length; index < len; index += 1) {
         parentIds.push(ScrumBoardStore.getParentIds[index].issueId);
       }
-      if (!this.props.parentId) {
-        //
+      if (!parentId) {
+        const parentIssueBoardData = ScrumBoardStore.getBoardParentIssueId;
         for (let index = 0, len = data.length; index < len; index += 1) {
-          if (!data[index].parentIssueId) {
+          if (!parentIssueBoardData.has(data[index].parentIssueId)) {
             if (_.indexOf(parentIds, data[index].issueId) === -1) {
+              ScrumBoardStore.addOtherQuestionCount();
               result.push(
                 <StatusIssue
                   key={data[index].issueId}
@@ -49,7 +54,7 @@ class StatusBodyColumn extends Component {
                   statusName={statusName}
                   categoryCode={categoryCode}
                   isCompleted={isCompleted}
-                  statusData={this.props.data.subStatuses}
+                  statusData={paramData.subStatuses}
                   renderIssues={this.renderIssues.bind(this)}
                   ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
                   parentsIds={ScrumBoardStore.getParentIds}
@@ -63,8 +68,9 @@ class StatusBodyColumn extends Component {
           }
         }
       } else {
+        parentIssueIdArray.push(parentId);
         for (let index = 0, len = data.length; index < len; index += 1) {
-          if (data[index].parentIssueId === this.props.parentId) {
+          if (data[index].parentIssueId === parentId) {
             result.push(
               <StatusIssue
                 key={data[index].issueId}
@@ -74,7 +80,7 @@ class StatusBodyColumn extends Component {
                 statusName={statusName}
                 categoryCode={categoryCode}
                 isCompleted={isCompleted}
-                statusData={this.props.data.subStatuses}
+                statusData={paramData.subStatuses}
                 renderIssues={this.renderIssues.bind(this)}
                 ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
                 parentsIds={ScrumBoardStore.getParentIds}
@@ -87,11 +93,14 @@ class StatusBodyColumn extends Component {
           }
         }
       }
+      if (parentIssueIdArray.length) {
+        ScrumBoardStore.setBoardParentIssueId(parentIssueIdArray);
+      }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
-      if (this.props.assigneeId) {
+      if (assigneeId) {
         for (let index = 0, len = data.length; index < len; index += 1) {
           if (data[index].assigneeId) {
-            if (data[index].assigneeId === this.props.assigneeId) {
+            if (data[index].assigneeId === assigneeId) {
               result.push(
                 <StatusIssue
                   key={data[index].issueId}
@@ -101,7 +110,7 @@ class StatusBodyColumn extends Component {
                   statusName={statusName}
                   categoryCode={categoryCode}
                   isCompleted={isCompleted}
-                  statusData={this.props.data.subStatuses}
+                  statusData={paramData.subStatuses}
                   renderIssues={this.renderIssues.bind(this)}
                   ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
                   parentsIds={ScrumBoardStore.getParentIds}
@@ -126,7 +135,7 @@ class StatusBodyColumn extends Component {
                 statusName={statusName}
                 categoryCode={categoryCode}
                 isCompleted={isCompleted}
-                statusData={this.props.data.subStatuses}
+                statusData={paramData.subStatuses}
                 renderIssues={this.renderIssues.bind(this)}
                 ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
                 parentsIds={ScrumBoardStore.getParentIds}
@@ -140,10 +149,10 @@ class StatusBodyColumn extends Component {
         }
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
-      if (this.props.epicId) {
+      if (epicId) {
         for (let index = 0, len = data.length; index < len; index += 1) {
           if (data[index].epicId) {
-            if (data[index].epicId === this.props.epicId) {
+            if (data[index].epicId === epicId) {
               result.push(
                 <StatusIssue
                   key={data[index].issueId}
@@ -153,7 +162,7 @@ class StatusBodyColumn extends Component {
                   statusName={statusName}
                   categoryCode={categoryCode}
                   isCompleted={isCompleted}
-                  statusData={this.props.data.subStatuses}
+                  statusData={paramData.subStatuses}
                   renderIssues={this.renderIssues.bind(this)}
                   ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
                   parentsIds={ScrumBoardStore.getParentIds}
@@ -178,7 +187,7 @@ class StatusBodyColumn extends Component {
                 statusName={statusName}
                 categoryCode={categoryCode}
                 isCompleted={isCompleted}
-                statusData={this.props.data.subStatuses}
+                statusData={paramData.subStatuses}
                 renderIssues={this.renderIssues.bind(this)}
                 ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
                 parentsIds={ScrumBoardStore.getParentIds}
@@ -202,7 +211,7 @@ class StatusBodyColumn extends Component {
             statusName={statusName}
             categoryCode={categoryCode}
             isCompleted={isCompleted}
-            statusData={this.props.data.subStatuses}
+            statusData={paramData.subStatuses}
             renderIssues={this.renderIssues.bind(this)}
             ifClickMe={String(clickItem.issueId) === String(data[index].issueId)}
             parentsIds={ScrumBoardStore.getParentIds}
@@ -225,6 +234,7 @@ class StatusBodyColumn extends Component {
    * @memberof StatusBodyColumn
    */
   renderBackground(isDraggingOver) {
+    const { source, assigneeId, epicId } = this.props;
     // 如果拖动过这个drop
     if (isDraggingOver) {
       return 'rgba(26,177,111,0.08)';
@@ -232,24 +242,24 @@ class StatusBodyColumn extends Component {
       JSON.stringify(ScrumBoardStore.getDragStartItem) !== '{}') {
       // 如果开始拖动 并且拖动的issue在当前source里
       if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) 
-        === String(this.props.source)
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId)
+        === String(source)
         ) {
           return 'rgba(140,158,255,0.12)';
         } else {
           return 'rgba(0, 0, 0, 0.04)';
         }
       } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) 
-        === String(this.props.assigneeId)
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId)
+        === String(assigneeId)
         ) {
           return 'rgba(140,158,255,0.12)';
         } else {
           return 'rgba(0, 0, 0, 0.04)';
         }
       } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId) 
-        === String(this.props.epicId)
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId)
+        === String(epicId)
         ) {
           return 'rgba(140,158,255,0.12)';
         } else {
@@ -267,6 +277,9 @@ class StatusBodyColumn extends Component {
   // 这里是拖动issue 不会显示同一列的其他状态drop
   renderDisplay(item, type) {
     const data = ScrumBoardStore.getDragStartItem;
+    const {
+      data: paramData, source, assigneeId, epicId,
+    } = this.props;
     // 如果没有开始拖动 则都显示
     if (JSON.stringify(data) === '{}') {
       if (type === 'visibility') {
@@ -277,28 +290,30 @@ class StatusBodyColumn extends Component {
     } else {
       const dropCode = JSON.parse(data.source.droppableId).code;
       const currentStatusList = [];
-      for (let index = 0, len = this.props.data.subStatuses.length; index < len; index += 1) {
-        currentStatusList.push(this.props.data.subStatuses[index].id);
+      for (let index = 0, len = paramData.subStatuses.length; index < len; index += 1) {
+        currentStatusList.push(paramData.subStatuses[index].id);
       }
       let flag = 0;
       if (_.indexOf(currentStatusList, dropCode) !== -1) {
         // 如果当前列的状态包含拖动卡片的状态列
         if (item.id !== dropCode) {
           // 并且当前状态列的id不等于拖动时的状态列id
-          if (this.props.source) {
-            if (String(JSON.parse(data.source.droppableId).parentId) === String(this.props.source)) {
+          if (source) {
+            if (String(JSON.parse(data.source.droppableId).parentId) === String(source)) {
               flag = 1;
             }
-          } else if (this.props.assigneeId) {
-            if (String(JSON.parse(data.source.droppableId).assigneeId) === String(this.props.assigneeId)) {
+          } else if (assigneeId) {
+            if (String(JSON.parse(data.source.droppableId).assigneeId) === String(assigneeId)) {
               flag = 1;
             }
-          } else if (this.props.epicId) {
-            if (String(JSON.parse(data.source.droppableId).epicId) === String(this.props.epicId)) {
+          } else if (epicId) {
+            if (String(JSON.parse(data.source.droppableId).epicId) === String(epicId)) {
               flag = 1;
             }
+            /* eslint-disable */
           } else if (!JSON.parse(data.source.droppableId).hasOwnProperty('parentId') && !JSON.parse(data.source.droppableId).hasOwnProperty('assigneeId') && !JSON.parse(data.source.droppableId).hasOwnProperty('epicId')) {
             flag = 1;
+            /* eslint-enable */
           }
         }
       }
@@ -327,12 +342,16 @@ class StatusBodyColumn extends Component {
    * @memberof StatusBodyColumn
    */
   renderBorder(data, index, position, drag) {
+    const {
+      source, data: paramData, assigneeId, epicId,
+    } = this.props;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
-      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source && ScrumBoardStore.getDragStartItem.source.droppableId).parentId) 
-      === String(this.props.source)) {
+      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source
+        && ScrumBoardStore.getDragStartItem.source.droppableId).parentId)
+      === String(source)) {
         // 如果在同一个泳道
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) 
-        !== String(this.props.data.columnId)) {
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId)
+        !== String(paramData.columnId)) {
           let flag = 0;
           // 如果不在同一列
           if (data.length === 1) {
@@ -367,11 +386,11 @@ class StatusBodyColumn extends Component {
         return 'unset';
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
-      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) 
-      === String(this.props.assigneeId)) {
+      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId)
+      === String(assigneeId)) {
         // 如果在同一个泳道
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) 
-        !== String(this.props.data.columnId)) {
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId)
+        !== String(paramData.columnId)) {
           let flag = 0;
           // 如果不在同一列
           if (data.length === 1) {
@@ -406,11 +425,11 @@ class StatusBodyColumn extends Component {
         return 'unset';
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
-      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId) 
-      === String(this.props.epicId)) {
+      if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId)
+      === String(epicId)) {
         // 如果在同一个泳道
-        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId) 
-        !== String(this.props.data.columnId)) {
+        if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).columnId)
+        !== String(paramData.columnId)) {
           let flag = 0;
           // 如果不在同一列
           if (data.length === 1) {
@@ -461,22 +480,28 @@ class StatusBodyColumn extends Component {
    * @memberof StatusBodyColumn
    */
   renderStatusDisplay(dragStartData, data) {
+    const { source, assigneeId, epicId } = this.props;
     if (JSON.stringify(dragStartData) !== '{}') {
       let flag = 0;
       if (data.length > 1) {
-        if (this.props.source) {
-          if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId) === String(this.props.source)) {
+        if (source) {
+          if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).parentId)
+            === String(source)) {
             flag = 1;
           }
-        } else if (this.props.assigneeId) {
-          if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId) === String(this.props.assigneeId)) {
+        } else if (assigneeId) {
+          if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).assigneeId)
+            === String(assigneeId)) {
             flag = 1;
           }
-        } else if (this.props.epicId) {
-          if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId) === String(this.props.epicId)) {
+        } else if (epicId) {
+          if (String(JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).epicId)
+            === String(epicId)) {
             flag = 1;
           }
-        } else if (!JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).hasOwnProperty('parentId') && !JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).hasOwnProperty('assigneeId') && !JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).hasOwnProperty('epicId')) {
+          /* eslint-disable */
+        } else if (!Object.prototype.hasOwnProperty.call('parentId') && !JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).hasOwnProperty('assigneeId') && !JSON.parse(ScrumBoardStore.getDragStartItem.source.droppableId).hasOwnProperty('epicId')) {
+          /* eslint-enable */
           flag = 1;
         }
       }

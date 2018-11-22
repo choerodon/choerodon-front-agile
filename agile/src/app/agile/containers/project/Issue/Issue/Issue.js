@@ -396,7 +396,7 @@ class Issue extends Component {
 
   BodyCell = (props) => {
     const { expand } = this.state;
-    return expand ? (<div {...props} style={{ marginRight: '10px' }} />) : (<td {...props} />);
+    return expand ? (<div {...props} style={{ marginRight: '10px' }} />) : (<td {...props} style={{ height: 42 }} />);
   };
 
   renderIssueNum = (text, record, index) => (
@@ -928,7 +928,7 @@ class Issue extends Component {
                 onlyMe={this.onlyMe}
               />
             </div>
-           
+
             <section
               className={`c7n-table ${expand ? 'expand-sign' : ''}`}
               style={{
