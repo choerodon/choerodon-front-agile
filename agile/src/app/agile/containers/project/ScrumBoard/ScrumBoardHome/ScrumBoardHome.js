@@ -602,30 +602,9 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.getCurrentSprint.sprintId,
     ).then((res) => {
       BacklogStore.setSprintCompleteMessage(res);
-      let flag = 0;
-      if (res.parentsDoneUnfinishedSubtasks) {
-        if (res.parentsDoneUnfinishedSubtasks.length > 0) {
-          flag = 1;
-          let issueNums = '';
-          for (
-            let index = 0, len = res.parentsDoneUnfinishedSubtasks.length;
-            index < len;
-            index += 1) {
-            issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
-          }
-          confirm({
-            title: '提醒',
-            content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
-            onCancel() {
-            },
-          });
-        }
-      }
-      if (flag === 0) {
-        this.setState({
-          closeSprintVisible: true,
-        });
-      }
+      this.setState({
+        closeSprintVisible: true,
+      });
     }).catch((error) => {
     });
   }
