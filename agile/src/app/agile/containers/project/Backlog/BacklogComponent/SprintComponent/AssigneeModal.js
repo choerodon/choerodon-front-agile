@@ -25,9 +25,14 @@ class AssigneeModal extends Component {
         <p>{text}</p>
       ) : (<p>{text || '未分配'}</p>)),
     }, {
-      title: '问题',
+      title: '问题总数',
       dataIndex: 'issueCount',
       key: 'issueCount',
+      render: text => (text || '无'),
+    }, {
+      title: '问题剩余数',
+      dataIndex: 'remainingIssueCount',
+      key: 'remainingIssueCount',
       render: text => (text || '无'),
     }, {
       title: '故事点',
@@ -35,7 +40,12 @@ class AssigneeModal extends Component {
       key: 'totalStoryPoints',
       render: text => (text || '无'),
     }, {
-      title: '剩余预估时间',
+      title: '总任务工时',
+      dataIndex: 'remainingTime',
+      key: 'remainingTime',
+      render: text => (text || '无'),
+    }, {
+      title: '剩余任务工时',
       dataIndex: 'totalRemainingTime',
       index: 'totalRemainingTime',
       render: text => (text || '无'),
@@ -44,6 +54,8 @@ class AssigneeModal extends Component {
     let totalIssue = 0;
     let totalStoryPoints = 0;
     let totalTime = 0;
+    let totalRemainIssueCount = 0;
+    let totalRemainTime = 0;
     if (Array.isArray(assignData)) {
       for (let index = 0, lens = assignData.length; index < lens; index += 1) {
         if (assignData[index].issueCount) {
@@ -55,9 +67,17 @@ class AssigneeModal extends Component {
         if (assignData[index].totalRemainingTime) {
           totalTime += assignData[index].totalRemainingTime;
         }
+        if (assignData[index].remainingIssueCount) {
+          totalRemainIssueCount += assignData[index].remainingIssueCount;
+        }
+        if (assignData[index].remainingTime) {
+          totalRemainTime += assignData[index].remainingTime;
+        }
       }
     }
-    const total = { totalIssue, totalStoryPoints, totalTime };
+    const total = {
+      totalIssue, totalRemainIssueCount, totalStoryPoints, totalTime, totalRemainTime, 
+    };
     let noAssign = [];
     let dataSource = [];
     if (data.assigneeIssues) {
@@ -86,8 +106,10 @@ class AssigneeModal extends Component {
             dataSource={_.concat(dataSource, {
               assigneeName: '合计',
               issueCount: total.totalIssue,
+              remainingIssueCount: total.totalRemainIssueCount,
               totalStoryPoints: total.totalStoryPoints,
               totalRemainingTime: total.totalTime,
+              remainingTime: total.totalRemainTime,
             })}
             columns={columns}
             filterBar={false}
