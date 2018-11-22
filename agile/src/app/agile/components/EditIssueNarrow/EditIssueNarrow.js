@@ -56,6 +56,8 @@ const STATUS_SHOW = {
   merged: '已合并',
   closed: '关闭',
 };
+
+let loginUserId;
 class CreateSprint extends Component {
   debounceFilterIssues = _.debounce((input) => {
     this.setState({
@@ -74,6 +76,8 @@ class CreateSprint extends Component {
     this.needBlur = true;
     this.componentRef = React.createRef();
     this.state = {
+      hasPermission: false,
+      createdById: undefined,
       issueLoading: false,
       flag: undefined,
       selectLoading: true,
@@ -179,6 +183,26 @@ class CreateSprint extends Component {
         }
       }
     });
+    axios.get('/iam/v1/users/self')
+      .then((data) => {
+        loginUserId = data.id;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+
+    axios.post('/iam/v1/permissions/checkPermission', [
+      { 
+        code: 'agile-service.project-info.updateProjectInfo',
+        organizationId: 4,
+        projectId: 28,
+        resourceType: 'project',
+      }])
+      .then((res) => {
+        this.setState({
+          hasPermission: res.find(item => item.code === 'agile-service.project-info.updateProjectInfo').approve,
+        });
+      });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -447,6 +471,9 @@ class CreateSprint extends Component {
     const { origin } = this.state;
     loadIssue(origin.issueId).then((res) => {
       this.setAnIssueToState(res);
+      this.setState({
+        createdById: res.createdBy,
+      });
     });
     loadWorklogs(origin.issueId).then((res) => {
       this.setState({
@@ -741,6 +768,9 @@ class CreateSprint extends Component {
     }, () => {
       loadIssue(issueId).then((res) => {
         this.setAnIssueToState(res);
+        this.setState({
+          createdById: res.createdBy,
+        });
       });
       loadWorklogs(issueId).then((res) => {
         this.setState({
@@ -858,7 +888,7 @@ class CreateSprint extends Component {
     if (e.key === '0') {
       this.setState({ dailyLogShow: true });
     } else if (e.key === 'item_1') {
-      this.handleDeleteIssue(issueId);
+        this.handleDeleteIssue(issueId);
     } else if (e.key === '2') {
       this.setState({ createSubTaskShow: true });
     } else if (e.key === '3') {
@@ -889,6 +919,9 @@ class CreateSprint extends Component {
     updateIssueType(issueupdateTypeDTO)
       .then((res) => {
         loadIssue(id).then((response) => {
+          this.setState({
+            createdById: res.createdBy,
+          });
           this.reloadIssue(origin.issueId);
           onUpdate();
         });
@@ -1125,8 +1158,8 @@ class CreateSprint extends Component {
                         }}
                       >
                         {branchs.totalCommit || '0'}
-                        提交
-                      </span>
+                        {'提交'}
+                        </span>
                     </div>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1167,8 +1200,8 @@ class CreateSprint extends Component {
                         }}
                       >
                         {branchs.totalMergeRequest}
-                        合并请求
-                      </span>
+                        {'合并请求'}
+                       </span>
                       <span style={{
                         width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center',
                       }}
@@ -1299,55 +1332,62 @@ class CreateSprint extends Component {
         && t.typeCode !== typeCode && t.typeCode !== 'sub_task'
       ));
     }
-    const getMenu = () => (
-      <Menu onClick={this.handleClickMenu.bind(this)}>
-        <Menu.Item key="0">
-          登记工作日志
-        </Menu.Item>
-        <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue.deleteIssue']}>
-          <Menu.Item key="1">
-            删除
+    const getMenu = () => {
+      const { createdById, hasPermission } = this.state;
+      // console.log(`loginUserId: ${loginUserId}, createById: ${createdById}, ${loginUserId === createdById}`);
+      return (
+        <Menu onClick={this.handleClickMenu.bind(this)}>
+          <Menu.Item key="0">
+            {'登记工作日志'}
           </Menu.Item>
-        </Permission>
-        {
-          typeCode !== 'sub_task' && (
-            <Menu.Item key="2">
-              创建子任务
+          <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue.deleteIssue']}>
+            <Menu.Item 
+              key="1" 
+              disabled={loginUserId !== createdById && !hasPermission}
+            >
+              {'删除'}
             </Menu.Item>
-          )
-        }
-        <Menu.Item key="3">
-          复制问题
-        </Menu.Item>
-        {
-          typeCode !== 'sub_task' && origin.subIssueDTOList && origin.subIssueDTOList.length === 0 && (
-            <Menu.Item key="4">
-              转化为子任务
-            </Menu.Item>
-          )
-        }
-        {
-          typeCode === 'sub_task' && (
-            <Menu.Item key="5">
-              转化为任务
-            </Menu.Item>
-          )
-        }
-        <Menu.Item key="6">
-          创建分支
-        </Menu.Item>
-        <Menu.Item key="7">
-          分配问题
-        </Menu.Item>
-        {
-          typeCode === 'sub_task' && (
-            <Menu.Item key="8">
-              修改父级
-            </Menu.Item>
-          )
-        }
-      </Menu>
-    );
+          </Permission>
+          {
+            typeCode !== 'sub_task' && (
+              <Menu.Item key="2">
+                {'创建子任务'}
+              </Menu.Item>
+            )
+          }
+          <Menu.Item key="3">
+            {'复制问题'}
+          </Menu.Item>
+          {
+            typeCode !== 'sub_task' && origin.subIssueDTOList && origin.subIssueDTOList.length === 0 && (
+              <Menu.Item key="4">
+                {'转化为子任务'}
+              </Menu.Item>
+            )
+          }
+          {
+            typeCode === 'sub_task' && (
+              <Menu.Item key="5">
+                {'转化为任务'}
+              </Menu.Item>
+            )
+          }
+          <Menu.Item key="6">
+            {'创建分支'}
+          </Menu.Item>
+          <Menu.Item key="7">
+            {'分配问题'}
+          </Menu.Item>
+          {
+            typeCode === 'sub_task' && (
+              <Menu.Item key="8">
+                {'修改父级'}
+              </Menu.Item>
+            )
+          }
+        </Menu>
+      );
+    };
     const callback = (value) => {
       this.setState({
         description: value,
@@ -1962,8 +2002,8 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-                            标签：
-                          </span>
+                            {'标签'}
+                                                    </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -2057,8 +2097,8 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
-                                影响的版本：
-                              </span>
+                                {'影响的版本：'}
+                                                            </span>
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit
@@ -2150,8 +2190,12 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
+
+
+
+
                             修复的版本：
-                          </span>
+                                                    </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -2243,7 +2287,7 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
-                                史诗：
+                                {'史诗：'}
                               </span>
                             </div>
                             <div className="c7n-value-wrapper">
@@ -2331,8 +2375,8 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-                            冲刺：
-                          </span>
+                            {'冲刺：'}
+                                                    </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           {
@@ -2466,8 +2510,8 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-                            时间跟踪：
-                          </span>
+                            {'时间跟踪：'}
+                                                    </span>
                         </div>
                         <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                           <Progress
@@ -2486,7 +2530,7 @@ class CreateSprint extends Component {
                             h/
                             {this.getWorkloads() + (origin.remainingTime || 0)}
                             h
-                          </span>
+                                                    </span>
                           <span
                             role="none"
                             style={{
@@ -2500,8 +2544,8 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
-                            登记工作
-                          </span>
+                            {'登记工作'}
+                                                    </span>
                         </div>
                       </div>
                       {
@@ -2509,8 +2553,8 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
-                                Epic名：
-                              </span>
+                                {'Epic名：'}
+                                                            </span>
                             </div>
                             <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                               <ReadAndEdit
@@ -2553,8 +2597,8 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-subtitle">
-                            人员
-                          </span>
+                            {'人员'}
+                                                    </span>
                         </div>
                       </div>
                       <div className="line-start mt-10 assignee">
@@ -2660,8 +2704,8 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
-                            分配给我
-                          </span>
+                            {'分配给我'}
+                                                    </span>
                         </div>
                       </div>
                       <div className="line-start mt-10 assignee">
@@ -2765,8 +2809,8 @@ class CreateSprint extends Component {
                               });
                             }}
                           >
-                            分配给我
-                          </span>
+                            {'分配给我'}
+                                                    </span>
                         </div>
                       </div>
                       <div className="line-start mt-10">

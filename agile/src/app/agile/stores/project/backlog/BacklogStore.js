@@ -133,6 +133,16 @@ class BacklogStore {
     return toJS(this.cleanQuickSearch);
   }
 
+  @observable assigneeProps = [];
+
+  @computed get getAssigneeProps() {
+    return this.assigneeProps;
+  }
+
+  @action setAssigneeProps(data) {
+    this.assigneeProps = data;
+  }
+
   getSprintFilter() {
     const data = {
       advancedSearchArgs: {},
@@ -362,9 +372,19 @@ class BacklogStore {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`);
   }
 
+  @observable assigneeFilterIds = [];
+
+  @computed get getAssigneeFilterIds() {
+    return this.assigneeFilterIds;
+  }
+
+  @action setAssigneeFilterIds(data) {
+    this.assigneeFilterIds = data;
+  }
+
   axiosGetSprint(data) {
     const orgId = AppState.currentMenuType.organizationId;
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?organizationId=${orgId}&quickFilterIds=${this.quickFilters}`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?organizationId=${orgId}&quickFilterIds=${this.quickFilters}${this.assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${this.assigneeFilterIds}` : ''}`, data);
   }
 
   handleEpicDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data);

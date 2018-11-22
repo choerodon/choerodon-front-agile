@@ -8,7 +8,14 @@ import {
 } from 'choerodon-ui';
 
 import BacklogStore from '../../stores/project/backlog/BacklogStore';
+import ScrumBoardStore from '../../stores/project/scrumBoard/ScrumBoardStore';
+import IssueStore from '../../stores/project/sprint/IssueStore';
+import UserMapStore from '../../stores/project/userMap/UserMapStore';
 import './QuickSearch.scss';
+
+const quickSearchStores = {
+  BacklogStore, ScrumBoardStore, IssueStore, UserMapStore, 
+};
 
 const { Option, OptGroup } = Select;
 const { CheckableTag } = Tag;
@@ -38,43 +45,32 @@ class QuickSearch extends Component {
 
   state = {
     quickSearchSelected: [],
-    assignee: [],
   };
 
-  componentDidMount() {
-    axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?page=0&size=9999`)
-      .then((res) => {
-        this.setState({
-          assignee: res.content,
-        });
-      })
-      .catch((e) => {
-        Choerodon.prompt('获取经办人信息失败');
-      });
-  }
-
   handleQuickSearchChange = (value) => {
-    console.log(`stathe: ${this.state.quickSearchSelected}`)
-    console.log(JSON.stringify(value));
     const { onQuickSearchChange } = this.props;
     const labels = _.map(value, 'label');
     this.setState(
       {
         quickSearchSelected: _.map(value, 'key'),
-      }, () => {
-        console.log(`quickSearchSelected: ${JSON.stringify(this.state.quickSearchSelected)}`);
-      }
-    )
+      },
+    );
     onQuickSearchChange(labels.includes('仅我的问题'), labels.includes('仅故事'), _.pull(_.map(value, 'key'), '仅故事', '仅我的问题'));
-    // onQuickSearchChange(value.includes('仅我的问题'), value.includes('仅故事'), _.pull(value, '仅我的问题', '仅故事'));
+  }
+
+  handleAssigneeChange = (value) => {
+    const { onAssigneeChange, pageFlag } = this.props;
+    if (pageFlag !== 'Issue') {
+      quickSearchStores[`${pageFlag}Store`].setAssigneeFilterIds(_.map(value, 'key'));
+    }
+    onAssigneeChange(value);
   }
 
   render() {
     const {
-      title, moreSelection,
+      title, moreSelection, assignee,
     } = this.props;
     const { quickSearchSelected } = this.state;
-    const { assignee } = this.state;
     const listChildren = moreSelection.map(item => ({
       label: item.name,
       value: item.filterId,
@@ -100,17 +96,9 @@ class QuickSearch extends Component {
               labelInValue
               placeholder="快速搜索"
               maxTagCount={0}
-              maxTagPlaceholder={(ommittedValues) => 
-                // console.log(ommittedValues);
-                 `${_.map(ommittedValues, 'label').join(', ')}`
+              maxTagPlaceholder={ommittedValues => `${_.map(ommittedValues, 'label').join(', ')}`
                 // return ommittedValues.join(', ')}
               }
-              // value={BacklogStore.getQuickSearchClean ? `${{ key: '', value: '' }}` : JSON.stringify(quickSearchSelected[0])}
-              // value={() => {
-              //   if (BacklogStore.getQuickSearchClean) {
-              //     return `${{ key: '', value: '' }}`;
-              //   }
-              // }}
               onChange={this.handleQuickSearchChange}
             >
               {
@@ -148,11 +136,12 @@ class QuickSearch extends Component {
               optionFilterProp="children"
               filterOption={(input, option) => option.props.children.toLowerCase()
                 .indexOf(input.toLowerCase()) >= 0}
+              onChange={this.handleAssigneeChange}
             >
               {
                 assignee && assignee.length && (
                   assignee.map(item => (
-                    <Option key={item.id} value={item.realName}>{item.realName}</Option>
+                    <Option key={item.id} value={item.id}>{item.realName}</Option>
                   ))
                 )
               }

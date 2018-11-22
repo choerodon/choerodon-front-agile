@@ -2,6 +2,8 @@ import {
   observable, action, computed, toJS,
 } from 'mobx';
 import { store, stores, axios } from 'choerodon-front-boot';
+import _ from 'lodash';
+
 import { loadIssues } from '../../../../api/NewIssueApi';
 
 const { AppState } = stores;
@@ -16,6 +18,7 @@ let filter = {
   },
   content: '',
   quickFilterIds: [],
+  assigneeFilterIds: null,
   searchArgs: {
     assignee: '',
     component: '',
@@ -270,6 +273,7 @@ class SprintCommonStore {
       },
       content: '',
       quickFilterIds: [],
+      assigneeFilterIds: null,
       searchArgs: {
         assignee: '',
         component: '',
@@ -286,12 +290,32 @@ class SprintCommonStore {
     };
   }
 
+  @observable assigneeProps = [];
+
+  @computed get getAssigneeProps() {
+    return this.assigneeProps;
+  }
+
+  @action setAssigneeProps(data) {
+    this.assigneeProps = data;
+  }
+
   loadIssues(page = 0, size = 10) {
     this.setLoading(true);
     const { orderField = '', orderType = '' } = this.order;
     return loadIssues(page, size, toJS(this.getFilter), orderField, orderType)
       .then((res) => {
         this.setIssues(res.content);
+        const arrAssignee = [];
+        _.forEach(res.content, (item) => {
+          if (item.assigneeId && item.assigneeName) {
+            arrAssignee.push({
+              id: item.assigneeId,
+              realName: item.assigneeName,
+            });
+          }
+        });
+        this.setAssigneeProps(_.map(_.union(_.map(arrAssignee, JSON.stringify)), JSON.parse));
         this.setPagination({
           current: res.number + 1,
           pageSize: res.size,

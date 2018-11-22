@@ -379,6 +379,8 @@ class SprintItem extends Component {
    */
   handleClickIssue=(sprintId, item) => {
     // command ctrl shift
+
+    console.log(`item: ${JSON.stringify(item)}`);
     const { keydown, selected } = this.state;
     const { store } = this.props;
     if (keydown === 91 || keydown === 17 || keydown === 16) {

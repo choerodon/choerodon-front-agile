@@ -72,7 +72,7 @@ class Issue extends Component {
 
   componentWillUnmount() {
     IssueStore.cleanSearchArgs();
-    IssueStore.setSelectedQuickSearch({ quickFilterIds: [] });
+    IssueStore.setSelectedQuickSearch({ quickFilterIds: [], assigneeFilterIds: null });
     IssueStore.resetOtherArgs();
   }
 
@@ -336,7 +336,7 @@ class Issue extends Component {
 
   MyTable = (props) => {
     const { expand } = this.state;
-    if (IssueStore.getIssues.length === 0 && !IssueStore.loading) {
+    if (IssueStore.getIssues && IssueStore.getIssues.length === 0 && !IssueStore.loading) {
       // fixed 会渲染两张表，所以要判断子元素有没有这个属性
       // 如果有的话禁止渲染，防止 Empty 重复渲染
       if (!props.children[0].props.fixed) {
@@ -653,20 +653,17 @@ class Issue extends Component {
     return null;
   };
 
-  onlyMe = (checked) => {
-    IssueStore.setAdvArg({ assigneeIds: checked ? [AppState.userInfo.id] : null });
+  onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
+    IssueStore.setAdvArg({ assigneeIds: onlyMeChecked ? [AppState.userInfo.id] : null });
+    IssueStore.setSelectedQuickSearch({ onlyStory: onlyStoryChecked });
+    IssueStore.setSelectedQuickSearch({ quickFilterIds: moreChecked });
     IssueStore.loadIssues();
-  };
+  }
 
-  onlyStory = (checked) => {
-    IssueStore.setSelectedQuickSearch({ onlyStory: checked });
+  onAssigneeChange = (value) => {
+    IssueStore.setSelectedQuickSearch({ assigneeFilterIds: _.map(value, 'key').length === 0 ? null : _.map(value, 'key') });
     IssueStore.loadIssues();
-  };
-
-  onChangeSelect = (checkedValues) => {
-    IssueStore.setSelectedQuickSearch({ quickFilterIds: checkedValues });
-    IssueStore.loadIssues();
-  };
+  }
 
   setTableWidth = (columns) => {
     const ret = columns.reduce((sum, column) => sum + (column.hidden ? 0 : column.width), 0);
@@ -923,9 +920,10 @@ class Issue extends Component {
                 buttonName="更多"
                 buttonIcon="more_vert"
                 moreSelection={IssueStore.getQuickSearch}
-                onChangeCheckBox={this.onChangeSelect}
-                onlyStory={this.onlyStory}
-                onlyMe={this.onlyMe}
+                onQuickSearchChange={this.onQuickSearchChange}
+                pageFlag="Issue"
+                onAssigneeChange={this.onAssigneeChange}
+                assignee={IssueStore.getAssigneeProps}
               />
             </div>
 
@@ -1065,7 +1063,7 @@ class Issue extends Component {
               </div>
             </div>
             {
-              IssueStore.getIssues.length !== 0 ? (
+              IssueStore.getIssues && IssueStore.getIssues.length !== 0 ? (
                 <div style={{
                   display: 'flex', justifyContent: 'flex-end', marginTop: 16, marginBottom: 16,
                 }}

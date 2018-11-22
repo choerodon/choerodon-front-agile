@@ -219,9 +219,6 @@ class Home extends Component {
     if (UserMapStore.showBackLog) {
       UserMapStore.loadBacklogIssues();
     }
-    // this.getPrepareOffsetTops();
-
-    // this.props.UserMapStore.loadBacklogIssues();
   };
 
   showBackLog =() => {
@@ -430,60 +427,31 @@ class Home extends Component {
     UserMapStore.setCreateEpic(true);
   }
 
-  addFilter =(filter) => {
-    const { UserMapStore } = this.props;
-    const arr = _.cloneDeep(toJS(UserMapStore.currentFilters));
-    const value = filter;
-    const index = UserMapStore.currentFilters.indexOf(value);
-    if (index !== -1) {
-      arr.splice(index, 1);
-    } else {
-      arr.push(value);
-    }
-    UserMapStore.setCurrentFilter(arr);
-    UserMapStore.loadIssues('usermap');
-
-    if (UserMapStore.isApplyToEpic) {
-      UserMapStore.loadEpic();
-    }
-  };
-
   onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
     const { UserMapStore } = this.props;
     // const arr = _.cloneDeep(toJS(UserMapStore.currentFilters));
     const arr = [];
-    const userStoryIndex = arr.indexOf('userStory');
-    const mineIndex = arr.indexOf('mine');
-    // if (userStoryIndex === -1) {
-    //   if (onlyStoryChecked) {
-    //     arr.push('userStory');
-    //   }
-    // } else if (!onlyStoryChecked) {
-    //   arr.splice(userStoryIndex, 1);
-    // }
-
-    // if (mineIndex === -1) {
-    //   if (onlyMeChecked) {
-    //     arr.push('mine');
-    //   }
-    // } else if (!onlyMeChecked) {
-    //   arr.splice(mineIndex, 1);
-    // }
-
     if (onlyMeChecked) {
       arr.push('mine');
     }
 
-    if(onlyStoryChecked){
+    if (onlyStoryChecked) {
       arr.push('userStory');
     }
 
-    UserMapStore.setCurrentFilter(arr, ...moreChecked);
+    UserMapStore.setCurrentFilter([...arr, ...moreChecked]);
     UserMapStore.loadIssues('usermap');
     if (UserMapStore.isApplyToEpic) {
       UserMapStore.loadEpic();
     }
+  }
 
+  onAssigneeChange = () => {
+    const { UserMapStore } = this.props;
+    UserMapStore.loadIssues('usermap');
+    if (UserMapStore.isApplyToEpic) {
+      UserMapStore.loadEpic();
+    }
   }
 
   fullScreen = () => {
@@ -2053,17 +2021,7 @@ class Home extends Component {
     }
     return dom;
   };
-
-  onChangeSelect = (arr) => {
-    const { UserMapStore } = this.props;
-    UserMapStore.setCurrentFilter(arr);
-    UserMapStore.loadIssues('usermap');
-
-    if (UserMapStore.isApplyToEpic) {
-      UserMapStore.loadEpic();
-    }
-  };
-
+  
   render() {
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
@@ -2098,10 +2056,10 @@ class Home extends Component {
                       buttonName="更多"
                       buttonIcon="more_vert"
                       moreSelection={UserMapStore.getFilters}
-                      onChangeCheckBox={this.onChangeSelect}
-                      onlyStory={this.addFilter.bind(this, 'userStory')}
-                      onlyMe={this.addFilter.bind(this, 'mine')}
                       onQuickSearchChange={this.onQuickSearchChange}
+                      pageFlag="UserMap"
+                      onAssigneeChange={this.onAssigneeChange}
+                      assignee={UserMapStore.getAssigneeProps}
                     />
                     { showBackLog ? (
                       <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
@@ -2170,10 +2128,10 @@ class Home extends Component {
               buttonName="更多"
               buttonIcon="more_vert"
               moreSelection={UserMapStore.getFilters}
-              onChangeCheckBox={this.onChangeSelect}
-              onlyStory={this.addFilter.bind(this, 'userStory')}
-              onlyMe={this.addFilter.bind(this, 'mine')}
               onQuickSearchChange={this.onQuickSearchChange}
+              pageFlag="UserMap"
+              onAssigneeChange={this.onAssigneeChange}
+              assignee={UserMapStore.getAssigneeProps}
             />
             <div style={{
               display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',

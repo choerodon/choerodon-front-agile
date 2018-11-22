@@ -220,21 +220,22 @@ class Accumulation extends Component {
     return axios.get(`/agile/v1/projects/${projectId}/board`);
   }
 
-  loadBoardData(boardId, recent, filter, projectId = AppState.currentMenuType.id) {
-    return axios.get(`/agile/v1/projects/${projectId}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?onlyStory=${recent}&quickFilterIds=${filter}`);
+  loadBoardData(boardId, recent, filter, projectId = AppState.currentMenuType.id, assigneeFilterIds) {
+    return axios.get(`/agile/v1/projects/${projectId}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?onlyStory=${recent}&quickFilterIds=${filter}&assigneeFilterIds=${assigneeFilterIds}`);
   }
 
   loadProjectInfo(projectId = AppState.currentMenuType.id) {
     return axios.get(`/agile/v1/projects/${projectId}/project_info`);
   }
 
-  loadChartData(boardId, startDate, columnIds, endDate = `${moment().format('YYYY-MM-DD')} 23:59:59`, quickFilterIds = []) {
+  loadChartData(boardId, startDate, columnIds, endDate = `${moment().format('YYYY-MM-DD')} 23:59:59`, quickFilterIds = [], assigneeFilterIds = []) {
     const obj = {
       columnIds,
       endDate,
       quickFilterIds,
       startDate,
       boardId,
+      assigneeFilterIds,
     };
     axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/cumulative_flow_diagram`, obj)
       .then((res) => {
