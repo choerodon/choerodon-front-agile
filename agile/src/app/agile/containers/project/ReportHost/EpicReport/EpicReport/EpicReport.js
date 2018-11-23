@@ -543,7 +543,7 @@ class EpicReport extends Component {
     return (
       <Page className="c7n-epicReport">
         <Header 
-          title="史诗报告"
+          title="史诗报告图"
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
@@ -559,7 +559,7 @@ class EpicReport extends Component {
           </Button>
         </Header>
         <Content
-          title="史诗报告"
+          title="史诗报告图"
           description="随时了解一个史诗的完成进度。这有助于您跟踪未完成或未分配问题来管理团队的开发进度。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >

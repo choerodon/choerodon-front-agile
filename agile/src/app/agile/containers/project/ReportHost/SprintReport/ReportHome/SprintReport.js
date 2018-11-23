@@ -652,7 +652,7 @@ class SprintReport extends Component {
     return (
       <Page className="c7n-report">
         <Header
-          title="冲刺报告"
+          title="冲刺报告图"
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart

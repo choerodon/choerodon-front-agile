@@ -14,7 +14,9 @@
 
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table } from 'choerodon-ui';
+import {
+ DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table 
+} from 'choerodon-ui';
 
 let isClick = false;
 @inject('AppState')
@@ -27,6 +29,7 @@ class EasyEdit extends Component {
       hoverIf: false,
     };
   }
+
   handleOnOk(e) {
     this.props.onChange(this.state.date, this.state.dateString || e._i);
     isClick = true;
@@ -35,6 +38,7 @@ class EasyEdit extends Component {
       // hoverIf: false,
     });
   }
+
   renderEdit() {
     const that = this;
     if (this.props.type === 'input') {
@@ -90,6 +94,7 @@ class EasyEdit extends Component {
       );
     }
   }
+
   render() {
     return (
       <div
@@ -166,4 +171,3 @@ class EasyEdit extends Component {
 }
 
 export default EasyEdit;
-

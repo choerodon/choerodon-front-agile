@@ -589,7 +589,7 @@ class VersionReport extends Component {
     return (
       <Page>
         <Header
-          title="版本报告"
+          title="版本报告图"
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
@@ -608,7 +608,7 @@ class VersionReport extends Component {
           </Button>
         </Header>
         <Content
-          title="版本报告"
+          title="版本报告图"
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/version-report/"
         >
@@ -619,16 +619,16 @@ class VersionReport extends Component {
                   label="版本"
                   value={this.state.chosenVersion}
                   style={{
-      width: 244,
-    }}
+                    width: 244,
+                  }}
                   onChange={(value) => {
-      this.setState({
-        chosenVersion: value,
-      }, () => {
-        this.updateIssues(this.state.datas);
-        this.getReportData(this.state.type);
-      });
-    }}
+                    this.setState({
+                      chosenVersion: value,
+                    }, () => {
+                      this.updateIssues(this.state.datas);
+                      this.getReportData(this.state.type);
+                    });
+                  }}
                 >
                   {
                   VersionReportStore.getVersionList.map(item => (
@@ -640,17 +640,17 @@ class VersionReport extends Component {
                   label="单位"
                   value={this.state.type}
                   style={{
-      width: 244,
-      marginLeft: 24,
-    }}
+                    width: 244,
+                    marginLeft: 24,
+                  }}
                   onChange={(value) => {
-      this.setState({
-        type: value,
-      }, () => {
-        this.updateIssues(this.state.datas);
-        this.getReportData(this.state.type);
-      });
-    }}
+                    this.setState({
+                      type: value,
+                    }, () => {
+                      this.updateIssues(this.state.datas);
+                      this.getReportData(this.state.type);
+                    });
+                  }}
                 >
                   {
                   [{
@@ -668,25 +668,23 @@ class VersionReport extends Component {
                 }
                 </Select>
                 <div className="c7n-versionReport-versionInfo">
-                  <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate ? VersionReportStore.getReportData.version.releaseDate : '未指定发布日期'}` : '未发布'}</p>
+                  <p style={{ fontWeight: 'bold' }}>{VersionReportStore.getReportData.version && VersionReportStore.getReportData.version.statusCode === 'released' ? `发布于 ${VersionReportStore.getReportData.version.releaseDate ? VersionReportStore.getReportData.version.releaseDate.split(' ')[0] : '未指定发布日期'}` : '未发布'}</p>
                   <p
-      style={{
-                    color: '#3F51B5',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-      role="none"
-      onClick={this.goIssues.bind(this)}
-    >
+                    style={{
+                      color: '#3F51B5',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                    role="none"
+                    onClick={this.goIssues.bind(this)}
+                  >
+                    {'在“问题管理中”查看V'}
+                    {' '}
+                    {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}
+                    <Icon style={{ fontSize: 13 }} type="open_in_new" />
 
-
-在“问题管理中”查看V
-{' '}
-      {VersionReportStore.getReportData.version ? VersionReportStore.getReportData.version.name : ''}
-      <Icon style={{ fontSize: 13 }} type="open_in_new" />
-
-    </p>
+                  </p>
                 </div>
                 {
                 JSON.stringify(this.state.options) === '{}' ? '' : (
@@ -704,20 +702,20 @@ class VersionReport extends Component {
               }
                 <div className="c7n-versionReport-issues">
                   <Tabs defaultActiveKey="1">
-      <TabPane tab="已完成的问题" key="1">
-                    {this.renderTabTable('done')}
-                  </TabPane>
-      <TabPane tab="未完成的问题" key="2">
-                    {this.renderTabTable('unfinished')}
-                  </TabPane>
-      {
+                    <TabPane tab="已完成的问题" key="1">
+                      {this.renderTabTable('done')}
+                    </TabPane>
+                    <TabPane tab="未完成的问题" key="2">
+                      {this.renderTabTable('unfinished')}
+                    </TabPane>
+                    {
                     this.state.type === 'issueCount' ? '' : (
                       <TabPane tab="未完成的未预估问题" key="3">
                         {this.renderTabTable('unfinishedUnestimated')}
                       </TabPane>
                     )
                   }
-    </Tabs>
+                  </Tabs>
                 </div>
               </React.Fragment>
             ) : <NoDataComponent img={versionSvg} title="版本" links={[{ name: '发布版本', link: '/agile/release' }]} />}

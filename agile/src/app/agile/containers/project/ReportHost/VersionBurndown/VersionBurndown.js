@@ -795,71 +795,71 @@ class VersionBurndown extends Component {
     );
   }
 
-  transformReleaseDate(data) {
-    const arrDate = data.split(' ')[0].split('-');
-    let month = '';
-    switch (arrDate[1]) {
-      case '01': {
-        month = '一月';
-        break;
-      }
-      case '02': {
-        month = '二月';
-        break;
-      }
-      case '03': {
-        month = '三月';
-        break;
-      }
-      case '04': {
-        month = '四月';
-        break;
-      }
-      case '05': {
-        month = '五月';
-        break;
-      }
-      case '06': {
-        month = '六月';
-        break;
-      }
-      case '07': {
-        month = '七月';
-        break;
-      }
-      case '08': {
-        month = '八月';
-        break;
-      }
-      case '09': {
-        month = '九月';
-        break;
-      }
-      case '10': {
-        month = '十月';
-        break;
-      }
-      case '11': {
-        month = '十一月';
-        break;
-      }
-      case '12': {
-        month = '十二月';
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-    return `${arrDate[2]}/${month}/${arrDate[0].slice(2, 4)}`;
-  }
+  // transformReleaseDate(data) {
+  //   const arrDate = data.split(' ')[0].split('-');
+  //   let month = '';
+  //   switch (arrDate[1]) {
+  //     case '01': {
+  //       month = '一月';
+  //       break;
+  //     }
+  //     case '02': {
+  //       month = '二月';
+  //       break;
+  //     }
+  //     case '03': {
+  //       month = '三月';
+  //       break;
+  //     }
+  //     case '04': {
+  //       month = '四月';
+  //       break;
+  //     }
+  //     case '05': {
+  //       month = '五月';
+  //       break;
+  //     }
+  //     case '06': {
+  //       month = '六月';
+  //       break;
+  //     }
+  //     case '07': {
+  //       month = '七月';
+  //       break;
+  //     }
+  //     case '08': {
+  //       month = '八月';
+  //       break;
+  //     }
+  //     case '09': {
+  //       month = '九月';
+  //       break;
+  //     }
+  //     case '10': {
+  //       month = '十月';
+  //       break;
+  //     }
+  //     case '11': {
+  //       month = '十一月';
+  //       break;
+  //     }
+  //     case '12': {
+  //       month = '十二月';
+  //       break;
+  //     }
+  //     default: {
+  //       break;
+  //     }
+  //   }
+  //   return `${arrDate[2]}/${month}/${arrDate[0].slice(2, 4)}`;
+  // }
 
   renderVersionInfo() {
     if (ES.currentVersionId != undefined) {
       const currentVersion = ES.versions.filter(item => item.versionId === ES.currentVersionId)[0];
       return (
         <p className="c7n-versionInfo">
-          { `${currentVersion && currentVersion.releaseDate === null ? '未发布' : (`发布于 ${currentVersion && this.transformReleaseDate(currentVersion.releaseDate)}`)}`}
+          { `${currentVersion && currentVersion.releaseDate === null ? '未发布' : (`发布于 ${currentVersion && this.currentVersion.releaseDate.split(' ')[0]}`)}`}
         </p>
       );
     }
