@@ -4,7 +4,7 @@ import { Droppable, Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import { stores } from 'choerodon-front-boot';
 import {
-  Input, message, Icon, Modal, 
+  Input, message, Icon, Modal,
 } from 'choerodon-ui';
 import StatusCard from '../StatusCard/StatusCard';
 import './SettingColumn.scss';
@@ -136,7 +136,7 @@ class SettingColumn extends Component {
             height: '100%',
           }}
         >
-          <div 
+          <div
             className="c7n-scrumsetting-columnContent"
             style={{
               background: 'white',
@@ -184,11 +184,11 @@ class SettingColumn extends Component {
                   cancelText="取消"
                   // confirmLoading={loading}
                 >
-                  
+
                   {'确定要删除该列？'}
 
                 </Modal>
-               
+
               </div>
               <div className="c7n-scrumsetting-columnStatus">
                 {this.props.data.name}
@@ -239,7 +239,7 @@ class SettingColumn extends Component {
       );
     } else {
       return (
-        <Draggable 
+        <Draggable
           key={this.props.data.columnId}
           index={this.props.index}
           draggableId={JSON.stringify({
@@ -337,7 +337,7 @@ class SettingColumn extends Component {
                           <EasyEdit
                             className="editSpan"
                             type="input"
-                            defaultValue={this.props.data.maxNum 
+                            defaultValue={this.props.data.maxNum
                               ? this.props.data.maxNum : null}
                             enterOrBlur={(value) => {
                               this.updateColumnMaxMin('maxNum', value);
@@ -346,44 +346,14 @@ class SettingColumn extends Component {
                             <span
                               style={{ cursor: 'pointer', minWidth: '110px' }}
                             >
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                               最大值：
-{this.props.data.maxNum || '没有最大'}
-
+                              {typeof this.props.data.maxNum === 'number' ? this.props.data.maxNum : '没有最大'}
                             </span>
                           </EasyEdit>
                           <EasyEdit
                             className="editSpan"
                             type="input"
-                            defaultValue={this.props.data.minNum 
+                            defaultValue={this.props.data.minNum
                               ? this.props.data.minNum : null}
                             enterOrBlur={(value) => {
                               this.updateColumnMaxMin('minNum', value);
@@ -392,38 +362,8 @@ class SettingColumn extends Component {
                             <span
                               style={{ cursor: 'pointer', minWidth: '110px' }}
                             >
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                               最小值：
-{this.props.data.minNum || '没有最小'}
-
+                              {typeof this.props.data.minNum === 'number' ? this.props.data.minNum : '没有最小'}
                             </span>
                           </EasyEdit>
                         </div>
@@ -440,7 +380,7 @@ class SettingColumn extends Component {
                       <div
                         ref={provided.innerRef}
                         style={{
-                          background: snapshot.isDraggingOver 
+                          background: snapshot.isDraggingOver
                             ? 'rgba(26,177,111,0.08)' : 'unset',
                           height: '100%',
                         }}
