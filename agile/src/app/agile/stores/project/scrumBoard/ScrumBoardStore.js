@@ -372,6 +372,7 @@ class ScrumBoardStore {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status`, data);
   }
 
+  // eslint-disable-next-line consistent-return
   axiosGetBoardDataBySetting(boardId) {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}`);
   }

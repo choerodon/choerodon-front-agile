@@ -67,9 +67,6 @@ class Home extends Component {
     super(props);
     this.state = {
       expandColumns: [],
-      // showBackLog: false,
-      // position: 'absolute',
-      // isFullScreen: false,
       popOverVisible: false,
       showDoneEpicCheckbox: false,
       filterEpicCheckbox: false,
@@ -145,26 +142,6 @@ class Home extends Component {
       }
     }, 1000);
   };
-
-  // debounceHandleScroll = _.debounce((e) => {
-  //   this.handleScroll(e);
-  // }, 16);
-
-  // checkIsFirstLeftScroll() {
-  //   if (!isFirstScroll) {
-  //     isFirstScroll = true;
-  //     // do someting
-  //   }
-  // }
-
-  // debounceSetLeft = _.debounce((left) => {
-  //   const { UserMapStore } = this.props;
-  //   window.console.log(left);
-  //   UserMapStore.setLeft(left);
-  //   // do other thing
-  //   isFirstScroll = false;
-  // }, 300);
-
 
   /**
    *键盘按起事件
@@ -400,16 +377,6 @@ class Home extends Component {
       showDoneEpicCheckbox: false,
       filterEpicCheckbox: false,
     });
-    // const showDoneEpicCheckbox = document.getElementsByClassName('showDoneEpicCheckbox')[0];
-    // const filterEpicCheckbox = document.getElementsByClassName('filterEpicCheckbox')[0];
-    // if(showDoneEpicCheckbox){
-    //   console.log(showDoneEpicCheckbox);
-    //   showDoneEpicCheckbox.checked = false;
-    // }
-    // if(filterEpicCheckbox){
-    //   console.log(filterEpicCheckbox);
-    //   filterEpicCheckbox.checked = false;
-    // }
     const timer = setInterval(() => {
       if (document.getElementById('fixHead-body')) {
         document.getElementById('fixHead-head').addEventListener('scroll', this.handleScrollHead, { passive: true });
@@ -728,68 +695,6 @@ class Home extends Component {
             }
           }
         }
-
-        // if (!desEpicAndModeIssues.every(v => !issueIds.includes(v.issueId))) {
-        //   // 该块中存在有块被选中
-        //   if (_.map(desEpicAndModeIssues, 'issueId').includes(dragIssueId)) {
-        //     if (desIndex === desEpicAndModeIssues.length - 1) {
-        //       before = false;
-        //       outsetIssueId =
-        // _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
-        //     } else if (true) {
-        //       if (sourceIndex <= desIndex) {
-        //         const afterDesIndex =
-        // _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-        //         const beforeDesIndex =
-        // _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-        //         if (afterDesIndex) {
-        //           before = true;
-        //           outsetIssueId = afterDesIndex.issueId;
-        //         } else if (beforeDesIndex) {
-        //           before = false;
-        //           outsetIssueId = beforeDesIndex.issueId;
-        //         } else {
-        //           before = true;
-        //           outsetIssueId = 0;
-        //         }
-        //       } else {
-        //         const afterDesIndex =
-        // _.find(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-        //         const beforeDesIndex =
-        // _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-        //         if (afterDesIndex) {
-        //           before = true;
-        //           outsetIssueId = afterDesIndex.issueId;
-        //         } else if (beforeDesIndex) {
-        //           before = false;
-        //           outsetIssueId = beforeDesIndex.issueId;
-        //         } else {
-        //           before = true;
-        //           outsetIssueId = 0;
-        //         }
-        //       }
-
-        //     }
-        //   } else if (true) {
-        //     if (desIndex === desEpicAndModeIssues.length) {
-        //       before = false;
-        //       outsetIssueId =
-        // _.findLast(desEpicAndModeIssues, v => !issueIds.includes(v.issueId)).issueId;
-        //     } else {
-        //       before = true;
-        //       outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
-        //     }
-        //   }
-        // } else if (true) {
-        //   // 该块中所有块都未被选中
-        //   if (desIndex === desEpicAndModeIssues.length) {
-        //     before = false;
-        //     outsetIssueId = desEpicAndModeIssues[desEpicAndModeIssues.length - 1].issueId;
-        //   } else {
-        //     before = true;
-        //     outsetIssueId = desEpicAndModeIssues[desIndex].issueId;
-        //   }
-        // }
       }
     } else if (true) {
       // 移到无卡的块中
@@ -984,68 +889,6 @@ class Home extends Component {
             }
           }
         }
-        // -----------------
-        // if (!desModeIssues.every(v => !issueIds.includes(v.issueId))) {
-        //   // 该块中存在有卡被选中，也有卡未被选中
-        //   if (_.map(desModeIssues, 'issueId').includes(dragIssueId)) {
-        //     if (desIndex === desModeIssues.length - 1) {
-        //       before = false;
-        //       outsetIssueId =
-        // _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
-        //     } else if (true) {
-        //       if (sourceIndex <= desIndex) {
-        //         const afterDesIndex =
-        // _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-        //         const beforeDesIndex =
-        // _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex + 1);
-        //         if (afterDesIndex) {
-        //           before = true;
-        //           outsetIssueId = afterDesIndex.issueId;
-        //         } else if (beforeDesIndex) {
-        //           before = false;
-        //           outsetIssueId = beforeDesIndex.issueId;
-        //         } else {
-        //           before = true;
-        //           outsetIssueId = 0;
-        //         }
-        //       } else {
-        //         const afterDesIndex =
-        // _.find(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-        //         const beforeDesIndex =
-        // _.findLast(desModeIssues, v => !issueIds.includes(v.issueId), desIndex);
-        //         if (afterDesIndex) {
-        //           before = true;
-        //           outsetIssueId = afterDesIndex.issueId;
-        //         } else if (beforeDesIndex) {
-        //           before = false;
-        //           outsetIssueId = beforeDesIndex.issueId;
-        //         } else {
-        //           before = true;
-        //           outsetIssueId = 0;
-        //         }
-        //       }
-        //     }
-        //   } else if (true) {
-        //     if (desIndex === desModeIssues.length) {
-        //       before = false;
-        //       outsetIssueId =
-        // _.findLast(desModeIssues, v => !issueIds.includes(v.issueId)).issueId;
-        //     } else {
-        //       before = true;
-        //       outsetIssueId = desModeIssues[desIndex].issueId;
-        //     }
-        //   }
-        // } else if (true) {
-        //   // 该块中所有块都未被选中
-        //   if (desIndex === desModeIssues.length) {
-        //     before = false;
-        //     outsetIssueId = desModeIssues[desModeIssues.length - 1].issueId;
-        //   } else {
-        //     before = true;
-        //     outsetIssueId = desModeIssues[desIndex].issueId;
-        //   }
-        // }
-        // -----------------
       }
     } else if (true) {
       // 移到无卡的块中
@@ -1094,19 +937,6 @@ class Home extends Component {
     }
     const tarBacklogData = backlogIssues;
     this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, 0, desModeId);
-    // _.map(issueIds, (id) => {
-    //   // const currentIssue = _.find(issueData, item => item.issueId === id);
-    //   // const vosId = desModeId === 0 ? null : desModeId;
-    //   // currentIssue.epicId = 0;
-    //   // if (mode !== 'none') {
-    //   //   currentIssue[key] = vosId;
-    //   // }
-    //   // postData = {
-    //   before, epicId: souEpicId ? 0 :
-    // undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
-    //   // };
-    // });
-    // window.console.log(postData);
     UserMapStore.handleMoveIssue(postData);
     UserMapStore.setSelectIssueIds([]);
     UserMapStore.setCurrentDraggableId(null);
@@ -1250,29 +1080,6 @@ class Home extends Component {
       const tarBacklogData = backlogIssues;
 
       this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, desEpicId, desModeId);
-      // _.map(issueIds, (id) => {
-      //   const currentIssue = _.find(issueData, item => item.issueId === id);
-      //   const vosId = desModeId === 0 ? null : desModeId;
-      //   currentIssue.epicId = desEpicId;
-      //   if (mode !== 'none') {
-      //     currentIssue[key] = vosId;
-      //   }
-      //   // postData = {
-      //   //   before, epicId: desEpicId, outsetIssueId, rankIndex, issueIds,
-      //   // };
-      //   if (res.source.droppableId.includes('backlog')) {
-      //     tarBacklogData = _.find(backlogData, item => item.issueId === id);
-      //     const index = backlogData.indexOf(tarBacklogData);
-      //     backlogData.splice(index, 1);
-      //   }
-      //   if (mode !== 'none') {
-      //     // postData[key] = desModeId;
-      //   }
-      // });
-      // if (res.source.droppableId.includes('backlog')) {
-      //   UserMapStore.setBacklogIssues(backlogData);
-      // }
-      // UserMapStore.setIssues(issueData);
       UserMapStore.handleMoveIssue(postData);
       UserMapStore.setSelectIssueIds([]);
       UserMapStore.setCurrentDraggableId(null);
@@ -1312,18 +1119,6 @@ class Home extends Component {
           desModeIssues = _.filter(backlogData, issue => issue[key] === desModeId);
         }
       }
-      // if (desModeId === 0) {
-      //   const desEpicIssues = _.filter(issueData, issue => issue.epicId === desEpicId);
-      //   if (mode === 'none') {
-      //     desEpicAndModeIssues = desEpicIssues.slice();
-      //   } else {
-      //     desEpicAndModeIssues = _.filter(desEpicIssues, issue => issue[key] === 0
-      //       || issue[key] === null);
-      //   }
-      // } else {
-      //   desEpicAndModeIssues = _.filter(issueData, issue => issue.epicId === desEpicId
-      //     && issue[key] === desModeId);
-      // }
       let before;
       let outsetIssueId;
       if (desModeIssues.length) {
@@ -1420,31 +1215,6 @@ class Home extends Component {
       }
       const tarBacklogData = backlogIssues;
       this.handleDataWhenMove(issueIds, before, outsetIssueId, mode, 0, desModeId);
-      // _.map(issueIds, (id) => {
-      //   const currentIssue = _.find(issueData, item => item.issueId === id);
-      //   const vosId = desModeId === 0 ? null : desModeId;
-      //   currentIssue.epicId = 0;
-      //   if (mode !== 'none') {
-      //     // currentIssue[key] = vosId;
-      //   }
-      //   // postData = {
-      //   //   before, epicId: souEpicId ? 0
-      // : undefined, outsetIssueId, rankIndex, issueIds, [key]: desModeId,
-      //   // };
-      //   // if (res.source.droppableId.includes('backlog')) {
-      //   //   tarBacklogData = _.find(backlogData, item => item.issueId === id);
-      //   //   const index = backlogData.indexOf(tarBacklogData);
-      //   //   backlogData.splice(index, 1);
-      //   // }
-      //   // if (mode !== 'none') {
-      //   //   postData[key] = desModeId;
-      //   // }
-      // });
-      // if (res.source.droppableId.includes('backlog')) {
-      //   UserMapStore.setBacklogIssues(backlogData);
-      // }
-      // UserMapStore.setIssues(issueData);
-      // window.console.log(postData);
       UserMapStore.handleMoveIssue(postData);
       UserMapStore.setSelectIssueIds([]);
       UserMapStore.setCurrentDraggableId(null);
@@ -2042,123 +1812,126 @@ class Home extends Component {
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listEpic']}
       >
         {this.renderHeader()}
-        { epicData.length ? (
-          <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
-            {isLoading ? <Spin spinning={isLoading} style={{ marginLeft: '40%', marginTop: '30%' }} size="large" />
-              : (
-                <DragDropContext
-                  onDragEnd={this.handleEpicOrIssueDrag}
-                  onDragStart={this.handleEpicOrIssueDragStart}
-                >
-                  <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
-                    <QuickSearch
-                      title
-                      buttonName="更多"
-                      buttonIcon="more_vert"
-                      moreSelection={UserMapStore.getFilters}
-                      onQuickSearchChange={this.onQuickSearchChange}
-                      pageFlag="UserMap"
-                      onAssigneeChange={this.onAssigneeChange}
-                      assignee={UserMapStore.getAssigneeProps}
-                    />
-                    { showBackLog ? (
-                      <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
-                        <Backlog handleClickIssue={this.handleClickIssue} />
-                      </div>
-                    ) : null }
-                    <div className="fixHead" style={{ height: `calc(100% - ${57}px)` }}>
-                      <div className="fixHead-head" id="fixHead-head">
-                        <div className="fixHead-line">
-                          <Droppable droppableId="epic" direction="horizontal">
-                            {(provided, snapshot) => (
-                              <div
-                                className="fixHead-line-epic"
-                                ref={provided.innerRef}
-                                style={{
-                                  background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
-                                  padding: 'grid',
-                                  // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                                }}
-                              >
-                                {UserMapStore.epics.map((epic, index) => (
-                                  <div className="fixHead-block" key={epic.issueId}>
-                                    <EpicCard
-                                      index={index}
-                                      // key={epic.issueId}
-                                      epic={epic}
-                                    />
-                                  </div>
-                                ))}
-                                {provided.placeholder}
-                              </div>
-                            )}
-                          </Droppable>
+        <div style={{ padding: 0, paddingLeft: 24, overflow: 'unset', }}>
+          <QuickSearch
+            title
+            buttonName="更多"
+            buttonIcon="more_vert"
+            moreSelection={UserMapStore.getFilters}
+            onQuickSearchChange={this.onQuickSearchChange}
+            pageFlag="UserMap"
+            onAssigneeChange={this.onAssigneeChange}
+            assignee={UserMapStore.getAssigneeProps}
+          />
+        </div>
+       
+        <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
+          {isLoading 
+            ? (
+              <div style={{ 
+                display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center', 
+              }}
+              >
+                <Spin spinning={isLoading} />
+              </div>
+            )
+            : epicData.length 
+              ? (
+                <div style={{ padding: 0, height: '100%'}}>
+                  <DragDropContext
+                    onDragEnd={this.handleEpicOrIssueDrag}
+                    onDragStart={this.handleEpicOrIssueDragStart}
+                  >
+                    <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
+                     
+                      { showBackLog ? (
+                        <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
+                          <Backlog handleClickIssue={this.handleClickIssue} />
+                        </div>
+                      ) : null }
+                      <div className="fixHead" style={{ height: `calc(100% - ${11}px)` }}>
+                        <div className="fixHead-head" id="fixHead-head">
+                          <div className="fixHead-line">
+                            <Droppable droppableId="epic" direction="horizontal">
+                              {(provided, snapshot) => (
+                                <div
+                                  className="fixHead-line-epic"
+                                  ref={provided.innerRef}
+                                  style={{
+                                    background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
+                                    padding: 'grid',
+                                    // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                                  }}
+                                >
+                                  {UserMapStore.epics.map((epic, index) => (
+                                    <div className="fixHead-block" key={epic.issueId}>
+                                      <EpicCard
+                                        index={index}
+                                          // key={epic.issueId}
+                                        epic={epic}
+                                      />
+                                    </div>
+                                  ))}
+                                  {provided.placeholder}
+                                </div>
+                              )}
+                            </Droppable>
+                          </div>
+                        </div>
+                        <div id="fixHead-body" className="fixHead-body" style={{ flex: 1, position: 'relative' }}>
+                          {this.renderBody()}
                         </div>
                       </div>
-                      <div id="fixHead-body" className="fixHead-body" style={{ flex: 1, position: 'relative' }}>
-                        {this.renderBody()}
-                      </div>
+                    </div>
+                  </DragDropContext>
+                  <CreateEpic
+                    store={UserMapStore}
+                      // container={document.querySelector('.c7n-userMap')}
+                    visible={createEpic}
+                    onOk={() => {
+                      UserMapStore.setCreateEpic(false);
+                      UserMapStore.loadEpic();
+                    }}
+                    onCancel={() => UserMapStore.setCreateEpic(false)}
+                  />
+                  <CreateVOS
+                      // container={document.querySelector('.c7n-userMap')}
+                    visible={UserMapStore.createVOS}
+                      // onOk={() => {UserMapStore.setCreateVOS(false)}}
+                    onOk={this.handleCreateOk}
+                    onCancel={() => { UserMapStore.setCreateVOS(false); }}
+                    type={UserMapStore.getCreateVOSType}
+                  />
+                </div>
+              )
+              : (
+                <div style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
+                  <div style={{
+                    display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
+                  }}
+                  >
+                    <CreateEpic
+                      store={UserMapStore}
+                // container={document.querySelector('.c7n-userMap')}
+                      visible={createEpic}
+                      onOk={() => {
+                        UserMapStore.setCreateEpic(false);
+                        UserMapStore.loadEpic();
+                      }}
+                      onCancel={() => UserMapStore.setCreateEpic(false)}
+                    />
+                    <img src={epicPic} alt="" width="200" />
+                    <div style={{ marginLeft: 50, width: 390 }}>
+                      <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+                      <p style={{ fontSize: 20, marginTop: 10 }}>
+                        {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
+                        <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
+                        {'进入用户故事地图。'}
+                      </p>
                     </div>
                   </div>
-                </DragDropContext>
-              )}
-            <CreateEpic
-              store={UserMapStore}
-              // container={document.querySelector('.c7n-userMap')}
-              visible={createEpic}
-              onOk={() => {
-                UserMapStore.setCreateEpic(false);
-                UserMapStore.loadEpic();
-              }}
-              onCancel={() => UserMapStore.setCreateEpic(false)}
-            />
-            <CreateVOS
-              // container={document.querySelector('.c7n-userMap')}
-              visible={UserMapStore.createVOS}
-              // onOk={() => {UserMapStore.setCreateVOS(false)}}
-              onOk={this.handleCreateOk}
-              onCancel={() => { UserMapStore.setCreateVOS(false); }}
-              type={UserMapStore.getCreateVOSType}
-            />
-          </Content>
-        ) : (
-          <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
-            <QuickSearch
-              title
-              buttonName="更多"
-              buttonIcon="more_vert"
-              moreSelection={UserMapStore.getFilters}
-              onQuickSearchChange={this.onQuickSearchChange}
-              pageFlag="UserMap"
-              onAssigneeChange={this.onAssigneeChange}
-              assignee={UserMapStore.getAssigneeProps}
-            />
-            <div style={{
-              display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
-            }}
-            >
-              <CreateEpic
-                store={UserMapStore}
-                // container={document.querySelector('.c7n-userMap')}
-                visible={createEpic}
-                onOk={() => {
-                  UserMapStore.setCreateEpic(false);
-                  UserMapStore.loadEpic();
-                }}
-                onCancel={() => UserMapStore.setCreateEpic(false)}
-              />
-              <img src={epicPic} alt="" width="200" />
-              <div style={{ marginLeft: 50, width: 390 }}>
-                <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
-                <p style={{ fontSize: 20, marginTop: 10 }}>
-                  {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
-                  <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
-                  {'进入用户故事地图。'}
-                </p>
-              </div>
-            </div>
-          </Content>
-        )}
+                </div>)}
+        </Content>
       </Page>
     );
   }

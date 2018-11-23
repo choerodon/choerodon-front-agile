@@ -18,43 +18,18 @@ const quickSearchStores = {
 };
 
 const { Option, OptGroup } = Select;
-const { CheckableTag } = Tag;
-const { Group: CheckboxGroup } = Checkbox;
 const { AppState } = stores;
 
-// @inject('AppState')
 @observer
 class QuickSearch extends Component {
-  static defaultProps = {
-    selectionGroup: ['仅我的问题', '仅故事'],
-    resetFilter: false,
-  };
-
   static propTypes = {
-    selectionGroup: PropTypes.arrayOf(PropTypes.any),
     title: PropTypes.bool,
-    buttonName: PropTypes.string,
-    buttonIcon: PropTypes.string,
     moreSelection: PropTypes.arrayOf(PropTypes.any),
-    onChangeCheckBox: PropTypes.func,
-    onlyMe: PropTypes.func,
-    onlyStory: PropTypes.func,
-    resetFilter: PropTypes.bool,
-  };
-
-
-  state = {
-    quickSearchSelected: [],
   };
 
   handleQuickSearchChange = (value) => {
     const { onQuickSearchChange } = this.props;
     const labels = _.map(value, 'label');
-    this.setState(
-      {
-        quickSearchSelected: _.map(value, 'key'),
-      },
-    );
     onQuickSearchChange(labels.includes('仅我的问题'), labels.includes('仅故事'), _.pull(_.map(value, 'key'), '仅故事', '仅我的问题'));
   }
 
@@ -70,7 +45,6 @@ class QuickSearch extends Component {
     const {
       title, moreSelection, assignee,
     } = this.props;
-    const { quickSearchSelected } = this.state;
     const listChildren = moreSelection.map(item => ({
       label: item.name,
       value: item.filterId,
@@ -97,7 +71,6 @@ class QuickSearch extends Component {
               placeholder="快速搜索"
               maxTagCount={0}
               maxTagPlaceholder={ommittedValues => `${_.map(ommittedValues, 'label').join(', ')}`
-                // return ommittedValues.join(', ')}
               }
               onChange={this.handleQuickSearchChange}
             >
