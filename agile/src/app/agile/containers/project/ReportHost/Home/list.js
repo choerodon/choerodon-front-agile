@@ -8,7 +8,7 @@ export default [
   },
   {
     key: 'sprint',
-    title: '冲刺报告',
+    title: '冲刺报告图',
     des: '了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定团队的工作量是否超额。',
     link: '/agile/reporthost/sprintReport',
     pic: 'sprint',
@@ -22,7 +22,7 @@ export default [
   },
   {
     key: 'versionReport',
-    title: '版本报告',
+    title: '版本报告图',
     des: '跟踪对应的版本发布日期，这有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。',
     link: '/agile/reporthost/versionReport',
     pic: 'versionReport',
@@ -36,7 +36,7 @@ export default [
   },
   {
     key: 'epicReport',
-    title: '史诗报告',
+    title: '史诗报告图',
     des: '随时了解一个史诗的完成进度。这有助于您跟踪未完成或未分配问题来管理团队的开发进度。',
     link: '/agile/reporthost/EpicReport',
     pic: 'epicReport',

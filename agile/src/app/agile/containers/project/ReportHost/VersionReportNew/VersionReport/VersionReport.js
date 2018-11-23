@@ -575,7 +575,7 @@ class EpicReport extends Component {
     return (
       <Page className="c7n-versionReport">
         <Header 
-          title="版本报告"
+          title="版本报告图"
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
@@ -591,7 +591,7 @@ class EpicReport extends Component {
           </Button>
         </Header>
         <Content
-          title="版本报告"
+          title="版本报告图"
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/version-report/"
         >
@@ -623,7 +623,7 @@ class EpicReport extends Component {
                   </Select>
                 </div>
                 <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between' }}>
-                  <p style={{ fontWeight: '600', marginBottom: 0 }}>{VS.getCurrentVersion.versionId && VS.getCurrentVersion.statusCode === 'released' ? `发布于 ${VS.getCurrentVersion.releaseDate ? VS.getCurrentVersion.releaseDate : '未指定发布日期'}` : '未发布'}</p>
+                  <p style={{ marginBottom: 0 }}>{VS.getCurrentVersion.versionId && VS.getCurrentVersion.statusCode === 'released' ? `发布于 ${VS.getCurrentVersion.releaseDate ? VS.getCurrentVersion.releaseDate.split(' ')[0] : '未指定发布日期'}` : '未发布'}</p>
                   <p
                     style={{
                       color: '#3F51B5',
@@ -637,9 +637,7 @@ class EpicReport extends Component {
                       this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
                     }}
                   >
-
-
-                    在“问题管理中”查看
+                    {'在“问题管理中”查看'}
                     <Icon style={{ fontSize: 13 }} type="open_in_new" />
                   </p>
                 </div>

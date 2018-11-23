@@ -307,7 +307,7 @@ class VersionItem extends Component {
                       projectId={projectId}
                       organizationId={orgId}
                       service={['agile-service.product-version.updateVersion']}
-                      noAccessChildren={<p>{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[2].substring(0, 2)}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[0].substring(2, 4)}` : '无'}</p>}
+                      noAccessChildren={<p>{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[0]}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[2].substring(0, 2)}` : '无'}</p>}
                     >
                       <EasyEdit
                         time
@@ -318,8 +318,7 @@ class VersionItem extends Component {
                           this.updateDate('startDate', dateString);
                         }}
                       >
-                        {/* <p>{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[2].substring(0, 2)}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[0].substring(2, 4)}` : '无'}</p> */}
-                        <p>{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[0]}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[0].substring(0, 2)}` : '无'}</p>
+                        <p>{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[0]}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[2].substring(0, 2)}` : '无'}</p>
                       </EasyEdit>
                     </Permission>
 
@@ -331,7 +330,7 @@ class VersionItem extends Component {
                       projectId={projectId}
                       organizationId={orgId}
                       service={['agile-service.product-version.updateVersion']}
-                      noAccessChildren={<p>{!_.isNull(item.releaseDate) ? `${item && item.releaseDate.split('-')[2].substring(0, 2)}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[0].substring(2, 4)}` : '无'}</p>}
+                      noAccessChildren={<p>{!_.isNull(item.releaseDate) ? `${item && item.releaseDate.split('-')[0]}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[2].substring(0, 2)}` : '无'}</p>}
                     >
                       <EasyEdit
                         type="date"
@@ -360,7 +359,7 @@ class VersionItem extends Component {
                   </div>
                   <div className="c7n-backlog-versionItemParam">
                     <p className="c7n-backlog-versionItemParamKey">故事点数</p>
-                    <p className="c7n-backlog-versionItemParamValue" style={{ minWidth: 31, color: 'rgba(0,0,0,0.65)' }}>{item.totalEstimate}p</p>
+                    <p className="c7n-backlog-versionItemParamValue" style={{ minWidth: 31 }}>{`${item.totalEstimate}p`}</p>
                   </div>
                 </div>
               </div>
