@@ -187,12 +187,10 @@ class CreateSprint extends Component {
       .then((data) => {
         loginUserId = data.id;
       })
-      .catch((e) => {
-        console.log(e);
-      });
+      .catch((e) => {});
 
     axios.post('/iam/v1/permissions/checkPermission', [
-      { 
+      {
         code: 'agile-service.project-info.updateProjectInfo',
         organizationId: 4,
         projectId: 28,
@@ -612,6 +610,9 @@ class CreateSprint extends Component {
             if (onUpdate) {
               onUpdate();
             }
+            this.setState({
+              transformId: false,
+            });
           });
       }
     } else {
@@ -888,7 +889,7 @@ class CreateSprint extends Component {
     if (e.key === '0') {
       this.setState({ dailyLogShow: true });
     } else if (e.key === 'item_1') {
-        this.handleDeleteIssue(issueId);
+      this.handleDeleteIssue(issueId);
     } else if (e.key === '2') {
       this.setState({ createSubTaskShow: true });
     } else if (e.key === '3') {
@@ -1159,7 +1160,7 @@ class CreateSprint extends Component {
                       >
                         {branchs.totalCommit || '0'}
                         {'提交'}
-                        </span>
+                      </span>
                     </div>
                     <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                       <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1201,7 +1202,7 @@ class CreateSprint extends Component {
                       >
                         {branchs.totalMergeRequest}
                         {'合并请求'}
-                       </span>
+                      </span>
                       <span style={{
                         width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center',
                       }}
@@ -1334,15 +1335,14 @@ class CreateSprint extends Component {
     }
     const getMenu = () => {
       const { createdById, hasPermission } = this.state;
-      // console.log(`loginUserId: ${loginUserId}, createById: ${createdById}, ${loginUserId === createdById}`);
       return (
         <Menu onClick={this.handleClickMenu.bind(this)}>
           <Menu.Item key="0">
             {'登记工作日志'}
           </Menu.Item>
           <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue.deleteIssue']}>
-            <Menu.Item 
-              key="1" 
+            <Menu.Item
+              key="1"
               disabled={loginUserId !== createdById && !hasPermission}
             >
               {'删除'}
@@ -2003,7 +2003,7 @@ class CreateSprint extends Component {
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
                             {'标签'}
-                                                    </span>
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -2098,7 +2098,7 @@ class CreateSprint extends Component {
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
                                 {'影响的版本：'}
-                                                            </span>
+                              </span>
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit
@@ -2192,10 +2192,8 @@ class CreateSprint extends Component {
                           <span className="c7n-property">
 
 
-
-
                             修复的版本：
-                                                    </span>
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -2376,7 +2374,7 @@ class CreateSprint extends Component {
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
                             {'冲刺：'}
-                                                    </span>
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           {
@@ -2511,7 +2509,7 @@ class CreateSprint extends Component {
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
                             {'时间跟踪：'}
-                                                    </span>
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                           <Progress
@@ -2530,7 +2528,7 @@ class CreateSprint extends Component {
                             h/
                             {this.getWorkloads() + (origin.remainingTime || 0)}
                             h
-                                                    </span>
+                          </span>
                           <span
                             role="none"
                             style={{
@@ -2545,7 +2543,7 @@ class CreateSprint extends Component {
                             }}
                           >
                             {'登记工作'}
-                                                    </span>
+                          </span>
                         </div>
                       </div>
                       {
@@ -2554,7 +2552,7 @@ class CreateSprint extends Component {
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
                                 {'Epic名：'}
-                                                            </span>
+                              </span>
                             </div>
                             <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                               <ReadAndEdit
@@ -2598,7 +2596,7 @@ class CreateSprint extends Component {
                         <div className="c7n-property-wrapper">
                           <span className="c7n-subtitle">
                             {'人员'}
-                                                    </span>
+                          </span>
                         </div>
                       </div>
                       <div className="line-start mt-10 assignee">
@@ -2705,7 +2703,7 @@ class CreateSprint extends Component {
                             }}
                           >
                             {'分配给我'}
-                                                    </span>
+                          </span>
                         </div>
                       </div>
                       <div className="line-start mt-10 assignee">
@@ -2810,7 +2808,7 @@ class CreateSprint extends Component {
                             }}
                           >
                             {'分配给我'}
-                                                    </span>
+                          </span>
                         </div>
                       </div>
                       <div className="line-start mt-10">

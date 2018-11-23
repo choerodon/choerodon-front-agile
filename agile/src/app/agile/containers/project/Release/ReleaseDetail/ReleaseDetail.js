@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import {
-  Page, Header, Content, stores, Permission, 
+  Page, Header, Content, stores, Permission,
 } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
-  Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip, 
+  Button, Tabs, Table, Popover, Form, Icon, Spin, Avatar, Tooltip,
 } from 'choerodon-ui';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 import './ReleaseDetail.scss';
@@ -24,13 +24,18 @@ class ReleaseDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedIssue: {},
       publicVersion: false,
+      tab: null,
     };
   }
 
   componentWillMount() {
     document.getElementById('autoRouter').style.overflow = 'scroll';
+    try {
+      ReleaseStore.getSettings();
+    } catch (e) {
+      throw e;
+    }
     this.refresh();
   }
 
@@ -38,160 +43,73 @@ class ReleaseDetail extends Component {
     document.getElementById('autoRouter').style.overflow = 'unset';
   }
 
-  refresh() {
-    const { match } = this.props;
-    this.setState({
-      loading: true,
-    });
-    ReleaseStore.axiosGetVersionDetail(match.params.id).then((res) => {
-      ReleaseStore.setVersionDetail(res);
-      this.setState({
-        loading: false,
-      });
-    }).catch((error) => {
-    });
-    ReleaseStore.axiosGetVersionStatusIssues(match.params.id).then((res2) => {
-      let todoCount = 0;
-      let doingCount = 0;
-      let doneCount = 0;
-      let todoStatusCount = 0;
-      let doingStatusCount = 0;
-      let doneStatusCount = 0;
-      const todoStatus = {};
-      const doingStatus = {};
-      const doneStatus = {};
-      if (res2 && res2.length) {
-        // 按状态和状态类别统计
-        res2.forEach((issue) => {
-          if (issue.statusMapDTO) {
-            if (issue.statusMapDTO.type === 'todo') {
-              todoCount += 1;
-              if (todoStatus[issue.statusMapDTO.id]) {
-                todoStatus[issue.statusMapDTO.id].count += 1;
-              } else {
-                todoStatusCount += 1;
-                todoStatus[issue.statusMapDTO.id] = {
-                  count: 1,
-                  name: issue.statusMapDTO.name,
-                };
-              }
-            } else if (issue.statusMapDTO.type === 'doing') {
-              doingCount += 1;
-              if (doingStatus[issue.statusMapDTO.id]) {
-                doingStatus[issue.statusMapDTO.id].count += 1;
-              } else {
-                doingStatusCount += 1;
-                doingStatus[issue.statusMapDTO.id] = {
-                  count: 1,
-                  name: issue.statusMapDTO.name,
-                };
-              }
-            } else if (issue.statusMapDTO.type === 'done') {
-              doneCount += 1;
-              if (doneStatus[issue.statusMapDTO.id]) {
-                doneStatus[issue.statusMapDTO.id].count += 1;
-              } else {
-                doneStatusCount += 1;
-                doneStatus[issue.statusMapDTO.id] = {
-                  count: 1,
-                  name: issue.statusMapDTO.name,
-                };
-              }
-            }
-          }
-        });
-        ReleaseStore.setIssueCountDetail({
-          todoCount,
-          todoStatus,
-          doingCount,
-          todoStatusCount,
-          doingStatusCount,
-          doneStatusCount,
-          doingStatus,
-          doneCount,
-          doneStatus,
-          count: res2.length,
-        });
-        ReleaseStore.setVersionStatusIssues(res2);
+  handleFilterChange = (pagination, filters, sorter, barFilters) => {
+    const { tab } = this.state;
+    Object.keys(filters).forEach((key) => {
+      if (key === 'statusId' || key === 'priorityId' || key === 'issueTypeId') {
+        ReleaseStore.setAdvArg(filters);
+      } else if (key === 'issueNum') {
+        // 根据接口进行对象调整
+        ReleaseStore.setArg({ issueNum: filters[key][0] });
+      } else if (key === 'assigneeName') {
+        // 同上
+        ReleaseStore.setArg({ assignee: filters[key][0] });
+      } else if (key === 'summary') {
+        ReleaseStore.setArg({ summary: filters[key][0] });
       } else {
-        ReleaseStore.setVersionStatusIssues([]);
-        ReleaseStore.setIssueCountDetail({
-          todoCount,
-          todoStatus,
-          doingCount,
-          todoStatusCount,
-          doingStatusCount,
-          doneStatusCount,
-          doingStatus,
-          doneCount,
-          doneStatus,
-          count: 0,
-        });
+        ReleaseStore.setArg({ comment: filters[key][0] });
       }
-      this.setState({
-        loading: false,
-      });
-    }).catch((error2) => {
     });
-  }
+    this.refresh(tab, ReleaseStore.getFilter);
+  };
 
   handleChangeTab(key) {
-    ReleaseStore.axiosGetVersionStatusIssues(this.props.match.params.id, key).then((res2) => {
-      this.setState({
-        selectedIssue: {},
-      });
+    const { match } = this.props;
+    this.setState({
+      tab: key,
+    });
+    ReleaseStore.axiosGetVersionStatusIssues(
+      match.params.id,
+      ReleaseStore.getFilterMap.get(key), key,
+    ).then((res2) => {
       ReleaseStore.setVersionStatusIssues(res2);
     }).catch((error2) => {
     });
   }
 
-  renderTypecode(item, type) {
-    if (item.typeCode === 'issue_epic') {
-      if (type === 'background') {
-        return '#743BE7';
-      } else {
-        return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="priority" />
-        );
-      }
-    }
-    if (item.typeCode === 'story') {
-      if (type === 'background') {
-        return '#00BFA5';
-      } else {
-        return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="turned_in" />
-        );
-      }
-    }
-    if (item.typeCode === 'task') {
-      if (type === 'background') {
-        return '#4D90FE';
-      } else {
-        return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="assignment" />
-        );
-      }
-    }
-    if (item.typeCode === 'sub_task') {
-      if (type === 'background') {
-        return '#4D90FE';
-      } else {
-        return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="relation" />
-        );
-      }
-    }
-    if (item.typeCode === 'bug') {
-      if (type === 'background') {
-        return '#F44336';
-      } else {
-        return (
-          <Icon style={{ color: 'white', fontSize: '14px' }} type="bug_report" />
-        );
-      }
-    }
-    return '';
+  refresh(key, filter = {}) {
+    const { match } = this.props;
+    ReleaseStore.setFilterMap(key || '0');
+    ReleaseStore.clearArg();
+    this.setState({
+      loading: true,
+    });
+    ReleaseStore.axiosGetVersionDetail(match.params.id).then((res) => {
+      ReleaseStore.setVersionDetail(res);
+      ReleaseStore.setIssueCountDetail({
+        todoCount: res.todoIssueCount,
+        todoStatus: res.todoStatusIds,
+        doingCount: res.doingIssueCount,
+        todoStatusCount: res.todoStatusIds.length,
+        doingStatusCount: res.doingStatusIds.length,
+        doneStatusCount: res.doneStatusIds.length,
+        doingStatus: res.doingStatusIds,
+        doneCount: res.doneIssueCount,
+        doneStatus: res.doneStatusIds,
+        count: res.issueCount,
+      });
+      this.setState({
+        loading: false,
+      });
+    }).catch((error) => {
+    });
+    ReleaseStore.axiosGetVersionStatusIssues(match.params.id, filter, key).then((res2) => {
+      ReleaseStore.setVersionStatusIssues(res2);
+      this.setState({
+        loading: false,
+      });
+    }).catch((error2) => {
+    });
   }
 
   renderBorderRadius(position) {
@@ -244,27 +162,14 @@ class ReleaseDetail extends Component {
     return radius;
   }
 
-  renderStatusBackground(record) {
-    if (record.categoryCode === 'done' || record === '已完成') {
-      return 'rgb(0, 191, 165)';
-    } else if (record.categoryCode === 'doing' || record === '处理中') {
-      return 'rgb(77, 144, 254)';
-    } else if (record.categoryCode === 'todo' || record === '待处理') {
-      return 'rgb(255, 177, 0)';
-    } else {
-      return 'gray';
-    }
-  }
-
   renderTabTables(columns) {
     const urlParams = AppState.currentMenuType;
     return (
       <div>
         <div style={{
-          padding: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+          padding: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}
         >
-          <p>{`共${ReleaseStore.getVersionStatusIssues.length}个`}</p>
           <p
             style={{
               color: '#3F51B5',
@@ -283,15 +188,9 @@ class ReleaseDetail extends Component {
         <Table
           ref={(node) => { this.Table = node; }}
           pagination={ReleaseStore.getVersionStatusIssues.length > 10}
+          onChange={this.handleFilterChange}
           dataSource={ReleaseStore.getVersionStatusIssues}
           columns={columns}
-          onRow={record => ({
-            onClick: () => {
-              this.setState({
-                selectedIssue: record,
-              });
-            },
-          })}
           rowKey="issueId"
         />
       </div>
@@ -353,26 +252,27 @@ class ReleaseDetail extends Component {
     );
   }
 
-  renderPriorityStyle(type, item) {
-    if (type === 'color') {
-      if (item.priorityName === '中') {
-        return 'rgb(53, 117, 223)';
-      } else if (item.priorityName === '高') {
-        return 'rgb(255, 177, 0)';
-      } else {
-        return 'rgba(0, 0, 0, 0.36)';
-      }
-    } else if (item.priorityName === '中') {
-      return 'rgba(77, 144, 254, 0.2)';
-    } else if (item.priorityName === '高') {
-      return 'rgba(255, 177, 0, 0.12)';
-    } else {
-      return 'rgba(0, 0, 0, 0.08)';
-    }
-  }
-
   render() {
     const urlParams = AppState.currentMenuType;
+    const filterMap = new Map([
+      ['issueNum', []],
+      ['issueTypeId', ReleaseStore.getIssueTypes.map(item => ({
+        text: item.name,
+        value: item.id.toString(),
+      }))],
+      ['summary', []],
+      ['assigneeName', []],
+      ['priorityId', ReleaseStore.getIssuePriority.map(item => ({
+        text: item.name,
+        value: item.id.toString(),
+      }))],
+      ['statusId', ReleaseStore.getIssueStatus.map(item => ({
+        text: item.name,
+        value: item.id.toString(),
+      }))],
+    ]);
+    const { history, match } = this.props;
+    const { loading, publicVersion } = this.state;
     const columns = [
       {
         width: '10%',
@@ -380,18 +280,21 @@ class ReleaseDetail extends Component {
         dataIndex: 'issueNum',
         key: 'issueNum',
         render: text => <span className="textDisplayOneColumn">{text}</span>,
+        filters: filterMap.get('issueNum'),
       },
       {
         width: '10%',
         title: '问题类型',
-        dataIndex: 'typeCode',
-        key: 'typeCode',
+        dataIndex: 'issueTypeId',
+        key: 'issueTypeId',
         render: (text, record) => (
           <TypeTag
             data={record.issueTypeDTO}
             showName
           />
         ),
+        filters: filterMap.get('issueTypeId'),
+        filterMultiple: true,
       },
       {
         width: '40%',
@@ -399,6 +302,7 @@ class ReleaseDetail extends Component {
         dataIndex: 'summary',
         key: 'summary',
         render: text => <span className="textDisplayOneColumn">{text}</span>,
+        filters: filterMap.get('summary'),
       },
       {
         width: '15%',
@@ -414,28 +318,33 @@ class ReleaseDetail extends Component {
               avatar: record.assigneeImageUrl,
             }}
           />
-        ) : '')
-        ,
+        ) : ''),
+        filters: filterMap.get('assigneeName'),
       },
       {
         width: '10%',
         title: '优先级',
         dataIndex: 'priorityName',
-        key: 'priorityName',
+        key: 'priorityId',
         render: (text, record) => (
           <PriorityTag
             priority={record.priorityDTO}
           />
         ),
+        filters: filterMap.get('priorityId'),
+        filterMultiple: true,
       }, {
         width: '15%',
         title: '状态',
         dataIndex: 'statusName',
+        key: 'statusId',
         render: (text, record) => (
           <StatusTag
             data={record.statusMapDTO}
           />
         ),
+        filters: filterMap.get('statusId'),
+        filterMultiple: true,
       },
     ];
     return (
@@ -443,12 +352,12 @@ class ReleaseDetail extends Component {
         <Header
           title={(
             <Tooltip title={`版本${ReleaseStore.getVersionDetail.name}`}>
-              <div 
-                style={{ 
+              <div
+                style={{
                   display: 'inline-block',
-                  maxWidth: '141px', 
-                  whiteSpace: 'nowrap', 
-                  overflow: 'hidden', 
+                  maxWidth: '141px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   marginTop: '23px',
                 }}
@@ -464,9 +373,7 @@ class ReleaseDetail extends Component {
           }}
           >
             {ReleaseStore.getVersionDetail.statusName}
-
           </div>
-               
           {
             ReleaseStore.getVersionDetail.statusCode === 'archived' ? '' : (
               <Permission service={ReleaseStore.getVersionDetail.statusCode === 'version_planning' ? ['agile-service.product-version.releaseVersion'] : ['agile-service.product-version.revokeReleaseVersion']}>
@@ -507,17 +414,15 @@ class ReleaseDetail extends Component {
               marginLeft: 8,
             }}
             onClick={() => {
-              const { history } = this.props;
-              history.push(`/agile/release/logs/${this.props.match.params.id}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+              history.push(`/agile/release/logs/${match.params.id}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
             }}
           >
             <Icon type="find_in_page" />
             <span>版本日志</span>
           </Button>
-
         </Header>
         <Content className="c7n-versionDetail">
-          <Spin spinning={this.state.loading}>
+          <Spin spinning={loading}>
             <div style={{ display: 'flex', color: 'rgba(0,0,0,0.54)' }}>
               <div className="c7n-versionTime">
                 <Icon style={{ fontSize: 20 }} type="date_range" />
@@ -654,7 +559,7 @@ class ReleaseDetail extends Component {
             </div>
 
             <PublicRelease
-              visible={this.state.publicVersion}
+              visible={publicVersion}
               onCancel={() => {
                 this.setState({
                   publicVersion: false,
