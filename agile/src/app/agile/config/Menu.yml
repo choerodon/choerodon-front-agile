@@ -26,7 +26,7 @@
         Routes: /agile/issue
         sort: 4
         permission:
-          - 'agile-service.issue.listIssueWithoutSub'
+          - 'agile-service.issue.listIssueWithSub'
     - "release":
         icon: publish2
         Routes: /agile/release

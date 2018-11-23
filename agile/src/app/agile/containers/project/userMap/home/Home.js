@@ -2039,7 +2039,7 @@ class Home extends Component {
     return (
       <Page
         className="c7n-userMap"
-        service={['agile-service.issue.deleteIssue', 'agile-service.issue.listIssueWithoutSub']}
+        service={['agile-service.issue.deleteIssue', 'agile-service.issue.listEpic']}
       >
         {this.renderHeader()}
         { epicData.length ? (
