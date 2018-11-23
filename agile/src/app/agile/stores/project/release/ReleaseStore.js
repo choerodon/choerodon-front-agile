@@ -1,5 +1,5 @@
 import {
-  observable, action, computed, toJS, 
+  observable, action, computed, toJS,
 } from 'mobx';
 import axios from 'axios';
 import { store, stores } from 'choerodon-front-boot';
@@ -16,6 +16,12 @@ class ReleaseStore {
   @observable versionStatusIssues = [];
 
   @observable publicVersionDetail = {};
+
+  @observable issueTypes = [];
+
+  @observable issueStatus = [];
+
+  @observable issuePriority = [];
 
   @observable issueCountDetail = {
     todoCount: 0,
@@ -35,6 +41,13 @@ class ReleaseStore {
     content: '',
   };
 
+  @observable filterMap = new Map([
+    ['todo', {}],
+    ['doing', {}],
+    ['done', {}],
+    ['0', {}],
+  ]);
+
   @computed get getIssueCountDetail() {
     return this.issueCountDetail;
   }
@@ -43,6 +56,38 @@ class ReleaseStore {
     this.issueCountDetail = data;
   }
 
+  @action setAdvArg(data) {
+    if (data) {
+      Object.assign(this.filters.advancedSearchArgs, data);
+    }
+  }
+
+  @action setArg(data) {
+    if (data) {
+      Object.assign(this.filters.searchArgs, data);
+    }
+  }
+
+  @computed get getFilter() {
+    return toJS(this.filters);
+  }
+
+  @action setFilterMap(key) {
+    this.filterMap.set(key, toJS(this.filters));
+    this.clearArg();
+  }
+
+  @computed get getFilterMap() {
+    return toJS(this.filterMap);
+  }
+
+  @action clearArg() {
+    this.filters = {
+      advancedSearchArgs: {},
+      searchArgs: {},
+      content: '',
+    };
+  }
 
   axiosFileVersion(id) {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${id}/archived`);
@@ -84,12 +129,12 @@ class ReleaseStore {
     return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/update/${versionId}`, data);
   }
 
-  axiosGetVersionStatusIssues(versionId, statusCode) {
+  axiosGetVersionStatusIssues(versionId, data = {}, statusCode) {
     const orgId = AppState.currentMenuType.organizationId;
     if (statusCode && statusCode !== '0') {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}/issues?organizationId=${orgId}&statusCode=${statusCode}`);
+      return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}/issues?organizationId=${orgId}&statusCode=${statusCode}`, data);
     } else {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}/issues?organizationId=${orgId}`);
+      return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/${versionId}/issues?organizationId=${orgId}`, data);
     }
   }
 
@@ -127,6 +172,30 @@ class ReleaseStore {
     this.filters = data;
   }
 
+  @action setIssueTypes(data) {
+    this.issueTypes = data;
+  }
+
+  @computed get getIssueTypes() {
+    return toJS(this.issueTypes);
+  }
+
+  @action setIssuePriority(data) {
+    this.issuePriority = data;
+  }
+
+  @computed get getIssuePriority() {
+    return toJS(this.issuePriority);
+  }
+
+  @action setIssueStatus(data) {
+    this.issueStatus = data;
+  }
+
+  @computed get getIssueStatus() {
+    return toJS(this.issueStatus);
+  }
+
   axiosAddRelease(data) {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version`, data);
   }
@@ -151,8 +220,25 @@ class ReleaseStore {
   }
 
   axiosCheckName(proId, name) {
-    return axios.get(`/agile/v1/projects/${proId}/product_version/${name}/check`);
+    return axios.get(`/agile/v1/projects/${proId}/product_version/check?name=${name}`);
   }
+
+  async getSettings() {
+    const type = await this.loadType();
+    this.setIssueTypes(type);
+
+    const status = await this.loadStatus();
+    this.setIssueStatus(status);
+
+    const priorities = await this.loadPriorities();
+    this.setIssuePriority(priorities);
+  }
+
+  loadType = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_issue_types?apply_type=agile`);
+
+  loadStatus = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_status_by_project_id?apply_type=agile`);
+
+  loadPriorities = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/priority/list_by_org`);
 }
 
 const releaseStore = new ReleaseStore();

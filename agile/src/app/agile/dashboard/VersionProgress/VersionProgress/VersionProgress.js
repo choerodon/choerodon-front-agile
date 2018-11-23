@@ -18,7 +18,6 @@ class VersionProgress extends Component {
     this.state = {
       versionList: [],
       currentVersionId: 0,
-      currentVersionName: '',
       currentVersion: {},
       loading: true,
     };
@@ -56,9 +55,9 @@ class VersionProgress extends Component {
             { value: currentVersion.doingIssueCount, name: '处理中' },
             { value: currentVersion.doneIssueCount, name: '已完成' },
           ],
-          itemStyle: { 
-            normal: { 
-              borderColor: '#FFFFFF', borderWidth: 1, 
+          itemStyle: {
+            normal: {
+              borderColor: '#FFFFFF', borderWidth: 1,
             },
           },
         },
@@ -124,7 +123,7 @@ class VersionProgress extends Component {
               <Tooltip title={currentVersionName || ''} placement="bottom">
                 <span className="charts-inner-versionName">{currentVersionName || ''}</span>
               </Tooltip>
-            </div> 
+            </div>
             <ul className="charts-legend">
               <li>
                 <div />
@@ -149,7 +148,7 @@ class VersionProgress extends Component {
       </div>
     );
   };
- 
+
   loadData() {
     const { projectId } = AppState.currentMenuType;
     axios.get(`agile/v1/projects/${projectId}/product_version/versions`)
@@ -163,7 +162,7 @@ class VersionProgress extends Component {
           currentVersionId: latestVersionId,
           loading: false,
         });
-      });  
+      });
   }
 
   loadSelectData(versionId) {
@@ -171,24 +170,9 @@ class VersionProgress extends Component {
     this.setState({
       loading: true,
     });
-    axios.get(`agile/v1/projects/${projectId}/product_version/${versionId}/issues?organizationId=${organizationId}`)
+    axios.get(`/agile/v1/projects/${projectId}/product_version/${versionId}`)
       .then((res) => {
-        let todoIssueCount = 0;
-        let doingIssueCount = 0;
-        let doneIssueCount = 0;
-        if (res && res.length) {
-          res.forEach((issue) => {
-            if (issue.statusMapDTO) {
-              if (issue.statusMapDTO.type === 'todo') {
-                todoIssueCount += 1;
-              } else if (issue.statusMapDTO.type === 'doing') {
-                doingIssueCount += 1;
-              } else if (issue.statusMapDTO.type === 'done') {
-                doneIssueCount += 1;
-              }
-            }
-          });
-        }
+        const { todoIssueCount, doingIssueCount, doneIssueCount } = res;
         this.setState({
           currentVersion: {
             todoIssueCount,
@@ -199,21 +183,21 @@ class VersionProgress extends Component {
         });
       });
   }
-  
+
   render() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     const {
       type, name, id, organizationId,
     } = urlParams;
-    
+
     return (
       <div className="c7n-VersionProgress">
         {
           this.renderContent()
-        }    
+        }
         <DashBoardNavBar>
-          <a 
+          <a
             role="none"
             onClick={() => history.push(`/agile/release?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}`)}
           >
