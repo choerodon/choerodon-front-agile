@@ -132,87 +132,48 @@ class ScrumBoardHome extends Component {
     });
     ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
       ScrumBoardStore.setQuickSearchList(res);
-      ScrumBoardStore.axiosGetBoardData(boardId,
-        onlyMe ? AppState.getUserId : 0,
-        recent,
-        quickFilter).then((data) => {
-        this.setState({ dataSource: data });
-        if (data) {
-          ScrumBoardStore.setSprintData(data.currentSprint);
-        } else {
-          ScrumBoardStore.setSprintData(false);
-        }
-        ScrumBoardStore.axiosGetAllEpicData().then((data2) => {
-          const parentIds = [];
-          const assigneeIds = [];
-          const storeParentIds = [];
-          const storeAssignee = [];
-          const epicData = data.epicInfo ? data.epicInfo : [];
-          for (let index = 0, len = data.columnsData && data.columnsData.columns.length; index < len; index += 1) {
-            for (
-              let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length;
-              index2 < len2;
-              index2 += 1) {
+      if (boardId) {
+        ScrumBoardStore.axiosGetBoardData(boardId,
+          onlyMe ? AppState.getUserId : 0,
+          recent,
+          quickFilter).then((data) => {
+          this.setState({ dataSource: data });
+          if (data) {
+            ScrumBoardStore.setSprintData(data.currentSprint);
+          } else {
+            ScrumBoardStore.setSprintData(false);
+          }
+          ScrumBoardStore.axiosGetAllEpicData().then((data2) => {
+            const parentIds = [];
+            const assigneeIds = [];
+            const storeParentIds = [];
+            const storeAssignee = [];
+            const epicData = data.epicInfo ? data.epicInfo : [];
+            for (let index = 0, len = data.columnsData && data.columnsData.columns.length; index < len; index += 1) {
               for (
-                let index3 = 0, len3 = data.columnsData.columns[index]
-                  .subStatuses[index2].issues.length;
-                index3 < len3;
-                index3 += 1) {
-                if (data.parentIds
-                  .indexOf(parseInt(
-                    data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId, 10,
-                  )) !== -1) {
-                  if (parentIds.indexOf(
-                    data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId,
-                  ) === -1) {
-                    const parentId = data.columnsData
-                      .columns[index].subStatuses[index2].issues[index3].issueId;
-                    let count = 0;
-                    _.map(data.columnsData.columns, (columns) => {
-                      _.map(columns.subStatuses, (status) => {
-                        count = _.reduce(status.issues, (sum, item) => {
-                          let result = sum;
-                          if (item.parentIssueId && item.parentIssueId === parentId) {
-                            result += 1;
-                            return result;
-                          } else {
-                            result += 0;
-                            return result;
-                          }
-                        }, count);
-                      });
-                    });
-                    parentIds.push(data.columnsData
-                      .columns[index].subStatuses[index2].issues[index3].issueId);
-                    storeParentIds.push({
-                      status: data.columnsData
-                        .columns[index].subStatuses[index2].name,
-                      categoryCode: data.columnsData
-                        .columns[index].subStatuses[index2].categoryCode,
-                      ...data.columnsData.columns[index].subStatuses[index2].issues[index3],
-                      count,
-                    });
-                  }
-                }
-                if (data.assigneeIds
-                  .indexOf(parseInt(
-                    data.columnsData
-                      .columns[index].subStatuses[index2].issues[index3].assigneeId, 10,
-                  )) !== -1) {
-                  if (assigneeIds.indexOf(data.columnsData
-                    .columns[index].subStatuses[index2].issues[index3].assigneeId) === -1) {
-                    if (data.columnsData
-                      .columns[index].subStatuses[index2].issues[index3].assigneeId) {
-                      assigneeIds.push(data.columnsData
-                        .columns[index].subStatuses[index2].issues[index3].assigneeId);
-                      const { assigneeId } = data.columnsData
-                        .columns[index].subStatuses[index2].issues[index3];
+                let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length;
+                index2 < len2;
+                index2 += 1) {
+                for (
+                  let index3 = 0, len3 = data.columnsData.columns[index]
+                    .subStatuses[index2].issues.length;
+                  index3 < len3;
+                  index3 += 1) {
+                  if (data.parentIds
+                    .indexOf(parseInt(
+                      data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId, 10,
+                    )) !== -1) {
+                    if (parentIds.indexOf(
+                      data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId,
+                    ) === -1) {
+                      const parentId = data.columnsData
+                        .columns[index].subStatuses[index2].issues[index3].issueId;
                       let count = 0;
                       _.map(data.columnsData.columns, (columns) => {
                         _.map(columns.subStatuses, (status) => {
                           count = _.reduce(status.issues, (sum, item) => {
                             let result = sum;
-                            if (item.assigneeId && item.assigneeId === assigneeId) {
+                            if (item.parentIssueId && item.parentIssueId === parentId) {
                               result += 1;
                               return result;
                             } else {
@@ -222,92 +183,137 @@ class ScrumBoardHome extends Component {
                           }, count);
                         });
                       });
-                      storeAssignee.push({
+                      parentIds.push(data.columnsData
+                        .columns[index].subStatuses[index2].issues[index3].issueId);
+                      storeParentIds.push({
+                        status: data.columnsData
+                          .columns[index].subStatuses[index2].name,
+                        categoryCode: data.columnsData
+                          .columns[index].subStatuses[index2].categoryCode,
+                        ...data.columnsData.columns[index].subStatuses[index2].issues[index3],
                         count,
-                        assigneeId: data.columnsData
-                          .columns[index].subStatuses[index2].issues[index3].assigneeId,
-                        assigneeName: data.columnsData
-                          .columns[index].subStatuses[index2].issues[index3].assigneeName,
-                        imageUrl: data.columnsData
-                          .columns[index].subStatuses[index2].issues[index3].imageUrl,
                       });
+                    }
+                  }
+                  if (data.assigneeIds
+                    .indexOf(parseInt(
+                      data.columnsData
+                        .columns[index].subStatuses[index2].issues[index3].assigneeId, 10,
+                    )) !== -1) {
+                    if (assigneeIds.indexOf(data.columnsData
+                      .columns[index].subStatuses[index2].issues[index3].assigneeId) === -1) {
+                      if (data.columnsData
+                        .columns[index].subStatuses[index2].issues[index3].assigneeId) {
+                        assigneeIds.push(data.columnsData
+                          .columns[index].subStatuses[index2].issues[index3].assigneeId);
+                        const { assigneeId } = data.columnsData
+                          .columns[index].subStatuses[index2].issues[index3];
+                        let count = 0;
+                        _.map(data.columnsData.columns, (columns) => {
+                          _.map(columns.subStatuses, (status) => {
+                            count = _.reduce(status.issues, (sum, item) => {
+                              let result = sum;
+                              if (item.assigneeId && item.assigneeId === assigneeId) {
+                                result += 1;
+                                return result;
+                              } else {
+                                result += 0;
+                                return result;
+                              }
+                            }, count);
+                          });
+                        });
+                        storeAssignee.push({
+                          count,
+                          assigneeId: data.columnsData
+                            .columns[index].subStatuses[index2].issues[index3].assigneeId,
+                          assigneeName: data.columnsData
+                            .columns[index].subStatuses[index2].issues[index3].assigneeName,
+                          imageUrl: data.columnsData
+                            .columns[index].subStatuses[index2].issues[index3].imageUrl,
+                        });
+                      }
                     }
                   }
                 }
               }
             }
-          }
-          for (let index = 0, len = epicData.length; index < len; index += 1) {
-            for (let index2 = 0, len2 = data2.length; index2 < len2; index2 += 1) {
-              if (String(epicData[index].epicId) === String(data2[index2].issueId)) {
-                let count = 0;
-                _.map(data.columnsData.columns, (columns) => {
-                  _.map(columns.subStatuses, (status) => {
-                    count = _.reduce(status.issues, (sum, item) => {
-                      let result = sum;
-                      if (epicData[index].epicId === item.epicId) {
-                        result += 1;
-                        return result;
-                      } else {
-                        result += 0;
-                        return result;
-                      }
-                    }, count);
+            for (let index = 0, len = epicData.length; index < len; index += 1) {
+              for (let index2 = 0, len2 = data2.length; index2 < len2; index2 += 1) {
+                if (String(epicData[index].epicId) === String(data2[index2].issueId)) {
+                  let count = 0;
+                  _.map(data.columnsData.columns, (columns) => {
+                    _.map(columns.subStatuses, (status) => {
+                      count = _.reduce(status.issues, (sum, item) => {
+                        let result = sum;
+                        if (epicData[index].epicId === item.epicId) {
+                          result += 1;
+                          return result;
+                        } else {
+                          result += 0;
+                          return result;
+                        }
+                      }, count);
+                    });
                   });
-                });
-                epicData[index].count = count;
-                epicData[index].color = data2[index2].color;
+                  epicData[index].count = count;
+                  epicData[index].color = data2[index2].color;
+                }
               }
             }
-          }
-
-          ScrumBoardStore.setAssigneer(storeAssignee);
-          const arrAssigneeProps = [];
-          _.forEach(_.map(storeAssignee, item => _.pick(item, ['assigneeId', 'assigneeName'])), (item) => {
-            arrAssigneeProps.push({
-              id: item.assigneeId,
-              realName: item.assigneeName && item.assigneeName.replace(/[0-9]/ig, ''),
+  
+            ScrumBoardStore.setAssigneer(storeAssignee);
+            const arrAssigneeProps = [];
+            _.forEach(_.map(storeAssignee, item => _.pick(item, ['assigneeId', 'assigneeName'])), (item) => {
+              arrAssigneeProps.push({
+                id: item.assigneeId,
+                realName: item.assigneeName && item.assigneeName.replace(/[0-9]/ig, ''),
+              });
             });
-          });
-          ScrumBoardStore.setAssigneeProps(arrAssigneeProps);
-          ScrumBoardStore.setCurrentSprint(data.currentSprint);
-          ScrumBoardStore.setParentIds(storeParentIds);
-          ScrumBoardStore.setEpicData(epicData);
-          const newColumnData = data.columnsData && data.columnsData.columns;
-          const statusList = [];
-          for (let index = 0, len = newColumnData && newColumnData.length; index < len; index += 1) {
-            if (newColumnData[index].subStatuses) {
-              for (let index2 = 0, len2 = newColumnData[index].subStatuses.length;
-                index2 < len2; index2 += 1) {
-                statusList.push({
-                  id: newColumnData[index].subStatuses[index2].statusId,
-                  name: newColumnData[index].subStatuses[index2].name,
-                });
-                if (newColumnData[index].subStatuses[index2].issues) {
-                  for (let index3 = 0, len3 = newColumnData[index]
-                    .subStatuses[index2].issues.length;
-                    index3 < len3; index3 += 1) {
-                    newColumnData[index]
-                      .subStatuses[index2].issues[index3].statusName = newColumnData[index]
-                        .subStatuses[index2].name;
-                    newColumnData[index]
-                      .subStatuses[index2].issues[index3].categoryCode = newColumnData[index]
-                        .subStatuses[index2].categoryCode;
+            ScrumBoardStore.setAssigneeProps(arrAssigneeProps);
+            ScrumBoardStore.setCurrentSprint(data.currentSprint);
+            ScrumBoardStore.setParentIds(storeParentIds);
+            ScrumBoardStore.setEpicData(epicData);
+            const newColumnData = data.columnsData && data.columnsData.columns;
+            const statusList = [];
+            for (let index = 0, len = newColumnData && newColumnData.length; index < len; index += 1) {
+              if (newColumnData[index].subStatuses) {
+                for (let index2 = 0, len2 = newColumnData[index].subStatuses.length;
+                  index2 < len2; index2 += 1) {
+                  statusList.push({
+                    id: newColumnData[index].subStatuses[index2].statusId,
+                    name: newColumnData[index].subStatuses[index2].name,
+                  });
+                  if (newColumnData[index].subStatuses[index2].issues) {
+                    for (let index3 = 0, len3 = newColumnData[index]
+                      .subStatuses[index2].issues.length;
+                      index3 < len3; index3 += 1) {
+                      newColumnData[index]
+                        .subStatuses[index2].issues[index3].statusName = newColumnData[index]
+                          .subStatuses[index2].name;
+                      newColumnData[index]
+                        .subStatuses[index2].issues[index3].categoryCode = newColumnData[index]
+                          .subStatuses[index2].categoryCode;
+                    }
                   }
                 }
               }
             }
-          }
-          ScrumBoardStore.setStatusList(statusList);
-          ScrumBoardStore.setBoardData(newColumnData);
-          // this.storeIssueNumberCount(storeParentIds, )
-          this.setState({
-            spinIf: false,
+            ScrumBoardStore.setStatusList(statusList);
+            ScrumBoardStore.setBoardData(newColumnData);
+            // this.storeIssueNumberCount(storeParentIds, )
+            this.setState({
+              spinIf: false,
+            });
           });
+        }).catch((error) => {
+          ScrumBoardStore.setSprintData(false);
         });
-      }).catch((error) => {
-        ScrumBoardStore.setSprintData(false);
-      });
+      } else {
+        this.setState({
+          spinIf: false,
+        });
+      }
     }).catch((error) => {
     });
   }
@@ -588,6 +594,7 @@ class ScrumBoardHome extends Component {
       recent: onlyStoryChecked,
       quickFilter: moreChecked || [],
     }, () => {
+      // if(ScrumBoardStore.getIssues)
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
@@ -988,8 +995,6 @@ class ScrumBoardHome extends Component {
                 <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
                   <QuickSearch
                     title
-                    buttonName="更多"
-                    buttonIcon="more_vert"
                     moreSelection={ScrumBoardStore.getQuickSearchList}
                     onQuickSearchChange={this.onQuickSearchChange}
                     pageFlag="ScrumBoard"

@@ -555,8 +555,6 @@ class BacklogHome extends Component {
           <div className="backlogTools" style={{ paddingLeft: 24 }}>
             <QuickSearch
               title
-              buttonName="更多"
-              buttonIcon="more_vert"
               moreSelection={BacklogStore.getQuickSearchList}
               onQuickSearchChange={this.onQuickSearchChange}
               resetFilter={BacklogStore.getQuickSearchClean}

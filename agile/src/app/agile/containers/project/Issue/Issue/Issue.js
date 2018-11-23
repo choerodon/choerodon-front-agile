@@ -948,7 +948,6 @@ class Issue extends Component {
                     },
                   }
                 }
-                size="large"
                 dataSource={IssueStore.getIssues}
                 showHeader={!expand}
                 filterBarPlaceholder="过滤表"

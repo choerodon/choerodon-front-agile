@@ -305,6 +305,7 @@ class UserMapStore {
 
 
   loadEpic = () => {
+    this.setIsLoading(true);
     let url = '';
     if (this.currentFilters.includes('mine')) {
       url += `&assigneeId=${AppState.getUserId}`;
@@ -318,9 +319,11 @@ class UserMapStore {
     return axios.get(`/agile/v1/projects/${proId}/issues/storymap/epics?organizationId=${orgId}&showDoneEpic=${this.showDoneEpic}${this.isApplyToEpic ? url : ''}`)
       .then((epics) => {
         this.setEpics(epics);
+        this.setIsLoading(false);
       })
       .catch((error) => {
         Choerodon.handleResponseError(error);
+        this.setIsLoading(false);
       });
   };
 
@@ -330,6 +333,7 @@ class UserMapStore {
     });
 
   loadIssues = (pageType) => {
+    this.setIsLoading(true);
     let url = '';
     if (this.currentFilters.includes('mine')) {
       url += `&assigneeId=${AppState.getUserId}`;
@@ -340,6 +344,7 @@ class UserMapStore {
     const orgId = AppState.currentMenuType.organizationId;
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?organizationId=${orgId}&type=${this.mode}&pageType=${pageType}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}${url}${this.assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${this.assigneeFilterIds}` : ''}`)
       .then((issues) => {
+        this.setIsLoading(false);
         if (issues.failed) {
           this.setIssues([]);
         } else if (this.mode === 'version') {
