@@ -95,12 +95,18 @@
 
           .c7n-backlog-versionItemParamValue {
             border-radius: 100px;
-            background: rgba(0, 0, 0, 0.26);
+            background: rgba(0, 0, 0, 0.08);
             color: white;
             min-width: 24px;
             height: 16px;
             text-align: center;
             line-height: 16px;
+          }
+          .c7n-backlog-versionItemNotStoryPoint {
+            min-width: 31px;
+            text-align: center;
+            line-height: 16px;
+            color: #5a5a5a;
           }
         }
       }

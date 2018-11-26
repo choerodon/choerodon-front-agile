@@ -4,7 +4,9 @@ import _ from 'lodash';
 import moment from 'moment';
 import { stores, Permission } from 'choerodon-front-boot';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
-import { Input, DatePicker, Icon, Dropdown, Menu } from 'choerodon-ui';
+import {
+  Input, DatePicker, Icon, Dropdown, Menu,
+} from 'choerodon-ui';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
 
@@ -15,14 +17,15 @@ class VersionItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      editDescription: false,
+      // editDescription: false,
       editName: false,
-      editStartDate: false,
-      editEndDate: false,
-      hoverBlockEditName: false,
-      hoverBlockEditDes: false,
+      // editStartDate: false,
+      // editEndDate: false,
+      // hoverBlockEditName: false,
+      // hoverBlockEditDes: false,
     };
   }
+
   /**
    *下拉菜单的menu
    *
@@ -36,6 +39,7 @@ class VersionItem extends Component {
       </Menu>
     );
   }
+
   /**
    *点击单个menu的事件
    *
@@ -50,6 +54,7 @@ class VersionItem extends Component {
       });
     }
   }
+
   /**
    *好像这个方法没用了
 
@@ -63,6 +68,7 @@ class VersionItem extends Component {
       editName: true,
     });
   }
+
   /**
    *
    *这个方法好像也没用了
@@ -71,10 +77,11 @@ class VersionItem extends Component {
    */
   handleClickDes(e) {
     e.stopPropagation();
-    this.setState({
-      editDescription: true,
-    });
+    // this.setState({
+    //   editDescription: true,
+    // });
   }
+
   /**
    *更新描述
    *
@@ -82,26 +89,28 @@ class VersionItem extends Component {
    * @memberof VersionItem
    */
   handleOnBlurDes(value) {
+    const { data: { objectVersionNumber, versionId }, index } = this.props;
     const data = {
-      objectVersionNumber: this.props.data.objectVersionNumber,
+      objectVersionNumber,
       projectId: parseInt(AppState.currentMenuType.id, 10),
-      versionId: this.props.data.versionId,
+      versionId,
       description: value,
     };
-    BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
-      this.setState({
-        editDescription: false,
-      });
+    BacklogStore.axiosUpdateVerison(versionId, data).then((res) => {
+      // this.setState({
+      //   editDescription: false,
+      // });
       const originData = _.clone(BacklogStore.getVersionData);
-      originData[this.props.index].description = res.description;
-      originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
+      originData[index].description = res.description;
+      originData[index].objectVersionNumber = res.objectVersionNumber;
       BacklogStore.setVersionData(originData);
     }).catch((error) => {
-      this.setState({
-        editDescription: false,
-      });
+      // this.setState({
+      //   editDescription: false,
+      // });
     });
   }
+
   /**
    *更改名称
    *
@@ -109,19 +118,20 @@ class VersionItem extends Component {
    * @memberof VersionItem
    */
   handleBlurName(value) {
+    const { data: { objectVersionNumber, versionId }, index } = this.props;
     const data = {
-      objectVersionNumber: this.props.data.objectVersionNumber,
+      objectVersionNumber,
       projectId: parseInt(AppState.currentMenuType.id, 10),
-      versionId: this.props.data.versionId,
+      versionId,
       name: value,
     };
-    BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
+    BacklogStore.axiosUpdateVerison(versionId, data).then((res) => {
       this.setState({
         editName: false,
       });
       const originData = _.clone(BacklogStore.getVersionData);
-      originData[this.props.index].name = res.name;
-      originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
+      originData[index].name = res.name;
+      originData[index].objectVersionNumber = res.objectVersionNumber;
       BacklogStore.setVersionData(originData);
     }).catch((error) => {
       this.setState({
@@ -129,6 +139,7 @@ class VersionItem extends Component {
       });
     });
   }
+
   /**
    *更新日期
    *
@@ -138,24 +149,28 @@ class VersionItem extends Component {
    */
   updateDate(type, date2) {
     let date = date2;
+    const { data: { objectVersionNumber, versionId }, index } = this.props;
     const data = {
-      objectVersionNumber: this.props.data.objectVersionNumber,
+      objectVersionNumber,
       projectId: parseInt(AppState.currentMenuType.id, 10),
-      versionId: this.props.data.versionId,
+      versionId,
       [type]: date ? date += ' 00:00:00' : null,
     };
-    BacklogStore.axiosUpdateVerison(this.props.data.versionId, data).then((res) => {
+    BacklogStore.axiosUpdateVerison(versionId, data).then((res) => {
       const originData = _.clone(BacklogStore.getVersionData);
-      originData[this.props.index][type] = res[type];
-      originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
+      originData[index][type] = res[type];
+      originData[index].objectVersionNumber = res.objectVersionNumber;
       BacklogStore.setVersionData(originData);
     }).catch((error) => {
     });
   }
 
   render() {
-    const item = this.props.data;
-    const index = this.props.index;
+    // const { data: item } = this.props;
+    const {
+      data: item, index, handelClickVersion, issueRefresh, refresh, draggableIds,
+    } = this.props;
+    const { editName } = this.state;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
@@ -173,26 +188,27 @@ class VersionItem extends Component {
               ...provided1.draggableProps.style,
             }}
             role="none"
-            onClick={this.props.handelClickVersion.bind(this, item.versionId)}
+            onClick={handelClickVersion.bind(this, item.versionId)}
             onMouseEnter={() => {
-              this.setState({
-                hoverBlockEditName: true,
-              });
+              // this.setState({
+              //   hoverBlockEditName: true,
+              // });
             }}
             onMouseLeave={() => {
-              this.setState({
-                hoverBlockEditName: false,
-              });
+              // this.setState({
+              //   hoverBlockEditName: false,
+              // });
             }}
             onMouseUp={() => {
               if (BacklogStore.getIsDragging) {
                 BacklogStore.axiosUpdateIssuesToVersion(
-                  item.versionId, this.props.draggableIds).then((res) => {
-                  this.props.issueRefresh();
-                  this.props.refresh();
+                  item.versionId, draggableIds,
+                ).then((res) => {
+                  issueRefresh();
+                  refresh();
                 }).catch((error) => {
-                  this.props.issueRefresh();
-                  this.props.refresh();
+                  issueRefresh();
+                  refresh();
                 });
               }
             }}
@@ -218,7 +234,7 @@ class VersionItem extends Component {
                     flexGrow: 1,
                   }}
                   byHand
-                  editIf={this.state.editName}
+                  editIf={editName}
                 >
                   <div className="c7n-backlog-versionItemTitleName">
                     <p>{item.name}</p>
@@ -257,20 +273,20 @@ class VersionItem extends Component {
                 </div>
               </div>
             </div>
-          
+
             {item.expand ? (
               <div style={{ paddingLeft: 12 }}>
                 <div
                   style={{ marginTop: 12 }}
                   onMouseEnter={() => {
-                    this.setState({
-                      hoverBlockEditDes: true,
-                    });
+                    // this.setState({
+                    //   hoverBlockEditDes: true,
+                    // });
                   }}
                   onMouseLeave={() => {
-                    this.setState({
-                      hoverBlockEditDes: false,
-                    });
+                    // this.setState({
+                    //   hoverBlockEditDes: false,
+                    // });
                   }}
                 >
                   <Permission
@@ -278,11 +294,13 @@ class VersionItem extends Component {
                     projectId={projectId}
                     organizationId={orgId}
                     service={['agile-service.product-version.updateVersion']}
-                    noAccessChildren={<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <p className="c7n-backlog-versionItemDes" ref={(versionId) => { this[item.versionId] = versionId; }}>
-                        {!item.description ? '没有描述' : item.description}
-                      </p>
-                    </div>}
+                    noAccessChildren={(
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <p className="c7n-backlog-versionItemDes" ref={(versionId) => { this[item.versionId] = versionId; }}>
+                          {!item.description ? '没有描述' : item.description}
+                        </p>
+                      </div>
+)}
                   >
                     <EasyEdit
                       type="input"
@@ -347,15 +365,15 @@ class VersionItem extends Component {
                   </div>
                   <div className="c7n-backlog-versionItemParam">
                     <p className="c7n-backlog-versionItemParamKey">问题数</p>
-                    <p className="c7n-backlog-versionItemParamValue">{item.issueCount}</p>
+                    <p className="c7n-backlog-versionItemNotStoryPoint">{item.issueCount}</p>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
                     <p className="c7n-backlog-versionItemParamKey">已完成数</p>
-                    <p className="c7n-backlog-versionItemParamValue">{item.doneIssueCount}</p>
+                    <p className="c7n-backlog-versionItemNotStoryPoint">{item.doneIssueCount}</p>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
                     <p className="c7n-backlog-versionItemParamKey">未预估数</p>
-                    <p className="c7n-backlog-versionItemParamValue">{item.notEstimate}</p>
+                    <p className="c7n-backlog-versionItemNotStoryPoint">{item.notEstimate}</p>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
                     <p className="c7n-backlog-versionItemParamKey">故事点数</p>

@@ -149,7 +149,10 @@ class ScrumBoardHome extends Component {
             const storeParentIds = [];
             const storeAssignee = [];
             const epicData = data.epicInfo ? data.epicInfo : [];
-            for (let index = 0, len = data.columnsData && data.columnsData.columns.length; index < len; index += 1) {
+            for (
+              let index = 0,
+                len = data.columnsData && data.columnsData.columns.length;
+              index < len; index += 1) {
               for (
                 let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length;
                 index2 < len2;
@@ -161,7 +164,8 @@ class ScrumBoardHome extends Component {
                   index3 += 1) {
                   if (data.parentIds
                     .indexOf(parseInt(
-                      data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId, 10,
+                      data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId,
+                      10,
                     )) !== -1) {
                     if (parentIds.indexOf(
                       data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId,
@@ -261,7 +265,7 @@ class ScrumBoardHome extends Component {
                 }
               }
             }
-  
+
             ScrumBoardStore.setAssigneer(storeAssignee);
             const arrAssigneeProps = [];
             _.forEach(_.map(storeAssignee, item => _.pick(item, ['assigneeId', 'assigneeName'])), (item) => {
@@ -276,7 +280,9 @@ class ScrumBoardHome extends Component {
             ScrumBoardStore.setEpicData(epicData);
             const newColumnData = data.columnsData && data.columnsData.columns;
             const statusList = [];
-            for (let index = 0, len = newColumnData && newColumnData.length; index < len; index += 1) {
+            for (let index = 0, len = newColumnData && newColumnData.length;
+              index < len;
+              index += 1) {
               if (newColumnData[index].subStatuses) {
                 for (let index2 = 0, len2 = newColumnData[index].subStatuses.length;
                   index2 < len2; index2 += 1) {
@@ -353,7 +359,7 @@ class ScrumBoardHome extends Component {
               index += 1) {
               totalIssues += originState[oriIndex].subStatuses[index].issues.length;
             }
-            if (originState[oriIndex].minNum >= totalIssues) {
+            if (typeof originState[oriIndex].maxNum === 'number' && originState[oriIndex].minNum >= totalIssues) {
               flag = 1;
               message.info(`少于列${originState[oriIndex].name}的最小长度，无法更新`);
             }
@@ -369,7 +375,7 @@ class ScrumBoardHome extends Component {
               index += 1) {
               totalIssues += originState[oriIndex].subStatuses[index].issues.length;
             }
-            if (originState[oriIndex].maxNum <= totalIssues) {
+            if (typeof originState[oriIndex].maxNum === 'number' && originState[oriIndex].maxNum <= totalIssues) {
               flag = 1;
               message.info(`多于列${originState[oriIndex].name}的最大长度，无法更新`);
             }
@@ -398,7 +404,7 @@ class ScrumBoardHome extends Component {
                 }
               }
             }
-            if (originState[oriIndex].minNum >= totalIssues) {
+            if (typeof originState[oriIndex].maxNum === 'number' && originState[oriIndex].minNum >= totalIssues) {
               flag = 1;
               message.info(`少于列${originState[oriIndex].name}的最小长度，无法更新`);
             }
@@ -421,7 +427,7 @@ class ScrumBoardHome extends Component {
                 }
               }
             }
-            if (originState[oriIndex].maxNum <= totalIssues) {
+            if (typeof originState[oriIndex].maxNum === 'number' && originState[oriIndex].maxNum <= totalIssues) {
               flag = 1;
               message.info(`多于列${originState[oriIndex].name}的最大长度，无法更新`);
             }
