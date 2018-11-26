@@ -72,7 +72,7 @@ class VersionBurndown extends Component {
         return '';
       }
     } else {
-      return record.remainTime === null ? '' : record.remainTime; 
+      return record.remainTime === null ? '' : record.remainTime;
     }
   }
 
@@ -206,7 +206,9 @@ class VersionBurndown extends Component {
         borderWidth: 1,
         extraCssText: 'box-shadow: 0 2px 4px 0 rgba(0,0,0,0.20);',
         formatter(params) {
+          /* eslint-disable */
           params[0].name = _.trim(params[0].name, '\n\n');
+          /* eslint-enable */
           const sprint = chartDataOrigin.filter(item => item.name === params[0].name)[0];
           let res = `<span style="color: #3F51B5">${params[0].name}</span>`;
           res += `<span style="display:block; margin-top: 0px; margin-bottom: 2px; color: rgba(0,0,0,0.54); font-size: 11px;">${sprint.startDate && sprint.startDate.split(' ')[0].split('-').join('/')}-${sprint.endDate && sprint.endDate.split(' ')[0].split('-').join('/')}</span>`;
@@ -367,11 +369,9 @@ class VersionBurndown extends Component {
         },
       ],
     };
-    return option;         
+    return option;
   }
 
-  transformPlaceholder2Zero = arr => arr.map(v => (v === '-' ? 0 : v))
-  
   getSprintSpeed =() => {
     const { chartData, chartDataOrigin } = ES;
     if (chartDataOrigin.length > 3) {
@@ -404,7 +404,7 @@ class VersionBurndown extends Component {
     if (item && item.length > 0) {
       totalStoryPoints = _.sum(_.map(_.filter(item, o => o.typeCode === 'story' && o.storyPoints !== null), 'storyPoints'));
     }
-    
+
     const column = [
       ...[
         {
@@ -413,7 +413,7 @@ class VersionBurndown extends Component {
           dataIndex: 'issueNum',
           render: (issueNum, record) => (
             <span
-              style={{ 
+              style={{
                 color: '#3f51b5',
                 cursor: 'pointer',
               }}
@@ -424,7 +424,7 @@ class VersionBurndown extends Component {
                 history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/VersionBurndown`);
               }}
             >
-              {issueNum} 
+              {issueNum}
               {' '}
               {record.addIssue ? '*' : ''}
 
@@ -439,7 +439,7 @@ class VersionBurndown extends Component {
             <div style={{ width: '100%', overflow: 'hidden' }}>
               <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={summary}>
                 <p style={{
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, 
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0,
                 }}
                 >
                   {summary}
@@ -520,15 +520,17 @@ class VersionBurndown extends Component {
     return [];
   }
 
-  refresh() {
-    if (!ES.currentVersionId) {
-      ES.loadVersionAndChartAndTableData();
-    } else {
-      ES.loadChartData();
-      ES.loadTableData();
-      // this.setInitialPagination();
-    }
+  handleIconMouseEnter = () => {
+    const iconShowInfo = document.getElementsByClassName('icon-show-info')[0];
+    iconShowInfo.style.display = 'flex';
   }
+
+  handleIconMouseLeave = () => {
+    const iconShowInfo = document.getElementsByClassName('icon-show-info')[0];
+    iconShowInfo.style.display = 'none';
+  }
+
+  transformPlaceholder2Zero = arr => arr.map(v => (v === '-' ? 0 : v));
 
   handleChangeCurrentVersion(versionId) {
     ES.setCurrentVersion(versionId);
@@ -544,16 +546,6 @@ class VersionBurndown extends Component {
       checkbox,
       inverse: checkbox[0] !== 'checked',
     });
-  }
-
-  handleIconMouseEnter = () => {
-    const iconShowInfo = document.getElementsByClassName('icon-show-info')[0];
-    iconShowInfo.style.display = 'flex';
-  }
-
-  handleIconMouseLeave = () => {
-    const iconShowInfo = document.getElementsByClassName('icon-show-info')[0];
-    iconShowInfo.style.display = 'none';
   }
 
   handleLinkToIssue(linkType, item) {
@@ -574,11 +566,21 @@ class VersionBurndown extends Component {
     }
   }
 
+  refresh() {
+    if (!ES.currentVersionId) {
+      ES.loadVersionAndChartAndTableData();
+    } else {
+      ES.loadChartData();
+      ES.loadTableData();
+      // this.setInitialPagination();
+    }
+  }
+
   renderChart = () => {
     if (!ES.chartDataOrigin.length) {
       return (
         <div style={{
-          display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '50px 0', textAlign: 'center', 
+          display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '50px 0', textAlign: 'center',
         }}
         >
           <img src={pic} alt="没有预估故事点" />
@@ -627,7 +629,7 @@ class VersionBurndown extends Component {
     );
   }
 
- 
+
   renderTable = (type) => {
     const sprintBurnDownReportDTOS = this.getTableDta('compoleted');
     let firstCompleteIssues = 0;
@@ -660,18 +662,18 @@ class VersionBurndown extends Component {
                 sprintBurnDownReportDTOS.map((item) => {
                   if (item.completeIssues.length !== 0) {
                     return (
-                      <div 
+                      <div
                         style={{ marginBottom: 22 }}
                         key={item.sprintId}
                       >
-                        <p style={{ 
+                        <p style={{
                           position: 'relative',
-                          marginBottom: 12, 
+                          marginBottom: 12,
                           marginLeft: 15,
                         }}
                         >
-                          <span 
-                            style={{ 
+                          <span
+                            style={{
                               color: '#3f51b5',
                               cursor: 'pointer',
                             }}
@@ -699,7 +701,7 @@ class VersionBurndown extends Component {
                             {`${item.startDate && item.startDate.slice(0, 11).replace(/-/g, '.')}-${item.endDate && item.endDate.slice(0, 11).replace(/-/g, '.')}`}
                           </span>
                           <span
-                            style={{ 
+                            style={{
                               display: 'inline-block',
                               position: 'absolute',
                               right: 0,
@@ -736,7 +738,7 @@ class VersionBurndown extends Component {
       }
       return <p>当前版本下的冲刺没有已完成的问题</p>;
     }
-     
+
     return <p>当前版本下的冲刺没有已完成的问题</p>;
   }
 
@@ -855,11 +857,11 @@ class VersionBurndown extends Component {
   // }
 
   renderVersionInfo() {
-    if (ES.currentVersionId != undefined) {
+    if (ES.currentVersionId !== undefined) {
       const currentVersion = ES.versions.filter(item => item.versionId === ES.currentVersionId)[0];
       return (
         <p className="c7n-versionInfo">
-          { `${currentVersion && currentVersion.releaseDate === null ? '未发布' : (`发布于 ${currentVersion && this.currentVersion.releaseDate.split(' ')[0]}`)}`}
+          { `${currentVersion && currentVersion.releaseDate === null ? '未发布' : (`发布于 ${currentVersion && currentVersion.releaseDate.split(' ')[0]}`)}`}
         </p>
       );
     }
@@ -872,7 +874,7 @@ class VersionBurndown extends Component {
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-versionBurndown">
-        <Header 
+        <Header
           title="版本燃耗图"
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
@@ -880,8 +882,8 @@ class VersionBurndown extends Component {
             history={history}
             current="versionBurndown"
           />
-          <Button 
-            funcType="flat" 
+          <Button
+            funcType="flat"
             onClick={this.refresh.bind(this)}
           >
             <Icon type="refresh icon" />
@@ -906,7 +908,12 @@ class VersionBurndown extends Component {
                   >
                     {
                       ES.versions.map(version => (
-                        <Option key={version.versionId} value={version.versionId}>{version.name}</Option>
+                        <Option
+                          key={version.versionId}
+                          value={version.versionId}
+                        >
+                          {version.name}
+                        </Option>
                       ))
                     }
                   </Select>
@@ -942,22 +949,22 @@ class VersionBurndown extends Component {
                       </figure>
                     </div>
                   </div>
-                 
+
                 </div>
                 <div>
                   {this.renderVersionInfo()}
                 </div>
-               
+
                 <Spin spinning={ES.chartLoading}>
                   <div>
                     {
                       this.renderChart()
                     }
-                    
+
                   </div>
                 </Spin>
-                <Tabs 
-                  activeKey={tabActiveKey} 
+                <Tabs
+                  activeKey={tabActiveKey}
                   onChange={(key) => {
                     this.setState({
                       tabActiveKey: key,
@@ -1006,7 +1013,7 @@ class VersionBurndown extends Component {
               />
             )
           }
-          
+
         </Content>
       </Page>
     );

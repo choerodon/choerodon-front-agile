@@ -1,4 +1,6 @@
-import { observable, action, computed, toJS } from 'mobx';
+import {
+  observable, action, computed, toJS, 
+} from 'mobx';
 import { store, stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
 
@@ -26,14 +28,23 @@ const UNIT2NAME = {
 @store('EpicReportStore')
 class EpicReportStore {
   @observable tableLoading = false;
+
   @observable tableData = [];
+
   @observable chartLoading = false;
+
   @observable chartData = [];
+
   @observable beforeCurrentUnit = 'story_point';
+
   @observable currentUnit = 'story_point';
+
   @observable epics = [];
+
   @observable epicFinishLoading = false;
+
   @observable currentEpicId = undefined;
+
   @observable reload = false;
 
   loadEpicAndChartAndTableData() {
