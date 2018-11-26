@@ -5,7 +5,9 @@ import TimeAgo from 'timeago-react';
 import UserHead from '../../UserHead';
 import WYSIWYGEditor from '../../WYSIWYGEditor';
 import { IssueDescription, DatetimeAgo } from '../../CommonComponent';
-import { delta2Html, text2Delta, beforeTextUpload, formatDate } from '../../../common/utils';
+import {
+  delta2Html, text2Delta, beforeTextUpload, formatDate,
+} from '../../../common/utils';
 import { deleteWorklog, updateWorklog } from '../../../api/NewIssueApi';
 import './Log.scss';
 
@@ -23,27 +25,33 @@ class Log extends Component {
   componentDidMount() {
   }
 
-  confirm(logId, e) {
-    this.handleDeleteLog(logId);
-  }
-
-  cancel(e) {
-  }
+  updateLog = (log) => {
+    const { onUpdateLog } = this.props;
+    updateWorklog(log.logId, log).then((res) => {
+      this.setState({
+        editLogId: undefined,
+        editLog: undefined,
+      });
+      onUpdateLog();
+    });
+  };
 
   handleDeleteLog(logId) {
+    const { onDeleteLog } = this.props;
     deleteWorklog(logId)
       .then((res) => {
-        this.props.onDeleteLog();
+        onDeleteLog();
       });
   }
 
   handleUpdateLog(log) {
     const { logId, objectVersionNumber } = log;
+    const { editLog } = this.state;
     const extra = {
       logId,
       objectVersionNumber,
     };
-    const updateLogDes = this.state.editLog;
+    const updateLogDes = editLog;
     if (updateLogDes) {
       beforeTextUpload(updateLogDes, extra, this.updateLog, 'description');
     } else {
@@ -52,29 +60,27 @@ class Log extends Component {
     }
   }
 
-  updateLog = (log) => {
-    updateWorklog(log.logId, log).then((res) => {
-      this.setState({
-        editLogId: undefined,
-        editLog: undefined,
-      });
-      this.props.onUpdateLog();
-    });
+  cancel(e) {
+  }
+
+  confirm(logId, e) {
+    this.handleDeleteLog(logId);
   }
 
   render() {
     const { worklog, isWide } = this.props;
-    const deltaEdit = text2Delta(this.state.editLog);
+    const { editLog, editLogId, expand } = this.state;
+    const deltaEdit = text2Delta(editLog);
     return (
       <div
-        className={`c7n-log ${worklog.logId === this.state.editLogId ? 'c7n-log-focus' : ''}`}
+        className={`c7n-log ${worklog.logId === editLogId ? 'c7n-log-focus' : ''}`}
       >
         <div className="line-justify">
           {
-            this.state.expand ? (
+            expand ? (
               <Icon
                 role="none"
-                style={{ 
+                style={{
                   position: 'absolute',
                   left: 5,
                   top: 15,
@@ -89,10 +95,10 @@ class Log extends Component {
             ) : null
           }
           {
-            !this.state.expand ? (
+            !expand ? (
               <Icon
                 role="none"
-                style={{ 
+                style={{
                   position: 'absolute',
                   left: 5,
                   top: 15,
@@ -115,7 +121,7 @@ class Log extends Component {
                   realName: worklog.userName,
                   avatar: worklog.imageUrl,
                 }}
-                color={'#3f51b5'}
+                color="#3f51b5"
               />
             </div>
             <span style={{ color: 'rgba(0, 0, 0, 0.65)' }}>记录了工作日志</span>
@@ -154,27 +160,27 @@ class Log extends Component {
         </div>
         <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: '10px' }}>
           <span style={{ width: 70 }}>耗费时间:</span>
-          <span style={{ color: '#000', fontWeight: '500' }}>{`${worklog.workTime}h` || '无'}</span>
+          <span style={{ color: '#000', fontWeight: '500' }}>{`${worklog.workTime}小时` || '无'}</span>
         </div>
         <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: '10px' }}>
           <span style={{ width: 70 }}>工作日期:</span>
           <span style={{ color: '#000', fontWeight: '500' }}>{worklog.startDate || '无'}</span>
         </div>
         {
-          this.state.expand && (
+          expand && (
             <div>
               <div className="c7n-conent-log" style={{ marginTop: 10, display: 'flex' }}>
                 <span style={{ width: 70, flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>备注:</span>
                 <span style={{ flex: 1 }}>
                   {
-                    worklog.logId !== this.state.editLogId ? (
+                    worklog.logId !== editLogId ? (
                       <IssueDescription data={delta2Html(worklog.description)} />
                     ) : null
                   }
                 </span>
               </div>
               {
-                worklog.logId === this.state.editLogId ? (
+                worklog.logId === editLogId ? (
                   <WYSIWYGEditor
                     bottomBar
                     value={deltaEdit}
@@ -196,7 +202,7 @@ class Log extends Component {
             </div>
           )
         }
-        
+
       </div>
     );
   }

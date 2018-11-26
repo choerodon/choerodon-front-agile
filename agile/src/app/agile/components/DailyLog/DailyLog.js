@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
 import moment from 'moment';
-import { Select, DatePicker, Button, Modal, Radio, message, Icon } from 'choerodon-ui';
+import {
+  Select, DatePicker, Button, Modal, Radio, message, Icon,
+} from 'choerodon-ui';
 import { NumericInput } from '../CommonComponent';
 import { beforeTextUpload } from '../../common/utils';
 import { createWorklog } from '../../api/NewIssueApi';
@@ -26,13 +28,13 @@ class DailyLog extends Component {
     super(props);
     this.state = {
       dissipate: undefined,
-      dissipateUnit: 'h',
+      dissipateUnit: '小时',
       startTime: null,
       radio: 1,
       time: undefined,
-      timeUnit: 'h',
+      timeUnit: '小时',
       reduce: undefined,
-      reduceUnit: 'h',
+      reduceUnit: '小时',
       delta: '',
       createLoading: false,
     };
@@ -49,42 +51,32 @@ class DailyLog extends Component {
     });
   }
 
-  transformTime(pro, unit) {
-    const TIME = {
-      h: 1,
-      d: 8,
-      w: 40,
-    };
-    if (!this.state[pro]) {
-      return 0;
-    } else {
-      return this.state[pro] * TIME[this.state[unit]];
-    }
-  }
-
   handleCreateDailyLog = () => {
-    const { dissipate, startTime } = this.state;
+    const {
+      dissipate, startTime, radio, delta,
+    } = this.state;
+    const { issueId } = this.props;
     if (typeof dissipate === 'undefined' || dissipate === '' || startTime == null) {
       message.warning('请输入耗费时间和工作日期');
       return;
     }
     this.setState({ createLoading: true });
     let num;
-    if (this.state.radio === '3' || this.state.radio === 3) {
+    if (radio === '3' || radio === 3) {
       num = this.transformTime('time', 'timeUnit');
     }
-    if (this.state.radio === '4' || this.state.radio === 4) {
+    if (radio === '4' || radio === 4) {
       num = this.transformTime('reduce', 'reduceUnit');
     }
     const extra = {
-      issueId: this.props.issueId,
+      issueId,
       projectId: AppState.currentMenuType.id,
-      startDate: this.state.startTime.format('YYYY-MM-DD HH:mm:ss'),
+      startDate: startTime.format('YYYY-MM-DD HH:mm:ss'),
       workTime: this.transformTime('dissipate', 'dissipateUnit'),
-      residualPrediction: TYPE[this.state.radio],
-      predictionTime: [3, 4].indexOf(this.state.radio) === -1 ? undefined : num,
+      residualPrediction: TYPE[radio],
+      predictionTime: [3, 4].indexOf(radio) === -1 ? undefined : num,
     };
-    const deltaOps = this.state.delta;
+    const deltaOps = delta;
     if (deltaOps) {
       beforeTextUpload(deltaOps, extra, this.handleSave);
     } else {
@@ -94,9 +86,10 @@ class DailyLog extends Component {
   };
 
   handleSave = (data) => {
+    const { onOk } = this.props;
     createWorklog(data)
       .then((res) => {
-        this.props.onOk();
+        onOk();
       });
   };
 
@@ -133,6 +126,20 @@ class DailyLog extends Component {
     return data === '' || data === undefined || data === null;
   }
 
+  transformTime(pro, unit) {
+    const { state } = this;
+    const TIME = new Map([
+      ['小时', 1],
+      ['天', 8],
+      ['周', 40],
+    ]);
+    if (!state[pro]) {
+      return 0;
+    } else {
+      return state[pro] * TIME.get(state[unit]);
+    }
+  }
+
   formDate(data) {
     const temp = data ? new Date(data) : new Date();
     return `${temp.getFullYear()}-${temp.getMonth() + 1}-${temp.getDate()}`;
@@ -149,7 +156,14 @@ class DailyLog extends Component {
   }
 
   render() {
-    const { initValue, visible, onCancel, onOk } = this.props;
+    const {
+      initValue, visible, onCancel, onOk, issueNum,
+    } = this.props;
+    const {
+      createLoading, dissipate, dissipateUnit,
+      startTime, radio, time, timeUnit, reduce,
+      reduceUnit, delta, edit,
+    } = this.state;
     const radioStyle = {
       display: 'block',
       height: '30px',
@@ -177,10 +191,10 @@ class DailyLog extends Component {
         onCancel={onCancel}
         okText="创建"
         cancelText="取消"
-        confirmLoading={this.state.createLoading}
+        confirmLoading={createLoading}
       >
         <div>
-          <h2>{`登记"${this.props.issueNum}"的工作日志`}</h2>
+          <h2>{`登记"${issueNum}"的工作日志`}</h2>
           <p style={{ width: 520 }}>
             您可以在这里记录您的工作，花费的时间会在关联问题中预估时间进行扣减，以便更精确地计算问题进度和提升工作效率。
           </p>
@@ -189,30 +203,34 @@ class DailyLog extends Component {
               <NumericInput
                 label="耗费时间*"
                 style={tempAlignStyle}
-                value={this.state.dissipate}
+                value={dissipate}
                 onChange={this.handleDissipateChange.bind(this)}
               />
               <Select
-                value={this.state.dissipateUnit}
+                value={dissipateUnit}
                 style={{ width: 100, marginLeft: 18 }}
                 onChange={this.handleDissipateUnitChange.bind(this)}
               >
-                {['h', 'd', 'w'].map(type => (
-                  <Option key={type} value={type}>{type}</Option>),
-                )}
+                {['小时', '天', '周'].map(type => (
+                  <Option key={type} value={type}>{type}</Option>))}
               </Select>
             </div>
-            <div className="dataPicker" style={{ width: 218, marginBottom: 32, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+            <div
+              className="dataPicker"
+              style={{
+                width: 218, marginBottom: 32, display: 'flex', flexDirection: 'column', position: 'relative',
+              }}
+            >
               <DatePicker
                 label="工作日期*"
-                value={this.state.startTime}
+                value={startTime}
                 format={DATA_FORMAT}
                 onChange={this.changeEndTime}
               />
             </div>
 
             <div className="line-info">
-              <RadioGroup label="剩余的估计" onChange={this.onRadioChange} value={this.state.radio}>
+              <RadioGroup label="剩余的估计" onChange={this.onRadioChange} value={radio}>
                 <Radio style={radioStyle} value={1}>自动调整</Radio>
                 <Radio style={radioStyle} value={2}>不设置预估时间</Radio>
                 <Radio
@@ -225,19 +243,18 @@ class DailyLog extends Component {
                   <span style={{ display: 'inline-block', width: 52 }}>设置为</span>
                   <NumericInput
                     style={tempAlignStyle}
-                    disabled={this.state.radio !== 3}
-                    value={this.state.time}
+                    disabled={radio !== 3}
+                    value={time}
                     onChange={this.handleTimeChange.bind(this)}
                   />
                   <Select
-                    disabled={this.state.radio !== 3}
+                    disabled={radio !== 3}
                     style={{ width: 100, marginLeft: 18 }}
-                    value={this.state.timeUnit}
+                    value={timeUnit}
                     onChange={this.handleTimeUnitChange.bind(this)}
                   >
-                    {['h', 'd', 'w'].map(type => (
-                      <Option key={`${type}`} value={`${type}`}>{type}</Option>),
-                    )}
+                    {['小时', '天', '周'].map(type => (
+                      <Option key={`${type}`} value={`${type}`}>{type}</Option>))}
                   </Select>
                 </Radio>
                 <Radio
@@ -250,19 +267,18 @@ class DailyLog extends Component {
                   <span style={{ display: 'inline-block', width: 52 }}>缩减</span>
                   <NumericInput
                     style={tempAlignStyle}
-                    disabled={this.state.radio !== 4}
-                    value={this.state.reduce}
+                    disabled={radio !== 4}
+                    value={reduce}
                     onChange={this.handleReduceChange.bind(this)}
                   />
                   <Select
-                    disabled={this.state.radio !== 4}
+                    disabled={radio !== 4}
                     style={{ width: 100, marginLeft: 18 }}
-                    value={this.state.reduceUnit}
+                    value={reduceUnit}
                     onChange={this.handleReduceUnitChange.bind(this)}
                   >
-                    {['h', 'd', 'w'].map(type => (
-                      <Option key={`${type}`} value={`${type}`}>{type}</Option>),
-                    )}
+                    {['小时', '天', '周'].map(type => (
+                      <Option key={`${type}`} value={`${type}`}>{type}</Option>))}
                   </Select>
                 </Radio>
               </RadioGroup>
@@ -279,10 +295,10 @@ class DailyLog extends Component {
                 </div>
               </div>
               {
-                !this.state.edit && (
+                !edit && (
                   <div className="clear-p-mw">
                     <WYSIWYGEditor
-                      value={this.state.delta}
+                      value={delta}
                       style={{ height: 200, width: '100%' }}
                       onChange={(value) => {
                         this.setState({ delta: value });
@@ -295,10 +311,10 @@ class DailyLog extends Component {
           </section>
         </div>
         {
-          this.state.edit ? (
+          edit ? (
             <FullEditor
-              initValue={this.state.delta}
-              visible={this.state.edit}
+              initValue={delta}
+              visible={edit}
               onCancel={() => this.setState({ edit: false })}
               onOk={callback}
             />

@@ -3,10 +3,10 @@ import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import {
-  Button, Tabs, Table, Select, Icon, Tooltip, Spin, 
+  Button, Tabs, Table, Select, Icon, Tooltip, Spin,
 } from 'choerodon-ui';
 // import pic from './no_epic.svg';
 import pic from '../../../../../assets/image/emptyChart.svg';
@@ -20,9 +20,9 @@ import EmptyBlock from '../../../../../components/EmptyBlock';
 import './EpicReport.scss';
 import { STATUS } from '../../../../../common/Constant';
 
-const TabPane = Tabs.TabPane;
+const { TabPane } = Tabs;
 const { AppState } = stores;
-const Option = Select.Option;
+const { Option } = Select;
 const MONTH = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'];
 
 @observer
@@ -42,7 +42,7 @@ class EpicReport extends Component {
     });
     ES.loadEpicAndChartAndTableData();
   }
-  
+
   getLabel(record) {
     if (ES.beforeCurrentUnit === 'story_point') {
       if (record.issueTypeDTO && record.issueTypeDTO.typeCode === 'story') {
@@ -51,7 +51,7 @@ class EpicReport extends Component {
         return '';
       }
     } else {
-      return record.remainTime === null ? '未预估' : record.remainTime; 
+      return record.remainTime === null ? '未预估' : record.remainTime;
     }
   }
 
@@ -155,7 +155,7 @@ class EpicReport extends Component {
             color: ['#eee'],
             width: 1,
             type: 'solid',
-          }, 
+          },
         },
         data: ES.getChartDataX,
       },
@@ -419,7 +419,7 @@ class EpicReport extends Component {
     time -= 40 * w;
     const d = Math.floor(time / 8);
     time -= 8 * d;
-    return `${w ? `${w}w ` : ''}${d ? `${d}d ` : ''}${time ? `${time}h ` : ''}`;
+    return `${w ? `${w}周 ` : ''}${d ? `${d}天 ` : ''}${time ? `${time}小时 ` : ''}`;
   }
 
   renderTable(type) {
@@ -431,7 +431,7 @@ class EpicReport extends Component {
           dataIndex: 'issueNum',
           render: (issueNum, record) => (
             <span
-              style={{ 
+              style={{
                 color: '#3f51b5',
                 cursor: 'pointer',
               }}
@@ -442,7 +442,7 @@ class EpicReport extends Component {
                 history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/EpicReport`);
               }}
             >
-              {issueNum} 
+              {issueNum}
               {' '}
               {record.addIssue ? '*' : ''}
 
@@ -457,7 +457,7 @@ class EpicReport extends Component {
             <div style={{ width: '100%', overflow: 'hidden' }}>
               <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={summary}>
                 <p style={{
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, 
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0,
                 }}
                 >
                   {summary}
@@ -542,16 +542,16 @@ class EpicReport extends Component {
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-epicReport">
-        <Header 
+        <Header
           title="史诗报告图"
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
-            history={this.props.history}
+            history={history}
             current="epicReport"
           />
-          <Button 
-            funcType="flat" 
+          <Button
+            funcType="flat"
             onClick={this.refresh.bind(this)}
           >
             <Icon type="refresh icon" />
@@ -638,9 +638,8 @@ class EpicReport extends Component {
                                 <div>
                                   <h4>
                                     {`${ES.getChartYAxisName}`}
-
                                     汇总
-</h4>
+                                  </h4>
                                   <ul>
                                     <li>
                                       <span className="c7n-tip">合计：</span>
@@ -659,18 +658,17 @@ class EpicReport extends Component {
                               ) : null
                             }
                             <p
-                              style={{ 
+                              style={{
                                 color: '#3F51B5',
-                                cursor: 'pointer',                
+                                cursor: 'pointer',
                               }}
                               role="none"
                               onClick={() => {
-                                this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
+                                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
                               }}
                             >
-
                               在“问题管理”中查看
-<Icon style={{ fontSize: 13 }} type="open_in_new" />
+                              <Icon style={{ fontSize: 13 }} type="open_in_new" />
                             </p>
                           </div>
                         </div>
@@ -680,7 +678,7 @@ class EpicReport extends Component {
                         </div>
                       )
                     }
-                    
+
                   </div>
                 </Spin>
                 <Tabs>
@@ -715,9 +713,8 @@ class EpicReport extends Component {
                         history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
-
                       待办事项
-</span>
+                    </span>
                     <span>或</span>
                     <span
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
@@ -726,15 +723,14 @@ class EpicReport extends Component {
                         history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
-
                       问题管理
-</span>
+                    </span>
                     <span>中创建一个史诗</span>
                   </div>)}
               />
             )
           }
-          
+
         </Content>
       </Page>
     );

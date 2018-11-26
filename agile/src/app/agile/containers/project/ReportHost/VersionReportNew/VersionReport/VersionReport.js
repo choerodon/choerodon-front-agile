@@ -3,10 +3,10 @@ import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import {
-  Button, Tabs, Table, Select, Icon, Tooltip, Spin, 
+  Button, Tabs, Table, Select, Icon, Tooltip, Spin,
 } from 'choerodon-ui';
 // import pic from './no_version.svg';
 import pic from '../../../../../assets/image/emptyChart.svg';
@@ -22,9 +22,9 @@ import EmptyBlock from '../../../../../components/EmptyBlock';
 import './VersionReport.scss';
 import { STATUS } from '../../../../../common/Constant';
 
-const TabPane = Tabs.TabPane;
+const { TabPane } = Tabs;
 const { AppState } = stores;
-const Option = Select.Option;
+const { Option } = Select;
 const MONTH = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'];
 let backUrl;
 
@@ -46,18 +46,6 @@ class EpicReport extends Component {
 
     VS.loadEpicAndChartAndTableData();
   }
-  
-  GetRequest(url) {
-    const theRequest = {};
-    if (url.indexOf('?') !== -1) {
-      const str = url.split('?')[1];
-      const strs = str.split('&');
-      for (let i = 0; i < strs.length; i += 1) {
-        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
-      }
-    }
-    return theRequest;
-  }
 
   getLabel(record) {
     if (VS.beforeCurrentUnit === 'story_point') {
@@ -67,7 +55,7 @@ class EpicReport extends Component {
         return '';
       }
     } else {
-      return record.remainTime === null ? '未预估' : record.remainTime; 
+      return record.remainTime === null ? '未预估' : record.remainTime;
     }
   }
 
@@ -170,7 +158,7 @@ class EpicReport extends Component {
             color: ['#eee'],
             width: 2,
             type: 'solid',
-          }, 
+          },
         },
         data: VS.getChartDataX,
       },
@@ -422,6 +410,18 @@ class EpicReport extends Component {
     return [];
   }
 
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
+  }
+
   refresh() {
     if (!VS.currentVersionId) {
       VS.loadEpicAndChartAndTableData();
@@ -463,7 +463,7 @@ class EpicReport extends Component {
           dataIndex: 'issueNum',
           render: (issueNum, record) => (
             <span
-              style={{ 
+              style={{
                 color: '#3f51b5',
                 cursor: 'pointer',
               }}
@@ -474,10 +474,9 @@ class EpicReport extends Component {
                 history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/versionReport`);
               }}
             >
-              {issueNum} 
+              {issueNum}
               {' '}
               {record.addIssue ? '*' : ''}
-
             </span>
           ),
         },
@@ -489,7 +488,7 @@ class EpicReport extends Component {
             <div style={{ width: '100%', overflow: 'hidden' }}>
               <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={summary}>
                 <p style={{
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, 
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0,
                 }}
                 >
                   {summary}
@@ -574,16 +573,16 @@ class EpicReport extends Component {
     const urlParams = AppState.currentMenuType;
     return (
       <Page className="c7n-versionReport">
-        <Header 
+        <Header
           title="版本报告图"
           backPath={`/agile/${linkFromParamUrl || 'reporthost'}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
           <SwithChart
-            history={this.props.history}
+            history={history}
             current="versionReport"
           />
-          <Button 
-            funcType="flat" 
+          <Button
+            funcType="flat"
             onClick={this.refresh.bind(this)}
           >
             <Icon type="refresh icon" />
@@ -607,7 +606,12 @@ class EpicReport extends Component {
                   >
                     {
                       VS.versions.map(version => (
-                        <Option key={version.versionId} value={version.versionId}>{version.name}</Option>
+                        <Option
+                          key={version.versionId}
+                          value={version.versionId}
+                        >
+                          {version.name}
+                        </Option>
                       ))
                     }
                   </Select>
@@ -634,7 +638,7 @@ class EpicReport extends Component {
                     }}
                     role="none"
                     onClick={() => {
-                      this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
+                      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
                     }}
                   >
                     {'在“问题管理中”查看'}
@@ -692,16 +696,13 @@ class EpicReport extends Component {
                         history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
-
-
                       发布版本
-                                        </span>
+                    </span>
                     <span>中创建一个版本</span>
                   </div>)}
               />
             )
           }
-          
         </Content>
       </Page>
     );
