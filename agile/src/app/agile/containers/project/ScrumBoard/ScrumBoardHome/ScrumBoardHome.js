@@ -641,13 +641,11 @@ class ScrumBoardHome extends Component {
 
   // 渲染issue列
   renderIssueColumns = (id) => {
-    // debugger;
     const result = [];
     const data = ScrumBoardStore.getBoardData && ScrumBoardStore.getBoardData.filter(obj => obj.columnId !== 'unset');
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       // 故事泳道
       for (let index = 0, len = data.length; index < len; index += 1) {
-        // debugger;
         if (data[index].subStatuses.length > 0) {
           result.push(
             <StatusBodyColumn
@@ -795,7 +793,6 @@ class ScrumBoardHome extends Component {
     const data = ScrumBoardStore.getBoardData;
     let flag = 0;
     // 如果没有其他任务则其他任务列就不渲染，
-    // debugger;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       for (let index = 0, len = data.length; index < len; index += 1) {
         if (data[index].subStatuses) {

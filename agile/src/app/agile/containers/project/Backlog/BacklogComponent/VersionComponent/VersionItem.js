@@ -296,7 +296,7 @@ class VersionItem extends Component {
                     service={['agile-service.product-version.updateVersion']}
                     noAccessChildren={(
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <p className="c7n-backlog-versionItemDes" ref={(versionId) => { this[item.versionId] = versionId; }}>
+                        <p className="c7n-backlog-versionItemDes c7n-backlog-versionItemNotStoryPoint" ref={(versionId) => { this[item.versionId] = versionId; }}>
                           {!item.description ? '没有描述' : item.description}
                         </p>
                       </div>
@@ -307,7 +307,6 @@ class VersionItem extends Component {
                       defaultValue={item.description}
                       enterOrBlur={this.handleOnBlurDes.bind(this)}
                     >
-
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <p className="c7n-backlog-versionItemDes" ref={(versionId) => { this[item.versionId] = versionId; }}>
                           {!item.description ? '没有描述' : item.description}
@@ -325,7 +324,7 @@ class VersionItem extends Component {
                       projectId={projectId}
                       organizationId={orgId}
                       service={['agile-service.product-version.updateVersion']}
-                      noAccessChildren={<p>{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[0]}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[2].substring(0, 2)}` : '无'}</p>}
+                      noAccessChildren={<p className="c7n-backlog-versionItemNotStoryPoint">{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[0]}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[2].substring(0, 2)}` : '无'}</p>}
                     >
                       <EasyEdit
                         time
@@ -336,10 +335,9 @@ class VersionItem extends Component {
                           this.updateDate('startDate', dateString);
                         }}
                       >
-                        <p>{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[0]}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[2].substring(0, 2)}` : '无'}</p>
+                        <p className="c7n-backlog-versionItemNotStoryPoint">{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[0]}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[2].substring(0, 2)}` : '无'}</p>
                       </EasyEdit>
                     </Permission>
-
                   </div>
                   <div className="c7n-backlog-versionItemParam">
                     <p style={{ color: 'rgba(0,0,0,0.65)' }}>发布日期</p>
@@ -348,7 +346,7 @@ class VersionItem extends Component {
                       projectId={projectId}
                       organizationId={orgId}
                       service={['agile-service.product-version.updateVersion']}
-                      noAccessChildren={<p>{!_.isNull(item.releaseDate) ? `${item && item.releaseDate.split('-')[0]}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[2].substring(0, 2)}` : '无'}</p>}
+                      noAccessChildren={<p className="c7n-backlog-versionItemNotStoryPoint">{!_.isNull(item.releaseDate) ? `${item && item.releaseDate.split('-')[0]}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[2].substring(0, 2)}` : '无'}</p>}
                     >
                       <EasyEdit
                         type="date"
@@ -359,7 +357,7 @@ class VersionItem extends Component {
                           this.updateDate('releaseDate', dateString);
                         }}
                       >
-                        <p>{!_.isNull(item.releaseDate) ? `${item && item.releaseDate.split('-')[0]}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[2].substring(0, 2)}` : '无'}</p>
+                        <p className="c7n-backlog-versionItemNotStoryPoint">{!_.isNull(item.releaseDate) ? `${item && item.releaseDate.split('-')[0]}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[2].substring(0, 2)}` : '无'}</p>
                       </EasyEdit>
                     </Permission>
                   </div>
@@ -377,7 +375,7 @@ class VersionItem extends Component {
                   </div>
                   <div className="c7n-backlog-versionItemParam">
                     <p className="c7n-backlog-versionItemParamKey">故事点数</p>
-                    <p className="c7n-backlog-versionItemParamValue" style={{ minWidth: 31 }}>{`${item.totalEstimate}p`}</p>
+                    <p className="c7n-backlog-versionItemParamValue" style={{ minWidth: 31 }}>{`${item.totalEstimate}`}</p>
                   </div>
                 </div>
               </div>

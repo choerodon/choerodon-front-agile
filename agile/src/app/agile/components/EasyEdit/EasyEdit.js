@@ -15,7 +15,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
- DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table 
+  DatePicker, Input, Button, Select, Icon, Tooltip, Popover, Modal, Table,
 } from 'choerodon-ui';
 
 let isClick = false;
@@ -31,32 +31,39 @@ class EasyEdit extends Component {
   }
 
   handleOnOk(e) {
-    this.props.onChange(this.state.date, this.state.dateString || e._i);
+    const { onChange } = this.props;
+    const { date, dateString } = this.state;
+    /* eslint-disable */
+    onChange(date, dateString || e._i);
+    /* eslint-enable */
     isClick = true;
     this.setState({
       edit: false,
-      // hoverIf: false,
     });
   }
 
   renderEdit() {
     const that = this;
-    if (this.props.type === 'input') {
+    const {
+      type, width: propWidth, maxLength, defaultValue, enterOrBlur, disabledDate, time,
+    } = this.props;
+    const { edit } = this.state;
+    if (type === 'input') {
       return (
         <Input
-          style={{ width: this.props.width ? this.props.width : '' }}
-          maxLength={this.props.maxLength}
-          defaultValue={this.props.defaultValue}
+          style={{ width: propWidth || '' }}
+          maxLength={maxLength}
+          defaultValue={defaultValue}
           autoFocus
           onPressEnter={(e) => {
-            this.props.enterOrBlur(e.target.value);
+            enterOrBlur(e.target.value);
             this.setState({
               edit: false,
               hoverIf: false,
             });
           }}
           onBlur={(e) => {
-            this.props.enterOrBlur(e.target.value);
+            enterOrBlur(e.target.value);
             this.setState({
               edit: false,
               hoverIf: false,
@@ -68,11 +75,11 @@ class EasyEdit extends Component {
       return (
         <DatePicker
           autoFocus
-          open={this.state.edit}
-          defaultValue={this.props.defaultValue}
-          disabledDate={this.props.disabledDate}
+          open={edit}
+          defaultValue={defaultValue}
+          disabledDate={disabledDate}
           format="YYYY-MM-DD HH:mm:ss"
-          showTime={this.props.time}
+          showTime={time}
           onOpenChange={(status) => {
             if (!status) {
               this.setState({
@@ -96,19 +103,23 @@ class EasyEdit extends Component {
   }
 
   render() {
+    const {
+      className, style, disabled, byHand, editIf, children,
+    } = this.props;
+    const { edit, hoverIf } = this.state;
     return (
       <div
-        className={this.props.className}
-        style={{ 
+        className={className}
+        style={{
           position: 'relative',
           cursor: 'pointer',
           minHeight: 20,
-          ...this.props.style ? this.props.style : {},
+          ...style,
         }}
         role="none"
         onClick={() => {
-          if (!this.props.disabled) {
-            if (!this.props.byHand && !isClick) {
+          if (!disabled) {
+            if (!byHand && !isClick) {
               this.setState({
                 edit: true,
               });
@@ -117,8 +128,8 @@ class EasyEdit extends Component {
           isClick = false;
         }}
         onMouseEnter={() => {
-          if (!this.props.disabled) {
-            if (!this.props.byHand) {
+          if (!disabled) {
+            if (!byHand) {
               this.setState({
                 hoverIf: true,
               });
@@ -126,8 +137,8 @@ class EasyEdit extends Component {
           }
         }}
         onMouseLeave={() => {
-          if (!this.props.disabled) {
-            if (!this.props.byHand) {
+          if (!disabled) {
+            if (!byHand) {
               this.setState({
                 hoverIf: false,
               });
@@ -136,12 +147,12 @@ class EasyEdit extends Component {
         }}
       >
         {
-          this.state.edit || this.props.editIf ? this.renderEdit() : (
+          edit || editIf ? this.renderEdit() : (
             <div>
-              {this.props.children}
+              {children}
               <div
                 style={{
-                  display: this.state.hoverIf ? 'flex' : 'none',
+                  display: hoverIf ? 'flex' : 'none',
                   width: '100%',
                   position: 'absolute',
                   height: 'calc(100% + 10px)',
@@ -156,7 +167,9 @@ class EasyEdit extends Component {
                     background: 'gainsboro',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     padding: '0 3px',
+                    width: '31px',
                   }}
                 >
                   <Icon style={{ fontSize: 15 }} type="mode_edit" />
