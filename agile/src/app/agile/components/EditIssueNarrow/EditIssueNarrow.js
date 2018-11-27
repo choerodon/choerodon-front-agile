@@ -44,6 +44,7 @@ import MergeRequest from '../MergeRequest';
 import Assignee from '../Assignee';
 import ChangeParent from '../ChangeParent';
 import TypeTag from '../TypeTag';
+import ScrumBoardStore from '../../stores/project/scrumBoard/ScrumBoardStore';
 
 const { AppState } = stores;
 const { Option, blur } = Select;
@@ -498,18 +499,15 @@ class CreateSprint extends Component {
 
   statusOnChange = (e, item) => {
     // e.preventDefault();
-
     const that = this;
-    setTimeout(() => {
-      if (that.needBlur) {
-        setTimeout(() => {
-          if (document.getElementsByClassName(that.state.currentRae).length) {
-            that.needBlur = false;
-            document.getElementsByClassName(that.state.currentRae)[0].click();
-          }
-        }, 10);
-      }
-    }, 10);
+    if (that.needBlur) {
+      setTimeout(() => {
+        if (document.getElementsByClassName(that.state.currentRae).length) {
+          that.needBlur = false;
+          document.getElementsByClassName(that.state.currentRae)[0].click();
+        }
+      }, 10);
+    }
   };
 
   updateVersionSelect = (originPros, pros) => {
@@ -769,6 +767,7 @@ class CreateSprint extends Component {
     }, () => {
       loadIssue(issueId).then((res) => {
         this.setAnIssueToState(res);
+        ScrumBoardStore.setClickIssueDetail(res);
         this.setState({
           createdById: res.createdBy,
         });
@@ -792,9 +791,6 @@ class CreateSprint extends Component {
         editDesShow: false,
       });
     });
-    // if (this.props.onUpdate) {
-    //   this.props.onUpdate();
-    // }
   }
 
   /**
@@ -1816,11 +1812,13 @@ class CreateSprint extends Component {
                               }}
                             >
                               {
-                                originStatus.map(transform => (
-                                  <Option key={transform.id} value={transform.endStatusId}>
-                                    { transform.statusDTO.name }
-                                  </Option>
-                                ))
+                                originStatus && originStatus.length
+                                  ? originStatus.map(transform => (transform.statusDTO ? (
+                                    <Option key={transform.id} value={transform.endStatusId}>
+                                      { transform.statusDTO.name }
+                                    </Option>
+                                  ) : ''))
+                                  : null
                               }
                             </Select>
                           </ReadAndEdit>
@@ -2525,9 +2523,9 @@ class CreateSprint extends Component {
                           />
                           <span>
                             {this.getWorkloads()}
-                            h/
+                            小时/
                             {this.getWorkloads() + (origin.remainingTime || 0)}
-                            h
+                            小时
                           </span>
                           <span
                             role="none"

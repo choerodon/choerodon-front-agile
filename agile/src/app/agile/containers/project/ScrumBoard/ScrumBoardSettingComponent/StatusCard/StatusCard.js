@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Draggable } from 'react-beautiful-dnd';
-import { Radio, Icon, Tooltip } from 'choerodon-ui';
+import {
+  Radio, Icon, Tooltip, Modal,
+} from 'choerodon-ui';
 import { stores, Permission } from 'choerodon-front-boot';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import EditStatus from '../EditStatus/EditStatus';
 import './StatusCard.scss';
 
 const { AppState } = stores;
+const { confirm } = Modal;
 
 @observer
 class StatusCard extends Component {
@@ -28,8 +31,20 @@ class StatusCard extends Component {
     return length;
   }
 
-  handleDeleteStatus() {
-    const { data: propData } = this.props;
+  handleDeleteClick = () => {
+    const that = this;
+    confirm({
+      title: '确认要删除此状态吗？',
+      content: 'Some descriptions',
+      onOk() {
+        that.handleDeleteStatus();
+      },
+      onCancel() {},
+    });
+  }
+
+  handleDeleteStatus = () => {
+    const { data: propData, refresh } = this.props;
     const originData = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
     const data = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
     const deleteCode = propData.statusId;
@@ -44,7 +59,8 @@ class StatusCard extends Component {
     ScrumBoardStore.axiosDeleteStatus(deleteCode).catch((error) => {
       ScrumBoardStore.setBoardData(originData);
     });
-  }
+    refresh();
+  };
 
   renderCloseDisplay() {
     const { columnId, data } = this.props;
@@ -125,22 +141,24 @@ class StatusCard extends Component {
                   }}
                 />
               </Permission>
-              <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.deleteStatus']}>
-                <Icon
-                  style={{
-                    position: 'absolute',
-                    top: 15,
-                    right: 12,
-                    display: this.renderCloseDisplay(),
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    visibility: 'hidden',
-                  }}
-                  role="none"
-                  onClick={this.handleDeleteStatus.bind(this)}
-                  type="delete"
-                />
-              </Permission>
+              {ScrumBoardStore.getCanAddStatus ? (
+                <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.deleteStatus']}>
+                  <Icon
+                    style={{
+                      position: 'absolute',
+                      top: 15,
+                      right: 12,
+                      display: this.renderCloseDisplay(),
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      // visibility: 'hidden',
+                    }}
+                    role="none"
+                    onClick={this.handleDeleteClick}
+                    type="delete"
+                  />
+                </Permission>
+              ) : ''}
               <EditStatus
                 visible={visible}
                 onChangeVisible={(item) => {
@@ -197,7 +215,7 @@ class StatusCard extends Component {
                     }}
                   >
                     {'设置已完成'}
-                    <Tooltip title="勾选后，卡片处于此状态的编号会显示为：#̶0̶0̶1̶，卡片状态视为已完成。">
+                    <Tooltip title="勾选后，卡片处于此状态的编号会显示为：#̶0̶0̶1̶，卡片状态视为已完成。" placement="topRight">
                       <Icon
                         type="help"
                         style={{
