@@ -270,12 +270,17 @@ class SprintItem extends Component {
           for (let index = 0; index < len; index += 1) {
             issueNums += `${res.parentsDoneUnfinishedSubtasks[index].issueNum} `;
           }
-          confirm({
-            title: '提醒',
-            content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
-            onCancel() {
+          this.setState({
+            [`${indexs}-closeSprint`]: {
+              closeSprintVisible: true,
             },
           });
+          // confirm({
+          //   title: '提醒',
+          //   content: `父卡${issueNums}有未完成的子任务，无法完成冲刺`,
+          //   onCancel() {
+          //   },
+          // });
         }
       }
       if (flag === 0) {
@@ -379,8 +384,6 @@ class SprintItem extends Component {
    */
   handleClickIssue=(sprintId, item) => {
     // command ctrl shift
-
-    console.log(`item: ${JSON.stringify(item)}`);
     const { keydown, selected } = this.state;
     const { store } = this.props;
     if (keydown === 91 || keydown === 17 || keydown === 16) {
@@ -941,7 +944,14 @@ class SprintItem extends Component {
                         </EasyEdit>
                       </div>
                     ) : ''}
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        minWidth: '480px',
+                        justifyContent: 'flex-end',
+                      }}
+                    >
                       <p>冲刺目标：</p>
                       <EasyEdit
                         type="input"
