@@ -7,7 +7,7 @@ import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
 const { Sidebar } = Modal;
 const { AppState } = stores;
-const Option = Select.Option;
+const { Option } = Select;
 
 @observer
 class CloseSprint extends Component {
@@ -17,33 +17,42 @@ class CloseSprint extends Component {
       selectChose: '0',
     };
   }
+
   /**
    *完成冲刺事件
    *
    * @memberof CloseSprint
    */
   handleCloseSprint() {
+    const { selectChose } = this.state;
+    const {
+      store, data: propData, onCancel, refresh,
+    } = this.props;
     const data = {
-      incompleteIssuesDestination: parseInt(this.state.selectChose, 10),
+      incompleteIssuesDestination: parseInt(selectChose, 10),
       projectId: parseInt(AppState.currentMenuType.id, 10),
-      sprintId: this.props.data.sprintId,
+      sprintId: propData.sprintId,
     };
-    this.props.store.axiosCloseSprint(data).then((res) => {
-      this.props.onCancel();
-      this.props.refresh();
+    store.axiosCloseSprint(data).then((res) => {
+      onCancel();
+      refresh();
     }).catch((error) => {
     });
   }
+
   render() {
-    const data = this.props.data;
-    const completeMessage = JSON.stringify(this.props.store.getSprintCompleteMessage) === '{}' ? null : this.props.store.getSprintCompleteMessage;
+    const {
+      data, store, visible, onCancel,
+    } = this.props;
+    const { selectChose } = this.state;
+    const completeMessage = JSON.stringify(store.getSprintCompleteMessage) === '{}' ? null : store.getSprintCompleteMessage;
     return (
       <Sidebar
         title="完成冲刺"
-        visible={this.props.visible}
+        visible={visible}
         okText="结束"
         cancelText="取消"
-        onCancel={this.props.onCancel.bind(this)}
+        onCancel={onCancel.bind(this)}
         onOk={this.handleCloseSprint.bind(this)}
       >
         <Content
@@ -56,17 +65,21 @@ class CloseSprint extends Component {
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/sprint/close-sprint/"
         >
           <p className="c7n-closeSprint-message">
-            <span>{!_.isNull(completeMessage) ? completeMessage.partiallyCompleteIssues : ''}</span> 个问题 已经完成
+            <span>{!_.isNull(completeMessage) ? completeMessage.partiallyCompleteIssues : ''}</span>
+            {' '}
+个问题 已经完成
           </p>
           <p style={{ marginTop: 24 }} className="c7n-closeSprint-message">
-            <span>{!_.isNull(completeMessage) ? completeMessage.incompleteIssues : ''}</span> 个问题 未完成
+            <span>{!_.isNull(completeMessage) ? completeMessage.incompleteIssues : ''}</span>
+            {' '}
+个问题 未完成
           </p>
-          <p style={{ marginTop: 19, color: 'rgba(0,0,0,0.65)' }}>子任务数不包含在上面的合计中，它们只能与父问题在同一个Sprint中。</p>
-          <p style={{ fontSize: 14, marginTop: 36 }}>选择所有应移动的不完整问题：</p>
-          <Select 
-            label="移动至" 
-            style={{ marginTop: 12, width: 512 }} 
-            value={this.state.selectChose}
+          <p style={{ marginTop: 19, color: 'rgba(0,0,0,0.65)' }}>{`其中有${completeMessage ? completeMessage.parentsDoneUnfinishedSubtasks.length : 0}个问题包含子任务，父级任务移动后与之相关的子任务也会被移动`}</p>
+          <p style={{ fontSize: 14, marginTop: 36 }}>选择该冲刺未完成的问题：</p>
+          <Select
+            label="移动至"
+            style={{ marginTop: 12, width: 512 }}
+            value={selectChose}
             onChange={(value) => {
               this.setState({
                 selectChose: value,
@@ -87,4 +100,3 @@ class CloseSprint extends Component {
 }
 
 export default CloseSprint;
-
