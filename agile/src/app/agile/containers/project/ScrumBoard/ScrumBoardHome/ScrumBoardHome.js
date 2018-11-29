@@ -22,7 +22,8 @@ import QuickSearch from '../../../../components/QuickSearch';
 const { Option } = Select;
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
-let scroll;
+let currentTab = false;
+let eventListenerAdded = false;
 const { AppState } = stores;
 const { confirm } = Modal;
 
@@ -48,6 +49,7 @@ class ScrumBoardHome extends Component {
   componentDidMount() {
     const { location } = this.props;
     this.getBoard();
+    eventListenerAdded = false;
     const url = this.GetRequest(location.search);
     ScrumBoardStore.axiosGetIssueTypes();
     if (url.paramIssueId) {
@@ -57,6 +59,7 @@ class ScrumBoardHome extends Component {
 
   componentWillUnmount() {
     ScrumBoardStore.setClickIssueDetail({});
+    this.removeEventListener();
   }
 
   getIssueCount = (data, key) => {
@@ -735,9 +738,6 @@ class ScrumBoardHome extends Component {
 
   renderHeight = () => {
     if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-      if (document.getElementsByClassName('c7n-scrumboard-header').length > 0) {
-        document.getElementsByClassName('c7n-scrumboard-header')[0].style.paddingRight = '32px';
-      }
       document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
     }
   };
@@ -886,9 +886,62 @@ class ScrumBoardHome extends Component {
     }
   };
 
+  handleScroll = () => {
+    const scrumBoardContainer = document.getElementsByClassName('c7n-scrumboard-content').length ? document.getElementsByClassName('c7n-scrumboard-content')[0] : null;
+    const scrumBoardTitle = document.getElementsByClassName('c7n-scrumboard-header').length ? document.getElementsByClassName('c7n-scrumboard-header')[0] : null;
+    // debugger;
+    const syncTop = () => {
+      if (currentTab !== 1) return;
+      scrumBoardTitle.scrollLeft = scrumBoardContainer.scrollLeft;
+    };
+    const syncDown = () => {
+      if (currentTab !== 2) return;
+      scrumBoardContainer.scrollLeft = scrumBoardTitle.scrollLeft;
+    };
+    const judgeTopHover = () => {
+      currentTab = 1;
+    };
+    const judgeDownHover = () => {
+      currentTab = 2;
+    };
+    if (scrumBoardContainer && scrumBoardTitle) {
+      if (document.getElementsByClassName('c7n-scrumboard-container')[0].scrollWidth > document.getElementsByClassName('c7n-scrumboard-container')[0].clientWidth && !eventListenerAdded) {
+        scrumBoardContainer.addEventListener('scroll', syncTop);
+        scrumBoardTitle.addEventListener('scroll', syncDown);
+        scrumBoardContainer.addEventListener('mouseover', judgeTopHover);
+        scrumBoardTitle.addEventListener('mouseover', judgeDownHover);
+        eventListenerAdded = true;
+      }
+    }
+  };
+
+  removeEventListener = () => {
+    const scrumBoardContainer = document.getElementsByClassName('c7n-scrumboard-content')[0];
+    const scrumBoardTitle = document.getElementsByClassName('c7n-scrumboard-header')[0];
+    const syncTop = () => {
+      if (currentTab !== 1) return;
+      scrumBoardTitle.scrollLeft = scrumBoardContainer.scrollLeft;
+    };
+    const syncDown = () => {
+      if (currentTab !== 2) return;
+      scrumBoardContainer.scrollLeft = scrumBoardTitle.scrollLeft;
+    };
+    const judgeTopHover = () => {
+      currentTab = 1;
+    };
+    const judgeDownHover = () => {
+      currentTab = 2;
+    };
+    scrumBoardContainer.removeEventListener('scroll', syncTop);
+    scrumBoardTitle.removeEventListener('scroll', syncDown);
+    scrumBoardContainer.removeEventListener('mouseover', judgeTopHover);
+    scrumBoardTitle.removeEventListener('mouseover', judgeDownHover);
+  };
+
   render() {
     this.renderHeight();
     // 其他问题计数 -- 临时逻辑
+    this.handleScroll();
     const { form: { getFieldDecorator }, history } = this.props;
     const {
       dataSource,
@@ -1045,8 +1098,10 @@ class ScrumBoardHome extends Component {
                 ) : ''
               }
               <div className="c7n-scrumboard">
-                <div className="c7n-scrumboard-header">
-                  {this.renderStatusColumns()}
+                <div style={{ height: 44, overflowY: 'hidden' }}>
+                  <div className="c7n-scrumboard-header" style={{ marginRight: 10, height: 56 }}>
+                    {this.renderStatusColumns()}
+                  </div>
                 </div>
                 <div
                   className="c7n-scrumboard-content"
