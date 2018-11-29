@@ -997,14 +997,10 @@ class ScrumBoardHome extends Component {
               <div className="c7n-scrumTools">
                 <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
                   <QuickSearch
-                    title
-                    moreSelection={ScrumBoardStore.getQuickSearchList}
                     onQuickSearchChange={this.onQuickSearchChange}
-                    pageFlag="ScrumBoard"
                     onAssigneeChange={() => {
                       this.refresh(ScrumBoardStore.getSelectedBoard);
                     }}
-                    assignee={ScrumBoardStore.getAssigneeProps}
                   />
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}>

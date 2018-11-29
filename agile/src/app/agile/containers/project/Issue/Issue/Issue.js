@@ -661,7 +661,7 @@ class Issue extends Component {
   }
 
   onAssigneeChange = (value) => {
-    IssueStore.setSelectedQuickSearch({ assigneeFilterIds: _.map(value, 'key').length === 0 ? null : _.map(value, 'key') });
+    IssueStore.setSelectedQuickSearch({ assigneeFilterIds: value.length === 0 ? null : value });
     IssueStore.loadIssues();
   }
 
@@ -914,18 +914,11 @@ class Issue extends Component {
               overflowX: 'hidden',
             }}
           >
-            <div style={{ paddingLeft: 24 }}>
-              <QuickSearch
-                title
-                buttonName="更多"
-                buttonIcon="more_vert"
-                moreSelection={IssueStore.getQuickSearch}
-                onQuickSearchChange={this.onQuickSearchChange}
-                pageFlag="Issue"
-                onAssigneeChange={this.onAssigneeChange}
-                assignee={IssueStore.getAssigneeProps}
-              />
-            </div>
+            <QuickSearch
+              style={{ paddingLeft: 24 }}
+              onQuickSearchChange={this.onQuickSearchChange}
+              onAssigneeChange={this.onAssigneeChange}
+            />
 
             <section
               className={`c7n-table ${expand ? 'expand-sign' : ''}`}

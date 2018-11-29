@@ -19,6 +19,10 @@ class UserMapStore {
 
   @observable currentFilters = [];
 
+  @observable onlyMe = false;
+
+  @observable onlyStory = false;
+
   // @observable
   // currentBacklogFilters = [[], []];
   @observable sprints = [];
@@ -177,13 +181,15 @@ class UserMapStore {
 
 
   @action
-  setCurrentFilter(data) {
-    this.currentFilters = data;
+  setCurrentFilter(onlyMeChecked = false, onlyStoryChecked = false, moreChecked = []) {
+    this.onlyMe = onlyMeChecked;
+    this.onlyStory = onlyStoryChecked;
+    this.currentFilters = moreChecked;
   }
 
   @computed
   get getCurrentFilter() {
-    return this.currentFilters;
+    return toJS(this.currentFilters);
   }
 
   @action
@@ -286,7 +292,7 @@ class UserMapStore {
   @observable assigneeFilterIds = [];
 
   @computed get getAssigneeFilterIds() {
-    return this.assigneeFilterIds;
+    return toJS(this.assigneeFilterIds);
   }
 
   @action setAssigneeFilterIds(data) {
@@ -327,22 +333,27 @@ class UserMapStore {
       });
   };
 
-  loadFilters = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
-    .then((filters) => {
-      this.setFilters(filters);
-    });
-
   loadIssues = (pageType) => {
     this.setIsLoading(true);
-    let url = '';
-    if (this.currentFilters.includes('mine')) {
-      url += `&assigneeId=${AppState.getUserId}`;
-    }
-    if (this.currentFilters.includes('userStory')) {
-      url += '&onlyStory=true';
-    }
+    // let url = '';
+    // if (this.currentFilters.includes('mine')) {
+    //   url += `&assigneeId=${AppState.getUserId}`;
+    // }
+    // if (this.currentFilters.includes('userStory')) {
+    //   url += '&onlyStory=true';
+    // }
     const orgId = AppState.currentMenuType.organizationId;
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?organizationId=${orgId}&type=${this.mode}&pageType=${pageType}&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}${url}${this.assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${this.assigneeFilterIds}` : ''}`)
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues`, {
+      params: {
+        organizationId: orgId,
+        type: this.mode,
+        pageType,
+        quickFilterIds: JSON.stringify(this.getCurrentFilter).replace(/(]|\[)/g, ''), // [asd,asd] => asd,asd
+        assigneeFilterIds: JSON.stringify(this.getAssigneeFilterIds).replace(/(]|\[)/g, ''),
+        onlyStory: this.onlyStory,
+        assigneeId: this.onlyMe ? AppState.getUserId : null,
+      },
+    })
       .then((issues) => {
         this.setIsLoading(false);
         if (issues.failed) {
@@ -357,7 +368,7 @@ class UserMapStore {
           // this.setIssues(issues);
           this.setIssues(sortedIssues);
         }
-        
+
         const arrAssignee = [];
         _.forEach(issues, (item) => {
           if (item.assigneeId && item.assigneeName) {

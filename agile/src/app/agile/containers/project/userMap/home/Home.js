@@ -95,7 +95,7 @@ class Home extends Component {
 
   componentWillUnmount() {
     const { UserMapStore } = this.props;
-    UserMapStore.setCurrentFilter([]);
+    UserMapStore.setCurrentFilter(false, false, []);
     UserMapStore.setMode('none');
     UserMapStore.setIssues([]);
     UserMapStore.setEpics([]);
@@ -396,25 +396,16 @@ class Home extends Component {
 
   onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
     const { UserMapStore } = this.props;
-    // const arr = _.cloneDeep(toJS(UserMapStore.currentFilters));
-    const arr = [];
-    if (onlyMeChecked) {
-      arr.push('mine');
-    }
-
-    if (onlyStoryChecked) {
-      arr.push('userStory');
-    }
-
-    UserMapStore.setCurrentFilter([...arr, ...moreChecked]);
+    UserMapStore.setCurrentFilter(onlyMeChecked, onlyStoryChecked, moreChecked);
     UserMapStore.loadIssues('usermap');
     if (UserMapStore.isApplyToEpic) {
       UserMapStore.loadEpic();
     }
   }
 
-  onAssigneeChange = () => {
+  onAssigneeChange = (filters) => {
     const { UserMapStore } = this.props;
+    UserMapStore.setAssigneeFilterIds(filters);
     UserMapStore.loadIssues('usermap');
     if (UserMapStore.isApplyToEpic) {
       UserMapStore.loadEpic();
@@ -1791,7 +1782,7 @@ class Home extends Component {
     }
     return dom;
   };
-  
+
   render() {
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
@@ -1812,107 +1803,78 @@ class Home extends Component {
         service={['agile-service.issue.deleteIssue', 'agile-service.issue.listEpic']}
       >
         {this.renderHeader()}
-        <div style={{ padding: 0, paddingLeft: 24, overflow: 'unset', }}>
+        <div style={{ padding: 0, paddingLeft: 24, overflow: 'unset' }}>
           <QuickSearch
-            title
-            buttonName="更多"
-            buttonIcon="more_vert"
             moreSelection={UserMapStore.getFilters}
             onQuickSearchChange={this.onQuickSearchChange}
-            pageFlag="UserMap"
             onAssigneeChange={this.onAssigneeChange}
-            assignee={UserMapStore.getAssigneeProps}
           />
         </div>
-       
+
         <Content style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
-          {isLoading 
-            ? (
-              <div style={{ 
-                display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center', 
-              }}
-              >
-                <Spin spinning={isLoading} />
-              </div>
-            )
-            : epicData.length 
+          {/* eslint-disable */
+            isLoading
+           /* eslint-enable */
               ? (
-                <div style={{ padding: 0, height: '100%'}}>
-                  <DragDropContext
-                    onDragEnd={this.handleEpicOrIssueDrag}
-                    onDragStart={this.handleEpicOrIssueDragStart}
-                  >
-                    <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
-                     
-                      { showBackLog ? (
-                        <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
-                          <Backlog handleClickIssue={this.handleClickIssue} />
-                        </div>
-                      ) : null }
-                      <div className="fixHead" style={{ height: `calc(100% - ${11}px)` }}>
-                        <div className="fixHead-head" id="fixHead-head">
-                          <div className="fixHead-line">
-                            <Droppable droppableId="epic" direction="horizontal">
-                              {(provided, snapshot) => (
-                                <div
-                                  className="fixHead-line-epic"
-                                  ref={provided.innerRef}
-                                  style={{
-                                    background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
-                                    padding: 'grid',
-                                    // borderBottom: '1px solid rgba(0,0,0,0.12)'
-                                  }}
-                                >
-                                  {UserMapStore.epics.map((epic, index) => (
-                                    <div className="fixHead-block" key={epic.issueId}>
-                                      <EpicCard
-                                        index={index}
-                                          // key={epic.issueId}
-                                        epic={epic}
-                                      />
-                                    </div>
-                                  ))}
-                                  {provided.placeholder}
-                                </div>
-                              )}
-                            </Droppable>
-                          </div>
-                        </div>
-                        <div id="fixHead-body" className="fixHead-body" style={{ flex: 1, position: 'relative' }}>
-                          {this.renderBody()}
-                        </div>
-                      </div>
-                    </div>
-                  </DragDropContext>
-                  <CreateEpic
-                    store={UserMapStore}
-                      // container={document.querySelector('.c7n-userMap')}
-                    visible={createEpic}
-                    onOk={() => {
-                      UserMapStore.setCreateEpic(false);
-                      UserMapStore.loadEpic();
-                    }}
-                    onCancel={() => UserMapStore.setCreateEpic(false)}
-                  />
-                  <CreateVOS
-                      // container={document.querySelector('.c7n-userMap')}
-                    visible={UserMapStore.createVOS}
-                      // onOk={() => {UserMapStore.setCreateVOS(false)}}
-                    onOk={this.handleCreateOk}
-                    onCancel={() => { UserMapStore.setCreateVOS(false); }}
-                    type={UserMapStore.getCreateVOSType}
-                  />
+                <div style={{
+                  display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center',
+                }}
+                >
+                  <Spin spinning={isLoading} />
                 </div>
               )
-              : (
-                <div style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
-                  <div style={{
-                    display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
-                  }}
-                  >
+              : epicData.length
+                ? (
+                  <div style={{ padding: 0, height: '100%' }}>
+                    <DragDropContext
+                      onDragEnd={this.handleEpicOrIssueDrag}
+                      onDragStart={this.handleEpicOrIssueDragStart}
+                    >
+                      <div style={{ width: showBackLog ? `calc(100% - ${350}px)` : '100%', height: '100%' }}>
+
+                        { showBackLog ? (
+                          <div style={{ display: showBackLog ? 'block' : 'none', width: 350 }}>
+                            <Backlog handleClickIssue={this.handleClickIssue} />
+                          </div>
+                        ) : null }
+                        <div className="fixHead" style={{ height: `calc(100% - ${11}px)` }}>
+                          <div className="fixHead-head" id="fixHead-head">
+                            <div className="fixHead-line">
+                              <Droppable droppableId="epic" direction="horizontal">
+                                {(provided, snapshot) => (
+                                  <div
+                                    className="fixHead-line-epic"
+                                    ref={provided.innerRef}
+                                    style={{
+                                      background: snapshot.isDraggingOver ? '#f0f0f0' : 'white',
+                                      padding: 'grid',
+                                    // borderBottom: '1px solid rgba(0,0,0,0.12)'
+                                    }}
+                                  >
+                                    {UserMapStore.epics.map((epic, index) => (
+                                      <div className="fixHead-block" key={epic.issueId}>
+                                        <EpicCard
+                                          index={index}
+                                          // key={epic.issueId}
+                                          epic={epic}
+                                        />
+                                      </div>
+                                    ))}
+                                    {provided.placeholder}
+                                  </div>
+                                )}
+                              </Droppable>
+                            </div>
+                          </div>
+                          <div id="fixHead-body" className="fixHead-body" style={{ flex: 1, position: 'relative' }}>
+                            {this.renderBody()}
+                          </div>
+                        </div>
+                      </div>
+                    </DragDropContext>
                     <CreateEpic
                       store={UserMapStore}
-                // container={document.querySelector('.c7n-userMap')}
+                      // container={document.querySelector('.c7n-userMap')}
                       visible={createEpic}
                       onOk={() => {
                         UserMapStore.setCreateEpic(false);
@@ -1920,17 +1882,43 @@ class Home extends Component {
                       }}
                       onCancel={() => UserMapStore.setCreateEpic(false)}
                     />
-                    <img src={epicPic} alt="" width="200" />
-                    <div style={{ marginLeft: 50, width: 390 }}>
-                      <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
-                      <p style={{ fontSize: 20, marginTop: 10 }}>
-                        {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
-                        <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
-                        {'进入用户故事地图。'}
-                      </p>
-                    </div>
+                    <CreateVOS
+                      // container={document.querySelector('.c7n-userMap')}
+                      visible={UserMapStore.createVOS}
+                      // onOk={() => {UserMapStore.setCreateVOS(false)}}
+                      onOk={this.handleCreateOk}
+                      onCancel={() => { UserMapStore.setCreateVOS(false); }}
+                      type={UserMapStore.getCreateVOSType}
+                    />
                   </div>
-                </div>)}
+                )
+                : (
+                  <div style={{ padding: 0, height: '100%', paddingLeft: 24 }}>
+                    <div style={{
+                      display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%',
+                    }}
+                    >
+                      <CreateEpic
+                        store={UserMapStore}
+                // container={document.querySelector('.c7n-userMap')}
+                        visible={createEpic}
+                        onOk={() => {
+                          UserMapStore.setCreateEpic(false);
+                          UserMapStore.loadEpic();
+                        }}
+                        onCancel={() => UserMapStore.setCreateEpic(false)}
+                      />
+                      <img src={epicPic} alt="" width="200" />
+                      <div style={{ marginLeft: 50, width: 390 }}>
+                        <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 14 }}>欢迎使用敏捷用户故事地图</span>
+                        <p style={{ fontSize: 20, marginTop: 10 }}>
+                          {'用户故事地图是以史诗为基础，根据版本控制，迭代冲刺多维度对问题进行管理规划，点击'}
+                          <a role="none" onClick={this.handleCreateEpic}>创建史诗</a>
+                          {'进入用户故事地图。'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>)}
         </Content>
       </Page>
     );

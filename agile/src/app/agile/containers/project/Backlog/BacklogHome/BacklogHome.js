@@ -61,7 +61,6 @@ class BacklogHome extends Component {
       .then((data) => {
         let arrAssignee = [];
         data.sprintData.forEach((sprintItem) => {
-          // const sprintDataItemAssignees = _.pick(sprintItem.assigneeIssues, ['assigneeId', 'assigneeName']);
           const sprintDataItemAssignees = _.map(sprintItem.assigneeIssues, issueItem => _.pick(issueItem, ['assigneeId', 'assigneeName']));
 
           _.forEach(sprintDataItemAssignees, (item) => {
@@ -81,7 +80,7 @@ class BacklogHome extends Component {
             });
           }
         });
-        
+
         arrAssignee = _.map(_.uniq(_.map(arrAssignee, JSON.stringify)), JSON.parse);
         BacklogStore.setAssigneeProps(arrAssignee);
         BacklogStore.setSprintData(data);
@@ -509,8 +508,9 @@ class BacklogHome extends Component {
       });
   }
 
-  onAssigneeChange = () => {
+  onAssigneeChange = (data) => {
     const { BacklogStore } = this.props;
+    BacklogStore.setAssigneeFilterIds(data);
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
       .then((res) => {
         BacklogStore.setSprintData(res);
@@ -554,13 +554,9 @@ class BacklogHome extends Component {
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div className="backlogTools" style={{ paddingLeft: 24 }}>
             <QuickSearch
-              title
-              moreSelection={BacklogStore.getQuickSearchList}
               onQuickSearchChange={this.onQuickSearchChange}
               resetFilter={BacklogStore.getQuickSearchClean}
-              pageFlag="Backlog"
               onAssigneeChange={this.onAssigneeChange}
-              assignee={BacklogStore.getAssigneeProps}
             />
           </div>
           <div className="c7n-backlog">
