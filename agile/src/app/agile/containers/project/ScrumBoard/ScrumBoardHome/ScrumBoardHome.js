@@ -887,16 +887,17 @@ class ScrumBoardHome extends Component {
   };
 
   handleScroll = () => {
-    const scrumBoardContainer = document.getElementsByClassName('c7n-scrumboard-content').length ? document.getElementsByClassName('c7n-scrumboard-content')[0] : null;
+    const scrumBoardContent = document.getElementsByClassName('c7n-scrumboard-content').length ? document.getElementsByClassName('c7n-scrumboard-content')[0] : null;
     const scrumBoardTitle = document.getElementsByClassName('c7n-scrumboard-header').length ? document.getElementsByClassName('c7n-scrumboard-header')[0] : null;
+    const scrumBoardContainer = document.getElementsByClassName('c7n-scrumboard-container').length ? document.getElementsByClassName('c7n-scrumboard-container')[0] : null;
     // debugger;
     const syncTop = () => {
       if (currentTab !== 1) return;
-      scrumBoardTitle.scrollLeft = scrumBoardContainer.scrollLeft;
+      scrumBoardTitle.scrollLeft = scrumBoardContent.scrollLeft;
     };
     const syncDown = () => {
       if (currentTab !== 2) return;
-      scrumBoardContainer.scrollLeft = scrumBoardTitle.scrollLeft;
+      scrumBoardContent.scrollLeft = scrumBoardTitle.scrollLeft;
     };
     const judgeTopHover = () => {
       currentTab = 1;
@@ -904,11 +905,12 @@ class ScrumBoardHome extends Component {
     const judgeDownHover = () => {
       currentTab = 2;
     };
-    if (scrumBoardContainer && scrumBoardTitle) {
-      if (document.getElementsByClassName('c7n-scrumboard-container')[0].scrollWidth > document.getElementsByClassName('c7n-scrumboard-container')[0].clientWidth && !eventListenerAdded) {
-        scrumBoardContainer.addEventListener('scroll', syncTop);
+    if (scrumBoardContent && scrumBoardTitle && scrumBoardContainer) {
+      if (scrumBoardContainer.scrollWidth > scrumBoardContainer.clientWidth
+        && !eventListenerAdded) {
+        scrumBoardContent.addEventListener('scroll', syncTop);
         scrumBoardTitle.addEventListener('scroll', syncDown);
-        scrumBoardContainer.addEventListener('mouseover', judgeTopHover);
+        scrumBoardContent.addEventListener('mouseover', judgeTopHover);
         scrumBoardTitle.addEventListener('mouseover', judgeDownHover);
         eventListenerAdded = true;
       }
