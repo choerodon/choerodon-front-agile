@@ -345,7 +345,7 @@ class SprintCommonStore {
 
   loadQuickSearch = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`);
 
-  loadType = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_issue_types?apply_type=agile`);
+  loadType = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_issue_types_with_sm_id?apply_type=agile`);
 
   loadStatus = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_status_by_project_id?apply_type=agile`);
 
