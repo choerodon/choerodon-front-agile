@@ -32,16 +32,17 @@ class StatusCard extends Component {
   }
 
   handleDeleteClick = () => {
+    const { data } = this.props;
     const that = this;
     confirm({
-      title: '确认要删除此状态吗？',
-      content: 'Some descriptions',
+      title: '移除状态',
+      content: `确定要移除状态 ${data.name}？`,
       onOk() {
         that.handleDeleteStatus();
       },
       onCancel() {},
     });
-  }
+  };
 
   handleDeleteStatus = () => {
     const { data: propData, refresh } = this.props;

@@ -133,9 +133,11 @@ class ScrumBoardHome extends Component {
     this.setState({
       spinIf: true,
     });
+    // 快速搜索
     ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
       ScrumBoardStore.setQuickSearchList(res);
       if (boardId) {
+        // 加载冲刺及Issue
         ScrumBoardStore.axiosGetBoardData(boardId,
           onlyMe ? AppState.getUserId : 0,
           recent,
@@ -146,38 +148,47 @@ class ScrumBoardHome extends Component {
           } else {
             ScrumBoardStore.setSprintData(false);
           }
+          // 加载史诗
           ScrumBoardStore.axiosGetAllEpicData().then((data2) => {
             const parentIds = [];
             const assigneeIds = [];
             const storeParentIds = [];
             const storeAssignee = [];
             const epicData = data.epicInfo ? data.epicInfo : [];
+            // 看板列
             for (
               let index = 0,
                 len = data.columnsData && data.columnsData.columns.length;
               index < len; index += 1) {
+              // 列中的状态
               for (
                 let index2 = 0, len2 = data.columnsData.columns[index].subStatuses.length;
                 index2 < len2;
                 index2 += 1) {
+                // 状态下的Issue
                 for (
                   let index3 = 0, len3 = data.columnsData.columns[index]
                     .subStatuses[index2].issues.length;
                   index3 < len3;
                   index3 += 1) {
+                  // 问题是有子任务
                   if (data.parentIds
                     .indexOf(parseInt(
                       data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId,
                       10,
                     )) !== -1) {
+                    // 问题不在parentIds中
                     if (parentIds.indexOf(
                       data.columnsData.columns[index].subStatuses[index2].issues[index3].issueId,
                     ) === -1) {
                       const parentId = data.columnsData
                         .columns[index].subStatuses[index2].issues[index3].issueId;
                       let count = 0;
+                      // 列
                       _.map(data.columnsData.columns, (columns) => {
+                        // 状态
                         _.map(columns.subStatuses, (status) => {
+                          // 计算子任务数量
                           count = _.reduce(status.issues, (sum, item) => {
                             let result = sum;
                             if (item.parentIssueId && item.parentIssueId === parentId) {
@@ -190,8 +201,10 @@ class ScrumBoardHome extends Component {
                           }, count);
                         });
                       });
+                      // 将父任务加入parentIds
                       parentIds.push(data.columnsData
                         .columns[index].subStatuses[index2].issues[index3].issueId);
+                      // 保存父任务信息，加入状态，状态类别，子任务数量
                       storeParentIds.push({
                         status: data.columnsData
                           .columns[index].subStatuses[index2].name,
