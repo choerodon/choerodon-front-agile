@@ -707,8 +707,8 @@ class AddComponent extends Component {
                                 }],
                               })(
                                 <Select label="关系">
-                                  <Option key="and" value="and">AND</Option>
-                                  <Option key="or" value="or">OR</Option>  
+                                  <Option key="and" value="and">且</Option>
+                                  <Option key="or" value="or">或</Option>
                                 </Select>,
                               )}
                             </FormItem>
