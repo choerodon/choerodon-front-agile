@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Content, stores } from 'choerodon-front-boot';
+import { axios, Content, stores } from 'choerodon-front-boot';
 import {
   Form, Modal, Input, Select,
 } from 'choerodon-ui';
@@ -21,6 +21,7 @@ class AddColumn extends Component {
       loading: false,
       statusType: false,
     };
+    this.checkStatusDebounce = false;
   }
 
   handleAddColumn(e) {
@@ -84,26 +85,24 @@ class AddColumn extends Component {
   checkStatusName(rule, value, callback) {
     const { store, form } = this.props;
     const statusDate = store.getStatusList;
-    const status = statusDate.find(s => s.name === value);
-    if (status) {
-      this.setState({
-        statusType: status.type,
-      }, () => {
-        form.setFieldsValue({
-          column_categoryCode: status.type,
-        });
-      });
-      callback();
-    } else {
-      this.setState({
-        statusType: false,
-      }, () => {
-        form.setFieldsValue({
-          column_categoryCode: undefined,
-        });
-      });
-      callback();
+    if (this.checkStatusDebounce) {
+      clearTimeout(this.checkStatusDebounce);
+      this.checkStatusDebounce = null;
     }
+    this.checkStatusDebounce = setTimeout(() => {
+      axios.get(`state/v1/projects/${AppState.currentMenuType.id}/status/project_check_name?organization_id=${AppState.currentMenuType.organizationId}&name=${value}`).then((res) => {
+      // if (res.statusExist) {
+        this.setState({
+          statusType: res.type,
+        }, () => {
+          form.setFieldsValue({
+            categoryCode: res.type,
+          });
+        });
+        callback();
+      // }
+      });
+    }, 300);
   }
 
   renderOptions() {
@@ -212,4 +211,3 @@ class AddColumn extends Component {
 }
 
 export default Form.create()(AddColumn);
-

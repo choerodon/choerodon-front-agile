@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Content, stores } from 'choerodon-front-boot';
+import { Content, stores, axios } from 'choerodon-front-boot';
 import {
-  Form, Modal, Input, Select, 
+  Form, Modal, Input, Select,
 } from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import { STATUS } from '../../../../../common/Constant';
@@ -20,6 +20,7 @@ class AddStatus extends Component {
       loading: false,
       statusType: false,
     };
+    this.checkStatusDebounce = false;
   }
 
   handleAddStatus(e) {
@@ -57,27 +58,24 @@ class AddStatus extends Component {
 
   checkStatusName(rule, value, callback) {
     const { store, form } = this.props;
-    const statusDate = store.getStatusList;
-    const status = statusDate.find(s => s.name === value);
-    if (status) {
-      this.setState({
-        statusType: status.type,
-      }, () => {
-        form.setFieldsValue({
-          categoryCode: status.type,
-        });
-      });
-      callback();
-    } else {
-      this.setState({
-        statusType: false,
-      }, () => {
-        form.setFieldsValue({
-          categoryCode: undefined,
-        });
-      });
-      callback();
+    if (this.checkStatusDebounce) {
+      clearTimeout(this.checkStatusDebounce);
+      this.checkStatusDebounce = null;
     }
+    this.checkStatusDebounce = setTimeout(() => {
+      axios.get(`state/v1/projects/${AppState.currentMenuType.id}/status/project_check_name?organization_id=${AppState.currentMenuType.organizationId}&name=${value}`).then((res) => {
+        // if (res.statusExist) {
+        this.setState({
+          statusType: res.type,
+        }, () => {
+          form.setFieldsValue({
+            categoryCode: res.type,
+          });
+        });
+        callback();
+        // }
+      });
+    }, 300);
   }
 
   renderOptions() {
@@ -107,7 +105,7 @@ class AddStatus extends Component {
                 background: STATUS[data[index].valueCode] || 'rgb(255, 177, 0)',
               }}
               />
-              <span> 
+              <span>
                 {` ${data[index].name}`}
               </span>
             </div>
