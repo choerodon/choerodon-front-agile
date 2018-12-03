@@ -19,6 +19,11 @@ class QuickSearch extends Component {
     };
   }
 
+  /**
+   * DidMount =>
+   * 1. 请求快速搜索数据
+   * 2. 请求项目经办人信息
+   */
   componentDidMount() {
     const { AppState } = this.props;
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`).then((res = []) => {
@@ -88,6 +93,7 @@ class QuickSearch extends Component {
           maxTagCount={0}
           maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
           onChange={this.handleQuickSearchChange}
+          getPopupContainer={triggerNode => triggerNode.parentNode}
         >
           {
             <OptGroup key="quickSearch" label="常用选项">
@@ -115,6 +121,7 @@ class QuickSearch extends Component {
           filter
           optionFilterProp="children"
           onChange={this.handleAssigneeChange}
+          getPopupContainer={triggerNode => triggerNode.parentNode}
         >
           {
             userDataArray.length && userDataArray.map(item => (

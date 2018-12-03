@@ -242,9 +242,6 @@ class IssueCard extends Component {
                   />
                   <span
                     className="c7n-issueNum"
-                    style={{
-                      textDecoration: statusMapDTO && statusMapDTO.type === 'done' ? 'line-through' : 'unset',
-                    }}
                     role="none"
                     onClick={() => {
                       const urlParams = AppState.currentMenuType;

@@ -28,6 +28,7 @@ const CheckboxGroup = Checkbox.Group;
 
 // let scrollL;
 const left = 0;
+let flag = false;
 let inWhich;
 
 function toFullScreen(dom) {
@@ -76,6 +77,7 @@ class Home extends Component {
   componentDidMount() {
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
+    flag = false;
     this.initData();
     const timer = setInterval(() => {
       if (document.getElementById('fixHead-body')) {
@@ -103,8 +105,19 @@ class Home extends Component {
     UserMapStore.setLeft(0);
     UserMapStore.setCurrentIndex(0);
     UserMapStore.setIsFullScreen(false);
+    document.removeEventListener('fullscreenchange', this.handleChangeFullScreen);
+    document.removeEventListener('webkitfullscreenchange', this.handleChangeFullScreen);
+    document.removeEventListener('mozfullscreenchange', this.handleChangeFullScreen);
+    document.removeEventListener('MSFullscreenChange', this.handleChangeFullScreen);
+    document.getElementById('fixHead-head').removeEventListener('scroll', this.handleScrollHead, { passive: true });
+    document.getElementById('fixHead-body').removeEventListener('scroll', this.handleScroll, { passive: true });
+    document.getElementById('fixHead-head').removeEventListener('mouseover', this.handleMouseOverHead);
+    document.getElementById('fixHead-body').removeEventListener('mouseover', this.handleMouseOverBody);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
+    // 清除需求池，退出全屏
+    UserMapStore.clearShowBacklog();
+    this.exitFullScreen();
   }
 
   getPrepareOffsetTops = (isExpand = false) => {
@@ -1320,6 +1333,16 @@ class Home extends Component {
     return count;
   };
 
+  handleInitScroll = () => {
+    if (document.getElementById('fixHead-body')) {
+      document.getElementById('fixHead-head').addEventListener('scroll', this.handleScrollHead, { passive: true });
+      document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll, { passive: true });
+      document.getElementById('fixHead-head').addEventListener('mouseover', this.handleMouseOverHead);
+      document.getElementById('fixHead-body').addEventListener('mouseover', this.handleMouseOverBody);
+      flag = true;
+    }
+  }
+
   renderHeader = () => {
     const { UserMapStore } = this.props;
     const { showDoneEpicCheckbox, filterEpicCheckbox, popOverVisible } = this.state;
@@ -1786,6 +1809,9 @@ class Home extends Component {
   render() {
     const { UserMapStore } = this.props;
     const epicData = UserMapStore.getEpics;
+    if (!flag) {
+      this.handleInitScroll();
+    }
     const {
       filters, mode, createEpic, currentFilters, showBackLog, isLoading,
     } = UserMapStore;

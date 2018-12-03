@@ -144,6 +144,10 @@ class UserMapStore {
     this.showBackLog = !this.showBackLog;
   }
 
+  @action clearShowBacklog() {
+    this.showBackLog = false;
+  }
+
   @action saveChangeShowBackLog() {
     this.showBackLog = false;
   }
