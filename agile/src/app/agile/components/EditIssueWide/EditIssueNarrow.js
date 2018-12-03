@@ -240,21 +240,22 @@ class CreateSprint extends Component {
         loginUserId = data.id;
       })
       .catch((e) => {
-        console.log(e);
+        // console.log(e);
       });
 
-    axios.post('/iam/v1/permissions/checkPermission', [
-      { 
-        code: 'agile-service.project-info.updateProjectInfo',
-        organizationId: 4,
-        projectId: 28,
-        resourceType: 'project',
-      }])
-      .then((res) => {
-        this.setState({
-          hasPermission: res.find(item => item.code === 'agile-service.project-info.updateProjectInfo').approve,
-        });
-      });
+    // axios.post('/iam/v1/permissions/checkPermission', [
+    //   {
+    //     code: 'agile-service.project-info.updateProjectInfo',
+    //     organizationId: 4,
+    //     projectId: 28,
+    //     resourceType: 'project',
+    //   }])
+    //   .then((res) => {
+    //     this.setState({
+    //       hasPermission: res.find(item => item.code
+    // === 'agile-service.project-info.updateProjectInfo').approve,
+    //     });
+    //   });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -1434,7 +1435,7 @@ class CreateSprint extends Component {
       ));
     }
     const getMenu = () => {
-      const { createdById, hasPermission } = this.state;
+      const { createdById } = this.state;
       return (
         <Menu onClick={this.handleClickMenu.bind(this)}>
           <Menu.Item key="0">登记工作日志</Menu.Item>
@@ -1442,11 +1443,18 @@ class CreateSprint extends Component {
             type={type}
             projectId={projectId}
             organizationId={orgId}
-            service={['agile-service.issue.deleteIssue']}
+            service={['agile-service.project-info.updateProjectInfo']}
+            noAccessChildren={(
+              <Menu.Item
+                key="1"
+                disabled={loginUserId !== createdById}
+              >
+                {'删除'}
+              </Menu.Item>
+            )}
           >
             <Menu.Item 
-              key="1" 
-              disabled={loginUserId !== createdById && !hasPermission}
+              key="1"
             >
               {'删除'}
             </Menu.Item>
