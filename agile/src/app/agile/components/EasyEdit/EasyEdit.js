@@ -94,6 +94,10 @@ class EasyEdit extends Component {
               hoverIf: false,
               date,
               dateString,
+            }, () => {
+              if (!time) {
+                this.handleOnOk();
+              }
             });
           }}
           onOk={this.handleOnOk.bind(this)}

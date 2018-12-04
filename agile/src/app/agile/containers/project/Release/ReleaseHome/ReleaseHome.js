@@ -207,16 +207,29 @@ class ReleaseHome extends Component {
   }
 
   handleDrag =(res, postData) => {
+    const { pagination } = this.state;
     ReleaseStore.setVersionList(res);
     ReleaseStore.handleDataDrag(AppState.currentMenuType.id, postData)
       .then(() => {
-        this.refresh(this.state.pagination);
+        this.refresh(pagination);
       }).catch((error) => {
-        this.refresh(this.state.pagination);
+        this.refresh(pagination);
       });
   };
 
   render() {
+    const {
+      loading,
+      pagination,
+      addRelease,
+      versionDelete,
+      editRelease,
+      sourceList,
+      combineVisible,
+      versionDelInfo,
+      selectItem,
+      publicVersion,
+    } = this.state;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     const versionData = ReleaseStore.getVersionList.length > 0 ? ReleaseStore.getVersionList : [];
@@ -286,6 +299,11 @@ class ReleaseHome extends Component {
       title: '开始日期',
       dataIndex: 'startDate',
       key: 'startDate',
+      render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
+    }, {
+      title: '预计发布日期',
+      dataIndex: 'expectReleaseDate',
+      key: 'expectReleaseDate',
       render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
     }, {
       title: '结束日期',
@@ -386,7 +404,7 @@ class ReleaseHome extends Component {
           description="根据项目周期，可以对软件项目追踪不同的版本，同时可以将对应的问题分配到版本中。例如：v1.0.0、v0.5.0等。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/release/"
         >
-          <Spin spinning={this.state.loading}>
+          <Spin spinning={loading}>
             {
               // versionData.length > 0 ? (
               //   <DragSortingTable
@@ -409,7 +427,8 @@ class ReleaseHome extends Component {
               //         justifyContent: 'center',
               //       }}
               //     >
-              //       <img style={{ width: 237, height: 200 }} src={emptyVersion} alt="emptyVersion" />
+              //       <img style={{ width: 237, height: 200 }}
+              //            src={emptyVersion} alt="emptyVersion" />
               //       <div style={{ marginLeft: 50 }}>
               //         <p style={{ color: 'rgba(0,0,0,0.65)' }}>您还没有为此项目添加任何版本</p>
               //         <p style={{ fontSize: '20px', lineHeight: '34px' }}>
@@ -426,32 +445,32 @@ class ReleaseHome extends Component {
                 handleDrag={this.handleDrag}
                 columns={versionColumn}
                 dataSource={versionData}
-                pagination={this.state.pagination}
+                pagination={pagination}
                 onChange={this.handleChangeTable.bind(this)}
               />
             }
           </Spin>
           <AddRelease
-            visible={this.state.addRelease}
+            visible={addRelease}
             onCancel={() => {
               this.setState({
                 addRelease: false,
               });
             }}
-            refresh={this.refresh.bind(this, this.state.pagination)}
+            refresh={this.refresh.bind(this, pagination)}
           />
           <Modal
-            title={`删除版本 ${this.state.versionDelete.name}`}
-            visible={JSON.stringify(this.state.versionDelete) !== '{}'}
+            title={`删除版本 ${versionDelete.name}`}
+            visible={JSON.stringify(versionDelete) !== '{}'}
             closable={false}
             okText="删除"
             onOk={() => {
               const data2 = {
                 projectId: AppState.currentMenuType.id,
-                versionId: this.state.versionDelete.versionId,
+                versionId: versionDelete.versionId,
               };
               ReleaseStore.axiosDeleteVersion(data2).then((data) => {
-                this.refresh(this.state.pagination);
+                this.refresh(pagination);
                 this.setState({
                   versionDelete: {},
                 });
@@ -465,58 +484,58 @@ class ReleaseHome extends Component {
             }}
           >
             <div style={{ marginTop: 20 }}>
-              {`确定要删除 V${this.state.versionDelete.name}?`}
+              {`确定要删除 V${versionDelete.name}?`}
             </div>
           </Modal>
           <CombineRelease
             onRef={(ref) => {
               this.combineRelease = ref;
             }}
-            sourceList={this.state.sourceList}
-            visible={this.state.combineVisible}
+            sourceList={sourceList}
+            visible={combineVisible}
             onCancel={() => {
               this.setState({
                 combineVisible: false,
               });
             }}
-            refresh={this.refresh.bind(this, this.state.pagination)}
+            refresh={this.refresh.bind(this, pagination)}
           />
           <DeleteReleaseWithIssues
-            versionDelInfo={this.state.versionDelInfo}
+            versionDelInfo={versionDelInfo}
             onCancel={() => {
               this.setState({
                 versionDelInfo: {},
                 versionDelete: {},
               });
             }}
-            refresh={this.refresh.bind(this, this.state.pagination)}
+            refresh={this.refresh.bind(this, pagination)}
             changeState={(k, v) => {
               this.setState({
                 [k]: v,
               });
             }}
           />
-          {this.state.editRelease ? (
+          {editRelease ? (
             <EditRelease
-              visible={this.state.editRelease}
+              visible={editRelease}
               onCancel={() => {
                 this.setState({
                   editRelease: false,
                   selectItem: {},
                 });
               }}
-              refresh={this.refresh.bind(this, this.state.pagination)}
-              data={this.state.selectItem}
+              refresh={this.refresh.bind(this, pagination)}
+              data={selectItem}
             />
           ) : ''}
           <PublicRelease
-            visible={this.state.publicVersion}
+            visible={publicVersion}
             onCancel={() => {
               this.setState({
                 publicVersion: false,
               });
             }}
-            refresh={this.refresh.bind(this, this.state.pagination)}
+            refresh={this.refresh.bind(this, pagination)}
           />
         </Content>
       </Page>

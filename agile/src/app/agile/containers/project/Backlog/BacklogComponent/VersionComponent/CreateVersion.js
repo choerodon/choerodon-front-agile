@@ -20,7 +20,7 @@ class CreateVersion extends Component {
     this.state = {
       loading: false,
       startDate: null,
-      endDate: null,
+      expectReleaseDate: null,
     };
   }
 
@@ -32,14 +32,15 @@ class CreateVersion extends Component {
    */
   handleCreateVersion(e) {
     e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, value) => {
+    const { form } = this.props;
+    form.validateFieldsAndScroll((err, value) => {
       if (!err) {
         const data = {
           description: value.description,
           name: value.name,
           projectId: AppState.currentMenuType.id,
           startDate: value.startDate ? `${moment(value.startDate).format('YYYY-MM-DD')} 00:00:00` : null,
-          releaseDate: value.endDate ? `${moment(value.endDate).format('YYYY-MM-DD')} 00:00:00` : null,
+          expectReleaseDate: value.expectReleaseDate ? `${moment(value.expectReleaseDate).format('YYYY-MM-DD')} 00:00:00` : null,
         };
         this.setState({
           loading: true,
@@ -121,18 +122,18 @@ class CreateVersion extends Component {
                       startDate: date,
                     });
                   }}
-                  disabledDate={this.state.endDate ? current => current > moment(this.state.endDate) : ''}
+                  disabledDate={this.state.expectReleaseDate ? current => current > moment(this.state.expectReleaseDate) : ''}
                 />,
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('endDate', {})(
+              {getFieldDecorator('expectReleaseDate', {})(
                 <DatePicker
                   style={{ width: '100%' }}
-                  label="结束日期"
+                  label="预计发布日期"
                   onChange={(date) => {
                     this.setState({
-                      endDate: date,
+                      expectReleaseDate: date,
                     });
                   }}
                   disabledDate={this.state.startDate ? current => current < moment(this.state.startDate) : ''}

@@ -279,7 +279,19 @@ class ReleaseDetail extends Component {
         title: '任务编号',
         dataIndex: 'issueNum',
         key: 'issueNum',
-        render: text => <span className="textDisplayOneColumn">{text}</span>,
+        render: (text, record) => (
+          <a
+            role="none"
+            onClick={() => {
+              if (record.parentIssueId) {
+                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${record.parentIssueNum}&paramIssueId=${record.parentIssueId}&paramOpenIssueId=${record.issueId}&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
+              } else {
+                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${record.issueNum}&paramIssueId=${record.issueId}&paramOpenIssueId=${record.issueId}&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
+              }
+            }}
+          >
+            <span className="textDisplayOneColumn">{text}</span>
+          </a>),
         filters: filterMap.get('issueNum'),
       },
       {

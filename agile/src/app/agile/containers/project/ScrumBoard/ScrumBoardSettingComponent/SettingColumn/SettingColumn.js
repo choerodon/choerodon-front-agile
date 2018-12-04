@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
-import { stores } from 'choerodon-front-boot';
+import { stores, Permission } from 'choerodon-front-boot';
 import {
   Input, message, Icon, Modal,
 } from 'choerodon-ui';
@@ -238,6 +238,8 @@ class SettingColumn extends Component {
         </div>
       );
     } else {
+      const menu = AppState.currentMenuType;
+      const { type, id: projectId, organizationId: orgId } = menu;
       return (
         <Draggable
           key={this.props.data.columnId}
@@ -334,38 +336,68 @@ class SettingColumn extends Component {
                             flexWrap: 'wrap',
                           }}
                         >
-                          <EasyEdit
-                            className="editSpan"
-                            type="input"
-                            defaultValue={this.props.data.maxNum
-                              ? this.props.data.maxNum : null}
-                            enterOrBlur={(value) => {
-                              this.updateColumnMaxMin('maxNum', value);
-                            }}
+                          <Permission
+                            type={type}
+                            projectId={projectId}
+                            organizationId={orgId}
+                            service={['agile-service.project-info.updateProjectInfo']}
+                            noAccessChildren={(
+                              <span
+                                style={{ minWidth: '110px' }}
+                              >
+                                最大值：
+                                {typeof this.props.data.maxNum === 'number' ? this.props.data.maxNum : '没有最大'}
+                              </span>
+                            )}
                           >
-                            <span
-                              style={{ cursor: 'pointer', minWidth: '110px' }}
+                            <EasyEdit
+                              className="editSpan"
+                              type="input"
+                              defaultValue={this.props.data.maxNum
+                                ? this.props.data.maxNum : null}
+                              enterOrBlur={(value) => {
+                                this.updateColumnMaxMin('maxNum', value);
+                              }}
                             >
-                              最大值：
-                              {typeof this.props.data.maxNum === 'number' ? this.props.data.maxNum : '没有最大'}
-                            </span>
-                          </EasyEdit>
-                          <EasyEdit
-                            className="editSpan"
-                            type="input"
-                            defaultValue={this.props.data.minNum
-                              ? this.props.data.minNum : null}
-                            enterOrBlur={(value) => {
-                              this.updateColumnMaxMin('minNum', value);
-                            }}
+                              <span
+                                style={{ cursor: 'pointer', minWidth: '110px' }}
+                              >
+                                最大值：
+                                {typeof this.props.data.maxNum === 'number' ? this.props.data.maxNum : '没有最大'}
+                              </span>
+                            </EasyEdit>
+                          </Permission>
+                          <Permission
+                            type={type}
+                            projectId={projectId}
+                            organizationId={orgId}
+                            service={['agile-service.project-info.updateProjectInfo']}
+                            noAccessChildren={(
+                              <span
+                                style={{ minWidth: '110px' }}
+                              >
+                                最小值：
+                                {typeof this.props.data.minNum === 'number' ? this.props.data.minNum : '没有最小'}
+                              </span>
+                            )}
                           >
-                            <span
-                              style={{ cursor: 'pointer', minWidth: '110px' }}
+                            <EasyEdit
+                              className="editSpan"
+                              type="input"
+                              defaultValue={this.props.data.minNum
+                                ? this.props.data.minNum : null}
+                              enterOrBlur={(value) => {
+                                this.updateColumnMaxMin('minNum', value);
+                              }}
                             >
-                              最小值：
-                              {typeof this.props.data.minNum === 'number' ? this.props.data.minNum : '没有最小'}
-                            </span>
-                          </EasyEdit>
+                              <span
+                                style={{ cursor: 'pointer', minWidth: '110px' }}
+                              >
+                                最小值：
+                                {typeof this.props.data.minNum === 'number' ? this.props.data.minNum : '没有最小'}
+                              </span>
+                            </EasyEdit>
+                          </Permission>
                         </div>
                       )
                     }
