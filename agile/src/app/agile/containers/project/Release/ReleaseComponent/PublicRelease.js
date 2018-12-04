@@ -31,7 +31,7 @@ class PublicRelease extends Component {
         const data = {
           projectId: AppState.currentMenuType.id,
           versionId: ReleaseStore.getVersionDetail.versionId,
-          releaseDate: values.startDate ? `${moment(values.startDate).format('YYYY-MM-DD')} 00:00:00` : null,
+          releaseDate: values.releaseDate ? `${moment(values.releaseDate).format('YYYY-MM-DD')} 00:00:00` : null,
         };
         if (values.chose) {
           if (values.chose === 2) {
@@ -161,7 +161,7 @@ class PublicRelease extends Component {
                     ) : ''
                   }
                   <FormItem>
-                    {getFieldDecorator('startDate', {
+                    {getFieldDecorator('releaseDate', {
                       rules: [{
                         required: true,
                         message: '发布日期是必须的',

@@ -5,7 +5,7 @@ import moment from 'moment';
 import { stores, Permission } from 'choerodon-front-boot';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import {
-  Input, DatePicker, Icon, Dropdown, Menu,
+  message, DatePicker, Icon, Dropdown, Menu,
 } from 'choerodon-ui';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
@@ -126,13 +126,20 @@ class VersionItem extends Component {
       name: value,
     };
     BacklogStore.axiosUpdateVerison(versionId, data).then((res) => {
-      this.setState({
-        editName: false,
-      });
-      const originData = _.clone(BacklogStore.getVersionData);
-      originData[index].name = res.name;
-      originData[index].objectVersionNumber = res.objectVersionNumber;
-      BacklogStore.setVersionData(originData);
+      if (res && res.failed) {
+        this.setState({
+          editName: false,
+        });
+        message.error(res.message);
+      } else {
+        this.setState({
+          editName: false,
+        });
+        const originData = _.clone(BacklogStore.getVersionData);
+        originData[index].name = res.name;
+        originData[index].objectVersionNumber = res.objectVersionNumber;
+        BacklogStore.setVersionData(originData);
+      }
     }).catch((error) => {
       this.setState({
         editName: false,
@@ -327,10 +334,9 @@ class VersionItem extends Component {
                       noAccessChildren={<p className="c7n-backlog-versionItemNotStoryPoint">{!_.isNull(item.startDate) ? `${item && item.startDate.split('-')[0]}/${item.startDate.split('-')[1]}/${item.startDate.split('-')[2].substring(0, 2)}` : '无'}</p>}
                     >
                       <EasyEdit
-                        time
                         type="date"
                         defaultValue={item.startDate ? moment(item.startDate.split(' ')[0], 'YYYY-MM-DD') : ''}
-                        disabledDate={item.releaseDate ? current => current > moment(item.releaseDate, 'YYYY-MM-DD HH:mm:ss') : ''}
+                        disabledDate={item.expectReleaseDate ? current => current > moment(item.expectReleaseDate, 'YYYY-MM-DD HH:mm:ss') : ''}
                         onChange={(date, dateString) => {
                           this.updateDate('startDate', dateString);
                         }}
@@ -340,24 +346,23 @@ class VersionItem extends Component {
                     </Permission>
                   </div>
                   <div className="c7n-backlog-versionItemParam">
-                    <p style={{ color: 'rgba(0,0,0,0.65)' }}>发布日期</p>
+                    <p style={{ color: 'rgba(0,0,0,0.65)' }}>预计发布日期</p>
                     <Permission
                       type={type}
                       projectId={projectId}
                       organizationId={orgId}
                       service={['agile-service.product-version.updateVersion']}
-                      noAccessChildren={<p className="c7n-backlog-versionItemNotStoryPoint">{!_.isNull(item.releaseDate) ? `${item && item.releaseDate.split('-')[0]}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[2].substring(0, 2)}` : '无'}</p>}
+                      noAccessChildren={<p className="c7n-backlog-versionItemNotStoryPoint">{!_.isNull(item.expectReleaseDate) ? `${item && item.expectReleaseDate.split('-')[0]}/${item.expectReleaseDate.split('-')[1]}/${item.expectReleaseDate.split('-')[2].substring(0, 2)}` : '无'}</p>}
                     >
                       <EasyEdit
                         type="date"
-                        time
-                        defaultValue={item.releaseDate ? moment(item.releaseDate.split(' ')[0], 'YYYY-MM-DD') : ''}
+                        defaultValue={item.expectReleaseDate ? moment(item.expectReleaseDate.split(' ')[0], 'YYYY-MM-DD') : ''}
                         disabledDate={item.startDate ? current => current < moment(item.startDate, 'YYYY-MM-DD HH:mm:ss') : ''}
                         onChange={(date, dateString) => {
-                          this.updateDate('releaseDate', dateString);
+                          this.updateDate('expectReleaseDate', dateString);
                         }}
                       >
-                        <p className="c7n-backlog-versionItemNotStoryPoint">{!_.isNull(item.releaseDate) ? `${item && item.releaseDate.split('-')[0]}/${item.releaseDate.split('-')[1]}/${item.releaseDate.split('-')[2].substring(0, 2)}` : '无'}</p>
+                        <p className="c7n-backlog-versionItemNotStoryPoint">{!_.isNull(item.expectReleaseDate) ? `${item && item.expectReleaseDate.split('-')[0]}/${item.expectReleaseDate.split('-')[1]}/${item.expectReleaseDate.split('-')[2].substring(0, 2)}` : '无'}</p>
                       </EasyEdit>
                     </Permission>
                   </div>

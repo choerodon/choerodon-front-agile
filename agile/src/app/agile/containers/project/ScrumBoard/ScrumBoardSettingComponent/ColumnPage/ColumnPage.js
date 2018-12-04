@@ -299,46 +299,69 @@ class ColumnPage extends Component {
             justifyContent: 'space-between',
           }}
         >
-          <Select
-            value={ScrumBoardStore.getCurrentConstraint}
-            label="列约束"
-            style={{ width: 512 }}
-            onChange={(value) => {
-              let objectVersionNumber;
-              const oldData = ScrumBoardStore.getBoardList;
-              for (let index = 0, len = oldData.length; index < len; index += 1) {
-                if (oldData[index].boardId === ScrumBoardStore.getSelectedBoard) {
-                  /* eslint-disable */
-                  objectVersionNumber = oldData[index].objectVersionNumber;
-                  /* eslint-enable */
+          <Permission
+            type={type}
+            projectId={projectId}
+            organizationId={orgId}
+            service={['agile-service.project-info.updateProjectInfo']}
+            noAccessChildren={(
+              <Select
+                value={ScrumBoardStore.getCurrentConstraint}
+                label="列约束"
+                style={{ width: 512 }}
+                disabled
+              >
+                {
+                  ScrumBoardStore.getLookupValue.constraint ? (
+                    ScrumBoardStore.getLookupValue.constraint.map(item => (
+                      <Option key={item.valueCode} value={item.valueCode}>{item.name}</Option>
+                    ))
+                  ) : ''
                 }
-              }
-              ScrumBoardStore.axiosUpdateBoard({
-                boardId: ScrumBoardStore.getSelectedBoard,
-                columnConstraint: value,
-                projectId: AppState.currentMenuType.id,
-                objectVersionNumber,
-              }).then((res) => {
+              </Select>
+            )}
+          >
+            <Select
+              value={ScrumBoardStore.getCurrentConstraint}
+              label="列约束"
+              style={{ width: 512 }}
+              onChange={(value) => {
+                let objectVersionNumber;
+                const oldData = ScrumBoardStore.getBoardList;
                 for (let index = 0, len = oldData.length; index < len; index += 1) {
                   if (oldData[index].boardId === ScrumBoardStore.getSelectedBoard) {
-                    oldData[index].objectVersionNumber = res.objectVersionNumber;
-                    oldData[index].columnConstraint = res.columnConstraint;
+                    /* eslint-disable */
+                    objectVersionNumber = oldData[index].objectVersionNumber;
+                    /* eslint-enable */
                   }
                 }
-                ScrumBoardStore.setBoardList(oldData);
-                ScrumBoardStore.setCurrentConstraint(value);
-              }).catch((error) => {
-              });
-            }}
-          >
-            {
-              ScrumBoardStore.getLookupValue.constraint ? (
-                ScrumBoardStore.getLookupValue.constraint.map(item => (
-                  <Option key={item.valueCode} value={item.valueCode}>{item.name}</Option>
-                ))
-              ) : ''
-            }
-          </Select>
+                ScrumBoardStore.axiosUpdateBoard({
+                  boardId: ScrumBoardStore.getSelectedBoard,
+                  columnConstraint: value,
+                  projectId: AppState.currentMenuType.id,
+                  objectVersionNumber,
+                }).then((res) => {
+                  for (let index = 0, len = oldData.length; index < len; index += 1) {
+                    if (oldData[index].boardId === ScrumBoardStore.getSelectedBoard) {
+                      oldData[index].objectVersionNumber = res.objectVersionNumber;
+                      oldData[index].columnConstraint = res.columnConstraint;
+                    }
+                  }
+                  ScrumBoardStore.setBoardList(oldData);
+                  ScrumBoardStore.setCurrentConstraint(value);
+                }).catch((error) => {
+                });
+              }}
+            >
+              {
+                ScrumBoardStore.getLookupValue.constraint ? (
+                  ScrumBoardStore.getLookupValue.constraint.map(item => (
+                    <Option key={item.valueCode} value={item.valueCode}>{item.name}</Option>
+                  ))
+                ) : ''
+              }
+            </Select>
+          </Permission>
           <div>
             {
               ScrumBoardStore.getCanAddStatus ? (

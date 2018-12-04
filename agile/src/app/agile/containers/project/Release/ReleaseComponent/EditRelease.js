@@ -18,7 +18,7 @@ class EditRelease extends Component {
     super(props);
     this.state = {
       startDate: null,
-      endDate: null,
+      expectReleaseDate: null,
       loading: false,
     };
   }
@@ -26,7 +26,7 @@ class EditRelease extends Component {
   componentWillMount() {
     this.setState({
       startDate: ReleaseStore.getVersionDetail.startDate ? moment(ReleaseStore.getVersionDetail.startDate, 'YYYY-MM-DD HH:mm:ss') : null,
-      endDate: ReleaseStore.getVersionDetail.releaseDate ? moment(ReleaseStore.getVersionDetail.releaseDate, 'YYYY-MM-DD HH:mm:ss') : null,
+      expectReleaseDate: ReleaseStore.getVersionDetail.expectReleaseDate ? moment(ReleaseStore.getVersionDetail.expectReleaseDate, 'YYYY-MM-DD HH:mm:ss') : null,
     });
   }
 
@@ -46,7 +46,7 @@ class EditRelease extends Component {
           objectVersionNumber: data.objectVersionNumber,
           projectId: AppState.currentMenuType.id,
           startDate: values.startDate ? `${moment(values.startDate).format('YYYY-MM-DD')} 00:00:00` : null,
-          releaseDate: values.endDate ? `${moment(values.endDate).format('YYYY-MM-DD')} 00:00:00` : null,
+          expectReleaseDate: values.expectReleaseDate ? `${moment(values.expectReleaseDate).format('YYYY-MM-DD')} 00:00:00` : null,
           versionId: ReleaseStore.getVersionDetail.versionId,
         };
         ReleaseStore.axiosUpdateVersion(
@@ -84,7 +84,7 @@ class EditRelease extends Component {
   };
 
   render() {
-    const { loading, endDate, startDate } = this.state;
+    const { loading, expectReleaseDate, startDate } = this.state;
     const { form, visible, onCancel } = this.props;
     const { getFieldDecorator } = form;
     const data = JSON.parse(JSON.stringify(ReleaseStore.getVersionDetail));
@@ -130,7 +130,8 @@ class EditRelease extends Component {
                     <DatePicker
                       style={{ width: '100%' }}
                       label="开始日期"
-                      disabledDate={endDate ? current => current > moment(endDate) : () => false}
+                      disabledDate={expectReleaseDate
+                        ? current => current > moment(expectReleaseDate) : () => false}
                       onChange={(date) => {
                         this.setState({
                           startDate: date,
@@ -140,17 +141,17 @@ class EditRelease extends Component {
                   )}
                 </FormItem>
                 <FormItem>
-                  {getFieldDecorator('endDate', {
-                    initialValue: data.releaseDate ? moment(data.releaseDate, 'YYYY-MM-DD HH-mm-ss') : null,
+                  {getFieldDecorator('expectReleaseDate', {
+                    initialValue: data.expectReleaseDate ? moment(data.expectReleaseDate, 'YYYY-MM-DD HH-mm-ss') : null,
                   })(
                     <DatePicker
                       style={{ width: '100%' }}
-                      label="结束日期"
+                      label="预计发布时间"
                       disabledDate={startDate
                         ? current => current < moment(startDate) : () => false}
                       onChange={(date) => {
                         this.setState({
-                          endDate: date,
+                          expectReleaseDate: date,
                         });
                       }}
                     />,
