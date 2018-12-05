@@ -347,17 +347,22 @@ class UserMapStore {
     //   url += '&onlyStory=true';
     // }
     const orgId = AppState.currentMenuType.organizationId;
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues`, {
-      params: {
-        organizationId: orgId,
-        type: this.mode,
-        pageType,
-        quickFilterIds: JSON.stringify(this.getCurrentFilter).replace(/(]|\[)/g, ''), // [asd,asd] => asd,asd
-        assigneeFilterIds: JSON.stringify(this.getAssigneeFilterIds).replace(/(]|\[)/g, ''),
-        onlyStory: this.onlyStory,
-        assigneeId: this.onlyMe ? AppState.getUserId : null,
-      },
-    })
+    let axiosGetIssue = `/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?organizationId=${orgId}&type=${this.mode}&pageType=${pageType}`;
+    if (this.getCurrentFilter.length) {
+      const currentFilter = JSON.stringify(this.getCurrentFilter).replace(/(]|\[)/g, '');
+      axiosGetIssue += `&quickFilterIds=${currentFilter}`;
+    }
+    if (this.getAssigneeFilterIds.length) {
+      const currentAssignee = JSON.stringify(this.getAssigneeFilterIds).replace(/(]|\[)/g, '');
+      axiosGetIssue += `&assigneeFilterIds=${currentAssignee}`;
+    }
+    if (this.onlyMe) {
+      axiosGetIssue += `&assigneeId=${AppState.getUserId}`;
+    }
+    if (this.onlyStory) {
+      axiosGetIssue += `&onlyStory=${this.onlyStory}`;
+    }
+    return axios.get(axiosGetIssue)
       .then((issues) => {
         this.setIsLoading(false);
         if (issues.failed) {

@@ -75,6 +75,7 @@ class Home extends Component {
   }
 
   componentDidMount() {
+    const { UserMapStore } = this.props;
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
     flag = false;
@@ -93,6 +94,7 @@ class Home extends Component {
     document.addEventListener('webkitfullscreenchange', this.handleChangeFullScreen);
     document.addEventListener('mozfullscreenchange', this.handleChangeFullScreen);
     document.addEventListener('MSFullscreenChange', this.handleChangeFullScreen);
+    UserMapStore.setCurrentFilter(false, false, []);
   }
 
   componentWillUnmount() {
@@ -105,14 +107,16 @@ class Home extends Component {
     UserMapStore.setLeft(0);
     UserMapStore.setCurrentIndex(0);
     UserMapStore.setIsFullScreen(false);
+    if (document.getElementById('fixHead-head') && document.getElementById('fixHead-head')) {
+      document.getElementById('fixHead-head').removeEventListener('scroll', this.handleScrollHead, { passive: true });
+      document.getElementById('fixHead-body').removeEventListener('scroll', this.handleScroll, { passive: true });
+      document.getElementById('fixHead-head').removeEventListener('mouseover', this.handleMouseOverHead);
+      document.getElementById('fixHead-body').removeEventListener('mouseover', this.handleMouseOverBody);
+    }
     document.removeEventListener('fullscreenchange', this.handleChangeFullScreen);
     document.removeEventListener('webkitfullscreenchange', this.handleChangeFullScreen);
     document.removeEventListener('mozfullscreenchange', this.handleChangeFullScreen);
     document.removeEventListener('MSFullscreenChange', this.handleChangeFullScreen);
-    document.getElementById('fixHead-head').removeEventListener('scroll', this.handleScrollHead, { passive: true });
-    document.getElementById('fixHead-body').removeEventListener('scroll', this.handleScroll, { passive: true });
-    document.getElementById('fixHead-head').removeEventListener('mouseover', this.handleMouseOverHead);
-    document.getElementById('fixHead-body').removeEventListener('mouseover', this.handleMouseOverBody);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
     // 清除需求池，退出全屏
