@@ -1804,7 +1804,7 @@ class CreateSprint extends Component {
                           currentRae: undefined,
                         });
                       }}
-                      onBlur={() => this.statusOnChange()}
+                      // onBlur={() => this.statusOnChange()}
                     />
                   </ReadAndEdit>
                   <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
@@ -1876,14 +1876,14 @@ class CreateSprint extends Component {
                             value={originStatus.length ? statusId : statusName}
                             style={{ width: 150 }}
                             loading={selectLoading}
-                            onBlur={() => this.statusOnChange()}
+                            // onBlur={() => this.statusOnChange()}
                             onChange={(value, item) => {
                               this.setState({
                                 statusId: value,
                                 transformId: item.key,
                               });
                               // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                              setTimeout(() => { this.needBlur = true; }, 100);
+                              // setTimeout(() => { this.needBlur = true; }, 100);
                             }}
                           >
                             {
@@ -1964,7 +1964,7 @@ class CreateSprint extends Component {
                             value={originPriorities.length ? priorityId : priorityName}
                             style={{ width: '150px' }}
                             loading={selectLoading}
-                            onBlur={() => this.statusOnChange()}
+                            // onBlur={() => this.statusOnChange()}
                             onFocus={() => {
                               this.setState({
                                 selectLoading: true,
@@ -1986,7 +1986,7 @@ class CreateSprint extends Component {
                               });
                               this.needBlur = false;
                               // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                              setTimeout(() => { this.needBlur = true; }, 100);
+                              // setTimeout(() => { this.needBlur = true; }, 100);
                             }}
                           >
                             {originPriorities.map(priority => (
@@ -2127,14 +2127,14 @@ class CreateSprint extends Component {
                                   });
                                 });
                               }}
-                              onBlur={() => this.statusOnChange()}
+                              // onBlur={() => this.statusOnChange()}
                               onChange={(value) => {
                                 this.setState({
                                   sprintId: value,
                                 });
                                 this.needBlur = false;
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                setTimeout(() => { this.needBlur = true; }, 100);
+                                // setTimeout(() => { this.needBlur = true; }, 100);
                               }}
                             >
                               {originSprints.map(sprint => (
@@ -2225,7 +2225,7 @@ class CreateSprint extends Component {
                               maxLength="3"
                               value={storyPoints}
                               onChange={this.handleStoryPointsChange.bind(this)}
-                              onBlur={() => this.statusOnChange()}
+                              // onBlur={() => this.statusOnChange()}
                               onPressEnter={() => {
                                 this.updateIssue('storyPoints');
                                 this.setState({
@@ -2295,7 +2295,7 @@ class CreateSprint extends Component {
                               maxLength="3"
                               value={remainingTime}
                               onChange={this.handleRemainingTimeChange.bind(this)}
-                              onBlur={() => this.statusOnChange()}
+                              // onBlur={() => this.statusOnChange()}
                               onPressEnter={() => {
                                 this.updateIssue('remainingTime');
                                 this.setState({
@@ -2373,7 +2373,7 @@ class CreateSprint extends Component {
                                   )}
                                   loading={selectLoading}
                                   mode="tags"
-                                  onBlur={e => this.statusOnChange(e)}
+                                  // onBlur={e => this.statusOnChange(e)}
                                   ref={(e) => {
                                     this.componentRef = e;
                                   }}
@@ -2400,14 +2400,14 @@ class CreateSprint extends Component {
                                     });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    this.needBlur = false;
-                                    if (this.changeTimer > 0) {
-                                      clearTimeout(this.changeTimer);
-                                      this.changeTimer = 0;
-                                    }
-                                    this.changeTimer = setTimeout(() => {
-                                      this.needBlur = true;
-                                    }, 500);
+                                    // this.needBlur = false;
+                                    // if (this.changeTimer > 0) {
+                                    //   clearTimeout(this.changeTimer);
+                                    //   this.changeTimer = 0;
+                                    // }
+                                    // this.changeTimer = setTimeout(() => {
+                                    //   this.needBlur = true;
+                                    // }, 500);
                                   }}
                                 >
                                   {originComponents && originComponents.map(component => (
@@ -2476,7 +2476,7 @@ class CreateSprint extends Component {
                                   'array',
                                 )}
                                 mode="tags"
-                                onBlur={e => this.statusOnChange(e)}
+                                // onBlur={e => this.statusOnChange(e)}
                                 ref={(e) => {
                                   this.componentRef = e;
                                 }}
@@ -2504,14 +2504,14 @@ class CreateSprint extends Component {
                                   });
                                   // 由于 OnChange 和 OnBlur 几乎同时执行，
                                   // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                  this.needBlur = false;
-                                  if (this.changeTimer > 0) {
-                                    clearTimeout(this.changeTimer);
-                                    this.changeTimer = 0;
-                                  }
-                                  this.changeTimer = setTimeout(() => {
-                                    this.needBlur = true;
-                                  }, 500);
+                                  // this.needBlur = false;
+                                  // if (this.changeTimer > 0) {
+                                  //   clearTimeout(this.changeTimer);
+                                  //   this.changeTimer = 0;
+                                  // }
+                                  // this.changeTimer = setTimeout(() => {
+                                  //   this.needBlur = true;
+                                  // }, 500);
                                 }}
                               >
                                 {originLabels.map(label => (
@@ -2583,7 +2583,7 @@ class CreateSprint extends Component {
                                     'array',
                                   )}
                                   mode="tags"
-                                  onBlur={e => this.statusOnChange(e)}
+                                  // onBlur={e => this.statusOnChange(e)}
                                   ref={(e) => {
                                     this.componentRef = e;
                                   }}
@@ -2610,13 +2610,13 @@ class CreateSprint extends Component {
                                     this.setState({ influenceVersions: value });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    if (this.changeTimer > 0) {
-                                      clearTimeout(this.changeTimer);
-                                      this.changeTimer = 0;
-                                    }
-                                    this.changeTimer = setTimeout(() => {
-                                      this.needBlur = true;
-                                    }, 500);
+                                    // if (this.changeTimer > 0) {
+                                    //   clearTimeout(this.changeTimer);
+                                    //   this.changeTimer = 0;
+                                    // }
+                                    // this.changeTimer = setTimeout(() => {
+                                    //   this.needBlur = true;
+                                    // }, 500);
                                   }}
                                 >
                                   {originVersions.map(version => (
@@ -2682,7 +2682,7 @@ class CreateSprint extends Component {
                                 label="未归档版本"
                                 value={this.transToArr(fixVersions, 'name', 'array')}
                                 mode="tags"
-                                onBlur={e => this.statusOnChange(e)}
+                                // onBlur={e => this.statusOnChange(e)}
                                 ref={(e) => {
                                   this.componentRef = e;
                                 }}
@@ -2710,14 +2710,14 @@ class CreateSprint extends Component {
                                   });
                                   // 由于 OnChange 和 OnBlur 几乎同时执行，
                                   // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                  this.needBlur = false;
-                                  if (this.changeTimer > 0) {
-                                    clearTimeout(this.changeTimer);
-                                    this.changeTimer = 0;
-                                  }
-                                  this.changeTimer = setTimeout(() => {
-                                    this.needBlur = true;
-                                  }, 500);
+                                  // this.needBlur = false;
+                                  // if (this.changeTimer > 0) {
+                                  //   clearTimeout(this.changeTimer);
+                                  //   this.changeTimer = 0;
+                                  // }
+                                  // this.changeTimer = setTimeout(() => {
+                                  //   this.needBlur = true;
+                                  // }, 500);
                                 }}
                               >
                                 {originVersions.map(version => (
@@ -2782,7 +2782,7 @@ class CreateSprint extends Component {
                                   }
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '200px' }}
-                                  onBlur={e => this.statusOnChange(e)}
+                                  // onBlur={e => this.statusOnChange(e)}
                                   ref={(e) => {
                                     this.componentRef = e;
                                   }}
@@ -2813,13 +2813,13 @@ class CreateSprint extends Component {
                                     });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    if (this.changeTimer > 0) {
-                                      clearTimeout(this.changeTimer);
-                                      this.changeTimer = 0;
-                                    }
-                                    this.changeTimer = setTimeout(() => {
-                                      this.needBlur = true;
-                                    }, 500);
+                                    // if (this.changeTimer > 0) {
+                                    //   clearTimeout(this.changeTimer);
+                                    //   this.changeTimer = 0;
+                                    // }
+                                    // this.changeTimer = setTimeout(() => {
+                                    //   this.needBlur = true;
+                                    // }, 500);
                                   }}
                                 >
                                   {originEpics.map(epic => (
