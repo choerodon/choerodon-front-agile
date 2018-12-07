@@ -3,13 +3,14 @@ import { stores, axios } from 'choerodon-front-boot';
 import {
   Modal,
   Table,
+  message,
 } from 'choerodon-ui';
 import './Wiki.scss';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
 
-class DailyLog extends Component {
+class Wiki extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -18,7 +19,7 @@ class DailyLog extends Component {
       expendIds: [],
       idAddress: {},
       selectedRows: [],
-      selectedRowKeys: ['/bin/view/O-Song/P-Song/ceshi/WebHome/'],
+      selectedRowKeys: props.checkIds || [],
       loading: false,
     };
   }
@@ -62,8 +63,12 @@ class DailyLog extends Component {
       if (id) {
         let goalData = data;
         if (idIndex[id] && idIndex[id].length) {
-          idIndex[id].forEach((i) => {
-            goalData = goalData[i];
+          idIndex[id].forEach((i, index) => {
+            if (index === 0) {
+              goalData = goalData[i];
+            } else {
+              goalData = goalData.children[i];
+            }
           });
         }
         goalData.children = dataSource;
@@ -97,8 +102,12 @@ class DailyLog extends Component {
     });
   };
 
-  onExpandedRowsChange = (ids) => {
-    console.log(ids);
+  getCheckboxProps = (record) => {
+    const { checkIds } = this.props;
+    return ({
+      disabled: checkIds.indexOf(record.href) !== -1,
+      name: record.name,
+    });
   };
 
   onExpand = (expand, data) => {
@@ -108,6 +117,40 @@ class DailyLog extends Component {
         expendIds: [...expendIds, data.id],
       });
       this.loadWiki(data.id);
+    }
+  };
+
+  handleCreateWiki = () => {
+    const menu = AppState.currentMenuType;
+    const { id: proId } = menu;
+    const { selectedRows } = this.state;
+    const { issueId, onOk, checkIds } = this.props;
+    this.setState({
+      createLoading: true,
+    });
+    if (selectedRows && selectedRows.length) {
+      const postData = [];
+      selectedRows.forEach((row) => {
+        if (checkIds.indexOf(row.href) === -1) {
+          postData.push({
+            issueId,
+            wikiName: row.name,
+            wikiUrl: row.href,
+            projectId: proId,
+          });
+        }
+      });
+      axios.post(`/agile/v1/projects/${proId}/wiki_relation`, postData).then(() => {
+        this.setState({
+          createLoading: false,
+        });
+        onOk();
+      }).catch(() => {
+        message.error('关联wiki文档失败');
+        this.setState({
+          createLoading: false,
+        });
+      });
     }
   };
 
@@ -128,6 +171,7 @@ class DailyLog extends Component {
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange,
+      getCheckboxProps: this.getCheckboxProps,
     };
 
     return (
@@ -147,7 +191,6 @@ class DailyLog extends Component {
             dataSource={data}
             columns={this.getColumn()}
             rowSelection={rowSelection}
-            onExpandedRowsChange={this.onExpandedRowsChange}
             onExpand={this.onExpand}
             rowKey={record => record.href}
             pagination={false}
@@ -158,4 +201,4 @@ class DailyLog extends Component {
     );
   }
 }
-export default DailyLog;
+export default Wiki;

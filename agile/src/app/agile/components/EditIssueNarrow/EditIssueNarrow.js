@@ -22,6 +22,7 @@ import {
   loadIssue, loadWorklogs, updateIssue, loadPriorities,
   loadComponents, loadVersions, loadEpics, createCommit,
   deleteIssue, updateIssueType, loadSprints, loadStatus,
+  loadWikies, deleteWiki,
 } from '../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
@@ -31,6 +32,7 @@ import CreateSubTask from '../CreateSubTask';
 import CreateLinkTask from '../CreateLinkTask';
 import UserHead from '../UserHead';
 import Comment from './Component/Comment';
+import WikiItem from './Component/WikiItem';
 import Log from './Component/Log';
 import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
@@ -166,6 +168,7 @@ class CreateSprint extends Component {
       originInfluenceVersions: [],
       transformId: false,
       addWiki: false,
+      wikies: [],
     };
   }
 
@@ -767,6 +770,7 @@ class CreateSprint extends Component {
       editLogId: undefined,
       editLog: undefined,
       issueLoading: true,
+      addWiki: false,
     }, () => {
       loadIssue(issueId).then((res) => {
         this.setAnIssueToState(res);
@@ -788,6 +792,11 @@ class CreateSprint extends Component {
       loadBranchs(issueId).then((res) => {
         this.setState({
           branchs: res || {},
+        });
+      });
+      loadWikies(issueId).then((res) => {
+        this.setState({
+          wikies: res || [],
         });
       });
       this.setState({
@@ -934,8 +943,44 @@ class CreateSprint extends Component {
     });
   }
 
-  renderWiki = () => {
+  onDeleteWiki = async (id) => {
+    const { origin } = this.state;
+    const { issueId } = origin;
+    await deleteWiki(id);
+    const res = await loadWikies(issueId);
+    this.setState({
+      wikies: res || [],
+    });
+  };
 
+  onWikiCreate = async () => {
+    const { origin } = this.state;
+    const { issueId } = origin;
+    this.setState({ addWiki: false });
+    const res = await loadWikies(issueId);
+    this.setState({
+      wikies: res || [],
+    });
+  };
+
+  renderWiki = () => {
+    const { wikies } = this.state;
+    return (
+      <div>
+        {
+          wikies && wikies.wikiRelationList
+          && wikies.wikiRelationList.map(wiki => (
+            <WikiItem
+              key={wiki.id}
+              wiki={wiki}
+              onDeleteWiki={this.onDeleteWiki}
+              wikiHost={wikies.wikiHost}
+              type="narrow"
+            />
+          ))
+        }
+      </div>
+    );
   };
 
   /**
@@ -1326,6 +1371,7 @@ class CreateSprint extends Component {
       fixVersionsFixed,
       fixVersions,
       addWiki,
+      wikies,
     } = this.state;
     const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
@@ -3047,12 +3093,11 @@ class CreateSprint extends Component {
         {
           addWiki ? (
             <Wiki
+              issueId={origin.issueId}
               visible={addWiki}
               onCancel={() => this.setState({ addWiki: false })}
-              onOk={() => {
-                this.addWiki(origin.issueId);
-                this.setState({ addWiki: false });
-              }}
+              onOk={this.onWikiCreate}
+              checkIds={wikies ? wikies.wikiRelationList.map(wiki => wiki.wikiUrl) : []}
             />
           ) : null
         }
