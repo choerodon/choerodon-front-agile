@@ -1,13 +1,81 @@
-//临时测试
-.ant-tag-checkable {
-  &, a, a:hover {
-    color: #000;
+.c7n-content-issue {
+  width: 100%;
+}
+.c7n-Issue-expand + .c7n-content-issue {
+  width: 36%;
+  .c7n-typeTag {
+    .name {
+      display: none;
+    }
   }
-  &:active, &-checked {
-    color: #fff;
+  .c7n-backlog-sprintIssue {
+    justify-content: flex-end;
+  }
+  table {
+    thead {
+      display: none;
+    }
+    td {
+      display: block;
+      padding: 0 4px;
+    }
+    tr {
+      display: flex;
+      flex-wrap: wrap;
+      height: 64px;
+      padding: 10px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    }
+    tbody {
+      tr:hover {
+        background: rgba(0, 0, 0, 0.04);
+        td {
+          background: none;
+        }
+      }
+      tr {
+        td {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+  .left:before {
+    display: flex;
+  }
+  .lastUpdateDate {
+    display: none;
+  }
+  .sprint {
+    display: none;
+  }
+  .issueId {
+    order: 2;
+    flex-grow: 1;
+  }
+  .issueType {
+    order: 1;
+  }
+  .summary {
+    order: 6;
+    width: 100%;
+    margin-top: 7px;
+  }
+  .status {
+    order: 3;
+  }
+  .priority {
+    order: 4;
+  }
+  .assignee {
+    order: 5;
   }
 }
+
 .c7n-Issue {
+  display: flex;
+  padding: 0;
+  width: 100%;
   &-advsearch {
     &-title {
       padding-left: 7px;
@@ -102,6 +170,14 @@
     // display: none;
   }
 
+  .ant-table-footer {
+    background: none;
+    border-bottom: 1px solid rgb(232, 232, 232);
+  }
+  .c7n-backlog-sprintIssue {
+    border-bottom: none !important;
+  }
+
   .c7n-icon-disabled {
     font-size: 16px;
     color: rgba(0, 0, 0, 0.36);
@@ -120,6 +196,11 @@
     }
 
     .ant-table-columns-chooser {
+      display: none;
+    }
+  }
+  &-table {
+    .priority {
       display: none;
     }
   }
@@ -159,12 +240,10 @@
     .c7n-border-visible {
       border-left: 3px solid #3f51b5;
       background: rgba(140, 158, 255, 0.08);
-      height: 36px;
     }
 
     .c7n-border {
       border-left: 3px solid transparent;
-      height: 36px;
     }
 
     .c7n-avator {

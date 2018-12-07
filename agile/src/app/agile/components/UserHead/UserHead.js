@@ -34,6 +34,7 @@ class UserHead extends Component {
         style={{
           ...style,
           display: user.id ? 'flex' : 'none',
+          maxWidth: 108,
         }}
       >
         {

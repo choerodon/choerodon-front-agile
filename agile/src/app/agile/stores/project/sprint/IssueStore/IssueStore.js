@@ -2,9 +2,6 @@ import {
   observable, action, computed, toJS,
 } from 'mobx';
 import { store, stores, axios } from 'choerodon-front-boot';
-import _ from 'lodash';
-
-import { loadIssues } from '../../../../api/NewIssueApi';
 
 const { AppState } = stores;
 const proId = AppState.currentMenuType.id;
@@ -15,6 +12,15 @@ let filter = {
     statusId: [],
     priorityId: [],
     issueTypeId: [],
+  },
+  otherArgs: {
+    component: [],
+    epic: [],
+    issueIds: [],
+    label: [],
+    reporter: [],
+    summary: [],
+    version: [],
   },
   content: '',
   quickFilterIds: [],
@@ -34,12 +40,16 @@ let filter = {
   },
 };
 
+let paramIssueSelected = false;
+
 
 @store('SprintCommonStore')
 class SprintCommonStore {
   @observable issues = [];
 
-  @observable pagination = {};
+  @observable pagination = {
+    total: 0,
+  };
 
   @observable filteredInfo = {};
 
@@ -48,27 +58,21 @@ class SprintCommonStore {
     orderType: '',
   };
 
+  @observable paramObj = {};
+
+  @observable paramFilter = '';
+
+  @observable barFilter = [];
+
+  @observable createFlag = false;
+
   @observable loading = true;
 
-  @observable paramType = undefined;
+  @observable paramName = '';
 
-  @observable paramId = undefined;
+  @observable barFilters = '';
 
-  @observable paramName = undefined;
-
-  @observable paramStatus = undefined;
-
-  @observable paramPriority = undefined;
-
-  @observable paramIssueType = undefined;
-
-  @observable paramIssueId = undefined;
-
-  @observable paramOpenIssueId = undefined;
-
-  @observable paramUrl = undefined;
-
-  @observable barFilters = undefined;
+  @observable paramId = '';
 
   @observable quickSearch = [];
 
@@ -78,28 +82,58 @@ class SprintCommonStore {
 
   @observable defaultPriorityId = false;
 
-  @observable issuePriority = [];
-
-  @observable issueStatus = [];
-
-  @observable tagData = [];
-
   @observable otherArgs = {};
 
   @observable resolution = false;
 
-  init() {
-    this.setOrder({
+  @observable selectedIssue = {};
+
+  @observable expand = false;
+
+  @action initPram(data) {
+    if (data.paramType) {
+      filter.otherArgs[data.paramType] = data.paramId ? [data.paramId] : undefined;
+    }
+    if (data.paramIssueId) {
+      filter.otherArgs.issueIds = [data.paramIssueId.toString()];
+      paramIssueSelected = true;
+    }
+    filter.otherArgs.resolution = data.resolution;
+    this.paramObj = data;
+  }
+
+  @computed get getParamFilter() {
+    return toJS(this.paramFilter);
+  }
+
+  @computed get getParam() {
+    return toJS(this.paramObj);
+  }
+
+  @action init() {
+    this.order = {
       orderField: '',
       orderType: '',
-    });
-    this.setFilter({
+    };
+    this.filter = {
       advancedSearchArgs: {},
       searchArgs: {},
-    });
+    };
+  }
+
+  @action updateFiltedIssue(pagination, data, barFilters) {
+    this.pagination = pagination;
+    this.issues = data;
+    this.barFilter = barFilters;
+    this.loading = false;
+  }
+
+  @computed get getBarFilter() {
+    return toJS(this.barFilter);
   }
 
   @action setIssues(data) {
+    this.loading = false;
     this.issues = data;
   }
 
@@ -120,7 +154,7 @@ class SprintCommonStore {
   }
 
   @computed get getIssueTypes() {
-    return this.issueTypes.slice();
+    return toJS(this.issueTypes);
   }
 
   @action setIssueStatus(data) {
@@ -161,7 +195,7 @@ class SprintCommonStore {
     this.filter = data;
   }
 
-  @action setAdvArg(data) {
+  setAdvArg(data) {
     if (data) {
       Object.assign(filter.advancedSearchArgs, data);
     }
@@ -171,7 +205,7 @@ class SprintCommonStore {
     filter.advancedSearchArgs.issueTypeId.push(data);
   }
 
-  @action setArg(data) {
+  setArg(data) {
     if (data) {
       Object.assign(filter.searchArgs, data);
     }
@@ -186,82 +220,39 @@ class SprintCommonStore {
     this.loading = data;
   }
 
-  @action setParamType(data) {
-    this.paramType = data;
-  }
-
-  @action setParamId(data) {
-    this.paramId = data;
-  }
-
-  @action setParamName(data) {
-    this.paramName = data;
-  }
-
-  @computed get getParamName() {
-    return toJS(this.paramName);
-  }
-
-  @action setParamStatus(data) {
-    this.paramStatus = data;
-  }
-
-  @action setParamPriority(data) {
-    this.paramPriority = data;
-  }
-
-  @action setParamIssueType(data) {
-    this.paramIssueType = data;
-  }
-
-  @action setParamIssueId(data) {
-    this.paramIssueId = data;
-  }
-
-  @action setParamOpenIssueId(data) {
-    this.paramOpenIssueId = data;
-  }
-
-  @action setParamUrl(data) {
-    this.paramUrl = data;
-  }
-
-  @action setResolution(data) {
-    this.resolution = data;
+  @computed get getLoading() {
+    return toJS(this.loading);
   }
 
   @action setBarFilters(data) {
-    let res = '';
-    data.forEach((item, index) => {
-      if (this.paramName) {
-        if (!(index === 0)) {
-          res += item;
-        }
-      } else {
-        res += item;
-      }
-    });
-    Object.assign(filter, { content: res });
+    Object.assign(filter, { content: data });
   }
 
-  @action setParamInOtherArgs() {
-    if (this.paramType) {
-      this.otherArgs[this.paramType] = this.paramId ? [this.paramId] : undefined;
-    }
-    if (this.paramIssueId) {
-      this.otherArgs.issueIds = [this.paramIssueId.toString()];
-    }
-    this.otherArgs.resolution = this.resolution;
+  @action createQuestion(data) {
+    this.createFlag = data;
   }
 
-  @action setOtherArgs(data) {
+  @computed get getCreateQuestion() {
+    return this.createFlag;
+  }
+
+
+  setOtherArgs(data) {
     if (data) {
-      Object.assign(this.otherArgs, data);
+      Object.assign(filter.otherArgs, data);
     }
   }
 
-  @action resetOtherArgs() {
-    this.otherArgs = {};
+  resetOtherArgs() {
+    Object.assign(filter.otherArgs, {
+      component: [],
+      epic: [],
+      issueIds: [],
+      label: [],
+      reporter: [],
+      summary: [],
+      version: [],
+    });
   }
 
   @action cleanSearchArgs() {
@@ -274,6 +265,15 @@ class SprintCommonStore {
       content: '',
       quickFilterIds: [],
       assigneeFilterIds: null,
+      otherArgs: {
+        component: [],
+        epic: [],
+        issueIds: [],
+        label: [],
+        reporter: [],
+        summary: [],
+        version: [],
+      },
       searchArgs: {
         assignee: '',
         component: '',
@@ -300,58 +300,71 @@ class SprintCommonStore {
     this.assigneeProps = data;
   }
 
-  loadIssues(page = 0, size = 10) {
-    this.setLoading(true);
-    const { orderField = '', orderType = '' } = this.order;
-    return loadIssues(page, size, toJS(this.getFilter), orderField, orderType)
-      .then((res) => {
-        this.setIssues(res.content);
-        const arrAssignee = [];
-        _.forEach(res.content, (item) => {
-          if (item.assigneeId && item.assigneeName) {
-            arrAssignee.push({
-              id: item.assigneeId,
-              realName: item.assigneeName,
-            });
-          }
-        });
-        this.setAssigneeProps(_.map(_.union(_.map(arrAssignee, JSON.stringify)), JSON.parse));
-        this.setPagination({
-          current: res.number + 1,
-          pageSize: res.size,
-          total: res.totalElements,
-        });
-        this.setLoading(false);
-        return Promise.resolve(res);
-      });
+  @action setClickedRow(data) {
+    this.selectedIssue = data.selectedIssue;
+    this.expand = data.expand;
   }
 
-  async loadCurrentSetting() {
-    const quickSearch = await this.loadQuickSearch();
-    this.setQuickSearch(quickSearch);
-
-    const type = await this.loadType();
-    this.setIssueTypes(type);
-
-    const status = await this.loadStatus();
-    this.setIssueStatus(status);
-
-    const priorities = await this.loadPriorities();
-    this.setIssuePriority(priorities);
-
-    const tag = await this.loadLabel();
-    this.setLabel(tag);
+  @computed get getSelectedIssue() {
+    return toJS(this.selectedIssue);
   }
 
-  loadQuickSearch = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`);
+  @computed get getExpand() {
+    return toJS(this.expand);
+  }
 
-  loadType = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_issue_types_with_sm_id?apply_type=agile`);
+  loadIssues(page = 0, size = 10, orderDTO = {}, barFilters) {
+    const { column } = orderDTO;
+    let { order = '' } = orderDTO;
+    if (order) {
+      order = order === 'ascend' ? 'asc' : 'desc';
+    }
+    if (this.paramFilter && barFilters[0] !== this.paramFilter) {
+      this.resetOtherArgs();
+    }
+    return axios.post(
+      `/agile/v1/projects/${AppState.currentMenuType.id}/issues/include_sub?organizationId=${AppState.currentMenuType.organizationId}&page=${page}&size=${size}`, filter, {
+        params: {
+          sort: `${column && order ? `${column.sorterId},${order}` : ''}`,
+        },
+      },
+    );
+  }
 
-  loadStatus = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_status_by_project_id?apply_type=agile`);
+  @computed get getPagination() {
+    return toJS(this.pagination);
+  }
 
-  loadPriorities = () => axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/priority/list_by_org`);
+  loadCurrentSetting() {
+    const loadType = axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_issue_types_with_sm_id?apply_type=agile`);
+    const loadStatus = axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_status_by_project_id?apply_type=agile`);
+    const loadPriorities = axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/priority/list_by_org`);
+    const loadLabel = axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_labels`);
+    const loadIssue = axios.post(
+      `/agile/v1/projects/${AppState.currentMenuType.id}/issues/include_sub?organizationId=${AppState.currentMenuType.organizationId}&page=${0}&size=${10}`, filter,
+    );
+    return Promise.all([loadType, loadStatus, loadPriorities, loadLabel, loadIssue]);
+  }
 
-  loadLabel = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_labels`);
+  @action setCurrentSetting(res) {
+    /* eslint-disable */
+    this.issueTypes = res[0];
+    this.issueStatus = res[1];
+    this.issuePriority = res[2];
+    this.tagData = res[3];
+    this.issues = res[4].content;
+    this.pagination.total = res[4].totalElements;
+    if (paramIssueSelected === true) {
+      this.selectedIssue = this.issues[0];
+      this.expand = true;
+      paramIssueSelected = false;
+    }
+    this.paramUrl = this.paramObj.paramUrl;
+    this.paramFilter = this.paramObj.paramName ? decodeURI(this.paramObj.paramName) : null;
+    this.barFilter = this.paramFilter ? [this.paramFilter] : [];
+    this.loading = false;
+    /* eslint-enable */
+  }
 
   createIssue(issueObj, projectId = AppState.currentMenuType.id) {
     const issue = {
@@ -377,14 +390,6 @@ class SprintCommonStore {
       ...filter,
       otherArgs: this.otherArgs,
     };
-  }
-
-  @computed get getPriorities() {
-    return this.priorities.slice();
-  }
-
-  @action setPriorities(data) {
-    this.priorities = data;
   }
 
   @computed get getDefaultPriorityId() {
