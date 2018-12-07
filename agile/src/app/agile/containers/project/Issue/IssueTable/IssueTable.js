@@ -1,17 +1,17 @@
-import React, { PureComponent } from 'react';
-import { Table } from 'choerodon-ui';
+import React, { Component } from 'react';
+import { Table, Spin } from 'choerodon-ui';
+import { observer } from 'mobx-react';
+import { trace } from 'mobx';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import {
   IssueNum, TypeCode, Summary, StatusName, Priority, Assignee, LastUpdateTime, Sprint,
 } from './IssueTableComponent';
 import EmptyBlock from '../../../../components/EmptyBlock';
 import pic from '../../../../assets/image/emptyIssue.svg';
+import QuickCreateIssue from '../QuickCreateIssue/QuickCraeteIssue';
 
-class IssueTable extends PureComponent {
-  componentDidMount() {
-
-  }
-
+@observer
+class IssueTable extends Component {
   componentWillUnmount() {
     IssueStore.setClickedRow({
       selectedIssue: {},
@@ -19,41 +19,54 @@ class IssueTable extends PureComponent {
     });
   }
 
-  handleFilterChange = (pagination, filters, sorter, barFilters) => {
+  // shouldComponentUpdate(nextProps, nextState, nextContext) {
+  //   debugger;
+  //   return true
+  // }
+
+  filterConvert = (filters) => {
     Object.keys(filters).forEach((key) => {
-      if (key === 'statusId' || key === 'priorityId' || key === 'issueTypeId') {
-        IssueStore.setAdvArg(filters);
-      } else if (key === 'label') {
-        IssueStore.setOtherArgs(filters);
-      } else if (key === 'issueId') {
-        // 根据接口进行对象调整
-        IssueStore.setArg({ issueNum: filters[key][0] });
-      } else if (key === 'assigneeId') {
-        // 同上
-        IssueStore.setArg({ assignee: filters[key][0] });
-      } else {
-        const temp = {
-          [key]: filters[key][0],
-        };
-        IssueStore.setArg(temp);
+      switch (key) {
+        case 'statusId':
+        case 'priorityId':
+        case 'issueTypeId':
+          IssueStore.setAdvArg(filters);
+          break;
+        case 'label':
+          IssueStore.setOtherArgs(filters);
+          break;
+        default:
+          IssueStore.setArg({
+            [key]: filters[key][0],
+          });
+          break;
       }
     });
-    if (IssueStore.getParamName) {
-      if (barFilters.indexOf(IssueStore.getParamName) === -1) {
-        IssueStore.resetOtherArgs();
-      }
+  };
+
+  barFilterConvert = (barFilters) => {
+    if (IssueStore.getParamFilter) {
+      barFilters.shift();
     }
-    IssueStore.setBarFilters(barFilters);
-    // this.setState({
-    //   filterName: barFilters,
-    // });
-    const { current, pageSize } = IssueStore.pagination;
-    IssueStore.setOrder(sorter.columnKey, sorter.order === 'ascend' ? 'asc' : 'desc');
-    IssueStore.loadIssues(current - 1, pageSize);
+    IssueStore.setBarFilters(barFilters.join(''));
+  };
+
+  handleFilterChange = (pagination, filters, sorter, barFilters) => {
+    this.filterConvert(filters);
+    this.barFilterConvert(barFilters);
+    IssueStore.setLoading(true);
+    IssueStore.loadIssues(pagination.current - 1, pagination.pageSize, sorter, barFilters).then(
+      (res) => {
+        IssueStore.updateFiltedIssue({
+          current: res.number + 1,
+          pageSize: res.size,
+          total: res.totalElements,
+        }, res.content, barFilters);
+      },
+    );
   };
 
   render() {
-    const { data, filter } = this.props;
     const columnFilter = new Map([
       ['issueNum', []],
       [
@@ -92,8 +105,9 @@ class IssueTable extends PureComponent {
       {
         title: '任务编号',
         dataIndex: 'issueNum',
-        key: 'issueId',
+        key: 'issueNum',
         className: 'issueId',
+        sorterId: 'issueId',
         disableClick: true,
         sorter: true,
         filters: columnFilter.get('issueNum'),
@@ -104,6 +118,7 @@ class IssueTable extends PureComponent {
         key: 'issueTypeId',
         className: 'issueType',
         disableClick: true,
+        sorterId: 'issueTypeId',
         sorter: true,
         filters: columnFilter.get('typeId'),
         filterMultiple: true,
@@ -123,6 +138,7 @@ class IssueTable extends PureComponent {
         key: 'statusId',
         className: 'status',
         disableClick: true,
+        sorterId: 'statusId',
         sorter: true,
         filters: columnFilter.get('statusId'),
         filterMultiple: true,
@@ -133,6 +149,7 @@ class IssueTable extends PureComponent {
         key: 'priorityId',
         className: 'priority',
         disableClick: true,
+        sorterId: 'priorityId',
         sorter: true,
         filters: columnFilter.get('priorityId'),
         filterMultiple: true,
@@ -142,8 +159,9 @@ class IssueTable extends PureComponent {
         title: '当前处理人',
         dataIndex: 'assigneeName',
         className: 'assignee',
-        key: 'assigneeId',
+        key: 'assignee',
         disableClick: true,
+        sorterId: 'assigneeId',
         sorter: true,
         filters: columnFilter.get('assigneeName'),
         render: (text, record) => <Assignee text={text} record={record} />,
@@ -160,6 +178,7 @@ class IssueTable extends PureComponent {
         dataIndex: 'lastUpdateDate',
         className: 'lastUpdateDate',
         key: 'lastUpdateDate',
+        sorterId: 'lastUpdateDate',
         sorter: true,
         render: text => <LastUpdateTime text={text} />,
       },
@@ -193,15 +212,16 @@ class IssueTable extends PureComponent {
         title: '标签',
         key: 'label',
         filters: columnFilter.get('label'),
+        filterMultiple: true,
         hidden: true,
       },
     ];
     return (
       <Table
-        // rowKey={record => record.issueId}
+        rowKey={record => record.issueId}
         {...this.props}
         columns={columns}
-        dataSource={data}
+        dataSource={IssueStore.getIssues}
         empty={(
           <EmptyBlock
             style={{ marginTop: 60, marginBottom: 60 }}
@@ -212,17 +232,17 @@ class IssueTable extends PureComponent {
           />
         )}
         filterBarPlaceholder="过滤表"
-        filters={filter}
         noFilter
-        // loading={IssueStore.loading}
-        pagination={false}
+        filters={IssueStore.getBarFilter}
+        loading={IssueStore.getLoading}
+        pagination={IssueStore.getPagination}
+        footer={() => (<QuickCreateIssue />)}
         onChange={this.handleFilterChange}
         className="c7n-Issue-table"
         onRow={record => ({
           onClick: (e) => {
             e.currentTarget.style.background = 'rgba(140, 158, 255, 0.08)';
             e.currentTarget.style.borderLeft = '3px solid #3f51b5';
-            // e.currentTarget.toggleAttribute()
             IssueStore.setClickedRow({
               selectedIssue: record,
               expand: true,

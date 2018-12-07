@@ -1,22 +1,24 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { trace } from 'mobx';
 import {
   Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
 import {
-  Button, Pagination, Icon,
+  Button, Icon,
 } from 'choerodon-ui';
 import './Issue.scss';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 
-import pic from '../../../../assets/image/emptyIssue.svg';
-import CreateIssue from '../../../../components/CreateIssueNew';
+// 快速搜索
 import QuickSearch from '../../../../components/QuickSearch';
+// CSS 利用相邻兄弟选择器注入
 import ExpandCssControler from '../ExpandCssControler';
+// Table
 import IssueTable from '../IssueTable/IssueTable';
-import EmptyBlock from '../../../../components/EmptyBlock';
+// 任务详情
 import ExpandWideCard from '../ExpandWideCard';
-import QuickCreateIssue from '../QuickCreateIssue/QuickCraeteIssue';
+// 创建问题按钮
 import CreateIssueModal from '../CreateIssueModal';
 
 const FileSaver = require('file-saver');
@@ -25,124 +27,36 @@ const { AppState } = stores;
 
 @observer
 class Issue extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      create: false,
-      filterName: [],
-      checkCreateIssue: false,
-      selectIssueType: 'task',
-      createIssueValue: '',
-      createLoading: false,
-    };
-  }
-
-  componentDidMount() {
-    this.getInit();
+  componentWillMount() {
+    const { location } = this.props;
+    if (location.search.indexOf('param') !== -1) {
+      const request = this.GetRequest(location.search);
+      IssueStore.initPram(request);
+    }
+    IssueStore.setLoading(true);
+    IssueStore.loadCurrentSetting().then(
+      (res) => {
+        IssueStore.setCurrentSetting(res);
+      },
+    ).catch((e) => {
+    });
   }
 
   componentWillUnmount() {
     IssueStore.cleanSearchArgs();
-    IssueStore.setSelectedQuickSearch({ quickFilterIds: [], assigneeFilterIds: null });
-    IssueStore.resetOtherArgs();
-  }
-
-  getInit() {
-    const { location } = this.props;
-    const Request = this.GetRequest(location.search);
-    const {
-      paramType, paramId, paramName, paramStatus,
-      paramPriority, paramIssueType, paramIssueId, paramUrl, paramOpenIssueId,
-      paramResolution,
-    } = Request;
-    IssueStore.loadCurrentSetting();
-    IssueStore.setParamId(paramId);
-    IssueStore.setParamType(paramType);
-    IssueStore.setParamName(paramName);
-    this.setState({
-      filterName: IssueStore.getParamName ? [IssueStore.getParamName] : [],
-    });
-    IssueStore.setParamStatus(paramStatus);
-    IssueStore.setParamPriority(paramPriority);
-    IssueStore.setParamIssueType(paramIssueType);
-    IssueStore.setParamIssueId(paramIssueId);
-    IssueStore.setParamUrl(paramUrl);
-    IssueStore.setParamOpenIssueId(paramOpenIssueId);
-    IssueStore.setResolution(paramResolution);
-
-    IssueStore.setParamInOtherArgs();
-    const arr = [];
-    if (paramName) {
-      arr.push(paramName);
-    }
-    if (paramStatus) {
-      const obj = {
-        advancedSearchArgs: {},
-        searchArgs: {},
-      };
-      const a = paramStatus.split(',');
-      obj.advancedSearchArgs.statusCode = a || [];
-      IssueStore.setBarFilters(arr);
-      IssueStore.setFilter(obj);
-      IssueStore.setFilteredInfo({ statusCode: paramStatus.split(',') });
-      IssueStore.loadIssues();
-    } else if (paramPriority) {
-      const obj = {
-        advancedSearchArgs: {},
-        searchArgs: {},
-      };
-      const a = [paramPriority];
-      obj.advancedSearchArgs.priorityId = a || [];
-      IssueStore.setBarFilters(arr);
-      IssueStore.setFilter(obj);
-      IssueStore.setFilteredInfo({ priorityId: [paramPriority] });
-      IssueStore.loadIssues();
-    } else if (paramIssueType) {
-      const obj = {
-        advancedSearchArgs: {},
-        searchArgs: {},
-      };
-      const a = [paramIssueType];
-      obj.advancedSearchArgs.typeCode = a || [];
-      IssueStore.setBarFilters(arr);
-      IssueStore.setFilter(obj);
-      IssueStore.setFilteredInfo({ typeCode: [paramIssueType] });
-      IssueStore.loadIssues();
-    } else if (paramIssueId) {
-      IssueStore.setBarFilters(arr);
-      IssueStore.init();
-      IssueStore.loadIssues()
-        .then((res) => {
-          IssueStore.setClickedRow({
-            selectedIssue: res.content.length ? res.content[0] : {},
-            expand: true,
-          });
-        });
-    } else {
-      IssueStore.setBarFilters(arr);
-      IssueStore.init();
-      IssueStore.loadIssues();
-    }
+    // IssueStore.setSelectedQuickSearch({ quickFilterIds: [], assigneeFilterIds: null });
   }
 
   GetRequest = (url) => {
-    const theRequest = {};
-    if (url.indexOf('?') !== -1) {
-      const str = url.split('?')[1];
-      const strs = str.split('&');
-      for (let i = 0; i < strs.length; i += 1) {
-        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
-      }
-    }
-    return theRequest;
-  };
-
-  handlePaginationChange = (page, pageSize) => {
-    IssueStore.loadIssues(page - 1, pageSize);
-  };
-
-  handlePaginationShowSizeChange = (current, size) => {
-    IssueStore.loadIssues(current - 1, size);
+    const reg = /(?<=[?&])param[^=]+=[^&?\n]*/g;
+    const ret = {};
+    url.match(reg).forEach((paramObj) => {
+      const [paramKey, paramValue] = paramObj.split('=');
+      Object.assign(ret, {
+        [paramKey]: paramValue,
+      });
+    });
+    return ret;
   };
 
   exportExcel = () => {
@@ -158,25 +72,31 @@ class Issue extends Component {
   };
 
   onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
-    IssueStore.setAdvArg({ assigneeIds: onlyMeChecked ? [AppState.userInfo.id] : null });
+    // debugger;
+    IssueStore.setAdvArg({ assigneeIds: onlyMeChecked ? [AppState.userInfo.id] : [] });
     IssueStore.setSelectedQuickSearch({ onlyStory: onlyStoryChecked });
     IssueStore.setSelectedQuickSearch({ quickFilterIds: moreChecked });
-    IssueStore.loadIssues();
-  }
+    IssueStore.loadIssues().then((res) => {
+      IssueStore.updateFiltedIssue({
+        current: res.number + 1,
+        pageSize: res.size,
+        total: res.totalElements,
+      }, res.content);
+    });
+  };
 
   onAssigneeChange = (value) => {
     IssueStore.setSelectedQuickSearch({ assigneeFilterIds: value.length === 0 ? null : value });
-    IssueStore.loadIssues();
+    IssueStore.loadIssues().then((res) => {
+      IssueStore.updateFiltedIssue({
+        current: res.number + 1,
+        pageSize: res.size,
+        total: res.totalElements,
+      }, res.content);
+    });
   };
 
   render() {
-    const {
-      createIssueValue,
-      selectIssueType, createLoading, create, checkCreateIssue,
-    } = this.state;
-    // 获取筛选框的显示内容
-    const { filterName = [] } = this.state;
-    // 筛选器配置（服务端获取筛选数据）
     return (
       <Page
         className="c7n-Issue"
@@ -201,8 +121,12 @@ class Issue extends Component {
           <Button
             funcType="flat"
             onClick={() => {
-              const { current, pageSize } = IssueStore.pagination;
-              IssueStore.loadIssues(current - 1, pageSize);
+              IssueStore.loadCurrentSetting().then(
+                (res) => {
+                  IssueStore.setCurrentSetting(res);
+                },
+              ).catch((e) => {
+              });
             }}
           >
             <Icon type="refresh icon" />
@@ -210,12 +134,14 @@ class Issue extends Component {
           </Button>
         </Header>
         <Content className="c7n-Issue">
+          <ExpandCssControler />
           <div
             className="c7n-content-issue"
             style={{
               display: 'block',
               overflowY: 'auto',
               overflowX: 'hidden',
+              paddingLeft: '18px',
             }}
           >
             <QuickSearch
@@ -223,41 +149,10 @@ class Issue extends Component {
               onQuickSearchChange={this.onQuickSearchChange}
               onAssigneeChange={this.onAssigneeChange}
             />
-            <ExpandCssControler />
-            <IssueTable data={IssueStore.getIssues} filter={filterName} />
-            <QuickCreateIssue />
-            {
-              IssueStore.getIssues && IssueStore.getIssues.length !== 0 ? (
-                <div style={{
-                  display: 'flex', justifyContent: 'flex-end', marginTop: 16, marginBottom: 16,
-                }}
-                >
-                  <Pagination
-                    current={IssueStore.pagination.current}
-                    defaultCurrent={1}
-                    defaultPageSize={10}
-                    pageSize={IssueStore.pagination.pageSize}
-                    showSizeChanger
-                    total={IssueStore.pagination.total}
-                    onChange={this.handlePaginationChange.bind(this)}
-                    onShowSizeChange={this.handlePaginationShowSizeChange.bind(this)}
-                  />
-                </div>
-              ) : null
-            }
+            <IssueTable />
           </div>
-
-          <ExpandWideCard style={{ height: 'calc(100vh - 106px)' }} />
-          {
-          create ? (
-            <CreateIssue
-              visible={create}
-              onCancel={() => this.setState({ create: false })}
-              onOk={this.handleCreateIssue.bind(this)}
-              store={IssueStore}
-            />
-          ) : null
-          }
+          <ExpandWideCard />
+          <CreateIssueModal />
         </Content>
       </Page>
     );

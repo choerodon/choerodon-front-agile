@@ -26,27 +26,30 @@ class QuickSearch extends Component {
    */
   componentDidMount() {
     const { AppState } = this.props;
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`).then((res = []) => {
-      const resData = res.map(item => ({
+    const axiosGetFilter = axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`);
+    const axiosGetUser = axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?size=40`);
+    Promise.all([axiosGetFilter, axiosGetUser]).then((res = []) => {
+      const resFilterData = res[0].map(item => ({
         label: item.name,
         value: item.filterId,
       }));
-      this.setState({
-        quickSearchArray: resData,
-      });
-    }).catch((e) => {
-      Choerodon.prompt(e);
-    });
-    axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?size=40`).then((res = []) => {
-      const resData = res.content.map(item => ({
+      const resUserData = res[1].content.map(item => ({
         id: item.id,
         realName: item.realName,
       }));
       this.setState({
-        userDataArray: resData,
+        userDataArray: resUserData,
+        quickSearchArray: resFilterData,
       });
-    }).catch((e) => {
-      Choerodon.prompt(e);
+    }).catch((error) => {
+      Choerodon.prompt(error);
+    });
+  }
+
+  componentWillUnmount() {
+    this.setState({
+      userDataArray: [],
+      quickSearchArray: [],
     });
   }
 
@@ -75,6 +78,7 @@ class QuickSearch extends Component {
   };
 
   render() {
+    // debugger;
     const { style } = this.props;
     const {
       userDataArray,

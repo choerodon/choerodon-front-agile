@@ -19,32 +19,23 @@ class QuickCreateIssue extends Component {
       createLoading: false,
       createIssueValue: '',
       selectIssueType: 'task',
-      defaultPriorityId: false,
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     loadPriorities().then((res) => {
       if (res && res.length) {
-        const defaultPriority = res.find(p => p.default);
-        const defaultPriorityId = defaultPriority ? defaultPriority.id : '';
-        this.setState({
-          defaultPriorityId,
-        });
-        IssueStore.setPriorities(res);
+        const defaultPriorityId = !!res.find(p => p.default) && res.find(p => p.default).id;
         IssueStore.setDefaultPriorityId(defaultPriorityId);
       } else {
-        this.setState({
-          defaultPriorityId: '',
-        });
-        IssueStore.setPriorities([]);
         IssueStore.setDefaultPriorityId('');
       }
     });
   }
 
   handleBlurCreateIssue = () => {
-    const { defaultPriorityId, createIssueValue, selectIssueType } = this.state;
+    const createIssueValue = this.inputvalue.input.value;
+    const { selectIssueType } = this.state;
     const currentType = IssueStore.getIssueTypes.find(t => t.typeCode === selectIssueType);
     if (createIssueValue !== '') {
       const { history } = this.props;
@@ -54,8 +45,8 @@ class QuickCreateIssue extends Component {
       axios.get(`/agile/v1/projects/${id}/project_info`)
         .then((res) => {
           const data = {
-            priorityCode: `priority-${defaultPriorityId}`,
-            priorityId: defaultPriorityId,
+            priorityCode: `priority-${IssueStore.getDefaultPriorityId}`,
+            priorityId: IssueStore.getDefaultPriorityId,
             projectId: id,
             sprintId: 0,
             summary: createIssueValue,
@@ -71,9 +62,16 @@ class QuickCreateIssue extends Component {
           createIssue(data)
             .then((response) => {
               IssueStore.init();
-              IssueStore.loadIssues();
+              IssueStore.loadIssues().then((resRefresh) => {
+                IssueStore.updateFiltedIssue({
+                  current: resRefresh.number + 1,
+                  pageSize: resRefresh.size,
+                  total: resRefresh.totalElements,
+                }, resRefresh.content);
+              });
+              this.inputvalue.input.value = '';
               this.setState({
-                createIssueValue: '',
+                checkCreateIssue: false,
                 createLoading: false,
               });
               history.push(`/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}&paramName=${response.issueNum}&paramIssueId=${response.issueId}&paramOpenIssueId=${response.issueId}`);
@@ -150,13 +148,8 @@ class QuickCreateIssue extends Component {
               <div style={{ marginLeft: 8, flexGrow: 1 }}>
                 <Input
                   autoFocus
-                  value={createIssueValue}
+                  ref={(e) => { this.inputvalue = e; }}
                   placeholder="需要做什么？"
-                  onChange={(e) => {
-                    this.setState({
-                      createIssueValue: e.target.value,
-                    });
-                  }}
                   maxLength={44}
                   onPressEnter={this.handleBlurCreateIssue.bind(this)}
                 />
