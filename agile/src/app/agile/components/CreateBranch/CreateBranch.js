@@ -111,7 +111,7 @@ class CreateBranch extends Component {
             </div>
             <FormItem className="branch-formItem">
               {getFieldDecorator('app', {
-                rules: [{ required: true }],
+                rules: [{ required: true, message: '请选择应用' }],
               })(
                 <Select
                   label="应用名称"
@@ -142,7 +142,7 @@ class CreateBranch extends Component {
             </div>
             <FormItem className="branch-formItem">
               {getFieldDecorator('branch', {
-                rules: [{ required: true }],
+                rules: [{ required: true, message: '请选择分支来源' }],
               })(
                 <Select
                   label="分支来源"
@@ -267,7 +267,7 @@ class CreateBranch extends Component {
             </div>
             <FormItem className={'c7n-formItem_180'}>
               {getFieldDecorator('type', {
-                rules: [{ required: true }],
+                rules: [{ required: true, message: '请选择分支类型' }],
                 initialValue: MAP[this.props.typeCode || 'task'],
               })(
                 <Select
@@ -289,6 +289,7 @@ class CreateBranch extends Component {
               {getFieldDecorator('name', {
                 rules: [{
                   required: true,
+                  message: '请输入分支名称',
                 }, {
                   validator: this.checkName,
                 }],
