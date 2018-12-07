@@ -22,6 +22,7 @@ import {
   loadIssue, loadWorklogs, updateIssue, loadPriorities,
   loadComponents, loadVersions, loadEpics, createCommit,
   deleteIssue, updateIssueType, loadSprints, loadStatus,
+  loadWikies, deleteWiki,
 } from '../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
@@ -31,6 +32,7 @@ import CreateSubTask from '../CreateSubTask';
 import CreateLinkTask from '../CreateLinkTask';
 import UserHead from '../UserHead';
 import Comment from './Component/Comment';
+import WikiItem from './Component/WikiItem';
 import Log from './Component/Log';
 import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
@@ -44,6 +46,7 @@ import MergeRequest from '../MergeRequest';
 import Assignee from '../Assignee';
 import ChangeParent from '../ChangeParent';
 import TypeTag from '../TypeTag';
+import Wiki from '../Wiki';
 import ScrumBoardStore from '../../stores/project/scrumBoard/ScrumBoardStore';
 
 const { AppState } = stores;
@@ -164,6 +167,8 @@ class CreateSprint extends Component {
       originFixVersions: [],
       originInfluenceVersions: [],
       transformId: false,
+      addWiki: false,
+      wikies: [],
     };
   }
 
@@ -765,6 +770,7 @@ class CreateSprint extends Component {
       editLogId: undefined,
       editLog: undefined,
       issueLoading: true,
+      addWiki: false,
     }, () => {
       loadIssue(issueId).then((res) => {
         this.setAnIssueToState(res);
@@ -786,6 +792,11 @@ class CreateSprint extends Component {
       loadBranchs(issueId).then((res) => {
         this.setState({
           branchs: res || {},
+        });
+      });
+      loadWikies(issueId).then((res) => {
+        this.setState({
+          wikies: res || [],
         });
       });
       this.setState({
@@ -931,6 +942,46 @@ class CreateSprint extends Component {
       currentRae,
     });
   }
+
+  onDeleteWiki = async (id) => {
+    const { origin } = this.state;
+    const { issueId } = origin;
+    await deleteWiki(id);
+    const res = await loadWikies(issueId);
+    this.setState({
+      wikies: res || [],
+    });
+  };
+
+  onWikiCreate = async () => {
+    const { origin } = this.state;
+    const { issueId } = origin;
+    this.setState({ addWiki: false });
+    const res = await loadWikies(issueId);
+    this.setState({
+      wikies: res || [],
+    });
+  };
+
+  renderWiki = () => {
+    const { wikies } = this.state;
+    return (
+      <div>
+        {
+          wikies && wikies.wikiRelationList
+          && wikies.wikiRelationList.map(wiki => (
+            <WikiItem
+              key={wiki.id}
+              wiki={wiki}
+              onDeleteWiki={this.onDeleteWiki}
+              wikiHost={wikies.wikiHost}
+              type="narrow"
+            />
+          ))
+        }
+      </div>
+    );
+  };
 
   /**
    * Comment
@@ -1319,6 +1370,8 @@ class CreateSprint extends Component {
       originVersions,
       fixVersionsFixed,
       fixVersions,
+      addWiki,
+      wikies,
     } = this.state;
     const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
@@ -1670,7 +1723,7 @@ class CreateSprint extends Component {
                           currentRae: undefined,
                         });
                       }}
-                      onBlur={() => this.statusOnChange()}
+                      // onBlur={() => this.statusOnChange()}
                     />
                   </ReadAndEdit>
                   <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
@@ -1813,7 +1866,7 @@ class CreateSprint extends Component {
                               style={{ width: 150 }}
                               loading={selectLoading}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
-                              onBlur={() => this.statusOnChange()}
+                              // onBlur={() => this.statusOnChange()}
                               onChange={(value, item) => {
                                 this.setState({
                                   statusId: value,
@@ -1821,7 +1874,7 @@ class CreateSprint extends Component {
                                 });
                                 this.needBlur = false;
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                setTimeout(() => { this.needBlur = true; }, 100);
+                                // setTimeout(() => { this.needBlur = true; }, 100);
                               }}
                             >
                               {
@@ -1884,7 +1937,7 @@ class CreateSprint extends Component {
                               value={originPriorities.length ? priorityId : priorityName}
                               style={{ width: '150px' }}
                               loading={selectLoading}
-                              onBlur={() => this.statusOnChange()}
+                              // onBlur={() => this.statusOnChange()}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               onFocus={() => {
                                 this.setState({
@@ -1906,7 +1959,7 @@ class CreateSprint extends Component {
                                 });
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
 
-                                setTimeout(() => { this.needBlur = true; }, 10);
+                                // setTimeout(() => { this.needBlur = true; }, 10);
                               }}
                             >
                               {
@@ -1967,7 +2020,7 @@ class CreateSprint extends Component {
                                   onPopupFocus={(e) => {
                                     this.componentRef.rcSelect.focus();
                                   }}
-                                  onBlur={e => this.statusOnChange(e)}
+                                  // onBlur={e => this.statusOnChange(e)}
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   tokenSeparators={[',']}
                                   style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
@@ -1986,14 +2039,14 @@ class CreateSprint extends Component {
                                     this.setState({ componentIssueRelDTOList: value });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    this.needBlur = false;
-                                    if (this.changeTimer > 0) {
-                                      clearTimeout(this.changeTimer);
-                                      this.changeTimer = 0;
-                                    }
-                                    this.changeTimer = setTimeout(() => {
-                                      this.needBlur = true;
-                                    }, 1000);
+                                    // this.needBlur = false;
+                                    // if (this.changeTimer > 0) {
+                                    //   clearTimeout(this.changeTimer);
+                                    //   this.changeTimer = 0;
+                                    // }
+                                    // this.changeTimer = setTimeout(() => {
+                                    //   this.needBlur = true;
+                                    // }, 1000);
                                   }}
                                 >
                                   {originComponents && originComponents.map(component => (
@@ -2065,7 +2118,7 @@ class CreateSprint extends Component {
                               tokenSeparators={[',']}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
                               style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
-                              onBlur={() => this.statusOnChange()}
+                              // onBlur={() => this.statusOnChange()}
                               onFocus={() => {
                                 this.setState({
                                   selectLoading: true,
@@ -2081,14 +2134,14 @@ class CreateSprint extends Component {
                                 this.setState({ labelIssueRelDTOList: value });
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，
                                 // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                this.needBlur = false;
-                                if (this.changeTimer > 0) {
-                                  clearTimeout(this.changeTimer);
-                                  this.changeTimer = 0;
-                                }
-                                this.changeTimer = setTimeout(() => {
-                                  this.needBlur = true;
-                                }, 1000);
+                                // this.needBlur = false;
+                                // if (this.changeTimer > 0) {
+                                //   clearTimeout(this.changeTimer);
+                                //   this.changeTimer = 0;
+                                // }
+                                // this.changeTimer = setTimeout(() => {
+                                //   this.needBlur = true;
+                                // }, 1000);
                               }}
                             >
                               {originLabels.map(label => (
@@ -2151,7 +2204,7 @@ class CreateSprint extends Component {
                                   label="未归档版本"
                                   value={this.transToArr(influenceVersions, 'name', 'array')}
                                   mode="tags"
-                                  onBlur={() => this.statusOnChange()}
+                                  // onBlur={() => this.statusOnChange()}
                                   onPopupFocus={(e) => {
                                     this.componentRef.rcSelect.focus();
                                   }}
@@ -2174,14 +2227,14 @@ class CreateSprint extends Component {
                                     this.setState({ influenceVersions: value });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    this.needBlur = false;
-                                    if (this.changeTimer > 0) {
-                                      clearTimeout(this.changeTimer);
-                                      this.changeTimer = 0;
-                                    }
-                                    this.changeTimer = setTimeout(() => {
-                                      this.needBlur = true;
-                                    }, 1000);
+                                    // this.needBlur = false;
+                                    // if (this.changeTimer > 0) {
+                                    //   clearTimeout(this.changeTimer);
+                                    //   this.changeTimer = 0;
+                                    // }
+                                    // this.changeTimer = setTimeout(() => {
+                                    //   this.needBlur = true;
+                                    // }, 1000);
                                   }}
                                 >
                                   {originVersions.map(version => (
@@ -2247,7 +2300,7 @@ class CreateSprint extends Component {
                               value={this.transToArr(fixVersions, 'name', 'array')}
                               mode="tags"
                               loading={selectLoading}
-                              onBlur={() => this.statusOnChange()}
+                              // onBlur={() => this.statusOnChange()}
                               onPopupFocus={(e) => {
                                 this.componentRef.rcSelect.focus();
                               }}
@@ -2269,14 +2322,14 @@ class CreateSprint extends Component {
                                 this.setState({ fixVersions: value });
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，
                                 // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                this.needBlur = false;
-                                if (this.changeTimer > 0) {
-                                  clearTimeout(this.changeTimer);
-                                  this.changeTimer = 0;
-                                }
-                                this.changeTimer = setTimeout(() => {
-                                  this.needBlur = true;
-                                }, 1000);
+                                // this.needBlur = false;
+                                // if (this.changeTimer > 0) {
+                                //   clearTimeout(this.changeTimer);
+                                //   this.changeTimer = 0;
+                                // }
+                                // this.changeTimer = setTimeout(() => {
+                                //   this.needBlur = true;
+                                // }, 1000);
                               }}
                             >
                               {originVersions.map(version => (
@@ -2347,7 +2400,7 @@ class CreateSprint extends Component {
                                   }
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '150px' }}
-                                  onBlur={() => this.statusOnChange()}
+                                  // onBlur={() => this.statusOnChange()}
                                   allowClear
                                   loading={selectLoading}
                                   onFocus={() => {
@@ -2371,7 +2424,7 @@ class CreateSprint extends Component {
                                     this.needBlur = false;
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    setTimeout(() => { this.needBlur = true; }, 100);
+                                    // setTimeout(() => { this.needBlur = true; }, 100);
                                   }}
                                 >
                                   {originEpics.map(epic => <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>)}
@@ -2453,7 +2506,7 @@ class CreateSprint extends Component {
                                   value={sprintId || undefined}
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '150px' }}
-                                  onBlur={() => this.statusOnChange()}
+                                  // onBlur={() => this.statusOnChange()}
                                   onPopupFocus={(e) => {
                                     this.componentRef.rcSelect.focus();
                                   }}
@@ -2479,14 +2532,14 @@ class CreateSprint extends Component {
                                     });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    this.needBlur = false;
-                                    if (this.changeTimer > 0) {
-                                      clearTimeout(this.changeTimer);
-                                      this.changeTimer = 0;
-                                    }
-                                    this.changeTimer = setTimeout(() => {
-                                      this.needBlur = true;
-                                    }, 1000);
+                                    // this.needBlur = false;
+                                    // if (this.changeTimer > 0) {
+                                    //   clearTimeout(this.changeTimer);
+                                    //   this.changeTimer = 0;
+                                    // }
+                                    // this.changeTimer = setTimeout(() => {
+                                    //   this.needBlur = true;
+                                    // }, 1000);
                                   }}
                                 >
                                   {originSprints.map(sprint => <Option key={`${sprint.sprintId}`} value={sprint.sprintId}>{sprint.sprintName}</Option>)}
@@ -2664,7 +2717,7 @@ class CreateSprint extends Component {
                               value={flag === 'loading' ? undefined : reporterId || undefined}
                               style={{ width: 150 }}
                               loading={selectLoading}
-                              onBlur={() => this.statusOnChange()}
+                              // onBlur={() => this.statusOnChange()}
                               allowClear
                               filter
                               onFilterChange={this.onFilterChange.bind(this)}
@@ -2901,6 +2954,25 @@ class CreateSprint extends Component {
                     />
                   </div>
                 </div>
+                <div id="wiki">
+                  <div className="c7n-title-wrapper">
+                    <div className="c7n-title-left">
+                      <Icon type="library_books c7n-icon-title" />
+                      <span>Wiki 文档</span>
+                    </div>
+                    <div style={{
+                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
+                    }}
+                    />
+                    <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ addWiki: true })}>
+                        <Icon type="add_box icon" />
+                        <span>添加文档</span>
+                      </Button>
+                    </div>
+                  </div>
+                  {this.renderWiki()}
+                </div>
                 <div id="commit">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
@@ -3015,6 +3087,17 @@ class CreateSprint extends Component {
               visible={edit}
               onCancel={() => this.setState({ edit: false })}
               onOk={callback}
+            />
+          ) : null
+        }
+        {
+          addWiki ? (
+            <Wiki
+              issueId={origin.issueId}
+              visible={addWiki}
+              onCancel={() => this.setState({ addWiki: false })}
+              onOk={this.onWikiCreate}
+              checkIds={wikies ? wikies.wikiRelationList.map(wiki => wiki.wikiUrl) : []}
             />
           ) : null
         }
