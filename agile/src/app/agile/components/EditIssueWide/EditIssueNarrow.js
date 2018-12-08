@@ -753,129 +753,26 @@ class CreateSprint extends Component {
     });
   }
 
-  /**
-   * Comment
-   */
-
-  handleCreateCommit() {
-    const { addCommitDes, origin: { issueId: extra } } = this.state;
-    if (addCommitDes) {
-      beforeTextUpload(addCommitDes, extra, this.createReply, 'commentText');
-    } else {
-      extra.commentText = '';
-      this.createReply(extra);
-    }
-  }
-
-  handleCreateSubIssue(subIssue) {
-    const { onUpdate } = this.props;
-    this.reloadIssue();
-    this.setState({
-      createSubTaskShow: false,
-    });
-    if (onUpdate) {
-      onUpdate();
-    }
-  }
-
-  handleCreateLinkIssue() {
-    const { onUpdate } = this.props;
-    this.reloadIssue();
-    this.setState({
-      createLinkTaskShow: false,
-    });
-    if (onUpdate) {
-      onUpdate();
-    }
-  }
-
-  handleCopyIssue() {
-    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
-    this.reloadIssue();
-    this.setState({
-      copyIssueShow: false,
-    });
-    if (onUpdate) {
-      onUpdate();
-    }
-    if (onCopyAndTransformToSubIssue) {
-      onCopyAndTransformToSubIssue();
-    }
-  }
-
-  handleTransformSubIssue() {
-    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
-    this.reloadIssue();
-    this.setState({
-      transformSubIssueShow: false,
-    });
-    if (onUpdate) {
-      onUpdate();
-    }
-    if (onCopyAndTransformToSubIssue) {
-      onCopyAndTransformToSubIssue();
-    }
-  }
-
-  handleTransformFromSubIssue() {
-    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
-    this.reloadIssue();
-    this.setState({
-      transformFromSubIssueShow: false,
-    });
-    if (onUpdate) {
-      onUpdate();
-    }
-    if (onCopyAndTransformToSubIssue) {
-      onCopyAndTransformToSubIssue();
-    }
-  }
-
-  handleClickMenu(e) {
+  onDeleteWiki = async (id) => {
     const { origin } = this.state;
-    if (e.key === '0') {
-      this.setState({ dailyLogShow: true });
-    } else if (e.key === 'item_1') {
-      this.handleDeleteIssue(origin.issueId);
-    } else if (e.key === '2') {
-      this.setState({ createSubTaskShow: true });
-    } else if (e.key === '3') {
-      this.setState({ copyIssueShow: true });
-    } else if (e.key === '4') {
-      this.setState({ transformSubIssueShow: true });
-    } else if (e.key === '5') {
-      this.setState({ transformFromSubIssueShow: true });
-    } else if (e.key === '6') {
-      this.setState({ createBranchShow: true });
-    } else if (e.key === '7') {
-      this.setState({ assigneeShow: true });
-    } else if (e.key === '8') {
-      this.setState({ changeParentShow: true });
-    }
-  }
+    const { issueId } = origin;
+    await deleteWiki(id);
+    const res = await loadWikies(issueId);
+    this.setState({
+      wikies: res || [],
+    });
+  };
 
-  handleChangeType(type) {
-    const { issueId, summary, origin } = this.state;
-    const { onUpdate, store } = this.props;
-    const id = store.getSelectedIssue ? store.getSelectedIssue.issueId : null;
-    const issueupdateTypeDTO = {
-      epicName: type.key === 'issue_epic' ? summary : undefined,
-      issueId,
-      objectVersionNumber: origin.objectVersionNumber,
-      typeCode: type.key,
-      issueTypeId: type.item.props.value,
-    };
-    updateIssueType(issueupdateTypeDTO)
-      .then((res) => {
-        loadIssue(id).then((response) => {
-          this.setState({
-            createdById: res.createdBy,
-          });
-          this.reloadIssue(origin.issueId);
-          onUpdate();
-        });
-      });
-  }
+  onWikiCreate = async () => {
+    const { origin } = this.state;
+    const { issueId } = origin;
+    this.setState({ addWiki: false });
+    const res = await loadWikies(issueId);
+    this.setState({
+      wikies: res || [],
+    });
+  };
+
 
   isInLook(ele) {
     const a = ele.offsetTop;
@@ -1021,25 +918,129 @@ class CreateSprint extends Component {
     }
   }
 
-  onDeleteWiki = async (id) => {
-    const { origin } = this.state;
-    const { issueId } = origin;
-    await deleteWiki(id);
-    const res = await loadWikies(issueId);
+  handleCreateSubIssue(subIssue) {
+    const { onUpdate } = this.props;
+    this.reloadIssue();
     this.setState({
-      wikies: res || [],
+      createSubTaskShow: false,
     });
-  };
+    if (onUpdate) {
+      onUpdate();
+    }
+  }
 
-  onWikiCreate = async () => {
-    const { origin } = this.state;
-    const { issueId } = origin;
-    this.setState({ addWiki: false });
-    const res = await loadWikies(issueId);
+  handleCreateLinkIssue() {
+    const { onUpdate } = this.props;
+    this.reloadIssue();
     this.setState({
-      wikies: res || [],
+      createLinkTaskShow: false,
     });
-  };
+    if (onUpdate) {
+      onUpdate();
+    }
+  }
+
+  handleCopyIssue() {
+    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
+    this.reloadIssue();
+    this.setState({
+      copyIssueShow: false,
+    });
+    if (onUpdate) {
+      onUpdate();
+    }
+    if (onCopyAndTransformToSubIssue) {
+      onCopyAndTransformToSubIssue();
+    }
+  }
+
+  handleTransformSubIssue() {
+    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
+    this.reloadIssue();
+    this.setState({
+      transformSubIssueShow: false,
+    });
+    if (onUpdate) {
+      onUpdate();
+    }
+    if (onCopyAndTransformToSubIssue) {
+      onCopyAndTransformToSubIssue();
+    }
+  }
+
+  handleTransformFromSubIssue() {
+    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
+    this.reloadIssue();
+    this.setState({
+      transformFromSubIssueShow: false,
+    });
+    if (onUpdate) {
+      onUpdate();
+    }
+    if (onCopyAndTransformToSubIssue) {
+      onCopyAndTransformToSubIssue();
+    }
+  }
+
+  handleClickMenu(e) {
+    const { origin } = this.state;
+    if (e.key === '0') {
+      this.setState({ dailyLogShow: true });
+    } else if (e.key === 'item_1') {
+      this.handleDeleteIssue(origin.issueId);
+    } else if (e.key === '2') {
+      this.setState({ createSubTaskShow: true });
+    } else if (e.key === '3') {
+      this.setState({ copyIssueShow: true });
+    } else if (e.key === '4') {
+      this.setState({ transformSubIssueShow: true });
+    } else if (e.key === '5') {
+      this.setState({ transformFromSubIssueShow: true });
+    } else if (e.key === '6') {
+      this.setState({ createBranchShow: true });
+    } else if (e.key === '7') {
+      this.setState({ assigneeShow: true });
+    } else if (e.key === '8') {
+      this.setState({ changeParentShow: true });
+    }
+  }
+
+  handleChangeType(type) {
+    const { issueId, summary, origin } = this.state;
+    const { onUpdate, store } = this.props;
+    const id = store.getSelectedIssue ? store.getSelectedIssue.issueId : null;
+    const issueupdateTypeDTO = {
+      epicName: type.key === 'issue_epic' ? summary : undefined,
+      issueId,
+      objectVersionNumber: origin.objectVersionNumber,
+      typeCode: type.key,
+      issueTypeId: type.item.props.value,
+    };
+    updateIssueType(issueupdateTypeDTO)
+      .then((res) => {
+        loadIssue(id).then((response) => {
+          this.setState({
+            createdById: res.createdBy,
+          });
+          this.reloadIssue(origin.issueId);
+          onUpdate();
+        });
+      });
+  }
+
+  /**
+   * Comment
+   */
+
+  handleCreateCommit() {
+    const { addCommitDes, origin: { issueId: extra } } = this.state;
+    if (addCommitDes) {
+      beforeTextUpload(addCommitDes, extra, this.createReply, 'commentText');
+    } else {
+      extra.commentText = '';
+      this.createReply(extra);
+    }
+  }
 
   renderWiki = () => {
     const { wikies } = this.state;
@@ -1463,6 +1464,7 @@ class CreateSprint extends Component {
       issueLoading,
       transformSubIssueShow,
       transformFromSubIssueShow,
+      hasPermission,
       commitShow,
       issueNum,
       parentIssueId,
@@ -1512,14 +1514,9 @@ class CreateSprint extends Component {
               </Menu.Item>
             )}
           >
-<<<<<<< HEAD
-            <Menu.Item
-              key="1"
-=======
             <Menu.Item
               key="1"
               disabled={loginUserId !== createdById && !hasPermission}
->>>>>>> [IMP] 搬迁原有逻辑，优化整体代码解构
             >
               {'删除'}
             </Menu.Item>
