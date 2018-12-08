@@ -70,6 +70,14 @@ class SprintCommonStore {
 
   @observable paramName = '';
 
+  @observable issuePriority = [];
+
+  @observable issueStatus = [];
+
+  @observable issueTypes = [];
+
+  @observable columnFilter = new Map();
+
   @observable barFilters = '';
 
   @observable paramId = '';
@@ -108,6 +116,10 @@ class SprintCommonStore {
 
   @computed get getParam() {
     return toJS(this.paramObj);
+  }
+
+  @computed get getColumnFilter() {
+    return toJS(this.columnFilter);
   }
 
   @action init() {
@@ -352,6 +364,40 @@ class SprintCommonStore {
     this.issueStatus = res[1];
     this.issuePriority = res[2];
     this.tagData = res[3];
+    this.columnFilter = new Map([
+      ['issueNum', []],
+      [
+        'typeId', this.issueTypes.map(item => ({
+        text: item.name,
+        value: item.id.toString(),
+      })),
+      ],
+      ['summary', []],
+      [
+        'statusId', this.issueStatus.map(item => ({
+        text: item.name,
+        value: item.id.toString(),
+      })),
+      ],
+      [
+        'priorityId', this.issuePriority.map(item => ({
+        text: item.name,
+        value: item.id.toString(),
+      })),
+      ],
+      ['reporterName', []],
+      ['assigneeName', []],
+      ['version', []],
+      ['sprint', []],
+      ['component', []],
+      ['epic', []],
+      ['issueId', []],
+      ['label', this.tagData.map(item => ({
+        text: item.labelName,
+        value: item.labelId.toString(),
+      }))],
+    ]);
+
     this.issues = res[4].content;
     this.pagination.total = res[4].totalElements;
     if (paramIssueSelected === true) {

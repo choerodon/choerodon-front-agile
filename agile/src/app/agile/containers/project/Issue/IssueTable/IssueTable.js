@@ -67,40 +67,6 @@ class IssueTable extends Component {
   };
 
   render() {
-    const columnFilter = new Map([
-      ['issueNum', []],
-      [
-        'typeId', IssueStore.getIssueTypes.map(item => ({
-          text: item.name,
-          value: item.id.toString(),
-        })),
-      ],
-      ['summary', []],
-      [
-        'statusId', IssueStore.getIssueStatus.map(item => ({
-          text: item.name,
-          value: item.id.toString(),
-        })),
-      ],
-      [
-        'priorityId', IssueStore.getIssuePriority.map(item => ({
-          text: item.name,
-          value: item.id.toString(),
-        })),
-      ],
-      ['reporterName', []],
-      ['assigneeName', []],
-      ['version', []],
-      ['sprint', []],
-      ['component', []],
-      ['epic', []],
-      ['issueId', []],
-      ['label', IssueStore.getLabel.map(item => ({
-        text: item.labelName,
-        value: item.labelId.toString(),
-      }))],
-    ]);
-    // 表格列配置
     const columns = [
       {
         title: '任务编号',
@@ -110,7 +76,7 @@ class IssueTable extends Component {
         sorterId: 'issueId',
         disableClick: true,
         sorter: true,
-        filters: columnFilter.get('issueNum'),
+        filters: IssueStore.getColumnFilter.get('issueNum'),
         render: (text, record) => <IssueNum text={text} />,
       },
       {
@@ -120,7 +86,7 @@ class IssueTable extends Component {
         disableClick: true,
         sorterId: 'issueTypeId',
         sorter: true,
-        filters: columnFilter.get('typeId'),
+        filters: IssueStore.getColumnFilter.get('typeId'),
         filterMultiple: true,
         render: (text, record) => <TypeCode record={record} />,
       },
@@ -130,7 +96,7 @@ class IssueTable extends Component {
         className: 'summary',
         key: 'summary',
         disableClick: true,
-        filters: columnFilter.get('summary'),
+        filters: IssueStore.getColumnFilter.get('summary'),
         render: text => <Summary text={text} />,
       },
       {
@@ -140,7 +106,7 @@ class IssueTable extends Component {
         disableClick: true,
         sorterId: 'statusId',
         sorter: true,
-        filters: columnFilter.get('statusId'),
+        filters: IssueStore.getColumnFilter.get('statusId'),
         filterMultiple: true,
         render: (text, record) => <StatusName record={record} />,
       },
@@ -151,7 +117,7 @@ class IssueTable extends Component {
         disableClick: true,
         sorterId: 'priorityId',
         sorter: true,
-        filters: columnFilter.get('priorityId'),
+        filters: IssueStore.getColumnFilter.get('priorityId'),
         filterMultiple: true,
         render: (text, record) => <Priority record={record} />,
       },
@@ -163,14 +129,14 @@ class IssueTable extends Component {
         disableClick: true,
         sorterId: 'assigneeId',
         sorter: true,
-        filters: columnFilter.get('assigneeName'),
+        filters: IssueStore.getColumnFilter.get('assigneeName'),
         render: (text, record) => <Assignee text={text} record={record} />,
       },
       {
         title: '报告人',
         dataIndex: 'reporterName',
         key: 'reporter',
-        filters: columnFilter.get('reporterName'),
+        filters: IssueStore.getColumnFilter.get('reporterName'),
         hidden: true,
       },
       {
@@ -184,7 +150,7 @@ class IssueTable extends Component {
       },
       {
         title: '版本',
-        filters: columnFilter.get('versionIssueRelDTOS'),
+        filters: IssueStore.getColumnFilter.get('versionIssueRelDTOS'),
         key: 'version',
         hidden: true,
       },
@@ -192,30 +158,31 @@ class IssueTable extends Component {
         title: '冲刺',
         key: 'sprint',
         className: 'sprint',
-        filters: columnFilter.get('sprint'),
+        filters: IssueStore.getColumnFilter.get('sprint'),
         render: (text, record) => <Sprint text={text} record={record} />,
       },
       {
         title: '模块',
         key: 'component',
-        filters: columnFilter.get('component'),
+        filters: IssueStore.getColumnFilter.get('component'),
         hidden: true,
       },
       {
         title: '史诗',
         dataIndex: 'epicName',
         key: 'epic',
-        filters: columnFilter.get('epic'),
+        filters: IssueStore.getColumnFilter.get('epic'),
         hidden: true,
       },
       {
         title: '标签',
         key: 'label',
-        filters: columnFilter.get('label'),
+        filters: IssueStore.getColumnFilter.get('label'),
         filterMultiple: true,
         hidden: true,
       },
     ];
+    // 表格列配置
     return (
       <Table
         rowKey={record => record.issueId}
@@ -230,7 +197,7 @@ class IssueTable extends Component {
             title="根据当前搜索条件没有查询到问题"
             des="尝试修改您的过滤选项或者在下面创建新的问题"
           />
-        )}
+          )}
         filterBarPlaceholder="过滤表"
         noFilter
         filters={IssueStore.getBarFilter}
@@ -253,7 +220,7 @@ class IssueTable extends Component {
             e.currentTarget.style.borderLeft = 'none';
           },
         })
-        }
+          }
       />
     );
   }
