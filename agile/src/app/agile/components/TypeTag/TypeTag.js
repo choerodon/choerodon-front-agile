@@ -7,10 +7,10 @@ const initTypes = ['agile_epic', 'agile_story', 'agile_fault', 'agile_task', 'ag
 class TypeTag extends Component {
   render() {
     const {
-      data, showName,
+      data, showName, style,
     } = this.props;
     return (
-      <div className="c7n-typeTag" {...this.props}>
+      <div className="c7n-typeTag" style={style}>
         {initTypes.indexOf(data ? data.icon : '') !== -1
           ? (
             <Icon

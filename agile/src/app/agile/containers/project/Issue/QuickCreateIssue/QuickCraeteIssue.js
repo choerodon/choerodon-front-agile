@@ -7,6 +7,7 @@ import { axios, stores } from 'choerodon-front-boot';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import { createIssue, loadPriorities } from '../../../../api/NewIssueApi';
 import TypeTag from '../../../../components/TypeTag';
+import IssueFilterControler from '../IssueFilterControler';
 
 const { AppState } = stores;
 
@@ -61,13 +62,11 @@ class QuickCreateIssue extends Component {
           });
           createIssue(data)
             .then((response) => {
-              IssueStore.init();
-              IssueStore.loadIssues().then((resRefresh) => {
-                IssueStore.updateFiltedIssue({
-                  current: resRefresh.number + 1,
-                  pageSize: resRefresh.size,
-                  total: resRefresh.totalElements,
-                }, resRefresh.content);
+              this.filterControler = new IssueFilterControler();
+              this.filterControler.resetCacheMap();
+              IssueStore.setLoading(true);
+              this.filterControler.refresh('refresh').then((resRefresh) => {
+                IssueStore.refreshTrigger(resRefresh);
               });
               this.inputvalue.input.value = '';
               this.setState({
