@@ -203,7 +203,8 @@ class BacklogStore {
   }
 
   axiosGetIssueDetail(issueId) {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/${issueId}?organizationId=${AppState.currentMenuType.organizationId}`);
+    const orgId = AppState.currentMenuType.organizationId;
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/${issueId}${orgId ? `?organizationId=${orgId}` : ''}`);
   }
 
   @computed get getOpenSprintDetail() {

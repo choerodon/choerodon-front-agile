@@ -46,7 +46,7 @@ class Wiki extends Component {
     }
     const dataSource = [];
     const newData = await axios.post(`agile/v1/projects/${proId}/wiki_relation/menus`, postData);
-    if (newData) {
+    if (newData && !newData.failed) {
       let idIndex = idAddress;
       newData.forEach((item, index) => {
         idIndex = {
@@ -84,6 +84,10 @@ class Wiki extends Component {
           loading: false,
         });
       }
+    } else {
+      this.setState({
+        loading: false,
+      });
     }
   };
 
@@ -177,7 +181,7 @@ class Wiki extends Component {
     return (
       <Sidebar
         className="c7n-dailyLog"
-        title="登记工作日志"
+        title="添加wiki文档"
         visible={visible || false}
         onOk={this.handleCreateWiki}
         onCancel={onCancel}

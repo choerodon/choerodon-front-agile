@@ -179,6 +179,31 @@ class CreateSubIssue extends Component {
       });
   };
 
+  // 分派给我
+  assigneeMe = () => {
+    const {
+      id, imagesUrl, loginName, realName,
+    } = AppState.userInfo;
+    const { originUsers } = this.state;
+    const { form } = this.props;
+    const newUsers = originUsers.filter(user => user.id !== id);
+    this.setState({
+      originUsers: [
+        ...newUsers,
+        {
+          id,
+          imagesUrl,
+          loginName,
+          realName,
+        },
+      ],
+    }, () => {
+      form.setFieldsValue({
+        assigneedId: id,
+      });
+    });
+  };
+
   render() {
     const {
       visible, onCancel, form,
@@ -297,17 +322,18 @@ class CreateSubIssue extends Component {
                 </Select>,
               )}
             </FormItem>
-            <Tooltip title={'可自行选择经办人，如不选择，会应用模块的默认经办人逻辑和项目的默认经办人策略'}>
-              <Icon
-                type="error"
-                style={{
-                  fontSize: '16px',
-                  color: 'rgba(0,0,0,0.54)',
-                  marginLeft: 15,
-                  marginTop: 20,
-                }}
-              />
-            </Tooltip>
+            <span
+              onClick={this.assigneeMe}
+              style={{
+                display: 'inline-block',
+                color: 'rgba(63, 81, 181)',
+                marginLeft: 10,
+                marginTop: 20,
+                cursor: 'pointer',
+              }}
+            >
+              分派给我
+            </span>
 
             <FormItem label="冲刺" style={{ width: 520 }}>
               {getFieldDecorator('sprintId', {
