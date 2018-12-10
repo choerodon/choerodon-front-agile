@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { trace } from 'mobx';
+// 用于追踪 Mobx 引起的渲染，非性能调优时可注释
+// import { trace } from 'mobx';
 import {
   Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
@@ -9,6 +10,7 @@ import {
 } from 'choerodon-ui';
 import './Issue.scss';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
+import IssueFilterControler from '../IssueFilterControler';
 
 // 快速搜索
 import QuickSearch from '../../../../components/QuickSearch';
@@ -27,42 +29,63 @@ const { AppState } = stores;
 
 @observer
 class Issue extends Component {
+  /**
+   * @param props
+   * 新建一个 filterControler 类，用来管理 ajax 请求所发出的对象
+   */
+  constructor(props) {
+    super(props);
+    this.filterControler = new IssueFilterControler();
+  }
+
+  /**
+   * 处理传入的 Param（如果有的话）
+   * 利用 filterControler 类中的 refresh 方法发出初始化请求（包含优先级，状态，类型，标签数据）
+   */
   componentWillMount() {
     const { location } = this.props;
     if (location.search.indexOf('param') !== -1) {
-      const request = this.GetRequest(location.search);
-      IssueStore.initPram(request);
+      this.filterControler.paramConverter(location.search);
     }
     IssueStore.setLoading(true);
-    IssueStore.loadCurrentSetting().then(
-      (res) => {
-        IssueStore.setCurrentSetting(res);
-      },
-    ).catch((e) => {
+    this.filterControler.refresh('init').then((data) => {
+      if (data.failed) {
+        Choerodon.prompt(data.message);
+      } else {
+        IssueStore.setCurrentSetting(data);
+      }
+    }).catch((e) => {
+      Choerodon.prompt(e);
     });
   }
 
+  /**
+   * 清除 filterMap 的数据，清除 BarFilter（展示 Table Filter）内容
+   */
   componentWillUnmount() {
-    IssueStore.cleanSearchArgs();
-    // IssueStore.setSelectedQuickSearch({ quickFilterIds: [], assigneeFilterIds: null });
+    this.filterControler = new IssueFilterControler();
+    this.filterControler.resetCacheMap();
+    IssueStore.setBarFilter([]);
   }
 
-  GetRequest = (url) => {
-    const reg = '/(?<=[?&])param[^=]+=[^&?\n]*/g';
-    const ret = {};
-    url.match(reg).forEach((paramObj) => {
-      const [paramKey, paramValue] = paramObj.split('=');
-      Object.assign(ret, {
-        [paramKey]: paramValue,
-      });
+  /**
+   * 刷新函数
+   */
+  Refresh = () => {
+    this.filterControler = new IssueFilterControler();
+    IssueStore.setLoading(true);
+    this.filterControler.refresh('refresh').then((res) => {
+      IssueStore.refreshTrigger(res);
     });
-    return ret;
-  };
+  }
 
+  /**
+   * 输出 excel
+   */
   exportExcel = () => {
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
-    const searchParam = IssueStore.getFilter;
+    const searchParam = IssueStore.getFilterMap.get('userFilter');
     axios.post(`/zuul/agile/v1/projects/${projectId}/issues/export?organizationId=${orgId}`, searchParam, { responseType: 'arraybuffer' })
       .then((data) => {
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -71,31 +94,52 @@ class Issue extends Component {
       });
   };
 
+  /**
+   * 快速搜索函数（内容变动时触发）
+   * @param boolean => onlyMeChecked 点击仅我的
+   * @param boolean => onlyStoryChecked 点击仅故事
+   * @param Array => moreChecked 点击其余选项
+   */
   onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
-    // debugger;
-    IssueStore.setAdvArg({ assigneeIds: onlyMeChecked ? [AppState.userInfo.id] : [] });
-    IssueStore.setSelectedQuickSearch({ onlyStory: onlyStoryChecked });
-    IssueStore.setSelectedQuickSearch({ quickFilterIds: moreChecked });
-    IssueStore.loadIssues().then((res) => {
-      IssueStore.updateFiltedIssue({
-        current: res.number + 1,
-        pageSize: res.size,
-        total: res.totalElements,
-      }, res.content);
-    });
+    this.filterControler = new IssueFilterControler();
+    this.filterControler.quickSearchFilterUpdate(
+      onlyMeChecked,
+      onlyStoryChecked,
+      moreChecked,
+      AppState.userInfo.id,
+    );
+    IssueStore.setLoading(true);
+    this.filterControler.update().then(
+      (res) => {
+        IssueStore.updateFiltedIssue({
+          current: res.number + 1,
+          pageSize: res.size,
+          total: res.totalElements,
+        }, res.content);
+      },
+    );
   };
 
+  /**
+   * 经办人函数（经办人变动时触发）
+   * @param Number => value（经办人ID）
+   */
   onAssigneeChange = (value) => {
-    IssueStore.setSelectedQuickSearch({ assigneeFilterIds: value.length === 0 ? null : value });
-    IssueStore.loadIssues().then((res) => {
-      IssueStore.updateFiltedIssue({
-        current: res.number + 1,
-        pageSize: res.size,
-        total: res.totalElements,
-      }, res.content);
-    });
+    this.filterControler = new IssueFilterControler();
+    this.filterControler.assigneeFilterUpdate(value);
+    IssueStore.setLoading(true);
+    this.filterControler.update().then(
+      (res) => {
+        IssueStore.updateFiltedIssue({
+          current: res.number + 1,
+          pageSize: res.size,
+          total: res.totalElements,
+        }, res.content);
+      },
+    );
   };
 
+  // ExpandCssControler => 用于向 IssueTable 注入 CSS 样式
   render() {
     return (
       <Page
@@ -109,7 +153,9 @@ class Issue extends Component {
           <Button
             className="leftBtn"
             funcType="flat"
-            onClick={IssueStore.createQuestion(true)}
+            onClick={() => {
+              IssueStore.createQuestion(true);
+            }}
           >
             <Icon type="playlist_add icon" />
             <span>创建问题</span>
@@ -121,12 +167,7 @@ class Issue extends Component {
           <Button
             funcType="flat"
             onClick={() => {
-              IssueStore.loadCurrentSetting().then(
-                (res) => {
-                  IssueStore.setCurrentSetting(res);
-                },
-              ).catch((e) => {
-              });
+              this.Refresh();
             }}
           >
             <Icon type="refresh icon" />
@@ -149,7 +190,7 @@ class Issue extends Component {
               onQuickSearchChange={this.onQuickSearchChange}
               onAssigneeChange={this.onAssigneeChange}
             />
-            <IssueTable />
+            <IssueTable filterControler={this.filterControler} />
           </div>
           <ExpandWideCard />
           <CreateIssueModal />

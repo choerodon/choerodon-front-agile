@@ -6,6 +6,11 @@ import StatusTag from '../../../../components/StatusTag/StatusTag';
 import UserHead from '../../../../components/UserHead/UserHead';
 import PriorityTag from '../../../../components/PriorityTag/PriorityTag';
 
+/**
+ * 任务编号呈现
+ * @param props => text（任务编号信息）
+ * @returns React 函数式组件
+ */
 export function IssueNum(props) {
   const { text } = props;
   return (
@@ -17,18 +22,26 @@ export function IssueNum(props) {
   );
 }
 
+/**
+ * 任务类型呈现
+ * @param props => 任务类型对象
+ * @returns React 函数式组件
+ */
 export function TypeCode(props) {
   const { record } = props;
   return (
-    <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.issueTypeDTO.name}`}>
-      <TypeTag
-        data={record.issueTypeDTO}
-        showName={record.issueTypeDTO.name}
-      />
-    </Tooltip>
+    <TypeTag
+      data={record.issueTypeDTO}
+      showName={record.issueTypeDTO.name}
+    />
   );
 }
 
+/**
+ * 任务概要呈现
+ * @param props => 任务概要信息
+ * @returns React 函数式组件
+ */
 export function Summary(props) {
   const { text } = props;
   return (
@@ -40,6 +53,11 @@ export function Summary(props) {
   );
 }
 
+/**
+ * 任务优先级呈现
+ * @param props => 任务优先级对象
+ * @returns React 函数式组件
+ */
 export function Priority(props) {
   const { record } = props;
   return (
@@ -51,6 +69,11 @@ export function Priority(props) {
   );
 }
 
+/**
+ * 任务状态呈现
+ * @param props => 任务状态对象
+ * @returns React 函数式组件
+ */
 export function StatusName(props) {
   const { record } = props;
   return (
@@ -63,6 +86,11 @@ export function StatusName(props) {
   );
 }
 
+/**
+ * 任务经办人呈现
+ * @param props => 任务经办人对象，任务经办人信息
+ * @returns React 函数式组件
+ */
 export function Assignee(props) {
   const { text, record } = props;
   return (
@@ -81,6 +109,11 @@ export function Assignee(props) {
   );
 }
 
+/**
+ * 临近更新时间呈现
+ * @param props => 更新时间信息
+ * @returns React 函数式组件
+ */
 export function LastUpdateTime(props) {
   const { text } = props;
   return (
@@ -96,7 +129,9 @@ export function LastUpdateTime(props) {
 }
 
 /**
- * @return {null}
+ * 冲刺呈现
+ * @param props => 冲刺对象
+ * @returns React 函数式组件
  */
 export function Sprint(props) {
   const { record } = props;

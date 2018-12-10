@@ -1,138 +1,179 @@
 import {
   observable, action, computed, toJS,
 } from 'mobx';
-import { store, stores, axios } from 'choerodon-front-boot';
+import { store, stores } from 'choerodon-front-boot';
 
 const { AppState } = stores;
-const proId = AppState.currentMenuType.id;
-const orgId = AppState.currentMenuType.organizationId;
-
-let filter = {
-  advancedSearchArgs: {
-    statusId: [],
-    priorityId: [],
-    issueTypeId: [],
-  },
-  otherArgs: {
-    component: [],
-    epic: [],
-    issueIds: [],
-    label: [],
-    reporter: [],
-    summary: [],
-    version: [],
-  },
-  content: '',
-  quickFilterIds: [],
-  assigneeFilterIds: null,
-  searchArgs: {
-    assignee: '',
-    component: '',
-    epic: '',
-    issueNum: '',
-    sprint: '',
-    summary: '',
-    version: '',
-    updateStartDate: null,
-    updateEndDate: null,
-    createStartDate: null,
-    createEndDate: null,
-  },
-};
-
+// 当前跳转是否需要单选信息（跳转单个任务时使用）
 let paramIssueSelected = false;
-
 
 @store('SprintCommonStore')
 class SprintCommonStore {
+  // 任务信息
   @observable issues = [];
 
+  // 分页信息存取（默认信息）
   @observable pagination = {
+    current: 0,
+    pageSize: 10,
     total: 0,
   };
 
-  @observable filteredInfo = {};
+  // filter（请求对象）缓存
+  @observable filterMap = new Map([
+    [
+      'filter', {
+        advancedSearchArgs: {
+          statusId: [],
+          priorityId: [],
+          issueTypeId: [],
+        },
+        content: '',
+        quickFilterIds: [],
+        assigneeFilterIds: null,
+        otherArgs: {
+          component: [],
+          epic: [],
+          issueIds: [],
+          label: [],
+          reporter: [],
+          summary: [],
+          version: [],
+        },
+        searchArgs: {
+          assignee: '',
+          component: '',
+          epic: '',
+          issueNum: '',
+          sprint: '',
+          summary: '',
+          version: '',
+        },
+      },
+    ],
+    [
+      'paramFilter', {},
+    ],
+    [
+      'userFilter', {},
+    ],
+  ]);
 
-  @observable order = {
-    orderField: '',
-    orderType: '',
-  };
-
-  @observable paramObj = {};
-
+  // paramName 传入值，为项目跳转初始化 Table 的 Filter 名称
   @observable paramFilter = '';
 
+  // 控制 Table Filter 内容（必须是字符串，否则 Filter 内部的 Select 会出现问题）
   @observable barFilter = [];
 
-  @observable createFlag = false;
-
-  @observable loading = true;
-
-  @observable paramName = '';
-
-  @observable issuePriority = [];
-
-  @observable issueStatus = [];
-
-  @observable issueTypes = [];
-
+  // Table Filter 使用的筛选内容
   @observable columnFilter = new Map();
 
-  @observable barFilters = '';
+  // 当前加载状态
+  @observable loading = false;
 
-  @observable paramId = '';
+  // 创建问题窗口是否展开
+  @observable createFlag = false;
 
-  @observable quickSearch = [];
-
-  @observable issueTypes = [];
-
-  @observable priorities = [];
-
-  @observable defaultPriorityId = false;
-
-  @observable otherArgs = {};
-
-  @observable resolution = false;
-
-  @observable selectedIssue = {};
-
+  // 问题详情是否展开
   @observable expand = false;
 
-  @action initPram(data) {
-    if (data.paramType) {
-      filter.otherArgs[data.paramType] = data.paramId ? [data.paramId] : undefined;
+  // 当前选中 Issue 详细信息
+  @observable selectedIssue = {};
+
+  // 当前项目默认优先级（QuickCreate，CreateIssue 使用）
+  @observable defaultPriorityId = false;
+
+  // 项目优先级
+  @observable issuePriority = [];
+
+  // 项目状态
+  @observable issueStatus = [];
+
+  // 项目类型
+  @observable issueTypes = [];
+
+  /**
+   * 跳转至问题管理页时设定传入参数
+   * @param paramSelected => Boolean => 单个任务跳转
+   * @param paramName => String => 跳转时 paramName 信息
+   * @param paramUrl => String => 跳转时 Header 部分 Back 按钮需要的信息
+   */
+  @action initPram(paramSelected, paramName = null, paramUrl) {
+    paramIssueSelected = paramSelected;
+    this.paramUrl = paramUrl;
+    if (paramName) {
+      this.paramFilter = paramName;
+      this.barFilter = [paramName];
     }
-    if (data.paramIssueId) {
-      filter.otherArgs.issueIds = [data.paramIssueId.toString()];
-      paramIssueSelected = true;
+  }
+  /**
+   * 设置初始化信息
+   * @param res（loadCurrentSetting 返回数据）
+   */
+  @action setCurrentSetting(res) {
+    /* eslint-disable */
+    this.issueTypes = res[0];
+    this.issueStatus = res[1];
+    this.issuePriority = res[2];
+    this.tagData = res[3];
+    // 生成 Filter 单选项所需数据
+    this.columnFilter = new Map([
+      [
+        'typeId', this.issueTypes.map(item => ({
+        text: item.name,
+        value: item.id.toString(),
+      })),
+      ],
+      [
+        'statusId', this.issueStatus.map(item => ({
+        text: item.name,
+        value: item.id.toString(),
+      })),
+      ],
+      [
+        'priorityId', this.issuePriority.map(item => ({
+        text: item.name,
+        value: item.id.toString(),
+      })),
+      ],
+      [
+        'label', this.tagData.map(item => ({
+        text: item.labelName,
+        value: item.labelId.toString(),
+      }))
+      ],
+    ]);
+    // 设置 issue 信息
+    this.issues = res[4].content;
+    // 设置分页总数
+    this.pagination.total = res[4].totalElements;
+    // 当跳转为单任务时
+    if (paramIssueSelected === true) {
+      // 设置当前展开任务为请求返回第一项
+      this.selectedIssue = this.issues[0];
+      this.expand = true;
+      paramIssueSelected = false;
     }
-    filter.otherArgs.resolution = data.resolution;
-    this.paramObj = data;
+    // 退出 loading 状态
+    this.loading = false;
+    /* eslint-enable */
   }
 
-  @computed get getParamFilter() {
-    return toJS(this.paramFilter);
+  /**
+   * 重置 filterMap，与受控的 barFilter
+   * @param data => Map => 重置所需数据
+   */
+  @action reset(data) {
+    this.filterMap = data;
+    this.barFilter = [];
   }
 
-  @computed get getParam() {
-    return toJS(this.paramObj);
-  }
-
-  @computed get getColumnFilter() {
-    return toJS(this.columnFilter);
-  }
-
-  @action init() {
-    this.order = {
-      orderField: '',
-      orderType: '',
-    };
-    this.filter = {
-      advancedSearchArgs: {},
-      searchArgs: {},
-    };
-  }
-
+  /**
+   * 用于 Table 更新 ajax 请求对象时时重设数据
+   * @param pagination => Object => 分页对象
+   * @param data => issue 数据
+   * @param barFilters => 受控 Table Filter
+   */
   @action updateFiltedIssue(pagination, data, barFilters) {
     this.pagination = pagination;
     this.issues = data;
@@ -140,7 +181,28 @@ class SprintCommonStore {
     this.loading = false;
   }
 
+  @computed get getParamFilter() {
+    return toJS(this.paramFilter);
+  }
+
+  @computed get getColumnFilter() {
+    return toJS(this.columnFilter);
+  }
+
+  @action setFilterMap(data) {
+    this.filterMap = data;
+  }
+
+  @computed get getFilterMap() {
+    return toJS(this.filterMap);
+  }
+
+  @action setBarFilter(data) {
+    this.barFilter = data;
+  }
+
   @computed get getBarFilter() {
+    debugger;
     return toJS(this.barFilter);
   }
 
@@ -151,14 +213,6 @@ class SprintCommonStore {
 
   @computed get getIssues() {
     return toJS(this.issues);
-  }
-
-  @action setQuickSearch(data) {
-    this.quickSearch = data;
-  }
-
-  @computed get getQuickSearch() {
-    return toJS(this.quickSearch);
   }
 
   @action setIssueTypes(data) {
@@ -185,49 +239,6 @@ class SprintCommonStore {
     return toJS(this.issuePriority);
   }
 
-  @action setLabel(data) {
-    this.tagData = data;
-  }
-
-  @computed get getLabel() {
-    return toJS(this.tagData);
-  }
-
-  @action setSelectedQuickSearch(data) {
-    if (data) {
-      Object.assign(filter, data);
-    }
-  }
-
-  @action setPagination(data) {
-    this.pagination = data;
-  }
-
-  @action setFilter(data) {
-    this.filter = data;
-  }
-
-  setAdvArg(data) {
-    if (data) {
-      Object.assign(filter.advancedSearchArgs, data);
-    }
-  }
-
-  @action setOnlyStory(data) {
-    filter.advancedSearchArgs.issueTypeId.push(data);
-  }
-
-  setArg(data) {
-    if (data) {
-      Object.assign(filter.searchArgs, data);
-    }
-  }
-
-  @action setOrder(orderField, orderType) {
-    this.order.orderField = orderField;
-    this.order.orderType = orderType;
-  }
-
   @action setLoading(data) {
     this.loading = data;
   }
@@ -236,80 +247,13 @@ class SprintCommonStore {
     return toJS(this.loading);
   }
 
-  @action setBarFilters(data) {
-    Object.assign(filter, { content: data });
-  }
-
   @action createQuestion(data) {
+    debugger;
     this.createFlag = data;
   }
 
   @computed get getCreateQuestion() {
     return this.createFlag;
-  }
-
-
-  setOtherArgs(data) {
-    if (data) {
-      Object.assign(filter.otherArgs, data);
-    }
-  }
-
-  resetOtherArgs() {
-    Object.assign(filter.otherArgs, {
-      component: [],
-      epic: [],
-      issueIds: [],
-      label: [],
-      reporter: [],
-      summary: [],
-      version: [],
-    });
-  }
-
-  @action cleanSearchArgs() {
-    filter = {
-      advancedSearchArgs: {
-        statusId: [],
-        priorityId: [],
-        issueTypeId: [],
-      },
-      content: '',
-      quickFilterIds: [],
-      assigneeFilterIds: null,
-      otherArgs: {
-        component: [],
-        epic: [],
-        issueIds: [],
-        label: [],
-        reporter: [],
-        summary: [],
-        version: [],
-      },
-      searchArgs: {
-        assignee: '',
-        component: '',
-        epic: '',
-        issueNum: '',
-        sprint: '',
-        summary: '',
-        version: '',
-        updateStartDate: null,
-        updateEndDate: null,
-        createStartDate: null,
-        createEndDate: null,
-      },
-    };
-  }
-
-  @observable assigneeProps = [];
-
-  @computed get getAssigneeProps() {
-    return this.assigneeProps;
-  }
-
-  @action setAssigneeProps(data) {
-    this.assigneeProps = data;
   }
 
   @action setClickedRow(data) {
@@ -325,101 +269,25 @@ class SprintCommonStore {
     return toJS(this.expand);
   }
 
-  loadIssues(page = 0, size = 10, orderDTO = {}, barFilters) {
-    const { column } = orderDTO;
-    let { order = '' } = orderDTO;
-    if (order) {
-      order = order === 'ascend' ? 'asc' : 'desc';
-    }
-    if (this.paramFilter && barFilters[0] !== this.paramFilter) {
-      this.resetOtherArgs();
-    }
-    return axios.post(
-      `/agile/v1/projects/${AppState.currentMenuType.id}/issues/include_sub?organizationId=${AppState.currentMenuType.organizationId}&page=${page}&size=${size}`, filter, {
-        params: {
-          sort: `${column && order ? `${column.sorterId},${order}` : ''}`,
-        },
-      },
-    );
-  }
-
   @computed get getPagination() {
     return toJS(this.pagination);
   }
 
-  loadCurrentSetting() {
-    const loadType = axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_issue_types_with_sm_id?apply_type=agile`);
-    const loadStatus = axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_status_by_project_id?apply_type=agile`);
-    const loadPriorities = axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/priority/list_by_org`);
-    const loadLabel = axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_labels`);
-    const loadIssue = axios.post(
-      `/agile/v1/projects/${AppState.currentMenuType.id}/issues/include_sub?organizationId=${AppState.currentMenuType.organizationId}&page=${0}&size=${10}`, filter,
-    );
-    return Promise.all([loadType, loadStatus, loadPriorities, loadLabel, loadIssue]);
-  }
-
-  @action setCurrentSetting(res) {
-    /* eslint-disable */
-    this.issueTypes = res[0];
-    this.issueStatus = res[1];
-    this.issuePriority = res[2];
-    this.tagData = res[3];
-    this.columnFilter = new Map([
-      ['issueNum', []],
-      [
-        'typeId', this.issueTypes.map(item => ({
-        text: item.name,
-        value: item.id.toString(),
-      })),
-      ],
-      ['summary', []],
-      [
-        'statusId', this.issueStatus.map(item => ({
-        text: item.name,
-        value: item.id.toString(),
-      })),
-      ],
-      [
-        'priorityId', this.issuePriority.map(item => ({
-        text: item.name,
-        value: item.id.toString(),
-      })),
-      ],
-      ['reporterName', []],
-      ['assigneeName', []],
-      ['version', []],
-      ['sprint', []],
-      ['component', []],
-      ['epic', []],
-      ['issueId', []],
-      ['label', this.tagData.map(item => ({
-        text: item.labelName,
-        value: item.labelId.toString(),
-      }))],
-    ]);
-
-    this.issues = res[4].content;
-    this.pagination.total = res[4].totalElements;
-    if (paramIssueSelected === true) {
-      this.selectedIssue = this.issues[0];
-      this.expand = true;
-      paramIssueSelected = false;
-    }
-    this.paramUrl = this.paramObj.paramUrl;
-    this.paramFilter = this.paramObj.paramName ? decodeURI(this.paramObj.paramName) : null;
-    this.barFilter = this.paramFilter ? [this.paramFilter] : [];
+  /**
+   * 更新时所调用的用于设置数据的函数
+   * @param res
+   */
+  @action refreshTrigger(res) {
+    debugger;
+    this.issues = res.contents;
+    this.pagination.total = res.totalElements;
     this.loading = false;
-    /* eslint-enable */
   }
 
-  createIssue(issueObj, projectId = AppState.currentMenuType.id) {
-    const issue = {
-      projectId: proId,
-      ...issueObj,
-    };
-    return axios.post(`/agile/v1/projects/${projectId}/issue`, issue);
-  }
-
+  /**
+   * 用于根据 paramUrl 拼接返回原地址的 URL
+   * @returns URL => String => 跳转回源地址的 URL
+   */
   @computed get getBackUrl() {
     const urlParams = AppState.currentMenuType;
     if (!this.paramUrl) {
@@ -429,13 +297,6 @@ class SprintCommonStore {
     } else {
       return `/agile/${this.paramUrl}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`;
     }
-  }
-
-  @computed get getFilter() {
-    return {
-      ...filter,
-      otherArgs: this.otherArgs,
-    };
   }
 
   @computed get getDefaultPriorityId() {

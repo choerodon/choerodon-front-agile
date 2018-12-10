@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Table, Spin } from 'choerodon-ui';
+import { Table } from 'choerodon-ui';
 import { observer } from 'mobx-react';
 import { trace } from 'mobx';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
+import IssueFilterControler from '../IssueFilterControler';
 import {
   IssueNum, TypeCode, Summary, StatusName, Priority, Assignee, LastUpdateTime, Sprint,
 } from './IssueTableComponent';
@@ -12,6 +13,11 @@ import QuickCreateIssue from '../QuickCreateIssue/QuickCraeteIssue';
 
 @observer
 class IssueTable extends Component {
+  constructor(props) {
+    super(props);
+    this.filterControler = new IssueFilterControler();
+  }
+
   componentWillUnmount() {
     IssueStore.setClickedRow({
       selectedIssue: {},
@@ -19,24 +25,25 @@ class IssueTable extends Component {
     });
   }
 
-  // shouldComponentUpdate(nextProps, nextState, nextContext) {
-  //   debugger;
-  //   return true
-  // }
-
-  filterConvert = (filters) => {
+  /**
+   * @param filters => Object => Table 传入的 filter
+   * @param setArgs => function => 设置参数时需要调用的闭包函数
+   */
+  filterConvert = (filters, setArgs) => {
+    // 循环遍历 Object 中的每个键
     Object.keys(filters).forEach((key) => {
+      // 根据对应的 key 传入对应的 mode
       switch (key) {
         case 'statusId':
         case 'priorityId':
         case 'issueTypeId':
-          IssueStore.setAdvArg(filters);
+          setArgs('advArgs', filters);
           break;
         case 'label':
-          IssueStore.setOtherArgs(filters);
+          setArgs('otherArgs', filters);
           break;
         default:
-          IssueStore.setArg({
+          setArgs('searchArgs', {
             [key]: filters[key][0],
           });
           break;
@@ -44,18 +51,42 @@ class IssueTable extends Component {
     });
   };
 
-  barFilterConvert = (barFilters) => {
-    if (IssueStore.getParamFilter) {
-      barFilters.shift();
+  /**
+   *
+   * @param barFilters => Array => Table Filter 生成的 barFilter，模糊搜索和 filter 受控会使用到
+   * @param setArgs => function => 设置参数时会调用到的闭包函数
+   */
+  barFilterConvert = (barFilters, setArgs) => {
+    // 复制 Array
+    const temp = barFilters.slice();
+    // 如果 paramFilter 在当前 barFilter 中能找到，则不调用模糊搜索
+    if (barFilters.indexOf(IssueStore.getParamFilter) !== -1) {
+      temp.shift();
     }
-    IssueStore.setBarFilters(barFilters.join(''));
+    setArgs('content', {
+      content: temp.join(''),
+    });
   };
 
+  /**
+   * Table 默认的 filter 处理函数
+   * @param pagination => Object => 分页对象
+   * @param filters => Object => Table 筛选对象
+   * @param sorter => Object => 排序对象
+   * @param barFilters => Object => filter 受控对象
+   */
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
-    this.filterConvert(filters);
-    this.barFilterConvert(barFilters);
+    const setArgs = this.filterControler.initArgsFilter();
+    this.filterConvert(filters, setArgs);
+    this.barFilterConvert(barFilters, setArgs);
     IssueStore.setLoading(true);
-    IssueStore.loadIssues(pagination.current - 1, pagination.pageSize, sorter, barFilters).then(
+    // 更新函数
+    this.filterControler.update(
+      pagination.current - 1,
+      pagination.pageSize,
+      sorter,
+      barFilters,
+    ).then(
       (res) => {
         IssueStore.updateFiltedIssue({
           current: res.number + 1,
@@ -67,6 +98,7 @@ class IssueTable extends Component {
   };
 
   render() {
+    // Table 列配置
     const columns = [
       {
         title: '任务编号',
@@ -76,7 +108,7 @@ class IssueTable extends Component {
         sorterId: 'issueId',
         disableClick: true,
         sorter: true,
-        filters: IssueStore.getColumnFilter.get('issueNum'),
+        filters: [],
         render: (text, record) => <IssueNum text={text} />,
       },
       {
@@ -96,7 +128,7 @@ class IssueTable extends Component {
         className: 'summary',
         key: 'summary',
         disableClick: true,
-        filters: IssueStore.getColumnFilter.get('summary'),
+        filters: [],
         render: text => <Summary text={text} />,
       },
       {
@@ -129,14 +161,14 @@ class IssueTable extends Component {
         disableClick: true,
         sorterId: 'assigneeId',
         sorter: true,
-        filters: IssueStore.getColumnFilter.get('assigneeName'),
+        filters: [],
         render: (text, record) => <Assignee text={text} record={record} />,
       },
       {
         title: '报告人',
         dataIndex: 'reporterName',
         key: 'reporter',
-        filters: IssueStore.getColumnFilter.get('reporterName'),
+        filters: [],
         hidden: true,
       },
       {
@@ -150,7 +182,7 @@ class IssueTable extends Component {
       },
       {
         title: '版本',
-        filters: IssueStore.getColumnFilter.get('versionIssueRelDTOS'),
+        filters: [],
         key: 'version',
         hidden: true,
       },
@@ -158,20 +190,20 @@ class IssueTable extends Component {
         title: '冲刺',
         key: 'sprint',
         className: 'sprint',
-        filters: IssueStore.getColumnFilter.get('sprint'),
+        filters: [],
         render: (text, record) => <Sprint text={text} record={record} />,
       },
       {
         title: '模块',
         key: 'component',
-        filters: IssueStore.getColumnFilter.get('component'),
+        filters: [],
         hidden: true,
       },
       {
         title: '史诗',
         dataIndex: 'epicName',
         key: 'epic',
-        filters: IssueStore.getColumnFilter.get('epic'),
+        filters: [],
         hidden: true,
       },
       {
@@ -208,6 +240,7 @@ class IssueTable extends Component {
         className="c7n-Issue-table"
         onRow={record => ({
           onClick: (e) => {
+            // 点击时设置当前点击元素 style
             e.currentTarget.style.background = 'rgba(140, 158, 255, 0.08)';
             e.currentTarget.style.borderLeft = '3px solid #3f51b5';
             IssueStore.setClickedRow({
@@ -216,6 +249,7 @@ class IssueTable extends Component {
             });
           },
           onBlur: (e) => {
+            // 失焦时设置当前点击元素 style
             e.currentTarget.style.background = 'none';
             e.currentTarget.style.borderLeft = 'none';
           },

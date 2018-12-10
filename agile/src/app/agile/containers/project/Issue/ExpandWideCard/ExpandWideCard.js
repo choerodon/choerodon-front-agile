@@ -3,9 +3,11 @@ import { observer } from 'mobx-react';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import EditIssue from '../../../../components/EditIssueWide';
 import { loadIssue } from '../../../../api/NewIssueApi';
+import IssueFilterControler from '../IssueFilterControler';
 
 @observer
 class ExpandWideCard extends Component {
+  // 更新 Issue 时
   handleIssueUpdate = (issueId) => {
     const selectedIssue = IssueStore.getSelectedIssue;
     let Id;
@@ -22,6 +24,7 @@ class ExpandWideCard extends Component {
         versionIssueRelDTOS: res.versionIssueRelDTOList,
       };
       const originIssues = new Map(IssueStore.getIssues.map(item => [item.issueId, item]));
+      // 修改部分被更改过的 issue 数据
       originIssues.set(res.issueId, obj);
       IssueStore.setIssues(Array.from(originIssues.values()));
     });
@@ -53,13 +56,19 @@ class ExpandWideCard extends Component {
               expand: false,
               selectedIssue: {},
             });
-            IssueStore.init();
-            IssueStore.loadIssues();
+            const filterControler = new IssueFilterControler();
+            filterControler.refresh('refresh').then((res) => {
+              IssueStore.refreshTrigger(res);
+              Promise.resolve();
+            });
           }}
           onUpdate={this.handleIssueUpdate.bind(this)}
           onCopyAndTransformToSubIssue={() => {
-            const { current, pageSize } = IssueStore.pagination;
-            IssueStore.loadIssues(current - 1, pageSize);
+            const filterControler = new IssueFilterControler();
+            filterControler.refresh('refresh').then((res) => {
+              IssueStore.refreshTrigger(res);
+              Promise.resolve();
+            });
           }}
         />
       </div>

@@ -82,6 +82,7 @@ class CreateIssue extends Component {
 
   handleCreateIssue = () => {
     const { form, store } = this.props;
+    debugger;
     const {
       originComponents,
       originLabels,
@@ -168,6 +169,7 @@ class CreateIssue extends Component {
     };
     createIssue(data)
       .then((res) => {
+        debugger;
         if (fileList.length > 0) {
           const config = {
             issueType: res.statusId,
@@ -182,6 +184,7 @@ class CreateIssue extends Component {
         onOk(res);
       })
       .catch(() => {
+        debugger;
         onOk();
       });
   };

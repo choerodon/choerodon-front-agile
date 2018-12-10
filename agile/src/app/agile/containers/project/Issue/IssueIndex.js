@@ -13,7 +13,7 @@ const issueHome = asyncRouter(() => (import('./Issue')));
 const IssueIndex = ({ match }) => (
   <Switch>
     <Route exact path={match.url} component={issueHome} />
-    <Route path={'*'} component={nomatch} />
+    <Route path="*" component={nomatch} />
   </Switch>
 );
 export default IssueIndex;
