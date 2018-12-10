@@ -17,6 +17,72 @@ class StatusBodyColumn extends Component {
     this.state = {};
   }
 
+  getDisplayIssues = (data) => {
+    const {
+      parentId, assigneeId, epicId,
+    } = this.props;
+    const result = [];
+    const parentIds = [];
+    if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      for (let index = 0, len = ScrumBoardStore.getParentIds.length; index < len; index += 1) {
+        parentIds.push(ScrumBoardStore.getParentIds[index].issueId);
+      }
+      if (!parentId) {
+        const parentIssueBoardData = ScrumBoardStore.getBoardParentIssueId;
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (!parentIssueBoardData.has(data[index].parentIssueId)) {
+            if (_.indexOf(parentIds, data[index].issueId) === -1) {
+              result.push(data[index]);
+            }
+          }
+        }
+      } else {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (data[index].parentIssueId === parentId) {
+            result.push(data[index]);
+          }
+        }
+      }
+    } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
+      if (assigneeId) {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (data[index].assigneeId) {
+            if (data[index].assigneeId === assigneeId) {
+              result.push(data[index]);
+            }
+          }
+        }
+      } else {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (!data[index].assigneeId) {
+            result.push(data[index]);
+          }
+        }
+      }
+    } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      if (epicId) {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (data[index].epicId) {
+            if (data[index].epicId === epicId) {
+              result.push(data[index]);
+            }
+          }
+        }
+      } else {
+        for (let index = 0, len = data.length; index < len; index += 1) {
+          if (!data[index].epicId) {
+            result.push(data[index]);
+          }
+        }
+      }
+    } else {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        result.push(data[index]);
+      }
+    }
+    return result;
+  };
+
   renderIssues(subStatuse, clickItem) {
     const {
       issues,
@@ -29,8 +95,8 @@ class StatusBodyColumn extends Component {
     const {
       parentId, data: paramData, assigneeId, epicId,
     } = this.props;
-    let data = issues;
-    data = _.orderBy(data, ['rank'], 'desc');
+    const data = issues;
+    // data = _.orderBy(data, ['rank'], 'desc');
     // data = _.sortBy(data, o => o.rank);
     const result = [];
     const parentIds = [];
@@ -543,6 +609,7 @@ class StatusBodyColumn extends Component {
               assigneeId,
               epicId,
               categoryCode,
+              issues: this.getDisplayIssues(subStatuses[index].issues),
             })
           }
         >

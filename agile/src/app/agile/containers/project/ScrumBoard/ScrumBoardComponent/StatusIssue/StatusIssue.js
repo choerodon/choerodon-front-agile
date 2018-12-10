@@ -322,7 +322,8 @@ class StatusIssue extends Component {
     const {
       isCompleted, statusName, categoryCode, swimLaneCode, statusId,
     } = this.props;
-    if (this.renderSubDisplay(item, type) === 'block') {
+    // 子任务和父任务分离显示！
+    if (true || this.renderSubDisplay(item, type) === 'block') {
       return (
         <div
           key={item.issueId}
@@ -515,7 +516,8 @@ class StatusIssue extends Component {
             }
           </Draggable>
           {
-             !type && swimLaneCode === 'assignee' ? this.getChildren() : ''
+            // 父子任务分离显示
+            // !type && swimLaneCode === 'assignee' ? this.getChildren() : ''
           }
         </div>
       );

@@ -48,7 +48,7 @@ class Issue extends Component {
   }
 
   GetRequest = (url) => {
-    const reg = /(?<=[?&])param[^=]+=[^&?\n]*/g;
+    const reg = '/(?<=[?&])param[^=]+=[^&?\n]*/g';
     const ret = {};
     url.match(reg).forEach((paramObj) => {
       const [paramKey, paramValue] = paramObj.split('=');
