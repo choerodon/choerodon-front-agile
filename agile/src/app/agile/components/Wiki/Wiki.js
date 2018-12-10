@@ -155,6 +155,10 @@ class Wiki extends Component {
           createLoading: false,
         });
       });
+    } else {
+      this.setState({
+        createLoading: false,
+      });
     }
   };
 

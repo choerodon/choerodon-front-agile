@@ -1691,6 +1691,18 @@ class CreateSprint extends Component {
                 />
               </li>
             </Tooltip>
+            <Tooltip placement="right" title="Wiki文档">
+              <li id="COMMENT-nav" className={`c7n-li ${nav === 'wiki' ? 'c7n-li-active' : ''}`}>
+                <Icon
+                  type="library_books c7n-icon-li"
+                  role="none"
+                  onClick={() => {
+                    this.setState({ nav: 'wiki' });
+                    this.scrollToAnchor('wiki');
+                  }}
+                />
+              </li>
+            </Tooltip>
             <Tooltip placement="right" title="评论">
               <li
                 id="ATTACHMENT-nav"
