@@ -403,6 +403,7 @@ class ScrumBoardStore {
 
   updateIssue(
     issueId, objectVersionNumber, endStatusId, boardId, originColumnId, columnId, transformId,
+    before, outsetIssueId, sprintId, rank,
   ) {
     const proId = AppState.currentMenuType.id;
     const data = {
@@ -412,6 +413,10 @@ class ScrumBoardStore {
       boardId,
       originColumnId,
       columnId,
+      before,
+      outsetIssueId,
+      sprintId,
+      rank,
     };
     return axios.post(`/agile/v1/projects/${proId}/board/issue/${issueId}/move?transformId=${transformId}`, data);
   }
