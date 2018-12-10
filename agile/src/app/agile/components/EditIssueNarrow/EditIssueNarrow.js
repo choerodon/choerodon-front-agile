@@ -1565,6 +1565,18 @@ class CreateSprint extends Component {
                 />
               </li>
             </Tooltip>
+            <Tooltip placement="right" title="Wiki文档">
+              <li id="COMMENT-nav" className={`c7n-li ${nav === 'wiki' ? 'c7n-li-active' : ''}`}>
+                <Icon
+                  type="library_books c7n-icon-li"
+                  role="none"
+                  onClick={() => {
+                    this.setState({ nav: 'wiki' });
+                    this.scrollToAnchor('wiki');
+                  }}
+                />
+              </li>
+            </Tooltip>
             <Tooltip placement="right" title="评论">
               <li id="ATTACHMENT-nav" className={`c7n-li ${nav === 'commit' ? 'c7n-li-active' : ''}`}>
                 <Icon
@@ -2256,8 +2268,9 @@ class CreateSprint extends Component {
                           <span className="c7n-property">
 
 
+
                             修复的版本：
-                          </span>
+</span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -2589,10 +2602,12 @@ class CreateSprint extends Component {
                           />
                           <span>
                             {this.getWorkloads()}
+
                             小时/
-                            {this.getWorkloads() + (origin.remainingTime || 0)}
+{this.getWorkloads() + (origin.remainingTime || 0)}
+
                             小时
-                          </span>
+</span>
                           <span
                             role="none"
                             style={{
