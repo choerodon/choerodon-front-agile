@@ -3,10 +3,11 @@ import { observer } from 'mobx-react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
+import { trace } from 'mobx';
 import {
-  Button, Table, Select, Icon, Spin, 
+  Button, Table, Select, Icon, Spin,
 } from 'choerodon-ui';
 // import pic from './no_sprint.svg';
 import pic from '../../../../../assets/image/emptyChart.svg';
@@ -16,7 +17,7 @@ import EmptyBlock from '../../../../../components/EmptyBlock';
 import './VelocityChart.scss';
 
 const { AppState } = stores;
-const Option = Select.Option;
+const { Option } = Select;
 let backUrl;
 
 @observer
@@ -34,11 +35,13 @@ class VelocityChart extends Component {
     this.setState({
       linkFromParamUrl,
     });
-
     VS.setCurrentUnit('story_point');
+    VS.loadChartAndTableData();
+  }
+
+  componentWillUnmount() {
     VS.setChartData([]);
     VS.setTableData([]);
-    VS.loadChartAndTableData();
   }
 
   GetRequest(url) {
@@ -374,13 +377,8 @@ class VelocityChart extends Component {
                       );
                     }}
                   >
-
-
-
-
-
                     待办事项
-                                    </span>
+                  </span>
                   <span>中创建一个冲刺</span>
                 </div>
 )}
