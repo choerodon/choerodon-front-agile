@@ -106,6 +106,7 @@ class SprintCommonStore {
       this.barFilter = [paramName];
     }
   }
+
   /**
    * 设置初始化信息
    * @param res（loadCurrentSetting 返回数据）
@@ -202,7 +203,6 @@ class SprintCommonStore {
   }
 
   @computed get getBarFilter() {
-    debugger;
     return toJS(this.barFilter);
   }
 
@@ -248,7 +248,6 @@ class SprintCommonStore {
   }
 
   @action createQuestion(data) {
-    debugger;
     this.createFlag = data;
   }
 
@@ -278,7 +277,6 @@ class SprintCommonStore {
    * @param res
    */
   @action refreshTrigger(res) {
-    debugger;
     this.issues = res.contents;
     this.pagination.total = res.totalElements;
     this.loading = false;
