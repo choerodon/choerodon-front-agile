@@ -58,9 +58,11 @@ class UserHead extends Component {
                 user.avatar ? (
                   <img src={user.avatar} alt="" style={{ width: '100%' }} />
                 ) : (
-                  <span style={{
-                    width: 40, height: 40, lineHeight: '40px', textAlign: 'center', color: '#fff', fontSize: '12px',
-                  }}
+                  <span
+                    style={{
+                      width: 40, height: 40, lineHeight: '40px', textAlign: 'center', color: '#fff', fontSize: '12px',
+                    }}
+                    className="user-Head-Title"
                   >
                     {this.getFirst(user.realName)}
                   </span>

@@ -1,8 +1,19 @@
+@media (max-width: 1600px) {
+  .c7n-Issue-summary {
+    width: 180px !important;
+  }
+}
 .c7n-content-issue {
   width: 100%;
 }
+
+@keyframes slidein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 .c7n-Issue-expand + .c7n-content-issue {
   width: 36%;
+  animation: 1s slidein;
   .c7n-typeTag {
     .name {
       display: none;
@@ -24,12 +35,14 @@
       display: block;
       padding: 0 4px;
     }
+
     tr {
       display: flex;
       flex-wrap: wrap;
       height: 64px;
       padding: 10px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      animation: 0.5s slidein;
     }
     tbody {
       tr:hover {
@@ -74,6 +87,7 @@
   }
   .assignee {
     order: 5;
+    width: 128px;
   }
 }
 
@@ -81,6 +95,10 @@
   display: flex;
   padding: 0;
   width: 100%;
+  animation: 0.5s slidein;
+  .ant-table-tbody > tr > td {
+    transition: none;
+  }
   &-advsearch {
     &-title {
       padding-left: 7px;
@@ -158,7 +176,8 @@
     }
   }
   &-summary {
-    width: 300px;
+    width: auto;
+    font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

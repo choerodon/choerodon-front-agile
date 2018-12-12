@@ -11,7 +11,6 @@ import IssueFilterControler from "../IssueFilterControler";
 class CreateIssueModal extends Component {
   // 点击创建时触发
   handleCreateIssue = (issueObj) => {
-    debugger;
     IssueStore.createQuestion(false);
     this.filterControler = new IssueFilterControler();
     this.filterControler.resetCacheMap();
