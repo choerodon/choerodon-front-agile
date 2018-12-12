@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   flex-grow: 1;
-  height: 44px;
+  height: 48px;
   p {
     margin-bottom: 0;
     margin-right: 16px;
@@ -67,6 +67,7 @@
     // antd Select 组件覆盖
     .ant-select-selection--multiple {
       cursor: pointer;
+      padding: 3px 0 3px 5px;
       .ant-select-selection__rendered {
         margin-bottom: 0;
         li {
