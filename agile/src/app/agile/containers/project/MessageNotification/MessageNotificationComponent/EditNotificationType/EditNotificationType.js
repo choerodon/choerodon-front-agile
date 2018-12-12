@@ -125,7 +125,6 @@ class EditNotificationType extends Component {
                 .then((res) => {
                   this.setState({
                     userOptionsLoading: false,
-                    // userOptions: param ? res.content : [...(_.map(_.union(_.map(res.content, JSON.stringify), _.map(_.filter(userOptions, 'id'), JSON.stringify)), JSON.parse)), ...userOptionsWithUserId], 
                     userOptions: param ? res.content : [...res.content, ...userOptionsWithUserId], 
                     // 如果搜索条件为空，就把为空时搜出来的20条与之前有userId的数据进行拼接，保证已被选中但不在20条之内的数据显示出来
                   });
@@ -143,8 +142,7 @@ class EditNotificationType extends Component {
             autoFocus
           >
             {
-              // userOptions && _.map(userOptions, item => <Option key={item.id} value={item.id}>{`${item.loginName} ${item.realName}`}</Option>)
-              userOptions && _.map(userOptions, item => <Option key={item.id ? item.id : item.userId} value={item.id ? item.id : item.userId}>{item.loginName ? `${item.loginName}${item.realName}` : item.name}</Option>)
+              userOptions && _.map(userOptions.filter(u => u.enabled), item => <Option key={item.id ? item.id : item.userId} value={item.id ? item.id : item.userId}>{item.loginName ? `${item.loginName}${item.realName}` : item.name}</Option>)
             }
           </Select>
         ) : ''),

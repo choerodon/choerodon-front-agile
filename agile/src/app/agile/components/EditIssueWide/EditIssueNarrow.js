@@ -227,13 +227,13 @@ class CreateSprint extends Component {
 
   componentDidMount() {
     const { onRef, issueId } = this.props;
-    const { nav } = this.state;
     if (onRef) {
       onRef(this);
     }
     this.reloadIssue(issueId);
     document.getElementById('scroll-area').addEventListener('scroll', (e) => {
       if (sign) {
+        const { nav } = this.state;
         const currentNav = this.getCurrentNav(e);
         if (nav !== currentNav && currentNav) {
           this.setState({
@@ -249,20 +249,6 @@ class CreateSprint extends Component {
       .catch((e) => {
         // console.log(e);
       });
-
-    // axios.post('/iam/v1/permissions/checkPermission', [
-    //   {
-    //     code: 'agile-service.project-info.updateProjectInfo',
-    //     organizationId: 4,
-    //     projectId: 28,
-    //     resourceType: 'project',
-    //   }])
-    //   .then((res) => {
-    //     this.setState({
-    //       hasPermission: res.find(item => item.code
-    // === 'agile-service.project-info.updateProjectInfo').approve,
-    //     });
-    //   });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -312,12 +298,13 @@ class CreateSprint extends Component {
     const { issueTypeDTO } = this.state;
     let eles;
     if (issueTypeDTO && issueTypeDTO.typeCode === 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'data_log', 'branch'];
+      eles = ['detail', 'des', 'attachment', 'wiki', 'commit', 'log', 'data_log', 'branch'];
     } else {
       eles = [
         'detail',
         'des',
         'attachment',
+        'wiki',
         'commit',
         'log',
         'data_log',
@@ -3081,7 +3068,7 @@ class CreateSprint extends Component {
                                   this.setState({ reporterId: value });
                                 }}
                               >
-                                {originUsers.map(user => (
+                                {originUsers.filter(u => u.enabled).map(user => (
                                   <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                     <div
                                       style={{
