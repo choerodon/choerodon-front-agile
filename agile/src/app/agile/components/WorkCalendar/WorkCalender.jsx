@@ -123,6 +123,8 @@ class WorkCalendar extends Component {
         holidayTag = workDate[0].status === 0 ? <span className="tag tag-work" style={{ background: 'none' }}>休</span> : <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
       } else if (selectDay.length) {
         holidayTag = selectDay[0].status === 0 ? <span className="tag tag-work" style={{ background: 'none' }}>休</span> : <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
+      } else if (isWeekDay) {
+        holidayTag = <span className="tag tag-work" style={{ background: 'none' }}>休</span>;
       } else {
         holidayTag = <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
       }

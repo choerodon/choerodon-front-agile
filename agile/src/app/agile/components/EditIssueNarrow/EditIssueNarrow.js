@@ -174,13 +174,13 @@ class CreateSprint extends Component {
 
   componentDidMount() {
     const { onRef, issueId } = this.props;
-    const { nav } = this.state;
     if (onRef) {
       onRef(this);
     }
     this.reloadIssue(issueId);
     document.getElementById('scroll-area').addEventListener('scroll', (e) => {
       if (sign) {
+        const { nav } = this.state;
         const currentNav = this.getCurrentNav(e);
         if (nav !== currentNav && currentNav) {
           this.setState({
@@ -194,20 +194,6 @@ class CreateSprint extends Component {
         loginUserId = data.id;
       })
       .catch((e) => {});
-
-    // axios.post('/iam/v1/permissions/checkPermission', [
-    //   {
-    //     code: 'agile-service.project-info.updateProjectInfo',
-    //     organizationId: 4,
-    //     projectId: 28,
-    //     resourceType: 'project',
-    //   }])
-    //   .then((res) => {
-    //     this.setState({
-    //       hasPermission: res.find(item => item.code ===
-    // 'agile-service.project-info.updateProjectInfo').approve,
-    //     });
-    //   });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -241,9 +227,9 @@ class CreateSprint extends Component {
     const { issueTypeDTO } = this.state;
     let eles;
     if (issueTypeDTO && issueTypeDTO.typeCode === 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'branch'];
+      eles = ['detail', 'des', 'attachment', 'wiki', 'commit', 'log', 'branch'];
     } else {
-      eles = ['detail', 'des', 'attachment', 'commit', 'log', 'sub_task', 'link_task', 'branch'];
+      eles = ['detail', 'des', 'attachment', 'wiki', 'commit', 'log', 'sub_task', 'link_task', 'branch'];
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
@@ -2741,7 +2727,7 @@ class CreateSprint extends Component {
                                 this.setState({ reporterId: value });
                               }}
                             >
-                              {originUsers.map(user => (
+                              {originUsers.filter(u => u.enabled).map(user => (
                                 <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                     <UserHead
@@ -2846,7 +2832,7 @@ class CreateSprint extends Component {
                                 this.setState({ assigneeId: value });
                               }}
                             >
-                              {originUsers.map(user => (
+                              {originUsers.filter(u => u.enabled).map(user => (
                                 <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                   <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                     <UserHead

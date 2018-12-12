@@ -28,7 +28,7 @@ class CreateIssue extends Component {
     this.setState({ selectLoading: true });
     getUsers(input).then((res) => {
       this.setState({
-        originUsers: res.content,
+        originUsers: res.content.filter(u => u.enabled),
         selectLoading: false,
       });
     });
@@ -66,7 +66,7 @@ class CreateIssue extends Component {
       });
       getUsers(input).then((res) => {
         this.setState({
-          originUsers: res.content,
+          originUsers: res.content.filter(u => u.enabled),
           selectLoading: false,
         });
       });

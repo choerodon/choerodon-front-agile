@@ -31,7 +31,7 @@ class AddComponent extends Component {
       });
       getUsers(input).then((res) => {
         this.setState({
-          originUsers: res.content,
+          originUsers: res.content.filter(u => u.enabled),
           selectLoading: false,
         });
       });
@@ -47,7 +47,7 @@ class AddComponent extends Component {
     });
     getUsers(input).then((res) => {
       this.setState({
-        originUsers: res.content,
+        originUsers: res.content.filter(u => u.enabled),
         selectLoading: false,
       });
     });

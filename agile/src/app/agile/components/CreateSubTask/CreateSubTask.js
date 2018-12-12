@@ -305,7 +305,7 @@ class CreateSubIssue extends Component {
                   allowClear
                   onFilterChange={this.onFilterChange.bind(this)}
                 >
-                  {this.state.originUsers.map(user =>
+                  {this.state.originUsers.filter(u => u.enabled).map(user =>
                     (<Option key={user.id} value={user.id}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                         <UserHead
