@@ -947,12 +947,16 @@ class SprintItem extends Component {
                     <div
                       style={{
                         display: 'flex',
-                        alignItems: 'center',
-                        minWidth: '480px',
+                        alignItems: 'flex-start',
+                        minWidth: '100px',
                         justifyContent: 'flex-end',
                       }}
                     >
-                      <p>冲刺目标：</p>
+                      <p 
+                        style={{ whiteSpace: 'nowrap' }}
+                      >
+                        {'冲刺目标：'}
+                      </p>
                       <EasyEdit
                         type="input"
                         width={200}

@@ -35,7 +35,6 @@ class PriorityTag extends Component {
   }
 
   render() {
-    debugger;
     const { priority } = this.props;
     return (
       <div
