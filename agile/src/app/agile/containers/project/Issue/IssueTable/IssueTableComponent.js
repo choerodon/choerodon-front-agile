@@ -56,7 +56,6 @@ export function Summary({ text }) {
  * @returns React 函数式组件
  */
 export function Priority({ record }) {
-  debugger;
   return (
     <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityDTO ? record.priorityDTO.name : ''}`}>
       <PriorityTag

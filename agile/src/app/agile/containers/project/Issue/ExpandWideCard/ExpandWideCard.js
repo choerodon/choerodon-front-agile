@@ -34,7 +34,7 @@ class ExpandWideCard extends Component {
     return IssueStore.getExpand ? (
       <div
         style={{
-          width: '64%',
+          width: IssueStore.getExpand ? '64%' : 0,
           display: 'block',
           overflow: 'hidden',
           height: 'calc(100vh - 106px)',

@@ -11,6 +11,7 @@ import EmptyBlock from '../../../../components/EmptyBlock';
 import pic from '../../../../assets/image/emptyIssue.svg';
 import QuickCreateIssue from '../QuickCreateIssue/QuickCraeteIssue';
 
+let previousClick = false;
 @observer
 class IssueTable extends Component {
   constructor(props) {
@@ -106,6 +107,7 @@ class IssueTable extends Component {
         key: 'issueNum',
         className: 'issueId',
         sorterId: 'issueId',
+        width: 128,
         sorter: true,
         filters: [],
         render: text => <IssueNum text={text} />,
@@ -115,6 +117,7 @@ class IssueTable extends Component {
         key: 'issueTypeId',
         className: 'issueType',
         sorterId: 'issueTypeId',
+        width: 128,
         sorter: true,
         filters: IssueStore.getColumnFilter.get('typeId'),
         filterMultiple: true,
@@ -133,6 +136,7 @@ class IssueTable extends Component {
         key: 'statusId',
         className: 'status',
         sorterId: 'statusId',
+        width: 128,
         sorter: true,
         filters: IssueStore.getColumnFilter.get('statusId'),
         filterMultiple: true,
@@ -144,6 +148,7 @@ class IssueTable extends Component {
         className: 'priority',
         sorterId: 'priorityId',
         sorter: true,
+        width: 108,
         filters: IssueStore.getColumnFilter.get('priorityId'),
         filterMultiple: true,
         render: (text, record) => <Priority record={record} />,
@@ -152,6 +157,7 @@ class IssueTable extends Component {
         title: '经办人',
         dataIndex: 'assigneeName',
         className: 'assignee',
+        width: 168,
         key: 'assignee',
         sorterId: 'assigneeId',
         sorter: true,
@@ -162,6 +168,7 @@ class IssueTable extends Component {
         title: '冲刺',
         key: 'sprint',
         className: 'sprint',
+        width: 128,
         filters: [],
         render: (text, record) => <Sprint text={text} record={record} />,
       },
@@ -171,6 +178,7 @@ class IssueTable extends Component {
         className: 'lastUpdateDate',
         key: 'lastUpdateDate',
         sorterId: 'lastUpdateDate',
+        width: '142px',
         sorter: true,
         render: text => <LastUpdateTime text={text} />,
       },
@@ -240,17 +248,24 @@ class IssueTable extends Component {
         onRow={record => ({
           onClick: (e) => {
             // 点击时设置当前点击元素 style
+            if (previousClick) {
+              // 如果上一次点击过，就清空 previousClick 中保存的 style
+              previousClick.style.background = '';
+              previousClick.style.borderLeft = '';
+            }
             e.currentTarget.style.background = 'rgba(140, 158, 255, 0.08)';
             e.currentTarget.style.borderLeft = '3px solid #3f51b5';
+            // 将这次的点击元素设置为 previousClick 供下次使用
+            previousClick = e.currentTarget;
             IssueStore.setClickedRow({
               selectedIssue: record,
               expand: true,
             });
           },
           onBlur: (e) => {
-            // 失焦时设置当前点击元素 style
-            e.currentTarget.style.background = 'none';
-            e.currentTarget.style.borderLeft = 'none';
+            // 点击隐藏详情时无法触发 onClick，所以需要利用 onBlur 触发
+            e.currentTarget.style.background = '';
+            e.currentTarget.style.borderLeft = '';
           },
         })
           }
