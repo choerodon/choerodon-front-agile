@@ -337,8 +337,8 @@ class UserMapStore {
       });
   };
 
-  loadIssues = (pageType) => {
-    this.setIsLoading(true);
+  loadIssues = (pageType, isLoading = true) => {
+    this.setIsLoading(isLoading);
     // let url = '';
     // if (this.currentFilters.includes('mine')) {
     //   url += `&assigneeId=${AppState.getUserId}`;
@@ -554,10 +554,10 @@ class UserMapStore {
   handleMoveIssue = (data, type = 'userMap') => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/move`, data)
     .then((res) => {
       if (type === 'userMap' && this.showBackLog) {
-        this.loadIssues('usermap');
+        this.loadIssues('usermap', false);
         this.loadBacklogIssues();
       } else if (type === 'userMap' && !this.showBackLog) {
-        this.loadIssues('usermap');
+        this.loadIssues('usermap', false);
       } else {
         this.loadBacklogIssues();
       }
