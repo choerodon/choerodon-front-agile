@@ -226,7 +226,7 @@ class IterationType extends Component {
     return (
       <div className="c7n-iterationType-chart">
         <ReactEcharts 
-          style={{ height: 226 }}
+          style={{ height: 227 }}
           option={this.getOption()}
         />
       </div>
