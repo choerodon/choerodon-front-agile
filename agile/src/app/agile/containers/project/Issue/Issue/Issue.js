@@ -42,12 +42,11 @@ class Issue extends Component {
    * 处理传入的 Param（如果有的话）
    * 利用 filterControler 类中的 refresh 方法发出初始化请求（包含优先级，状态，类型，标签数据）
    */
-  componentWillMount() {
+  componentDidMount() {
     const { location } = this.props;
     if (location.search.indexOf('param') !== -1) {
       this.filterControler.paramConverter(location.search);
     }
-    IssueStore.setLoading(true);
     this.filterControler.refresh('init').then((data) => {
       if (data.failed) {
         Choerodon.prompt(data.message);
@@ -74,8 +73,12 @@ class Issue extends Component {
   Refresh = () => {
     this.filterControler = new IssueFilterControler();
     IssueStore.setLoading(true);
-    this.filterControler.refresh('refresh').then((res) => {
-      IssueStore.refreshTrigger(res);
+    this.filterControler.refresh('refresh').then((data) => {
+      if (data.failed) {
+        Choerodon.prompt(data.message);
+      } else {
+        IssueStore.refreshTrigger(data);
+      }
     });
   }
 

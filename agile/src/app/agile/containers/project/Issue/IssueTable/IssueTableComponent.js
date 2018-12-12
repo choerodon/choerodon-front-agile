@@ -11,10 +11,9 @@ import PriorityTag from '../../../../components/PriorityTag/PriorityTag';
  * @param props => text（任务编号信息）
  * @returns React 函数式组件
  */
-export function IssueNum(props) {
-  const { text } = props;
+export function IssueNum({ text }) {
   return (
-    <Tooltip mouseEnterDelay={0.5} title={`任务编号： ${text}`}>
+    <Tooltip mouseEnterDelay={0.5} title={`问题编号： ${text}`}>
       <a>
         {text}
       </a>
@@ -27,8 +26,7 @@ export function IssueNum(props) {
  * @param props => 任务类型对象
  * @returns React 函数式组件
  */
-export function TypeCode(props) {
-  const { record } = props;
+export function TypeCode({ record }) {
   return (
     <TypeTag
       data={record.issueTypeDTO}
@@ -42,10 +40,9 @@ export function TypeCode(props) {
  * @param props => 任务概要信息
  * @returns React 函数式组件
  */
-export function Summary(props) {
-  const { text } = props;
+export function Summary({ text }) {
   return (
-    <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`任务概要： ${text}`}>
+    <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`问题概要： ${text}`}>
       <span className="c7n-Issue-summary">
         {text}
       </span>
@@ -58,8 +55,8 @@ export function Summary(props) {
  * @param props => 任务优先级对象
  * @returns React 函数式组件
  */
-export function Priority(props) {
-  const { record } = props;
+export function Priority({ record }) {
+  debugger;
   return (
     <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityDTO ? record.priorityDTO.name : ''}`}>
       <PriorityTag
@@ -74,10 +71,9 @@ export function Priority(props) {
  * @param props => 任务状态对象
  * @returns React 函数式组件
  */
-export function StatusName(props) {
-  const { record } = props;
+export function StatusName({ record }) {
   return (
-    <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusMapDTO.name}`}>
+    <Tooltip mouseEnterDelay={0.5} title={`问题状态： ${record.statusMapDTO.name}`}>
       <StatusTag
         data={record.statusMapDTO}
         style={{ display: 'inline-block', verticalAlign: 'middle' }}
@@ -91,8 +87,7 @@ export function StatusName(props) {
  * @param props => 任务经办人对象，任务经办人信息
  * @returns React 函数式组件
  */
-export function Assignee(props) {
-  const { text, record } = props;
+export function Assignee({ text, record }) {
   return (
     <Tooltip mouseEnterDelay={0.5} title={`经办人： ${text}`}>
       <div style={{ marginRight: 12 }}>
@@ -114,16 +109,13 @@ export function Assignee(props) {
  * @param props => 更新时间信息
  * @returns React 函数式组件
  */
-export function LastUpdateTime(props) {
-  const { text } = props;
+export function LastUpdateTime({ text }) {
   return (
     <Tooltip mouseEnterDelay={0.5} title={`日期： ${text}`}>
-      <div style={{ width: '150px' }}>
-        <TimeAgo
-          datetime={text}
-          locale="zh_CN"
-        />
-      </div>
+      <TimeAgo
+        datetime={text}
+        locale="zh_CN"
+      />
     </Tooltip>
   );
 }
@@ -133,8 +125,7 @@ export function LastUpdateTime(props) {
  * @param props => 冲刺对象
  * @returns React 函数式组件
  */
-export function Sprint(props) {
-  const { record } = props;
+export function Sprint({ record }) {
   if (record.issueSprintDTOS) {
     if (record.issueSprintDTOS.length > 0) {
       return record.issueSprintDTOS.length > 1
