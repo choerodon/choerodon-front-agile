@@ -1,9 +1,20 @@
 .c7n-priorityTag {
-  border-radius: 2px;
-  padding: 0 4px;
+  &-container {
+    width: 64px;
+    border-radius: 2px;
+    padding: 0 4px;
+    display: block;
+    line-height: 20px;
+    font-size: 13px;
+    height: 22px;
+  }
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 64px;
+  min-width: 18px;
+  width: fit-content;
+  text-overflow: ellipsis;
   display: inline-block;
-  line-height: 20px;
-  font-size: 13px;
-  text-align: center;
-  height: fit-content;
+  padding: 1px 3px;
+  border-radius: 2px;
 }

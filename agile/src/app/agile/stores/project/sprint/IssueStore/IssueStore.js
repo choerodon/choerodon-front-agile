@@ -69,7 +69,7 @@ class SprintCommonStore {
   @observable columnFilter = new Map();
 
   // 当前加载状态
-  @observable loading = false;
+  @observable loading = true;
 
   // 创建问题窗口是否展开
   @observable createFlag = false;
@@ -277,7 +277,7 @@ class SprintCommonStore {
    * @param res
    */
   @action refreshTrigger(res) {
-    this.issues = res.contents;
+    this.issues = res.content;
     this.pagination.total = res.totalElements;
     this.loading = false;
   }

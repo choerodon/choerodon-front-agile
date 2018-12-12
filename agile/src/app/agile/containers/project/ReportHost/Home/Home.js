@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import './style';
 import list from './list';
@@ -12,7 +12,7 @@ class Home extends Component {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     const {
-      type, id, name, organizationId, 
+      type, id, name, organizationId,
     } = urlParams;
     history.push(`${report.link}?type=${type}&id=${id}&name=${name}&organizationId=${organizationId}`);
   }
@@ -39,9 +39,8 @@ class Home extends Component {
   render() {
     return (
       <Page>
-        <Header title="所有报告" />
+        <Header title="敏捷报表" />
         <Content
-          title="所有报告"
           description="这里会根据您项目的进展情况以多个维度直观地记录和展示您项目、迭代、版本、进度等汇总情况。点击您需要查看的报告类型可以查看具体的详细内容。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/"
         >

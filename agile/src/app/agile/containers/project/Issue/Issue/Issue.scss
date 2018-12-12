@@ -8,6 +8,11 @@
       display: none;
     }
   }
+  .c7n-priorityTag {
+    min-width: 24px;
+    max-width: 48px;
+    width: auto !important;
+  }
   .c7n-backlog-sprintIssue {
     justify-content: flex-end;
   }
@@ -196,11 +201,6 @@
     }
 
     .ant-table-columns-chooser {
-      display: none;
-    }
-  }
-  &-table {
-    .priority {
       display: none;
     }
   }

@@ -35,16 +35,21 @@ class PriorityTag extends Component {
   }
 
   render() {
+    debugger;
     const { priority } = this.props;
     return (
       <div
-        className="c7n-priorityTag"
-        style={{
-          backgroundColor: `${priority ? priority.colour : '#FFFFFF'}1F`,
-          color: priority ? priority.colour : '#FFFFFF',
-        }}
+        className="c7n-priorityTag-container"
       >
-        {priority ? priority.name : ''}
+        <div
+          className="c7n-priorityTag"
+          style={{
+            backgroundColor: `${priority ? priority.colour : '#FFFFFF'}1F`,
+            color: priority ? priority.colour : '#FFFFFF',
+          }}
+        >
+          {priority ? priority.name : ''}
+        </div>
       </div>
     );
   }
