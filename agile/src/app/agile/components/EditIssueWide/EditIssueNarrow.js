@@ -513,7 +513,7 @@ class CreateSprint extends Component {
           <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
           <p style={{ marginBottom: 10 }}>
             {'如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。'}
-             </p>
+          </p>
           {subIssueDTOList.length ? (
             <p style={{ color: '#d50000' }}>
               {`注意：问题的 ${
@@ -1020,10 +1020,9 @@ class CreateSprint extends Component {
   handleCreateCommit() {
     const { addCommitDes, origin: { issueId: extra } } = this.state;
     if (addCommitDes) {
-      beforeTextUpload(addCommitDes, extra, this.createReply, 'commentText');
+      beforeTextUpload(addCommitDes, { issueId: extra, commentText: '' }, this.createReply, 'commentText');
     } else {
-      extra.commentText = '';
-      this.createReply(extra);
+      this.createReply({ issueId: extra, commentText: '' });
     }
   }
 
@@ -1288,8 +1287,9 @@ class CreateSprint extends Component {
 
 
 
+
                     提交
-</span>
+                                    </span>
                 </div>
                 <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                   <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1339,8 +1339,9 @@ class CreateSprint extends Component {
 
 
 
+
                     合并请求
-</span>
+                                    </span>
                   <span
                     style={{
                       width: 36,
@@ -2262,8 +2263,9 @@ class CreateSprint extends Component {
 
 
 
+
                               故事点
-</div>
+                                                </div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2335,8 +2337,9 @@ class CreateSprint extends Component {
 
 
 
+
                               预估时间
-</div>
+                                                </div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2928,15 +2931,17 @@ class CreateSprint extends Component {
 
 
 
+
                                   时/
-{this.getWorkloads() + (origin.remainingTime || 0)}
+                              {this.getWorkloads() + (origin.remainingTime || 0)}
+
 
 
 
 
 
                                   时
-</span>
+                                                        </span>
                             <span
                               role="none"
                               style={{
@@ -2955,8 +2960,9 @@ class CreateSprint extends Component {
 
 
 
+
                               登记工作
-</span>
+                                                        </span>
                           </div>
                         </div>
                         {typeCode === 'issue_epic' ? (
@@ -3140,8 +3146,9 @@ class CreateSprint extends Component {
 
 
 
+
                               分配给我
-</span>
+                                                        </span>
                           </div>
                         </div>
                         <div className="line-start mt-10 assignee">
@@ -3265,8 +3272,9 @@ class CreateSprint extends Component {
 
 
 
+
                               分配给我
-</span>
+                                                        </span>
                           </div>
                         </div>
                         <div className="line-start mt-10">

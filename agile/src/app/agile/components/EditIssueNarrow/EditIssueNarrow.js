@@ -242,7 +242,7 @@ class CreateSprint extends Component {
         anchorElement.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
-          // inline: "nearest",
+          inline: "end",
         });
         setTimeout(() => {
           sign = true;
@@ -794,13 +794,13 @@ class CreateSprint extends Component {
   /**
    * Comment
    */
+
   handleCreateCommit() {
     const { addCommitDes, origin: { issueId: extra } } = this.state;
     if (addCommitDes) {
-      beforeTextUpload(addCommitDes, extra, this.createCommit, 'commentText');
+      beforeTextUpload(addCommitDes, { issueId: extra, commentText: '' }, this.createCommit, 'commentText');
     } else {
-      extra.commentText = '';
-      this.createCommit(extra);
+      this.createCommit({ issueId: extra, commentText: '' });
     }
   }
 
