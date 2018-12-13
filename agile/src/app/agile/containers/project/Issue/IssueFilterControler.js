@@ -73,7 +73,9 @@ export default class IssueFilterControler {
     if (Object.keys(this.cache.get('paramFilter')).length) {
       return IssueFilterControler.loadCurrentSetting(this.cache.get('paramFilter'), mode);
     } else {
-      return IssueFilterControler.loadCurrentSetting(this.cache.get('filter'), mode);
+      // debugger;
+      // const a = IssueStore.getPagination;
+      return IssueFilterControler.loadCurrentSetting(this.cache.get('filter'), mode, 0, IssueStore.getPagination.pageSize);
     }
   };
 

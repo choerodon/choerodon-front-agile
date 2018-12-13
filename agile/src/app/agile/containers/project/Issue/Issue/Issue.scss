@@ -42,6 +42,7 @@
       display: flex;
       flex-wrap: wrap;
       height: fit-content;
+      min-height: 64px;
       padding: 10px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12);
       animation: 0.5s slidein;
@@ -103,6 +104,9 @@
   // 暂时隐藏筛选按钮
   .ant-table-columns-chooser {
     display: none;
+  }
+  .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+    padding: 8px 8px;
   }
   .ant-table-tbody > tr > td {
     transition: none;
