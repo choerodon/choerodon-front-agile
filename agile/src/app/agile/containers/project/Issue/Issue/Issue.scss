@@ -28,6 +28,8 @@
     justify-content: flex-end;
   }
   table {
+    display: flex;
+    flex-direction: column;
     thead {
       display: none;
     }
@@ -39,12 +41,14 @@
     tr {
       display: flex;
       flex-wrap: wrap;
-      height: 64px;
+      height: fit-content;
       padding: 10px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12);
       animation: 0.5s slidein;
     }
     tbody {
+      display: flex;
+      flex-direction: column;
       tr:hover {
         background: rgba(0, 0, 0, 0.04);
         td {
@@ -96,6 +100,10 @@
   padding: 0;
   width: 100%;
   animation: 0.5s slidein;
+  // 暂时隐藏筛选按钮
+  .ant-table-columns-chooser {
+    display: none;
+  }
   .ant-table-tbody > tr > td {
     transition: none;
   }

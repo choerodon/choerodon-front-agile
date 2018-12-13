@@ -86,16 +86,16 @@ export function StatusName({ record }) {
  * @param props => 任务经办人对象，任务经办人信息
  * @returns React 函数式组件
  */
-export function Assignee({ text, record }) {
+export function Assignee({ text, id, img }) {
   return (
     <Tooltip mouseEnterDelay={0.5} title={`经办人： ${text}`}>
       <div style={{ marginRight: 12 }}>
         <UserHead
           user={{
-            id: record.assigneeId,
+            id,
             loginName: '',
             realName: text,
-            avatar: record.assigneeImageUrl,
+            avatar: img,
           }}
         />
       </div>
@@ -124,27 +124,11 @@ export function LastUpdateTime({ text }) {
  * @param props => 冲刺对象
  * @returns React 函数式组件
  */
-export function Sprint({ record }) {
-  if (record.issueSprintDTOS) {
-    if (record.issueSprintDTOS.length > 0) {
-      return record.issueSprintDTOS.length > 1
-        ? (
-          <div style={{ display: 'flex' }}>
-            <Tag
-              color="blue"
-              style={{
-                maxWidth: 160,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {record.issueSprintDTOS[0].sprintName}
-            </Tag>
-            <Tag color="blue">...</Tag>
-          </div>
-        )
-        : (
+export function Sprint({ objArray, name }) {
+  if (objArray) {
+    if (objArray.length > 0) {
+      return (
+        <div style={{ display: 'flex' }}>
           <Tag
             color="blue"
             style={{
@@ -154,10 +138,32 @@ export function Sprint({ record }) {
               whiteSpace: 'nowrap',
             }}
           >
-            {record.issueSprintDTOS[0].sprintName}
+            {name}
           </Tag>
-        );
+          { objArray.length > 1 ? <Tag color="blue">...</Tag> : null }
+        </div>
+      );
     }
   }
   return null;
+}
+
+/**
+ * 冲刺呈现
+ * @param props => 冲刺对象
+ * @returns React 函数式组件
+ */
+export function Epic({ color, name }) {
+  const style = {
+    color,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: color,
+    borderRadius: '2px',
+    fontSize: '13px',
+    lineHeight: '20px',
+    padding: '0 8px',
+    display: 'inline-block',
+  };
+  return name ? <span style={style}>{name}</span> : null;
 }
