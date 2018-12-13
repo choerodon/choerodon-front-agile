@@ -97,15 +97,11 @@ class QuickSearch extends Component {
       <div className="c7n-agile-quickSearch" style={style}>
         <p>搜索:</p>
         <Select
-          allowClear
           key="quickSearchSelect"
           className="quickSearchSelect"
           dropdownClassName="quickSearchSelect-dropdown"
           mode="multiple"
           labelInValue
-          // filterValue={[-1, -2]}
-          value={[-2]}
-          ref={(e) => { this.quickSearch = e; }}
           placeholder="快速搜索"
           maxTagCount={0}
           maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
@@ -127,7 +123,6 @@ class QuickSearch extends Component {
           </OptGroup>
         </Select>
         <Select
-          allowClear
           key="assigneeSelect"
           className="assigneeSelect"
           mode="multiple"
