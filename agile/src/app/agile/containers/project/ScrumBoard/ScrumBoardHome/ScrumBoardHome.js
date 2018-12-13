@@ -123,7 +123,7 @@ class ScrumBoardHome extends Component {
   }
 
   // 根据泳道，统计各个分类下的数量
-  refresh = (boardId) => {
+  refresh = (boardId, value = null) => {
     const { onlyMe, recent, quickFilter } = this.state;
     this.setState({
       spinIf: true,
@@ -133,6 +133,10 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.setQuickSearchList(res);
       if (boardId) {
         // 加载冲刺及Issue
+        debugger;
+        if (value) {
+          ScrumBoardStore.setAssigneeFilterIds(value);
+        }
         ScrumBoardStore.axiosGetBoardData(boardId,
           onlyMe ? AppState.getUserId : 0,
           recent,
@@ -778,14 +782,18 @@ class ScrumBoardHome extends Component {
     const { dataSource } = this.state;
     const data = dataSource || {};
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      // todo: 下一个迭代重写其他问题计数
       result = (
         <span>
           {'其他问题'}
-          <span className="c7n-scrumboard-otherHeader-issueCount">
-            {`${ScrumBoardStore.getOtherQuestionCount} 问题`}
-          </span>
         </span>
       );
+      // <span>
+      //   {'其他问题'}
+      //   <span className="c7n-scrumboard-otherHeader-issueCount">
+      //     {`${ScrumBoardStore.getOtherQuestionCount} 问题`}
+      //   </span>
+      // </span>
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       result = (
         <span>
@@ -1086,8 +1094,8 @@ class ScrumBoardHome extends Component {
                 <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
                   <QuickSearch
                     onQuickSearchChange={this.onQuickSearchChange}
-                    onAssigneeChange={() => {
-                      this.refresh(ScrumBoardStore.getSelectedBoard);
+                    onAssigneeChange={(value) => {
+                      this.refresh(ScrumBoardStore.getSelectedBoard, value);
                     }}
                   />
                 </div>
