@@ -949,26 +949,28 @@ class ScrumBoardHome extends Component {
   };
 
   removeEventListener = () => {
-    const scrumBoardContainer = document.getElementsByClassName('c7n-scrumboard-content')[0];
-    const scrumBoardTitle = document.getElementsByClassName('c7n-scrumboard-header')[0];
-    const syncTop = () => {
-      if (currentTab !== 1) return;
-      scrumBoardTitle.scrollLeft = scrumBoardContainer.scrollLeft;
-    };
-    const syncDown = () => {
-      if (currentTab !== 2) return;
-      scrumBoardContainer.scrollLeft = scrumBoardTitle.scrollLeft;
-    };
-    const judgeTopHover = () => {
-      currentTab = 1;
-    };
-    const judgeDownHover = () => {
-      currentTab = 2;
-    };
-    scrumBoardContainer.removeEventListener('scroll', syncTop);
-    scrumBoardTitle.removeEventListener('scroll', syncDown);
-    scrumBoardContainer.removeEventListener('mouseover', judgeTopHover);
-    scrumBoardTitle.removeEventListener('mouseover', judgeDownHover);
+    if (document && document.getElementsByClassName('c7n-scrumboard-content').length) {
+      const scrumBoardContainer = document.getElementsByClassName('c7n-scrumboard-content')[0];
+      const scrumBoardTitle = document.getElementsByClassName('c7n-scrumboard-header')[0];
+      const syncTop = () => {
+        if (currentTab !== 1) return;
+        scrumBoardTitle.scrollLeft = scrumBoardContainer.scrollLeft;
+      };
+      const syncDown = () => {
+        if (currentTab !== 2) return;
+        scrumBoardContainer.scrollLeft = scrumBoardTitle.scrollLeft;
+      };
+      const judgeTopHover = () => {
+        currentTab = 1;
+      };
+      const judgeDownHover = () => {
+        currentTab = 2;
+      };
+      scrumBoardContainer.removeEventListener('scroll', syncTop);
+      scrumBoardTitle.removeEventListener('scroll', syncDown);
+      scrumBoardContainer.removeEventListener('mouseover', judgeTopHover);
+      scrumBoardTitle.removeEventListener('mouseover', judgeDownHover);
+    }
   };
 
   render() {

@@ -239,6 +239,7 @@ class ScrumBoardStore {
   }
 
   @action setClickIssueDetail(data) {
+    debugger;
     this.clickIssueDetail = data;
   }
 

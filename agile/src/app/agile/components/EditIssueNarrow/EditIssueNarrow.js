@@ -741,7 +741,7 @@ class CreateSprint extends Component {
 
   reloadIssue(paramIssueId) {
     const { origin } = this.state;
-    const { onUpdate } = this.props;
+    const { onUpdate, store } = this.props;
     const issueId = paramIssueId || origin.issueId;
     if (onUpdate) {
       onUpdate();
@@ -760,7 +760,7 @@ class CreateSprint extends Component {
     }, () => {
       loadIssue(issueId).then((res) => {
         this.setAnIssueToState(res);
-        ScrumBoardStore.setClickIssueDetail(res);
+        store.setClickIssueDetail(res);
         this.setState({
           createdById: res.createdBy,
         });

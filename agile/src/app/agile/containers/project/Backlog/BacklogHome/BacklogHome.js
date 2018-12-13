@@ -43,6 +43,7 @@ class BacklogHome extends Component {
   componentWillUnmount() {
     const { BacklogStore } = this.props;
     BacklogStore.dispose();
+    BacklogStore.setClickIssueDetail({});
   }
 
   // 加载问题类型和默认优先级
