@@ -96,7 +96,7 @@ class AddColumn extends Component {
             statusType: res.type,
           }, () => {
             form.setFieldsValue({
-              categoryCode: res.type,
+              column_categoryCode: res.type,
             });
           });
           callback();

@@ -25,10 +25,9 @@ class AddStatus extends Component {
 
   handleAddStatus(e) {
     e.preventDefault();
-    const { statusType } = this.state;
     const { form, onChangeVisible, refresh } = this.props;
     form.validateFields((err, values) => {
-      if (!err && !statusType) {
+      if (!err) {
         this.setState({
           loading: true,
         });
@@ -49,9 +48,6 @@ class AddStatus extends Component {
             loading: false,
           });
         });
-      } else {
-        onChangeVisible(false);
-        refresh();
       }
     });
   }
