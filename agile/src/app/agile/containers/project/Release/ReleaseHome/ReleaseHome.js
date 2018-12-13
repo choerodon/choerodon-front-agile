@@ -306,7 +306,7 @@ class ReleaseHome extends Component {
       key: 'expectReleaseDate',
       render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
     }, {
-      title: '结束日期',
+      title: '发布日期',
       dataIndex: 'releaseDate',
       key: 'releaseDate',
       render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
