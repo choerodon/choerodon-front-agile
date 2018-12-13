@@ -512,10 +512,8 @@ class CreateSprint extends Component {
           <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
           <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
           <p style={{ marginBottom: 10 }}>
-
-
-            如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。
-          </p>
+            {'如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。'}
+             </p>
           {subIssueDTOList.length ? (
             <p style={{ color: '#d50000' }}>
               {`注意：问题的 ${
@@ -1287,8 +1285,11 @@ class CreateSprint extends Component {
                     {branchs.totalCommit || '0'}
 
 
+
+
+
                     提交
-                  </span>
+</span>
                 </div>
                 <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                   <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1335,8 +1336,11 @@ class CreateSprint extends Component {
                     {branchs.totalMergeRequest}
 
 
+
+
+
                     合并请求
-                  </span>
+</span>
                   <span
                     style={{
                       width: 36,
@@ -1665,7 +1669,7 @@ class CreateSprint extends Component {
             </Tooltip>
             <Tooltip placement="right" title="附件">
               <li
-                id="COMMENT-nav"
+                id="ATTACHMENT-nav"
                 className={`c7n-li ${nav === 'attachment' ? 'c7n-li-active' : ''}`}
               >
                 <Icon
@@ -1679,7 +1683,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="Wiki文档">
-              <li id="COMMENT-nav" className={`c7n-li ${nav === 'wiki' ? 'c7n-li-active' : ''}`}>
+              <li id="WIKI-nav" className={`c7n-li ${nav === 'wiki' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="library_books c7n-icon-li"
                   role="none"
@@ -1692,7 +1696,7 @@ class CreateSprint extends Component {
             </Tooltip>
             <Tooltip placement="right" title="评论">
               <li
-                id="ATTACHMENT-nav"
+                id="COMMIT-nav"
                 className={`c7n-li ${nav === 'commit' ? 'c7n-li-active' : ''}`}
               >
                 <Icon
@@ -1979,9 +1983,7 @@ class CreateSprint extends Component {
                       <div
                         style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.54)', marginBottom: 4 }}
                       >
-
-
-                            优先级
+                        {'优先级'}
                       </div>
                       <div>
                         <ReadAndEdit
@@ -2022,6 +2024,7 @@ class CreateSprint extends Component {
                             </div>)}
                         >
                           <Select
+                            dropdownStyle={{ minWidth: 185 }}
                             value={originPriorities.length ? priorityId : priorityName}
                             style={{ width: '150px' }}
                             loading={selectLoading}
@@ -2256,8 +2259,11 @@ class CreateSprint extends Component {
                         >
 
 
+
+
+
                               故事点
-                        </div>
+</div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2326,8 +2332,11 @@ class CreateSprint extends Component {
                         >
 
 
+
+
+
                               预估时间
-                        </div>
+</div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2916,12 +2925,18 @@ class CreateSprint extends Component {
                               {this.getWorkloads()}
 
 
+
+
+
                                   时/
-                              {this.getWorkloads() + (origin.remainingTime || 0)}
+{this.getWorkloads() + (origin.remainingTime || 0)}
+
+
+
 
 
                                   时
-                            </span>
+</span>
                             <span
                               role="none"
                               style={{
@@ -2937,8 +2952,11 @@ class CreateSprint extends Component {
                             >
 
 
+
+
+
                               登记工作
-                            </span>
+</span>
                           </div>
                         </div>
                         {typeCode === 'issue_epic' ? (
@@ -3119,8 +3137,11 @@ class CreateSprint extends Component {
                             >
 
 
+
+
+
                               分配给我
-                            </span>
+</span>
                           </div>
                         </div>
                         <div className="line-start mt-10 assignee">
@@ -3241,8 +3262,11 @@ class CreateSprint extends Component {
                             >
 
 
+
+
+
                               分配给我
-                            </span>
+</span>
                           </div>
                         </div>
                         <div className="line-start mt-10">

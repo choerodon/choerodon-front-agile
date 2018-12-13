@@ -1540,7 +1540,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="附件">
-              <li id="COMMENT-nav" className={`c7n-li ${nav === 'attachment' ? 'c7n-li-active' : ''}`}>
+              <li id="ATTACHMENT-nav" className={`c7n-li ${nav === 'attachment' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="attach_file c7n-icon-li"
                   role="none"
@@ -1552,7 +1552,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="Wiki文档">
-              <li id="COMMENT-nav" className={`c7n-li ${nav === 'wiki' ? 'c7n-li-active' : ''}`}>
+              <li id="WIKI-nav" className={`c7n-li ${nav === 'wiki' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="library_books c7n-icon-li"
                   role="none"
@@ -1564,7 +1564,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="评论">
-              <li id="ATTACHMENT-nav" className={`c7n-li ${nav === 'commit' ? 'c7n-li-active' : ''}`}>
+              <li id="COMMIT-nav" className={`c7n-li ${nav === 'commit' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="sms_outline c7n-icon-li"
                   role="none"
@@ -1932,6 +1932,7 @@ class CreateSprint extends Component {
                             )}
                           >
                             <Select
+                              dropdownStyle={{ minWidth: 185 }}
                               value={originPriorities.length ? priorityId : priorityName}
                               style={{ width: '150px' }}
                               loading={selectLoading}
@@ -2252,11 +2253,8 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-
-
-
-                            修复的版本：
-</span>
+                            {'修复的版本：'}
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -2588,12 +2586,10 @@ class CreateSprint extends Component {
                           />
                           <span>
                             {this.getWorkloads()}
-
-                            小时/
-{this.getWorkloads() + (origin.remainingTime || 0)}
-
-                            小时
-</span>
+                            {'小时/'}
+                            {this.getWorkloads() + (origin.remainingTime || 0)}
+                            {'小时'}
+                           </span>
                           <span
                             role="none"
                             style={{

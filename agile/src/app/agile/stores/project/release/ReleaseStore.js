@@ -216,7 +216,7 @@ class ReleaseStore {
   }
 
   axiosGetVersionListWithoutPage() {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`, []);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`, ['version_planning']);
   }
 
   axiosCheckName(proId, name) {
