@@ -99,8 +99,16 @@ class AddColumn extends Component {
               column_categoryCode: res.type,
             });
           });
-          callback();
+        } else {
+          this.setState({
+            statusType: false,
+          }, () => {
+            form.setFieldsValue({
+              column_categoryCode: '',
+            });
+          });
         }
+        callback();
       });
     }, 300);
   }

@@ -68,8 +68,16 @@ class AddStatus extends Component {
               categoryCode: res.type,
             });
           });
-          callback();
+        } else {
+          this.setState({
+            statusType: false,
+          }, () => {
+            form.setFieldsValue({
+              categoryCode: '',
+            });
+          });
         }
+        callback();
       });
     }, 300);
   }
