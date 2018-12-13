@@ -91,16 +91,16 @@ class AddColumn extends Component {
     }
     this.checkStatusDebounce = setTimeout(() => {
       axios.get(`state/v1/projects/${AppState.currentMenuType.id}/status/project_check_name?organization_id=${AppState.currentMenuType.organizationId}&name=${value}`).then((res) => {
-      // if (res.statusExist) {
-        this.setState({
-          statusType: res.type,
-        }, () => {
-          form.setFieldsValue({
-            categoryCode: res.type,
+        if (res.statusExist) {
+          this.setState({
+            statusType: res.type,
+          }, () => {
+            form.setFieldsValue({
+              categoryCode: res.type,
+            });
           });
-        });
-        callback();
-      // }
+          callback();
+        }
       });
     }, 300);
   }
