@@ -443,7 +443,7 @@ class ReleaseDetail extends Component {
               </div>
               <div className="c7n-versionTime" style={{ marginLeft: 80 }}>
                 <Icon style={{ fontSize: 20 }} type="date_range" />
-                {'发布日期:'}
+                {'实际发布日期:'}
                 <span className="c7n-version-timemoment">{ReleaseStore.getVersionDetail.releaseDate ? ReleaseStore.getVersionDetail.releaseDate.slice(0, 10) : '无'}</span>
               </div>
             </div>

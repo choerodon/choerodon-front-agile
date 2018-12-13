@@ -1063,22 +1063,25 @@ class ScrumBoardHome extends Component {
             }
           </Select>
           {
-            // this.state.dataSource && this.state.dataSource.currentSprint
-            // && this.state.dataSource.currentSprint.sprintId ? (
-            //   <Button className="leftBtn2" funcType="flat"
-            // onClick={() => { this.props.history.push(`/agile/iterationBoard/
-            // ${this.state.dataSource.currentSprint.sprintId}?type=project&id=
-            // ${AppState.currentMenuType.id}&name=
-            // ${AppState.currentMenuType.name}&organizationId=
-            // ${AppState.currentMenuType.organizationId}`); }}>
-            //     <span>切换至工作台</span>
-            //   </Button>
-            // ) : null
-
              (
-               <Button className="leftBtn2" disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)} funcType="flat" onClick={() => { history.push(`/agile/iterationBoard/${dataSource && dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+               <Button 
+                 className="leftBtn2" 
+                 disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)} 
+                 funcType="flat" 
+                 onClick={() => { 
+                   if (dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId) {
+                     history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); 
+                   } else {
+                     message.info('等待加载当前迭代');
+                   }
+                 }}
+               >
                  <span>切换至工作台</span>
                </Button>
+
+              //  <Button className="leftBtn2" disabled={dataSource ? (dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId) : false} funcType="flat" onClick={() => { history.push(`/agile/iterationBoard/${dataSource && dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+              //   <span>切换至工作台</span>
+              // </Button>
             )
           }
           <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>

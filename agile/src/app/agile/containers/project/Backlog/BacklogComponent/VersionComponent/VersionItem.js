@@ -232,38 +232,6 @@ class VersionItem extends Component {
                   BacklogStore.setVersionData(data);
                 }}
               />
-              {/* <div style={{ width: '100%' }}> */}
-              {/* <EasyEdit
-                  type="input"
-                  defaultValue={item.name}
-                  enterOrBlur={this.handleBlurName.bind(this)}
-                  style={{
-                    flexGrow: 1,
-                  }}
-                  byHand
-                  editIf={editName}
-                >
-                  <div className="c7n-backlog-versionItemTitleName">
-                    <p>{item.name}</p>
-                    <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
-                      <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
-                        <Icon
-                          style={{
-                            width: 12,
-                            height: 12,
-                            background: '#f5f5f5',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            border: '1px solid #ccc',
-                            borderRadius: 2,
-                          }}
-                          type="arrow_drop_down"
-                        />
-                      </Dropdown>
-                    </Permission>
-                  </div>
-                </EasyEdit> */}
               <div style={{ width: '100%' }}>
                 <div 
                   className="c7n-backlog-ItemsHead"
@@ -274,7 +242,7 @@ class VersionItem extends Component {
                         autoFocus
                         defaultValue={item.name}
                         onPressEnter={this.handleBlurName.bind(this)}
-                        onBlur={this.handleBlurName.bind(this)}
+                        // onBlur={this.handleBlurName.bind(this)}
                         onClick={e => e.stopPropagation()}
                         maxLength={30}
                       />
