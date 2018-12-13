@@ -36,6 +36,7 @@ class StatusColumn extends Component {
             whiteSpace: 'nowrap',
             maxWidth: 'calc(100% - 50px)',
             display: 'inline-block',
+            marginLeft: 12,
           }}
         >
           {`${this.props.data.name}`}

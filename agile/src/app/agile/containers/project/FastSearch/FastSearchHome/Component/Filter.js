@@ -502,21 +502,11 @@ class AddComponent extends Component {
         name: 'name',
       },
     };
-    const { temp } = this.state;
-    let arr = [];
-    if (['assignee', 'reporter', 'created_user', 'last_updated_user'].indexOf(filter) !== -1) {
-      arr = temp.filter(t => t.enabled).map(v => (
-        <Option key={v[OPTION_FILTER[filter].id]} value={v[OPTION_FILTER[filter].id]}>
-          {v[OPTION_FILTER[filter].name]}
-        </Option>
-      ));
-    } else {
-      arr = temp.map(v => (
-        <Option key={v[OPTION_FILTER[filter].id]} value={v[OPTION_FILTER[filter].id]}>
-          {v[OPTION_FILTER[filter].name]}
-        </Option>
-      ));
-    }
+    const arr = this.state.temp.map(v => (
+      <Option key={v[OPTION_FILTER[filter].id]} value={v[OPTION_FILTER[filter].id]}>
+        {v[OPTION_FILTER[filter].name]}
+      </Option>
+    ));
     return arr;
   };
 

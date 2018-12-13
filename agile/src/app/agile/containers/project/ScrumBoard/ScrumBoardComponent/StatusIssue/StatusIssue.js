@@ -436,12 +436,12 @@ class StatusIssue extends Component {
                               <p
                                 style={{
                                   borderRadius: 2,
-                                  paddingLeft: 8,
-                                  paddingRight: 8,
+                                  paddingLeft: 4,
+                                  paddingRight: 4,
                                   background: this.renderStatusBackground(categoryCode),
                                   color: 'white',
-                                  maxWidth: 76,
-                                  minWidth: 56,
+                                  maxWidth: 50,
+                                  minWidth: 20,
                                   textAlign: 'center',
                                   height: 20,
                                   whiteSpace: 'nowrap',
@@ -460,11 +460,14 @@ class StatusIssue extends Component {
                                   textAlign: 'center',
                                   marginLeft: '8px',
                                   minWidth: 16,
-                                  maxWidth: 30,
+                                  maxWidth: 46,
                                   paddingLeft: 2,
                                   paddingRight: 2,
                                   height: 20,
                                   borderRadius: 2,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
                                 }}
                               >
                                 {item.priorityDTO && item.priorityDTO.name}

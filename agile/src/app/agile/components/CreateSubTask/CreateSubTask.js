@@ -182,7 +182,7 @@ class CreateSubIssue extends Component {
   // 分派给我
   assigneeMe = () => {
     const {
-      id, imagesUrl, loginName, realName,
+      id, imageUrl, loginName, realName,
     } = AppState.userInfo;
     const { originUsers } = this.state;
     const { form } = this.props;
@@ -192,9 +192,10 @@ class CreateSubIssue extends Component {
         ...newUsers,
         {
           id,
-          imagesUrl,
+          imageUrl,
           loginName,
           realName,
+          enabled: true,
         },
       ],
     }, () => {
