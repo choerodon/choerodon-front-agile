@@ -768,58 +768,72 @@ class CreateSprint extends Component {
 
   resetStoryPoints(value) {
     this.setState({ storyPoints: value });
+    this.refresh();
   }
 
   resetRemainingTime(value) {
     this.setState({ remainingTime: value });
+    this.refresh();
   }
 
   resetAssigneeId(value) {
     this.setState({ assigneeId: value });
+    this.refresh();
   }
 
   resetReporterId(value) {
     this.setState({ reporterId: value });
+    this.refresh();
   }
 
   resetSummary(value) {
     this.setState({ summary: value });
+    this.refresh();
   }
 
   resetEpicName(value) {
     this.setState({ epicName: value });
+    this.refresh();
   }
 
   resetPriorityId(value) {
     this.setState({ priorityId: value });
+    this.refresh();
   }
 
   resetStatusId(value) {
     this.setState({ statusId: value });
+    this.refresh();
   }
 
   resetEpicId(value) {
     this.setState({ epicId: value });
+    this.refresh();
   }
 
   resetSprintId(value) {
     this.setState({ sprintId: value });
+    this.refresh();
   }
 
   resetComponentIssueRelDTOList(value) {
     this.setState({ componentIssueRelDTOList: value });
+    this.refresh();
   }
 
   resetInfluenceVersions(value) {
     this.setState({ influenceVersions: value });
+    this.refresh();
   }
 
   resetFixVersions(value) {
     this.setState({ fixVersions: value });
+    this.refresh();
   }
 
   resetlabelIssueRelDTOList(value) {
     this.setState({ labelIssueRelDTOList: value });
+    this.refresh();
   }
 
   reloadIssue(paramIssueId) {
@@ -1284,12 +1298,8 @@ class CreateSprint extends Component {
                     {branchs.totalCommit || '0'}
 
 
-
-
-
-
                     提交
-                                    </span>
+                  </span>
                 </div>
                 <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                   <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1336,12 +1346,8 @@ class CreateSprint extends Component {
                     {branchs.totalMergeRequest}
 
 
-
-
-
-
                     合并请求
-                                    </span>
+                  </span>
                   <span
                     style={{
                       width: 36,
@@ -2260,12 +2266,8 @@ class CreateSprint extends Component {
                         >
 
 
-
-
-
-
                               故事点
-                                                </div>
+                        </div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2334,12 +2336,8 @@ class CreateSprint extends Component {
                         >
 
 
-
-
-
-
                               预估时间
-                                                </div>
+                        </div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2469,7 +2467,9 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={(value) => {
                                     this.setState({
-                                      componentIssueRelDTOList: value,
+                                      componentIssueRelDTOList: value.map(
+                                        item => item.substr(0, 30),
+                                      ),
                                     });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
@@ -2573,7 +2573,9 @@ class CreateSprint extends Component {
                                 }}
                                 onChange={(value) => {
                                   this.setState({
-                                    labelIssueRelDTOList: value,
+                                    labelIssueRelDTOList: value.map(
+                                      item => item.substr(0, 30),
+                                    ),
                                   });
                                   // 由于 OnChange 和 OnBlur 几乎同时执行，
                                   // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
@@ -2680,7 +2682,11 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={(value) => {
                                     this.needBlur = false;
-                                    this.setState({ influenceVersions: value });
+                                    this.setState({
+                                      influenceVersions: value.map(
+                                        item => item.substr(0, 30),
+                                      ),
+                                    });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                                     // if (this.changeTimer > 0) {
@@ -2779,7 +2785,9 @@ class CreateSprint extends Component {
                                 }}
                                 onChange={(value) => {
                                   this.setState({
-                                    fixVersions: value,
+                                    fixVersions: value.map(
+                                      item => item.substr(0, 30),
+                                    ),
                                   });
                                   // 由于 OnChange 和 OnBlur 几乎同时执行，
                                   // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
@@ -2928,20 +2936,12 @@ class CreateSprint extends Component {
                               {this.getWorkloads()}
 
 
-
-
-
-
                                   时/
                               {this.getWorkloads() + (origin.remainingTime || 0)}
 
 
-
-
-
-
                                   时
-                                                        </span>
+                            </span>
                             <span
                               role="none"
                               style={{
@@ -2957,12 +2957,8 @@ class CreateSprint extends Component {
                             >
 
 
-
-
-
-
                               登记工作
-                                                        </span>
+                            </span>
                           </div>
                         </div>
                         {typeCode === 'issue_epic' ? (
@@ -3143,12 +3139,8 @@ class CreateSprint extends Component {
                             >
 
 
-
-
-
-
                               分配给我
-                                                        </span>
+                            </span>
                           </div>
                         </div>
                         <div className="line-start mt-10 assignee">
@@ -3269,12 +3261,8 @@ class CreateSprint extends Component {
                             >
 
 
-
-
-
-
                               分配给我
-                                                        </span>
+                            </span>
                           </div>
                         </div>
                         <div className="line-start mt-10">

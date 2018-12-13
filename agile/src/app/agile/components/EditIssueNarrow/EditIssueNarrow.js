@@ -242,7 +242,7 @@ class CreateSprint extends Component {
         anchorElement.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
-          inline: "end",
+          inline: 'end',
         });
         setTimeout(() => {
           sign = true;
@@ -2035,7 +2035,11 @@ class CreateSprint extends Component {
                                     });
                                   }}
                                   onChange={(value) => {
-                                    this.setState({ componentIssueRelDTOList: value });
+                                    this.setState({
+                                      componentIssueRelDTOList: value.map(
+                                        item => item.substr(0, 30),
+                                      ),
+                                    });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                                     // this.needBlur = false;
@@ -2130,7 +2134,11 @@ class CreateSprint extends Component {
                                 });
                               }}
                               onChange={(value) => {
-                                this.setState({ labelIssueRelDTOList: value });
+                                this.setState({
+                                  labelIssueRelDTOList: value.map(
+                                    item => item.substr(0, 30),
+                                  ),
+                                });
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，
                                 // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                                 // this.needBlur = false;
@@ -2223,7 +2231,11 @@ class CreateSprint extends Component {
                                     });
                                   }}
                                   onChange={(value) => {
-                                    this.setState({ influenceVersions: value });
+                                    this.setState({
+                                      influenceVersions: value.map(
+                                        item => item.substr(0, 30),
+                                      ),
+                                    });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                                     // this.needBlur = false;
@@ -2316,7 +2328,11 @@ class CreateSprint extends Component {
                                 });
                               }}
                               onChange={(value) => {
-                                this.setState({ fixVersions: value });
+                                this.setState({
+                                  fixVersions: value.map(
+                                    item => item.substr(0, 30),
+                                  ),
+                                });
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，
                                 // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                                 // this.needBlur = false;
@@ -2589,7 +2605,7 @@ class CreateSprint extends Component {
                             {'小时/'}
                             {this.getWorkloads() + (origin.remainingTime || 0)}
                             {'小时'}
-                           </span>
+                          </span>
                           <span
                             role="none"
                             style={{

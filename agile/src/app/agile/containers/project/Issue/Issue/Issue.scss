@@ -4,7 +4,7 @@
   }
 }
 .c7n-content-issue {
-  width: 100%;
+  width: calc(100% + 18px);
 }
 
 @keyframes slidein {
@@ -100,13 +100,14 @@
   display: flex;
   padding: 0;
   width: 100%;
+  //left: 20px;
   animation: 0.5s slidein;
   // 暂时隐藏筛选按钮
   .ant-table-columns-chooser {
     display: none;
   }
   .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
-    padding: 8px 8px;
+    padding: 8px 4px;
   }
   .ant-table-tbody > tr > td {
     transition: none;
