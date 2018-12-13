@@ -25,13 +25,15 @@ class AddColumn extends Component {
   }
 
   handleAddColumn(e) {
-    const { form } = this.props;
+    const { form, store } = this.props;
     const { statusType } = this.state;
     const that = this;
     e.preventDefault();
     form.validateFields((err, values) => {
       if (!err) {
-        if (statusType) {
+        const statusDate = store.getStatusList;
+        const status = statusDate.find(s => s.name === values.column_name);
+        if (status) {
           confirm({
             title: '警告',
             content: `已存在状态${values.column_name}，如果创建该列，不会创建同名状态`,
