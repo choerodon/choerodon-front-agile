@@ -133,7 +133,6 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.setQuickSearchList(res);
       if (boardId) {
         // 加载冲刺及Issue
-        debugger;
         if (value) {
           ScrumBoardStore.setAssigneeFilterIds(value);
         }

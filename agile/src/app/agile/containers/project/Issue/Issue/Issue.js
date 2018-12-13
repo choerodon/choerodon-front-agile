@@ -74,7 +74,6 @@ class Issue extends Component {
     this.filterControler = new IssueFilterControler();
     IssueStore.setLoading(true);
     this.filterControler.refresh('refresh').then((data) => {
-      debugger;
       if (data.failed) {
         Choerodon.prompt(data.message);
       } else {
