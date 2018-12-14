@@ -31,15 +31,15 @@ class EditRelease extends Component {
   }
 
   handleOk = (e) => {
-    this.setState({
-      loading: true,
-    });
     e.preventDefault();
     const {
       form, onCancel, refresh, data,
     } = this.props;
     form.validateFields((err, values) => {
       if (!err) {
+        this.setState({
+          loading: true,
+        });
         const newData = {
           description: values.description,
           name: values.name,
@@ -85,6 +85,7 @@ class EditRelease extends Component {
 
   render() {
     const { loading, expectReleaseDate, startDate } = this.state;
+    debugger;
     const { form, visible, onCancel } = this.props;
     const { getFieldDecorator } = form;
     const data = JSON.parse(JSON.stringify(ReleaseStore.getVersionDetail));
@@ -115,7 +116,7 @@ class EditRelease extends Component {
                     initialValue: data.name ? data.name : null,
                     rules: [{
                       required: true,
-                      message: '版本名称必须',
+                      message: '版本名称必填',
                     }, {
                       validator: this.checkName,
                     }],

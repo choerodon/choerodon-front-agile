@@ -1064,13 +1064,13 @@ class ScrumBoardHome extends Component {
           </Select>
           {
              (
-               <Button 
-                 className="leftBtn2" 
-                 disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)} 
-                 funcType="flat" 
-                 onClick={() => { 
+               <Button
+                 className="leftBtn2"
+                 disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)}
+                 funcType="flat"
+                 onClick={() => {
                    if (dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId) {
-                     history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); 
+                     history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`);
                    } else {
                      message.info('等待加载当前迭代');
                    }
@@ -1266,7 +1266,7 @@ class ScrumBoardHome extends Component {
                 <FormItem>
                   {getFieldDecorator('name', {
                     rules: [{
-                      required: true, message: '看板名是必须的',
+                      required: true, message: '看板名是必填的',
                     }],
                   })(
                     <Input

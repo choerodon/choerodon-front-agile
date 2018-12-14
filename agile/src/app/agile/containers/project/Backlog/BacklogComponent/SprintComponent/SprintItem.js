@@ -387,6 +387,7 @@ class SprintItem extends Component {
     const { keydown, selected } = this.state;
     const { store } = this.props;
     if (keydown === 91 || keydown === 17 || keydown === 16) {
+      debugger;
       // 如果没点击
       if (selected.droppableId === '') {
         this.setState({
@@ -952,7 +953,7 @@ class SprintItem extends Component {
                         justifyContent: 'flex-end',
                       }}
                     >
-                      <p 
+                      <p
                         style={{ whiteSpace: 'nowrap' }}
                       >
                         {'冲刺目标：'}

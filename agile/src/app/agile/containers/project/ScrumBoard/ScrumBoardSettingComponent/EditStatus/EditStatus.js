@@ -122,13 +122,13 @@ class EditStatus extends Component {
               {getFieldDecorator('name', {
                 initialValue: this.props.data.name ? this.props.data.name : undefined,
                 rules: [{
-                  required: true, message: '状态名称是必须的',
+                  required: true, message: '状态名称是必填的',
                 }, {
                   validator: this.checkStatusName.bind(this),
                 }],
               })(
                 <Input
-                  label="状态名称" 
+                  label="状态名称"
                   placeholder="请输入状态名称"
                   onChange={() => {
                     if (!this.state.changeName) {
@@ -142,10 +142,10 @@ class EditStatus extends Component {
             </FormItem>
             <FormItem>
               {getFieldDecorator('categoryCode', {
-                initialValue: this.props.data.categoryCode ? 
+                initialValue: this.props.data.categoryCode ?
                   this.props.data.categoryCode : undefined,
                 rules: [{
-                  required: true, message: '类别是必须的',
+                  required: true, message: '类别是必填的',
                 }],
               })(
                 <Select

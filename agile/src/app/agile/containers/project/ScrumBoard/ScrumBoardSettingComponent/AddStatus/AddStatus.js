@@ -158,7 +158,7 @@ class AddStatus extends Component {
             <FormItem>
               {getFieldDecorator('name', {
                 rules: [{
-                  required: true, message: '状态名称是必须的',
+                  required: true, message: '状态名称是必填的',
                 }, {
                   validator: this.checkStatusName.bind(this),
                 }],
@@ -169,7 +169,7 @@ class AddStatus extends Component {
             <FormItem>
               {getFieldDecorator('categoryCode', {
                 rules: [{
-                  required: true, message: '类别是必须的',
+                  required: true, message: '类别是必填的',
                 }],
               })(
                 <Select

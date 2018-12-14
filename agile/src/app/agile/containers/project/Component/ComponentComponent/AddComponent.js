@@ -122,7 +122,7 @@ class AddComponent extends Component {
               {getFieldDecorator('name', {
                 rules: [{
                   required: true,
-                  message: '模块名称必须',
+                  message: '模块名称必填',
                 }],
               })(
                 <Input label="模块名称" maxLength={30} />,
@@ -163,7 +163,7 @@ class AddComponent extends Component {
               {getFieldDecorator('defaultAssigneeRole', {
                 rules: [{
                   required: true,
-                  message: '默认经办人必须',
+                  message: '默认经办人必填',
                 }],
               })(
                 <Select label="默认经办人">

@@ -190,7 +190,7 @@ class AddColumn extends Component {
             <FormItem>
               {getFieldDecorator('column_name', {
                 rules: [{
-                  required: true, message: '列名称是必须的',
+                  required: true, message: '列名称是必填的',
                 }, {
                   validator: this.checkStatusName.bind(this),
                 }],
@@ -201,7 +201,7 @@ class AddColumn extends Component {
             <FormItem>
               {getFieldDecorator('column_categoryCode', {
                 rules: [{
-                  required: true, message: '类别是必须的',
+                  required: true, message: '类别是必填的',
                 }],
               })(
                 <Select

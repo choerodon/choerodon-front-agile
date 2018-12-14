@@ -272,13 +272,13 @@ class IssueTable extends Component {
             }
             e.currentTarget.style.background = 'rgba(140, 158, 255, 0.08)';
             e.currentTarget.style.borderLeft = '3px solid #3f51b5';
-            e.currentTarget.scrollIntoView();
             // 将这次的点击元素设置为 previousClick 供下次使用
             previousClick = e.currentTarget;
             IssueStore.setClickedRow({
               selectedIssue: record,
               expand: true,
             });
+            e.currentTarget.scrollIntoView(false);
           },
           onBlur: (e) => {
             // 点击隐藏详情时无法触发 onClick，所以需要利用 onBlur 触发

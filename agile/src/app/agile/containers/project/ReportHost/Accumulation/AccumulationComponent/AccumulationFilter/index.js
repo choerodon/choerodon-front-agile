@@ -124,11 +124,11 @@ class AccumulationFilter extends Component {
                 getFieldDecorator('circle', {
                   rules: [{
                     required: true,
-                    message: '周期是必须的',
+                    message: '周期是必填的',
                   }],
                   initialValue: this.props.getTimeType(AccumulationStore.getTimeData, 'id'),
                 })(
-                  <Select 
+                  <Select
                     label="周期"
                     onChange={this.changeStartDate.bind(this)}
                   >
@@ -146,11 +146,11 @@ class AccumulationFilter extends Component {
                 getFieldDecorator('startDate', {
                   rules: [{
                     required: true,
-                    message: '开始日期是必须的',
+                    message: '开始日期是必填的',
                   }],
                   initialValue: AccumulationStore.getStartDate,
                 })(
-                  <DatePicker 
+                  <DatePicker
                     label="开始日期"
                     onChange={() => {
                       this.props.form.setFieldsValue({
@@ -166,7 +166,7 @@ class AccumulationFilter extends Component {
                 getFieldDecorator('endDate', {
                   rules: [{
                     required: true,
-                    message: '结束日期是必须的',
+                    message: '结束日期是必填的',
                   }],
                   initialValue: AccumulationStore.getEndDate,
                 })(
@@ -187,11 +187,11 @@ class AccumulationFilter extends Component {
                 getFieldDecorator('board', {
                   rules: [{
                     required: true,
-                    message: '看板是必须的',
+                    message: '看板是必填的',
                   }],
                   initialValue: this.props.getTimeType(AccumulationStore.getBoardList, 'boardId'),
                 })(
-                  <Select 
+                  <Select
                     label="看板"
                     onChange={(value) => {
                       this.props.getColumnData(value);

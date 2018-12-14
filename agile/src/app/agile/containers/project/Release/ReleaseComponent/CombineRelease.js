@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
- Modal, Form, Select, message 
+ Modal, Form, Select, message
 } from 'choerodon-ui';
 import { stores, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
@@ -108,7 +108,7 @@ class CombineRelease extends Component {
               {getFieldDecorator('source', {
                 rules: [{
                   required: true,
-                  message: '合并版本是必须的',
+                  message: '合并版本是必填的',
                 }],
               })(
                 <Select
@@ -125,7 +125,7 @@ class CombineRelease extends Component {
               {getFieldDecorator('destination', {
                 rules: [{
                   required: true,
-                  message: '合并至版本是必须的',
+                  message: '合并至版本是必填的',
                 }],
               })(
                 <Select
