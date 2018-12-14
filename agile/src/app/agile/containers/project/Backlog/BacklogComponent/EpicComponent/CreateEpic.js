@@ -105,7 +105,7 @@ class CreateEpic extends Component {
                 rules: [{
                   required: true,
                   message: '史诗名称不能为空',
-                  transform: value => value.trim(),
+                  transform: value => (value ? value.trim() : value),
                 }],
               })(
                 <Input label="史诗名称" maxLength={44} />,
@@ -116,7 +116,7 @@ class CreateEpic extends Component {
                 rules: [{
                   required: true,
                   message: '概要不能为空',
-                  transform: value => value.trim(),
+                  transform: value => (value ? value.trim() : value),
                 }],
               })(
                 <TextArea autosize label="概要" maxLength={44} />,
