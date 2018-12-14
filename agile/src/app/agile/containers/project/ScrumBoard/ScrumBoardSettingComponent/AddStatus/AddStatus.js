@@ -53,6 +53,9 @@ class AddStatus extends Component {
   }
 
   checkStatusName(rule, value, callback) {
+    if (!value) {
+      callback();
+    }
     const { store, form } = this.props;
     if (this.checkStatusDebounce) {
       clearTimeout(this.checkStatusDebounce);

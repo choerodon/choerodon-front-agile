@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
- Modal, Form, Input, DatePicker, message
+  Modal, Form, Input, DatePicker,
 } from 'choerodon-ui';
 import moment from 'moment';
 import { Content, stores } from 'choerodon-front-boot';
@@ -18,7 +18,7 @@ class AddRelease extends Component {
     super(props);
     this.state = {
       expectReleaseDate: null,
-      startDate: null,
+      startDate: moment(),
       loading: false,
     };
   }
