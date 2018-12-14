@@ -699,6 +699,7 @@ class SprintReport extends Component {
                         }, () => {
                           // this.getChartData();
                           this.getChartCoordinate();
+                          this.axiosGetRestDays();
                         });
                       }}
                     >
