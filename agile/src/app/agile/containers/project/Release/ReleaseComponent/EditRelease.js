@@ -85,7 +85,6 @@ class EditRelease extends Component {
 
   render() {
     const { loading, expectReleaseDate, startDate } = this.state;
-    debugger;
     const { form, visible, onCancel } = this.props;
     const { getFieldDecorator } = form;
     const data = JSON.parse(JSON.stringify(ReleaseStore.getVersionDetail));

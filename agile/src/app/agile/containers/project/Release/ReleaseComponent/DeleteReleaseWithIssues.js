@@ -28,7 +28,6 @@ class DeleteReleaseWithIssue extends Component {
 
   componentWillMount() {
     ReleaseStore.axiosGetVersionListWithoutPage().then((res) => {
-      debugger;
       this.setState({
         planning: res,
       });
@@ -74,7 +73,6 @@ class DeleteReleaseWithIssue extends Component {
   }
 
   render() {
-    debugger;
     const { planning } = this.state;
     return (
       <Sidebar
