@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Page, Header, Content, stores, Permission, 
+  Page, Header, Content, stores, Permission,
 } from 'choerodon-front-boot';
 import {
-  Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin, Tooltip, 
+  Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin, Tooltip,
 } from 'choerodon-ui';
 import { Action } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
@@ -114,7 +114,7 @@ class ReleaseHome extends Component {
           .then((res) => {
             ReleaseStore.setPublicVersionDetail(res);
             ReleaseStore.setVersionDetail(record);
-            this.setState({ publicVersion: true }); 
+            this.setState({ publicVersion: true });
           }).catch((error) => {
           });
       } else {
@@ -242,7 +242,7 @@ class ReleaseHome extends Component {
         <Tooltip title={text}>
           <div
             role="none"
-            style={{ 
+            style={{
               maxWidth: '94px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}
           >
@@ -266,8 +266,8 @@ class ReleaseHome extends Component {
       key: 'key',
       render: text => (
         <p style={{ marginBottom: 0 }}>
-          <span 
-            style={{ 
+          <span
+            style={{
               color: '#fff',
               background: COLOR_MAP[text],
               display: 'inline-block',
@@ -385,8 +385,8 @@ class ReleaseHome extends Component {
             </Button>
           </Permission>
           <Permission service={['agile-service.product-version.mergeVersion']} type={type} projectId={projectId} organizationId={orgId}>
-            <Button 
-              className="leftBtn2" 
+            <Button
+              className="leftBtn2"
               funcType="flat"
               onClick={this.handleCombineRelease.bind(this)}
             >

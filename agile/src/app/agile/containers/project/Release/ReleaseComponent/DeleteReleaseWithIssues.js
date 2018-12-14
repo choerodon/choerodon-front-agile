@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import {
-  Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, 
+  Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select,
 } from 'choerodon-ui';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 
@@ -22,7 +22,17 @@ class DeleteReleaseWithIssue extends Component {
       fixTargetRadio: 0,
       influenceTargetVersionId: '',
       fixTargetVersionId: '',
+      planning: [],
     };
+  }
+
+  componentWillMount() {
+    ReleaseStore.axiosGetVersionListWithoutPage().then((res) => {
+      debugger;
+      this.setState({
+        planning: res,
+      });
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -64,6 +74,8 @@ class DeleteReleaseWithIssue extends Component {
   }
 
   render() {
+    debugger;
+    const { planning } = this.state;
     return (
       <Sidebar
         title={`删除版本 ${this.props.versionDelInfo.versionName}`}
@@ -85,8 +97,8 @@ class DeleteReleaseWithIssue extends Component {
                 {
                   this.props.versionDelInfo.versionNames.length > 0 ? (
                     <div
-                      style={{ 
-                        flex: 4, 
+                      style={{
+                        flex: 4,
                       }}
                     >
                       <RadioGroup
@@ -116,18 +128,18 @@ class DeleteReleaseWithIssue extends Component {
                                 influenceTargetVersionId: value,
                               });
                             }}
-                            defaultValue={this.props.versionDelInfo.versionNames 
-                              ? this.props.versionDelInfo.versionNames[0].versionId : undefined}
+                            defaultValue={this.props.versionDelInfo.versionNames
+                              ? planning[0].versionId : undefined}
                           >
                             {this.props.versionDelInfo.versionNames ? (
-                              this.props.versionDelInfo.versionNames.map(item => (
+                              planning.map(item => (
                                 <Option value={item.versionId}>{item.name}</Option>
                               ))
                             ) : ''}
                           </Select>
                         </Radio>
                         <Radio
-                          style={{ 
+                          style={{
                             display: 'block',
                             height: '30px',
                             lineHeight: '30px',
@@ -179,18 +191,18 @@ class DeleteReleaseWithIssue extends Component {
                                 fixTargetVersionId: value,
                               });
                             }}
-                            defaultValue={this.props.versionDelInfo.versionNames 
-                              ? this.props.versionDelInfo.versionNames[0].versionId : undefined}
+                            defaultValue={this.props.versionDelInfo.versionNames
+                              ? planning[0].versionId : undefined}
                           >
                             {this.props.versionDelInfo.versionNames ? (
-                              this.props.versionDelInfo.versionNames.map(item => (
+                              planning.map(item => (
                                 <Option value={item.versionId}>{item.name}</Option>
                               ))
                             ) : ''}
                           </Select>
                         </Radio>
                         <Radio
-                          style={{ 
+                          style={{
                             display: 'block',
                             height: '30px',
                             lineHeight: '30px',
