@@ -179,7 +179,11 @@ class IssueTable extends Component {
         render: record => (
           <Sprint
             objArray={record.issueSprintDTOS}
-            name={record.issueSprintDTOS && record.issueSprintDTOS.length ? record.issueSprintDTOS[0].sprintName : null}
+            name={
+              record.issueSprintDTOS && record.issueSprintDTOS.length
+                ? record.issueSprintDTOS[0].sprintName
+                : null
+            }
           />
         ),
       },
@@ -212,14 +216,31 @@ class IssueTable extends Component {
         filters: [],
         key: 'version',
         hidden: true,
-        render: record => <Sprint objArray={record.versionIssueRelDTOS} name={record.versionIssueRelDTOS && record.versionIssueRelDTOS.length ? record.versionIssueRelDTOS[0].name : null} />,
+        render: record => (
+          <Sprint
+            objArray={record.versionIssueRelDTOS}
+            name={
+            record.versionIssueRelDTOS && record.versionIssueRelDTOS.length
+              ? record.versionIssueRelDTOS[0].name
+              : null}
+          />
+        ),
       },
       {
         title: '模块',
         key: 'component',
         filters: [],
         hidden: true,
-        render: record => <Sprint objArray={record.componentIssueRelDTOList} name={record.componentIssueRelDTOList && record.componentIssueRelDTOList.length ? record.componentIssueRelDTOList[0].name : null} />,
+        render: record => (
+          <Sprint
+            objArray={record.componentIssueRelDTOList}
+            name={
+              record.componentIssueRelDTOList && record.componentIssueRelDTOList.length
+                ? record.componentIssueRelDTOList[0].name
+                : null
+            }
+          />
+        ),
       },
       {
         title: '史诗',
