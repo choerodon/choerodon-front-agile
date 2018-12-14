@@ -759,6 +759,7 @@ class BurndownChartHome extends Component {
                       }, () => {
                         this.getChartData();
                         this.getChartCoordinate();
+                        this.axiosGetRestDays();
                       });
                     }}
                   >
@@ -783,16 +784,8 @@ class BurndownChartHome extends Component {
                     checked={this.state.restDayShow}
                     onChange={this.onCheckChange}
                   >
-
-
-
-
-
-
-
-
                     显示非工作日
-                                    </Checkbox>
+                  </Checkbox>
                 </div>
                 <Spin spinning={this.state.chartLoading}>
                   <ReactEcharts option={this.getOption()} />
