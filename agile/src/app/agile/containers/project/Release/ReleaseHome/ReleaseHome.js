@@ -50,6 +50,7 @@ class ReleaseHome extends Component {
       combineVisible: false,
       loading: false,
       sourceList: [],
+      release: false,
     };
   }
 
@@ -114,7 +115,7 @@ class ReleaseHome extends Component {
           .then((res) => {
             ReleaseStore.setPublicVersionDetail(res);
             ReleaseStore.setVersionDetail(record);
-            this.setState({ publicVersion: true });
+            this.setState({ publicVersion: true, release: record });
           }).catch((error) => {
           });
       } else {
@@ -229,6 +230,7 @@ class ReleaseHome extends Component {
       versionDelInfo,
       selectItem,
       publicVersion,
+      release,
     } = this.state;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -450,15 +452,18 @@ class ReleaseHome extends Component {
               />
             }
           </Spin>
-          <AddRelease
-            visible={addRelease}
-            onCancel={() => {
-              this.setState({
-                addRelease: false,
-              });
-            }}
-            refresh={this.refresh.bind(this, pagination)}
-          />
+          {addRelease
+            ? (
+              <AddRelease
+                visible={addRelease}
+                onCancel={() => {
+                  this.setState({
+                    addRelease: false,
+                  });
+                }}
+                refresh={this.refresh.bind(this, pagination)}
+              />) : ''
+          }
           <Modal
             title={`删除版本 ${versionDelete.name}`}
             visible={JSON.stringify(versionDelete) !== '{}'}
@@ -530,6 +535,7 @@ class ReleaseHome extends Component {
           ) : ''}
           <PublicRelease
             visible={publicVersion}
+            release={release}
             onCancel={() => {
               this.setState({
                 publicVersion: false,

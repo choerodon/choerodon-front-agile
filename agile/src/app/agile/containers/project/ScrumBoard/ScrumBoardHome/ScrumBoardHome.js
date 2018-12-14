@@ -534,7 +534,9 @@ class ScrumBoardHome extends Component {
             rank,
           ).then((data) => {
             if (data.failed) {
-              // message.info(data.message);
+              if (data.code === 'error.instanceFeignClient.executeTransform') {
+                message.warn('由于状态机的配置，不能将问题移动到该状态');
+              }
               ScrumBoardStore.setBoardData(originState);
             } else {
               for (let index = 0, len = ScrumBoardStore.getStatusList.length;

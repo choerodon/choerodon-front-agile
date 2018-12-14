@@ -64,7 +64,10 @@ class PublicRelease extends Component {
 
   render() {
     // const { getFieldDecorator } = this.props.form;
-    const { form: { getFieldDecorator, getFieldValue }, visible, onCancel } = this.props;
+    const {
+      form: { getFieldDecorator, getFieldValue },
+      visible, onCancel, release,
+    } = this.props;
     return (
       <Sidebar
         title="发布版本"
@@ -167,7 +170,12 @@ class PublicRelease extends Component {
                         message: '发布日期是必填的',
                       }],
                     })(
-                      <DatePicker style={{ width: 512 }} label="发布日期" />,
+                      <DatePicker
+                        style={{ width: 512 }}
+                        label="发布日期"
+                        disabledDate={release.startDate
+                          ? current => current < moment(release.startDate) : () => false}
+                      />,
                     )}
                   </FormItem>
                 </Form>
