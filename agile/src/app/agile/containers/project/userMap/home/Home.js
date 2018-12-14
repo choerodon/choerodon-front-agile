@@ -33,13 +33,13 @@ let inWhich;
 
 function toFullScreen(dom) {
   if (dom.requestFullscreen) {
-    return dom.requestFullScreen();
-  } else if (dom.webkitRequestFullScreen) {
-    return dom.webkitRequestFullScreen();
+    dom.requestFullscreen();
+  } else if (dom.webkitRequestFullscreen) {
+    dom.webkitRequestFullscreen();
   } else if (dom.mozRequestFullScreen) {
-    return dom.mozRequestFullScreen();
+    dom.mozRequestFullScreen();
   } else {
-    return dom.msRequestFullscreen();
+    dom.msRequestFullscreen();
   }
 }
 
