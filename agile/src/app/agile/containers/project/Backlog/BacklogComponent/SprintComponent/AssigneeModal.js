@@ -41,13 +41,13 @@ class AssigneeModal extends Component {
       render: text => (text || '无'),
     }, {
       title: '总任务工时',
-      dataIndex: 'remainingTime',
-      key: 'remainingTime',
+      dataIndex: 'totalRemainingTime',
+      key: 'totalRemainingTime',
       render: text => (text || '无'),
     }, {
       title: '剩余任务工时',
-      dataIndex: 'totalRemainingTime',
-      index: 'totalRemainingTime',
+      dataIndex: 'remainingTime',
+      index: 'remainingTime',
       render: text => (text || '无'),
     }];
     const assignData = data.assigneeIssues;
@@ -76,7 +76,7 @@ class AssigneeModal extends Component {
       }
     }
     const total = {
-      totalIssue, totalRemainIssueCount, totalStoryPoints, totalTime, totalRemainTime, 
+      totalIssue, totalRemainIssueCount, totalStoryPoints, totalTime, totalRemainTime,
     };
     let noAssign = [];
     let dataSource = [];
