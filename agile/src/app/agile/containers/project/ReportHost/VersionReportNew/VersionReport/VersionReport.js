@@ -459,13 +459,15 @@ class EpicReport extends Component {
       ...[
         {
           width: '15%',
-          title: '编码',
+          title: '问题编号',
           dataIndex: 'issueNum',
           render: (issueNum, record) => (
             <span
               style={{
                 color: '#3f51b5',
                 cursor: 'pointer',
+                display: 'block',
+                minWidth: 85,
               }}
               role="none"
               onClick={() => {
@@ -486,7 +488,7 @@ class EpicReport extends Component {
           dataIndex: 'summary',
           render: summary => (
             <div style={{ width: '100%', overflow: 'hidden' }}>
-              <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={summary}>
+              <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={`问题概要：${summary}`}>
                 <p style={{
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0,
                 }}
@@ -504,6 +506,7 @@ class EpicReport extends Component {
           render: (typeCode, record) => (
             <div>
               <TypeTag
+                style={{ minWidth: 90 }}
                 data={record.issueTypeDTO}
                 showName
               />
@@ -517,6 +520,7 @@ class EpicReport extends Component {
           render: (priorityId, record) => (
             <div>
               <PriorityTag
+                style={{ minWidth: 55 }}
                 priority={record.priorityDTO}
               />
             </div>
@@ -547,7 +551,7 @@ class EpicReport extends Component {
           title: VS.beforeCurrentUnit === 'story_point' ? '故事点' : '剩余时间',
           dataIndex: 'storyPoints',
           render: (storyPoints, record) => (
-            <div>
+            <div style={{ minWidth: 15 }}>
               {this.getLabel(record)}
             </div>
           ),

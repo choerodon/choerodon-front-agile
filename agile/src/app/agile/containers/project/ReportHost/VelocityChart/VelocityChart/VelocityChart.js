@@ -250,11 +250,14 @@ class VelocityChart extends Component {
     const column = [
       {
         width: '33%',
+        // width: 65,
         title: '冲刺',
         dataIndex: 'sprintName',
         render: (sprintName, record) => (
           <span
             style={{
+              display: 'inline-block',
+              minWidth: '65px',
               color: '#3f51b5',
               cursor: 'pointer',
             }}
@@ -280,7 +283,11 @@ class VelocityChart extends Component {
         title: '预估',
         dataIndex: 'committedRemainTime',
         render: (committedRemainTime, record) => (
-          <span>
+          <span style={{
+            display: 'inline-block',
+            minWidth: '100px',
+          }}
+          >
             {/* {this.transformRemainTime(committedRemainTime)} */}
             {this.getTableValue(record, 'committed')}
           </span>
@@ -291,7 +298,11 @@ class VelocityChart extends Component {
         title: '已完成',
         dataIndex: 'completedRemainTime',
         render: (completedRemainTime, record) => (
-          <span>
+          <span style={{
+            display: 'inline-block',
+            minWidth: '25px',
+          }}
+          >
             {/* {this.transformRemainTime(completedRemainTime)} */}
             {this.getTableValue(record, 'completed')}
           </span>
@@ -377,8 +388,14 @@ class VelocityChart extends Component {
                       );
                     }}
                   >
+
+
+
+
+
+
                     待办事项
-                  </span>
+                                    </span>
                   <span>中创建一个冲刺</span>
                 </div>
 )}

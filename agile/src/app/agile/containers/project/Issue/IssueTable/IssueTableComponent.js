@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Tooltip, Tag } from 'choerodon-ui';
 import TimeAgo from 'timeago-react';
 import TypeTag from '../../../../components/TypeTag/TypeTag';
@@ -14,7 +14,7 @@ import PriorityTag from '../../../../components/PriorityTag/PriorityTag';
 export function IssueNum({ text }) {
   return (
     <Tooltip mouseEnterDelay={0.5} title={`问题编号： ${text}`}>
-      <a>
+      <a style={{ display: 'block', minWidth: 85 }}>
         {text}
       </a>
     </Tooltip>
@@ -31,6 +31,7 @@ export function TypeCode({ record }) {
     <TypeTag
       data={record.issueTypeDTO}
       showName={record.issueTypeDTO.name}
+      style={{ minWidth: 80 }}
     />
   );
 }
@@ -60,6 +61,7 @@ export function Priority({ record }) {
     <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityDTO ? record.priorityDTO.name : ''}`}>
       <PriorityTag
         priority={record.priorityDTO}
+        style={{ minWidth: 65 }}
       />
     </Tooltip>
   );
@@ -111,10 +113,15 @@ export function Assignee({ text, id, img }) {
 export function LastUpdateTime({ text }) {
   return (
     <Tooltip mouseEnterDelay={0.5} title={`日期： ${text}`}>
-      <TimeAgo
-        datetime={text}
-        locale="zh_CN"
-      />
+      <div
+        style={{ minWidth: 50 }}
+      >
+        <TimeAgo
+          datetime={text}
+          locale="zh_CN"
+        />
+      </div>
+      
     </Tooltip>
   );
 }

@@ -142,8 +142,7 @@ class Link extends Component {
       {
         title: '',
         dataIndex: 'linkTypeId',
-        // width: '15%',
-        width: '100px',
+        width: 100,
         render: (linkTypeId, record) => (
           <div>
             <Permission

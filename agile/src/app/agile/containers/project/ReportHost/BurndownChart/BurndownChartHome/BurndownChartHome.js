@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Spin, message, Icon, Select, Table, Menu, Checkbox,
+  Button, Spin, message, Icon, Select, Table, Menu, Checkbox, Tooltip,
 } from 'choerodon-ui';
 import {
   Page, Header, Content, stores, 
@@ -521,7 +521,17 @@ class BurndownChartHome extends Component {
         }
       }
     }
-    return result;
+    return (
+      <p style={{ 
+        maxWidth: '60px',
+        whiteSpace: 'nowrap', 
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+      }}
+      >
+        {result}
+      </p>
+    );
   }
 
   renderUp(item) {
@@ -588,7 +598,15 @@ class BurndownChartHome extends Component {
       <div>
         {
           splitArray.map(item => (
-            <p>{this.judgeText(item)}</p>
+            <Tooltip mouseEnterDelay={0.5} title={`事件类型：${this.judgeText(item)}`}>
+              <p style={{
+                maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
+              }}
+              >
+                {this.judgeText(item)}
+
+              </p>
+            </Tooltip>
           ))
         }
       </div>
@@ -608,17 +626,35 @@ class BurndownChartHome extends Component {
       title: '日期',
       dataIndex: 'date',
       key: 'date',
+      width: '25%',
+      render: text => (
+        <Tooltip mouseEnterDelay={0.5} title={`日期：${text}`}>
+          <p style={{ 
+            maxWidth: '120px',
+            whiteSpace: 'nowrap', 
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+          }}
+          >
+            {text}
+          </p>
+        </Tooltip>
+      ),
     }, {
       title: '问题',
       dataIndex: 'issues',
       key: 'issues',
+      width: '25%',
       render: (text, record) => (
         <div>
           {
             text.map(item => (
               <p
                 style={{ 
+                  maxWidth: '130px',
                   whiteSpace: 'nowrap', 
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
                   color: '#3F51B5',
                   cursor: 'pointer',
                 }}
@@ -633,8 +669,9 @@ class BurndownChartHome extends Component {
                   }
                 }}
               >
-                {item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}
-
+                <Tooltip mouseEnterDelay={0.5} title={`问题：${item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}`}>
+                  {item.parentIssueId ? `${item.parentIssueNum}/${item.issueNum}` : item.issueNum}
+                </Tooltip>
               </p>
             ))
           }
@@ -644,6 +681,7 @@ class BurndownChartHome extends Component {
       title: '事件类型',
       dataIndex: 'type',
       key: 'type',
+      width: '20%',
       render: text => (
         <div>{this.renderTypeText(text)}</div>
       ),
@@ -651,11 +689,12 @@ class BurndownChartHome extends Component {
       title: '事件详情',
       dataIndex: 'detail',
       key: 'detail',
+      width: '10.5%',
       render: (text, record) => (
-        <div>
+        <div className="textDisplayOverflow">
           {
             record.issues.map(item => (
-              <div>
+              <div className="textDisplayOverflow">
                 {this.renderDetail(item, record)}
               </div>
             ))
@@ -666,11 +705,12 @@ class BurndownChartHome extends Component {
       title: '升',
       dataIndex: 'up',
       key: 'up',
+      width: '6.5%',
       render: (text, record) => (
         <div>
           {
             record.issues.map(item => (
-              <div>
+              <div style={{ minWidth: 15 }}>
                 {this.renderUp(item)}
               </div>
             ))
@@ -681,11 +721,12 @@ class BurndownChartHome extends Component {
       title: '降',
       dataIndex: 'down',
       key: 'down',
+      width: '6.5%',
       render: (text, record) => (
-        <div>
+        <div className="textDisplayOverflow">
           {
             record.issues.map(item => (
-              <div>
+              <div style={{ minWidth: 15 }}>
                 {this.renderDown(item)}
               </div>
             ))
@@ -696,6 +737,10 @@ class BurndownChartHome extends Component {
       title: '剩余',
       dataIndex: 'rest',
       key: 'rest',
+      width: '6.5%',
+      render: text => (
+        <p style={{ minWidth: 15 }}>{text}</p>
+      ),
     }];
     let sprintName;
     for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
@@ -784,8 +829,37 @@ class BurndownChartHome extends Component {
                     checked={this.state.restDayShow}
                     onChange={this.onCheckChange}
                   >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     显示非工作日
-                  </Checkbox>
+</Checkbox>
                 </div>
                 <Spin spinning={this.state.chartLoading}>
                   <ReactEcharts option={this.getOption()} />
