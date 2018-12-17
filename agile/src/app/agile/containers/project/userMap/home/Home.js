@@ -102,6 +102,7 @@ class Home extends Component {
     UserMapStore.setCurrentFilter(false, false, []);
     UserMapStore.setMode('none');
     UserMapStore.setIssues([]);
+    UserMapStore.setAssigneeFilterIds([]);
     UserMapStore.setEpics([]);
     UserMapStore.setTop(0);
     UserMapStore.setLeft(0);
@@ -389,7 +390,7 @@ class Home extends Component {
     UserMapStore.initData(true);
     UserMapStore.setShowDoneEpic(false);
     UserMapStore.setIsApplyToEpic(false);
-    UserMapStore.setCurrentFilter([]);
+    // UserMapStore.setCurrentFilter(false, false[]);
     this.setState({
       showDoneEpicCheckbox: false,
       filterEpicCheckbox: false,
