@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-import { Modal, Form, Input, Select, Icon } from 'choerodon-ui';
+import {
+  Modal, Form, Input, Select, Icon,
+} from 'choerodon-ui';
 import { stores, Content, axios } from 'choerodon-front-boot';
 import './CreateBranch.scss';
 import './commom.scss';
 
 const { AppState } = stores;
-const Sidebar = Modal.Sidebar;
+const { Sidebar } = Modal;
 const { Option, OptGroup } = Select;
 const FormItem = Form.Item;
 const MAP = {
@@ -21,18 +23,19 @@ class CreateBranch extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: 'feature',
-      value: '',
+      // name: 'feature',
+      // value: '',
       confirmLoading: false,
-      selectLoading: false,
+      selectLoading: true,
+      branchLoading: true,
       originApps: [],
       branchs: [],
-      branchsShowMore: false,
+      // branchsShowMore: false,
       branchsInput: '',
       branchsSize: 5,
       branchsObj: {},
       tags: [],
-      tagsShowMore: false,
+      // tagsShowMore: false,
       tagsSize: 5,
       tagsObj: {},
     };
@@ -40,11 +43,12 @@ class CreateBranch extends Component {
 
   handleOk = (e) => {
     e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, values) => {
+    const { form, issueId, onOk } = this.props;
+    form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const devopsBranchDTO = {
           branchName: values.type === 'custom' ? values.name : `${values.type}-${values.name}`,
-          issueId: this.props.issueId,
+          issueId,
           originBranch: values.branch,
         };
         const applicationId = values.app;
@@ -57,7 +61,7 @@ class CreateBranch extends Component {
             this.setState({
               confirmLoading: false,
             });
-            this.props.onOk();
+            onOk();
           })
           .catch((error) => {
             this.setState({
@@ -82,26 +86,45 @@ class CreateBranch extends Component {
     }
   };
 
+  onApplicationNameChange = () => {
+    // this.setState({ selectLoading: true });
+    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps`)
+      .then((res) => {
+        this.setState({
+          originApps: res,
+          selectLoading: false,
+          branchLoading: true,
+        });
+      });
+  };
+
   render() {
-    const { getFieldDecorator } = this.props.form;
-    const { visible, store } = this.props;
+    const {
+      visible, store, form, form: { getFieldDecorator },
+      onCancel, issueNum, typeCode,
+    } = this.props;
+    const {
+      confirmLoading, selectLoading, branchLoading,
+      originApps, branchs, branchsObj, branchsSize,
+      branchsInput, tags, tagsObj, tagsSize,
+    } = this.state;
     return (
       <Sidebar
         className="c7n-createBranch"
         title="创建分支"
         visible={visible}
         onOk={this.handleOk}
-        onCancel={this.props.onCancel}
+        onCancel={onCancel}
         okText="创建"
         cancelText="取消"
-        confirmLoading={this.state.confirmLoading}
+        confirmLoading={confirmLoading}
       >
         <Content
           style={{
             padding: 0,
             width: 512,
           }}
-          title={`对问题“${this.props.issueNum}”创建分支`}
+          title={`对问题“${issueNum}”创建分支`}
           description="您可以在此选择应用、分支来源，可以修改默认的分支类型及分支名称，即可为该问题创建关联的分支。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/issue/manage-branch/"
         >
@@ -116,27 +139,21 @@ class CreateBranch extends Component {
                 <Select
                   label="应用名称"
                   allowClear
-                  onFocus={() => {
-                    this.setState({ selectLoading: true });
-                    axios.get(`/devops/v1/projects/${AppState.currentMenuType.id}/apps`)
-                      .then((res) => {
-                        this.setState({
-                          originApps: res,
-                          selectLoading: false,
-                        });
-                      });
-                  }}
+                  onFocus={this.onApplicationNameChange}
                   filter
                   optionFilterProp="children"
-                  filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                  loading={this.state.selectLoading}
+                  filterOption={
+                    (input, option) => option.props.children.toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0
+                  }
+                  loading={selectLoading}
                 >
-                  {this.state.originApps.map(app => (
+                  {originApps.map(app => (
                     <Option value={app.id} key={app.id}>{app.name}</Option>
                   ))}
                 </Select>,
               )}
-            </FormItem> 
+            </FormItem>
             <div className="branch-formItem-icon">
               <span className="icon icon-wrap_text" />
             </div>
@@ -147,14 +164,16 @@ class CreateBranch extends Component {
                 <Select
                   label="分支来源"
                   allowClear
-                  disabled={!this.props.form.getFieldValue('app')}
+                  disabled={!form.getFieldValue('app')}
                   filter
                   filterOption={false}
                   optionLabelProp="value"
-                  loading={this.state.selectLoading}
+                  loading={branchLoading}
                   onFilterChange={(input) => {
-                    this.setState({ branchsInput: input });
-                    axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/branches?page=0&size=5`, {
+                    this.setState({
+                      branchsInput: input,
+                    });
+                    axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${form.getFieldValue('app')}/git/branches?page=0&size=5`, {
                       searchParam: {
                         branchName: [input],
                       },
@@ -164,11 +183,12 @@ class CreateBranch extends Component {
                         this.setState({
                           branchs: res.content,
                           branchsSize: res.numberOfElements,
-                          branchsShowMore: res.totalPages !== 1,
+                          // branchsShowMore: res.totalPages !== 1,
                           branchsObj: res,
+                          branchLoading: false,
                         });
                       });
-                    axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/tags_list_options?page=0&size=5`, {
+                    axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${form.getFieldValue('app')}/git/tags_list_options?page=0&size=5`, {
                       searchParam: {
                         tagName: [input],
                       },
@@ -178,18 +198,22 @@ class CreateBranch extends Component {
                         this.setState({
                           tags: res.content,
                           tagsSize: res.numberOfElements,
-                          tagsShowMore: res.totalPages !== 1,
+                          // tagsShowMore: res.totalPages !== 1,
                           tagsObj: res,
                         });
                       });
                   }}
                 >
                   <OptGroup label="分支" key="branchGroup">
-                    {this.state.branchs.map(s => (
-                      <Option value={s.branchName} key={s.branchName}><Icon type="branch" />{s.branchName}</Option>
+                    {branchs.map(s => (
+                      <Option value={s.branchName} key={s.branchName}>
+                        <Icon type="branch" />
+                        {s.branchName}
+                      </Option>
                     ))}
                     {
-                      this.state.branchsObj.totalElements > this.state.branchsObj.numberOfElements && this.state.branchsObj.numberOfElements > 0 ? (
+                      branchsObj.totalElements > branchsObj.numberOfElements
+                      && branchsObj.numberOfElements > 0 ? (
                         <Option key="more">
                           <div
                             role="none"
@@ -199,9 +223,9 @@ class CreateBranch extends Component {
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/branches?page=0&size=${this.state.branchsSize + 5}`, {
+                              axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${form.getFieldValue('app')}/git/branches?page=0&size=${branchsSize + 5}`, {
                                 searchParam: {
-                                  branchName: [this.state.branchsInput],
+                                  branchName: [branchsInput],
                                 },
                                 param: null,
                               })
@@ -209,7 +233,7 @@ class CreateBranch extends Component {
                                   this.setState({
                                     branchs: res.content,
                                     branchsSize: res.numberOfElements,
-                                    branchsShowMore: res.totalPages !== 1,
+                                    // branchsShowMore: res.totalPages !== 1,
                                     branchsObj: res,
                                   });
                                 });
@@ -218,15 +242,19 @@ class CreateBranch extends Component {
                             查看更多
                           </div>
                         </Option>
-                      ) : null
-                    } 
+                        ) : null
+                    }
                   </OptGroup>
                   <OptGroup label="tag" key="tagGroup">
-                    {this.state.tags.map(s => (
-                      <Option value={s.tagName} key={s.tagName}><Icon type="local_offer" />{s.tagName}</Option>
+                    {tags.map(s => (
+                      <Option value={s.tagName} key={s.tagName}>
+                        <Icon type="local_offer" />
+                        {s.tagName}
+                      </Option>
                     ))}
                     {
-                      this.state.tagsObj.totalElements > this.state.branchsObj.numberOfElements && this.state.branchsObj.numberOfElements > 0 ? (
+                      tagsObj.totalElements > branchsObj.numberOfElements
+                      && branchsObj.numberOfElements > 0 ? (
                         <Option key="more">
                           <div
                             role="none"
@@ -236,9 +264,9 @@ class CreateBranch extends Component {
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${this.props.form.getFieldValue('app')}/git/tags_list_options?page=0&size=${this.state.tagsSize + 5}`, {
+                              axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${form.getFieldValue('app')}/git/tags_list_options?page=0&size=${tagsSize + 5}`, {
                                 searchParam: {
-                                  tagName: [this.state.branchsInput],
+                                  tagName: [branchsInput],
                                 },
                                 param: null,
                               })
@@ -246,7 +274,7 @@ class CreateBranch extends Component {
                                   this.setState({
                                     tags: res.content,
                                     tagsSize: res.numberOfElements,
-                                    tagsShowMore: res.totalPages !== 1,
+                                    // tagsShowMore: res.totalPages !== 1,
                                     tagsObj: res,
                                   });
                                 });
@@ -255,20 +283,20 @@ class CreateBranch extends Component {
                             查看更多
                           </div>
                         </Option>
-                      ) : null
-                    } 
+                        ) : null
+                    }
                   </OptGroup>
                 </Select>,
               )}
             </FormItem>
-            
+
             <div className="branch-formItem-icon">
               <span className="icon icon-branch" />
             </div>
-            <FormItem className={'c7n-formItem_180'}>
+            <FormItem className="c7n-formItem_180">
               {getFieldDecorator('type', {
                 rules: [{ required: true, message: '请选择分支类型' }],
-                initialValue: MAP[this.props.typeCode || 'task'],
+                initialValue: MAP[typeCode || 'task'],
               })(
                 <Select
                   allowClear
@@ -293,11 +321,11 @@ class CreateBranch extends Component {
                 }, {
                   validator: this.checkName,
                 }],
-                initialValue: this.props.issueNum,
+                initialValue: issueNum,
               })(
                 <Input
                   label="分支名称"
-                  prefix={this.props.form.getFieldValue('type') === 'custom' || !this.props.form.getFieldValue('type') ? '' : `${this.props.form.getFieldValue('type')}-`}
+                  prefix={form.getFieldValue('type') === 'custom' || !form.getFieldValue('type') ? '' : `${form.getFieldValue('type')}-`}
                   maxLength={30}
                 />,
               )}
