@@ -41,6 +41,7 @@ class ScrumBoardHome extends Component {
       judgeUpdateParent: {},
       updateParentStatus: null,
       quickFilter: [],
+      assigneeFilterIds: [],
       translateId: [],
       expandFilter: false,
     };
@@ -123,8 +124,10 @@ class ScrumBoardHome extends Component {
   }
 
   // 根据泳道，统计各个分类下的数量
-  refresh = (boardId, value = null) => {
-    const { onlyMe, recent, quickFilter } = this.state;
+  refresh = (boardId) => {
+    const {
+      onlyMe, recent, quickFilter, assigneeFilterIds,
+    } = this.state;
     this.setState({
       spinIf: true,
     });
@@ -133,13 +136,11 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.setQuickSearchList(res);
       if (boardId) {
         // 加载冲刺及Issue
-        if (value) {
-          ScrumBoardStore.setAssigneeFilterIds(value);
-        }
         ScrumBoardStore.axiosGetBoardData(boardId,
           onlyMe ? AppState.getUserId : 0,
           recent,
-          quickFilter).then((data) => {
+          quickFilter,
+          assigneeFilterIds).then((data) => {
           this.setState({ dataSource: data });
           if (data) {
             ScrumBoardStore.setSprintData(data.currentSprint);
@@ -642,6 +643,14 @@ class ScrumBoardHome extends Component {
       // if(ScrumBoardStore.getIssues)
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
+  };
+
+  onAssigneeChange = (value) => {
+    this.setState({
+      assigneeFilterIds: value,
+    }, () => {
+      this.refresh(ScrumBoardStore.getSelectedBoard);
+    });
   }
 
   /**
@@ -1068,10 +1077,13 @@ class ScrumBoardHome extends Component {
              (
                <Button
                  className="leftBtn2"
-                 disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)}
+                 disabled={!dataSource ? false
+                   : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)}
                  funcType="flat"
                  onClick={() => {
-                   if (dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId) {
+                   if (dataSource
+                     && dataSource.currentSprint
+                     && dataSource.currentSprint.sprintId) {
                      history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`);
                    } else {
                      message.info('等待加载当前迭代');
@@ -1081,7 +1093,18 @@ class ScrumBoardHome extends Component {
                  <span>切换至工作台</span>
                </Button>
 
-              //  <Button className="leftBtn2" disabled={dataSource ? (dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId) : false} funcType="flat" onClick={() => { history.push(`/agile/iterationBoard/${dataSource && dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+              //  <Button className="leftBtn2"
+               //  disabled={dataSource ?
+               //  (dataSource
+               //  && dataSource.currentSprint
+               //  && dataSource.currentSprint.sprintId)
+               //  : false}
+               //  funcType="flat"
+               //  onClick={() => { history.push(`/agile/iterationBoard/
+               //  ${dataSource && dataSource.currentSprint.sprintId}?
+               //  type=project&id=${AppState.currentMenuType.id}&name=
+               //  ${AppState.currentMenuType.name}&organizationId=
+               //  ${AppState.currentMenuType.organizationId}`); }}>
               //   <span>切换至工作台</span>
               // </Button>
             )
@@ -1098,9 +1121,7 @@ class ScrumBoardHome extends Component {
                 <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
                   <QuickSearch
                     onQuickSearchChange={this.onQuickSearchChange}
-                    onAssigneeChange={(value) => {
-                      this.refresh(ScrumBoardStore.getSelectedBoard, value);
-                    }}
+                    onAssigneeChange={this.onAssigneeChange}
                   />
                 </div>
                 <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}>
