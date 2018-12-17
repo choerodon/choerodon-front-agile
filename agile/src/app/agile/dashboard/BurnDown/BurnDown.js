@@ -231,13 +231,12 @@ class BurnDown extends Component {
     diffDay.setDate(beginDay[2]);
     diffDay.setMonth(beginDay[1] - 1);
     diffDay.setFullYear(beginDay[0]);
-    result.push(start);
+    // result.push(start);
     while (i === 0) {
       if (restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         rest.push(moment(diffDay).format('YYYY-MM-DD'));
       }
-      const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
-      diffDay.setTime(countDay);
+      const countDay = diffDay.getTime();
       dateList[2] = diffDay.getDate();
       dateList[1] = diffDay.getMonth() + 1;
       dateList[0] = diffDay.getFullYear();
@@ -246,6 +245,7 @@ class BurnDown extends Component {
       if (restDayShow || !restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
       }
+      diffDay.setTime(countDay + 24 * 60 * 60 * 1000);
       if (String(dateList[0]) === endDay[0]
         && String(dateList[1]) === endDay[1]
         && String(dateList[2]) === endDay[2]) {

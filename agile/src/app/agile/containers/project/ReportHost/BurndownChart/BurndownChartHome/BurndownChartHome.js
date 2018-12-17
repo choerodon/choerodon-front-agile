@@ -82,13 +82,11 @@ class BurndownChartHome extends Component {
     diffDay.setDate(beginDay[2]);
     diffDay.setMonth(beginDay[1] - 1);
     diffDay.setFullYear(beginDay[0]);
-    result.push(start);
     while (i === 0) {
+      const countDay = diffDay.getTime();
       if (restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         rest.push(moment(diffDay).format('YYYY-MM-DD'));
       }
-      const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
-      diffDay.setTime(countDay);
       dateList[2] = diffDay.getDate();
       dateList[1] = diffDay.getMonth() + 1;
       dateList[0] = diffDay.getFullYear();
@@ -97,6 +95,7 @@ class BurndownChartHome extends Component {
       if (restDayShow || !restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
       }
+      diffDay.setTime(countDay + 24 * 60 * 60 * 1000);
       if (String(dateList[0]) === endDay[0] && String(dateList[1]) === endDay[1] && String(dateList[2]) === endDay[2]) {
         i = 1;
       }
@@ -187,7 +186,7 @@ class BurndownChartHome extends Component {
           const dayAmount = res.expectCount / countWorkDay;
           if (rest.includes(allDate[b])) {
             // 非工作日
-            if (b < len - 1) {
+            if (b < len) {
               markAreaData.push([
                 {
                   xAxis: b === 0 ? '' : allDate[b - 1].split(' ')[0].slice(5).replace('-', '/'),
