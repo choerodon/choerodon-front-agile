@@ -83,6 +83,9 @@ class EditFieldConfiguration extends Component {
               {
                       text.slice(0, 20).map((item) => {
                         if (item !== '用户') {
+                          if (item === '当前处理人') {
+                            return <li>经办人</li>;
+                          }
                           return (
                             <li>{item}</li>
                           );
