@@ -540,29 +540,32 @@ class SprintReport extends Component {
     const column = [
       {
         width: '15%',
-        title: '编码',
+        title: '问题编号',
         dataIndex: 'issueNum',
         render: (issueNum, record) => (
-          <span
-            style={{
-              color: '#3f51b5',
-              cursor: 'pointer',
-            }}
-            role="none"
-            onClick={() => {
-              const { history } = this.props;
-              const urlParams = AppState.currentMenuType;
-              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/sprintreport`);
-            }}
-          >
-            {issueNum} 
-            {' '}
-            {record.addIssue ? '*' : ''}
-
-          </span>
+          <Tooltip mouseEnterDelay={0.5} title={`问题编号：${issueNum}`}>
+            <span
+              style={{
+                display: 'block',
+                minWidth: '85px',
+                color: '#3f51b5',
+                cursor: 'pointer',
+              }}
+              role="none"
+              onClick={() => {
+                const { history } = this.props;
+                const urlParams = AppState.currentMenuType;
+                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/sprintreport`);
+              }}
+            >
+              {issueNum} 
+              {' '}
+              {record.addIssue ? '*' : ''}
+            </span>
+          </Tooltip>
         ),
       }, {
-        // width: '30%',
+        width: '30%',
         title: '概要',
         dataIndex: 'summary',
         render: (summary, record) => {
@@ -590,6 +593,7 @@ class SprintReport extends Component {
             <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.issueTypeDTO.name}`}>
               <div>
                 <TypeTag
+                  style={{ minWidth: 90 }}
                   data={record.issueTypeDTO}
                   showName
                 />
@@ -606,6 +610,7 @@ class SprintReport extends Component {
             <Tooltip mouseEnterDelay={0.5} placement="topLeft" title={`优先级： ${record.priorityDTO.name}`}>
               <div style={{ marginRight: 12 }}>
                 <PriorityTag
+                  style={{ minWidth: 55 }}
                   priority={record.priorityDTO}
                 />
               </div>
@@ -634,7 +639,7 @@ class SprintReport extends Component {
         title: '故事点',
         dataIndex: 'storyPoints',
         render: (storyPoints, record) => (
-          <div>
+          <div style={{ minWidth: 15 }}>
             {record.typeCode === 'story' ? storyPoints || '0' : ''}
           </div>
         ),

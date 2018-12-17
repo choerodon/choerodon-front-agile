@@ -276,22 +276,25 @@ class ReleaseDetail extends Component {
     const columns = [
       {
         width: '10%',
-        title: '任务编号',
+        title: '问题编号',
         dataIndex: 'issueNum',
         key: 'issueNum',
         render: (text, record) => (
-          <a
-            role="none"
-            onClick={() => {
-              if (record.parentIssueId) {
-                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${record.parentIssueNum}&paramIssueId=${record.parentIssueId}&paramOpenIssueId=${record.issueId}&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
-              } else {
-                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${record.issueNum}&paramIssueId=${record.issueId}&paramOpenIssueId=${record.issueId}&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
-              }
-            }}
-          >
-            <span className="textDisplayOneColumn">{text}</span>
-          </a>),
+          <Tooltip mouseEnterDelay={0.5} title={`问题编号： ${text}`}>
+            <a
+              role="none"
+              onClick={() => {
+                if (record.parentIssueId) {
+                  history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${record.parentIssueNum}&paramIssueId=${record.parentIssueId}&paramOpenIssueId=${record.issueId}&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
+                } else {
+                  history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${record.issueNum}&paramIssueId=${record.issueId}&paramOpenIssueId=${record.issueId}&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
+                }
+              }}
+            >
+              <span className="textDisplayOneColumn" style={{ minWidth: 85 }}>{text}</span>
+            </a>
+          </Tooltip>
+        ),
         filters: filterMap.get('issueNum'),
       },
       {
@@ -301,6 +304,7 @@ class ReleaseDetail extends Component {
         key: 'issueTypeId',
         render: (text, record) => (
           <TypeTag
+            style={{ minWidth: 90 }}
             data={record.issueTypeDTO}
             showName
           />
@@ -313,7 +317,11 @@ class ReleaseDetail extends Component {
         title: '概要',
         dataIndex: 'summary',
         key: 'summary',
-        render: text => <span className="textDisplayOneColumn">{text}</span>,
+        render: text => (
+          <Tooltip mouseEnterDelay={0.5} title={`问题概要：${text}`}>
+            <span className="textDisplayOneColumn" style={{ minWidth: 40 }}>{text}</span>
+          </Tooltip>
+        ),
         filters: filterMap.get('summary'),
       },
       {
@@ -322,14 +330,19 @@ class ReleaseDetail extends Component {
         dataIndex: 'assigneeName',
         key: 'assigneeName',
         render: (text, record) => (text ? (
-          <UserHead
-            user={{
-              id: record.assigneeId,
-              loginName: '',
-              realName: text,
-              avatar: record.assigneeImageUrl,
-            }}
-          />
+          <Tooltip mouseEnterDelay={0.5} title={`经办人： ${text}`}>
+            <div>
+              <UserHead
+                user={{
+                  id: record.assigneeId,
+                  loginName: '',
+                  realName: text,
+                  avatar: record.assigneeImageUrl,
+                }}
+              />
+            </div>
+          </Tooltip>
+         
         ) : ''),
         filters: filterMap.get('assigneeName'),
       },
@@ -340,6 +353,7 @@ class ReleaseDetail extends Component {
         key: 'priorityId',
         render: (text, record) => (
           <PriorityTag
+            style={{ minWidth: 55 }}
             priority={record.priorityDTO}
           />
         ),

@@ -147,7 +147,7 @@ class Issue extends Component {
   render() {
     // 清除整页滚动条
     if (document && document.getElementsByClassName('page-body').length) {
-      document.getElementsByClassName('page-body')[0].style.overflow = 'hidden';
+      // document.getElementsByClassName('page-body')[0].style.overflow = 'hidden';
     }
     return (
       <Page
@@ -189,7 +189,7 @@ class Issue extends Component {
             style={{
               display: 'block',
               overflowY: 'auto',
-              overflowX: 'hidden',
+              // overflowX: 'hidden',
               padding: '0px 18px',
             }}
           >

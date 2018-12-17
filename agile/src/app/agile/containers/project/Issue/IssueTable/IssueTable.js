@@ -110,6 +110,7 @@ class IssueTable extends Component {
         width: 128,
         sorter: true,
         filters: [],
+        // fixed: true,
         render: text => <IssueNum text={text} />,
       },
       {
@@ -121,7 +122,12 @@ class IssueTable extends Component {
         sorter: true,
         filters: IssueStore.getColumnFilter.get('typeId'),
         filterMultiple: true,
-        render: (text, record) => <TypeCode record={record} />,
+        // fixed: true,
+        render: (text, record) => (
+          <div>
+            <TypeCode record={record} />
+          </div>
+        ),
       },
       {
         title: '概要',
@@ -129,6 +135,7 @@ class IssueTable extends Component {
         className: 'summary',
         key: 'summary',
         filters: [],
+        // fixed: true,
         render: text => <Summary text={text} />,
       },
       {
@@ -265,7 +272,7 @@ class IssueTable extends Component {
         {...this.props}
         columns={columns}
         dataSource={IssueStore.getIssues}
-        // scroll={{ x: true }}
+        // scroll={{ x: 1600 }}
         empty={(
           <EmptyBlock
             style={{ marginTop: 60, marginBottom: 60 }}

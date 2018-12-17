@@ -427,13 +427,15 @@ class EpicReport extends Component {
       ...[
         {
           width: '15%',
-          title: '编码',
+          title: '问题编号',
           dataIndex: 'issueNum',
           render: (issueNum, record) => (
             <span
               style={{
                 color: '#3f51b5',
                 cursor: 'pointer',
+                display: 'block',
+                minWidth: 85,
               }}
               role="none"
               onClick={() => {
@@ -473,6 +475,7 @@ class EpicReport extends Component {
           render: (typeCode, record) => (
             <div>
               <TypeTag
+                style={{ minWidth: 90 }}
                 data={record.issueTypeDTO}
                 showName
               />
@@ -486,6 +489,7 @@ class EpicReport extends Component {
           render: (priorityId, record) => (
             <div>
               <PriorityTag
+                style={{ minWidth: 55 }}
                 priority={record.priorityDTO}
               />
             </div>
@@ -500,7 +504,7 @@ class EpicReport extends Component {
               <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusMapDTO.name}`}>
                 <div>
                   <StatusTag
-                    style={{ display: 'inline-block' }}
+                    style={{ display: 'inline-block', minWidth: 55 }}
                     name={record.statusMapDTO.name}
                     color={STATUS[record.statusMapDTO.type]}
                   />
@@ -516,7 +520,7 @@ class EpicReport extends Component {
           title: ES.beforeCurrentUnit === 'story_point' ? '故事点' : '剩余时间',
           dataIndex: 'storyPoints',
           render: (storyPoints, record) => (
-            <div>
+            <div style={{ minWidth: 15 }}>
               {this.getLabel(record)}
             </div>
           ),

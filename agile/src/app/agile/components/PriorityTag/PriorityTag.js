@@ -35,9 +35,10 @@ class PriorityTag extends Component {
   }
 
   render() {
-    const { priority } = this.props;
+    const { priority, style } = this.props;
     return (
       <div
+        style={style}
         className="c7n-priorityTag-container"
       >
         <div

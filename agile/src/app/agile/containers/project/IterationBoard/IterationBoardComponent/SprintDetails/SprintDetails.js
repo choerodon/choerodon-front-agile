@@ -161,7 +161,7 @@ class SprintDetails extends Component {
             columns={column}
             filterBar={false}
             pagination={doneIssues.length > 10 ? pagination : false}
-            scroll={{ x: true }}
+            scroll={{ x: false }}
             loading={loading}
             onChange={this.handleTableChange}
           />
@@ -179,7 +179,7 @@ class SprintDetails extends Component {
             columns={column}
             filterBar={false}
             pagination={undoIssues.length > 10 ? pagination : false}
-            scroll={{ x: true }}
+            scroll={{ x: false }}
             loading={loading}
             onChange={this.handleTableChange}
           />
@@ -197,7 +197,7 @@ class SprintDetails extends Component {
             columns={column}
             filterBar={false}
             pagination={undoAndNotEstimatedIssues.length > 10 ? pagination : false}
-            scroll={{ x: true }}
+            scroll={{ x: false }}
             loading={loading}
             onChange={this.handleTableChange}
           />
@@ -209,39 +209,46 @@ class SprintDetails extends Component {
     render() {
       const { activeKey, pagination, sprintId } = this.state;
       const column = [{
-        title: '编码',
+        title: '问题编号',
         dataIndex: 'issueNum',
         key: 'keyword',
-        // width: '94px',
+        width: 70,
         render: (issueNum, record) => (
-          <span
-            style={{
-              color: '#3f51b5',
-              cursor: 'pointer',
-            }}
-            role="none"
-            onClick={() => {
-              const { history } = this.props;
-              const urlParams = AppState.currentMenuType;
-              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=iterationBoard/${sprintId}`);
-            }}
-          >
-            {issueNum} 
-            {' '}
-            {record.addIssue ? '*' : ''}
-
-          </span>
+          <Tooltip mouseEnterDelay={0.5} title={`问题编号：${issueNum}`}>
+            <span
+              style={{
+                display: 'block',
+                minWidth: 70,
+                color: '#3f51b5',
+                cursor: 'pointer',
+              }}
+              role="none"
+              onClick={() => {
+                const { history } = this.props;
+                const urlParams = AppState.currentMenuType;
+                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=iterationBoard/${sprintId}`);
+              }}
+            >
+              {/* <span> */}
+              {issueNum} 
+              {' '}
+              {record.addIssue ? '*' : ''}
+              {/* </span> */}
+             
+            </span>
+          </Tooltip>
         ),
       }, {
         title: '概要',
         dataIndex: 'summary',
         key: 'summary',
+        width: 160,
         render: summary => (
-          <Tooltip title={summary}>
+          <Tooltip title={`概要：${summary}`}>
             <div
               role="none"
               style={{ 
-                maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                maxWidth: '250px', minWidth: '50px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
             >
               {summary}
@@ -252,11 +259,13 @@ class SprintDetails extends Component {
         title: '问题类型',
         dataIndex: 'typeCode',
         key: 'typeCode',
+        width: 100,
         render: (typeCode, record) => (
           <div>
             <Tooltip mouseEnterDelay={0.5} title={`任务类型： ${record.issueTypeDTO.name}`}>
               <div>
                 <TypeTag
+                  style={{ minWidth: 100 }}
                   data={record.issueTypeDTO}
                   showName
                 />
@@ -268,11 +277,13 @@ class SprintDetails extends Component {
         title: '优先级',
         dataIndex: 'priority',
         key: 'priority',
+        width: 40,
         render: (text, record) => (
           <div>
             <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityDTO.name}`}>
               <div style={{ marginRight: 12 }}>
                 <PriorityTag
+                  style={{ minWidth: 40 }}
                   priority={record.priorityDTO}
                 />
               </div>
@@ -283,11 +294,13 @@ class SprintDetails extends Component {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
+        width: 40,
         render: (text, record) => (
           <div>
             <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${record.statusMapDTO.name}`}>
               <div>
                 <StatusTag
+                  style={{ minWidth: 40 }}
                   data={record.statusMapDTO}
                 />
               </div>
@@ -298,15 +311,17 @@ class SprintDetails extends Component {
         title: '剩余时间',
         dataIndex: 'remainingTime',
         key: 'remainingTime',
+        width: 60,
         render: (remainingTime, record) => (
-          <span>{`${remainingTime === null ? '' : (`${remainingTime}h`)}`}</span>
+          <span style={{ display: 'inline-block', minWidth: 15 }}>{`${remainingTime === null ? '' : (`${remainingTime}h`)}`}</span>
         ),
       }, {
         title: '故事点',
         dataIndex: 'storyPoints',
         key: 'storyPoints',
+        width: 40,
         render: (storyPoints, record) => (
-          <div>
+          <div style={{ minWidth: 15 }}>
             {record.typeCode === 'story' ? storyPoints || '0' : ''}
           </div>
         ),

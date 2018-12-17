@@ -15,6 +15,7 @@
   width: 36%;
   animation: 1s slidein;
   .c7n-typeTag {
+    min-width: 0 !important;
     .name {
       display: none;
     }

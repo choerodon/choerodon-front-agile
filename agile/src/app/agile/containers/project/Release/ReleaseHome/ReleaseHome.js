@@ -241,7 +241,7 @@ class ReleaseHome extends Component {
       key: 'name',
       width: '94px',
       render: (text, record) => (
-        <Tooltip title={text}>
+        <Tooltip title={`版本名称：${text}`}>
           <div
             role="none"
             style={{
@@ -267,7 +267,7 @@ class ReleaseHome extends Component {
       dataIndex: 'status',
       key: 'key',
       render: text => (
-        <p style={{ marginBottom: 0 }}>
+        <p style={{ marginBottom: 0, minWidth: 60 }}>
           <span
             style={{
               color: '#fff',
@@ -301,21 +301,31 @@ class ReleaseHome extends Component {
       title: '开始日期',
       dataIndex: 'startDate',
       key: 'startDate',
-      render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
+      render: text => (text ? <p style={{ marginBottom: 0, minWidth: 75 }}>{text.split(' ')[0]}</p> : ''),
     }, {
       title: '预计发布日期',
       dataIndex: 'expectReleaseDate',
       key: 'expectReleaseDate',
-      render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
+      render: text => (text ? <p style={{ marginBottom: 0, minWidth: 75 }}>{text.split(' ')[0]}</p> : ''),
     }, {
       title: '实际发布日期',
       dataIndex: 'releaseDate',
       key: 'releaseDate',
-      render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
+      render: text => (text ? <p style={{ marginBottom: 0, minWidth: 75 }}>{text.split(' ')[0]}</p> : ''),
     }, {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
+      render: text => (
+        <Tooltip mouseEnterDelay={0.5} title={`描述：${text}`}>
+          <p style={{
+            marginBottom: 0, maxWidth: '120px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', 
+          }}
+          >
+            {text}
+          </p>
+        </Tooltip>
+      ),
       filters: [],
     }, {
       title: '',
