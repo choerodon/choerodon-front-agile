@@ -25,10 +25,9 @@ class AddStatus extends Component {
 
   handleAddStatus(e) {
     e.preventDefault();
-    const { statusType } = this.state;
     const { form, onChangeVisible, refresh } = this.props;
     form.validateFields((err, values) => {
-      if (!err && !statusType) {
+      if (!err) {
         this.setState({
           loading: true,
         });
@@ -49,14 +48,14 @@ class AddStatus extends Component {
             loading: false,
           });
         });
-      } else {
-        onChangeVisible(false);
-        refresh();
       }
     });
   }
 
   checkStatusName(rule, value, callback) {
+    if (!value) {
+      callback();
+    }
     const { store, form } = this.props;
     if (this.checkStatusDebounce) {
       clearTimeout(this.checkStatusDebounce);
@@ -64,16 +63,24 @@ class AddStatus extends Component {
     }
     this.checkStatusDebounce = setTimeout(() => {
       axios.get(`state/v1/projects/${AppState.currentMenuType.id}/status/project_check_name?organization_id=${AppState.currentMenuType.organizationId}&name=${value}`).then((res) => {
-        // if (res.statusExist) {
-        this.setState({
-          statusType: res.type,
-        }, () => {
-          form.setFieldsValue({
-            categoryCode: res.type,
+        if (res.statusExist) {
+          this.setState({
+            statusType: res.type,
+          }, () => {
+            form.setFieldsValue({
+              categoryCode: res.type,
+            });
           });
-        });
+        } else {
+          this.setState({
+            statusType: false,
+          }, () => {
+            form.setFieldsValue({
+              categoryCode: '',
+            });
+          });
+        }
         callback();
-        // }
       });
     }, 300);
   }
@@ -154,7 +161,7 @@ class AddStatus extends Component {
             <FormItem>
               {getFieldDecorator('name', {
                 rules: [{
-                  required: true, message: '状态名称是必须的',
+                  required: true, message: '状态名称是必填的',
                 }, {
                   validator: this.checkStatusName.bind(this),
                 }],
@@ -165,7 +172,7 @@ class AddStatus extends Component {
             <FormItem>
               {getFieldDecorator('categoryCode', {
                 rules: [{
-                  required: true, message: '类别是必须的',
+                  required: true, message: '类别是必填的',
                 }],
               })(
                 <Select

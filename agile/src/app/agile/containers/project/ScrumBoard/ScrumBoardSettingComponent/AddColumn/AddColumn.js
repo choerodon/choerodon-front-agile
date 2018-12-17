@@ -25,13 +25,15 @@ class AddColumn extends Component {
   }
 
   handleAddColumn(e) {
-    const { form } = this.props;
+    const { form, store } = this.props;
     const { statusType } = this.state;
     const that = this;
     e.preventDefault();
     form.validateFields((err, values) => {
       if (!err) {
-        if (statusType) {
+        const statusDate = store.getStatusList;
+        const status = statusDate.find(s => s.name === values.column_name);
+        if (status) {
           confirm({
             title: '警告',
             content: `已存在状态${values.column_name}，如果创建该列，不会创建同名状态`,
@@ -91,16 +93,24 @@ class AddColumn extends Component {
     }
     this.checkStatusDebounce = setTimeout(() => {
       axios.get(`state/v1/projects/${AppState.currentMenuType.id}/status/project_check_name?organization_id=${AppState.currentMenuType.organizationId}&name=${value}`).then((res) => {
-      // if (res.statusExist) {
-        this.setState({
-          statusType: res.type,
-        }, () => {
-          form.setFieldsValue({
-            categoryCode: res.type,
+        if (res.statusExist) {
+          this.setState({
+            statusType: res.type,
+          }, () => {
+            form.setFieldsValue({
+              column_categoryCode: res.type,
+            });
           });
-        });
+        } else {
+          this.setState({
+            statusType: false,
+          }, () => {
+            form.setFieldsValue({
+              column_categoryCode: '',
+            });
+          });
+        }
         callback();
-      // }
       });
     }, 300);
   }
@@ -180,7 +190,7 @@ class AddColumn extends Component {
             <FormItem>
               {getFieldDecorator('column_name', {
                 rules: [{
-                  required: true, message: '列名称是必须的',
+                  required: true, message: '列名称是必填的',
                 }, {
                   validator: this.checkStatusName.bind(this),
                 }],
@@ -191,7 +201,7 @@ class AddColumn extends Component {
             <FormItem>
               {getFieldDecorator('column_categoryCode', {
                 rules: [{
-                  required: true, message: '类别是必须的',
+                  required: true, message: '类别是必填的',
                 }],
               })(
                 <Select

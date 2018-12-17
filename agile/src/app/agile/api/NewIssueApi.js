@@ -68,7 +68,7 @@ export function loadSprints(arr = []) {
   return axios.post(`/agile/v1/projects/${projectId}/sprint/names`, arr);
 }
 
-export function loadSprint(sprintId) {
+export function loadSprint(sprintId = '') {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/agile/v1/projects/${projectId}/sprint/${sprintId}`);
 }

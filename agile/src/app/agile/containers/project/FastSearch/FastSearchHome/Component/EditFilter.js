@@ -202,20 +202,11 @@ class AddComponent extends Component {
         state: 'originTypes',
       },
     };
-    let arr = [];
-    if (['assignee', 'reporter', 'created_user', 'last_updated_user'].indexOf(filter) !== -1) {
-      arr = this.state[[OPTION_FILTER[filter].state]].filter(t => t.enabled).map(v => (
-        <Option key={v[OPTION_FILTER[filter].id]} value={v[OPTION_FILTER[filter].id]}>
-          {v[OPTION_FILTER[filter].name]}
-        </Option>
-      ));
-    } else {
-      arr = this.state[[OPTION_FILTER[filter].state]].map(v => (
-        <Option key={v[OPTION_FILTER[filter].id]} value={v[OPTION_FILTER[filter].id]}>
-          {v[OPTION_FILTER[filter].name]}
-        </Option>
-      ));
-    }
+    const arr = this.state[[OPTION_FILTER[filter].state]].map(v => (
+      <Option key={v[OPTION_FILTER[filter].id]} value={v[OPTION_FILTER[filter].id]}>
+        {v[OPTION_FILTER[filter].name]}
+      </Option>
+    ));
     if (addEmpty) {
       arr.unshift(
         <Option key="null" value="null">

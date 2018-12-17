@@ -1,7 +1,9 @@
 .c7n-backlog-version {
   flex: 1;
   border-right: 1px solid #d3d3d3;
-  overflow: auto;
+  // overflow: auto;
+  overflow-y: scroll;
+  overflow-x: hidden;
 
   p {
     margin-bottom: 0;
@@ -34,7 +36,7 @@
       }
 
       .c7n-backlog-versionItems {
-        padding: 8px 12px 8px 16px;
+        padding: 8px 5px 8px 16px;
         cursor: pointer;
       }
 
@@ -43,27 +45,30 @@
       }
 
       .c7n-backlog-versionItemTitle {
+         
+
         display: flex;
         align-items: baseline;
         cursor: move;
         span {
-          font-size: 16px;
+          font-size: 12px;
+          margin-top: 3px;
         }
-
         i {
           cursor: pointer;
-          // font-size: 12px;
         }
-
-        .c7n-backlog-versionItemTitleName {
-          flex-grow: 1;
-          display: flex;
-          justify-content: space-between;
-          cursor: move;
-          align-items: baseline;
-          p {
-            word-break: break-all;
-          }
+      }
+      .c7n-backlog-ItemsHead{
+        word-break: break-all;
+        flex-grow: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        .ant-input-underline{
+          display: none;
+        }
+        i {
+          cursor: pointer;
         }
       }
 
@@ -118,6 +123,7 @@
   width: 100%;
   height: 5px;
   display: flex;
+  // margin-left: 18px;
 
   .c7n-backlog-versionItemDone {
     background: rgb(77, 144, 254);

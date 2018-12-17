@@ -1,10 +1,10 @@
 @media (max-width: 1600px) {
   .c7n-Issue-summary {
-    width: 180px !important;
+    width: 240px !important;
   }
 }
 .c7n-content-issue {
-  width: 100%;
+  width: calc(100% + 18px);
 }
 
 @keyframes slidein {
@@ -28,6 +28,8 @@
     justify-content: flex-end;
   }
   table {
+    display: flex;
+    flex-direction: column;
     thead {
       display: none;
     }
@@ -39,12 +41,15 @@
     tr {
       display: flex;
       flex-wrap: wrap;
-      height: 64px;
+      height: fit-content;
+      min-height: 64px;
       padding: 10px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12);
       animation: 0.5s slidein;
     }
     tbody {
+      display: flex;
+      flex-direction: column;
       tr:hover {
         background: rgba(0, 0, 0, 0.04);
         td {
@@ -52,6 +57,7 @@
         }
       }
       tr {
+        padding: 4px;
         td {
           border-bottom: none;
         }
@@ -77,7 +83,6 @@
   .summary {
     order: 6;
     width: 100%;
-    margin-top: 7px;
   }
   .status {
     order: 3;
@@ -95,7 +100,15 @@
   display: flex;
   padding: 0;
   width: 100%;
+  //left: 20px;
   animation: 0.5s slidein;
+  // 暂时隐藏筛选按钮
+  .ant-table-columns-chooser {
+    display: none;
+  }
+  .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+  }
   .ant-table-tbody > tr > td {
     transition: none;
   }

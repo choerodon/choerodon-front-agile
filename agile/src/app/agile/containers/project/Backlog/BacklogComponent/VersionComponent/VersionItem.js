@@ -5,7 +5,7 @@ import moment from 'moment';
 import { stores, Permission } from 'choerodon-front-boot';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import {
-  message, DatePicker, Icon, Dropdown, Menu,
+  message, DatePicker, Icon, Dropdown, Menu, Input,
 } from 'choerodon-ui';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
@@ -117,13 +117,13 @@ class VersionItem extends Component {
    * @param {*} value
    * @memberof VersionItem
    */
-  handleBlurName(value) {
+  handleBlurName(e) {
     const { data: { objectVersionNumber, versionId }, index } = this.props;
     const data = {
       objectVersionNumber,
       projectId: parseInt(AppState.currentMenuType.id, 10),
       versionId,
-      name: value,
+      name: e.target.value,
     };
     BacklogStore.axiosUpdateVerison(versionId, data).then((res) => {
       if (res && res.failed) {
@@ -233,19 +233,25 @@ class VersionItem extends Component {
                 }}
               />
               <div style={{ width: '100%' }}>
-                <EasyEdit
-                  type="input"
-                  defaultValue={item.name}
-                  enterOrBlur={this.handleBlurName.bind(this)}
-                  style={{
-                    flexGrow: 1,
-                  }}
-                  byHand
-                  editIf={editName}
+                <div 
+                  className="c7n-backlog-ItemsHead"
                 >
-                  <div className="c7n-backlog-versionItemTitleName">
-                    <p>{item.name}</p>
-                    <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
+                  {editName ? (
+                      <Input
+                        className="editVersionName"
+                        autoFocus
+                        defaultValue={item.name}
+                        onPressEnter={this.handleBlurName.bind(this)}
+                        // onBlur={this.handleBlurName.bind(this)}
+                        onClick={e => e.stopPropagation()}
+                        maxLength={30}
+                      />
+                    
+                    ) : (
+                      <p>{item.name}</p>
+                    )}
+                      
+                  <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
                       <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
                         <Icon
                           style={{
@@ -262,25 +268,25 @@ class VersionItem extends Component {
                         />
                       </Dropdown>
                     </Permission>
-                  </div>
-                </EasyEdit>
+                </div>
+                {/* </div> */}
                 <div className="c7n-backlog-versionItemProgress">
-                  <div
-                    className="c7n-backlog-versionItemDone"
-                    style={{
+                <div
+                  className="c7n-backlog-versionItemDone"
+                  style={{
                       flex: item.doneIssueCount,
                     }}
-                  />
-                  <div
-                    className="c7n-backlog-versionItemTodo"
-                    style={{
+                />
+                <div
+                  className="c7n-backlog-versionItemTodo"
+                  style={{
                       flex: item.issueCount ? item.issueCount - item.doneIssueCount : 1,
                     }}
-                  />
-                </div>
+                />
+              </div>
               </div>
             </div>
-
+           
             {item.expand ? (
               <div style={{ paddingLeft: 12 }}>
                 <div

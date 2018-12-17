@@ -38,7 +38,7 @@ class StartSprint extends Component {
     e.preventDefault();
     const { workDates } = this.state;
     const {
-      form, data, store, onCancel, refresh, 
+      form, data, store, onCancel, refresh,
     } = this.props;
     form.validateFields((err, values) => {
       if (!err) {
@@ -193,7 +193,7 @@ class StartSprint extends Component {
                 initialValue: !_.isNull(completeMessage) ? completeMessage.sprintName : null,
                 rules: [{
                   required: true,
-                  message: '冲刺名称是必须的',
+                  message: '冲刺名称是必填的',
                 }],
               })(
                 <Input label="Sprint名称" maxLength={30} />,
@@ -242,7 +242,7 @@ class StartSprint extends Component {
               {getFieldDecorator('startDate', {
                 rules: [{
                   required: true,
-                  message: '开始日期是必须的',
+                  message: '开始日期是必填的',
                 }],
               })(
                 <DatePicker
@@ -275,7 +275,7 @@ class StartSprint extends Component {
               {getFieldDecorator('endDate', {
                 rules: [{
                   required: true,
-                  message: '结束日期是必须的',
+                  message: '结束日期是必填的',
                 }],
               })(
                 <DatePicker

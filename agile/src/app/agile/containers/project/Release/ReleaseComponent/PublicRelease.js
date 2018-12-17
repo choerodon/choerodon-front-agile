@@ -64,7 +64,10 @@ class PublicRelease extends Component {
 
   render() {
     // const { getFieldDecorator } = this.props.form;
-    const { form: { getFieldDecorator, getFieldValue }, visible, onCancel } = this.props;
+    const {
+      form: { getFieldDecorator, getFieldValue },
+      visible, onCancel, release,
+    } = this.props;
     return (
       <Sidebar
         title="发布版本"
@@ -110,7 +113,7 @@ class PublicRelease extends Component {
                           {getFieldDecorator('chose', {
                             initialValue: 1,
                             rules: [{
-                              required: true, message: '该选型时必须的',
+                              required: true, message: '该选型时必填的',
                             }],
                           })(
                             <RadioGroup
@@ -137,7 +140,7 @@ class PublicRelease extends Component {
                               : undefined,
                             rules: [{
                               required: getFieldValue('chose') === 2,
-                              message: '移动版本是必须的',
+                              message: '移动版本是必填的',
                             }],
                           })(
                             <Select
@@ -164,10 +167,15 @@ class PublicRelease extends Component {
                     {getFieldDecorator('releaseDate', {
                       rules: [{
                         required: true,
-                        message: '发布日期是必须的',
+                        message: '发布日期是必填的',
                       }],
                     })(
-                      <DatePicker style={{ width: 512 }} label="发布日期" />,
+                      <DatePicker
+                        style={{ width: 512 }}
+                        label="发布日期"
+                        disabledDate={release.startDate
+                          ? current => current < moment(release.startDate) : () => false}
+                      />,
                     )}
                   </FormItem>
                 </Form>

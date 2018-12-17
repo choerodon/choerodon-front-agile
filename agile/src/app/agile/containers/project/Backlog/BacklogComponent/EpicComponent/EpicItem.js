@@ -28,7 +28,7 @@ class EpicItem extends Component {
     return (
       <Menu onClick={this.clickMenu.bind(this)}>
         <div style={{ padding: '5px 12px' }}>
-          颜色
+          {'颜色'}
           <div className="c7n-backlog-epicColor">
             {BacklogStore.getColorLookupValue.map(item => (
               <div
@@ -156,11 +156,12 @@ class EpicItem extends Component {
                 <div className="c7n-backlog-epicItemsHead">
                   {editName ? (
                     <Input
+                      className="editEpicName"
                       autoFocus
                       defaultValue={item.epicName}
                       onPressEnter={this.handleSave.bind(this)}
                       onClick={e => e.stopPropagation()}
-                      onBlur={this.handleSave.bind(this)}
+                      // onBlur={this.handleSave.bind(this)}
                       maxLength={44}
                     />
                   ) : (
@@ -182,7 +183,9 @@ class EpicItem extends Component {
                     />
                   </Dropdown>
                 </div>
-                <div className="c7n-backlog-epicItemProgress">
+                <div 
+                  className="c7n-backlog-epicItemProgress"
+                >
                   <div
                     className="c7n-backlog-epicItemDone"
                     style={{

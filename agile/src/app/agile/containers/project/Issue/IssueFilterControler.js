@@ -32,12 +32,13 @@ export default class IssueFilterControler {
     // &organizationId=4&paramType=version&paramId=209
     // &paramName=0.12下的问题&paramUrl=release/detail/209
     // 只取出 paramType、paramId、paramName、paramUrl
-    const reg = /(?<=[?&])param[^=]+=[^&?\n]*/g;
+    const reg = /[?&]param[^=]+=[^&?\n]*/g;
     const filter = this.cache.get('filter');
     let paramIssueSelected = false;
     const paramObj = {};
     url.match(reg).forEach((item) => {
-      const [paramKey, paramValue] = item.split('=');
+      const [tempKey, paramValue] = item.split('=');
+      const paramKey = tempKey.substring(1);
       Object.assign(paramObj, {
         [paramKey]: paramValue,
       });
@@ -72,7 +73,9 @@ export default class IssueFilterControler {
     if (Object.keys(this.cache.get('paramFilter')).length) {
       return IssueFilterControler.loadCurrentSetting(this.cache.get('paramFilter'), mode);
     } else {
-      return IssueFilterControler.loadCurrentSetting(this.cache.get('filter'), mode);
+      // debugger;
+      // const a = IssueStore.getPagination;
+      return IssueFilterControler.loadCurrentSetting(this.cache.get('filter'), mode, 0, IssueStore.getPagination.pageSize);
     }
   };
 

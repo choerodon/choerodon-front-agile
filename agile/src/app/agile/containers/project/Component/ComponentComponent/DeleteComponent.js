@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Modal, Radio, Select, message, Icon, 
+  Modal, Radio, Select, message, Icon,
 } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import { getUsers } from '../../../../api/CommonApi';
@@ -138,9 +138,14 @@ class DeleteComponent extends Component {
         okType="danger"
       >
         <div style={{ margin: '20px 0', position: 'relative' }}>
-          <Icon style={{ color: '#d50000', position: 'absolute', fontSize: '16px', lineHeight: '26px' }} type="error" />
+          <Icon
+            style={{
+              color: '#d50000', position: 'absolute', fontSize: '16px', lineHeight: '26px',
+            }}
+            type="error"
+          />
           <div style={{ marginLeft: 20, width: 400, 'line-height': '26px' }}>
-            如果有问题关联到这个模块，而且这个项目中已经没有其他模块可供关联这个模块将会从所有问题中移除。
+            如果有问题与该模块相关联，一旦删除，所有相关的问题可以选择关联到其他模块，或不关联模块。
           </div>
         </div>
         <ul style={{ margin: '20px 0 20px 20px', paddingLeft: '20px' }}>
@@ -158,7 +163,9 @@ class DeleteComponent extends Component {
                 );
               }}
             >
-              相关的问题（{this.state.component.issueCount || 0}）
+              相关的问题（
+              {this.state.component.issueCount || 0}
+）
             </span>
           </li>
         </ul>

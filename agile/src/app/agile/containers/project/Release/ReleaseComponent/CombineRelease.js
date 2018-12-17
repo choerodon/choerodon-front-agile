@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Modal, Form, Select, message } from 'choerodon-ui';
+import {
+ Modal, Form, Select, message
+} from 'choerodon-ui';
 import { stores, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -18,6 +20,7 @@ class CombineRelease extends Component {
       sourceList: [],
     };
   }
+
   // componentWillMount() {
   //   ReleaseStore.axiosGetVersionListWithoutPage().then((res) => {
   //     this.setState({
@@ -29,11 +32,13 @@ class CombineRelease extends Component {
   componentDidMount() {
     this.props.onRef();
   }
+
   changeState(data) {
     this.setState({
       sourceList: data,
     });
   }
+
   handleCombine(e) {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, value) => {
@@ -60,6 +65,7 @@ class CombineRelease extends Component {
       }
     });
   }
+
   judgeSelectDisabled(item) {
     if (this.props.form.getFieldValue('source')) {
       if (this.props.form.getFieldValue('source').length === 1 && this.props.form.getFieldValue('source')[0] === item.versionId) {
@@ -68,10 +74,12 @@ class CombineRelease extends Component {
     }
     return false;
   }
+
   handleCancel = () => {
     this.props.form.resetFields();
     this.props.onCancel();
   };
+
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -91,13 +99,16 @@ class CombineRelease extends Component {
           description="您可以通过合并版本的功能将多个版本的issue合并到一个版本中，被合并的版本将被删除。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/release/merge-version/"
         >
-          <p style={{ display: 'flex', alignItems: 'center' }}><span className="c7n-release-icon">!</span>一旦版本合并后，您就无法还原。</p>
+          <p style={{ display: 'flex', alignItems: 'center' }}>
+<span className="c7n-release-icon">!</span>
+一旦版本合并后，您就无法还原。
+</p>
           <Form style={{ width: '512px' }}>
             <FormItem>
               {getFieldDecorator('source', {
                 rules: [{
                   required: true,
-                  message: '合并版本是必须的',
+                  message: '合并版本是必填的',
                 }],
               })(
                 <Select
@@ -114,7 +125,7 @@ class CombineRelease extends Component {
               {getFieldDecorator('destination', {
                 rules: [{
                   required: true,
-                  message: '合并至版本是必须的',
+                  message: '合并至版本是必填的',
                 }],
               })(
                 <Select
@@ -124,7 +135,10 @@ class CombineRelease extends Component {
                     <Option
                       key={item.versionId}
                       value={String(item.versionId)}
-                    >{item.name}</Option>
+                    >
+{item.name}
+
+                    </Option>
                   )) : ''}
                 </Select>,
               )}
@@ -137,4 +151,3 @@ class CombineRelease extends Component {
 }
 
 export default Form.create()(CombineRelease);
-

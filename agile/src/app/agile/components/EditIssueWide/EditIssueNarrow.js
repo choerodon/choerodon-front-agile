@@ -512,9 +512,7 @@ class CreateSprint extends Component {
           <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
           <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
           <p style={{ marginBottom: 10 }}>
-
-
-            如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。
+            {'如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。'}
           </p>
           {subIssueDTOList.length ? (
             <p style={{ color: '#d50000' }}>
@@ -770,58 +768,72 @@ class CreateSprint extends Component {
 
   resetStoryPoints(value) {
     this.setState({ storyPoints: value });
+    this.refresh();
   }
 
   resetRemainingTime(value) {
     this.setState({ remainingTime: value });
+    this.refresh();
   }
 
   resetAssigneeId(value) {
     this.setState({ assigneeId: value });
+    this.refresh();
   }
 
   resetReporterId(value) {
     this.setState({ reporterId: value });
+    this.refresh();
   }
 
   resetSummary(value) {
     this.setState({ summary: value });
+    this.refresh();
   }
 
   resetEpicName(value) {
     this.setState({ epicName: value });
+    this.refresh();
   }
 
   resetPriorityId(value) {
     this.setState({ priorityId: value });
+    this.refresh();
   }
 
   resetStatusId(value) {
     this.setState({ statusId: value });
+    this.refresh();
   }
 
   resetEpicId(value) {
     this.setState({ epicId: value });
+    this.refresh();
   }
 
   resetSprintId(value) {
     this.setState({ sprintId: value });
+    this.refresh();
   }
 
   resetComponentIssueRelDTOList(value) {
     this.setState({ componentIssueRelDTOList: value });
+    this.refresh();
   }
 
   resetInfluenceVersions(value) {
     this.setState({ influenceVersions: value });
+    this.refresh();
   }
 
   resetFixVersions(value) {
     this.setState({ fixVersions: value });
+    this.refresh();
   }
 
   resetlabelIssueRelDTOList(value) {
     this.setState({ labelIssueRelDTOList: value });
+    this.refresh();
   }
 
   reloadIssue(paramIssueId) {
@@ -1022,10 +1034,9 @@ class CreateSprint extends Component {
   handleCreateCommit() {
     const { addCommitDes, origin: { issueId: extra } } = this.state;
     if (addCommitDes) {
-      beforeTextUpload(addCommitDes, extra, this.createReply, 'commentText');
+      beforeTextUpload(addCommitDes, { issueId: extra, commentText: '' }, this.createReply, 'commentText');
     } else {
-      extra.commentText = '';
-      this.createReply(extra);
+      this.createReply({ issueId: extra, commentText: '' });
     }
   }
 
@@ -1665,7 +1676,7 @@ class CreateSprint extends Component {
             </Tooltip>
             <Tooltip placement="right" title="附件">
               <li
-                id="COMMENT-nav"
+                id="ATTACHMENT-nav"
                 className={`c7n-li ${nav === 'attachment' ? 'c7n-li-active' : ''}`}
               >
                 <Icon
@@ -1679,7 +1690,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="Wiki文档">
-              <li id="COMMENT-nav" className={`c7n-li ${nav === 'wiki' ? 'c7n-li-active' : ''}`}>
+              <li id="WIKI-nav" className={`c7n-li ${nav === 'wiki' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="library_books c7n-icon-li"
                   role="none"
@@ -1692,7 +1703,7 @@ class CreateSprint extends Component {
             </Tooltip>
             <Tooltip placement="right" title="评论">
               <li
-                id="ATTACHMENT-nav"
+                id="COMMIT-nav"
                 className={`c7n-li ${nav === 'commit' ? 'c7n-li-active' : ''}`}
               >
                 <Icon
@@ -1979,9 +1990,7 @@ class CreateSprint extends Component {
                       <div
                         style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.54)', marginBottom: 4 }}
                       >
-
-
-                            优先级
+                        {'优先级'}
                       </div>
                       <div>
                         <ReadAndEdit
@@ -2022,6 +2031,7 @@ class CreateSprint extends Component {
                             </div>)}
                         >
                           <Select
+                            dropdownStyle={{ minWidth: 185 }}
                             value={originPriorities.length ? priorityId : priorityName}
                             style={{ width: '150px' }}
                             loading={selectLoading}
@@ -2457,7 +2467,9 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={(value) => {
                                     this.setState({
-                                      componentIssueRelDTOList: value,
+                                      componentIssueRelDTOList: value.map(
+                                        item => item.substr(0, 30),
+                                      ),
                                     });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
@@ -2561,7 +2573,9 @@ class CreateSprint extends Component {
                                 }}
                                 onChange={(value) => {
                                   this.setState({
-                                    labelIssueRelDTOList: value,
+                                    labelIssueRelDTOList: value.map(
+                                      item => item.substr(0, 30),
+                                    ),
                                   });
                                   // 由于 OnChange 和 OnBlur 几乎同时执行，
                                   // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
@@ -2668,7 +2682,11 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={(value) => {
                                     this.needBlur = false;
-                                    this.setState({ influenceVersions: value });
+                                    this.setState({
+                                      influenceVersions: value.map(
+                                        item => item.substr(0, 30),
+                                      ),
+                                    });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                                     // if (this.changeTimer > 0) {
@@ -2767,7 +2785,9 @@ class CreateSprint extends Component {
                                 }}
                                 onChange={(value) => {
                                   this.setState({
-                                    fixVersions: value,
+                                    fixVersions: value.map(
+                                      item => item.substr(0, 30),
+                                    ),
                                   });
                                   // 由于 OnChange 和 OnBlur 几乎同时执行，
                                   // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序

@@ -952,7 +952,7 @@ class SprintItem extends Component {
                         justifyContent: 'flex-end',
                       }}
                     >
-                      <p 
+                      <p
                         style={{ whiteSpace: 'nowrap' }}
                       >
                         {'冲刺目标：'}

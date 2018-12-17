@@ -160,10 +160,10 @@ class EditComponent extends Component {
                 initialValue: this.state.name,
                 rules: [{
                   required: true,
-                  message: '模块名称必须',
+                  message: '模块名称必填',
                 }],
               })(
-                <Input label="模块名称" maxLength={30} />,
+                <Input label="模块名称" maxLength={10} />,
               )}
             </FormItem>
             <FormItem>
@@ -206,7 +206,7 @@ class EditComponent extends Component {
                 initialValue: this.state.defaultAssigneeRole,
                 rules: [{
                   required: true,
-                  message: '默认经办人必须',
+                  message: '默认经办人必填',
                 }],
               })(
                 <Select label="默认经办人">

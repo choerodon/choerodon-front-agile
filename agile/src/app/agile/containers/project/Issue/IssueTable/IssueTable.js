@@ -5,7 +5,7 @@ import { trace } from 'mobx';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import IssueFilterControler from '../IssueFilterControler';
 import {
-  IssueNum, TypeCode, Summary, StatusName, Priority, Assignee, LastUpdateTime, Sprint,
+  IssueNum, TypeCode, Summary, StatusName, Priority, Assignee, LastUpdateTime, Sprint, Epic,
 } from './IssueTableComponent';
 import EmptyBlock from '../../../../components/EmptyBlock';
 import pic from '../../../../assets/image/emptyIssue.svg';
@@ -162,7 +162,13 @@ class IssueTable extends Component {
         sorterId: 'assigneeId',
         sorter: true,
         filters: [],
-        render: (text, record) => <Assignee text={text} record={record} />,
+        render: (text, record) => (
+          <Assignee
+            text={text}
+            id={record.assigneeId}
+            img={record.assigneeImageUrl}
+          />
+        ),
       },
       {
         title: '冲刺',
@@ -170,7 +176,16 @@ class IssueTable extends Component {
         className: 'sprint',
         width: 128,
         filters: [],
-        render: (text, record) => <Sprint text={text} record={record} />,
+        render: record => (
+          <Sprint
+            objArray={record.issueSprintDTOS}
+            name={
+              record.issueSprintDTOS && record.issueSprintDTOS.length
+                ? record.issueSprintDTOS[0].sprintName
+                : null
+            }
+          />
+        ),
       },
       {
         title: '最后更新时间',
@@ -178,7 +193,7 @@ class IssueTable extends Component {
         className: 'lastUpdateDate',
         key: 'lastUpdateDate',
         sorterId: 'lastUpdateDate',
-        width: '142px',
+        width: 160,
         sorter: true,
         render: text => <LastUpdateTime text={text} />,
       },
@@ -188,21 +203,44 @@ class IssueTable extends Component {
         key: 'reporter',
         filters: [],
         hidden: true,
-        notDisplay: true,
+        render: (text, record) => (
+          <Assignee
+            text={text}
+            id={record.reporterId}
+            img={record.reporterImageUrl}
+          />
+        ),
       },
       {
         title: '版本',
         filters: [],
         key: 'version',
         hidden: true,
-        notDisplay: true,
+        render: record => (
+          <Sprint
+            objArray={record.versionIssueRelDTOS}
+            name={
+            record.versionIssueRelDTOS && record.versionIssueRelDTOS.length
+              ? record.versionIssueRelDTOS[0].name
+              : null}
+          />
+        ),
       },
       {
         title: '模块',
         key: 'component',
         filters: [],
         hidden: true,
-        notDisplay: true,
+        render: record => (
+          <Sprint
+            objArray={record.componentIssueRelDTOList}
+            name={
+              record.componentIssueRelDTOList && record.componentIssueRelDTOList.length
+                ? record.componentIssueRelDTOList[0].name
+                : null
+            }
+          />
+        ),
       },
       {
         title: '史诗',
@@ -210,7 +248,7 @@ class IssueTable extends Component {
         key: 'epic',
         filters: [],
         hidden: true,
-        notDisplay: true,
+        render: (text, record) => <Epic name={record.epicName} color={record.epicColor} />,
       },
       {
         title: '标签',
@@ -218,7 +256,6 @@ class IssueTable extends Component {
         filters: IssueStore.getColumnFilter.get('label'),
         filterMultiple: true,
         hidden: true,
-        notDisplay: true,
       },
     ];
     // 表格列配置
@@ -228,6 +265,7 @@ class IssueTable extends Component {
         {...this.props}
         columns={columns}
         dataSource={IssueStore.getIssues}
+        // scroll={{ x: true }}
         empty={(
           <EmptyBlock
             style={{ marginTop: 60, marginBottom: 60 }}
@@ -261,6 +299,7 @@ class IssueTable extends Component {
               selectedIssue: record,
               expand: true,
             });
+            e.currentTarget.scrollIntoView(false);
           },
           onBlur: (e) => {
             // 点击隐藏详情时无法触发 onClick，所以需要利用 onBlur 触发

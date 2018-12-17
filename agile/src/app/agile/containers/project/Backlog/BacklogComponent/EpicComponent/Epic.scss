@@ -1,7 +1,8 @@
 .c7n-backlog-epic {
   flex: 1;
   border-right: 1px solid #d3d3d3;
-  overflow: auto;
+  overflow-y: scroll;
+  overflow-x: hidden;
 
   p {
     margin-bottom: 0;
@@ -39,7 +40,7 @@
       }
 
       .c7n-backlog-epicItems {
-        padding: 8px 12px 8px 16px;
+        padding: 8px 6px 8px 16px;
         cursor: pointer;
       }
 
@@ -52,7 +53,8 @@
         align-items: baseline;
 
         span {
-          font-size: 16px;
+          font-size: 12px;
+          margin-top: 3px;
         }
 
         i {
@@ -65,7 +67,9 @@
           display: flex;
           justify-content: space-between;
           align-items: baseline;
-
+          .ant-input-underline{
+            display: none;
+          }
           i {
             cursor: pointer;
           }

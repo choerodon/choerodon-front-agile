@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Page, Header, Content, stores, Permission, 
+  Page, Header, Content, stores, Permission,
 } from 'choerodon-front-boot';
 import {
-  Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin, Tooltip, 
+  Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin, Tooltip,
 } from 'choerodon-ui';
 import { Action } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
@@ -50,6 +50,7 @@ class ReleaseHome extends Component {
       combineVisible: false,
       loading: false,
       sourceList: [],
+      release: false,
     };
   }
 
@@ -114,7 +115,7 @@ class ReleaseHome extends Component {
           .then((res) => {
             ReleaseStore.setPublicVersionDetail(res);
             ReleaseStore.setVersionDetail(record);
-            this.setState({ publicVersion: true }); 
+            this.setState({ publicVersion: true, release: record });
           }).catch((error) => {
           });
       } else {
@@ -229,6 +230,7 @@ class ReleaseHome extends Component {
       versionDelInfo,
       selectItem,
       publicVersion,
+      release,
     } = this.state;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -242,7 +244,7 @@ class ReleaseHome extends Component {
         <Tooltip title={text}>
           <div
             role="none"
-            style={{ 
+            style={{
               maxWidth: '94px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}
           >
@@ -266,8 +268,8 @@ class ReleaseHome extends Component {
       key: 'key',
       render: text => (
         <p style={{ marginBottom: 0 }}>
-          <span 
-            style={{ 
+          <span
+            style={{
               color: '#fff',
               background: COLOR_MAP[text],
               display: 'inline-block',
@@ -306,7 +308,7 @@ class ReleaseHome extends Component {
       key: 'expectReleaseDate',
       render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
     }, {
-      title: '结束日期',
+      title: '实际发布日期',
       dataIndex: 'releaseDate',
       key: 'releaseDate',
       render: text => (text ? <p style={{ marginBottom: 0 }}>{text.split(' ')[0]}</p> : ''),
@@ -385,8 +387,8 @@ class ReleaseHome extends Component {
             </Button>
           </Permission>
           <Permission service={['agile-service.product-version.mergeVersion']} type={type} projectId={projectId} organizationId={orgId}>
-            <Button 
-              className="leftBtn2" 
+            <Button
+              className="leftBtn2"
               funcType="flat"
               onClick={this.handleCombineRelease.bind(this)}
             >
@@ -450,15 +452,18 @@ class ReleaseHome extends Component {
               />
             }
           </Spin>
-          <AddRelease
-            visible={addRelease}
-            onCancel={() => {
-              this.setState({
-                addRelease: false,
-              });
-            }}
-            refresh={this.refresh.bind(this, pagination)}
-          />
+          {addRelease
+            ? (
+              <AddRelease
+                visible={addRelease}
+                onCancel={() => {
+                  this.setState({
+                    addRelease: false,
+                  });
+                }}
+                refresh={this.refresh.bind(this, pagination)}
+              />) : ''
+          }
           <Modal
             title={`删除版本 ${versionDelete.name}`}
             visible={JSON.stringify(versionDelete) !== '{}'}
@@ -530,6 +535,7 @@ class ReleaseHome extends Component {
           ) : ''}
           <PublicRelease
             visible={publicVersion}
+            release={release}
             onCancel={() => {
               this.setState({
                 publicVersion: false,

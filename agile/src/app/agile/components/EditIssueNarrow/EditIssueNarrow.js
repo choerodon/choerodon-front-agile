@@ -242,7 +242,7 @@ class CreateSprint extends Component {
         anchorElement.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
-          // inline: "nearest",
+          inline: 'end',
         });
         setTimeout(() => {
           sign = true;
@@ -741,7 +741,7 @@ class CreateSprint extends Component {
 
   reloadIssue(paramIssueId) {
     const { origin } = this.state;
-    const { onUpdate } = this.props;
+    const { onUpdate, store } = this.props;
     const issueId = paramIssueId || origin.issueId;
     if (onUpdate) {
       onUpdate();
@@ -760,7 +760,7 @@ class CreateSprint extends Component {
     }, () => {
       loadIssue(issueId).then((res) => {
         this.setAnIssueToState(res);
-        ScrumBoardStore.setClickIssueDetail(res);
+        store.setClickIssueDetail(res);
         this.setState({
           createdById: res.createdBy,
         });
@@ -794,13 +794,13 @@ class CreateSprint extends Component {
   /**
    * Comment
    */
+
   handleCreateCommit() {
     const { addCommitDes, origin: { issueId: extra } } = this.state;
     if (addCommitDes) {
-      beforeTextUpload(addCommitDes, extra, this.createCommit, 'commentText');
+      beforeTextUpload(addCommitDes, { issueId: extra, commentText: '' }, this.createCommit, 'commentText');
     } else {
-      extra.commentText = '';
-      this.createCommit(extra);
+      this.createCommit({ issueId: extra, commentText: '' });
     }
   }
 
@@ -1540,7 +1540,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="附件">
-              <li id="COMMENT-nav" className={`c7n-li ${nav === 'attachment' ? 'c7n-li-active' : ''}`}>
+              <li id="ATTACHMENT-nav" className={`c7n-li ${nav === 'attachment' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="attach_file c7n-icon-li"
                   role="none"
@@ -1552,7 +1552,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="Wiki文档">
-              <li id="COMMENT-nav" className={`c7n-li ${nav === 'wiki' ? 'c7n-li-active' : ''}`}>
+              <li id="WIKI-nav" className={`c7n-li ${nav === 'wiki' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="library_books c7n-icon-li"
                   role="none"
@@ -1564,7 +1564,7 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             <Tooltip placement="right" title="评论">
-              <li id="ATTACHMENT-nav" className={`c7n-li ${nav === 'commit' ? 'c7n-li-active' : ''}`}>
+              <li id="COMMIT-nav" className={`c7n-li ${nav === 'commit' ? 'c7n-li-active' : ''}`}>
                 <Icon
                   type="sms_outline c7n-icon-li"
                   role="none"
@@ -1932,6 +1932,7 @@ class CreateSprint extends Component {
                             )}
                           >
                             <Select
+                              dropdownStyle={{ minWidth: 185 }}
                               value={originPriorities.length ? priorityId : priorityName}
                               style={{ width: '150px' }}
                               loading={selectLoading}
@@ -2034,7 +2035,11 @@ class CreateSprint extends Component {
                                     });
                                   }}
                                   onChange={(value) => {
-                                    this.setState({ componentIssueRelDTOList: value });
+                                    this.setState({
+                                      componentIssueRelDTOList: value.map(
+                                        item => item.substr(0, 30),
+                                      ),
+                                    });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                                     // this.needBlur = false;
@@ -2129,7 +2134,11 @@ class CreateSprint extends Component {
                                 });
                               }}
                               onChange={(value) => {
-                                this.setState({ labelIssueRelDTOList: value });
+                                this.setState({
+                                  labelIssueRelDTOList: value.map(
+                                    item => item.substr(0, 30),
+                                  ),
+                                });
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，
                                 // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                                 // this.needBlur = false;
@@ -2222,7 +2231,11 @@ class CreateSprint extends Component {
                                     });
                                   }}
                                   onChange={(value) => {
-                                    this.setState({ influenceVersions: value });
+                                    this.setState({
+                                      influenceVersions: value.map(
+                                        item => item.substr(0, 30),
+                                      ),
+                                    });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                                     // this.needBlur = false;
@@ -2252,11 +2265,8 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-
-
-
-                            修复的版本：
-</span>
+                            {'修复的版本：'}
+                          </span>
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
@@ -2318,7 +2328,11 @@ class CreateSprint extends Component {
                                 });
                               }}
                               onChange={(value) => {
-                                this.setState({ fixVersions: value });
+                                this.setState({
+                                  fixVersions: value.map(
+                                    item => item.substr(0, 30),
+                                  ),
+                                });
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，
                                 // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                                 // this.needBlur = false;
@@ -2588,12 +2602,10 @@ class CreateSprint extends Component {
                           />
                           <span>
                             {this.getWorkloads()}
-
-                            小时/
-{this.getWorkloads() + (origin.remainingTime || 0)}
-
-                            小时
-</span>
+                            {'小时/'}
+                            {this.getWorkloads() + (origin.remainingTime || 0)}
+                            {'小时'}
+                          </span>
                           <span
                             role="none"
                             style={{

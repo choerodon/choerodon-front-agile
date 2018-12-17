@@ -123,7 +123,7 @@ class ScrumBoardHome extends Component {
   }
 
   // 根据泳道，统计各个分类下的数量
-  refresh = (boardId) => {
+  refresh = (boardId, value = null) => {
     const { onlyMe, recent, quickFilter } = this.state;
     this.setState({
       spinIf: true,
@@ -133,6 +133,9 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.setQuickSearchList(res);
       if (boardId) {
         // 加载冲刺及Issue
+        if (value) {
+          ScrumBoardStore.setAssigneeFilterIds(value);
+        }
         ScrumBoardStore.axiosGetBoardData(boardId,
           onlyMe ? AppState.getUserId : 0,
           recent,
@@ -531,7 +534,9 @@ class ScrumBoardHome extends Component {
             rank,
           ).then((data) => {
             if (data.failed) {
-              // message.info(data.message);
+              if (data.code === 'error.instanceFeignClient.executeTransform') {
+                message.warn('由于状态机的配置，不能将问题移动到该状态');
+              }
               ScrumBoardStore.setBoardData(originState);
             } else {
               for (let index = 0, len = ScrumBoardStore.getStatusList.length;
@@ -769,7 +774,7 @@ class ScrumBoardHome extends Component {
 
   renderHeight = () => {
     if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-      document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 48}px)`;
+      document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 108}px)`;
     }
   };
 
@@ -778,14 +783,18 @@ class ScrumBoardHome extends Component {
     const { dataSource } = this.state;
     const data = dataSource || {};
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
+      // todo: 下一个迭代重写其他问题计数
       result = (
         <span>
           {'其他问题'}
-          <span className="c7n-scrumboard-otherHeader-issueCount">
-            {`${ScrumBoardStore.getOtherQuestionCount} 问题`}
-          </span>
         </span>
       );
+      // <span>
+      //   {'其他问题'}
+      //   <span className="c7n-scrumboard-otherHeader-issueCount">
+      //     {`${ScrumBoardStore.getOtherQuestionCount} 问题`}
+      //   </span>
+      // </span>
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       result = (
         <span>
@@ -949,26 +958,28 @@ class ScrumBoardHome extends Component {
   };
 
   removeEventListener = () => {
-    const scrumBoardContainer = document.getElementsByClassName('c7n-scrumboard-content')[0];
-    const scrumBoardTitle = document.getElementsByClassName('c7n-scrumboard-header')[0];
-    const syncTop = () => {
-      if (currentTab !== 1) return;
-      scrumBoardTitle.scrollLeft = scrumBoardContainer.scrollLeft;
-    };
-    const syncDown = () => {
-      if (currentTab !== 2) return;
-      scrumBoardContainer.scrollLeft = scrumBoardTitle.scrollLeft;
-    };
-    const judgeTopHover = () => {
-      currentTab = 1;
-    };
-    const judgeDownHover = () => {
-      currentTab = 2;
-    };
-    scrumBoardContainer.removeEventListener('scroll', syncTop);
-    scrumBoardTitle.removeEventListener('scroll', syncDown);
-    scrumBoardContainer.removeEventListener('mouseover', judgeTopHover);
-    scrumBoardTitle.removeEventListener('mouseover', judgeDownHover);
+    if (document && document.getElementsByClassName('c7n-scrumboard-content').length) {
+      const scrumBoardContainer = document.getElementsByClassName('c7n-scrumboard-content')[0];
+      const scrumBoardTitle = document.getElementsByClassName('c7n-scrumboard-header')[0];
+      const syncTop = () => {
+        if (currentTab !== 1) return;
+        scrumBoardTitle.scrollLeft = scrumBoardContainer.scrollLeft;
+      };
+      const syncDown = () => {
+        if (currentTab !== 2) return;
+        scrumBoardContainer.scrollLeft = scrumBoardTitle.scrollLeft;
+      };
+      const judgeTopHover = () => {
+        currentTab = 1;
+      };
+      const judgeDownHover = () => {
+        currentTab = 2;
+      };
+      scrumBoardContainer.removeEventListener('scroll', syncTop);
+      scrumBoardTitle.removeEventListener('scroll', syncDown);
+      scrumBoardContainer.removeEventListener('mouseover', judgeTopHover);
+      scrumBoardTitle.removeEventListener('mouseover', judgeDownHover);
+    }
   };
 
   render() {
@@ -1054,22 +1065,25 @@ class ScrumBoardHome extends Component {
             }
           </Select>
           {
-            // this.state.dataSource && this.state.dataSource.currentSprint
-            // && this.state.dataSource.currentSprint.sprintId ? (
-            //   <Button className="leftBtn2" funcType="flat"
-            // onClick={() => { this.props.history.push(`/agile/iterationBoard/
-            // ${this.state.dataSource.currentSprint.sprintId}?type=project&id=
-            // ${AppState.currentMenuType.id}&name=
-            // ${AppState.currentMenuType.name}&organizationId=
-            // ${AppState.currentMenuType.organizationId}`); }}>
-            //     <span>切换至工作台</span>
-            //   </Button>
-            // ) : null
-
              (
-               <Button className="leftBtn2" disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)} funcType="flat" onClick={() => { history.push(`/agile/iterationBoard/${dataSource && dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+               <Button
+                 className="leftBtn2"
+                 disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)}
+                 funcType="flat"
+                 onClick={() => {
+                   if (dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId) {
+                     history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`);
+                   } else {
+                     message.info('等待加载当前迭代');
+                   }
+                 }}
+               >
                  <span>切换至工作台</span>
                </Button>
+
+              //  <Button className="leftBtn2" disabled={dataSource ? (dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId) : false} funcType="flat" onClick={() => { history.push(`/agile/iterationBoard/${dataSource && dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+              //   <span>切换至工作台</span>
+              // </Button>
             )
           }
           <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>
@@ -1084,8 +1098,8 @@ class ScrumBoardHome extends Component {
                 <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
                   <QuickSearch
                     onQuickSearchChange={this.onQuickSearchChange}
-                    onAssigneeChange={() => {
-                      this.refresh(ScrumBoardStore.getSelectedBoard);
+                    onAssigneeChange={(value) => {
+                      this.refresh(ScrumBoardStore.getSelectedBoard, value);
                     }}
                   />
                 </div>
@@ -1138,10 +1152,6 @@ class ScrumBoardHome extends Component {
                 </div>
                 <div
                   className="c7n-scrumboard-content"
-                  style={{
-                    // height: `calc(100vh - ${88 + 48}px)`,
-                    paddingBottom: 83,
-                  }}
                 >
                   {
                     ScrumBoardStore.getCurrentSprint ? (
@@ -1258,7 +1268,7 @@ class ScrumBoardHome extends Component {
                 <FormItem>
                   {getFieldDecorator('name', {
                     rules: [{
-                      required: true, message: '看板名是必须的',
+                      required: true, message: '看板名是必填的',
                     }],
                   })(
                     <Input

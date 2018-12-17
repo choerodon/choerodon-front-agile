@@ -33,13 +33,13 @@ let inWhich;
 
 function toFullScreen(dom) {
   if (dom.requestFullscreen) {
-    return dom.requestFullScreen();
-  } else if (dom.webkitRequestFullScreen) {
-    return dom.webkitRequestFullScreen();
+    dom.requestFullscreen();
+  } else if (dom.webkitRequestFullscreen) {
+    dom.webkitRequestFullscreen();
   } else if (dom.mozRequestFullScreen) {
-    return dom.mozRequestFullScreen();
+    dom.mozRequestFullScreen();
   } else {
-    return dom.msRequestFullscreen();
+    dom.msRequestFullscreen();
   }
 }
 
@@ -1816,6 +1816,16 @@ class Home extends Component {
     if (!flag) {
       this.handleInitScroll();
     }
+    const timer = setInterval(() => {
+      if (document.getElementById('fixHead-body')) {
+        document.getElementById('fixHead-head').addEventListener('scroll', this.handleScrollHead, { passive: true });
+        document.getElementById('fixHead-body').addEventListener('scroll', this.handleScroll, { passive: true });
+        document.getElementById('fixHead-head').addEventListener('mouseover', this.handleMouseOverHead);
+        document.getElementById('fixHead-body').addEventListener('mouseover', this.handleMouseOverBody);
+        // this.getPrepareOffsetTops();
+        clearInterval(timer);
+      }
+    }, 20);
     const {
       filters, mode, createEpic, currentFilters, showBackLog, isLoading,
     } = UserMapStore;

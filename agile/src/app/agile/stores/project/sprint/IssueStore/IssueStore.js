@@ -165,8 +165,10 @@ class SprintCommonStore {
    * @param data => Map => 重置所需数据
    */
   @action reset(data) {
+    this.issues = [];
     this.filterMap = data;
     this.barFilter = [];
+    this.loading = true;
   }
 
   /**
@@ -279,6 +281,8 @@ class SprintCommonStore {
   @action refreshTrigger(res) {
     this.issues = res.content;
     this.pagination.total = res.totalElements;
+    this.pagination.pageSize = res.size;
+    this.pagination.current = 1;
     this.loading = false;
   }
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
- Modal, Form, Input, DatePicker, message 
+  Modal, Form, Input, DatePicker,
 } from 'choerodon-ui';
 import moment from 'moment';
 import { Content, stores } from 'choerodon-front-boot';
@@ -18,7 +18,7 @@ class AddRelease extends Component {
     super(props);
     this.state = {
       expectReleaseDate: null,
-      startDate: null,
+      startDate: moment(),
       loading: false,
     };
   }
@@ -107,7 +107,7 @@ class AddRelease extends Component {
         <Content
           style={{ padding: 0 }}
           title={`在项目“${AppState.currentMenuType.name}”中创建发布版本`}
-          description="请在下面输入版本的名称、描述、开始和结束日期，创建新的软件版本。"
+          description="请在下面输入版本的名称、描述、开始和预计发布日期，创建新的软件版本。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/release/"
         >
           <Form style={{ width: 512 }}>
@@ -115,7 +115,7 @@ class AddRelease extends Component {
               {getFieldDecorator('name', {
                 rules: [{
                   required: true,
-                  message: '版本名称必须',
+                  message: '版本名称必填',
                 }, {
                   validator: this.checkName,
                 }],
@@ -124,9 +124,11 @@ class AddRelease extends Component {
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('startDate', {})(
+              {getFieldDecorator('startDate', {
+                initialValue: moment(),
+              })(
                 <DatePicker
-                  style={{ width: '100%' }} 
+                  style={{ width: '100%' }}
                   label="开始日期"
                   disabledDate={expectReleaseDate
                     ? current => current > moment(expectReleaseDate) : () => false}
@@ -140,8 +142,8 @@ class AddRelease extends Component {
             </FormItem>
             <FormItem>
               {getFieldDecorator('expectReleaseDate', {})(
-                <DatePicker 
-                  style={{ width: '100%' }} 
+                <DatePicker
+                  style={{ width: '100%' }}
                   label="预计发布日期"
                   onChange={(date) => {
                     this.setState({
