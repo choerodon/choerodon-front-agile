@@ -1159,20 +1159,6 @@ class ScrumBoardHome extends Component {
               >
                 <span>切换至工作台</span>
               </Button>
-              //  <Button className="leftBtn2"
-              //  disabled={dataSource ?
-              //  (dataSource
-              //  && dataSource.currentSprint
-              //  && dataSource.currentSprint.sprintId)
-              //  : false}
-              //  funcType="flat"
-              //  onClick={() => { history.push(`/agile/iterationBoard/
-              //  ${dataSource && dataSource.currentSprint.sprintId}?
-              //  type=project&id=${AppState.currentMenuType.id}&name=
-              //  ${AppState.currentMenuType.name}&organizationId=
-              //  ${AppState.currentMenuType.organizationId}`); }}>
-              //   <span>切换至工作台</span>
-              // </Button>
             )
           }
           <Button
