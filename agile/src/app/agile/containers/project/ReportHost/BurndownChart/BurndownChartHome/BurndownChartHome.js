@@ -766,7 +766,8 @@ class BurndownChartHome extends Component {
             funcType="flat"
             onClick={() => {
               this.getChartData();
-              this.getChartCoordinate();
+              // this.getChartCoordinate();
+              this.axiosGetRestDays();
             }}
           >
             <Icon type="refresh icon" />

@@ -4,7 +4,7 @@ import {
   Button, Spin, message, Icon, Select, Table, Menu, Checkbox, Tabs, Tooltip,
 } from 'choerodon-ui';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
@@ -23,7 +23,7 @@ import PriorityTag from '../../../../../components/PriorityTag';
 import TypeTag from '../../../../../components/TypeTag';
 import './ReleaseDetail.scss';
 import { STATUS } from '../../../../../common/Constant';
-
+/* eslint-disable */
 
 const { AppState } = stores;
 const Option = Select.Option;
@@ -49,7 +49,7 @@ class SprintReport extends Component {
     };
   }
 
-  componentWillMount() { 
+  componentWillMount() {
     const { location: { search } } = this.props;
     const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
     this.setState({
@@ -79,15 +79,13 @@ class SprintReport extends Component {
     const beginDay = start.split('-');
     const endDay = end.split('-');
     const diffDay = new Date();
-    const dateList = new Array();
+    const dateList = [];
     let i = 0;
     diffDay.setDate(beginDay[2]);
     diffDay.setMonth(beginDay[1] - 1);
     diffDay.setFullYear(beginDay[0]);
-    result.push(start);
     while (i === 0) {
-      const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
-      diffDay.setTime(countDay);
+      const countDay = diffDay.getTime();
       if (restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         rest.push(moment(diffDay).format('YYYY-MM-DD'));
       }
@@ -103,6 +101,7 @@ class SprintReport extends Component {
       if (restDayShow || !restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
       }
+      diffDay.setTime(countDay + 24 * 60 * 60 * 1000);
       if (String(dateList[0]) === endDay[0] && String(dateList[1]) === endDay[1] && String(dateList[2]) === endDay[2]) {
         i = 1;
       }
@@ -187,7 +186,7 @@ class SprintReport extends Component {
           const dayAmount = res.expectCount / countWorkDay;
           if (rest.includes(allDate[b])) {
             // 非工作日
-            if (b < len - 1) {
+            if (b < len) {
               markAreaData.push([
                 {
                   xAxis: b === 0 ? '' : allDate[b - 1].split(' ')[0].slice(5).replace('-', '/'),
@@ -666,7 +665,10 @@ class SprintReport extends Component {
           />
           <Button
             funcType="flat"
-            onClick={() => ReportStore.changeCurrentSprint(ReportStore.currentSprint.sprintId)}
+            onClick={() => {
+              this.axiosGetRestDays();
+              ReportStore.changeCurrentSprint(ReportStore.currentSprint.sprintId)
+            }}
           >
             <Icon type="refresh icon" />
             <span>刷新</span>
@@ -703,7 +705,7 @@ class SprintReport extends Component {
                           startDate,
                         }, () => {
                           // this.getChartData();
-                          this.getChartCoordinate();
+                          // this.getChartCoordinate();
                           this.axiosGetRestDays();
                         });
                       }}
