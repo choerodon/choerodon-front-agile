@@ -382,10 +382,15 @@ class SprintItem extends Component {
    * @param {*} item
    * @memberof Sprint
    */
-  handleClickIssue=(sprintId, item) => {
+  handleClickIssue=(sprintId, item, e) => {
     // command ctrl shift
     const { keydown, selected } = this.state;
     const { store } = this.props;
+    // magic, don't touch it
+    store.isInner = true;
+    setTimeout(() => {
+      store.isInner = false;
+    }, 500);
     if (keydown === 91 || keydown === 17 || keydown === 16) {
       // 如果没点击
       if (selected.droppableId === '') {
