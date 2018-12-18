@@ -10,7 +10,7 @@ import EditStatus from '../EditStatus/EditStatus';
 import './StatusCard.scss';
 
 const { AppState } = stores;
-const { confirm } = Modal;
+const { confirm, warning } = Modal;
 
 @observer
 class StatusCard extends Component {
@@ -31,17 +31,28 @@ class StatusCard extends Component {
     return length;
   }
 
-  handleDeleteClick = () => {
+  handleDeleteClick = async () => {
     const { data } = this.props;
+    const deleteCode = data.statusId;
+    const canBeDeleted = await ScrumBoardStore.axiosStatusCanBeDelete(deleteCode);
     const that = this;
-    confirm({
-      title: '移除状态',
-      content: `确定要移除状态 ${data.name}？`,
-      onOk() {
-        that.handleDeleteStatus();
-      },
-      onCancel() {},
-    });
+    if (canBeDeleted) {
+      confirm({
+        title: '移除状态',
+        content: `确定要移除状态 ${data.name}？`,
+        onOk() {
+          that.handleDeleteStatus();
+        },
+        onCancel() {},
+      });
+    } else {
+      warning({
+        title: '移除状态',
+        content: `无法移除初始状态 ${data.name}，如要移除请联系组织管理员。`,
+        onOk() {},
+        onCancel() {},
+      });
+    }
   };
 
   async handleDeleteStatus() {
@@ -57,14 +68,10 @@ class StatusCard extends Component {
     }
     data[data.length - 1].subStatuses.splice(deleteIndex, 1);
     ScrumBoardStore.setBoardData(data);
-    const canBeDeleted = await ScrumBoardStore.axiosStatusCanBeDelete(deleteCode);
-    // debugger;
-    if (canBeDeleted) {
-      try {
-        await ScrumBoardStore.axiosDeleteStatus(deleteCode);
-      } catch (err) {
-        ScrumBoardStore.setBoardData(originData);
-      }
+    try {
+      await ScrumBoardStore.axiosDeleteStatus(deleteCode);
+    } catch (err) {
+      ScrumBoardStore.setBoardData(originData);
     }
     refresh();
   }
