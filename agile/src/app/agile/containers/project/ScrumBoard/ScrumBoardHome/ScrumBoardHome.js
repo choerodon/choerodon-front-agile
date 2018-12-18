@@ -352,7 +352,8 @@ class ScrumBoardHome extends Component {
     const { issues: destIssues } = JSON.parse(result.destination.droppableId);
     // 目标位置在该分组下所有issue的索引
     const destIndex = result.destination.index;
-
+    // 目标位置在改状态下所有issue的索引，用于插入拖动issue
+    let destColumeIndex = 0;
     // 被拖动issue状态已有的issue
     const { issues: sourceIssue } = JSON.parse(result.source.droppableId);
     // 被拖动issue状态已有的issue中的索引
@@ -515,9 +516,13 @@ class ScrumBoardHome extends Component {
             if (String(newState[index].subStatuses[index2].statusId)
             === String(JSON.parse(result.destination.droppableId).endStatusId)) {
               // 目标位置在改状态下所有issue的索引，用于插入拖动issue
-              let destColumeIndex = 0;
-              const isLast = !!destIssues.length === destIndex;
+              let isLast = destIssues.length === destIndex;
               const destColumeIssue = newState[index].subStatuses[index2].issues;
+              if (JSON.parse(result.source.droppableId).columnId
+                === JSON.parse(result.destination.droppableId).columnId
+                && destColumeIssue.length === destIndex) {
+                isLast = true;
+              }
               const targetIssue = isLast ? destIssues[destIndex - 1] : destIssues[destIndex];
               destColumeIssue.forEach((issue, issueIndex) => {
                 if (targetIssue && targetIssue.issueId === issue.issueId) {
@@ -544,7 +549,7 @@ class ScrumBoardHome extends Component {
           let outsetIssueId = '';
           // 控制是否更新排序，当拖动到空的区域时，不更新
           let rank = false;
-          if (destIndex && destIssues.length) {
+          if (destIssues && destIssues.length) {
             rank = true;
             if (destIndex === 0 || (JSON.parse(result.source.droppableId).columnId
               === JSON.parse(result.destination.droppableId).columnId
@@ -589,7 +594,7 @@ class ScrumBoardHome extends Component {
                       === String(JSON.parse(result.destination.droppableId).endStatusId)) {
                       destinationStatus = newState[index].subStatuses[index2].categoryCode;
                       newState[index].subStatuses[index2].issues.splice(
-                        result.destination.index, 1, draggableData,
+                        destColumeIndex, 1, draggableData,
                       );
                     }
                   }
