@@ -1733,7 +1733,7 @@ class CreateSprint extends Component {
                     issueId && typeCode === 'story' ? (
                       <div style={{ display: 'flex', marginRight: 25 }}>
                         <span>故事点：</span>
-                        <div>
+                        <div style={{ maxWidth: 130 }}>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
                             thisType="storyPoints"
@@ -1752,6 +1752,7 @@ class CreateSprint extends Component {
                             <NumericInput
                               maxLength="3"
                               value={storyPoints}
+                              suffix={'点'}
                               onChange={this.handleStoryPointsChange.bind(this)}
                               onPressEnter={() => {
                                 this.updateIssue('storyPoints');
@@ -1769,7 +1770,7 @@ class CreateSprint extends Component {
                     issueId && typeCode !== 'issue_epic' ? (
                       <div style={{ display: 'flex' }}>
                         <span>预估时间：</span>
-                        <div>
+                        <div style={{ maxWidth: 150 }}>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
                             thisType="remainingTime"
@@ -1789,6 +1790,7 @@ class CreateSprint extends Component {
                               maxLength="3"
                               value={remainingTime}
                               onChange={this.handleRemainingTimeChange.bind(this)}
+                              suffix={'小时'}
                               onPressEnter={() => {
                                 this.updateIssue('remainingTime');
                                 this.setState({

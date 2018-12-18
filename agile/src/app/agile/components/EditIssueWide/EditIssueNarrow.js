@@ -2291,6 +2291,7 @@ class CreateSprint extends Component {
                               value={storyPoints}
                               onChange={this.handleStoryPointsChange.bind(this)}
                               // onBlur={() => this.statusOnChange()}
+                              suffix={'点'}
                               onPressEnter={() => {
                                 this.updateIssue('storyPoints');
                                 this.setState({
@@ -2328,11 +2329,8 @@ class CreateSprint extends Component {
                             marginBottom: 4,
                           }}
                         >
-
-
-
-                              预估时间
-</div>
+                              {'预估时间'}
+                          </div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2362,6 +2360,7 @@ class CreateSprint extends Component {
                               value={remainingTime}
                               onChange={this.handleRemainingTimeChange.bind(this)}
                               // onBlur={() => this.statusOnChange()}
+                              suffix={'小时'}
                               onPressEnter={() => {
                                 this.updateIssue('remainingTime');
                                 this.setState({
