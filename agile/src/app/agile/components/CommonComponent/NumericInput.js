@@ -44,7 +44,7 @@ class NumericInput extends Component {
   }
 
   render() {
-    const { value } = this.props;
+    const { value, suffix } = this.props;
     const title = value ? (
       <span className="numeric-input-title">
         {value !== '-' ? this.formatNumber(value) : '-'}
@@ -57,6 +57,7 @@ class NumericInput extends Component {
           onChange={this.onChange}
           onBlur={this.onBlur}
           maxLength="3"
+          suffix={suffix}
         />
       </div>
     );

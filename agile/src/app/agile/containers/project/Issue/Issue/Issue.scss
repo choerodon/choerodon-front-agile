@@ -36,7 +36,7 @@
     }
     td {
       display: block;
-      // padding: 0 4px;
+      padding: 0 0 7px !important;
     }
 
     tr {
@@ -80,17 +80,31 @@
   }
   .issueType {
     order: 1;
+    .c7n-typeTag{
+      padding-right: 8px !important;
+    }
   }
   .summary {
     order: 6;
     width: 100%;
-    // padding: 0 4px 4px;
+    padding-bottom: 0 !important;
   }
   .status {
     order: 3;
+    padding-right: 7px !important;
+    .c7n-statusTag{
+      vertical-align: -6px !important;
+    }
   }
   .priority {
     order: 4;
+    padding-right: 7px !important;
+    .c7n-priorityTag-container{
+      min-width: 0 !important;
+    }
+  }
+  .c7n-priorityTag-container{
+    padding: 0;
   }
   .assignee {
     order: 5;
