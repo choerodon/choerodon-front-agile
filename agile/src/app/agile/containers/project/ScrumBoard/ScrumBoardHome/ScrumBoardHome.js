@@ -346,6 +346,10 @@ class ScrumBoardHome extends Component {
    * @memberof ScrumBoardHome
    */
   handleDragEnd = (result) => {
+    ScrumBoardStore.setDragStartItem({});
+    if (!result.destination) {
+      return;
+    }
     // 由于重构导致数据结构不符合新逻辑的需求，且原有逻辑存在bug: 在有泳道情况下，index不准确
     // 在重构之前，先使用以下代码获取正确的index
 
@@ -370,13 +374,11 @@ class ScrumBoardHome extends Component {
         }
       });
     }
-    ScrumBoardStore.setDragStartItem({});
-    if (!result.destination) {
-      return;
-    }
     // 位置不变直接返回
     if (JSON.parse(result.source.droppableId).columnId
       === JSON.parse(result.destination.droppableId).columnId
+      && JSON.parse(result.source.droppableId).endStatusId
+      === JSON.parse(result.destination.droppableId).endStatusId
       && sourceIndex === destIndex) {
       return;
     }
@@ -474,7 +476,7 @@ class ScrumBoardHome extends Component {
       }
     }
     if (flag === 0) {
-      const newState = _.clone(ScrumBoardStore.getBoardData);
+      const newState = _.cloneDeep(ScrumBoardStore.getBoardData);
       const {
         issueId, objectVersionNumber, typeId, statusId,
       } = JSON.parse(result.draggableId);
@@ -517,10 +519,13 @@ class ScrumBoardHome extends Component {
             if (String(newState[index].subStatuses[index2].statusId)
               === String(JSON.parse(result.destination.droppableId).endStatusId)) {
               // 目标位置在改状态下所有issue的索引，用于插入拖动issue
-              let isLast = destIssues.length === destIndex;
-              const destColumeIssue = newState[index].subStatuses[index2].issues;
+              let isLast = !!destIssues.length && (destIssues.length === destIndex);
+              const issueCopy = _.cloneDeep(ScrumBoardStore.getBoardData);
+              const destColumeIssue = issueCopy[index].subStatuses[index2].issues;
               if (JSON.parse(result.source.droppableId).columnId
                 === JSON.parse(result.destination.droppableId).columnId
+                && JSON.parse(result.source.droppableId).endStatusId
+                === JSON.parse(result.destination.droppableId).endStatusId
                 && destColumeIssue.length === destIndex) {
                 isLast = true;
               }
@@ -556,7 +561,13 @@ class ScrumBoardHome extends Component {
             rank = true;
             if (destIndex === 0 || (JSON.parse(result.source.droppableId).columnId
               === JSON.parse(result.destination.droppableId).columnId
+              && JSON.parse(result.source.droppableId).endStatusId
+              === JSON.parse(result.destination.droppableId).endStatusId
               && sourceIndex < destIndex)) {
+              if (destIndex >= destIssues.length) {
+                ScrumBoardStore.setBoardData(originState);
+                return;
+              }
               outsetIssueId = destIssues[destIndex].issueId;
             } else if (destIndex) {
               outsetIssueId = destIssues[destIndex - 1].issueId;
