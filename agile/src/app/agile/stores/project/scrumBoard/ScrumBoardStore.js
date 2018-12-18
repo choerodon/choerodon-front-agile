@@ -532,6 +532,11 @@ class ScrumBoardStore {
     const { issueId, objectVersionNumber, transformId } = data;
     return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=agile&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objectVersionNumber}`);
   }
+
+  // 校验看板名称是否重复
+  checkBoardNameRepeat = (proId, name) => axios.get(
+    `/agile/v1/projects/${proId}/board/check_name?boardName=${name}`,
+  );
 }
 
 const scrumBoardStore = new ScrumBoardStore();

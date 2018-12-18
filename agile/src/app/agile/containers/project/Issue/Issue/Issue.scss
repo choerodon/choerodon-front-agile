@@ -36,7 +36,7 @@
     }
     td {
       display: block;
-      padding: 0 4px;
+      // padding: 0 4px;
     }
 
     tr {
@@ -58,7 +58,7 @@
         }
       }
       tr {
-        padding: 4px;
+        // padding: 4px;
         td {
           border-bottom: none;
         }
@@ -84,6 +84,7 @@
   .summary {
     order: 6;
     width: 100%;
+    // padding: 0 4px 4px;
   }
   .status {
     order: 3;
@@ -94,6 +95,7 @@
   .assignee {
     order: 5;
     width: 128px;
+    // padding: 0 4px 4px;
   }
 }
 

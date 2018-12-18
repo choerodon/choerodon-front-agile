@@ -62,6 +62,7 @@ const STATUS_SHOW = {
 };
 
 let loginUserId;
+let hasPermission;
 class CreateSprint extends Component {
   debounceFilterIssues = _.debounce((input) => {
     this.setState({
@@ -80,7 +81,6 @@ class CreateSprint extends Component {
     this.needBlur = true;
     this.componentRef = React.createRef();
     this.state = {
-      hasPermission: false,
       createdById: undefined,
       issueLoading: false,
       flag: undefined,
@@ -189,11 +189,20 @@ class CreateSprint extends Component {
         }
       }
     });
-    axios.get('/iam/v1/users/self')
-      .then((data) => {
-        loginUserId = data.id;
-      })
-      .catch((e) => {});
+
+    axios.all([
+      axios.get('/iam/v1/users/self'),
+      axios.post('/iam/v1/permissions/checkPermission', [{
+        code: 'agile-service.project-info.updateProjectInfo',
+        organizationId: AppState.currentMenuType.organizationId,
+        projectId: AppState.currentMenuType.id,
+        resourceType: 'project',
+      }]),
+    ])
+      .then(axios.spread((users, permission) => {
+        loginUserId = users.id;
+        hasPermission = permission[0].approve;
+      }));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -882,7 +891,8 @@ class CreateSprint extends Component {
     const { origin: { issueId } } = this.state;
     if (e.key === '0') {
       this.setState({ dailyLogShow: true });
-    } else if (e.key === 'item_1') {
+    } else if (e.key === '1') {
+      const { createdById } = this.state;
       this.handleDeleteIssue(issueId);
     } else if (e.key === '2') {
       this.setState({ createSubTaskShow: true });
@@ -1376,26 +1386,14 @@ class CreateSprint extends Component {
           <Menu.Item key="0">
             {'登记工作日志'}
           </Menu.Item>
-          <Permission
-            type={type}
-            projectId={projectId}
-            organizationId={orgId}
-            service={['agile-service.project-info.updateProjectInfo']}
-            noAccessChildren={(
-              <Menu.Item
-                key="1"
-                disabled={loginUserId !== createdById}
-              >
-                {'删除'}
-              </Menu.Item>
-            )}
-          >
+          {
             <Menu.Item
               key="1"
+              disabled={loginUserId !== createdById && !hasPermission}
             >
               {'删除'}
             </Menu.Item>
-          </Permission>
+          }
           {
             typeCode !== 'sub_task' && (
               <Menu.Item key="2">

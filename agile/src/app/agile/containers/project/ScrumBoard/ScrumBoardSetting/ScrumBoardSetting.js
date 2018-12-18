@@ -13,6 +13,7 @@ import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardSto
 import ColumnPage from '../ScrumBoardSettingComponent/ColumnPage/ColumnPage';
 import SwimLanePage from '../ScrumBoardSettingComponent/SwimLanePage/SwimLanePage';
 import WorkcalendarPage from '../ScrumBoardSettingComponent/WorkCalendarPage/WorkCalendarPage';
+import EditBoardName from '../ScrumBoardSettingComponent/EditBoardName/EditBoardName';
 
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
@@ -154,6 +155,9 @@ class ScrumBoardSetting extends Component {
                 </TabPane>
               ) : null
             }
+            <TabPane tab="看板名称" key="4">
+              <EditBoardName />
+            </TabPane>
           </Tabs>
         </Content>
       </Page>
