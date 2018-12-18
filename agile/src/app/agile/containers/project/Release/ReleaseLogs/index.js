@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
-import { Page, Header, Content, stores, axios } from 'choerodon-front-boot';
-import { Button, DatePicker, Tabs, Table, Popover, Modal, Radio, Form, Select, Icon, Spin } from 'choerodon-ui';
+import {
+  Page, Header, Content, stores, axios,
+} from 'choerodon-front-boot';
+import {
+  Button, DatePicker, Tabs, Table, Popover, Modal, Radio, Form, Select, Icon, Spin,
+} from 'choerodon-ui';
 import moment from 'moment';
 import TypeTag from '../../../../components/TypeTag';
 
@@ -42,7 +46,7 @@ class ReleaseLogs extends Component {
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
     const versionId = match.params.id;
-    axios.get(`/agile/v1/projects/${projectId}/product_version/${versionId}/issues?organizationId=${orgId}`)
+    axios.post(`/agile/v1/projects/${projectId}/product_version/${versionId}/issues?organizationId=${orgId}`, {})
       .then((res) => {
         this.setState({ issues: res });
         this.splitIssues(res);
@@ -99,16 +103,18 @@ class ReleaseLogs extends Component {
   };
 
   combine(typeCode, name) {
-    if (this.state[typeCode].length) {
+    const { state } = this;
+    if (state[typeCode].length) {
       str += `\n### ${name}\n`;
-      this.state[typeCode].forEach((v) => {
+      state[typeCode].forEach((v) => {
         str += `- [${v.issueNum}]-${v.summary}\n`;
       });
     }
   }
 
   renderSubsetIssues(issueType) {
-    const { history } = this.props;
+    const { history, match } = this.props;
+    const { state } = this;
     const menu = AppState.currentMenuType;
     const urlParams = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -122,7 +128,7 @@ class ReleaseLogs extends Component {
         </div>
         <ul style={{ marginBottom: 0, paddingLeft: 45 }}>
           {
-            this.state[issueType.typeCode].map(issue => (
+            state[issueType.typeCode].map(issue => (
               <li style={{ marginBottom: 16 }}>
                 <span>[</span>
                 {
@@ -130,7 +136,7 @@ class ReleaseLogs extends Component {
                     <a
                       role="none"
                       onClick={() => {
-                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}&paramUrl=release/logs/${this.props.match.params.id}`);
+                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}&paramUrl=release/logs/${match.params.id}`);
                         return false;
                       }}
                     >
@@ -159,12 +165,12 @@ class ReleaseLogs extends Component {
     const { issueTypeData, version } = this.state;
     return (
       <Page>
-        <Header 
+        <Header
           title="版本日志"
           backPath={`/agile/release/detail/${versionId}?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
-          <Button 
-            funcType="flat" 
+          <Button
+            funcType="flat"
             onClick={() => {
               this.exportLogs();
             }}
@@ -172,7 +178,7 @@ class ReleaseLogs extends Component {
             <Icon type="library_books" />
             <span>导出</span>
           </Button>
-          
+
         </Header>
         <Content
           title={`版本“${version.name}” 的版本日志`}
