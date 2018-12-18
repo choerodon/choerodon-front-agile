@@ -43,6 +43,7 @@ class ScrumBoardHome extends Component {
       quickFilter: [],
       translateId: [],
       expandFilter: false,
+      checkResult: false,
     };
   }
 
@@ -618,8 +619,9 @@ class ScrumBoardHome extends Component {
   handleCreateBoard = (e) => {
     e.preventDefault();
     const { form } = this.props;
+    const { checkResult } = this.state;
     form.validateFields((err, values) => {
-      if (!err) {
+      if (!err && !checkResult) {
         ScrumBoardStore.axiosCreateBoard(values.name).then((res) => {
           form.resetFields();
           message.success('创建成功');
@@ -982,6 +984,21 @@ class ScrumBoardHome extends Component {
     }
   };
 
+  checkBoardNameRepeat = (rule, value, callback) => {
+    const proId = AppState.currentMenuType.id;
+    ScrumBoardStore.checkBoardNameRepeat(proId, value)
+      .then((res) => {
+        this.setState({
+          checkResult: res,
+        });
+        if (res) {
+          callback('看板名称重复');
+        } else {
+          callback();
+        }
+      });
+  };
+
   render() {
     this.renderHeight();
     // 其他问题计数 -- 临时逻辑
@@ -1269,6 +1286,8 @@ class ScrumBoardHome extends Component {
                   {getFieldDecorator('name', {
                     rules: [{
                       required: true, message: '看板名是必填的',
+                    }, {
+                      validator: this.checkBoardNameRepeat,
                     }],
                   })(
                     <Input
