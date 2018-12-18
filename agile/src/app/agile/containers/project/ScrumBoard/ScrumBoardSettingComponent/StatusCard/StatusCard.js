@@ -44,7 +44,7 @@ class StatusCard extends Component {
     });
   };
 
-  handleDeleteStatus = () => {
+  async handleDeleteStatus() {
     const { data: propData, refresh } = this.props;
     const originData = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
     const data = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
@@ -57,11 +57,17 @@ class StatusCard extends Component {
     }
     data[data.length - 1].subStatuses.splice(deleteIndex, 1);
     ScrumBoardStore.setBoardData(data);
-    ScrumBoardStore.axiosDeleteStatus(deleteCode).catch((error) => {
-      ScrumBoardStore.setBoardData(originData);
-    });
+    const canBeDeleted = await ScrumBoardStore.axiosStatusCanBeDelete(deleteCode);
+    // debugger;
+    if (canBeDeleted) {
+      try {
+        await ScrumBoardStore.axiosDeleteStatus(deleteCode);
+      } catch (err) {
+        ScrumBoardStore.setBoardData(originData);
+      }
+    }
     refresh();
-  };
+  }
 
   renderCloseDisplay() {
     const { columnId, data } = this.props;

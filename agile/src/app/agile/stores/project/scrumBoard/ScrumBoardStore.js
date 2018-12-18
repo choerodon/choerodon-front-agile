@@ -397,6 +397,10 @@ class ScrumBoardStore {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list_by_options?boardId=${boardId}`);
   }
 
+  axiosStatusCanBeDelete(code) {
+    return axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/check_remove_status_for_agile?status_id=${code}`);
+  }
+
   axiosDeleteStatus(code) {
     return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}`);
   }
