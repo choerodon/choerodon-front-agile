@@ -29,6 +29,13 @@ class BacklogHome extends Component {
 
   componentDidMount() {
     const { BacklogStore, location } = this.props;
+    // magic, don't touch it
+    document.addEventListener('click', (e) => {
+      if (!BacklogStore.isInner) {
+        // 取消选择
+        BacklogStore.setSelectIssue([]);
+      }
+    });
     BacklogStore.clearSprintFilter();
     BacklogStore.setClickIssueDetail({});
     this.refresh();
