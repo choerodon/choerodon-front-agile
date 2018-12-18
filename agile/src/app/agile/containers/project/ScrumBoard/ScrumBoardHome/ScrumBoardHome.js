@@ -385,7 +385,7 @@ class ScrumBoardHome extends Component {
     if (ScrumBoardStore.getCurrentConstraint === 'issue') {
       // 问题计数
       if (JSON.parse(result.source.droppableId).columnId
-      !== JSON.parse(result.destination.droppableId).columnId) {
+        !== JSON.parse(result.destination.droppableId).columnId) {
         // 如果是拖不同列
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
           if (String(originState[oriIndex].columnId)
@@ -405,7 +405,7 @@ class ScrumBoardHome extends Component {
         }
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
           if (String(originState[oriIndex].columnId)
-          === String(JSON.parse(result.destination.droppableId).columnId)) {
+            === String(JSON.parse(result.destination.droppableId).columnId)) {
             let totalIssues = 0;
             for (
               let index = 0, len2 = originState[oriIndex].subStatuses.length;
@@ -423,7 +423,7 @@ class ScrumBoardHome extends Component {
     } else if (ScrumBoardStore.getCurrentConstraint === 'issue_without_sub_task') {
       // 问题计数 不包含子任务
       if (JSON.parse(result.source.droppableId).columnId
-      !== JSON.parse(result.destination.droppableId).columnId) {
+        !== JSON.parse(result.destination.droppableId).columnId) {
         // 如果是拖不同列
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
           if (String(originState[oriIndex].columnId)
@@ -450,7 +450,7 @@ class ScrumBoardHome extends Component {
         }
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
           if (String(originState[oriIndex].columnId)
-          === String(JSON.parse(result.destination.droppableId).columnId)) {
+            === String(JSON.parse(result.destination.droppableId).columnId)) {
             let totalIssues = 0;
             for (
               let index = 0, len2 = originState[oriIndex].subStatuses.length;
@@ -509,13 +509,13 @@ class ScrumBoardHome extends Component {
       // 放入新位置
       for (let index = 0, len = newState.length; index < len; index += 1) {
         if (String(newState[index].columnId)
-        === String(JSON.parse(result.destination.droppableId).columnId)) {
+          === String(JSON.parse(result.destination.droppableId).columnId)) {
           for (
             let index2 = 0, len2 = newState[index].subStatuses.length;
             index2 < len2;
             index2 += 1) {
             if (String(newState[index].subStatuses[index2].statusId)
-            === String(JSON.parse(result.destination.droppableId).endStatusId)) {
+              === String(JSON.parse(result.destination.droppableId).endStatusId)) {
               // 目标位置在改状态下所有issue的索引，用于插入拖动issue
               let isLast = destIssues.length === destIndex;
               const destColumeIssue = newState[index].subStatuses[index2].issues;
@@ -525,11 +525,13 @@ class ScrumBoardHome extends Component {
                 isLast = true;
               }
               const targetIssue = isLast ? destIssues[destIndex - 1] : destIssues[destIndex];
+              /* eslint-disable */
               destColumeIssue.forEach((issue, issueIndex) => {
                 if (targetIssue && targetIssue.issueId === issue.issueId) {
                   destColumeIndex = issueIndex;
                 }
               });
+              /* eslint-enable */
               if (isLast) {
                 destColumeIndex += 1;
               }
@@ -819,9 +821,11 @@ class ScrumBoardHome extends Component {
   };
 
   renderHeight = () => {
-    if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-      document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 108}px)`;
-    }
+    setTimeout(() => {
+      if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
+        document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 108}px)`;
+      }
+    }, 600);
   };
 
   renderOthersTitle = () => {
@@ -1126,42 +1130,46 @@ class ScrumBoardHome extends Component {
             }
           </Select>
           {
-             (
-               <Button
-                 className="leftBtn2"
-                 disabled={!dataSource ? false
-                   : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)}
-                 funcType="flat"
-                 onClick={() => {
-                   if (dataSource
-                     && dataSource.currentSprint
-                     && dataSource.currentSprint.sprintId) {
-                     history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`);
-                   } else {
-                     message.info('等待加载当前迭代');
-                   }
-                 }}
-               >
-                 <span>切换至工作台</span>
-               </Button>
+            (
+              <Button
+                className="leftBtn2"
+                disabled={!dataSource ? false
+                  : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)}
+                funcType="flat"
+                onClick={() => {
+                  if (dataSource
+                    && dataSource.currentSprint
+                    && dataSource.currentSprint.sprintId) {
+                    history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`);
+                  } else {
+                    message.info('等待加载当前迭代');
+                  }
+                }}
+              >
+                <span>切换至工作台</span>
+              </Button>
 
               //  <Button className="leftBtn2"
-               //  disabled={dataSource ?
-               //  (dataSource
-               //  && dataSource.currentSprint
-               //  && dataSource.currentSprint.sprintId)
-               //  : false}
-               //  funcType="flat"
-               //  onClick={() => { history.push(`/agile/iterationBoard/
-               //  ${dataSource && dataSource.currentSprint.sprintId}?
-               //  type=project&id=${AppState.currentMenuType.id}&name=
-               //  ${AppState.currentMenuType.name}&organizationId=
-               //  ${AppState.currentMenuType.organizationId}`); }}>
+              //  disabled={dataSource ?
+              //  (dataSource
+              //  && dataSource.currentSprint
+              //  && dataSource.currentSprint.sprintId)
+              //  : false}
+              //  funcType="flat"
+              //  onClick={() => { history.push(`/agile/iterationBoard/
+              //  ${dataSource && dataSource.currentSprint.sprintId}?
+              //  type=project&id=${AppState.currentMenuType.id}&name=
+              //  ${AppState.currentMenuType.name}&organizationId=
+              //  ${AppState.currentMenuType.organizationId}`); }}>
               //   <span>切换至工作台</span>
               // </Button>
             )
           }
-          <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>
+          <Button
+            className="leftBtn2"
+            funcType="flat"
+            onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}
+          >
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -1176,9 +1184,19 @@ class ScrumBoardHome extends Component {
                     onAssigneeChange={this.onAssigneeChange}
                   />
                 </div>
-                <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}>
+                <div
+                  className="c7n-scrumTools-right"
+                  style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}
+                >
                   <Icon type="av_timer" />
-                  <span style={{ paddingLeft: 5, marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint && ScrumBoardStore.getCurrentSprint.dayRemain >= 0 ? `${ScrumBoardStore.getCurrentSprint.dayRemain} days剩余` : '无剩余时间'}`}</span>
+                  <span style={{
+                    paddingLeft: 5,
+                    marginLeft: 0,
+                    marginRight: 15,
+                  }}
+                  >
+                    {`${ScrumBoardStore.getCurrentSprint && ScrumBoardStore.getCurrentSprint.dayRemain >= 0 ? `${ScrumBoardStore.getCurrentSprint.dayRemain} days剩余` : '无剩余时间'}`}
+                  </span>
                   <Button
                     funcType="flat"
                     onClick={this.handleFinishSprint.bind(this)}
