@@ -94,6 +94,9 @@
     order: 5;
     width: 128px;
   }
+  .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+    padding: 4px 4px;
+  }
 }
 
 .c7n-Issue {
