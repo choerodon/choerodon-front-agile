@@ -562,6 +562,8 @@ class ScrumBoardHome extends Component {
             if (data.failed) {
               if (data.code === 'error.instanceFeignClient.executeTransform') {
                 message.warn('由于状态机的配置，不能将问题移动到该状态');
+              } else {
+                message.warn(data.message);
               }
               ScrumBoardStore.setBoardData(originState);
             } else {
@@ -628,6 +630,7 @@ class ScrumBoardHome extends Component {
             ScrumBoardStore.setBoardData(JSON.parse(JSON.stringify(originState)));
           });
         } else {
+          message.warn('由于状态机的配置，不能将问题移动到该状态');
           ScrumBoardStore.setBoardData(JSON.parse(JSON.stringify(originState)));
         }
       });
