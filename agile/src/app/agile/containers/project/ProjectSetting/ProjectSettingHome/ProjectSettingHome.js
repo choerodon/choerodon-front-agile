@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import {
-  stores, axios, Page, Header, Content, Permission, 
+  stores, axios, Page, Header, Content, Permission,
 } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import {
-  Form, Input, Button, Icon, Select, Radio, 
+  Form, Input, Button, Icon, Select, Radio,
 } from 'choerodon-ui';
 import { COLOR } from '../../../../common/Constant';
 import { loadPriorities } from '../../../../api/NewIssueApi';
@@ -42,7 +42,7 @@ class ProjectSetting extends Component {
     if (strategy !== 'assignee') {
       this.props.form.setFieldsValue({
         assignee: undefined,
-      }); 
+      });
     }
   }
 
@@ -83,7 +83,7 @@ class ProjectSetting extends Component {
     getUser(assigneeId).then((res) => {
       this.setState({
         assignee: assigneeId,
-        originUsers: [res.content[0]],
+        originUsers: res.content.length ? [res.content[0]] : [],
       });
       this.props.form.setFieldsValue({
         assignee: assigneeId,

@@ -831,13 +831,13 @@ class ScrumBoardHome extends Component {
     return result;
   };
 
-  renderHeight = () => {
-    setTimeout(() => {
-      if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-        document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 108}px)`;
-      }
-    }, 600);
-  };
+  // renderHeight = () => {
+  //   setTimeout(() => {
+  //     if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
+  //       document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 108}px)`;
+  //     }
+  //   }, 600);
+  // };
 
   renderOthersTitle = () => {
     let result = '';
@@ -1059,7 +1059,7 @@ class ScrumBoardHome extends Component {
   };
 
   render() {
-    this.renderHeight();
+    // this.renderHeight();
     // 其他问题计数 -- 临时逻辑
     this.handleScroll();
     const { form: { getFieldDecorator }, history } = this.props;

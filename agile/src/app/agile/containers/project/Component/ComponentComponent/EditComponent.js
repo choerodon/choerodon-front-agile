@@ -97,7 +97,7 @@ class EditComponent extends Component {
     getUser(managerId).then((res) => {
       this.setState({
         managerId: JSON.stringify(res.content[0]),
-        originUsers: [res.content[0]],
+        originUsers: res.content.length ? [res.content[0]] : [],
       });
     });
   }
