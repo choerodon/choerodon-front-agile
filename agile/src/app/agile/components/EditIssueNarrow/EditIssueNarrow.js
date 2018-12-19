@@ -18,7 +18,7 @@ import {
   delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload,
 } from '../../common/utils';
 import {
-  loadBranchs, updateStatus, loadLinkIssues, loadLabels,
+  loadBranchs, loadDatalogs, updateStatus, loadLinkIssues, loadLabels,
   loadIssue, loadWorklogs, updateIssue, loadPriorities,
   loadComponents, loadVersions, loadEpics, createCommit,
   deleteIssue, updateIssueType, loadSprints, loadStatus,
@@ -34,6 +34,7 @@ import UserHead from '../UserHead';
 import Comment from './Component/Comment';
 import WikiItem from './Component/WikiItem';
 import Log from './Component/Log';
+import DataLogs from "./Component/DataLogs";
 import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
 import LinkList from './Component/LinkList';
@@ -784,6 +785,11 @@ class CreateSprint extends Component {
           linkIssues: res,
         });
       });
+      loadDatalogs(issueId).then((res) => {
+        this.setState({
+          datalogs: res,
+        });
+      });
       loadBranchs(issueId).then((res) => {
         this.setState({
           branchs: res || {},
@@ -1042,6 +1048,15 @@ class CreateSprint extends Component {
         }
       </div>
     );
+  }
+
+  /**
+   * DataLog
+   */
+  renderDataLogs() {
+    const { datalogs: stateDatalogs } = this.state;
+    const datalogs = _.filter(stateDatalogs, v => v.field !== 'Version');
+    return <DataLogs datalogs={datalogs} />;
   }
 
   /**
@@ -1585,6 +1600,21 @@ class CreateSprint extends Component {
                 />
               </li>
             </Tooltip>
+            <Tooltip placement="right" title="活动日志">
+              <li
+                id="DATA_LOG-nav"
+                className={`c7n-li ${nav === 'data_log' ? 'c7n-li-active' : ''}`}
+              >
+                <Icon
+                  type="insert_invitation c7n-icon-li"
+                  role="none"
+                  onClick={() => {
+                    this.setState({ nav: 'data_log' });
+                    this.scrollToAnchor('data_log');
+                  }}
+                />
+              </li>
+            </Tooltip>
             {
               typeCode !== 'sub_task' && (
                 <Tooltip placement="right" title="子任务">
@@ -1752,7 +1782,7 @@ class CreateSprint extends Component {
                             <NumericInput
                               maxLength="3"
                               value={storyPoints}
-                              suffix={'点'}
+                              suffix="点"
                               onChange={this.handleStoryPointsChange.bind(this)}
                               onPressEnter={() => {
                                 this.updateIssue('storyPoints');
@@ -1790,7 +1820,7 @@ class CreateSprint extends Component {
                               maxLength="3"
                               value={remainingTime}
                               onChange={this.handleRemainingTimeChange.bind(this)}
-                              suffix={'小时'}
+                              suffix="小时"
                               onPressEnter={() => {
                                 this.updateIssue('remainingTime');
                                 this.setState({
@@ -3023,6 +3053,23 @@ class CreateSprint extends Component {
                     </div>
                   </div>
                   {this.renderLogs()}
+                </div>
+                <div id="data_log">
+                  <div className="c7n-title-wrapper">
+                    <div className="c7n-title-left">
+                      <Icon type="insert_invitation c7n-icon-title" />
+                      <span>活动日志</span>
+                    </div>
+                    <div
+                      style={{
+                        flex: 1,
+                        height: 1,
+                        borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+                        marginLeft: '14px',
+                      }}
+                    />
+                  </div>
+                  {this.renderDataLogs()}
                 </div>
                 {
                   typeCode !== 'sub_task' && (
