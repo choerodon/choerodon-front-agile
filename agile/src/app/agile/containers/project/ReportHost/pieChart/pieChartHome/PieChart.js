@@ -7,24 +7,39 @@ import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/title';
 import 'echarts/lib/component/legend';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
 import {
-  Button, Select, Icon, Spin, Tooltip, 
+  Button, Select, Icon, Spin, Tooltip, DatePicker,
 } from 'choerodon-ui';
 import _ from 'lodash';
 import './pie.scss';
 import { reduce } from 'zrender/lib/core/util';
 import util from 'util';
+import moment from 'moment';
 import SwitchChart from '../../Component/switchChart';
 import VersionReportStore from '../../../../../stores/project/versionReport/VersionReport';
 import NoDataComponent from '../../Component/noData';
 import pic from '../../../../../assets/image/emptyChart.svg';
 import ReleaseStore from '../../../../../stores/project/release/ReleaseStore';
+import { loadSprints, loadVersions } from '../../../../../api/NewIssueApi';
 
 const Option = Select.Option;
 const { AppState } = stores;
+const { RangePicker } = DatePicker;
 let backUrl;
+const chooseDimension = [
+  {
+    key: 'sprint',
+    name: '迭代冲刺',
+  }, {
+    key: 'version',
+    name: '版本',
+  }, {
+    key: 'timeRange',
+    name: '时间',
+  },
+];
 
 @observer
 class ReleaseDetail extends Component {
@@ -36,37 +51,62 @@ class ReleaseDetail extends Component {
       value: '',
       showOtherTooltip: false,
       linkFromParamUrl: undefined,
+      sprintAndVersion: {
+        sprint: [],
+        version: [],
+      },
+      currentChooseDimension: '',
+      currentSprintChoose: '',
+      currentVersionChoose: '',
+      startDate: '',
+      endDate: '',
     };
   }
 
-  componentDidMount = () => {
-    const Request = this.GetRequest(this.props.location.search);
-    backUrl = Request.paramUrl || 'reporthost';
-    const value = this.getSelectDefaultValue();
-    VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
-    setTimeout(() => {
-      const pieChart = this.pie.getEchartsInstance();
-      pieChart.on('mouseout', (params) => {
-        if (params.data.name === '其它') {
-          this.setState({
-            showOtherTooltip: false,
-          });
-        }
-      });
-    }, 0);
-  }
+   componentDidMount = async () => {
+     const Request = this.GetRequest(this.props.location.search);
+     backUrl = Request.paramUrl || 'reporthost';
+     const value = this.getSelectDefaultValue();
+     await VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
+     await axios.all([
+       axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, ['started', 'closed']),
+       axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`, ['version_planning', 'released']),
+     ])
+       .then(axios.spread((sprints, versions) => {
+         this.setState({
+           sprintAndVersion: {
+             //  sprint: _.map(sprints, 'sprintName'),
+             //  version: _.map(versions, 'name'),
+             sprint: sprints,
+             version: versions,
+           },
+           currentSprintChoose: sprints[0].sprintId,
+           currentVersionChoose: versions[0].versionId,
+         });
+       }));
+
+      
+     const pieChart = this.pie.getEchartsInstance();
+     pieChart.on('mouseout', (params) => {
+       if (params.data.name === '其它') {
+         this.setState({
+           showOtherTooltip: false,
+         });
+       }
+     });
+   }
  
-  GetRequest(url) {
-    const theRequest = {};
-    if (url.indexOf('?') !== -1) {
-      const str = url.split('?')[1];
-      const strs = str.split('&');
-      for (let i = 0; i < strs.length; i += 1) {
-        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
-      }
-    }
-    return theRequest;
-  }
+   GetRequest(url) {
+     const theRequest = {};
+     if (url.indexOf('?') !== -1) {
+       const str = url.split('?')[1];
+       const strs = str.split('&');
+       for (let i = 0; i < strs.length; i += 1) {
+         theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+       }
+     }
+     return theRequest;
+   }
 
   getFirstName = (str) => {
     if (!str) {
@@ -203,6 +243,13 @@ class ReleaseDetail extends Component {
   }
 
   handelRefresh = () => {
+    this.setState({
+      currentChooseDimension: '',
+      currentSprintChoose: '',
+      currentVersionChoose: '',
+      startDate: '',
+      endDate: '',
+    });
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, this.state.value);
   };
 
@@ -300,9 +347,90 @@ class ReleaseDetail extends Component {
     }    
   }
 
+  renderChooseDimension = () => {
+    const {
+      value, showOtherTooltip, sprintAndVersion, currentChooseDimension, currentSprintChoose, currentVersionChoose, startDate, endDate,
+    } = this.state;
+    return (
+      <div>
+      
+        {
+              currentChooseDimension === 'timeRange' ? (
+                <RangePicker
+                  className="c7n-pieChart-filter-item"
+                  style={{ minWidth: 160 }}
+                  value={[startDate, endDate]}
+                  allowClear={false}
+                  onChange={(date, dateString) => {
+                    this.setState({
+                      startDate: moment(dateString[0]),
+                      endDate: moment(dateString[1]),
+                    });
+                    VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, '', '', dateString[0], dateString[1]);
+                  }}
+                />
+              ) : (
+                <Select 
+                  className="c7n-pieChart-filter-item"
+                  style={{ minWidth: 200 }}
+                  value={currentChooseDimension === 'version' ? (
+                    sprintAndVersion.version.find(item => item.versionId === currentVersionChoose) && sprintAndVersion.version.find(item => item.versionId === currentVersionChoose).name) : (
+                    sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose) && sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose).sprintName)
+                    } 
+                  onChange={this.handleSecondChooseChange}
+                >
+                  {
+                    sprintAndVersion && currentChooseDimension && sprintAndVersion[currentChooseDimension] && sprintAndVersion[currentChooseDimension].map((item) => {
+                      if (currentChooseDimension === 'version') {
+                        return <Option key={item.versionId} value={item.versionId}>{item.name}</Option>;
+                      }
+                      if (currentChooseDimension === 'sprint') {
+                        return <Option key={item.sprintId} value={item.sprintId}>{item.sprintName}</Option>;
+                      }
+                    })
+                  }
+                </Select>)
+        }      
+      </div>
+     
+    );
+  }
+
+  handleChooseDimensionChange = (chooseDimension) => {
+    const { value, sprintAndVersion } = this.state;
+    this.setState({
+      currentChooseDimension: chooseDimension,
+    });
+
+    this.setState({
+      currentVersionChoose: sprintAndVersion.version[0].versionId,
+      currentSprintChoose: sprintAndVersion.sprint[0].sprintId,
+      startDate: '',
+      endDate: '',
+    });
+    VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, chooseDimension === 'sprint' ? sprintAndVersion.sprint[0].sprintId : '', chooseDimension === 'version' ? sprintAndVersion.version[0].versionId : '', '', '');
+  }
+
+  handleSecondChooseChange = (chooseValue) => {
+    const { value, currentChooseDimension } = this.state;
+    if (currentChooseDimension === 'version') {
+      this.setState({
+        currentVersionChoose: chooseValue,
+      });
+      VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, '', chooseValue, '', '');
+    }
+    if (currentChooseDimension === 'sprint') {
+      this.setState({
+        currentSprintChoose: chooseValue,
+      });
+      VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, chooseValue, '', '', '');
+    }
+  }
 
   render() {
-    const { value, showOtherTooltip } = this.state;
+    const {
+      value, showOtherTooltip, sprintAndVersion, currentChooseDimension, currentSprintChoose, currentVersionChoose, startDate, endDate,
+    } = this.state;
     const data = VersionReportStore.getPieData;
     const sourceData = VersionReportStore.getSourceData;
     let total = 0;
@@ -322,6 +450,7 @@ class ReleaseDetail extends Component {
       { title: '史诗', value: 'epic' },
       { title: '解决结果', value: 'resolution' },
     ];
+
     return (
       <Page className="pie-chart">
         <Header
@@ -338,29 +467,139 @@ class ReleaseDetail extends Component {
           </Button>
         </Header>
         <Content
-          title={data.length ? `项目"${AppState.currentMenuType.name}"下的问题统计图` : '无问题的统计图'}
+          title="统计图"
           description="根据指定字段以统计图呈现项目或筛选器下的问题，这可以使您一目了然地了解问题详情。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/statistical/"
         >
-          <Spin spinning={VersionReportStore.pieLoading}>
+          {/* <Spin spinning={VersionReportStore.pieLoading}>
             {data.length ? (
               <React.Fragment>
-                <Select
-                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                  defaultValue={value}
-                  value={value}
-                  label="统计类型"
-                  style={{
-                    width: 512,
-                  }}
-                  onChange={this.changeType}
-                >
-                  {
+                <div className="c7n-pieChart-filter">
+                  <Select
+                    className="c7n-pieChart-filter-item"
+                    getPopupContainer={triggerNode => triggerNode.parentNode}
+                    defaultValue={value}
+                    value={value}
+                    label="统计类型"
+                    onChange={this.changeType}
+                  >
+                    {
                   type.map(item => (
                     <Option value={item.value} key={item.title}>{item.title}</Option>
                   ))
                 }
-                </Select>
+                  </Select>
+                  <Select 
+                    className="c7n-pieChart-filter-item"
+                    style={{ minWidth: 70 }}
+                    label="选择维度" 
+                    defaultValue={chooseDimension[0].name} 
+                    value={chooseDimension.find(item => item.key === currentChooseDimension) && chooseDimension.find(item => item.key === currentChooseDimension).name} 
+                    onChange={this.handleChooseDimensionChange}
+                  >
+                    {
+                      chooseDimension.map(item => <Option key={item.key} value={item.key}>{item.name}</Option>)
+                    }
+                  </Select>  
+                  {
+                    currentChooseDimension ? this.renderChooseDimension() : '' 
+                  }
+                </div>
+                <div style={{
+                  display: 'flex', justifyContent: 'flex-start', alignItems: 'center', 
+                }}
+                >
+                  <ReactEchartsCore
+                    ref={(pie) => { this.pie = pie; }}
+                    style={{ width: '58%', height: 500 }}
+                    echarts={echarts}
+                    option={this.getOption()}
+                  />
+                 
+                  <div className="pie-otherTooltip" style={{ display: `${showOtherTooltip ? 'block' : 'none'}` }}>
+                    <div className="pie-otherTooltip-wrap" />
+                    <div className="pie-otherTooltip-item-wrap">
+                      {this.renderOtherTooltip()}
+                    </div>
+                   
+                  </div>
+                  <div className="pie-title">
+                    <p className="pie-legend-title">数据统计</p>
+                    <table>
+                      <thead>
+                        <tr>
+                          <td style={{ width: '158px' }}>{this.state.type}</td>
+                          <td style={{ width: '62px' }}>问题</td>
+                          <td style={{ paddingRight: 35 }}>百分比</td>
+                        </tr>
+                      </thead>
+                    </table>
+                    <table className="pie-legend-tbody">
+                      {
+                        sourceData.map((item, index) => (
+                          <tr>
+                            <td style={{ width: '158px' }}>
+                              <div className="pie-legend-icon" style={{ background: colors[index] }} />
+                              <Tooltip title={item && item.name}>
+                                <div className="pie-legend-text">{item.name ? item.name : '未分配'}</div>
+                              </Tooltip>
+                            </td>
+                            <td style={{ width: '62px' }}>
+                              <a
+                                role="none"
+                                onClick={this.handleLinkToIssue.bind(this, item)}
+                              >
+                                {item.value}
+                              </a>
+                            </td>
+                            <td style={{ width: '62px', paddingRight: 15 }}>{`${(item.percent).toFixed(2)}%`}</td>
+                          </tr>
+                        ))
+                      }
+                    </table>        
+                  </div>
+                </div>
+              </React.Fragment>
+            ) : <NoDataComponent title="问题" links={[{ name: '问题管理', link: '/agile/issue' }]} img={pic} /> }
+          </Spin> */}
+
+
+          <Spin spinning={VersionReportStore.pieLoading}>
+
+            <div className="c7n-pieChart-filter">
+              <Select
+                className="c7n-pieChart-filter-item"
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                defaultValue={value}
+                value={value}
+                label="统计类型"
+                onChange={this.changeType}
+              >
+                {
+                  type.map(item => (
+                    <Option value={item.value} key={item.title}>{item.title}</Option>
+                  ))
+                }
+              </Select>
+              <Select 
+                className="c7n-pieChart-filter-item"
+                style={{ minWidth: 70 }}
+                label="选择维度" 
+                defaultValue={chooseDimension[0].name} 
+                value={chooseDimension.find(item => item.key === currentChooseDimension) && chooseDimension.find(item => item.key === currentChooseDimension).name} 
+                onChange={this.handleChooseDimensionChange}
+              >
+                {
+                  chooseDimension.map(item => <Option key={item.key} value={item.key}>{item.name}</Option>)
+                }
+              </Select>  
+              {
+                currentChooseDimension ? this.renderChooseDimension() : '' 
+              }
+            </div>
+
+            {data.length ? (
+              <React.Fragment>
                 <div style={{
                   display: 'flex', justifyContent: 'flex-start', alignItems: 'center', 
                 }}
@@ -418,6 +657,7 @@ class ReleaseDetail extends Component {
               </React.Fragment>
             ) : <NoDataComponent title="问题" links={[{ name: '问题管理', link: '/agile/issue' }]} img={pic} /> }
           </Spin>
+
         </Content>
       </Page>
     );

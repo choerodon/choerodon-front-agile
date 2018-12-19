@@ -112,10 +112,10 @@ class VersionReportStore {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`, ['version_planning', 'released']);
   }
 
-  getPieDatas = (projectId, type) => {
+  getPieDatas = (projectId, type, sprintId, versionId, startDate, endDate) => {
     const orgId = AppState.currentMenuType.organizationId;
     this.changePieLoading(true);
-    axios.get(`/agile/v1/projects/${projectId}/reports/pie_chart?organizationId=${orgId}&fieldName=${type}`)
+    axios.get(`/agile/v1/projects/${projectId}/reports/pie_chart?organizationId=${orgId}&fieldName=${type}${sprintId ? `&sprintId=${sprintId}` : ''}${versionId ? `&versionId=${versionId}` : ''}${startDate ? `&startDate=${startDate}` : ''}${endDate ? `&endDate=${endDate}` : ''}`)
       .then((data) => {
         const len = data.length;
         if (len) {
@@ -135,6 +135,8 @@ class VersionReportStore {
             bigData.push(otherData);
           }
           this.setPieData(bigData);
+        } else {
+          this.setPieData([]);
         }
         this.changePieLoading(false);
       })

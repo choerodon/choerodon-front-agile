@@ -8,7 +8,7 @@ class VersionProgressWrap extends Component {
     return (
       <Card 
         title="版本进度"
-        link={link}
+        // link={link}
       >
         <VersionProgress />
       </Card>
