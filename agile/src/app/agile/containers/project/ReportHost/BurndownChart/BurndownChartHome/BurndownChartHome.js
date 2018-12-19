@@ -1,10 +1,11 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
   Button, Spin, message, Icon, Select, Table, Menu, Checkbox, Tooltip,
 } from 'choerodon-ui';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
@@ -19,7 +20,7 @@ import epicSvg from '../../../../../assets/image/emptyChart.svg';
 import SwithChart from '../../Component/switchChart';
 
 const { AppState } = stores;
-const Option = Select.Option;
+const { Option } = Select;
 let backUrl;
 
 @observer
@@ -56,17 +57,17 @@ class BurndownChartHome extends Component {
   }
 
   // 废弃
-  GetRequest(url) {
-    const theRequest = {};
-    if (url.indexOf('?') !== -1) {
-      const str = url.split('?')[1];
-      const strs = str.split('&');
-      for (let i = 0; i < strs.length; i += 1) {
-        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
-      }
-    }
-    return theRequest;
-  }
+  // GetRequest(url) {
+  //   const theRequest = {};
+  //   if (url.indexOf('?') !== -1) {
+  //     const str = url.split('?')[1];
+  //     const strs = str.split('&');
+  //     for (let i = 0; i < strs.length; i += 1) {
+  //       theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+  //     }
+  //   }
+  //   return theRequest;
+  // }
 
   getBetweenDateStr(start, end) {
     // 是否显示非工作日
@@ -81,10 +82,8 @@ class BurndownChartHome extends Component {
     diffDay.setDate(beginDay[2]);
     diffDay.setMonth(beginDay[1] - 1);
     diffDay.setFullYear(beginDay[0]);
-    result.push(start);
     while (i === 0) {
-      const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
-      diffDay.setTime(countDay);
+      const countDay = diffDay.getTime();
       if (restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         rest.push(moment(diffDay).format('YYYY-MM-DD'));
       }
@@ -96,6 +95,7 @@ class BurndownChartHome extends Component {
       if (restDayShow || !restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
       }
+      diffDay.setTime(countDay + 24 * 60 * 60 * 1000);
       if (String(dateList[0]) === endDay[0] && String(dateList[1]) === endDay[1] && String(dateList[2]) === endDay[2]) {
         i = 1;
       }
@@ -111,11 +111,10 @@ class BurndownChartHome extends Component {
         endDate: res[0].endDate,
         startDate: res[0].startDate,
       }, () => {
-        console.log(`defaultSprint: ${this.state.defaultSprint}`);
         if (this.state.defaultSprint) {
           this.getChartData();
           this.axiosGetRestDays();
-        } 
+        }
       });
     }).catch((error) => {
     });
@@ -151,6 +150,7 @@ class BurndownChartHome extends Component {
       // 如果后端给的最大日期小于结束日期
       let allDate;
       let rest = [];
+      /* eslint-disable */
       if (moment(maxDate).isBefore(this.state.endDate.split(' ')[0])) {
         const result = this.getBetweenDateStr(minDate, this.state.endDate.split(' ')[0]);
         allDate = result.result;
@@ -186,7 +186,7 @@ class BurndownChartHome extends Component {
           const dayAmount = res.expectCount / countWorkDay;
           if (rest.includes(allDate[b])) {
             // 非工作日
-            if (b < len - 1) {
+            if (b < len) {
               markAreaData.push([
                 {
                   xAxis: b === 0 ? '' : allDate[b - 1].split(' ')[0].slice(5).replace('-', '/'),
@@ -497,7 +497,7 @@ class BurndownChartHome extends Component {
       this.getChartCoordinate();
     });
   }
-  
+
   renderChartTitle() {
     let result = '';
     if (this.state.select === 'remainingEstimatedTime') {
@@ -766,7 +766,8 @@ class BurndownChartHome extends Component {
             funcType="flat"
             onClick={() => {
               this.getChartData();
-              this.getChartCoordinate();
+              // this.getChartCoordinate();
+              this.axiosGetRestDays();
             }}
           >
             <Icon type="refresh icon" />
@@ -785,8 +786,8 @@ class BurndownChartHome extends Component {
                 <div>
                   <Select
                     getPopupContainer={triggerNode => triggerNode.parentNode}
-                    style={{ width: 244 }} 
-                    label="迭代冲刺" 
+                    style={{ width: 244 }}
+                    label="迭代冲刺"
                     value={this.state.defaultSprint}
                     onChange={(value) => {
                       let endDate;
@@ -808,15 +809,15 @@ class BurndownChartHome extends Component {
                       });
                     }}
                   >
-                    {BurndownChartStore.getSprintList.length > 0 
+                    {BurndownChartStore.getSprintList.length > 0
                       ? BurndownChartStore.getSprintList.map(item => (
                         <Option value={item.sprintId}>{item.sprintName}</Option>
                       )) : ''}
                   </Select>
                   <Select
                     getPopupContainer={triggerNode => triggerNode.parentNode}
-                    style={{ width: 244, marginLeft: 24 }} 
-                    label="单位" 
+                    style={{ width: 244, marginLeft: 24 }}
+                    label="单位"
                     defaultValue={this.state.select}
                     onChange={this.handleChangeSelect.bind(this)}
                   >

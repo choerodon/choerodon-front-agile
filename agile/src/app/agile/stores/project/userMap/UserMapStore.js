@@ -408,10 +408,15 @@ class UserMapStore {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/swim_lane`)
       .then((res) => {
         this.setMode(res);
+        let axiosGetIssue = `/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?organizationId=${orgId}&type=${this.mode}&pageType=${pageType}`;
+        if (this.getAssigneeFilterIds.length) {
+          const currentAssignee = JSON.stringify(this.getAssigneeFilterIds).replace(/(]|\[)/g, '');
+          axiosGetIssue += `&assigneeFilterIds=${currentAssignee}`;
+        }
         axios.all([
           axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?organizationId=${orgId}&showDoneEpic=${this.showDoneEpic}`),
           axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
-          axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/issues?organizationId=${orgId}&type=${this.mode}&pageType=${pageType}`),
+          axios.get(axiosGetIssue),
         ])
           .then(
             axios.spread((epics, filters, issues) => {

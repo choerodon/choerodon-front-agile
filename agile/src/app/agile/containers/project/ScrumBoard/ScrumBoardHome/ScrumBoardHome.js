@@ -41,6 +41,7 @@ class ScrumBoardHome extends Component {
       judgeUpdateParent: {},
       updateParentStatus: null,
       quickFilter: [],
+      assigneeFilterIds: [],
       translateId: [],
       expandFilter: false,
       checkResult: false,
@@ -124,8 +125,10 @@ class ScrumBoardHome extends Component {
   }
 
   // 根据泳道，统计各个分类下的数量
-  refresh = (boardId, value = null) => {
-    const { onlyMe, recent, quickFilter } = this.state;
+  refresh = (boardId) => {
+    const {
+      onlyMe, recent, quickFilter, assigneeFilterIds,
+    } = this.state;
     this.setState({
       spinIf: true,
     });
@@ -134,13 +137,11 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.setQuickSearchList(res);
       if (boardId) {
         // 加载冲刺及Issue
-        if (value) {
-          ScrumBoardStore.setAssigneeFilterIds(value);
-        }
         ScrumBoardStore.axiosGetBoardData(boardId,
           onlyMe ? AppState.getUserId : 0,
           recent,
-          quickFilter).then((data) => {
+          quickFilter,
+          assigneeFilterIds).then((data) => {
           this.setState({ dataSource: data });
           if (data) {
             ScrumBoardStore.setSprintData(data.currentSprint);
@@ -349,10 +350,36 @@ class ScrumBoardHome extends Component {
     if (!result.destination) {
       return;
     }
+    // 由于重构导致数据结构不符合新逻辑的需求，且原有逻辑存在bug: 在有泳道情况下，index不准确
+    // 在重构之前，先使用以下代码获取正确的index
+
+    // 目标分组已有的issue
+    const { issues: destIssues } = JSON.parse(result.destination.droppableId);
+    // 目标位置在该分组下所有issue的索引
+    const destIndex = result.destination.index;
+    // 目标位置在改状态下所有issue的索引，用于插入拖动issue
+    let destColumeIndex = 0;
+    // 被拖动issue状态已有的issue
+    const { issues: sourceIssue } = JSON.parse(result.source.droppableId);
+    // 被拖动issue状态已有的issue中的索引
+    const sourceColumeIndex = result.source.index;
+    // 被拖动issueId
+    const { issueId: sourceIssueId } = JSON.parse(result.draggableId);
+    // 被拖动issue索引
+    let sourceIndex = 0;
+    if (sourceIssue && sourceIssue.length) {
+      sourceIssue.forEach((issue, index) => {
+        if (issue.issueId === sourceIssueId) {
+          sourceIndex = index;
+        }
+      });
+    }
     // 位置不变直接返回
     if (JSON.parse(result.source.droppableId).columnId
       === JSON.parse(result.destination.droppableId).columnId
-      && result.source.index === result.destination.index) {
+      && JSON.parse(result.source.droppableId).endStatusId
+      === JSON.parse(result.destination.droppableId).endStatusId
+      && sourceIndex === destIndex) {
       return;
     }
     const originState = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
@@ -360,7 +387,7 @@ class ScrumBoardHome extends Component {
     if (ScrumBoardStore.getCurrentConstraint === 'issue') {
       // 问题计数
       if (JSON.parse(result.source.droppableId).columnId
-      !== JSON.parse(result.destination.droppableId).columnId) {
+        !== JSON.parse(result.destination.droppableId).columnId) {
         // 如果是拖不同列
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
           if (String(originState[oriIndex].columnId)
@@ -380,7 +407,7 @@ class ScrumBoardHome extends Component {
         }
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
           if (String(originState[oriIndex].columnId)
-          === String(JSON.parse(result.destination.droppableId).columnId)) {
+            === String(JSON.parse(result.destination.droppableId).columnId)) {
             let totalIssues = 0;
             for (
               let index = 0, len2 = originState[oriIndex].subStatuses.length;
@@ -398,7 +425,7 @@ class ScrumBoardHome extends Component {
     } else if (ScrumBoardStore.getCurrentConstraint === 'issue_without_sub_task') {
       // 问题计数 不包含子任务
       if (JSON.parse(result.source.droppableId).columnId
-      !== JSON.parse(result.destination.droppableId).columnId) {
+        !== JSON.parse(result.destination.droppableId).columnId) {
         // 如果是拖不同列
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
           if (String(originState[oriIndex].columnId)
@@ -425,7 +452,7 @@ class ScrumBoardHome extends Component {
         }
         for (let oriIndex = 0, len = originState.length; oriIndex < len; oriIndex += 1) {
           if (String(originState[oriIndex].columnId)
-          === String(JSON.parse(result.destination.droppableId).columnId)) {
+            === String(JSON.parse(result.destination.droppableId).columnId)) {
             let totalIssues = 0;
             for (
               let index = 0, len2 = originState[oriIndex].subStatuses.length;
@@ -449,15 +476,13 @@ class ScrumBoardHome extends Component {
       }
     }
     if (flag === 0) {
-      // this.setState({
-      //   spinIf: true,
-      // });
-      const newState = _.clone(ScrumBoardStore.getBoardData);
+      const newState = _.cloneDeep(ScrumBoardStore.getBoardData);
       const {
         issueId, objectVersionNumber, typeId, statusId,
       } = JSON.parse(result.draggableId);
       const { endStatusId } = JSON.parse(result.destination.droppableId);
       let draggableData = {};
+      // 移除源issue
       for (let index = 0, len = newState.length; index < len; index += 1) {
         if (String(newState[index].columnId)
           === String(JSON.parse(result.source.droppableId).columnId)) {
@@ -467,32 +492,56 @@ class ScrumBoardHome extends Component {
             index2 += 1) {
             if (String(newState[index].subStatuses[index2].statusId)
               === String(JSON.parse(result.source.droppableId).endStatusId)) {
-              let spliceIndex = '';
-              for (
-                let index3 = 0, len3 = newState[index].subStatuses[index2].issues.length;
-                index3 < len3;
-                index3 += 1) {
-                if (String(newState[index].subStatuses[index2].issues[index3].issueId)
-                  === String(issueId)) {
-                  spliceIndex = index3;
-                }
-              }
-              [draggableData] = newState[index].subStatuses[index2].issues.splice(spliceIndex, 1);
+              // let spliceIndex = '';
+              // for (
+              //   let index3 = 0, len3 = newState[index].subStatuses[index2].issues.length;
+              //   index3 < len3;
+              //   index3 += 1) {
+              //   if (String(newState[index].subStatuses[index2].issues[index3].issueId)
+              //     === String(issueId)) {
+              //     spliceIndex = index3;
+              //   }
+              // }
+              [draggableData] = newState[index]
+                .subStatuses[index2].issues.splice(sourceColumeIndex, 1);
             }
           }
         }
       }
+      // 放入新位置
       for (let index = 0, len = newState.length; index < len; index += 1) {
         if (String(newState[index].columnId)
-        === String(JSON.parse(result.destination.droppableId).columnId)) {
+          === String(JSON.parse(result.destination.droppableId).columnId)) {
           for (
             let index2 = 0, len2 = newState[index].subStatuses.length;
             index2 < len2;
             index2 += 1) {
             if (String(newState[index].subStatuses[index2].statusId)
-            === String(JSON.parse(result.destination.droppableId).endStatusId)) {
+              === String(JSON.parse(result.destination.droppableId).endStatusId)) {
+              // 目标位置在改状态下所有issue的索引，用于插入拖动issue
+              let isLast = !!destIssues.length && (destIssues.length === destIndex);
+              const issueCopy = _.cloneDeep(ScrumBoardStore.getBoardData);
+              const destColumeIssue = issueCopy[index].subStatuses[index2].issues;
+              if (JSON.parse(result.source.droppableId).columnId
+                === JSON.parse(result.destination.droppableId).columnId
+                && JSON.parse(result.source.droppableId).endStatusId
+                === JSON.parse(result.destination.droppableId).endStatusId
+                && destColumeIssue.length === destIndex) {
+                isLast = true;
+              }
+              const targetIssue = isLast ? destIssues[destIndex - 1] : destIssues[destIndex];
+              /* eslint-disable */
+              destColumeIssue.forEach((issue, issueIndex) => {
+                if (targetIssue && targetIssue.issueId === issue.issueId) {
+                  destColumeIndex = issueIndex;
+                }
+              });
+              /* eslint-enable */
+              if (isLast) {
+                destColumeIndex += 1;
+              }
               newState[index].subStatuses[index2].issues.splice(
-                result.destination.index, 0, draggableData,
+                destColumeIndex, 0, draggableData,
               );
             }
           }
@@ -503,25 +552,25 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.loadTransforms(statusId, issueId, typeId).then((types) => {
         if (types && _.some(types, t => t.endStatusId === endStatusId)) {
           const transformId = types.filter(t => t.endStatusId === endStatusId)[0].id;
-          // 拖拽目标状态已有的issue
-          const { issues } = JSON.parse(result.destination.droppableId);
-          // 目标位置索引
-          const destId = result.destination.index;
-          // 拖动issue索引
-          const sourceId = result.source.index;
           const { sprintId } = ScrumBoardStore.getCurrentSprint;
           // 拖动后，如果有issue排在前面，则取其id，否则取后面issueId
           let outsetIssueId = '';
           // 控制是否更新排序，当拖动到空的区域时，不更新
           let rank = false;
-          if (issues && issues.length) {
+          if (destIssues && destIssues.length) {
             rank = true;
-            if (destId === 0 || (JSON.parse(result.source.droppableId).columnId
+            if (destIndex === 0 || (JSON.parse(result.source.droppableId).columnId
               === JSON.parse(result.destination.droppableId).columnId
-              && sourceId < destId)) {
-              outsetIssueId = issues[destId].issueId;
-            } else if (destId) {
-              outsetIssueId = issues[destId - 1].issueId;
+              && JSON.parse(result.source.droppableId).endStatusId
+              === JSON.parse(result.destination.droppableId).endStatusId
+              && sourceIndex < destIndex)) {
+              if (destIndex >= destIssues.length) {
+                ScrumBoardStore.setBoardData(originState);
+                return;
+              }
+              outsetIssueId = destIssues[destIndex].issueId;
+            } else if (destIndex) {
+              outsetIssueId = destIssues[destIndex - 1].issueId;
             }
           }
           ScrumBoardStore.updateIssue(
@@ -529,7 +578,7 @@ class ScrumBoardHome extends Component {
             JSON.parse(result.source.droppableId).columnId,
             JSON.parse(result.destination.droppableId).columnId,
             transformId,
-            !destId,
+            !destIndex,
             outsetIssueId,
             sprintId,
             rank,
@@ -559,7 +608,7 @@ class ScrumBoardHome extends Component {
                       === String(JSON.parse(result.destination.droppableId).endStatusId)) {
                       destinationStatus = newState[index].subStatuses[index2].categoryCode;
                       newState[index].subStatuses[index2].issues.splice(
-                        result.destination.index, 1, draggableData,
+                        destColumeIndex, 1, draggableData,
                       );
                     }
                   }
@@ -642,6 +691,14 @@ class ScrumBoardHome extends Component {
       quickFilter: moreChecked || [],
     }, () => {
       // if(ScrumBoardStore.getIssues)
+      this.refresh(ScrumBoardStore.getSelectedBoard);
+    });
+  };
+
+  onAssigneeChange = (value) => {
+    this.setState({
+      assigneeFilterIds: value,
+    }, () => {
       this.refresh(ScrumBoardStore.getSelectedBoard);
     });
   }
@@ -775,9 +832,11 @@ class ScrumBoardHome extends Component {
   };
 
   renderHeight = () => {
-    if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-      document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 108}px)`;
-    }
+    setTimeout(() => {
+      if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
+        document.getElementsByClassName('c7n-scrumboard-content')[0].style.height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0].offsetTop, 10) + 108}px)`;
+      }
+    }, 600);
   };
 
   renderOthersTitle = () => {
@@ -1082,28 +1141,46 @@ class ScrumBoardHome extends Component {
             }
           </Select>
           {
-             (
-               <Button
-                 className="leftBtn2"
-                 disabled={!dataSource ? false : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)}
-                 funcType="flat"
-                 onClick={() => {
-                   if (dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId) {
-                     history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`);
-                   } else {
-                     message.info('等待加载当前迭代');
-                   }
-                 }}
-               >
-                 <span>切换至工作台</span>
-               </Button>
+            (
+              <Button
+                className="leftBtn2"
+                disabled={!dataSource ? false
+                  : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)}
+                funcType="flat"
+                onClick={() => {
+                  if (dataSource
+                    && dataSource.currentSprint
+                    && dataSource.currentSprint.sprintId) {
+                    history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`);
+                  } else {
+                    message.info('等待加载当前迭代');
+                  }
+                }}
+              >
+                <span>切换至工作台</span>
+              </Button>
 
-              //  <Button className="leftBtn2" disabled={dataSource ? (dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId) : false} funcType="flat" onClick={() => { history.push(`/agile/iterationBoard/${dataSource && dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`); }}>
+              //  <Button className="leftBtn2"
+              //  disabled={dataSource ?
+              //  (dataSource
+              //  && dataSource.currentSprint
+              //  && dataSource.currentSprint.sprintId)
+              //  : false}
+              //  funcType="flat"
+              //  onClick={() => { history.push(`/agile/iterationBoard/
+              //  ${dataSource && dataSource.currentSprint.sprintId}?
+              //  type=project&id=${AppState.currentMenuType.id}&name=
+              //  ${AppState.currentMenuType.name}&organizationId=
+              //  ${AppState.currentMenuType.organizationId}`); }}>
               //   <span>切换至工作台</span>
               // </Button>
             )
           }
-          <Button className="leftBtn2" funcType="flat" onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}>
+          <Button
+            className="leftBtn2"
+            funcType="flat"
+            onClick={this.refresh.bind(this, ScrumBoardStore.getSelectedBoard)}
+          >
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -1115,14 +1192,22 @@ class ScrumBoardHome extends Component {
                 <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
                   <QuickSearch
                     onQuickSearchChange={this.onQuickSearchChange}
-                    onAssigneeChange={(value) => {
-                      this.refresh(ScrumBoardStore.getSelectedBoard, value);
-                    }}
+                    onAssigneeChange={this.onAssigneeChange}
                   />
                 </div>
-                <div className="c7n-scrumTools-right" style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}>
+                <div
+                  className="c7n-scrumTools-right"
+                  style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}
+                >
                   <Icon type="av_timer" />
-                  <span style={{ paddingLeft: 5, marginLeft: 0, marginRight: 15 }}>{`${ScrumBoardStore.getCurrentSprint && ScrumBoardStore.getCurrentSprint.dayRemain >= 0 ? `${ScrumBoardStore.getCurrentSprint.dayRemain} days剩余` : '无剩余时间'}`}</span>
+                  <span style={{
+                    paddingLeft: 5,
+                    marginLeft: 0,
+                    marginRight: 15,
+                  }}
+                  >
+                    {`${ScrumBoardStore.getCurrentSprint && ScrumBoardStore.getCurrentSprint.dayRemain >= 0 ? `${ScrumBoardStore.getCurrentSprint.dayRemain} days剩余` : '无剩余时间'}`}
+                  </span>
                   <Button
                     funcType="flat"
                     onClick={this.handleFinishSprint.bind(this)}

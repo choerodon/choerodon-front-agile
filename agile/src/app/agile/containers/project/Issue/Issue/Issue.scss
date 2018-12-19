@@ -111,6 +111,9 @@
     width: 128px;
     // padding: 0 4px 4px;
   }
+  .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+    padding: 4px 4px;
+  }
 }
 
 .c7n-Issue {
@@ -124,7 +127,7 @@
     display: none;
   }
   .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
-    padding: 8px 4px;
+    padding: 6px 4px;
   }
   .ant-table-tbody > tr > td {
     transition: none;

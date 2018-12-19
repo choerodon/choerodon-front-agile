@@ -25,50 +25,59 @@ class AssigneeModal extends Component {
         <p>{text}</p>
       ) : (<p>{text || '未分配'}</p>)),
     }, {
-      title: '问题总数',
+      title: '总问题数',
       dataIndex: 'issueCount',
       key: 'issueCount',
       render: text => (text || '无'),
     }, {
-      title: '问题剩余数',
+      title: '剩余问题数',
       dataIndex: 'remainingIssueCount',
       key: 'remainingIssueCount',
       render: text => (text || '无'),
     }, {
-      title: '故事点',
+      title: '总故事点',
       dataIndex: 'totalStoryPoints',
       key: 'totalStoryPoints',
       render: text => (text || '无'),
     }, {
+      title: '剩余故事点',
+      dataIndex: 'remainingStoryPoints',
+      key: 'remainingStoryPoints',
+      render: text => (text || '无'),
+    }, {
       title: '总任务工时',
-      dataIndex: 'remainingTime',
-      key: 'remainingTime',
+      dataIndex: 'totalRemainingTime',
+      key: 'totalRemainingTime',
       render: text => (text || '无'),
     }, {
       title: '剩余任务工时',
-      dataIndex: 'totalRemainingTime',
-      index: 'totalRemainingTime',
+      dataIndex: 'remainingTime',
+      index: 'remainingTime',
       render: text => (text || '无'),
     }];
     const assignData = data.assigneeIssues;
     let totalIssue = 0;
-    let totalStoryPoints = 0;
-    let totalTime = 0;
     let totalRemainIssueCount = 0;
+    let totalStoryPoints = 0;
+    let remainingStoryPoints = 0;
+    let totalTime = 0;
     let totalRemainTime = 0;
     if (Array.isArray(assignData)) {
       for (let index = 0, lens = assignData.length; index < lens; index += 1) {
         if (assignData[index].issueCount) {
           totalIssue += assignData[index].issueCount;
         }
+        if (assignData[index].remainingIssueCount) {
+          totalRemainIssueCount += assignData[index].remainingIssueCount;
+        }
         if (assignData[index].totalStoryPoints) {
           totalStoryPoints += assignData[index].totalStoryPoints;
         }
+        if (assignData[index].remainingStoryPoints) {
+          remainingStoryPoints += assignData[index].remainingStoryPoints;
+        }
         if (assignData[index].totalRemainingTime) {
           totalTime += assignData[index].totalRemainingTime;
-        }
-        if (assignData[index].remainingIssueCount) {
-          totalRemainIssueCount += assignData[index].remainingIssueCount;
         }
         if (assignData[index].remainingTime) {
           totalRemainTime += assignData[index].remainingTime;
@@ -76,7 +85,12 @@ class AssigneeModal extends Component {
       }
     }
     const total = {
-      totalIssue, totalRemainIssueCount, totalStoryPoints, totalTime, totalRemainTime, 
+      totalIssue,
+      totalRemainIssueCount,
+      totalStoryPoints,
+      remainingStoryPoints,
+      totalTime,
+      totalRemainTime,
     };
     let noAssign = [];
     let dataSource = [];
@@ -108,6 +122,7 @@ class AssigneeModal extends Component {
               issueCount: total.totalIssue,
               remainingIssueCount: total.totalRemainIssueCount,
               totalStoryPoints: total.totalStoryPoints,
+              remainingStoryPoints: total.remainingStoryPoints,
               totalRemainingTime: total.totalTime,
               remainingTime: total.totalRemainTime,
             })}

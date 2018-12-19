@@ -66,7 +66,7 @@ class BurnDown extends Component {
 
   getOption() {
     const {
-      unit, xAxis, yAxis, expectCount, sprint: { startDate, endDate },
+      unit, xAxis, yAxis, expectCount, sprint: { startDate, endDate }, exportAxis, markAreaData,
     } = this.state;
     return {
       tooltip: {
@@ -75,7 +75,7 @@ class BurnDown extends Component {
         textStyle: {
           color: '#000',
         },
-        extraCssText: 
+        extraCssText:
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
         formatter: (params) => {
           let content = '';
@@ -186,7 +186,7 @@ class BurnDown extends Component {
           symbol: 'none',
           name: '期望值',
           type: 'line',
-          data: this.state.exportAxis,
+          data: exportAxis,
           itemStyle: {
             color: 'rgba(0,0,0,0.65)',
           },
@@ -203,7 +203,7 @@ class BurnDown extends Component {
                 color: 'rgba(220,220,220,0.65)',
               },
             },
-            data: this.state.markAreaData,
+            data: markAreaData,
           },
         },
         {
@@ -231,13 +231,12 @@ class BurnDown extends Component {
     diffDay.setDate(beginDay[2]);
     diffDay.setMonth(beginDay[1] - 1);
     diffDay.setFullYear(beginDay[0]);
-    result.push(start);
+    // result.push(start);
     while (i === 0) {
-      const countDay = diffDay.getTime() + 24 * 60 * 60 * 1000;
-      diffDay.setTime(countDay);
       if (restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         rest.push(moment(diffDay).format('YYYY-MM-DD'));
       }
+      const countDay = diffDay.getTime();
       dateList[2] = diffDay.getDate();
       dateList[1] = diffDay.getMonth() + 1;
       dateList[0] = diffDay.getFullYear();
@@ -246,6 +245,7 @@ class BurnDown extends Component {
       if (restDayShow || !restDays.includes(moment(diffDay).format('YYYY-MM-DD'))) {
         result.push(`${dateList[0]}-${dateList[1]}-${dateList[2]}`);
       }
+      diffDay.setTime(countDay + 24 * 60 * 60 * 1000);
       if (String(dateList[0]) === endDay[0]
         && String(dateList[1]) === endDay[1]
         && String(dateList[2]) === endDay[2]) {
@@ -288,6 +288,7 @@ class BurnDown extends Component {
   };
 
   loadChartData = (sprintId, unit = 'remainingEstimatedTime') => {
+    /* eslint-disable */
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${unit}`)
       .then((res) => {
         const dataDates = Object.keys(res.coordinate);
@@ -344,7 +345,7 @@ class BurnDown extends Component {
               exportAxisData[index + 1] = exportAxisData[index];
             } else {
               // 工作量取整
-              exportAxisData[index + 1] = (exportAxisData[index] - dayAmount) < 0 
+              exportAxisData[index + 1] = (exportAxisData[index] - dayAmount) < 0
                 ? 0 : exportAxisData[index] - dayAmount;
             }
           }
@@ -363,6 +364,7 @@ class BurnDown extends Component {
           markAreaData,
         });
       });
+    /* eslint-enable */
   }
 
   handleChangeUnit = ({ key }) => {
@@ -412,7 +414,7 @@ class BurnDown extends Component {
   }
 
   render() {
-    const { loading, sprint: { sprintId } } = this.state;
+    const { loading, sprint: { sprintId }, restDayShow } = this.state;
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
     const menu = (
@@ -433,7 +435,7 @@ class BurnDown extends Component {
           </Dropdown>
           <Checkbox
             style={{ marginLeft: 24 }}
-            checked={this.state.restDayShow}
+            checked={restDayShow}
             onChange={this.onCheckChange}
           >
             {'显示非工作日'}
