@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
- Modal, Form, Input, DatePicker, Icon 
+  Modal, Form, Input, DatePicker, Icon, 
 } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import moment from 'moment';
@@ -104,7 +104,7 @@ class CreateVersion extends Component {
                   message: '版本名称不能为空',
                 }],
               })(
-                <Input maxLength={30} label="版本名称" />,
+                <Input maxLength={10} label="版本名称" />,
               )}
             </FormItem>
             <FormItem>

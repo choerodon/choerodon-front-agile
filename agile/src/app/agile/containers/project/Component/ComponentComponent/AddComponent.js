@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Select, message } from 'choerodon-ui';
+import {
+ Modal, Form, Input, Select, message 
+} from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import UserHead from '../../../../components/UserHead';
@@ -70,7 +72,9 @@ class AddComponent extends Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        const { defaultAssigneeRole, description, managerId, name } = values;
+        const {
+ defaultAssigneeRole, description, managerId, name 
+} = values;
         const component = {
           defaultAssigneeRole,
           description,
@@ -125,7 +129,7 @@ class AddComponent extends Component {
                   message: '模块名称必填',
                 }],
               })(
-                <Input label="模块名称" maxLength={30} />,
+                <Input label="模块名称" maxLength={10} />,
               )}
             </FormItem>
             <FormItem>
@@ -137,8 +141,8 @@ class AddComponent extends Component {
                   filter
                   onFilterChange={this.onFilterChange.bind(this)}
                 >
-                  {this.state.originUsers.map(user =>
-                    (<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
+                  {this.state.originUsers.map(user => (
+<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                         <UserHead
                           user={{
@@ -149,8 +153,8 @@ class AddComponent extends Component {
                           }}
                         />
                       </div>
-                    </Option>),
-                  )}
+                    </Option>
+),)}
                 </Select>,
               )}
             </FormItem>
@@ -167,11 +171,11 @@ class AddComponent extends Component {
                 }],
               })(
                 <Select label="默认经办人">
-                  {['模块负责人', '无'].map(defaultAssigneeRole =>
-                    (<Option key={defaultAssigneeRole} value={defaultAssigneeRole}>
+                  {['模块负责人', '无'].map(defaultAssigneeRole => (
+<Option key={defaultAssigneeRole} value={defaultAssigneeRole}>
                       {defaultAssigneeRole}
-                    </Option>),
-                  )}
+                    </Option>
+),)}
                 </Select>,
               )}
             </FormItem>

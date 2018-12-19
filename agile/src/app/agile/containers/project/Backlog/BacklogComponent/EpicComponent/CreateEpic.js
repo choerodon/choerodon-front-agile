@@ -108,7 +108,7 @@ class CreateEpic extends Component {
                   transform: value => value && value.trim(),
                 }],
               })(
-                <Input label="史诗名称" maxLength={44} />,
+                <Input label="史诗名称" maxLength={10} />,
               )}
             </FormItem>
             <FormItem>
