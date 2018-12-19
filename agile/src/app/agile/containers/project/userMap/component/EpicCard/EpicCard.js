@@ -193,14 +193,15 @@ class EpicCard extends Component {
               <div className="c7n-footer">
                 <div className="c7n-footer-left">
                   <TypeTag
+                    style={{ marginRight: 8 }}
                     data={epic.issueTypeDTO}
                   />
-                  <span className="c7n-issueCount">{epic.totalEstimate}</span>
                   <StatusTag
                     data={epic.statusMapDTO}
                     name={epic.statusName}
                     color={epic.statusColor}
                   />
+                  <span className="c7n-issueCount">{epic.totalEstimate}</span>
                 </div>
                 <span
                   className="c7n-issueNum"

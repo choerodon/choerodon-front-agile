@@ -288,6 +288,12 @@ class IssueCard extends Component {
                   data={issueTypeDTO}
                   style={{ margin: 4, marginLeft: 0 }}
                 />
+                <StatusTag
+                  name={statusName}
+                  color={statusColor}
+                  data={statusMapDTO}
+                  style={{ margin: 4 }}
+                />
                 {
                   issueTypeDTO && issueTypeDTO.typeCode === 'story'
                     ? (
@@ -297,12 +303,6 @@ class IssueCard extends Component {
                     )
                     : null
                 }
-                <StatusTag
-                  name={statusName}
-                  color={statusColor}
-                  data={statusMapDTO}
-                  style={{ margin: 4 }}
-                />
               </div>
             </div>
           </div>
