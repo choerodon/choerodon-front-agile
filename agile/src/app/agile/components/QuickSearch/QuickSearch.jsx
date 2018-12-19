@@ -6,7 +6,7 @@ import { Select } from 'choerodon-ui';
 
 import './QuickSearch.scss';
 import BacklogStore from '../../stores/project/backlog/BacklogStore';
-import Backlog from "../../containers/project/userMap/component/Backlog/Backlog";
+import Backlog from '../../containers/project/userMap/component/Backlog/Backlog';
 
 const { Option, OptGroup } = Select;
 
@@ -37,7 +37,8 @@ class QuickSearch extends Component {
         label: item.name,
         value: item.filterId,
       }));
-      const resUserData = res[1].content.map(item => ({
+      // 非停用角色
+      const resUserData = res[1].content.filter(item => item.enabled).map(item => ({
         id: item.id,
         realName: item.realName,
       }));
@@ -86,9 +87,22 @@ class QuickSearch extends Component {
     onAssigneeChange(flattenValue);
   };
 
+  deBounce = (delay) => {
+    let timeout;
+    return (fn, that) => {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      timeout = setTimeout(fn, delay, that);// (自定义函数，延迟时间，自定义函数参数1，参数2)
+    };
+  };
+
   render() {
     // debugger;
-    const { style } = this.props;
+    // 防抖函数
+    const debounceCallback = this.deBounce(500);
+    const { style, AppState } = this.props;
     const {
       userDataArray,
       quickSearchArray,
@@ -133,6 +147,27 @@ class QuickSearch extends Component {
           maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
           filter
           optionFilterProp="children"
+          onFilterChange={(value) => {
+            if (value) {
+              debounceCallback(() => {
+                axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?size=40&param=${value}`).then((res) => {
+                  // Set 用于查询是否有 id 重复的，没有重复才往里加
+                  const temp = new Set(userDataArray.map(item => item.id));
+                  res.content.filter(item => item.enabled).forEach((item) => {
+                    if (!temp.has(item.id)) {
+                      userDataArray.push({
+                        id: item.id,
+                        realName: item.realName,
+                      });
+                    }
+                  });
+                  this.setState({
+                    userDataArray,
+                  });
+                });
+              }, this);
+            }
+          }}
           onChange={this.handleAssigneeChange}
           getPopupContainer={triggerNode => triggerNode.parentNode}
         >
