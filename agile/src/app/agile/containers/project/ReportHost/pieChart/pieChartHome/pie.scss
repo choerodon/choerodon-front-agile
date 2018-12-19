@@ -1,4 +1,16 @@
 .pie-chart {
+  .c7n-pieChart-filter {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 67%;
+    align-items: flex-end;
+    .c7n-pieChart-filter-item {
+      flex-grow: 1;
+      margin-right: 10px;
+    }
+  }
   .pie-otherTooltip {
     position: absolute;
     bottom: -37px;
