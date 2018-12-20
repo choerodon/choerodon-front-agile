@@ -90,7 +90,7 @@ class ReadAndEdit extends Component {
         }
         {
           (current === thisType) && (
-            <section>
+            <section className="lwf-select">
               {children}
             </section>
           )

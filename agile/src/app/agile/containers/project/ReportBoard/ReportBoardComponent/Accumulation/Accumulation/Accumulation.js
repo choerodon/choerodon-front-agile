@@ -16,7 +16,7 @@ class Accumulation extends Component {
     super(props);
     this.state = {
       newxAxis: [],
-      loading: false,
+      loading: true,
       chartData: [],
     };
   }
@@ -27,6 +27,15 @@ class Accumulation extends Component {
 
   getOption() {
     const { chartData, newxAxis } = this.state;
+    const sorceColors = [];
+    const colors = ['#743BE7', '#F953BA', '#4090FE', '#d07da6', '#FFB100', '#00BFA5'];
+    _.map(chartData, (item, index) => {
+      if (sorceColors.includes(item.color)) {
+        item.color = colors[index % 6];
+      }
+      sorceColors.push(item.color);
+    });
+
     const legendData = chartData.map(v => ({
       icon: 'rect',
       name: v.name,
@@ -196,16 +205,13 @@ class Accumulation extends Component {
             const targetBoard = boards.find(v => v.userDefault) || boards[0];
             this.loadBoardData(targetBoard.boardId, false, [])
               .then((boardData) => {
-                const column = boardData.columnsData.columns;
+                const column = boardData && boardData.columnsData && boardData.columnsData.columns;
                 const columnIds = _.map(column, 'columnId');
                 this.loadChartData(targetBoard.boardId, sd, columnIds);
               });
           } else {
             window.console.warn('Can not get any board.');
           }   
-          this.setState({
-            loading: false,
-          });      
         }),
       )
       .catch(() => {
@@ -237,6 +243,9 @@ class Accumulation extends Component {
       boardId,
       assigneeFilterIds,
     };
+    this.setState({
+      loading: true,
+    });
     axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/cumulative_flow_diagram`, obj)
       .then((res) => {
         let newxAxis = [];
@@ -248,8 +257,13 @@ class Accumulation extends Component {
         newxAxis = _.orderBy(newxAxis, item => new Date(item).getTime());
         this.setState({
           newxAxis,
-          loading: false,
           chartData: res,
+          loading: false,
+        });
+      })
+      .catch((e) => {
+        this.setState({
+          loading: false,
         });
       });
   }

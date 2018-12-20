@@ -41,12 +41,12 @@ class AccumulationHome extends Component {
       options2: {},
       optionsVisible: false,
       sprintData: {},
-      loading: false,
+      loading: true,
       linkFromParamUrl: undefined,
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { location: { search } } = this.props;
     const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
     this.setState({
@@ -71,7 +71,14 @@ class AccumulationHome extends Component {
           }
         }
         AccumulationStore.setBoardList(newData2);
-        this.getColumnData(res[newIndex || 0].boardId, true);
+        if (newData2.length) {
+          this.getColumnData(res[newIndex || 0].boardId, true);
+        } else {
+          this.setState({
+            loading: false,
+          });
+          AccumulationStore.setAccumulationData([]);
+        }
       }).catch((error) => {
       });
       // this.getData();
@@ -92,7 +99,7 @@ class AccumulationHome extends Component {
   }
 
   getColumnData(id, type) {
-    ScrumBoardStore.axiosGetBoardData(id, 0, false, []).then((res2) => {
+    ScrumBoardStore.axiosGetBoardData(id, 0, false, [], []).then((res2) => {
       const data2 = res2.columnsData.columns;
       for (let index = 0, len = data2.length; index < len; index += 1) {
         data2[index].check = true;
@@ -105,6 +112,7 @@ class AccumulationHome extends Component {
         AccumulationStore.setProjectInfo(res);
         AccumulationStore.setStartDate(moment(res.creationDate.split(' ')[0]));
         if (type) {
+          // eslint-disable-next-line no-return-assign
           this.getData();
         }
       }).catch((error) => {
@@ -129,6 +137,8 @@ class AccumulationHome extends Component {
         boardId = AccumulationStore.getBoardList[index].boardId;
       }
     }
+    // this.getColumnData(boardId);
+
     for (let index2 = 0, len2 = columnData.length; index2 < len2; index2 += 1) {
       if (columnData[index2].check) {
         columnIds.push(columnData[index2].columnId);
@@ -161,7 +171,7 @@ class AccumulationHome extends Component {
   getOption() {
     let data = _.clone(AccumulationStore.getAccumulationData);
     const sorceColors = [];
-    const colors = ['#743BE7', '#F953BA', '#4090FE', '#FF555', '#FFB100', '#00BFA5'];
+    const colors = ['#743BE7', '#F953BA', '#4090FE', '#d07da6', '#FFB100', '#00BFA5'];
     _.map(data, (item, index) => {
       if (sorceColors.includes(item.color)) {
         item.color = colors[index % 6];
@@ -212,6 +222,7 @@ class AccumulationHome extends Component {
         data: [],
         symbol: 'circle',
       });
+
       for (let index2 = 0, len2 = newxAxis.length; index2 < len2; index2 += 1) {
         let date = '';
         let max = 0;
@@ -229,12 +240,13 @@ class AccumulationHome extends Component {
           }
         }
         if (flag === 1) {
-          legendSeries[index].data.push(max);
+          legendSeries[index].data.push(max || 0);
         } else {
-          legendSeries[index].data.push(legendSeries[index].data[legendSeries[index].data.length - 1]);
+          legendSeries[index].data.push(legendSeries[index].data[legendSeries[index].data.length - 1] || 0);
         }
       }
     }
+
     this.setState({
       options: {
         tooltip: {
@@ -398,6 +410,36 @@ class AccumulationHome extends Component {
 
   // handleOnBrushSelected(params) {
   // }
+
+  renderContent() {
+    const { loading } = this.state;
+    if (loading) {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '100px' }}>
+          <Spin />
+        </div>
+      );
+    }
+    if (!AccumulationStore.getAccumulationData.length) {
+      return (
+        <NoDataComponent title="问题" links={[{ name: '问题管理', link: '/agile/issue' }]} img={pic} />
+      );
+    }
+    return (
+      <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
+        <ReactEcharts
+          ref={(e) => { this.echarts_react = e; }}
+          option={this.state.options}
+          style={{
+            height: '600px',
+          }}
+          notMerge
+          lazyUpdate
+        />
+      </div>
+    );
+  }
+
   render() {
     const { history } = this.props;
     const { linkFromParamUrl } = this.state;
@@ -426,9 +468,8 @@ class AccumulationHome extends Component {
             flexDirection: 'column',
           }}
         >
-          <Spin spinning={this.state.loading}>
-            <div className="c7n-accumulation-filter">
-              <RangePicker
+          <div className="c7n-accumulation-filter">
+            <RangePicker
                 value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
                 allowClear={false}
                 onChange={(date, dateString) => {
@@ -437,7 +478,7 @@ class AccumulationHome extends Component {
                   this.getData();
                 }}
               />
-              {
+            {
                 this.getFilterData().map((item, index) => (
                   <Popover
                     placement="bottom"
@@ -482,7 +523,7 @@ class AccumulationHome extends Component {
                   </Popover>
                 ))
               }
-              {
+            {
                 this.state.optionsVisible ? (
                   <AccumulationFilter
                     visible={this.state.optionsVisible}
@@ -498,23 +539,8 @@ class AccumulationHome extends Component {
                   />
                 ) : ''
               }
-            </div>
-            {AccumulationStore.getAccumulationData.length ? (
-              <React.Fragment>
-                <div className="c7n-accumulation-report" style={{ flexGrow: 1, height: '100%' }}>
-                  <ReactEcharts
-                    ref={(e) => { this.echarts_react = e; }}
-                    option={this.state.options}
-                    style={{
-                      height: '600px',
-                    }}
-                    notMerge
-                    lazyUpdate
-                  />
-                </div>
-              </React.Fragment>
-            ) : <NoDataComponent title="问题" links={[{ name: '问题管理', link: '/agile/issue' }]} img={pic} /> }
-          </Spin>
+          </div>
+          { this.renderContent()}
         </Content>
       </Page>
     );

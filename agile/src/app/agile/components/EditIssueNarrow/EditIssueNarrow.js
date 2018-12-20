@@ -2067,7 +2067,7 @@ class CreateSprint extends Component {
                                   onChange={(value) => {
                                     this.setState({
                                       componentIssueRelDTOList: value.map(
-                                        item => item.substr(0, 30),
+                                        item => item.substr(0, 10),
                                       ),
                                     });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
@@ -2166,7 +2166,7 @@ class CreateSprint extends Component {
                               onChange={(value) => {
                                 this.setState({
                                   labelIssueRelDTOList: value.map(
-                                    item => item.substr(0, 30),
+                                    item => item.substr(0, 10),
                                   ),
                                 });
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，

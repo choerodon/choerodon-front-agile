@@ -162,7 +162,7 @@ class EpicItem extends Component {
                       onPressEnter={this.handleSave.bind(this)}
                       onClick={e => e.stopPropagation()}
                       // onBlur={this.handleSave.bind(this)}
-                      maxLength={44}
+                      maxLength={10}
                     />
                   ) : (
                     <p>{item.epicName}</p>
