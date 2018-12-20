@@ -23,6 +23,7 @@ class EditBoardName extends Component {
       initialBoardName: '',
       boardName: '',
       checkResult: true,
+      saveDisable: true,
     };
   }
 
@@ -35,12 +36,15 @@ class EditBoardName extends Component {
   checkBoardNameRepeat = (rule, value, callback) => {
     const proId = AppState.currentMenuType.id;
     this.setState(
-      { boardName: value },
+      { 
+        boardName: value,
+      },
     );
     ScrumBoardStore.checkBoardNameRepeat(proId, value)
       .then((res) => {
         this.setState({
           checkResult: res,
+          saveDisable: res || !value,
         });
         if (res) {
           callback('看板名称重复');
@@ -78,7 +82,7 @@ class EditBoardName extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { initialBoardName, boardName, loading } = this.state;
+    const { initialBoardName, boardName, loading, checkResult, saveDisable } = this.state;
     return (
       <Content
         description={`您正在编辑项目“${AppState.currentMenuType.name}”的看板名称`}
@@ -107,7 +111,8 @@ class EditBoardName extends Component {
             <Button
               type="primary"
               funcType="raised"
-              loading={this.state.loading}
+              loading={loading}
+              disabled={saveDisable}
               onClick={this.handleUpdateBoardName}
             >
               {'保存'}

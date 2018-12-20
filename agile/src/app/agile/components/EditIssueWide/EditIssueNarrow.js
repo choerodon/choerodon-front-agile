@@ -1304,8 +1304,9 @@ class CreateSprint extends Component {
 
 
 
+
                     提交
-</span>
+                                    </span>
                 </div>
                 <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                   <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1353,8 +1354,9 @@ class CreateSprint extends Component {
 
 
 
+
                     合并请求
-</span>
+                                    </span>
                   <span
                     style={{
                       width: 36,
@@ -1506,11 +1508,11 @@ class CreateSprint extends Component {
           <Menu.Item key="0">登记工作日志</Menu.Item>
           {
             <Menu.Item
-               key="1"
-               disabled={loginUserId !== createdById && !hasPermission}
-             >
-               {'删除'}
-             </Menu.Item>
+              key="1"
+              disabled={loginUserId !== createdById && !hasPermission}
+            >
+              {'删除'}
+            </Menu.Item>
           }
           {
             typeCode !== 'sub_task' && (
@@ -2260,8 +2262,9 @@ class CreateSprint extends Component {
 
 
 
+
                               故事点
-</div>
+                                                </div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2291,7 +2294,7 @@ class CreateSprint extends Component {
                               value={storyPoints}
                               onChange={this.handleStoryPointsChange.bind(this)}
                               // onBlur={() => this.statusOnChange()}
-                              suffix={'点'}
+                              suffix="点"
                               onPressEnter={() => {
                                 this.updateIssue('storyPoints');
                                 this.setState({
@@ -2329,8 +2332,8 @@ class CreateSprint extends Component {
                             marginBottom: 4,
                           }}
                         >
-                              {'预估时间'}
-                          </div>
+                          {'预估时间'}
+                        </div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}
@@ -2360,7 +2363,7 @@ class CreateSprint extends Component {
                               value={remainingTime}
                               onChange={this.handleRemainingTimeChange.bind(this)}
                               // onBlur={() => this.statusOnChange()}
-                              suffix={'小时'}
+                              suffix="小时"
                               onPressEnter={() => {
                                 this.updateIssue('remainingTime');
                                 this.setState({
@@ -2425,7 +2428,7 @@ class CreateSprint extends Component {
                                         marginBottom: 0,
                                       }}
                                     >
-                                      {this.transToArr(componentIssueRelDTOList, 'name')}
+                                      {this.transToArr(componentIssueRelDTOList, 'name', 'string')}
                                     </p>
                                   </div>
                                     )}
@@ -2435,6 +2438,7 @@ class CreateSprint extends Component {
                                     componentIssueRelDTOList,
                                     'name',
                                     'array',
+                                    // 10,
                                   )}
                                   loading={selectLoading}
                                   mode="tags"
@@ -2461,9 +2465,7 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={(value) => {
                                     this.setState({
-                                      componentIssueRelDTOList: value.map(
-                                        item => item.substr(0, 30),
-                                      ),
+                                      componentIssueRelDTOList: value.map(item => item.substring(0, 10)),
                                     });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
@@ -2568,7 +2570,7 @@ class CreateSprint extends Component {
                                 onChange={(value) => {
                                   this.setState({
                                     labelIssueRelDTOList: value.map(
-                                      item => item.substr(0, 30),
+                                      item => item.substr(0, 10),
                                     ),
                                   });
                                   // 由于 OnChange 和 OnBlur 几乎同时执行，
@@ -2931,13 +2933,15 @@ class CreateSprint extends Component {
 
 
 
+
                                   时/
-{this.getWorkloads() + (origin.remainingTime || 0)}
+                              {this.getWorkloads() + (origin.remainingTime || 0)}
+
 
 
 
                                   时
-</span>
+                                                        </span>
                             <span
                               role="none"
                               style={{
@@ -2954,8 +2958,9 @@ class CreateSprint extends Component {
 
 
 
+
                               登记工作
-</span>
+                                                        </span>
                           </div>
                         </div>
                         {typeCode === 'issue_epic' ? (
@@ -3137,8 +3142,9 @@ class CreateSprint extends Component {
 
 
 
+
                               分配给我
-</span>
+                                                        </span>
                           </div>
                         </div>
                         <div className="line-start mt-10 assignee">
@@ -3260,8 +3266,9 @@ class CreateSprint extends Component {
 
 
 
+
                               分配给我
-</span>
+                                                        </span>
                           </div>
                         </div>
                         <div className="line-start mt-10">

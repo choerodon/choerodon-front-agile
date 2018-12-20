@@ -237,23 +237,23 @@ class VersionItem extends Component {
                   className="c7n-backlog-ItemsHead"
                 >
                   {editName ? (
-                      <Input
-                        className="editVersionName"
-                        autoFocus
-                        defaultValue={item.name}
-                        onPressEnter={this.handleBlurName.bind(this)}
+                    <Input
+                      className="editVersionName"
+                      autoFocus
+                      defaultValue={item.name}
+                      onPressEnter={this.handleBlurName.bind(this)}
                         // onBlur={this.handleBlurName.bind(this)}
-                        onClick={e => e.stopPropagation()}
-                        maxLength={30}
-                      />
+                      onClick={e => e.stopPropagation()}
+                      maxLength={10}
+                    />
                     
-                    ) : (
-                      <p>{item.name}</p>
-                    )}
+                  ) : (
+                    <p>{item.name}</p>
+                  )}
                       
                   <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
-                      <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
-                        <Icon
+                    <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
+                      <Icon
                           style={{
                             width: 12,
                             height: 12,
@@ -266,24 +266,24 @@ class VersionItem extends Component {
                           }}
                           type="arrow_drop_down"
                         />
-                      </Dropdown>
-                    </Permission>
+                    </Dropdown>
+                  </Permission>
                 </div>
                 {/* </div> */}
                 <div className="c7n-backlog-versionItemProgress">
-                <div
-                  className="c7n-backlog-versionItemDone"
-                  style={{
-                      flex: item.doneIssueCount,
-                    }}
-                />
-                <div
-                  className="c7n-backlog-versionItemTodo"
-                  style={{
-                      flex: item.issueCount ? item.issueCount - item.doneIssueCount : 1,
-                    }}
-                />
-              </div>
+                  <div
+                    className="c7n-backlog-versionItemDone"
+                    style={{
+                    flex: item.doneIssueCount,
+                  }}
+                  />
+                  <div
+                    className="c7n-backlog-versionItemTodo"
+                    style={{
+                    flex: item.issueCount ? item.issueCount - item.doneIssueCount : 1,
+                  }}
+                  />
+                </div>
               </div>
             </div>
            

@@ -109,9 +109,13 @@ class VersionProgress extends Component {
             show: false,
           },
           axisLabel: {
+            interval: 0,
             fontSize: 12,
             color: 'rgba(0,0,0,0.65)',
+            // eslint-disable-next-line no-confusing-arrow
+            formatter: (value, index) => value.length > 7 ? `${value.substring(0, 7)}...` : value,
           },
+         
         },
       ],
       yAxis: [
@@ -191,7 +195,7 @@ class VersionProgress extends Component {
         }
         this.setState({
           loading: false,
-          versionProgressInfo: res,
+          versionProgressInfo: _.reverse(res),
         });
       });
   }
