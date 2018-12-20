@@ -2728,7 +2728,7 @@ class CreateSprint extends Component {
                                 getUser(reporterId).then((res) => {
                                   this.setState({
                                     reporterId: JSON.stringify(res.content[0]),
-                                    originUsers: [res.content[0]],
+                                    originUsers: res.content.length ? [res.content[0]] : [],
                                     flag: 'finish',
                                   });
                                 });
@@ -2835,7 +2835,7 @@ class CreateSprint extends Component {
                                 getUser(assigneeId).then((res) => {
                                   this.setState({
                                     assigneeId: JSON.stringify(res.content[0]),
-                                    originUsers: [res.content[0]],
+                                    originUsers: res.content.length ? [res.content[0]] : [],
                                     flag: 'finish',
                                   });
                                 });

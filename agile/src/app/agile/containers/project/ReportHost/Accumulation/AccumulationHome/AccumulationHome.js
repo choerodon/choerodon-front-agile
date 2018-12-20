@@ -81,7 +81,6 @@ class AccumulationHome extends Component {
         }
       }).catch((error) => {
       });
-      // this.getData();
     }).catch((error) => {
     });
   }
@@ -137,7 +136,6 @@ class AccumulationHome extends Component {
         boardId = AccumulationStore.getBoardList[index].boardId;
       }
     }
-    // this.getColumnData(boardId);
 
     for (let index2 = 0, len2 = columnData.length; index2 < len2; index2 += 1) {
       if (columnData[index2].check) {

@@ -338,11 +338,6 @@ class SprintReport extends Component {
         right: '40',
         containLabel: true,
       },
-      // toolbox: {
-      //   feature: {
-      //     saveAsImage: {},
-      //   },
-      // },
       xAxis: {
         axisTick: { show: false },
         axisLine: {

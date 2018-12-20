@@ -107,6 +107,7 @@ class StatusBodyColumn extends Component {
       }
       if (!parentId) {
         const parentIssueBoardData = ScrumBoardStore.getBoardParentIssueId;
+        let issueIndex = 0;
         for (let index = 0, len = data.length; index < len; index += 1) {
           if (!parentIssueBoardData.has(data[index].parentIssueId)) {
             if (_.indexOf(parentIds, data[index].issueId) === -1) {
@@ -115,7 +116,7 @@ class StatusBodyColumn extends Component {
                 <StatusIssue
                   key={data[index].issueId}
                   data={data[index]}
-                  index={index}
+                  index={issueIndex}
                   droppableId={droppableId}
                   statusName={statusName}
                   categoryCode={categoryCode}
@@ -130,18 +131,20 @@ class StatusBodyColumn extends Component {
                   statusId={statusId}
                 />,
               );
+              issueIndex += 1;
             }
           }
         }
       } else {
         parentIssueIdArray.push(parentId);
+        let issueIndex = 0;
         for (let index = 0, len = data.length; index < len; index += 1) {
           if (data[index].parentIssueId === parentId) {
             result.push(
               <StatusIssue
                 key={data[index].issueId}
                 data={data[index]}
-                index={index}
+                index={issueIndex}
                 droppableId={droppableId}
                 statusName={statusName}
                 categoryCode={categoryCode}
@@ -156,6 +159,7 @@ class StatusBodyColumn extends Component {
                 statusId={statusId}
               />,
             );
+            issueIndex += 1;
           }
         }
       }
@@ -164,6 +168,7 @@ class StatusBodyColumn extends Component {
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       if (assigneeId) {
+        let issueIndex = 0;
         for (let index = 0, len = data.length; index < len; index += 1) {
           if (data[index].assigneeId) {
             if (data[index].assigneeId === assigneeId) {
@@ -171,7 +176,7 @@ class StatusBodyColumn extends Component {
                 <StatusIssue
                   key={data[index].issueId}
                   data={data[index]}
-                  index={index}
+                  index={issueIndex}
                   droppableId={droppableId}
                   statusName={statusName}
                   categoryCode={categoryCode}
@@ -186,17 +191,19 @@ class StatusBodyColumn extends Component {
                   statusId={statusId}
                 />,
               );
+              issueIndex += 1;
             }
           }
         }
       } else {
+        let issueIndex = 0;
         for (let index = 0, len = data.length; index < len; index += 1) {
           if (!data[index].assigneeId) {
             result.push(
               <StatusIssue
                 key={data[index].issueId}
                 data={data[index]}
-                index={index}
+                index={issueIndex}
                 droppableId={droppableId}
                 statusName={statusName}
                 categoryCode={categoryCode}
@@ -211,11 +218,13 @@ class StatusBodyColumn extends Component {
                 statusId={statusId}
               />,
             );
+            issueIndex += 1;
           }
         }
       }
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
       if (epicId) {
+        let issueIndex = 0;
         for (let index = 0, len = data.length; index < len; index += 1) {
           if (data[index].epicId) {
             if (data[index].epicId === epicId) {
@@ -223,7 +232,7 @@ class StatusBodyColumn extends Component {
                 <StatusIssue
                   key={data[index].issueId}
                   data={data[index]}
-                  index={index}
+                  index={issueIndex}
                   droppableId={droppableId}
                   statusName={statusName}
                   categoryCode={categoryCode}
@@ -238,17 +247,19 @@ class StatusBodyColumn extends Component {
                   statusId={statusId}
                 />,
               );
+              issueIndex += 1;
             }
           }
         }
       } else {
+        let issueIndex = 0;
         for (let index = 0, len = data.length; index < len; index += 1) {
           if (!data[index].epicId) {
             result.push(
               <StatusIssue
                 key={data[index].issueId}
                 data={data[index]}
-                index={index}
+                index={issueIndex}
                 droppableId={droppableId}
                 statusName={statusName}
                 categoryCode={categoryCode}
@@ -263,16 +274,18 @@ class StatusBodyColumn extends Component {
                 statusId={statusId}
               />,
             );
+            issueIndex += 1;
           }
         }
       }
     } else {
+      let issueIndex = 0;
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
           <StatusIssue
             key={data[index].issueId}
             data={data[index]}
-            index={index}
+            index={issueIndex}
             droppableId={droppableId}
             statusName={statusName}
             categoryCode={categoryCode}
@@ -287,6 +300,7 @@ class StatusBodyColumn extends Component {
             statusId={statusId}
           />,
         );
+        issueIndex += 1;
       }
     }
     return result;

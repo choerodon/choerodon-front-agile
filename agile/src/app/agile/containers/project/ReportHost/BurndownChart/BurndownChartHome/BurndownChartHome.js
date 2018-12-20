@@ -266,7 +266,6 @@ class BurndownChartHome extends Component {
                 }],
                 type: data[index].type,
               });
-              // newData[index2].type += `-${data[index].type}`;
             } else {
               newData[index2].issues = [...newData[index2].issues, {
                 issueId: data[index].issueId,
@@ -830,37 +829,8 @@ class BurndownChartHome extends Component {
                     checked={this.state.restDayShow}
                     onChange={this.onCheckChange}
                   >
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     显示非工作日
-</Checkbox>
+                  </Checkbox>
                 </div>
                 <Spin spinning={this.state.chartLoading}>
                   <ReactEcharts option={this.getOption()} />

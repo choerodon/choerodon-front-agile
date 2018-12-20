@@ -38,7 +38,7 @@ class Assignee extends Component {
   componentDidMount() {
     this.loadUser();
   }
-  
+
   handleClickAssignee = () => {
     const {
       form, issueId, objectVersionNumber, onOk,
@@ -106,7 +106,7 @@ class Assignee extends Component {
     getUser(assigneeId).then((res) => {
       this.setState({
         assigneeId: res.content[0].id,
-        originUsers: [res.content[0]],
+        originUsers: res.content.length ? [res.content[0]] : [],
       });
     });
   }
@@ -118,7 +118,7 @@ class Assignee extends Component {
     const {
       loading, selectLoading, assigneeId, originUsers,
     } = this.state;
-  
+
     return (
       <Modal
         className="c7n-agile-assignee"

@@ -127,7 +127,7 @@ class QuickSearch extends Component {
               <Option key={-1} value={-1}>仅我的问题</Option>
               <Option key={-2} value={-2}>仅故事</Option>
             </OptGroup>
-              }
+          }
           <OptGroup key="more" label="更多">
             {
               quickSearchArray.map(item => (

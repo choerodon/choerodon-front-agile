@@ -375,7 +375,7 @@ class CreateIssue extends Component {
                       }
                       getPopupContainer={triggerNode => triggerNode.parentNode}
                       loading={selectLoading}
-                      onFocus={() => {
+                      onFilterChange={() => {
                         this.setState({
                           selectLoading: true,
                         });
@@ -416,7 +416,7 @@ class CreateIssue extends Component {
                     }
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     loading={selectLoading}
-                    onFocus={() => {
+                    onFilterChange={() => {
                       this.setState({
                         selectLoading: true,
                       });

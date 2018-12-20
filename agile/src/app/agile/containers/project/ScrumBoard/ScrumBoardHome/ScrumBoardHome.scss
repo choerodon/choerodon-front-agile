@@ -14,7 +14,7 @@
 
   .c7n-scrumboard-content {
     overflow: auto;
-
+    height: calc(100vh - 230px);
     .c7n-scrumboard-others {
       padding: 0 24px;
 
