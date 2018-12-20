@@ -9,7 +9,7 @@ class DatetimeAgo extends Component {
       <Tooltip placement="top" title={date || ''}>
         <TimeAgo
           datetime={date || ''}
-          locale="zh_CN"
+          locale={Choerodon.getMessage('zh_CN', 'en')}
         />
       </Tooltip>
     );
