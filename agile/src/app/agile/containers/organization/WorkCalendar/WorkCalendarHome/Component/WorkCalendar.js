@@ -76,14 +76,14 @@ class WorkCalendar extends Component {
       dateStyle = selectDay[0].status === 1 ? workDayStyle : notWorkDayStyle;
     } else if (useHoliday && holidayInfo.length) {
       return holidayInfo[0].status === 1 ? (
-        <div data-day={holidayInfo[0]} className="rc-calendar-date workday">
-          <span className="tag">班</span>
+        <div data-day={holidayInfo[0]} className="rc-calendar-date workday" style={workDayStyle}>
+          <span className="tag tag-work">班</span>
           {current.date()}
         </div>
       )
         : (
-          <div data-day={holidayInfo[0]} className="rc-calendar-date restday">
-            <span className="tag">休</span>
+          <div data-day={holidayInfo[0]} className="rc-calendar-date restday" style={notWorkDayStyle}>
+            <span className="tag tag-notwork">休</span>
             {current.date()}
             <span className="des">{holidayInfo[0].name}</span>
           </div>

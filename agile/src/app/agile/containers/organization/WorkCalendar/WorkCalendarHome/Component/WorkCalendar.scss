@@ -18,10 +18,9 @@
   .rc-calendar-footer-btn:after {
     content: '';
   }
-
   .rc-calendar-date {
     position: relative;
-    background-color: #ffe7e7;
+    background-color: #fdf0ef;
     border-radius: 2px;
     margin-bottom: 10px;
     width: 42px;
@@ -107,6 +106,10 @@
     font-size: 12px;
     transform: scale(0.83);
   }
+  .rc-calendar-year-select:hover,
+  .rc-calendar-month-select:hover {
+    color: #3f51b5;
+  }
 
   .rc-calendar-column-header-inner,
   .rc-calendar-year-panel-year,
@@ -118,11 +121,6 @@
   .rc-calendar-decade-panel-century,
   .rc-calendar-month-panel-year-select-content {
     font-size: 14px;
-  }
-
-  .rc-calendar-year-select:hover,
-  .rc-calendar-month-select:hover {
-    color: #3f51b5;
   }
 
   .rc-calendar-year-panel-decade-select-content:hover,
