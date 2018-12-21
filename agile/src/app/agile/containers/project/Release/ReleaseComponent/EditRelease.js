@@ -35,18 +35,18 @@ class EditRelease extends Component {
     const {
       form, onCancel, refresh, data,
     } = this.props;
-    form.validateFields((err, values) => {
-      if (!err) {
+    form.validateFields((err, value, modify) => {
+      if (!err && modify) {
         this.setState({
           loading: true,
         });
         const newData = {
-          description: values.description,
-          name: values.name,
+          description: value.description,
+          name: value.name,
           objectVersionNumber: data.objectVersionNumber,
           projectId: AppState.currentMenuType.id,
-          startDate: values.startDate ? `${moment(values.startDate).format('YYYY-MM-DD')} 00:00:00` : null,
-          expectReleaseDate: values.expectReleaseDate ? `${moment(values.expectReleaseDate).format('YYYY-MM-DD')} 00:00:00` : null,
+          startDate: value.startDate ? `${moment(value.startDate).format('YYYY-MM-DD')} 00:00:00` : null,
+          expectReleaseDate: value.expectReleaseDate ? `${moment(value.expectReleaseDate).format('YYYY-MM-DD')} 00:00:00` : null,
           versionId: ReleaseStore.getVersionDetail.versionId,
         };
         ReleaseStore.axiosUpdateVersion(
@@ -72,7 +72,7 @@ class EditRelease extends Component {
     if (value && data.name !== value) {
       ReleaseStore.axiosCheckName(proId, value).then((res) => {
         if (res) {
-          callback('版本名称已存在');
+          callback('版本名称重复');
         } else {
           callback();
         }

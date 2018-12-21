@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Modal, Form, Input, DatePicker, Icon } from 'choerodon-ui';
+import {
+  Modal, Form, Input, DatePicker, Icon, 
+} from 'choerodon-ui';
 import { Content, stores, Permission } from 'choerodon-front-boot';
 import { fromJS, is } from 'immutable';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
@@ -22,15 +24,17 @@ class Version extends Component {
       loading: false,
     };
   }
+
   componentDidMount() {
     this.props.onRef(this);
   }
+
   shouldComponentUpdate = (nextProps, nextState) => {
     const thisProps = fromJS(this.props || {});
     const thisState = fromJS(this.state || {});
     const nextStates = fromJS(nextState || {});
-    if (thisProps.size !== nextProps.size ||
-      thisState.size !== nextState.size) {
+    if (thisProps.size !== nextProps.size
+      || thisState.size !== nextState.size) {
       return true;
     }
     if (is(thisState, nextStates)) {
@@ -38,6 +42,7 @@ class Version extends Component {
     }
     return true;
   };
+
   /**
    *其他组件修改该组件state的方法
    *
@@ -49,6 +54,7 @@ class Version extends Component {
       draggableIds: value,
     });
   }
+
   /**
    *点击versionItem事件
    *
@@ -62,6 +68,7 @@ class Version extends Component {
     }).catch((error) => {
     });
   }
+
   renderVersion() {
     const data = this.props.store.getVersionData;
     const result = [];
@@ -126,7 +133,9 @@ class Version extends Component {
     }
     const epicId = data[sourceIndex].versionId;
     const { objectVersionNumber } = data[sourceIndex];
-    const postData = { afterSequence, beforeSequence, versionId: epicId, objectVersionNumber };
+    const postData = {
+      afterSequence, beforeSequence, versionId: epicId, objectVersionNumber, 
+    };
     BacklogStore.handleVersionDrap(postData)
       .then(() => {
         BacklogStore.axiosGetVersion().then((data3) => {
@@ -138,15 +147,15 @@ class Version extends Component {
         }).catch((error3) => {
         });
       }).catch(() => {
-      BacklogStore.axiosGetVersion().then((data3) => {
-        const newEpic = [...data3];
-        for (let index = 0, len = newEpic.length; index < len; index += 1) {
-          newEpic[index].expand = false;
-        }
-        BacklogStore.setVersionData(newEpic);
-      }).catch((error3) => {
+        BacklogStore.axiosGetVersion().then((data3) => {
+          const newEpic = [...data3];
+          for (let index = 0, len = newEpic.length; index < len; index += 1) {
+            newEpic[index].expand = false;
+          }
+          BacklogStore.setVersionData(newEpic);
+        }).catch((error3) => {
+        });
       });
-    });
   };
 
   render() {
@@ -193,7 +202,9 @@ class Version extends Component {
                           addVersion: true,
                         });
                       }}
-                    >创建版本</p>
+                    >
+                      {'创建版本'}
+                    </p>
                   </Permission>
                   <Icon
                     type="close"
@@ -219,8 +230,10 @@ class Version extends Component {
                   role="none"
                   onClick={this.handelClickVersion.bind(this, 'all')}
                 >
+
+
                   所有问题
-                </div>
+                                </div>
                 <DragDropContext onDragEnd={this.handleVersionDrag}>
                   {this.renderVersion()}
                 </DragDropContext>
@@ -235,7 +248,8 @@ class Version extends Component {
                   onMouseUp={() => {
                     if (this.props.store.getIsDragging) {
                       this.props.store.axiosUpdateIssuesToVersion(
-                        0, this.state.draggableIds).then((res) => {
+                        0, this.state.draggableIds,
+                      ).then((res) => {
                         this.props.issueRefresh();
                         this.props.refresh();
                       }).catch((error) => {
@@ -244,7 +258,7 @@ class Version extends Component {
                     }
                   }}
                 >
-                  未指定版本的问题
+                  {'未指定版本的问题'}
                 </div>
               </div>
               <CreateVersion
@@ -266,4 +280,3 @@ class Version extends Component {
 }
 
 export default Form.create()(Version);
-

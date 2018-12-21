@@ -53,6 +53,17 @@ class CreateEpic extends Component {
     });
   }
 
+  checkEpicNameRepeat = (rule, value, callback) => {
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/check_epic_name?epicName=${value}`)
+      .then((res) => {
+        if (res) {
+          callback('史诗名称重复');
+        } else {
+          callback();
+        }
+      });
+  };
+
   render() {
     const { loading } = this.state;
     const {
@@ -65,7 +76,7 @@ class CreateEpic extends Component {
         title="创建史诗"
         // getContainer={() => container}
         visible={visible}
-        okText="新建"
+        okText="创建"
         cancelText="取消"
         onCancel={() => {
           form.resetFields();
@@ -87,6 +98,8 @@ class CreateEpic extends Component {
                 rules: [{
                   required: true,
                   message: '史诗名称不能为空',
+                }, {
+                  validator: this.checkEpicNameRepeat,
                 }],
               })(
                 <Input label="史诗名称" maxLength={10} />,

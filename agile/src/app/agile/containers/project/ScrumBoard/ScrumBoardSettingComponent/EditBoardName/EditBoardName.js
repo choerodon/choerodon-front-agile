@@ -22,8 +22,6 @@ class EditBoardName extends Component {
       loading: false,
       initialBoardName: '',
       boardName: '',
-      checkResult: true,
-      saveDisable: true,
     };
   }
 
@@ -34,28 +32,30 @@ class EditBoardName extends Component {
   }
 
   checkBoardNameRepeat = (rule, value, callback) => {
+    const { initialBoardName } = this.state;
     const proId = AppState.currentMenuType.id;
-    this.setState(
-      { 
-        boardName: value,
-      },
-    );
-    ScrumBoardStore.checkBoardNameRepeat(proId, value)
-      .then((res) => {
-        this.setState({
-          checkResult: res,
-          saveDisable: res || !value,
+    if (initialBoardName === value) {
+      callback();
+    } else {
+      ScrumBoardStore.checkBoardNameRepeat(proId, value)
+        .then((res) => {
+          if (res) {
+            callback('看板名称重复');
+          } else {
+            this.setState(
+              { 
+                boardName: value,
+              },
+            );
+            callback();
+          }
         });
-        if (res) {
-          callback('看板名称重复');
-        } else {
-          callback();
-        }
-      });
+    }
   };
 
   handleUpdateBoardName = () => {
-    const { boardName, checkResult } = this.state;
+    const { boardName } = this.state;
+    const { form, history } = this.props;
     const currentEditBoard = ScrumBoardStore.getBoardList.find(item => item.boardId === ScrumBoardStore.getSelectedBoard);
     const { objectVersionNumber, boardId, projectId } = currentEditBoard;
     const data = {
@@ -65,24 +65,28 @@ class EditBoardName extends Component {
       projectId,
     };
 
-    if (!checkResult && boardName) {
-      this.setState({
-        loading: true,
-      });
-      axios.put(`/agile/v1/projects/${data.projectId}/board/${data.boardId}?boardName=${encodeURIComponent(data.name)}`, data)
-        .then(() => {
-          this.setState({
-            loading: false,
-          });
-          message.success('保存成功');
-          this.props.history.push(`/agile/scrumboard?type=project&id=${data.projectId}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
+    form.validateFields((err, value, modify) => {
+      if (!err && modify) {
+        this.setState({
+          loading: true,
         });
-    }
+        axios.put(`/agile/v1/projects/${data.projectId}/board/${data.boardId}?boardName=${encodeURIComponent(data.name)}`, data)
+          .then(() => {
+            this.setState({
+              loading: false,
+            });
+            message.success('保存成功');
+            history.push(`/agile/scrumboard?type=project&id=${data.projectId}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
+          });
+      }
+    });
   }
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { initialBoardName, boardName, loading, checkResult, saveDisable } = this.state;
+    const {
+      initialBoardName, loading, 
+    } = this.state;
     return (
       <Content
         description={`您正在编辑项目“${AppState.currentMenuType.name}”的看板名称`}
@@ -112,7 +116,6 @@ class EditBoardName extends Component {
               type="primary"
               funcType="raised"
               loading={loading}
-              disabled={saveDisable}
               onClick={this.handleUpdateBoardName}
             >
               {'保存'}

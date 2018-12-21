@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import {
   Modal, Form, Select, Icon, Input,
 } from 'choerodon-ui';
-import { Content, stores } from 'choerodon-front-boot';
+import { Content, stores, axios } from 'choerodon-front-boot';
 import TypeTag from '../../../../../components/TypeTag';
 
 const { AppState } = stores;
@@ -70,6 +70,17 @@ class CreateEpic extends Component {
     });
   };
 
+  checkEpicNameRepeat = (rule, value, callback) => {
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/check_epic_name?epicName=${value}`)
+      .then((res) => {
+        if (res) {
+          callback('史诗名称重复');
+        } else {
+          callback();
+        }
+      });
+  };
+
   render() {
     const {
       form, onCancel, visible, store,
@@ -82,7 +93,7 @@ class CreateEpic extends Component {
       <Sidebar
         title="创建史诗"
         visible={visible}
-        okText="新建"
+        okText="创建"
         cancelText="取消"
         onCancel={() => {
           form.resetFields();
@@ -105,7 +116,9 @@ class CreateEpic extends Component {
                 rules: [{
                   required: true,
                   message: '史诗名称不能为空',
-                  transform: value => value && value.trim(),
+                  // transform: value => value && value.trim(),
+                }, {
+                  validator: this.checkEpicNameRepeat,
                 }],
               })(
                 <Input label="史诗名称" maxLength={10} />,
@@ -116,7 +129,7 @@ class CreateEpic extends Component {
                 rules: [{
                   required: true,
                   message: '概要不能为空',
-                  transform: value => value && value.trim(),
+                  // transform: value => value && value.trim(),
                 }],
               })(
                 <TextArea autosize label="概要" maxLength={44} />,

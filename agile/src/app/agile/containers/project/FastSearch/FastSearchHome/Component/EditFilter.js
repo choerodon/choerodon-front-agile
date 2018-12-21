@@ -42,6 +42,7 @@ class AddComponent extends Component {
       ],
       quickFilterFiled: [],
       deleteItem: [],
+      originFilterName: '',
     };
   }
 
@@ -89,6 +90,7 @@ class AddComponent extends Component {
               ...res,
               description,
             },
+            originFilterName: res.name,
           });
         }
       });
@@ -210,8 +212,14 @@ class AddComponent extends Component {
     if (addEmpty) {
       arr.unshift(
         <Option key="null" value="null">
+
+
+
+
+
+
           无
-        </Option>,
+                </Option>,
       );
     }
     return arr;
@@ -471,28 +479,26 @@ class AddComponent extends Component {
             { [OPTION_FILTER[filter].id]: k }).name,
         });
       }
+    } else if (operation === 'in' || operation === 'notIn' || operation === 'not in') {
+      const arr = value.slice(1, -1).split(',');
+      return arr.map(v => ({
+        key: v * 1,
+        label: _.find(this.state[OPTION_FILTER[filter].state],
+          { [OPTION_FILTER[filter].id]: v * 1 })
+          ? _.find(this.state[OPTION_FILTER[filter].state],
+            { [OPTION_FILTER[filter].id]: v * 1 })[OPTION_FILTER[filter].name]
+          : undefined,
+      }));
     } else {
-      if (operation === 'in' || operation === 'notIn' || operation === 'not in') {
-        const arr = value.slice(1, -1).split(',');
-        return arr.map(v => ({
-          key: v * 1,
-          label: _.find(this.state[OPTION_FILTER[filter].state],
-            { [OPTION_FILTER[filter].id]: v * 1 })
-            ? _.find(this.state[OPTION_FILTER[filter].state],
-              { [OPTION_FILTER[filter].id]: v * 1 })[OPTION_FILTER[filter].name]
-            : undefined,
-        }));
-      } else {
-        const k = value * 1;
-        return ({
-          key: k,
-          label: _.find(this.state[OPTION_FILTER[filter].state],
-            { [OPTION_FILTER[filter].id]: k })
-            ? _.find(this.state[OPTION_FILTER[filter].state],
-              { [OPTION_FILTER[filter].id]: k })[OPTION_FILTER[filter].name]
-            : undefined,
-        });
-      }
+      const k = value * 1;
+      return ({
+        key: k,
+        label: _.find(this.state[OPTION_FILTER[filter].state],
+          { [OPTION_FILTER[filter].id]: k })
+          ? _.find(this.state[OPTION_FILTER[filter].state],
+            { [OPTION_FILTER[filter].id]: k })[OPTION_FILTER[filter].name]
+          : undefined,
+      });
     }
   }
 
@@ -502,8 +508,8 @@ class AddComponent extends Component {
     const {
       deleteItem, quickFilterFiled, origin, arr,
     } = this.state;
-    form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
+    form.validateFieldsAndScroll((err, values, modify) => {
+      if (!err && modify) {
         const arrCopy = [];
         const expressQueryArr = [];
         const o = [];
@@ -645,8 +651,14 @@ class AddComponent extends Component {
               .indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
+
+
+
+
+
+
               空
-            </Option>
+                        </Option>
           </Select>
         );
       } else {
@@ -689,8 +701,14 @@ class AddComponent extends Component {
               .indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
+
+
+
+
+
+
               空
-            </Option>
+                        </Option>
           </Select>
         );
       } else {
@@ -703,6 +721,26 @@ class AddComponent extends Component {
       }
     }
   }
+
+  /**
+   *校验快速搜索名称是否重复
+  *
+  * @memberof AddComponent
+  */
+  checkSearchNameRepeat = (rule, value, callback) => {
+    const { originFilterName } = this.state;
+    if (originFilterName === value) {
+      callback();
+    }
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/check_name?quickFilterName=${value}`)
+      .then((res) => {
+        if (res) {
+          callback('快速搜索名称重复');
+        } else {
+          callback();
+        }
+      });
+  };
 
   render() {
     const { form, onCancel } = this.props;
@@ -735,6 +773,8 @@ class AddComponent extends Component {
               {getFieldDecorator('name', {
                 rules: [{
                   required: true,
+                }, {
+                  validator: this.checkSearchNameRepeat,
                 }],
                 initialValue: origin.name,
               })(

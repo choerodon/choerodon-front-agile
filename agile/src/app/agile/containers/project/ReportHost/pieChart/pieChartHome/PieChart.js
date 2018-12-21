@@ -361,6 +361,7 @@ class ReleaseDetail extends Component {
                   style={{ minWidth: 160 }}
                   value={[startDate, endDate]}
                   allowClear={false}
+                  disabledDate={current => current && current > moment().endOf('day')}
                   onChange={(date, dateString) => {
                     this.setState({
                       startDate: moment(dateString[0]),
