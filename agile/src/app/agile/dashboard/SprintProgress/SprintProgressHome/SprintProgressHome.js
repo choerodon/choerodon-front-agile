@@ -20,7 +20,7 @@ class SprintProgressHome extends Component {
   componentDidMount() {
     this.loadData();
   }
-  
+
   getTotalDay(startDate, endDate) {
     if (!startDate) return '';
     if (!endDate) return '';
@@ -54,37 +54,39 @@ class SprintProgressHome extends Component {
 
     return (
       <div className="c7n-SprintProgressHome">
-        <p className="c7n-SprintStage">
-          {`${this.transformDateStr(sprint.startDate)}-${this.transformDateStr(sprint.endDate)} ${sprint.sprintName}`}
-        </p>
-        <p className="c7n-SprintRemainDay">
-          {'剩余'}
-          <span className="c7n-remainDay">
-            {sprint.dayRemain > 0 ? sprint.dayRemain : 0}
-          </span>
-          {'天'}
-        </p>
-        <div className="c7n-progress">
-          <Progress
-            percent={(sprint.dayRemain > 0 ? totalDay - sprint.dayRemain : totalDay)
-                / totalDay * 100}
-            showInfo={false}
-          />
-          <span className="c7n-sprintStart">
-            {`${this.transformDateStr(sprint.startDate)}`}
-          </span>
-          <span className="c7n-sprintEnd">
-            {`${this.transformDateStr(sprint.endDate)}`}
-          </span>
+        <div className="c7n-SprintContainer">
+          <p className="c7n-SprintStage">
+            {`${this.transformDateStr(sprint.startDate)}-${this.transformDateStr(sprint.endDate)} ${sprint.sprintName}`}
+          </p>
+          <p className="c7n-SprintRemainDay">
+            {'剩余'}
+            <span className="c7n-remainDay">
+              {sprint.dayRemain > 0 ? sprint.dayRemain : 0}
+            </span>
+            {'天'}
+          </p>
+          <div className="c7n-progress">
+            <Progress
+              percent={(sprint.dayRemain > 0 ? totalDay - sprint.dayRemain : totalDay)
+              / totalDay * 100}
+              showInfo={false}
+            />
+            <span className="c7n-sprintStart">
+              {`${this.transformDateStr(sprint.startDate)}`}
+            </span>
+            <span className="c7n-sprintEnd">
+              {`${this.transformDateStr(sprint.endDate)}`}
+            </span>
+          </div>
         </div>
       </div>
     );
   }
 
- 
+
   /**
    * 'MM/DD' format
-   * @param {*} date 
+   * @param {*} date
    */
   transformDateStr(date) {
     if (!date) return '';
@@ -100,7 +102,7 @@ class SprintProgressHome extends Component {
           sprint: res,
           loading: false,
         });
-      });  
+      });
   }
 
   render() {

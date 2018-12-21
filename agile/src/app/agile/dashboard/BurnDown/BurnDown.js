@@ -7,7 +7,7 @@ import {
   Dropdown, Icon, Menu, Spin, Checkbox,
 } from 'choerodon-ui';
 import {
-  DashBoardNavBar, stores, axios,
+  DashBoardNavBar, stores, axios, DashBoardToolBar,
 } from 'choerodon-front-boot';
 import EmptyBlockDashboard from '../../components/EmptyBlockDashboard';
 // import pic from './no_sprint.svg';
@@ -406,7 +406,7 @@ class BurnDown extends Component {
     return (
       <ReactEcharts
         style={{
-          height: 200,
+          height: '100%',
         }}
         option={this.getOption()}
       />
@@ -426,21 +426,23 @@ class BurnDown extends Component {
     );
     return (
       <div className="c7n-agile-dashboard-burndown">
-        <div className="switch" style={{ display: !loading && !sprintId ? 'none' : 'block' }}>
-          <Dropdown overlay={menu} trigger={['click']} getPopupContainer={triggerNode => triggerNode.parentNode}>
-            <div className="ant-dropdown-link c7n-agile-dashboard-burndown-select">
-              {'单位选择'}
-              <Icon type="arrow_drop_down" />
-            </div>
-          </Dropdown>
-          <Checkbox
-            style={{ marginLeft: 24 }}
-            checked={restDayShow}
-            onChange={this.onCheckChange}
-          >
-            {'显示非工作日'}
-          </Checkbox>
-        </div>
+        <DashBoardToolBar>
+          <div className="switch" style={{ display: !loading && !sprintId ? 'none' : 'block' }}>
+            <Dropdown overlay={menu} trigger={['click']} getPopupContainer={triggerNode => triggerNode.parentNode}>
+              <div className="ant-dropdown-link c7n-agile-dashboard-burndown-select">
+                {'单位选择'}
+                <Icon type="arrow_drop_down" />
+              </div>
+            </Dropdown>
+            <Checkbox
+              style={{ marginLeft: 24 }}
+              checked={restDayShow}
+              onChange={this.onCheckChange}
+            >
+              {'显示非工作日'}
+            </Checkbox>
+          </div>
+        </DashBoardToolBar>
         {this.renderContent()}
         <DashBoardNavBar>
           <a

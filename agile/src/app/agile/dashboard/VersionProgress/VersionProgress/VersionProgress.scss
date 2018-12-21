@@ -1,10 +1,10 @@
-.ant-dropdown{
+.ant-dropdown {
   // position: relative;
-  .menu{
+  .menu {
     right: -15px;
     top: 0;
-    .ant-dropdown-menu-item{
-      .c7n-menuItem{
+    .ant-dropdown-menu-item {
+      .c7n-menuItem {
         display: inline-block;
         max-width: 90px;
         overflow: hidden;
@@ -15,33 +15,29 @@
   }
 }
 
-.c7n-VersionProgress{
-  .switchVersion{
-     position: absolute;
-      top: 25px;
-      right: 16px;
-    
-    .ant-dropdown-link{
+.c7n-VersionProgress {
+  height: calc(100% - 60px);
+  .switchVersion {
+    .ant-dropdown-link {
       font-size: 13px;
       // color: #3F51B5;
       // font-weight: 600;
       line-height: 15px;
     }
-    .ant-dropdown-link:hover{
+    .ant-dropdown-link:hover {
       color: #000;
     }
   }
-  .c7n-loadWrap{
+  .c7n-loadWrap {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 220px;
-
   }
-  .charts{
+  .charts {
     position: relative;
     // margin-bottom: -120px;
-    .charts-inner{
+    .charts-inner {
       width: 64px;
       height: 64px;
       display: flex;
@@ -51,22 +47,22 @@
       position: absolute;
       top: calc(42% - 30px);
       left: calc(35% - 32px);
-      .charts-inner-versionName{
+      .charts-inner-versionName {
         max-width: 64px;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
       }
     }
-    .charts-legend{
+    .charts-legend {
       list-style: none;
       position: absolute;
       right: 15%;
       top: 28px;
-      li{
+      li {
         margin-bottom: 29px;
         display: flex;
-        div{
+        div {
           width: 20px;
           height: 20px;
           // background-color: aquamarine;
@@ -75,33 +71,34 @@
         }
         font-size: 13px;
       }
-      li:first-child{
-        div{
-          background-color: #FFB100;
+      li:first-child {
+        div {
+          background-color: #ffb100;
         }
       }
-      li:nth-child(2){
-        div{
-          background-color: #4D90FE;
+      li:nth-child(2) {
+        div {
+          background-color: #4d90fe;
         }
       }
-      li:last-child{
-        div{
-          background-color: #00BFA5;
+      li:last-child {
+        div {
+          background-color: #00bfa5;
         }
       }
     }
-  }   
-  .c7n-emptyVersion{
+  }
+  .c7n-emptyVersion {
       margin-top: 40px;
       padding-bottom: 33px;
   }
 }
 .c7n-agile-dashboard-versionProgress-select {
-  display: flex;
-  align-items: center;
   font-size: 13px;
-  line-height: 15px;
+  line-height: 16px;
   cursor: pointer;
   color: #000;
+  .icon-arrow_drop_down {
+    font-size: 16px !important;
+  }
 }
