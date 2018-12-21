@@ -79,7 +79,7 @@ class AddRelease extends Component {
     if (value) {
       ReleaseStore.axiosCheckName(proId, value).then((res) => {
         if (res) {
-          callback('版本名称已存在');
+          callback('版本名称重复');
         } else {
           callback();
         }

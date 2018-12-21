@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import moment from 'moment';
-import { stores, Permission } from 'choerodon-front-boot';
+import { stores, Permission, axios } from 'choerodon-front-boot';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import {
   message, DatePicker, Icon, Dropdown, Menu, Input,
@@ -118,34 +118,50 @@ class VersionItem extends Component {
    * @memberof VersionItem
    */
   handleBlurName(e) {
+    const { data } = this.props;
     const { data: { objectVersionNumber, versionId }, index } = this.props;
-    const data = {
-      objectVersionNumber,
-      projectId: parseInt(AppState.currentMenuType.id, 10),
-      versionId,
-      name: e.target.value,
-    };
-    BacklogStore.axiosUpdateVerison(versionId, data).then((res) => {
-      if (res && res.failed) {
-        this.setState({
-          editName: false,
-        });
-        message.error(res.message);
-      } else {
-        this.setState({
-          editName: false,
-        });
-        const originData = _.clone(BacklogStore.getVersionData);
-        originData[index].name = res.name;
-        originData[index].objectVersionNumber = res.objectVersionNumber;
-        BacklogStore.setVersionData(originData);
-      }
-    }).catch((error) => {
+    const { value } = e.target;
+    if (data && data.name === value) {
       this.setState({
         editName: false,
       });
-    });
+    } else {
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/check?name=${value}`)
+        .then((checkRes) => {
+          if (checkRes) {
+            message.info('版本名称重复', 2);
+          } else {
+            const data = {
+              objectVersionNumber,
+              projectId: parseInt(AppState.currentMenuType.id, 10),
+              versionId,
+              name: value,
+            };
+            BacklogStore.axiosUpdateVerison(versionId, data).then((res) => {
+              if (res && res.failed) {
+                this.setState({
+                  editName: false,
+                });
+                message.error(res.message);
+              } else {
+                this.setState({
+                  editName: false,
+                });
+                const originData = _.clone(BacklogStore.getVersionData);
+                originData[index].name = res.name;
+                originData[index].objectVersionNumber = res.objectVersionNumber;
+                BacklogStore.setVersionData(originData);
+              }
+            }).catch((error) => {
+              this.setState({
+                editName: false,
+              });
+            });
+          }
+        });
+    }
   }
+
 
   /**
    *更新日期
@@ -254,18 +270,18 @@ class VersionItem extends Component {
                   <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
                     <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
                       <Icon
-                          style={{
-                            width: 12,
-                            height: 12,
-                            background: '#f5f5f5',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            border: '1px solid #ccc',
-                            borderRadius: 2,
-                          }}
-                          type="arrow_drop_down"
-                        />
+                        style={{
+                          width: 12,
+                          height: 12,
+                          background: '#f5f5f5',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          border: '1px solid #ccc',
+                          borderRadius: 2,
+                        }}
+                        type="arrow_drop_down"
+                      />
                     </Dropdown>
                   </Permission>
                 </div>
@@ -274,14 +290,14 @@ class VersionItem extends Component {
                   <div
                     className="c7n-backlog-versionItemDone"
                     style={{
-                    flex: item.doneIssueCount,
-                  }}
+                      flex: item.doneIssueCount,
+                    }}
                   />
                   <div
                     className="c7n-backlog-versionItemTodo"
                     style={{
-                    flex: item.issueCount ? item.issueCount - item.doneIssueCount : 1,
-                  }}
+                      flex: item.issueCount ? item.issueCount - item.doneIssueCount : 1,
+                    }}
                   />
                 </div>
               </div>

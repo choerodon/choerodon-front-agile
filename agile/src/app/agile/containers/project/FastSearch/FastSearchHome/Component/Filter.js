@@ -389,6 +389,23 @@ class AddComponent extends Component {
     });
   };
 
+  
+/**
+ *校验快速搜索名称是否重复
+ *
+ * @memberof AddComponent
+ */
+checkSearchNameRepeat = (rule, value, callback) => {
+  axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/check_name?quickFilterName=${value}`)
+    .then((res) => {
+      if (res) {
+        callback('快速搜索名称重复');
+      } else {
+        callback();
+      }
+    });
+};
+
   /**
    * 转化关系
    * @param value
@@ -683,6 +700,8 @@ class AddComponent extends Component {
                 rules: [{
                   required: true,
                   message: '名称必填',
+                }, {
+                  validator: this.checkSearchNameRepeat,
                 }],
               })(
                 <Input

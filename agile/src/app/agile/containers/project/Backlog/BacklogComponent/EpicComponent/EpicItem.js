@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
+import { stores, axios, store } from 'choerodon-front-boot';
 import { observer, inject } from 'mobx-react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import {
-  Dropdown, Menu, Input, Icon,
+  Dropdown, Menu, Input, Icon, message,
 } from 'choerodon-ui';
 import _ from 'lodash';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
-@inject('AppState')
+const { AppState } = stores;
+// @inject('AppState')
 @observer
 class EpicItem extends Component {
   constructor(props) {
@@ -87,21 +89,35 @@ class EpicItem extends Component {
   handleSave(e) {
     const { data, index } = this.props;
     e.stopPropagation();
-    this.setState({
-      editName: false,
-    });
-    const dataP = {
-      objectVersionNumber: data.objectVersionNumber,
-      issueId: data.issueId,
-      epicName: e.target.value,
-    };
-    BacklogStore.axiosUpdateIssue(dataP).then((res) => {
-      const originEpic = _.clone(BacklogStore.getEpicData);
-      originEpic[index].epicName = res.epicName;
-      originEpic[index].objectVersionNumber = res.objectVersionNumber;
-      BacklogStore.setEpicData(originEpic);
-    }).catch((error) => {
-    });
+    const { value } = e.target;
+    if (data && data.epicName === value) {
+      this.setState({
+        editName: false,
+      });
+    } else {
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/check_epic_name?epicName=${value}`)
+        .then((checkRes) => {
+          if (checkRes) {
+            message.info('史诗名称重复', 2);
+          } else {
+            this.setState({
+              editName: false,
+            });
+            const dataP = {
+              objectVersionNumber: data.objectVersionNumber,
+              issueId: data.issueId,
+              epicName: value,
+            };
+            BacklogStore.axiosUpdateIssue(dataP).then((res) => {
+              const originEpic = _.clone(BacklogStore.getEpicData);
+              originEpic[index].epicName = res.epicName;
+              originEpic[index].objectVersionNumber = res.objectVersionNumber;
+              BacklogStore.setEpicData(originEpic);
+            }).catch((error) => {
+            });
+          }
+        });
+    }
   }
 
   render() {

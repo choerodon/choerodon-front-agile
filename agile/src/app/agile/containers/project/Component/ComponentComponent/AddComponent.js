@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {
- Modal, Form, Input, Select, message 
+  Modal, Form, Input, Select, message, 
 } from 'choerodon-ui';
-import { Content, stores } from 'choerodon-front-boot';
+import { Content, stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
 import UserHead from '../../../../components/UserHead';
 import { getUsers } from '../../../../api/CommonApi';
@@ -25,6 +25,7 @@ class AddComponent extends Component {
       createLoading: false,
     };
   }
+
 
   onFilterChange(input) {
     if (!sign) {
@@ -73,8 +74,8 @@ class AddComponent extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const {
- defaultAssigneeRole, description, managerId, name 
-} = values;
+          defaultAssigneeRole, description, managerId, name, 
+        } = values;
         const component = {
           defaultAssigneeRole,
           description,
@@ -98,6 +99,17 @@ class AddComponent extends Component {
       }
     });
   }
+  
+  checkComponentNameRepeat = (rule, value, callback) => {
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component/check_name?componentName=${value}`)
+      .then((res) => {
+        if (res) {
+          callback('模块名称重复');
+        } else {
+          callback();
+        }
+      });
+  };
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -127,6 +139,8 @@ class AddComponent extends Component {
                 rules: [{
                   required: true,
                   message: '模块名称必填',
+                }, {
+                  validator: this.checkComponentNameRepeat,
                 }],
               })(
                 <Input label="模块名称" maxLength={10} />,
@@ -142,7 +156,7 @@ class AddComponent extends Component {
                   onFilterChange={this.onFilterChange.bind(this)}
                 >
                   {this.state.originUsers.map(user => (
-<Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
+                    <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                         <UserHead
                           user={{
@@ -154,7 +168,7 @@ class AddComponent extends Component {
                         />
                       </div>
                     </Option>
-),)}
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -172,10 +186,10 @@ class AddComponent extends Component {
               })(
                 <Select label="默认经办人">
                   {['模块负责人', '无'].map(defaultAssigneeRole => (
-<Option key={defaultAssigneeRole} value={defaultAssigneeRole}>
+                    <Option key={defaultAssigneeRole} value={defaultAssigneeRole}>
                       {defaultAssigneeRole}
                     </Option>
-),)}
+                  ))}
                 </Select>,
               )}
             </FormItem>
