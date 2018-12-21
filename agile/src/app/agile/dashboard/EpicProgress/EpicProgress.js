@@ -37,7 +37,7 @@ class EpicProgress extends Component {
           const res = `${epic.name}:</br>${epic.value}%`;
           return res;
         },
-        extraCssText: 
+        extraCssText:
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
       },
       legend: {
@@ -226,7 +226,7 @@ class EpicProgress extends Component {
       );
     }
     return (
-      <ReactEcharts className="c7n-chart" option={this.getOption()} />
+      <ReactEcharts className="c7n-chart" style={{ height: '100%' }} option={this.getOption()} />
     );
   }
 

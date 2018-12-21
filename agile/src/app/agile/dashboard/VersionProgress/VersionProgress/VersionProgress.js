@@ -3,7 +3,7 @@ import {
   Menu, Dropdown, Icon, Spin, Tooltip,
 } from 'choerodon-ui';
 import { withRouter } from 'react-router-dom';
-import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';
+import { DashBoardNavBar, stores, axios, DashBoardToolBar } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import EmptyBlockDashboard from '../../../components/EmptyBlockDashboard';
 // import pic from './no_version.svg';
@@ -105,24 +105,28 @@ class VersionProgress extends Component {
     if (currentVersionId >= 0) {
       return (
         <React.Fragment>
-          <div className="switchVersion">
-            <Dropdown overlay={menu} trigger={['click']} getPopupContainer={triggerNode => triggerNode.parentNode}>
-              <a className="ant-dropdown-link c7n-agile-dashboard-versionProgress-select">
-                {' 切换版本 '}
-                <Icon type="arrow_drop_down" />
-              </a>
-            </Dropdown>
-          </div>
+          <DashBoardToolBar>
+            <div className="switchVersion">
+              <Dropdown overlay={menu} trigger={['click']} getPopupContainer={triggerNode => triggerNode.parentNode}>
+                <a className="ant-dropdown-link c7n-agile-dashboard-versionProgress-select">
+                  {' 切换版本 '}
+                  <Icon type="arrow_drop_down" />
+                </a>
+              </Dropdown>
+            </div>
+          </DashBoardToolBar>
           <div className="charts">
-            <ReactEcharts
-              style={{ height: 200 }}
-              option={this.getOption()}
-            />
-            <div className="charts-inner">
-              <span>版本</span>
-              <Tooltip title={currentVersionName || ''} placement="bottom">
-                <span className="charts-inner-versionName">{currentVersionName || ''}</span>
-              </Tooltip>
+            <div>
+              <ReactEcharts
+                style={{ height: 200 }}
+                option={this.getOption()}
+              />
+              <div className="charts-inner">
+                <span>版本</span>
+                <Tooltip title={currentVersionName || ''} placement="bottom">
+                  <span className="charts-inner-versionName">{currentVersionName || ''}</span>
+                </Tooltip>
+              </div>
             </div>
             <ul className="charts-legend">
               <li>

@@ -26,7 +26,7 @@ class UncompleteTaskHome extends Component {
           completeInfo: res,
           loading: false,
         });
-      });  
+      });
   }
 
   render() {
@@ -42,7 +42,7 @@ class UncompleteTaskHome extends Component {
            <Progress
              percent={completeInfo.unresolved / completeInfo.all * 100}
              title={completeInfo.unresolved}
-             unit={'个'}
+             unit="个"
            />
          )
        }
