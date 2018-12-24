@@ -169,6 +169,7 @@ export default class IssueFilterControler {
     if (IssueStore.getParamFilter && barFilters.indexOf(IssueStore.getParamFilter) === -1) {
       const filter = this.cache.get('userFilter');
       Object.assign(filter.otherArgs, {
+        assigneeId: [],
         component: [],
         epic: [],
         issueIds: [],
