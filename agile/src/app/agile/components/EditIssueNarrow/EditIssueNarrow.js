@@ -2024,7 +2024,6 @@ class CreateSprint extends Component {
                             </div>
                             <div className="c7n-value-wrapper c7n-value-component-wrapper">
                               <ReadAndEdit
-                                limit={10}
                                 callback={this.changeRae.bind(this)}
                                 thisType="componentIssueRelDTOList"
                                 handleEnter
@@ -2106,7 +2105,6 @@ class CreateSprint extends Component {
                         </div>
                         <div className="c7n-value-wrapper">
                           <ReadAndEdit
-                            limit={10}
                             callback={this.changeRae.bind(this)}
                             thisType="labelIssueRelDTOList"
                             current={currentRae}
@@ -2684,7 +2682,7 @@ class CreateSprint extends Component {
                                 )}
                               >
                                 <TextArea
-                                  maxLength={44}
+                                  maxLength={10}
                                   style={{ width: '200px' }}
                                   value={epicName}
                                   size="small"

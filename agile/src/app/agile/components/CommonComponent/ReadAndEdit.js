@@ -45,7 +45,7 @@ class ReadAndEdit extends Component {
     const {
       current, thisType, style, line,
       origin, onInit, callback, children,
-      readModeContent, onOk, onCancel, limit,
+      readModeContent, onOk, onCancel,
     } = this.props;
     return (
       <div
@@ -97,12 +97,7 @@ class ReadAndEdit extends Component {
         }
         {
           (current === thisType) && (
-            <div style={{ display: 'flex', justifyContent: `${limit ? 'space-between' : 'flex-end'}` }}>
-              {
-              limit && (
-                <div style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: 2 }}>{`输入时只能保存${limit}个字符`}</div>
-              )
-            }
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <div
                 style={{
                   backgroundColor: 'rgba(0, 0, 0, 0.08)',
