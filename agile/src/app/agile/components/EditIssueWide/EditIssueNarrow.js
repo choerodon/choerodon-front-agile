@@ -1301,12 +1301,8 @@ class CreateSprint extends Component {
                     }}
                   >
                     {branchs.totalCommit || '0'}
-
-
-
-
-                    提交
-                                    </span>
+                    {'提交'}
+                    </span>
                 </div>
                 <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                   <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1351,12 +1347,8 @@ class CreateSprint extends Component {
                     }}
                   >
                     {branchs.totalMergeRequest}
-
-
-
-
-                    合并请求
-                                    </span>
+                    {'合并请求'}
+                    </span>
                   <span
                     style={{
                       width: 36,
@@ -2408,6 +2400,7 @@ class CreateSprint extends Component {
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit
+                                limit={10}
                                 callback={this.changeRae.bind(this)}
                                 thisType="componentIssueRelDTOList"
                                 current={currentRae}
@@ -2495,6 +2488,7 @@ class CreateSprint extends Component {
                           </div>
                           <div className="c7n-value-wrapper">
                             <ReadAndEdit
+                              limit={10}
                               callback={this.changeRae.bind(this)}
                               thisType="labelIssueRelDTOList"
                               current={currentRae}
