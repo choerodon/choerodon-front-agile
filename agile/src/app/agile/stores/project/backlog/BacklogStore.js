@@ -28,6 +28,8 @@ class BacklogStore {
 
   @observable clickIssueDetail = {};
 
+  @observable clickIssueId = null;
+
   @observable sprintCompleteMessage = {};
 
   @observable openSprintDetail = {};
@@ -271,8 +273,15 @@ class BacklogStore {
     return toJS(this.clickIssueDetail);
   }
 
+  @computed get getClickIssueId() {
+    return toJS(this.clickIssueId);
+  }
+
   @action setClickIssueDetail(data) {
     this.clickIssueDetail = data;
+    if (this.clickIssueDetail) {
+      this.clickIssueId = data.issueId;
+    }
   }
 
   axiosUpdateIssuesToVersion(versionId, ids) {
@@ -356,8 +365,6 @@ class BacklogStore {
   }
 
   @action setSprintData(data) {
-    let data1 = this.getSprintData;
-    data1 = null;
     this.sprintData = data;
   }
 

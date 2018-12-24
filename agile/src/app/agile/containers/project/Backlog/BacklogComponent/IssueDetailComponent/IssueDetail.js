@@ -7,12 +7,9 @@ import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 @inject('AppState')
 @observer
 class IssueDetail extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   componentDidMount() {
-    this.props.onRef(this);
+    const { onRef } = this.props;
+    onRef(this);
   }
 
   /**
@@ -39,26 +36,27 @@ class IssueDetail extends Component {
 
   render() {
     // const { paramOpenIssueId } = this.state;
+    const { visible, cancelCallback, refresh } = this.props;
     return (
       <div
-        className={this.props.visible ? 'c7n-issueDetail-container' : ''}
+        className={visible ? 'c7n-issueDetail-container' : ''}
       >
-        {this.props.visible ? (
+        {visible ? (
           <EditIssue
             store={BacklogStore}
             onRef={(ref) => {
               this.editIssue = ref;
             }}
-            issueId={BacklogStore.getClickIssueDetail.issueId}
+            issueId={BacklogStore.getClickIssueId}
             onCancel={() => {
               BacklogStore.setClickIssueDetail({});
               BacklogStore.setIsLeaveSprint(false);
-              this.props.cancelCallback();
+              cancelCallback();
             }}
             onDeleteIssue={() => {
               BacklogStore.setClickIssueDetail({});
               BacklogStore.setIsLeaveSprint(false);
-              this.props.refresh();
+              refresh();
             }}
             onCreateVersion={() => {
               BacklogStore.axiosGetVersion().then((data2) => {
