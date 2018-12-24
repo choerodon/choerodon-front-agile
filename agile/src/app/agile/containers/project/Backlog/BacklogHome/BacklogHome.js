@@ -37,7 +37,6 @@ class BacklogHome extends Component {
       }
     });
     BacklogStore.clearSprintFilter();
-    BacklogStore.setClickIssueDetail({});
     this.refresh();
     this.loadQuickFilter();
     const url = this.handleRequest(location.search);

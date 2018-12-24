@@ -34,7 +34,7 @@ import UserHead from '../UserHead';
 import Comment from './Component/Comment';
 import WikiItem from './Component/WikiItem';
 import Log from './Component/Log';
-import DataLogs from "./Component/DataLogs";
+import DataLogs from './Component/DataLogs';
 import DataLog from './Component/DataLog';
 import IssueList from './Component/IssueList';
 import LinkList from './Component/LinkList';
@@ -208,7 +208,7 @@ class CreateSprint extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { issueId } = this.props;
-    if (nextProps.issueId !== issueId) {
+    if (nextProps.issueId && nextProps.issueId !== issueId) {
       this.setState({
         currentRae: undefined,
       });
@@ -397,6 +397,47 @@ class CreateSprint extends Component {
       handleFileUpload(arr, this.addFileToFileList, config);
     }
   };
+
+  onDeleteWiki = async (id) => {
+    const { origin } = this.state;
+    const { issueId } = origin;
+    await deleteWiki(id);
+    const res = await loadWikies(issueId);
+    this.setState({
+      wikies: res || [],
+    });
+  };
+
+  onWikiCreate = async () => {
+    const { origin } = this.state;
+    const { issueId } = origin;
+    this.setState({ addWiki: false });
+    const res = await loadWikies(issueId);
+    this.setState({
+      wikies: res || [],
+    });
+  };
+
+  renderWiki = () => {
+    const { wikies } = this.state;
+    return (
+      <div>
+        {
+          wikies && wikies.wikiRelationList
+          && wikies.wikiRelationList.map(wiki => (
+            <WikiItem
+              key={wiki.id}
+              wiki={wiki}
+              onDeleteWiki={this.onDeleteWiki}
+              wikiHost={wikies.wikiHost}
+              type="narrow"
+            />
+          ))
+        }
+      </div>
+    );
+  };
+
 
   /**
    * Comment
@@ -686,7 +727,7 @@ class CreateSprint extends Component {
       });
   };
 
-  isInLook(ele) {
+  isInLook = (ele) => {
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
     // return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
@@ -770,7 +811,7 @@ class CreateSprint extends Component {
     }, () => {
       loadIssue(issueId).then((res) => {
         this.setAnIssueToState(res);
-        store.setClickIssueDetail(res);
+        // store.setClickIssueDetail(res);
         this.setState({
           createdById: res.createdBy,
         });
@@ -944,46 +985,6 @@ class CreateSprint extends Component {
       currentRae,
     });
   }
-
-  onDeleteWiki = async (id) => {
-    const { origin } = this.state;
-    const { issueId } = origin;
-    await deleteWiki(id);
-    const res = await loadWikies(issueId);
-    this.setState({
-      wikies: res || [],
-    });
-  };
-
-  onWikiCreate = async () => {
-    const { origin } = this.state;
-    const { issueId } = origin;
-    this.setState({ addWiki: false });
-    const res = await loadWikies(issueId);
-    this.setState({
-      wikies: res || [],
-    });
-  };
-
-  renderWiki = () => {
-    const { wikies } = this.state;
-    return (
-      <div>
-        {
-          wikies && wikies.wikiRelationList
-          && wikies.wikiRelationList.map(wiki => (
-            <WikiItem
-              key={wiki.id}
-              wiki={wiki}
-              onDeleteWiki={this.onDeleteWiki}
-              wikiHost={wikies.wikiHost}
-              type="narrow"
-            />
-          ))
-        }
-      </div>
-    );
-  };
 
   /**
    * Comment
