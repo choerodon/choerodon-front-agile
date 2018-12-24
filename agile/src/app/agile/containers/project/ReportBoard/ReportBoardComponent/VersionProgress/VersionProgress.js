@@ -195,7 +195,7 @@ class VersionProgress extends Component {
         }
         this.setState({
           loading: false,
-          versionProgressInfo: _.reverse(res),
+          versionProgressInfo: res,
         });
       });
   }
