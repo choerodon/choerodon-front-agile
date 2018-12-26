@@ -26,6 +26,7 @@ class ReleaseDetail extends Component {
     this.state = {
       publicVersion: false,
       tab: null,
+      release: false,
     };
   }
 
@@ -272,7 +273,7 @@ class ReleaseDetail extends Component {
       }))],
     ]);
     const { history, match } = this.props;
-    const { loading, publicVersion } = this.state;
+    const { loading, publicVersion, release } = this.state;
     const columns = [
       {
         width: '10%',
@@ -415,7 +416,7 @@ class ReleaseDetail extends Component {
                       )
                         .then((res) => {
                           ReleaseStore.setPublicVersionDetail(res);
-                          this.setState({ publicVersion: true });
+                          this.setState({ publicVersion: true, release: res });
                         }).catch((error) => {
                         });
                     } else {
@@ -585,6 +586,7 @@ class ReleaseDetail extends Component {
             </div>
 
             <PublicRelease
+              release={release}
               visible={publicVersion}
               onCancel={() => {
                 this.setState({
