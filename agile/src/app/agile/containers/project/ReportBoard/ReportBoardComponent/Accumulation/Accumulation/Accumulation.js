@@ -249,6 +249,13 @@ class Accumulation extends Component {
     axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/cumulative_flow_diagram`, obj)
       .then((res) => {
         let newxAxis = [];
+        _.map(res, (item) => {
+          if (item.coordinateDTOList && item.coordinateDTOList.length) {
+            _.map(item.coordinateDTOList, (subItem) => {
+              subItem.issueCount = subItem.issueCount < 0 ? 0 : subItem.issueCount;
+            });
+          }
+        });
         res.forEach((v) => {
           const temp = newxAxis.concat(_.map(v.coordinateDTOList, 'date'));
           const uniq = [...new Set(temp)];

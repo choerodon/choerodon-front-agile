@@ -154,6 +154,13 @@ class AccumulationHome extends Component {
       startDate,
       boardId,
     }).then((res) => {
+      _.map(res, (item) => {
+        if (item.coordinateDTOList && item.coordinateDTOList.length) {
+          _.map(item.coordinateDTOList, (subItem) => {
+            subItem.issueCount = subItem.issueCount < 0 ? 0 : subItem.issueCount;
+          });
+        }
+      });
       AccumulationStore.setAccumulationData(res);
       this.setState({
         loading: false,
@@ -468,14 +475,14 @@ class AccumulationHome extends Component {
         >
           <div className="c7n-accumulation-filter">
             <RangePicker
-                value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
-                allowClear={false}
-                onChange={(date, dateString) => {
+              value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
+              allowClear={false}
+              onChange={(date, dateString) => {
                   AccumulationStore.setStartDate(moment(dateString[0]));
                   AccumulationStore.setEndDate(moment(dateString[1]));
                   this.getData();
                 }}
-              />
+            />
             {
                 this.getFilterData().map((item, index) => (
                   <Popover
