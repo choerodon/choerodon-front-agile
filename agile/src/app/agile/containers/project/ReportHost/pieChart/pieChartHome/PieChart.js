@@ -28,18 +28,18 @@ const Option = Select.Option;
 const { AppState } = stores;
 const { RangePicker } = DatePicker;
 let backUrl;
-const chooseDimension = [
-  {
-    key: 'sprint',
-    name: '迭代冲刺',
-  }, {
-    key: 'version',
-    name: '版本',
-  }, {
-    key: 'timeRange',
-    name: '时间',
-  },
-];
+// const chooseDimension = [
+//   {
+//     key: 'sprint',
+//     name: '迭代冲刺',
+//   }, {
+//     key: 'version',
+//     name: '版本',
+//   }, {
+//     key: 'timeRange',
+//     name: '时间',
+//   },
+// ];
 
 @observer
 class ReleaseDetail extends Component {
@@ -55,6 +55,18 @@ class ReleaseDetail extends Component {
         sprint: [],
         version: [],
       },
+      chooseDimensionType: [
+        {
+          key: 'sprint',
+          name: '冲刺',
+        }, {
+          key: 'version',
+          name: '修复版本',
+        }, {
+          key: 'timeRange',
+          name: '时间',
+        },
+      ],
       currentChooseDimension: '',
       currentSprintChoose: '',
       currentVersionChoose: '',
@@ -255,7 +267,53 @@ class ReleaseDetail extends Component {
 
   changeType =(value, option) => {
     // VersionReportStore.setPieData([]);
-    this.setState({ type: option.key, value });
+    this.setState({ 
+      type: option.key, 
+      value,
+      currentChooseDimension: '',
+      
+    });
+    if (value === 'sprint') {
+      this.setState({
+        chooseDimensionType: [
+          {
+            key: 'version',
+            name: '修复版本',
+          }, {
+            key: 'timeRange',
+            name: '时间',
+          },
+        ],
+      });
+    } else if (value === 'version') {
+      this.setState({
+        chooseDimensionType: [
+          {
+            key: 'sprint',
+            name: '冲刺',
+          }, {
+            key: 'timeRange',
+            name: '时间',
+          },
+        ],
+      });
+    } else {
+      this.setState({
+        chooseDimensionType: [
+          {
+            key: 'sprint',
+            name: '冲刺',
+          }, {
+            key: 'version',
+            name: '修复版本',
+          }, {
+            key: 'timeRange',
+            name: '时间',
+          },
+        ],
+      });
+    }
+   
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
   };
 
@@ -289,18 +347,48 @@ class ReleaseDetail extends Component {
     return `${QUERY[type]}${value === null ? '0' : value}`;
   }
 
+  getCurrentChoose() {
+    const {
+      currentChooseDimension, currentSprintChoose, currentVersionChoose, startDate, endDate, 
+    } = this.state;
+    const CHOOSEQUERY = {
+      sprint: `&paramChoose=sprint&paramCurrentSprint=${currentSprintChoose}`,
+      version: `&paramChoose=version&paramCurrentVersion=${currentVersionChoose}`,
+      timeRange: startDate && endDate && `&paramChoose=timeRange&paramStartDate=${startDate.format().substring(0, 10)}&paramEndDate=${endDate.format().substring(0, 10)}`,
+    };
+    return (currentChooseDimension && CHOOSEQUERY[currentChooseDimension]) ? CHOOSEQUERY[currentChooseDimension] : '';
+  }
+
   handleLinkToIssue(item) {
     const urlParams = AppState.currentMenuType;
     const {
       type, id, organizationId,
     } = urlParams;
     const { history } = this.props;
-    const { value } = this.state;
+    const {
+      value, sprintAndVersion, currentChooseDimension, currentSprintChoose, currentVersionChoose, startDate, endDate, 
+    } = this.state;
     const { typeName, name } = item;
     const queryString = this.getQueryString(value, typeName);
+    const chooseQueryString = this.getCurrentChoose();
+    let paramName = name || '未分配';
+    if (currentChooseDimension === 'sprint') {
+      paramName += `、冲刺为${sprintAndVersion.sprint.find(sprintItem => sprintItem.sprintId === currentSprintChoose).sprintName}`;
+    }
+
+    if (currentChooseDimension === 'version') {
+      paramName += `、修复版本为${sprintAndVersion.version.find(versionItem => versionItem.versionId === currentVersionChoose).name}`;
+    }
+
+    if (currentChooseDimension === 'timeRange' && startDate && endDate) {
+      paramName += `、时间范围为${startDate.format().substring(0, 10)}到${endDate.format().substring(0, 10)}`;
+    }
+
+    paramName += '下的问题';
+
     if (!queryString) return;
     history.push(
-      `/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${organizationId}&${queryString}&paramName=${name || '未分配'}下的问题&paramUrl=reporthost/pieReport`,
+      `/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${organizationId}&${queryString}${`${chooseQueryString || ''}`}&paramName=${paramName}&paramUrl=reporthost/pieReport`,
     );
   }
 
@@ -353,44 +441,43 @@ class ReleaseDetail extends Component {
     } = this.state;
     return (
       <div>
-      
         {
-              currentChooseDimension === 'timeRange' ? (
-                <RangePicker
-                  className="c7n-pieChart-filter-item"
-                  style={{ minWidth: 160 }}
-                  value={[startDate, endDate]}
-                  allowClear={false}
-                  disabledDate={current => current && current > moment().endOf('day')}
-                  onChange={(date, dateString) => {
-                    this.setState({
-                      startDate: moment(dateString[0]),
-                      endDate: moment(dateString[1]),
-                    });
-                    VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, '', '', dateString[0], dateString[1]);
-                  }}
-                />
-              ) : (
-                <Select 
-                  className="c7n-pieChart-filter-item"
-                  style={{ minWidth: 200 }}
-                  value={currentChooseDimension === 'version' ? (
-                    sprintAndVersion.version.find(item => item.versionId === currentVersionChoose) && sprintAndVersion.version.find(item => item.versionId === currentVersionChoose).name) : (
-                    sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose) && sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose).sprintName)
-                    } 
-                  onChange={this.handleSecondChooseChange}
-                >
-                  {
-                    sprintAndVersion && currentChooseDimension && sprintAndVersion[currentChooseDimension] && sprintAndVersion[currentChooseDimension].map((item) => {
-                      if (currentChooseDimension === 'version') {
-                        return <Option key={item.versionId} value={item.versionId}>{item.name}</Option>;
-                      }
-                      if (currentChooseDimension === 'sprint') {
-                        return <Option key={item.sprintId} value={item.sprintId}>{item.sprintName}</Option>;
-                      }
-                    })
+          currentChooseDimension === 'timeRange' ? (
+            <RangePicker
+              className="c7n-pieChart-filter-item"
+              style={{ minWidth: 160 }}
+              value={[startDate, endDate]}
+              allowClear={false}
+              disabledDate={current => current && current > moment().endOf('day')}
+              onChange={(date, dateString) => {
+                this.setState({
+                  startDate: moment(dateString[0]),
+                  endDate: moment(dateString[1]),
+                });
+                VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, '', '', dateString[0], dateString[1]);
+              }}
+            />
+          ) : (
+            <Select 
+              className="c7n-pieChart-filter-item"
+              style={{ minWidth: 200 }}
+              value={currentChooseDimension === 'version' ? (
+                sprintAndVersion.version.find(item => item.versionId === currentVersionChoose) && sprintAndVersion.version.find(item => item.versionId === currentVersionChoose).name) : (
+                sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose) && sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose).sprintName)
+                } 
+              onChange={this.handleSecondChooseChange}
+            >
+              {
+                sprintAndVersion && currentChooseDimension && sprintAndVersion[currentChooseDimension] && sprintAndVersion[currentChooseDimension].map((item) => {
+                  if (currentChooseDimension === 'version') {
+                    return <Option key={item.versionId} value={item.versionId}>{item.name}</Option>;
                   }
-                </Select>)
+                  if (currentChooseDimension === 'sprint') {
+                    return <Option key={item.sprintId} value={item.sprintId}>{item.sprintName}</Option>;
+                  }
+                })
+              }
+            </Select>)
         }      
       </div>
      
@@ -430,7 +517,7 @@ class ReleaseDetail extends Component {
 
   render() {
     const {
-      value, showOtherTooltip, sprintAndVersion, currentChooseDimension, currentSprintChoose, currentVersionChoose, startDate, endDate,
+      value, showOtherTooltip, chooseDimensionType, sprintAndVersion, currentChooseDimension, currentSprintChoose, currentVersionChoose, startDate, endDate,
     } = this.state;
     const data = VersionReportStore.getPieData;
     const sourceData = VersionReportStore.getSourceData;
@@ -472,101 +559,7 @@ class ReleaseDetail extends Component {
           description="根据指定字段以统计图呈现项目或筛选器下的问题，这可以使您一目了然地了解问题详情。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/statistical/"
         >
-          {/* <Spin spinning={VersionReportStore.pieLoading}>
-            {data.length ? (
-              <React.Fragment>
-                <div className="c7n-pieChart-filter">
-                  <Select
-                    className="c7n-pieChart-filter-item"
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                    defaultValue={value}
-                    value={value}
-                    label="统计类型"
-                    onChange={this.changeType}
-                  >
-                    {
-                  type.map(item => (
-                    <Option value={item.value} key={item.title}>{item.title}</Option>
-                  ))
-                }
-                  </Select>
-                  <Select 
-                    className="c7n-pieChart-filter-item"
-                    style={{ minWidth: 70 }}
-                    label="选择维度" 
-                    defaultValue={chooseDimension[0].name} 
-                    value={chooseDimension.find(item => item.key === currentChooseDimension) && chooseDimension.find(item => item.key === currentChooseDimension).name} 
-                    onChange={this.handleChooseDimensionChange}
-                  >
-                    {
-                      chooseDimension.map(item => <Option key={item.key} value={item.key}>{item.name}</Option>)
-                    }
-                  </Select>  
-                  {
-                    currentChooseDimension ? this.renderChooseDimension() : '' 
-                  }
-                </div>
-                <div style={{
-                  display: 'flex', justifyContent: 'flex-start', alignItems: 'center', 
-                }}
-                >
-                  <ReactEchartsCore
-                    ref={(pie) => { this.pie = pie; }}
-                    style={{ width: '58%', height: 500 }}
-                    echarts={echarts}
-                    option={this.getOption()}
-                  />
-                 
-                  <div className="pie-otherTooltip" style={{ display: `${showOtherTooltip ? 'block' : 'none'}` }}>
-                    <div className="pie-otherTooltip-wrap" />
-                    <div className="pie-otherTooltip-item-wrap">
-                      {this.renderOtherTooltip()}
-                    </div>
-                   
-                  </div>
-                  <div className="pie-title">
-                    <p className="pie-legend-title">数据统计</p>
-                    <table>
-                      <thead>
-                        <tr>
-                          <td style={{ width: '158px' }}>{this.state.type}</td>
-                          <td style={{ width: '62px' }}>问题</td>
-                          <td style={{ paddingRight: 35 }}>百分比</td>
-                        </tr>
-                      </thead>
-                    </table>
-                    <table className="pie-legend-tbody">
-                      {
-                        sourceData.map((item, index) => (
-                          <tr>
-                            <td style={{ width: '158px' }}>
-                              <div className="pie-legend-icon" style={{ background: colors[index] }} />
-                              <Tooltip title={item && item.name}>
-                                <div className="pie-legend-text">{item.name ? item.name : '未分配'}</div>
-                              </Tooltip>
-                            </td>
-                            <td style={{ width: '62px' }}>
-                              <a
-                                role="none"
-                                onClick={this.handleLinkToIssue.bind(this, item)}
-                              >
-                                {item.value}
-                              </a>
-                            </td>
-                            <td style={{ width: '62px', paddingRight: 15 }}>{`${(item.percent).toFixed(2)}%`}</td>
-                          </tr>
-                        ))
-                      }
-                    </table>        
-                  </div>
-                </div>
-              </React.Fragment>
-            ) : <NoDataComponent title="问题" links={[{ name: '问题管理', link: '/agile/issue' }]} img={pic} /> }
-          </Spin> */}
-
-
           <Spin spinning={VersionReportStore.pieLoading}>
-
             <div className="c7n-pieChart-filter">
               <Select
                 className="c7n-pieChart-filter-item"
@@ -586,12 +579,12 @@ class ReleaseDetail extends Component {
                 className="c7n-pieChart-filter-item"
                 style={{ minWidth: 70 }}
                 label="选择维度" 
-                defaultValue={chooseDimension[0].name} 
-                value={chooseDimension.find(item => item.key === currentChooseDimension) && chooseDimension.find(item => item.key === currentChooseDimension).name} 
+                defaultValue={chooseDimensionType[0].name} 
+                value={chooseDimensionType.find(item => item.key === currentChooseDimension) && chooseDimensionType.find(item => item.key === currentChooseDimension).name} 
                 onChange={this.handleChooseDimensionChange}
               >
                 {
-                  chooseDimension.map(item => <Option key={item.key} value={item.key}>{item.name}</Option>)
+                  chooseDimensionType.map(item => <Option key={item.key} value={item.key}>{item.name}</Option>)
                 }
               </Select>  
               {

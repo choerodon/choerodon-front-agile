@@ -22,12 +22,15 @@ class EditBoardName extends Component {
       loading: false,
       initialBoardName: '',
       boardName: '',
+      lastBoardName: '',
     };
   }
 
   componentDidMount() {
+    const initialBoardName = ScrumBoardStore.getBoardList.find(item => item.boardId === ScrumBoardStore.getSelectedBoard).name;
     this.setState({
-      initialBoardName: ScrumBoardStore.getBoardList.find(item => item.boardId === ScrumBoardStore.getSelectedBoard).name,
+      initialBoardName,
+      lastBoardName: initialBoardName,
     });
   }
 
@@ -69,6 +72,7 @@ class EditBoardName extends Component {
       if (!err && modify) {
         this.setState({
           loading: true,
+          lastBoardName: value.boardName,
         });
         axios.put(`/agile/v1/projects/${data.projectId}/board/${data.boardId}?boardName=${encodeURIComponent(data.name)}`, data)
           .then(() => {
@@ -76,16 +80,16 @@ class EditBoardName extends Component {
               loading: false,
             });
             message.success('保存成功');
-            history.push(`/agile/scrumboard?type=project&id=${data.projectId}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
+            // history.push(`/agile/scrumboard?type=project&id=${data.projectId}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
           });
       }
     });
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator, setFieldsValue } = this.props.form;
     const {
-      initialBoardName, loading, 
+      initialBoardName, loading, boardName, lastBoardName,
     } = this.state;
     return (
       <Content
@@ -124,7 +128,15 @@ class EditBoardName extends Component {
               funcType="raised"
               style={{ marginLeft: 12 }}
               onClick={() => {
-                this.props.history.push(`/agile/scrumboard?type=project&id=${AppState.currentMenuType.id}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
+                setFieldsValue({
+                  boardName: lastBoardName,
+                });
+                this.setState({
+                  boardName: initialBoardName,
+                }, () => {
+                  console.log(this.state.boardName);
+                });
+                // this.props.history.push(`/agile/scrumboard?type=project&id=${AppState.currentMenuType.id}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
               }}
             >
               {'取消'}

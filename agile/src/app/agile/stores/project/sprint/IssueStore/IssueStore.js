@@ -48,6 +48,8 @@ class SprintCommonStore {
           sprint: '',
           summary: '',
           version: '',
+          createStartDate: '',
+          createEndDate: '',
         },
       },
     ],

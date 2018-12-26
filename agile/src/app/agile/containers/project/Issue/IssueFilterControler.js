@@ -43,7 +43,7 @@ export default class IssueFilterControler {
         [paramKey]: paramValue,
       });
     });
-    // 版本跳转 => otherArgs 设置对应 tpye 所需信息
+    // 版本跳转 => otherArgs 设置对应 tpye 所需信息 
     if (paramObj.paramType && paramObj.paramId) {
       filter.otherArgs[paramObj.paramType] = [paramObj.paramId];
     }
@@ -52,8 +52,39 @@ export default class IssueFilterControler {
       filter.otherArgs.issueIds = [paramObj.paramIssueId.toString()];
       paramIssueSelected = true;
     }
+
+    // 饼图选择版本或冲刺或时间维度设置相应的filter
+    const { paramChoose } = paramObj;
+    if (paramChoose) {
+      if (paramChoose === 'sprint') {
+        filter.otherArgs.sprint = [paramObj.paramCurrentSprint];
+      }
+      if (paramChoose === 'version') {
+        filter.otherArgs.version = [paramObj.paramCurrentVersion];
+      }
+      if (paramChoose === 'timeRange') {
+        filter.searchArgs.createStartDate = `${paramObj.paramStartDate} 00:00:00`;
+        filter.searchArgs.createEndDate = `${paramObj.paramEndDate} 00:00:00`;
+      }
+    }
+      
+    // 饼图选择了问题类型或者优先级后的跳转
+    const { paramPriority, paramIssueType } = paramObj;
+    if (paramPriority) {
+      filter.advancedSearchArgs.priorityId = [paramPriority];
+    }
+    if (paramIssueType) {
+      filter.advancedSearchArgs.issueTypeId = [paramIssueType];
+    }
+
+    // 饼图选择了解决未解决后的跳转  
+    const { paramType, paramId } = paramObj;
+    if (paramType === 'resolution') {
+      filter.otherArgs.resolution = (paramId === '1' ? 'true' : 'false');
+    }
+
     // 暂时未知的跳转
-    filter.otherArgs.resolution = paramObj.resolution;
+    // filter.otherArgs.resolution = paramObj.resolution;
     // 缓存初始化过的 filter，存入 store
     this.cache.set('paramFilter', filter);
     IssueStore.setFilterMap(this.cache);
