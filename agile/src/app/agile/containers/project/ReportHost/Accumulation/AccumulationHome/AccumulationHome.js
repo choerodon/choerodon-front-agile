@@ -14,7 +14,6 @@ import AccumulationStore from '../../../../../stores/project/accumulation/Accumu
 import AccumulationFilter from '../AccumulationComponent/AccumulationFilter';
 import './AccumulationHome.scss';
 import '../../BurndownChart/BurndownChartHome/BurndownChartHome.scss';
-import txt from '../test';
 import NoDataComponent from '../../Component/noData';
 import pic from '../../../../../assets/image/emptyChart.svg';
 import SwithChart from '../../Component/switchChart';
