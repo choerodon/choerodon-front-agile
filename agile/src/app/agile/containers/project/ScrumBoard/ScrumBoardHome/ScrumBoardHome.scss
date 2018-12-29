@@ -15,6 +15,9 @@
   .c7n-scrumboard-content {
     overflow: auto;
     height: calc(100vh - 230px);
+    .c7n-scrumboard-container {
+      padding-bottom: 83px;
+    }
     .c7n-scrumboard-others {
       padding: 0 24px;
 
@@ -120,11 +123,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     height: 20px;
-  }
-
-  .c7n-scrumboard-container {
-    overflow: auto;
-    padding-bottom: 83px;
   }
 }
 .wrapSpin {
