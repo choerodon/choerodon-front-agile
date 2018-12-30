@@ -10,7 +10,7 @@ import './rc-calendar.scss';
 import './WorkCalender.scss';
 
 const format = 'YYYY-MM-DD';
-const test = 'YYYY-M-DD';
+const holidayFormat = 'YYYY-M-D';
 
 @observer
 class WorkCalendar extends Component {
@@ -64,6 +64,7 @@ class WorkCalendar extends Component {
       );
     }
     const date = current.format(format);
+    const holidayFormatedDate = current.format(holidayFormat);
     const weekdays = [
       saturdayWork ? null : '六',
       sundayWork ? null : '日',
@@ -87,7 +88,7 @@ class WorkCalendar extends Component {
     // 判断是否为法定假期
     let holidayInfo = [];
     if (useHoliday && holidayRefs.length) {
-      holidayInfo = holidayRefs.filter(d => d.holiday === date);
+      holidayInfo = holidayRefs.filter(d => d.holiday === holidayFormatedDate);
     }
     // 冲刺自定义设置
     const workDate = workDates.length
@@ -98,8 +99,18 @@ class WorkCalendar extends Component {
 
     let holidayTag = null;
 
-    const startDateCopy = moment(startDate).format(test);
-    const endDateCopy = moment(endDate).format(test);
+    const startDateCopy = moment(startDate).format(format);
+    const endDateCopy = moment(endDate).format(format);
+
+    if (workDate.length) {
+      dateStyle = workDate[0].status === 1 ? workDayStyle : notWorkDayStyle;
+    } else if (selectDay.length) {
+      dateStyle = selectDay[0].status === 1 ? workDayStyle : notWorkDayStyle;
+    } else if (isWeekDay) {
+      dateStyle = notWorkDayStyle;
+    } else {
+      dateStyle = workDayStyle;
+    }
 
     if (startDateCopy === date || endDateCopy === date) {
       if (now.format('DD') === moment(date).format('DD')) {
@@ -112,9 +123,9 @@ class WorkCalendar extends Component {
         holidayTag = (
           <React.Fragment>
             {
-              workDate.length && (workDate[0].status === 1 || holidayInfo[0].status === 1)
-                ? (<span className="tag tag-work" style={{ background: 'none' }}>班</span>)
-                : (<span className="tag tag-notwork">休</span>)
+              workDate.length && (workDate[0].status === 0 || holidayInfo[0].status === 0)
+                ? (<span className="tag tag-notwork">休</span>)
+                : (<span className="tag tag-work" style={{ background: 'none' }}>班</span>)
             }
             <span className="des">{holidayInfo[0].name}</span>
           </React.Fragment>
@@ -128,27 +139,24 @@ class WorkCalendar extends Component {
       } else {
         holidayTag = <span className="tag tag-work" style={{ background: 'none' }}>班</span>;
       }
-    } else if (workDate.length) {
-      dateStyle = workDate[0].status === 1 ? workDayStyle : notWorkDayStyle;
-    } else if (selectDay.length) {
-      dateStyle = selectDay[0].status === 1 ? workDayStyle : notWorkDayStyle;
     } else if (useHoliday && holidayInfo.length) {
-      dateStyle = holidayInfo[0].status === 1 ? holiadyWorkDayStyle : notWorkDayStyle;
-      holidayTag = (
-        <React.Fragment>
-          {
-            holidayInfo[0].status === 1
-              ? <span className="tag tag-work">班</span>
-              : <span className="tag tag-notwork">休</span>
-          }
-          <span className="des">{holidayInfo[0].name}</span>
-        </React.Fragment>
-      );
-    } else if (isWeekDay) {
-      dateStyle = notWorkDayStyle;
-    } else {
-      dateStyle = workDayStyle;
+      if (workDate.length) {
+        dateStyle = workDate[0].status === 0 ? notWorkDayStyle : workDayStyle;
+      } else {
+        dateStyle = holidayInfo[0].status === 1 ? holiadyWorkDayStyle : notWorkDayStyle;
+        holidayTag = (
+          <React.Fragment>
+            {
+              holidayInfo[0].status === 1
+                ? <span className="tag tag-work">班</span>
+                : <span className="tag tag-notwork">休</span>
+            }
+            <span className="des">{holidayInfo[0].name}</span>
+          </React.Fragment>
+        );
+      }
     }
+
     return (
       <div className="rc-calendar-date" style={dateStyle}>
         {holidayTag}
@@ -227,7 +235,7 @@ class WorkCalendar extends Component {
       let isWorkDay = !weekdays.includes(dayOfWeek); // 是否是周末
       if (useHoliday && holidayRefs.length) {
         _.forEach(holidayRefs, (item) => {
-          if (item.holiday === selectDate) {
+          if (item.holiday === date.format(holidayFormat)) {
             isWorkDay = item.status === 1; // 是否是节假日及调休日期
           }
         });
