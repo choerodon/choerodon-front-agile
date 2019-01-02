@@ -64,7 +64,7 @@ export default class IssueFilterControler {
       }
       if (paramChoose === 'timeRange') {
         filter.searchArgs.createStartDate = `${paramObj.paramStartDate} 00:00:00`;
-        filter.searchArgs.createEndDate = `${paramObj.paramEndDate} 00:00:00`;
+        filter.searchArgs.createEndDate = `${paramObj.paramEndDate} 23:59:59`;
       }
     }
       

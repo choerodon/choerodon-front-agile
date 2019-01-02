@@ -61,6 +61,14 @@ class ScrumBoardHome extends Component {
 
   componentWillUnmount() {
     ScrumBoardStore.setClickIssueDetail({});
+    ScrumBoardStore.setBoardData([]);
+    ScrumBoardStore.setQuickSearchList([]);
+    ScrumBoardStore.setSprintData(false);
+    ScrumBoardStore.setAssigneer([]);
+    ScrumBoardStore.setCurrentSprint({});
+    ScrumBoardStore.setParentIds([]);
+    ScrumBoardStore.setEpicData([]);
+    ScrumBoardStore.setBoardList([]);
     this.removeEventListener();
   }
 
@@ -1081,36 +1089,42 @@ class ScrumBoardHome extends Component {
             <Icon type="playlist_add icon" />
             <span>创建看板</span>
           </Button>
-          <Select
-            className="select-without-underline"
-            value={ScrumBoardStore.getSelectedBoard}
-            style={{
-              maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: '28px',
-            }}
-            dropdownStyle={{
-              color: '#3F51B5',
-              width: 200,
-            }}
-            onChange={(value) => {
-              let newCode;
-              for (
-                let index = 0, len = ScrumBoardStore.getBoardList.length;
-                index < len;
-                index += 1) {
-                if (ScrumBoardStore.getBoardList[index].boardId === value) {
-                  ScrumBoardStore.setCurrentConstraint(
-                    ScrumBoardStore.getBoardList[index].columnConstraint,
-                  );
-                  newCode = ScrumBoardStore.getBoardList[index].userDefaultBoard;
-                }
-              }
-              ScrumBoardStore.setSelectedBoard(value);
-              ScrumBoardStore.setSwimLaneCode(newCode);
-              ScrumBoardStore.clearOtherQuestionCount();
-              this.refresh(value);
-            }}
-          >
-            {
+          {
+            ScrumBoardStore.getBoardList.length === 1 ? ScrumBoardStore.getBoardList.map((item, index, value) => (
+              <Tooltip key={item.boardId} title={item.name}>
+                <div style={{ color: '#3f51b5', margin: '0 20px' }}>{item.name}</div>
+              </Tooltip>
+            )) : (
+              <Select
+                className="select-without-underline"
+                value={ScrumBoardStore.getSelectedBoard}
+                style={{
+                  maxWidth: 100, color: '#3F51B5', margin: '0 30px', fontWeight: 500, lineHeight: '28px',
+                }}
+                dropdownStyle={{
+                  color: '#3F51B5',
+                  width: 200,
+                }}
+                onChange={(value) => {
+                  let newCode;
+                  for (
+                    let index = 0, len = ScrumBoardStore.getBoardList.length;
+                    index < len;
+                    index += 1) {
+                    if (ScrumBoardStore.getBoardList[index].boardId === value) {
+                      ScrumBoardStore.setCurrentConstraint(
+                        ScrumBoardStore.getBoardList[index].columnConstraint,
+                      );
+                      newCode = ScrumBoardStore.getBoardList[index].userDefaultBoard;
+                    }
+                  }
+                  ScrumBoardStore.setSelectedBoard(value);
+                  ScrumBoardStore.setSwimLaneCode(newCode);
+                  ScrumBoardStore.clearOtherQuestionCount();
+                  this.refresh(value);
+                }}
+              >
+                {
               ScrumBoardStore.getBoardList.map(item => (
                 <Option key={item.boardId} value={item.boardId}>
                   <Tooltip title={item.name}>
@@ -1119,7 +1133,10 @@ class ScrumBoardHome extends Component {
                 </Option>
               ))
             }
-          </Select>
+              </Select>
+            )
+          }
+         
           {
             (
               <Button

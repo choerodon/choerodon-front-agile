@@ -341,6 +341,7 @@ class ReleaseDetail extends Component {
       status: 'paramType=statusId&paramId=',
       sprint: 'paramType=sprint&paramId=',
       epic: 'paramType=epic&paramId=',
+      label: 'paramType=label&paramId=',
       resolution: 'paramType=resolution&paramId=',
     };
     if (!QUERY[type]) return null;
@@ -454,7 +455,7 @@ class ReleaseDetail extends Component {
                   startDate: moment(dateString[0]),
                   endDate: moment(dateString[1]),
                 });
-                VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, '', '', dateString[0], dateString[1]);
+                VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, '', '', `${dateString[0]} 00:00:00`, `${dateString[1]} 23:59:59`);
               }}
             />
           ) : (
@@ -536,6 +537,7 @@ class ReleaseDetail extends Component {
       { title: '状态', value: 'status' },
       { title: '冲刺', value: 'sprint' },
       { title: '史诗', value: 'epic' },
+      { title: '标签', value: 'label' },
       { title: '解决结果', value: 'resolution' },
     ];
 

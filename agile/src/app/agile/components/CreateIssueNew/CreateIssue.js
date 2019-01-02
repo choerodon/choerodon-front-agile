@@ -52,6 +52,8 @@ class CreateIssue extends Component {
       originUsers: [],
 
       defaultPriority: false,
+
+      newIssueType: '',
     };
   }
 
@@ -146,6 +148,8 @@ class CreateIssue extends Component {
           labelIssueRelDTOList,
           versionIssueRelDTOList: fixVersionIssueRelDTOList,
           componentIssueRelDTOList,
+          storyPoints: values.storyPoints,
+          remainingTime: values.estimatedTime,
         };
         this.setState({ createLoading: true });
         const deltaOps = delta;
@@ -208,7 +212,7 @@ class CreateIssue extends Component {
       originPriorities, defaultPriority, createLoading,
       edit, delta, originUsers, selectLoading,
       originEpics, originSprints, originFixVersions, originComponents,
-      originLabels, fileList,
+      originLabels, fileList, newIssueType,
     } = this.state;
     const callback = (value) => {
       this.setState({
@@ -242,6 +246,11 @@ class CreateIssue extends Component {
                   <Select
                     label="问题类型"
                     getPopupContainer={triggerNode => triggerNode.parentNode}
+                    onChange={((value) => {
+                      this.setState({
+                        newIssueType: value,
+                      });
+                    })}
                   >
                     {issueTypes.filter(t => t.typeCode !== 'sub_task').map(type => (
                       <Option key={type.id} value={type.id}>
@@ -319,6 +328,27 @@ class CreateIssue extends Component {
                 )
               }
               </div>
+
+              {
+                // 创建的问题类型为故事时，才显示故事点
+                newIssueType === 170 && (
+                  <FormItem label="故事点" style={{ width: 520 }}>
+                    {getFieldDecorator('storyPoints', {
+                      rules: [{}],
+                    })(
+                      <Input label="故事点" maxLength={3} suffix="点" />,
+                    )}
+                  </FormItem>
+                )
+              }
+
+              <FormItem label="预估时间" style={{ width: 520 }}>
+                {getFieldDecorator('estimatedTime', {
+                  rules: [{}],
+                })(
+                  <Input label="预估时间" maxLength={3} suffix="小时" />,
+                )}
+              </FormItem>
 
               <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
                 {getFieldDecorator('assigneedId', {})(
