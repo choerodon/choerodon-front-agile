@@ -73,6 +73,8 @@ class SwimLaneContext extends Component {
    * @memberof SwimLaneContext
    */
   renderSwimLaneTitle(item) {
+    const { data, changeState } = this.props;
+    const { expand } = this.state;
     let result;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       result = (
@@ -80,11 +82,11 @@ class SwimLaneContext extends Component {
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Icon 
               style={{ fontSize: 17, cursor: 'pointer' }}
-              type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+              type={expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
               role="none"
               onClick={() => {
                 this.setState({
-                  expand: !this.state.expand,
+                  expand: !expand,
                 });
               }}
             />
@@ -131,14 +133,16 @@ class SwimLaneContext extends Component {
           <Button
             type="primary"
             style={{
-              display: ScrumBoardStore.judgeMoveParentToDone(this.props.data.categoryCode, this.props.data.issueId) ? 'block' : 'none',
+              display: ScrumBoardStore.judgeMoveParentToDone(data.categoryCode, data.issueId) ? 'block' : 'none',
             }}
             onClick={() => {
-              this.props.changeState('judgeUpdateParent', {
-                id: this.props.data.issueId,
-                issueNumber: this.props.data.issueNum,
-                code: this.props.data.categoryCode,
-                objectVersionNumber: this.props.data.objectVersionNumber,
+              changeState('judgeUpdateParent', {
+                id: data.issueId,
+                issueNumber: data.issueNum,
+                code: data.categoryCode,
+                objectVersionNumber: data.objectVersionNumber,
+                typeId: data.issueTypeDTO && data.issueTypeDTO.id,
+                statusId: data.statusId,
               });
             }}
           >
@@ -151,11 +155,11 @@ class SwimLaneContext extends Component {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Icon 
             style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
-            type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+            type={expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
             role="none"
             onClick={() => {
               this.setState({
-                expand: !this.state.expand,
+                expand: !expand,
               });
             }}
           />
@@ -178,11 +182,11 @@ class SwimLaneContext extends Component {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Icon 
             style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
-            type={this.state.expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
+            type={expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
             role="none"
             onClick={() => {
               this.setState({
-                expand: !this.state.expand,
+                expand: !expand,
               });
             }}
           />

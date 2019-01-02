@@ -213,6 +213,8 @@ class ScrumBoardHome extends Component {
                         .columns[index].subStatuses[index2].issues[index3].issueId);
                       // 保存父任务信息，加入状态，状态类别，子任务数量
                       storeParentIds.push({
+                        statusId: data.columnsData
+                          .columns[index].subStatuses[index2].statusId,
                         status: data.columnsData
                           .columns[index].subStatuses[index2].name,
                         categoryCode: data.columnsData
@@ -779,7 +781,20 @@ class ScrumBoardHome extends Component {
       }
     }
     return result;
-  }
+  };
+
+  changeState = (name, value) => {
+    if (name === 'judgeUpdateParent') {
+      ScrumBoardStore.loadTransforms(value.statusId, value.id, value.typeId).then((types) => {
+        this.matchStatus(types);
+        this.setState({
+          [name]: value,
+        });
+      }).catch((e) => {
+        message.error('查询状态失败，请重试！');
+      });
+    }
+  };
 
   /**
    * 渲染被分配的任务列
@@ -805,11 +820,7 @@ class ScrumBoardHome extends Component {
           data={ids[index]}
           handleDragEnd={this.handleDragEnd.bind(this)}
           renderIssueColumns={this.renderIssueColumns.bind(this)}
-          changeState={(name, value) => {
-            this.setState({
-              [name]: value,
-            });
-          }}
+          changeState={this.changeState}
         />,
       );
     }
