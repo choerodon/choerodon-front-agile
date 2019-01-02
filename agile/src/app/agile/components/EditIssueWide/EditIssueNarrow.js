@@ -2251,12 +2251,8 @@ class CreateSprint extends Component {
                             marginBottom: 4,
                           }}
                         >
-
-
-
-
-                              故事点
-                                                </div>
+                              {'故事点'}
+                        </div>
                         <div>
                           <ReadAndEdit
                             callback={this.changeRae.bind(this)}

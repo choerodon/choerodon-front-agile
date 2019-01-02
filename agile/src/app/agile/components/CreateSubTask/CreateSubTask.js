@@ -141,6 +141,8 @@ class CreateSubIssue extends Component {
           sprintId: sprint.sprintId || 0,
           versionIssueRelDTOList: fixVersionIssueRelDTOList,
           issueTypeId: subIssueType && subIssueType.id,
+          remainingTime: values.estimatedTime,
+          // estimateTime: values.estimateTime,
         };
         this.setState({ createLoading: true });
         const deltaOps = delta;
@@ -235,12 +237,12 @@ class CreateSubIssue extends Component {
       >
         <div>
           <h2>
-            在项目“
+            {'在项目“'}
             {AppState.currentMenuType.name}
-            ”中创建子任务
+            {' ”中创建子任务'}
           </h2>
           <p style={{ width: 520, marginBottom: 24 }}>
-            请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。
+           {' 请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。'}
           </p>
           <Form layout="vertical">
             <FormItem label="概要" style={{ width: 520 }}>
@@ -295,6 +297,14 @@ class CreateSubIssue extends Component {
               }
             </div>
 
+            <FormItem label="预估时间" style={{ width: 520 }}>
+              {getFieldDecorator('estimatedTime', {
+                rules: [{}],
+              })(
+                <Input label="预估时间" maxLength={3} suffix="小时" />,
+              )}
+            </FormItem>
+
             <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
               {getFieldDecorator('assigneedId', {})(
                 <Select
@@ -306,8 +316,8 @@ class CreateSubIssue extends Component {
                   allowClear
                   onFilterChange={this.onFilterChange.bind(this)}
                 >
-                  {this.state.originUsers.filter(u => u.enabled).map(user =>
-                    (<Option key={user.id} value={user.id}>
+                  {this.state.originUsers.filter(u => u.enabled).map(user => (
+                    <Option key={user.id} value={user.id}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                         <UserHead
                           user={{
@@ -318,8 +328,8 @@ class CreateSubIssue extends Component {
                           }}
                         />
                       </div>
-                    </Option>),
-                  )}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -333,7 +343,7 @@ class CreateSubIssue extends Component {
                 cursor: 'pointer',
               }}
             >
-              分派给我
+              {'分派给我'}
             </span>
 
             <FormItem label="冲刺" style={{ width: 520 }}>
@@ -367,9 +377,7 @@ class CreateSubIssue extends Component {
                     });
                   }}
                 >
-                  {this.state.originFixVersions.map(version =>
-                    <Option key={version.name} value={version.name}>{version.name}</Option>,
-                  )}
+                  {this.state.originFixVersions.map(version => <Option key={version.name} value={version.name}>{version.name}</Option>)}
                 </Select>,
               )}
             </FormItem> 
@@ -396,11 +404,11 @@ class CreateSubIssue extends Component {
                     });
                   }}
                 >
-                  {this.state.originLabels.map(label =>
-                    (<Option key={label.labelName} value={label.labelName}>
+                  {this.state.originLabels.map(label => (
+                    <Option key={label.labelName} value={label.labelName}>
                       {label.labelName}
-                    </Option>),
-                  )}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
