@@ -41,6 +41,7 @@ class ReleaseDetail extends Component {
   }
 
   componentWillUnmount() {
+    ReleaseStore.setVersionStatusIssues([]);
     document.getElementById('autoRouter').style.overflow = 'unset';
   }
 
