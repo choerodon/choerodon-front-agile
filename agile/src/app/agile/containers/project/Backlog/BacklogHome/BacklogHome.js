@@ -50,6 +50,7 @@ class BacklogHome extends Component {
     const { BacklogStore } = this.props;
     BacklogStore.dispose();
     BacklogStore.setClickIssueDetail({});
+    BacklogStore.setSprintData({});
   }
 
   // 加载问题类型和默认优先级

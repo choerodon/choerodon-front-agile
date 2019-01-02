@@ -61,6 +61,13 @@ class ScrumBoardHome extends Component {
 
   componentWillUnmount() {
     ScrumBoardStore.setClickIssueDetail({});
+    ScrumBoardStore.setBoardData([]);
+    ScrumBoardStore.setQuickSearchList([]);
+    ScrumBoardStore.setSprintData(false);
+    ScrumBoardStore.setAssigneer([]);
+    ScrumBoardStore.setCurrentSprint({});
+    ScrumBoardStore.setParentIds([]);
+    ScrumBoardStore.setEpicData([]);
     this.removeEventListener();
   }
 

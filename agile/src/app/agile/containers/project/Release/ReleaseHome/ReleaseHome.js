@@ -58,6 +58,10 @@ class ReleaseHome extends Component {
     this.refresh(this.state.pagination);
   }
 
+  componentWillUnmount() {
+    ReleaseStore.setVersionList([]);
+  }
+
   refresh(pagination) {
     this.setState({
       loading: true,
