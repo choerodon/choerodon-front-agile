@@ -48,6 +48,17 @@ class ScrumBoardHome extends Component {
     };
   }
 
+  componentWillMount() {
+    ScrumBoardStore.setBoardData([]);
+    ScrumBoardStore.setQuickSearchList([]);
+    ScrumBoardStore.setSprintData(false);
+    ScrumBoardStore.setAssigneer([]);
+    ScrumBoardStore.setCurrentSprint({});
+    ScrumBoardStore.setParentIds([]);
+    ScrumBoardStore.setEpicData([]);
+    ScrumBoardStore.setBoardList([]);
+  }
+
   componentDidMount() {
     const { location } = this.props;
     this.getBoard();
@@ -61,14 +72,14 @@ class ScrumBoardHome extends Component {
 
   componentWillUnmount() {
     ScrumBoardStore.setClickIssueDetail({});
-    ScrumBoardStore.setBoardData([]);
-    ScrumBoardStore.setQuickSearchList([]);
-    ScrumBoardStore.setSprintData(false);
-    ScrumBoardStore.setAssigneer([]);
-    ScrumBoardStore.setCurrentSprint({});
-    ScrumBoardStore.setParentIds([]);
-    ScrumBoardStore.setEpicData([]);
-    ScrumBoardStore.setBoardList([]);
+    // ScrumBoardStore.setBoardData([]);
+    // ScrumBoardStore.setQuickSearchList([]);
+    // ScrumBoardStore.setSprintData(false);
+    // ScrumBoardStore.setAssigneer([]);
+    // ScrumBoardStore.setCurrentSprint({});
+    // ScrumBoardStore.setParentIds([]);
+    // ScrumBoardStore.setEpicData([]);
+    // ScrumBoardStore.setBoardList([]);
     this.removeEventListener();
   }
 
