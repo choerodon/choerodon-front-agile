@@ -581,7 +581,7 @@ class ReleaseDetail extends Component {
                   ))
                 }
               </Select>
-              <Select 
+              {/* <Select 
                 className="c7n-pieChart-filter-item"
                 style={{ minWidth: 70 }}
                 label="选择维度" 
@@ -595,7 +595,7 @@ class ReleaseDetail extends Component {
               </Select>  
               {
                 currentChooseDimension ? this.renderChooseDimension() : '' 
-              }
+              } */}
             </div>
 
             {data.length ? (
