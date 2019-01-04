@@ -1336,8 +1336,6 @@ class ScrumBoardHome extends Component {
                   {getFieldDecorator('name', {
                     rules: [{
                       required: true, message: '看板名是必填的',
-                    }, {
-                      validator: this.checkBoardNameRepeat,
                     }],
                   })(
                     <Input

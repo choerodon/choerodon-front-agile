@@ -155,9 +155,9 @@ class ScrumBoardSetting extends Component {
                 </TabPane>
               ) : null
             }
-            <TabPane tab="看板名称" key="4">
-              <EditBoardName />
-            </TabPane>
+            {/* <TabPane tab="看板名称" key="4"> */}
+            {/* <EditBoardName /> */}
+            {/* </TabPane> */}
           </Tabs>
         </Content>
       </Page>
