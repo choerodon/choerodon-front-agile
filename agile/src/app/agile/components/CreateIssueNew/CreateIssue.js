@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
-  Select, Form, Input, Button, Modal, Icon, Tooltip,
+  Select, Form, Input, Button, Modal, Icon, Tooltip, InputNumber,
 } from 'choerodon-ui';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
@@ -50,15 +50,19 @@ class CreateIssue extends Component {
       originFixVersions: [],
       originSprints: [],
       originUsers: [],
+      originIssueTypes: [],
 
       defaultPriority: false,
 
-      newIssueType: '',
+      newIssueTypeCode: '',
+      storyPoints: '',
+      estimatedTime: '',
     };
   }
 
   componentDidMount() {
     this.loadPriorities();
+    this.loadIssueTypes();
   }
 
   onFilterChange(input) {
@@ -89,6 +93,8 @@ class CreateIssue extends Component {
       originLabels,
       originFixVersions,
       delta,
+      storyPoints,
+      estimatedTime,
     } = this.state;
     form.validateFields((err, values) => {
       if (!err) {
@@ -148,8 +154,9 @@ class CreateIssue extends Component {
           labelIssueRelDTOList,
           versionIssueRelDTOList: fixVersionIssueRelDTOList,
           componentIssueRelDTOList,
-          storyPoints: values.storyPoints,
-          remainingTime: values.estimatedTime,
+          storyPoints,
+
+          remainingTime: estimatedTime,
         };
         this.setState({ createLoading: true });
         const deltaOps = delta;
@@ -200,6 +207,15 @@ class CreateIssue extends Component {
     });
   };
 
+  loadIssueTypes = () => {
+    axios.get(`/issue/v1/projects/${AppState.currentMenuType.projectId}/schemes/query_issue_types_with_sm_id?apply_type=agile`)
+      .then((res) => {
+        this.setState({
+          originIssueTypes: res,
+        });
+      });
+  }
+
   render() {
     const {
       visible,
@@ -207,12 +223,12 @@ class CreateIssue extends Component {
       store,
       form,
     } = this.props;
-    const { getFieldDecorator } = form;
+    const { getFieldDecorator, setFieldsValue } = form;
     const {
-      originPriorities, defaultPriority, createLoading,
+      originPriorities, defaultPriority, createLoading, storyPoints, estimatedTime,
       edit, delta, originUsers, selectLoading,
-      originEpics, originSprints, originFixVersions, originComponents,
-      originLabels, fileList, newIssueType,
+      originEpics, originSprints, originFixVersions, originComponents, originIssueTypes,
+      originLabels, fileList, newIssueTypeCode,
     } = this.state;
     const callback = (value) => {
       this.setState({
@@ -248,7 +264,7 @@ class CreateIssue extends Component {
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     onChange={((value) => {
                       this.setState({
-                        newIssueType: value,
+                        newIssueTypeCode: originIssueTypes.find(item => item.id === value).typeCode,
                       });
                     })}
                   >
@@ -264,6 +280,17 @@ class CreateIssue extends Component {
                   </Select>,
                 )}
               </FormItem>
+              { newIssueTypeCode === 'issue_epic' && (
+              <FormItem label="史诗名称" style={{ width: 520 }}>
+                {getFieldDecorator('epicName', {
+                  rules: [{ required: true, message: '史诗名称为必输项' }, {
+                    validator: this.checkEpicNameRepeat,
+                  }],
+                })(
+                  <Input label="史诗名称" maxLength={10} />,
+                )}
+              </FormItem>
+              )}
               <FormItem label="概要" style={{ width: 520 }}>
                 {getFieldDecorator('summary', {
                   rules: [{ required: true, message: '概要为必输项' }],
@@ -271,18 +298,6 @@ class CreateIssue extends Component {
                   <Input label="概要" maxLength={44} />,
                 )}
               </FormItem>
-
-              {
-              form.getFieldValue('typeCode') === 'issue_epic' && (
-                <FormItem label="史诗名称" style={{ width: 520 }}>
-                  {getFieldDecorator('epicName', {
-                    rules: [{ required: true, message: '史诗名称为必输项' }],
-                  })(
-                    <Input label="史诗名称" maxLength={44} />,
-                  )}
-                </FormItem>
-              )
-            }
 
               <FormItem label="优先级" style={{ width: 520 }}>
                 {getFieldDecorator('priorityId', {
@@ -331,25 +346,46 @@ class CreateIssue extends Component {
 
               {
                 // 创建的问题类型为故事时，才显示故事点
-                newIssueType === 170 && (
-                  <FormItem label="故事点" style={{ width: 520 }}>
-                    {getFieldDecorator('storyPoints', {
-                      rules: [{}],
-                    })(
-                      <Input label="故事点" maxLength={3} suffix="点" />,
-                    )}
-                  </FormItem>
+                newIssueTypeCode === 'story' && (
+                <Input
+                  style={{ width: 520, margin: '8px 0 18px' }}
+                  label="故事点"
+                  maxLength={3}
+                  suffix="点"
+                  value={storyPoints}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
+                    if ((!isNaN(value) && reg.test(value)) || value === '') {
+                      this.setState({
+                        storyPoints: value,
+                      });
+                    } 
+                  }}
+                />
                 )
               }
 
-              <FormItem label="预估时间" style={{ width: 520 }}>
-                {getFieldDecorator('estimatedTime', {
-                  rules: [{}],
-                })(
-                  <Input label="预估时间" maxLength={3} suffix="小时" />,
-                )}
-              </FormItem>
-
+              {
+                newIssueTypeCode !== 'issue_epic' && (
+                <Input 
+                  style={{ width: 520, margin: '8px 0 18px' }}
+                  label="预估时间" 
+                  maxLength={3} 
+                  suffix="小时" 
+                  value={estimatedTime}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
+                    if ((!isNaN(value) && reg.test(value)) || value === '') {
+                      this.setState({
+                        estimatedTime: value,
+                      });
+                    } 
+                  }}
+                />
+                )
+              }
               <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
                 {getFieldDecorator('assigneedId', {})(
                   <Select
@@ -391,7 +427,7 @@ class CreateIssue extends Component {
               </Tooltip>
 
               {
-              form.getFieldValue('typeCode') !== 'issue_epic' && (
+              newIssueTypeCode !== 'issue_epic' && (
                 <FormItem label="史诗" style={{ width: 520 }}>
                   {getFieldDecorator('epicId', {})(
                     <Select

@@ -46,6 +46,7 @@ class CreateSubIssue extends Component {
       originFixVersions: [],
       originUsers: [],
       defaultPriorityId: false,
+      estimatedTime: '',
     };
   }
 
@@ -94,7 +95,7 @@ class CreateSubIssue extends Component {
   };
 
   handleCreateIssue = () => {
-    const { sprint, delta } = this.state;
+    const { sprint, delta, estimatedTime } = this.state;
     const {
       store, form, issueId,
     } = this.props;
@@ -141,8 +142,8 @@ class CreateSubIssue extends Component {
           sprintId: sprint.sprintId || 0,
           versionIssueRelDTOList: fixVersionIssueRelDTOList,
           issueTypeId: subIssueType && subIssueType.id,
-          remainingTime: values.estimatedTime,
-          // estimateTime: values.estimateTime,
+          remainingTime: estimatedTime,
+          // estimatedTime: values.estimatedTime,
         };
         this.setState({ createLoading: true });
         const deltaOps = delta;
@@ -216,6 +217,7 @@ class CreateSubIssue extends Component {
       defaultPriorityId,
       originPriorities,
       createLoading,
+      estimatedTime,
     } = this.state;
     const callback = (value) => {
       this.setState({
@@ -242,7 +244,7 @@ class CreateSubIssue extends Component {
             {' ”中创建子任务'}
           </h2>
           <p style={{ width: 520, marginBottom: 24 }}>
-           {' 请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。'}
+            {' 请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。'}
           </p>
           <Form layout="vertical">
             <FormItem label="概要" style={{ width: 520 }}>
@@ -296,14 +298,33 @@ class CreateSubIssue extends Component {
                 )
               }
             </div>
-
+            {/* 
             <FormItem label="预估时间" style={{ width: 520 }}>
               {getFieldDecorator('estimatedTime', {
                 rules: [{}],
               })(
                 <Input label="预估时间" maxLength={3} suffix="小时" />,
               )}
-            </FormItem>
+            </FormItem> */}
+
+            {
+              <Input 
+                style={{ width: 520, margin: '8px 0 18px' }}
+                label="预估时间" 
+                maxLength={3} 
+                suffix="小时" 
+                value={estimatedTime}
+                onChange={(e) => {
+                  const { value } = e.target;
+                  const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
+                  if ((!isNaN(value) && reg.test(value)) || value === '') {
+                    this.setState({
+                      estimatedTime: value,
+                    });
+                  } 
+                }}
+              />
+            }
 
             <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
               {getFieldDecorator('assigneedId', {})(
