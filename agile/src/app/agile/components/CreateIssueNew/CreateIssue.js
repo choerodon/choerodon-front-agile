@@ -347,43 +347,46 @@ class CreateIssue extends Component {
               {
                 // 创建的问题类型为故事时，才显示故事点
                 newIssueTypeCode === 'story' && (
-                <Input
-                  style={{ width: 520, margin: '8px 0 18px' }}
-                  label="故事点"
-                  maxLength={3}
-                  suffix="点"
-                  value={storyPoints}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
-                    if ((!isNaN(value) && reg.test(value)) || value === '') {
-                      this.setState({
-                        storyPoints: value,
-                      });
-                    } 
-                  }}
-                />
+                <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
+                  <Input
+                    label="故事点"
+                    maxLength={3}
+                    suffix="点"
+                    value={storyPoints}
+                    onChange={(e) => {
+                      const { value } = e.target;
+                      const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
+                      if ((!isNaN(value) && reg.test(value)) || value === '') {
+                        this.setState({
+                          storyPoints: value,
+                        });
+                      } 
+                    }}
+                  />
+                </div>
                 )
               }
 
               {
                 newIssueTypeCode !== 'issue_epic' && (
-                <Input 
-                  style={{ width: 520, margin: '8px 0 18px' }}
-                  label="预估时间" 
-                  maxLength={3} 
-                  suffix="小时" 
-                  value={estimatedTime}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
-                    if ((!isNaN(value) && reg.test(value)) || value === '') {
-                      this.setState({
-                        estimatedTime: value,
-                      });
-                    } 
-                  }}
-                />
+                  <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
+                    <Input 
+                      label="预估时间" 
+                      maxLength={3} 
+                      suffix="小时" 
+                      value={estimatedTime}
+                      onChange={(e) => {
+                        const { value } = e.target;
+                        const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
+                        if ((!isNaN(value) && reg.test(value)) || value === '') {
+                          this.setState({
+                            estimatedTime: value,
+                          });
+                        } 
+                      }}
+                    />
+                  </div>
+               
                 )
               }
               <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
