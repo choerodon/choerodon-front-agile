@@ -271,7 +271,7 @@ class WorkCalendar extends Component {
       let isWorkDay = !weekdays.includes(dayOfWeek); // 是否是周末
       if (useHoliday && holidayRefs.length) {
         _.forEach(holidayRefs, (item) => {
-          if (item.holiday === selectDate) {
+          if (item.holiday === date.format(holidayFormat)) {
             isWorkDay = item.status === 1; // 是否是节假日及调休日期
           }
         });
