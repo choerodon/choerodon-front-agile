@@ -274,7 +274,7 @@ class CreateSubIssue extends Component {
               )}
             </FormItem>
 
-            <div>
+            <div style={{ width: 520 }}>
               <div style={{ display: 'flex', marginBottom: 3, alignItems: 'center' }}>
                 <div style={{ fontWeight: 'bold' }}>描述</div>
                 <div style={{ marginLeft: 80 }}>
@@ -298,32 +298,26 @@ class CreateSubIssue extends Component {
                 )
               }
             </div>
-            {/* 
-            <FormItem label="预估时间" style={{ width: 520 }}>
-              {getFieldDecorator('estimatedTime', {
-                rules: [{}],
-              })(
-                <Input label="预估时间" maxLength={3} suffix="小时" />,
-              )}
-            </FormItem> */}
-
             {
-              <Input 
-                style={{ width: 520, margin: '8px 0 18px' }}
-                label="预估时间" 
-                maxLength={3} 
-                suffix="小时" 
-                value={estimatedTime}
-                onChange={(e) => {
-                  const { value } = e.target;
-                  const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
-                  if ((!isNaN(value) && reg.test(value)) || value === '') {
-                    this.setState({
-                      estimatedTime: value,
-                    });
-                  } 
-                }}
-              />
+              <div>
+                <Input 
+                  style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}
+                  label="预估时间" 
+                  maxLength={3} 
+                  suffix="小时" 
+                  value={estimatedTime}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
+                    if ((!isNaN(value) && reg.test(value)) || value === '') {
+                      this.setState({
+                        estimatedTime: value,
+                      });
+                    } 
+                  }}
+                />
+              </div>
+             
             }
 
             <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
@@ -356,6 +350,7 @@ class CreateSubIssue extends Component {
             </FormItem>
             <span
               onClick={this.assigneeMe}
+              role="none"
               style={{
                 display: 'inline-block',
                 color: 'rgba(63, 81, 181)',
