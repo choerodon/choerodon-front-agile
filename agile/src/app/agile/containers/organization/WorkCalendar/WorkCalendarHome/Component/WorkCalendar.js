@@ -8,6 +8,9 @@ import zhCN from 'choerodon-ui/lib/rc-components/calendar/locale/zh_CN';
 import './rc-calendar.scss';
 import './WorkCalendar.scss';
 
+const format = 'YYYY-MM-DD';
+const holidayFormat = 'YYYY-M-D';
+
 @observer
 class WorkCalendar extends Component {
   constructor(props) {
@@ -31,8 +34,8 @@ class WorkCalendar extends Component {
         </div>
       );
     }
-    const format = 'YYYY-MM-DD';
     const date = current.format(format);
+    const holidayFormatedDate = current.format(holidayFormat);
     const {
       saturdayWork,
       sundayWork,
@@ -67,34 +70,39 @@ class WorkCalendar extends Component {
     const isWeekDay = weekdays.includes(localData.weekdaysMin(current));
     // 判断是否为法定假期
     let holidayInfo = [];
+    let holidayTag = null;
     if (useHoliday && holidayRefs.length) {
-      holidayInfo = holidayRefs.filter(d => d.holiday === date);
+      holidayInfo = holidayRefs.filter(d => d.holiday === holidayFormatedDate);
     }
     // 用户自定义设置
     const selectDay = selectDays.filter(d => d.workDay === date);
     if (selectDay.length) {
       dateStyle = selectDay[0].status === 1 ? workDayStyle : notWorkDayStyle;
-    } else if (useHoliday && holidayInfo.length) {
-      return holidayInfo[0].status === 1 ? (
-        <div data-day={holidayInfo[0]} className="rc-calendar-date workday" style={workDayStyle}>
-          <span className="tag tag-work">班</span>
-          {current.date()}
-        </div>
-      )
-        : (
-          <div data-day={holidayInfo[0]} className="rc-calendar-date restday" style={notWorkDayStyle}>
-            <span className="tag tag-notwork">休</span>
-            {current.date()}
-            <span className="des">{holidayInfo[0].name}</span>
-          </div>
-        );
     } else if (isWeekDay) {
       dateStyle = notWorkDayStyle;
     } else {
       dateStyle = workDayStyle;
     }
+    if (useHoliday && holidayInfo.length) {
+      if (selectDay.length) {
+        dateStyle = selectDay[0].status === 1 ? workDayStyle : notWorkDayStyle;
+      } else {
+        dateStyle = holidayInfo[0].status === 1 ? workDayStyle : notWorkDayStyle;
+        holidayTag = (
+          <React.Fragment>
+            {
+              holidayInfo[0].status === 1
+                ? <span className="tag tag-work">班</span>
+                : <span className="tag tag-notwork">休</span>
+            }
+            <span className="des">{holidayInfo[0].name}</span>
+          </React.Fragment>
+        );
+      }
+    }
     return (
       <div className="rc-calendar-date" style={dateStyle}>
+        {holidayTag}
         {current.date()}
       </div>
     );
@@ -105,7 +113,6 @@ class WorkCalendar extends Component {
       return;
     }
     const now = moment();
-    const format = 'YYYY-MM-DD';
     const {
       saturdayWork,
       sundayWork,
@@ -130,7 +137,7 @@ class WorkCalendar extends Component {
         let isWorkDay = !weekdays.includes(dayOfWeek); // 是否是周末
         if (useHoliday && holidayRefs.length) {
           _.forEach(holidayRefs, (item) => {
-            if (item.holiday === selectDate) {
+            if (item.holiday === date.format(holidayFormat)) {
               isWorkDay = item.status === 1; // 是否是节假日及调休日期
             }
           });
