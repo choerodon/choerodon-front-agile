@@ -43,7 +43,7 @@ export default class IssueFilterControler {
         [paramKey]: paramValue,
       });
     });
-    // 版本跳转 => otherArgs 设置对应 tpye 所需信息 
+    // 版本跳转 => otherArgs 设置对应 tpye 所需信息
     if (paramObj.paramType && paramObj.paramId) {
       filter.otherArgs[paramObj.paramType] = [paramObj.paramId];
     }
@@ -67,7 +67,7 @@ export default class IssueFilterControler {
         filter.searchArgs.createEndDate = `${paramObj.paramEndDate} 23:59:59`;
       }
     }
-      
+
     // 饼图选择了问题类型或者优先级后的跳转
     const { paramPriority, paramIssueType } = paramObj;
     if (paramPriority) {
@@ -77,7 +77,7 @@ export default class IssueFilterControler {
       filter.advancedSearchArgs.issueTypeId = [paramIssueType];
     }
 
-    // 饼图选择了解决未解决后的跳转  
+    // 饼图选择了解决未解决后的跳转
     const { paramType, paramId } = paramObj;
     if (paramType === 'resolution') {
       filter.otherArgs.resolution = (paramId === '1' ? 'true' : 'false');
@@ -101,13 +101,10 @@ export default class IssueFilterControler {
    */
   refresh = (mode) => {
     // 存在 paramFilter 时调用 paramFilter 进行刷新
-    if (Object.keys(this.cache.get('paramFilter')).length) {
-      return IssueFilterControler.loadCurrentSetting(this.cache.get('paramFilter'), mode);
-    } else {
-      // debugger;
-      // const a = IssueStore.getPagination;
-      return IssueFilterControler.loadCurrentSetting(this.cache.get('filter'), mode, 0, IssueStore.getPagination.pageSize);
-    }
+    const filter = Object.keys(this.cache.get('paramFilter')).length ? this.cache.get('paramFilter') : this.cache.get('filter');
+    return IssueFilterControler.loadCurrentSetting(
+      filter, mode, 0, IssueStore.getPagination.pageSize,
+    );
   };
 
   /**

@@ -200,7 +200,9 @@ class Issue extends Component {
             />
             <IssueTable filterControler={this.filterControler} />
           </div>
-          <ExpandWideCard />
+          <ExpandWideCard
+            issueRefresh={this.Refresh}
+          />
           <CreateIssueModal />
         </Content>
       </Page>
