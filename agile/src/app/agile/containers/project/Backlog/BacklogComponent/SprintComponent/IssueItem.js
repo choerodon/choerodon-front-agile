@@ -244,6 +244,7 @@ class IssueItem extends Component {
                     style={{
                       width: 60,
                       marginLeft: !_.isNull(item.statusMapDTO && item.statusMapDTO.name) ? '12px' : 0,
+                      paddingRight: 12,
                     }}
                     label="sprintIssue"
                     className="c7n-backlog-sprintIssueRight"

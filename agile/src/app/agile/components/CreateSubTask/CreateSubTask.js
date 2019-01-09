@@ -105,12 +105,12 @@ class CreateSubIssue extends Component {
         const subIssueType = store.getIssueTypes && store.getIssueTypes.find(t => t.typeCode === 'sub_task');
         const exitLabels = originLabels;
         const labelIssueRelDTOList = _.map(values.issueLink, (label) => {
-          const target = _.find(exitLabels, { labelName: label });
+          const target = _.find(exitLabels, { labelName: label.substr(0, 10) });
           if (target) {
             return target;
           } else {
             return ({
-              labelName: label,
+              labelName: label.substr(0, 10),
               projectId: AppState.currentMenuType.id,
             });
           }
