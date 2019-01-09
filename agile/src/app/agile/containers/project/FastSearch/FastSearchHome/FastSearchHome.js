@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Table, Spin, Popover, Tooltip, Icon, Modal, 
+  Button, Table, Spin, Popover, Tooltip, Icon, Modal,
 } from 'choerodon-ui';
 import {
-  Page, Header, Content, stores, axios, 
+  Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
 import Filter from './Component/Filter';
 import EditFilter from './Component/EditFilter';
@@ -13,7 +13,6 @@ import SortTable from './Component/SortTable';
 import './FastSearchHome.scss';
 
 const { AppState } = stores;
-const confirm = Modal.confirm;
 
 @observer
 class Search extends Component {
@@ -24,11 +23,10 @@ class Search extends Component {
       createFileterShow: false,
       currentFilterId: undefined,
       filter: {},
-      confirmShow: false,
-
+      // confirmShow: false,
       loading: false,
-      editComponentShow: false,
-      createComponentShow: false,
+      // editComponentShow: false,
+      // createComponentShow: false,
     };
   }
 
@@ -36,28 +34,28 @@ class Search extends Component {
     this.loadFilters();
   }
 
-  showFilter(record) {
+  showFilter = (record) => {
     this.setState({
       editFilterShow: true,
       currentFilterId: record.filterId,
     });
-  }
+  };
 
-  clickDeleteFilter(record) {
+  clickDeleteFilter = (record) => {
     this.setState({
       filter: record,
       deleteFilterShow: true,
     });
-  }
+  };
 
-  deleteComponent() {
-    this.setState({
-      confirmShow: false,
-    });
+  deleteComponent = () => {
+    // this.setState({
+    //   confirmShow: false,
+    // });
     this.loadComponents();
-  }
+  };
 
-  loadFilters() {
+  loadFilters = () => {
     this.setState({
       loading: true,
     });
@@ -70,7 +68,7 @@ class Search extends Component {
         });
       })
       .catch((error) => {});
-  }
+  };
 
   handleDrag = (data, postData) => {
     this.setState({
@@ -107,14 +105,22 @@ class Search extends Component {
       '>=': '大于或等于',
       '>': '大于',
       '=': '等于',
+      OR: '或',
+      AND: '与',
     };
-    
-    let transformKey = '';
-    transformKey = Object.keys(OPERATION).find(item => str.match(item)) && Object.keys(OPERATION).find(item => str.match(item));
-    return str.replace(transformKey, OPERATION[transformKey]);
+
+    let transformKey = str;
+    Object.keys(OPERATION).forEach((v) => {
+      transformKey = transformKey.replace(new RegExp(` ${v} `, 'g'), ` ${OPERATION[v]} `);
+    });
+    return transformKey;
   };
 
   render() {
+    const {
+      loading, filters, createFileterShow, editFilterShow,
+      deleteFilterShow, filter, currentFilterId,
+    } = this.state;
     const column = [
       {
         title: '名称',
@@ -197,7 +203,7 @@ class Search extends Component {
 )}
             >
               {/* <Button shape="circle" onClick={this.showFilter.bind(this, record)}> */}
-              <Icon type="mode_edit" onClick={this.showFilter.bind(this, record)} />
+              <Icon type="mode_edit" onClick={this.showFilter(record)} />
               {/* </Button> */}
             </Popover>
             <Popover
@@ -210,7 +216,7 @@ class Search extends Component {
 )}
             >
               {/* <Button shape="circle" onClick={this.clickDeleteFilter.bind(this, record)}> */}
-              <Icon type="delete_forever" onClick={this.clickDeleteFilter.bind(this, record)} />
+              <Icon type="delete_forever" onClick={this.clickDeleteFilter(record)} />
               {/* </Button> */}
             </Popover>
           </div>
@@ -235,16 +241,16 @@ class Search extends Component {
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/setup/quick-search/"
         >
           <div>
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
               <SortTable
                 handleDrag={this.handleDrag}
                 rowKey={record => record.filterId}
                 columns={column}
-                dataSource={this.state.filters}
+                dataSource={filters}
                 scroll={{ x: true }}
               />
             </Spin>
-            {this.state.createFileterShow ? (
+            {createFileterShow ? (
               <Filter
                 onOk={() => {
                   this.setState({ createFileterShow: false });
@@ -253,9 +259,9 @@ class Search extends Component {
                 onCancel={() => this.setState({ createFileterShow: false })}
               />
             ) : null}
-            {this.state.editFilterShow ? (
+            {editFilterShow ? (
               <EditFilter
-                filterId={this.state.currentFilterId}
+                filterId={currentFilterId}
                 onOk={() => {
                   this.setState({ editFilterShow: false });
                   this.loadFilters();
@@ -263,9 +269,9 @@ class Search extends Component {
                 onCancel={() => this.setState({ editFilterShow: false })}
               />
             ) : null}
-            {this.state.deleteFilterShow ? (
+            {deleteFilterShow ? (
               <DeleteFilter
-                filter={this.state.filter}
+                filter={filter}
                 onOk={() => {
                   this.setState({ deleteFilterShow: false });
                   this.loadFilters();

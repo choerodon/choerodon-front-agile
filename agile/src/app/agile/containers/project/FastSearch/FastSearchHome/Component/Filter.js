@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Modal, Form, Input, Select, message, Icon, Button, DatePicker, 
+  Modal, Form, Input, Select, message, Icon, Button, DatePicker,
 } from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
@@ -57,7 +57,7 @@ const arrOperation3 = [
     text: '小于',
   },
   {
-    value: '<',
+    value: '<=',
     text: '小于或等于',
   },
 ];
@@ -213,8 +213,7 @@ class AddComponent extends Component {
    * @param filter
    * @returns {*|Array}
    */
-  getOperation = filter => _.map(OPERATION_FILTER[filter], 'value') || []
-  ;
+  getOperation = filter => OPERATION_FILTER[filter] || [];
 
   /**
    * 调用接口，获取'属性'的值列表
@@ -389,7 +388,7 @@ class AddComponent extends Component {
     });
   };
 
-  
+
 /**
  *校验快速搜索名称是否重复
  *
@@ -434,6 +433,7 @@ checkSearchNameRepeat = (rule, value, callback) => {
    * @returns {Array}
    */
   tempOption = (filter, addEmpty) => {
+    const { temp } = this.state;
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
     const OPTION_FILTER = {
@@ -519,7 +519,7 @@ checkSearchNameRepeat = (rule, value, callback) => {
         name: 'name',
       },
     };
-    const arr = this.state.temp.map(v => (
+    const arr = temp.map(v => (
       <Option key={v[OPTION_FILTER[filter].id]} value={v[OPTION_FILTER[filter].id]}>
         {v[OPTION_FILTER[filter].name]}
       </Option>
@@ -553,8 +553,7 @@ checkSearchNameRepeat = (rule, value, callback) => {
         >
           {
             this.getOperation(filter).map(v => (
-              // <Option key={v} value={v}>{v}</Option>
-              <Option key={v} value={v}>{OPERATION_FILTER[filter].find(item => item.value === v).text}</Option>
+              <Option key={v.value} value={v.value}>{v.text}</Option>
             ))
           }
         </Select>
@@ -655,12 +654,14 @@ checkSearchNameRepeat = (rule, value, callback) => {
             <Option key="'null'" value="'null'">
               {'空'}
             </Option>
-          </Select>)
+          </Select>
+        )
         : (
           <NumericInput
             label="值"
             style={{ lineHeight: '22px', marginBottom: 0, width: 300 }}
-          />)
+          />
+        )
       );
     }
   }
@@ -791,12 +792,13 @@ checkSearchNameRepeat = (rule, value, callback) => {
                               }}
                             >
                               <Icon type="delete" />
-                            </Button>) : null
+                            </Button>
+                          ) : null
                         }
                       </div>
                     )
                   }
-                  
+
                 </div>
               ))
             }
@@ -824,7 +826,7 @@ checkSearchNameRepeat = (rule, value, callback) => {
               )}
             </FormItem>
           </Form>
-          
+
         </Content>
       </Sidebar>
     );
