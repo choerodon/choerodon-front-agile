@@ -62,10 +62,11 @@ class ReleaseDetail extends Component {
         }, {
           key: 'version',
           name: '修复版本',
-        }, {
-          key: 'timeRange',
-          name: '时间',
-        },
+        }, 
+        // {
+        //   key: 'timeRange',
+        //   name: '时间',
+        // },
       ],
       currentChooseDimension: '',
       currentSprintChoose: '',
@@ -256,13 +257,15 @@ class ReleaseDetail extends Component {
 
   handelRefresh = () => {
     this.setState({
+      value: 'assignee',
       currentChooseDimension: '',
       currentSprintChoose: '',
       currentVersionChoose: '',
       startDate: '',
       endDate: '',
+    }, () => {
+      VersionReportStore.getPieDatas(AppState.currentMenuType.id, this.state.value);
     });
-    VersionReportStore.getPieDatas(AppState.currentMenuType.id, this.state.value);
   };
 
   changeType =(value, option) => {
@@ -279,10 +282,11 @@ class ReleaseDetail extends Component {
           {
             key: 'version',
             name: '修复版本',
-          }, {
-            key: 'timeRange',
-            name: '时间',
-          },
+          }, 
+          // {
+          //   key: 'timeRange',
+          //   name: '时间',
+          // },
         ],
       });
     } else if (value === 'version') {
@@ -291,10 +295,11 @@ class ReleaseDetail extends Component {
           {
             key: 'sprint',
             name: '冲刺',
-          }, {
-            key: 'timeRange',
-            name: '时间',
-          },
+          }, 
+          // {
+          //   key: 'timeRange',
+          //   name: '时间',
+          // },
         ],
       });
     } else {
@@ -306,10 +311,11 @@ class ReleaseDetail extends Component {
           }, {
             key: 'version',
             name: '修复版本',
-          }, {
-            key: 'timeRange',
-            name: '时间',
-          },
+          }, 
+          // {
+          //   key: 'timeRange',
+          //   name: '时间',
+          // },
         ],
       });
     }
@@ -381,9 +387,9 @@ class ReleaseDetail extends Component {
       paramName += `、修复版本为${sprintAndVersion.version.find(versionItem => versionItem.versionId === currentVersionChoose).name}`;
     }
 
-    if (currentChooseDimension === 'timeRange' && startDate && endDate) {
-      paramName += `、时间范围为${startDate.format().substring(0, 10)}到${endDate.format().substring(0, 10)}`;
-    }
+    // if (currentChooseDimension === 'timeRange' && startDate && endDate) {
+    //   paramName += `、时间范围为${startDate.format().substring(0, 10)}到${endDate.format().substring(0, 10)}`;
+    // }
 
     paramName += '下的问题';
 
@@ -443,32 +449,32 @@ class ReleaseDetail extends Component {
     return (
       <div>
         {
-          currentChooseDimension === 'timeRange' ? (
-            <RangePicker
-              className="c7n-pieChart-filter-item"
-              style={{ minWidth: 160 }}
-              value={[startDate, endDate]}
-              allowClear={false}
-              disabledDate={current => current && current > moment().endOf('day')}
-              onChange={(date, dateString) => {
-                this.setState({
-                  startDate: moment(dateString[0]),
-                  endDate: moment(dateString[1]),
-                });
-                VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, '', '', `${dateString[0]} 00:00:00`, `${dateString[1]} 23:59:59`);
-              }}
-            />
-          ) : (
-            <Select
-              className="c7n-pieChart-filter-item"
-              style={{ minWidth: 200 }}
-              value={currentChooseDimension === 'version' ? (
-                sprintAndVersion.version.find(item => item.versionId === currentVersionChoose) && sprintAndVersion.version.find(item => item.versionId === currentVersionChoose).name) : (
-                sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose) && sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose).sprintName)
-                }
-              onChange={this.handleSecondChooseChange}
-            >
-              {
+          // currentChooseDimension === 'timeRange' ? (
+          //   <RangePicker
+          //     className="c7n-pieChart-filter-item"
+          //     style={{ minWidth: 160 }}
+          //     value={[startDate, endDate]}
+          //     allowClear={false}
+          //     disabledDate={current => current && current > moment().endOf('day')}
+          //     onChange={(date, dateString) => {
+          //       this.setState({
+          //         startDate: moment(dateString[0]),
+          //         endDate: moment(dateString[1]),
+          //       });
+          //       VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, '', '', `${dateString[0]} 00:00:00`, `${dateString[1]} 23:59:59`);
+          //     }}
+          //   />
+          // ) : (
+          <Select 
+            className="c7n-pieChart-filter-item"
+            style={{ minWidth: 200 }}
+            value={currentChooseDimension === 'version' ? (
+              sprintAndVersion.version.find(item => item.versionId === currentVersionChoose) && sprintAndVersion.version.find(item => item.versionId === currentVersionChoose).name) : (
+              sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose) && sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose).sprintName)
+                } 
+            onChange={this.handleSecondChooseChange}
+          >
+            {
                 sprintAndVersion && currentChooseDimension && sprintAndVersion[currentChooseDimension] && sprintAndVersion[currentChooseDimension].map((item) => {
                   if (currentChooseDimension === 'version') {
                     return <Option key={item.versionId} value={item.versionId}>{item.name}</Option>;
@@ -478,8 +484,9 @@ class ReleaseDetail extends Component {
                   }
                 })
               }
-            </Select>)
-        }
+          </Select>
+            // )
+        }      
       </div>
 
     );
