@@ -101,7 +101,6 @@ class SprintCommonStore {
    * @param paramUrl => String => 跳转时 Header 部分 Back 按钮需要的信息
    */
   @action initPram(paramSelected, paramName = null, paramUrl) {
-    debugger;
     paramIssueSelected = paramSelected;
     this.paramUrl = paramUrl;
     if (paramName) {
@@ -295,7 +294,6 @@ class SprintCommonStore {
    */
   @computed get getBackUrl() {
     const urlParams = AppState.currentMenuType;
-    debugger;
     if (!this.paramUrl) {
       return undefined;
     } else if (this.paramUrl === 'backlog') {
