@@ -9,7 +9,6 @@ import './rc-calendar.scss';
 import './WorkCalendar.scss';
 
 const format = 'YYYY-MM-DD';
-const holidayFormat = 'YYYY-M-D';
 
 @observer
 class WorkCalendar extends Component {
@@ -35,7 +34,6 @@ class WorkCalendar extends Component {
       );
     }
     const date = current.format(format);
-    const holidayFormatedDate = current.format(holidayFormat);
     const {
       saturdayWork,
       sundayWork,
@@ -72,7 +70,7 @@ class WorkCalendar extends Component {
     let holidayInfo = [];
     let holidayTag = null;
     if (useHoliday && holidayRefs.length) {
-      holidayInfo = holidayRefs.filter(d => d.holiday === holidayFormatedDate);
+      holidayInfo = holidayRefs.filter(d => d.holiday === date);
     }
     // 用户自定义设置
     const selectDay = selectDays.filter(d => d.workDay === date);
@@ -137,7 +135,7 @@ class WorkCalendar extends Component {
         let isWorkDay = !weekdays.includes(dayOfWeek); // 是否是周末
         if (useHoliday && holidayRefs.length) {
           _.forEach(holidayRefs, (item) => {
-            if (item.holiday === date.format(holidayFormat)) {
+            if (item.holiday === date.format(selectDate)) {
               isWorkDay = item.status === 1; // 是否是节假日及调休日期
             }
           });

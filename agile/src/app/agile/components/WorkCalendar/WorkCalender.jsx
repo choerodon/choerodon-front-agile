@@ -10,7 +10,6 @@ import './rc-calendar.scss';
 import './WorkCalender.scss';
 
 const format = 'YYYY-MM-DD';
-const holidayFormat = 'YYYY-M-D';
 
 @observer
 class WorkCalendar extends Component {
@@ -64,7 +63,6 @@ class WorkCalendar extends Component {
       );
     }
     const date = current.format(format);
-    const holidayFormatedDate = current.format(holidayFormat);
     const weekdays = [
       saturdayWork ? null : '六',
       sundayWork ? null : '日',
@@ -88,7 +86,7 @@ class WorkCalendar extends Component {
     // 判断是否为法定假期
     let holidayInfo = [];
     if (useHoliday && holidayRefs.length) {
-      holidayInfo = holidayRefs.filter(d => d.holiday === holidayFormatedDate);
+      holidayInfo = holidayRefs.filter(d => d.holiday === date);
     }
     // 冲刺自定义设置
     const workDate = workDates.length
@@ -235,7 +233,7 @@ class WorkCalendar extends Component {
       let isWorkDay = !weekdays.includes(dayOfWeek); // 是否是周末
       if (useHoliday && holidayRefs.length) {
         _.forEach(holidayRefs, (item) => {
-          if (item.holiday === date.format(holidayFormat)) {
+          if (item.holiday === date.format(selectDate)) {
             isWorkDay = item.status === 1; // 是否是节假日及调休日期
           }
         });
@@ -271,7 +269,7 @@ class WorkCalendar extends Component {
       let isWorkDay = !weekdays.includes(dayOfWeek); // 是否是周末
       if (useHoliday && holidayRefs.length) {
         _.forEach(holidayRefs, (item) => {
-          if (item.holiday === date.format(holidayFormat)) {
+          if (item.holiday === date.format(format)) {
             isWorkDay = item.status === 1; // 是否是节假日及调休日期
           }
         });

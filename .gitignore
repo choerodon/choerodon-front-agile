@@ -27,3 +27,4 @@ pythonsql.py
 
 ./dashboard.yml
 ./config.yml
+config.default.js
