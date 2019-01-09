@@ -521,9 +521,9 @@ class BurndownChartHome extends Component {
       }
     }
     return (
-      <p style={{ 
+      <p style={{
         maxWidth: '60px',
-        whiteSpace: 'nowrap', 
+        whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden',
       }}
@@ -599,7 +599,7 @@ class BurndownChartHome extends Component {
           splitArray.map(item => (
             <Tooltip mouseEnterDelay={0.5} title={`事件类型：${this.judgeText(item)}`}>
               <p style={{
-                maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
+                maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}
               >
                 {this.judgeText(item)}
@@ -628,9 +628,9 @@ class BurndownChartHome extends Component {
       width: '25%',
       render: text => (
         <Tooltip mouseEnterDelay={0.5} title={`日期：${text}`}>
-          <p style={{ 
+          <p style={{
             maxWidth: '120px',
-            whiteSpace: 'nowrap', 
+            whiteSpace: 'nowrap',
             textOverflow: 'ellipsis',
             overflow: 'hidden',
           }}
@@ -649,9 +649,9 @@ class BurndownChartHome extends Component {
           {
             text.map(item => (
               <p
-                style={{ 
+                style={{
                   maxWidth: '130px',
-                  whiteSpace: 'nowrap', 
+                  whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis',
                   overflow: 'hidden',
                   color: '#3F51B5',
@@ -776,7 +776,7 @@ class BurndownChartHome extends Component {
         <Content
           title={sprintName ? `迭代冲刺“${sprintName}”的燃尽图` : '无冲刺迭代的燃尽图'}
           description="跟踪记录所有问题的剩余工作工作时间，预估完成冲刺任务的可能性，回顾总结迭代过程中的经验与不足。这有助于在团队管理方面取得更进一步的掌控与把握。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/burn-down/"
+          link="https://v0-10.choerodon.io/zh/docs/user-guide/report/agile-report/burn-down/"
         >
           {
             // this.state.chartLoading || this.state.tableLoading || BurndownChartStore.getSprintList.length > 0 ? (

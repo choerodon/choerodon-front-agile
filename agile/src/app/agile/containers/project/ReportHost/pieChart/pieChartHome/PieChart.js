@@ -97,7 +97,7 @@ class ReleaseDetail extends Component {
          });
        }));
 
-      
+
      const pieChart = this.pie.getEchartsInstance();
      pieChart.on('mouseout', (params) => {
        if (params.data.name === '其它') {
@@ -107,7 +107,7 @@ class ReleaseDetail extends Component {
        }
      });
    }
- 
+
    GetRequest(url) {
      const theRequest = {};
      if (url.indexOf('?') !== -1) {
@@ -163,9 +163,9 @@ class ReleaseDetail extends Component {
       });
       return 'assignee';
     } else {
-      this.setState({ 
-        type: quaryLinks.filter(item => item.value === quaryLink)[0].title, 
-        value: quaryLink, 
+      this.setState({
+        type: quaryLinks.filter(item => item.value === quaryLink)[0].title,
+        value: quaryLink,
       });
       return quaryLink;
     }
@@ -196,7 +196,7 @@ class ReleaseDetail extends Component {
             this.setState({ showOtherTooltip: false });
             return `<div><span>问题：${value.data.value}</span><br/><span>百分比：${(value.data.percent.toFixed(2))}%</span></div>`;
           } else {
-            this.isShowOtherToolTip(); 
+            this.isShowOtherToolTip();
             return '';
           }
         },
@@ -232,7 +232,7 @@ class ReleaseDetail extends Component {
             formatter: (value) => {
               if (value.data.name === null) {
                 return '未分配';
-              } 
+              }
               // if (value.data.name === '其它') {
               //   return '';
               // }
@@ -267,11 +267,11 @@ class ReleaseDetail extends Component {
 
   changeType =(value, option) => {
     // VersionReportStore.setPieData([]);
-    this.setState({ 
-      type: option.key, 
+    this.setState({
+      type: option.key,
       value,
       currentChooseDimension: '',
-      
+
     });
     if (value === 'sprint') {
       this.setState({
@@ -313,23 +313,23 @@ class ReleaseDetail extends Component {
         ],
       });
     }
-   
+
     VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
   };
 
-  compare(pro) { 
-    return function (obj1, obj2) { 
-      const val1 = obj1[pro]; 
-      const val2 = obj2[pro]; 
-      if (val1 < val2) { 
-        return 1; 
-      } else if (val1 > val2) { 
-        return -1; 
-      } else { 
-        return 0; 
-      } 
-    }; 
-  } 
+  compare(pro) {
+    return function (obj1, obj2) {
+      const val1 = obj1[pro];
+      const val2 = obj2[pro];
+      if (val1 < val2) {
+        return 1;
+      } else if (val1 > val2) {
+        return -1;
+      } else {
+        return 0;
+      }
+    };
+  }
 
   getQueryString(type, value) {
     const QUERY = {
@@ -350,7 +350,7 @@ class ReleaseDetail extends Component {
 
   getCurrentChoose() {
     const {
-      currentChooseDimension, currentSprintChoose, currentVersionChoose, startDate, endDate, 
+      currentChooseDimension, currentSprintChoose, currentVersionChoose, startDate, endDate,
     } = this.state;
     const CHOOSEQUERY = {
       sprint: `&paramChoose=sprint&paramCurrentSprint=${currentSprintChoose}`,
@@ -367,7 +367,7 @@ class ReleaseDetail extends Component {
     } = urlParams;
     const { history } = this.props;
     const {
-      value, sprintAndVersion, currentChooseDimension, currentSprintChoose, currentVersionChoose, startDate, endDate, 
+      value, sprintAndVersion, currentChooseDimension, currentSprintChoose, currentVersionChoose, startDate, endDate,
     } = this.state;
     const { typeName, name } = item;
     const queryString = this.getQueryString(value, typeName);
@@ -415,7 +415,7 @@ class ReleaseDetail extends Component {
       } else {
         return (
           <React.Fragment>
-            { otherDates.slice(0, 6).map(item => ( 
+            { otherDates.slice(0, 6).map(item => (
               <div className="pie-otherTooptip-item">
                 <p className="pie-otherTooptip-item-percent">
                   <span>{`${item.percent.toFixed(2)}%`}</span>
@@ -430,10 +430,10 @@ class ReleaseDetail extends Component {
             <div className="pie-otherTooptip-item">
               <span className="pie-otherTooptip-item-ignore">...</span>
             </div>
-          </React.Fragment>     
+          </React.Fragment>
         );
       }
-    }    
+    }
   }
 
   renderChooseDimension = () => {
@@ -459,13 +459,13 @@ class ReleaseDetail extends Component {
               }}
             />
           ) : (
-            <Select 
+            <Select
               className="c7n-pieChart-filter-item"
               style={{ minWidth: 200 }}
               value={currentChooseDimension === 'version' ? (
                 sprintAndVersion.version.find(item => item.versionId === currentVersionChoose) && sprintAndVersion.version.find(item => item.versionId === currentVersionChoose).name) : (
                 sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose) && sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose).sprintName)
-                } 
+                }
               onChange={this.handleSecondChooseChange}
             >
               {
@@ -479,9 +479,9 @@ class ReleaseDetail extends Component {
                 })
               }
             </Select>)
-        }      
+        }
       </div>
-     
+
     );
   }
 
@@ -559,7 +559,7 @@ class ReleaseDetail extends Component {
         <Content
           title="统计图"
           description="根据指定字段以统计图呈现项目或筛选器下的问题，这可以使您一目了然地了解问题详情。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/statistical/"
+          link="https://v0-10.choerodon.io/zh/docs/user-guide/report/agile-report/statistical/"
         >
           <Spin spinning={VersionReportStore.pieLoading}>
             <div className="c7n-pieChart-filter">
@@ -577,27 +577,27 @@ class ReleaseDetail extends Component {
                   ))
                 }
               </Select>
-              <Select 
+              <Select
                 className="c7n-pieChart-filter-item"
                 style={{ minWidth: 70 }}
-                label="选择维度" 
-                defaultValue={chooseDimensionType[0].name} 
-                value={chooseDimensionType.find(item => item.key === currentChooseDimension) && chooseDimensionType.find(item => item.key === currentChooseDimension).name} 
+                label="选择维度"
+                defaultValue={chooseDimensionType[0].name}
+                value={chooseDimensionType.find(item => item.key === currentChooseDimension) && chooseDimensionType.find(item => item.key === currentChooseDimension).name}
                 onChange={this.handleChooseDimensionChange}
               >
                 {
                   chooseDimensionType.map(item => <Option key={item.key} value={item.key}>{item.name}</Option>)
                 }
-              </Select>  
+              </Select>
               {
-                currentChooseDimension ? this.renderChooseDimension() : '' 
+                currentChooseDimension ? this.renderChooseDimension() : ''
               }
             </div>
 
             {data.length ? (
               <React.Fragment>
                 <div style={{
-                  display: 'flex', justifyContent: 'flex-start', alignItems: 'center', 
+                  display: 'flex', justifyContent: 'flex-start', alignItems: 'center',
                 }}
                 >
                   <ReactEchartsCore
@@ -606,13 +606,13 @@ class ReleaseDetail extends Component {
                     echarts={echarts}
                     option={this.getOption()}
                   />
-                 
+
                   <div className="pie-otherTooltip" style={{ display: `${showOtherTooltip ? 'block' : 'none'}` }}>
                     <div className="pie-otherTooltip-wrap" />
                     <div className="pie-otherTooltip-item-wrap">
                       {this.renderOtherTooltip()}
                     </div>
-                   
+
                   </div>
                   <div className="pie-title">
                     <p className="pie-legend-title">数据统计</p>
@@ -647,7 +647,7 @@ class ReleaseDetail extends Component {
                           </tr>
                         ))
                       }
-                    </table>        
+                    </table>
                   </div>
                 </div>
               </React.Fragment>

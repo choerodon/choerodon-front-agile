@@ -207,6 +207,7 @@ class ReleaseDetail extends Component {
     if (type === 'done') {
       name = '已完成';
       count = ReleaseStore.getIssueCountDetail.doneStatusCount;
+      debugger;
       data = ReleaseStore.getIssueCountDetail.doneStatus;
       background = 'rgb(0, 191, 165)';
     } else if (type === 'doing') {
@@ -344,7 +345,7 @@ class ReleaseDetail extends Component {
               />
             </div>
           </Tooltip>
-         
+
         ) : ''),
         filters: filterMap.get('assigneeName'),
       },
