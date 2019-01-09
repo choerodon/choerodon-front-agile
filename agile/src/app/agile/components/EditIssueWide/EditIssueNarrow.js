@@ -1302,7 +1302,7 @@ class CreateSprint extends Component {
                   >
                     {branchs.totalCommit || '0'}
                     {'提交'}
-                    </span>
+                  </span>
                 </div>
                 <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
                   <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
@@ -1348,7 +1348,7 @@ class CreateSprint extends Component {
                   >
                     {branchs.totalMergeRequest}
                     {'合并请求'}
-                    </span>
+                  </span>
                   <span
                     style={{
                       width: 36,
@@ -1929,7 +1929,8 @@ class CreateSprint extends Component {
                               ) : (
                                 '无'
                               )}
-                            </div>)}
+                            </div>
+                          )}
                         >
                           <Select
                             value={originStatus.length ? statusId : statusName}
@@ -2015,7 +2016,8 @@ class CreateSprint extends Component {
                               ) : (
                                 '无'
                               )}
-                            </div>)}
+                            </div>
+                          )}
                         >
                           <Select
                             dropdownStyle={{ minWidth: 185 }}
@@ -2166,7 +2168,8 @@ class CreateSprint extends Component {
                                       </div>
                                     </div>
                                   )}
-                              </div>)}
+                              </div>
+                            )}
                           >
                             <Select
                               value={sprintId || undefined}
@@ -2251,7 +2254,7 @@ class CreateSprint extends Component {
                             marginBottom: 4,
                           }}
                         >
-                              {'故事点'}
+                          {'故事点'}
                         </div>
                         <div>
                           <ReadAndEdit
@@ -2453,7 +2456,9 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={(value) => {
                                     this.setState({
-                                      componentIssueRelDTOList: value.map(item => item.substring(0, 10)),
+                                      componentIssueRelDTOList: value.map(
+                                        item => item.substring(0, 10),
+                                      ),
                                     });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
                                     // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
@@ -2920,16 +2925,12 @@ class CreateSprint extends Component {
                               {this.getWorkloads()}
 
 
-
-
                                   时/
                               {this.getWorkloads() + (origin.remainingTime || 0)}
 
 
-
-
                                   时
-                                                        </span>
+                            </span>
                             <span
                               role="none"
                               style={{
@@ -2943,18 +2944,14 @@ class CreateSprint extends Component {
                                 });
                               }}
                             >
-
-
-
-
                               登记工作
-                                                        </span>
+                            </span>
                           </div>
                         </div>
                         {typeCode === 'issue_epic' ? (
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
-                              <span className="c7n-property">Epic名：</span>
+                              <span className="c7n-property">史诗名称：</span>
                             </div>
                             <div
                               className="c7n-value-wrapper"
@@ -3129,10 +3126,8 @@ class CreateSprint extends Component {
                             >
 
 
-
-
                               分配给我
-                                                        </span>
+                            </span>
                           </div>
                         </div>
                         <div className="line-start mt-10 assignee">
@@ -3185,7 +3180,8 @@ class CreateSprint extends Component {
                                   ) : (
                                     '无'
                                   )}
-                                </div>)}
+                                </div>
+                              )}
                             >
                               <Select
                                 value={
@@ -3251,12 +3247,8 @@ class CreateSprint extends Component {
                                 });
                               }}
                             >
-
-
-
-
                               分配给我
-                                                        </span>
+                            </span>
                           </div>
                         </div>
                         <div className="line-start mt-10">
