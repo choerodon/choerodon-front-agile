@@ -363,6 +363,11 @@ class SprintItem extends Component {
    */
   clearFilter =() => {
     const { store } = this.props;
+    // rc-select 组件的勾选框无法受控（bug），因此采用销毁并重建 Select 组件的方式清空 Select
+    store.hideQuickSearch();
+    setTimeout(() => {
+      store.showQuickSearch();
+    }, 10);
     store.setChosenEpic('all');
     store.setChosenVersion('all');
     store.setOnlyMe(false);

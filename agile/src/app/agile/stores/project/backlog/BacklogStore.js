@@ -8,6 +8,8 @@ const { AppState } = stores;
 
 @store('BacklogStore')
 class BacklogStore {
+  @observable showRealQuickSearch = true;
+
   @observable sprintData = {};
 
   @observable versionData = [];
@@ -139,6 +141,18 @@ class BacklogStore {
 
   @computed get getAssigneeProps() {
     return this.assigneeProps;
+  }
+
+  @action hideQuickSearch() {
+    this.showRealQuickSearch = false;
+  }
+
+  @action showQuickSearch() {
+    this.showRealQuickSearch = true;
+  }
+
+  @computed get getShowRealQuickSearch() {
+    return this.showRealQuickSearch;
   }
 
   @action setAssigneeProps(data) {

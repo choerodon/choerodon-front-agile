@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import PropTypes from 'prop-types';
 import { axios } from 'choerodon-front-boot';
 import { Select } from 'choerodon-ui';
 
 import './QuickSearch.scss';
 import BacklogStore from '../../stores/project/backlog/BacklogStore';
-import Backlog from '../../containers/project/userMap/component/Backlog/Backlog';
 
 const { Option, OptGroup } = Select;
 
@@ -17,9 +15,7 @@ class QuickSearch extends Component {
     super(props);
     this.state = {
       userDataArray: [],
-      // userDataSelected: [],
       quickSearchArray: [],
-      // quickSearchSelected: [],
     };
   }
 
@@ -67,11 +63,6 @@ class QuickSearch extends Component {
     const { onQuickSearchChange } = this.props;
     const flattenValue = value.map(item => item.key);
     const otherSearchId = flattenValue.filter(item => item >= 0);
-    // if (BacklogStore.getQuickSearchClean) {
-    //   BacklogStore.setQuickFilters([]);
-    // } else {
-    //   BacklogStore.setQuickFilters(key);
-    // }
     // -1 仅我的问题
     // -2 仅故事
     onQuickSearchChange(flattenValue.includes(-1), flattenValue.includes(-2), otherSearchId);
@@ -103,80 +94,92 @@ class QuickSearch extends Component {
     // 防抖函数
     const debounceCallback = this.deBounce(500);
     const { style, AppState } = this.props;
+    const { showRealQuickSearch } = BacklogStore;
     const {
       userDataArray,
       quickSearchArray,
     } = this.state;
+    // showRealQuickSearch 用于在待办事项中销毁组件
+    // 具体查看 Backlog/BacklogComponent/SprintComponent/SprintItem.js 中 clearFilter 方法
     return (
       <div className="c7n-agile-quickSearch" style={style}>
         <p>搜索:</p>
-        <Select
-          key="quickSearchSelect"
-          className="quickSearchSelect"
-          dropdownClassName="quickSearchSelect-dropdown"
-          mode="multiple"
-          labelInValue
-          placeholder="快速搜索"
-          maxTagCount={0}
-          maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
-          onChange={this.handleQuickSearchChange}
-          getPopupContainer={triggerNode => triggerNode.parentNode}
-        >
-          {
-            <OptGroup key="quickSearch" label="常用选项">
-              <Option key={-1} value={-1}>仅我的问题</Option>
-              <Option key={-2} value={-2}>仅故事</Option>
-            </OptGroup>
+        {showRealQuickSearch ? (
+          <React.Fragment>
+            <Select
+              key="quickSearchSelect"
+              className="quickSearchSelect"
+              dropdownClassName="quickSearchSelect-dropdown"
+              mode="multiple"
+              labelInValue
+              placeholder="快速搜索"
+              maxTagCount={0}
+              maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
+              onChange={this.handleQuickSearchChange}
+              getPopupContainer={triggerNode => triggerNode.parentNode}
+            >
+              {
+                <OptGroup key="quickSearch" label="常用选项">
+                  <Option key={-1} value={-1}>仅我的问题</Option>
+                  <Option key={-2} value={-2}>仅故事</Option>
+                </OptGroup>
           }
-          <OptGroup key="more" label="更多">
-            {
+              <OptGroup key="more" label="更多">
+                {
               quickSearchArray.map(item => (
                 <Option key={item.value} value={item.value} title={item.label}>{item.label}</Option>
               ))
             }
-          </OptGroup>
-        </Select>
-        <Select
-          key="assigneeSelect"
-          className="assigneeSelect"
-          mode="multiple"
-          dropdownClassName="assigneeSelect-dropdown"
-          placeholder="经办人"
-          labelInValue
-          maxTagCount={0}
-          maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
-          filter
-          optionFilterProp="children"
-          onFilterChange={(value) => {
-            if (value) {
-              debounceCallback(() => {
-                axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?size=40&param=${value}`).then((res) => {
-                  // Set 用于查询是否有 id 重复的，没有重复才往里加
-                  const temp = new Set(userDataArray.map(item => item.id));
-                  res.content.filter(item => item.enabled).forEach((item) => {
-                    if (!temp.has(item.id)) {
-                      userDataArray.push({
-                        id: item.id,
-                        realName: item.realName,
+              </OptGroup>
+            </Select>
+            <Select
+              key="assigneeSelect"
+              className="assigneeSelect"
+              mode="multiple"
+              dropdownClassName="assigneeSelect-dropdown"
+              placeholder="经办人"
+              labelInValue
+              maxTagCount={0}
+              maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
+              filter
+              optionFilterProp="children"
+              onFilterChange={(value) => {
+                if (value) {
+                  debounceCallback(() => {
+                    axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?size=40&param=${value}`).then((res) => {
+                      // Set 用于查询是否有 id 重复的，没有重复才往里加
+                      const temp = new Set(userDataArray.map(item => item.id));
+                      res.content.filter(item => item.enabled).forEach((item) => {
+                        if (!temp.has(item.id)) {
+                          userDataArray.push({
+                            id: item.id,
+                            realName: item.realName,
+                          });
+                        }
                       });
-                    }
-                  });
-                  this.setState({
-                    userDataArray,
-                  });
-                });
-              }, this);
-            }
-          }}
-          onChange={this.handleAssigneeChange}
-          getPopupContainer={triggerNode => triggerNode.parentNode}
-        >
-          {
+                      this.setState({
+                        userDataArray,
+                      });
+                    });
+                  }, this);
+                }
+              }}
+              onChange={this.handleAssigneeChange}
+              getPopupContainer={triggerNode => triggerNode.parentNode}
+            >
+              {
             userDataArray.length && userDataArray.map(item => (
               <Option key={item.id} value={item.id} title={item.realName}>{item.realName}</Option>
             ))
-          }
-        </Select>
+              }
+            </Select>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <Select placeholder="快速搜索" className="quickSearchSelect" />
+            <Select placeholder="经办人" className="assigneeSelect" />
+          </React.Fragment>
+        )}
       </div>
     );
   }
