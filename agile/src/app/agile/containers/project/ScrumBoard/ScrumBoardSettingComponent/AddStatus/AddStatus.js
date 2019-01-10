@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Content, stores, axios } from 'choerodon-front-boot';
 import {
-  Form, Modal, Input, Select,
+  Form, Modal, Input, Select, message,
 } from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import { STATUS } from '../../../../../common/Constant';
@@ -38,6 +38,9 @@ class AddStatus extends Component {
           categoryCode: values.categoryCode,
         };
         ScrumBoardStore.axiosAddStatus(params).then((data) => {
+          if (data && data.failed && data.code === 'error.status.exist') {
+            message.error(`状态 ${values.name} 已经存在。`);
+          }
           onChangeVisible(false);
           refresh();
           this.setState({

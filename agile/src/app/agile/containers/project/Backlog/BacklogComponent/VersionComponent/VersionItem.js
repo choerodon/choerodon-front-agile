@@ -258,7 +258,7 @@ class VersionItem extends Component {
                       autoFocus
                       defaultValue={item.name}
                       onPressEnter={this.handleBlurName.bind(this)}
-                        // onBlur={this.handleBlurName.bind(this)}
+                      onBlur={this.handleBlurName.bind(this)}
                       onClick={e => e.stopPropagation()}
                       maxLength={10}
                     />

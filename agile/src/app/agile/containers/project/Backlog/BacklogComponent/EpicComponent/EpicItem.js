@@ -177,7 +177,7 @@ class EpicItem extends Component {
                       defaultValue={item.epicName}
                       onPressEnter={this.handleSave.bind(this)}
                       onClick={e => e.stopPropagation()}
-                      // onBlur={this.handleSave.bind(this)}
+                      onBlur={this.handleSave.bind(this)}
                       maxLength={10}
                     />
                   ) : (
