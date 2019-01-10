@@ -90,14 +90,14 @@ class ReleaseDetail extends Component {
       ReleaseStore.setVersionDetail(res);
       ReleaseStore.setIssueCountDetail({
         todoCount: res.todoIssueCount,
-        todoStatus: res.todoStatusIds,
+        todoStatus: res.todoStatuses,
         doingCount: res.doingIssueCount,
-        todoStatusCount: res.todoStatusIds.length,
-        doingStatusCount: res.doingStatusIds.length,
-        doneStatusCount: res.doneStatusIds.length,
-        doingStatus: res.doingStatusIds,
+        todoStatusCount: res.todoStatuses.length,
+        doingStatusCount: res.doingStatuses.length,
+        doneStatusCount: res.doneStatuses.length,
+        doingStatus: res.doingStatuses,
         doneCount: res.doneIssueCount,
-        doneStatus: res.doneStatusIds,
+        doneStatus: res.doneStatuses,
         count: res.issueCount,
       });
       this.setState({
@@ -107,6 +107,7 @@ class ReleaseDetail extends Component {
     });
     ReleaseStore.axiosGetVersionStatusIssues(match.params.id, filter, key).then((res2) => {
       ReleaseStore.setVersionStatusIssues(res2);
+      ReleaseStore.setOriginIssue(res2);
       this.setState({
         loading: false,
       });
@@ -207,7 +208,6 @@ class ReleaseDetail extends Component {
     if (type === 'done') {
       name = '已完成';
       count = ReleaseStore.getIssueCountDetail.doneStatusCount;
-      debugger;
       data = ReleaseStore.getIssueCountDetail.doneStatus;
       background = 'rgb(0, 191, 165)';
     } else if (type === 'doing') {
@@ -231,9 +231,9 @@ class ReleaseDetail extends Component {
           {count || 0}
           {'种状态'}
         </p>
-        {data
-          ? _.keys(data).map(key => (
-            <div key={key} style={{ margin: '14px 0' }}>
+        {
+          data && data.length ? data.map(item => (
+            <div key={item.id} style={{ margin: '14px 0' }}>
               <span
                 style={{
                   background,
@@ -242,14 +242,19 @@ class ReleaseDetail extends Component {
                   marginRight: 16,
                 }}
               >
-                {data[key].name}
+                {item.name}
               </span>
               <span>
-                {data[key].count}
+                {
+                  ReleaseStore.getOriginIssue.filter(
+                    issues => issues.statusMapDTO.id === item.id,
+                  ).length
+                }
                 {'个'}
               </span>
-            </div>))
-          : ''
+            </div>
+          ))
+            : ''
         }
       </div>
     );
@@ -393,7 +398,8 @@ class ReleaseDetail extends Component {
               >
                 {`版本 ${ReleaseStore.getVersionDetail.name}`}
               </div>
-            </Tooltip>)}
+            </Tooltip>
+)}
           backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
 
@@ -520,7 +526,8 @@ class ReleaseDetail extends Component {
                         <br />
                         {'个问题'}
                       </span>
-                    </div>)}
+                    </div>
+                  )}
                   key="0"
                 >
                   {this.renderTabTables(columns)}
@@ -559,7 +566,8 @@ class ReleaseDetail extends Component {
                         <br />
                         {'正在处理'}
                       </span>
-                    </div>)}
+                    </div>
+                  )}
                   key="doing"
                 >
                   {this.renderTabTables(columns)}
