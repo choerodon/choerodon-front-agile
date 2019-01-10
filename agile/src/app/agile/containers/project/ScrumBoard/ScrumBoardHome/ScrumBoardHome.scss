@@ -102,6 +102,12 @@
   p {
     margin-bottom: 0;
   }
+
+  .boardBtn.ant-btn-flat:hover {
+    background: #fff;
+    cursor: text;
+  }
+  
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {

@@ -78,27 +78,48 @@ class CreateVOS extends Component {
     });
   };
 
-  render() {
-    const { visible, onCancel, onOk, type, container } = this.props;
-    const { getFieldDecorator } = this.props.form;
+  /**
+ *验证版本名称是否重复
+ *
+ * @memberof CreateVersion
+ */
+checkVersionNameRepeat = (rule, value, callback) => {
+  axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/check?name=${value}`)
+    .then((res) => {
+      if (res) {
+        callback('版本名称重复');
+      } else {
+        callback();
+      }
+    });
+};
+
+render() {
+  const {
+    visible, onCancel, onOk, type, container, 
+  } = this.props;
+  const { getFieldDecorator } = this.props.form;
   
-    return (
-      <Modal
-        className="c7n-createVOS"
+  return (
+    <Modal
+      className="c7n-createVOS"
         // getContainer={() => container}
-        title={`创建${type === 'sprint' ? '冲刺' : '版本'}`}
-        visible={visible || false}
-        onOk={this.handleCreate}
-        onCancel={onCancel}
-        okText="创建"
-        cancelText="取消"
-        destroyOnClose
-        confirmLoading={this.state.loading}
-      >
-        <Form layout="vertical">
+      title={`创建${type === 'sprint' ? '冲刺' : '版本'}`}
+      visible={visible || false}
+      onOk={this.handleCreate}
+      onCancel={onCancel}
+      okText="创建"
+      cancelText="取消"
+      destroyOnClose
+      confirmLoading={this.state.loading}
+    >
+      <Form layout="vertical">
           <FormItem>
             {getFieldDecorator('name', {
-              rules: [{ required: true, message: '请输入名称' }],
+              rules: [{ required: true, message: '请输入名称' },
+                type === 'version' ? {
+                  validator: this.checkVersionNameRepeat,
+                } : {}],
               initialValue: this.state.nextSprintName,
             })(
               <Input
@@ -110,8 +131,8 @@ class CreateVOS extends Component {
             )}
           </FormItem>
         </Form>
-      </Modal>
-    );
-  }
+    </Modal>
+  );
+}
 }
 export default Form.create({})(CreateVOS);

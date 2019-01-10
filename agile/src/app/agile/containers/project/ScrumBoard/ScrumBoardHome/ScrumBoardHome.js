@@ -1114,7 +1114,13 @@ class ScrumBoardHome extends Component {
           {
             ScrumBoardStore.getBoardList.length === 1 ? ScrumBoardStore.getBoardList.map((item, index, value) => (
               <Tooltip key={item.boardId} title={item.name}>
-                <div style={{ color: '#3f51b5', margin: '0 20px' }}>{item.name}</div>
+                {/* <div style={{ color: '#3f51b5', margin: '0 20px' }}>{item.name}</div> */}
+                <Button
+                  funcType="flat"
+                  className="boardBtn"
+                >
+                  <span>{item.name}</span>
+                </Button>
               </Tooltip>
             )) : (
               <Select
@@ -1162,6 +1168,9 @@ class ScrumBoardHome extends Component {
           {
             (
               <Button
+                style={{
+                  marginTop: 2,
+                }}
                 className="leftBtn2"
                 disabled={!dataSource ? false
                   : !(dataSource && dataSource.currentSprint && dataSource.currentSprint.sprintId)}
