@@ -23,74 +23,13 @@ class Search extends Component {
       createFileterShow: false,
       currentFilterId: undefined,
       filter: {},
-      // confirmShow: false,
       loading: false,
-      // editComponentShow: false,
-      // createComponentShow: false,
     };
   }
 
   componentDidMount() {
     this.loadFilters();
   }
-
-  showFilter = (record) => {
-    this.setState({
-      editFilterShow: true,
-      currentFilterId: record.filterId,
-    });
-  };
-
-  clickDeleteFilter = (record) => {
-    this.setState({
-      filter: record,
-      deleteFilterShow: true,
-    });
-  };
-
-  deleteComponent = () => {
-    // this.setState({
-    //   confirmShow: false,
-    // });
-    this.loadComponents();
-  };
-
-  loadFilters = () => {
-    this.setState({
-      loading: true,
-    });
-    axios
-      .get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
-      .then((res) => {
-        this.setState({
-          filters: res,
-          loading: false,
-        });
-      })
-      .catch((error) => {});
-  };
-
-  handleDrag = (data, postData) => {
-    this.setState({
-      filters: data,
-    });
-    axios
-      .put(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/drag`, postData)
-      .then(() => {
-        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`).then((res) => {
-          this.setState({
-            filters: res,
-          });
-        });
-      })
-      .catch(() => {
-        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`).then((ress) => {
-          this.setState({
-            filters: ress,
-          });
-        });
-      });
-  };
 
   transformOperation = (str) => {
     // 注意该对象key的顺序
@@ -115,6 +54,61 @@ class Search extends Component {
     });
     return transformKey;
   };
+
+  handleDrag = (data, postData) => {
+    this.setState({
+      filters: data,
+    });
+    axios
+      .put(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/drag`, postData)
+      .then(() => {
+        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`).then((res) => {
+          this.setState({
+            filters: res,
+          });
+        });
+      })
+      .catch(() => {
+        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`).then((ress) => {
+          this.setState({
+            filters: ress,
+          });
+        });
+      });
+  };
+
+  showFilter(record) {
+    this.setState({
+      editFilterShow: true,
+      currentFilterId: record.filterId,
+    });
+  }
+
+  clickDeleteFilter(record) {
+    this.setState({
+      filter: record,
+      deleteFilterShow: true,
+    });
+  }
+
+  deleteComponent() {
+    this.loadComponents();
+  }
+
+  loadFilters() {
+    this.setState({
+      loading: true,
+    });
+    axios
+      .get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
+      .then((res) => {
+        this.setState({
+          filters: res,
+          loading: false,
+        });
+      })
+      .catch((error) => {});
+  }
 
   render() {
     const {
@@ -200,10 +194,10 @@ class Search extends Component {
                 <div>
                   <span>详情</span>
                 </div>
-)}
+              )}
             >
               {/* <Button shape="circle" onClick={this.showFilter.bind(this, record)}> */}
-              <Icon type="mode_edit" onClick={this.showFilter(record)} />
+              <Icon type="mode_edit" onClick={this.showFilter.bind(this, record)} />
               {/* </Button> */}
             </Popover>
             <Popover
@@ -213,10 +207,10 @@ class Search extends Component {
                 <div>
                   <span>删除</span>
                 </div>
-)}
+              )}
             >
               {/* <Button shape="circle" onClick={this.clickDeleteFilter.bind(this, record)}> */}
-              <Icon type="delete_forever" onClick={this.clickDeleteFilter(record)} />
+              <Icon type="delete_forever" onClick={this.clickDeleteFilter.bind(this, record)} />
               {/* </Button> */}
             </Popover>
           </div>
