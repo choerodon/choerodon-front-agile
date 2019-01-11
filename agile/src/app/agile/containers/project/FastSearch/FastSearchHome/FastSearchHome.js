@@ -142,9 +142,15 @@ class Search extends Component {
         dataIndex: 'expressQuery',
         // width: '50%',
         render: expressQuery => (
-          <div style={{ width: '100%', overflow: 'hidden' }}>
+          <div style={{
+            maxWidth: '422px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+          >
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={this.transformOperation(expressQuery)}>
-              <p
+              <span
                 style={{
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -154,7 +160,7 @@ class Search extends Component {
               >
                 {/* {expressQuery} */}
                 {this.transformOperation(expressQuery)}
-              </p>
+              </span>
             </Tooltip>
           </div>
         ),
@@ -164,9 +170,15 @@ class Search extends Component {
         dataIndex: 'description',
         // width: '25%',
         render: description => (
-          <div style={{ width: '100%', overflow: 'hidden' }}>
+          <div style={{
+            maxWidth: '288px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+          >
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={description.split('+++')[0]}>
-              <p
+              <span
                 style={{
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -175,7 +187,7 @@ class Search extends Component {
                 }}
               >
                 {description.split('+++')[0] || ''}
-              </p>
+              </span>
             </Tooltip>
           </div>
         ),
