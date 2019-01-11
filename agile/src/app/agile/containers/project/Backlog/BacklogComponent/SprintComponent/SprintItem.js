@@ -24,10 +24,23 @@ const { confirm } = Modal;
 const { AppState } = stores;
 
 const filterIssueTypeCode = ['issue_epic', 'sub_task'];
+
+const deBounce = (delay) => {
+  let timeout;
+  return (fn, that) => {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+    timeout = setTimeout(fn, delay, that);// (自定义函数，延迟时间，自定义函数参数1，参数2)
+  };
+};
+
 @observer
 class SprintItem extends Component {
   constructor(props) {
     super(props);
+    this.debounceCallback = deBounce(500);
     this.state = {
       editStartDate: false,
       editendDate: false,
@@ -160,47 +173,50 @@ class SprintItem extends Component {
       this.setState({
         loading: true,
       });
-      const data = {
-        priorityCode: `priority-${priorityId}`,
-        priorityId,
-        projectId: AppState.currentMenuType.id,
-        sprintId: type !== 'backlog' ? item.sprintId : 0,
-        summary: this[`${index}-addInput`].input.value,
-        issueTypeId: currentType.id,
-        typeCode: currentType.typeCode,
-        /* eslint-disable */
-        ...!isNaN(store.getChosenEpic) ? {
-          epicId: store.getChosenEpic,
-        } : {},
-        ...!isNaN(store.getChosenVersion) ? {
-          versionIssueRelDTOList: [
-            {
-              versionId: store.getChosenVersion,
+      // 防抖函数
+      this.debounceCallback(() => {
+        const data = {
+          priorityCode: `priority-${priorityId}`,
+          priorityId,
+          projectId: AppState.currentMenuType.id,
+          sprintId: type !== 'backlog' ? item.sprintId : 0,
+          summary: this[`${index}-addInput`].input.value,
+          issueTypeId: currentType.id,
+          typeCode: currentType.typeCode,
+          /* eslint-disable */
+          ...!isNaN(store.getChosenEpic) ? {
+            epicId: store.getChosenEpic,
+          } : {},
+          ...!isNaN(store.getChosenVersion) ? {
+            versionIssueRelDTOList: [
+              {
+                versionId: store.getChosenVersion,
+              },
+            ],
+          } : {},
+          parentIssueId: 0,
+        };
+        /* eslint-enable */
+        store.axiosEasyCreateIssue(data).then((res) => {
+          this.setState({
+            [`${index}-create`]: {
+              createIssue: false,
             },
-          ],
-        } : {},
-        parentIssueId: 0,
-      };
-      /* eslint-enable */
-      store.axiosEasyCreateIssue(data).then((res) => {
-        this.setState({
-          [`${index}-create`]: {
-            createIssue: false,
-          },
-          // createIssueValue: '',
-          loading: false,
-          selected: {
-            issueIds: [res.issueId],
-          },
+            // createIssueValue: '',
+            loading: false,
+            selected: {
+              issueIds: [res.issueId],
+            },
+          });
+          refresh();
+          store.setSelectIssue([res.issueId]);
+          store.setClickIssueDetail(res);
+        }).catch((error) => {
+          this.setState({
+            loading: false,
+          });
         });
-        refresh();
-        store.setSelectIssue([res.issueId]);
-        store.setClickIssueDetail(res);
-      }).catch((error) => {
-        this.setState({
-          loading: false,
-        });
-      });
+      }, this);
     }
   };
 
