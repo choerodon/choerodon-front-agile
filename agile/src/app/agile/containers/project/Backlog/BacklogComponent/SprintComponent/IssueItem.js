@@ -242,7 +242,7 @@ class IssueItem extends Component {
                   </div>
                   <div
                     style={{
-                      width: 60,
+                      width: 63,
                       marginLeft: !_.isNull(item.statusMapDTO && item.statusMapDTO.name) ? '12px' : 0,
                     }}
                     label="sprintIssue"

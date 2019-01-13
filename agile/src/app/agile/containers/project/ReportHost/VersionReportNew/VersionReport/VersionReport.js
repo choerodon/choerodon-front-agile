@@ -596,7 +596,7 @@ class EpicReport extends Component {
         <Content
           title="版本报告图"
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/version-report/"
+          link="https://v0-10.choerodon.io/zh/docs/user-guide/report/agile-report/version-report/"
         >
           {
             !(!VS.versions.length && VS.versionFinishLoading) ? (

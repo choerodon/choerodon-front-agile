@@ -41,7 +41,7 @@ let BodyRow = (props) => {
   } = props;
   const style = { ...restProps.style, cursor: 'move' };
 
-  let className = restProps.className;
+  let { className } = restProps;
   if (isOver && initialClientOffset) {
     const direction = dragDirection(
       dragRow.index,
@@ -87,7 +87,8 @@ const rowTarget = {
       return;
     }
     props.moveRow(dragIndex, hoverIndex, monitor);
-    monitor.getItem().index = hoverIndex;
+    const item = monitor.getItem();
+    item.index = hoverIndex;
   },
 };
 
@@ -109,27 +110,32 @@ BodyRow = DropTarget('row', rowTarget, (connect, monitor) => ({
 
 @DragDropContext(HTML5Backend)
 class SortTable extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: props.dataSource,
-      sourceData: props.dataSource,
-    };
-  }
-  componentWillReceiveProps(nextProps) {
-    if (JSON.stringify(this.state.data) !== JSON.stringify(this.props.dataSource)) {
-      this.setState({ data: this.props.dataSource, sourceData: this.props.dataSource });
-    }
-  }
   components = {
     body: {
       row: BodyRow,
     },
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: props.dataSource,
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { dataSource } = this.props;
+    const { data } = this.state;
+    if (JSON.stringify(data) !== JSON.stringify(dataSource)) {
+      this.setState({ data: dataSource });
+    }
+  }
+
+
   moveRow = (dragIndex, hoverIndex, e) => {
+    const { dataSource, handleDrag } = this.props;
     // e.preventDefault();
-    const data = this.props.dataSource;
+    const data = dataSource;
     const result = Array.from(data);
     const [removed] = result.splice(dragIndex, 1);
     result.splice(hoverIndex, 0, removed);
@@ -147,20 +153,26 @@ class SortTable extends Component {
     }
     const versionId = data[dragIndex].filterId;
     const { objectVersionNumber } = data[dragIndex];
-    const postData = { afterSequence, beforeSequence, filterId: versionId, objectVersionNumber };
+    const postData = {
+      afterSequence, beforeSequence, filterId: versionId, objectVersionNumber,
+    };
 
-    this.props.handleDrag(result, postData);
+    handleDrag(result, postData);
   };
+
   render() {
     // window.console.log(this.props.dataSource);
     // window.console.log(this.state.data);
+    const {
+      columns, dataSource, onChange, pagination,
+    } = this.props;
     return (
       <Table
-        rowClassName={'table-row'}
-        columns={this.props.columns}
-        dataSource={this.props.dataSource}
-        pagination={this.props.dataSource.length <= 10 ? false : this.props.pagination}
-        onChange={this.props.onChange}
+        rowClassName="table-row"
+        columns={columns}
+        dataSource={dataSource}
+        pagination={dataSource.length <= 10 ? false : pagination}
+        onChange={onChange}
         components={this.components}
         filterBarPlaceholder="过滤表"
         onRow={(record, index) => ({
@@ -177,4 +189,3 @@ class SortTable extends Component {
 }
 
 export default SortTable;
-

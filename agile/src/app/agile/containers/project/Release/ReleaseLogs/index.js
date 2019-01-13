@@ -130,25 +130,17 @@ class ReleaseLogs extends Component {
           {
             state[issueType.typeCode].map(issue => (
               <li style={{ marginBottom: 16 }}>
-                <span>[</span>
-                {
-                  issue.typeCode !== 'sub_task' ? (
-                    <a
-                      role="none"
-                      onClick={() => {
-                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}&paramUrl=release/logs/${match.params.id}`);
-                        return false;
-                      }}
-                    >
-                      {issue.issueNum}
-                    </a>
-                  ) : (
-                    <span>
-                      {issue.issueNum}
-                    </span>
-                  )
-                }
-                <span>]</span>
+                <a
+                  role="none"
+                  onClick={() => {
+                    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}&paramUrl=release/logs/${match.params.id}`);
+                    return false;
+                  }}
+                >
+                  [
+                  {issue.issueNum}
+                  ]
+                </a>
                 {` - ${issue.summary}`}
               </li>
             ))

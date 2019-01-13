@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 // 用于追踪 Mobx 引起的渲染，非性能调优时可注释
-// import { trace } from 'mobx';
+import { trace } from 'mobx';
 import {
   Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
@@ -38,15 +38,18 @@ class Issue extends Component {
     this.filterControler = new IssueFilterControler();
   }
 
+  componentWillMount() {
+    const { location } = this.props;
+    if (location.search.indexOf('param') !== -1) {
+      this.filterControler.paramConverter(location.search);
+    }
+  }
+
   /**
    * 处理传入的 Param（如果有的话）
    * 利用 filterControler 类中的 refresh 方法发出初始化请求（包含优先级，状态，类型，标签数据）
    */
   componentDidMount() {
-    const { location } = this.props;
-    if (location.search.indexOf('param') !== -1) {
-      this.filterControler.paramConverter(location.search);
-    }
     this.filterControler.refresh('init').then((data) => {
       if (data.failed) {
         Choerodon.prompt(data.message);
@@ -146,6 +149,7 @@ class Issue extends Component {
   // ExpandCssControler => 用于向 IssueTable 注入 CSS 样式
   render() {
     // 清除整页滚动条
+    trace(true);
     if (document && document.getElementsByClassName('page-body').length) {
       // document.getElementsByClassName('page-body')[0].style.overflow = 'hidden';
     }
@@ -200,7 +204,9 @@ class Issue extends Component {
             />
             <IssueTable filterControler={this.filterControler} />
           </div>
-          <ExpandWideCard />
+          <ExpandWideCard
+            issueRefresh={this.Refresh}
+          />
           <CreateIssueModal />
         </Content>
       </Page>

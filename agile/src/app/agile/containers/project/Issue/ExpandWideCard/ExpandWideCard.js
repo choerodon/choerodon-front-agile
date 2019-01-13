@@ -9,25 +9,8 @@ import IssueFilterControler from '../IssueFilterControler';
 class ExpandWideCard extends Component {
   // 更新 Issue 时
   handleIssueUpdate = (issueId) => {
-    const selectedIssue = IssueStore.getSelectedIssue;
-    let Id;
-    if (!issueId) {
-      Id = selectedIssue.issueId;
-    } else {
-      Id = issueId;
-    }
-    IssueStore.setLoading(true);
-    loadIssue(Id).then((res) => {
-      const obj = {
-        ...res,
-        imageUrl: res.assigneeImageUrl || '',
-        versionIssueRelDTOS: res.versionIssueRelDTOList,
-      };
-      const originIssues = new Map(IssueStore.getIssues.map(item => [item.issueId, item]));
-      // 修改部分被更改过的 issue 数据
-      originIssues.set(res.issueId, obj);
-      IssueStore.setIssues(Array.from(originIssues.values()));
-    });
+    const { issueRefresh } = this.props;
+    issueRefresh();
   };
 
   render() {

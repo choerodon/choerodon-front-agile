@@ -11,6 +11,8 @@ const { AppState } = stores;
 class ReleaseStore {
   @observable versionList = [];
 
+  @observable originIssue = [];
+
   @observable versionDetail = {};
 
   @observable versionStatusIssues = [];
@@ -146,6 +148,14 @@ class ReleaseStore {
 
   @action setVersionStatusIssues(data) {
     this.versionStatusIssues = data;
+  }
+
+  @computed get getOriginIssue() {
+    return toJS(this.originIssue);
+  }
+
+  @action setOriginIssue(data) {
+    this.originIssue = data;
   }
 
   axiosGetVersionDetail(versionId) {

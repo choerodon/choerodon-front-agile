@@ -53,27 +53,149 @@ class AddComponent extends Component {
     this.loadFilter(filterId);
   }
 
+  getFilterGroup = (filter) => {
+    /* eslint-disable */
+    // [=, !=, in, notIn]
+    const equal_notEqual_in_notin = new Set(['priority', 'issue_type', 'status']);
+    // [=, !=, in, notIn, is, isNot]
+    const equal_notEqual_in_notIn_is_isNot= new Set(['assignee', 'reporter', 'created_user', 'last_updated_user', 'epic', 'sprint', 'label', 'component', 'influence_version', 'fix_version']);
+    // [>, >=, <, <=]
+    const greater_greaterAndEqual_lessThan_lessThanAndEqual = new Set(['last_update_date', 'creation_date']);
+    // [>, >=, <, <=, is, isNot]
+    const greater_greaterAndEqual_lessThan_lessThanAndEqual_is_isNot_equal = new Set(['story_point', 'remain_time']);
+    /* eslint-enable */
+
+    if (equal_notEqual_in_notin.has(filter)) {
+      return 'is (=,!=,in,notin)';
+    } else if (greater_greaterAndEqual_lessThan_lessThanAndEqual.has(filter)) {
+      return 'is (>,>=,<,<=)';
+    } else if (equal_notEqual_in_notIn_is_isNot.has(filter)) {
+      return 'is (=,!=,in,notin,is,isNot)';
+    } else if (greater_greaterAndEqual_lessThan_lessThanAndEqual_is_isNot_equal.has(filter)) {
+      return 'is (>,>=,<,<=,is,isNot)';
+    }
+    return null;
+  };
+
   getOperation = (filter) => {
-    const OPERATION_FILTER = {
-      assignee: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      priority: ['=', '!=', 'in', 'notIn'],
-      issue_type: ['=', '!=', 'in', 'notIn'],
-      status: ['=', '!=', 'in', 'notIn'],
-      reporter: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      created_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      last_updated_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      epic: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      sprint: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      label: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      component: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      influence_version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      fix_version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
-      creation_date: ['>', '>=', '<', '<='],
-      last_update_date: ['>', '>=', '<', '<='],
-      story_point: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
-      remain_time: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
-    };
-    return OPERATION_FILTER[filter] || [];
+    const operationGroupBase = [
+      [
+        {
+          value: '=',
+          text: '等于',
+        },
+        {
+          value: '!=',
+          text: '不等于',
+        },
+        {
+          value: 'in',
+          text: '包含',
+        },
+        {
+          value: 'notIn',
+          text: '不包含',
+        },
+      ],
+      [
+        {
+          value: '>',
+          text: '大于',
+        },
+        {
+          value: '>=',
+          text: '大于或等于',
+        },
+        {
+          value: '<',
+          text: '小于',
+        },
+        {
+          value: '<=',
+          text: '小于或等于',
+        },
+      ],
+    ];
+    const operationGroupAdv = [
+      [
+        ...operationGroupBase[0],
+        {
+          value: 'is',
+          text: '是',
+        },
+        {
+          value: 'isNot',
+          text: '不是',
+        },
+      ],
+      [
+        ...operationGroupBase[1],
+        {
+          value: 'is',
+          text: '是',
+        },
+        {
+          value: 'isNot',
+          text: '不是',
+        },
+        {
+          value: '=',
+          text: '等于',
+        },
+      ],
+    ];
+    switch (this.getFilterGroup(filter)) {
+      case 'is (=,!=,in,notin)':
+        return operationGroupBase[0];
+      case 'is (>,>=,<,<=)':
+        return operationGroupBase[1];
+      case 'is (=,!=,in,notin,is,isNot)':
+        return operationGroupAdv[0];
+      case 'is (>,>=,<,<=,is,isNot)':
+        return operationGroupAdv[1];
+      default:
+        return [];
+    }
+    // const OPERATION_FILTER = {
+    //   priority: ['=', '!=', 'in', 'notIn'],
+    //   issue_type: ['=', '!=', 'in', 'notIn'],
+    //   status: ['=', '!=', 'in', 'notIn'],
+    //   assignee: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+    //   reporter: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+    //   created_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+    //   last_updated_user: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+    //   epic: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+    //   sprint: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+    //   label: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+    //   component: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+    //   influence_version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+    //   fix_version: ['=', '!=', 'is', 'isNot', 'in', 'notIn'],
+    //   creation_date: ['>', '>=', '<', '<='],
+    //   last_update_date: ['>', '>=', '<', '<='],
+    //   story_point: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
+    //   remain_time: ['<', '<=', '=', '>=', '>', 'is', 'isNot'],
+    // };
+    // return OPERATION_FILTER[filter] || [];
+  };
+
+  /**
+   *校验快速搜索名称是否重复
+   *
+   * @memberof AddComponent
+   */
+  checkSearchNameRepeat = (rule, value, callback) => {
+    const { originFilterName } = this.state;
+    if (originFilterName === value) {
+      callback();
+    }
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/check_name?quickFilterName=${value}`)
+      .then((res) => {
+        if (res) {
+          callback('快速搜索名称重复');
+        } else {
+          callback();
+        }
+      });
   };
 
   loadFilter = (id) => {
@@ -106,6 +228,7 @@ class AddComponent extends Component {
   };
 
   tempOption = (filter, addEmpty) => {
+    const { state } = this;
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
     const OPTION_FILTER = {
@@ -204,7 +327,7 @@ class AddComponent extends Component {
         state: 'originTypes',
       },
     };
-    const arr = this.state[[OPTION_FILTER[filter].state]].map(v => (
+    const arr = state[[OPTION_FILTER[filter].state]].map(v => (
       <Option key={v[OPTION_FILTER[filter].id]} value={v[OPTION_FILTER[filter].id]}>
         {v[OPTION_FILTER[filter].name]}
       </Option>
@@ -214,12 +337,8 @@ class AddComponent extends Component {
         <Option key="null" value="null">
 
 
-
-
-
-
           无
-                </Option>,
+        </Option>,
       );
     }
     return arr;
@@ -327,6 +446,7 @@ class AddComponent extends Component {
   }
 
   transformInitialValue(index, filter, operation, value) {
+    const { state } = this;
     const projectId = AppState.currentMenuType.id;
     const orgId = AppState.currentMenuType.organizationId;
     const OPTION_FILTER = {
@@ -452,14 +572,14 @@ class AddComponent extends Component {
         const arr = value.slice(1, -1).split(',');
         return arr.map(v => ({
           key: v * 1,
-          label: _.find(this.state[OPTION_FILTER[filter].state],
+          label: _.find(state[OPTION_FILTER[filter].state],
             { id: v * 1 }).name,
         }));
       } else {
         const k = value;
         return ({
           key: k,
-          label: _.find(this.state[OPTION_FILTER[filter].state],
+          label: _.find(state[OPTION_FILTER[filter].state],
             { [OPTION_FILTER[filter].id]: k * 1 }).name,
         });
       }
@@ -468,14 +588,14 @@ class AddComponent extends Component {
         const arr = value.slice(1, -1).split(',');
         return arr.map(v => ({
           key: v.slice(1, -1),
-          label: _.find(this.state[OPTION_FILTER[filter].state],
+          label: _.find(state[OPTION_FILTER[filter].state],
             { [OPTION_FILTER[filter].id]: v.slice(1, -1) }).name,
         }));
       } else {
         const k = value.slice(1, -1);
         return ({
           key: k,
-          label: _.find(this.state[OPTION_FILTER[filter].state],
+          label: _.find(state[OPTION_FILTER[filter].state],
             { [OPTION_FILTER[filter].id]: k }).name,
         });
       }
@@ -483,9 +603,9 @@ class AddComponent extends Component {
       const arr = value.slice(1, -1).split(',');
       return arr.map(v => ({
         key: v * 1,
-        label: _.find(this.state[OPTION_FILTER[filter].state],
+        label: _.find(state[OPTION_FILTER[filter].state],
           { [OPTION_FILTER[filter].id]: v * 1 })
-          ? _.find(this.state[OPTION_FILTER[filter].state],
+          ? _.find(state[OPTION_FILTER[filter].state],
             { [OPTION_FILTER[filter].id]: v * 1 })[OPTION_FILTER[filter].name]
           : undefined,
       }));
@@ -493,9 +613,9 @@ class AddComponent extends Component {
       const k = value * 1;
       return ({
         key: k,
-        label: _.find(this.state[OPTION_FILTER[filter].state],
+        label: _.find(state[OPTION_FILTER[filter].state],
           { [OPTION_FILTER[filter].id]: k })
-          ? _.find(this.state[OPTION_FILTER[filter].state],
+          ? _.find(state[OPTION_FILTER[filter].state],
             { [OPTION_FILTER[filter].id]: k })[OPTION_FILTER[filter].name]
           : undefined,
       });
@@ -602,7 +722,7 @@ class AddComponent extends Component {
         >
           {
             this.getOperation(filter).map(v => (
-              <Option key={v} value={v}>{v}</Option>
+              <Option key={v.value} value={v.value}>{v.text}</Option>
             ))
           }
         </Select>
@@ -651,14 +771,8 @@ class AddComponent extends Component {
               .indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
-
-
-
-
-
-
               空
-                        </Option>
+            </Option>
           </Select>
         );
       } else {
@@ -690,57 +804,27 @@ class AddComponent extends Component {
     } else {
       // story points && remainning time
       // return number input
-      if (operation === 'is' || operation === 'isNot') {
-        return (
-          <Select
-            label="值"
-            labelInValue
-            filter
-            optionFilterProp="children"
-            filterOption={(input, option) => option.props.children.toLowerCase()
-              .indexOf(input.toLowerCase()) >= 0}
-          >
-            <Option key="'null'" value="'null'">
-
-
-
-
-
-
-              空
-                        </Option>
-          </Select>
-        );
-      } else {
-        return (
-          <NumericInput
-            label="值"
-            style={{ lineHeight: '22px', marginBottom: 0, width: 100 }}
-          />
-        );
-      }
+      return !(operation === 'is' || operation === 'isNot') ? (
+        <NumericInput
+          label="值"
+          style={{ lineHeight: '22px', marginBottom: 0, width: 100 }}
+        />
+      ) : (
+        <Select
+          label="值"
+          labelInValue
+          filter
+          optionFilterProp="children"
+          filterOption={(input, option) => option.props.children.toLowerCase()
+            .indexOf(input.toLowerCase()) >= 0}
+        >
+          <Option key="'null'" value="'null'">
+            空
+          </Option>
+        </Select>
+      );
     }
   }
-
-  /**
-   *校验快速搜索名称是否重复
-  *
-  * @memberof AddComponent
-  */
-  checkSearchNameRepeat = (rule, value, callback) => {
-    const { originFilterName } = this.state;
-    if (originFilterName === value) {
-      callback();
-    }
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/check_name?quickFilterName=${value}`)
-      .then((res) => {
-        if (res) {
-          callback('快速搜索名称重复');
-        } else {
-          callback();
-        }
-      });
-  };
 
   render() {
     const { form, onCancel } = this.props;
@@ -851,7 +935,7 @@ class AddComponent extends Component {
                             }],
                             initialValue: arr[index].value,
                           })(
-                            this.renderValue(form.getFieldValue(`filter-${index}-prop`), this.props.form.getFieldValue(`filter-${index}-rule`)),
+                            this.renderValue(form.getFieldValue(`filter-${index}-prop`), form.getFieldValue(`filter-${index}-rule`)),
                           )}
                         </FormItem>
                         {
@@ -903,7 +987,7 @@ class AddComponent extends Component {
               )}
             </FormItem>
           </Form>
-          
+
         </Content>
       </Sidebar>
     );

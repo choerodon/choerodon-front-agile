@@ -11,7 +11,7 @@ import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 const { Sidebar } = Modal;
 const { AppState } = stores;
 const RadioGroup = Radio.Group;
-const Option = Select.Option;
+const { Option } = Select;
 
 @observer
 class DeleteReleaseWithIssue extends Component {
@@ -51,49 +51,54 @@ class DeleteReleaseWithIssue extends Component {
   }
 
   handleOk() {
+    const { versionDelInfo, onCancel, refresh } = this.props;
+    const {
+      influenceRadio, influenceTargetVersionId, fixTargetRadio, fixTargetVersionId,
+    } = this.state;
     const data2 = {
       projectId: AppState.currentMenuType.id,
-      versionId: this.props.versionDelInfo.versionId,
+      versionId: versionDelInfo.versionId,
     };
-    if (this.props.versionDelInfo.influenceIssueCount) {
-      if (!this.state.influenceRadio) {
-        data2.influenceTargetVersionId = this.state.influenceTargetVersionId;
+    if (versionDelInfo.influenceIssueCount) {
+      if (!influenceRadio) {
+        data2.influenceTargetVersionId = influenceTargetVersionId;
       }
     }
-    if (this.props.versionDelInfo.fixIssueCount) {
-      if (!this.state.fixTargetRadio) {
-        data2.fixTargetVersionId = this.state.fixTargetVersionId;
+    if (versionDelInfo.fixIssueCount) {
+      if (!fixTargetRadio) {
+        data2.fixTargetVersionId = fixTargetVersionId;
       }
     }
     ReleaseStore.axiosDeleteVersion(data2).then((data) => {
-      this.props.onCancel();
-      this.props.refresh();
+      onCancel();
+      refresh();
     }).catch((error) => {
     });
   }
 
   render() {
     const { planning } = this.state;
+    const { versionDelInfo, onCancel } = this.props;
     return (
       <Sidebar
-        title={`删除版本 ${this.props.versionDelInfo.versionName}`}
+        title={`删除版本 ${versionDelInfo.versionName}`}
         closable={false}
-        visible={JSON.stringify(this.props.versionDelInfo) !== '{}'}
+        visible={JSON.stringify(versionDelInfo) !== '{}'}
         okText="删除"
         cancelText="取消"
-        onCancel={this.props.onCancel.bind(this)}
+        onCancel={onCancel.bind(this)}
         onOk={this.handleOk.bind(this)}
       >
         <p>您想对分配给此版本的任何问题做什么?</p>
         <div style={{ marginTop: 25 }}>
           {
-            this.props.versionDelInfo.influenceIssueCount ? (
+            versionDelInfo.influenceIssueCount ? (
               <div style={{ marginBottom: '20px' }}>
                 <p style={{ flex: 1 }}>
-                  {`此版本影响问题数：${this.props.versionDelInfo.influenceIssueCount}`}
+                  {`此版本影响问题数：${versionDelInfo.influenceIssueCount}`}
                 </p>
                 {
-                  this.props.versionDelInfo.versionNames.length > 0 ? (
+                  versionDelInfo.versionNames.length > 0 ? (
                     <div
                       style={{
                         flex: 4,
@@ -126,13 +131,17 @@ class DeleteReleaseWithIssue extends Component {
                                 influenceTargetVersionId: value,
                               });
                             }}
-                            defaultValue={this.props.versionDelInfo.versionNames
-                              ? planning[0].versionId : undefined}
+                            defaultValue={versionDelInfo.versionNames
+                              ? planning.filter(
+                                item => item.versionId !== versionDelInfo.versionId,
+                              )[0].versionId : undefined}
                           >
-                            {this.props.versionDelInfo.versionNames ? (
-                              planning.map(item => (
-                                <Option value={item.versionId}>{item.name}</Option>
-                              ))
+                            {versionDelInfo.versionNames ? (
+                              planning
+                                .filter(item => item.versionId !== versionDelInfo.versionId)
+                                .map(item => (
+                                  <Option value={item.versionId}>{item.name}</Option>
+                                ))
                             ) : ''}
                           </Select>
                         </Radio>
@@ -154,13 +163,13 @@ class DeleteReleaseWithIssue extends Component {
             ) : ''
           }
           {
-            this.props.versionDelInfo.fixIssueCount ? (
+            versionDelInfo.fixIssueCount ? (
               <div>
                 <p style={{ flex: 1 }}>
-                  {`此版本修复问题数：${this.props.versionDelInfo.fixIssueCount}`}
+                  {`此版本修复问题数：${versionDelInfo.fixIssueCount}`}
                 </p>
                 {
-                  this.props.versionDelInfo.versionNames.length > 0 ? (
+                  versionDelInfo.versionNames.length > 0 ? (
                     <div style={{ flex: 4 }}>
                       <RadioGroup
                         defaultValue={0}
@@ -189,13 +198,17 @@ class DeleteReleaseWithIssue extends Component {
                                 fixTargetVersionId: value,
                               });
                             }}
-                            defaultValue={this.props.versionDelInfo.versionNames
-                              ? planning[0].versionId : undefined}
+                            defaultValue={versionDelInfo.versionNames
+                              ? planning.filter(
+                                item => item.versionId !== versionDelInfo.versionId,
+                              )[0].versionId : undefined}
                           >
-                            {this.props.versionDelInfo.versionNames ? (
-                              planning.map(item => (
-                                <Option value={item.versionId}>{item.name}</Option>
-                              ))
+                            {versionDelInfo.versionNames ? (
+                              planning
+                                .filter(item => item.versionId !== versionDelInfo.versionId)
+                                .map(item => (
+                                  <Option value={item.versionId}>{item.name}</Option>
+                                ))
                             ) : ''}
                           </Select>
                         </Radio>

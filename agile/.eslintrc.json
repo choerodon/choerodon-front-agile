@@ -36,6 +36,7 @@
     "import/no-duplicates": "off",
     "import/no-named-as-default": "off",
     "import/no-named-as-default-member": "off",
+    "max-len": "off",
     "jsx-a11y/interactive-supports-focus": "off",
     "no-trailing-spaces": "off",
     "class-methods-use-this": "off",

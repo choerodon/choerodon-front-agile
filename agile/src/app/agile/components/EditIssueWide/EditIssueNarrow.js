@@ -843,17 +843,12 @@ class CreateSprint extends Component {
 
   reloadIssue(paramIssueId) {
     const { origin } = this.state;
-    const { history } = this.props;
+    const { onUpdate } = this.props;
     const issueId = paramIssueId || origin.issueId;
     const urlParams = AppState.currentMenuType;
     const {
       type, id, organizationId, name,
     } = urlParams;
-    // if (!issueId) {
-    //   history.push(`/
-    //  agile/issue?type=${type}&id=${id}&
-    //  name=${encodeURIComponent(name)}&organizationId=${organizationId}`);
-    // }
     this.setState(
       {
         addCommit: false,
@@ -904,6 +899,9 @@ class CreateSprint extends Component {
         });
       },
     );
+    if (onUpdate) {
+      onUpdate();
+    }
   }
 
   changeRae(currentRae) {

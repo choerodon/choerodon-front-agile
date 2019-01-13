@@ -552,7 +552,7 @@ class SprintReport extends Component {
                 history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${record.issueId}&paramUrl=reporthost/sprintreport`);
               }}
             >
-              {issueNum} 
+              {issueNum}
               {' '}
               {record.addIssue ? '*' : ''}
             </span>
@@ -672,7 +672,7 @@ class SprintReport extends Component {
         <Content
           title={sprintName ? `迭代冲刺“${sprintName}”的冲刺报告` : '无冲刺迭代的冲刺报告'}
           description="了解每个冲刺中完成、进行和退回待办的工作。这有助于您确定您团队的工作量是否超额，更直观的查看冲刺的范围与工作量。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
+          link="https://v0-10.choerodon.io/zh/docs/user-guide/report/agile-report/sprint/"
         >
           <Spin spinning={this.state.loading}>
             {

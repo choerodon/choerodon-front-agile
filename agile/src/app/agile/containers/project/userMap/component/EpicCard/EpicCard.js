@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Input } from 'choerodon-ui';
-import { stores } from 'choerodon-front-boot';
+import { Input, message } from 'choerodon-ui';
+import { axios, stores } from 'choerodon-front-boot';
 import { Draggable } from 'react-beautiful-dnd';
 import './EpicCard.scss';
 import StatusTag from '../../../../../components/StatusTag';
@@ -68,47 +68,60 @@ class EpicCard extends Component {
 
   handleEpicNameChange = (e) => {
     this.setState({ epicName: e.target.value });
-  };
+  }
 
   handlePressEnter = (e) => {
     e.preventDefault();
     const { target } = e;
-    const { epicName } = this.state;
-    if (!epicName) {
-      return;
-    }
     target.blur();
   };
 
   updateEpicName = (e) => {
     const { epicName, originEpicName } = this.state;
     const { handleUpdateEpicName } = this.props;
-
-    this.setState({ isEdit: false });
     if (!epicName) {
       this.setState({
         epicName: originEpicName,
+        isEdit: false,
       });
+      return;
     }
-    if (epicName === originEpicName) return;
-    e.preventDefault();
-    const { epic } = this.props;
-    const { issueId, objectVersionNumber } = epic;
-    if (!epicName) return;
-    const obj = {
-      issueId,
-      epicName,
-      objectVersionNumber,
-    };
-    updateIssue(obj).then((res) => {
+    if (epicName === originEpicName) {
       this.setState({
         isEdit: false,
       });
-      US.modifyEpic(issueId, res.epicName, res.objectVersionNumber);
-      if (handleUpdateEpicName) {
-        handleUpdateEpicName();
-      }
-    });
+      return;
+    }
+
+    e.preventDefault();
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/check_epic_name?epicName=${e.target.value}`)
+      .then((checkRes) => {
+        if (checkRes) {
+          message.info('史诗名称重复');
+          setTimeout(() => {
+            this.textArea.focus();
+          }, 0);
+        } else {
+          const { epic } = this.props;
+          const { issueId, objectVersionNumber } = epic;
+          if (!epicName) return;
+          const obj = {
+            issueId,
+            epicName,
+            objectVersionNumber,
+          };
+          updateIssue(obj).then((res) => {
+            this.setState({
+              isEdit: false,
+              originEpicName: epicName,
+            });
+            US.modifyEpic(issueId, res.epicName, res.objectVersionNumber);
+            if (handleUpdateEpicName) {
+              handleUpdateEpicName();
+            }
+          });
+        }
+      });
   };
 
   exitFullScreen() {
@@ -164,10 +177,12 @@ class EpicCard extends Component {
               <div
                 className="c7n-content"
               >
+
                 <TextArea
                   className="c7n-textArea"
                   autosize={{ minRows: 1, maxRows: 2 }}
                   value={epicName}
+                  ref={(textArea) => { this.textArea = textArea; }}
                   onChange={this.handleEpicNameChange.bind(this)}
                   onPressEnter={this.handlePressEnter}
                   onDoubleClick={this.handleClickTextArea}

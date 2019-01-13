@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Icon, DatePicker, Popover, Dropdown, Menu, Modal, Form, Select, Checkbox, Spin, 
+  Button, Icon, DatePicker, Popover, Dropdown, Menu, Modal, Form, Select, Checkbox, Spin,
 } from 'choerodon-ui';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
@@ -213,12 +213,12 @@ class AccumulationHome extends Component {
           normal: {
             color: data[index].color,
             opacity: 0.1,
-          }, 
+          },
         },
         lineStyle: {
           normal: {
             color: data[index].color,
-          }, 
+          },
         },
         itemStyle: {
           normal: { color: data[index].color },
@@ -466,7 +466,7 @@ class AccumulationHome extends Component {
         <Content
           title="累积流量图"
           description="显示状态的问题。这有助于您识别潜在的瓶颈, 需要对此进行调查。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/cumulative-flow/"
+          link="https://v0-10.choerodon.io/zh/docs/user-guide/report/agile-report/cumulative-flow/"
           style={{
             display: 'flex',
             flexDirection: 'column',

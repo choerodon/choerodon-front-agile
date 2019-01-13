@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { toJS } from 'mobx';
 import {
-  Button, Icon, Select, Tabs, Table, Dropdown, Menu, Tooltip, Spin, 
+  Button, Icon, Select, Tabs, Table, Dropdown, Menu, Tooltip, Spin,
 } from 'choerodon-ui';
 import {
-  Page, Header, Content, stores, 
+  Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
@@ -448,7 +448,7 @@ class VersionReport extends Component {
     }
     return '';
   }
-  
+
   renderTabTable(type) {
     const columns = [{
       title: '问题编号',
@@ -456,7 +456,7 @@ class VersionReport extends Component {
       key: 'issueNum',
       render: (text, record) => (
         <span
-          style={{ 
+          style={{
             color: '#3F51B5',
             cursor: 'pointer',
           }}
@@ -518,8 +518,8 @@ class VersionReport extends Component {
       dataIndex: 'statusName',
       key: 'statusName',
       render: (text, record) => (
-        <span 
-          label="sprintIssue" 
+        <span
+          label="sprintIssue"
           className="c7n-backlog-sprintIssueStatus"
           style={{
             background: record.statusMapDTO ? STATUS[record.statusMapDTO.type] : '#4d90fe',
@@ -596,9 +596,9 @@ class VersionReport extends Component {
             history={this.props.history}
             current="versionReport"
           />
-          <Button 
-            funcType="flat" 
-            onClick={() => { 
+          <Button
+            funcType="flat"
+            onClick={() => {
               this.updateIssues(this.state.datas);
               this.getReportData(this.state.type);
             }}
@@ -610,7 +610,7 @@ class VersionReport extends Component {
         <Content
           title="版本报告图"
           description="跟踪对应的版本发布日期。这样有助于您监控此版本是否按时发布，以便工作滞后时能采取行动。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/version-report/"
+          link="https://v0-10.choerodon.io/zh/docs/user-guide/report/agile-report/versionburndown/"
         >
           <Spin spinning={this.state.loading}>
             {VersionReportStore.getVersionList.length ? (

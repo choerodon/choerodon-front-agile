@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Table, Spin, Popover, Tooltip, Icon, Modal, 
+  Button, Table, Spin, Popover, Tooltip, Icon, Modal,
 } from 'choerodon-ui';
 import {
-  Page, Header, Content, stores, axios, 
+  Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
 import Filter from './Component/Filter';
 import EditFilter from './Component/EditFilter';
@@ -13,7 +13,6 @@ import SortTable from './Component/SortTable';
 import './FastSearchHome.scss';
 
 const { AppState } = stores;
-const confirm = Modal.confirm;
 
 @observer
 class Search extends Component {
@@ -24,11 +23,7 @@ class Search extends Component {
       createFileterShow: false,
       currentFilterId: undefined,
       filter: {},
-      confirmShow: false,
-
       loading: false,
-      editComponentShow: false,
-      createComponentShow: false,
     };
   }
 
@@ -36,41 +31,29 @@ class Search extends Component {
     this.loadFilters();
   }
 
-  showFilter(record) {
-    this.setState({
-      editFilterShow: true,
-      currentFilterId: record.filterId,
-    });
-  }
+  transformOperation = (str) => {
+    // 注意该对象key的顺序
+    const OPERATION = {
+      '!=': '不等于',
+      'not in': '不包含',
+      in: '包含',
+      'is not': '不是',
+      is: '是',
+      '<=': '小于或等于',
+      '<': '小于',
+      '>=': '大于或等于',
+      '>': '大于',
+      '=': '等于',
+      OR: '或',
+      AND: '与',
+    };
 
-  clickDeleteFilter(record) {
-    this.setState({
-      filter: record,
-      deleteFilterShow: true,
+    let transformKey = str;
+    Object.keys(OPERATION).forEach((v) => {
+      transformKey = transformKey.replace(new RegExp(` ${v} `, 'g'), ` ${OPERATION[v]} `);
     });
-  }
-
-  deleteComponent() {
-    this.setState({
-      confirmShow: false,
-    });
-    this.loadComponents();
-  }
-
-  loadFilters() {
-    this.setState({
-      loading: true,
-    });
-    axios
-      .get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
-      .then((res) => {
-        this.setState({
-          filters: res,
-          loading: false,
-        });
-      })
-      .catch((error) => {});
-  }
+    return transformKey;
+  };
 
   handleDrag = (data, postData) => {
     this.setState({
@@ -94,27 +77,44 @@ class Search extends Component {
       });
   };
 
-  transformOperation = (str) => {
-    // 注意该对象key的顺序
-    const OPERATION = {
-      '!=': '不等于',
-      'not in': '不包含',
-      in: '包含',
-      'is not': '不是',
-      is: '是',
-      '<=': '小于或等于',
-      '<': '小于',
-      '>=': '大于或等于',
-      '>': '大于',
-      '=': '等于',
-    };
-    
-    let transformKey = '';
-    transformKey = Object.keys(OPERATION).find(item => str.match(item)) && Object.keys(OPERATION).find(item => str.match(item));
-    return str.replace(transformKey, OPERATION[transformKey]);
-  };
+  showFilter(record) {
+    this.setState({
+      editFilterShow: true,
+      currentFilterId: record.filterId,
+    });
+  }
+
+  clickDeleteFilter(record) {
+    this.setState({
+      filter: record,
+      deleteFilterShow: true,
+    });
+  }
+
+  deleteComponent() {
+    this.loadComponents();
+  }
+
+  loadFilters() {
+    this.setState({
+      loading: true,
+    });
+    axios
+      .get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
+      .then((res) => {
+        this.setState({
+          filters: res,
+          loading: false,
+        });
+      })
+      .catch((error) => {});
+  }
 
   render() {
+    const {
+      loading, filters, createFileterShow, editFilterShow,
+      deleteFilterShow, filter, currentFilterId,
+    } = this.state;
     const column = [
       {
         title: '名称',
@@ -142,9 +142,15 @@ class Search extends Component {
         dataIndex: 'expressQuery',
         // width: '50%',
         render: expressQuery => (
-          <div style={{ width: '100%', overflow: 'hidden' }}>
+          <div style={{
+            maxWidth: '422px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+          >
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={this.transformOperation(expressQuery)}>
-              <p
+              <span
                 style={{
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -154,7 +160,7 @@ class Search extends Component {
               >
                 {/* {expressQuery} */}
                 {this.transformOperation(expressQuery)}
-              </p>
+              </span>
             </Tooltip>
           </div>
         ),
@@ -164,9 +170,15 @@ class Search extends Component {
         dataIndex: 'description',
         // width: '25%',
         render: description => (
-          <div style={{ width: '100%', overflow: 'hidden' }}>
+          <div style={{
+            maxWidth: '288px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+          >
             <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={description.split('+++')[0]}>
-              <p
+              <span
                 style={{
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -175,7 +187,7 @@ class Search extends Component {
                 }}
               >
                 {description.split('+++')[0] || ''}
-              </p>
+              </span>
             </Tooltip>
           </div>
         ),
@@ -194,7 +206,7 @@ class Search extends Component {
                 <div>
                   <span>详情</span>
                 </div>
-)}
+              )}
             >
               {/* <Button shape="circle" onClick={this.showFilter.bind(this, record)}> */}
               <Icon type="mode_edit" onClick={this.showFilter.bind(this, record)} />
@@ -207,7 +219,7 @@ class Search extends Component {
                 <div>
                   <span>删除</span>
                 </div>
-)}
+              )}
             >
               {/* <Button shape="circle" onClick={this.clickDeleteFilter.bind(this, record)}> */}
               <Icon type="delete_forever" onClick={this.clickDeleteFilter.bind(this, record)} />
@@ -235,16 +247,16 @@ class Search extends Component {
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/setup/quick-search/"
         >
           <div>
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
               <SortTable
                 handleDrag={this.handleDrag}
                 rowKey={record => record.filterId}
                 columns={column}
-                dataSource={this.state.filters}
+                dataSource={filters}
                 scroll={{ x: true }}
               />
             </Spin>
-            {this.state.createFileterShow ? (
+            {createFileterShow ? (
               <Filter
                 onOk={() => {
                   this.setState({ createFileterShow: false });
@@ -253,9 +265,9 @@ class Search extends Component {
                 onCancel={() => this.setState({ createFileterShow: false })}
               />
             ) : null}
-            {this.state.editFilterShow ? (
+            {editFilterShow ? (
               <EditFilter
-                filterId={this.state.currentFilterId}
+                filterId={currentFilterId}
                 onOk={() => {
                   this.setState({ editFilterShow: false });
                   this.loadFilters();
@@ -263,9 +275,9 @@ class Search extends Component {
                 onCancel={() => this.setState({ editFilterShow: false })}
               />
             ) : null}
-            {this.state.deleteFilterShow ? (
+            {deleteFilterShow ? (
               <DeleteFilter
-                filter={this.state.filter}
+                filter={filter}
                 onOk={() => {
                   this.setState({ deleteFilterShow: false });
                   this.loadFilters();

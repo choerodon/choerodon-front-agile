@@ -3,7 +3,7 @@ import { stores, axios, Content } from 'choerodon-front-boot';
 import {
   Modal, Form, Select, Input,
 } from 'choerodon-ui';
-import { updateIssueType } from '../../api/NewIssueApi';
+import { transformedTask } from '../../api/NewIssueApi';
 import TypeTag from '../TypeTag';
 
 import './TransformFromSubIssue.scss';
@@ -75,7 +75,7 @@ class TransformFromSubIssue extends Component {
         this.setState({
           loading: true,
         });
-        updateIssueType(issueUpdateTypeDTO)
+        transformedTask(issueUpdateTypeDTO)
           .then((res) => {
             this.setState({
               loading: false,

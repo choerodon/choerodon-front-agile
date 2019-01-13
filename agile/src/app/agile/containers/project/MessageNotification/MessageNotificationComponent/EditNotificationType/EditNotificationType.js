@@ -12,8 +12,8 @@ import './EditNotificationType.scss';
 
 const { Option } = Select;
 const { AppState } = stores;
-const { 
-  type, id, name, organizationId, 
+const {
+  type, id, name, organizationId,
 } = AppState.currentMenuType;
 
 let userOptionsWithUserId = [];
@@ -47,7 +47,7 @@ class EditNotificationType extends Component {
         this.setState({
           loading: false,
           checkeds: _.map(noticeTypeData, 'enable'),
-          userOptions: [...users.content, ...noticeTypeData[3].idWithNameDTOList.filter(item => !users.content.find(o => o.id === item.userId))], // 如果后端返回的idWithNameDTOList中的用户不在20条数据之内，就拼接在后面
+          userOptions: [...users.content.filter(item => item.enabled), ...noticeTypeData[3].idWithNameDTOList.filter(item => !users.content.find(o => o.id === item.userId))], // 如果后端返回的idWithNameDTOList中的用户不在20条数据之内，就拼接在后面
           updateData: _.map(noticeTypeData, (item) => {
             const pickItem = _.pick(item, ['id', 'event', 'noticeType', 'noticeName', 'enable', 'user', 'objectVersionNumber']); // 去除对象中的idWithNameDTOList字段，更新时不需要
             return ({ ...pickItem, objectVersionNumber: pickItem.id ? pickItem.objectVersionNumber : null });// 如果之前没有更新过,pickItem.id为null, 此时后端接受的objectVersionNumber为null
@@ -96,7 +96,7 @@ class EditNotificationType extends Component {
         dataIndex: 'checked',
         key: 'checked',
         render: (text, record, index) => (
-          <Checkbox 
+          <Checkbox
             style={{ marginTop: 5, marginBottom: 5 }}
             checked={checkeds[index]}
             onChange={e => this.handleCheckboxChange(e, index)}
@@ -108,7 +108,7 @@ class EditNotificationType extends Component {
         title: '通知对象',
         dataIndex: 'typeName',
         key: 'typeName',
-        width: '30%',  
+        width: '30%',
       },
       {
         render: (text, record, index) => (index > 2 ? (
@@ -125,12 +125,12 @@ class EditNotificationType extends Component {
                 .then((res) => {
                   this.setState({
                     userOptionsLoading: false,
-                    userOptions: param ? res.content : [...res.content, ...userOptionsWithUserId], 
+                    userOptions: param ? res.content : [...res.content, ...userOptionsWithUserId],
                     // 如果搜索条件为空，就把为空时搜出来的20条与之前有userId的数据进行拼接，保证已被选中但不在20条之内的数据显示出来
                   });
                 })
                 .catch((e) => {
-                  console.log(e);
+                  Choerodon.prompt(e);
                 });
             }}
             mode="multiple"
@@ -142,7 +142,7 @@ class EditNotificationType extends Component {
             autoFocus
           >
             {
-              userOptions && _.map(userOptions.filter(u => u.enabled), item => <Option key={item.id ? item.id : item.userId} value={item.id ? item.id : item.userId}>{item.loginName ? `${item.loginName}${item.realName}` : item.name}</Option>)
+              userOptions && _.map(userOptions, item => <Option key={item.id ? item.id : item.userId} value={item.id ? item.id : item.userId}>{item.loginName ? `${item.loginName}${item.realName}` : item.name}</Option>)
             }
           </Select>
         ) : ''),
@@ -190,7 +190,7 @@ class EditNotificationType extends Component {
          title="编辑通知对象"
          backPath={`/agile/messageNotification?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}`}
        />
-       <Content 
+       <Content
          className="c7n-editNotificationType"
        >
          <Table
@@ -203,7 +203,7 @@ class EditNotificationType extends Component {
          />
          <div className="saveOrCancel">
            <Button type="primary" funcType="raised" style={{ marginRight: 10 }} onClick={this.handleSaveBtnClick}>保存</Button>
-           <Button 
+           <Button
              funcType="raised"
              onClick={() => {
                const { history } = this.props;

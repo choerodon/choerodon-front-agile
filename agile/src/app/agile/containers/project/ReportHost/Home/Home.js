@@ -42,7 +42,7 @@ class Home extends Component {
         <Header title="敏捷报表" />
         <Content
           description="这里会根据您项目的进展情况以多个维度直观地记录和展示您项目、迭代、版本、进度等汇总情况。点击您需要查看的报告类型可以查看具体的详细内容。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/"
+          link="https://v0-10.choerodon.io/zh/docs/user-guide/report/agile-report/"
         >
           <div className="c7n-reportHome-pane">
             {this.renderContentLinks()}

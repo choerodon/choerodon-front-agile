@@ -175,6 +175,15 @@ export function updateIssueType(data, projectId = AppState.currentMenuType.id) {
   return axios.post(`/agile/v1/projects/${projectId}/issues/update_type?organizationId=${orgId}`, issueUpdateTypeDTO);
 }
 
+export function transformedTask(data, projectId = AppState.currentMenuType.id) {
+  const orgId = AppState.currentMenuType.organizationId;
+  const issueUpdateTypeDTO = {
+    projectId,
+    ...data,
+  };
+  return axios.post(`/agile/v1/projects/${projectId}/issues/transformed_task?organizationId=${orgId}`, issueUpdateTypeDTO);
+}
+
 export function loadIssues(page = 0, size = 10, searchDTO, orderField, orderType) {
   const orgId = AppState.currentMenuType.organizationId;
   const projectId = AppState.currentMenuType.id;
