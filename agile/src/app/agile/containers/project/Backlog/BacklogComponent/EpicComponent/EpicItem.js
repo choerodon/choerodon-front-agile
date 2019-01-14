@@ -87,7 +87,7 @@ class EpicItem extends Component {
    * @memberof EpicItem
    */
   handleSave(e) {
-    const { data, index } = this.props;
+    const { data, index, refresh } = this.props;
     e.stopPropagation();
     const { value } = e.target;
     if (data && data.epicName === value) {
@@ -109,10 +109,11 @@ class EpicItem extends Component {
               epicName: value,
             };
             BacklogStore.axiosUpdateIssue(dataP).then((res) => {
-              const originEpic = _.clone(BacklogStore.getEpicData);
-              originEpic[index].epicName = res.epicName;
-              originEpic[index].objectVersionNumber = res.objectVersionNumber;
-              BacklogStore.setEpicData(originEpic);
+              refresh();
+              // const originEpic = _.clone(BacklogStore.getEpicData);
+              // originEpic[index].epicName = res.epicName;
+              // originEpic[index].objectVersionNumber = res.objectVersionNumber;
+              // BacklogStore.setEpicData(originEpic);
             }).catch((error) => {
             });
           }

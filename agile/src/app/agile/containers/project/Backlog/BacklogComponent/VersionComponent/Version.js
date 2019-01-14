@@ -21,12 +21,12 @@ class Version extends Component {
       draggableIds: [],
       hoverBlockButton: false,
       addVersion: false,
-      loading: false,
     };
   }
 
   componentDidMount() {
-    this.props.onRef(this);
+    const { onRef } = this.props;
+    onRef(this);
   }
 
   shouldComponentUpdate = (nextProps, nextState) => {
@@ -44,72 +44,10 @@ class Version extends Component {
   };
 
   /**
-   *其他组件修改该组件state的方法
-   *
-   * @param {*} value
-   * @memberof Version
-   */
-  changeState(value) {
-    this.setState({
-      draggableIds: value,
-    });
-  }
-
-  /**
-   *点击versionItem事件
-   *
-   * @param {*} type
-   * @memberof Version
-   */
-  handelClickVersion(type) {
-    this.props.store.setChosenVersion(type);
-    this.props.store.axiosGetSprint(this.props.store.getSprintFilter()).then((res) => {
-      this.props.store.setSprintData(res);
-    }).catch((error) => {
-    });
-  }
-
-  renderVersion() {
-    const data = this.props.store.getVersionData;
-    const result = [];
-    if (data.length > 0) {
-      for (let index = 0, len = data.length; index < len; index += 1) {
-        result.push(
-          <VersionItem
-            data={data[index]}
-            index={index}
-            handelClickVersion={this.handelClickVersion.bind(this)}
-            draggableIds={this.state.draggableIds}
-            refresh={this.props.refresh.bind(this)}
-            issueRefresh={this.props.issueRefresh.bind(this)}
-          />,
-        );
-      }
-      return (
-        <Droppable droppableId="version">
-          {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-              style={{
-                background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                padding: 'grid',
-              }}
-            >
-              {result}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      );
-    }
-    return result;
-  }
-
-  /**
    * 处理史诗拖动
    * @param result
    */
-  handleVersionDrag =(result) => {
+  handleVersionDrag = (result) => {
     if (!result.destination) {
       return;
     }
@@ -134,7 +72,7 @@ class Version extends Component {
     const epicId = data[sourceIndex].versionId;
     const { objectVersionNumber } = data[sourceIndex];
     const postData = {
-      afterSequence, beforeSequence, versionId: epicId, objectVersionNumber, 
+      afterSequence, beforeSequence, versionId: epicId, objectVersionNumber,
     };
     BacklogStore.handleVersionDrap(postData)
       .then(() => {
@@ -158,31 +96,105 @@ class Version extends Component {
       });
   };
 
+
+  /**
+   *其他组件修改该组件state的方法
+   *
+   * @param {*} value
+   * @memberof Version
+   */
+  changeState(value) {
+    this.setState({
+      draggableIds: value,
+    });
+  }
+
+  /**
+   *点击versionItem事件
+   *
+   * @param {*} type
+   * @memberof Version
+   */
+  handelClickVersion(type) {
+    const { store } = this.props;
+    store.setChosenVersion(type);
+    store.axiosGetSprint(store.getSprintFilter()).then((res) => {
+      store.setSprintData(res);
+    }).catch((error) => {
+    });
+  }
+
+  renderVersion() {
+    const { store, refresh, issueRefresh } = this.props;
+    const { draggableIds } = this.state;
+    const data = store.getVersionData;
+    const result = [];
+    if (data.length > 0) {
+      for (let index = 0, len = data.length; index < len; index += 1) {
+        result.push(
+          <VersionItem
+            data={data[index]}
+            index={index}
+            handelClickVersion={this.handelClickVersion.bind(this)}
+            draggableIds={draggableIds}
+            refresh={refresh.bind(this)}
+            issueRefresh={issueRefresh.bind(this)}
+          />,
+        );
+      }
+      return (
+        <Droppable droppableId="version">
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              style={{
+                background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                padding: 'grid',
+              }}
+            >
+              {result}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      );
+    }
+    return result;
+  }
+
   render() {
+    const {
+      visible,
+      store,
+      changeVisible,
+      issueRefresh,
+      refresh,
+    } = this.props;
+    const { hoverBlockButton, draggableIds, addVersion } = this.state;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
       <div 
-        className={this.props.visible ? 'c7n-backlog-version' : ''}
+        className={visible ? 'c7n-backlog-version' : ''}
         onMouseEnter={() => {
           this.setState({
             hoverBlockButton: true,
           });
-          if (this.props.store.getIsDragging) {
-            this.props.store.setIsLeaveSprint(true);
+          if (store.getIsDragging) {
+            store.setIsLeaveSprint(true);
           }
         }}
         onMouseLeave={() => {
           this.setState({
             hoverBlockButton: false,
           });
-          if (this.props.store.getIsDragging) {
-            this.props.store.setIsLeaveSprint(false);
+          if (store.getIsDragging) {
+            store.setIsLeaveSprint(false);
           }
         }}
       >
         {
-          this.props.visible ? (
+          visible ? (
             <div className="c7n-backlog-versionContent">
               <div className="c7n-backlog-versionTitle">
                 <p style={{ fontWeight: 'bold' }}>版本</p>
@@ -190,7 +202,7 @@ class Version extends Component {
                   className="c7n-backlog-versionRight"
                   style={{
                     display: 'flex',
-                    visibility: this.state.hoverBlockButton ? 'visible' : 'hidden',
+                    visibility: hoverBlockButton ? 'visible' : 'hidden',
                   }}
                 >
                   <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.product-version.createVersion']}>
@@ -214,8 +226,8 @@ class Version extends Component {
                       marginLeft: 6,
                     }}
                     onClick={() => {
-                      this.props.changeVisible('versionVisible', false);
-                      this.props.store.setIsLeaveSprint(false);
+                      changeVisible('versionVisible', false);
+                      store.setIsLeaveSprint(false);
                     }}
                   />
                 </div>
@@ -225,35 +237,33 @@ class Version extends Component {
                   className="c7n-backlog-versionItems"
                   style={{
                     color: '#3F51B5',
-                    background: this.props.store.getChosenVersion === 'all' ? 'rgba(140, 158, 255, 0.08)' : '',
+                    background: store.getChosenVersion === 'all' ? 'rgba(140, 158, 255, 0.08)' : '',
                   }}
                   role="none"
                   onClick={this.handelClickVersion.bind(this, 'all')}
                 >
-
-
                   所有问题
-                                </div>
+                </div>
                 <DragDropContext onDragEnd={this.handleVersionDrag}>
                   {this.renderVersion()}
                 </DragDropContext>
 
                 <div
-                  className={this.props.store.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
+                  className={store.getIsDragging ? 'c7n-backlog-versionItems c7n-backlog-dragToVersion' : 'c7n-backlog-versionItems'}
                   style={{
-                    background: this.props.store.getChosenVersion === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
+                    background: store.getChosenVersion === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
                   }}
                   role="none"
                   onClick={this.handelClickVersion.bind(this, 'unset')}
                   onMouseUp={() => {
-                    if (this.props.store.getIsDragging) {
-                      this.props.store.axiosUpdateIssuesToVersion(
-                        0, this.state.draggableIds,
+                    if (store.getIsDragging) {
+                      store.axiosUpdateIssuesToVersion(
+                        0, draggableIds,
                       ).then((res) => {
-                        this.props.issueRefresh();
-                        this.props.refresh();
+                        issueRefresh();
+                        refresh();
                       }).catch((error) => {
-                        this.props.refresh();
+                        refresh();
                       });
                     }
                   }}
@@ -262,14 +272,14 @@ class Version extends Component {
                 </div>
               </div>
               <CreateVersion
-                store={this.props.store}
-                visible={this.state.addVersion}
+                store={store}
+                visible={addVersion}
                 onCancel={() => {
                   this.setState({
                     addVersion: false,
                   });
                 }}
-                refresh={this.props.refresh.bind(this)}
+                refresh={refresh.bind(this)}
               />
             </div>
           ) : ''
