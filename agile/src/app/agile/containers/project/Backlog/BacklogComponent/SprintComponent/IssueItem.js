@@ -19,7 +19,7 @@ class IssueItem extends Component {
   renderIssueBackground =(item) => {
     const { store } = this.props;
     if (store.getClickIssueDetail.issueId === item.issueId) {
-      return 'rgba(140,158,255,0.08)';
+      return '#F6F8FF';
     } else if (store.getIsDragging) {
       return 'white';
     } else {
@@ -72,7 +72,7 @@ class IssueItem extends Component {
               {...provided1.dragHandleProps}
               style={{
                 userSelect: 'none',
-                background: getSelect.includes(item.issueId) ? 'rgb(235, 242, 249)' : this.renderIssueBackground(item),
+                background: getSelect.includes(item.issueId) ? '#EFF2F9' : this.renderIssueBackground(item),
                 padding: '10px 20px',
                 borderBottom: '1px solid rgba(0,0,0,0.12)',
                 ...provided1.draggableProps.style,

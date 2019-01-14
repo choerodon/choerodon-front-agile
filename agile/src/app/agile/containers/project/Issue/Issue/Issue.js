@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 // 用于追踪 Mobx 引起的渲染，非性能调优时可注释
-import { trace } from 'mobx';
+// import { trace } from 'mobx';
 import {
   Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
@@ -149,7 +149,6 @@ class Issue extends Component {
   // ExpandCssControler => 用于向 IssueTable 注入 CSS 样式
   render() {
     // 清除整页滚动条
-    trace(true);
     if (document && document.getElementsByClassName('page-body').length) {
       // document.getElementsByClassName('page-body')[0].style.overflow = 'hidden';
     }
