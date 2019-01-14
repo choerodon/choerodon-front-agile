@@ -82,6 +82,9 @@
 }
 
 .c7n-scrumboard-page {
+  .boardBtn {
+    text-transform: none !important;
+  }
   .ant-select-selection__rendered {
     padding-right: unset;
     margin-bottom: unset;
@@ -102,12 +105,10 @@
   p {
     margin-bottom: 0;
   }
-
   .boardBtn.ant-btn-flat:hover {
     background: #fff;
     cursor: text;
   }
-  
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
