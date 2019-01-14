@@ -50,6 +50,7 @@ class BacklogHome extends Component {
     const { BacklogStore } = this.props;
     BacklogStore.dispose();
     BacklogStore.setClickIssueDetail({});
+    BacklogStore.setAssigneeFilterIds([]);
     BacklogStore.setSprintData({});
   }
 
