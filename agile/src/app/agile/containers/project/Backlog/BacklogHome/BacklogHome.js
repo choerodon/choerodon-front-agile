@@ -173,7 +173,7 @@ class BacklogHome extends Component {
     if (epicVisible) {
       this.loadEpic();
     }
-  }
+  };
 
   /**
    * 加载快速搜索
@@ -195,7 +195,7 @@ class BacklogHome extends Component {
     this.setState({
       [state]: value,
     });
-  }
+  };
 
   /**
    * 创建冲刺
@@ -231,7 +231,7 @@ class BacklogHome extends Component {
       });
       message.success('创建失败');
     });
-  }
+  };
 
   resetSprintChose =() => {
     this.resetMuilterChose();
@@ -247,7 +247,7 @@ class BacklogHome extends Component {
         issueIds: [],
       },
     });
-  }
+  };
 
   onDragEnd=(result) => {
     // this.props.changeEpicStat();

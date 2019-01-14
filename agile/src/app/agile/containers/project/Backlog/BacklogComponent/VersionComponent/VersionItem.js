@@ -118,8 +118,12 @@ class VersionItem extends Component {
    * @memberof VersionItem
    */
   handleBlurName(e) {
-    const { data } = this.props;
-    const { data: { objectVersionNumber, versionId }, index } = this.props;
+    const {
+      data: { objectVersionNumber, versionId },
+      index,
+      data,
+      refresh,
+    } = this.props;
     const { value } = e.target;
     if (data && data.name === value) {
       this.setState({
@@ -131,13 +135,13 @@ class VersionItem extends Component {
           if (checkRes) {
             message.info('版本名称重复', 2);
           } else {
-            const data = {
+            const verisonData = {
               objectVersionNumber,
               projectId: parseInt(AppState.currentMenuType.id, 10),
               versionId,
               name: value,
             };
-            BacklogStore.axiosUpdateVerison(versionId, data).then((res) => {
+            BacklogStore.axiosUpdateVerison(versionId, verisonData).then((res) => {
               if (res && res.failed) {
                 this.setState({
                   editName: false,
@@ -147,10 +151,11 @@ class VersionItem extends Component {
                 this.setState({
                   editName: false,
                 });
-                const originData = _.clone(BacklogStore.getVersionData);
-                originData[index].name = res.name;
-                originData[index].objectVersionNumber = res.objectVersionNumber;
-                BacklogStore.setVersionData(originData);
+                refresh();
+                // const originData = _.clone(BacklogStore.getVersionData);
+                // originData[index].name = res.name;
+                // originData[index].objectVersionNumber = res.objectVersionNumber;
+                // BacklogStore.setVersionData(originData);
               }
             }).catch((error) => {
               this.setState({
@@ -329,7 +334,7 @@ class VersionItem extends Component {
                           {!item.description ? '没有描述' : item.description}
                         </p>
                       </div>
-)}
+                    )}
                   >
                     <EasyEdit
                       type="input"

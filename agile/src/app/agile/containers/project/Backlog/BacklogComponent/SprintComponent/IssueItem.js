@@ -128,7 +128,13 @@ class IssueItem extends Component {
                     wordBreak: 'break-all',
                   }}
                 >
-                  {`${item.issueNum} `}
+                  <span
+                    style={{
+                      textDecoration: item.statusMapDTO.isComplete ? 'line-through' : 'none',
+                    }}
+                  >
+                    {`${item.issueNum} `}
+                  </span>
                   <Tooltip title={item.summary} placement="topLeft">
                     {item.summary}
                   </Tooltip>
