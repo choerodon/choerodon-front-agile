@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
 import {
-  Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu,
+  Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu, message,
 } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
 import _ from 'lodash';
@@ -228,20 +228,27 @@ class SprintItem extends Component {
    */
   handleBlurName =(item, value) => {
     const { store, refresh } = this.props;
-    const data = {
+    const projectId = AppState.currentMenuType.id;
+    const sprintData = {
       objectVersionNumber: item.objectVersionNumber,
-      projectId: AppState.currentMenuType.id,
+      projectId,
       sprintId: item.sprintId,
       sprintName: value,
     };
-    store.axiosUpdateSprint(data).then((res) => {
-      this.setState({
-        editName: false,
-      });
-      refresh();
-    }).catch((error) => {
+    store.checkSprintName(projectId, value).then((data) => {
+      if (data) {
+        message.info('冲刺名称重复', 2);
+      } else {
+        store.axiosUpdateSprint(sprintData).then((res) => {
+          this.setState({
+            editName: false,
+          });
+          refresh();
+        }).catch((error) => {
+        });
+      }
     });
-  }
+  };
 
   /**
    *修改冲刺目标

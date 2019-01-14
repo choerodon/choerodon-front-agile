@@ -477,6 +477,10 @@ class BacklogStore {
       }
     });
   }
+
+  checkSprintName(proId, name) {
+    return axios.get(`/agile/v1/projects/${proId}/sprint/check_name?sprintName=${name}`);
+  }
 }
 
 const backlogStore = new BacklogStore();

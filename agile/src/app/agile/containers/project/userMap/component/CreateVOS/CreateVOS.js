@@ -33,7 +33,8 @@ class CreateVOS extends Component {
   }
 
   handleCreate = () => {
-    this.props.form.validateFields((err, values) => {
+    const { form, onOk } = this.props;
+    form.validateFields((err, values) => {
       if (!err) {
         const projectId = AppState.currentMenuType.id;
         const { type } = this.props;
@@ -48,7 +49,7 @@ class CreateVOS extends Component {
           axios.post(`/agile/v1/projects/${projectId}/sprint/create?sprintName=${name}`)
             .then((res) => {
               this.setState({ loading: false });
-              this.props.onOk();
+              onOk();
             })
             .catch((error) => {
               this.setState({ loading: false });
@@ -64,7 +65,7 @@ class CreateVOS extends Component {
           axios.post(`/agile/v1/projects/${projectId}/product_version`, versionCreateDTO)
             .then((res) => {
               if (!res.failed) {
-                this.props.onOk();
+                onOk();
               } else {
                 Choerodon.promt(res.message);
               }
@@ -79,48 +80,65 @@ class CreateVOS extends Component {
   };
 
   /**
- *验证版本名称是否重复
- *
- * @memberof CreateVersion
- */
-checkVersionNameRepeat = (rule, value, callback) => {
-  axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/check?name=${value}`)
-    .then((res) => {
-      if (res) {
-        callback('版本名称重复');
-      } else {
-        callback();
-      }
-    });
-};
+   *验证版本名称是否重复
+   *
+   * @memberof CreateVersion
+   */
+  checkVersionNameRepeat = (rule, value, callback) => {
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/check?name=${value}`)
+      .then((res) => {
+        if (res) {
+          callback('版本名称重复');
+        } else {
+          callback();
+        }
+      });
+  };
 
-render() {
-  const {
-    visible, onCancel, onOk, type, container, 
-  } = this.props;
-  const { getFieldDecorator } = this.props.form;
-  
-  return (
-    <Modal
-      className="c7n-createVOS"
+  /**
+   *验证冲刺名称是否重复
+   */
+  checkSprintNameRepeat = (rule, value, callback) => {
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/check_name?sprintName=${value}`)
+      .then((res) => {
+        if (res) {
+          callback('冲刺名称重复');
+        } else {
+          callback();
+        }
+      });
+  };
+
+  render() {
+    const {
+      visible, onCancel, type, container, form,
+    } = this.props;
+    const { getFieldDecorator } = form;
+    const { loading, nextSprintName } = this.state;
+
+    return (
+      <Modal
+        className="c7n-createVOS"
         // getContainer={() => container}
-      title={`创建${type === 'sprint' ? '冲刺' : '版本'}`}
-      visible={visible || false}
-      onOk={this.handleCreate}
-      onCancel={onCancel}
-      okText="创建"
-      cancelText="取消"
-      destroyOnClose
-      confirmLoading={this.state.loading}
-    >
-      <Form layout="vertical">
+        title={`创建${type === 'sprint' ? '冲刺' : '版本'}`}
+        visible={visible || false}
+        onOk={this.handleCreate}
+        onCancel={onCancel}
+        okText="创建"
+        cancelText="取消"
+        destroyOnClose
+        confirmLoading={loading}
+      >
+        <Form layout="vertical">
           <FormItem>
             {getFieldDecorator('name', {
               rules: [{ required: true, message: '请输入名称' },
                 type === 'version' ? {
                   validator: this.checkVersionNameRepeat,
-                } : {}],
-              initialValue: this.state.nextSprintName,
+                } : {
+                  validator: this.checkSprintNameRepeat,
+                }],
+              initialValue: nextSprintName,
             })(
               <Input
                 label={`${type === 'sprint' ? '冲刺' : '版本'}名称`}
@@ -131,8 +149,8 @@ render() {
             )}
           </FormItem>
         </Form>
-    </Modal>
-  );
-}
+      </Modal>
+    );
+  }
 }
 export default Form.create({})(CreateVOS);

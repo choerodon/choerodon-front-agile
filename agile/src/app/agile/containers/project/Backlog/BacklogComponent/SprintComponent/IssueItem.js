@@ -130,7 +130,7 @@ class IssueItem extends Component {
                 >
                   <span
                     style={{
-                      textDecoration: item.statusMapDTO.isComplete ? 'line-through' : 'none',
+                      textDecoration: item.statusMapDTO.completed ? 'line-through' : 'none',
                     }}
                   >
                     {`${item.issueNum} `}
