@@ -205,7 +205,8 @@ class SwimLaneContext extends Component {
   }
 
   render() {
-    const { data: { item }, handleDragEnd, renderIssueColumns } = this.props;
+    /* eslint-disable */
+    const item = this.props.data;
     const { expand } = this.state;
     let id;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
@@ -230,16 +231,17 @@ class SwimLaneContext extends Component {
           }}
         >
           <DragDropContext
-            onDragEnd={handleDragEnd.bind(this)}
+            onDragEnd={this.props.handleDragEnd.bind(this)}
             onDragStart={(start) => {
               ScrumBoardStore.setDragStartItem(start);
             }}
           >
-            {renderIssueColumns(id)}
+            {this.props.renderIssueColumns(id)}
           </DragDropContext>
         </div>
       </div>
     );
+    /* eslint-enable */
   }
 }
 
