@@ -305,7 +305,7 @@ class StatusIssue extends Component {
       }
     }
     return result;
-  }
+  };
 
   /**
    *渲染issue逻辑
@@ -335,6 +335,7 @@ class StatusIssue extends Component {
         return 4;
       }
     };
+    const convertedDay = stayDayConvert(item.stayDay);
     // 子任务和父任务分离显示！
     if (true || this.renderSubDisplay(item, type) === 'block') {
       return (
@@ -443,7 +444,7 @@ class StatusIssue extends Component {
                                     character={<Icon type="brightness_1" />}
                                     allowHalf
                                     disabled
-                                    defaultValue={stayDayConvert(item.stayDay)}
+                                    value={convertedDay}
                                     count={4}
                                     className={item.stayDay <= 3 ? 'notEmergency' : 'emergency'}
                                   />
