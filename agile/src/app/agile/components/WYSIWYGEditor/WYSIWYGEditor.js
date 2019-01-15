@@ -1,31 +1,20 @@
 import React, { Component } from 'react';
+import { Button } from 'choerodon-ui';
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ImageDrop from './ImageDrop';
 import './WYSIWYGEditor.scss';
 import cls from '../CommonComponent/ClickOutSide';
-import { Button } from 'choerodon-ui';
 
 Quill.register('modules/imageDrop', ImageDrop);
 
 class WYSIWYGEditor extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      message: null,
-      msgSaving: null,
-      delta: null,
-      chatError: null,
-      loading: false,
-    };
-    this.handleChange = this.handleChange.bind(this);
-  }
-
   modules = {
     toolbar: [
       ['bold', 'italic', 'underline', 'strike', 'blockquote'],
       [{ list: 'ordered' }, { list: 'bullet' }],
       ['image'],
+      [{ color: [] }],
       // ['clean'],
     ],
     imageDrop: true,
@@ -40,6 +29,7 @@ class WYSIWYGEditor extends Component {
     'list',
     'bullet',
     'image',
+    'color',
   ];
 
   defaultStyle = {
@@ -47,6 +37,14 @@ class WYSIWYGEditor extends Component {
     height: 200,
     borderRight: 'none',
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false,
+    };
+    this.handleChange = this.handleChange.bind(this);
+  }
 
   isHasImg = (delta) => {
     let pass = false;
@@ -61,17 +59,19 @@ class WYSIWYGEditor extends Component {
   };
 
   handleChange = (content, delta, source, editor) => {
+    const { onChange } = this.props;
     const value = editor.getContents();
-    if (this.props.onChange && value && value.ops) {
-      this.props.onChange(value.ops);
+    if (onChange && value && value.ops) {
+      onChange(value.ops);
     }
   };
 
   empty = () => {
-    this.props.onChange(undefined);
-  }
+    const { onChange } = this.props;
+    onChange(undefined);
+  };
 
-  handleClickOutside = evt => {
+  handleClickOutside = (evt) => {
     const { handleClickOutSide } = this.props;
     if (handleClickOutSide) {
       handleClickOutSide();
@@ -79,12 +79,21 @@ class WYSIWYGEditor extends Component {
   };
 
   render() {
-    const { placeholder, value } = this.props;
-    const style = { ...this.defaultStyle, ...this.props.style };
-    const editHeight = style.height - (this.props.toolbarHeight || 42);
+    const {
+      placeholder,
+      value,
+      toolbarHeight,
+      style,
+      bottomBar,
+      handleDelete,
+      handleSave,
+    } = this.props;
+    const { loading } = this.state;
+    const newStyle = { ...this.defaultStyle, ...style };
+    const editHeight = newStyle.height - (toolbarHeight || 42);
     return (
       <div style={{ width: '100%' }}>
-        <div style={style} className="react-quill-editor">
+        <div style={newStyle} className="react-quill-editor">
           <ReactQuill
             theme="snow"
             modules={this.modules}
@@ -96,23 +105,31 @@ class WYSIWYGEditor extends Component {
           />
         </div>
         {
-          this.props.bottomBar && (
-            <div style={{ padding: '0 8px', border: '1px solid #ccc', borderTop: 'none', display: 'flex', justifyContent: 'flex-end' }}>
+          bottomBar && (
+            <div
+              style={{
+                padding: '0 8px',
+                border: '1px solid #ccc',
+                borderTop: 'none',
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
               <Button 
                 type="primary"
                 onClick={() => {
                   this.empty();
-                  this.props.handleDelete();
+                  handleDelete();
                 }}
               >
                 取消
               </Button>
               <Button
                 type="primary"
-                loading={this.state.loading}
+                loading={loading}
                 onClick={() => {
                   this.setState({ loading: true });
-                  this.props.handleSave();
+                  handleSave();
                 }}
               >
                 保存
