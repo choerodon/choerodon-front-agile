@@ -28,6 +28,28 @@
       align-items: center;
       flex-shrink: 0;
     }
+    .ant-rate {
+      font-size: 12px !important;
+      min-width: 48px;
+    }
+    .emergency {
+      color: #f5222d !important;
+    }
+    .notEmergency {
+      color: #faad14 !important;
+    }
+    .ant-rate-star {
+      margin-right: 0 !important;
+      width: 6px;
+      .icon {
+        font-size: 12px !important;
+        transform: scale(0.3333333) !important;
+      }
+    }
+    .ant-rate-star-first .ant-rate-star-second {
+      font-size: 12px !important;
+      transform: scale(0.3333333) !important;
+    }
   }
 
   .c7n-issueType-icon {
