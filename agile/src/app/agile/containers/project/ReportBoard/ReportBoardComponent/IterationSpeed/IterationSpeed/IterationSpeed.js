@@ -58,6 +58,18 @@ class IterationSpeed extends Component {
     const {
       unit, chartDataX, chartDataYCommitted, chartDataYCompleted,
     } = this.state;
+    let curUnit = '';
+    if (unit === 'story_point') {
+      curUnit = '点';
+    }
+
+    if (unit === 'issue_count') {
+      curUnit = '个';
+    }
+
+    if (unit === 'remain_time') {
+      curUnit = '小时';
+    }
     return {
       tooltip: {
         trigger: 'axis',
@@ -69,6 +81,18 @@ class IterationSpeed extends Component {
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
         axisPointer: {
           type: 'shadow',
+        },
+        formatter: (params, ticket, callback) => {
+          let content = '';
+          params.forEach((item, index) => {
+            content = `<div>
+            <span>${params[0].axisValue}</span>
+            <br />
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>预估：${chartDataYCommitted[item.dataIndex]} ${chartDataYCommitted[item.dataIndex] && curUnit ? curUnit : ''}</div>
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>已完成：${chartDataYCompleted[item.dataIndex]} ${chartDataYCompleted[item.dataIndex] && curUnit ? curUnit : ''}</div>
+          </div>`;
+          });
+          return content;
         },
       },
       legend: {

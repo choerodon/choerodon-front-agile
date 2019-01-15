@@ -52,7 +52,7 @@ class IssueType extends Component {
   }
   
 
-  getOption() {
+  getOption = () => {
     const { issueTypeInfo } = this.state;
     const option = {
       tooltip: {
@@ -63,6 +63,19 @@ class IssueType extends Component {
         backgroundColor: '#fff',
         textStyle: {
           color: 'rgba(0,0,0,0.64)',
+        },
+        formatter: (params) => {
+          let content = '';
+          params.forEach((item) => {
+            content = `<div>
+            <span>${params[0].axisValue}</span>
+            <br />
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>处理中：${this.getCategoryCount('doing')[item.dataIndex]} ${this.getCategoryCount('doing')[item.dataIndex] ? ' 个' : ''}</div>
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>待处理：${this.getCategoryCount('todo')[item.dataIndex]} ${this.getCategoryCount('todo')[item.dataIndex] ? ' 个' : ''}</div>
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[2].color}"></div>已完成：${this.getCategoryCount('done')[item.dataIndex]} ${this.getCategoryCount('done')[item.dataIndex] ? ' 个' : ''}</div>
+          </div>`;
+          });
+          return content;
         },
       },
       legend: {

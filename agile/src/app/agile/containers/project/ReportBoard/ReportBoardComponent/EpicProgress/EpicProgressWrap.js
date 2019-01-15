@@ -8,7 +8,7 @@ class EpicProgressWrap extends Component {
     return (
       <Card
         title="史诗进度"
-        link={link}
+        // link={link}
       >
         <EpicProgress />
       </Card>

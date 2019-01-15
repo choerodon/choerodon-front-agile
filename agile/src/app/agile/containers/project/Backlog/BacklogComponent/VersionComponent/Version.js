@@ -9,7 +9,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import VersionItem from './VersionItem';
 import './Version.scss';
-import CreateVersion from './CreateVersion';
+import AddRelease from '../../../Release/ReleaseComponent/AddRelease';
 
 const { AppState } = stores;
 
@@ -20,7 +20,7 @@ class Version extends Component {
     this.state = {
       draggableIds: [],
       hoverBlockButton: false,
-      addVersion: false,
+      addRelease: false,
     };
   }
 
@@ -170,7 +170,7 @@ class Version extends Component {
       issueRefresh,
       refresh,
     } = this.props;
-    const { hoverBlockButton, draggableIds, addVersion } = this.state;
+    const { hoverBlockButton, draggableIds, addRelease } = this.state;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
@@ -211,7 +211,7 @@ class Version extends Component {
                       role="none"
                       onClick={() => {
                         this.setState({
-                          addVersion: true,
+                          addRelease: true,
                         });
                       }}
                     >
@@ -242,8 +242,8 @@ class Version extends Component {
                   role="none"
                   onClick={this.handelClickVersion.bind(this, 'all')}
                 >
-                  所有问题
-                </div>
+                  {'所有问题'}
+                                </div>
                 <DragDropContext onDragEnd={this.handleVersionDrag}>
                   {this.renderVersion()}
                 </DragDropContext>
@@ -271,17 +271,18 @@ class Version extends Component {
                   {'未指定版本的问题'}
                 </div>
               </div>
-              <CreateVersion
-                store={store}
-                visible={addVersion}
+              <AddRelease
+                visible={addRelease}
                 onCancel={() => {
                   this.setState({
-                    addVersion: false,
+                    addRelease: false,
                   });
                 }}
                 refresh={refresh.bind(this)}
               />
-            </div>
+
+)
+                        </div>
           ) : ''
         }
       </div>

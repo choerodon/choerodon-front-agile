@@ -308,18 +308,18 @@ class SprintDetails extends Component {
           </div>
         ), 
       }, {
-        title: '剩余时间',
+        title: '剩余时间(小时)',
         dataIndex: 'remainingTime',
         key: 'remainingTime',
-        width: 60,
+        width: 90,
         render: (remainingTime, record) => (
-          <span style={{ display: 'inline-block', minWidth: 15 }}>{`${remainingTime === null ? '' : (`${remainingTime}h`)}`}</span>
+          <span style={{ display: 'inline-block', minWidth: 15 }}>{`${remainingTime === null ? '' : (`${remainingTime}`)}`}</span>
         ),
       }, {
-        title: '故事点',
+        title: '故事点(点)',
         dataIndex: 'storyPoints',
         key: 'storyPoints',
-        width: 40,
+        width: 70,
         render: (storyPoints, record) => (
           <div style={{ minWidth: 15 }}>
             {record.typeCode === 'story' ? storyPoints || '0' : ''}

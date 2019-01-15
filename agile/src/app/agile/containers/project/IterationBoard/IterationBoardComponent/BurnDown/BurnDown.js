@@ -84,15 +84,34 @@ class BurnDown extends Component {
         },
         extraCssText:
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
-        formatter: function (params) {
+        // formatter: function (params) {
+        //   let content = '';
+        //   params.forEach((item) => {
+        //     if (item.seriesName === '剩余值') {
+        //       content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value  : '-'}${item.value && ' 个'}`;
+        //     }
+        //   });
+        //   return content;
+        // }
+        formatter(params) {
           let content = '';
+          let curUnit = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value  : '-'}`;
+              if(item.value && unit === 'remainingEstimatedTime') {
+                curUnit = ' 小时';
+              }
+              if(item.value && unit === 'storyPoints') {
+                curUnit = ' 点';
+              }
+              if(item.value && unit === 'issueCount') {
+                curUnit = ' 个';
+              }
+              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}${curUnit && curUnit}`;
             }
           });
           return content;
-        }
+        },
       },
       legend: {
         top: '0',

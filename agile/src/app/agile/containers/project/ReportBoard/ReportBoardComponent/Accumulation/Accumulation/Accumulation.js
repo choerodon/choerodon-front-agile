@@ -92,6 +92,19 @@ class Accumulation extends Component {
         },
         extraCssText: 
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
+        formatter(params) {
+          let content = '';
+          params.forEach((item) => {
+            content = `<div>
+            <span>${params[0].axisValue}</span>
+            <br />
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>已完成：${legendSeries[0].data[item.dataIndex]} ${legendSeries[0].data[item.dataIndex] ? ' 个' : ''}</div>
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>处理中：${legendSeries[1].data[item.dataIndex]} ${legendSeries[1].data[item.dataIndex] ? ' 个' : ''}</div>
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[2].color}"></div>待处理：${legendSeries[2].data[item.dataIndex]} ${legendSeries[2].data[item.dataIndex] ? ' 个' : ''}</div>
+          </div>`;
+          });
+          return content;
+        },
       },
       legend: {
         top: '0',

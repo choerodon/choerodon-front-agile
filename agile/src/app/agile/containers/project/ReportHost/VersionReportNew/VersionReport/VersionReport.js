@@ -63,6 +63,41 @@ class EpicReport extends Component {
     const commonOption = {
       tooltip: {
         trigger: 'axis',
+        formatter: (params, ticket, callback) => {
+          let content = '';
+          params.forEach((item) => {
+            if (VS.beforeCurrentUnit === 'issue_count') {
+              content = `<div>
+              <span>${params[0].axisValue}</span>
+              <br />
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>总问题数：${VS.getChartDataYIssueCountAll[item.dataIndex]} ${VS.getChartDataYIssueCountAll[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>已完成问题数：${VS.getChartDataYIssueCountCompleted[item.dataIndex]} ${VS.getChartDataYIssueCountCompleted[item.dataIndex] ? ' 个' : ''}</div>
+            </div>`;
+            }
+  
+            if (VS.beforeCurrentUnit === 'story_point') {
+              content = `<div>
+              <span>${params[0].axisValue}</span>
+              <br />
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>未预估问题百分比：${VS.getChartDataYIssueCountUnEstimate[item.dataIndex]}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>已完成故事点：${VS.getChartDataYCompleted[item.dataIndex]}${VS.getChartDataYCompleted[item.dataIndex] ? ' 点' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[2].color}"></div>总计故事点：${VS.getChartDataYAll[item.dataIndex]}${VS.getChartDataYAll[item.dataIndex] ? ' 点' : ''}</div>
+            </div>`;
+            }
+  
+            if (VS.beforeCurrentUnit === 'remain_time') {
+              content = `<div>
+              <span>${params[0].axisValue}</span>
+              <br />
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>未预估问题百分比：${VS.getChartDataYIssueCountUnEstimate[item.dataIndex]}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>已完成剩余时间：${VS.getChartDataYCompleted[item.dataIndex]}${VS.getChartDataYCompleted[item.dataIndex] ? ' 小时' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[2].color}"></div>总计剩余时间：${VS.getChartDataYAll[item.dataIndex]}${VS.getChartDataYAll[item.dataIndex] ? ' 小时' : ''}</div>
+            </div>`;
+            }
+          });
+          
+          return content;
+        },
       },
       legend: {
         orient: 'horizontal',
@@ -451,7 +486,7 @@ class EpicReport extends Component {
     time -= 40 * w;
     const d = Math.floor(time / 8);
     time -= 8 * d;
-    return `${w ? `${w}w ` : ''}${d ? `${d}d ` : ''}${time ? `${time}h ` : ''}`;
+    return `${w ? `${w}周 ` : ''}${d ? `${d}天 ` : ''}${time ? `${time}小时 ` : ''}`;
   }
 
   renderTable(type) {
@@ -527,7 +562,7 @@ class EpicReport extends Component {
           ),
         },
         {
-          width: '15%',
+          width: '10%',
           title: '状态',
           dataIndex: 'statusCode',
           render: (statusCode, record) => (
@@ -547,8 +582,8 @@ class EpicReport extends Component {
       ],
       ...[
         VS.beforeCurrentUnit === 'issue_count' ? {} : {
-          width: '10%',
-          title: VS.beforeCurrentUnit === 'story_point' ? '故事点' : '剩余时间',
+          width: '15%',
+          title: VS.beforeCurrentUnit === 'story_point' ? '故事点(点)' : '剩余时间(小时)',
           dataIndex: 'storyPoints',
           render: (storyPoints, record) => (
             <div style={{ minWidth: 15 }}>
@@ -700,10 +735,13 @@ class EpicReport extends Component {
                         history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
+
+
                       发布版本
-                    </span>
+                                        </span>
                     <span>中创建一个版本</span>
-                  </div>)}
+                  </div>
+)}
               />
             )
           }
