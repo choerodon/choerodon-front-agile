@@ -195,7 +195,7 @@ class ReleaseDetail extends Component {
         formatter: (value) => {
           if (value.data.name !== '其它') {
             this.setState({ showOtherTooltip: false });
-            return `<div><span>问题：${value.data.value}</span><br/><span>百分比：${(value.data.percent.toFixed(2))}%</span></div>`;
+            return `<div><span>问题：${value.data.value} 个</span><br/><span>百分比：${(value.data.percent.toFixed(2))}%</span></div>`;
           } else {
             this.isShowOtherToolTip();
             return '';

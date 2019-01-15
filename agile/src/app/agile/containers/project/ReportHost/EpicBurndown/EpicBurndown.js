@@ -510,7 +510,7 @@ class EpicBurndown extends Component {
       ...[
         ES.beforeCurrentUnit === 'issue_count' ? {} : {
           // width: '10%',
-          title: ES.beforeCurrentUnit === 'story_point' ? `故事点 (${totalStoryPoints})` : '剩余时间',
+          title: ES.beforeCurrentUnit === 'story_point' ? `故事点 (${totalStoryPoints}点)` : '剩余时间(小时)',
           dataIndex: 'storyPoints',
           render: (storyPoints, record) => (
             <div style={{ minWidth: 15 }}>

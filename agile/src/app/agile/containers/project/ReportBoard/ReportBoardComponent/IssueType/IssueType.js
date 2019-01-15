@@ -37,7 +37,7 @@ class IssueType extends Component {
           fontSize: 12,
           color: '#000',
         },
-        formatter: value => `<div><span>问题：${value.data.value}</span><br/><span>百分比：${(value.data.percent.toFixed(2))}%</span></div>`,
+        formatter: value => `<div><span>问题：${value.data.value} 个</span><br/><span>百分比：${(value.data.percent.toFixed(2))}%</span></div>`,
         padding: 10,
         textStyle: {
           color: '#000',

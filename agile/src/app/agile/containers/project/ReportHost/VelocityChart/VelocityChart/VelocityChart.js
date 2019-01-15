@@ -57,11 +57,35 @@ class VelocityChart extends Component {
   }
 
   getOption() {
+    let unit = '';
+    if (VS.currentUnit === 'story_point') {
+      unit = '点';
+    }
+
+    if (VS.currentUnit === 'issue_count') {
+      unit = '个';
+    }
+
+    if (VS.currentUnit === 'remain_time') {
+      unit = '小时';
+    }
     return {
       tooltip: {
         trigger: 'axis',
         axisPointer: {
           type: 'shadow',
+        },
+        formatter: (params, ticket, callback) => {
+          let content = '';
+          params.forEach((item, index) => {
+            content = `<div>
+            <span>${params[0].axisValue}</span>
+            <br />
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>预估：${VS.getChartDataYCommitted[item.dataIndex]} ${VS.getChartDataYCommitted[item.dataIndex] && unit ? unit : ''}</div>
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>已完成：${VS.getChartDataYCompleted[item.dataIndex]} ${VS.getChartDataYCompleted[item.dataIndex] && unit ? unit : ''}</div>
+          </div>`;
+          });
+          return content;
         },
       },
       legend: {
@@ -247,6 +271,15 @@ class VelocityChart extends Component {
   }
 
   renderTable() {
+    let unit = '';
+    if (VS.currentUnit === 'story_point') {
+      unit = '(点)';
+    }
+
+    if (VS.currentUnit === 'issue_count') {
+      unit = '(个)';
+    }
+
     const column = [
       {
         width: '33%',
@@ -280,7 +313,7 @@ class VelocityChart extends Component {
       },
       {
         width: '33%',
-        title: '预估',
+        title: `预估${unit && unit}`,
         dataIndex: 'committedRemainTime',
         render: (committedRemainTime, record) => (
           <span style={{
@@ -295,7 +328,7 @@ class VelocityChart extends Component {
       },
       {
         width: '33%',
-        title: '已完成',
+        title: `已完成${unit && unit}`,
         dataIndex: 'completedRemainTime',
         render: (completedRemainTime, record) => (
           <span style={{
@@ -388,14 +421,8 @@ class VelocityChart extends Component {
                       );
                     }}
                   >
-
-
-
-
-
-
-                    待办事项
-                                    </span>
+                    {'待办事项'}
+                  </span>
                   <span>中创建一个冲刺</span>
                 </div>
 )}

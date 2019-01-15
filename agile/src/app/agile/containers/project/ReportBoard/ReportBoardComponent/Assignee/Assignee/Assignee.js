@@ -38,7 +38,7 @@ class Assignee extends Component {
           color: '#000',
         },
         formatter(params) {
-          const res = `${params.name}：${params.value}<br/>占比：
+          const res = `${params.name}：${params.value} 个<br/>占比：
             ${((params.value / allCount).toFixed(2) * 100).toFixed(0)}%`;
           return res;
         },

@@ -332,9 +332,19 @@ class BurndownChartHome extends Component {
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
         formatter(params) {
           let content = '';
+          let unit = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}`;
+              if(item.value && select === 'remainingEstimatedTime') {
+                unit = ' 小时';
+              }
+              if(item.value && select === 'storyPoints') {
+                unit = ' 点';
+              }
+              if(item.value && select === 'issueCount') {
+                unit = ' 个';
+              }
+              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}${unit && unit}`;
             }
           });
           return content;
@@ -359,20 +369,6 @@ class BurndownChartHome extends Component {
         right: '40',
         containLabel: true,
       },
-      // grid: {
-      //   left: '3%',
-      //   right: '3%',
-      //   // bottom: '3%',
-      //   containLabel: true,
-      //   show: true,
-      // },
-      // toolbox: {
-      //   feature: {
-      //     saveAsImage: {},
-      //   },
-      // },
-
-
       xAxis: {
         type: 'category',
         boundaryGap: false,
@@ -621,11 +617,22 @@ class BurndownChartHome extends Component {
   };
 
   render() {
+    const {select} = this.state;
+    let unit = '';
+    if(select === 'remainingEstimatedTime') {
+      unit = '(小时)';
+    }
+    if(select === 'storyPoints') {
+      unit = '(点)';
+    }
+    if(select === 'issueCount') {
+      unit = '(个)';
+    }
     const columns = [{
       title: '日期',
       dataIndex: 'date',
       key: 'date',
-      width: '25%',
+      width: '19%',
       render: text => (
         <Tooltip mouseEnterDelay={0.5} title={`日期：${text}`}>
           <p style={{
@@ -680,7 +687,7 @@ class BurndownChartHome extends Component {
       title: '事件类型',
       dataIndex: 'type',
       key: 'type',
-      width: '20%',
+      width: '14%',
       render: text => (
         <div>{this.renderTypeText(text)}</div>
       ),
@@ -701,10 +708,10 @@ class BurndownChartHome extends Component {
         </div>
       ),
     }, {
-      title: '升',
+      title: `升${unit}`,
       dataIndex: 'up',
       key: 'up',
-      width: '6.5%',
+      width: '10.5%',
       render: (text, record) => (
         <div>
           {
@@ -717,10 +724,10 @@ class BurndownChartHome extends Component {
         </div>
       ),
     }, {
-      title: '降',
+      title: `降${unit}`,
       dataIndex: 'down',
       key: 'down',
-      width: '6.5%',
+      width: '10.5%',
       render: (text, record) => (
         <div className="textDisplayOverflow">
           {
@@ -733,10 +740,10 @@ class BurndownChartHome extends Component {
         </div>
       ),
     }, {
-      title: '剩余',
+      title: `剩余${unit}`,
       dataIndex: 'rest',
       key: 'rest',
-      width: '6.5%',
+      width: '10.5%',
       render: text => (
         <p style={{ minWidth: 15 }}>{text}</p>
       ),

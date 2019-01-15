@@ -109,6 +109,7 @@ class AccumulationHome extends Component {
       AccumulationStore.axiosGetProjectInfo().then((res) => {
         AccumulationStore.setProjectInfo(res);
         AccumulationStore.setStartDate(moment(res.creationDate.split(' ')[0]));
+        AccumulationStore.setEndDate(moment());
         if (type) {
           // eslint-disable-next-line no-return-assign
           this.getData();
@@ -255,12 +256,19 @@ class AccumulationHome extends Component {
       options: {
         tooltip: {
           trigger: 'axis',
-          // axisPointer: {
-          //   type: 'cross',
-          //   label: {
-          //     backgroundColor: '#6a7985',
-          //   },
-          // },
+          formatter(params) {
+            let content = '';
+            params.forEach((item) => {
+              content = `<div>
+              <span>${params[0].axisValue}</span>
+              <br />
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>已完成：${legendSeries[0].data[item.dataIndex]} ${legendSeries[0].data[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>处理中：${legendSeries[1].data[item.dataIndex]} ${legendSeries[1].data[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[2].color}"></div>待处理：${legendSeries[2].data[item.dataIndex]} ${legendSeries[2].data[item.dataIndex] ? ' 个' : ''}</div>
+            </div>`;
+            });
+            return content;
+          },
         },
         legend: {
           right: '90',
@@ -276,15 +284,6 @@ class AccumulationHome extends Component {
           top: '8%',
           containLabel: true,
         },
-        // toolbox: {
-        //   left: 'left',
-        //   feature: {
-        //     restore: {},
-        //     // dataZoom: {
-        //     //   yAxisIndex: 'none',
-        //     // },
-        //   },
-        // },
         xAxis: [
           {
             name: '日期',
@@ -474,13 +473,14 @@ class AccumulationHome extends Component {
         >
           <div className="c7n-accumulation-filter">
             <RangePicker
-              value={[moment(AccumulationStore.getStartDate), moment(AccumulationStore.getEndDate)]}
+              value={[AccumulationStore.getStartDate && moment(AccumulationStore.getStartDate), AccumulationStore.getEndDate && moment(AccumulationStore.getEndDate)]}
               allowClear={false}
+              disabledDate={current => current && (current < AccumulationStore.getStartDate || current > AccumulationStore.getEndDate)}
               onChange={(date, dateString) => {
-                  AccumulationStore.setStartDate(moment(dateString[0]));
-                  AccumulationStore.setEndDate(moment(dateString[1]));
-                  this.getData();
-                }}
+                AccumulationStore.setStartDate(moment(dateString[0]));
+                AccumulationStore.setEndDate(moment(dateString[1]));
+                this.getData();
+              }}
             />
             {
                 this.getFilterData().map((item, index) => (

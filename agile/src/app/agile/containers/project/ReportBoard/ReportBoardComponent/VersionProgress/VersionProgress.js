@@ -86,7 +86,19 @@ class VersionProgress extends Component {
         textStyle: {
           color: 'rgba(0,0,0,0.64)',
         },
-      
+        formatter(params) {
+          let content = '';
+          params.forEach((item) => {
+            content = `<div>
+            <span>${params[0].axisValue}</span>
+            <br />
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>待处理：${versionProgressData.todoData[item.dataIndex]} ${versionProgressData.todoData[item.dataIndex] ? ' 个' : ''}</div>
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>处理中：${versionProgressData.doingData[item.dataIndex]} ${versionProgressData.doingData[item.dataIndex] ? ' 个' : ''}</div>
+            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[2].color}"></div>已完成：${versionProgressData.doneData[item.dataIndex]} ${versionProgressData.doneData[item.dataIndex] ? ' 个' : ''}</div>
+          </div>`;
+          });
+          return content;
+        },
       },
       legend: {
         // top: ,

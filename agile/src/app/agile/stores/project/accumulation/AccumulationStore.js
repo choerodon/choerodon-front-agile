@@ -1,5 +1,7 @@
 import axios from 'axios';
-import { observable, action, computed, toJS } from 'mobx';
+import {
+  observable, action, computed, toJS, 
+} from 'mobx';
 import { store, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import moment from 'moment';
@@ -9,7 +11,9 @@ const { AppState } = stores;
 @store('AccumulationStore')
 class AccumulationStore {
   @observable filterList = [];
+
   @observable columnData = [];
+
   @observable timeData = [{
     id: 1,
     name: '上周',
@@ -39,10 +43,15 @@ class AccumulationStore {
     name: '自定义',
     check: false,
   }];
-  @observable startDate = moment('2018-5-23');
-  @observable endDate = moment();
+
+  @observable startDate = '';
+
+  @observable endDate = '';
+
   @observable accumulationData = {};
+
   @observable boardList = [];
+
   @observable projectInfo = {};
 
   @action changeFilterData(id, bool) {
@@ -140,4 +149,3 @@ class AccumulationStore {
 
 const accumulationStore = new AccumulationStore();
 export default accumulationStore;
-

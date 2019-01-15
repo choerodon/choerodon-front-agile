@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Spin, message, Icon, Select, Table, Menu, Checkbox, Tabs, Tooltip,
+  Button, Spin, message, Icon, Select, Table, Menu, Checkbox, Tabs, Tooltip, Pagination,
 } from 'choerodon-ui';
 import {
   Page, Header, Content, stores,
@@ -314,7 +314,7 @@ class SprintReport extends Component {
           let content = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}`;
+              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}${item.value? ' 点' : ''}`;
             }
           });
           return content;
@@ -448,16 +448,29 @@ class SprintReport extends Component {
     };
   }
 
-  callback(key) {
+  callback = (key) => {
     ReportStore.setActiveKey(key);
     const ARRAY = {
-      done: 'loadDoneIssues',
-      todo: 'loadTodoIssues',
-      remove: 'loadRemoveIssues',
+      done: {
+        func: 'loadDoneIssues',
+        page: 0,
+        size: 10,
+      },
+      todo: {
+        func: 'loadTodoIssues',
+        page: 0,
+        size: 10,
+      },
+      remove: {
+        func: 'loadRemoveIssues',
+        page: 0,
+        size: 10,
+      },
     };
-    if (!ReportStore[key] && ReportStore.currentSprint.sprintId) {
-      ReportStore[ARRAY[key]]();
+    if (ReportStore.currentSprint.sprintId) {
+      ReportStore[ARRAY[key].func](ARRAY[key].page, ARRAY[key].size);
     }
+
   }
 
   renderDoneIssue(column) {
@@ -466,11 +479,15 @@ class SprintReport extends Component {
         <Table
           rowKey={record => record.issueId}
           dataSource={ReportStore.doneIssues}
+          pagination={ReportStore.donePagination}
           columns={column}
           filterBar={false}
-          pagination={false}
           scroll={{ x: true }}
           loading={ReportStore.loading}
+          onChange={(pagination, filters, sorter) => {
+           ReportStore.setDonePagination(pagination);
+           ReportStore.loadDoneIssues(pagination.current-1, pagination.pageSize);
+          }}
         />
       </div>
     );
@@ -482,11 +499,15 @@ class SprintReport extends Component {
         <Table
           rowKey={record => record.issueId}
           dataSource={ReportStore.todoIssues}
+          pagination={ReportStore.todoPagination}
           columns={column}
           filterBar={false}
-          pagination={false}
           scroll={{ x: true }}
           loading={ReportStore.loading}
+          onChange={(pagination, filters, sorter) => {
+            ReportStore.setTodoPagination(Pagination);
+            ReportStore.loadTodoeIssues(pagination.current-1, pagination.pageSize);
+          }}
         />
       </div>
     );
@@ -498,11 +519,15 @@ class SprintReport extends Component {
         <Table
           rowKey={record => record.issueId}
           dataSource={ReportStore.removeIssues}
+          pagination={ReportStore.removePagination}
           columns={column}
           filterBar={false}
-          pagination={false}
           scroll={{ x: true }}
           loading={ReportStore.loading}
+          onChange={(pagination, filters, sorter) => {
+            ReportStore.setRemovePagination(Pagination);
+            ReportStore.removePagination(pagination.current-1, pagination.pageSize);
+          }}
         />
       </div>
     );
@@ -630,7 +655,7 @@ class SprintReport extends Component {
         ),
       }, {
         width: '10%',
-        title: '故事点',
+        title: '故事点(点)',
         dataIndex: 'storyPoints',
         render: (storyPoints, record) => (
           <div style={{ minWidth: 15 }}>

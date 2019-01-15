@@ -59,6 +59,42 @@ class EpicReport extends Component {
     const commonOption = {
       tooltip: {
         trigger: 'axis',
+        formatter: (params, ticket, callback) => {
+          let content = '';
+          params.forEach((item) => {
+            if (ES.beforeCurrentUnit === 'issue_count') {
+              content = `<div>
+              <span>${params[0].axisValue}</span>
+              <br />
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>总问题数：${ES.getChartDataYIssueCountAll[item.dataIndex]} ${ES.getChartDataYIssueCountAll[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>已完成问题数：${ES.getChartDataYIssueCountCompleted[item.dataIndex]} ${ES.getChartDataYIssueCountCompleted[item.dataIndex] ? ' 个' : ''}</div>
+            </div>`;
+            }
+  
+            if (ES.beforeCurrentUnit === 'story_point') {
+              content = `<div>
+              <span>${params[0].axisValue}</span>
+              <br />
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>总问题数：${ES.getChartDataYIssueCountAll[item.dataIndex]} ${ES.getChartDataYIssueCountAll[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>未预估问题数：${ES.getChartDataYIssueCountUnEstimate[item.dataIndex]} ${ES.getChartDataYIssueCountAll[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[2].color}"></div>已完成故事点：${ES.getChartDataYCompleted[item.dataIndex]}${ES.getChartDataYCompleted[item.dataIndex] ? ' 点' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[3].color}"></div>总计故事点：${ES.getChartDataYAll[item.dataIndex]}${ES.getChartDataYAll[item.dataIndex] ? ' 点' : ''}</div>
+            </div>`;
+            }
+  
+            if (ES.beforeCurrentUnit === 'remain_time') {
+              content = `<div>
+              <span>${params[0].axisValue}</span>
+              <br />
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>总问题数：${ES.getChartDataYIssueCountAll[item.dataIndex]} ${ES.getChartDataYIssueCountAll[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>未预估问题数：${ES.getChartDataYIssueCountUnEstimate[item.dataIndex]} ${ES.getChartDataYIssueCountAll[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[2].color}"></div>已完成剩余时间：${ES.getChartDataYCompleted[item.dataIndex]}${ES.getChartDataYCompleted[item.dataIndex] ? ' 小时' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[3].color}"></div>总计剩余时间：${ES.getChartDataYAll[item.dataIndex]}${ES.getChartDataYAll[item.dataIndex] ? ' 小时' : ''}</div>
+            </div>`;
+            }
+          });
+          return content;
+        },
       },
       legend: {
         orient: 'horizontal',
@@ -419,7 +455,11 @@ class EpicReport extends Component {
     time -= 40 * w;
     const d = Math.floor(time / 8);
     time -= 8 * d;
-    return `${w ? `${w}周 ` : ''}${d ? `${d}天 ` : ''}${time ? `${time}小时 ` : ''}`;
+    return `${w ? `${w} 周 ` : ''}${d ? `${d} 天 ` : ''}${time ? `${time} 小时 ` : ''}`;
+  }
+
+  transformStoryPoints(storyPoints) {
+    return storyPoints && storyPoints > 0 ? `${storyPoints} 点` : storyPoints;
   }
 
   renderTable(type) {
@@ -452,7 +492,7 @@ class EpicReport extends Component {
           ),
         },
         {
-          width: '30%',
+          width: '25%',
           title: '概要',
           dataIndex: 'summary',
           render: summary => (
@@ -516,8 +556,8 @@ class EpicReport extends Component {
       ],
       ...[
         ES.beforeCurrentUnit === 'issue_count' ? {} : {
-          width: '10%',
-          title: ES.beforeCurrentUnit === 'story_point' ? '故事点' : '剩余时间',
+          width: '15%',
+          title: ES.beforeCurrentUnit === 'story_point' ? '故事点(点)' : '剩余时间(小时)',
           dataIndex: 'storyPoints',
           render: (storyPoints, record) => (
             <div style={{ minWidth: 15 }}>
@@ -617,14 +657,14 @@ class EpicReport extends Component {
                               <li>
                                 <span className="c7n-tip">合计：</span>
                                 <span>
-                                  {ES.getLatest.issueCount}
+                                  {`${ES.getLatest.issueCount}${ES.getLatest.issueCount > 0 ? ' 个' : ''}`}
                                 </span>
                               </li>
                               {
                                 ES.beforeCurrentUnit === 'issue_count' ? (
                                   <li>
                                     <span className="c7n-tip">已完成：</span>
-                                    <span>{ES.getLatest.issueCompletedCount}</span>
+                                    <span>{`${ES.getLatest.issueCompletedCount}${ES.getLatest.issueCompletedCount > 0 ? ' 个' : ''}`}</span>
                                   </li>
                                 ) : null
                               }
@@ -632,7 +672,7 @@ class EpicReport extends Component {
                                 ES.beforeCurrentUnit === 'issue_count' ? null : (
                                   <li>
                                     <span className="c7n-tip">未预估：</span>
-                                    <span>{ES.getLatest.unEstimateIssueCount}</span>
+                                    <span>{`${ES.getLatest.unEstimateIssueCount}${ES.getLatest.unEstimateIssueCount > 0 ? ' 个' : ''}`}</span>
                                   </li>
                                 )
                               }
@@ -648,13 +688,13 @@ class EpicReport extends Component {
                                     <li>
                                       <span className="c7n-tip">合计：</span>
                                       <span>
-                                        {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.allStoryPoints : this.transformRemainTime(ES.getLatest.allRemainTimes)}
+                                        {ES.beforeCurrentUnit === 'story_point' ? this.transformStoryPoints(ES.getLatest.allStoryPoints) : this.transformRemainTime(ES.getLatest.allRemainTimes)}
                                       </span>
                                     </li>
                                     <li>
                                       <span className="c7n-tip">已完成：</span>
                                       <span>
-                                        {ES.beforeCurrentUnit === 'story_point' ? ES.getLatest.completedStoryPoints : this.transformRemainTime(ES.getLatest.completedRemainTimes)}
+                                        {ES.beforeCurrentUnit === 'story_point' ? this.transformStoryPoints(ES.getLatest.completedStoryPoints) : this.transformRemainTime(ES.getLatest.completedRemainTimes)}
                                       </span>
                                     </li>
                                   </ul>

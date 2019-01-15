@@ -1,18 +1,26 @@
 import { observable, action, computed } from 'mobx';
 import { store, stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
-import { loadSprints, loadSprint, loadSprintIssues, loadChartData } from '../../../api/NewIssueApi';
+import {
+  loadSprints, loadSprint, loadSprintIssues, loadChartData, 
+} from '../../../api/NewIssueApi';
 
 const { AppState } = stores;
 
 @store('ReportStore')
 class ReportStore {
   @observable loading = false;
-  @observable todo = false;
-  @observable done = false;
-  @observable remove = false;
+
+  // @observable todo = false;
+
+  // @observable done = false;
+
+  // @observable remove = false;
+
   @observable sprints = [];
+
   @observable currentSprint = {};
+
   @observable activeKey = 'done';
 
   @observable doneIssues = [];
@@ -25,6 +33,24 @@ class ReportStore {
     xAxis: [],
     yAxis: [],
   };
+
+  @observable donePagination = {
+    current: 0, 
+    pageSize: 10, 
+    total: undefined,
+  };
+
+  @observable todoPagination = {
+    current: 0, 
+    pageSize: 10, 
+    total: undefined,
+  }; 
+
+  @observable removePagination = {
+    current: 0, 
+    pageSize: 10, 
+    total: undefined,
+  }
 
   init() {
     loadSprints(['started', 'closed'])
@@ -47,9 +73,9 @@ class ReportStore {
         .then((res) => {
           this.setCurrentSprint(res || {});
           // ready to load when activeKey change
-          this.setTodo(false);
-          this.setDone(false);
-          this.setRemove(false);
+          // this.setTodo(false);
+          // this.setDone(false);
+          // this.setRemove(false);
           // this.getChartData();
           this.loadCurrentTab();
         })
@@ -127,33 +153,45 @@ class ReportStore {
     });
   }
 
-  loadDoneIssues() {
+  loadDoneIssues(page = 0, size = 10) {
     this.setLoading(true);
-    loadSprintIssues(this.currentSprint.sprintId, 'done')
+    loadSprintIssues(this.currentSprint.sprintId, 'done', page, size)
       .then((res) => {
         this.setDoneIssues(res.content);
+        this.setDonePagination({
+          ...this.donePagination,
+          total: res.totalElements,
+        });
         this.setLoading(false);
-        this.setDone(true);
+        // this.setDone(true);
       });
   }
 
-  loadTodoIssues() {
+  loadTodoIssues(page = 0, size = 10) {
     this.setLoading(true);
-    loadSprintIssues(this.currentSprint.sprintId, 'unfinished')
+    loadSprintIssues(this.currentSprint.sprintId, 'unfinished', page, size)
       .then((res) => {
         this.setTodoIssues(res.content);
+        this.setTodoPagination({
+          ...this.todoPagination,
+          total: res.totalElements,
+        });
         this.setLoading(false);
-        this.setTodo(true);
+        // this.setTodo(true);
       });
   }
 
-  loadRemoveIssues() {
+  loadRemoveIssues(page = 0, size = 10) {
     this.setLoading(true);
-    loadSprintIssues(this.currentSprint.sprintId, 'remove')
+    loadSprintIssues(this.currentSprint.sprintId, 'remove', page, size)
       .then((res) => {
         this.setRemoveIssues(res.content);
+        this.setRemovePagination({
+          ...this.removePagination,
+          total: res.totalElements,
+        });
         this.setLoading(false);
-        this.setRemove(true);
+        // this.setRemove(true);
       });
   }
 
