@@ -98,7 +98,7 @@ class EpicItem extends Component {
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/check_epic_name?epicName=${value}`)
         .then((checkRes) => {
           if (checkRes) {
-            message.info('史诗名称重复', 2);
+            Choerodon.prompt('史诗名称重复');
           } else {
             this.setState({
               editName: false,

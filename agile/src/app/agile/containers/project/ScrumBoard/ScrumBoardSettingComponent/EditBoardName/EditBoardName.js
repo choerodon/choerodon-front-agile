@@ -79,7 +79,7 @@ class EditBoardName extends Component {
             this.setState({
               loading: false,
             });
-            message.success('保存成功');
+            Choerodon.prompt('保存成功');
             // history.push(`/agile/scrumboard?type=project&id=${data.projectId}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
           });
       }

@@ -49,12 +49,12 @@ class SettingColumn extends Component {
     if (type === 'maxNum') {
       if (this.props.data.minNum) {
         if (parseInt(value, 10) < parseInt(this.props.data.minNum, 10)) {
-          message.info('最大值不能小于最小值');
+          Choerodon.prompt('最大值不能小于最小值');
           return;
         }
       }
       if (parseInt(value, 10) < totalIssues) {
-        message.info('最大值不能小于当前已有issue数');
+        Choerodon.prompt('最大值不能小于当前已有issue数');
         return;
       }
       maxminObj.maxNum = value;
@@ -63,12 +63,12 @@ class SettingColumn extends Component {
     if (type === 'minNum') {
       if (this.props.data.maxNum) {
         if (parseInt(value, 10) > parseInt(this.props.data.maxNum, 10)) {
-          message.info('最小值不能大于最大值');
+          Choerodon.prompt('最小值不能大于最大值');
           return;
         }
       }
       if (parseInt(value, 10) > totalIssues) {
-        message.info('最小值不能大于当前已有issue数');
+        Choerodon.prompt('最小值不能大于当前已有issue数');
         return;
       }
       maxminObj.minNum = value;

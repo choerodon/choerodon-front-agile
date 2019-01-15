@@ -1110,7 +1110,7 @@ class SprintItem extends Component {
                   )}
                 </Droppable>
               ) : ''}
-            </div>); 
+                        </div>); 
           }
         } else {
           result = (

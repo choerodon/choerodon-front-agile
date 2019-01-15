@@ -150,7 +150,7 @@ class Wiki extends Component {
         });
         onOk();
       }).catch(() => {
-        message.error('关联wiki文档失败');
+        Choerodon.prompt('关联wiki文档失败');
         this.setState({
           createLoading: false,
         });

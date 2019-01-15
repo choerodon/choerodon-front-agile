@@ -133,7 +133,7 @@ class VersionItem extends Component {
       axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/check?name=${value}`)
         .then((checkRes) => {
           if (checkRes) {
-            message.info('版本名称重复', 2);
+            Choerodon.prompt('版本名称重复');
           } else {
             const verisonData = {
               objectVersionNumber,
@@ -146,7 +146,7 @@ class VersionItem extends Component {
                 this.setState({
                   editName: false,
                 });
-                message.error(res.message);
+                Choerodon.prompt(res.message);
               } else {
                 this.setState({
                   editName: false,

@@ -133,7 +133,7 @@ class EditComponent extends Component {
             this.setState({
               createLoading: false,
             });
-            message.error('修改模块失败');
+            Choerodon.prompt('修改模块失败');
           });
       }
     });

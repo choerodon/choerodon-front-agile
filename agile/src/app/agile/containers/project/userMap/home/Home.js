@@ -1297,10 +1297,10 @@ class Home extends Component {
         shareContent.style.width = shareContentWidth;
         shareContent.style.height = shareContentHeight;
 
-        message.success('导出图片成功', undefined, undefined, 'top');
+        Choerodon.prompt('导出图片成功');
       })
       .catch((error) => {
-        message.error('导出图片失败', undefined, undefined, 'top');
+        Choerodon.prompt('导出图片失败');
       });
   }
 
