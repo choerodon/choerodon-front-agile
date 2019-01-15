@@ -310,6 +310,7 @@ class ScrumBoardHome extends Component {
 
             ScrumBoardStore.setAssigneer(storeAssignee);
             ScrumBoardStore.setCurrentSprint(data.currentSprint);
+            ScrumBoardStore.setParentCompleted(data.parentCompleted);
             ScrumBoardStore.setParentIds(storeParentIds);
             ScrumBoardStore.setEpicData(epicData);
             const newColumnData = data.columnsData && data.columnsData.columns;
@@ -596,6 +597,7 @@ class ScrumBoardHome extends Component {
               }
               draggableData.objectVersionNumber = data.objectVersionNumber;
               draggableData.categoryCode = JSON.parse(result.destination.droppableId).categoryCode;
+              draggableData.stayDay = 0;
               for (let index = 0, len = newState.length; index < len; index += 1) {
                 if (String(newState[index].columnId) === String(destColumnId)) {
                   for (
@@ -737,7 +739,7 @@ class ScrumBoardHome extends Component {
   }
 
   // 渲染issue列
-  renderIssueColumns = (id) => {
+  renderIssueColumns = (id, isEpic) => {
     const result = [];
     const data = ScrumBoardStore.getBoardData && ScrumBoardStore.getBoardData.filter(obj => obj.columnId !== 'unset');
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
@@ -813,14 +815,21 @@ class ScrumBoardHome extends Component {
    * @returns {Array}
    */
   renderSwimlane = () => {
+    let isEpic = false;
     let ids = [];
+    let parentCompleted = [];
+    let completedArr = [];
+    let unCompletedArr = [];
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
-      ids = ScrumBoardStore.getParentIds;
-      ids = _.sortBy(ids, o => o.rank);
+      parentCompleted = new Set(ScrumBoardStore.getParentCompleted);
+      completedArr = ScrumBoardStore.getParentIds.filter(issue => parentCompleted.has(issue.issueId)).map(issue => ({ dontExpand: true, ...issue }));
+      unCompletedArr = ScrumBoardStore.getParentIds.filter(issue => !parentCompleted.has(issue.issueId)).map(issue => ({ dontExpand: false, ...issue })).sort((x, y) => x.rank - y.rank);
+      ids = [...unCompletedArr, ...completedArr];
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       ids = ScrumBoardStore.getAssigneer;
       ids = _.sortBy(ids, o => o.assigneeId);
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
+      isEpic = true;
       ids = ScrumBoardStore.getEpicData;
       ids = _.sortBy(ids, o => o.epicId);
     }
@@ -830,6 +839,8 @@ class ScrumBoardHome extends Component {
         <SwimLaneContext
           key={`${ids[index].assigneeId}-${index}`}
           data={ids[index]}
+          expand={ids[index].dontExpand}
+          // isEpic={isEpic}
           handleDragEnd={this.handleDragEnd.bind(this)}
           renderIssueColumns={this.renderIssueColumns.bind(this)}
           changeState={this.changeState}
@@ -838,16 +849,6 @@ class ScrumBoardHome extends Component {
     }
     return result;
   };
-
-  // renderHeight = () => {
-  //   setTimeout(() => {
-  //     if (document.getElementsByClassName('c7n-scrumboard-content').length > 0) {
-  //       document.getElementsByClassName('c7n-scrumboard-content')[0].style
-  // .height = `calc(100vh - ${parseInt(document.getElementsByClassName('c7n-scrumboard-content')[0]
-  // .offsetTop, 10) + 108}px)`;
-  //     }
-  //   }, 600);
-  // };
 
   renderOthersTitle = () => {
     let result = '';
@@ -1164,7 +1165,6 @@ class ScrumBoardHome extends Component {
               </Select>
             )
           }
-         
           {
             (
               <Button

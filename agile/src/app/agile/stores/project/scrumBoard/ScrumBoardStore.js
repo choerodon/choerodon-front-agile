@@ -61,6 +61,8 @@ class ScrumBoardStore {
 
   @observable workDate = false;
 
+  @observable parentCompleted = [];
+
   @observable issueTypes = [];
 
   @observable canAddStatus = true;
@@ -336,6 +338,14 @@ class ScrumBoardStore {
 
   @action setParentIds(data) {
     this.parentIds = data;
+  }
+
+  @computed get getParentCompleted() {
+    return toJS(this.parentCompleted);
+  }
+
+  @action setParentCompleted(data) {
+    this.parentCompleted = data;
   }
 
   @computed get getBoardData() {

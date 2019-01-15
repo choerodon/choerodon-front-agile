@@ -18,6 +18,12 @@ class SwimLaneContext extends Component {
     };
   }
 
+  componentWillReceiveProps(nextProps, nextContext) {
+    this.setState({
+      expand: !nextProps.data.dontExpand,
+    });
+  }
+
   getFirst(str) {
     if (!str) {
       return '';
@@ -39,7 +45,7 @@ class SwimLaneContext extends Component {
    * @memberof SwimLaneContext
    */
   renderTypeCode(type) {
-    const typeCode = this.props.data.typeCode;
+    const { data: { typeCode } } = this.props;
     if (typeCode === 'story') {
       if (type === 'background') {
         return '#00BFA5';
@@ -80,7 +86,7 @@ class SwimLaneContext extends Component {
       result = (
         <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Icon 
+            <Icon
               style={{ fontSize: 17, cursor: 'pointer' }}
               type={expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
               role="none"
@@ -115,9 +121,9 @@ class SwimLaneContext extends Component {
                 name: item.status,
               }}
             />
-            <span 
+            <span
               className="c7n-parentIssue-summary"
-              style={JSON.stringify(ScrumBoardStore.getClickIssueDetail) !== '{}' ? { 
+              style={JSON.stringify(ScrumBoardStore.getClickIssueDetail) !== '{}' ? {
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
@@ -153,7 +159,7 @@ class SwimLaneContext extends Component {
     } else if (ScrumBoardStore.getSwimLaneCode === 'assignee') {
       result = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Icon 
+          <Icon
             style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
             type={expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
             role="none"
@@ -163,7 +169,7 @@ class SwimLaneContext extends Component {
               });
             }}
           />
-          <UserHead 
+          <UserHead
             hiddenText
             size={24}
             user={{
@@ -180,7 +186,7 @@ class SwimLaneContext extends Component {
     } else if (ScrumBoardStore.getSwimLaneCode === 'swimlane_epic') {
       result = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Icon 
+          <Icon
             style={{ fontSize: 17, cursor: 'pointer', marginRight: 8 }}
             type={expand ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
             role="none"
@@ -199,7 +205,8 @@ class SwimLaneContext extends Component {
   }
 
   render() {
-    const item = this.props.data;
+    const { data: { item }, handleDragEnd, renderIssueColumns } = this.props;
+    const { expand } = this.state;
     let id;
     if (ScrumBoardStore.getSwimLaneCode === 'parent_child') {
       // 故事泳道
@@ -215,21 +222,20 @@ class SwimLaneContext extends Component {
       <div className="c7n-scrumboard-others">
         <div style={{ justifyContent: 'space-between' }} className="c7n-scrumboard-otherHeader">
           {this.renderSwimLaneTitle(item)}
-          
         </div>
-        <div 
+        <div
           className="c7n-scrumboard-otherContent"
           style={{
-            display: this.state.expand ? 'flex' : 'none',
+            display: expand ? 'flex' : 'none',
           }}
         >
-          <DragDropContext 
-            onDragEnd={this.props.handleDragEnd.bind(this)}
+          <DragDropContext
+            onDragEnd={handleDragEnd.bind(this)}
             onDragStart={(start) => {
               ScrumBoardStore.setDragStartItem(start);
             }}
           >
-            {this.props.renderIssueColumns(id)}
+            {renderIssueColumns(id)}
           </DragDropContext>
         </div>
       </div>
