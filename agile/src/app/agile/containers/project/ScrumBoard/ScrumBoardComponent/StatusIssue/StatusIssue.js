@@ -2,7 +2,9 @@ import React, { Component, PureComponent } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import { Draggable } from 'react-beautiful-dnd';
-import { Icon, Avatar, Tooltip } from 'choerodon-ui';
+import {
+  Icon, Avatar, Tooltip, Rate,
+} from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import './StatusIssue.scss';
 import TypeTag from '../../../../../components/TypeTag';
@@ -322,6 +324,17 @@ class StatusIssue extends Component {
     const {
       isCompleted, statusName, categoryCode, swimLaneCode, statusId,
     } = this.props;
+    const stayDayConvert = (stayDay) => {
+      if (stayDay >= 0 && stayDay <= 6) {
+        return 1;
+      } else if (stayDay >= 7 && stayDay <= 10) {
+        return 2;
+      } else if (stayDay >= 11 && stayDay <= 15) {
+        return 3;
+      } else {
+        return 4;
+      }
+    };
     // 子任务和父任务分离显示！
     if (true || this.renderSubDisplay(item, type) === 'block') {
       return (
@@ -423,6 +436,20 @@ class StatusIssue extends Component {
                             >
                               {item.issueNum}
                             </p>
+                            {!isCompleted ? (
+                              <Tooltip title={`卡片停留 ${item.stayDay} 天`}>
+                                <div>
+                                  <Rate
+                                    character={<Icon type="brightness_1" />}
+                                    allowHalf
+                                    disabled
+                                    defaultValue={stayDayConvert(item.stayDay)}
+                                    count={4}
+                                    className={item.stayDay <= 3 ? 'notEmergency' : 'emergency'}
+                                  />
+                                </div>
+                              </Tooltip>
+                            ) : ''}
                           </div>
                           <div style={{
                             display: 'flex',
