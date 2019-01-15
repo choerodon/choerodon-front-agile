@@ -213,7 +213,7 @@ class BacklogHome extends Component {
         loading: false,
       });
       this.refresh(true);
-      message.success('创建成功');
+      Choerodon.prompt('创建成功');
       // const anchorElement = document.getElementById('sprint_new');
       // if (anchorElement) {
       //   anchorElement.scrollIntoView({
@@ -229,7 +229,7 @@ class BacklogHome extends Component {
       this.setState({
         loading: false,
       });
-      message.success('创建失败');
+      Choerodon.prompt('创建失败');
     });
   };
 

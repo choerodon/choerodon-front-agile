@@ -439,7 +439,7 @@ class ScrumBoardHome extends Component {
             }
             if (typeof originState[oriIndex].maxNum === 'number' && originState[oriIndex].minNum >= totalIssues) {
               flag = 1;
-              message.info(`少于列${originState[oriIndex].name}的最小长度，无法更新`);
+              Choerodon.prompt(`少于列${originState[oriIndex].name}的最小长度，无法更新`);
             }
           }
         }
@@ -454,7 +454,7 @@ class ScrumBoardHome extends Component {
             }
             if (typeof originState[oriIndex].maxNum === 'number' && originState[oriIndex].maxNum <= totalIssues) {
               flag = 1;
-              message.info(`多于列${originState[oriIndex].name}的最大长度，无法更新`);
+              Choerodon.prompt(`多于列${originState[oriIndex].name}的最大长度，无法更新`);
             }
           }
         }
@@ -481,7 +481,7 @@ class ScrumBoardHome extends Component {
             }
             if (typeof originState[oriIndex].maxNum === 'number' && originState[oriIndex].minNum >= totalIssues) {
               flag = 1;
-              message.info(`少于列${originState[oriIndex].name}的最小长度，无法更新`);
+              Choerodon.prompt(`少于列${originState[oriIndex].name}的最小长度，无法更新`);
             }
           }
         }
@@ -503,7 +503,7 @@ class ScrumBoardHome extends Component {
             }
             if (typeof originState[oriIndex].maxNum === 'number' && originState[oriIndex].maxNum <= totalIssues) {
               flag = 1;
-              message.info(`多于列${originState[oriIndex].name}的最大长度，无法更新`);
+              Choerodon.prompt(`多于列${originState[oriIndex].name}的最大长度，无法更新`);
             }
           }
         }
@@ -672,7 +672,7 @@ class ScrumBoardHome extends Component {
       if (!err && !checkResult) {
         ScrumBoardStore.axiosCreateBoard(values.name).then((res) => {
           form.resetFields();
-          message.success('创建成功');
+          Choerodon.prompt('创建成功');
           this.setState({
             addBoard: false,
           });
@@ -803,7 +803,7 @@ class ScrumBoardHome extends Component {
           [name]: value,
         });
       }).catch((e) => {
-        message.error('查询状态失败，请重试！');
+        Choerodon.prompt('查询状态失败，请重试！');
       });
     }
   };
@@ -1181,7 +1181,7 @@ class ScrumBoardHome extends Component {
                     && dataSource.currentSprint.sprintId) {
                     history.push(`/agile/iterationBoard/${dataSource.currentSprint.sprintId}?type=project&id=${AppState.currentMenuType.id}&name=${AppState.currentMenuType.name}&organizationId=${AppState.currentMenuType.organizationId}`);
                   } else {
-                    message.info('等待加载当前迭代');
+                    Choerodon.prompt('等待加载当前迭代');
                   }
                 }}
               >

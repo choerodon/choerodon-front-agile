@@ -99,7 +99,7 @@ class ColumnPage extends Component {
           if (!isNaN(minNum)) {
             /* eslint-enable */
             if (parseInt(totalNum, 10) < parseInt(minNum, 10)) {
-              message.info('剩余状态issue数小于列的最小issue数，无法移动状态');
+              Choerodon.prompt('剩余状态issue数小于列的最小issue数，无法移动状态');
               return;
             }
           }
@@ -155,7 +155,7 @@ class ColumnPage extends Component {
           if (!isNaN(minNum)) {
             /* eslint-enable */
             if (parseInt(totalNum, 10) < parseInt(minNum, 10)) {
-              message.info('剩余状态issue数小于列的最小issue数，无法移动状态');
+              Choerodon.prompt('剩余状态issue数小于列的最小issue数，无法移动状态');
               return;
             }
           }
@@ -188,7 +188,7 @@ class ColumnPage extends Component {
             }
           }
           if ((destinationTotal + draggableTotal) > parseInt(maxNum, 10)) {
-            message.info('移动至目标列后的issue数大于目标列的最大issue数，无法移动状态');
+            Choerodon.prompt('移动至目标列后的issue数大于目标列的最大issue数，无法移动状态');
             return;
           }
         }

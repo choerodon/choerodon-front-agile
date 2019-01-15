@@ -94,7 +94,7 @@ class AddComponent extends Component {
             this.setState({
               createLoading: false,
             });
-            message.error('创建模块失败');
+            Choerodon.prompt('创建模块失败');
           });
       }
     });

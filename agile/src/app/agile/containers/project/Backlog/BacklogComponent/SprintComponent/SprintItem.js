@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
-import {
-  Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu, message,
+import { 
+  Input, Button, Select, Icon, Tooltip, Modal, Avatar, Dropdown, Menu,  
 } from 'choerodon-ui';
 import { stores } from 'choerodon-front-boot';
 import _ from 'lodash';
@@ -228,27 +228,20 @@ class SprintItem extends Component {
    */
   handleBlurName =(item, value) => {
     const { store, refresh } = this.props;
-    const projectId = AppState.currentMenuType.id;
-    const sprintData = {
+    const data = {
       objectVersionNumber: item.objectVersionNumber,
-      projectId,
+      projectId: AppState.currentMenuType.id,
       sprintId: item.sprintId,
       sprintName: value,
     };
-    store.checkSprintName(projectId, value).then((data) => {
-      if (data) {
-        message.info('冲刺名称重复', 2);
-      } else {
-        store.axiosUpdateSprint(sprintData).then((res) => {
-          this.setState({
-            editName: false,
-          });
-          refresh();
-        }).catch((error) => {
-        });
-      }
+    store.axiosUpdateSprint(data).then((res) => {
+      this.setState({
+        editName: false,
+      });
+      refresh();
+    }).catch((error) => {
     });
-  };
+  }
 
   /**
    *修改冲刺目标
@@ -280,9 +273,7 @@ class SprintItem extends Component {
    */
   handleFinishSprint =(item, indexs) => {
     const { store } = this.props;
-    store.axiosGetSprintCompleteMessage(
-      item.sprintId,
-    ).then((res) => {
+    store.axiosGetSprintCompleteMessage(item.sprintId).then((res) => {
       store.setSprintCompleteMessage(res);
       let flag = 0;
       if (res.parentsDoneUnfinishedSubtasks) {
@@ -326,9 +317,7 @@ class SprintItem extends Component {
     const { store } = this.props;
     if (!store.getSprintData.sprintData.filter(items => items.statusCode === 'started').length > 0) {
       if (item.issueSearchDTOList && item.issueSearchDTOList.length > 0) {
-        store.axiosGetOpenSprintDetail(
-          item.sprintId,
-        ).then((res) => {
+        store.axiosGetOpenSprintDetail(item.sprintId).then((res) => {
           store.setOpenSprintDetail(res);
           this.setState({
             [`${index}-startSprint`]: { startSprintVisible: true },
@@ -429,9 +418,7 @@ class SprintItem extends Component {
           },
         });
         store.setSelectIssue([item.issueId]);
-      } else if (String(
-        selected.droppableId,
-      ) === String(sprintId)) {
+      } else if (String(selected.droppableId) === String(sprintId)) {
         // 如果点击的是当前列的卡片
         const originIssueIds = _.clone(selected.issueIds);
         // 如果不存在
@@ -771,72 +758,71 @@ class SprintItem extends Component {
         if (data.length > 0) {
           for (let indexs = 0, len = data.length; indexs < len; indexs += 1) {
             const item = data[indexs];
-            result.push(
-              <div
-                key={item ? item.sprintId : '0'}
-                id={(indexs === 0 && item.statusCode === 'sprint_planning')
+            result.push(<div
+              key={item ? item.sprintId : '0'}
+              id={(indexs === 0 && item.statusCode === 'sprint_planning')
                 || (indexs === 1 && data[0].statusCode !== 'sprint_planning')
-                  ? 'sprint_new' : undefined}
-              >
-                <div className="c7n-backlog-sprintTop">
-                  <div className="c7n-backlog-springTitle">
-                    <div className="c7n-backlog-sprintTitleSide">
-                      <div className="c7n-backlog-sprintName">
-                        <Icon
-                          style={{ fontSize: 20, cursor: 'pointer' }}
-                          type={state[`${indexs}-sprint`] && !state[`${indexs}-sprint`].expand ? 'baseline-arrow_right' : 'baseline-arrow_drop_down'}
+                ? 'sprint_new' : undefined}
+            >
+              <div className="c7n-backlog-sprintTop">
+                <div className="c7n-backlog-springTitle">
+                  <div className="c7n-backlog-sprintTitleSide">
+                    <div className="c7n-backlog-sprintName">
+                      <Icon
+                        style={{ fontSize: 20, cursor: 'pointer' }}
+                        type={state[`${indexs}-sprint`] && !state[`${indexs}-sprint`].expand ? 'baseline-arrow_right' : 'baseline-arrow_drop_down'}
+                        role="none"
+                        onClick={() => {
+                          this.setState({
+                            [`${indexs}-sprint`]: { expand: state[`${indexs}-sprint`] ? !state[`${indexs}-sprint`].expand : false },
+                          });
+                        }}
+                      />
+                      <EasyEdit
+                        maxLength={30}
+                        type="input"
+                        defaultValue={item.sprintName}
+                        enterOrBlur={this.handleBlurName.bind(this, item)}
+                      >
+                        <span
+                          style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
                           role="none"
-                          onClick={() => {
-                            this.setState({
-                              [`${indexs}-sprint`]: { expand: state[`${indexs}-sprint`] ? !state[`${indexs}-sprint`].expand : false },
-                            });
-                          }}
-                        />
-                        <EasyEdit
-                          maxLength={30}
-                          type="input"
-                          defaultValue={item.sprintName}
-                          enterOrBlur={this.handleBlurName.bind(this, item)}
                         >
-                          <span
-                            style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-                            role="none"
-                          >
-                            {item.sprintName}
-                          </span>
-                        </EasyEdit>
-                      </div>
-                      <p className="c7n-backlog-sprintQuestion">
-                        {item.issueSearchDTOList && item.issueSearchDTOList.length > 0 ? `${item.issueSearchDTOList.length}个问题可见` : '0个问题可见'}
-                        {/* {!_.isNull(item.issueCount) ? ` 共${item.issueCount}个问题` : ' 共0个问题'} */}
-                      </p>
-                      <p
-                        className="c7n-backlog-clearFilter"
-                        style={{
-                          display:
+                          {item.sprintName}
+                        </span>
+                      </EasyEdit>
+                    </div>
+                    <p className="c7n-backlog-sprintQuestion">
+                      {item.issueSearchDTOList && item.issueSearchDTOList.length > 0 ? `${item.issueSearchDTOList.length}个问题可见` : '0个问题可见'}
+                      {/* {!_.isNull(item.issueCount) ? ` 共${item.issueCount}个问题` : ' 共0个问题'} */}
+                    </p>
+                    <p
+                      className="c7n-backlog-clearFilter"
+                      style={{
+                        display:
                             store.getChosenVersion !== 'all'
                             || store.getChosenEpic !== 'all'
                             || store.getOnlyMe
                             || store.getRecent // 仅故事
                             || (store.getQuickFilters && store.getQuickFilters.length > 0) ? 'block' : 'none',
-                        }}
-                        role="none"
-                        onClick={this.clearFilter}
-                      >
-                        {'清空所有筛选器'}
-                      </p>
-                    </div>
-                    <div style={{ flexGrow: 1 }}>
-                      {this.renderStatusCodeDom(item, indexs)}
-                    </div>
+                      }}
+                      role="none"
+                      onClick={this.clearFilter}
+                    >
+                      {'清空所有筛选器'}
+                    </p>
                   </div>
-                  <div
-                    className="c7n-backlog-sprintDes"
-                    style={{
-                      display: item.assigneeIssues && item.assigneeIssues.length > 0 ? 'flex' : 'none',
-                    }}
-                  >
-                    {
+                  <div style={{ flexGrow: 1 }}>
+                    {this.renderStatusCodeDom(item, indexs)}
+                  </div>
+                </div>
+                <div
+                  className="c7n-backlog-sprintDes"
+                  style={{
+                    display: item.assigneeIssues && item.assigneeIssues.length > 0 ? 'flex' : 'none',
+                  }}
+                >
+                  {
                       item.assigneeIssues ? (
                         item.assigneeIssues
                           .filter(ass => ass.assigneeId)
@@ -879,256 +865,252 @@ class SprintItem extends Component {
                             </Tooltip>
                           ))) : ''
                     }
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                      <Icon
-                        style={{
-                          // flex: 1,
-                          cursor: 'pointer',
-                          fontSize: 20,
-                          marginLeft: 8,
-                          display: item.assigneeIssues && item.assigneeIssues.length > 0 ? 'inline-block' : 'none',
-                        }}
-                        type="more_vert"
-                        role="none"
-                        onClick={() => {
-                          this.setState({
-                            [indexs]: {
-                              visibleAssign: true,
-                            },
-                          });
-                        }}
-                      />
-                    </div>
-                    <AssigneeModal
-                      visible={(state[indexs] && state[indexs].visibleAssign) || false}
-                      onCancel={() => {
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                    <Icon
+                      style={{
+                        // flex: 1,
+                        cursor: 'pointer',
+                        fontSize: 20,
+                        marginLeft: 8,
+                        display: item.assigneeIssues && item.assigneeIssues.length > 0 ? 'inline-block' : 'none',
+                      }}
+                      type="more_vert"
+                      role="none"
+                      onClick={() => {
                         this.setState({
                           [indexs]: {
-                            visibleAssign: false,
+                            visibleAssign: true,
                           },
                         });
                       }}
-                      data={item}
-                      // total={total}
                     />
-                    <div
-                      style={{
-                        display: item.statusCode === 'started' ? 'flex' : 'none',
-                      }}
-                      className="c7n-backlog-sprintGoalSide"
-                    >
-                      <Tooltip title={`待处理故事点: ${item.todoStoryPoint}`}>
-                        <div style={{ backgroundColor: '#FFB100' }}>{item.todoStoryPoint || 0}</div>
-                      </Tooltip>
-                      <Tooltip title={`处理中故事点: ${item.doingStoryPoint}`}>
-                        <div style={{ backgroundColor: '#4D90FE' }}>{item.doingStoryPoint || 0}</div>
-                      </Tooltip>
-                      <Tooltip title={`已完成故事点: ${item.doneStoryPoint}`}>
-                        <div style={{ backgroundColor: '#00BFA5' }}>{item.doneStoryPoint || 0}</div>
-                      </Tooltip>
-                    </div>
                   </div>
+                  <AssigneeModal
+                    visible={(state[indexs] && state[indexs].visibleAssign) || false}
+                    onCancel={() => {
+                      this.setState({
+                        [indexs]: {
+                          visibleAssign: false,
+                        },
+                      });
+                    }}
+                    data={item}
+                  />
                   <div
-                    className="c7n-backlog-sprintGoal"
                     style={{
                       display: item.statusCode === 'started' ? 'flex' : 'none',
                     }}
+                    className="c7n-backlog-sprintGoalSide"
                   >
-                    {item.statusCode === 'started' ? (
-                      <div
-                        className="c7n-backlog-sprintData"
-                        style={{
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        <EasyEdit
-                          type="date"
-                          time
-                          defaultValue={item.startDate ? moment(item.startDate, 'YYYY-MM-DD HH-mm-ss') : ''}
-                          disabledDate={item.endDate ? current => current > moment(item.endDate, 'YYYY-MM-DD HH:mm:ss') : ''}
-                          onChange={(date, dateString) => {
-                            this.updateDate('startDate', dateString, item);
-                          }}
-                        >
-                          <div
-                            className="c7n-backlog-sprintDataItem"
-                            role="none"
-                          >
-                            {this.renderData(item, 'startDate')}
-                          </div>
-                        </EasyEdit>
-                        <p>~</p>
-                        <EasyEdit
-                          type="date"
-                          time
-                          defaultValue={item.endDate ? moment(item.endDate, 'YYYY-MM-DD HH-mm-ss') : ''}
-                          disabledDate={item.startDate ? current => current < moment(item.startDate, 'YYYY-MM-DD HH:mm:ss') : ''}
-                          onChange={(date, dateString) => {
-                            this.updateDate('endDate', dateString, item);
-                          }}
-                        >
-                          <div
-                            className="c7n-backlog-sprintDataItem"
-                            role="none"
-                          >
-                            {this.renderData(item, 'endDate')}
-                          </div>
-                        </EasyEdit>
-                      </div>
-                    ) : ''}
+                    <Tooltip title={`待处理故事点: ${item.todoStoryPoint}`}>
+                      <div style={{ backgroundColor: '#FFB100' }}>{item.todoStoryPoint || 0}</div>
+                    </Tooltip>
+                    <Tooltip title={`处理中故事点: ${item.doingStoryPoint}`}>
+                      <div style={{ backgroundColor: '#4D90FE' }}>{item.doingStoryPoint || 0}</div>
+                    </Tooltip>
+                    <Tooltip title={`已完成故事点: ${item.doneStoryPoint}`}>
+                      <div style={{ backgroundColor: '#00BFA5' }}>{item.doneStoryPoint || 0}</div>
+                    </Tooltip>
+                  </div>
+                </div>
+                <div
+                  className="c7n-backlog-sprintGoal"
+                  style={{
+                    display: item.statusCode === 'started' ? 'flex' : 'none',
+                  }}
+                >
+                  {item.statusCode === 'started' ? (
                     <div
+                      className="c7n-backlog-sprintData"
                       style={{
                         display: 'flex',
-                        alignItems: 'flex-start',
-                        minWidth: '100px',
-                        justifyContent: 'flex-end',
+                        flexWrap: 'wrap',
                       }}
                     >
-                      <p
-                        style={{ whiteSpace: 'nowrap' }}
-                      >
-                        {'冲刺目标：'}
-                      </p>
                       <EasyEdit
-                        type="input"
-                        width={200}
-                        defaultValue={item.sprintGoal}
-                        enterOrBlur={this.handleBlurGoal.bind(this, item)}
-                        maxLength={30}
+                        type="date"
+                        time
+                        defaultValue={item.startDate ? moment(item.startDate, 'YYYY-MM-DD HH-mm-ss') : ''}
+                        disabledDate={item.endDate ? current => current > moment(item.endDate, 'YYYY-MM-DD HH:mm:ss') : ''}
+                        onChange={(date, dateString) => {
+                          this.updateDate('startDate', dateString, item);
+                        }}
                       >
                         <div
+                          className="c7n-backlog-sprintDataItem"
                           role="none"
-                          style={{
-                            cursor: 'pointer',
-                          }}
-                          onClick={() => {
-                            this.setState({
-                              editGoal: true,
-                            });
-                          }}
                         >
-                          {item.sprintGoal ? item.sprintGoal : '无'}
+                          {this.renderData(item, 'startDate')}
+                        </div>
+                      </EasyEdit>
+                      <p>~</p>
+                      <EasyEdit
+                        type="date"
+                        time
+                        defaultValue={item.endDate ? moment(item.endDate, 'YYYY-MM-DD HH-mm-ss') : ''}
+                        disabledDate={item.startDate ? current => current < moment(item.startDate, 'YYYY-MM-DD HH:mm:ss') : ''}
+                        onChange={(date, dateString) => {
+                          this.updateDate('endDate', dateString, item);
+                        }}
+                      >
+                        <div
+                          className="c7n-backlog-sprintDataItem"
+                          role="none"
+                        >
+                          {this.renderData(item, 'endDate')}
                         </div>
                       </EasyEdit>
                     </div>
-                  </div>
-                </div>
-                {(state[`${indexs}-sprint`] && state[`${indexs}-sprint`].expand) || state[`${indexs}-sprint`] === undefined ? (
-                  <Droppable
-                    droppableId={item.sprintId.toString()}
-                    isDropDisabled={store.getIsLeaveSprint}
+                  ) : ''}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      minWidth: '100px',
+                      justifyContent: 'flex-end',
+                    }}
                   >
-                    {(provided, snapshot) => (
+                    <p
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      {'冲刺目标：'}
+                    </p>
+                    <EasyEdit
+                      type="input"
+                      width={200}
+                      defaultValue={item.sprintGoal}
+                      enterOrBlur={this.handleBlurGoal.bind(this, item)}
+                      maxLength={30}
+                    >
                       <div
-                        ref={provided.innerRef}
+                        role="none"
                         style={{
-                          background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                          // background: 'white',
-                          padding: 'grid',
-                          borderBottom: '1px solid rgba(0,0,0,0.12)',
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => {
+                          this.setState({
+                            editGoal: true,
+                          });
                         }}
                       >
-                        {this.renderIssueOrIntro('sprint', indexs, item.issueSearchDTOList, item.sprintId)}
-                        {provided.placeholder}
-                        <div className="c7n-backlog-sprintIssue">
-                          <div
-                            style={{
-                              userSelect: 'none',
-                              padding: '10px 0 10px 33px',
-                              fontSize: 13,
-                              display: 'flex',
-                              alignItems: 'center',
-                            }}
-                          >
-                            {state[`${indexs}-create`] && state[`${indexs}-create`].createIssue ? (
-                              <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                  <Dropdown overlay={typeList} trigger={['click']}>
-                                    <div style={{ display: 'flex', alignItem: 'center' }}>
-                                      <TypeTag
-                                        data={currentType}
-                                      />
-                                      <Icon
-                                        type="arrow_drop_down"
-                                        style={{ fontSize: 16 }}
-                                      />
-                                    </div>
-                                  </Dropdown>
-                                  <div style={{ marginLeft: 8, flexGrow: 1 }}>
-                                    <Input
-                                      autoFocus
-                                      placeholder="需要做什么"
-                                      ref={(ref) => {
-                                        this[`${indexs}-addInput`] = ref;
-                                      }}
-                                      maxLength={44}
-                                      onPressEnter={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
-                                      // onBlur={this.handleBlurCreateIssue}
+                        {item.sprintGoal ? item.sprintGoal : '无'}
+                      </div>
+                    </EasyEdit>
+                  </div>
+                </div>
+              </div>
+              {(state[`${indexs}-sprint`] && state[`${indexs}-sprint`].expand) || state[`${indexs}-sprint`] === undefined ? (
+                <Droppable
+                  droppableId={item.sprintId.toString()}
+                  isDropDisabled={store.getIsLeaveSprint}
+                >
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      style={{
+                        background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
+                        // background: 'white',
+                        padding: 'grid',
+                        borderBottom: '1px solid rgba(0,0,0,0.12)',
+                      }}
+                    >
+                      {this.renderIssueOrIntro('sprint', indexs, item.issueSearchDTOList, item.sprintId)}
+                      {provided.placeholder}
+                      <div className="c7n-backlog-sprintIssue">
+                        <div
+                          style={{
+                            userSelect: 'none',
+                            padding: '10px 0 10px 33px',
+                            fontSize: 13,
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          {state[`${indexs}-create`] && state[`${indexs}-create`].createIssue ? (
+                            <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Dropdown overlay={typeList} trigger={['click']} getPopupContainer={trigger => trigger.parentNode}>
+                                  <div style={{ display: 'flex', alignItem: 'center' }}>
+                                    <TypeTag
+                                      data={currentType}
+                                    />
+                                    <Icon
+                                      type="arrow_drop_down"
+                                      style={{ fontSize: 16 }}
                                     />
                                   </div>
-                                </div>
-                                <div style={{
-                                  margin: '10px 0 5px',
-                                  display: 'flex',
-                                  justifyContent: 'flex-start',
-                                  paddingRight: 70,
-                                }}
-                                >
-                                  <Button
-                                    type="primary"
-                                    onClick={() => {
-                                      this.setState({
-                                        [`${indexs}-create`]: {
-                                          createIssue: false,
-                                        },
-                                      });
+                                </Dropdown>
+                                <div style={{ marginLeft: 8, flexGrow: 1 }}>
+                                  <Input
+                                    autoFocus
+                                    placeholder="需要做什么"
+                                    ref={(ref) => {
+                                      this[`${indexs}-addInput`] = ref;
                                     }}
-                                  >
-                                    {'取消'}
-                                  </Button>
-                                  <Button
-                                    type="primary"
-                                    loading={loading}
-                                    onClick={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
-                                  >
-                                    {'确定'}
-                                  </Button>
+                                    maxLength={44}
+                                    onPressEnter={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
+                                  />
                                 </div>
                               </div>
-                            ) : (
-                              <div className="c7n-backlog-sprintIssueSide">
+                              <div style={{
+                                margin: '10px 0 5px',
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                                paddingRight: 70,
+                              }}
+                              >
                                 <Button
-                                  className="leftBtn"
-                                  functyp="flat"
-                                  style={{
-                                    color: '#3f51b5',
-                                  }}
+                                  type="primary"
                                   onClick={() => {
                                     this.setState({
                                       [`${indexs}-create`]: {
-                                        createIssue: true,
+                                        createIssue: false,
                                       },
-                                    });
-                                    store.axiosGetProjectInfo().then((res) => {
-                                      store.setProjectInfo(res);
                                     });
                                   }}
                                 >
-                                  <Icon type="playlist_add" />
-                                  {'创建问题'}
+                                  {'取消'}
+                                </Button>
+                                <Button
+                                  type="primary"
+                                  loading={loading}
+                                  onClick={this.handleBlurCreateIssue.bind(this, 'sprint', item, indexs)}
+                                >
+                                  {'确定'}
                                 </Button>
                               </div>
-                            )}
-                          </div>
+                            </div>
+                          ) : (
+                            <div className="c7n-backlog-sprintIssueSide">
+                              <Button
+                                className="leftBtn"
+                                functyp="flat"
+                                style={{
+                                  color: '#3f51b5',
+                                }}
+                                onClick={() => {
+                                  this.setState({
+                                    [`${indexs}-create`]: {
+                                      createIssue: true,
+                                    },
+                                  });
+                                  store.axiosGetProjectInfo().then((res) => {
+                                    store.setProjectInfo(res);
+                                  });
+                                }}
+                              >
+                                <Icon type="playlist_add" />
+                                {'创建问题'}
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    )}
-                  </Droppable>
-                ) : ''}
-              </div>
-              ,
-            );
+                    </div>
+                  )}
+                </Droppable>
+              ) : ''}
+                        </div>); 
           }
         } else {
           result = (
@@ -1278,7 +1260,7 @@ class SprintItem extends Component {
                         {state['-1-create'] && state['-1-create'].createIssue ? (
                           <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                              <Dropdown overlay={typeList} trigger={['click']}>
+                              <Dropdown overlay={typeList} trigger={['click']} getPopupContainer={trigger => trigger.parentNode}>
                                 <div style={{ display: 'flex', alignItem: 'center' }}>
                                   <TypeTag
                                     data={currentType}

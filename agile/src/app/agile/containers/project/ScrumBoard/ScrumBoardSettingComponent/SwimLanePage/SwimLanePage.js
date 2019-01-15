@@ -27,9 +27,9 @@ class SwimLanePage extends Component {
       // projectId: AppState.currentMenuType.id,
     };
     ScrumBoardStore.axiosUpdateBoardDefault(data).then((res) => {
-      message.success('保存成功');
+      Choerodon.prompt('保存成功');
     }).catch((error) => {
-      message.success('保存失败');
+      Choerodon.prompt('保存失败');
     });
   }
 

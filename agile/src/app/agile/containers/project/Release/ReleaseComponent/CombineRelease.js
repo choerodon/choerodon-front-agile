@@ -45,7 +45,7 @@ class CombineRelease extends Component {
       if (!err) {
         if (value.source.length === 1) {
           if (value.source[0] === value.destination) {
-            message.error('合并版本不能一样');
+            Choerodon.prompt('合并版本不能一样');
             return;
           }
         }
