@@ -389,6 +389,7 @@ class SprintItem extends Component {
     store.setOnlyMe(false);
     store.setRecent(false);
     store.setQuickFilters([]);
+    store.setAssigneeFilterIds([]);
     store.setQuickSearchClean(true);
     store.axiosGetSprint(store.getSprintFilter()).then((res) => {
       store.setSprintData(res);
