@@ -144,15 +144,16 @@ class EditComponent extends Component {
     const { name } = this.state;
     if (name === value) {
       callback();
+    } else {
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component/check_name?componentName=${value}`)
+        .then((res) => {
+          if (res) {
+            callback('模块名称重复');
+          } else {
+            callback();
+          }
+        });
     }
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/component/check_name?componentName=${value}`)
-      .then((res) => {
-        if (res) {
-          callback('模块名称重复');
-        } else {
-          callback();
-        }
-      });
   };
 
   render() {
@@ -205,13 +206,13 @@ class EditComponent extends Component {
                     <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                         <UserHead
-      user={{
-                            id: user.id,
-                            loginName: user.loginName,
-                            realName: user.realName,
-                            avatar: user.imageUrl,
-                          }}
-    />
+                          user={{
+        id: user.id,
+        loginName: user.loginName,
+        realName: user.realName,
+        avatar: user.imageUrl,
+      }}
+                        />
                       </div>
                     </Option>
                   ))}
