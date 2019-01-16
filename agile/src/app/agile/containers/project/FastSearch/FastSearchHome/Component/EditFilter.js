@@ -42,6 +42,7 @@ class AddComponent extends Component {
       ],
       quickFilterFiled: [],
       deleteItem: [],
+      deleteFlag: false,
       originFilterName: '',
     };
   }
@@ -187,15 +188,16 @@ class AddComponent extends Component {
     const { originFilterName } = this.state;
     if (originFilterName === value) {
       callback();
+    } else {
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/check_name?quickFilterName=${value}`)
+        .then((res) => {
+          if (res) {
+            callback('快速搜索名称重复');
+          } else {
+            callback();
+          }
+        });
     }
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/check_name?quickFilterName=${value}`)
-      .then((res) => {
-        if (res) {
-          callback('快速搜索名称重复');
-        } else {
-          callback();
-        }
-      });
   };
 
   loadFilter = (id) => {
@@ -337,8 +339,16 @@ class AddComponent extends Component {
         <Option key="null" value="null">
 
 
+
+
+
+
+
+
+
+
           无
-        </Option>,
+                </Option>,
       );
     }
     return arr;
@@ -626,10 +636,10 @@ class AddComponent extends Component {
     e.preventDefault();
     const { form, onOk, filterId } = this.props;
     const {
-      deleteItem, quickFilterFiled, origin, arr,
+      deleteItem, quickFilterFiled, origin, arr, deleteFlag,
     } = this.state;
     form.validateFieldsAndScroll((err, values, modify) => {
-      if (!err && modify) {
+      if (!err && (modify || deleteFlag)) {
         const arrCopy = [];
         const expressQueryArr = [];
         const o = [];
@@ -771,7 +781,7 @@ class AddComponent extends Component {
               .indexOf(input.toLowerCase()) >= 0}
           >
             <Option key="'null'" value="'null'">
-              空
+              {'空'}
             </Option>
           </Select>
         );
@@ -819,7 +829,7 @@ class AddComponent extends Component {
             .indexOf(input.toLowerCase()) >= 0}
         >
           <Option key="'null'" value="'null'">
-            空
+            {'空'}
           </Option>
         </Select>
       );
@@ -948,6 +958,7 @@ class AddComponent extends Component {
                                 arrCopy.push(index);
                                 this.setState({
                                   deleteItem: arrCopy,
+                                  deleteFlag: true,
                                 });
                               }}
                             >

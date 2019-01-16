@@ -28,16 +28,17 @@ class EditLink extends Component {
     const { linkType: { linkName } } = this.state;
     if (linkName === value) {
       callback();
+    } else {
+      const projectId = AppState.currentMenuType.id;
+      axios.get(`agile/v1/projects/${projectId}/issue_link_types/check_name?issueLinkTypeName=${value}&issueLinkTypeId=`)
+        .then((res) => {
+          if (!res) {
+            callback('问题链接名称重复');
+          } else {
+            callback();
+          }
+        });
     }
-    const projectId = AppState.currentMenuType.id;
-    axios.get(`agile/v1/projects/${projectId}/issue_link_types/check_name?issueLinkTypeName=${value}&issueLinkTypeId=`)
-      .then((res) => {
-        if (!res) {
-          callback('问题链接名称重复');
-        } else {
-          callback();
-        }
-      });
   }
 
   handleOk(e) {
