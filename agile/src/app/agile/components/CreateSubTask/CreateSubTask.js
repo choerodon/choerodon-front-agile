@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
-  Select, Form, Input, Button, Modal, Icon, Tooltip,
+  Select, Form, Input, Button, Modal, Icon, InputNumber,
 } from 'choerodon-ui';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
@@ -300,20 +300,24 @@ class CreateSubIssue extends Component {
             </div>
             {
               <div>
-                <Input 
+                <InputNumber
                   style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}
                   label="预估时间" 
-                  maxLength={3} 
+                  maxLength={5}
                   suffix="小时" 
                   value={estimatedTime}
+                  step={0.1}
+                  precision={1}
                   onChange={(e) => {
-                    const { value } = e.target;
-                    const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
-                    if ((!isNaN(value) && reg.test(value)) || value === '') {
-                      this.setState({
-                        estimatedTime: value,
-                      });
-                    } 
+                    this.setState({
+                      estimatedTime: e,
+                    });
+                    // const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
+                    // if ((!isNaN(value) && reg.test(value)) || value === '') {
+                    //   this.setState({
+                    //     estimatedTime: value,
+                    //   });
+                    // }
                   }}
                 />
               </div>

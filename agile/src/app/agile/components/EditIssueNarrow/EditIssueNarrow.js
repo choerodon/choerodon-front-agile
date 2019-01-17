@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import TimeAgo from 'timeago-react';
 import {
-  Select, Input, DatePicker, Button, Modal, Tabs,
+  Select, Input, DatePicker, Button, Modal, Tabs, InputNumber,
   Tooltip, Progress, Dropdown, Menu, Spin, Icon, Popover,
 } from 'choerodon-ui';
 import {
@@ -12,7 +12,7 @@ import {
 } from '../../common/Constant';
 import './EditIssueNarrow.scss';
 import {
-  UploadButtonNow, NumericInput, ReadAndEdit, IssueDescription, DatetimeAgo,
+  UploadButtonNow, ReadAndEdit, IssueDescription, DatetimeAgo,
 } from '../CommonComponent';
 import {
   delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload,
@@ -1780,17 +1780,19 @@ class CreateSprint extends Component {
                               </span>
                             )}
                           >
-                            <NumericInput
-                              maxLength="3"
+                            <InputNumber
+                              maxLength="4"
                               value={storyPoints}
-                              suffix="点"
+                              // suffix="点"
                               onChange={this.handleStoryPointsChange.bind(this)}
-                              onPressEnter={() => {
-                                this.updateIssue('storyPoints');
-                                this.setState({
-                                  currentRae: undefined,
-                                });
-                              }}
+                              step={0.1}
+                              precision={1}
+                              // onPressEnter={() => {
+                              //   this.updateIssue('storyPoints');
+                              //   this.setState({
+                              //     currentRae: undefined,
+                              //   });
+                              // }}
                             />
                           </ReadAndEdit>
                         </div>
@@ -1817,17 +1819,19 @@ class CreateSprint extends Component {
                               </span>
                             )}
                           >
-                            <NumericInput
-                              maxLength="3"
+                            <InputNumber
+                              maxLength="4"
                               value={remainingTime}
                               onChange={this.handleRemainingTimeChange.bind(this)}
-                              suffix="小时"
-                              onPressEnter={() => {
-                                this.updateIssue('remainingTime');
-                                this.setState({
-                                  currentRae: undefined,
-                                });
-                              }}
+                              step={0.1}
+                              precision={1}
+                              // suffix="小时"
+                              // onPressEnter={() => {
+                              //   this.updateIssue('remainingTime');
+                              //   this.setState({
+                              //     currentRae: undefined,
+                              //   });
+                              // }}
                             />
                           </ReadAndEdit>
                         </div>

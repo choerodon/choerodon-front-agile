@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { stores, axios } from 'choerodon-front-boot';
 import moment from 'moment';
 import {
-  Select, DatePicker, Button, Modal, Radio, message, Icon,
+  Select, DatePicker, Button, Modal, Radio, message, Icon, InputNumber,
 } from 'choerodon-ui';
 import { NumericInput } from '../CommonComponent';
 import { beforeTextUpload } from '../../common/utils';
@@ -172,7 +172,7 @@ class DailyLog extends Component {
     };
     const tempAlignStyle = {
       lineHeight: '21px',
-      marginBottom: 0,
+      marginBottom: -3,
       width: 100,
     };
     const callback = (value) => {
@@ -200,7 +200,9 @@ class DailyLog extends Component {
           </p>
           <section className="info">
             <div className="line-info">
-              <NumericInput
+              <InputNumber
+                step={0.1}
+                precision={1}
                 label="耗费时间*"
                 style={tempAlignStyle}
                 value={dissipate}

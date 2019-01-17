@@ -297,6 +297,8 @@ class IssueTable extends Component {
               // 如果上一次点击过，就清空 previousClick 中保存的 style
               previousClick.style.background = '';
               previousClick.style.borderLeft = '';
+            } else {
+              e.currentTarget.scrollIntoView(true);
             }
             e.currentTarget.style.background = 'rgba(140, 158, 255, 0.08)';
             e.currentTarget.style.borderLeft = '3px solid #3f51b5';
@@ -306,7 +308,6 @@ class IssueTable extends Component {
               selectedIssue: record,
               expand: true,
             });
-            e.currentTarget.scrollIntoView(false);
           },
           onBlur: (e) => {
             // 点击隐藏详情时无法触发 onClick，所以需要利用 onBlur 触发
