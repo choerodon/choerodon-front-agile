@@ -370,19 +370,23 @@ class CreateIssue extends Component {
               {
                 newIssueTypeCode !== 'issue_epic' && (
                   <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
-                    <Input 
+                    <InputNumber
                       label="预估时间" 
-                      maxLength={3} 
+                      maxLength={5}
                       suffix="小时" 
                       value={estimatedTime}
+                      step={0.1}
+                      precision={1}
                       onChange={(e) => {
-                        const { value } = e.target;
-                        const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
-                        if ((!isNaN(value) && reg.test(value)) || value === '') {
-                          this.setState({
-                            estimatedTime: value,
-                          });
-                        } 
+                        this.setState({
+                          estimatedTime: e,
+                        });
+                        // const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
+                        // if ((!isNaN(value) && reg.test(value)) || value === '') {
+                        //   this.setState({
+                        //     estimatedTime: value,
+                        //   });
+                        // }
                       }}
                     />
                   </div>

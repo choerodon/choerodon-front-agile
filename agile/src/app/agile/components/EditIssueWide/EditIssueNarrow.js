@@ -17,6 +17,7 @@ import {
   Spin,
   Icon,
   Popover,
+  InputNumber,
 } from 'choerodon-ui';
 import {
   STATUS, COLOR, TYPE, ICON, TYPE_NAME,
@@ -24,7 +25,6 @@ import {
 import './EditIssueNarrow.scss';
 import {
   UploadButtonNow,
-  NumericInput,
   ReadAndEdit,
   IssueDescription,
   DatetimeAgo,
@@ -2278,18 +2278,20 @@ class CreateSprint extends Component {
                               </span>
                                 )}
                           >
-                            <NumericInput
-                              maxLength="3"
+                            <InputNumber
+                              maxLength="4"
                               value={storyPoints}
                               onChange={this.handleStoryPointsChange.bind(this)}
+                              step={0.1}
+                              precision={1}
                               // onBlur={() => this.statusOnChange()}
                               suffix="点"
-                              onPressEnter={() => {
-                                this.updateIssue('storyPoints');
-                                this.setState({
-                                  currentRae: undefined,
-                                });
-                              }}
+                              // onPressEnter={() => {
+                              //   this.updateIssue('storyPoints');
+                              //   this.setState({
+                              //     currentRae: undefined,
+                              //   });
+                              // }}
                             />
                           </ReadAndEdit>
                         </div>
@@ -2347,18 +2349,20 @@ class CreateSprint extends Component {
                               </span>
                                 )}
                           >
-                            <NumericInput
-                              maxLength="3"
+                            <InputNumber
+                              maxLength="4"
                               value={remainingTime}
                               onChange={this.handleRemainingTimeChange.bind(this)}
+                              step={0.1}
+                              precision={1}
                               // onBlur={() => this.statusOnChange()}
-                              suffix="小时"
-                              onPressEnter={() => {
-                                this.updateIssue('remainingTime');
-                                this.setState({
-                                  currentRae: undefined,
-                                });
-                              }}
+                              // suffix="小时"
+                              // onPressEnter={() => {
+                              //   this.updateIssue('remainingTime');
+                              //   this.setState({
+                              //     currentRae: undefined,
+                              //   });
+                              // }}
                             />
                           </ReadAndEdit>
                         </div>
