@@ -30,7 +30,10 @@
     }
     .ant-rate {
       font-size: 12px !important;
-      min-width: 48px;
+      min-width: 18px;
+      display: flex;
+      flex-direction: row-reverse;
+      float: left;
     }
     .emergency {
       color: #f5222d !important;
@@ -47,7 +50,7 @@
       }
     }
     .ant-rate-star-first .ant-rate-star-second {
-      font-size: 12px !important;
+      font-size: 16px !important;
       transform: scale(0.3333333) !important;
     }
   }

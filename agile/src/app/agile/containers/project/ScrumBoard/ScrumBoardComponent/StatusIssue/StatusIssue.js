@@ -437,7 +437,7 @@ class StatusIssue extends Component {
                             >
                               {item.issueNum}
                             </p>
-                            {!isCompleted ? (
+                            {!isCompleted && item.stayDay >= 3 ? (
                               <Tooltip title={`卡片停留 ${item.stayDay} 天`}>
                                 <div>
                                   <Rate
