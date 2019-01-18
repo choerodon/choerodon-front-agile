@@ -56,6 +56,7 @@ class EpicReport extends Component {
   }
 
   getOption() {
+    console.log(ES.getChartDataYCompleted);
     const commonOption = {
       tooltip: {
         trigger: 'axis',
@@ -74,6 +75,7 @@ class EpicReport extends Component {
             if (ES.beforeCurrentUnit === 'story_point') {
               content = `<div>
               <span>${params[0].axisValue}</span>
+
               <br />
               <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>总问题数：${ES.getChartDataYIssueCountAll[item.dataIndex]} ${ES.getChartDataYIssueCountAll[item.dataIndex] ? ' 个' : ''}</div>
               <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>未预估问题数：${ES.getChartDataYIssueCountUnEstimate[item.dataIndex]} ${ES.getChartDataYIssueCountAll[item.dataIndex] ? ' 个' : ''}</div>
@@ -682,8 +684,14 @@ class EpicReport extends Component {
                                 <div>
                                   <h4>
                                     {`${ES.getChartYAxisName}`}
+
+
+
+
+
+
                                     汇总
-                                  </h4>
+                                                                    </h4>
                                   <ul>
                                     <li>
                                       <span className="c7n-tip">合计：</span>
@@ -711,6 +719,12 @@ class EpicReport extends Component {
                                 history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
                               }}
                             >
+
+
+
+
+
+
                               在“问题管理”中查看
                               <Icon style={{ fontSize: 13 }} type="open_in_new" />
                             </p>
@@ -757,8 +771,13 @@ class EpicReport extends Component {
                         history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
+
+
+
+
+
                       待办事项
-                    </span>
+</span>
                     <span>或</span>
                     <span
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
@@ -767,10 +786,16 @@ class EpicReport extends Component {
                         history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
+
+
+
+
+
                       问题管理
-                    </span>
+</span>
                     <span>中创建一个史诗</span>
-                  </div>)}
+                  </div>
+)}
               />
             )
           }
