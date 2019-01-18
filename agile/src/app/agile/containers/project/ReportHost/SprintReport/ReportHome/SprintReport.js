@@ -506,7 +506,7 @@ class SprintReport extends Component {
           loading={ReportStore.loading}
           onChange={(pagination, filters, sorter) => {
             ReportStore.setTodoPagination(Pagination);
-            ReportStore.loadTodoeIssues(pagination.current-1, pagination.pageSize);
+            ReportStore.loadTodoIssues(pagination.current-1, pagination.pageSize);
           }}
         />
       </div>

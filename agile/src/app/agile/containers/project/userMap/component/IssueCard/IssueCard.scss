@@ -112,7 +112,8 @@
     padding-right: 4px;
 
     .c7n-issueCard-storyPoints {
-      width: 28px;
+      min-width: 28px;
+      padding: 0 2px;
       margin: 4px;
       height: 20px;
       line-height: 20px;

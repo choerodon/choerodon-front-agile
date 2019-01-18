@@ -371,6 +371,7 @@ class CreateIssue extends Component {
                 newIssueTypeCode !== 'issue_epic' && (
                   <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
                     <InputNumber
+                      max={999.9}
                       label="预估时间" 
                       maxLength={5}
                       suffix="小时" 

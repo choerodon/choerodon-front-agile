@@ -22,8 +22,8 @@ class AssigneeModal extends Component {
       dataIndex: 'assigneeName',
       key: 'assigneeName',
       render: text => (text === '合计' ? (
-        <p>{text}</p>
-      ) : (<p>{text || '未分配'}</p>)),
+        <span>{text}</span>
+      ) : (<span>{text || '未分配'}</span>)),
     }, {
       title: '总问题数',
       dataIndex: 'issueCount',

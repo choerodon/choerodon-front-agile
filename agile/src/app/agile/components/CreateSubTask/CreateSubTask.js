@@ -301,6 +301,7 @@ class CreateSubIssue extends Component {
             {
               <div>
                 <InputNumber
+                  max={999.9}
                   style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}
                   label="预估时间" 
                   maxLength={5}
