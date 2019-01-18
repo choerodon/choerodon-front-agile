@@ -30,7 +30,7 @@
     }
     .ant-rate {
       font-size: 12px !important;
-      min-width: 28px;
+      min-width: 36px;
       display: flex;
       flex-direction: row-reverse;
       float: left;
@@ -42,10 +42,10 @@
       color: #faad14 !important;
     }
     .ant-rate-star {
-      margin-right: 0 !important;
+      margin-right: 1px !important;
       width: 6px;
       .icon {
-        font-size: 12px !important;
+        font-size: 16px !important;
         transform: scale(0.3333333) !important;
       }
     }
