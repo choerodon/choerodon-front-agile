@@ -1128,9 +1128,9 @@ class CreateSprint extends Component {
    * DataLog
    */
   renderDataLogs() {
-    const { datalogs: stateDatalogs } = this.state;
+    const { datalogs: stateDatalogs, typeCode } = this.state;
     const datalogs = _.filter(stateDatalogs, v => v.field !== 'Version');
-    return <DataLogs datalogs={datalogs} />;
+    return <DataLogs datalogs={datalogs} typeCode={typeCode} />;
   }
 
   /**

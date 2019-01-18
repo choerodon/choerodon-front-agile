@@ -42,19 +42,24 @@ class DataLog extends Component {
   }
 
   getMode1(datalog) {
-    const { field, oldString, oldValue, newString, newValue, categoryCode } = datalog;
+    const {
+      field, oldString, oldValue, newString, newValue, categoryCode, 
+    } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
-      if (['labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child'].includes(field)) {
+      if (['Sprint', 'labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child'].includes(field)) {
         return '创建';
+      }
+      if (['Attachment'].includes(field)) {
+        return '上传';
       }
       return '更新';
     } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
-      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'issuetype', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return '将';
       }
-      if (['description', 'Attachment', 'WorklogId', 'Comment', 'timespent'].includes(field)) {
+      if (['description', 'WorklogId', 'Comment', 'timespent'].includes(field)) {
         return '更新';
       }
       if (field === 'status') {
@@ -76,8 +81,13 @@ class DataLog extends Component {
       if (['Story Points', 'timeestimate'].includes(field)) {
         return '将';
       }
-      if (['Attachment', 'timespent'].includes(field)) {
+      if (['timespent'].includes(field)) {
         return '更新';
+      }
+      if (['Attachment'].includes(field)) {
+        if (oldString && !newString) {
+          return '删除';
+        }
       }
     } else {
       // null -> null
@@ -119,22 +129,31 @@ class DataLog extends Component {
   }
 
   getMode2(datalog) {
-    const { field, oldString, oldValue, newString, newValue } = datalog;
+    const {
+      field, oldString, oldValue, newString, newValue, 
+    } = datalog;
     if (field === 'status') {
       return '';
     }
+
+    if (field === 'Sprint' && (!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
+      return <span style={{ color: '#000' }}>了一个</span>;
+    }
+
     return ` 【${PROP[field] || PROP_SIMPLE[field]}】 `;
   }
 
   // ['由', '']
   getMode3(datalog) {
-    const { field, oldString, oldValue, newString, newValue } = datalog;
+    const {
+      field, oldString, oldValue, newString, newValue, 
+    } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
       return '';
     } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
-      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'issuetype', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return '由';
       } else {
         return '';
@@ -173,18 +192,21 @@ class DataLog extends Component {
 
   // 原值，只有移除和修改可能出现
   getMode4(datalog) {
-    const { field, oldString, oldValue, newString, newValue } = datalog;
+    const {
+      field, oldString, oldValue, newString, newValue, 
+    } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
       return '';
     } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
-      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'issuetype', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return ` 【${oldString}】 `;
       }
-      if (['description', 'Attachment', 'WorklogId', 'Rank', 'Comment'].includes(field)) {
+      if (['description', 'WorklogId', 'Rank', 'Comment'].includes(field)) {
         return '';
       }
+      
       if (field === 'status') {
         return '';
       }
@@ -192,8 +214,11 @@ class DataLog extends Component {
       // yyy -> null
       if (['Story Points', 'timeestimate'].includes(field)) {
         return ` 【${oldString}】 `;
-      } else if (['Attachment', 'timespent', 'Comment'].includes(field)) {
+      } else if (['timespent', 'Comment'].includes(field)) {
         return '';
+      } else if (field === 'Attachment') {
+        const attachnewArr = oldString.split('_');
+        return ` 【${decodeURI(attachnewArr.slice(2, attachnewArr.length).join('_'))}】 `;
       } else {
         return ` 【${oldString}】 `;
       }
@@ -230,16 +255,18 @@ class DataLog extends Component {
 
   // ['改变为', '为', '']
   getMode5(datalog) {
-    const { field, oldString, oldValue, newString, newValue } = datalog;
+    const {
+      field, oldString, oldValue, newString, newValue, 
+    } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
-      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
         return '为';
       }
       return '';
     } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
-      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'issuetype', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return '改变为';
       }
       return '';
@@ -268,21 +295,37 @@ class DataLog extends Component {
 
   // 新值，只有新增和修改可能出现
   getMode6(datalog) {
-    const { field, oldString, oldValue, newString, newValue } = datalog;
+    const {
+      field, oldString, oldValue, newString, newValue, 
+    } = datalog;
+    const { typeCode } = this.props;
+    const TYPEARR = {
+      bug: '缺陷',
+      story: '故事',
+      task: '任务',
+      sub_task: '子任务',
+    };
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
-      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
         return ` 【${newString}】 `;
       }
-      if (['description', 'Attachment', 'WorklogId', 'Rank', 'Comment', 'timespent'].includes(field)) {
+      if (['description', 'WorklogId', 'Rank', 'Comment', 'timespent'].includes(field)) {
         return '';
       }
       if (['labels', 'Component', 'Fix Version', 'Epic Child'].includes(field)) {
         return ` 【${newString}】 `;
       }
+      if (field === 'Sprint') {
+        return ` 【${TYPEARR[typeCode]}】 `;
+      }
+      if (field === 'Attachment') {
+        const attachnewArr = newString.split('_');
+        return ` 【${decodeURI(attachnewArr.slice(2, attachnewArr.length).join('_'))}】 `;
+      }
     } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
-      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter', 'labels', 'Component', 'Fix Version', 'Epic Child'].includes(field)) {
+      if (['Epic Link', 'issuetype', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter', 'labels', 'Component', 'Fix Version', 'Epic Child'].includes(field)) {
         return ` 【${newString}】 `;
       }
       if (['description', 'Attachment', 'WorklogId', 'Rank', 'Comment', 'timespent'].includes(field)) {
@@ -340,7 +383,9 @@ class DataLog extends Component {
   }
 
   render() {
-    const { datalog, i, origin, user, callback, expand } = this.props;
+    const {
+      datalog, i, origin, user, callback, expand, 
+    } = this.props;
     return (
       <div>
         {
@@ -365,7 +410,7 @@ class DataLog extends Component {
                             avatar: datalog.imageUrl,
                           }}
                           hiddenText
-                          type={'datalog'}
+                          type="datalog"
                         />
                       )
                     }
@@ -398,18 +443,30 @@ class DataLog extends Component {
                               datalog.imageUrl ? (
                                 <img src={datalog.imageUrl} alt="" style={{ width: '100%' }} />
                               ) : (
-                                <span style={{ width: 62, height: 62, lineHeight: '62px', textAlign: 'center', color: '#6473c3' }}>
+                                <span style={{
+                                  width: 62, height: 62, lineHeight: '62px', textAlign: 'center', color: '#6473c3', 
+                                }}
+                                >
                                   {this.getFirst(datalog.name)}
                                 </span>
                               )
                             }
                           </div>
-                          <h1 style={{ margin: '8px auto 18px', fontSize: '13px', lineHeight: '20px', textAlign: 'center' }}>
+                          <h1 style={{
+                            margin: '8px auto 18px', fontSize: '13px', lineHeight: '20px', textAlign: 'center', 
+                          }}
+                          >
                             {datalog.name}
                           </h1>
-                          <div style={{ color: 'rgba(0, 0, 0, 0.65)', fontSize: '13px', textAlign: 'center', display: 'flex' }}>
+                          <div style={{
+                            color: 'rgba(0, 0, 0, 0.65)', fontSize: '13px', textAlign: 'center', display: 'flex', 
+                          }}
+                          >
                             <Icon type="markunread" style={{ lineHeight: '20px' }} />
-                            <span style={{ marginLeft: 6, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <span style={{
+                              marginLeft: 6, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
+                            }}
+                            >
                               {datalog.email}
                             </span>
                           </div>

@@ -122,7 +122,11 @@ class Comment extends Component {
               }}
               color="#3f51b5"
             />
-            <span style={{ color: 'rgba(0, 0, 0, 0.65)', flexShrink: 0, marginLeft: 15 }}>添加了评论</span>
+            <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginLeft: 15 }}>
+              <DatetimeAgo
+                date={commit.lastUpdateDate}
+              />
+            </div>
           </div>
           <div className="c7n-action">
             <Icon
@@ -157,11 +161,6 @@ class Comment extends Component {
               onClick={() => this.handleDeleteCommit(commit.commentId)}
             /> */}
           </div>
-        </div>
-        <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: 2 }}>
-          <DatetimeAgo
-            date={commit.lastUpdateDate}
-          />
         </div>
         {
           this.state.expand && (
