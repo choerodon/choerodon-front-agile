@@ -130,13 +130,14 @@
 
     .c7n-backlog-sprintGoalSide {
       div {
-        width: 27px;
+        min-width: 30px;
         height: 20px;
         display: flex;
         justify-content: center;
         align-items: center;
         color: white;
         border-radius: 100px;
+        padding: 0 2px;
       }
 
       div:not(:first-child) {
@@ -207,7 +208,8 @@
         }
 
         .c7n-backlog-sprintIssueStoryPoint {
-          width: 20px;
+          padding: 0 2px;
+          min-width: 20px;
           height: 20px;
           border-radius: 100px;
           background: rgba(0, 0, 0, 0.08);

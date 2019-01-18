@@ -295,7 +295,7 @@ class IssueCard extends Component {
                   style={{ margin: 4 }}
                 />
                 {
-                  issueTypeDTO && issueTypeDTO.typeCode === 'story'
+                  issueTypeDTO && issueTypeDTO.typeCode === 'story' && storyPoints
                     ? (
                       <span className="c7n-issueCard-storyPoints">
                         {storyPoints}

@@ -243,7 +243,7 @@ class Version extends Component {
                   onClick={this.handelClickVersion.bind(this, 'all')}
                 >
                   {'所有问题'}
-                                </div>
+                </div>
                 <DragDropContext onDragEnd={this.handleVersionDrag}>
                   {this.renderVersion()}
                 </DragDropContext>
@@ -280,9 +280,7 @@ class Version extends Component {
                 }}
                 refresh={refresh.bind(this)}
               />
-
-)
-                        </div>
+            </div>
           ) : ''
         }
       </div>

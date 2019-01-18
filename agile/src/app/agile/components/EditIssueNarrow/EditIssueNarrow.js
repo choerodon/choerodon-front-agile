@@ -1781,7 +1781,8 @@ class CreateSprint extends Component {
                             )}
                           >
                             <InputNumber
-                              maxLength="4"
+                              max={999.9}
+                              maxLength="5"
                               value={storyPoints}
                               // suffix="点"
                               onChange={this.handleStoryPointsChange.bind(this)}
@@ -1820,7 +1821,8 @@ class CreateSprint extends Component {
                             )}
                           >
                             <InputNumber
-                              maxLength="4"
+                              max={999.9}
+                              maxLength="5"
                               value={remainingTime}
                               onChange={this.handleRemainingTimeChange.bind(this)}
                               step={0.1}

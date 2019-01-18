@@ -1490,11 +1490,11 @@ class Home extends Component {
                   ),
                   (sum, issue) => {
                     if (issue.statusMapDTO && issue.statusMapDTO.type === 'todo') {
-                      return sum + issue.storyPoints;
+                      return sum + (issue.storyPoints || 0);
                     } else {
                       return sum;
                     }
-                  }, 0)
+                  }, 0).toFixed(1)
                 }`}
                 >
                   <p className="point-span" style={{ background: '#4D90FE' }}>
@@ -1504,11 +1504,11 @@ class Home extends Component {
                     ),
                     (sum, issue) => {
                       if (issue.statusMapDTO && issue.statusMapDTO.type === 'todo') {
-                        return sum + issue.storyPoints;
+                        return sum + (issue.storyPoints || 0);
                       } else {
                         return sum;
                       }
-                    }, 0)}
+                    }, 0).toFixed(1)}
                   </p>
                 </Tooltip>
                 <Tooltip title={`处理中故事点：${
@@ -1518,11 +1518,11 @@ class Home extends Component {
                   ),
                   (sum, issue) => {
                     if (issue.statusMapDTO && issue.statusMapDTO.type === 'doing') {
-                      return sum + issue.storyPoints;
+                      return sum + (issue.storyPoints || 0);
                     } else {
                       return sum;
                     }
-                  }, 0)}`
+                  }, 0).toFixed(1)}`
                 }
                 >
                   <p className="point-span" style={{ background: '#FFB100' }}>
@@ -1532,11 +1532,11 @@ class Home extends Component {
                     ),
                     (sum, issue) => {
                       if (issue.statusMapDTO && issue.statusMapDTO.type === 'doing') {
-                        return sum + issue.storyPoints;
+                        return sum + (issue.storyPoints || 0);
                       } else {
                         return sum;
                       }
-                    }, 0)}
+                    }, 0).toFixed(1)}
                   </p>
                 </Tooltip>
                 <Tooltip title={`已完成故事点: ${
@@ -1546,11 +1546,11 @@ class Home extends Component {
                   ),
                   (sum, issue) => {
                     if (issue.statusMapDTO && issue.statusMapDTO.type === 'done') {
-                      return sum + issue.storyPoints;
+                      return sum + (issue.storyPoints || 0);
                     } else {
                       return sum;
                     }
-                  }, 0)}`
+                  }, 0).toFixed(1)}`
                 }
                 >
                   <p className="point-span" style={{ background: '#00BFA5' }}>
@@ -1560,11 +1560,11 @@ class Home extends Component {
                     ),
                     (sum, issue) => {
                       if (issue.statusMapDTO && issue.statusMapDTO.type === 'done') {
-                        return sum + issue.storyPoints;
+                        return sum + (issue.storyPoints || 0);
                       } else {
                         return sum;
                       }
-                    }, 0)}
+                    }, 0).toFixed(1)}
                   </p>
                 </Tooltip>
                 <Button shape="circle" className="expand-btn" onClick={this.handleExpandColumn.bind(this, vos[id])} role="none">
@@ -1686,44 +1686,44 @@ class Home extends Component {
                 _.reduce(_.filter(issues, issue => issue.epicId !== 0
                   && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                   if (issue.statusMapDTO && issue.statusMapDTO.type === 'todo') {
-                    return sum + issue.storyPoints;
+                    return sum + (issue.storyPoints || 0);
                   } else {
                     return sum;
                   }
-                }, 0)
+                }, 0).toFixed(1)
               }`}
               >
                 <p className="point-span" style={{ background: '#4D90FE' }}>
                   {_.reduce(_.filter(issues, issue => issue.epicId !== 0
                     && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                     if (issue.statusMapDTO && issue.statusMapDTO.type === 'todo') {
-                      return sum + issue.storyPoints;
+                      return sum + (issue.storyPoints || 0);
                     } else {
                       return sum;
                     }
-                  }, 0)}
+                  }, 0).toFixed(1)}
                 </p>
               </Tooltip>
               <Tooltip title={`处理中故事点：${
                 _.reduce(_.filter(issues, issue => issue.epicId !== 0
                   && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                   if (issue.statusMapDTO && issue.statusMapDTO.type === 'doing') {
-                    return sum + issue.storyPoints;
+                    return sum + (issue.storyPoints || 0);
                   } else {
                     return sum;
                   }
-                }, 0)
+                }, 0).toFixed(1)
               }`}
               >
                 <p className="point-span" style={{ background: '#FFB100' }}>
                   {_.reduce(_.filter(issues, issue => issue.epicId !== 0
                     && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
                     if (issue.statusMapDTO && issue.statusMapDTO.type === 'doing') {
-                      return sum + issue.storyPoints;
+                      return sum + (issue.storyPoints || 0);
                     } else {
                       return sum;
                     }
-                  }, 0)}
+                  }, 0).toFixed(1)}
                 </p>
               </Tooltip>
             </div>

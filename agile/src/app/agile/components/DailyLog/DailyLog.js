@@ -201,6 +201,8 @@ class DailyLog extends Component {
           <section className="info">
             <div className="line-info">
               <InputNumber
+                max={999.9}
+                maxLength={5}
                 step={0.1}
                 precision={1}
                 label="耗费时间*"

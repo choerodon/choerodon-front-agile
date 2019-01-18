@@ -533,7 +533,7 @@ class BurndownChartHome extends Component {
     let result = '-';
     if (item.newValue > item.oldValue) {
       if (item.statistical) {
-        result = item.newValue - item.oldValue;
+        result = (item.newValue - item.oldValue).toFixed(1);
       }
     }
     return result;
@@ -543,7 +543,7 @@ class BurndownChartHome extends Component {
     let result = '-';
     if (item.newValue < item.oldValue) {
       if (item.statistical) {
-        result = item.oldValue - item.newValue;
+        result = (item.oldValue - item.newValue).toFixed(1);
       }
     }
     return result;
@@ -595,7 +595,7 @@ class BurndownChartHome extends Component {
           splitArray.map(item => (
             <Tooltip mouseEnterDelay={0.5} title={`事件类型：${this.judgeText(item)}`}>
               <p style={{
-                maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}
               >
                 {this.judgeText(item)}
@@ -632,11 +632,11 @@ class BurndownChartHome extends Component {
       title: '日期',
       dataIndex: 'date',
       key: 'date',
-      width: '19%',
+      width: '16%',
       render: text => (
         <Tooltip mouseEnterDelay={0.5} title={`日期：${text}`}>
           <p style={{
-            maxWidth: '120px',
+            maxWidth: '130px',
             whiteSpace: 'nowrap',
             textOverflow: 'ellipsis',
             overflow: 'hidden',
@@ -650,7 +650,7 @@ class BurndownChartHome extends Component {
       title: '问题',
       dataIndex: 'issues',
       key: 'issues',
-      width: '25%',
+      width: '22%',
       render: (text, record) => (
         <div>
           {
@@ -687,7 +687,7 @@ class BurndownChartHome extends Component {
       title: '事件类型',
       dataIndex: 'type',
       key: 'type',
-      width: '14%',
+      width: '17%',
       render: text => (
         <div>{this.renderTypeText(text)}</div>
       ),
@@ -695,12 +695,12 @@ class BurndownChartHome extends Component {
       title: '事件详情',
       dataIndex: 'detail',
       key: 'detail',
-      width: '10.5%',
+      width: '13.5%',
       render: (text, record) => (
         <div className="textDisplayOverflow">
           {
             record.issues.map(item => (
-              <div className="textDisplayOverflow">
+              <div>
                 {this.renderDetail(item, record)}
               </div>
             ))

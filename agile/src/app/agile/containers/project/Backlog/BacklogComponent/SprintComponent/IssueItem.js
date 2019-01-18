@@ -270,7 +270,7 @@ class IssueItem extends Component {
                   </div>
                   <div
                     style={{
-                      maxWidth: 27,
+                      minWidth: 27,
                       marginLeft: '12px',
                     }}
                     label="sprintIssue"
