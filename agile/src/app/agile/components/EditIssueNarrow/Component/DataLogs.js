@@ -5,7 +5,9 @@ import _ from 'lodash';
 import UserHead from '../../UserHead';
 import WYSIWYGEditor from '../../WYSIWYGEditor';
 import { IssueDescription } from '../../CommonComponent';
-import { delta2Html, text2Delta, beforeTextUpload, formatDate } from '../../../common/utils';
+import {
+ delta2Html, text2Delta, beforeTextUpload, formatDate 
+} from '../../../common/utils';
 import { deleteWorklog, updateWorklog } from '../../../api/NewIssueApi';
 import DataLog from './DataLog';
 
@@ -28,7 +30,7 @@ class DataLogs extends Component {
   }
 
   render() {
-    const { datalogs } = this.props;
+    const { datalogs, typeCode } = this.props;
     return (
       <div>
         {
@@ -37,6 +39,7 @@ class DataLogs extends Component {
               i={i}
               key={datalog.logId}
               datalog={datalog}
+              typeCode={typeCode}
               origin={datalogs}
               expand={this.state.expand}
               user={this.state.user}
