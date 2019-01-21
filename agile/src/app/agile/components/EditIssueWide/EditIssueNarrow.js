@@ -470,14 +470,14 @@ class CreateSprint extends Component {
   };
 
   handleStoryPointsChange = (e) => {
-    this.setState({ storyPoints: e });
+    this.setState({ storyPoints: e || '' });
     this.needBlur = false;
     // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
     setTimeout(() => { this.needBlur = true; }, 100);
   };
 
   handleRemainingTimeChange = (e) => {
-    this.setState({ remainingTime: e });
+    this.setState({ remainingTime: e || '' });
     this.needBlur = false;
     // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
     setTimeout(() => { this.needBlur = true; }, 100);

@@ -348,19 +348,18 @@ class CreateIssue extends Component {
                 // 创建的问题类型为故事时，才显示故事点
                 newIssueTypeCode === 'story' && (
                 <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
-                  <Input
+                  <InputNumber
                     label="故事点"
-                    maxLength={3}
+                    max={999.9}
+                    maxLength={5}
                     suffix="点"
+                    step={0.1}
+                    precision={1}
                     value={storyPoints}
                     onChange={(e) => {
-                      const { value } = e.target;
-                      const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
-                      if ((!isNaN(value) && reg.test(value)) || value === '') {
-                        this.setState({
-                          storyPoints: value,
-                        });
-                      } 
+                      this.setState({
+                        storyPoints: e || '',
+                      });
                     }}
                   />
                 </div>
@@ -380,7 +379,7 @@ class CreateIssue extends Component {
                       precision={1}
                       onChange={(e) => {
                         this.setState({
-                          estimatedTime: e,
+                          estimatedTime: e || '',
                         });
                         // const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
                         // if ((!isNaN(value) && reg.test(value)) || value === '') {
@@ -443,7 +442,7 @@ class CreateIssue extends Component {
                       allowClear
                       filter
                       filterOption={
-                        (input, option) => option.props.children.toLowerCase().indexOf(
+                        (input, option) => option.props.children && option.props.children.toLowerCase().indexOf(
                           input.toLowerCase(),
                         ) >= 0
                       }
@@ -484,7 +483,7 @@ class CreateIssue extends Component {
                     allowClear
                     filter
                     filterOption={
-                      (input, option) => option.props.children.toLowerCase().indexOf(
+                      (input, option) => option.props.children && option.props.children.toLowerCase().indexOf(
                         input.toLowerCase(),
                       ) >= 0
                     }

@@ -425,7 +425,7 @@ class VelocityChart extends Component {
                   </span>
                   <span>中创建一个冲刺</span>
                 </div>
-)}
+              )}
             />
           )}
         </Content>

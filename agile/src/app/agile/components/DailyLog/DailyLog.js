@@ -94,7 +94,7 @@ class DailyLog extends Component {
   };
 
   handleDissipateChange = (e) => {
-    this.setState({ dissipate: e });
+    this.setState({ dissipate: e || '' });
   }
 
   handleDissipateUnitChange = (value) => {
@@ -102,7 +102,7 @@ class DailyLog extends Component {
   }
 
   handleTimeChange = (e) => {
-    this.setState({ time: e });
+    this.setState({ time: e || '' });
   }
 
   handleTimeUnitChange = (value) => {
@@ -110,7 +110,7 @@ class DailyLog extends Component {
   }
 
   handleReduceChange = (e) => {
-    this.setState({ reduce: e });
+    this.setState({ reduce: e || '' });
   }
 
   handleReduceUnitChange = (value) => {
@@ -245,7 +245,11 @@ class DailyLog extends Component {
                   value={3}
                 >
                   <span style={{ display: 'inline-block', width: 52 }}>设置为</span>
-                  <NumericInput
+                  <InputNumber
+                    max={999.9}
+                    maxLength={5}
+                    step={0.1}
+                    precision={1}
                     style={tempAlignStyle}
                     disabled={radio !== 3}
                     value={time}
@@ -269,7 +273,11 @@ class DailyLog extends Component {
                   value={4}
                 >
                   <span style={{ display: 'inline-block', width: 52 }}>缩减</span>
-                  <NumericInput
+                  <InputNumber
+                    max={999.9}
+                    maxLength={5}
+                    step={0.1}
+                    precision={1}
                     style={tempAlignStyle}
                     disabled={radio !== 4}
                     value={reduce}

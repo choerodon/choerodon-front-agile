@@ -1,3 +1,6 @@
-import VersionReportHome from './VersionReportHome';
+/**
+ * Created by Qyellow on 2018/7/24.
+ */
+import VersionReport from './VersionReport';
 
-export default VersionReportHome;
+export default VersionReport;

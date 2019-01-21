@@ -26,7 +26,17 @@ const UNIT2NAME = {
 };
 
 function transformZero2Placeholder(arr) {
-  return arr.map(v => v || '-');
+  // 处理小数精度和null
+  return arr.map((item) => {
+    if (item) {
+      if (item % 1 > 0) {
+        return item.toFixed(1);
+      }
+      return item;
+    } else {
+      return '-';
+    }
+  });
 }
 
 function getChartDataFromServerData(data) {

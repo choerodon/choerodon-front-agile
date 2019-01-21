@@ -311,7 +311,7 @@ class CreateSubIssue extends Component {
                   precision={1}
                   onChange={(e) => {
                     this.setState({
-                      estimatedTime: e,
+                      estimatedTime: e || '',
                     });
                     // const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
                     // if ((!isNaN(value) && reg.test(value)) || value === '') {
