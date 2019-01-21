@@ -635,7 +635,8 @@ class ScrumBoardHome extends Component {
                   const judge = ScrumBoardStore.judgeMoveParentToDone(
                     parentIdCode, draggableData.parentIssueId,
                   );
-                  if (judge) {
+                  // 如果父任务不在当前board中，则不处理
+                  if (judge && parentObjectVersionNumber) {
                     this.matchStatus(types);
                     this.setState({
                       judgeUpdateParent: {

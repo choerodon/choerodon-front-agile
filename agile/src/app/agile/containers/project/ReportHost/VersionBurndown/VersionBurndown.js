@@ -403,6 +403,9 @@ class VersionBurndown extends Component {
     let totalStoryPoints = 0;
     if (item && item.length > 0) {
       totalStoryPoints = _.sum(_.map(_.filter(item, o => o.typeCode === 'story' && o.storyPoints !== null), 'storyPoints'));
+      if (totalStoryPoints % 1 > 0) {
+        totalStoryPoints = totalStoryPoints.toFixed(1);
+      }
     }
 
     const column = [
@@ -964,7 +967,6 @@ class VersionBurndown extends Component {
                     {
                       this.renderChart()
                     }
-
                   </div>
                 </Spin>
                 <Tabs

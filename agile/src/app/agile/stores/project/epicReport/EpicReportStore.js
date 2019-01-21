@@ -73,18 +73,7 @@ class EpicReportStore {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/epic_chart?epicId=${epicId}&type=${unit}`)
       .then((res) => {
         this.setBeforeCurrentUnit(unit);
-        res = res.map(item => ({
-          ...item,
-          allRemainTimes: res.allRemainTimes || 0,
-          allStoryPoints: res.allStoryPoints || 0,
-          completedRemainTimes: res.completedRemainTimes || 0,
-          completedStoryPoints: res.completedStoryPoints || 0,
-          issueCompletedCount: res.issueCompletedCount || 0,
-          issueCount: res.issueCount || 0,
-          unEstimateIssueCount: res.unEstimateIssueCount || 0,
-        }));
         this.setChartData(res);
-
         this.setChartLoading(false);
         this.setReload(false);
       });
@@ -151,8 +140,20 @@ class EpicReportStore {
       return [];
     }
     const all = _.map(this.chartData, prop);
-    return all;
+    return this.dealNullValue(all);
   }
+
+  // 处理后端返回值为null或小数精度问题
+  dealNullValue = (list = []) => _.map(list, (item) => {
+    if (item) {
+      if (item % 1 > 0) {
+        return item.toFixed(1);
+      }
+      return item || 0;
+    } else {
+      return 0;
+    }
+  });
 
   @computed get getChartDataYCompleted() {
     const prop = UNIT_STATUS[this.beforeCurrentUnit].completed;
@@ -160,7 +161,7 @@ class EpicReportStore {
       return [];
     }
     const completed = _.map(this.chartData, prop);
-    return completed;
+    return this.dealNullValue(completed);
   }
 
   @computed get getChartDataYIssueCountAll() {

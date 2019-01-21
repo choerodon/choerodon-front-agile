@@ -493,11 +493,11 @@ class CreateSprint extends Component {
   };
 
   handleStoryPointsChange = (e) => {
-    this.setState({ storyPoints: e });
+    this.setState({ storyPoints: e || '' });
   };
 
   handleRemainingTimeChange = (e) => {
-    this.setState({ remainingTime: e });
+    this.setState({ remainingTime: e || '' });
   };
 
   getWorkloads = () => {
@@ -1782,7 +1782,7 @@ class CreateSprint extends Component {
                           >
                             <InputNumber
                               max={999.9}
-                              maxLength="5"
+                              maxLength={5}
                               value={storyPoints}
                               // suffix="点"
                               onChange={this.handleStoryPointsChange.bind(this)}
@@ -1822,7 +1822,7 @@ class CreateSprint extends Component {
                           >
                             <InputNumber
                               max={999.9}
-                              maxLength="5"
+                              maxLength={5}
                               value={remainingTime}
                               onChange={this.handleRemainingTimeChange.bind(this)}
                               step={0.1}

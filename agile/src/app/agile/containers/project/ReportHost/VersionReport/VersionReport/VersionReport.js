@@ -735,13 +735,11 @@ class EpicReport extends Component {
                         history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
-
-
                       发布版本
-                                        </span>
+                    </span>
                     <span>中创建一个版本</span>
                   </div>
-)}
+                )}
               />
             )
           }

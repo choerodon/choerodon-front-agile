@@ -2,7 +2,15 @@
   .c7n-report {
     display: flex;
     flex-direction: row;
-    width: '100%';
+    width: 100%;
+
+    .c7n-tooltip-icon {
+      display:inline-block;
+      width: 10px;
+      height: 10px;
+      margin-right: 3px;
+      border-radius: 50%;
+    }
 
     .c7n-chart {
       flex: 1;

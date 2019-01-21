@@ -228,9 +228,9 @@ class EpicBurndown extends Component {
           let res = `<span style="color: #3F51B5">${params[0].name}</span>`;
           res += `<span style="display:block; margin-top: 0px; margin-bottom: 2px; color: rgba(0,0,0,0.54); font-size: 11px;">${sprint.startDate && sprint.startDate.split(' ')[0].split('-').join('/')}-${sprint.endDate && sprint.endDate.split(' ')[0].split('-').join('/')}</span>`;
           res += `本迭代开始时故事点数：${sprint.start}`;
-          res += `<br/>工作已完成: ${(params[1].value === '-' ? 0 : params[1].value) + (params[4].value === '-' ? 0 : params[4].value)}`;
+          res += `<br/>工作已完成: ${(params[1].value === '-' ? 0 : Number(params[1].value)) + (params[4].value === '-' ? 0 : Number(params[4].value))}`;
           res += `<br/>工作增加: ${sprint.add}`;
-          res += `<br/>本迭代结束时剩余故事点数: ${(params[2].value === '-' ? 0 : params[2].value) + (params[3].value === '-' ? 0 : params[3].value)}`;
+          res += `<br/>本迭代结束时剩余故事点数: ${(params[2].value === '-' ? 0 : Number(params[2].value)) + (params[3].value === '-' ? 0 : Number(params[3].value))}`;
           return res;
         },
       },
@@ -405,7 +405,7 @@ class EpicBurndown extends Component {
     // if (chartData[2].length > 3) {
     const lastRemain = _.last(this.transformPlaceholder2Zero(chartData[2]));
     const lastAdd = _.last(this.transformPlaceholder2Zero(chartData[3]));
-    return lastRemain + lastAdd;
+    return Number(lastRemain) + Number(lastAdd);
     // }
     // return 0;
   }
@@ -414,6 +414,9 @@ class EpicBurndown extends Component {
     let totalStoryPoints = 0;
     if (item && item.length > 0) {
       totalStoryPoints = _.sum(_.map(_.filter(item, o => o.typeCode === 'story' && o.storyPoints !== null), 'storyPoints'));
+      if (totalStoryPoints % 1 > 0) {
+        totalStoryPoints = totalStoryPoints.toFixed(1);
+      }
     }
 
     const column = [

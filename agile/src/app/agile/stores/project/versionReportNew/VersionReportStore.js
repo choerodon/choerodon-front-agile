@@ -122,13 +122,25 @@ class VersionReportStore {
     return groupDays;
   }
 
+  // 处理后端返回值为null或小数精度问题
+  dealNullValue = (list = []) => _.map(list, (item) => {
+    if (item) {
+      if (item % 1 > 0) {
+        return item.toFixed(1);
+      }
+      return item || 0;
+    } else {
+      return 0;
+    }
+  });
+
   @computed get getChartDataYAll() {
     const prop = UNIT_STATUS[this.beforeCurrentUnit].committed;
     if (!prop) {
       return [];
     }
     const all = _.map(this.chartData, prop);
-    return all;
+    return this.dealNullValue(all);
   }
 
   @computed get getChartDataYCompleted() {
@@ -137,7 +149,7 @@ class VersionReportStore {
       return [];
     }
     const completed = _.map(this.chartData, prop);
-    return completed;
+    return this.dealNullValue(completed);
   }
 
   @computed get getChartDataYIssueCountAll() {

@@ -230,6 +230,7 @@ class BurndownChartHome extends Component {
       .axiosGetBurndownChartReport(this.state.defaultSprint, this.state.select).then((res) => {
         const data = res;
         const newData = [];
+        // 将操作日期相同的合并
         for (let index = 0, len = data.length; index < len; index += 1) {
           if (!_.some(newData, { date: data[index].date })) {
             newData.push({
@@ -279,6 +280,7 @@ class BurndownChartHome extends Component {
             }
           }
         }
+        // 计算剩余
         for (let index = 0, dataLen = newData.length; index < dataLen; index += 1) {
           let rest = 0;
           if (newData[index].type !== 'endSprint') {
@@ -289,6 +291,10 @@ class BurndownChartHome extends Component {
           for (let i = 0, len = newData[index].issues.length; i < len; i += 1) {
             if (newData[index].issues[i].statistical) {
               rest += newData[index].issues[i].newValue - newData[index].issues[i].oldValue;
+              if (rest % 1 > 0) {
+                // 如果计算结果为小数，利用toFixed消除js计算精度bug
+                rest = rest.toFixed(1) * 1;
+              }
             }
           }
           newData[index].rest = rest;
@@ -518,7 +524,7 @@ class BurndownChartHome extends Component {
     }
     return (
       <p style={{
-        maxWidth: '60px',
+        maxWidth: '100px',
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden',
@@ -533,7 +539,10 @@ class BurndownChartHome extends Component {
     let result = '-';
     if (item.newValue > item.oldValue) {
       if (item.statistical) {
-        result = (item.newValue - item.oldValue).toFixed(1);
+        result = item.newValue - item.oldValue;
+        if (result && result % 1 > 0) {
+          result = result.toFixed(1);
+        }
       }
     }
     return result;
@@ -543,7 +552,10 @@ class BurndownChartHome extends Component {
     let result = '-';
     if (item.newValue < item.oldValue) {
       if (item.statistical) {
-        result = (item.oldValue - item.newValue).toFixed(1);
+        result = item.oldValue - item.newValue;
+        if (result && result % 1 > 0) {
+          result = result.toFixed(1);
+        }
       }
     }
     return result;
