@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { Button } from 'choerodon-ui';
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-// import ImageDrop from './ImageDrop';
+import ImageDrop from './ImageDrop';
 import './WYSIWYGEditor.scss';
 import cls from '../CommonComponent/ClickOutSide';
 
-// Quill.register('modules/imageDrop', ImageDrop);
+Quill.register('modules/imageDrop', ImageDrop);
 
 class WYSIWYGEditor extends Component {
   modules = {
@@ -17,7 +17,7 @@ class WYSIWYGEditor extends Component {
       [{ color: [] }],
       // ['clean'],
     ],
-    // imageDrop: true,
+    imageDrop: true,
   };
 
   formats = [
