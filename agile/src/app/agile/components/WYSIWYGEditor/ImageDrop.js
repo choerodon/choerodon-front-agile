@@ -44,9 +44,10 @@ class ImageDrop {
 	 * Handler for paste event to read pasted files from evt.clipboardData
 	 * @param {Event} evt
 	 */
-	handlePaste(evt) {
-		if (evt.clipboardData && evt.clipboardData.items && evt.clipboardData.items.length) {
-			this.readFiles(evt.clipboardData.items, dataUrl => {
+  handlePaste(evt) {
+    const len = evt.clipboardData.items.length;
+    if (evt.clipboardData && evt.clipboardData.items && evt.clipboardData.items.length) {    
+      this.readFiles(evt.clipboardData.items, dataUrl => {
         const userAgent = navigator.userAgent; // 取得浏览器的userAgent字符串
         if (userAgent.indexOf('Firefox') > -1) {
           const selection = this.quill.getSelection();
@@ -60,11 +61,15 @@ class ImageDrop {
             setTimeout(() => this.insert(dataUrl), 0);
           }
         } else {
+          // chrome下图片会重复的bug,右键复制网络图片时,length为2，此时会造成文本框中出现两张相同图片
+          if (len > 1) {
+            return;
+          }
           setTimeout(() => this.insert(dataUrl), 0);
         }
-			});
-		}
-	}
+      });
+    }
+  }
 
 	/**
 	 * Insert the image into the document at the current cursor position
