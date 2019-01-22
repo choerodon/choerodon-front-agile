@@ -15,6 +15,18 @@ class AssigneeModal extends Component {
     this.state = {};
   }
 
+  dealDecimal = (value) => {
+    if (value) {
+      if (value % 1 > 0) {
+        return value.toFixed(1);
+      } else {
+        return value;
+      }
+    } else {
+      return 0;
+    }
+  };
+
   render() {
     const { data, visible, onCancel } = this.props;
     const columns = [{
@@ -119,12 +131,12 @@ class AssigneeModal extends Component {
             pagination={dataSource + 1 > 10}
             dataSource={_.concat(dataSource, {
               assigneeName: '合计',
-              issueCount: total.totalIssue,
-              remainingIssueCount: total.totalRemainIssueCount,
-              totalStoryPoints: total.totalStoryPoints,
-              remainingStoryPoints: total.remainingStoryPoints,
-              totalRemainingTime: total.totalTime,
-              remainingTime: total.totalRemainTime,
+              issueCount: this.dealDecimal(total.totalIssue),
+              remainingIssueCount: this.dealDecimal(total.totalRemainIssueCount),
+              totalStoryPoints: this.dealDecimal(total.totalStoryPoints),
+              remainingStoryPoints: this.dealDecimal(total.remainingStoryPoints),
+              totalRemainingTime: this.dealDecimal(total.totalTime),
+              remainingTime: this.dealDecimal(total.totalRemainTime),
             })}
             columns={columns}
             filterBar={false}
