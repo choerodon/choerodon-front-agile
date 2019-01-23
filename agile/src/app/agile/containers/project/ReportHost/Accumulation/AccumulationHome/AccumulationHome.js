@@ -125,9 +125,9 @@ class AccumulationHome extends Component {
       loading: true,
     });
     const columnData = AccumulationStore.getColumnData;
-    const endDate = AccumulationStore.getEndDate.format('YYYY-MM-DD HH:mm:ss');
+    const endDate = AccumulationStore.getEndDate && AccumulationStore.getEndDate.format('YYYY-MM-DD HH:mm:ss');
     const filterList = AccumulationStore.getFilterList;
-    const startDate = AccumulationStore.getStartDate.format('YYYY-MM-DD HH:mm:ss');
+    const startDate = AccumulationStore.getStartDate && AccumulationStore.getStartDate.format('YYYY-MM-DD HH:mm:ss');
     const columnIds = [];
     const quickFilterIds = [];
     let boardId;

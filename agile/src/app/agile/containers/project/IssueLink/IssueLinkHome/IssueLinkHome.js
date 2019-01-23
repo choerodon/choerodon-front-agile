@@ -29,11 +29,19 @@ class Link extends Component {
       confirmShow: false,
       editComponentShow: false,
       createComponentShow: false,
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: undefined,
+      },
+      filterName: '',
+      barFilters: [],
     };
   }
 
   componentDidMount() {
-    this.loadLinks();
+    const { filterName, barFilters, pagination } = this.state;
+    this.loadLinks(pagination.current - 1, pagination.pageSize);
   }
 
   showLinkType(record) {
@@ -57,24 +65,47 @@ class Link extends Component {
     this.loadLinks();
   }
 
-  loadLinks() {
+  loadLinks(page = 0, size = 10) {
+    const { filterName, barFilters } = this.state;
     this.setState({
       loading: true,
     });
     axios
-      .get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types`)
+      .post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types/query_all?page=${page}&size=${size}`, {
+        contents: barFilters,
+        linkName: filterName,
+      })
       .then((res) => {
         this.setState({
-          links: res,
+          links: res.content,
           loading: false,
+          pagination: {
+            current: 1,
+            pageSize: 10,
+            total: res.totalElements,
+          },
         });
       })
       .catch((error) => {});
   }
 
+  handleTableChange = (pagination, filters, sorter, barFilters) => {
+    this.setState({
+      pagination,
+      filterName: filters.linkName && filters.linkName[0],
+      barFilters,
+    }, () => {
+      this.loadLinks(pagination.current - 1, pagination.pageSize);
+    });
+  }
+
   render() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
+    const {
+      loading, links, pagination, createLinkShow, editLinkShow, currentLinkTypeId, confirmShow, link, filterName, barFilters,
+    } = this.state;
+
     const column = [
       {
         title: '名称',
@@ -96,6 +127,7 @@ class Link extends Component {
             </Tooltip>
           </div>
         ),
+        filters: [],
       },
       {
         title: '链出描述',
@@ -210,7 +242,7 @@ class Link extends Component {
               <span>创建链接</span>
             </Button>
           </Permission>
-          <Button funcType="flat" onClick={() => this.loadLinks()}>
+          <Button funcType="flat" onClick={() => this.loadLinks(pagination.current - 1, pagination.pageSize)}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -221,17 +253,18 @@ class Link extends Component {
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/setup/issue-link/"
         >
           <div>
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
               <Table
-                pagination={this.state.links.length > 10}
+                pagination={pagination}
                 rowKey={record => record.linkTypeId}
                 columns={column}
-                dataSource={this.state.links}
+                dataSource={links}
                 filterBarPlaceholder="过滤表"
                 scroll={{ x: true }}
+                onChange={this.handleTableChange}
               />
             </Spin>
-            {this.state.createLinkShow ? (
+            {createLinkShow ? (
               <CreateLink
                 onOk={() => {
                   this.setState({ createLinkShow: false });
@@ -240,9 +273,9 @@ class Link extends Component {
                 onCancel={() => this.setState({ createLinkShow: false })}
               />
             ) : null}
-            {this.state.editLinkShow ? (
+            {editLinkShow ? (
               <EditLink
-                linkTypeId={this.state.currentLinkTypeId}
+                linkTypeId={currentLinkTypeId}
                 onOk={() => {
                   this.setState({ editLinkShow: false });
                   this.loadLinks();
@@ -250,10 +283,10 @@ class Link extends Component {
                 onCancel={() => this.setState({ editLinkShow: false })}
               />
             ) : null}
-            {this.state.confirmShow ? (
+            {confirmShow ? (
               <DeleteLink
-                visible={this.state.confirmShow}
-                link={this.state.link}
+                visible={confirmShow}
+                link={link}
                 onCancel={() => this.setState({ confirmShow: false })}
                 onOk={this.deleteLink.bind(this)}
               />

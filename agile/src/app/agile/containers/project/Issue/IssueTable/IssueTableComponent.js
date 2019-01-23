@@ -30,7 +30,7 @@ export function TypeCode({ record }) {
   return (
     <TypeTag
       data={record.issueTypeDTO}
-      showName={record.issueTypeDTO.name}
+      showName={record.issueTypeDTO && record.issueTypeDTO.name}
       style={{ minWidth: 80 }}
     />
   );
@@ -74,7 +74,7 @@ export function Priority({ record }) {
  */
 export function StatusName({ record }) {
   return (
-    <Tooltip mouseEnterDelay={0.5} title={`问题状态： ${record.statusMapDTO.name}`}>
+    <Tooltip mouseEnterDelay={0.5} title={`问题状态： ${record.statusMapDTO && record.statusMapDTO.name}`}>
       <StatusTag
         data={record.statusMapDTO}
         style={{ display: 'inline-block', verticalAlign: 'middle' }}

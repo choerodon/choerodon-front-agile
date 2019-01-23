@@ -27,7 +27,7 @@ class DeleteComponent extends Component {
         searchArgs: {},
         advancedSearchArgs: {
           defaultAssigneeRole: [],
-          content: '',
+          contents: [],
         },
       },
     };
@@ -145,8 +145,9 @@ class DeleteComponent extends Component {
             type="error"
           />
           <div style={{ marginLeft: 20, width: 400, 'line-height': '26px' }}>
+
             如果有问题与该模块相关联，一旦删除，所有相关的问题可以选择关联到其他模块，或不关联模块。
-          </div>
+</div>
         </div>
         <ul style={{ margin: '20px 0 20px 20px', paddingLeft: '20px' }}>
           <li>
@@ -163,10 +164,12 @@ class DeleteComponent extends Component {
                 );
               }}
             >
+
               相关的问题（
-              {this.state.component.issueCount || 0}
+{this.state.component.issueCount || 0}
+
 ）
-            </span>
+</span>
           </li>
         </ul>
         {this.state.component.issueCount ? <div>{this.renderDelete()}</div> : null}

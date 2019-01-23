@@ -50,6 +50,12 @@ class ReleaseStore {
     ['0', {}],
   ]);
 
+  @action setSearchContent(data) {
+    if (data) {
+      this.filters.contents = data;
+    }
+  }
+
   @computed get getIssueCountDetail() {
     return this.issueCountDetail;
   }

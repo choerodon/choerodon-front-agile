@@ -193,7 +193,7 @@ class ReleaseHome extends Component {
     ReleaseStore.setFilters({
       advancedSearchArgs: { statusCodes: filters && filters.key && filters.key.length > 0 ? filters.key : [] },
       searchArgs,
-      content: barFilters && barFilters.length > 0 ? barFilters.join('&') : '',
+      contents: barFilters,
     });
     this.refresh({
       current: pagination.current,
@@ -476,7 +476,8 @@ class ReleaseHome extends Component {
                   });
                 }}
                 refresh={this.refresh.bind(this, pagination)}
-              />) : ''
+              />
+            ) : ''
           }
           <Modal
             title={`删除版本 ${versionDelete.name}`}
