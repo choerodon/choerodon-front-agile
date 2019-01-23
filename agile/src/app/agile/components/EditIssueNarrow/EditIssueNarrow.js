@@ -62,6 +62,8 @@ const STATUS_SHOW = {
   closed: '关闭',
 };
 
+const storyPointList = ['0.5', '1', '2', '3', '5', '8', '13'];
+
 let loginUserId;
 let hasPermission;
 class CreateSprint extends Component {
@@ -493,11 +495,33 @@ class CreateSprint extends Component {
   };
 
   handleStoryPointsChange = (e) => {
-    this.setState({ storyPoints: e || '' });
+    this.setState({ storyPoints: (e && (e > 999.9 ? 999.9 : e)) || '' });
   };
 
   handleRemainingTimeChange = (e) => {
-    this.setState({ remainingTime: e || '' });
+    this.setState({ remainingTime: (e && (e > 999.9 ? 999.9 : e)) || '' });
+  };
+
+  handleChangeStoryPoint = (value) => {
+    const { storyPoints } = this.state;
+    // 只允许输入整数，选择时可选0.5
+    if (value === '0.5') {
+      this.setState({
+        storyPoints: '0.5',
+      });
+    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
+      this.setState({
+        storyPoints: String(value),
+      });
+    } else if (value.toString().charAt(value.length - 1) === '.') {
+      this.setState({
+        storyPoints: value.slice(0, -1),
+      });
+    } else {
+      this.setState({
+        storyPoints,
+      });
+    }
   };
 
   getWorkloads = () => {
@@ -1780,21 +1804,42 @@ class CreateSprint extends Component {
                               </span>
                             )}
                           >
-                            <InputNumber
-                              max={999.9}
-                              maxLength={5}
-                              value={storyPoints}
-                              // suffix="点"
-                              onChange={this.handleStoryPointsChange.bind(this)}
-                              step={0.1}
-                              precision={1}
-                              // onPressEnter={() => {
-                              //   this.updateIssue('storyPoints');
-                              //   this.setState({
-                              //     currentRae: undefined,
-                              //   });
-                              // }}
-                            />
+                            {/*<InputNumber*/}
+                              {/*max={999.9}*/}
+                              {/*maxLength={5}*/}
+                              {/*value={storyPoints}*/}
+                              {/*// suffix="点"*/}
+                              {/*onChange={this.handleStoryPointsChange.bind(this)}*/}
+                              {/*step={0.1}*/}
+                              {/*precision={1}*/}
+                              {/*// onPressEnter={() => {*/}
+                              {/*//   this.updateIssue('storyPoints');*/}
+                              {/*//   this.setState({*/}
+                              {/*//     currentRae: undefined,*/}
+                              {/*//   });*/}
+                              {/*// }}*/}
+                            {/*/>*/}
+                            <Select
+                              value={storyPoints && storyPoints.toString()}
+                              mode="combobox"
+                              // onBlur={e => this.statusOnChange(e)}
+                              ref={(e) => {
+                                this.componentRef = e;
+                              }}
+                              onPopupFocus={(e) => {
+                                this.componentRef.rcSelect.focus();
+                              }}
+                              tokenSeparators={[',']}
+                              // getPopupContainer={triggerNode => triggerNode.parentNode}
+                              style={{ marginTop: 0, paddingTop: 0 }}
+                              onChange={value => this.handleChangeStoryPoint(value)}
+                            >
+                              {storyPointList.map(sp => (
+                                <Option key={sp.toString()} value={sp}>
+                                  {sp}
+                                </Option>
+                              ))}
+                            </Select>
                           </ReadAndEdit>
                         </div>
                       </div>
