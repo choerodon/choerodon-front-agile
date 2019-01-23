@@ -39,7 +39,7 @@ class AddStatus extends Component {
         };
         ScrumBoardStore.axiosAddStatus(params).then((data) => {
           if (data && data.failed && data.code === 'error.status.exist') {
-            Choerodon.prompt(`状态 ${values.name} 已经存在。`);
+            Choerodon.prompt(`状态 ${values.name} 已经存在。`, 'error');
           }
           onChangeVisible(false);
           refresh();

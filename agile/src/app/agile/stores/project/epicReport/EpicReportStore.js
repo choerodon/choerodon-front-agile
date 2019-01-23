@@ -73,6 +73,16 @@ class EpicReportStore {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/epic_chart?epicId=${epicId}&type=${unit}`)
       .then((res) => {
         this.setBeforeCurrentUnit(unit);
+        res = res.map(item => ({
+          ...item,
+          allRemainTimes: item.allRemainTimes || 0,
+          allStoryPoints: item.allStoryPoints || 0,
+          completedRemainTimes: item.completedRemainTimes || 0,
+          completedStoryPoints: item.completedStoryPoints || 0,
+          issueCompletedCount: item.issueCompletedCount || 0,
+          issueCount: item.issueCount || 0,
+          unEstimateIssueCount: item.unEstimateIssueCount || 0,
+        }));
         this.setChartData(res);
         this.setChartLoading(false);
         this.setReload(false);

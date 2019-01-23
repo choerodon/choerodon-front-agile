@@ -33,7 +33,7 @@ class ComponentHome extends Component {
         searchArgs: {},
         advancedSearchArgs: {
           defaultAssigneeRole: [],
-          content: '',
+          contents: '',
         },
       },
     };
@@ -57,7 +57,7 @@ class ComponentHome extends Component {
       filters: {
         advancedSearchArgs: {},
         searchArgs: {},
-        content: '',
+        contents: [],
       },
     });
   }
@@ -102,7 +102,7 @@ class ComponentHome extends Component {
         defaultAssigneeRole: filters && filters.defaultAssigneeRole && filters.defaultAssigneeRole.length > 0 ? filters.defaultAssigneeRole : [],
       },
       searchArgs,
-      content: barFilters && barFilters.length > 0 ? barFilters.join('%') : '',
+      contents: barFilters,
     };
     this.setState({
       filters: filtersPost,

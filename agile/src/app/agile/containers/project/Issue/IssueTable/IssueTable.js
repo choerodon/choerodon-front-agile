@@ -65,7 +65,8 @@ class IssueTable extends Component {
       temp.shift();
     }
     setArgs('content', {
-      content: temp.join(''),
+      // content: temp.join(''),
+      contents: temp,
     });
   };
 

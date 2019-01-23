@@ -62,6 +62,7 @@ class ReleaseDetail extends Component {
         ReleaseStore.setArg({ comment: filters[key][0] });
       }
     });
+    ReleaseStore.setSearchContent(barFilters);
     this.refresh(tab, ReleaseStore.getFilter);
   };
 
@@ -247,7 +248,7 @@ class ReleaseDetail extends Component {
               <span>
                 {
                   ReleaseStore.getOriginIssue.filter(
-                    issues => issues.statusMapDTO.id === item.id,
+                    issues => issues.statusMapDTO && issues.statusMapDTO.id === item && item.id,
                   ).length
                 }
                 {'个'}
