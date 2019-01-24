@@ -153,7 +153,7 @@ class ScrumBoardHome extends Component {
     });
     // 快速搜索
     ScrumBoardStore.axiosGetQuickSearchList().then((res) => {
-      ScrumBoardStore.setQuickSearchList(res);
+      ScrumBoardStore.setQuickSearchList(res.Content);
       if (boardId) {
         // 加载冲刺及Issue
         ScrumBoardStore.axiosGetBoardData(boardId,

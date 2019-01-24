@@ -53,7 +53,7 @@ class AccumulationHome extends Component {
     });
 
     AccumulationStore.axiosGetFilterList().then((data) => {
-      const newData = _.clone(data);
+      const newData = _.clone(data.content);
       for (let index = 0, len = newData.length; index < len; index += 1) {
         newData[index].check = false;
       }
@@ -496,7 +496,7 @@ class AccumulationHome extends Component {
                         }}
                       >
                         {
-                          item.data.map(items => (
+                          item.data && item.data.length && item.data.map(items => (
                             <Checkbox
                               checked={item.onChecked(items[item.id])}
                               onChange={(e) => {
