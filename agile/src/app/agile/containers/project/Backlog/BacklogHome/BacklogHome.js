@@ -182,7 +182,7 @@ class BacklogHome extends Component {
   loadQuickFilter = () => {
     const { BacklogStore } = this.props;
     BacklogStore.axiosGetQuickSearchList().then((res) => {
-      BacklogStore.setQuickSearchList(res);
+      BacklogStore.setQuickSearchList(res.content);
     }).catch((error) => {
     });
   };

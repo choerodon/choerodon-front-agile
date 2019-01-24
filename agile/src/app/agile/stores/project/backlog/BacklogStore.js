@@ -391,7 +391,10 @@ class BacklogStore {
   }
 
   axiosGetQuickSearchList() {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all`, {
+      contents: [],
+      filterName: '',
+    });
   }
 
   @observable assigneeFilterIds = [];

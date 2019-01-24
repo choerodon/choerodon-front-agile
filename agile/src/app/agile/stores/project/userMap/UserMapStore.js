@@ -415,7 +415,10 @@ class UserMapStore {
         }
         axios.all([
           axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/storymap/epics?organizationId=${orgId}&showDoneEpic=${this.showDoneEpic}`),
-          axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`),
+          axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all`, {
+            contents: [],
+            filterName: '',
+          }),
           axios.get(axiosGetIssue),
         ])
           .then(

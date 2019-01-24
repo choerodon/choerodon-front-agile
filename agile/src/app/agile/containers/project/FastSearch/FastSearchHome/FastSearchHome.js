@@ -24,6 +24,13 @@ class Search extends Component {
       currentFilterId: undefined,
       filter: {},
       loading: false,
+      pagination: {
+        page: 0,
+        size: 10,
+        total: undefined,
+      },
+      barFilters: [],
+      filterName: '',
     };
   }
 
@@ -62,16 +69,24 @@ class Search extends Component {
     axios
       .put(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/drag`, postData)
       .then(() => {
-        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`).then((res) => {
+        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all`, {
+          contents: [
+          ],
+          filterName: '',
+        }).then((res) => {
           this.setState({
-            filters: res,
+            filters: res.content,
           });
         });
       })
       .catch(() => {
-        axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`).then((ress) => {
+        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all`, {
+          contents: [
+          ],
+          filterName: '',
+        }).then((ress) => {
           this.setState({
-            filters: ress,
+            filters: ress.content,
           });
         });
       });
@@ -95,25 +110,38 @@ class Search extends Component {
     this.loadComponents();
   }
 
-  loadFilters() {
+  loadFilters(page = 0, size = 10) {
+    const { filterName, barFilters } = this.state;
     this.setState({
       loading: true,
     });
-    axios
-      .get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`)
+    axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all?page=${page}&size=${size}`, {
+      contents: barFilters,
+      filterName,
+    })
       .then((res) => {
         this.setState({
-          filters: res,
+          filters: res.content,
           loading: false,
         });
       })
       .catch((error) => {});
   }
 
+  handleTableChange = (pagination, filters, sorter, barFilters) => {
+    this.setState({
+      pagination,
+      filterName: filters.name && filters.name[0],
+      barFilters,
+    }, () => {
+      this.loadFilters();
+    });
+  }
+
   render() {
     const {
       loading, filters, createFileterShow, editFilterShow,
-      deleteFilterShow, filter, currentFilterId,
+      deleteFilterShow, filter, currentFilterId, pagination,
     } = this.state;
     const column = [
       {
@@ -136,6 +164,7 @@ class Search extends Component {
             </Tooltip>
           </div>
         ),
+        filters: [],
       },
       {
         title: '筛选器',
@@ -249,6 +278,8 @@ class Search extends Component {
           <div>
             <Spin spinning={loading}>
               <SortTable
+                onChange={this.handleTableChange}
+                pagination={pagination}
                 handleDrag={this.handleDrag}
                 rowKey={record => record.filterId}
                 columns={column}

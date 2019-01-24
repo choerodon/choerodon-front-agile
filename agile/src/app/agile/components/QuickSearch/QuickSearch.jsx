@@ -26,10 +26,14 @@ class QuickSearch extends Component {
    */
   componentDidMount() {
     const { AppState } = this.props;
-    const axiosGetFilter = axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter`);
+    const axiosGetFilter = axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all`, {
+      contents: [
+      ],
+      filterName: '',
+    });
     const axiosGetUser = axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?size=40`);
     Promise.all([axiosGetFilter, axiosGetUser]).then((res = []) => {
-      const resFilterData = res[0].map(item => ({
+      const resFilterData = res[0].content.map(item => ({
         label: item.name,
         value: item.filterId,
       }));
