@@ -22,6 +22,7 @@ const TYPE = {
   3: 'set_to',
   4: 'reduce',
 };
+const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
 
 class DailyLog extends Component {
   constructor(props) {
@@ -122,6 +123,72 @@ class DailyLog extends Component {
     this.setState({ startTime: value });
   }
 
+  handleChangeDissipate = (value) => {
+    const { dissipate } = this.state;
+    // 只允许输入整数，选择时可选0.5
+    if (value === '0.5') {
+      this.setState({
+        dissipate: '0.5',
+      });
+    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
+      this.setState({
+        dissipate: String(value),
+      });
+    } else if (value.toString().charAt(value.length - 1) === '.') {
+      this.setState({
+        dissipate: value.slice(0, -1),
+      });
+    } else {
+      this.setState({
+        dissipate,
+      });
+    }
+  };
+
+  handleChangeTime = (value) => {
+    const { time } = this.state;
+    // 只允许输入整数，选择时可选0.5
+    if (value === '0.5') {
+      this.setState({
+        time: '0.5',
+      });
+    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
+      this.setState({
+        time: String(value),
+      });
+    } else if (value.toString().charAt(value.length - 1) === '.') {
+      this.setState({
+        time: value.slice(0, -1),
+      });
+    } else {
+      this.setState({
+        time,
+      });
+    }
+  };
+
+  handleChangeReduce = (value) => {
+    const { reduce } = this.state;
+    // 只允许输入整数，选择时可选0.5
+    if (value === '0.5') {
+      this.setState({
+        reduce: '0.5',
+      });
+    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
+      this.setState({
+        reduce: String(value),
+      });
+    } else if (value.toString().charAt(value.length - 1) === '.') {
+      this.setState({
+        reduce: value.slice(0, -1),
+      });
+    } else {
+      this.setState({
+        reduce,
+      });
+    }
+  };
+
   isEmpty(data) {
     return data === '' || data === undefined || data === null;
   }
@@ -200,16 +267,26 @@ class DailyLog extends Component {
           </p>
           <section className="info">
             <div className="line-info">
-              <InputNumber
-                max={999.9}
-                maxLength={5}
-                step={0.1}
-                precision={1}
+              <Select
                 label="耗费时间*"
-                style={tempAlignStyle}
-                value={dissipate}
-                onChange={this.handleDissipateChange.bind(this)}
-              />
+                value={dissipate && dissipate.toString()}
+                mode="combobox"
+                ref={(e) => {
+                  this.componentRef = e;
+                }}
+                onPopupFocus={(e) => {
+                  this.componentRef.rcSelect.focus();
+                }}
+                tokenSeparators={[',']}
+                style={{ marginTop: 0, paddingTop: 0 }}
+                onChange={value => this.handleChangeDissipate(value)}
+              >
+                {storyPointList.map(sp => (
+                  <Option key={sp.toString()} value={sp}>
+                    {sp}
+                  </Option>
+                ))}
+              </Select>
               <Select
                 value={dissipateUnit}
                 style={{ width: 100, marginLeft: 18 }}
@@ -245,16 +322,26 @@ class DailyLog extends Component {
                   value={3}
                 >
                   <span style={{ display: 'inline-block', width: 52 }}>设置为</span>
-                  <InputNumber
-                    max={999.9}
-                    maxLength={5}
-                    step={0.1}
-                    precision={1}
-                    style={tempAlignStyle}
+                  <Select
                     disabled={radio !== 3}
-                    value={time}
-                    onChange={this.handleTimeChange.bind(this)}
-                  />
+                    value={time && time.toString()}
+                    mode="combobox"
+                    ref={(e) => {
+                      this.componentRef = e;
+                    }}
+                    onPopupFocus={(e) => {
+                      this.componentRef.rcSelect.focus();
+                    }}
+                    tokenSeparators={[',']}
+                    style={{ marginTop: 0, paddingTop: 0 }}
+                    onChange={value => this.handleChangeTime(value)}
+                  >
+                    {storyPointList.map(sp => (
+                      <Option key={sp.toString()} value={sp}>
+                        {sp}
+                      </Option>
+                    ))}
+                  </Select>
                   <Select
                     disabled={radio !== 3}
                     style={{ width: 100, marginLeft: 18 }}
@@ -273,16 +360,26 @@ class DailyLog extends Component {
                   value={4}
                 >
                   <span style={{ display: 'inline-block', width: 52 }}>缩减</span>
-                  <InputNumber
-                    max={999.9}
-                    maxLength={5}
-                    step={0.1}
-                    precision={1}
-                    style={tempAlignStyle}
+                  <Select
                     disabled={radio !== 4}
-                    value={reduce}
-                    onChange={this.handleReduceChange.bind(this)}
-                  />
+                    value={reduce && reduce.toString()}
+                    mode="combobox"
+                    ref={(e) => {
+                      this.componentRef = e;
+                    }}
+                    onPopupFocus={(e) => {
+                      this.componentRef.rcSelect.focus();
+                    }}
+                    tokenSeparators={[',']}
+                    style={{ marginTop: 0, paddingTop: 0 }}
+                    onChange={value => this.handleChangeReduce(value)}
+                  >
+                    {storyPointList.map(sp => (
+                      <Option key={sp.toString()} value={sp}>
+                        {sp}
+                      </Option>
+                    ))}
+                  </Select>
                   <Select
                     disabled={radio !== 4}
                     style={{ width: 100, marginLeft: 18 }}

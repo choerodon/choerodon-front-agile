@@ -113,7 +113,7 @@ const STATUS_SHOW = {
   closed: '关闭',
 };
 
-const storyPointList = ['0.5', '1', '2', '3', '5', '8', '13'];
+const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
 
 let loginUserId;
 let hasPermission;
@@ -403,9 +403,9 @@ class CreateSprint extends Component {
     const fixVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
     const fixVersionsFixed = _.filter(fixVersionsTotal, { statusCode: 'archived' }) || [];
     const fixVersions = _.filter(fixVersionsTotal, v => v.statusCode !== 'archived') || [];
-    const influenceVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
-    const influenceVersionsFixed = _.filter(influenceVersionsTotal, { statusCode: 'archived' }) || [];
-    const influenceVersions = _.filter(influenceVersionsTotal, v => v.statusCode !== 'archived') || [];
+    const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
+    // const influenceVersionsFixed = _.filter(influenceVersionsTotal, { statusCode: 'archived' }) || [];
+    // const influenceVersions = _.filter(influenceVersionsTotal, v => v.statusCode !== 'archived') || [];
     this.setState({
       origin: issue,
       activeSprint: activeSprint || {},
@@ -455,7 +455,6 @@ class CreateSprint extends Component {
       fixVersions,
       influenceVersions,
       fixVersionsFixed,
-      influenceVersionsFixed,
       issueLoading: false,
     });
   };
@@ -1054,6 +1053,28 @@ class CreateSprint extends Component {
     }
   };
 
+  handleChangeRemainingTime = (value) => {
+    const { remainingTime } = this.state;
+    // 只允许输入整数，选择时可选0.5
+    if (value === '0.5') {
+      this.setState({
+        remainingTime: '0.5',
+      });
+    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
+      this.setState({
+        remainingTime: String(value),
+      });
+    } else if (value.toString().charAt(value.length - 1) === '.') {
+      this.setState({
+        remainingTime: value.slice(0, -1),
+      });
+    } else {
+      this.setState({
+        remainingTime,
+      });
+    }
+  };
+
   /**
    * Comment
    */
@@ -1498,7 +1519,6 @@ class CreateSprint extends Component {
       labelIssueRelDTOList,
       originLabels,
       influenceVersions,
-      influenceVersionsFixed,
       originVersions,
       fixVersionsFixed,
       fixVersions,
@@ -2302,26 +2322,9 @@ class CreateSprint extends Component {
                               </span>
                             )}
                           >
-                            {/* <InputNumber */}
-                            {/* max={999.9} */}
-                            {/* maxLength="5" */}
-                            {/* value={storyPoints} */}
-                            {/* onChange={this.handleStoryPointsChange.bind(this)} */}
-                            {/* step={0.1} */}
-                            {/* precision={1} */}
-                            {/* // onBlur={() => this.statusOnChange()} */}
-                            {/* suffix="点" */}
-                            {/* // onPressEnter={() => { */}
-                            {/* //   this.updateIssue('storyPoints'); */}
-                            {/* //   this.setState({ */}
-                            {/* //     currentRae: undefined, */}
-                            {/* //   }); */}
-                            {/* // }} */}
-                            {/* /> */}
                             <Select
                               value={storyPoints && storyPoints.toString()}
                               mode="combobox"
-                              // onBlur={e => this.statusOnChange(e)}
                               ref={(e) => {
                                 this.componentRef = e;
                               }}
@@ -2329,7 +2332,6 @@ class CreateSprint extends Component {
                                 this.componentRef.rcSelect.focus();
                               }}
                               tokenSeparators={[',']}
-                              // getPopupContainer={triggerNode => triggerNode.parentNode}
                               style={{ marginTop: 0, paddingTop: 0 }}
                               onChange={value => this.handleChangeStoryPoint(value)}
                             >
@@ -2395,22 +2397,25 @@ class CreateSprint extends Component {
                               </span>
                                 )}
                           >
-                            <InputNumber
-                              max={999.9}
-                              maxLength="5"
-                              value={remainingTime}
-                              onChange={this.handleRemainingTimeChange.bind(this)}
-                              step={0.1}
-                              precision={1}
-                              // onBlur={() => this.statusOnChange()}
-                              // suffix="小时"
-                              // onPressEnter={() => {
-                              //   this.updateIssue('remainingTime');
-                              //   this.setState({
-                              //     currentRae: undefined,
-                              //   });
-                              // }}
-                            />
+                            <Select
+                              value={remainingTime && remainingTime.toString()}
+                              mode="combobox"
+                              ref={(e) => {
+                                this.componentRef = e;
+                              }}
+                              onPopupFocus={(e) => {
+                                this.componentRef.rcSelect.focus();
+                              }}
+                              tokenSeparators={[',']}
+                              style={{ marginTop: 0, paddingTop: 0 }}
+                              onChange={value => this.handleChangeRemainingTime(value)}
+                            >
+                              {storyPointList.map(sp => (
+                                <Option key={sp.toString()} value={sp}>
+                                  {sp}
+                                </Option>
+                              ))}
+                            </Select>
                           </ReadAndEdit>
                         </div>
                       </div>
@@ -2656,40 +2661,26 @@ class CreateSprint extends Component {
                                 onCancel={this.resetInfluenceVersions.bind(this)}
                                 readModeContent={(
                                   <div>
-                                    {!influenceVersionsFixed.length
-                                        && !influenceVersions.length ? (
-                                        '无'
-                                      ) : (
-                                        <div>
-                                          <div style={{ color: '#000' }}>
-                                            {_.map(influenceVersionsFixed, 'name').join(
-                                              ' , ',
-                                            )}
-                                          </div>
-                                          <p
-                                            style={{
-                                              color: '#3f51b5',
-                                              wordBreak: 'break-word',
-                                              marginBottom: 0,
-                                            }}
-                                          >
-                                            {_.map(influenceVersions, 'name').join(' , ')}
-                                          </p>
-                                        </div>
-                                      )}
+                                    {!influenceVersions.length ? (
+                                      '无'
+                                    ) : (
+                                      <div>
+                                        <p
+                                          style={{
+                                            color: '#3f51b5',
+                                            wordBreak: 'break-word',
+                                            marginBottom: 0,
+                                          }}
+                                        >
+                                          {_.map(influenceVersions, 'name').join(' , ')}
+                                        </p>
+                                      </div>
+                                    )}
                                   </div>
                                     )}
                               >
-                                {influenceVersionsFixed.length ? (
-                                  <div>
-                                    <span>已归档版本：</span>
-                                    <span>
-                                      {_.map(influenceVersionsFixed, 'name').join(' , ')}
-                                    </span>
-                                  </div>
-                                ) : null}
                                 <Select
-                                  label="未归档版本"
+                                  label="影响的版本"
                                   value={this.transToArr(
                                     influenceVersions,
                                     'name',
@@ -2711,7 +2702,7 @@ class CreateSprint extends Component {
                                     this.setState({
                                       selectLoading: true,
                                     });
-                                    loadVersions(['version_planning', 'released']).then((res) => {
+                                    loadVersions([]).then((res) => {
                                       this.setState({
                                         originVersions: res,
                                         selectLoading: false,
@@ -2725,15 +2716,6 @@ class CreateSprint extends Component {
                                         item => item.substr(0, 30),
                                       ),
                                     });
-                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    // if (this.changeTimer > 0) {
-                                    //   clearTimeout(this.changeTimer);
-                                    //   this.changeTimer = 0;
-                                    // }
-                                    // this.changeTimer = setTimeout(() => {
-                                    //   this.needBlur = true;
-                                    // }, 500);
                                   }}
                                 >
                                   {originVersions.map(version => (

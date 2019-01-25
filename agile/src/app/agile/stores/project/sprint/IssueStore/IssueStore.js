@@ -284,7 +284,7 @@ class SprintCommonStore {
     this.issues = res.content;
     this.pagination.total = res.totalElements;
     this.pagination.pageSize = res.size;
-    this.pagination.current = 1;
+    this.pagination.current = res.number + 1;
     this.loading = false;
   }
 
