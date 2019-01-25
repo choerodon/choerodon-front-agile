@@ -21,6 +21,8 @@ const { Option } = Select;
 const FormItem = Form.Item;
 let sign = false;
 
+const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
+
 class CreateSubIssue extends Component {
   debounceFilterIssues = _.debounce((input) => {
     this.setState({ selectLoading: true });
@@ -182,6 +184,28 @@ class CreateSubIssue extends Component {
       });
   };
 
+  handleChangeEstimatedTime = (value) => {
+    const { estimatedTime } = this.state;
+    // 只允许输入整数，选择时可选0.5
+    if (value === '0.5') {
+      this.setState({
+        estimatedTime: '0.5',
+      });
+    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
+      this.setState({
+        estimatedTime: String(value),
+      });
+    } else if (value.toString().charAt(value.length - 1) === '.') {
+      this.setState({
+        estimatedTime: value.slice(0, -1),
+      });
+    } else {
+      this.setState({
+        estimatedTime,
+      });
+    }
+  };
+
   // 分派给我
   assigneeMe = () => {
     const {
@@ -300,27 +324,26 @@ class CreateSubIssue extends Component {
             </div>
             {
               <div>
-                <InputNumber
-                  max={999.9}
-                  style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}
-                  label="预估时间" 
-                  maxLength={5}
-                  suffix="小时" 
-                  value={estimatedTime}
-                  step={0.1}
-                  precision={1}
-                  onChange={(e) => {
-                    this.setState({
-                      estimatedTime: e || '',
-                    });
-                    // const reg = /^(0|[1-9][0-9]*)(\[0-9]*)?$/;
-                    // if ((!isNaN(value) && reg.test(value)) || value === '') {
-                    //   this.setState({
-                    //     estimatedTime: value,
-                    //   });
-                    // }
+                <Select
+                  label="预估时间"
+                  value={estimatedTime && estimatedTime.toString()}
+                  mode="combobox"
+                  ref={(e) => {
+                    this.componentRef = e;
                   }}
-                />
+                  onPopupFocus={(e) => {
+                    this.componentRef.rcSelect.focus();
+                  }}
+                  tokenSeparators={[',']}
+                  style={{ marginTop: 0, paddingTop: 0, width: 520 }}
+                  onChange={value => this.handleChangeEstimatedTime(value)}
+                >
+                  {storyPointList.map(sp => (
+                    <Option key={sp.toString()} value={sp}>
+                      {sp}
+                    </Option>
+                  ))}
+                </Select>
               </div>
              
             }
