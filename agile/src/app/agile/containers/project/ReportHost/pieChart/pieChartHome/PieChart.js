@@ -93,8 +93,8 @@ class ReleaseDetail extends Component {
              sprint: sprints,
              version: versions,
            },
-           currentSprintChoose: sprints[0].sprintId,
-           currentVersionChoose: versions[0].versionId,
+           currentSprintChoose: sprints[0] && sprints[0].sprintId,
+           currentVersionChoose: versions[0] && versions[0].versionId,
          });
        }));
 
@@ -195,7 +195,7 @@ class ReleaseDetail extends Component {
         formatter: (value) => {
           if (value.data.name !== '其它') {
             this.setState({ showOtherTooltip: false });
-            return `<div><span>问题：${value.data.value}</span><br/><span>百分比：${(value.data.percent.toFixed(2))}%</span></div>`;
+            return `<div><span>问题：${value.data.value} 个</span><br/><span>百分比：${(value.data.percent.toFixed(2))}%</span></div>`;
           } else {
             this.isShowOtherToolTip();
             return '';
@@ -499,12 +499,12 @@ class ReleaseDetail extends Component {
     });
 
     this.setState({
-      currentVersionChoose: sprintAndVersion.version[0].versionId,
-      currentSprintChoose: sprintAndVersion.sprint[0].sprintId,
+      currentVersionChoose: sprintAndVersion.version[0] && sprintAndVersion.version[0].versionId,
+      currentSprintChoose: sprintAndVersion.sprint[0] && sprintAndVersion.sprint[0].sprintId,
       startDate: '',
       endDate: '',
     });
-    VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, chooseDimension === 'sprint' ? sprintAndVersion.sprint[0].sprintId : '', chooseDimension === 'version' ? sprintAndVersion.version[0].versionId : '', '', '');
+    VersionReportStore.getPieDatas(AppState.currentMenuType.id, value, chooseDimension === 'sprint' ? sprintAndVersion.sprint[0] && sprintAndVersion.sprint[0].sprintId : '', chooseDimension === 'version' ? sprintAndVersion.version[0] && sprintAndVersion.version[0].versionId : '', '', '');
   }
 
   handleSecondChooseChange = (chooseValue) => {
