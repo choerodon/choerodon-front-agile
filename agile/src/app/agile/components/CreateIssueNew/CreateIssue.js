@@ -7,7 +7,7 @@ import {
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
 import {
-  createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics,
+  createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics, loadIssuesInLink,
 } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
 import { COLOR } from '../../common/Constant';
@@ -59,6 +59,11 @@ class CreateIssue extends Component {
       newIssueTypeCode: '',
       storyPoints: '',
       estimatedTime: '',
+      issueLinkArr: [Math.random()],
+      links: [],
+      originLinks: [],
+      originIssues: [],
+      selectedIssueIds: [],
     };
   }
 
@@ -86,91 +91,6 @@ class CreateIssue extends Component {
 
   setFileList = (data) => {
     this.setState({ fileList: data });
-  };
-
-  handleCreateIssue = () => {
-    const { form, store } = this.props;
-    const {
-      originComponents,
-      originLabels,
-      originFixVersions,
-      delta,
-      storyPoints,
-      estimatedTime,
-    } = this.state;
-    form.validateFields((err, values) => {
-      if (!err) {
-        const issueTypes = store.getIssueTypes;
-        const { typeCode } = issueTypes.find(t => t.id === values.typeId);
-        const exitComponents = originComponents;
-        const componentIssueRelDTOList = _.map(values.componentIssueRel, (component) => {
-          const target = _.find(exitComponents, { name: component });
-          if (target) {
-            return target;
-          } else {
-            return ({
-              name: component,
-              projectId: AppState.currentMenuType.id,
-            });
-          }
-        });
-        const exitLabels = originLabels;
-        const labelIssueRelDTOList = _.map(values.issueLink, (label) => {
-          const target = _.find(exitLabels, { labelName: label });
-          if (target) {
-            return target;
-          } else {
-            return ({
-              labelName: label,
-              projectId: AppState.currentMenuType.id,
-            });
-          }
-        });
-        const exitFixVersions = originFixVersions;
-        const fixVersionIssueRelDTOList = _.map(values.fixVersionIssueRel, (version) => {
-          const target = _.find(exitFixVersions, { name: version });
-          if (target) {
-            return {
-              ...target,
-              relationType: 'fix',
-            };
-          } else {
-            return ({
-              name: version,
-              relationType: 'fix',
-              projectId: AppState.currentMenuType.id,
-            });
-          }
-        });
-        const extra = {
-          issueTypeId: values.typeId,
-          typeCode,
-          summary: values.summary,
-          priorityId: values.priorityId,
-          priorityCode: `priority-${values.priorityId}`,
-          sprintId: values.sprintId || 0,
-          epicId: values.epicId || 0,
-          epicName: values.epicName,
-          parentIssueId: 0,
-          assigneeId: values.assigneedId,
-          labelIssueRelDTOList,
-          versionIssueRelDTOList: fixVersionIssueRelDTOList,
-          componentIssueRelDTOList,
-          storyPoints,
-
-          remainingTime: estimatedTime,
-        };
-        this.setState({ createLoading: true });
-        const deltaOps = delta;
-        if (deltaOps) {
-          beforeTextUpload(deltaOps, extra, this.handleSave);
-        } else {
-          extra.description = '';
-          this.handleSave(extra);
-        }
-        // this.props.onOk(extra);
-      }
-    });
   };
 
   handleSave = (data) => {
@@ -262,6 +182,184 @@ class CreateIssue extends Component {
     }
   };
 
+
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    loadIssuesInLink(0, 20, undefined, input).then((res) => {
+      this.setState({
+        originIssues: res.content,
+        selectLoading: false,
+      });
+    });
+  }, 500);
+
+  onIssueSelectFilterChange(input) {
+    if (!sign) {
+      this.setState({
+        selectLoading: true,
+      });
+      loadIssuesInLink(0, 20, undefined, input).then((res) => {
+        this.setState({
+          originIssues: res.content,
+          selectLoading: false,
+        });
+      });
+      sign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  getLinks() {
+    this.setState({
+      selectLoading: true,
+    });
+    axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types/query_all`, {
+      contents: [],
+      linkName: '',
+    })
+      .then((res) => {
+        this.setState({
+          selectLoading: false,
+          links: res.content,
+          originLinks: res.content,
+        });
+        this.transform(res.content);
+      });
+  }
+
+  transform = (links) => {
+    // split active and passive
+    const active = links.map(link => ({
+      name: link.outWard,
+      linkTypeId: link.linkTypeId,
+    }));
+    const passive = [];
+    links.forEach((link) => {
+      if (link.inWard !== link.outWard) {
+        passive.push({
+          name: link.inWard,
+          linkTypeId: link.linkTypeId,
+        });
+      }
+    });
+    this.setState({
+      links: active.concat(passive),
+    });
+  };
+
+  handleIssueSelect = (value, option) => {
+    const selectedIssueIds = _.map(option.slice(), v => v.key);
+    this.setState({ selectedIssueIds });
+  };
+
+  handleCreateIssue = () => {
+    const { form, store } = this.props;
+    const {
+      originComponents,
+      originLabels,
+      originFixVersions,
+      delta,
+      storyPoints,
+      estimatedTime,
+      originLinks,
+      originIssues,
+    } = this.state;
+    form.validateFields((err, values) => {
+      if (!err) {
+        const issueTypes = store.getIssueTypes;
+        const { typeCode } = issueTypes.find(t => t.id === values.typeId);
+        const exitComponents = originComponents;
+        const componentIssueRelDTOList = _.map(values.componentIssueRel, (component) => {
+          const target = _.find(exitComponents, { name: component });
+          if (target) {
+            return target;
+          } else {
+            return ({
+              name: component,
+              projectId: AppState.currentMenuType.id,
+            });
+          }
+        });
+        const exitLabels = originLabels;
+        const labelIssueRelDTOList = _.map(values.issueLabel, (label) => {
+          const target = _.find(exitLabels, { labelName: label });
+          if (target) {
+            return target;
+          } else {
+            return ({
+              labelName: label,
+              projectId: AppState.currentMenuType.id,
+            });
+          }
+        });
+        const exitFixVersions = originFixVersions;
+        const fixVersionIssueRelDTOList = _.map(values.fixVersionIssueRel, (version) => {
+          const target = _.find(exitFixVersions, { name: version });
+          if (target) {
+            return {
+              ...target,
+              relationType: 'fix',
+            };
+          } else {
+            return ({
+              name: version,
+              relationType: 'fix',
+              projectId: AppState.currentMenuType.id,
+            });
+          }
+        });
+        let issueLinkCreateDTOList = [];
+        Object.keys(values.linkTypeId).forEach((link, index) => {
+          const currentLinkType = _.find(originLinks, { linkTypeId: values.linkTypeId[link].split('+')[0] * 1 });
+          values.linkIssues[link].forEach((issueNum, i, issues) => {
+            const { issueId } = _.find(originIssues, { issueNum });
+            if (currentLinkType.outWard === values.linkTypeId[link].split('+')[1]) {
+              issueLinkCreateDTOList.push({
+                linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
+                linkedIssueId: issueId * 1,
+              });
+            } else {
+              issueLinkCreateDTOList.push({
+                linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
+                issueId: issueId * 1,
+              });
+            }
+          });
+        });
+        const extra = {
+          issueTypeId: values.typeId,
+          typeCode,
+          summary: values.summary,
+          priorityId: values.priorityId,
+          priorityCode: `priority-${values.priorityId}`,
+          sprintId: values.sprintId || 0,
+          epicId: values.epicId || 0,
+          epicName: values.epicName,
+          parentIssueId: 0,
+          assigneeId: values.assigneedId,
+          labelIssueRelDTOList,
+          versionIssueRelDTOList: fixVersionIssueRelDTOList,
+          componentIssueRelDTOList,
+          storyPoints,
+          remainingTime: estimatedTime,
+          issueLinkCreateDTOList,
+        };
+        this.setState({ createLoading: true });
+        const deltaOps = delta;
+        if (deltaOps) {
+          beforeTextUpload(deltaOps, extra, this.handleSave);
+        } else {
+          extra.description = '';
+          this.handleSave(extra);
+        }
+        // this.props.onOk(extra);
+      }
+    });
+  };
+
   render() {
     const {
       visible,
@@ -274,7 +372,7 @@ class CreateIssue extends Component {
       originPriorities, defaultPriority, createLoading, storyPoints, estimatedTime,
       edit, delta, originUsers, selectLoading,
       originEpics, originSprints, originFixVersions, originComponents, originIssueTypes,
-      originLabels, fileList, newIssueTypeCode,
+      originLabels, fileList, newIssueTypeCode, issueLinkArr, originIssues, links,
     } = this.state;
     const callback = (value) => {
       this.setState({
@@ -322,7 +420,8 @@ class CreateIssue extends Component {
                             showName
                           />
                         </div>
-                      </Option>))}
+                      </Option>
+                    ))}
                   </Select>,
                 )}
               </FormItem>
@@ -637,7 +736,7 @@ class CreateIssue extends Component {
               </FormItem>
 
               <FormItem label="标签" style={{ width: 520 }}>
-                {getFieldDecorator('issueLink', {
+                {getFieldDecorator('issueLabel', {
                   rules: [{ transform: value => (value ? value.toString() : value) }],
                 })(
                   <Select
@@ -666,8 +765,120 @@ class CreateIssue extends Component {
                   </Select>,
                 )}
               </FormItem>
-            </Form>
 
+              {
+                newIssueTypeCode !== 'issue_epic' && (
+                  issueLinkArr && issueLinkArr.length > 0 && (
+                    issueLinkArr.map((item, index, arr) => (
+                      <div
+                        key={item}
+                        style={{
+                          display: 'flex', width: 520, justifyContent: 'flex-start', alignItems: 'flex-end', 
+                        }}
+                      >
+                        <FormItem label="关系" style={{ width: 120, marginRight: 20 }}>
+                          {getFieldDecorator(`linkTypeId[${item}]`, {
+                          })(
+                            <Select
+                              label="关系"
+                              loading={selectLoading}
+                              getPopupContainer={triggerNode => triggerNode.parentNode}
+                              tokenSeparators={[',']}
+                              onFocus={() => {
+                                this.getLinks();
+                              }}
+                            >
+                              {links.map(link => (
+                                <Option key={`${link.linkTypeId}+${link.name}`} value={`${link.linkTypeId}+${link.name}`}>
+                                  {link.name}
+                                </Option>
+                              ))}
+                            </Select>,
+                          )}
+                        </FormItem>
+                        <FormItem label="问题" style={{ width: 330, marginRight: 20 }}>
+                          {getFieldDecorator(`linkIssues[${item}]`, {
+                          })(
+                            <Select
+                              label="问题"
+                              mode="multiple"
+                              loading={selectLoading}
+                              optionLabelProp="value"
+                              filter
+                              filterOption={false}
+                              onFilterChange={this.onIssueSelectFilterChange.bind(this)}
+                              onChange={this.handleIssueSelect.bind(this)}
+                            >
+                              {originIssues.map(issue => (
+                                <Option
+                                  key={issue.issueId}
+                                  value={issue.issueNum}
+                                >
+                                  <div style={{
+                                    display: 'inline-flex',
+                                    width: '100%',
+                                    flex: 1,
+                                    alignItems: 'center',
+                                    verticalAlign: 'bottom',
+                                  }}
+                                  >
+                                    <TypeTag
+                                      data={issue.issueTypeDTO}
+                                    />
+                                    <span style={{
+                                      paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
+                                    }}
+                                    >
+                                      {issue.issueNum}
+                                    </span>
+                                    <div style={{ overflow: 'hidden', flex: 1 }}>
+                                      <p style={{
+                                        paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset', 
+                                      }}
+                                      >
+                                        {issue.summary}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </Option>
+                              ))}
+                            </Select>,
+                          )}
+                        </FormItem>
+                        <Button
+                          shape="circle"
+                          style={{ marginBottom: 10 }}
+                          onClick={() => {
+                            arr.splice(index + 1, 0, Math.random());
+                            this.setState({
+                              issueLinkArr: arr,
+                            });
+                          }}
+                        >
+                          <Icon type="add icon" />
+                        </Button>
+                        {
+                            issueLinkArr.length > 1 ? (
+                              <Button
+                                shape="circle"
+                                style={{ marginBottom: 10 }}
+                                onClick={() => {
+                                  arr.splice(index, 1);
+                                  this.setState({
+                                    issueLinkArr: arr,
+                                  });
+                                }}
+                              >
+                                <Icon type="delete" />
+                              </Button>
+                            ) : null
+                          }
+                      </div>
+                    )))
+                )
+              }        
+            </Form>
+          
             <div className="sign-upload" style={{ marginTop: 20 }}>
               <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
                 <div style={{ fontWeight: 'bold' }}>附件</div>

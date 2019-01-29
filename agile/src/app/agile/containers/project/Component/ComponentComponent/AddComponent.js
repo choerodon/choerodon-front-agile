@@ -112,7 +112,8 @@ class AddComponent extends Component {
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator, getFieldsValue } = this.props.form;
+    console.log(this.props.form.getFieldsValue(['defaultAssigneeRole']).defaultAssigneeRole);
     return (
       <Sidebar
         className="c7n-component-component"
@@ -146,6 +147,28 @@ class AddComponent extends Component {
                 <Input label="模块名称" maxLength={10} />,
               )}
             </FormItem>
+            <FormItem style={{ marginBottom: 5 }}>
+              {getFieldDecorator('description', {})(
+                <TextArea label="模块描述" autosize maxLength={30} />,
+              )}
+            </FormItem>
+            <FormItem>
+              {getFieldDecorator('defaultAssigneeRole', {
+                rules: [{
+                  required: true,
+                  message: '默认经办人必填',
+                }],
+              })(
+                <Select label="默认经办人">
+                  {['模块负责人', '无'].map(defaultAssigneeRole => (
+                    <Option key={defaultAssigneeRole} value={defaultAssigneeRole}>
+                      {defaultAssigneeRole}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
+            </FormItem>
+            {getFieldsValue(['defaultAssigneeRole']).defaultAssigneeRole && getFieldsValue(['defaultAssigneeRole']).defaultAssigneeRole === '模块负责人' && (
             <FormItem>
               {getFieldDecorator('managerId', {})(
                 <Select
@@ -172,27 +195,7 @@ class AddComponent extends Component {
                 </Select>,
               )}
             </FormItem>
-            <FormItem style={{ marginBottom: 5 }}>
-              {getFieldDecorator('description', {})(
-                <TextArea label="模块描述" autosize maxLength={30} />,
-              )}
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator('defaultAssigneeRole', {
-                rules: [{
-                  required: true,
-                  message: '默认经办人必填',
-                }],
-              })(
-                <Select label="默认经办人">
-                  {['模块负责人', '无'].map(defaultAssigneeRole => (
-                    <Option key={defaultAssigneeRole} value={defaultAssigneeRole}>
-                      {defaultAssigneeRole}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
+            )}
           </Form>
         </Content>
       </Sidebar>

@@ -196,10 +196,14 @@ export function loadIssues(page = 0, size = 10, searchDTO, orderField, orderType
 
 export function loadIssuesInLink(page = 0, size = 10, issueId, content) {
   const projectId = AppState.currentMenuType.id;
-  if (content) {
+  if (issueId && content) {
     return axios.get(`/agile/v1/projects/${projectId}/issues/agile/summary?issueId=${issueId}&self=false&content=${content}&page=${page}&size=${size}`);
-  } else {
+  } else if (issueId && !content) {
     return axios.get(`/agile/v1/projects/${projectId}/issues/agile/summary?issueId=${issueId}&self=false&page=${page}&size=${size}`);
+  } else if (!issueId && content) {
+    return axios.get(`/agile/v1/projects/${projectId}/issues/agile/summary?self=false&content=${content}&page=${page}&size=${size}`);
+  } else {
+    return axios.get(`/agile/v1/projects/${projectId}/issues/agile/summary?self=false&page=${page}&size=${size}`);
   }
 }
 
