@@ -2205,7 +2205,11 @@ class CreateSprint extends Component {
                                         }}
                                       >
                                         {activeSprint.sprintId
-                                          ? activeSprint.sprintName
+                                          ? (
+                                            <Tooltip title={activeSprint.sprintName} placement="topLeft">
+                                              {activeSprint.sprintName}
+                                            </Tooltip>
+                                          )
                                           : '无活跃冲刺'}
                                       </div>
                                     </div>
@@ -2216,7 +2220,7 @@ class CreateSprint extends Component {
                             <Select
                               value={sprintId || undefined}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
-                              style={{ width: '120px' }}
+                              style={{ width: '110px' }}
                               allowClear
                               loading={selectLoading}
                               onFocus={() => {
@@ -2956,12 +2960,14 @@ class CreateSprint extends Component {
                               {this.getWorkloads()}
 
 
+
                                   时/
-                              {this.getWorkloads() + (origin.remainingTime || 0)}
+{this.getWorkloads() + (origin.remainingTime || 0)}
+
 
 
                                   时
-                            </span>
+</span>
                             <span
                               role="none"
                               style={{
@@ -2975,8 +2981,9 @@ class CreateSprint extends Component {
                                 });
                               }}
                             >
+
                               登记工作
-                            </span>
+</span>
                           </div>
                         </div>
                         {typeCode === 'issue_epic' ? (
@@ -3157,8 +3164,9 @@ class CreateSprint extends Component {
                             >
 
 
+
                               分配给我
-                            </span>
+</span>
                           </div>
                         </div>
                         <div className="line-start mt-10 assignee">
@@ -3278,8 +3286,9 @@ class CreateSprint extends Component {
                                 });
                               }}
                             >
+
                               分配给我
-                            </span>
+</span>
                           </div>
                         </div>
                         <div className="line-start mt-10">
