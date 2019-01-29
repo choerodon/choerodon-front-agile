@@ -2171,7 +2171,7 @@ class CreateSprint extends Component {
                           >
                             <Select
                               value={sprintId || undefined}
-                              getPopupContainer={triggerNode => triggerNode.parentNode}
+                              // getPopupContainer={triggerNode => triggerNode.parentNode}
                               style={{ width: '120px' }}
                               allowClear
                               loading={selectLoading}
