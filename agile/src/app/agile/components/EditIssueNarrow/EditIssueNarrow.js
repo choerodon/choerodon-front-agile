@@ -857,6 +857,7 @@ class CreateSprint extends Component {
         // store.setClickIssueDetail(res);
         this.setState({
           createdById: res.createdBy,
+          creationDate: res.creationDate,
         });
       });
       loadWorklogs(issueId).then((res) => {
@@ -1098,9 +1099,9 @@ class CreateSprint extends Component {
    * DataLog
    */
   renderDataLogs() {
-    const { datalogs: stateDatalogs, typeCode } = this.state;
+    const { datalogs: stateDatalogs, typeCode, createdById, creationDate } = this.state;
     const datalogs = _.filter(stateDatalogs, v => v.field !== 'Version');
-    return <DataLogs datalogs={datalogs} typeCode={typeCode}/>;
+    return <DataLogs datalogs={datalogs} typeCode={typeCode} createdById={createdById} creationDate={creationDate}/>;
   }
 
   /**

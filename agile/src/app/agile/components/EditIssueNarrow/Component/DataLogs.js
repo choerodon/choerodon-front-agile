@@ -6,7 +6,7 @@ import UserHead from '../../UserHead';
 import WYSIWYGEditor from '../../WYSIWYGEditor';
 import { IssueDescription } from '../../CommonComponent';
 import {
- delta2Html, text2Delta, beforeTextUpload, formatDate 
+  delta2Html, text2Delta, beforeTextUpload, formatDate, 
 } from '../../../common/utils';
 import { deleteWorklog, updateWorklog } from '../../../api/NewIssueApi';
 import DataLog from './DataLog';
@@ -30,7 +30,10 @@ class DataLogs extends Component {
   }
 
   render() {
-    const { datalogs, typeCode } = this.props;
+    const {
+      datalogs, typeCode, createdById, creationDate, 
+    } = this.props;
+
     return (
       <div>
         {
@@ -46,6 +49,18 @@ class DataLogs extends Component {
               callback={this.setUser.bind(this)}
             />
           ))
+          // <div className="createDataLog">
+          //      <UserHead
+          //         user={{
+          //           id: createdById,
+          //           loginName: '',
+          //           realName: datalog.name,
+          //           avatar: datalog.imageUrl,
+          //         }}
+          //         hiddenText
+          //         type="datalog"
+          //       />
+          // </div>
         }
         {
           datalogs.length > 5 && !this.state.expand ? (

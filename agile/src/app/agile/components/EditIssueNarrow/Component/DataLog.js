@@ -47,7 +47,7 @@ class DataLog extends Component {
     } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
-      if (['Sprint', 'labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child'].includes(field)) {
+      if (['labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child'].includes(field)) {
         return '创建';
       }
       if (['Attachment'].includes(field)) {
@@ -136,9 +136,9 @@ class DataLog extends Component {
       return '';
     }
 
-    if (field === 'Sprint' && (!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
-      return <span style={{ color: '#000' }}>了一个</span>;
-    }
+    // if (field === 'Sprint' && (!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
+    //   return <span style={{ color: '#000' }}>了一个</span>;
+    // }
 
     return ` 【${PROP[field] || PROP_SIMPLE[field]}】 `;
   }
@@ -260,7 +260,7 @@ class DataLog extends Component {
     } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
-      if (['Epic Link', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
         return '为';
       }
       return '';
@@ -307,7 +307,7 @@ class DataLog extends Component {
     };
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
-      if (['Epic Link', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
         return ` 【${newString}】 `;
       }
       if (['description', 'WorklogId', 'Rank', 'Comment', 'timespent'].includes(field)) {
@@ -316,9 +316,9 @@ class DataLog extends Component {
       if (['labels', 'Component', 'Fix Version', 'Epic Child'].includes(field)) {
         return ` 【${newString}】 `;
       }
-      if (field === 'Sprint') {
-        return ` 【${TYPEARR[typeCode]}】 `;
-      }
+      // if (field === 'Sprint') {
+      //   return ` 【${TYPEARR[typeCode]}】 `;
+      // }
       if (field === 'Attachment') {
         const attachnewArr = newString.split('_');
         return ` 【${decodeURI(attachnewArr.slice(2, attachnewArr.length).join('_'))}】 `;
