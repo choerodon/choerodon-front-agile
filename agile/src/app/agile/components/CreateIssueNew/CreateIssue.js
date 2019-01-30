@@ -26,11 +26,23 @@ let sign = false;
 const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
 
 class CreateIssue extends Component {
-  debounceFilterIssues = _.debounce((input) => {
+  debounceFilterUsers = _.debounce((input) => {
     this.setState({ selectLoading: true });
     getUsers(input).then((res) => {
       this.setState({
         originUsers: res.content.filter(u => u.enabled),
+        selectLoading: false,
+      });
+    });
+  }, 500);
+  
+  debounceFilterIssues = _.debounce((input) => {
+    this.setState({
+      selectLoading: true,
+    });
+    loadIssuesInLink(0, 20, undefined, input).then((res) => {
+      this.setState({
+        originIssues: res.content,
         selectLoading: false,
       });
     });
@@ -63,7 +75,6 @@ class CreateIssue extends Component {
       links: [],
       originLinks: [],
       originIssues: [],
-      selectedIssueIds: [],
     };
   }
 
@@ -72,7 +83,7 @@ class CreateIssue extends Component {
     this.loadIssueTypes();
   }
 
-  onFilterChange(input) {
+  onFilterChangeAssignee(input) {
     if (!sign) {
       this.setState({
         selectLoading: true,
@@ -85,7 +96,7 @@ class CreateIssue extends Component {
       });
       sign = true;
     } else {
-      this.debounceFilterIssues(input);
+      this.debounceFilterUsers(input);
     }
   }
 
@@ -182,19 +193,6 @@ class CreateIssue extends Component {
     }
   };
 
-
-  debounceFilterIssues = _.debounce((input) => {
-    this.setState({
-      selectLoading: true,
-    });
-    loadIssuesInLink(0, 20, undefined, input).then((res) => {
-      this.setState({
-        originIssues: res.content,
-        selectLoading: false,
-      });
-    });
-  }, 500);
-
   onIssueSelectFilterChange(input) {
     if (!sign) {
       this.setState({
@@ -248,11 +246,6 @@ class CreateIssue extends Component {
     this.setState({
       links: active.concat(passive),
     });
-  };
-
-  handleIssueSelect = (value, option) => {
-    const selectedIssueIds = _.map(option.slice(), v => v.key);
-    this.setState({ selectedIssueIds });
   };
 
   handleCreateIssue = () => {
@@ -311,20 +304,22 @@ class CreateIssue extends Component {
             });
           }
         });
-        let issueLinkCreateDTOList = [];
+        const issueLinkCreateDTOList = [];
         Object.keys(values.linkTypeId).forEach((link, index) => {
           const currentLinkType = _.find(originLinks, { linkTypeId: values.linkTypeId[link].split('+')[0] * 1 });
           values.linkIssues[link].forEach((issueNum, i, issues) => {
             const { issueId } = _.find(originIssues, { issueNum });
-            if (currentLinkType.outWard === values.linkTypeId[link].split('+')[1]) {
+            if (currentLinkType.inWard === values.linkTypeId[link].split('+')[1]) {
               issueLinkCreateDTOList.push({
                 linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
                 linkedIssueId: issueId * 1,
+                in: false,
               });
             } else {
               issueLinkCreateDTOList.push({
                 linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
-                issueId: issueId * 1,
+                linkedIssueId: issueId * 1,
+                in: true,
               });
             }
           });
@@ -551,7 +546,7 @@ class CreateIssue extends Component {
                     filter
                     filterOption={false}
                     allowClear
-                    onFilterChange={this.onFilterChange.bind(this)}
+                    onFilterChange={this.onFilterChangeAssignee.bind(this)}
                   >
                     {originUsers.map(user => (
                       <Option key={user.id} value={user.id}>
@@ -805,7 +800,6 @@ class CreateIssue extends Component {
                               filter
                               filterOption={false}
                               onFilterChange={this.onIssueSelectFilterChange.bind(this)}
-                              onChange={this.handleIssueSelect.bind(this)}
                             >
                               {originIssues.map(issue => (
                                 <Option
