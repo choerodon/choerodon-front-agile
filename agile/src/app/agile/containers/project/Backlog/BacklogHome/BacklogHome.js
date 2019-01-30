@@ -10,6 +10,7 @@ import _ from 'lodash';
 import Version from '../BacklogComponent/VersionComponent/Version';
 import Epic from '../BacklogComponent/EpicComponent/Epic';
 import IssueDetail from '../BacklogComponent/IssueDetailComponent/IssueDetail';
+import CreateIssue from '../../../../components/CreateIssueNew';
 import './BacklogHome.scss';
 import SprintItem from '../BacklogComponent/SprintComponent/SprintItem';
 import QuickSearch from '../../../../components/QuickSearch';
@@ -24,6 +25,7 @@ class BacklogHome extends Component {
       spinIf: false,
       versionVisible: false,
       epicVisible: false,
+      newIssueVisible: false,
     };
   }
 
@@ -528,12 +530,19 @@ class BacklogHome extends Component {
         });
       }).catch((error) => {
       });
-  }
+  };
+
+  handleCreateIssue = () => {
+    const { newIssueVisible } = this.state;
+    this.setState({
+      newIssueVisible: !newIssueVisible,
+    });
+  };
 
   render() {
     const { BacklogStore } = this.props;
     const {
-      epicVisible, versionVisible, spinIf,
+      epicVisible, versionVisible, spinIf, newIssueVisible,
     } = this.state;
     return (
       <Page
@@ -544,8 +553,16 @@ class BacklogHome extends Component {
         ]}
       >
         <Header title="待办事项">
+          <Button
+            className="leftBtn"
+            funcType="flat"
+            onClick={this.handleCreateIssue}
+          >
+            <Icon type="playlist_add icon" />
+            <span>创建问题</span>
+          </Button>
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint}>
-            <Icon type="playlist_add" />
+            <Icon type="queue" />
             {'创建冲刺'}
           </Button>
           <Button
@@ -673,6 +690,15 @@ class BacklogHome extends Component {
                 }}
                 cancelCallback={this.resetSprintChose}
               />
+              {newIssueVisible
+                ? (
+                  <CreateIssue
+                    visible={newIssueVisible}
+                    onCancel={this.handleCreateIssue}
+                    onOk={this.handleCreateIssue}
+                  />
+                ) : null
+              }
             </div>
           </div>
         </div>

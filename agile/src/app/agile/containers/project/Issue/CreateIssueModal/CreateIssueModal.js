@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { stores } from 'choerodon-front-boot';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import CreateIssue from '../../../../components/CreateIssueNew';
-import IssueFilterControler from "../IssueFilterControler";
+import IssueFilterControler from '../IssueFilterControler';
 
 // const { AppState } = stores;
 
@@ -32,9 +32,8 @@ class CreateIssueModal extends Component {
     return IssueStore.getCreateQuestion ? (
       <CreateIssue
         visible={IssueStore.getCreateQuestion}
-        onCancel={() => {IssueStore.createQuestion(false)}}
+        onCancel={() => { IssueStore.createQuestion(false); }}
         onOk={this.handleCreateIssue.bind(this)}
-        store={IssueStore}
       />
     ) : null;
   }

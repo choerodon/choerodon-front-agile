@@ -256,11 +256,12 @@ class CreateIssue extends Component {
   };
 
   handleCreateIssue = () => {
-    const { form, store } = this.props;
+    const { form } = this.props;
     const {
       originComponents,
       originLabels,
       originFixVersions,
+      originIssueTypes,
       delta,
       storyPoints,
       estimatedTime,
@@ -269,8 +270,7 @@ class CreateIssue extends Component {
     } = this.state;
     form.validateFields((err, values) => {
       if (!err) {
-        const issueTypes = store.getIssueTypes;
-        const { typeCode } = issueTypes.find(t => t.id === values.typeId);
+        const { typeCode } = originIssueTypes.find(t => t.id === values.typeId);
         const exitComponents = originComponents;
         const componentIssueRelDTOList = _.map(values.componentIssueRel, (component) => {
           const target = _.find(exitComponents, { name: component });
@@ -364,7 +364,6 @@ class CreateIssue extends Component {
     const {
       visible,
       onCancel,
-      store,
       form,
     } = this.props;
     const { getFieldDecorator, setFieldsValue } = form;
@@ -380,7 +379,6 @@ class CreateIssue extends Component {
         edit: false,
       });
     };
-    const issueTypes = store.getIssueTypes;
     return (
       <Sidebar
         className="c7n-createIssue"
@@ -412,7 +410,7 @@ class CreateIssue extends Component {
                       });
                     })}
                   >
-                    {issueTypes.filter(t => t.typeCode !== 'sub_task').map(type => (
+                    {originIssueTypes.filter(t => t.typeCode !== 'sub_task').map(type => (
                       <Option key={type.id} value={type.id}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                           <TypeTag
