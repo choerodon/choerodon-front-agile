@@ -289,7 +289,7 @@ class BurnDown extends Component {
 
   loadChartData = (sprintId, unit = 'remainingEstimatedTime') => {
     /* eslint-disable */
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${unit}`)
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${unit}&ordinalType=desc`)
       .then((res) => {
         const dataDates = Object.keys(res.coordinate);
         const [dataMinDate, dataMaxDate] = [dataDates[0], dataDates[dataDates.length - 1]];

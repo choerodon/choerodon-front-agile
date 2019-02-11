@@ -81,7 +81,7 @@ export function loadSprintIssues(sprintId, status, page = 0, size = 99999) {
 
 export function loadChartData(id, type) {
   const projectId = AppState.currentMenuType.id;
-  return axios.get(`/agile/v1/projects/${projectId}/reports/${id}/burn_down_report?type=${type}`);
+  return axios.get(`/agile/v1/projects/${projectId}/reports/${id}/burn_down_report?type=${type}&ordinalType=desc`);
 }
 
 export function loadStatus(statusId, issueId, typeId) {

@@ -587,7 +587,7 @@ class EpicBurndown extends Component {
     let urlPush = `/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${organizationId}`;
     if (JSON.stringify(item) !== '{}') {
       if (linkType === 'sprint') {
-        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reporthost/epicBurndown`;
+        urlPush += `&paramType=statusId&paramId=36&paramChoose=sprint&paramCurrentSprint=${item.sprintId}&paramName=已完成、冲刺为${item.sprintName || '未分配'}下的问题&paramUrl=reporthost/epicBurndown`;
       }
       if (linkType === 'epic') {
         urlPush += `&paramType=epic&paramId=${item.issueId}&paramName=${item.epicName || '未分配'}下的问题&paramUrl=reporthost/epicBurndown`;
