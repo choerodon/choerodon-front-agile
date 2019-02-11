@@ -564,7 +564,7 @@ class VersionBurndown extends Component {
     let urlPush = `/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${organizationId}`;
     if (JSON.stringify(item) !== '{}') {
       if (linkType === 'sprint') {
-        urlPush += `&paramType=sprint&paramId=${item.sprintId}&paramName=${item.sprintName || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
+        urlPush += `&paramType=statusId&paramId=36&paramChoose=sprint&paramCurrentSprint=${item.sprintId}&paramName=已完成、冲刺为${item.sprintName || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
       }
       if (linkType === 'version') {
         urlPush += `&paramType=version&paramId=${item.versionId}&paramName=${item.name || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;

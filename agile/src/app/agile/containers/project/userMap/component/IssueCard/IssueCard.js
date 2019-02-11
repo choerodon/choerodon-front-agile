@@ -155,6 +155,25 @@ class IssueCard extends Component {
     }
   }
 
+  getIssueCountBackground() {
+    const { issue } = this.state;
+    const issueType =  issue.statusMapDTO.type;
+    switch(issueType) {
+      case 'todo': {
+        return 'rgb(77, 144, 254)'
+      };
+      case 'doing': {
+        return 'rgb(255, 177, 0)';
+      };
+      case 'done': {
+        return 'rgb(0, 191, 165)';
+      };
+      default: {
+        return 'rgba(0, 0, 0, 0.26)';
+      }
+    }
+  }
+
   render() {
     const {
       issue, borderTop, history, selected, dragged, draggableId, index, showDelete,
@@ -297,7 +316,7 @@ class IssueCard extends Component {
                 {
                   issueTypeDTO && issueTypeDTO.typeCode === 'story' && storyPoints
                     ? (
-                      <span className="c7n-issueCard-storyPoints">
+                      <span className="c7n-issueCard-storyPoints" style={{ background: this.getIssueCountBackground()}}>
                         {storyPoints}
                       </span>
                     )

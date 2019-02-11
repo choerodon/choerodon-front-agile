@@ -83,7 +83,7 @@ class ReleaseDetail extends Component {
      await VersionReportStore.getPieDatas(AppState.currentMenuType.id, value);
      await axios.all([
        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/names`, ['started', 'closed']),
-       axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`, ['version_planning', 'released']),
+       axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/names`),
      ])
        .then(axios.spread((sprints, versions) => {
          this.setState({
@@ -473,6 +473,7 @@ class ReleaseDetail extends Component {
               sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose) && sprintAndVersion.sprint.find(item => item.sprintId === currentSprintChoose).sprintName)
                 } 
             onChange={this.handleSecondChooseChange}
+            allowClear
           >
             {
                 sprintAndVersion && currentChooseDimension && sprintAndVersion[currentChooseDimension] && sprintAndVersion[currentChooseDimension].map((item) => {
@@ -545,7 +546,7 @@ class ReleaseDetail extends Component {
       { title: '冲刺', value: 'sprint' },
       { title: '史诗', value: 'epic' },
       { title: '标签', value: 'label' },
-      { title: '解决结果', value: 'resolution' },
+      // { title: '解决结果', value: 'resolution' },
     ];
 
     return (
@@ -591,6 +592,7 @@ class ReleaseDetail extends Component {
                 defaultValue={chooseDimensionType[0].name}
                 value={chooseDimensionType.find(item => item.key === currentChooseDimension) && chooseDimensionType.find(item => item.key === currentChooseDimension).name}
                 onChange={this.handleChooseDimensionChange}
+                allowClear
               >
                 {
                   chooseDimensionType.map(item => <Option key={item.key} value={item.key}>{item.name}</Option>)
