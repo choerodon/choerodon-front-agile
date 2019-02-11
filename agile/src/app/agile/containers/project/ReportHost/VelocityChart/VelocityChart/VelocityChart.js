@@ -106,7 +106,6 @@ class VelocityChart extends Component {
         ],
       },
       grid: {
-        y2: 10,
         top: '30',
         left: 0,
         right: '50',
@@ -117,11 +116,8 @@ class VelocityChart extends Component {
         name: '冲刺',
         type: 'category',
         boundaryGap: true,
-        nameGap: -10,
-        nameLocation: 'end',
         nameTextStyle: {
           color: '#000',
-          padding: [35, 0, 0, 0],
         },
         axisTick: { show: false },
         axisLine: {
@@ -134,8 +130,7 @@ class VelocityChart extends Component {
         },
         axisLabel: {
           show: true,
-          interval: 0,
-          margin: 13,
+          interval: VS.getChartDataX.length >= 49 ? 7 : 0,
           textStyle: {
             color: 'rgba(0, 0, 0, 0.65)',
             fontSize: 12,
@@ -181,7 +176,6 @@ class VelocityChart extends Component {
         axisLabel: {
           show: true,
           interval: 'auto',
-          margin: 18,
           textStyle: {
             color: 'rgba(0, 0, 0, 0.65)',
             fontSize: 12,
@@ -197,12 +191,24 @@ class VelocityChart extends Component {
           },
         },
       },
+      dataZoom: [{
+        startValue: VS.getChartDataX[0],
+        type: 'slider',
+        handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+        handleSize: '100%',
+        handleStyle: {
+          color: '#fff',
+          shadowBlur: 3,
+          shadowColor: 'rgba(0, 0, 0, 0.6)',
+          shadowOffsetX: 2,
+          shadowOffsetY: 2,
+        },
+      }],
       series: [
         {
           name: '预估',
           type: 'bar',
           barWidth: 34,
-          barGap: '12%',
           itemStyle: {
             color: '#d3d3d3',
           },
@@ -397,7 +403,10 @@ class VelocityChart extends Component {
                 </Option>
               </Select>
               <Spin spinning={VS.chartLoading}>
-                <ReactEcharts className="c7n-chart" option={this.getOption()} />
+                <ReactEcharts 
+                  className="c7n-chart" 
+                  option={this.getOption()}   
+                />
               </Spin>
               {this.renderTable()}
             </div>

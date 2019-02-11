@@ -258,13 +258,13 @@ class AccumulationHome extends Component {
           trigger: 'axis',
           formatter(params) {
             let content = '';
-            params.forEach((item) => {
+            params.forEach((item, index, arr) => {
               content = `<div>
               <span>${params[0].axisValue}</span>
               <br />
-              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>已完成：${legendSeries[0].data[item.dataIndex]} ${legendSeries[0].data[item.dataIndex] ? ' 个' : ''}</div>
-              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>处理中：${legendSeries[1].data[item.dataIndex]} ${legendSeries[1].data[item.dataIndex] ? ' 个' : ''}</div>
-              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[2].color}"></div>待处理：${legendSeries[2].data[item.dataIndex]} ${legendSeries[2].data[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${arr[0].color}"></div>已完成：${legendSeries[0].data[item.dataIndex]} ${legendSeries[0].data[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${arr[1].color}"></div>处理中：${legendSeries[1].data[item.dataIndex]} ${legendSeries[1].data[item.dataIndex] ? ' 个' : ''}</div>
+              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${arr[2].color}"></div>待处理：${legendSeries[2].data[item.dataIndex]} ${legendSeries[2].data[item.dataIndex] ? ' 个' : ''}</div>
             </div>`;
             });
             return content;
@@ -390,16 +390,7 @@ class AccumulationHome extends Component {
       },
       id: 'boardId',
       text: '看板',
-    }, {
-      data: AccumulationStore.getColumnData,
-      onChecked: id => this.getTimeType(AccumulationStore.getColumnData, 'columnId', 'array').indexOf(String(id)) !== -1,
-      onChange: (id, bool) => {
-        AccumulationStore.changeColumnData(id, bool);
-        this.getData();
-      },
-      id: 'columnId',
-      text: '列',
-    }, {
+    },  {
       data: AccumulationStore.getFilterList,
       onChecked: id => this.getTimeType(AccumulationStore.getFilterList, 'filterId', 'array').indexOf(String(id)) !== -1,
       onChange: (id, bool) => {
