@@ -76,7 +76,9 @@ class Backlog extends Component {
    * 2. mode not none render issue group, sprint||version
    */
   renderIssues() {
-    const { mode, backlogExpand, selectIssueIds, currentDraggableId } = US;
+    const {
+      mode, backlogExpand, selectIssueIds, currentDraggableId, 
+    } = US;
     const { keyword } = this.state;
     let group = [];
     if (mode === 'none') {
@@ -236,14 +238,17 @@ class Backlog extends Component {
               ...provided1.draggableProps.style,
               background: selectIssueIds.includes(issue.issueId) ? 'rgb(235, 242, 249)' : 'white',
             }}
-            role={'none'}
+            role="none"
           >
             <li
               role="none"
               key={issue.issueId}
               className="issue"
             >
-              <div style={{ display: selectIssueIds.length > 1 && currentDraggableId === issue.issueId ? 'block' : 'none', width: 20, height: 20, color: 'white', background: '#F44336', borderRadius: '50%', textAlign: 'center', float: 'right' }}>
+              <div style={{
+                display: selectIssueIds.length > 1 && currentDraggableId === issue.issueId ? 'block' : 'none', width: 20, height: 20, color: 'white', background: '#F44336', borderRadius: '50%', textAlign: 'center', float: 'right', 
+              }}
+              >
                 {selectIssueIds.length > 1 ? selectIssueIds.length : null}
               </div>
               <span className="type">
@@ -293,7 +298,7 @@ class Backlog extends Component {
     this.props.handleClickIssue(id);
   };
 
-  render() {
+  render() { 
     return (
       <div className="c7n-userMap-backlog agile">
         <div className="header">
@@ -336,7 +341,7 @@ class Backlog extends Component {
                   ))
                 }
                 {
-                  US.filters.map(filter => (
+                  US.getFilters.content.map(filter => (
                     <Checkbox
                       onChange={this.handleClickFilter.bind(this, filter.filterId)}
                       checked={US.currentBacklogFilters.includes(filter.filterId)}
