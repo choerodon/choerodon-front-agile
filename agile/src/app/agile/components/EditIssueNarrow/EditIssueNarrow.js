@@ -1099,9 +1099,14 @@ class CreateSprint extends Component {
    * DataLog
    */
   renderDataLogs() {
-    const { datalogs: stateDatalogs, typeCode, createdById, creationDate } = this.state;
+    const {
+      datalogs: stateDatalogs,
+      typeCode,
+      createdById,
+      creationDate,
+    } = this.state;
     const datalogs = _.filter(stateDatalogs, v => v.field !== 'Version');
-    return <DataLogs datalogs={datalogs} typeCode={typeCode} createdById={createdById} creationDate={creationDate}/>;
+    return <DataLogs datalogs={datalogs} typeCode={typeCode} createdById={createdById} creationDate={creationDate} />;
   }
 
   /**
@@ -2105,7 +2110,7 @@ class CreateSprint extends Component {
                                   ref={(e) => {
                                     this.componentRef = e;
                                   }}
-                                  mode="tags"
+                                  mode={hasPermission ? 'tags' : 'multiple'}
                                   onPopupFocus={(e) => {
                                     this.componentRef.rcSelect.focus();
                                   }}
@@ -2127,7 +2132,7 @@ class CreateSprint extends Component {
                                   onChange={(value) => {
                                     this.setState({
                                       componentIssueRelDTOList: value.map(
-                                        item => item.substr(0, 10),
+                                        item => item.trim().substr(0, 10),
                                       ),
                                     });
                                     // 由于 OnChange 和 OnBlur 几乎同时执行，
@@ -2287,7 +2292,7 @@ class CreateSprint extends Component {
                                 <Select
                                   label="影响的版本"
                                   value={this.transToArr(influenceVersions, 'name', 'array')}
-                                  mode="tags"
+                                  mode={hasPermission ? 'tags' : 'multiple'}
                                   // onBlur={() => this.statusOnChange()}
                                   onPopupFocus={(e) => {
                                     this.componentRef.rcSelect.focus();
@@ -2310,7 +2315,7 @@ class CreateSprint extends Component {
                                   onChange={(value) => {
                                     this.setState({
                                       influenceVersions: value.map(
-                                        item => item.substr(0, 30),
+                                        item => item.trim().substr(0, 30),
                                       ),
                                     });
                                   }}
@@ -2374,7 +2379,7 @@ class CreateSprint extends Component {
                             <Select
                               label="未归档版本"
                               value={this.transToArr(fixVersions, 'name', 'array')}
-                              mode="tags"
+                              mode={hasPermission ? 'tags' : 'multiple'}
                               loading={selectLoading}
                               // onBlur={() => this.statusOnChange()}
                               onPopupFocus={(e) => {
@@ -2397,7 +2402,7 @@ class CreateSprint extends Component {
                               onChange={(value) => {
                                 this.setState({
                                   fixVersions: value.map(
-                                    item => item.substr(0, 30),
+                                    item => item.trim().substr(0, 30),
                                   ),
                                 });
                                 // 由于 OnChange 和 OnBlur 几乎同时执行，

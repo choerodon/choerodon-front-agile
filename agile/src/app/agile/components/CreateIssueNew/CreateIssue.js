@@ -99,6 +99,41 @@ class CreateIssue extends Component {
     }
   }
 
+  onIssueSelectFilterChange(input) {
+    if (!sign) {
+      this.setState({
+        selectLoading: true,
+      });
+      loadIssuesInLink(0, 20, undefined, input).then((res) => {
+        this.setState({
+          originIssues: res.content,
+          selectLoading: false,
+        });
+      });
+      sign = true;
+    } else {
+      this.debounceFilterIssues(input);
+    }
+  }
+
+  getLinks() {
+    this.setState({
+      selectLoading: true,
+    });
+    axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types/query_all`, {
+      contents: [],
+      linkName: '',
+    })
+      .then((res) => {
+        this.setState({
+          selectLoading: false,
+          links: res.content,
+          originLinks: res.content,
+        });
+        this.transform(res.content);
+      });
+  }
+
   setFileList = (data) => {
     this.setState({ fileList: data });
   };
@@ -191,41 +226,6 @@ class CreateIssue extends Component {
       });
     }
   };
-
-  onIssueSelectFilterChange(input) {
-    if (!sign) {
-      this.setState({
-        selectLoading: true,
-      });
-      loadIssuesInLink(0, 20, undefined, input).then((res) => {
-        this.setState({
-          originIssues: res.content,
-          selectLoading: false,
-        });
-      });
-      sign = true;
-    } else {
-      this.debounceFilterIssues(input);
-    }
-  }
-
-  getLinks() {
-    this.setState({
-      selectLoading: true,
-    });
-    axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types/query_all`, {
-      contents: [],
-      linkName: '',
-    })
-      .then((res) => {
-        this.setState({
-          selectLoading: false,
-          links: res.content,
-          originLinks: res.content,
-        });
-        this.transform(res.content);
-      });
-  }
 
   transform = (links) => {
     // split active and passive

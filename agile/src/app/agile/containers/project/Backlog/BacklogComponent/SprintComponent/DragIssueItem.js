@@ -10,15 +10,15 @@ import StatusTag from '../../../../../components/StatusTag';
 import PriorityTag from '../../../../../components/PriorityTag';
 
 @observer
-class DragIssueItem extends Component {  
-
+class DragIssueItem extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     const itemProperty = ['assigneeId', 'assigneeName', 'categoryCode', 'color', 'description', 'epicId', 'epicName', 'imageUrl', 'issueId', 'issueNum', 'issueTypeDTO', 'objectVersionNumber', 'priorityCode', 'priorityDTO', 'statusMapDTO', 'statusName', 'storyPoints', 'summary', 'typeCode', 'versionIds', 'versionNames'];
+    const { item } = this.props;
     return itemProperty.some((property) => {
       if (typeof nextProps.item[property] !== 'object') {
-        return nextProps.item[property] !== this.props.item[property];
+        return nextProps.item[property] !== item[property];
       } else {
-        return JSON.stringify(nextProps.item[property]) !== JSON.stringify(this.props.item[property]);
+        return JSON.stringify(nextProps.item[property]) !== JSON.stringify(item[property]);
       } 
     });
   }

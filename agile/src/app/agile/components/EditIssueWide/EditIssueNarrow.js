@@ -764,13 +764,49 @@ class CreateSprint extends Component {
     });
   };
 
+  handleChangeStoryPoint = (value) => {
+    const { storyPoints } = this.state;
+    // 只允许输入整数，选择时可选0.5
+    if (value === '0.5') {
+      this.setState({
+        storyPoints: '0.5',
+      });
+    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
+      this.setState({
+        storyPoints: String(value),
+      });
+    } else if (value.toString().charAt(value.length - 1) === '.') {
+      this.setState({
+        storyPoints: value.slice(0, -1),
+      });
+    } else {
+      this.setState({
+        storyPoints,
+      });
+    }
+  };
 
-  isInLook(ele) {
-    const a = ele.offsetTop;
-    const target = document.getElementById('scroll-area');
-    // return a >= target.scrollTop && a < (target.scrollTop + target.offsetHeight);
-    return a + ele.offsetHeight > target.scrollTop;
-  }
+  handleChangeRemainingTime = (value) => {
+    const { remainingTime } = this.state;
+    // 只允许输入整数，选择时可选0.5
+    if (value === '0.5') {
+      this.setState({
+        remainingTime: '0.5',
+      });
+    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
+      this.setState({
+        remainingTime: String(value),
+      });
+    } else if (value.toString().charAt(value.length - 1) === '.') {
+      this.setState({
+        remainingTime: value.slice(0, -1),
+      });
+    } else {
+      this.setState({
+        remainingTime,
+      });
+    }
+  };
 
   resetStoryPoints(value) {
     this.setState({ storyPoints: value });
@@ -1032,54 +1068,6 @@ class CreateSprint extends Component {
       });
   }
 
-  handleChangeStoryPoint = (value) => {
-    const { storyPoints } = this.state;
-    // 只允许输入整数，选择时可选0.5
-    if (value === '0.5') {
-      this.setState({
-        storyPoints: '0.5',
-      });
-    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
-      this.setState({
-        storyPoints: String(value),
-      });
-    } else if (value.toString().charAt(value.length - 1) === '.') {
-      this.setState({
-        storyPoints: value.slice(0, -1),
-      });
-    } else {
-      this.setState({
-        storyPoints,
-      });
-    }
-  };
-
-  handleChangeRemainingTime = (value) => {
-    const { remainingTime } = this.state;
-    // 只允许输入整数，选择时可选0.5
-    if (value === '0.5') {
-      this.setState({
-        remainingTime: '0.5',
-      });
-    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
-      this.setState({
-        remainingTime: String(value),
-      });
-    } else if (value.toString().charAt(value.length - 1) === '.') {
-      this.setState({
-        remainingTime: value.slice(0, -1),
-      });
-    } else {
-      this.setState({
-        remainingTime,
-      });
-    }
-  };
-
-  /**
-   * Comment
-   */
-
   handleCreateCommit() {
     const { addCommitDes, origin: { issueId: extra } } = this.state;
     if (addCommitDes) {
@@ -1174,9 +1162,14 @@ class CreateSprint extends Component {
    * DataLog
    */
   renderDataLogs() {
-    const { datalogs: stateDatalogs, typeCode, createdById, creationDate } = this.state;
+    const {
+      datalogs: stateDatalogs,
+      typeCode,
+      createdById,
+      creationDate,
+    } = this.state;
     const datalogs = _.filter(stateDatalogs, v => v.field !== 'Version');
-    return <DataLogs datalogs={datalogs} typeCode={typeCode} createdById={createdById} creationDate={creationDate}/>;
+    return <DataLogs datalogs={datalogs} typeCode={typeCode} createdById={createdById} creationDate={creationDate} />;
   }
 
   /**
@@ -2484,7 +2477,7 @@ class CreateSprint extends Component {
                                     // 10,
                                   )}
                                   loading={selectLoading}
-                                  mode="tags"
+                                  mode={hasPermission ? 'tags' : 'multiple'}
                                   // onBlur={e => this.statusOnChange(e)}
                                   ref={(e) => {
                                     this.componentRef = e;
@@ -2509,7 +2502,7 @@ class CreateSprint extends Component {
                                   onChange={(value) => {
                                     this.setState({
                                       componentIssueRelDTOList: value.map(
-                                        item => item.substring(0, 10),
+                                        item => item.trim().substring(0, 10),
                                       ),
                                     });
                                   }}
@@ -2674,7 +2667,7 @@ class CreateSprint extends Component {
                                     'name',
                                     'array',
                                   )}
-                                  mode="tags"
+                                  mode={hasPermission ? 'tags' : 'multiple'}
                                   // onBlur={e => this.statusOnChange(e)}
                                   ref={(e) => {
                                     this.componentRef = e;
@@ -2701,7 +2694,7 @@ class CreateSprint extends Component {
                                     this.needBlur = false;
                                     this.setState({
                                       influenceVersions: value.map(
-                                        item => item.substr(0, 30),
+                                        item => item.trim().substr(0, 30),
                                       ),
                                     });
                                   }}
@@ -2768,7 +2761,7 @@ class CreateSprint extends Component {
                               <Select
                                 label="未归档版本"
                                 value={this.transToArr(fixVersions, 'name', 'array')}
-                                mode="tags"
+                                mode={hasPermission ? 'tags' : 'multiple'}
                                 // onBlur={e => this.statusOnChange(e)}
                                 ref={(e) => {
                                   this.componentRef = e;
@@ -2794,19 +2787,9 @@ class CreateSprint extends Component {
                                 onChange={(value) => {
                                   this.setState({
                                     fixVersions: value.map(
-                                      item => item.substr(0, 30),
+                                      item => item.trim().substr(0, 30),
                                     ),
                                   });
-                                  // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                  // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                  // this.needBlur = false;
-                                  // if (this.changeTimer > 0) {
-                                  //   clearTimeout(this.changeTimer);
-                                  //   this.changeTimer = 0;
-                                  // }
-                                  // this.changeTimer = setTimeout(() => {
-                                  //   this.needBlur = true;
-                                  // }, 500);
                                 }}
                               >
                                 {originVersions.map(version => (
@@ -3139,11 +3122,8 @@ class CreateSprint extends Component {
                                 });
                               }}
                             >
-
-
-
-                              分配给我
-</span>
+                              {'分配给我'}
+                            </span>
                           </div>
                         </div>
                         <div className="line-start mt-10 assignee">
@@ -3263,9 +3243,8 @@ class CreateSprint extends Component {
                                 });
                               }}
                             >
-
-                              分配给我
-</span>
+                              {'分配给我'}
+                            </span>
                           </div>
                         </div>
                         <div className="line-start mt-10">
