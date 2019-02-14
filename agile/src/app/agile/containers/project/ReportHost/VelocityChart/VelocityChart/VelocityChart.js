@@ -130,7 +130,7 @@ class VelocityChart extends Component {
         },
         axisLabel: {
           show: true,
-          interval: VS.getChartDataX.length >= 49 ? 7 : 0,
+          // interval: VS.getChartDataX.length >= 16 ? 5 : 0,
           textStyle: {
             color: 'rgba(0, 0, 0, 0.65)',
             fontSize: 12,
@@ -192,7 +192,8 @@ class VelocityChart extends Component {
         },
       },
       dataZoom: [{
-        startValue: VS.getChartDataX[0],
+        startValue: VS.getChartDataX[VS.getChartDataX.length - 6],
+        zoomLock: true,
         type: 'slider',
         handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
         handleSize: '100%',
@@ -208,7 +209,6 @@ class VelocityChart extends Component {
         {
           name: '预估',
           type: 'bar',
-          barWidth: 34,
           itemStyle: {
             color: '#d3d3d3',
           },
@@ -222,7 +222,6 @@ class VelocityChart extends Component {
         {
           name: '已完成',
           type: 'bar',
-          barWidth: 34,
           data: VS.getChartDataYCompleted,
           itemStyle: {
             color: '#00bfa5',

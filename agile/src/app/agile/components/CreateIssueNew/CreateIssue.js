@@ -34,7 +34,7 @@ class CreateIssue extends Component {
       });
     });
   }, 500);
-  
+
   debounceFilterIssues = _.debounce((input) => {
     this.setState({
       selectLoading: true,
@@ -535,7 +535,7 @@ class CreateIssue extends Component {
                       ))}
                     </Select>
                   </div>
-               
+
                 )
               }
               <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
@@ -767,7 +767,7 @@ class CreateIssue extends Component {
                       <div
                         key={item}
                         style={{
-                          display: 'flex', width: 520, justifyContent: 'flex-start', alignItems: 'flex-end', 
+                          display: 'flex', width: 520, justifyContent: 'flex-start', alignItems: 'flex-end',
                         }}
                       >
                         <FormItem label="关系" style={{ width: 110, marginRight: 20 }}>
@@ -790,7 +790,7 @@ class CreateIssue extends Component {
                             </Select>,
                           )}
                         </FormItem>
-                        <FormItem label="问题" style={{ width: 320, marginRight: 20 }}>
+                        <FormItem label="问题" style={{ width: 290, marginRight: 20 }}>
                           {getFieldDecorator(`linkIssues[${item}]`, {
                           })(
                             <Select
@@ -819,14 +819,14 @@ class CreateIssue extends Component {
                                       data={issue.issueTypeDTO}
                                     />
                                     <span style={{
-                                      paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
+                                      paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                                     }}
                                     >
                                       {issue.issueNum}
                                     </span>
                                     <div style={{ overflow: 'hidden', flex: 1 }}>
                                       <p style={{
-                                        paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset', 
+                                        paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset',
                                       }}
                                       >
                                         {issue.summary}
@@ -840,7 +840,7 @@ class CreateIssue extends Component {
                         </FormItem>
                         <Button
                           shape="circle"
-                          style={{ marginBottom: 10 }}
+                          style={{ marginBottom: 10, marginRight: 10 }}
                           onClick={() => {
                             arr.splice(index + 1, 0, randomString(5));
                             this.setState({
@@ -869,9 +869,9 @@ class CreateIssue extends Component {
                       </div>
                     )))
                 )
-              }        
+              }
             </Form>
-          
+
             <div className="sign-upload" style={{ marginTop: 20 }}>
               <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
                 <div style={{ fontWeight: 'bold' }}>附件</div>

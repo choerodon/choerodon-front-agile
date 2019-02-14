@@ -42,6 +42,7 @@ class BurndownChartHome extends Component {
       restDays: [],
       exportAxis: [],
       markAreaData: [],
+      dateSort: 'asc',
     };
   }
 
@@ -227,7 +228,7 @@ class BurndownChartHome extends Component {
       tableLoading: true,
     });
     BurndownChartStore
-      .axiosGetBurndownChartReport(this.state.defaultSprint, this.state.select).then((res) => {
+      .axiosGetBurndownChartReport(this.state.defaultSprint, this.state.select, this.state.dateSort).then((res) => {
         const data = res;
         const newData = [];
         // 将操作日期相同的合并
@@ -628,8 +629,17 @@ class BurndownChartHome extends Component {
     });
   };
 
+  handleChangeSort = () => {
+    const { dateSort } = this.state;
+    this.setState({
+      dateSort: dateSort === 'asc' ? 'desc' : 'asc',
+    }, () => {
+      this.getChartData();
+    })
+  }
+
   render() {
-    const {select} = this.state;
+    const {select, dateSort} = this.state;
     let unit = '';
     if(select === 'remainingEstimatedTime') {
       unit = '(小时)';
@@ -641,7 +651,9 @@ class BurndownChartHome extends Component {
       unit = '(个)';
     }
     const columns = [{
-      title: '日期',
+      title: (
+        <span>日期<Icon type={ dateSort === 'asc' ? 'arrow_upward' : 'arrow_downward' } style={{ cursor: 'pointer', marginTop: -4, marginLeft: 4 }} onClick={this.handleChangeSort} /></span>
+      ),
       dataIndex: 'date',
       key: 'date',
       width: '16%',

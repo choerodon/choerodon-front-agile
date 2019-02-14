@@ -40,7 +40,7 @@ class WorkCalendarPage extends Component {
       startDate,
       endDate,
     } = ScrumBoardStore.getWorkDate;
-
+    const { selectedDateDisabled } = this.props;
     return (
       <Content
         description="工作日历是用于配置当前冲刺的实际工作时间，比如：在开启冲刺后，原定的法定节假日需要加班，这时可针对该冲刺进行日历修改，此工作日历的修改会导致当前冲刺报表数据的变动。"
@@ -61,6 +61,7 @@ class WorkCalendarPage extends Component {
           holidayRefs={holidayRefs}
           workDates={workDates}
           onWorkDateChange={this.onWorkDateChange}
+          selectedDateDisabled={selectedDateDisabled}
         />
       </Content>
     );
