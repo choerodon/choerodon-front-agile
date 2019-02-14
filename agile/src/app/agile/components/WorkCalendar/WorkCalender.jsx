@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
+import { axios, stores } from 'choerodon-front-boot';
 import Calendar from 'choerodon-ui/lib/rc-components/calendar/';
 import _ from 'lodash';
 import moment from 'moment';
@@ -48,6 +49,7 @@ class WorkCalendar extends Component {
       startDate,
       endDate,
       workDates = [],
+      selectedDateDisabled,
     } = this.props;
     const { workDatesInLocal } = this.state;
     // 渲染当前月，当前迭代可见数据
@@ -68,6 +70,7 @@ class WorkCalendar extends Component {
       sundayWork ? null : '日',
     ];
     let dateStyle;
+   
     const workDayStyle = {
       color: '#000', background: '#EFEFEF',
     };
@@ -155,6 +158,11 @@ class WorkCalendar extends Component {
       }
     }
 
+    dateStyle = {
+      ...dateStyle,
+      cursor: selectedDateDisabled ? 'auto' : 'pointer',
+    };
+
     return (
       <div className="rc-calendar-date" style={dateStyle}>
         {holidayTag}
@@ -170,46 +178,49 @@ class WorkCalendar extends Component {
    */
 
   onSelectDate = (date, source) => {
-    if (source && source.source === 'todayButton') {
-      return;
-    }
-    const {
-      saturdayWork,
-      sundayWork,
-      mode,
-      useHoliday,
-      selectDays,
-      holidayRefs,
-      startDate,
-      endDate,
-      onWorkDateChange,
-      workDates = [],
-    } = this.props;
-    const { workDatesInLocal } = this.state;
-    const weekdays = [
-      saturdayWork ? null : '六',
-      sundayWork ? null : '日',
-    ];
-    // 如果不是当前冲刺
-    if (!date || !startDate || !endDate
+    const { selectedDateDisabled } = this.props;
+    if (!selectedDateDisabled) {
+      if (source && source.source === 'todayButton') {
+        return;
+      }
+      const {
+        saturdayWork,
+        sundayWork,
+        mode,
+        useHoliday,
+        selectDays,
+        holidayRefs,
+        startDate,
+        endDate,
+        onWorkDateChange,
+        workDates = [],
+      } = this.props;
+      const { workDatesInLocal } = this.state;
+      const weekdays = [
+        saturdayWork ? null : '六',
+        sundayWork ? null : '日',
+      ];
+      // 如果不是当前冲刺
+      if (!date || !startDate || !endDate
       || moment(date.format(format)).isBefore(moment(moment(startDate).format(format)))
       || moment(date.format(format)).isAfter(moment(moment(endDate).format(format)))) {
-      return;
-    }
-    if (date) {
-      switch (mode) {
-        case 'ScrumBoard':
-          this.scrumBoard(
-            date, weekdays, useHoliday, selectDays, holidayRefs, onWorkDateChange, workDates,
-          );
-          break;
-        case 'BacklogComponent':
-          this.backLog(
-            date, weekdays, useHoliday, selectDays, holidayRefs, onWorkDateChange, workDatesInLocal,
-          );
-          break;
-        default:
-          break;
+        return;
+      }
+      if (date) {
+        switch (mode) {
+          case 'ScrumBoard':
+            this.scrumBoard(
+              date, weekdays, useHoliday, selectDays, holidayRefs, onWorkDateChange, workDates,
+            );
+            break;
+          case 'BacklogComponent':
+            this.backLog(
+              date, weekdays, useHoliday, selectDays, holidayRefs, onWorkDateChange, workDatesInLocal,
+            );
+            break;
+          default:
+            break;
+        }
       }
     }
   };

@@ -168,7 +168,7 @@ class EpicReport extends Component {
         },
         axisLabel: {
           show: true,
-          interval: 0,
+          interval: VS.getChartDataX.length >= 20 ? 4 : 0,
           margin: 13,
           textStyle: {
             color: 'rgba(0, 0, 0, 0.65)',
@@ -748,8 +748,9 @@ class EpicReport extends Component {
                         history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
+
                       发布版本
-                    </span>
+</span>
                     <span>中创建一个版本</span>
                   </div>
                 )}

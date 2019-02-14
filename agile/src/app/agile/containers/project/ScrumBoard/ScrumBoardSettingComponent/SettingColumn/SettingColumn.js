@@ -114,6 +114,7 @@ class SettingColumn extends Component {
     for (let index = 0, len = list.length; index < len; index += 1) {
       result.push(
         <StatusCard
+          draggabled={this.props.draggabled}
           key={`${this.props.data.columnId}-${index}`}
           columnId={this.props.data.columnId}
           data={list[index]}
@@ -127,6 +128,9 @@ class SettingColumn extends Component {
   }
 
   render() {
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
+
     if (this.props.disabled) {
       return (
         <div
@@ -143,53 +147,55 @@ class SettingColumn extends Component {
             }}
           >
             <div className="c7n-scrumsetting-columnTop">
-              <div
-                className="c7n-scrumsetting-icons"
-                style={{
-                  visibility: this.props.data.columnId === 'unset' ? 'hidden' : 'visible',
-                }}
-              >
-                <Icon
-                  type="open_with"
+              <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.board.deleteScrumBoard']}>
+                <div
+                  className="c7n-scrumsetting-icons"
                   style={{
-                    cursor: 'pointer',
+                    visibility: this.props.data.columnId === 'unset' ? 'hidden' : 'visible',
                   }}
-                />
-                <Icon
-                  type="delete"
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                  role="none"
-                  onClick={this.handleDeleteColumn.bind(this)}
-                />
-                <Modal
-                  title="删除列"
-                  visible={this.state.visible || false}
-                  onOk={() => {
-                    this.setState({
-                      visible: false,
-                    });
-                    ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
-                      this.props.refresh();
-                    }).catch((err) => {
-                    });
-                  }}
-                  onCancel={() => {
-                    this.setState({
-                      visible: false,
-                    });
-                  }}
-                  okText="确定"
-                  cancelText="取消"
-                  // confirmLoading={loading}
                 >
+                  <Icon
+                    type="open_with"
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                  />
+                  <Icon
+                    type="delete"
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                    role="none"
+                    onClick={this.handleDeleteColumn.bind(this)}
+                  />
+                  <Modal
+                    title="删除列"
+                    visible={this.state.visible || false}
+                    onOk={() => {
+                      this.setState({
+                        visible: false,
+                      });
+                      ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
+                        this.props.refresh();
+                      }).catch((err) => {
+                      });
+                    }}
+                    onCancel={() => {
+                      this.setState({
+                        visible: false,
+                      });
+                    }}
+                    okText="确定"
+                    cancelText="取消"
+                  >
 
-                  {'确定要删除该列？'}
+                    {'确定要删除该列？'}
 
-                </Modal>
+                  </Modal>
 
-              </div>
+                </div>
+              </Permission>
+
               <div className="c7n-scrumsetting-columnStatus">
                 {this.props.data.name}
               </div>
@@ -214,6 +220,7 @@ class SettingColumn extends Component {
                 }
               </div>
             </div>
+            
             <div className="c7n-scrumsetting-columnDrop">
               <Droppable
                 type="status"
@@ -238,10 +245,9 @@ class SettingColumn extends Component {
         </div>
       );
     } else {
-      const menu = AppState.currentMenuType;
-      const { type, id: projectId, organizationId: orgId } = menu;
       return (
         <Draggable
+          isDragDisabled={this.props.draggabled}
           key={this.props.data.columnId}
           index={this.props.index}
           draggableId={JSON.stringify({
@@ -264,26 +270,31 @@ class SettingColumn extends Component {
               <div className="c7n-scrumsetting-columnContent">
                 <div className="c7n-scrumsetting-columnTop">
                   <div
-                    className="c7n-scrumsetting-icons"
                     style={{
                       visibility: this.props.data.columnId === 'unset' ? 'hidden' : 'visible',
                     }}
                   >
-                    <Icon
-                      type="open_with"
-                      style={{
-                        cursor: 'move',
-                      }}
-                      {...provided1.dragHandleProps}
-                    />
-                    <Icon
-                      type="delete"
-                      style={{
-                        cursor: 'pointer',
-                      }}
-                      role="none"
-                      onClick={this.handleDeleteColumn.bind(this)}
-                    />
+                    <div
+                      className="c7n-scrumsetting-icons"
+                    >
+                      <Icon
+                        type="open_with"
+                        style={{
+                          cursor: 'move',
+                          display: this.props.draggabled && 'none',
+                        }}
+                        {...provided1.dragHandleProps}
+                      />
+                      <Icon
+                        type="delete"
+                        style={{
+                          cursor: 'pointer',
+                          display: this.props.draggabled && 'none',
+                        }}
+                        role="none"
+                        onClick={this.handleDeleteColumn.bind(this)}
+                      />
+                    </div>
                     <Modal
                       title="删除列"
                       visible={this.state.visible || false}
@@ -308,13 +319,23 @@ class SettingColumn extends Component {
                     </Modal>
                   </div>
                   <div className="c7n-scrumsetting-columnStatus">
-                    <EasyEdit
-                      type="input"
-                      defaultValue={this.props.data.name}
-                      enterOrBlur={this.handleSaveColumnName.bind(this)}
+                    <Permission
+                      type={type}
+                      projectId={projectId}
+                      organizationId={orgId}
+                      service={['agile-service.board.deleteScrumBoard']}
+                      noAccessChildren={(
+                        this.props.data.name
+                    )}
                     >
-                      {this.props.data.name}
-                    </EasyEdit>
+                      <EasyEdit
+                        type="input"
+                        defaultValue={this.props.data.name}
+                        enterOrBlur={this.handleSaveColumnName.bind(this)}
+                      >
+                        {this.props.data.name}
+                      </EasyEdit>
+                    </Permission>
                   </div>
                   <div
                     className="c7n-scrumsetting-columnBottom"
@@ -345,7 +366,7 @@ class SettingColumn extends Component {
                               <span
                                 style={{ minWidth: '110px' }}
                               >
-                                最大值：
+                                {'最大值：'}
                                 {typeof this.props.data.maxNum === 'number' ? this.props.data.maxNum : '没有最大'}
                               </span>
                             )}
@@ -362,7 +383,7 @@ class SettingColumn extends Component {
                               <span
                                 style={{ cursor: 'pointer', minWidth: '110px' }}
                               >
-                                最大值：
+                                {'最大值：'}
                                 {typeof this.props.data.maxNum === 'number' ? this.props.data.maxNum : '没有最大'}
                               </span>
                             </EasyEdit>
@@ -376,7 +397,7 @@ class SettingColumn extends Component {
                               <span
                                 style={{ minWidth: '110px' }}
                               >
-                                最小值：
+                                {'最小值：'}
                                 {typeof this.props.data.minNum === 'number' ? this.props.data.minNum : '没有最小'}
                               </span>
                             )}
@@ -393,7 +414,7 @@ class SettingColumn extends Component {
                               <span
                                 style={{ cursor: 'pointer', minWidth: '110px' }}
                               >
-                                最小值：
+                                {'最小值：'}
                                 {typeof this.props.data.minNum === 'number' ? this.props.data.minNum : '没有最小'}
                               </span>
                             </EasyEdit>

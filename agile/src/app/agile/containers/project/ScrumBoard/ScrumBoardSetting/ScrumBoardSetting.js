@@ -25,11 +25,22 @@ class ScrumBoardSetting extends Component {
     super(props);
     this.state = {
       loading: false,
+      hasPermission: false,
     };
   }
 
   componentDidMount() {
     this.refresh();
+    axios.post('/iam/v1/permissions/checkPermission', [{
+      code: 'agile-service.project-info.updateProjectInfo',
+      organizationId: AppState.currentMenuType.organizationId,
+      projectId: AppState.currentMenuType.id,
+      resourceType: 'project',
+    }]).then((permission) => {
+      this.setState({
+        hasPermission: !permission[0].approve,
+      });
+    });
   }
 
   refresh() {
@@ -103,6 +114,7 @@ class ScrumBoardSetting extends Component {
     const urlParams = AppState.currentMenuType;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
+    const { hasPermission } = this.state;
     return (
       <Page>
         <Header title="配置看板" backPath={`/agile/scrumboard?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}>
@@ -137,12 +149,12 @@ class ScrumBoardSetting extends Component {
             {ScrumBoardStore.getSprintData
               ? (
                 <TabPane tab="工作日历" key="3">
-                  <WorkcalendarPage />
+                  <WorkcalendarPage selectedDateDisabled={hasPermission} />
                 </TabPane>
               ) : null
             }
             <TabPane tab="看板名称" key="4">
-              <EditBoardName />
+              <EditBoardName editBoardNameDisabled={hasPermission} />
             </TabPane>
           </Tabs>
         </Content>
