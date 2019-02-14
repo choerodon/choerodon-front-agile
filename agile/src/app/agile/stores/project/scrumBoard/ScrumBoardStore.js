@@ -1,5 +1,5 @@
 import {
-  observable, action, computed, toJS,
+  observable, action, computed, toJS, get, set,
 } from 'mobx';
 import axios from 'axios';
 import _ from 'lodash';
@@ -9,7 +9,38 @@ const { AppState } = stores;
 
 @store('ScrumBoardStore')
 class ScrumBoardStore {
+  @observable translateToCompleted = [];
+
+  @observable clickedIssue = false;
+
+  @observable moveOverRef = {};
+
+  @observable updateParent = false;
+
+  @observable statusMap = new Map();
+
+  @observable headerData = new Map();
+
+  @observable updatedParentIssue = {
+    statusId: 0,
+    issueTypeId: 0,
+  };
+
   @observable dragStartItem = {};
+
+  @observable otherIssue = [];
+
+  @observable dragStart = false;
+
+  @observable swimLaneData = new Map();
+
+  @observable canDragOn = new Map();
+
+  @observable allDataMap = new Map();
+
+  @observable otherIssue = [];
+
+  @observable swimLaneData = new Map();
 
   @observable boardData = [];
 
@@ -17,15 +48,33 @@ class ScrumBoardStore {
 
   @observable statusCategory = {};
 
-  @observable boardList = [];
+  @observable boardList = new Map();
 
-  @observable selectedBoard = '';
+  @observable selectedBoardId = '';
 
   @observable unParentIds = [];
 
   @observable lookupValue = {
     constraint: [],
-  }
+  };
+
+  @observable stateMachineMap = {
+
+  };
+
+  @observable statusColumnMap = new Map();
+
+  @observable spinIf = true;
+
+  @observable dayRemain = 0;
+
+  @observable sprintId = 0;
+
+  @observable interconnectedData = new Map();
+
+  @observable parentId = [];
+
+  @observable mapStructure = {};
 
   @observable currentConstraint = '';
 
@@ -37,7 +86,7 @@ class ScrumBoardStore {
 
   @observable assigneer = [];
 
-  @observable swimlaneBasedCode = '';
+  @observable swimlaneBasedCode = null;
 
   @observable quickSearchList = [];
 
@@ -179,6 +228,14 @@ class ScrumBoardStore {
     this.swimlaneBasedCode = data;
   }
 
+  @action setDragStart(data) {
+    this.dragStart = data;
+  }
+
+  @computed get getDragStart() {
+    return this.dragStart;
+  }
+
   @computed get getAssigneer() {
     return toJS(this.assigneer);
   }
@@ -187,36 +244,70 @@ class ScrumBoardStore {
     this.assigneer = data;
   }
 
-  judgeMoveParentToDone(parentCategoryCode, parentId) {
-    if (parentCategoryCode !== 'done') {
-      const data = this.boardData;
-      let subTasks = [];
-      for (let index = 0, len = data.length; index < len; index += 1) {
-        for (let index2 = 0, len2 = data[index].subStatuses.length; index2 < len2; index2 += 1) {
-          for (
-            let index3 = 0, len3 = data[index].subStatuses[index2].issues.length;
-            index3 < len3;
-            index3 += 1
-          ) {
-            if (data[index].subStatuses[index2].issues[index3].parentIssueId === parentId) {
-              subTasks.push({
-                categoryCode: data[index].subStatuses[index2].categoryCode,
-                ...data[index].subStatuses[index2].issues[index3],
-              });
-            }
-          }
-        }
-      }
-      subTasks = _.uniqBy(subTasks, 'issueId');
-      const end = _.remove(subTasks, n => n.categoryCode !== 'done');
-      if (end.length === 0) {
-        return true;
-      } else {
-        return false;
-      }
+  @computed get getParentId() {
+    return toJS(this.parentId);
+  }
+
+  @action setParentId(data) {
+    this.parentId = data;
+  }
+
+  @action setClickedIssue(issue) {
+    this.clickIssueDetail = issue;
+    this.clickedIssue = true;
+  }
+
+  @computed get getClickedIssue() {
+    return this.clickedIssue;
+  }
+
+  @action setMoveOverRef(data) {
+    this.moveOverRef = data;
+  }
+
+  @computed get getMoveOverRef() {
+    return this.moveOverRef;
+  }
+
+  @action judgeMoveParentToDone(destinationStatus, swimLaneId, parentId, statusIsDone) {
+    const completedStatusIssueLength = Object.keys(this.swimLaneData[swimLaneId])
+      .filter(statusId => this.statusMap.get(+statusId).categoryCode === 'done')
+      .map(statusId => this.swimLaneData[swimLaneId][+statusId].length)
+      .reduce((accumulator, currentValue) => accumulator + currentValue);
+    if (statusIsDone && completedStatusIssueLength === this.interconnectedData.get(parentId).subIssueData.length) {
+      this.updatedParentIssue = this.interconnectedData.get(parentId);
+      this.setTransFromData(this.updatedParentIssue, parentId);
     } else {
-      return false;
+      this.interconnectedData.set(parentId, {
+        ...this.interconnectedData.get(parentId),
+        canMoveToComplish: false,
+      });
     }
+  }
+
+  setTransFromData(parentIssue, parentId) {
+    const projectId = AppState.currentMenuType.id;
+    axios.get(
+      `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${parentIssue.statusId}&issue_id=${parentIssue.issueId}&issue_type_id=${parentIssue.issueTypeId}&apply_type=agile`,
+    ).then(
+      action('fetchSuccess', (res) => {
+        this.updatedParentIssue = this.interconnectedData.get(parentId);
+        this.translateToCompleted = res.filter(transform => transform.statusDTO.type === 'done');
+        this.interconnectedData.set(+parentId, {
+          ...this.interconnectedData.get(parentId),
+          canMoveToComplish: true,
+        });
+        this.updateParent = true;
+      }),
+    );
+  }
+
+  @computed get getTransformToCompleted() {
+    return this.translateToCompleted;
+  }
+
+  @computed get getUpdatedParentIssue() {
+    return this.updatedParentIssue;
   }
 
   axiosUpdateIssueStatus(id, data) {
@@ -235,24 +326,39 @@ class ScrumBoardStore {
     return toJS(this.IssueNumberCount);
   }
 
+  @action updateParentIssueToDone(issueId, data) {
+    this.interconnectedData.set(issueId, {
+      ...this.updatedParentIssue,
+      ...data,
+    });
+  }
+
   @action setIssueNumberCount(data) {
     this.IssueNumberCount = data;
   }
 
   @computed get getClickIssueDetail() {
-    return toJS(this.clickIssueDetail);
+    return this.clickIssueDetail;
   }
 
   @action setClickIssueDetail(data) {
     this.clickIssueDetail = data;
   }
 
-  @computed get getCurrentSprint() {
-    return toJS(this.currentSprint);
+  @computed get getDayRemain() {
+    return toJS(this.dayRemain);
   }
 
   @action setCurrentSprint(data) {
     this.currentSprint = data;
+  }
+
+  @computed get getSprintId() {
+    return this.sprintId;
+  }
+
+  @computed get getSprintName() {
+    return this.sprintName;
   }
 
   axiosCreateBoard(name) {
@@ -260,7 +366,7 @@ class ScrumBoardStore {
   }
 
   axiosDeleteBoard() {
-    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${this.selectedBoard}`);
+    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${this.selectedBoardId}`);
   }
 
   axiosUpdateBoardDefault(data) {
@@ -268,7 +374,7 @@ class ScrumBoardStore {
   }
 
   axiosUpdateBoard(data) {
-    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${this.selectedBoard}`, data);
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${this.selectedBoardId}`, data);
   }
 
   @computed get getCurrentConstraint() {
@@ -304,19 +410,31 @@ class ScrumBoardStore {
   }
 
   @computed get getSelectedBoard() {
-    return this.selectedBoard;
+    return this.selectedBoardId;
   }
 
   @action setSelectedBoard(data) {
-    this.selectedBoard = data;
+    this.selectedBoardId = data;
   }
 
   @computed get getBoardList() {
-    return toJS(this.boardList);
+    return this.boardList;
   }
 
-  @action setBoardList(data) {
-    this.boardList = data;
+  @action rewriteCurrentConstraint({ columnConstraint, objectVersionNumber }, boardId, boardData) {
+    this.currentConstraint = columnConstraint;
+    this.boardList.set(boardId, {
+      ...boardData,
+      columnConstraint,
+      objectVersionNumber,
+    });
+  }
+
+  @action setBoardListData(boardListData, { boardId, userDefaultBoard, columnConstraint }) {
+    this.boardList = boardListData;
+    this.selectedBoardId = boardId;
+    this.swimlaneBasedCode = userDefaultBoard;
+    this.currentConstraint = columnConstraint;
   }
 
   axiosGetBoardList() {
@@ -390,12 +508,10 @@ class ScrumBoardStore {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}`);
   }
 
-  axiosGetBoardData(boardId, assign, recent, filter, assigneeFilterIds) {
-    if (assign === 0) {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?onlyStory=${recent}&quickFilterIds=${filter}${assigneeFilterIds && assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${assigneeFilterIds}` : ''}`);
-    } else {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?assigneeId=${assign}&onlyStory=${recent}&quickFilterIds=${filter}${assigneeFilterIds && assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${assigneeFilterIds}` : ''}`);
-    }
+  axiosGetBoardData(boardId, {
+    onlyMe, onlyStory, quickSearchArray, assigneeFilterIds,
+  }) {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?${onlyMe ? `assigneeId=${AppState.getUserId}&` : ''}onlyStory=${onlyStory}&quickFilterIds=${quickSearchArray}${assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${assigneeFilterIds}` : ''}`);
   }
 
   axiosFilterBoardData(boardId, assign, recent) {
@@ -418,23 +534,28 @@ class ScrumBoardStore {
     return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}`);
   }
 
-  updateIssue(
-    issueId, objectVersionNumber, endStatusId, boardId, originColumnId, columnId, transformId,
-    before, outsetIssueId, sprintId, rank,
-  ) {
+  updateIssue = (
+    {
+      issueId, objectVersionNumber, boardId, originColumnId, columnId,
+      before, outsetIssueId, sprintId, rank, issueTypeId,
+    }, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId,
+  ) => {
     const proId = AppState.currentMenuType.id;
     const data = {
       issueId,
       objectVersionNumber,
-      statusId: endStatusId,
-      boardId,
-      originColumnId,
-      columnId,
-      before,
-      outsetIssueId,
-      sprintId,
-      rank,
+      statusId: destinationStatus,
+      boardId: this.selectedBoardId,
+      originColumnId: this.statusColumnMap.get(startStatus),
+      columnId: this.statusColumnMap.get(destinationStatus),
+      before: destinationStatusIndex === 0,
+      outsetIssueId:
+        destinationStatusIndex === 0 ? ''
+          : this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId,
+      sprintId: this.sprintId,
+      rank: true,
     };
+    const { id: transformId } = this.stateMachineMap[issueTypeId][+startStatus].find(issue => issue.endStatusId === parseInt(destinationStatus, 10));
     return axios.post(`/agile/v1/projects/${proId}/board/issue/${issueId}/move?transformId=${transformId}`, data);
   }
 
@@ -515,16 +636,10 @@ class ScrumBoardStore {
 
   axiosGetIssueTypes() {
     const proId = AppState.currentMenuType.id;
-    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?apply_type=agile`).then((data) => {
-      if (data && !data.failed) {
-        this.setIssueTypes(data);
-      } else {
-        this.setIssueTypes([]);
-      }
-    });
+    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?apply_type=agile`);
   }
 
-  loadTransforms(statusId, issueId, typeId) {
+  loadTransforms = (statusId, issueId, typeId) => {
     const projectId = AppState.currentMenuType.id;
     return axios.get(
       `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&apply_type=agile`,
@@ -544,6 +659,11 @@ class ScrumBoardStore {
     });
   };
 
+  axiosGetStateMachine = () => {
+    const projectId = AppState.currentMenuType.id;
+    return axios.get(`/issue/v1/projects/${projectId}/schemes/query_transforms_map?apply_type=agile`);
+  }
+
   axiosUpdateIssue(data) {
     const proId = AppState.currentMenuType.id;
     const { issueId, objectVersionNumber, transformId } = data;
@@ -554,6 +674,166 @@ class ScrumBoardStore {
   checkBoardNameRepeat = (proId, name) => axios.get(
     `/agile/v1/projects/${proId}/board/check_name?boardName=${name}`,
   );
+
+  // @action async scrumBoardInit(AppState, url) {
+  //   try {
+  //     const boardData = await this.axiosGetBoardList;
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
+
+  @action setSpinIf(data) {
+    this.spinIf = data;
+  }
+
+  @computed get getSpinIf() {
+    return this.spinIf;
+  }
+
+  @action scrumBoardInit(AppStates, url = null, boardListData = null, { boardId, userDefaultBoard, columnConstraint }, { currentSprint }, quickSearchList, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData) {
+    this.boardData = [];
+    this.spinIf = false;
+    this.quickSearchList = [];
+    this.sprintData = false;
+    this.assigneer = [];
+    this.currentSprint = {};
+    this.parentIds = [];
+    this.epicData = [];
+    if (boardListData) {
+      this.boardList = observable.map(boardListData.map(board => [board.boardId, board]));
+    }
+    this.selectedBoardId = boardId;
+    this.swimlaneBasedCode = userDefaultBoard;
+    this.currentConstraint = columnConstraint;
+    this.quickSearchList = quickSearchList;
+    if (currentSprint) {
+      this.dayRemain = currentSprint.dayRemain;
+      this.sprintId = currentSprint.sprintId;
+      this.sprintName = currentSprint.sprintName;
+    }
+    this.allDataMap = allDataMap;
+    this.mapStructure = mapStructure;
+    if (url && url.paramIssueId) {
+      this.clickIssueDetail = { issueId: url.paramIssueId };
+    }
+    if (issueTypes && issueTypes.failed) {
+      this.issueTypes = issueTypes;
+    } else {
+      this.issueTypes = [];
+    }
+    this.stateMachineMap = stateMachineMap;
+    this.canDragOn = observable.map(canDragOn);
+    this.statusColumnMap = statusColumnMap;
+    const { unInterConnectedDataMap, interConnectedDataMap, swimLaneData } = renderData;
+    this.otherIssue = unInterConnectedDataMap;
+    this.interconnectedData = observable.map(interConnectedDataMap);
+    this.swimLaneData = swimLaneData;
+    this.allDataMap = allDataMap;
+    this.statusMap = observable.map(statusMap);
+    this.headerData = observable.map(headerData);
+  }
+
+  @computed get getHeaderData() {
+    return this.headerData;
+  }
+
+  @action resetHeaderData(startColumnId, destinationColumnId) {
+    const startColumnData = this.headerData.get(startColumnId);
+    const destinationColumnData = this.headerData.get(destinationColumnId);
+    this.headerData.set(+startColumnId, {
+      ...startColumnData,
+      columnIssueCount: startColumnData.columnIssueCount - 1,
+    });
+    this.headerData.set(+destinationColumnId, {
+      ...destinationColumnData,
+      columnIssueCount: destinationColumnData.columnIssueCount + 1,
+    });
+  }
+
+  @computed get getStateMachineMap() {
+    return this.stateMachineMap;
+  }
+
+  @computed get getStatusMap() {
+    return this.statusMap;
+  }
+
+  @computed get getMapStructure() {
+    return this.mapStructure;
+  }
+
+  @action setWhichCanNotDragOn(statusId, typeId) {
+    [...this.canDragOn.keys()].forEach((status) => {
+      if (this.stateMachineMap[typeId][statusId].find(issue => issue.endStatusId === status)) {
+        this.canDragOn.set(status, false);
+      } else {
+        this.canDragOn.set(status, true);
+      }
+    });
+    // console.log(this.stateMachineMap[typeId][statusId]);
+    // this.canDragOn.set(36, false);
+  }
+
+  @computed get getCanDragOn() {
+    return this.canDragOn;
+  }
+
+  @computed get getIssueWithStatus() {
+    return toJS(this.interconnectedData);
+  }
+
+  @action setOtherQuestion({ parentDataMap }) {
+    // 数组 单独管理
+    this.otherIssue = parentDataMap;
+  }
+
+  @computed get getOtherQuestion() {
+    return this.otherIssue;
+  }
+
+  @action setInterconnectedData(data) {
+    // id - Map 相关联
+    this.interconnectedData = data;
+  }
+
+  @computed get getInterconnectedData() {
+    return this.interconnectedData;
+  }
+
+  @action setSwimLaneData(startSwimLane, startStatus, startStatusIndex, destinationSwimLane, destinationStatus, destinationStatusIndex, issue, revert) {
+    if (!revert) {
+      this.swimLaneData[startSwimLane][startStatus].splice(startStatusIndex, 1);
+      this.swimLaneData[startSwimLane][destinationStatus].splice(destinationStatusIndex, 0, issue);
+    } else {
+      this.swimLaneData[startSwimLane][destinationStatus].splice(startStatusIndex, 1);
+      this.swimLaneData[startSwimLane][startStatus].splice(destinationStatusIndex, 0, issue);
+    }
+  }
+
+  @action rewriteObjNumber({ objectVersionNumber }, issueId, issue) {
+    this.allDataMap.set(+issueId, {
+      ...issue,
+      objectVersionNumber,
+    });
+  }
+
+  @computed get getSwimLaneData() {
+    // swimLaneCode - Map 相关联
+    return this.swimLaneData;
+  }
+
+  @computed get getAllDataMap() {
+    return this.allDataMap;
+  }
+
+  @action setUpdateParent(data) {
+    this.updateParent = data;
+  }
+
+  @computed get getUpdateParent() {
+    return this.updateParent;
+  }
 }
 
 const scrumBoardStore = new ScrumBoardStore();

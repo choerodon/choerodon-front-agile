@@ -1,4 +1,4 @@
-.c7n-scrumboard-status {
+.c7n-scrumboard-statusHeader {
   height: 48px;
   flex: 1;
   display: flex;
@@ -6,7 +6,18 @@
   font-size: 13px;
   font-weight: 500;
   overflow: hidden;
-  border-right: 10px solid white;
+  margin-right: 10px;
   background: rgba(0, 0, 0, 0.04);
   min-width: 200px;
+  .c7n-scrumboard-statusHeader-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: calc(100% - 50px);
+    display: inline-block;
+    margin-left: 12px;
+  }
+  .c7n-scrumboard-statusHeader-count {
+    display: inline-block;
+  }
 }

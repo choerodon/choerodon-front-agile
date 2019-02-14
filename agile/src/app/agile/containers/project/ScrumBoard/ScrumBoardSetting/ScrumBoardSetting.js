@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Page, Header, Content, stores, axios, Permission, 
+  Page, Header, Content, stores, axios, Permission,
 } from 'choerodon-front-boot';
 import moment from 'moment';
 import {
-  Button, Spin, Modal, Form, Input, Select, Tabs, message, Icon, 
+  Button, Spin, Modal, Form, Input, Select, Tabs, message, Icon,
 } from 'choerodon-ui';
 import { withRouter } from 'react-router-dom';
 import './ScrumBoardSetting.scss';
@@ -15,11 +15,8 @@ import SwimLanePage from '../ScrumBoardSettingComponent/SwimLanePage/SwimLanePag
 import WorkcalendarPage from '../ScrumBoardSettingComponent/WorkCalendarPage/WorkCalendarPage';
 import EditBoardName from '../ScrumBoardSettingComponent/EditBoardName/EditBoardName';
 
-const { Sidebar } = Modal;
-const FormItem = Form.Item;
-const Option = Select.Option;
-const TabPane = Tabs.TabPane;
-const confirm = Modal.confirm;
+const { TabPane } = Tabs;
+const { confirm } = Modal;
 const { AppState } = stores;
 
 @observer
@@ -34,17 +31,6 @@ class ScrumBoardSetting extends Component {
   componentDidMount() {
     this.refresh();
   }
-
-  // getQueryVariable(variable) {
-  //   const data = window.location.hash.split('?')[1].split('&');
-  //   const result = _.find(data, o => o.indexOf(variable) !== -1).replace(/[^0-9]/ig, '');
-  //   return parseInt(result, 10);
-  // }
-  // setLoading = () => {
-  //   this.setState({
-  //     loading: true,
-  //   });
-  // }
 
   refresh() {
     this.setState({
@@ -88,16 +74,11 @@ class ScrumBoardSetting extends Component {
       ScrumBoardStore.axiosCanAddStatus();
     }
   }
-  
+
   handleDeleteBoard() {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    let name;
-    for (let index = 0, len = ScrumBoardStore.getBoardList.length; index < len; index += 1) {
-      if (ScrumBoardStore.getBoardList[index].boardId === ScrumBoardStore.getSelectedBoard) {
-        name = ScrumBoardStore.getBoardList[index].name;
-      }
-    }
+    const { name } = ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard);
     confirm({
       title: `删除看板"${name}"`,
       content: '确定要删除该看板吗?',
@@ -117,7 +98,8 @@ class ScrumBoardSetting extends Component {
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { form: { getFieldDecorator } } = this.props;
+    const { loading } = this.state;
     const urlParams = AppState.currentMenuType;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
@@ -136,11 +118,15 @@ class ScrumBoardSetting extends Component {
           </Button>
         </Header>
         <Content className="c7n-scrumboard" style={{ height: '100%', paddingTop: 0 }}>
-          <Tabs style={{ display: 'flex', flexDirection: 'column', height: '100%' }} defaultActiveKey="1">
+          <Tabs
+            style={{
+              display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto',
+            }}
+            defaultActiveKey="1"
+          >
             <TabPane tab="列配置" key="1">
-              <Spin spinning={this.state.loading}>
+              <Spin spinning={loading}>
                 <ColumnPage
-                  // setLoading={this.setLoading}
                   refresh={this.refresh.bind(this)}
                 />
               </Spin>

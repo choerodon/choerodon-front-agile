@@ -12,36 +12,30 @@ class IssueDetail extends Component {
     super(props);
     this.state = {};
   }
-  
+
   render() {
-    // let height = '';
-    // if (document.getElementsByClassName('page-content').length > 0) {
-    //   if (document.getElementsByClassName('page-content')[0].offsetHeight) {
-    //     height = document.getElementsByClassName('page-content')[0].offsetHeight;
-    //   }
-    // }
+    const { visible, refresh } = this.props;
     return (
-      <div
-        className={this.props.visible ? 'c7n-issueDetail-container' : ''}
-        // style={{
-        //   height,
-        // }}
-      >
-        {this.props.visible ? (
+      <div>
+        {visible ? (
           <EditIssue
             store={ScrumBoardStore}
             backUrl="scrumboard"
+            style={{
+              height: 'calc(100vh - 156px)',
+              width: '440px',
+            }}
             issueId={ScrumBoardStore.getClickIssueDetail.issueId}
             onCancel={() => {
               ScrumBoardStore.setClickIssueDetail({});
-              this.props.refresh();
+              refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
             }}
             onDeleteIssue={() => {
               ScrumBoardStore.setClickIssueDetail({});
-              this.props.refresh();              
+              refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
             }}
             onUpdate={() => {
-              this.props.refresh();     
+              refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
             }}
           />
         ) : ''}
@@ -51,4 +45,3 @@ class IssueDetail extends Component {
 }
 
 export default IssueDetail;
-

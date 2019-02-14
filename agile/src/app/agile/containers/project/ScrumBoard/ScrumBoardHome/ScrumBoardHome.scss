@@ -1,21 +1,18 @@
 .c7n-scrumboard {
   flex-grow: 1;
-
+  overflow: auto;
+  height: calc(100vh - 156px);
   .c7n-scrumboard-header {
     display: flex;
-    height: 40px;
-    padding: 0 0 0 24px;
-    overflow: auto;
-    :last-child {
-      margin-right: 32px;
-      border-right: none;
-    }
+    padding: 0 16px;
+    margin-right: 8px;
   }
 
   .c7n-scrumboard-content {
-    overflow: auto;
     height: calc(100vh - 230px);
+    display: flex;
     .c7n-scrumboard-container {
+      margin: 0 32px 0 16px !important;
       padding-bottom: 83px;
     }
     .c7n-scrumboard-others {
@@ -56,7 +53,13 @@
   justify-content: space-between;
   font-size: 14px;
   padding: 8px 24px;
-
+  flex-grow: unset !important;
+  height: 48px;
+  min-height: 47px;
+  overflow: hidden !important;
+  .ant-spin-container {
+    display: flex !important;
+  }
   .c7n-scrumTools-left {
     display: flex;
     align-items: center;

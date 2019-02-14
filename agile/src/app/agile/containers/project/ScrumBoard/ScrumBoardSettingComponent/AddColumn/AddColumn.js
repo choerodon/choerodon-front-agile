@@ -24,69 +24,8 @@ class AddColumn extends Component {
     this.checkStatusDebounce = false;
   }
 
-  handleAddColumn(e) {
-    const { form, store } = this.props;
-    const { statusType } = this.state;
-    const that = this;
-    e.preventDefault();
-    form.validateFields((err, values) => {
-      if (!err) {
-        const statusDate = store.getStatusList;
-        const status = statusDate.find(s => s.name === values.column_name);
-        if (status) {
-          confirm({
-            title: '警告',
-            content: `已存在状态${values.column_name}，如果创建该列，不会创建同名状态`,
-            onOk() {
-              const categoryCode = values.column_categoryCode;
-              const data = {
-                boardId: ScrumBoardStore.getSelectedBoard,
-                name: values.column_name,
-                projectId: AppState.currentMenuType.id,
-                maxNum: 1,
-                minNum: 1,
-                categoryCode: values.column_categoryCode,
-                sequence: ScrumBoardStore.getBoardData.length - 1,
-              };
-              ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
-                that.props.onChangeVisible(false);
-                that.props.refresh();
-              }).catch((error) => {
-              });
-            },
-            onCancel() {
-            },
-          });
-        } else {
-          const categoryCode = values.column_categoryCode;
-          const data = {
-            boardId: ScrumBoardStore.getSelectedBoard,
-            name: values.column_name,
-            projectId: AppState.currentMenuType.id,
-            maxNum: 1,
-            minNum: 1,
-            categoryCode: values.column_categoryCode,
-            sequence: ScrumBoardStore.getBoardData.length - 1,
-          };
-          ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
-            that.props.onChangeVisible(false);
-            that.props.refresh();
-            this.setState({
-              loading: false,
-            });
-          }).catch((error) => {
-            this.setState({
-              loading: false,
-            });
-          });
-        }
-      }
-    });
-  }
-
   checkStatusName(rule, value, callback) {
     const { store, form } = this.props;
-    const statusDate = store.getStatusList;
     if (this.checkStatusDebounce) {
       clearTimeout(this.checkStatusDebounce);
       this.checkStatusDebounce = null;
@@ -119,17 +58,7 @@ class AddColumn extends Component {
     const result = [];
     if (JSON.stringify(ScrumBoardStore.getStatusCategory) !== '{}') {
       const data = ScrumBoardStore.getStatusCategory.lookupValues;
-      data.sort((x, y) => {
-        if (x.valueCode === 'todo') {
-          return -1;
-        } else if (x.valueCode === 'done') {
-          return 1;
-        } else if (y.valueCode === 'todo') {
-          return 1;
-        } else {
-          return -1;
-        }
-      });
+      data.sort();
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
           <Option value={data[index].valueCode}>
@@ -164,19 +93,14 @@ class AddColumn extends Component {
       statusType,
     } = this.state;
     const { getFieldDecorator } = form;
-    let kanbanName;
-    for (let index = 0, len = ScrumBoardStore.getBoardList.length; index < len; index += 1) {
-      if (ScrumBoardStore.getBoardList[index].boardId === ScrumBoardStore.getSelectedBoard) {
-        kanbanName = ScrumBoardStore.getBoardList[index].name;
-      }
-    }
+    const { name: kanbanName } = ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard);
     return (
       <Sidebar
         title="添加列"
         visible={visible}
         onCancel={onChangeVisible.bind(this, false)}
         confirmLoading={loading}
-        onOk={this.handleAddColumn.bind(this)}
+        onOk={this.handleAddColumn}
         okText="创建"
         cancelText="取消"
       >

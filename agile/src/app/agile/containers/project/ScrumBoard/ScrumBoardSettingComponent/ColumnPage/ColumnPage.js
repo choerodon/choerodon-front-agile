@@ -8,8 +8,7 @@ import _ from 'lodash';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import SettingColumn from '../SettingColumn/SettingColumn';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
-import AddStatus from '../AddStatus/AddStatus';
-import AddColumn from '../AddColumn/AddColumn';
+import SideBarContent from '../SideBarContent/SideBarContent';
 
 const { AppState } = stores;
 const { Option } = Select;
@@ -392,7 +391,6 @@ class ColumnPage extends Component {
         <div
           className="c7n-scrumsetting"
           style={{
-            // height: 'calc(100vh - 247px)',
             marginTop: 32,
             flexGrow: 1,
             height: '100%',
@@ -423,8 +421,9 @@ class ColumnPage extends Component {
         </div>
         {
           addStatus ? (
-            <AddStatus
+            <SideBarContent
               visible={addStatus}
+              type="Status"
               onChangeVisible={(data) => {
                 this.setState({
                   addStatus: data,
@@ -437,8 +436,9 @@ class ColumnPage extends Component {
         }
         {
           addColumn ? (
-            <AddColumn
+            <SideBarContent
               visible={addColumn}
+              type="Column"
               onChangeVisible={(data) => {
                 this.setState({
                   addColumn: data,

@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Content, stores } from 'choerodon-front-boot';
 import {
- Button, Select, Icon, message 
+  Button, Select, Icon, message,
 } from 'choerodon-ui';
 import _ from 'lodash';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 
 const { AppState } = stores;
-const Option = Select.Option;
+const { Option } = Select;
 
 @observer
 class SwimLanePage extends Component {
@@ -20,13 +20,14 @@ class SwimLanePage extends Component {
   }
 
   handleSave(select) {
+    const { selectValue, selectedValue } = this.state;
     const data = {
       // objectVersionNumber: select.objectVersionNumber,
       boardId: select.boardId,
-      swimlaneBasedCode: this.state.selectValue ? this.state.selectValue : ScrumBoardStore.getSwimLaneCode,
-      // projectId: AppState.currentMenuType.id,
+      swimlaneBasedCode: selectValue || ScrumBoardStore.getSwimLaneCode,
     };
     ScrumBoardStore.axiosUpdateBoardDefault(data).then((res) => {
+      ScrumBoardStore.setSwimLaneCode(selectedValue);
       Choerodon.prompt('保存成功');
     }).catch((error) => {
       Choerodon.prompt('保存失败');
@@ -34,14 +35,7 @@ class SwimLanePage extends Component {
   }
 
   render() {
-    const data = ScrumBoardStore.getBoardList;
-    const selectBoard = ScrumBoardStore.getSelectedBoard;
-    let defaultSelect;
-    for (let index = 0, len = data.length; index < len; index += 1) {
-      if (String(data[index].boardId) === String(selectBoard)) {
-        defaultSelect = data[index];
-      }
-    }
+    const defaultSelect = ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard);
     return (
       <Content
         description="泳道是指看板中一横排的主板，基于横排对问题进行状态的流转。泳道类型可以在下面进行修改，并将自动保存。注意：修改泳道会修改看板的分组维度，同时修改看板样式。"
@@ -52,8 +46,8 @@ class SwimLanePage extends Component {
         link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
       >
         <Select
-          style={{ width: 512 }} 
-          label="基础泳道在" 
+          style={{ width: 512 }}
+          label="基础泳道在"
           defaultValue={ScrumBoardStore.getSwimLaneCode || 'parent_child'}
           onChange={(value) => {
             this.setState({
@@ -68,14 +62,6 @@ class SwimLanePage extends Component {
           <Option value="swimlane_epic">史诗</Option>
           <Option value="swimlane_none">无</Option>
         </Select>
-        {/* <div style={{ marginTop: 12 }}>
-          <Button
-            type="primary" 
-            funcType="raised"
-            onClick={this.handleSave.bind(this, defaultSelect)}
-          >保存</Button>
-          <Button style={{ marginLeft: 12 }} funcType="raised">取消</Button>
-        </div> */}
       </Content>
     );
   }
