@@ -5,12 +5,11 @@ import {
   Select, Form, Input, Button, Modal, Icon, Tooltip, InputNumber,
 } from 'choerodon-ui';
 import { UploadButton } from '../CommonComponent';
-import { handleFileUpload, beforeTextUpload } from '../../common/utils';
+import { handleFileUpload, beforeTextUpload, randomString } from '../../common/utils';
 import {
   createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics, loadIssuesInLink,
 } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
-import { COLOR } from '../../common/Constant';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import UserHead from '../UserHead';
@@ -71,7 +70,7 @@ class CreateIssue extends Component {
       newIssueTypeCode: '',
       storyPoints: '',
       estimatedTime: '',
-      issueLinkArr: [Math.random()],
+      issueLinkArr: [randomString(5)],
       links: [],
       originLinks: [],
       originIssues: [],
@@ -306,23 +305,25 @@ class CreateIssue extends Component {
         });
         const issueLinkCreateDTOList = [];
         Object.keys(values.linkTypeId).forEach((link, index) => {
-          const currentLinkType = _.find(originLinks, { linkTypeId: values.linkTypeId[link].split('+')[0] * 1 });
-          values.linkIssues[link].forEach((issueNum, i, issues) => {
-            const { issueId } = _.find(originIssues, { issueNum });
-            if (currentLinkType.inWard === values.linkTypeId[link].split('+')[1]) {
-              issueLinkCreateDTOList.push({
-                linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
-                linkedIssueId: issueId * 1,
-                in: false,
-              });
-            } else {
-              issueLinkCreateDTOList.push({
-                linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
-                linkedIssueId: issueId * 1,
-                in: true,
-              });
-            }
-          });
+          if (values.linkTypeId[link] && values.linkIssues[link]) {
+            const currentLinkType = _.find(originLinks, { linkTypeId: values.linkTypeId[link].split('+')[0] * 1 });
+            values.linkIssues[link].forEach((issueNum, i, issues) => {
+              const { issueId } = _.find(originIssues, { issueNum });
+              if (currentLinkType.inWard === values.linkTypeId[link].split('+')[1]) {
+                issueLinkCreateDTOList.push({
+                  linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
+                  linkedIssueId: issueId * 1,
+                  in: false,
+                });
+              } else {
+                issueLinkCreateDTOList.push({
+                  linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
+                  linkedIssueId: issueId * 1,
+                  in: true,
+                });
+              }
+            });
+          }
         });
         const extra = {
           issueTypeId: values.typeId,
@@ -769,7 +770,7 @@ class CreateIssue extends Component {
                           display: 'flex', width: 520, justifyContent: 'flex-start', alignItems: 'flex-end', 
                         }}
                       >
-                        <FormItem label="关系" style={{ width: 120, marginRight: 20 }}>
+                        <FormItem label="关系" style={{ width: 110, marginRight: 20 }}>
                           {getFieldDecorator(`linkTypeId[${item}]`, {
                           })(
                             <Select
@@ -789,7 +790,7 @@ class CreateIssue extends Component {
                             </Select>,
                           )}
                         </FormItem>
-                        <FormItem label="问题" style={{ width: 330, marginRight: 20 }}>
+                        <FormItem label="问题" style={{ width: 320, marginRight: 20 }}>
                           {getFieldDecorator(`linkIssues[${item}]`, {
                           })(
                             <Select
@@ -841,7 +842,7 @@ class CreateIssue extends Component {
                           shape="circle"
                           style={{ marginBottom: 10 }}
                           onClick={() => {
-                            arr.splice(index + 1, 0, Math.random());
+                            arr.splice(index + 1, 0, randomString(5));
                             this.setState({
                               issueLinkArr: arr,
                             });

@@ -225,3 +225,18 @@ export function commonformatDate(str) {
   }
   return `${d[0]}/${d[1]}/${d[2]} ${t[0] < 12 ? t[0] : t[0] * 1 - 12}:${t[1]}  ${t[0] * 1 < 12 ? ' 上' : ' 下'}午`;
 }
+
+/**
+ * 生成指定长度的随机字符串
+ * @param len 字符串长度
+ * @returns {string}
+ */
+export function randomString(len = 32) {
+  let code = '';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const maxPos = chars.length;
+  for (let i = 0; i < len; i += 1) {
+    code += chars.charAt(Math.floor(Math.random() * (maxPos + 1)));
+  }
+  return code;
+}

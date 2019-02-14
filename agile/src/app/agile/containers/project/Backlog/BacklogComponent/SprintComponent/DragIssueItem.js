@@ -75,6 +75,7 @@ class DragIssueItem extends Component {
       <Draggable key={item.issueId} draggableId={item.issueId} index={index}>
         {(provided1, snapshot1) => (
           <div
+            id={item.issueId}
             className={store.getIsDragging ? 'c7n-backlog-sprintIssue' : 'c7n-backlog-sprintIssue c7n-backlog-sprintIssueHover'}
             style={{
               position: 'relative',

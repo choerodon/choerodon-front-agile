@@ -1985,8 +1985,6 @@ class CreateSprint extends Component {
                                 statusId: value,
                                 transformId: item.key,
                               });
-                              // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                              // setTimeout(() => { this.needBlur = true; }, 100);
                             }}
                           >
                             {
@@ -2088,8 +2086,6 @@ class CreateSprint extends Component {
                                 priorityName: priority.name,
                               });
                               this.needBlur = false;
-                              // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                              // setTimeout(() => { this.needBlur = true; }, 100);
                             }}
                           >
                             {originPriorities.map(priority => (
@@ -2220,7 +2216,7 @@ class CreateSprint extends Component {
                           >
                             <Select
                               value={sprintId || undefined}
-                              getPopupContainer={triggerNode => triggerNode.parentNode}
+                              // getPopupContainer={triggerNode => triggerNode.parentNode}
                               style={{ width: '110px' }}
                               allowClear
                               loading={selectLoading}
@@ -2235,14 +2231,11 @@ class CreateSprint extends Component {
                                   });
                                 });
                               }}
-                              // onBlur={() => this.statusOnChange()}
                               onChange={(value) => {
                                 this.setState({
                                   sprintId: value,
                                 });
                                 this.needBlur = false;
-                                // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                // setTimeout(() => { this.needBlur = true; }, 100);
                               }}
                             >
                               {originSprints.map(sprint => (
@@ -2519,16 +2512,6 @@ class CreateSprint extends Component {
                                         item => item.substring(0, 10),
                                       ),
                                     });
-                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    // this.needBlur = false;
-                                    // if (this.changeTimer > 0) {
-                                    //   clearTimeout(this.changeTimer);
-                                    //   this.changeTimer = 0;
-                                    // }
-                                    // this.changeTimer = setTimeout(() => {
-                                    //   this.needBlur = true;
-                                    // }, 500);
                                   }}
                                 >
                                   {originComponents && originComponents.map(component => (
@@ -2959,16 +2942,10 @@ class CreateSprint extends Component {
                             />
                             <span>
                               {this.getWorkloads()}
-
-
-
-                                  时/
-{this.getWorkloads() + (origin.remainingTime || 0)}
-
-
-
-                                  时
-</span>
+                              {'时/'}
+                              {this.getWorkloads() + (origin.remainingTime || 0)}
+                              {'时'}
+                            </span>
                             <span
                               role="none"
                               style={{
@@ -2982,9 +2959,8 @@ class CreateSprint extends Component {
                                 });
                               }}
                             >
-
-                              登记工作
-</span>
+                              {'登记工作'}
+                            </span>
                           </div>
                         </div>
                         {typeCode === 'issue_epic' ? (

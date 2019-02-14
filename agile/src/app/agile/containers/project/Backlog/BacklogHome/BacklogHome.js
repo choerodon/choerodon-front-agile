@@ -65,8 +65,10 @@ class BacklogHome extends Component {
 
   /**
    * 加载选择快速搜索的冲刺数据
+   * isCreate: 是否创建冲刺，如果是则自动滚动到新建的冲刺
+   * issue: 新建的issue，如果新建issue则自动滚动到新建的issue
    */
-  getSprint =(isCreate = false) => {
+  getSprint = (isCreate = false, issue) => {
     const { BacklogStore } = this.props;
     BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
       .then((data) => {
@@ -116,6 +118,15 @@ class BacklogHome extends Component {
                 sprint.style.backgroundColor = 'white';
               }
             }, 2000);
+          } else if (issue) {
+            const anchorElement = document.getElementById(issue.issueId);
+            if (anchorElement) {
+              anchorElement.scrollIntoView({
+                // behavior: 'smooth',
+                block: 'start',
+                inline: 'end',
+              });
+            }
           }
         });
       }).catch((error2) => {
@@ -164,11 +175,11 @@ class BacklogHome extends Component {
     });
   };
 
-  refresh =(isCreate) => {
+  refresh =(isCreate, issue) => {
     this.setState({
       spinIf: true,
     });
-    this.getSprint(isCreate);
+    this.getSprint(isCreate, issue);
     const { versionVisible, epicVisible } = this.state;
     if (versionVisible) {
       this.loadVersion();
@@ -532,11 +543,16 @@ class BacklogHome extends Component {
       });
   };
 
-  handleCreateIssue = () => {
+  handleCreateIssue = (res) => {
     const { newIssueVisible } = this.state;
     this.setState({
       newIssueVisible: !newIssueVisible,
     });
+    // 创建issue后刷新
+    if (res) {
+      this.refresh(false, res);
+      this.loadQuickFilter();
+    }
   };
 
   render() {
