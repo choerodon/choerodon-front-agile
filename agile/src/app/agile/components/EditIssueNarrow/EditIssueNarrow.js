@@ -1823,21 +1823,6 @@ class CreateSprint extends Component {
                               </span>
                             )}
                           >
-                            {/*<InputNumber*/}
-                              {/*max={999.9}*/}
-                              {/*maxLength={5}*/}
-                              {/*value={storyPoints}*/}
-                              {/*// suffix="点"*/}
-                              {/*onChange={this.handleStoryPointsChange.bind(this)}*/}
-                              {/*step={0.1}*/}
-                              {/*precision={1}*/}
-                              {/*// onPressEnter={() => {*/}
-                              {/*//   this.updateIssue('storyPoints');*/}
-                              {/*//   this.setState({*/}
-                              {/*//     currentRae: undefined,*/}
-                              {/*//   });*/}
-                              {/*// }}*/}
-                            {/*/>*/}
                             <Select
                               value={storyPoints && storyPoints.toString()}
                               mode="combobox"

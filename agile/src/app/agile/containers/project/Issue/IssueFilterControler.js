@@ -103,7 +103,10 @@ export default class IssueFilterControler {
     // 存在 paramFilter 时调用 paramFilter 进行刷新
     const filter = Object.keys(this.cache.get('paramFilter')).length ? this.cache.get('paramFilter') : this.cache.get('filter');
     return IssueFilterControler.loadCurrentSetting(
-      filter, mode, IssueStore.getPagination.current - 1, IssueStore.getPagination.pageSize,
+      filter,
+      mode,
+      IssueStore.getPagination.current - 1 > 0 ? IssueStore.getPagination.current - 1 : 0,
+      IssueStore.getPagination.pageSize,
     );
   };
 
