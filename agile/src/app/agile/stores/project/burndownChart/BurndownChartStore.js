@@ -54,8 +54,8 @@ class BurndownChartStore {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${id}/burn_down_coordinate?type=${type}`);
   }
 
-  axiosGetBurndownChartReport(id, type) {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${id}/burn_down_report?type=${type}&ordinalType=desc`);
+  axiosGetBurndownChartReport(id, type, dateSort) {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${id}/burn_down_report?type=${type}&ordinalType=${dateSort}`);
   }
 }
 

@@ -166,7 +166,7 @@ class EpicReport extends Component {
         },
         axisLabel: {
           show: true,
-          interval: 0,
+          interval: ES.getChartDataX.length >= 20 ? 4 : 0,
           margin: 13,
           textStyle: {
             color: 'rgba(0, 0, 0, 0.65)',

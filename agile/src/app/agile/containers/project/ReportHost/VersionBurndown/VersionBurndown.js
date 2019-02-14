@@ -563,9 +563,9 @@ class VersionBurndown extends Component {
     const { history } = this.props;
     let urlPush = `/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${organizationId}`;
     if (JSON.stringify(item) !== '{}') {
-      if (linkType === 'sprint') {
-        urlPush += `&paramType=statusId&paramId=36&paramChoose=sprint&paramCurrentSprint=${item.sprintId}&paramName=已完成、冲刺为${item.sprintName || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
-      }
+      // if (linkType === 'sprint') {
+      //   urlPush += `&paramType=statusId&paramId=36&paramChoose=sprint&paramCurrentSprint=${item.sprintId}&paramName=已完成、冲刺为${item.sprintName || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
+      // }
       if (linkType === 'version') {
         urlPush += `&paramType=version&paramId=${item.versionId}&paramName=${item.name || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
       }
@@ -707,7 +707,7 @@ class VersionBurndown extends Component {
                           >
                             {`${item.startDate && item.startDate.slice(0, 11).replace(/-/g, '.')}-${item.endDate && item.endDate.slice(0, 11).replace(/-/g, '.')}`}
                           </span>
-                          <span
+                          {/* <span
                             style={{
                               display: 'inline-block',
                               position: 'absolute',
@@ -722,7 +722,7 @@ class VersionBurndown extends Component {
                           >
                             {'在“问题管理中”查看'}
                             <Icon style={{ fontSize: 13 }} type="open_in_new" />
-                          </span>
+                          </span> */}
                         </p>
                         <Table
                           rowKey={record => record.issueId}
@@ -741,7 +741,8 @@ class VersionBurndown extends Component {
                 })
               //  : <p>当前版本下的冲刺没有已完成的问题</p>
             }
-          </div>);
+          </div>
+        );
       }
       return <p>当前版本下的冲刺没有已完成的问题</p>;
     }

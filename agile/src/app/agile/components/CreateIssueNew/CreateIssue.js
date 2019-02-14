@@ -789,7 +789,7 @@ class CreateIssue extends Component {
                             </Select>,
                           )}
                         </FormItem>
-                        <FormItem label="问题" style={{ width: 330, marginRight: 20 }}>
+                        <FormItem label="问题" style={{ width: 290, marginRight: 20 }}>
                           {getFieldDecorator(`linkIssues[${item}]`, {
                           })(
                             <Select
@@ -839,7 +839,7 @@ class CreateIssue extends Component {
                         </FormItem>
                         <Button
                           shape="circle"
-                          style={{ marginBottom: 10 }}
+                          style={{ marginBottom: 10, marginRight: 10 }}
                           onClick={() => {
                             arr.splice(index + 1, 0, Math.random());
                             this.setState({

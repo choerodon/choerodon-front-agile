@@ -91,6 +91,7 @@ class EditBoardName extends Component {
     const {
       initialBoardName, loading, boardName, lastBoardName,
     } = this.state;
+    const { editBoardNameDisabled } = this.props;
     return (
       <Content
         description={`您正在编辑项目“${AppState.currentMenuType.name}”的看板名称`}
@@ -100,48 +101,60 @@ class EditBoardName extends Component {
         }}
       >
         <Spin spinning={loading}>
-          <Form layout="vertical">
-            <FormItem label="boardName" style={{ width: 512 }}>
-              {getFieldDecorator('boardName', {
-                rules: [{ required: true, message: '看板名称必填' }, {
-                  validator: this.checkBoardNameRepeat,
-                }],
-                initialValue: initialBoardName,
-              })(
-                <Input
-                  label="看板名称"
-                  maxLength={10}
-                />,
-              )}
-            </FormItem>
-          </Form>
-          <div style={{ padding: '12px 0', borderTop: '1px solid rgba(0, 0, 0, 0.12)' }}>
-            <Button
-              type="primary"
-              funcType="raised"
-              loading={loading}
-              onClick={this.handleUpdateBoardName}
-            >
-              {'保存'}
-            </Button>
-            <Button
-              funcType="raised"
-              style={{ marginLeft: 12 }}
-              onClick={() => {
-                setFieldsValue({
-                  boardName: lastBoardName,
-                });
-                this.setState({
-                  boardName: initialBoardName,
-                }, () => {
-                  console.log(this.state.boardName);
-                });
-                // this.props.history.push(`/agile/scrumboard?type=project&id=${AppState.currentMenuType.id}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
-              }}
-            >
-              {'取消'}
-            </Button>
-          </div>
+          {
+            editBoardNameDisabled ? (
+              <Input
+                style={{ width: 512 }}
+                label="看板名称"
+                maxLength={10}
+                defaultValue={initialBoardName}
+                disabled={editBoardNameDisabled}
+              />
+            ) : (
+              <div>
+                <Form layout="vertical">
+                  <FormItem label="boardName" style={{ width: 512 }}>
+                    {getFieldDecorator('boardName', {
+                      rules: [{ required: true, message: '看板名称必填' }, {
+                        validator: this.checkBoardNameRepeat,
+                      }],
+                      initialValue: initialBoardName,
+                    })(
+                      <Input
+                        label="看板名称"
+                        maxLength={10}
+                      />,
+                    )}
+                  </FormItem>
+                </Form>
+                <div style={{ padding: '12px 0', borderTop: '1px solid rgba(0, 0, 0, 0.12)' }}>
+                  <Button
+                    type="primary"
+                    funcType="raised"
+                    loading={loading}
+                    onClick={this.handleUpdateBoardName}
+                  >
+                    {'保存'}
+                  </Button>
+                  <Button
+                    funcType="raised"
+                    style={{ marginLeft: 12 }}
+                    onClick={() => {
+                      setFieldsValue({
+                        boardName: lastBoardName,
+                      });
+                      this.setState({
+                        boardName: initialBoardName,
+                      });
+                    }}
+                  >
+                    {'取消'}
+                  </Button>
+                </div>
+              </div>
+            )
+          }
+         
         </Spin>
        
       </Content>

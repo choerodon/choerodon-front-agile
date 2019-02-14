@@ -234,34 +234,71 @@ class ColumnPage extends Component {
   }
 
   renderColumn(data) {
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     const result = [];
     const { refresh } = this.props;
     for (let index = 0, len = data.length; index < len; index += 1) {
       result.push(
-        <SettingColumn
-          data={data[index]}
-          refresh={refresh.bind(this)}
+        <Permission
+          type={type}
+          projectId={projectId}
+          organizationId={orgId}
+          service={['agile-service.board.deleteScrumBoard']}
+          noAccessChildren={(
+            <SettingColumn
+              draggabled
+              data={data[index]}
+              refresh={refresh.bind(this)}
           // setLoading={this.props.setLoading.bind}
-          index={index}
-          styleValue={`${parseFloat(parseFloat(1 / data.length) * 100)}%`}
-        />,
+              index={index}
+              styleValue={`${parseFloat(parseFloat(1 / data.length) * 100)}%`}
+            />
+      )}
+        >
+          <SettingColumn
+            data={data[index]}
+            refresh={refresh.bind(this)}
+          // setLoading={this.props.setLoading.bind}
+            index={index}
+            styleValue={`${parseFloat(parseFloat(1 / data.length) * 100)}%`}
+          />
+        </Permission>,
       );
     }
     return result;
   }
 
   renderUnsetColumn() {
+    const menu = AppState.currentMenuType;
+    const { type, id: projectId, organizationId: orgId } = menu;
     const BoardData = ScrumBoardStore.getBoardData;
     const { refresh } = this.props;
     if (BoardData.length > 0) {
       if (BoardData[BoardData.length - 1].columnId === 'unset') {
         return (
-          <SettingColumn
-            data={BoardData[BoardData.length - 1]}
-            refresh={refresh.bind(this)}
-            index={BoardData.length - 1}
-            disabled
-          />
+          <Permission
+            type={type}
+            projectId={projectId}
+            organizationId={orgId}
+            service={['agile-service.board.deleteScrumBoard']}
+            noAccessChildren={(
+              <SettingColumn
+                draggabled
+                data={BoardData[BoardData.length - 1]}
+                refresh={refresh.bind(this)}
+                index={BoardData.length - 1}
+                disabled
+              />
+          )}
+          >
+            <SettingColumn
+              data={BoardData[BoardData.length - 1]}
+              refresh={refresh.bind(this)}
+              index={BoardData.length - 1}
+              disabled
+            />
+          </Permission>
         );
       }
     }
@@ -280,6 +317,7 @@ class ColumnPage extends Component {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
+   
       <Content
         description="分栏可以添加、删除、重新排序和重命名。列是基于全局状态和可移动的列与列之间。最小和最大限制可设置为每个已映射的列中。"
         style={{
