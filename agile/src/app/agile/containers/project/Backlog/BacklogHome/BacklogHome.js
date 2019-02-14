@@ -549,10 +549,11 @@ class BacklogHome extends Component {
       newIssueVisible: !newIssueVisible,
     });
     // 创建issue后刷新
-    if (res) {
-      this.refresh(false, res);
-      this.loadQuickFilter();
-    }
+    // if (res) {
+    //   this.refresh(false, res);
+    //   this.loadQuickFilter();
+    // }
+    this.refresh();
   };
 
   render() {
@@ -710,7 +711,11 @@ class BacklogHome extends Component {
                 ? (
                   <CreateIssue
                     visible={newIssueVisible}
-                    onCancel={this.handleCreateIssue}
+                    onCancel={() => {
+                      this.setState({
+                        newIssueVisible: false,
+                      });
+                    }}
                     onOk={this.handleCreateIssue}
                   />
                 ) : null
