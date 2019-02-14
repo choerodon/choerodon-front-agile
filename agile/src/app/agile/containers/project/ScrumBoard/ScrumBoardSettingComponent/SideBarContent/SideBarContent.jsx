@@ -8,12 +8,12 @@ import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoard
 import { STATUS } from '../../../../../common/Constant';
 
 const FormItem = Form.Item;
-const { Sidebar } = Modal;
+const { Sidebar, confirm } = Modal;
 const { Option } = Select;
 const { AppState } = stores;
 
 @observer
-class AddStatus extends Component {
+class SideBarContent extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -23,7 +23,57 @@ class AddStatus extends Component {
     this.checkStatusDebounce = false;
   }
 
-  handleAddStatus(e) {
+  handleAddColumn = (e) => {
+    const {
+      form, store, onChangeVisible, refresh,
+    } = this.props;
+    e.preventDefault();
+    form.validateFields((err, values) => {
+      if (!err) {
+        const statusDate = store.getStatusList;
+        const status = statusDate.find(s => s.name === values.column_name);
+        const categoryCode = values.column_categoryCode;
+        const data = {
+          boardId: ScrumBoardStore.getSelectedBoard,
+          name: values.column_name,
+          projectId: AppState.currentMenuType.id,
+          maxNum: 1,
+          minNum: 1,
+          categoryCode: values.column_categoryCode,
+          sequence: ScrumBoardStore.getBoardData.length - 1,
+        };
+        if (status) {
+          confirm({
+            title: '警告',
+            content: `已存在状态${values.column_name}，如果创建该列，不会创建同名状态`,
+            onOk() {
+              ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
+                onChangeVisible(false);
+                refresh();
+              }).catch((error) => {
+              });
+            },
+            onCancel() {
+            },
+          });
+        } else {
+          ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
+            onChangeVisible(false);
+            refresh();
+            this.setState({
+              loading: false,
+            });
+          }).catch((error) => {
+            this.setState({
+              loading: false,
+            });
+          });
+        }
+      }
+    });
+  }
+
+  handleAddStatus = (e) => {
     e.preventDefault();
     const { form, onChangeVisible, refresh } = this.props;
     form.validateFields((err, values) => {
@@ -89,41 +139,26 @@ class AddStatus extends Component {
   }
 
   renderOptions() {
-    const result = [];
     if (JSON.stringify(ScrumBoardStore.getStatusCategory) !== '{}') {
-      const data = ScrumBoardStore.getStatusCategory.lookupValues;
-      data.sort((x, y) => {
-        if (x.valueCode === 'todo') {
-          return -1;
-        } else if (x.valueCode === 'done') {
-          return 1;
-        } else if (y.valueCode === 'todo') {
-          return 1;
-        } else {
-          return -1;
-        }
-      });
-      for (let index = 0, len = data.length; index < len; index += 1) {
-        result.push(
-          <Option value={data[index].valueCode}>
-            <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-              <div style={{
-                width: 15,
-                height: 15,
-                borderRadius: 2,
-                marginRight: 5,
-                background: STATUS[data[index].valueCode] || 'rgb(255, 177, 0)',
-              }}
-              />
-              <span>
-                {` ${data[index].name}`}
-              </span>
-            </div>
-          </Option>,
-        );
-      }
+      return ScrumBoardStore.getStatusCategory.lookupValues.sort().map(item => (
+        <Option value={item.valueCode}>
+          <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <div style={{
+              width: 15,
+              height: 15,
+              borderRadius: 2,
+              marginRight: 5,
+              background: STATUS[item.valueCode] || 'rgb(255, 177, 0)',
+            }}
+            />
+            <span>
+              {item.name}
+            </span>
+          </div>
+        </Option>
+      ));
     }
-    return result;
+    return [];
   }
 
   render() {
@@ -132,44 +167,55 @@ class AddStatus extends Component {
       visible,
       onChangeVisible,
       fromStatus,
+      type,
     } = this.props;
     const {
       loading,
       statusType,
     } = this.state;
     const { getFieldDecorator } = form;
-    let kanbanName;
-    for (let index = 0, len = ScrumBoardStore.getBoardList.length; index < len; index += 1) {
-      if (ScrumBoardStore.getBoardList[index].boardId === ScrumBoardStore.getSelectedBoard) {
-        kanbanName = ScrumBoardStore.getBoardList[index].name;
-      }
-    }
+    const { name: kanbanName } = ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard);
+    const modifiedMap = new Map([
+      ['Status', {
+        name: '状态',
+        contentTitle: fromStatus ? `在项目“${AppState.currentMenuType.name}”中创建状态` : `添加看板“${kanbanName}”的状态`,
+        contentDescription: '配置完成后，您可以通过board对问题拖拽进行状态的流转。',
+        onOk: this.handleAddStatus,
+      }],
+      ['Column', {
+        name: '列',
+        contentTitle: `添加看板“${kanbanName}”的列`,
+        contentDescription: '同时可以通过设置最大最小值来控制每列中的问题数量',
+        onOk: this.handleAddColumn,
+      }],
+    ]);
+    const { name: modifiedName, contentDescription: description } = modifiedMap.get(type);
     return (
       <Sidebar
-        title="添加状态"
+        title={`添加${modifiedName}`}
         visible={visible}
         onCancel={onChangeVisible.bind(this, false)}
-        onOk={this.handleAddStatus.bind(this)}
+        onOk={modifiedMap.get(type).onOk}
         confirmLoading={loading}
         okText="创建"
         cancelText="取消"
       >
         <Content
           style={{ padding: 0 }}
-          title={fromStatus ? `在项目“${AppState.currentMenuType.name}”中创建状态` : `添加看板“${kanbanName}”的状态`}
-          description="请在下面输入状态名称，选择状态的类别。可以添加、删除、重新排序和重命名一个状态，配置完成后，您可以通过board对问题拖拽进行状态的流转。"
+          title={modifiedMap.get(type).contentTitle}
+          description={`请在下面输入${modifiedName}名称，选择${modifiedName}的类别。可以添加、删除、重新排序和重命名一个${modifiedName}，${description}`}
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
         >
           <Form style={{ width: 512 }}>
             <FormItem>
               {getFieldDecorator('name', {
                 rules: [{
-                  required: true, message: '状态名称是必填的',
+                  required: true, message: `${modifiedName}名称是必填的`,
                 }, {
                   validator: this.checkStatusName.bind(this),
                 }],
               })(
-                <Input label="状态名称" placeholder="请输入状态名称" maxLength={30} />,
+                <Input label={`${modifiedName}名称`} placeholder={`请输入${modifiedName}名称`} maxLength={30} />,
               )}
             </FormItem>
             <FormItem>
@@ -194,4 +240,4 @@ class AddStatus extends Component {
   }
 }
 
-export default Form.create()(AddStatus);
+export default Form.create()(SideBarContent);

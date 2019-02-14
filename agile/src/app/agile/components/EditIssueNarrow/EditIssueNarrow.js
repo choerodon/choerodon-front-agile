@@ -1100,10 +1100,7 @@ class CreateSprint extends Component {
    */
   renderDataLogs() {
     const {
-      datalogs: stateDatalogs,
-      typeCode,
-      createdById,
-      creationDate,
+      datalogs: stateDatalogs, typeCode, createdById, creationDate,
     } = this.state;
     const datalogs = _.filter(stateDatalogs, v => v.field !== 'Version');
     return <DataLogs datalogs={datalogs} typeCode={typeCode} createdById={createdById} creationDate={creationDate} />;
@@ -1364,6 +1361,7 @@ class CreateSprint extends Component {
       backUrl,
       history,
       onCancel,
+      style,
     } = this.props;
     const {
       activeSprint,
@@ -1533,7 +1531,7 @@ class CreateSprint extends Component {
     );
     const urlParams = AppState.currentMenuType;
     return (
-      <div className="choerodon-modal-editIssue">
+      <div className="choerodon-modal-editIssue" style={style}>
         {
           issueLoading ? (
             <div
@@ -1952,7 +1950,8 @@ class CreateSprint extends Component {
                                   </div>
                                 ) : '无'
                               }
-                              </div>)}
+                              </div>
+                            )}
                           >
                             <Select
                               value={originStatus.length ? statusId : statusName}
@@ -2902,7 +2901,8 @@ class CreateSprint extends Component {
                                   />
                                 ) : '无'
                               }
-                              </div>)}
+                              </div>
+                            )}
                           >
                             <Select
                               value={flag === 'loading' ? undefined : assigneeId || undefined}

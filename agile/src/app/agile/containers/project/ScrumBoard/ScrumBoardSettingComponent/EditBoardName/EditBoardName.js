@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  stores, axios, Page, Header, Content, Permission, 
+  stores, axios, Page, Header, Content, Permission,
 } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
@@ -12,8 +12,6 @@ import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoard
 const { AppState } = stores;
 const { Option } = Select;
 const FormItem = Form.Item;
-const RadioGroup = Radio.Group;
-const sign = false;
 
 class EditBoardName extends Component {
   constructor(props) {
@@ -27,7 +25,7 @@ class EditBoardName extends Component {
   }
 
   componentDidMount() {
-    const initialBoardName = ScrumBoardStore.getBoardList.find(item => item.boardId === ScrumBoardStore.getSelectedBoard).name;
+    const initialBoardName = ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard).name;
     this.setState({
       initialBoardName,
       lastBoardName: initialBoardName,
@@ -39,21 +37,20 @@ class EditBoardName extends Component {
     const proId = AppState.currentMenuType.id;
     if (initialBoardName === value) {
       callback();
-    } else {
-      ScrumBoardStore.checkBoardNameRepeat(proId, value)
-        .then((res) => {
-          if (res) {
-            callback('看板名称重复');
-          } else {
-            this.setState(
-              { 
-                boardName: value,
-              },
-            );
-            callback();
-          }
-        });
     }
+    ScrumBoardStore.checkBoardNameRepeat(proId, value)
+      .then((res) => {
+        if (res) {
+          callback('看板名称重复');
+        } else {
+          this.setState(
+            {
+              boardName: value,
+            },
+          );
+          callback();
+        }
+      });
   };
 
   handleUpdateBoardName = () => {
@@ -87,7 +84,7 @@ class EditBoardName extends Component {
   }
 
   render() {
-    const { getFieldDecorator, setFieldsValue } = this.props.form;
+    const { form: { getFieldDecorator, setFieldsValue } } = this.props;
     const {
       initialBoardName, loading, boardName, lastBoardName,
     } = this.state;
@@ -133,8 +130,6 @@ class EditBoardName extends Component {
                 });
                 this.setState({
                   boardName: initialBoardName,
-                }, () => {
-                  console.log(this.state.boardName);
                 });
                 // this.props.history.push(`/agile/scrumboard?type=project&id=${AppState.currentMenuType.id}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
               }}
@@ -143,7 +138,7 @@ class EditBoardName extends Component {
             </Button>
           </div>
         </Spin>
-       
+
       </Content>
     );
   }
