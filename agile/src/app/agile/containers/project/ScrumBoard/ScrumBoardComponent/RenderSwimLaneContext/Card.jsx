@@ -28,6 +28,18 @@ export default class CardProvider extends React.Component {
     }
   };
 
+  convertedDay = (stayDay) => {
+    if (stayDay >= 0 && stayDay <= 6) {
+      return 1;
+    } else if (stayDay >= 7 && stayDay <= 10) {
+      return 2;
+    } else if (stayDay >= 11 && stayDay <= 15) {
+      return 3;
+    } else {
+      return 4;
+    }
+  }
+
   render() {
     const {
       completed, issue, statusName, categoryCode, onClick, ...otherProps
@@ -97,7 +109,7 @@ export default class CardProvider extends React.Component {
                         character={<Icon type="brightness_1" />}
                         allowHalf
                         disabled
-                        // value={convertedDay}
+                        value={this.convertedDay(issue.stayDay)}
                         count={4}
                         className={issue.stayDay <= 3 ? 'notEmergency' : 'emergency'}
                       />
