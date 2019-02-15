@@ -3,7 +3,6 @@ import {
 } from 'mobx';
 import axios from 'axios';
 import { store, stores } from 'choerodon-front-boot';
-import { Observable } from 'rxjs/Observable';
 
 const { AppState } = stores;
 

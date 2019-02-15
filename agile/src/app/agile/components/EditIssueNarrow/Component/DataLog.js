@@ -23,6 +23,11 @@ const PROP_SIMPLE = {
   Component: '模块',
   'Fix Version': '修复版本',
   'Epic Child': '史诗关联任务',
+  issue_epic: '史诗',
+  story: '故事',
+  bug: '缺陷',
+  task: '任务',
+  sub_task: '子任务',
   description: '描述',
   Attachment: '附件',
   timespent: '花费时间',
@@ -43,11 +48,11 @@ class DataLog extends Component {
 
   getMode1(datalog) {
     const {
-      field, oldString, oldValue, newString, newValue, categoryCode, 
+      field, oldString, oldValue, newString, newValue, categoryCode,
     } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
-      if (['labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child'].includes(field)) {
+      if (['labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child', 'issue_epic', 'story', 'bug', 'task', 'sub_task'].includes(field)) {
         return '创建';
       }
       if (['Attachment'].includes(field)) {
@@ -130,7 +135,7 @@ class DataLog extends Component {
 
   getMode2(datalog) {
     const {
-      field, oldString, oldValue, newString, newValue, 
+      field, oldString, oldValue, newString, newValue,
     } = datalog;
     if (field === 'status') {
       return '';
@@ -146,7 +151,7 @@ class DataLog extends Component {
   // ['由', '']
   getMode3(datalog) {
     const {
-      field, oldString, oldValue, newString, newValue, 
+      field, oldString, oldValue, newString, newValue,
     } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
@@ -193,7 +198,7 @@ class DataLog extends Component {
   // 原值，只有移除和修改可能出现
   getMode4(datalog) {
     const {
-      field, oldString, oldValue, newString, newValue, 
+      field, oldString, oldValue, newString, newValue,
     } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
@@ -206,7 +211,7 @@ class DataLog extends Component {
       if (['description', 'WorklogId', 'Rank', 'Comment'].includes(field)) {
         return '';
       }
-      
+
       if (field === 'status') {
         return '';
       }
@@ -256,7 +261,7 @@ class DataLog extends Component {
   // ['改变为', '为', '']
   getMode5(datalog) {
     const {
-      field, oldString, oldValue, newString, newValue, 
+      field, oldString, oldValue, newString, newValue,
     } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
@@ -296,7 +301,7 @@ class DataLog extends Component {
   // 新值，只有新增和修改可能出现
   getMode6(datalog) {
     const {
-      field, oldString, oldValue, newString, newValue, 
+      field, oldString, oldValue, newString, newValue,
     } = datalog;
     const { typeCode } = this.props;
     const TYPEARR = {
@@ -384,7 +389,7 @@ class DataLog extends Component {
 
   render() {
     const {
-      datalog, i, origin, user, callback, expand, 
+      datalog, i, origin, user, callback, expand,
     } = this.props;
     return (
       <div>
@@ -414,7 +419,7 @@ class DataLog extends Component {
                         />
                       )
                     }
-              
+
                   </div>
                 </div>
                 <div style={{ flex: 1, borderBottom: '1px solid rgba(0, 0, 0, 0.12)', padding: '8.5px 0' }}>
@@ -443,28 +448,28 @@ class DataLog extends Component {
                               datalog.imageUrl ? (
                                 <img src={datalog.imageUrl} alt="" style={{ width: '100%' }} />
                               ) : (
-                                <span style={{
-                                  width: 62, height: 62, lineHeight: '62px', textAlign: 'center', color: '#6473c3', 
-                                }}
-                                >
-                                  {this.getFirst(datalog.name)}
-                                </span>
-                              )
+                                  <span style={{
+                                    width: 62, height: 62, lineHeight: '62px', textAlign: 'center', color: '#6473c3',
+                                  }}
+                                  >
+                                    {this.getFirst(datalog.name)}
+                                  </span>
+                                )
                             }
                           </div>
                           <h1 style={{
-                            margin: '8px auto 18px', fontSize: '13px', lineHeight: '20px', textAlign: 'center', 
+                            margin: '8px auto 18px', fontSize: '13px', lineHeight: '20px', textAlign: 'center',
                           }}
                           >
                             {datalog.name}
                           </h1>
                           <div style={{
-                            color: 'rgba(0, 0, 0, 0.65)', fontSize: '13px', textAlign: 'center', display: 'flex', 
+                            color: 'rgba(0, 0, 0, 0.65)', fontSize: '13px', textAlign: 'center', display: 'flex',
                           }}
                           >
                             <Icon type="markunread" style={{ lineHeight: '20px' }} />
                             <span style={{
-                              marginLeft: 6, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
+                              marginLeft: 6, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                             }}
                             >
                               {datalog.email}
