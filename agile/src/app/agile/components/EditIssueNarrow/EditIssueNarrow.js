@@ -2130,20 +2130,10 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={(value) => {
                                     this.setState({
-                                      componentIssueRelDTOList: value.map(
+                                      componentIssueRelDTOList: value.filter(v => v && v.trim()).map(
                                         item => item.trim().substr(0, 10),
                                       ),
                                     });
-                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    // this.needBlur = false;
-                                    // if (this.changeTimer > 0) {
-                                    //   clearTimeout(this.changeTimer);
-                                    //   this.changeTimer = 0;
-                                    // }
-                                    // this.changeTimer = setTimeout(() => {
-                                    //   this.needBlur = true;
-                                    // }, 1000);
                                   }}
                                 >
                                   {originComponents && originComponents.map(component => (
@@ -2313,7 +2303,7 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={(value) => {
                                     this.setState({
-                                      influenceVersions: value.map(
+                                      influenceVersions: value.filter(v => v && v.trim()).map(
                                         item => item.trim().substr(0, 30),
                                       ),
                                     });
@@ -2400,20 +2390,10 @@ class CreateSprint extends Component {
                               }}
                               onChange={(value) => {
                                 this.setState({
-                                  fixVersions: value.map(
+                                  fixVersions: value.filter(v => v && v.trim()).map(
                                     item => item.trim().substr(0, 30),
                                   ),
                                 });
-                                // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                // this.needBlur = false;
-                                // if (this.changeTimer > 0) {
-                                //   clearTimeout(this.changeTimer);
-                                //   this.changeTimer = 0;
-                                // }
-                                // this.changeTimer = setTimeout(() => {
-                                //   this.needBlur = true;
-                                // }, 1000);
                               }}
                             >
                               {originVersions.map(version => (

@@ -118,7 +118,8 @@ class BacklogHome extends Component {
                 sprint.style.backgroundColor = 'white';
               }
             }, 2000);
-          } else if (issue) {
+          } else if (issue && issue.issueId) {
+            BacklogStore.setClickIssueDetail(issue);
             const anchorElement = document.getElementById(issue.issueId);
             if (anchorElement) {
               anchorElement.scrollIntoView({
@@ -549,11 +550,9 @@ class BacklogHome extends Component {
       newIssueVisible: !newIssueVisible,
     });
     // 创建issue后刷新
-    // if (res) {
-    //   this.refresh(false, res);
-    //   this.loadQuickFilter();
-    // }
-    this.refresh();
+    if (res) {
+      this.refresh(false, res);
+    }
   };
 
   render() {

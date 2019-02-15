@@ -2501,7 +2501,7 @@ class CreateSprint extends Component {
                                   }}
                                   onChange={(value) => {
                                     this.setState({
-                                      componentIssueRelDTOList: value.map(
+                                      componentIssueRelDTOList: value.filter(v => v && v.trim()).map(
                                         item => item.trim().substring(0, 10),
                                       ),
                                     });
@@ -2693,7 +2693,7 @@ class CreateSprint extends Component {
                                   onChange={(value) => {
                                     this.needBlur = false;
                                     this.setState({
-                                      influenceVersions: value.map(
+                                      influenceVersions: value.filter(v => v && v.trim()).map(
                                         item => item.trim().substr(0, 30),
                                       ),
                                     });
@@ -2786,7 +2786,7 @@ class CreateSprint extends Component {
                                 }}
                                 onChange={(value) => {
                                   this.setState({
-                                    fixVersions: value.map(
+                                    fixVersions: value.filter(v => v && v.trim()).map(
                                       item => item.trim().substr(0, 30),
                                     ),
                                   });

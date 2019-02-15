@@ -21,6 +21,7 @@ const { Sidebar } = Modal;
 const { Option } = Select;
 const FormItem = Form.Item;
 let sign = false;
+let hasPermission = false;
 
 const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
 
@@ -80,6 +81,7 @@ class CreateIssue extends Component {
   componentDidMount() {
     this.loadPriorities();
     this.loadIssueTypes();
+    this.loadPermission();
   }
 
   onFilterChangeAssignee(input) {
@@ -183,6 +185,17 @@ class CreateIssue extends Component {
       });
   };
 
+  loadPermission = () => {
+    axios.post('/iam/v1/permissions/checkPermission', [{
+      code: 'agile-service.project-info.updateProjectInfo',
+      organizationId: AppState.currentMenuType.organizationId,
+      projectId: AppState.currentMenuType.id,
+      resourceType: 'project',
+    }]).then((permission) => {
+      hasPermission = permission.length && permission[0].approve;
+    });
+  };
+
   handleChangeStoryPoint = (value) => {
     const { storyPoints } = this.state;
     // 只允许输入整数，选择时可选0.5
@@ -264,13 +277,14 @@ class CreateIssue extends Component {
       if (!err) {
         const { typeCode } = originIssueTypes.find(t => t.id === values.typeId);
         const exitComponents = originComponents;
-        const componentIssueRelDTOList = _.map(values.componentIssueRel, (component) => {
-          const target = _.find(exitComponents, { name: component });
+        const componentIssueRelDTOList = _.map(values.componentIssueRel
+          && values.componentIssueRel.filter(v => v && v.trim()), (component) => {
+          const target = _.find(exitComponents, { name: component.trim() });
           if (target) {
             return target;
           } else {
             return ({
-              name: component,
+              name: component.trim(),
               projectId: AppState.currentMenuType.id,
             });
           }
@@ -288,8 +302,9 @@ class CreateIssue extends Component {
           }
         });
         const exitFixVersions = originFixVersions;
-        const fixVersionIssueRelDTOList = _.map(values.fixVersionIssueRel, (version) => {
-          const target = _.find(exitFixVersions, { name: version });
+        const fixVersionIssueRelDTOList = _.map(values.fixVersionIssueRel
+          && values.fixVersionIssueRel.filter(v => v && v.trim()), (version) => {
+          const target = _.find(exitFixVersions, { name: version.trim() });
           if (target) {
             return {
               ...target,
@@ -297,7 +312,7 @@ class CreateIssue extends Component {
             };
           } else {
             return ({
-              name: version,
+              name: version.trim(),
               relationType: 'fix',
               projectId: AppState.currentMenuType.id,
             });
@@ -664,7 +679,7 @@ class CreateIssue extends Component {
                 })(
                   <Select
                     label="修复版本"
-                    mode="tags"
+                    mode={hasPermission ? 'tags' : 'multiple'}
                     loading={selectLoading}
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     tokenSeparators={[',']}
@@ -701,7 +716,7 @@ class CreateIssue extends Component {
                 })(
                   <Select
                     label="模块"
-                    mode="tags"
+                    mode={hasPermission ? 'tags' : 'multiple'}
                     loading={selectLoading}
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     tokenSeparators={[',']}
