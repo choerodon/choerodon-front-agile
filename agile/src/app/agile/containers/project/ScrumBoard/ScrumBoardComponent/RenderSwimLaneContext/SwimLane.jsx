@@ -95,7 +95,6 @@ class SwimLane extends Component {
   };
 
   render() {
-    trace(true);
     const { mode } = this.props;
     return (
       this.renderContext(mode)

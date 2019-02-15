@@ -9,7 +9,7 @@ import { observer } from 'mobx-react';
 class StatusColumn extends Component {
   render() {
     const { columnData } = this.props;
-    return columnData.map(column => (
+    return columnData.filter(column => column.hasStatus).map(column => (
       <div className="c7n-scrumboard-statusHeader" key={column.columnId}>
         <p className="c7n-scrumboard-statusHeader-name">
           {column.columnName}

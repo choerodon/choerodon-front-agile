@@ -8,30 +8,23 @@ const NoneSprint = () => (
     <div
       style={{
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh',
+        marginTop: '80px',
       }}
     >
-      <div className="emojis">
-        <div>L️</div>
-        <div>O</div>
-        <div>A</div>
-        <div>D</div>
-        <div>I</div>
-        <div>N</div>
-        <div>G</div>
-      </div>
-
-      <div className="palette">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+      <img style={{ width: 170 }} src={EmptyScrumboard} alt="emptyscrumboard" />
+      <div
+        style={{
+          marginLeft: 40,
+        }}
+      >
+        <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
+        <p style={{ fontSize: 20, lineHeight: '34px' }}>
+          {'在'}
+          <span style={{ color: '#3f51b5' }}>待办事项</span>
+          {'中开始Sprint'}
+        </p>
       </div>
     </div>
   </React.Fragment>
