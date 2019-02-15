@@ -228,7 +228,7 @@ class BurndownChartHome extends Component {
       tableLoading: true,
     });
     BurndownChartStore
-      .axiosGetBurndownChartReport(this.state.defaultSprint, this.state.select, this.state.dateSort).then((res) => {
+      .axiosGetBurndownChartReport(this.state.defaultSprint, this.state.select).then((res) => {
         const data = res;
         const newData = [];
         // 将操作日期相同的合并
@@ -629,14 +629,14 @@ class BurndownChartHome extends Component {
     });
   };
 
-  handleChangeSort = () => {
-    const { dateSort } = this.state;
-    this.setState({
-      dateSort: dateSort === 'asc' ? 'desc' : 'asc',
-    }, () => {
-      this.getChartData();
-    })
-  }
+  // handleChangeSort = () => {
+  //   const { dateSort } = this.state;
+  //   this.setState({
+  //     dateSort: dateSort === 'asc' ? 'desc' : 'asc',
+  //   }, () => {
+  //     this.getChartData();
+  //   })
+  // }
 
   render() {
     const {select, dateSort} = this.state;
@@ -651,9 +651,10 @@ class BurndownChartHome extends Component {
       unit = '(个)';
     }
     const columns = [{
-      title: (
-        <span>日期<Icon type={ dateSort === 'asc' ? 'arrow_upward' : 'arrow_downward' } style={{ cursor: 'pointer', marginTop: -4, marginLeft: 4 }} onClick={this.handleChangeSort} /></span>
-      ),
+      // title: (
+      //   <span>日期<Icon type={ dateSort === 'asc' ? 'arrow_upward' : 'arrow_downward' } style={{ cursor: 'pointer', marginTop: -4, marginLeft: 4 }} onClick={this.handleChangeSort} /></span>
+      // ),
+      title: '日期',
       dataIndex: 'date',
       key: 'date',
       width: '16%',
