@@ -28,18 +28,8 @@ class AccumulationHome extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeVisible: false,
-      reportVisible: false,
-      filterList: [],
-      columnDatas: [],
-      timeId: '',
-      startDate: '',
-      endDate: '',
-      boardList: [],
       options: {},
-      options2: {},
       optionsVisible: false,
-      sprintData: {},
       loading: true,
       linkFromParamUrl: undefined,
     };
@@ -97,7 +87,12 @@ class AccumulationHome extends Component {
   }
 
   getColumnData(id, type) {
-    ScrumBoardStore.axiosGetBoardData(id, 0, false, [], []).then((res2) => {
+    ScrumBoardStore.axiosGetBoardData(id, {
+      onlyMe: false,
+      onlyStory: false,
+      quickSearchArray: [],
+      assigneeFilterIds: [],
+    }).then((res2) => {
       const data2 = res2.columnsData.columns;
       for (let index = 0, len = data2.length; index < len; index += 1) {
         data2[index].check = true;
@@ -390,7 +385,7 @@ class AccumulationHome extends Component {
       },
       id: 'boardId',
       text: '看板',
-    },  {
+    }, {
       data: AccumulationStore.getFilterList,
       onChecked: id => this.getTimeType(AccumulationStore.getFilterList, 'filterId', 'array').indexOf(String(id)) !== -1,
       onChange: (id, bool) => {
