@@ -31,6 +31,7 @@ export default class ScrumBoardDataController {
       columnId: column.columnId,
       columnName: column.name,
       columnIssueCount: this.flattenedArr.filter(issue => issue.columnId === column.columnId).length,
+      hasStatus: column.subStatuses.length > 0,
     }]);
   }
 

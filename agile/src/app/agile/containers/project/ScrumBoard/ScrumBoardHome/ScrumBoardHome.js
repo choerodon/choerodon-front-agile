@@ -51,7 +51,7 @@ class ScrumBoardHome extends Component {
 
   componentWillUnmount() {
     this.dataConverter = null;
-    ScrumBoardStore.setClickIssueDetail({});
+    ScrumBoardStore.resetDataBeforeUnmount();
   }
 
   async getBoard() {
@@ -136,18 +136,6 @@ class ScrumBoardHome extends Component {
       });
     }).catch((error) => {
     });
-  }
-
-  // 渲染状态列表头
-  renderStatusColumns = () => {
-    const headerData = this.dataConverter.getHeaderData();
-    return headerData && headerData.map(columnData => (
-      <StatusColumn
-        key={columnData.columnId}
-        name={columnData.columnName}
-        count={columnData.columnIssueCount}
-      />
-    ));
   };
 
   changeState = (name, value) => {
@@ -413,7 +401,7 @@ class ScrumBoardHome extends Component {
           </div>
         </div>
         <Spin spinning={ScrumBoardStore.getSpinIf}>
-          {!ScrumBoardStore.getSprintId ? (
+          {!ScrumBoardStore.didCurrentSprintExist ? (
             <NoneSprint />
           ) : (
             <React.Fragment>

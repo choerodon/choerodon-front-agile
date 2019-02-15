@@ -18,7 +18,7 @@ export default class ColumnProvider extends React.Component {
   }
 
   render() {
-    const { columnStructure, subIssueData } = this.props;
-    return columnStructure.map(column => this.getColumn(column));
+    const { columnStructure, column_status_RelationMap } = this.props;
+    return columnStructure.filter(column => column_status_RelationMap.get(column.columnId).length > 0).map(column => this.getColumn(column));
   }
 }

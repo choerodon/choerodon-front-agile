@@ -9,6 +9,8 @@ const { AppState } = stores;
 
 @store('ScrumBoardStore')
 class ScrumBoardStore {
+  @observable currentSprintExist = false;
+
   @observable translateToCompleted = [];
 
   @observable clickedIssue = false;
@@ -68,7 +70,7 @@ class ScrumBoardStore {
 
   @observable dayRemain = 0;
 
-  @observable sprintId = 0;
+  @observable sprintId = null;
 
   @observable interconnectedData = new Map();
 
@@ -341,8 +343,12 @@ class ScrumBoardStore {
     return this.clickIssueDetail;
   }
 
-  @action setClickIssueDetail(data) {
-    this.clickIssueDetail = data;
+  @action resetDataBeforeUnmount() {
+    this.clickIssueDetail = {};
+    this.swimlaneBasedCode = null;
+    this.swimLaneData = {};
+    this.headerData = new Map();
+    this.currentSprintExist = false;
   }
 
   @computed get getDayRemain() {
@@ -708,6 +714,7 @@ class ScrumBoardStore {
     this.currentConstraint = columnConstraint;
     this.quickSearchList = quickSearchList;
     if (currentSprint) {
+      this.currentSprintExist = true;
       this.dayRemain = currentSprint.dayRemain;
       this.sprintId = currentSprint.sprintId;
       this.sprintName = currentSprint.sprintName;
@@ -799,6 +806,10 @@ class ScrumBoardStore {
 
   @computed get getInterconnectedData() {
     return this.interconnectedData;
+  }
+
+  @computed get didCurrentSprintExist() {
+    return this.currentSprintExist;
   }
 
   @action setSwimLaneData(startSwimLane, startStatus, startStatusIndex, destinationSwimLane, destinationStatus, destinationStatusIndex, issue, revert) {

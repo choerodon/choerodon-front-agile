@@ -9,6 +9,11 @@ import './StatusIssue.scss';
 import UserHead from '../../../../../components/UserHead';
 
 export default class CardProvider extends React.Component {
+  constructor(props) {
+    super(props);
+    this.ref = {};
+  }
+
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     if (JSON.stringify(nextProps) === JSON.stringify(this.props)) {
       return false;
@@ -38,7 +43,7 @@ export default class CardProvider extends React.Component {
     } else {
       return 4;
     }
-  }
+  };
 
   render() {
     const {
@@ -48,7 +53,7 @@ export default class CardProvider extends React.Component {
       <div
         className="c7n-scrumboard-issue"
         role="none"
-        onClick={() => {
+        onClick={(e) => {
           onClick();
         }}
         {...otherProps}
