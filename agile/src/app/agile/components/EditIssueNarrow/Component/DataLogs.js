@@ -33,7 +33,6 @@ class DataLogs extends Component {
     const {
       datalogs, typeCode, createdById, creationDate, 
     } = this.props;
-
     return (
       <div>
         {

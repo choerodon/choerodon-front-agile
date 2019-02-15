@@ -235,7 +235,7 @@ class CreateSprint extends Component {
     }
   }
 
-  getCurrentNav(e) {
+  getCurrentNav = (e) => {
     const { issueTypeDTO } = this.state;
     let eles;
     if (issueTypeDTO && issueTypeDTO.typeCode === 'sub_task') {
@@ -466,7 +466,7 @@ class CreateSprint extends Component {
             <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
             <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
             {
-            subIssueDTOList.length ? <p style={{ color: '#d50000' }}>{`注意：问题的${subIssueDTOList.length}子任务将被删除。`}</p> : null
+              subIssueDTOList.length ? <p style={{ color: '#d50000' }}>{`注意：问题的${subIssueDTOList.length}子任务将被删除。`}</p> : null
             }
           </div>
         ),
@@ -476,7 +476,7 @@ class CreateSprint extends Component {
             that.props.onDeleteIssue();
           });
       },
-      onCancel() {},
+      onCancel() { },
       okText: '删除',
       okType: 'danger',
     });
@@ -1100,10 +1100,26 @@ class CreateSprint extends Component {
    */
   renderDataLogs() {
     const {
-      datalogs: stateDatalogs, typeCode, createdById, creationDate,
+      datalogs: stateDatalogs, typeCode, createdById, creationDate, origin,
     } = this.state;
     const datalogs = _.filter(stateDatalogs, v => v.field !== 'Version');
-    return <DataLogs datalogs={datalogs} typeCode={typeCode} createdById={createdById} creationDate={creationDate} />;
+    const {
+      createdBy,
+      createrImageUrl, createrEmail,
+      createrName, issueTypeDTO,
+    } = origin;
+    const createLog = {
+      email: createrEmail,
+      field: issueTypeDTO && issueTypeDTO.typeCode,
+      imageUrl: createrImageUrl,
+      name: createrName,
+      lastUpdateDate: origin.creationDate,
+      lastUpdatedBy: createdBy,
+      newString: 'issueNum',
+      newValue: 'issueNum',
+    };
+    debugger;
+    return <DataLogs datalogs={[...datalogs, createLog]} typeCode={typeCode} createdById={createdById} creationDate={creationDate} />;
   }
 
   /**
@@ -1340,13 +1356,13 @@ class CreateSprint extends Component {
               }
             </div>
           ) : (
-            <div style={{
-              borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px',
-            }}
-            >
-              <span style={{ marginRight: 12 }}>暂无</span>
-            </div>
-          )
+              <div style={{
+                borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px',
+              }}
+              >
+                <span style={{ marginRight: 12 }}>暂无</span>
+              </div>
+            )
         }
       </div>
     );
@@ -1745,17 +1761,17 @@ class CreateSprint extends Component {
                           {issueNum}
                         </span>
                       ) : (
-                        <a
-                          role="none"
-                          onClick={() => {
-                            // const backUrl = this.props.backUrl || 'backlog';
-                            history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${origin.issueNum}&paramIssueId=${origin.issueId}&paramUrl=${backUrl || 'backlog'}`);
-                            return false;
-                          }}
-                        >
-                          {issueNum}
-                        </a>
-                      )
+                          <a
+                            role="none"
+                            onClick={() => {
+                              // const backUrl = this.props.backUrl || 'backlog';
+                              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${origin.issueNum}&paramIssueId=${origin.issueId}&paramUrl=${backUrl || 'backlog'}`);
+                              return false;
+                            }}
+                          >
+                            {issueNum}
+                          </a>
+                        )
                     }
                   </div>
                   <div
@@ -1796,7 +1812,7 @@ class CreateSprint extends Component {
                           currentRae: undefined,
                         });
                       }}
-                      // onBlur={() => this.statusOnChange()}
+                    // onBlur={() => this.statusOnChange()}
                     />
                   </ReadAndEdit>
                   <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
@@ -1935,21 +1951,21 @@ class CreateSprint extends Component {
                             readModeContent={(
                               <div>
                                 {
-                                statusId ? (
-                                  <div
-                                    style={{
-                                      background: STATUS[statusCode],
-                                      color: '#fff',
-                                      borderRadius: '2px',
-                                      padding: '0 8px',
-                                      display: 'inline-block',
-                                      margin: '2px auto 2px 0',
-                                    }}
-                                  >
-                                    { statusName }
-                                  </div>
-                                ) : '无'
-                              }
+                                  statusId ? (
+                                    <div
+                                      style={{
+                                        background: STATUS[statusCode],
+                                        color: '#fff',
+                                        borderRadius: '2px',
+                                        padding: '0 8px',
+                                        display: 'inline-block',
+                                        margin: '2px auto 2px 0',
+                                      }}
+                                    >
+                                      {statusName}
+                                    </div>
+                                  ) : '无'
+                                }
                               </div>
                             )}
                           >
@@ -1973,7 +1989,7 @@ class CreateSprint extends Component {
                                 originStatus && originStatus.length
                                   ? originStatus.map(transform => (transform.statusDTO ? (
                                     <Option key={transform.id} value={transform.endStatusId}>
-                                      { transform.statusDTO.name }
+                                      {transform.statusDTO.name}
                                     </Option>
                                   ) : ''))
                                   : null
@@ -2018,10 +2034,10 @@ class CreateSprint extends Component {
                                       display: 'inline-block',
                                     }}
                                   >
-                                    { priorityName }
+                                    {priorityName}
                                   </div>
                                 ) : '无'
-                              }
+                                }
                               </div>
                             )}
                           >
@@ -2067,7 +2083,7 @@ class CreateSprint extends Component {
                                           display: 'inline-block',
                                         }}
                                       >
-                                        { priority.name }
+                                        {priority.name}
                                       </div>
                                     </div>
                                   </Option>
@@ -2178,30 +2194,30 @@ class CreateSprint extends Component {
                             readModeContent={(
                               <div>
                                 {
-                                labelIssueRelDTOList.length > 0 ? (
-                                  <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                    {
-                                      this.transToArr(labelIssueRelDTOList, 'labelName', 'array').map(label => (
-                                        <div
-                                          key={label}
-                                          style={{
-                                            color: '#000',
-                                            borderRadius: '100px',
-                                            fontSize: '13px',
-                                            lineHeight: '24px',
-                                            padding: '2px 12px',
-                                            background: 'rgba(0, 0, 0, 0.08)',
-                                            marginRight: '8px',
-                                            marginBottom: 3,
-                                          }}
-                                        >
-                                          {label}
-                                        </div>
-                                      ))
-                                    }
-                                  </div>
-                                ) : '无'
-                              }
+                                  labelIssueRelDTOList.length > 0 ? (
+                                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                      {
+                                        this.transToArr(labelIssueRelDTOList, 'labelName', 'array').map(label => (
+                                          <div
+                                            key={label}
+                                            style={{
+                                              color: '#000',
+                                              borderRadius: '100px',
+                                              fontSize: '13px',
+                                              lineHeight: '24px',
+                                              padding: '2px 12px',
+                                              background: 'rgba(0, 0, 0, 0.08)',
+                                              marginRight: '8px',
+                                              marginBottom: 3,
+                                            }}
+                                          >
+                                            {label}
+                                          </div>
+                                        ))
+                                      }
+                                    </div>
+                                  ) : '无'
+                                }
                               </div>
                             )}
                           >
@@ -2277,14 +2293,14 @@ class CreateSprint extends Component {
                                 readModeContent={(
                                   <div>
                                     {
-                                    !influenceVersions.length ? '无' : (
-                                      <div>
-                                        <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
-                                          {_.map(influenceVersions, 'name').join(' , ')}
-                                        </p>
-                                      </div>
-                                    )
-                                  }
+                                      !influenceVersions.length ? '无' : (
+                                        <div>
+                                          <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
+                                            {_.map(influenceVersions, 'name').join(' , ')}
+                                          </p>
+                                        </div>
+                                      )
+                                    }
                                   </div>
                                 )}
                               >
@@ -2351,17 +2367,17 @@ class CreateSprint extends Component {
                             readModeContent={(
                               <div style={{ color: '#3f51b5' }}>
                                 {
-                                !fixVersionsFixed.length && !fixVersions.length ? '无' : (
-                                  <div>
-                                    <div style={{ color: '#000' }}>
-                                      {_.map(fixVersionsFixed, 'name').join(' , ')}
+                                  !fixVersionsFixed.length && !fixVersions.length ? '无' : (
+                                    <div>
+                                      <div style={{ color: '#000' }}>
+                                        {_.map(fixVersionsFixed, 'name').join(' , ')}
+                                      </div>
+                                      <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
+                                        {_.map(fixVersions, 'name').join(' , ')}
+                                      </p>
                                     </div>
-                                    <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
-                                      {_.map(fixVersions, 'name').join(' , ')}
-                                    </p>
-                                  </div>
-                                )
-                              }
+                                  )
+                                }
                               </div>
                             )}
                           >
@@ -2455,24 +2471,24 @@ class CreateSprint extends Component {
                                 readModeContent={(
                                   <div>
                                     {
-                                    epicId ? (
-                                      <div
-                                        style={{
-                                          color: epicColor,
-                                          borderWidth: '1px',
-                                          borderStyle: 'solid',
-                                          borderColor: epicColor,
-                                          borderRadius: '2px',
-                                          fontSize: '13px',
-                                          lineHeight: '20px',
-                                          padding: '0 8px',
-                                          display: 'inline-block',
-                                        }}
-                                      >
-                                        {epicName}
-                                      </div>
-                                    ) : '无'
-                                  }
+                                      epicId ? (
+                                        <div
+                                          style={{
+                                            color: epicColor,
+                                            borderWidth: '1px',
+                                            borderStyle: 'solid',
+                                            borderColor: epicColor,
+                                            borderRadius: '2px',
+                                            fontSize: '13px',
+                                            lineHeight: '20px',
+                                            padding: '0 8px',
+                                            display: 'inline-block',
+                                          }}
+                                        >
+                                          {epicName}
+                                        </div>
+                                      ) : '无'
+                                    }
                                   </div>
                                 )}
                               >
@@ -2546,32 +2562,32 @@ class CreateSprint extends Component {
                                 readModeContent={(
                                   <div>
                                     {
-                                    !closeSprint.length && !activeSprint.sprintId ? '无' : (
-                                      <div>
+                                      !closeSprint.length && !activeSprint.sprintId ? '无' : (
                                         <div>
-                                          {_.map(closeSprint, 'sprintName').join(' , ')}
+                                          <div>
+                                            {_.map(closeSprint, 'sprintName').join(' , ')}
+                                          </div>
+                                          {
+                                            activeSprint.sprintId && (
+                                              <div
+                                                style={{
+                                                  color: '#4d90fe',
+                                                  // border: '1px solid #4d90fe',
+                                                  // borderRadius: '2px',
+                                                  fontSize: '13px',
+                                                  lineHeight: '20px',
+                                                  // padding: '0 8px',
+                                                  display: 'inline-block',
+                                                  marginTop: 5,
+                                                }}
+                                              >
+                                                {activeSprint.sprintName}
+                                              </div>
+                                            )
+                                          }
                                         </div>
-                                        {
-                                          activeSprint.sprintId && (
-                                            <div
-                                              style={{
-                                                color: '#4d90fe',
-                                                // border: '1px solid #4d90fe',
-                                                // borderRadius: '2px',
-                                                fontSize: '13px',
-                                                lineHeight: '20px',
-                                                // padding: '0 8px',
-                                                display: 'inline-block',
-                                                marginTop: 5,
-                                              }}
-                                            >
-                                              {activeSprint.sprintName}
-                                            </div>
-                                          )
-                                        }
-                                      </div>
-                                    )
-                                  }
+                                      )
+                                    }
                                   </div>
                                 )}
                               >
@@ -2630,26 +2646,26 @@ class CreateSprint extends Component {
                                 </Select>
                               </ReadAndEdit>
                             ) : (
-                              <div>
-                                {
-                                  activeSprint.sprintId ? (
-                                    <div
-                                      style={{
-                                        color: '#4d90fe',
-                                        // border: '1px solid #4d90fe',
-                                        // borderRadius: '2px',
-                                        fontSize: '13px',
-                                        lineHeight: '20px',
-                                        // padding: '0 8px',
-                                        display: 'inline-block',
-                                      }}
-                                    >
-                                      {activeSprint.sprintName}
-                                    </div>
-                                  ) : '无'
-                                }
-                              </div>
-                            )
+                                <div>
+                                  {
+                                    activeSprint.sprintId ? (
+                                      <div
+                                        style={{
+                                          color: '#4d90fe',
+                                          // border: '1px solid #4d90fe',
+                                          // borderRadius: '2px',
+                                          fontSize: '13px',
+                                          lineHeight: '20px',
+                                          // padding: '0 8px',
+                                          display: 'inline-block',
+                                        }}
+                                      >
+                                        {activeSprint.sprintName}
+                                      </div>
+                                    ) : '无'
+                                  }
+                                </div>
+                              )
                           }
                         </div>
                       </div>
@@ -2783,17 +2799,17 @@ class CreateSprint extends Component {
                             readModeContent={(
                               <div>
                                 {
-                                reporterId && reporterName ? (
-                                  <UserHead
-                                    user={{
-                                      id: reporterId,
-                                      loginName: '',
-                                      realName: reporterName,
-                                      avatar: reporterImageUrl,
-                                    }}
-                                  />
-                                ) : '无'
-                              }
+                                  reporterId && reporterName ? (
+                                    <UserHead
+                                      user={{
+                                        id: reporterId,
+                                        loginName: '',
+                                        realName: reporterName,
+                                        avatar: reporterImageUrl,
+                                      }}
+                                    />
+                                  ) : '无'
+                                }
                               </div>
                             )}
                           >
@@ -2890,17 +2906,17 @@ class CreateSprint extends Component {
                             readModeContent={(
                               <div>
                                 {
-                                assigneeId && assigneeName ? (
-                                  <UserHead
-                                    user={{
-                                      id: assigneeId,
-                                      loginName: '',
-                                      realName: assigneeName,
-                                      avatar: assigneeImageUrl,
-                                    }}
-                                  />
-                                ) : '无'
-                              }
+                                  assigneeId && assigneeName ? (
+                                    <UserHead
+                                      user={{
+                                        id: assigneeId,
+                                        loginName: '',
+                                        realName: assigneeName,
+                                        avatar: assigneeImageUrl,
+                                      }}
+                                    />
+                                  ) : '无'
+                                }
                               </div>
                             )}
                           >

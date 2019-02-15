@@ -524,7 +524,7 @@ class CreateSprint extends Component {
             <p style={{ color: '#d50000' }}>
               {`注意：问题的 ${
                 subIssueDTOList.length
-              } 个子任务将被删除。`}
+                } 个子任务将被删除。`}
             </p>
           ) : null}
         </div>
@@ -534,7 +534,7 @@ class CreateSprint extends Component {
           that.props.onDeleteIssue();
         });
       },
-      onCancel() {},
+      onCancel() { },
       okText: '删除',
       okType: 'danger',
     });
@@ -1166,10 +1166,25 @@ class CreateSprint extends Component {
       datalogs: stateDatalogs,
       typeCode,
       createdById,
-      creationDate,
+      creationDate, origin,
     } = this.state;
     const datalogs = _.filter(stateDatalogs, v => v.field !== 'Version');
-    return <DataLogs datalogs={datalogs} typeCode={typeCode} createdById={createdById} creationDate={creationDate} />;
+    const {
+      createdBy,
+      createrImageUrl,
+      createrName, createrEmail, issueTypeDTO,
+    } = origin;
+    const createLog = {
+      email: createrEmail,
+      field: issueTypeDTO && issueTypeDTO.typeCode,
+      imageUrl: createrImageUrl,
+      name: createrName,
+      lastUpdateDate: origin.creationDate,
+      lastUpdatedBy: createdBy,
+      newString: 'issueNum',
+      newValue: 'issueNum',
+    };
+    return <DataLogs datalogs={[...datalogs, createLog]} typeCode={typeCode} createdById={createdById} creationDate={creationDate} />;
   }
 
   /**
@@ -1356,8 +1371,8 @@ class CreateSprint extends Component {
                         />
                       </Popover>
                     ) : (
-                      ''
-                    )}
+                        ''
+                      )}
                   </span>
                 </div>
               </div>
@@ -1416,27 +1431,27 @@ class CreateSprint extends Component {
                         />
                       </Popover>
                     ) : (
-                      ''
-                    )}
+                        ''
+                      )}
                   </span>
                 </div>
               </div>
             ) : null}
           </div>
         ) : (
-          <div
-            style={{
-              borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-              display: 'flex',
-              padding: '8px 26px',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: '13px',
-            }}
-          >
-            <span style={{ marginRight: 12 }}>暂无</span>
-          </div>
-        )}
+            <div
+              style={{
+                borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+                display: 'flex',
+                padding: '8px 26px',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '13px',
+              }}
+            >
+              <span style={{ marginRight: 12 }}>暂无</span>
+            </div>
+          )}
       </div>
     );
   }
@@ -1770,38 +1785,38 @@ class CreateSprint extends Component {
               </li>
             </Tooltip>
             {typeCode !== 'sub_task' && (
-            <Tooltip placement="right" title="子任务">
-              <li
-                id="SUB_TASKS-nav"
-                className={`c7n-li ${nav === 'sub_task' ? 'c7n-li-active' : ''}`}
-              >
-                <Icon
-                  type="filter_none c7n-icon-li"
-                  role="none"
-                  onClick={() => {
-                    this.setState({ nav: 'sub_task' });
-                    this.scrollToAnchor('sub_task');
-                  }}
-                />
-              </li>
-            </Tooltip>
+              <Tooltip placement="right" title="子任务">
+                <li
+                  id="SUB_TASKS-nav"
+                  className={`c7n-li ${nav === 'sub_task' ? 'c7n-li-active' : ''}`}
+                >
+                  <Icon
+                    type="filter_none c7n-icon-li"
+                    role="none"
+                    onClick={() => {
+                      this.setState({ nav: 'sub_task' });
+                      this.scrollToAnchor('sub_task');
+                    }}
+                  />
+                </li>
+              </Tooltip>
             )}
             {typeCode !== 'sub_task' && (
-            <Tooltip placement="right" title="问题链接">
-              <li
-                id="LINK_TASKS-nav"
-                className={`c7n-li ${nav === 'link_task' ? 'c7n-li-active' : ''}`}
-              >
-                <Icon
-                  type="link c7n-icon-li"
-                  role="none"
-                  onClick={() => {
-                    this.setState({ nav: 'link_task' });
-                    this.scrollToAnchor('link_task');
-                  }}
-                />
-              </li>
-            </Tooltip>
+              <Tooltip placement="right" title="问题链接">
+                <li
+                  id="LINK_TASKS-nav"
+                  className={`c7n-li ${nav === 'link_task' ? 'c7n-li-active' : ''}`}
+                >
+                  <Icon
+                    type="link c7n-icon-li"
+                    role="none"
+                    onClick={() => {
+                      this.setState({ nav: 'link_task' });
+                      this.scrollToAnchor('link_task');
+                    }}
+                  />
+                </li>
+              </Tooltip>
             )}
             <Tooltip placement="right" title="开发">
               <li
@@ -1899,7 +1914,7 @@ class CreateSprint extends Component {
                           currentRae: undefined,
                         });
                       }}
-                      // onBlur={() => this.statusOnChange()}
+                    // onBlur={() => this.statusOnChange()}
                     />
                   </ReadAndEdit>
                   <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
@@ -1963,8 +1978,8 @@ class CreateSprint extends Component {
                                   {statusName}
                                 </div>
                               ) : (
-                                '无'
-                              )}
+                                  '无'
+                                )}
                             </div>
                           )}
                         >
@@ -1981,12 +1996,12 @@ class CreateSprint extends Component {
                             }}
                           >
                             {
-                                  originStatus.map(transform => (
-                                    <Option key={transform.id} value={transform.endStatusId}>
-                                      { transform.statusDTO.name }
-                                    </Option>
-                                  ))
-                                }
+                              originStatus.map(transform => (
+                                <Option key={transform.id} value={transform.endStatusId}>
+                                  {transform.statusDTO.name}
+                                </Option>
+                              ))
+                            }
                           </Select>
                         </ReadAndEdit>
                       </div>
@@ -2045,11 +2060,11 @@ class CreateSprint extends Component {
                                     lineHeight: '18px',
                                   }}
                                 >
-                                  { priorityName }
+                                  {priorityName}
                                 </div>
                               ) : (
-                                '无'
-                              )}
+                                  '无'
+                                )}
                             </div>
                           )}
                         >
@@ -2138,12 +2153,12 @@ class CreateSprint extends Component {
                         <span>冲刺</span>
                         <Tooltip
                           title={
-                                closeSprint.length
-                                  ? `已完成冲刺：${_.map(closeSprint, 'sprintName').join(
-                                    ',',
-                                  )}`
-                                  : '无已完成冲刺'
-                              }
+                            closeSprint.length
+                              ? `已完成冲刺：${_.map(closeSprint, 'sprintName').join(
+                                ',',
+                              )}`
+                              : '无已完成冲刺'
+                          }
                         >
                           <Icon
                             type="error"
@@ -2181,7 +2196,7 @@ class CreateSprint extends Component {
                               }}
                               >
                                 {!closeSprint.length
-                                    && !activeSprint.sprintId ? (
+                                  && !activeSprint.sprintId ? (
                                     '无'
                                   ) : (
                                     <div>
@@ -2239,26 +2254,26 @@ class CreateSprint extends Component {
                             </Select>
                           </ReadAndEdit>
                         ) : (
-                          <div>
-                            {activeSprint.sprintId ? (
-                              <div
-                                style={{
-                                  // color: '#4d90fe',
-                                  // border: '1px solid #4d90fe',
-                                  // borderRadius: '2px',
-                                  fontSize: '15px',
-                                  lineHeight: '18px',
-                                  // padding: '0 8px',
-                                  // display: 'inline-block',
-                                }}
-                              >
-                                {activeSprint.sprintName}
-                              </div>
-                            ) : (
-                              '无'
-                            )}
-                          </div>
-                        )}
+                            <div>
+                              {activeSprint.sprintId ? (
+                                <div
+                                  style={{
+                                    // color: '#4d90fe',
+                                    // border: '1px solid #4d90fe',
+                                    // borderRadius: '2px',
+                                    fontSize: '15px',
+                                    lineHeight: '18px',
+                                    // padding: '0 8px',
+                                    // display: 'inline-block',
+                                  }}
+                                >
+                                  {activeSprint.sprintName}
+                                </div>
+                              ) : (
+                                  '无'
+                                )}
+                            </div>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -2307,7 +2322,7 @@ class CreateSprint extends Component {
                               }}
                               >
                                 {storyPoints === undefined
-                                || storyPoints === null
+                                  || storyPoints === null
                                   ? '无'
                                   : `${storyPoints} 点`}
                               </span>
@@ -2382,11 +2397,11 @@ class CreateSprint extends Component {
                               }}
                               >
                                 {remainingTime === undefined
-                                || remainingTime === null
+                                  || remainingTime === null
                                   ? '无'
                                   : `${remainingTime} 小时`}
                               </span>
-                                )}
+                            )}
                           >
                             <Select
                               value={remainingTime && remainingTime.toString()}
@@ -2467,7 +2482,7 @@ class CreateSprint extends Component {
                                       {this.transToArr(componentIssueRelDTOList, 'name', 'string')}
                                     </p>
                                   </div>
-                                    )}
+                                )}
                               >
                                 <Select
                                   value={this.transToArr(
@@ -2561,10 +2576,10 @@ class CreateSprint extends Component {
                                       ))}
                                     </div>
                                   ) : (
-                                    '无'
-                                  )}
+                                      '无'
+                                    )}
                                 </div>
-                                  )}
+                              )}
                             >
                               <Select
                                 value={this.transToArr(
@@ -2645,20 +2660,20 @@ class CreateSprint extends Component {
                                     {!influenceVersions.length ? (
                                       '无'
                                     ) : (
-                                      <div>
-                                        <p
-                                          style={{
-                                            color: '#3f51b5',
-                                            wordBreak: 'break-word',
-                                            marginBottom: 0,
-                                          }}
-                                        >
-                                          {_.map(influenceVersions, 'name').join(' , ')}
-                                        </p>
-                                      </div>
-                                    )}
+                                        <div>
+                                          <p
+                                            style={{
+                                              color: '#3f51b5',
+                                              wordBreak: 'break-word',
+                                              marginBottom: 0,
+                                            }}
+                                          >
+                                            {_.map(influenceVersions, 'name').join(' , ')}
+                                          </p>
+                                        </div>
+                                      )}
                                   </div>
-                                    )}
+                                )}
                               >
                                 <Select
                                   label="影响的版本"
@@ -2729,7 +2744,7 @@ class CreateSprint extends Component {
                               readModeContent={(
                                 <div style={{ color: '#3f51b5' }}>
                                   {!fixVersionsFixed.length
-                                      && !fixVersions.length ? (
+                                    && !fixVersions.length ? (
                                       '无'
                                     ) : (
                                       <div>
@@ -2748,7 +2763,7 @@ class CreateSprint extends Component {
                                       </div>
                                     )}
                                 </div>
-                                  )}
+                              )}
                             >
                               {fixVersionsFixed.length ? (
                                 <div>
@@ -2841,17 +2856,17 @@ class CreateSprint extends Component {
                                         {epicName}
                                       </div>
                                     ) : (
-                                      '无'
-                                    )}
+                                        '无'
+                                      )}
                                   </div>
-                                    )}
+                                )}
                               >
                                 <Select
                                   value={
-                                        originEpics.length
-                                          ? epicId || undefined
-                                          : epicName || undefined
-                                      }
+                                    originEpics.length
+                                      ? epicId || undefined
+                                      : epicName || undefined
+                                  }
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '200px' }}
                                   // onBlur={e => this.statusOnChange(e)}
@@ -2915,11 +2930,11 @@ class CreateSprint extends Component {
                             <Progress
                               style={{ width: 100 }}
                               percent={
-                                    this.getWorkloads() !== 0
-                                      ? (this.getWorkloads() * 100)
-                                      / (this.getWorkloads() + (origin.remainingTime || 0))
-                                      : 0
-                                  }
+                                this.getWorkloads() !== 0
+                                  ? (this.getWorkloads() * 100)
+                                  / (this.getWorkloads() + (origin.remainingTime || 0))
+                                  : 0
+                              }
                               size="small"
                               status="success"
                             />
@@ -2976,7 +2991,7 @@ class CreateSprint extends Component {
                                       {epicName}
                                     </p>
                                   </div>
-                                    )}
+                                )}
                               >
                                 <TextArea
                                   maxLength={10}
@@ -3052,17 +3067,17 @@ class CreateSprint extends Component {
                                       }}
                                     />
                                   ) : (
-                                    '无'
-                                  )}
+                                      '无'
+                                    )}
                                 </div>
-                                  )}
+                              )}
                             >
                               <Select
                                 value={
-                                      flag === 'loading'
-                                        ? undefined
-                                        : reporterId || undefined
-                                    }
+                                  flag === 'loading'
+                                    ? undefined
+                                    : reporterId || undefined
+                                }
                                 style={{ width: 150 }}
                                 loading={selectLoading}
                                 allowClear
@@ -3174,17 +3189,17 @@ class CreateSprint extends Component {
                                       }}
                                     />
                                   ) : (
-                                    '无'
-                                  )}
+                                      '无'
+                                    )}
                                 </div>
                               )}
                             >
                               <Select
                                 value={
-                                      flag === 'loading'
-                                        ? undefined
-                                        : assigneeId || undefined
-                                    }
+                                  flag === 'loading'
+                                    ? undefined
+                                    : assigneeId || undefined
+                                }
                                 style={{ width: 150 }}
                                 loading={selectLoading}
                                 allowClear
@@ -3439,62 +3454,62 @@ class CreateSprint extends Component {
                   {this.renderDataLogs()}
                 </div>
                 {typeCode !== 'sub_task' && (
-                <div id="sub_task">
-                  <div className="c7n-title-wrapper">
-                    <div className="c7n-title-left">
-                      <Icon type="filter_none c7n-icon-title" />
-                      <span>子任务</span>
+                  <div id="sub_task">
+                    <div className="c7n-title-wrapper">
+                      <div className="c7n-title-left">
+                        <Icon type="filter_none c7n-icon-title" />
+                        <span>子任务</span>
+                      </div>
+                      <div
+                        style={{
+                          flex: 1,
+                          height: 1,
+                          borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+                          marginLeft: '14px',
+                        }}
+                      />
+                      <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                        <Button
+                          className="leftBtn"
+                          funcType="flat"
+                          onClick={() => this.setState({ createSubTaskShow: true })}
+                        >
+                          <Icon type="playlist_add icon" />
+                          <span>创建子任务</span>
+                        </Button>
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        flex: 1,
-                        height: 1,
-                        borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-                        marginLeft: '14px',
-                      }}
-                    />
-                    <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                      <Button
-                        className="leftBtn"
-                        funcType="flat"
-                        onClick={() => this.setState({ createSubTaskShow: true })}
-                      >
-                        <Icon type="playlist_add icon" />
-                        <span>创建子任务</span>
-                      </Button>
-                    </div>
+                    {this.renderSubIssues()}
                   </div>
-                  {this.renderSubIssues()}
-                </div>
                 )}
                 {typeCode !== 'sub_task' && (
-                <div id="link_task">
-                  <div className="c7n-title-wrapper">
-                    <div className="c7n-title-left">
-                      <Icon type="link c7n-icon-title" />
-                      <span>问题链接</span>
+                  <div id="link_task">
+                    <div className="c7n-title-wrapper">
+                      <div className="c7n-title-left">
+                        <Icon type="link c7n-icon-title" />
+                        <span>问题链接</span>
+                      </div>
+                      <div
+                        style={{
+                          flex: 1,
+                          height: 1,
+                          borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+                          marginLeft: '14px',
+                        }}
+                      />
+                      <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                        <Button
+                          className="leftBtn"
+                          funcType="flat"
+                          onClick={() => this.setState({ createLinkTaskShow: true })}
+                        >
+                          <Icon type="playlist_add icon" />
+                          <span>创建链接</span>
+                        </Button>
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        flex: 1,
-                        height: 1,
-                        borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-                        marginLeft: '14px',
-                      }}
-                    />
-                    <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                      <Button
-                        className="leftBtn"
-                        funcType="flat"
-                        onClick={() => this.setState({ createLinkTaskShow: true })}
-                      >
-                        <Icon type="playlist_add icon" />
-                        <span>创建链接</span>
-                      </Button>
-                    </div>
+                    {this.renderLinkIssues()}
                   </div>
-                  {this.renderLinkIssues()}
-                </div>
                 )}
                 <div id="branch">
                   <div className="c7n-title-wrapper">
@@ -3558,145 +3573,145 @@ class CreateSprint extends Component {
             }}
           />
         ) : null
-            }
+        }
         {
-              createSubTaskShow ? (
-                <CreateSubTask
-                  issueId={origin.issueId}
-                  visible={createSubTaskShow}
-                  onCancel={() => this.setState({ createSubTaskShow: false })}
-                  onOk={this.handleCreateSubIssue.bind(this)}
-                  store={store}
-                />
-              ) : null
-            }
+          createSubTaskShow ? (
+            <CreateSubTask
+              issueId={origin.issueId}
+              visible={createSubTaskShow}
+              onCancel={() => this.setState({ createSubTaskShow: false })}
+              onOk={this.handleCreateSubIssue.bind(this)}
+              store={store}
+            />
+          ) : null
+        }
         {
-              createLinkTaskShow ? (
-                <CreateLinkTask
-                  issueId={origin.issueId}
-                  visible={createLinkTaskShow}
-                  onCancel={() => this.setState({ createLinkTaskShow: false })}
-                  onOk={this.handleCreateLinkIssue.bind(this)}
-                  store={store}
-                />
-              ) : null
-            }
+          createLinkTaskShow ? (
+            <CreateLinkTask
+              issueId={origin.issueId}
+              visible={createLinkTaskShow}
+              onCancel={() => this.setState({ createLinkTaskShow: false })}
+              onOk={this.handleCreateLinkIssue.bind(this)}
+              store={store}
+            />
+          ) : null
+        }
         {
-              copyIssueShow ? (
-                <CopyIssue
-                  issueId={origin.issueId}
-                  issueNum={origin.issueNum}
-                  issue={origin}
-                  issueLink={linkIssues}
-                  issueSummary={origin.summary}
-                  visible={copyIssueShow}
-                  onCancel={() => this.setState({ copyIssueShow: false })}
-                  onOk={this.handleCopyIssue.bind(this)}
-                />
-              ) : null
-            }
+          copyIssueShow ? (
+            <CopyIssue
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              issue={origin}
+              issueLink={linkIssues}
+              issueSummary={origin.summary}
+              visible={copyIssueShow}
+              onCancel={() => this.setState({ copyIssueShow: false })}
+              onOk={this.handleCopyIssue.bind(this)}
+            />
+          ) : null
+        }
         {
-              transformSubIssueShow ? (
-                <TransformSubIssue
-                  visible={transformSubIssueShow}
-                  issueId={origin.issueId}
-                  issueNum={origin.issueNum}
-                  ovn={origin.objectVersionNumber}
-                  onCancel={() => this.setState({ transformSubIssueShow: false })}
-                  onOk={this.handleTransformSubIssue.bind(this)}
-                  store={store}
-                />
-              ) : null
-            }
+          transformSubIssueShow ? (
+            <TransformSubIssue
+              visible={transformSubIssueShow}
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              ovn={origin.objectVersionNumber}
+              onCancel={() => this.setState({ transformSubIssueShow: false })}
+              onOk={this.handleTransformSubIssue.bind(this)}
+              store={store}
+            />
+          ) : null
+        }
         {
-              transformFromSubIssueShow ? (
-                <TransformFromSubIssue
-                  visible={transformFromSubIssueShow}
-                  issueId={origin.issueId}
-                  issueNum={origin.issueNum}
-                  ovn={origin.objectVersionNumber}
-                  onCancel={() => this.setState({ transformFromSubIssueShow: false })}
-                  onOk={this.handleTransformFromSubIssue.bind(this)}
-                  store={store}
-                />
-              ) : null
-            }
+          transformFromSubIssueShow ? (
+            <TransformFromSubIssue
+              visible={transformFromSubIssueShow}
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              ovn={origin.objectVersionNumber}
+              onCancel={() => this.setState({ transformFromSubIssueShow: false })}
+              onOk={this.handleTransformFromSubIssue.bind(this)}
+              store={store}
+            />
+          ) : null
+        }
         {
-              createBranchShow ? (
-                <CreateBranch
-                  issueId={origin.issueId}
-                  typeCode={typeCode}
-                  issueNum={origin.issueNum}
-                  onOk={() => {
-                    this.setState({ createBranchShow: false });
-                    this.reloadIssue();
-                  }}
-                  onCancel={() => this.setState({ createBranchShow: false })}
-                  visible={createBranchShow}
-                />
-              ) : null
-            }
+          createBranchShow ? (
+            <CreateBranch
+              issueId={origin.issueId}
+              typeCode={typeCode}
+              issueNum={origin.issueNum}
+              onOk={() => {
+                this.setState({ createBranchShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => this.setState({ createBranchShow: false })}
+              visible={createBranchShow}
+            />
+          ) : null
+        }
         {
-              commitShow ? (
-                <Commits
-                  issueId={origin.issueId}
-                  issueNum={origin.issueNum}
-                  time={branchs.commitUpdateTime}
-                  onCancel={() => {
-                    this.setState({ commitShow: false });
-                  }}
-                  visible={commitShow}
-                />
-              ) : null
-            }
+          commitShow ? (
+            <Commits
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              time={branchs.commitUpdateTime}
+              onCancel={() => {
+                this.setState({ commitShow: false });
+              }}
+              visible={commitShow}
+            />
+          ) : null
+        }
         {
-              mergeRequestShow ? (
-                <MergeRequest
-                  issueId={origin.issueId}
-                  issueNum={origin.issueNum}
-                  num={branchs.totalMergeRequest}
-                  onCancel={() => {
-                    this.setState({ mergeRequestShow: false });
-                  }}
-                  visible={mergeRequestShow}
-                />
-              ) : null
-            }
+          mergeRequestShow ? (
+            <MergeRequest
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              num={branchs.totalMergeRequest}
+              onCancel={() => {
+                this.setState({ mergeRequestShow: false });
+              }}
+              visible={mergeRequestShow}
+            />
+          ) : null
+        }
         {
-              assigneeShow ? (
-                <Assignee
-                  issueId={origin.issueId}
-                  issueNum={origin.issueNum}
-                  visible={assigneeShow}
-                  assigneeId={assigneeId}
-                  objectVersionNumber={origin.objectVersionNumber}
-                  onOk={() => {
-                    this.setState({ assigneeShow: false });
-                    this.reloadIssue();
-                  }}
-                  onCancel={() => {
-                    this.setState({ assigneeShow: false });
-                  }}
-                />
-              ) : null
-            }
+          assigneeShow ? (
+            <Assignee
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              visible={assigneeShow}
+              assigneeId={assigneeId}
+              objectVersionNumber={origin.objectVersionNumber}
+              onOk={() => {
+                this.setState({ assigneeShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => {
+                this.setState({ assigneeShow: false });
+              }}
+            />
+          ) : null
+        }
         {
-              changeParentShow ? (
-                <ChangeParent
-                  issueId={origin.issueId}
-                  issueNum={origin.issueNum}
-                  visible={changeParentShow}
-                  objectVersionNumber={origin.objectVersionNumber}
-                  onOk={() => {
-                    this.setState({ changeParentShow: false });
-                    this.reloadIssue();
-                  }}
-                  onCancel={() => {
-                    this.setState({ changeParentShow: false });
-                  }}
-                />
-              ) : null
-            }
+          changeParentShow ? (
+            <ChangeParent
+              issueId={origin.issueId}
+              issueNum={origin.issueNum}
+              visible={changeParentShow}
+              objectVersionNumber={origin.objectVersionNumber}
+              onOk={() => {
+                this.setState({ changeParentShow: false });
+                this.reloadIssue();
+              }}
+              onCancel={() => {
+                this.setState({ changeParentShow: false });
+              }}
+            />
+          ) : null
+        }
       </div>
     );
   }
