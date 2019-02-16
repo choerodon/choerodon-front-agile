@@ -14,6 +14,13 @@
     .c7n-scrumboard-container {
       margin: 0 32px 0 16px !important;
       padding-bottom: 83px;
+      display: flex;
+      flex: 1;
+      .ant-collapse.ant-collapse-borderless {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+      }
     }
     .c7n-scrumboard-others {
       padding: 0 24px;

@@ -231,7 +231,7 @@ class CreateSprint extends Component {
     if (onRef) {
       onRef(this);
     }
-    this.reloadIssue(issueId);
+    this.firstLoadIssue(issueId);
     document.getElementById('scroll-area').addEventListener('scroll', (e) => {
       if (sign) {
         const { nav } = this.state;
@@ -265,7 +265,7 @@ class CreateSprint extends Component {
       this.setState({
         currentRae: undefined,
       });
-      this.reloadIssue(nextProps.issueId);
+      this.firstLoadIssue(nextProps.issueId);
     }
   }
 
@@ -524,7 +524,7 @@ class CreateSprint extends Component {
             <p style={{ color: '#d50000' }}>
               {`注意：问题的 ${
                 subIssueDTOList.length
-                } 个子任务将被删除。`}
+              } 个子任务将被删除。`}
             </p>
           ) : null}
         </div>
@@ -878,9 +878,8 @@ class CreateSprint extends Component {
     this.refresh();
   }
 
-  reloadIssue(paramIssueId) {
+  firstLoadIssue(paramIssueId) {
     const { origin } = this.state;
-    const { onUpdate } = this.props;
     const issueId = paramIssueId || origin.issueId;
     const urlParams = AppState.currentMenuType;
     const {
@@ -937,6 +936,11 @@ class CreateSprint extends Component {
         });
       },
     );
+  }
+
+  reloadIssue(paramIssueId) {
+    const { onUpdate } = this.props;
+    this.firstLoadIssue(paramIssueId);
     if (onUpdate) {
       onUpdate();
     }
@@ -1371,8 +1375,8 @@ class CreateSprint extends Component {
                         />
                       </Popover>
                     ) : (
-                        ''
-                      )}
+                      ''
+                    )}
                   </span>
                 </div>
               </div>
@@ -1431,27 +1435,27 @@ class CreateSprint extends Component {
                         />
                       </Popover>
                     ) : (
-                        ''
-                      )}
+                      ''
+                    )}
                   </span>
                 </div>
               </div>
             ) : null}
           </div>
         ) : (
-            <div
-              style={{
-                borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-                display: 'flex',
-                padding: '8px 26px',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontSize: '13px',
-              }}
-            >
-              <span style={{ marginRight: 12 }}>暂无</span>
-            </div>
-          )}
+          <div
+            style={{
+              borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+              display: 'flex',
+              padding: '8px 26px',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+            }}
+          >
+            <span style={{ marginRight: 12 }}>暂无</span>
+          </div>
+        )}
       </div>
     );
   }
@@ -1978,8 +1982,8 @@ class CreateSprint extends Component {
                                   {statusName}
                                 </div>
                               ) : (
-                                  '无'
-                                )}
+                                '无'
+                              )}
                             </div>
                           )}
                         >
@@ -2063,8 +2067,8 @@ class CreateSprint extends Component {
                                   {priorityName}
                                 </div>
                               ) : (
-                                  '无'
-                                )}
+                                '无'
+                              )}
                             </div>
                           )}
                         >
@@ -2254,26 +2258,26 @@ class CreateSprint extends Component {
                             </Select>
                           </ReadAndEdit>
                         ) : (
-                            <div>
-                              {activeSprint.sprintId ? (
-                                <div
-                                  style={{
-                                    // color: '#4d90fe',
-                                    // border: '1px solid #4d90fe',
-                                    // borderRadius: '2px',
-                                    fontSize: '15px',
-                                    lineHeight: '18px',
-                                    // padding: '0 8px',
-                                    // display: 'inline-block',
-                                  }}
-                                >
-                                  {activeSprint.sprintName}
-                                </div>
-                              ) : (
-                                  '无'
-                                )}
-                            </div>
-                          )}
+                          <div>
+                            {activeSprint.sprintId ? (
+                              <div
+                                style={{
+                                  // color: '#4d90fe',
+                                  // border: '1px solid #4d90fe',
+                                  // borderRadius: '2px',
+                                  fontSize: '15px',
+                                  lineHeight: '18px',
+                                  // padding: '0 8px',
+                                  // display: 'inline-block',
+                                }}
+                              >
+                                {activeSprint.sprintName}
+                              </div>
+                            ) : (
+                              '无'
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -2576,8 +2580,8 @@ class CreateSprint extends Component {
                                       ))}
                                     </div>
                                   ) : (
-                                      '无'
-                                    )}
+                                    '无'
+                                  )}
                                 </div>
                               )}
                             >
@@ -2660,18 +2664,18 @@ class CreateSprint extends Component {
                                     {!influenceVersions.length ? (
                                       '无'
                                     ) : (
-                                        <div>
-                                          <p
-                                            style={{
-                                              color: '#3f51b5',
-                                              wordBreak: 'break-word',
-                                              marginBottom: 0,
-                                            }}
-                                          >
-                                            {_.map(influenceVersions, 'name').join(' , ')}
-                                          </p>
-                                        </div>
-                                      )}
+                                      <div>
+                                        <p
+                                          style={{
+                                            color: '#3f51b5',
+                                            wordBreak: 'break-word',
+                                            marginBottom: 0,
+                                          }}
+                                        >
+                                          {_.map(influenceVersions, 'name').join(' , ')}
+                                        </p>
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                               >
@@ -2856,8 +2860,8 @@ class CreateSprint extends Component {
                                         {epicName}
                                       </div>
                                     ) : (
-                                        '无'
-                                      )}
+                                      '无'
+                                    )}
                                   </div>
                                 )}
                               >
@@ -3067,8 +3071,8 @@ class CreateSprint extends Component {
                                       }}
                                     />
                                   ) : (
-                                      '无'
-                                    )}
+                                    '无'
+                                  )}
                                 </div>
                               )}
                             >
@@ -3189,8 +3193,8 @@ class CreateSprint extends Component {
                                       }}
                                     />
                                   ) : (
-                                      '无'
-                                    )}
+                                    '无'
+                                  )}
                                 </div>
                               )}
                             >

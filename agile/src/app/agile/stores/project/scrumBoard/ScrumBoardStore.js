@@ -9,7 +9,20 @@ const { AppState } = stores;
 
 @store('ScrumBoardStore')
 class ScrumBoardStore {
+  @observable quickSearchObj = {
+    onlyMe: false,
+    onlyStory: false,
+    quickSearchArray: [],
+    assigneeFilterIds: [],
+  };
+
+  @observable calanderCouldUse = false;
+
   @observable currentSprintExist = false;
+
+  @observable prevClick = null;
+
+  @observable currentClick = null;
 
   @observable translateToCompleted = [];
 
@@ -254,13 +267,28 @@ class ScrumBoardStore {
     this.parentId = data;
   }
 
-  @action setClickedIssue(issue) {
-    this.clickIssueDetail = issue;
-    this.clickedIssue = true;
+  @action resetClickedIssue() {
+    this.currentClick = null;
+    this.clickIssueDetail = {};
+    this.clickedIssue = false;
   }
 
   @computed get getClickedIssue() {
     return this.clickedIssue;
+  }
+
+  @action setClickedIssue(issue) {
+    this.currentClick = issue.issueId;
+    this.clickIssueDetail = issue;
+    this.clickedIssue = true;
+  }
+
+  @computed get currentClickId() {
+    return this.currentClick;
+  }
+
+  @computed get prevClickId() {
+    return this.prevClick;
   }
 
   @action setMoveOverRef(data) {
@@ -285,6 +313,26 @@ class ScrumBoardStore {
         canMoveToComplish: false,
       });
     }
+  }
+
+  @action addAssigneeFilter(data) {
+    this.quickSearchObj.assigneeFilterIds = data;
+  }
+
+  @action addQuickSearchFilter(onlyMeChecked = false, onlyStoryChecked = false, moreChecked = []) {
+    this.quickSearchObj.onlyMe = onlyMeChecked;
+    this.quickSearchObj.onlyStory = onlyStoryChecked;
+    this.quickSearchObj.quickSearchArray = moreChecked;
+  }
+
+  @computed get hasSetFilter() {
+    const {
+      onlyMe, onlyStory, quickSearchArray, assigneeFilterIds,
+    } = this.quickSearchObj;
+    if (onlyMe === false && onlyStory === false && quickSearchArray.length === 0 && assigneeFilterIds.length === 0) {
+      return true;
+    }
+    return false;
   }
 
   setTransFromData(parentIssue, parentId) {
@@ -343,11 +391,21 @@ class ScrumBoardStore {
     return this.clickIssueDetail;
   }
 
+  @action resetCurrentClick(parentIssueId) {
+    this.currentClick = parentIssueId;
+    this.clickIssueDetail = this.allDataMap.get(parentIssueId);
+  }
+
   @action resetDataBeforeUnmount() {
     this.clickIssueDetail = {};
-    this.swimlaneBasedCode = null;
     this.swimLaneData = {};
     this.headerData = new Map();
+    this.quickSearchObj = {
+      onlyMe: false,
+      onlyStory: false,
+      quickSearchArray: [],
+      assigneeFilterIds: [],
+    };
     this.currentSprintExist = false;
   }
 
@@ -493,6 +551,10 @@ class ScrumBoardStore {
     this.assigneeProps = data;
   }
 
+  @computed get getCalanderCouldUse() {
+    return this.calanderCouldUse;
+  }
+
   axiosUpdateColumnSequence(boardId, data) {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column/column_sort`, data);
   }
@@ -514,9 +576,10 @@ class ScrumBoardStore {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}`);
   }
 
-  axiosGetBoardData(boardId, {
-    onlyMe, onlyStory, quickSearchArray, assigneeFilterIds,
-  }) {
+  axiosGetBoardData(boardId) {
+    const {
+      onlyMe, onlyStory, quickSearchArray, assigneeFilterIds,
+    } = this.quickSearchObj;
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?${onlyMe ? `assigneeId=${AppState.getUserId}&` : ''}onlyStory=${onlyStory}&quickFilterIds=${quickSearchArray}${assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${assigneeFilterIds}` : ''}`);
   }
 
@@ -611,6 +674,7 @@ class ScrumBoardStore {
   }
 
   @action setWorkDate(data) {
+    this.calanderCouldUse = true;
     this.workDate = data;
   }
 
@@ -736,7 +800,6 @@ class ScrumBoardStore {
     this.otherIssue = unInterConnectedDataMap;
     this.interconnectedData = observable.map(interConnectedDataMap);
     this.swimLaneData = swimLaneData;
-    this.allDataMap = allDataMap;
     this.statusMap = observable.map(statusMap);
     this.headerData = observable.map(headerData);
   }

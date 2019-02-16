@@ -30,7 +30,10 @@
     min-width: 180px;
     background: #fff;
   }
-  .quickSearchSelect {
+  .ant-spin-container > div {
+    width: 100%;
+  }
+  .quickSearchSelect, .assigneeSelect {
     border-radius: 3px;
     padding: 0 5px;
     min-width: 96px;
