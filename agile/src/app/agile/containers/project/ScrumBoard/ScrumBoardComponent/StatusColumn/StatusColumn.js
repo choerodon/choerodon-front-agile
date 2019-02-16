@@ -4,6 +4,7 @@
 import React, { Component } from 'react';
 import './StatusColumn.scss';
 import { observer } from 'mobx-react';
+import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 
 @observer
 class StatusColumn extends Component {
@@ -15,7 +16,7 @@ class StatusColumn extends Component {
           {column.columnName}
         </p>
         <p className="c7n-scrumboard-statusHeader-count">
-          {column.columnIssueCount}
+          {`(${column.columnIssueCount})`}
         </p>
       </div>
     ));

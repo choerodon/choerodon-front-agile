@@ -1,8 +1,6 @@
 /* eslint-disable camelcase */
 import React from 'react';
-import { observer } from 'mobx-react';
 
-@observer
 export default class ColumnProvider extends React.Component {
   getColumn(columnObj) {
     const { children, column_status_RelationMap } = this.props;

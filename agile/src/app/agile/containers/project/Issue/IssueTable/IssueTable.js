@@ -125,7 +125,7 @@ class IssueTable extends Component {
         filterMultiple: true,
         // fixed: true,
         render: (text, record) => (
-          <div>
+          <div style={{ lineHeight: 0 }}>
             <TypeCode record={record} />
           </div>
         ),

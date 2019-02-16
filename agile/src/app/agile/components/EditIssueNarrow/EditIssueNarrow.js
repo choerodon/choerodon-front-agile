@@ -180,7 +180,7 @@ class CreateSprint extends Component {
     if (onRef) {
       onRef(this);
     }
-    this.reloadIssue(issueId);
+    this.firstLoadIssue(issueId);
     document.getElementById('scroll-area').addEventListener('scroll', (e) => {
       if (sign) {
         const { nav } = this.state;
@@ -214,7 +214,7 @@ class CreateSprint extends Component {
       this.setState({
         currentRae: undefined,
       });
-      this.reloadIssue(nextProps.issueId);
+      this.firstLoadIssue(nextProps.issueId);
     }
   }
 
@@ -833,13 +833,9 @@ class CreateSprint extends Component {
     this.setState({ labelIssueRelDTOList: value });
   }
 
-  reloadIssue(paramIssueId) {
+  firstLoadIssue(paramIssueId) {
     const { origin } = this.state;
-    const { onUpdate, store } = this.props;
     const issueId = paramIssueId || origin.issueId;
-    if (onUpdate) {
-      onUpdate();
-    }
     this.setState({
       addCommit: false,
       addCommitDes: '',
@@ -889,6 +885,14 @@ class CreateSprint extends Component {
         editDesShow: false,
       });
     });
+  }
+
+  reloadIssue(paramIssueId) {
+    const { onUpdate, store } = this.props;
+    this.firstLoadIssue(paramIssueId);
+    if (onUpdate) {
+      onUpdate();
+    }
   }
 
   /**
@@ -1118,7 +1122,6 @@ class CreateSprint extends Component {
       newString: 'issueNum',
       newValue: 'issueNum',
     };
-    debugger;
     return <DataLogs datalogs={[...datalogs, createLog]} typeCode={typeCode} createdById={createdById} creationDate={creationDate} />;
   }
 
@@ -1356,13 +1359,13 @@ class CreateSprint extends Component {
               }
             </div>
           ) : (
-              <div style={{
-                borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px',
-              }}
-              >
-                <span style={{ marginRight: 12 }}>暂无</span>
-              </div>
-            )
+            <div style={{
+              borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px',
+            }}
+            >
+              <span style={{ marginRight: 12 }}>暂无</span>
+            </div>
+          )
         }
       </div>
     );
@@ -1378,6 +1381,7 @@ class CreateSprint extends Component {
       history,
       onCancel,
       style,
+      resetIssue,
     } = this.props;
     const {
       activeSprint,
@@ -1745,7 +1749,10 @@ class CreateSprint extends Component {
                             role="none"
                             style={{ color: 'rgb(63, 81, 181)', cursor: 'pointer' }}
                             onClick={() => {
-                              this.reloadIssue(parentIssueId);
+                              this.firstLoadIssue(parentIssueId);
+                              if (resetIssue) {
+                                resetIssue(parentIssueId);
+                              }
                             }
                             }
                           >
@@ -1761,17 +1768,17 @@ class CreateSprint extends Component {
                           {issueNum}
                         </span>
                       ) : (
-                          <a
-                            role="none"
-                            onClick={() => {
-                              // const backUrl = this.props.backUrl || 'backlog';
-                              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${origin.issueNum}&paramIssueId=${origin.issueId}&paramUrl=${backUrl || 'backlog'}`);
-                              return false;
-                            }}
-                          >
-                            {issueNum}
-                          </a>
-                        )
+                        <a
+                          role="none"
+                          onClick={() => {
+                            // const backUrl = this.props.backUrl || 'backlog';
+                            history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${origin.issueNum}&paramIssueId=${origin.issueId}&paramUrl=${backUrl || 'backlog'}`);
+                            return false;
+                          }}
+                        >
+                          {issueNum}
+                        </a>
+                      )
                     }
                   </div>
                   <div
@@ -1779,7 +1786,9 @@ class CreateSprint extends Component {
                       cursor: 'pointer', fontSize: '13px', lineHeight: '20px', display: 'flex', alignItems: 'center',
                     }}
                     role="none"
-                    onClick={() => onCancel()}
+                    onClick={() => {
+                      onCancel();
+                    }}
                   >
                     <Icon type="last_page" style={{ fontSize: '18px', fontWeight: '500' }} />
                     <span>隐藏详情</span>
@@ -2626,8 +2635,8 @@ class CreateSprint extends Component {
                                 </Select>
                               </ReadAndEdit>
                             ) : (
-                                <div>
-                                  {
+                              <div>
+                                {
                                     activeSprint.sprintId ? (
                                       <div
                                         style={{
@@ -2644,8 +2653,8 @@ class CreateSprint extends Component {
                                       </div>
                                     ) : '无'
                                   }
-                                </div>
-                              )
+                              </div>
+                            )
                           }
                         </div>
                       </div>

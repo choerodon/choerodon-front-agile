@@ -13,18 +13,31 @@ class StatusTag extends Component {
   //   return true;
   // }
 
+  renderStatusBackground = (categoryCode) => {
+    if (categoryCode === 'todo') {
+      return 'rgb(255, 177, 0)';
+    } else if (categoryCode === 'doing') {
+      return 'rgb(77, 144, 254)';
+    } else if (categoryCode === 'done') {
+      return 'rgb(0, 191, 165)';
+    } else {
+      return 'gray';
+    }
+  };
+
   render() {
     const {
       name,
       color,
       data,
       style,
+      categoryCode,
     } = this.props;
     return (
       <div
         className="c7n-statusTag"
         style={{
-          background: color || (data && STATUS[data.type]) || 'transparent',
+          background: color || (categoryCode && this.renderStatusBackground(categoryCode)) || (data && STATUS[data.type]) || 'transparent',
           ...style,
         }}
       >

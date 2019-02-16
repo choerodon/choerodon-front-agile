@@ -15,32 +15,31 @@ class IssueDetail extends Component {
 
   render() {
     const { visible, refresh } = this.props;
-    return (
-      <div>
-        {visible ? (
-          <EditIssue
-            store={ScrumBoardStore}
-            backUrl="scrumboard"
-            style={{
-              height: 'calc(100vh - 156px)',
-              width: '440px',
-            }}
-            issueId={ScrumBoardStore.getClickIssueDetail.issueId}
-            onCancel={() => {
-              ScrumBoardStore.setClickIssueDetail({});
-              refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
-            }}
-            onDeleteIssue={() => {
-              ScrumBoardStore.setClickIssueDetail({});
-              refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
-            }}
-            onUpdate={() => {
-              refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
-            }}
-          />
-        ) : ''}
-      </div>
-    );
+    return visible ? (
+      <EditIssue
+        store={ScrumBoardStore}
+        onRef={this.onRef}
+        backUrl="scrumboard"
+        style={{
+          height: 'calc(100vh - 156px)',
+          width: '440px',
+        }}
+        issueId={ScrumBoardStore.getClickIssueDetail.issueId}
+        onCancel={() => {
+          ScrumBoardStore.resetClickedIssue();
+        }}
+        onDeleteIssue={() => {
+          ScrumBoardStore.resetClickedIssue();
+          refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
+        }}
+        onUpdate={() => {
+          refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
+        }}
+        resetIssue={(parentIssueId) => {
+          ScrumBoardStore.resetCurrentClick(parentIssueId);
+        }}
+      />
+    ) : null;
   }
 }
 

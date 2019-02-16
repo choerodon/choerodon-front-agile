@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import {
-  Icon, Button, Avatar, Collapse, Tooltip, Rate,
-} from 'choerodon-ui';
-import { Draggable } from 'react-beautiful-dnd';
+import { Icon, Tooltip, Rate } from 'choerodon-ui';
+import { observer } from 'mobx-react';
 import TypeTag from '../../../../../components/TypeTag';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import './StatusIssue.scss';
 import UserHead from '../../../../../components/UserHead';
 
+@observer
 export default class CardProvider extends React.Component {
   constructor(props) {
     super(props);
@@ -51,7 +50,7 @@ export default class CardProvider extends React.Component {
     } = this.props;
     return (
       <div
-        className="c7n-scrumboard-issue"
+        className={`c7n-scrumboard-issue ${ScrumBoardStore.currentClickId === issue.issueId ? 'shouldBackgroundColorChange' : ''}`}
         role="none"
         onClick={(e) => {
           onClick();
@@ -61,7 +60,7 @@ export default class CardProvider extends React.Component {
         style={{
           // marginLeft: item.parentIssueId && this.props.swimLaneCode === '
           // assignee' && this.getParent(item.parentIssueId, item) ? 16 : 0,
-          background: 'white',
+          // backgroundColor: '#fff',
           // borderTop: item.parentIssueId && swimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 'unset' : '1px solid rgba(0, 0, 0, 0.20)',
         }}
       >

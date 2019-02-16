@@ -146,7 +146,7 @@ class ScrumBoardSetting extends Component {
             <TabPane tab="泳道" key="2">
               <SwimLanePage />
             </TabPane>
-            {ScrumBoardStore.getSprintData
+            {ScrumBoardStore.getCalanderCouldUse
               ? (
                 <TabPane tab="工作日历" key="3">
                   <WorkcalendarPage selectedDateDisabled={hasPermission} />
