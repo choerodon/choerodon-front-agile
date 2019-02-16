@@ -13,6 +13,10 @@ class IssueDetail extends Component {
     this.state = {};
   }
 
+  onRef = (ref) => {
+    ScrumBoardStore.setEditRef(ref);
+  };
+
   render() {
     const { visible, refresh } = this.props;
     return visible ? (

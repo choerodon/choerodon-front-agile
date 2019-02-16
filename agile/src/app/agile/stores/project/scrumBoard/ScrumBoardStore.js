@@ -908,6 +908,14 @@ class ScrumBoardStore {
   @computed get getUpdateParent() {
     return this.updateParent;
   }
+
+  @action setEditRef(ref) {
+    this.editRef = ref;
+  }
+
+  @computed get getEditRef() {
+    return this.editRef;
+  }
 }
 
 const scrumBoardStore = new ScrumBoardStore();
