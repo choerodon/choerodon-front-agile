@@ -193,7 +193,7 @@ export default class ScrumBoardDataController {
 
     return {
       swimLaneData: this.swimLaneDataConstructor([...parentDataMap.values()], otherIssueWithoutParent, mode, 'issueId'),
-      interConnectedDataMap: parentDataArr,
+      interConnectedDataMap: mode.includes('swimlane_epic') ? parentDataMap : parentDataArr,
       unInterConnectedDataMap: otherIssueWithoutParent,
     };
   }

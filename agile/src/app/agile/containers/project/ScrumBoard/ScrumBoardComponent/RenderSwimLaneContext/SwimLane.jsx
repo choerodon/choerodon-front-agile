@@ -3,7 +3,6 @@
  */
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { trace } from 'mobx';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import './SwimLane.scss';
 import RenderSwimLaneContext from './index';
@@ -43,7 +42,7 @@ class SwimLane extends Component {
       otherIssueWithoutParent={fromEpic ? parentIssue.unInterConnectedDataMap : ScrumBoardStore.getOtherQuestion}
       // mapStructure={mapStructure}
       // style={style}
-      reAssignStyle={fromEpic}
+      fromEpic={fromEpic}
       epicPrefix={epicPrefix}
       mode={mode}
     >

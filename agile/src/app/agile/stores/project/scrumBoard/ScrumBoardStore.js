@@ -335,6 +335,7 @@ class ScrumBoardStore {
     return false;
   }
 
+
   setTransFromData(parentIssue, parentId) {
     const projectId = AppState.currentMenuType.id;
     axios.get(
@@ -397,9 +398,12 @@ class ScrumBoardStore {
   }
 
   @action resetDataBeforeUnmount() {
+    this.spinIf = true;
     this.clickIssueDetail = {};
     this.swimLaneData = {};
     this.headerData = new Map();
+    this.clickedIssue = false;
+    this.swimlaneBasedCode = null;
     this.quickSearchObj = {
       onlyMe: false,
       onlyStory: false,
@@ -478,6 +482,7 @@ class ScrumBoardStore {
   }
 
   @action setSelectedBoard(data) {
+    this.currentSprintExist = false;
     this.selectedBoardId = data;
   }
 
@@ -624,9 +629,9 @@ class ScrumBoardStore {
       sprintId: this.sprintId,
       rank: true,
     };
-    const { id: transformId } = this.stateMachineMap[issueTypeId][+startStatus].find(issue => issue.endStatusId === parseInt(destinationStatus, 10));
+    const { id: transformId } = this.stateMachineMap[issueTypeId] ? this.stateMachineMap[issueTypeId][startStatus].find(issue => issue.endStatusId === parseInt(destinationStatus, 10)) : this.stateMachineMap[0][startStatus].find(issue => issue.endStatusId === parseInt(destinationStatus, 10));
     return axios.post(`/agile/v1/projects/${proId}/board/issue/${issueId}/move?transformId=${transformId}`, data);
-  }
+  };
 
   moveStatusToUnset(code, data) {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}/move_to_uncorrespond`, data);
@@ -754,6 +759,7 @@ class ScrumBoardStore {
   // };
 
   @action setSpinIf(data) {
+    // this.currentSprintExist = false;
     this.spinIf = data;
   }
 
@@ -835,7 +841,13 @@ class ScrumBoardStore {
 
   @action setWhichCanNotDragOn(statusId, typeId) {
     [...this.canDragOn.keys()].forEach((status) => {
-      if (this.stateMachineMap[typeId][statusId].find(issue => issue.endStatusId === status)) {
+      if (this.stateMachineMap[typeId]) {
+        if (this.stateMachineMap[typeId][statusId].find(issue => issue.endStatusId === status)) {
+          this.canDragOn.set(status, false);
+        } else {
+          this.canDragOn.set(status, true);
+        }
+      } else if (this.stateMachineMap[0][statusId].find(issue => issue.endStatusId === status)) {
         this.canDragOn.set(status, false);
       } else {
         this.canDragOn.set(status, true);
