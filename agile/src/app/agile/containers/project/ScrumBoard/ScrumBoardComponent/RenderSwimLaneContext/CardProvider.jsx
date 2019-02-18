@@ -6,8 +6,6 @@ import Card from './Card';
 
 @observer
 export default class CardProvider extends React.Component {
-  couldGetSwimLaneData = () => Object.keys(ScrumBoardStore.getSwimLaneData).length;
-
   render() {
     const { keyId, id, issueProvider } = this.props;
     return ScrumBoardStore.getSwimLaneData[keyId][id].map(

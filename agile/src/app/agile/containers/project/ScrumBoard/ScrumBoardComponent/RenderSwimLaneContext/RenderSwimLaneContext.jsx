@@ -28,11 +28,11 @@ class SwimLaneContext extends React.PureComponent {
   };
 
   getPanelItem = (key, parentIssue = null) => {
-    const { children, mode, reAssignStyle } = this.props;
+    const { children, mode, fromEpic } = this.props;
     return (
       <Panel
         key={this.getPanelKey(mode, parentIssue, key)}
-        className={`c7n-swimlaneContext-container ${reAssignStyle ? 'shouldBeIndent' : ''}`}
+        className={`c7n-swimlaneContext-container ${fromEpic ? 'shouldBeIndent' : ''}`}
         header={(
           <SwimLaneHeader
             parentIssue={parentIssue}

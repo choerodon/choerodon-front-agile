@@ -395,7 +395,7 @@ class ScrumBoardHome extends Component {
             </div>
           </div>
           <Spin spinning={ScrumBoardStore.getSpinIf}>
-            {ScrumBoardStore.getSpinIf ? (
+            {!ScrumBoardStore.didCurrentSprintExist ? (
               <NoneSprint />
             ) : (
               <div style={{ display: 'flex', width: '100%' }}>

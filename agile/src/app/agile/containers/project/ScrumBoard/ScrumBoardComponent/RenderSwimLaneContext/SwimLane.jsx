@@ -42,7 +42,7 @@ class SwimLane extends Component {
       otherIssueWithoutParent={fromEpic ? parentIssue.unInterConnectedDataMap : ScrumBoardStore.getOtherQuestion}
       // mapStructure={mapStructure}
       // style={style}
-      reAssignStyle={fromEpic}
+      fromEpic={fromEpic}
       epicPrefix={epicPrefix}
       mode={mode}
     >
