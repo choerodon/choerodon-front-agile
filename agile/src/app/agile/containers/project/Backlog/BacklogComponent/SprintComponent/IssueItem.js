@@ -16,7 +16,18 @@ class IssueItem extends Component {
     } = this.props;
     const getSelect = store.getSelectIssue;
     return data.map((item, index) => (
-      <DragIssueItem store={store} item={item} draggableId={draggableId} index={index} handleClickIssue={handleClickIssue} sprintId={sprintId} epicVisible={epicVisible} versionVisible={versionVisible} selected={selected} />
+      <DragIssueItem
+        key={item.issueId}
+        store={store}
+        item={item}
+        draggableId={draggableId}
+        index={index}
+        handleClickIssue={handleClickIssue}
+        sprintId={sprintId}
+        epicVisible={epicVisible}
+        versionVisible={versionVisible}
+        selected={selected}
+      />
     ));
   }
 }
