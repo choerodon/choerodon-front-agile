@@ -335,6 +335,7 @@ class ScrumBoardStore {
     return false;
   }
 
+
   setTransFromData(parentIssue, parentId) {
     const projectId = AppState.currentMenuType.id;
     axios.get(
@@ -397,6 +398,7 @@ class ScrumBoardStore {
   }
 
   @action resetDataBeforeUnmount() {
+    this.spinIf = true;
     this.clickIssueDetail = {};
     this.swimLaneData = {};
     this.headerData = new Map();

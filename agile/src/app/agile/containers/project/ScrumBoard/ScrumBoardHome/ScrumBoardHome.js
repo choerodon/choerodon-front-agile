@@ -69,7 +69,7 @@ class ScrumBoardHome extends Component {
     const retObj = {};
     url.match(reg).forEach((item) => {
       const [tempKey, paramValue] = item.split('=');
-      const paramKey = tempKey.substring(1);
+      const paramKey = tempKey[0] !== '&' ? tempKey : tempKey.substring(1);
       Object.assign(retObj, {
         [paramKey]: paramValue,
       });
@@ -395,49 +395,46 @@ class ScrumBoardHome extends Component {
             </div>
           </div>
           <Spin spinning={ScrumBoardStore.getSpinIf}>
-            {!ScrumBoardStore.didCurrentSprintExist ? (
+            {ScrumBoardStore.getSpinIf ? (
               <NoneSprint />
             ) : (
-              <React.Fragment>
-                <div style={{ display: 'flex', width: '100%' }}>
-                  <CloseSprint
-                    store={BacklogStore}
-                    visible={closeSprintVisible}
-                    onCancel={() => {
-                      this.setState({
-                        closeSprintVisible: false,
-                      });
-                    }}
-                    data={{
-                      sprintId: ScrumBoardStore.getSprintId,
-                      sprintName: ScrumBoardStore.getSprintName,
-                    }}
-                    // refresh={this.getBoard.bind(this)}
-                  />
-                  <div className="c7n-scrumboard">
-                    <div className="c7n-scrumboard-header">
-                      <StatusColumn columnData={[...ScrumBoardStore.getHeaderData.values()]} />
-                    </div>
-                    <div
-                      className="c7n-scrumboard-content"
-                    >
-                      <div className="c7n-scrumboard-container">
-                        <SwimLane
-                          mode={ScrumBoardStore.getSwimLaneCode}
-                          allDataMap={this.dataConverter.getAllDataMap()}
-                          mapStructure={ScrumBoardStore.getMapStructure}
-                          onDragEnd={this.onDragEnd}
-                          onDragStart={this.onDragStart}
-                        />
-                      </div>
+              <div style={{ display: 'flex', width: '100%' }}>
+                <CloseSprint
+                  store={BacklogStore}
+                  visible={closeSprintVisible}
+                  onCancel={() => {
+                    this.setState({
+                      closeSprintVisible: false,
+                    });
+                  }}
+                  data={{
+                    sprintId: ScrumBoardStore.getSprintId,
+                    sprintName: ScrumBoardStore.getSprintName,
+                  }}
+                />
+                <div className="c7n-scrumboard">
+                  <div className="c7n-scrumboard-header">
+                    <StatusColumn columnData={[...ScrumBoardStore.getHeaderData.values()]} />
+                  </div>
+                  <div
+                    className="c7n-scrumboard-content"
+                  >
+                    <div className="c7n-scrumboard-container">
+                      <SwimLane
+                        mode={ScrumBoardStore.getSwimLaneCode}
+                        allDataMap={this.dataConverter.getAllDataMap()}
+                        mapStructure={ScrumBoardStore.getMapStructure}
+                        onDragEnd={this.onDragEnd}
+                        onDragStart={this.onDragStart}
+                      />
                     </div>
                   </div>
-                  <IssueDetail
-                    visible={ScrumBoardStore.getClickedIssue}
-                    refresh={this.refresh.bind(this)}
-                  />
                 </div>
-              </React.Fragment>
+                <IssueDetail
+                  visible={ScrumBoardStore.getClickedIssue}
+                  refresh={this.refresh.bind(this)}
+                />
+              </div>
             )}
           </Spin>
         </div>
