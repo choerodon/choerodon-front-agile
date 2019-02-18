@@ -3,7 +3,6 @@
  */
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { trace } from 'mobx';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import './SwimLane.scss';
 import RenderSwimLaneContext from './index';
