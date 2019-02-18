@@ -120,7 +120,7 @@ class AccumulationHome extends Component {
       loading: true,
     });
     const columnData = AccumulationStore.getColumnData;
-    const endDate = AccumulationStore.getEndDate && AccumulationStore.getEndDate.format('YYYY-MM-DD HH:mm:ss');
+    const endDate = AccumulationStore.getEndDate && `${AccumulationStore.getEndDate.format('YYYY-MM-DD')} 23:59:59`;
     const filterList = AccumulationStore.getFilterList;
     const startDate = AccumulationStore.getStartDate && AccumulationStore.getStartDate.format('YYYY-MM-DD HH:mm:ss');
     const columnIds = [];
