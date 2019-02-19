@@ -403,7 +403,7 @@ class ScrumBoardStore {
     this.swimLaneData = {};
     this.headerData = new Map();
     this.clickedIssue = false;
-    this.swimlaneBasedCode = null;
+    // this.swimlaneBasedCode = null;
     this.quickSearchObj = {
       onlyMe: false,
       onlyStory: false,
@@ -794,7 +794,7 @@ class ScrumBoardStore {
     if (url && url.paramIssueId) {
       this.clickIssueDetail = { issueId: url.paramIssueId };
     }
-    if (issueTypes && issueTypes.failed) {
+    if (issueTypes && !issueTypes.failed) {
       this.issueTypes = issueTypes;
     } else {
       this.issueTypes = [];
