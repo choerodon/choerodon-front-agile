@@ -18,10 +18,16 @@ export default class SwimLaneHeader extends Component {
       ['assignee', this.renderAssigneeComponent],
       ['swimlane_epic', this.renderEpicComponent],
     ]);
+    const strMap = new Map([
+      ['parent_child', '子任务'],
+      ['assignee', '任务'],
+      ['swimlane_epic', '子任务'],
+      ['swimlane_none', '子任务'],
+    ]);
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
         {switchMap.get(mode)(parentIssue)}
-        <span className="c7n-parentIssue-count" style={{ whiteSpace: 'nowrap' }}>{`  (${subIssueDataLength} 子任务)`}</span>
+        <span className="c7n-parentIssue-count" style={{ whiteSpace: 'nowrap' }}>{`  (${subIssueDataLength} ${strMap.get(mode)})`}</span>
       </div>
     );
   }
@@ -51,6 +57,7 @@ export default class SwimLaneHeader extends Component {
         </span>
         <StatusTag
           categoryCode={categoryCode}
+          style={{ marginRight: 8 }}
           name={statusName}
         />
         <span

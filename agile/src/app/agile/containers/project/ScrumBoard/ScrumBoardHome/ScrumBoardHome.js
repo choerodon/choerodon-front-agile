@@ -242,12 +242,12 @@ class ScrumBoardHome extends Component {
         ['assignee', this.dataConverter.getAssigneeData],
         ['swimlane_none', this.dataConverter.getAllData],
       ]);
-      const renderData = renderDataMap.get(ScrumBoardStore.getSwimLaneCode || defaultBoard.userDefaultBoard)();
+      const renderData = renderDataMap.get(defaultBoard.userDefaultBoard)();
       const canDragOn = this.dataConverter.getCanDragOn();
       const statusColumnMap = this.dataConverter.getStatusColumnMap();
       const statusMap = this.dataConverter.getStatusMap();
       const mapStructure = this.dataConverter.getMapStructure();
-      const allDataMap = this.dataConverter.getAllDataMap(ScrumBoardStore.getSwimLaneCode);
+      const allDataMap = this.dataConverter.getAllDataMap(defaultBoard.userDefaultBoard);
       const headerData = this.dataConverter.getHeaderData();
       ScrumBoardStore.scrumBoardInit(AppState, url, boardListData, defaultBoard, defaultBoardData, null, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData);
     });
