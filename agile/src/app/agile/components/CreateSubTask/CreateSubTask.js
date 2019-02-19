@@ -20,6 +20,7 @@ const { Sidebar } = Modal;
 const { Option } = Select;
 const FormItem = Form.Item;
 let sign = false;
+let hasPermission = false;
 
 const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
 
@@ -62,7 +63,8 @@ class CreateSubIssue extends Component {
         },
       });
     });
-    this.loadPriorities();
+    this.loadPriority();
+    this.loadPermission();
   }
 
   onFilterChange(input) {
@@ -86,13 +88,24 @@ class CreateSubIssue extends Component {
     this.setState({ fileList: data });
   };
 
-  loadPriorities = () => {
+  loadPriority = () => {
     loadPriorities().then((res) => {
       const defaultPriorities = res.filter(p => p.default);
       this.setState({
         originPriorities: res,
         defaultPriorityId: defaultPriorities.length ? defaultPriorities[0].id : '',
       });
+    });
+  };
+
+  loadPermission = () => {
+    axios.post('/iam/v1/permissions/checkPermission', [{
+      code: 'agile-service.project-info.updateProjectInfo',
+      organizationId: AppState.currentMenuType.organizationId,
+      projectId: AppState.currentMenuType.id,
+      resourceType: 'project',
+    }]).then((permission) => {
+      hasPermission = permission.length && permission[0].approve;
     });
   };
 
@@ -118,8 +131,9 @@ class CreateSubIssue extends Component {
           }
         });
         const exitFixVersions = originFixVersions;
-        const fixVersionIssueRelDTOList = _.map(values.fixVersionIssueRel, (version) => {
-          const target = _.find(exitFixVersions, { name: version });
+        const fixVersionIssueRelDTOList = _.map(values.fixVersionIssueRel
+          && values.fixVersionIssueRel.filter(v => v && v.trim()), (version) => {
+          const target = _.find(exitFixVersions, { name: version.trim() });
           if (target) {
             return {
               ...target,
@@ -127,7 +141,7 @@ class CreateSubIssue extends Component {
             };
           } else {
             return ({
-              name: version,
+              name: version.trim(),
               relationType: 'fix',
               projectId: AppState.currentMenuType.id,
             });
@@ -323,7 +337,7 @@ class CreateSubIssue extends Component {
               }
             </div>
             {
-              <div>
+              <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
                 <Select
                   label="预估时间"
                   value={estimatedTime && estimatedTime.toString()}
@@ -405,7 +419,7 @@ class CreateSubIssue extends Component {
               })(
                 <Select
                   label="修复版本"
-                  mode="tags"
+                  mode={hasPermission ? 'tags' : 'multiple'}
                   loading={this.state.selectLoading}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                   tokenSeparators={[',']}
