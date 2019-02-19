@@ -91,9 +91,7 @@
     font-size: 13px;
     line-height: 20px;
     font-weight: 600;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    -webkit-line-clamp: 2;
+    word-break: break-all;
   }
 
   .c7n-commit {
