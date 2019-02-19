@@ -4,7 +4,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 
 const getListStyle = isDraggingOver => ({
-  background: isDraggingOver ? 'rgba(26,177,111,0.08)' : 'none',
+  background: isDraggingOver ? '#f2f9f4' : 'none',
   borderColor: isDraggingOver ? '#1ab16f' : 'inherit',
 });
 

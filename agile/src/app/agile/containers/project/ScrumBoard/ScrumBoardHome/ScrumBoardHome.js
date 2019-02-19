@@ -361,6 +361,7 @@ class ScrumBoardHome extends Component {
             <QuickSearch
               onQuickSearchChange={this.onQuickSearchChange}
               onAssigneeChange={this.onAssigneeChange}
+              style={{ height: 32 }}
             />
             <div
               className="c7n-scrumTools-right"
