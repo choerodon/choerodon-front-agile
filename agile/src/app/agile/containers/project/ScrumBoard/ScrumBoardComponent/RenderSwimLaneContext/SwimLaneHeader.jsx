@@ -33,7 +33,7 @@ export default class SwimLaneHeader extends Component {
   }
 
   renderStoryComponent = ({
-    issueTypeDTO, issueNum, categoryCode, statusName, summary,
+    issueTypeDTO, issueNum, categoryCode, statusName, summary, assigneeId, assigneeName, imageUrl,
   }) => {
     const { parentIssue } = this.props;
     return (
@@ -46,7 +46,7 @@ export default class SwimLaneHeader extends Component {
           data={issueTypeDTO}
         />
         <span
-          style={{ cursor: 'pointer', width: '100px' }}
+          style={{ cursor: 'pointer', minWidth: 70, marginRight: 10 }}
           role="none"
           onClick={(e) => {
             e.stopPropagation();
@@ -57,8 +57,19 @@ export default class SwimLaneHeader extends Component {
         </span>
         <StatusTag
           categoryCode={categoryCode}
-          style={{ marginRight: 8 }}
+          style={{ marginRight: 10 }}
           name={statusName}
+        />
+        <UserHead
+          style={{ marginRight: 10 }}
+          hiddenText
+          size={24}
+          user={{
+            id: assigneeId,
+            loginName: assigneeName,
+            realName: assigneeName,
+            avatar: imageUrl,
+          }}
         />
         <span
           className="c7n-parentIssue-summary"
