@@ -94,13 +94,19 @@ class Accumulation extends Component {
           'box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); border: 1px solid #ddd; border-radius: 0;',
         formatter(params) {
           let content = '';
-          params.forEach((item) => {
+          let paramsContent = params.map(item => {
+            return (
+              `<div style="font-size: 11px">
+                <div style={display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${item.color}}></div>
+                ${item.seriesName}：${item.data} ${item.data ? ' 个' : ''}
+              </div>`
+            )
+          });
+          params.forEach((item, index, arr) => {
             content = `<div>
             <span>${params[0].axisValue}</span>
             <br />
-            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[0].color}"></div>已完成：${legendSeries[0].data[item.dataIndex]} ${legendSeries[0].data[item.dataIndex] ? ' 个' : ''}</div>
-            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[1].color}"></div>处理中：${legendSeries[1].data[item.dataIndex]} ${legendSeries[1].data[item.dataIndex] ? ' 个' : ''}</div>
-            <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${params[2].color}"></div>待处理：${legendSeries[2].data[item.dataIndex]} ${legendSeries[2].data[item.dataIndex] ? ' 个' : ''}</div>
+           ${paramsContent.join('\n')}
           </div>`;
           });
           return content;
@@ -115,7 +121,7 @@ class Accumulation extends Component {
         itemHeight: 14,
       },
       grid: {
-        y2: 30,
+        y2: 50,
         top: '40',
         left: '20',
         right: '40',
@@ -160,6 +166,21 @@ class Accumulation extends Component {
           },
         },
       ],
+      dataZoom: [{
+        startValue: newxAxis[0],
+        type: 'slider',
+        handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+        handleSize: '80%',
+        handleStyle: {
+          color: '#fff',
+          shadowBlur: 3,
+          shadowColor: 'rgba(0, 0, 0, 0.6)',
+          shadowOffsetX: 2,
+          shadowOffsetY: 2,
+        },
+        // right: '50%',
+        // left: '0%',
+      }],
       yAxis: [
         {
           splitLine: {

@@ -253,13 +253,19 @@ class AccumulationHome extends Component {
           trigger: 'axis',
           formatter(params) {
             let content = '';
+            let paramsContent = params.map(item => {
+              return (
+                `<div style="font-size: 11px">
+                  <div style={display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${item.color}}></div>
+                  ${item.seriesName}：${item.data} ${item.data ? ' 个' : ''}
+                </div>`
+              )
+            });
             params.forEach((item, index, arr) => {
               content = `<div>
               <span>${params[0].axisValue}</span>
               <br />
-              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${arr[0].color}"></div>已完成：${legendSeries[0].data[item.dataIndex]} ${legendSeries[0].data[item.dataIndex] ? ' 个' : ''}</div>
-              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${arr[1].color}"></div>处理中：${legendSeries[1].data[item.dataIndex]} ${legendSeries[1].data[item.dataIndex] ? ' 个' : ''}</div>
-              <div style="font-size: 11px"><div style="display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${arr[2].color}"></div>待处理：${legendSeries[2].data[item.dataIndex]} ${legendSeries[2].data[item.dataIndex] ? ' 个' : ''}</div>
+             ${paramsContent.join('\n')}
             </div>`;
             });
             return content;
