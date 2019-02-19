@@ -50,7 +50,7 @@ export default class CardProvider extends React.Component {
     } = this.props;
     return (
       <div
-        className={`c7n-scrumboard-issue ${ScrumBoardStore.currentClickId === issue.issueId ? 'shouldBackgroundColorChange' : ''}`}
+        className={`c7n-scrumboard-issue ${ScrumBoardStore.getCurrentClickId === issue.issueId ? 'shouldBackgroundColorChange' : ''}`}
         role="none"
         onClick={(e) => {
           onClick();

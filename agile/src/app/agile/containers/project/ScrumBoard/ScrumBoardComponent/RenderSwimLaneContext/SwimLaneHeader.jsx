@@ -121,7 +121,14 @@ export default class SwimLaneHeader extends Component {
       }
     } else {
       return (
-        <div className="c7n-swimlaneHeader" style={style}>
+        <div
+          className="c7n-swimlaneHeader"
+          style={style}
+          role="none"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
           {this.renderByMode(mode, subIssueDataLength)}
           {
             mode === 'parent_child' ? (

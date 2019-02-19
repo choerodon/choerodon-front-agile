@@ -31,15 +31,15 @@ class SideBarContent extends Component {
     form.validateFields((err, values) => {
       if (!err) {
         const statusDate = store.getStatusList;
-        const status = statusDate.find(s => s.name === values.column_name);
-        const categoryCode = values.column_categoryCode;
+        const status = statusDate.find(s => s.name === values.name);
+        const { categoryCode } = values;
         const data = {
           boardId: ScrumBoardStore.getSelectedBoard,
-          name: values.column_name,
+          name: values.name,
           projectId: AppState.currentMenuType.id,
           maxNum: 1,
           minNum: 1,
-          categoryCode: values.column_categoryCode,
+          categoryCode: values.categoryCode,
           sequence: ScrumBoardStore.getBoardData.length - 1,
         };
         if (status) {

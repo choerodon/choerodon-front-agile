@@ -22,7 +22,7 @@ class ScrumBoardStore {
 
   @observable prevClick = null;
 
-  @observable currentClick = null;
+  @observable currentClick = 0;
 
   @observable translateToCompleted = [];
 
@@ -283,7 +283,7 @@ class ScrumBoardStore {
     this.clickedIssue = true;
   }
 
-  @computed get currentClickId() {
+  @computed get getCurrentClickId() {
     return this.currentClick;
   }
 
@@ -301,7 +301,7 @@ class ScrumBoardStore {
 
   @action judgeMoveParentToDone(destinationStatus, swimLaneId, parentId, statusIsDone) {
     const completedStatusIssueLength = Object.keys(this.swimLaneData[swimLaneId])
-      .filter(statusId => this.statusMap.get(+statusId).categoryCode === 'done')
+      .filter(statusId => this.statusMap.get(+statusId).completed === 'done')
       .map(statusId => this.swimLaneData[swimLaneId][+statusId].length)
       .reduce((accumulator, currentValue) => accumulator + currentValue);
     if (statusIsDone && completedStatusIssueLength === this.interconnectedData.get(parentId).subIssueData.length) {
@@ -770,6 +770,7 @@ class ScrumBoardStore {
   @action scrumBoardInit(AppStates, url = null, boardListData = null, { boardId, userDefaultBoard, columnConstraint }, { currentSprint }, quickSearchList, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData) {
     this.boardData = [];
     this.spinIf = false;
+    this.currentClick = 0;
     this.quickSearchList = [];
     this.sprintData = false;
     this.assigneer = [];
@@ -788,6 +789,8 @@ class ScrumBoardStore {
       this.dayRemain = currentSprint.dayRemain;
       this.sprintId = currentSprint.sprintId;
       this.sprintName = currentSprint.sprintName;
+    } else {
+      this.currentSprintExist = false;
     }
     this.allDataMap = allDataMap;
     this.mapStructure = mapStructure;
@@ -885,6 +888,10 @@ class ScrumBoardStore {
 
   @computed get didCurrentSprintExist() {
     return this.currentSprintExist;
+  }
+
+  @action resetCurrentSprintExist() {
+    this.currentSprintExist = null;
   }
 
   @action setSwimLaneData(startSwimLane, startStatus, startStatusIndex, destinationSwimLane, destinationStatus, destinationStatusIndex, issue, revert) {
