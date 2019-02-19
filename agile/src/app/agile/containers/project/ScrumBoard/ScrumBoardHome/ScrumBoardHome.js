@@ -5,7 +5,7 @@ import {
 } from 'choerodon-front-boot';
 import { trace, toJS } from 'mobx';
 import {
-  Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip,
+  Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip, Affix,
 } from 'choerodon-ui';
 import ScrumBoardDataController from './ScrumBoardDataController';
 import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
@@ -31,6 +31,7 @@ class ScrumBoardHome extends Component {
   constructor(props) {
     super(props);
     this.dataConverter = new ScrumBoardDataController();
+    this.ref = null;
     this.state = {
       quickSearchObj: {
         onlyMe: false,
@@ -124,6 +125,7 @@ class ScrumBoardHome extends Component {
       ScrumBoardStore.getSprintId,
     ).then((res) => {
       BacklogStore.setSprintCompleteMessage(res);
+      // this.refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
       this.setState({
         closeSprintVisible: true,
       });
@@ -251,6 +253,10 @@ class ScrumBoardHome extends Component {
       const headerData = this.dataConverter.getHeaderData();
       ScrumBoardStore.scrumBoardInit(AppState, url, boardListData, defaultBoard, defaultBoardData, null, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData);
     });
+  }
+
+  boardRef(ref) {
+    this.ref = ref;
   }
 
   render() {
@@ -407,6 +413,9 @@ class ScrumBoardHome extends Component {
                     this.setState({
                       closeSprintVisible: false,
                     });
+                  }}
+                  refresh={() => {
+                    this.refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
                   }}
                   data={{
                     sprintId: ScrumBoardStore.getSprintId,

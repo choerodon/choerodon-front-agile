@@ -1,8 +1,12 @@
 .c7n-scrumboard {
+  position: relative;
   flex-grow: 1;
   overflow: auto;
   height: calc(100vh - 156px);
   .c7n-scrumboard-header {
+    position: sticky;
+    top: 0;
+    z-index: 10000;
     display: flex;
     padding: 0 16px;
     margin-right: 8px;
@@ -58,6 +62,7 @@
 .c7n-scrumTools {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 14px;
   padding: 8px 24px;
   flex-grow: unset !important;
