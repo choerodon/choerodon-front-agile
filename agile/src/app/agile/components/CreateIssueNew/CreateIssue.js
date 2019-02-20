@@ -205,7 +205,7 @@ class CreateIssue extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        storyPoints: String(value),
+        storyPoints: String(value).slice(0, 3),
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
