@@ -253,14 +253,12 @@ class AccumulationHome extends Component {
           trigger: 'axis',
           formatter(params) {
             let content = '';
-            let paramsContent = params.map(item => {
-              return (
+            const paramsContent = params.map((item) => (
                 `<div style="font-size: 11px">
                   <div style={display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${item.color}}></div>
                   ${item.seriesName}：${item.data} ${item.data ? ' 个' : ''}
                 </div>`
-              )
-            });
+              ));
             params.forEach((item, index, arr) => {
               content = `<div>
               <span>${params[0].axisValue}</span>
@@ -488,7 +486,7 @@ class AccumulationHome extends Component {
                         }}
                       >
                         {
-                          item.data && item.data.length && item.data.map(items => (
+                          item.data && item.data.length > 0 && item.data.map(items => (
                             <Checkbox
                               checked={item.onChecked(items[item.id])}
                               onChange={(e) => {

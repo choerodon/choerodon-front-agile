@@ -3,6 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import { Spin, Table } from 'choerodon-ui';
+import _ from 'lodash';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 // import pic from './no_issue.png';
 import pic from '../../../../../assets/image/emptyChart.svg';
@@ -128,7 +129,7 @@ class IssueType extends Component {
             <tbody>
               {
                 issueTypeInfo.map((item, index) => (
-                  <tr>
+                  <tr key={`tr_${_.random(0, 10)}`}>
                     <td style={{ width: '115px' }}>
                       <span
                         className="item-icon"
