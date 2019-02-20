@@ -347,6 +347,8 @@ class AddComponent extends Component {
 
 
 
+
+
           无
                 </Option>,
       );
@@ -867,6 +869,7 @@ class AddComponent extends Component {
               {getFieldDecorator('name', {
                 rules: [{
                   required: true,
+                  message: '名称必填',
                 }, {
                   validator: this.checkSearchNameRepeat,
                 }],
@@ -906,7 +909,7 @@ class AddComponent extends Component {
                           {getFieldDecorator(`filter-${index}-prop`, {
                             rules: [{
                               required: true,
-                              message: '属性为必选字段',
+                              message: '属性不可为空',
                             }],
                             initialValue: arr[index].fieldCode,
                           })(
@@ -931,7 +934,7 @@ class AddComponent extends Component {
                           {getFieldDecorator(`filter-${index}-rule`, {
                             rules: [{
                               required: true,
-                              message: '关系为必选字段',
+                              message: '关系不可为空',
                             }],
                             initialValue: this.transformOperation(arr[index].operation),
                           })(
@@ -942,6 +945,7 @@ class AddComponent extends Component {
                           {getFieldDecorator(`filter-${index}-value`, {
                             rules: [{
                               required: true,
+                              message: '值不可为空',
                             }],
                             initialValue: arr[index].value,
                           })(

@@ -157,7 +157,7 @@ class EditComponent extends Component {
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator, getFieldsValue } = this.props.form;
     return (
       <Sidebar
         title="修改模块"
@@ -191,34 +191,6 @@ class EditComponent extends Component {
                 <Input label="模块名称" maxLength={10} />,
               )}
             </FormItem>
-            <FormItem>
-              {getFieldDecorator('managerId', {
-                initialValue: this.state.managerId,
-              })(
-                <Select
-                  label="负责人"
-                  loading={this.state.selectLoading}
-                  allowClear
-                  filter
-                  onFilterChange={this.onFilterChange.bind(this)}
-                >
-                  {this.state.originUsers.map(user => (
-                    <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                        <UserHead
-                          user={{
-        id: user.id,
-        loginName: user.loginName,
-        realName: user.realName,
-        avatar: user.imageUrl,
-      }}
-                        />
-                      </div>
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
             <FormItem style={{ marginBottom: 5 }}>
               {getFieldDecorator('description', {
                 initialValue: this.state.description,
@@ -243,6 +215,40 @@ class EditComponent extends Component {
                 </Select>,
               )}
             </FormItem>
+            
+            {
+              getFieldsValue(['defaultAssigneeRole']).defaultAssigneeRole && getFieldsValue(['defaultAssigneeRole']).defaultAssigneeRole === '模块负责人' && (
+                <FormItem>
+                  {getFieldDecorator('managerId', {
+                    initialValue: this.state.managerId,
+                  })(
+                    <Select
+                      label="负责人"
+                      loading={this.state.selectLoading}
+                      allowClear
+                      filter
+                      onFilterChange={this.onFilterChange.bind(this)}
+                    >
+                      {this.state.originUsers.map(user => (
+                        <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                            <UserHead
+                              user={{
+                                id: user.id,
+                                loginName: user.loginName,
+                                realName: user.realName,
+                                avatar: user.imageUrl,
+                              }}
+                            />
+                          </div>
+                        </Option>
+                      ))}
+                    </Select>,
+                  )}
+                </FormItem>
+              )
+            }
+            
           </Form>
         </Content>
       </Sidebar>

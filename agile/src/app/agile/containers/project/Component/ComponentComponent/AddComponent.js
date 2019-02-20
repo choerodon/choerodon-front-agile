@@ -113,7 +113,6 @@ class AddComponent extends Component {
 
   render() {
     const { getFieldDecorator, getFieldsValue } = this.props.form;
-    console.log(this.props.form.getFieldsValue(['defaultAssigneeRole']).defaultAssigneeRole);
     return (
       <Sidebar
         className="c7n-component-component"
