@@ -79,6 +79,7 @@ class DeleteReleaseWithIssue extends Component {
   render() {
     const { planning } = this.state;
     const { versionDelInfo, onCancel } = this.props;
+    const filteredVersion = planning.filter(item => item.versionId !== versionDelInfo.versionId)
     return (
       <Sidebar
         title={`删除版本 ${versionDelInfo.versionName}`}
@@ -132,13 +133,10 @@ class DeleteReleaseWithIssue extends Component {
                               });
                             }}
                             defaultValue={versionDelInfo.versionNames
-                              ? planning.filter(
-                                item => item.versionId !== versionDelInfo.versionId,
-                              )[0].versionId : undefined}
+                              && filteredVersion.length > 0 ? filteredVersion[0].versionId : undefined}
                           >
                             {versionDelInfo.versionNames ? (
-                              planning
-                                .filter(item => item.versionId !== versionDelInfo.versionId)
+                              filteredVersion
                                 .map(item => (
                                   <Option value={item.versionId}>{item.name}</Option>
                                 ))
@@ -199,14 +197,10 @@ class DeleteReleaseWithIssue extends Component {
                               });
                             }}
                             defaultValue={versionDelInfo.versionNames
-                              ? planning.filter(
-                                item => item.versionId !== versionDelInfo.versionId,
-                              )[0].versionId : undefined}
+                              && filteredVersion.length > 0 ? filteredVersion[0].versionId : undefined}
                           >
                             {versionDelInfo.versionNames ? (
-                              planning
-                                .filter(item => item.versionId !== versionDelInfo.versionId)
-                                .map(item => (
+                              filteredVersion.map(item => (
                                   <Option value={item.versionId}>{item.name}</Option>
                                 ))
                             ) : ''}
