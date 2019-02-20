@@ -31,8 +31,6 @@ export default class CardProvider extends React.Component {
     const {
       completed, issue, statusName, categoryCode, onClick, clicked, ...otherProps
     } = this.props;
-
-
     return (
       <div
         className={classnames('c7n-scrumboard-issue', {

@@ -283,9 +283,17 @@ class ScrumBoardStore {
 
   @action setClickedIssue(issue, swimlane, status, index) {
     if (this.isEmptyObj(this.prevClick)) {
-      set(this.swimLaneData[this.prevClick.swimlane][this.prevClick.status][this.prevClick.index], 'clicked', false);
+      this.swimLaneData[this.prevClick.swimlane][this.prevClick.status][this.prevClick.index] = {
+        ...this.prevClick.issue,
+        clicked: false,
+      };
+      // set(this.swimLaneData[this.prevClick.swimlane][this.prevClick.status][this.prevClick.index], 'clicked', false);
     }
-    set(this.swimLaneData[swimlane][status][index], 'clicked', true);
+    this.swimLaneData[swimlane][status][index] = {
+      ...issue,
+      clicked: true,
+    };
+    // set(this.swimLaneData[swimlane][status][index], 'clicked', true);
     this.prevClick = {
       swimlane,
       status,
