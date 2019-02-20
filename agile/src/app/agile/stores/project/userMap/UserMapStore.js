@@ -431,13 +431,13 @@ class UserMapStore {
                 const uniqIssues = _.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId');
                 const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
                 this.setIssues(sortedUniqIssues);
-                if (this.cacheIssues.length === 0) {
+                if (this.cacheIssues.length === 0 || sortedUniqIssues.length > this.cacheIssues.length) {
                   this.setCacheIssues(sortedUniqIssues);
                 }
               } else {
                 const sortedIssues = _.orderBy(issues, 'mapRank', 'asc');
                 this.setIssues(sortedIssues);
-                if (this.cacheIssues.length === 0) {
+                if (this.cacheIssues.length === 0 || sortedIssues.length > this.cacheIssues.length) {
                   this.setCacheIssues(sortedIssues);
                 }
               }
