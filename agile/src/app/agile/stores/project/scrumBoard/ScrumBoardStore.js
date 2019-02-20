@@ -20,7 +20,9 @@ class ScrumBoardStore {
 
   @observable currentSprintExist = false;
 
-  @observable prevClick = null;
+  @observable prevClick = {};
+
+  @observable currentDrag = null;
 
   @observable currentClick = 0;
 
@@ -277,8 +279,19 @@ class ScrumBoardStore {
     return this.clickedIssue;
   }
 
-  @action setClickedIssue(issue) {
-    this.currentClick = issue.issueId;
+  isEmptyObj = obj => Object.keys(obj).length > 0;
+
+  @action setClickedIssue(issue, swimlane, status, index) {
+    if (this.isEmptyObj(this.prevClick)) {
+      set(this.swimLaneData[this.prevClick.swimlane][this.prevClick.status][this.prevClick.index], 'clicked', false);
+    }
+    set(this.swimLaneData[swimlane][status][index], 'clicked', true);
+    this.prevClick = {
+      swimlane,
+      status,
+      index,
+      issue,
+    };
     this.clickIssueDetail = issue;
     this.clickedIssue = true;
   }
@@ -301,7 +314,7 @@ class ScrumBoardStore {
 
   @action judgeMoveParentToDone(destinationStatus, swimLaneId, parentId, statusIsDone) {
     const completedStatusIssueLength = Object.keys(this.swimLaneData[swimLaneId])
-      .filter(statusId => this.statusMap.get(+statusId).completed === 'done')
+      .filter(statusId => this.statusMap.get(+statusId).completed === true)
       .map(statusId => this.swimLaneData[swimLaneId][+statusId].length)
       .reduce((accumulator, currentValue) => accumulator + currentValue);
     if (statusIsDone && completedStatusIssueLength === this.interconnectedData.get(parentId).subIssueData.length) {
@@ -488,6 +501,10 @@ class ScrumBoardStore {
 
   @computed get getBoardList() {
     return this.boardList;
+  }
+
+  @action setBoardList(key, data) {
+    this.boardList.set(key, data);
   }
 
   @action rewriteCurrentConstraint({ columnConstraint, objectVersionNumber }, boardId, boardData) {
@@ -770,7 +787,7 @@ class ScrumBoardStore {
   @action scrumBoardInit(AppStates, url = null, boardListData = null, { boardId, userDefaultBoard, columnConstraint }, { currentSprint }, quickSearchList, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData) {
     this.boardData = [];
     this.spinIf = false;
-    this.currentClick = 0;
+    // this.currentClick = 0;
     this.quickSearchList = [];
     this.sprintData = false;
     this.assigneer = [];
@@ -842,6 +859,14 @@ class ScrumBoardStore {
     return this.mapStructure;
   }
 
+  @computed get getCurrentDrag() {
+    return this.currentDrag;
+  }
+
+  @action setCurrentDrag(data) {
+    this.currentDrag = data;
+  }
+
   @action setWhichCanNotDragOn(statusId, typeId) {
     [...this.canDragOn.keys()].forEach((status) => {
       if (this.stateMachineMap[typeId]) {
@@ -892,6 +917,12 @@ class ScrumBoardStore {
 
   @action resetCurrentSprintExist() {
     this.currentSprintExist = null;
+  }
+
+  @action resetCanDragOn() {
+    [...this.canDragOn.keys()].forEach((status) => {
+      this.canDragOn.set(status, false);
+    });
   }
 
   @action setSwimLaneData(startSwimLane, startStatus, startStatusIndex, destinationSwimLane, destinationStatus, destinationStatusIndex, issue, revert) {

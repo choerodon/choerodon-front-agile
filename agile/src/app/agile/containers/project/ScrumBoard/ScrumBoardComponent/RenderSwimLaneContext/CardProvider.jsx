@@ -6,6 +6,11 @@ import Card from './Card';
 
 @observer
 export default class CardProvider extends React.Component {
+  handleCardClick = (issue, index) => {
+    const { keyId, id } = this.props;
+    ScrumBoardStore.setClickedIssue(issue, keyId, id, index);
+  };
+
   render() {
     const { keyId, id, issueProvider } = this.props;
     return ScrumBoardStore.getSwimLaneData[keyId][id].map(
@@ -20,9 +25,9 @@ export default class CardProvider extends React.Component {
               {...provided.dragHandleProps}
             >
               <Card
-                onClick={() => {
-                  ScrumBoardStore.setClickedIssue(issueObj);
-                }}
+                onClick={this.handleCardClick}
+                clicked={issueObj.clicked}
+                index={index}
                 issue={issueObj}
                 {...issueProvider}
               />
