@@ -132,7 +132,7 @@ class DailyLog extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        dissipate: String(value),
+        dissipate: String(value).slice(0, 3), // 限制最长三位,
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
@@ -154,7 +154,7 @@ class DailyLog extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        time: String(value),
+        time: String(value).slice(0, 3), // 限制最长三位,
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
@@ -176,7 +176,7 @@ class DailyLog extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        reduce: String(value),
+        reduce: String(value).slice(0, 3), // 限制最长三位,
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({

@@ -207,7 +207,7 @@ class CreateSubIssue extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        estimatedTime: String(value),
+        estimatedTime: String(value).slice(0, 3), // 限制最长三位
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
@@ -307,7 +307,8 @@ class CreateSubIssue extends Component {
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                         <span>{priority.name}</span>
                       </div>
-                    </Option>))}
+                    </Option>
+))}
                 </Select>,
               )}
             </FormItem>
