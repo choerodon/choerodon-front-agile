@@ -13,12 +13,9 @@ export default class ColumnProvider extends React.Component {
     } = this.props;
     const subStatusArr = column_status_RelationMap.get(columnObj.columnId);
     return (
-      <React.Fragment>
+      <React.Fragment key={columnObj.columnId}>
         <ColumnCouldDragOn keyId={keyId} dragOn={ScrumBoardStore.getCurrentDrag === keyId} />
-        <div
-          key={columnObj.columnId}
-          className={className}
-        >
+        <div className={className}>
           {children(subStatusArr, columnObj.columnId)}
         </div>
       </React.Fragment>

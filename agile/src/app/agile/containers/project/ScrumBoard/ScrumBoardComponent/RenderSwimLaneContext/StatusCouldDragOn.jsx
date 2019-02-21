@@ -11,7 +11,8 @@ class StatusCouldDragOn extends Component {
   }
 
   render() {
-    const { cantDragOn } = this.props;
+    const { statusId } = this.props;
+    const cantDragOn = ScrumBoardStore.getCanDragOn.get(statusId);
     return (
       <div className={cantDragOn ? 'statusCantDragOn' : ''} />
     );

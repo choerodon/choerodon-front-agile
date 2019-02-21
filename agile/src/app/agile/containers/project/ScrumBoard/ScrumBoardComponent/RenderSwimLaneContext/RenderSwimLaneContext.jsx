@@ -8,7 +8,7 @@ const { Panel } = Collapse;
 
 @inject('AppState')
 @observer
-class SwimLaneContext extends React.PureComponent {
+class SwimLaneContext extends React.Component {
   getPanelKey = (mode, issue) => {
     const modeMap = new Map([
       ['swimlane_none', 'swimlaneContext-all'],
