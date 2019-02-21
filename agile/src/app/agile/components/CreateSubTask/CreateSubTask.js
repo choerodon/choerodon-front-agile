@@ -308,7 +308,7 @@ class CreateSubIssue extends Component {
                         <span>{priority.name}</span>
                       </div>
                     </Option>
-))}
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -417,6 +417,7 @@ class CreateSubIssue extends Component {
             <FormItem label="修复版本" style={{ width: 520 }}>
               {getFieldDecorator('fixVersionIssueRel', {
                 rules: [{ transform: value => (value ? value.toString() : value) }],
+                normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), 
               })(
                 <Select
                   label="修复版本"
@@ -444,6 +445,7 @@ class CreateSubIssue extends Component {
             <FormItem label="标签" style={{ width: 520 }}>
               {getFieldDecorator('issueLink', {
                 rules: [{ transform: value => (value ? value.toString() : value) }],
+                normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), 
               })(
                 <Select
                   label="标签"

@@ -45,7 +45,7 @@ class SideBarContent extends Component {
         if (status) {
           confirm({
             title: '警告',
-            content: `已存在状态${values.column_name}，如果创建该列，不会创建同名状态`,
+            content: `已存在状态“${values.name}”，如果创建该列，不会创建同名状态`,
             onOk() {
               ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
                 onChangeVisible(false);
