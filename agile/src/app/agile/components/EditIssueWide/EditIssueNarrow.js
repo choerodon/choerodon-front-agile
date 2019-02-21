@@ -301,7 +301,7 @@ class CreateSprint extends Component {
     }
   }
 
-  getCurrentNav(e) {
+  getCurrentNav=(e) => {
     const { issueTypeDTO } = this.state;
     let eles;
     if (issueTypeDTO && issueTypeDTO.typeCode === 'sub_task') {
@@ -322,7 +322,16 @@ class CreateSprint extends Component {
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
-
+  isInLook(ele) {
+    const a = ele.offsetTop;
+    const target = document.getElementById('scroll-area');
+    return a + ele.offsetHeight > target.scrollTop;
+  }
+  isInLook(ele) {
+    const a = ele.offsetTop;
+    const target = document.getElementById('scroll-area');
+    return a + ele.offsetHeight > target.scrollTop;
+  }
   scrollToAnchor = (anchorName) => {
     if (anchorName) {
       const anchorElement = document.getElementById(anchorName);
