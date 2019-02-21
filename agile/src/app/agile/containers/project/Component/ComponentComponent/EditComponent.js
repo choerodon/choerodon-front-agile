@@ -256,5 +256,4 @@ class EditComponent extends Component {
     );
   }
 }
-
 export default Form.create()(EditComponent);
