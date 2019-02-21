@@ -34,5 +34,16 @@
     "react-image-lightbox": "^4.6.0",
     "react-quill": "^1.3.2",
     "timeago-react": "2.0.0"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx}": [
+      "npm run lint-staged:es"
+    ],
+    "src/**/*.scss": "stylelint --syntax scss"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }

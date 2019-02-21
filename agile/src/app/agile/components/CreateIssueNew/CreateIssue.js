@@ -205,7 +205,7 @@ class CreateIssue extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        storyPoints: String(value),
+        storyPoints: String(value).slice(0, 3),
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
@@ -319,28 +319,30 @@ class CreateIssue extends Component {
           }
         });
         const issueLinkCreateDTOList = [];
-        Object.keys(values.linkTypeId).forEach((link, index) => {
-          if (values.linkTypeId[link] && values.linkIssues[link]) {
-            const currentLinkType = _.find(originLinks, { linkTypeId: values.linkTypeId[link].split('+')[0] * 1 });
-            values.linkIssues[link].forEach((issueNum, i, issues) => {
-              const { issueId } = _.find(originIssues, { issueNum });
-              if (currentLinkType.inWard === values.linkTypeId[link].split('+')[1]) {
-                issueLinkCreateDTOList.push({
-                  linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
-                  linkedIssueId: issueId * 1,
-                  in: false,
-                });
-              } else {
-                issueLinkCreateDTOList.push({
-                  linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
-                  linkedIssueId: issueId * 1,
-                  in: true,
-                });
-              }
-            });
-          }
-        });
-
+        if (values.linkTypeId) {
+          Object.keys(values.linkTypeId).forEach((link, index) => {
+            if (values.linkTypeId[link] && values.linkIssues[link]) {
+              const currentLinkType = _.find(originLinks, { linkTypeId: values.linkTypeId[link].split('+')[0] * 1 });
+              values.linkIssues[link].forEach((issueNum, i, issues) => {
+                const { issueId } = _.find(originIssues, { issueNum });
+                if (currentLinkType.inWard === values.linkTypeId[link].split('+')[1]) {
+                  issueLinkCreateDTOList.push({
+                    linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
+                    linkedIssueId: issueId * 1,
+                    in: false,
+                  });
+                } else {
+                  issueLinkCreateDTOList.push({
+                    linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
+                    linkedIssueId: issueId * 1,
+                    in: true,
+                  });
+                }
+              });
+            }
+          });
+        }
+      
         const extra = {
           issueTypeId: values.typeId,
           typeCode,

@@ -166,35 +166,15 @@ class ScrumBoardHome extends Component {
     const allDataMap = this.dataConverter.getAllDataMap();
     const { issueTypeId } = allDataMap.get(+issueId);
     const statusId = parseInt(result.source.droppableId.split(['/']).shift(), 10);
+    ScrumBoardStore.setCurrentDrag(SwimLaneId);
     ScrumBoardStore.setWhichCanNotDragOn(statusId, issueTypeId);
-    const column = document.getElementsByClassName('c7n-swimlaneContext-itemBodyColumn');
-    const status = document.getElementsByClassName('c7n-swimlaneContext-itemBodyStatus-container');
-    for (let i = 0; i < column.length; i += 1) {
-      column[i].style.backgroundColor = 'rgba(140,158,255,0.12)';
-    }
-    for (let i = 0; i < status.length; i += 1) {
-      status[i].style.borderWidth = '2px';
-      status[i].style.borderStyle = 'dashed';
-      status[i].style.borderColor = '#26348b';
-      status[i].firstElementChild.style.visibility = 'visible';
-    }
   };
 
   onDragEnd = (result) => {
-    const column = document.getElementsByClassName('c7n-swimlaneContext-itemBodyColumn');
-    const status = document.getElementsByClassName('c7n-swimlaneContext-itemBodyStatus-container');
-    for (let i = 0; i < column.length; i += 1) {
-      column[i].style.backgroundColor = '#f5f5f5';
-    }
-    for (let i = 0; i < status.length; i += 1) {
-      status[i].style.borderWidth = 'unset';
-      status[i].style.borderStyle = 'unset';
-      status[i].style.borderColor = 'unset';
-      status[i].firstElementChild.style.visibility = 'hidden';
-    }
-
     const { destination, source, draggableId } = result;
+    const [SwimLaneId, issueId] = draggableId.split(['/']);
     const allDataMap = ScrumBoardStore.getAllDataMap;
+    ScrumBoardStore.setCurrentDrag(null);
     if (!destination) {
       return;
     }
@@ -202,7 +182,6 @@ class ScrumBoardHome extends Component {
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }
-    const [SwimLaneId, issueId] = draggableId.split(['/']);
 
     const [startStatus, startColumn] = source.droppableId.split(['/']).map(id => parseInt(id, 10));
     const startStatusIndex = source.index;
@@ -216,7 +195,7 @@ class ScrumBoardHome extends Component {
 
     ScrumBoardStore.updateIssue(issue, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId).then((data) => {
       if (data.failed) {
-        message.warn('状态更新失败');
+        Choerodon.prompt(data.message);
         ScrumBoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, true);
       } else {
         if (ScrumBoardStore.getSwimLaneCode === 'parent_child' && parentId !== 'other') {
@@ -225,7 +204,9 @@ class ScrumBoardHome extends Component {
         if (data.issueId === ScrumBoardStore.currentClickId) {
           ScrumBoardStore.getEditRef.reloadIssue();
         }
-        ScrumBoardStore.resetHeaderData(startColumn, destinationColumn);
+        if (startColumn !== destinationColumn) {
+          ScrumBoardStore.resetHeaderData(startColumn, destinationColumn);
+        }
         ScrumBoardStore.rewriteObjNumber(data, issueId, issue);
       }
     });
@@ -402,30 +383,14 @@ class ScrumBoardHome extends Component {
             </div>
           </div>
           <Spin spinning={ScrumBoardStore.getSpinIf}>
-            {!ScrumBoardStore.didCurrentSprintExist ? (
-              <NoneSprint />
-            ) : (
-              <div style={{ display: 'flex', width: '100%' }}>
-                <CloseSprint
-                  store={BacklogStore}
-                  visible={closeSprintVisible}
-                  onCancel={() => {
-                    this.setState({
-                      closeSprintVisible: false,
-                    });
-                  }}
-                  refresh={() => {
-                    this.refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
-                  }}
-                  data={{
-                    sprintId: ScrumBoardStore.getSprintId,
-                    sprintName: ScrumBoardStore.getSprintName,
-                  }}
-                />
-                <div className="c7n-scrumboard">
-                  <div className="c7n-scrumboard-header">
-                    <StatusColumn columnData={[...ScrumBoardStore.getHeaderData.values()]} />
-                  </div>
+            <div style={{ display: 'flex', width: '100%' }}>
+              <div className="c7n-scrumboard">
+                <div className="c7n-scrumboard-header">
+                  <StatusColumn columnData={ScrumBoardStore.getHeaderData} />
+                </div>
+                {!ScrumBoardStore.didCurrentSprintExist ? (
+                  <NoneSprint />
+                ) : (
                   <div
                     className="c7n-scrumboard-content"
                   >
@@ -439,15 +404,31 @@ class ScrumBoardHome extends Component {
                       />
                     </div>
                   </div>
-                </div>
-                <IssueDetail
-                  visible={ScrumBoardStore.getClickedIssue}
-                  refresh={this.refresh.bind(this)}
-                />
+                )}
               </div>
-            )}
+              <IssueDetail
+                visible={ScrumBoardStore.getClickedIssue}
+                refresh={this.refresh.bind(this)}
+              />
+            </div>
           </Spin>
         </div>
+        <CloseSprint
+          store={BacklogStore}
+          visible={closeSprintVisible}
+          onCancel={() => {
+            this.setState({
+              closeSprintVisible: false,
+            });
+          }}
+          refresh={() => {
+            this.refresh(ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard));
+          }}
+          data={{
+            sprintId: ScrumBoardStore.getSprintId,
+            sprintName: ScrumBoardStore.getSprintName,
+          }}
+        />
         {
           ScrumBoardStore.getUpdateParent ? (
             <Modal

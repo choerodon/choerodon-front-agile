@@ -56,7 +56,7 @@ class EditBoardName extends Component {
   handleUpdateBoardName = () => {
     const { boardName } = this.state;
     const { form, history } = this.props;
-    const currentEditBoard = ScrumBoardStore.getBoardList.find(item => item.boardId === ScrumBoardStore.getSelectedBoard);
+    const currentEditBoard = ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard);
     const { objectVersionNumber, boardId, projectId } = currentEditBoard;
     const data = {
       objectVersionNumber,
@@ -72,10 +72,11 @@ class EditBoardName extends Component {
           lastBoardName: value.boardName,
         });
         axios.put(`/agile/v1/projects/${data.projectId}/board/${data.boardId}?boardName=${encodeURIComponent(data.name)}`, data)
-          .then(() => {
+          .then((res) => {
             this.setState({
               loading: false,
             });
+            ScrumBoardStore.setBoardList(ScrumBoardStore.getSelectedBoard, res);
             Choerodon.prompt('保存成功');
             // history.push(`/agile/scrumboard?type=project&id=${data.projectId}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
           });

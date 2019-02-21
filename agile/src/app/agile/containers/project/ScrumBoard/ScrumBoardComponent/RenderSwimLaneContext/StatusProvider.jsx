@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
+import classnames from 'classnames';
 import { Droppable } from 'react-beautiful-dnd';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
+import StatusCouldDragOn from './StatusCouldDragOn';
 
-const getListStyle = isDraggingOver => ({
+const getDragOver = isDraggingOver => ({
   background: isDraggingOver ? '#f2f9f4' : 'none',
   borderColor: isDraggingOver ? '#1ab16f' : 'inherit',
 });
@@ -28,25 +30,28 @@ export default class StatusProvider extends Component {
           isDropDisabled={ScrumBoardStore.getCanDragOn.get(statusId)}
         >
           {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-              className="c7n-swimlaneContext-itemBodyStatus-container"
-              style={getListStyle(snapshot.isDraggingOver)}
-              {...provided.droppableProps}
-            >
-              <span
-                className="c7n-swimlaneContext-itemBodyStatus-container-statusName"
-                style={getStatusNameStyle(snapshot.isDraggingOver)}
+            <React.Fragment>
+              <StatusCouldDragOn cantDragOn={ScrumBoardStore.getCanDragOn.get(statusId)} />
+              <div
+                ref={provided.innerRef}
+                className="c7n-swimlaneContext-itemBodyStatus-container"
+                style={getDragOver(snapshot.isDraggingOver)}
+                {...provided.droppableProps}
               >
-                {statusName}
-              </span>
-              {children(keyId, statusId, {
-                completed,
-                statusName,
-                categoryCode,
-              })}
-              {provided.placeholder}
-            </div>
+                <span
+                  className="c7n-swimlaneContext-itemBodyStatus-container-statusName"
+                  style={getStatusNameStyle(snapshot.isDraggingOver)}
+                >
+                  {statusName}
+                </span>
+                {children(keyId, statusId, {
+                  completed,
+                  statusName,
+                  categoryCode,
+                })}
+                {provided.placeholder}
+              </div>
+            </React.Fragment>
           )}
         </Droppable>
       </div>

@@ -316,7 +316,7 @@ class ColumnPage extends Component {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
-   
+
       <Content
         description="分栏可以添加、删除、重新排序和重命名。列是基于全局状态和可移动的列与列之间。最小和最大限制可设置为每个已映射的列中。"
         style={{
@@ -363,28 +363,14 @@ class ColumnPage extends Component {
               label="列约束"
               style={{ width: 512 }}
               onChange={(value) => {
-                let objectVersionNumber;
-                const oldData = ScrumBoardStore.getBoardList;
-                for (let index = 0, len = oldData.length; index < len; index += 1) {
-                  if (oldData[index].boardId === ScrumBoardStore.getSelectedBoard) {
-                    /* eslint-disable */
-                    objectVersionNumber = oldData[index].objectVersionNumber;
-                    /* eslint-enable */
-                  }
-                }
+                const oldData = ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard);
                 ScrumBoardStore.axiosUpdateBoard({
                   boardId: ScrumBoardStore.getSelectedBoard,
                   columnConstraint: value,
                   projectId: AppState.currentMenuType.id,
-                  objectVersionNumber,
+                  objectVersionNumber: oldData.objectVersionNumber,
                 }).then((res) => {
-                  for (let index = 0, len = oldData.length; index < len; index += 1) {
-                    if (oldData[index].boardId === ScrumBoardStore.getSelectedBoard) {
-                      oldData[index].objectVersionNumber = res.objectVersionNumber;
-                      oldData[index].columnConstraint = res.columnConstraint;
-                    }
-                  }
-                  ScrumBoardStore.setBoardList(oldData);
+                  ScrumBoardStore.setBoardList(ScrumBoardStore.getSelectedBoard, res);
                   ScrumBoardStore.setCurrentConstraint(value);
                 }).catch((error) => {
                 });
