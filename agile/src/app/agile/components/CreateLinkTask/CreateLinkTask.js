@@ -200,30 +200,27 @@ class CreateLinkTask extends Component {
                       key={issue.issueId}
                       value={issue.issueNum}
                     >
-                      <div style={{
-                        display: 'inline-flex',
-                        width: '100%',
-                        flex: 1,
-                        alignItems: 'center',
-                        verticalAlign: 'bottom',
-                      }}
-                      >
-                        <TypeTag
-                          data={issue.issueTypeDTO}
-                        />
-                        <span style={{
-                          paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
-                        }}
-                        >
-                          {issue.issueNum}
-                        </span>
-                        <div style={{ overflow: 'hidden', flex: 1 }}>
-                          <p style={{
-                            paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset', 
+                      <div style={{ display: 'inline-block' }}>
+                        <div className="c7nagile-link-select-item">
+                          <div>
+                            <TypeTag
+                              type={issue.issueTypeDTO}
+                            />
+                          </div>
+                          <div style={{
+                            paddingLeft: 12, paddingRight: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', 
                           }}
                           >
-                            {issue.summary}
-                          </p>
+                            {issue.issueNum}
+                          </div>
+                          <div style={{ overflow: 'hidden', flex: 1 }}>
+                            <p style={{
+                              paddingRight: '25px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 0, maxWidth: 'unset', 
+                            }}
+                            >
+                              {issue.summary}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </Option>
