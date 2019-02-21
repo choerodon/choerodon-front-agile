@@ -1,14 +1,21 @@
 import React from 'react';
 import { observer } from 'mobx-react';
+import { get } from 'mobx';
 import { Draggable } from 'react-beautiful-dnd';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import Card from './Card';
 
 @observer
 export default class CardProvider extends React.Component {
-  handleCardClick = (issue, index) => {
-    const { keyId, id } = this.props;
-    ScrumBoardStore.setClickedIssue(issue, keyId, id, index);
+  handleCardClick = (ref, issue) => {
+    // eslint-disable-next-line no-param-reassign
+    ref.style.backgroundColor = '#edeff6';
+    ScrumBoardStore.setClickedIssue(issue, ref);
+  };
+
+  handleCardBlur = (e) => {
+    e.style.backgroundColor = '#fff';
+    ScrumBoardStore.resetClickedIssue();
   };
 
   render() {
@@ -26,6 +33,7 @@ export default class CardProvider extends React.Component {
             >
               <Card
                 onClick={this.handleCardClick}
+                onBlur={this.handleCardBlur}
                 clicked={issueObj.clicked}
                 index={index}
                 issue={issueObj}

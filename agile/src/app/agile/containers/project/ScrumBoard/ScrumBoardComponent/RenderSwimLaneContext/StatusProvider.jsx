@@ -24,6 +24,8 @@ export default class StatusProvider extends Component {
       <div
         key={statusId}
         className="c7n-swimlaneContext-itemBodyStatus"
+        onClick={this.handleColumnClick}
+        role="none"
       >
         <Droppable
           droppableId={`${statusId}/${columnId}`}
@@ -57,6 +59,10 @@ export default class StatusProvider extends Component {
       </div>
     );
   }
+
+  handleColumnClick = () => {
+    ScrumBoardStore.resetClickedIssue();
+  };
 
   render() {
     const { statusData, keyId } = this.props;

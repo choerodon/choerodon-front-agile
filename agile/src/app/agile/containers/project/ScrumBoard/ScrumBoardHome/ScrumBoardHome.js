@@ -236,10 +236,6 @@ class ScrumBoardHome extends Component {
     });
   }
 
-  boardRef(ref) {
-    this.ref = ref;
-  }
-
   render() {
     const { form: { getFieldDecorator }, history } = this.props;
     const {

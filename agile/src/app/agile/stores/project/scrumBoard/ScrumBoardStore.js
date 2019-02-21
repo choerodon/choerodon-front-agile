@@ -269,37 +269,30 @@ class ScrumBoardStore {
     this.parentId = data;
   }
 
-  @action resetClickedIssue() {
-    this.currentClick = null;
-    this.clickIssueDetail = {};
-    this.clickedIssue = false;
-  }
+  // @action resetClickedIssue() {
+  //   this.currentClick = null;
+  //   this.clickIssueDetail = {};
+  //   this.clickedIssue = false;
+  // }
 
   @computed get getClickedIssue() {
     return this.clickedIssue;
   }
 
-  isEmptyObj = obj => Object.keys(obj).length > 0;
-
-  @action setClickedIssue(issue, swimlane, status, index) {
-    if (this.isEmptyObj(this.prevClick)) {
-      this.swimLaneData[this.prevClick.swimlane][this.prevClick.status][this.prevClick.index] = {
-        ...this.prevClick.issue,
-        clicked: false,
-      };
-      // set(this.swimLaneData[this.prevClick.swimlane][this.prevClick.status][this.prevClick.index], 'clicked', false);
+  @action resetClickedIssue() {
+    if (this.currentClickTarget) {
+      this.currentClickTarget.style.backgroundColor = '#fff';
     }
-    this.swimLaneData[swimlane][status][index] = {
-      ...issue,
-      clicked: true,
-    };
-    // set(this.swimLaneData[swimlane][status][index], 'clicked', true);
-    this.prevClick = {
-      swimlane,
-      status,
-      index,
-      issue,
-    };
+    this.currentClickTarget = null;
+    this.clickedIssue = false;
+    this.clickIssueDetail = null;
+  }
+
+  @action setClickedIssue(issue, ref) {
+    if (this.currentClickTarget && ref !== this.currentClickTarget) {
+      this.currentClickTarget.style.backgroundColor = '#fff';
+    }
+    this.currentClickTarget = ref;
     this.clickIssueDetail = issue;
     this.clickedIssue = true;
   }
@@ -414,6 +407,10 @@ class ScrumBoardStore {
   }
 
   @action resetCurrentClick(parentIssueId) {
+    if (this.currentClickTarget) {
+      this.currentClickTarget.style.backgroundColor = '#fff';
+    }
+    this.currentClickTarget = null;
     this.currentClick = parentIssueId;
     this.clickIssueDetail = this.allDataMap.get(parentIssueId);
   }

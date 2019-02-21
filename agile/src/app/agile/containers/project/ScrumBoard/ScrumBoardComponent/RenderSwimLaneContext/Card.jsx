@@ -23,9 +23,19 @@ export default class CardProvider extends React.Component {
   }
 
   handleClick = (e) => {
-    const { onClick, issue, index } = this.props;
-    onClick(issue, index);
-  }
+    const { onClick, issue } = this.props;
+    e.stopPropagation();
+    onClick(this.ref, issue);
+  };
+
+  handleBlur = () => {
+    const { onBlur } = this.props;
+    onBlur(this.ref);
+  };
+
+  editRef = (e) => {
+    this.ref = e;
+  };
 
   render() {
     const {
@@ -37,15 +47,11 @@ export default class CardProvider extends React.Component {
           shouldBackgroundColorChange: clicked,
         })}
         role="none"
-        onClick={this.handleClick}
+        onClick={e => this.handleClick(e)}
+        onBlur={this.handleBlur}
+        ref={this.editRef}
         {...otherProps}
         key={issue.issueNum}
-        style={{
-          // marginLeft: item.parentIssueId && this.props.swimLaneCode === '
-          // assignee' && this.getParent(item.parentIssueId, item) ? 16 : 0,
-          // backgroundColor: '#fff',
-          // borderTop: item.parentIssueId && swimLaneCode === 'assignee' && this.getParent(item.parentIssueId, item) ? 'unset' : '1px solid rgba(0, 0, 0, 0.20)',
-        }}
       >
         <div style={{ flexGrow: 1 }}>
           <div
