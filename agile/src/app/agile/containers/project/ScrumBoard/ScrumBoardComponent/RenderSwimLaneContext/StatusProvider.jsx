@@ -29,7 +29,7 @@ export default class StatusProvider extends Component {
       >
         <Droppable
           droppableId={`${statusId}/${columnId}`}
-          isDropDisabled={ScrumBoardStore.getCanDragOn.get(statusId)}
+          // isDropDisabled={ScrumBoardStore.getCanDragOn.get(statusId)}
         >
           {(provided, snapshot) => (
             <React.Fragment>
