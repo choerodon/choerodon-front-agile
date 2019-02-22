@@ -124,7 +124,6 @@ class Log extends Component {
                 color="#3f51b5"
               />
             </div>
-            <span style={{ color: 'rgba(0, 0, 0, 0.65)' }}>记录了工作日志</span>
             <span style={{ color: 'rgba(0, 0, 0, 0.65)', marginLeft: 15 }}>
               <DatetimeAgo
                 date={worklog.lastUpdateDate}

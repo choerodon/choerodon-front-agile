@@ -188,6 +188,7 @@ class CreateLinkTask extends Component {
                 <Select
                   label="问题"
                   mode="multiple"
+                  dropdownClassName="issueSelectDropDown"
                   loading={selectLoading}
                   optionLabelProp="value"
                   filter
@@ -201,10 +202,15 @@ class CreateLinkTask extends Component {
                       value={issue.issueNum}
                     >
                       <div style={{ display: 'inline-block' }}>
-                        <div className="c7nagile-link-select-item">
+                        <div style={{
+                          display: 'flex',
+                          width: '100%',
+                          flex: 1,
+                        }}
+                        >
                           <div>
                             <TypeTag
-                              type={issue.issueTypeDTO}
+                              data={issue.issueTypeDTO}
                             />
                           </div>
                           <div style={{
