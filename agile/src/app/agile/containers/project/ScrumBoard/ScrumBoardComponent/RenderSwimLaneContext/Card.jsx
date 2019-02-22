@@ -15,8 +15,11 @@ export default class CardProvider extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
-    const { clicked } = this.props;
+    const { clicked, issue } = this.props;
     if (nextProps.clicked !== clicked) {
+      return true;
+    }
+    if (nextProps.issue.stayDay !== issue.stayDay) {
       return true;
     }
     return JSON.stringify(nextProps) !== JSON.stringify(this.props);

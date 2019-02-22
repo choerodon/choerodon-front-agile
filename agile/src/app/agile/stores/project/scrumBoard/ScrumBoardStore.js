@@ -318,7 +318,7 @@ class ScrumBoardStore {
       .filter(statusId => this.statusMap.get(+statusId).completed === true)
       .map(statusId => this.swimLaneData[swimLaneId][+statusId].length)
       .reduce((accumulator, currentValue) => accumulator + currentValue);
-    if (statusIsDone && completedStatusIssueLength === this.interconnectedData.get(parentId).subIssueData.length) {
+    if (statusIsDone && completedStatusIssueLength === this.interconnectedData.get(parentId).subIssueData.length && this.interconnectedData.get(parentId).categoryCode !== 'done') {
       this.updatedParentIssue = this.interconnectedData.get(parentId);
       this.setTransFromData(this.updatedParentIssue, parentId);
     } else {
