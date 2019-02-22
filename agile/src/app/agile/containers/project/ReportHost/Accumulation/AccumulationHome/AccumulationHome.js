@@ -168,8 +168,32 @@ class AccumulationHome extends Component {
     });
   }
 
+  // 返回指定数量的*
+  getAsterisk = (count) => {
+    let str = '';
+    for (let index = 0, len = count; index < len; index += 1) {
+      str += '*';
+    }
+    return str;
+  };
+
   getOption() {
-    let data = _.clone(AccumulationStore.getAccumulationData);
+    // let data = _.clone(AccumulationStore.getAccumulationData);
+    const countMap = {};
+    let data = [];
+    // 处理name相同的数据，末尾加*
+    _.map(AccumulationStore.getAccumulationData, (item, index) => {
+      if (countMap[item.name]) {
+        data.push({
+          ...item,
+          name: item.name + this.getAsterisk(countMap[item.name]),
+        });
+        countMap[item.name] += 1;
+      } else {
+        data.push(_.clone(item));
+        countMap[item.name] = 1;
+      }
+    });
     const sorceColors = [];
     const colors = ['#743BE7', '#F953BA', '#4090FE', '#d07da6', '#FFB100', '#00BFA5'];
     _.map(data, (item, index) => {
@@ -253,12 +277,12 @@ class AccumulationHome extends Component {
           trigger: 'axis',
           formatter(params) {
             let content = '';
-            const paramsContent = params.map((item) => (
-                `<div style="font-size: 11px">
-                  <div style={display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${item.color}}></div>
-                  ${item.seriesName}：${item.data} ${item.data ? ' 个' : ''}
-                </div>`
-              ));
+            const paramsContent = params.map(item => (
+              `<div style="font-size: 11px">
+                <div style={display:inline-block; width: 10px; height: 10px; margin-right: 3px; border-radius: 50%; background:${item.color}}></div>
+                ${item.seriesName}：${item.data} ${item.data ? ' 个' : ''}
+              </div>`
+            ));
             params.forEach((item, index, arr) => {
               content = `<div>
               <span>${params[0].axisValue}</span>
