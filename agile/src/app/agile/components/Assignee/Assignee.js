@@ -137,7 +137,7 @@ class Assignee extends Component {
                 initialValue: assigneeId,
               })(
                 <Select
-                  label="负责人"
+                  label="分配给"
                   loading={selectLoading}
                   allowClear
                   filter
@@ -157,7 +157,8 @@ class Assignee extends Component {
                           }}
                         />
                       </div>
-                    </Option>))}
+                    </Option>
+))}
                 </Select>,
               )}
             </FormItem>
