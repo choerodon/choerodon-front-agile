@@ -82,7 +82,6 @@ class IssueType extends Component {
         }
       })
       .catch((e) => {
-        console.log('error');
         this.setState({
           loading: false,
         });

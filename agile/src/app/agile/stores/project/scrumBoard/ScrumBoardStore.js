@@ -873,26 +873,19 @@ class ScrumBoardStore {
   }
 
   @action setWhichCanNotDragOn(statusId, typeId) {
-    debugger;
     [...this.canDragOn.keys()].forEach((status) => {
-      console.log("status: ", status);
-      console.log("stateMachineMap: ", this.stateMachineMap);
       if (this.stateMachineMap[typeId]) {
-        console.log(`this.stateMachineMap[${typeId}][${statusId}]: `, this.stateMachineMap[typeId][statusId]);
         if (this.stateMachineMap[typeId][statusId].find(issue => issue.endStatusId === status)) {
           this.canDragOn.set(status, false);
         } else {
           this.canDragOn.set(status, true);
         }
       } else if (this.stateMachineMap[0][statusId].find(issue => issue.endStatusId === status)) {
-        console.log(`this.stateMachineMap[0][${statusId}]: `, this.stateMachineMap[0][statusId]);
         this.canDragOn.set(status, false);
       } else {
         this.canDragOn.set(status, true);
       }
     });
-    // console.log(this.stateMachineMap[typeId][statusId]);
-    // this.canDragOn.set(36, false);
   }
 
   @computed get getCanDragOn() {
