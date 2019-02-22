@@ -280,6 +280,7 @@ class ScrumBoardStore {
   }
 
   @action resetClickedIssue() {
+    this.currentClick = 0;
     if (this.currentClickTarget) {
       this.currentClickTarget.style.backgroundColor = '#fff';
     }
@@ -289,6 +290,7 @@ class ScrumBoardStore {
   }
 
   @action setClickedIssue(issue, ref) {
+    this.currentClick = issue.issueId;
     if (this.currentClickTarget && ref !== this.currentClickTarget) {
       this.currentClickTarget.style.backgroundColor = '#fff';
     }

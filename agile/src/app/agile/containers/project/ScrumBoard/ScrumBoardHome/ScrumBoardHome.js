@@ -201,7 +201,7 @@ class ScrumBoardHome extends Component {
         if (ScrumBoardStore.getSwimLaneCode === 'parent_child' && parentId !== 'other') {
           ScrumBoardStore.judgeMoveParentToDone(destinationStatus, SwimLaneId, +parentId, ScrumBoardStore.getStatusMap.get(destinationStatus).categoryCode === 'done');
         }
-        if (data.issueId === ScrumBoardStore.currentClickId) {
+        if (data.issueId === ScrumBoardStore.getCurrentClickId) {
           ScrumBoardStore.getEditRef.reloadIssue();
         }
         if (startColumn !== destinationColumn) {
