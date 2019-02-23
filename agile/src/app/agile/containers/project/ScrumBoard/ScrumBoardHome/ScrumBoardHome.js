@@ -189,7 +189,10 @@ class ScrumBoardHome extends Component {
     const [destinationStatus, destinationColumn] = destination.droppableId.split(['/']).map(id => parseInt(id, 10));
     const destinationStatusIndex = destination.index;
 
-    const issue = allDataMap.get(+issueId);
+    const issue = {
+      ...allDataMap.get(+issueId),
+      stayDay: 0,
+    };
 
     const [type, parentId] = SwimLaneId.split('-');
 
