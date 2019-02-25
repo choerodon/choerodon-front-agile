@@ -41,6 +41,10 @@ class IssueTable extends Component {
           setArgs('advArgs', filters);
           break;
         case 'label':
+        case 'component':
+        case 'version':
+        case 'epic':
+        case 'sprint':
           setArgs('otherArgs', filters);
           break;
         default:
@@ -183,7 +187,8 @@ class IssueTable extends Component {
         key: 'sprint',
         className: 'sprint',
         width: 128,
-        filters: [],
+        filters: IssueStore.getColumnFilter.get('sprint'),
+        filterMultiple: true,
         render: record => (
           <Sprint
             objArray={record.issueSprintDTOS}
@@ -220,9 +225,10 @@ class IssueTable extends Component {
         ),
       },
       {
-        title: '版本',
-        filters: [],
+        title: '版本',       
         key: 'version',
+        filters: IssueStore.getColumnFilter.get('version'),
+        filterMultiple: true,
         hidden: true,
         render: record => (
           <Sprint
@@ -237,7 +243,8 @@ class IssueTable extends Component {
       {
         title: '模块',
         key: 'component',
-        filters: [],
+        filters: IssueStore.getColumnFilter.get('component'),
+        filterMultiple: true,
         hidden: true,
         render: record => (
           <Sprint
@@ -254,7 +261,8 @@ class IssueTable extends Component {
         title: '史诗',
         dataIndex: 'epicName',
         key: 'epic',
-        filters: [],
+        filters: IssueStore.getColumnFilter.get('epic'),
+        filterMultiple: true,
         hidden: true,
         render: (text, record) => <Epic name={record.epicName} color={record.epicColor} />,
       },
