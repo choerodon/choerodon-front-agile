@@ -6,8 +6,9 @@ import {
 import {
   Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select, Spin, Tooltip,
 } from 'choerodon-ui';
-import { Action } from 'choerodon-front-boot';
+import { Action, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
+import _ from 'lodash';
 import DragSortingTable from '../ReleaseComponent/DragSortingTable';
 import AddRelease from '../ReleaseComponent/AddRelease';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
@@ -43,6 +44,8 @@ class ReleaseHome extends Component {
       },
       selectItem: {},
       versionDelete: {},
+      beSureDelete: false,
+      hasTestCase: true,
       versionDelInfo: {},
       publicVersion: false,
       radioChose: null,
@@ -111,6 +114,31 @@ class ReleaseHome extends Component {
     return expand ? renderNarrow : (<table {...props} />);
   };
 
+  handleExpandSideBarWithIssue(record) {
+    if (ReleaseStore.getVersionList.length > 1) {
+      ReleaseStore.axiosVersionIssueStatistics(record.versionId).then((res) => {
+        if (res.fixIssueCount > 0 || res.influenceIssueCount > 0) {
+          this.setState({
+            versionDelInfo: {
+              versionName: record.name,
+              versionId: record.versionId,
+              ...res,
+            },
+          });
+        } else {
+          this.setState({
+            versionDelete: record,
+          });
+        }
+      }).catch((error) => {
+      });
+    } else {
+      this.setState({
+        versionDelete: record,
+      });
+    }
+  }
+
   handleClickMenu(record, e) {
     const that = this;
     if (e.key.indexOf('0') !== -1) {
@@ -132,28 +160,31 @@ class ReleaseHome extends Component {
       }
     }
     if (e.key.indexOf('4') !== -1) {
-      if (ReleaseStore.getVersionList.length > 1) {
-        ReleaseStore.axiosVersionIssueStatistics(record.versionId).then((res) => {
-          if (res.fixIssueCount > 0 || res.influenceIssueCount > 0) {
-            this.setState({
-              versionDelInfo: {
-                versionName: record.name,
-                versionId: record.versionId,
-                ...res,
-              },
-            });
-          } else {
-            this.setState({
-              versionDelete: record,
-            });
-          }
-        }).catch((error) => {
+      axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_issue_types_with_sm_id?apply_type=test&organizationId=${AppState.currentMenuType.organizationId}`)
+        .then((testIssueTypes) => {
+          axios.post(`/test/v1/projects/${AppState.currentMenuType.id}/issueFolderRel/query?page=0&size=10&organizationId=${AppState.currentMenuType.organizationId}&sort=`, {
+            versionIds: [record.versionId],
+            searchDTO: {
+              advancedSearchArgs: { issueTypeId: _.map(testIssueTypes, 'id') },
+              otherArgs: {},
+              searchArgs: {},
+            },
+          }).then((res) => {
+            if (res.totalElements > 0) {
+              this.setState({
+                hasTestCase: true,
+              }, () => {
+                this.handleExpandSideBarWithIssue(record);
+              });
+            } else {
+              this.setState({
+                hasTestCase: false,
+              }, () => {
+                this.handleExpandSideBarWithIssue(record);
+              });
+            }
+          });
         });
-      } else {
-        this.setState({
-          versionDelete: record,
-        });
-      }
     }
     if (e.key.indexOf('5') !== -1) {
       ReleaseStore.axiosGetVersionDetail(record.versionId).then((res) => {
@@ -228,6 +259,8 @@ class ReleaseHome extends Component {
       pagination,
       addRelease,
       versionDelete,
+      beSureDelete,
+      hasTestCase,
       editRelease,
       sourceList,
       combineVisible,
@@ -483,6 +516,44 @@ class ReleaseHome extends Component {
             title={`删除版本 ${versionDelete.name}`}
             visible={JSON.stringify(versionDelete) !== '{}'}
             closable={false}
+            okText="确定"
+            onOk={() => {
+              if (hasTestCase) {
+                this.setState({
+                  beSureDelete: true,
+                });
+              } else {
+                this.setState({
+                  beSureDelete: false,
+                });
+                const data2 = {
+                  projectId: AppState.currentMenuType.id,
+                  versionId: versionDelete.versionId,
+                };
+                ReleaseStore.axiosDeleteVersion(data2).then((data) => {
+                  this.refresh(pagination);
+                  this.setState({
+                    versionDelete: {},
+                  });
+                }).catch((error) => {
+                });
+              }
+            }}
+            onCancel={() => {
+              this.setState({
+                beSureDelete: false,
+                versionDelete: {},
+              });
+            }}
+          >
+            <div style={{ marginTop: 20 }}>
+              {`确定要删除 V${versionDelete.name}?`}
+            </div>
+          </Modal>
+          <Modal
+            title={`删除版本 ${versionDelete.name}`}
+            visible={beSureDelete}
+            closable={false}
             okText="删除"
             onOk={() => {
               const data2 = {
@@ -493,20 +564,23 @@ class ReleaseHome extends Component {
                 this.refresh(pagination);
                 this.setState({
                   versionDelete: {},
+                  beSureDelete: false,
                 });
               }).catch((error) => {
               });
             }}
             onCancel={() => {
               this.setState({
+                beSureDelete: false,
                 versionDelete: {},
               });
             }}
           >
             <div style={{ marginTop: 20 }}>
-              {`确定要删除 V${versionDelete.name}?`}
+              {`版本 ${versionDelete.name} 下的测试用例将会被同步删除`}
             </div>
           </Modal>
+          
           <CombineRelease
             onRef={(ref) => {
               this.combineRelease = ref;
@@ -522,6 +596,7 @@ class ReleaseHome extends Component {
           />
           <DeleteReleaseWithIssues
             versionDelInfo={versionDelInfo}
+            hasTestCase={hasTestCase}
             onCancel={() => {
               this.setState({
                 versionDelInfo: {},

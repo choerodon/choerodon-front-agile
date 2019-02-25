@@ -2276,9 +2276,11 @@ class CreateSprint extends Component {
                         typeCode === 'bug' ? (
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
+                            <Tooltip title="对于非当前版本所发现的bug进行版本选择">
                               <span className="c7n-property">
                                 {'影响的版本：'}
                               </span>
+                            </Tooltip>
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit
@@ -2351,7 +2353,7 @@ class CreateSprint extends Component {
                       <div className="line-start mt-10">
                         <div className="c7n-property-wrapper">
                           <span className="c7n-property">
-                            {'修复的版本：'}
+                            {'版本：'}
                           </span>
                         </div>
                         <div className="c7n-value-wrapper">
