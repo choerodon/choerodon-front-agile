@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
- Modal, Radio, Select, message, Icon 
+  Modal, Radio, Select, message, Icon, 
 } from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
 
@@ -38,7 +38,10 @@ class DeleteLink extends Component {
       radio: 1,
       relatedComponentId: undefined,
     });
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types?issueLinkTypeId=${this.props.link.linkTypeId}`)
+    axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_link_types/query_all?issueLinkTypeId=${this.props.link.linkTypeId}`, {
+      contents: [],
+      linkName: '',
+    })
       .then((res) => {
         this.setState({
           originComponents: res.content,
@@ -106,7 +109,7 @@ class DeleteLink extends Component {
                 <Option key={component.linkTypeId} value={component.linkTypeId}>
                   {component.linkName}
                 </Option>
-),)}
+              ))}
             </Select>
           </Radio>
         </RadioGroup>
@@ -129,6 +132,12 @@ class DeleteLink extends Component {
         <div style={{ margin: '20px 0', position: 'relative' }}>
           <Icon style={{ color: '#d50000', position: 'absolute', fontSize: '16px' }} type="error" />
           <div style={{ marginLeft: 20, width: 400 }}>
+
+
+
+
+
+
 
             删除后相关联的任务都会消失，是否要直接删除或者更换。
 </div>

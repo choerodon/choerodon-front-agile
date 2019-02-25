@@ -207,7 +207,7 @@ class CreateSubIssue extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        estimatedTime: String(value),
+        estimatedTime: String(value).slice(0, 3), // 限制最长三位
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
@@ -307,7 +307,8 @@ class CreateSubIssue extends Component {
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                         <span>{priority.name}</span>
                       </div>
-                    </Option>))}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -416,6 +417,7 @@ class CreateSubIssue extends Component {
             <FormItem label="修复版本" style={{ width: 520 }}>
               {getFieldDecorator('fixVersionIssueRel', {
                 rules: [{ transform: value => (value ? value.toString() : value) }],
+                normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), 
               })(
                 <Select
                   label="修复版本"
@@ -443,6 +445,7 @@ class CreateSubIssue extends Component {
             <FormItem label="标签" style={{ width: 520 }}>
               {getFieldDecorator('issueLink', {
                 rules: [{ transform: value => (value ? value.toString() : value) }],
+                normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), 
               })(
                 <Select
                   label="标签"

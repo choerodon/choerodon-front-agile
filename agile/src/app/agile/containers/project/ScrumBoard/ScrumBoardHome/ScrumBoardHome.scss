@@ -6,7 +6,8 @@
   .c7n-scrumboard-header {
     position: sticky;
     top: 0;
-    z-index: 10000;
+    z-index: 100;
+    background: #fff;
     display: flex;
     padding: 0 16px;
     margin-right: 8px;
@@ -24,6 +25,9 @@
         display: flex;
         flex: 1;
         flex-direction: column;
+      }
+      .ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-expand-icon:before {
+        content: "\E313" !important;
       }
     }
     .c7n-scrumboard-others {
@@ -69,6 +73,7 @@
   height: 48px;
   min-height: 47px;
   overflow: hidden !important;
+  border-bottom: 1px solid #d3d3d3;
   .ant-spin-container {
     display: flex !important;
   }

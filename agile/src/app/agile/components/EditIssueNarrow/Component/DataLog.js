@@ -80,7 +80,7 @@ class DataLog extends Component {
       }
     } else if ((oldValue || oldValue === 0) && (!newValue && newValue !== 0)) {
       // yyy -> null
-      if (['Epic Link', 'Sprint', 'assignee', 'reporter', 'labels', 'WorklogId', 'Comment', 'Component', 'Fix Version', 'Epic Child', 'resolution'].includes(field)) {
+      if (['Epic Link', 'Sprint', 'assignee', 'reporter', 'labels', 'Component', 'Fix Version', 'Epic Child', 'resolution'].includes(field)) {
         return '移除';
       }
       if (['Story Points', 'timeestimate'].includes(field)) {
@@ -89,7 +89,7 @@ class DataLog extends Component {
       if (['timespent'].includes(field)) {
         return '更新';
       }
-      if (['Attachment'].includes(field)) {
+      if (['Attachment', 'WorklogId', 'Comment'].includes(field)) {
         if (oldString && !newString) {
           return '删除';
         }
@@ -448,13 +448,13 @@ class DataLog extends Component {
                               datalog.imageUrl ? (
                                 <img src={datalog.imageUrl} alt="" style={{ width: '100%' }} />
                               ) : (
-                                  <span style={{
+                                <span style={{
                                     width: 62, height: 62, lineHeight: '62px', textAlign: 'center', color: '#6473c3',
                                   }}
                                   >
                                     {this.getFirst(datalog.name)}
                                   </span>
-                                )
+                              )
                             }
                           </div>
                           <h1 style={{

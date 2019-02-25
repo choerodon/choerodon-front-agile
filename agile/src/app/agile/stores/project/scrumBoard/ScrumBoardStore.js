@@ -20,7 +20,9 @@ class ScrumBoardStore {
 
   @observable currentSprintExist = false;
 
-  @observable prevClick = null;
+  @observable prevClick = {};
+
+  @observable currentDrag = null;
 
   @observable currentClick = 0;
 
@@ -267,18 +269,32 @@ class ScrumBoardStore {
     this.parentId = data;
   }
 
-  @action resetClickedIssue() {
-    this.currentClick = null;
-    this.clickIssueDetail = {};
-    this.clickedIssue = false;
-  }
+  // @action resetClickedIssue() {
+  //   this.currentClick = null;
+  //   this.clickIssueDetail = {};
+  //   this.clickedIssue = false;
+  // }
 
   @computed get getClickedIssue() {
     return this.clickedIssue;
   }
 
-  @action setClickedIssue(issue) {
+  @action resetClickedIssue() {
+    this.currentClick = 0;
+    if (this.currentClickTarget) {
+      this.currentClickTarget.style.backgroundColor = '#fff';
+    }
+    this.currentClickTarget = null;
+    this.clickedIssue = false;
+    this.clickIssueDetail = null;
+  }
+
+  @action setClickedIssue(issue, ref) {
     this.currentClick = issue.issueId;
+    if (this.currentClickTarget && ref !== this.currentClickTarget) {
+      this.currentClickTarget.style.backgroundColor = '#fff';
+    }
+    this.currentClickTarget = ref;
     this.clickIssueDetail = issue;
     this.clickedIssue = true;
   }
@@ -301,10 +317,10 @@ class ScrumBoardStore {
 
   @action judgeMoveParentToDone(destinationStatus, swimLaneId, parentId, statusIsDone) {
     const completedStatusIssueLength = Object.keys(this.swimLaneData[swimLaneId])
-      .filter(statusId => this.statusMap.get(+statusId).completed === 'done')
+      .filter(statusId => this.statusMap.get(+statusId).completed === true)
       .map(statusId => this.swimLaneData[swimLaneId][+statusId].length)
       .reduce((accumulator, currentValue) => accumulator + currentValue);
-    if (statusIsDone && completedStatusIssueLength === this.interconnectedData.get(parentId).subIssueData.length) {
+    if (statusIsDone && completedStatusIssueLength === this.interconnectedData.get(parentId).subIssueData.length && this.interconnectedData.get(parentId).categoryCode !== 'done') {
       this.updatedParentIssue = this.interconnectedData.get(parentId);
       this.setTransFromData(this.updatedParentIssue, parentId);
     } else {
@@ -393,6 +409,10 @@ class ScrumBoardStore {
   }
 
   @action resetCurrentClick(parentIssueId) {
+    if (this.currentClickTarget) {
+      this.currentClickTarget.style.backgroundColor = '#fff';
+    }
+    this.currentClickTarget = null;
     this.currentClick = parentIssueId;
     this.clickIssueDetail = this.allDataMap.get(parentIssueId);
   }
@@ -488,6 +508,10 @@ class ScrumBoardStore {
 
   @computed get getBoardList() {
     return this.boardList;
+  }
+
+  @action setBoardList(key, data) {
+    this.boardList.set(key, data);
   }
 
   @action rewriteCurrentConstraint({ columnConstraint, objectVersionNumber }, boardId, boardData) {
@@ -770,7 +794,7 @@ class ScrumBoardStore {
   @action scrumBoardInit(AppStates, url = null, boardListData = null, { boardId, userDefaultBoard, columnConstraint }, { currentSprint }, quickSearchList, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData) {
     this.boardData = [];
     this.spinIf = false;
-    this.currentClick = 0;
+    // this.currentClick = 0;
     this.quickSearchList = [];
     this.sprintData = false;
     this.assigneer = [];
@@ -842,6 +866,14 @@ class ScrumBoardStore {
     return this.mapStructure;
   }
 
+  @computed get getCurrentDrag() {
+    return this.currentDrag;
+  }
+
+  @action setCurrentDrag(data) {
+    this.currentDrag = data;
+  }
+
   @action setWhichCanNotDragOn(statusId, typeId) {
     [...this.canDragOn.keys()].forEach((status) => {
       if (this.stateMachineMap[typeId]) {
@@ -856,8 +888,6 @@ class ScrumBoardStore {
         this.canDragOn.set(status, true);
       }
     });
-    // console.log(this.stateMachineMap[typeId][statusId]);
-    // this.canDragOn.set(36, false);
   }
 
   @computed get getCanDragOn() {
@@ -892,6 +922,12 @@ class ScrumBoardStore {
 
   @action resetCurrentSprintExist() {
     this.currentSprintExist = null;
+  }
+
+  @action resetCanDragOn() {
+    [...this.canDragOn.keys()].forEach((status) => {
+      this.canDragOn.set(status, false);
+    });
   }
 
   @action setSwimLaneData(startSwimLane, startStatus, startStatusIndex, destinationSwimLane, destinationStatus, destinationStatusIndex, issue, revert) {

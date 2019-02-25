@@ -9,8 +9,8 @@ import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoard
 @observer
 class StatusColumn extends Component {
   render() {
-    const { columnData } = this.props;
-    return columnData.filter(column => column.hasStatus).map(column => (
+    // const { columnData } = this.props;
+    return [...ScrumBoardStore.getHeaderData.values()].filter(column => column.hasStatus).map(column => (
       <div className="c7n-scrumboard-statusHeader" key={column.columnId}>
         <p className="c7n-scrumboard-statusHeader-name">
           {column.columnName}

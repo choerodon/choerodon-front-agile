@@ -3,6 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import { Spin, Table } from 'choerodon-ui';
+import _ from 'lodash';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 // import pic from './no_issue.png';
 import pic from '../../../../../assets/image/emptyChart.svg';
@@ -81,7 +82,6 @@ class IssueType extends Component {
         }
       })
       .catch((e) => {
-        console.log('error');
         this.setState({
           loading: false,
         });
@@ -128,7 +128,7 @@ class IssueType extends Component {
             <tbody>
               {
                 issueTypeInfo.map((item, index) => (
-                  <tr>
+                  <tr key={`tr_${_.random(0, 10)}`}>
                     <td style={{ width: '115px' }}>
                       <span
                         className="item-icon"
@@ -146,7 +146,7 @@ class IssueType extends Component {
                           } = urlParams;
                           const { history } = this.props;
                           history.push(
-                            `/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${organizationId}&paramIssueType=story&paramName=${item.name || '未分配'}下的问题&paramUrl=reportBoard`,
+                            `/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${organizationId}&paramIssueType=${item.typeName}&paramName=${item.name || '未分配'}下的问题&paramUrl=reportBoard`,
                           );
                         }}
                       >

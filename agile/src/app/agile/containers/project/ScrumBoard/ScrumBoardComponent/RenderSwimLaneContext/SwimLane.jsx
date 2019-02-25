@@ -4,6 +4,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import classnames from 'classnames';
 import './SwimLane.scss';
 import RenderSwimLaneContext from './index';
 import ColumnProvider from './ColumnProvider';
@@ -63,6 +64,7 @@ class SwimLane extends Component {
       >
         <ColumnProvider
           className="c7n-swimlaneContext-itemBodyColumn"
+          keyId={key}
           {...mapStructure}
         >
           {(statusArr, columnId) => (

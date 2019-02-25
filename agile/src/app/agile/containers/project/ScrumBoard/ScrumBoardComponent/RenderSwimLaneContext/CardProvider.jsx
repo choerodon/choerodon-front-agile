@@ -1,11 +1,23 @@
 import React from 'react';
 import { observer } from 'mobx-react';
+import { get } from 'mobx';
 import { Draggable } from 'react-beautiful-dnd';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import Card from './Card';
 
 @observer
 export default class CardProvider extends React.Component {
+  handleCardClick = (ref, issue) => {
+    // eslint-disable-next-line no-param-reassign
+    ref.style.backgroundColor = '#edeff6';
+    ScrumBoardStore.setClickedIssue(issue, ref);
+  };
+
+  handleCardBlur = (e) => {
+    e.style.backgroundColor = '#fff';
+    ScrumBoardStore.resetClickedIssue();
+  };
+
   render() {
     const { keyId, id, issueProvider } = this.props;
     return ScrumBoardStore.getSwimLaneData[keyId][id].map(
@@ -20,9 +32,10 @@ export default class CardProvider extends React.Component {
               {...provided.dragHandleProps}
             >
               <Card
-                onClick={() => {
-                  ScrumBoardStore.setClickedIssue(issueObj);
-                }}
+                onClick={this.handleCardClick}
+                onBlur={this.handleCardBlur}
+                clicked={issueObj.clicked}
+                index={index}
                 issue={issueObj}
                 {...issueProvider}
               />

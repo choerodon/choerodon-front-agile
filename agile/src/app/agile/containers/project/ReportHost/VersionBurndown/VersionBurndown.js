@@ -555,24 +555,6 @@ class VersionBurndown extends Component {
     });
   }
 
-  handleLinkToIssue(linkType, item) {
-    const urlParams = AppState.currentMenuType;
-    const {
-      type, id, organizationId,
-    } = urlParams;
-    const { history } = this.props;
-    let urlPush = `/agile/issue?type=${type}&id=${id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${organizationId}`;
-    if (JSON.stringify(item) !== '{}') {
-      // if (linkType === 'sprint') {
-      //   urlPush += `&paramType=statusId&paramId=36&paramChoose=sprint&paramCurrentSprint=${item.sprintId}&paramName=已完成、冲刺为${item.sprintName || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
-      // }
-      if (linkType === 'version') {
-        urlPush += `&paramType=version&paramId=${item.versionId}&paramName=${item.name || '未分配'}下的问题&paramUrl=reporthost/versionBurnDown`;
-      }
-      history.push(urlPush);
-    }
-  }
-
   refresh() {
     if (!ES.currentVersionId) {
       ES.loadVersionAndChartAndTableData();
@@ -707,22 +689,6 @@ class VersionBurndown extends Component {
                           >
                             {`${item.startDate && item.startDate.slice(0, 11).replace(/-/g, '.')}-${item.endDate && item.endDate.slice(0, 11).replace(/-/g, '.')}`}
                           </span>
-                          {/* <span
-                            style={{
-                              display: 'inline-block',
-                              position: 'absolute',
-                              right: 0,
-                              color: '#3f51b5',
-                              cursor: 'pointer',
-                              fontSize: 13,
-                              flex: 1,
-                            }}
-                            role="none"
-                            onClick={this.handleLinkToIssue.bind(this, 'sprint', item)}
-                          >
-                            {'在“问题管理中”查看'}
-                            <Icon style={{ fontSize: 13 }} type="open_in_new" />
-                          </span> */}
                         </p>
                         <Table
                           rowKey={record => record.issueId}

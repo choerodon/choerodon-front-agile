@@ -45,20 +45,20 @@ class AddRelease extends Component {
           this.setState({
             loading: false,
             expectReleaseDate: null,
-            startDate: null,
+            startDate: moment(),
           });
         }).catch((error) => {
           this.setState({
             loading: false,
             expectReleaseDate: null,
-            startDate: null,
+            startDate: moment(),
           });
         });
       } else {
         this.setState({
           loading: false,
           expectReleaseDate: null,
-          startDate: null,
+          startDate: moment(),
         });
       }
     });
@@ -70,7 +70,7 @@ class AddRelease extends Component {
     onCancel();
     this.setState({
       expectReleaseDate: null,
-      startDate: null,
+      startDate: moment(),
     });
   };
 

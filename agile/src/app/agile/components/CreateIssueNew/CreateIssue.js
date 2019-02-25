@@ -205,7 +205,7 @@ class CreateIssue extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        storyPoints: String(value),
+        storyPoints: String(value).slice(0, 3),
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
@@ -227,7 +227,7 @@ class CreateIssue extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        estimatedTime: String(value),
+        estimatedTime: String(value).slice(0, 3), // 限制最长三位
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
@@ -319,27 +319,29 @@ class CreateIssue extends Component {
           }
         });
         const issueLinkCreateDTOList = [];
-        Object.keys(values.linkTypeId).forEach((link, index) => {
-          if (values.linkTypeId[link] && values.linkIssues[link]) {
-            const currentLinkType = _.find(originLinks, { linkTypeId: values.linkTypeId[link].split('+')[0] * 1 });
-            values.linkIssues[link].forEach((issueNum, i, issues) => {
-              const { issueId } = _.find(originIssues, { issueNum });
-              if (currentLinkType.inWard === values.linkTypeId[link].split('+')[1]) {
-                issueLinkCreateDTOList.push({
-                  linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
-                  linkedIssueId: issueId * 1,
-                  in: false,
-                });
-              } else {
-                issueLinkCreateDTOList.push({
-                  linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
-                  linkedIssueId: issueId * 1,
-                  in: true,
-                });
-              }
-            });
-          }
-        });
+        if (values.linkTypeId) {
+          Object.keys(values.linkTypeId).forEach((link, index) => {
+            if (values.linkTypeId[link] && values.linkIssues[link]) {
+              const currentLinkType = _.find(originLinks, { linkTypeId: values.linkTypeId[link].split('+')[0] * 1 });
+              values.linkIssues[link].forEach((issueNum, i, issues) => {
+                const { issueId } = _.find(originIssues, { issueNum });
+                if (currentLinkType.inWard === values.linkTypeId[link].split('+')[1]) {
+                  issueLinkCreateDTOList.push({
+                    linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
+                    linkedIssueId: issueId * 1,
+                    in: false,
+                  });
+                } else {
+                  issueLinkCreateDTOList.push({
+                    linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
+                    linkedIssueId: issueId * 1,
+                    in: true,
+                  });
+                }
+              });
+            }
+          });
+        }
       
         const extra = {
           issueTypeId: values.typeId,
@@ -435,16 +437,16 @@ class CreateIssue extends Component {
                   </Select>,
                 )}
               </FormItem>
-              { newIssueTypeCode === 'issue_epic' && (
-              <FormItem label="史诗名称" style={{ width: 520 }}>
-                {getFieldDecorator('epicName', {
-                  rules: [{ required: true, message: '史诗名称为必输项' }, {
-                    validator: this.checkEpicNameRepeat,
-                  }],
-                })(
-                  <Input label="史诗名称" maxLength={10} />,
-                )}
-              </FormItem>
+              {newIssueTypeCode === 'issue_epic' && (
+                <FormItem label="史诗名称" style={{ width: 520 }}>
+                  {getFieldDecorator('epicName', {
+                    rules: [{ required: true, message: '史诗名称为必输项' }, {
+                      validator: this.checkEpicNameRepeat,
+                    }],
+                  })(
+                    <Input label="史诗名称" maxLength={10} />,
+                  )}
+                </FormItem>
               )}
               <FormItem label="概要" style={{ width: 520 }}>
                 {getFieldDecorator('summary', {
@@ -485,45 +487,45 @@ class CreateIssue extends Component {
                   </div>
                 </div>
                 {
-                !edit && (
-                  <div className="clear-p-mw">
-                    <WYSIWYGEditor
-                      value={delta}
-                      style={{ height: 200, width: '100%' }}
-                      onChange={(value) => {
-                        this.setState({ delta: value });
-                      }}
-                    />
-                  </div>
-                )
-              }
+                  !edit && (
+                    <div className="clear-p-mw">
+                      <WYSIWYGEditor
+                        value={delta}
+                        style={{ height: 200, width: '100%' }}
+                        onChange={(value) => {
+                          this.setState({ delta: value });
+                        }}
+                      />
+                    </div>
+                  )
+                }
               </div>
 
               {
                 // 创建的问题类型为故事时，才显示故事点
                 newIssueTypeCode === 'story' && (
-                <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
-                  <Select
-                    label="故事点"
-                    value={storyPoints && storyPoints.toString()}
-                    mode="combobox"
-                    ref={(e) => {
-                      this.componentRef = e;
-                    }}
-                    onPopupFocus={(e) => {
-                      this.componentRef.rcSelect.focus();
-                    }}
-                    tokenSeparators={[',']}
-                    style={{ marginTop: 0, paddingTop: 0 }}
-                    onChange={value => this.handleChangeStoryPoint(value)}
-                  >
-                    {storyPointList.map(sp => (
-                      <Option key={sp.toString()} value={sp}>
-                        {sp}
-                      </Option>
-                    ))}
-                  </Select>
-                </div>
+                  <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
+                    <Select
+                      label="故事点"
+                      value={storyPoints && storyPoints.toString()}
+                      mode="combobox"
+                      ref={(e) => {
+                        this.componentRef = e;
+                      }}
+                      onPopupFocus={(e) => {
+                        this.componentRef.rcSelect.focus();
+                      }}
+                      tokenSeparators={[',']}
+                      style={{ marginTop: 0, paddingTop: 0 }}
+                      onChange={value => this.handleChangeStoryPoint(value)}
+                    >
+                      {storyPointList.map(sp => (
+                        <Option key={sp.toString()} value={sp}>
+                          {sp}
+                        </Option>
+                      ))}
+                    </Select>
+                  </div>
                 )
               }
 
@@ -595,47 +597,47 @@ class CreateIssue extends Component {
               </Tooltip>
 
               {
-              newIssueTypeCode !== 'issue_epic' && (
-                <FormItem label="史诗" style={{ width: 520 }}>
-                  {getFieldDecorator('epicId', {})(
-                    <Select
-                      label="史诗"
-                      allowClear
-                      filter
-                      filterOption={
-                        (input, option) => option.props.children && option.props.children.toLowerCase().indexOf(
-                          input.toLowerCase(),
-                        ) >= 0
-                      }
-                      getPopupContainer={triggerNode => triggerNode.parentNode}
-                      loading={selectLoading}
-                      onFilterChange={() => {
-                        this.setState({
-                          selectLoading: true,
-                        });
-                        loadEpics().then((res) => {
+                newIssueTypeCode !== 'issue_epic' && (
+                  <FormItem label="史诗" style={{ width: 520 }}>
+                    {getFieldDecorator('epicId', {})(
+                      <Select
+                        label="史诗"
+                        allowClear
+                        filter
+                        filterOption={
+                          (input, option) => option.props.children && option.props.children.toLowerCase().indexOf(
+                            input.toLowerCase(),
+                          ) >= 0
+                        }
+                        getPopupContainer={triggerNode => triggerNode.parentNode}
+                        loading={selectLoading}
+                        onFilterChange={() => {
                           this.setState({
-                            originEpics: res,
-                            selectLoading: false,
+                            selectLoading: true,
                           });
-                        });
-                      }}
-                    >
-                      {originEpics.map(
-                        epic => (
-                          <Option
-                            key={epic.issueId}
-                            value={epic.issueId}
-                          >
-                            {epic.epicName}
-                          </Option>
-                        ),
-                      )}
-                    </Select>,
-                  )}
-                </FormItem>
-              )
-            }
+                          loadEpics().then((res) => {
+                            this.setState({
+                              originEpics: res,
+                              selectLoading: false,
+                            });
+                          });
+                        }}
+                      >
+                        {originEpics.map(
+                          epic => (
+                            <Option
+                              key={epic.issueId}
+                              value={epic.issueId}
+                            >
+                              {epic.epicName}
+                            </Option>
+                          ),
+                        )}
+                      </Select>,
+                    )}
+                  </FormItem>
+                )
+              }
 
               <FormItem label="冲刺" style={{ width: 520 }}>
                 {getFieldDecorator('sprintId', {})(
@@ -674,6 +676,7 @@ class CreateIssue extends Component {
               <FormItem label="修复版本" style={{ width: 520 }}>
                 {getFieldDecorator('fixVersionIssueRel', {
                   rules: [{ transform: value => (value ? value.toString() : value) }],
+                  normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), // 限制最长10位
                 })(
                   <Select
                     label="修复版本"
@@ -711,6 +714,7 @@ class CreateIssue extends Component {
               <FormItem label="模块" style={{ width: 520 }}>
                 {getFieldDecorator('componentIssueRel', {
                   rules: [{ transform: value => (value ? value.toString() : value) }],
+                  normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), // 限制最长10位
                 })(
                   <Select
                     label="模块"
@@ -748,6 +752,7 @@ class CreateIssue extends Component {
               <FormItem label="标签" style={{ width: 520 }}>
                 {getFieldDecorator('issueLabel', {
                   rules: [{ transform: value => (value ? value.toString() : value) }],
+                  normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), // 限制最长10位
                 })(
                   <Select
                     label="标签"
@@ -867,21 +872,21 @@ class CreateIssue extends Component {
                           <Icon type="add icon" />
                         </Button>
                         {
-                            issueLinkArr.length > 1 ? (
-                              <Button
-                                shape="circle"
-                                style={{ marginBottom: 10 }}
-                                onClick={() => {
-                                  arr.splice(index, 1);
-                                  this.setState({
-                                    issueLinkArr: arr,
-                                  });
-                                }}
-                              >
-                                <Icon type="delete" />
-                              </Button>
-                            ) : null
-                          }
+                          issueLinkArr.length > 1 ? (
+                            <Button
+                              shape="circle"
+                              style={{ marginBottom: 10 }}
+                              onClick={() => {
+                                arr.splice(index, 1);
+                                this.setState({
+                                  issueLinkArr: arr,
+                                });
+                              }}
+                            >
+                              <Icon type="delete" />
+                            </Button>
+                          ) : null
+                        }
                       </div>
                     )))
                 )
@@ -902,15 +907,15 @@ class CreateIssue extends Component {
             </div>
           </div>
           {
-          edit ? (
-            <FullEditor
-              initValue={delta}
-              visible={edit}
-              onCancel={() => this.setState({ edit: false })}
-              onOk={callback}
-            />
-          ) : null
-        }
+            edit ? (
+              <FullEditor
+                initValue={delta}
+                visible={edit}
+                onCancel={() => this.setState({ edit: false })}
+                onOk={callback}
+              />
+            ) : null
+          }
 
         </Content>
 

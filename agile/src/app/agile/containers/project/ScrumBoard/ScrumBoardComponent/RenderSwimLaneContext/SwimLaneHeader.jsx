@@ -113,7 +113,7 @@ export default class SwimLaneHeader extends Component {
     } = this.props;
     if (keyId === 'other') {
       if (mode === 'swimlane_epic') {
-        return `其他史诗问题（${subIssueDataLength}）`;
+        return `无史诗问题（${subIssueDataLength}）`;
       } else if (mode === 'swimlane_none') {
         return `所有问题（${subIssueDataLength}）`;
       } else {

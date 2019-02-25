@@ -317,13 +317,20 @@ class UserMapStore {
   loadEpic = () => {
     this.setIsLoading(true);
     let url = '';
-    if (this.currentFilters.includes('mine')) {
+    if (this.getCurrentFilter.length) {
+      const currentFilter = JSON.stringify(this.getCurrentFilter).replace(/(]|\[)/g, '');
+      url += `&quickFilterIds=${currentFilter}`;
+    }
+    if (this.getAssigneeFilterIds.length) {
+      const currentAssignee = JSON.stringify(this.getAssigneeFilterIds).replace(/(]|\[)/g, '');
+      url += `&assigneeFilterIds=${currentAssignee}`;
+    }
+    if (this.onlyMe) {
       url += `&assigneeId=${AppState.getUserId}`;
     }
-    if (this.currentFilters.includes('userStory')) {
-      url += '&onlyStory=true';
+    if (this.onlyStory) {
+      url += `&onlyStory=${this.onlyStory}`;
     }
-    url += `&quickFilterIds=${this.currentFilters.filter(item => item !== 'mine' && item !== 'userStory')}`;
     const orgId = AppState.currentMenuType.organizationId;
     const proId = AppState.currentMenuType.id;
     return axios.get(`/agile/v1/projects/${proId}/issues/storymap/epics?organizationId=${orgId}&showDoneEpic=${this.showDoneEpic}${this.isApplyToEpic ? url : ''}`)
@@ -431,13 +438,13 @@ class UserMapStore {
                 const uniqIssues = _.uniqBy(_.orderBy(issues, ['versionId'], ['desc']), 'issueId');
                 const sortedUniqIssues = _.orderBy(uniqIssues, 'mapRank', 'asc');
                 this.setIssues(sortedUniqIssues);
-                if (this.cacheIssues.length === 0) {
+                if (this.cacheIssues.length === 0 || sortedUniqIssues.length > this.cacheIssues.length) {
                   this.setCacheIssues(sortedUniqIssues);
                 }
               } else {
                 const sortedIssues = _.orderBy(issues, 'mapRank', 'asc');
                 this.setIssues(sortedIssues);
-                if (this.cacheIssues.length === 0) {
+                if (this.cacheIssues.length === 0 || sortedIssues.length > this.cacheIssues.length) {
                   this.setCacheIssues(sortedIssues);
                 }
               }

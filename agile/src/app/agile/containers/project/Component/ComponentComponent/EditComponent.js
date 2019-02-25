@@ -157,7 +157,7 @@ class EditComponent extends Component {
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator, getFieldsValue } = this.props.form;
     return (
       <Sidebar
         title="修改模块"
@@ -169,15 +169,17 @@ class EditComponent extends Component {
         onCancel={this.props.onCancel.bind(this)}
       >
         <Content
-          style={{
-            padding: 0,
-            width: 512,
-          }}
           title={`在项目“${AppState.currentMenuType.name}”中修改模块`}
           description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，修改模版。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/component/"
+          style={{
+            padding: 0,
+          }}
         >
-          <Form>
+          <Form style={{
+            width: 512,
+          }}
+          >
             <FormItem>
               {getFieldDecorator('name', {
                 initialValue: this.state.name,
@@ -189,34 +191,6 @@ class EditComponent extends Component {
                 }],
               })(
                 <Input label="模块名称" maxLength={10} />,
-              )}
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator('managerId', {
-                initialValue: this.state.managerId,
-              })(
-                <Select
-                  label="负责人"
-                  loading={this.state.selectLoading}
-                  allowClear
-                  filter
-                  onFilterChange={this.onFilterChange.bind(this)}
-                >
-                  {this.state.originUsers.map(user => (
-                    <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                        <UserHead
-                          user={{
-        id: user.id,
-        loginName: user.loginName,
-        realName: user.realName,
-        avatar: user.imageUrl,
-      }}
-                        />
-                      </div>
-                    </Option>
-                  ))}
-                </Select>,
               )}
             </FormItem>
             <FormItem style={{ marginBottom: 5 }}>
@@ -243,11 +217,43 @@ class EditComponent extends Component {
                 </Select>,
               )}
             </FormItem>
+            
+            {
+              getFieldsValue(['defaultAssigneeRole']).defaultAssigneeRole && getFieldsValue(['defaultAssigneeRole']).defaultAssigneeRole === '模块负责人' && (
+                <FormItem>
+                  {getFieldDecorator('managerId', {
+                    initialValue: this.state.managerId,
+                  })(
+                    <Select
+                      label="负责人"
+                      loading={this.state.selectLoading}
+                      allowClear
+                      filter
+                      onFilterChange={this.onFilterChange.bind(this)}
+                    >
+                      {this.state.originUsers.map(user => (
+                        <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                            <UserHead
+                              user={{
+                                id: user.id,
+                                loginName: user.loginName,
+                                realName: user.realName,
+                                avatar: user.imageUrl,
+                              }}
+                            />
+                          </div>
+                        </Option>
+                      ))}
+                    </Select>,
+                  )}
+                </FormItem>
+              )
+            }
           </Form>
         </Content>
       </Sidebar>
     );
   }
 }
-
 export default Form.create()(EditComponent);

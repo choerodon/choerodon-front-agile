@@ -188,7 +188,8 @@ export default class ScrumBoardDataController {
       parentDataMap = new Map([...unCompletedArr, ...completedArr]);
     }
     if (noParentIssueIdsSet.size) {
-      otherIssueWithoutParent = combinedIssueArr.filter(issue => issue.parentIssueId === 0 && noParentIssueIdsSet.has(issue.issueId));
+      // parentIssueId 没有值可能为 null，也可能为 0（后端返回数据不可信）
+      otherIssueWithoutParent = combinedIssueArr.filter(issue => (issue.parentIssueId === 0 || issue.parentIssueId === null) && noParentIssueIdsSet.has(issue.issueId));
     }
 
     return {
@@ -242,6 +243,7 @@ export default class ScrumBoardDataController {
         subStatusObj.issues.forEach((issue) => {
           if (issue) {
             flattenedArr.push({
+              clicked: false,
               columnId: columnObj.columnId,
               statusId: subStatusObj.statusId,
               statusName: subStatusObj.name,

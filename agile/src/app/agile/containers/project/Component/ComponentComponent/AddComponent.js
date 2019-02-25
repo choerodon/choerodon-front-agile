@@ -113,7 +113,6 @@ class AddComponent extends Component {
 
   render() {
     const { getFieldDecorator, getFieldsValue } = this.props.form;
-    console.log(this.props.form.getFieldsValue(['defaultAssigneeRole']).defaultAssigneeRole);
     return (
       <Sidebar
         className="c7n-component-component"
@@ -128,13 +127,15 @@ class AddComponent extends Component {
         <Content
           style={{
             padding: 0,
-            width: 512,
           }}
           title={`在项目“${AppState.currentMenuType.name}”中创建模块`}
           description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，创建新模版。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/component/"
         >
-          <Form>
+          <Form style={{
+            width: 512,
+          }}
+          >
             <FormItem>
               {getFieldDecorator('name', {
                 rules: [{

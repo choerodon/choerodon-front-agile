@@ -108,6 +108,7 @@ class Home extends Component {
     UserMapStore.setLeft(0);
     UserMapStore.setCurrentIndex(0);
     UserMapStore.setIsFullScreen(false);
+    UserMapStore.setCacheIssues([]);
     if (document.getElementById('fixHead-head') && document.getElementById('fixHead-head')) {
       document.getElementById('fixHead-head').removeEventListener('scroll', this.handleScrollHead, { passive: true });
       document.getElementById('fixHead-body').removeEventListener('scroll', this.handleScroll, { passive: true });

@@ -510,7 +510,7 @@ class CreateSprint extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        storyPoints: String(value),
+        storyPoints: String(value).slice(0, 3), // 限制最长三位,
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
@@ -532,7 +532,7 @@ class CreateSprint extends Component {
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
-        remainingTime: String(value),
+        remainingTime: String(value).slice(0, 3), // 限制最长三位,
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
@@ -1800,7 +1800,7 @@ class CreateSprint extends Component {
                     thisType="summary"
                     line
                     current={currentRae}
-                    origin={summary}
+                    origin={origin.summary}
                     onInit={() => this.setAnIssueToState()}
                     onOk={this.updateIssue.bind(this, 'summary')}
                     onCancel={this.resetSummary.bind(this)}
@@ -1841,7 +1841,7 @@ class CreateSprint extends Component {
                             thisType="storyPoints"
                             current={currentRae}
                             handleEnter
-                            origin={storyPoints}
+                            origin={origin.storyPoints}
                             onInit={() => this.setAnIssueToState(origin)}
                             onOk={this.updateIssue.bind(this, 'storyPoints')}
                             onCancel={this.resetStoryPoints.bind(this)}
@@ -2329,7 +2329,7 @@ class CreateSprint extends Component {
                                   onChange={(value) => {
                                     this.setState({
                                       influenceVersions: value.filter(v => v && v.trim()).map(
-                                        item => item.trim().substr(0, 30),
+                                        item => item.trim().substr(0, 10),
                                       ),
                                     });
                                   }}
@@ -2416,7 +2416,7 @@ class CreateSprint extends Component {
                               onChange={(value) => {
                                 this.setState({
                                   fixVersions: value.filter(v => v && v.trim()).map(
-                                    item => item.trim().substr(0, 30),
+                                    item => item.trim().substr(0, 10),
                                   ),
                                 });
                               }}
