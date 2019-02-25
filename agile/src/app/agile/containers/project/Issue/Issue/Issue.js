@@ -57,6 +57,7 @@ class Issue extends Component {
         IssueStore.setCurrentSetting(data);
       }
     }).catch((e) => {
+      console.log(e);
       Choerodon.prompt(e);
     });
   }

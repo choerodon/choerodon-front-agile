@@ -113,43 +113,71 @@ class SprintCommonStore {
    * 设置初始化信息
    * @param res（loadCurrentSetting 返回数据）
    */
-  @action setCurrentSetting(res) {
+  @action setCurrentSetting([issueTypes, issueStatus, issuePriority, tagData, issueComponents, issueVersions, issueEpics, issueSprints, issues]) {
     /* eslint-disable */
-    this.issueTypes = res[0];
-    this.issueStatus = res[1];
-    this.issuePriority = res[2];
-    this.tagData = res[3];
+    this.issueTypes = issueTypes;
+    this.issueStatus = issueStatus;
+    this.issuePriority = issuePriority;
+    this.tagData = tagData;
+    this.issueComponents = issueComponents;
+    this.issueVersions = issueVersions;
+    this.issueEpics = issueEpics;
+    this.issueSprints = issueSprints;
     // 生成 Filter 单选项所需数据
     this.columnFilter = new Map([
       [
         'typeId', this.issueTypes.map(item => ({
-        text: item.name,
-        value: item.id.toString(),
-      })),
+          text: item.name,
+          value: item.id.toString(),
+        })),
       ],
       [
         'statusId', this.issueStatus.map(item => ({
-        text: item.name,
-        value: item.id.toString(),
-      })),
+          text: item.name,
+          value: item.id.toString(),
+        })),
       ],
       [
         'priorityId', this.issuePriority.map(item => ({
-        text: item.name,
-        value: item.id.toString(),
-      })),
+          text: item.name,
+          value: item.id.toString(),
+        })),
       ],
       [
         'label', this.tagData.map(item => ({
-        text: item.labelName,
-        value: item.labelId.toString(),
-      }))
+          text: item.labelName,
+          value: item.labelId.toString(),
+        }))
+      ],
+      [
+        'component', this.issueComponents.content.map(item => ({
+          text: item.name,
+          value: item.componentId.toString(),
+        }))
+      ],
+      [
+        'version', this.issueVersions.map(item => ({
+          text: item.name,
+          value: item.versionId.toString(),
+        }))
+      ],
+      [
+        'epic', this.issueEpics.map(item => ({
+          text: item.epicName,
+          value: item.issueId.toString(),
+        }))
+      ],
+      [
+        'sprint', this.issueSprints.map(item => ({
+          text: item.sprintName,
+          value: item.sprintId.toString(),
+        }))
       ],
     ]);
     // 设置 issue 信息
-    this.issues = res[4].content;
+    this.issues = issues.content;
     // 设置分页总数
-    this.pagination.total = res[4].totalElements;
+    this.pagination.total = issues.totalElements;
     // 当跳转为单任务时
     if (paramIssueSelected === true) {
       // 设置当前展开任务为请求返回第一项

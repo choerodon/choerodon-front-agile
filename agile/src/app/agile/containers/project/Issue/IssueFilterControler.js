@@ -6,6 +6,9 @@
  * */
 import { axios, stores } from 'choerodon-front-boot';
 import IssueStore from '../../../stores/project/sprint/IssueStore';
+import {
+  loadIssueTypes, loadStatusList, loadPriorities, loadLabels, loadComponents, loadVersions, loadEpics, loadSprints, 
+} from '../../../api/NewIssueApi';
 
 const { AppState } = stores;
 
@@ -122,14 +125,10 @@ export default class IssueFilterControler {
    */
   static loadCurrentSetting(filters, mode, page = 0, size = 10) {
     if (mode === 'init') {
-      const loadType = axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_issue_types_with_sm_id?apply_type=agile`);
-      const loadStatus = axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/query_status_by_project_id?apply_type=agile`);
-      const loadPriorities = axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/priority/list_by_org`);
-      const loadLabel = axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_labels`);
       const loadIssue = axios.post(
         `/agile/v1/projects/${AppState.currentMenuType.id}/issues/include_sub?organizationId=${AppState.currentMenuType.organizationId}&page=${page}&size=${size}`, filters,
       );
-      return Promise.all([loadType, loadStatus, loadPriorities, loadLabel, loadIssue]);
+      return Promise.all([loadIssueTypes(), loadStatusList(), loadPriorities(), loadLabels(), loadComponents(), loadVersions(), loadEpics(), loadSprints(), loadIssue]);
     } else {
       return axios.post(
         `/agile/v1/projects/${AppState.currentMenuType.id}/issues/include_sub?organizationId=${AppState.currentMenuType.organizationId}&page=${page}&size=${size}`, filters,
