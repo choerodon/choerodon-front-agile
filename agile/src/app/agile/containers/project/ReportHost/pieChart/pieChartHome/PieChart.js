@@ -61,7 +61,7 @@ class ReleaseDetail extends Component {
           name: '冲刺',
         }, {
           key: 'version',
-          name: '修复版本',
+          name: '版本',
         }, 
         // {
         //   key: 'timeRange',
@@ -281,7 +281,7 @@ class ReleaseDetail extends Component {
         chooseDimensionType: [
           {
             key: 'version',
-            name: '修复版本',
+            name: '版本',
           }, 
           // {
           //   key: 'timeRange',
@@ -310,7 +310,7 @@ class ReleaseDetail extends Component {
             name: '冲刺',
           }, {
             key: 'version',
-            name: '修复版本',
+            name: '版本',
           }, 
           // {
           //   key: 'timeRange',
@@ -384,7 +384,7 @@ class ReleaseDetail extends Component {
     }
 
     if (currentChooseDimension === 'version') {
-      paramName += `、修复版本为${sprintAndVersion.version.find(versionItem => versionItem.versionId === currentVersionChoose).name}`;
+      paramName += `、版本为${sprintAndVersion.version.find(versionItem => versionItem.versionId === currentVersionChoose).name}`;
     }
 
     // if (currentChooseDimension === 'timeRange' && startDate && endDate) {
@@ -540,7 +540,7 @@ class ReleaseDetail extends Component {
       { title: '经办人', value: 'assignee' },
       { title: '模块', value: 'component' },
       { title: '问题类型', value: 'typeCode' },
-      { title: '修复版本', value: 'version' },
+      { title: '版本', value: 'version' },
       { title: '优先级', value: 'priority' },
       { title: '状态', value: 'status' },
       { title: '冲刺', value: 'sprint' },

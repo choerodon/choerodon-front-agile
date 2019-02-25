@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Page, Header, Content, stores,
+  Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
 import {
   Button, Table, Menu, Dropdown, Icon, Modal, Radio, Select,
 } from 'choerodon-ui';
+import _ from 'lodash';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 
 const { Sidebar } = Modal;
@@ -26,7 +27,8 @@ class DeleteReleaseWithIssue extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
+    const { versionDelInfo } = this.props;
     ReleaseStore.axiosGetVersionListWithoutPage().then((res) => {
       this.setState({
         planning: res,
@@ -35,6 +37,7 @@ class DeleteReleaseWithIssue extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    const { versionDelInfo } = this.props;
     if (nextProps.versionDelInfo.versionNames) {
       if (nextProps.versionDelInfo.versionNames.length > 0) {
         this.setState({
@@ -51,7 +54,9 @@ class DeleteReleaseWithIssue extends Component {
   }
 
   handleOk() {
-    const { versionDelInfo, onCancel, refresh } = this.props;
+    const {
+      versionDelInfo, onCancel, refresh, 
+    } = this.props;
     const {
       influenceRadio, influenceTargetVersionId, fixTargetRadio, fixTargetVersionId,
     } = this.state;
@@ -78,11 +83,11 @@ class DeleteReleaseWithIssue extends Component {
 
   render() {
     const { planning } = this.state;
-    const { versionDelInfo, onCancel } = this.props;
-    const filteredVersion = planning.filter(item => item.versionId !== versionDelInfo.versionId)
+    const { versionDelInfo, onCancel, hasTestCase } = this.props;
+    const filteredVersion = planning.filter(item => item.versionId !== versionDelInfo.versionId);
     return (
       <Sidebar
-        title={`删除版本 ${versionDelInfo.versionName}`}
+        title={`删除版本 ${JSON.stringify(versionDelInfo) !== '{}' ? versionDelInfo.versionName : ''}`}
         closable={false}
         visible={JSON.stringify(versionDelInfo) !== '{}'}
         okText="删除"
@@ -201,8 +206,8 @@ class DeleteReleaseWithIssue extends Component {
                           >
                             {versionDelInfo.versionNames ? (
                               filteredVersion.map(item => (
-                                  <Option value={item.versionId}>{item.name}</Option>
-                                ))
+                                <Option value={item.versionId}>{item.name}</Option>
+                              ))
                             ) : ''}
                           </Select>
                         </Radio>
@@ -220,6 +225,15 @@ class DeleteReleaseWithIssue extends Component {
                     </div>
                   ) : ''
                 }
+              </div>
+            ) : ''
+          }
+          {
+            hasTestCase ? (
+              <div>
+                <p style={{ marginTop: 10 }}>
+                  {'此版本下的测试用例将会被同时删除'}
+                </p>
               </div>
             ) : ''
           }

@@ -414,13 +414,13 @@ class CreateSubIssue extends Component {
               )}
             </FormItem>
 
-            <FormItem label="修复版本" style={{ width: 520 }}>
+            <FormItem label="版本" style={{ width: 520 }}>
               {getFieldDecorator('fixVersionIssueRel', {
                 rules: [{ transform: value => (value ? value.toString() : value) }],
                 normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), 
               })(
                 <Select
-                  label="修复版本"
+                  label="版本"
                   mode={hasPermission ? 'tags' : 'multiple'}
                   loading={this.state.selectLoading}
                   getPopupContainer={triggerNode => triggerNode.parentNode}

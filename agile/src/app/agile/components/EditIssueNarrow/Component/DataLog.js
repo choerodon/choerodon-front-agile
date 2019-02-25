@@ -21,7 +21,7 @@ const PROP = {
 };
 const PROP_SIMPLE = {
   Component: '模块',
-  'Fix Version': '修复版本',
+  'Fix Version': '版本',
   'Epic Child': '史诗关联任务',
   issue_epic: '史诗',
   story: '故事',
