@@ -233,3 +233,17 @@ export function exportExcelTmpl() {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/agile/v1/projects/${projectId}/excel/download`, { responseType: 'arraybuffer' });
 }
+
+/**
+ * 导入issue
+ * @param data
+ * @returns {*}
+ */
+export function importIssue(data) {
+  const axiosConfig = {
+    headers: { 'content-type': 'multipart/form-data' },
+  };
+  const projectId = AppState.currentMenuType.id;
+  const orgId = AppState.currentMenuType.organizationId;
+  return axios.post(`/agile/v1/projects/${projectId}/excel/import?organizationId=${orgId}`, data, axiosConfig);
+}
