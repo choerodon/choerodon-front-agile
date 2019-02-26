@@ -222,3 +222,14 @@ export function loadLinkIssues(issueId) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/agile/v1/projects/${projectId}/issue_links/${issueId}?no_issue_test=true`);
 }
+
+/**
+ *下载导入模板
+ *
+ * @export
+ * @returns
+ */
+export function exportExcelTmpl() {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/projects/${projectId}/excel/download`, { responseType: 'arraybuffer' });
+}
