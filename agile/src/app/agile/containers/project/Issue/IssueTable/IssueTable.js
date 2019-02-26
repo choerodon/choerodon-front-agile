@@ -125,8 +125,8 @@ class IssueTable extends Component {
         sorterId: 'issueTypeId',
         width: 128,
         sorter: true,
-        filters: IssueStore.getColumnFilter.get('typeId'),
-        filterMultiple: true,
+        // filters: IssueStore.getColumnFilter.get('typeId'),
+        // filterMultiple: true,
         // fixed: true,
         render: (text, record) => (
           <div style={{ lineHeight: 0 }}>
@@ -150,8 +150,8 @@ class IssueTable extends Component {
         sorterId: 'statusId',
         width: 128,
         sorter: true,
-        filters: IssueStore.getColumnFilter.get('statusId'),
-        filterMultiple: true,
+        // filters: IssueStore.getColumnFilter.get('statusId'),
+        // filterMultiple: true,
         render: (text, record) => <StatusName record={record} />,
       },
       {
@@ -161,8 +161,8 @@ class IssueTable extends Component {
         sorterId: 'priorityId',
         sorter: true,
         width: 108,
-        filters: IssueStore.getColumnFilter.get('priorityId'),
-        filterMultiple: true,
+        // filters: IssueStore.getColumnFilter.get('priorityId'),
+        // filterMultiple: true,
         render: (text, record) => <Priority record={record} />,
       },
       {
@@ -173,7 +173,6 @@ class IssueTable extends Component {
         key: 'assignee',
         sorterId: 'assigneeId',
         sorter: true,
-        filters: [],
         render: (text, record) => (
           <Assignee
             text={text}
@@ -317,6 +316,7 @@ class IssueTable extends Component {
               selectedIssue: record,
               expand: true,
             });
+            IssueStore.setFilterListVisible(false);
           },
           onBlur: (e) => {
             // 点击隐藏详情时无法触发 onClick，所以需要利用 onBlur 触发

@@ -20,7 +20,9 @@ class ExpandWideCard extends Component {
           width: IssueStore.getExpand ? '64%' : 0,
           display: 'block',
           overflow: 'hidden',
-          height: 'calc(100vh - 106px)',
+          height: 'calc(100vh - 154px)',
+          marginTop: 48,
+          borderTop: '1px solid rgb(211, 211, 211)',
         }}
       >
         <EditIssue

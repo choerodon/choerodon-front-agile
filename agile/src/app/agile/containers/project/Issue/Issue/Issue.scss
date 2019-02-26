@@ -597,7 +597,7 @@
 }
 
 .c7n-filterNameForm {
-  margin-top: 20px;
+  // margin-top: 20px;
 }
 .c7n-filterList {
   width: 100%;
@@ -648,6 +648,36 @@
           margin-right: 8px;
         }
       }
+      .c7n-filterNameForm {
+        // .c7n-filterNameInput {
+        //   margin-top: 6px;
+        // }
+        // .ant-input-icon {
+        //   margin-top: 6px;
+        // }
+        .ant-input-content {
+          display: flex;
+          margin-top: 12px;
+        }
+        .ant-input-underline {
+          display: none;
+        }
+        .ant-form-item-control.has-success {
+          margin-top: 14px;
+        }
+        .ant-form-item-control.has-error {
+          display: flex;
+          align-items: center;
+          .ant-form-explain {
+            margin-top: 5px;
+          }
+        }
+      }
     }
+  }
+}
+.c7n-Issue-table {
+  .ant-table {
+    margin-top: 0 !important;
   }
 }
