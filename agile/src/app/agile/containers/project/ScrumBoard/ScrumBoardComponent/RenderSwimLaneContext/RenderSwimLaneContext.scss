@@ -68,6 +68,12 @@
     margin: 0 10px 0 0;
     height: inherit;
   }
+  &-itemBodyColumn.greaterThanMax {
+    background-color: #e43b3b;
+  }
+  &-itemBodyColumn.lessThanMin {
+    background-color: #ffbb50;
+  }
   .onDragStart {
     display: block;
   }

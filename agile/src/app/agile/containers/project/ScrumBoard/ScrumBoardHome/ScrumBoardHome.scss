@@ -4,6 +4,14 @@
   overflow: auto;
   height: calc(100vh - 156px);
   .c7n-scrumboard-header {
+    .greaterThanMax {
+      color: white;
+      background-color: #e43b3b !important;
+    }
+    .lessThanMin {
+      color: white;
+      background-color: #ffbb50 !important;
+    }
     position: sticky;
     top: 0;
     z-index: 100;

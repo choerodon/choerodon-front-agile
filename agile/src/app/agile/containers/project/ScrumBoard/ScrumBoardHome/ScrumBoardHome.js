@@ -385,7 +385,7 @@ class ScrumBoardHome extends Component {
             <div style={{ display: 'flex', width: '100%' }}>
               <div className="c7n-scrumboard">
                 <div className="c7n-scrumboard-header">
-                  <StatusColumn columnData={ScrumBoardStore.getHeaderData} />
+                  <StatusColumn />
                 </div>
                 {!ScrumBoardStore.didCurrentSprintExist ? (
                   <NoneSprint />
