@@ -16,6 +16,8 @@ class ScrumBoardStore {
     assigneeFilterIds: [],
   };
 
+  @observable allColumnCount = [];
+
   @observable calanderCouldUse = false;
 
   @observable currentSprintExist = false;
@@ -791,14 +793,13 @@ class ScrumBoardStore {
     return this.spinIf;
   }
 
-  @action scrumBoardInit(AppStates, url = null, boardListData = null, { boardId, userDefaultBoard, columnConstraint }, { currentSprint }, quickSearchList, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData) {
+  @action scrumBoardInit(AppStates, url = null, boardListData = null, { boardId, userDefaultBoard, columnConstraint }, { currentSprint, allColumnNum }, quickSearchList, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData) {
     this.boardData = [];
     this.spinIf = false;
     // this.currentClick = 0;
     this.quickSearchList = [];
     this.sprintData = false;
     this.assigneer = [];
-    this.currentSprint = {};
     this.parentIds = [];
     this.epicData = [];
     if (boardListData) {
@@ -808,6 +809,7 @@ class ScrumBoardStore {
     this.swimlaneBasedCode = userDefaultBoard;
     this.currentConstraint = columnConstraint;
     this.quickSearchList = quickSearchList;
+    this.allColumnCount = observable.map(allColumnNum.map(({ columnId, issueCount }) => [columnId, issueCount]));
     if (currentSprint) {
       this.currentSprintExist = true;
       this.dayRemain = currentSprint.dayRemain;
@@ -837,21 +839,29 @@ class ScrumBoardStore {
     this.headerData = observable.map(headerData);
   }
 
+  @computed get getAllColumnCount() {
+    return this.allColumnCount;
+  }
+
   @computed get getHeaderData() {
     return this.headerData;
   }
 
   @action resetHeaderData(startColumnId, destinationColumnId) {
     const startColumnData = this.headerData.get(startColumnId);
+    const startColumnCount = this.allColumnCount.get(startColumnId);
     const destinationColumnData = this.headerData.get(destinationColumnId);
+    const destinationColumnCount = this.allColumnCount.get(destinationColumnId);
     this.headerData.set(+startColumnId, {
       ...startColumnData,
       columnIssueCount: startColumnData.columnIssueCount - 1,
     });
+    this.allColumnCount.set(+startColumnId, startColumnCount - 1);
     this.headerData.set(+destinationColumnId, {
       ...destinationColumnData,
       columnIssueCount: destinationColumnData.columnIssueCount + 1,
     });
+    this.allColumnCount.set(+destinationColumnId, destinationColumnCount + 1);
   }
 
   @computed get getStateMachineMap() {

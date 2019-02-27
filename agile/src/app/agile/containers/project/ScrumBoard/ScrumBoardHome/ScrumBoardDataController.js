@@ -27,11 +27,15 @@ export default class ScrumBoardDataController {
     if (!this.dataReady) {
       return null;
     }
-    return this.columnStructureMap.map(column => [column.columnId, {
-      columnId: column.columnId,
-      columnName: column.name,
-      columnIssueCount: this.flattenedArr.filter(issue => issue.columnId === column.columnId).length,
-      hasStatus: column.subStatuses.length > 0,
+    return this.columnStructureMap.map(({
+      maxNum, minNum, columnId, name, subStatuses,
+    }) => [columnId, {
+      maxNum,
+      minNum,
+      columnId,
+      columnName: name,
+      columnIssueCount: this.flattenedArr.filter(issue => issue.columnId === columnId).length,
+      hasStatus: subStatuses.length > 0,
     }]);
   }
 

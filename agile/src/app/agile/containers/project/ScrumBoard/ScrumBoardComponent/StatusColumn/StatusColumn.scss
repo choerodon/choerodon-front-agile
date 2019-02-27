@@ -3,21 +3,36 @@
   flex: 1;
   display: flex;
   align-items: center;
-  font-size: 13px;
+  justify-content: space-between;
+  font-size: 12px;
   font-weight: 500;
   overflow: hidden;
   margin-right: 10px;
   background: #f5f5f5;
   min-width: 200px;
-  .c7n-scrumboard-statusHeader-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: calc(100% - 50px);
-    display: inline-block;
-    margin-left: 12px;
+  &-columnMsg {
+    display: flex;
+    min-width: 90px;
+    line-height: 20px;
+    &-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: calc(100% - 40px);
+      display: inline-block;
+      margin-left: 12px;
+    }
+    &-count {
+      display: inline-block;
+    }
   }
-  .c7n-scrumboard-statusHeader-count {
-    display: inline-block;
+  &-columnConstraint {
+    display: flex;
+    align-items: center;
+    min-width: 110px;
+    line-height: 20px;
+    &-max {
+      margin-right: 12px;
+    }
   }
 }

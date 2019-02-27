@@ -63,7 +63,6 @@ class SwimLane extends Component {
         }}
       >
         <ColumnProvider
-          className="c7n-swimlaneContext-itemBodyColumn"
           keyId={key}
           {...mapStructure}
         >

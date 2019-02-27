@@ -15,7 +15,12 @@ export default class ColumnProvider extends React.Component {
     return (
       <React.Fragment key={columnObj.columnId}>
         <ColumnCouldDragOn keyId={keyId} dragOn={ScrumBoardStore.getCurrentDrag === keyId} />
-        <div className={className}>
+        <div
+          className={classnames('c7n-swimlaneContext-itemBodyColumn', {
+            greaterThanMax: columnObj.maxNum && ScrumBoardStore.getAllColumnCount.get(columnObj.columnId) > columnObj.maxNum,
+            lessThanMin: columnObj.minNum && ScrumBoardStore.getAllColumnCount.get(columnObj.columnId) < columnObj.minNum,
+          })}
+        >
           {children(subStatusArr, columnObj.columnId)}
         </div>
       </React.Fragment>
