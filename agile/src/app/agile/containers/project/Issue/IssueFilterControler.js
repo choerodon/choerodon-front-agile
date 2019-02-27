@@ -279,6 +279,44 @@ export default class IssueFilterControler {
   }
 
   /**
+   * 更新上边的高级搜索条件
+   * @param {*} issueTypeId 
+   * @param {*} statusId 
+   * @param {*} priorityId 
+   */
+  advancedSearchArgsFilterUpdate(issueTypeId, statusId, priorityId) {
+    const filter = Object.keys(this.cache.get('paramFilter')).length ? this.cache.get('paramFilter') : this.cache.get('filter');
+    const advancedSearchArgs = {
+      statusId,
+      priorityId,
+      issueTypeId,
+    };
+    this.cache.set('filter', { ...filter, advancedSearchArgs });
+    this.updateCache(
+      Object.assign(filter, { ...filter, advancedSearchArgs }),
+    );
+    IssueStore.setFilterMap(this.cache);
+  }
+
+  /**
+ * 设置创建创建时间范围变化时的搜索条件
+ * @param {*} createStartDate 
+ * @param {*} createEndDate 
+ */
+  searchArgsFilterUpdate(createStartDate, createEndDate) {
+    const filter = Object.keys(this.cache.get('paramFilter')).length ? this.cache.get('paramFilter') : this.cache.get('filter');
+    const searchArgs = {
+      createStartDate,
+      createEndDate,
+    };
+    this.cache.set('filter', { ...filter, searchArgs });
+    this.updateCache(
+      Object.assign(filter, { ...filter, searchArgs }),
+    );
+    IssueStore.setFilterMap(this.cache);
+  }
+
+  /**
    * 重置当前 cache
    */
   resetCacheMap = () => {

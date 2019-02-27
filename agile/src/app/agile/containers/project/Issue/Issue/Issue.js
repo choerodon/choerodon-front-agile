@@ -6,7 +6,7 @@ import {
   Page, Header, Content, stores, axios,
 } from 'choerodon-front-boot';
 import {
-  Button, Icon, Select, DatePicker, Modal, Input, Form,
+  Button, Icon, Select, DatePicker, Modal, Input, Form, Tooltip,
 } from 'choerodon-ui';
 import _ from 'lodash';
 import './Issue.scss';
@@ -33,7 +33,6 @@ const { AppState } = stores;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const FormItem = Form.Item;
-const Sidebar = Modal.Sidebar;
 @observer
 class Issue extends Component {
   /**
@@ -47,62 +46,17 @@ class Issue extends Component {
       statusLists: [],
       prioritys: [],
       users: [],
-      myFilters: [{
-        id: 1,
-        name: 'filter1',
-      }, {
-        id: 2,
-        name: 'filter2',
-      }, {
-        id: 3,
-        name: 'filter3',
-      }, {
-        id: 4,
-        name: 'filter1',
-      }, {
-        id: 5,
-        name: 'filter2',
-      }, {
-        id: 6,
-        name: 'filter3',
-      }, {
-        id: 7,
-        name: 'filter1',
-      }, {
-        id: 8,
-        name: 'filter2',
-      }, {
-        id: 9,
-        name: 'filter3',
-      }, {
-        id: 10,
-        name: 'filter1',
-      }, {
-        id: 11,
-        name: 'filter2',
-      }, {
-        id: 22,
-        name: 'filter3',
-      }, {
-        id: 13,
-        name: 'filter1',
-      }, {
-        id: 14,
-        name: 'filter2',
-      }, {
-        id: 15,
-        name: 'filter3',
-      }],
+      myFilters: [],
+      selectMyFilter: [],
       selectedIssueType: [],
       selectedStatus: [],
       selectedPriority: [],
       selectedAssignee: [],
-      earliestCreateDate: moment(),
-      latestCreateDate: moment(),
+      createStartDate: moment().format('YYYY-MM-DD hh:mm:ss'),
+      createEndDate: moment().format('YYYY-MM-DD hh:mm:ss'),
       saveFilterVisible: false,
-      filterListVisible: false,
-      filterName: '',
       editFilterInfo: [],
+    
     };
     this.filterControler = new IssueFilterControler();
   }
@@ -119,16 +73,6 @@ class Issue extends Component {
    * 利用 filterControler 类中的 refresh 方法发出初始化请求（包含优先级，状态，类型，标签数据）
    */
   componentDidMount() {
-    const { myFilters } = this.state;
-    this.setState({
-      editFilterInfo: _.map(_.map(myFilters, item => ({
-        id: item.id,
-      })), (item, index) => ({
-        ...item,
-        isEditing: false,
-        isEditingIndex: index,
-      })),
-    });
     this.filterControler.refresh('init').then((data) => {
       if (data.failed) {
         Choerodon.prompt(data.message);
@@ -136,10 +80,15 @@ class Issue extends Component {
         IssueStore.setCurrentSetting(data);
       }
     }).catch((e) => {
-      console.log(e);
       Choerodon.prompt(e);
     });
-
+    
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`).then((res) => {
+      this.setState({
+        createStartDate: moment(res.creationDate).format('YYYY-MM-DD HH:mm:ss'),
+      });
+    });
+    this.axiosGetMyFilterList();
     axios.all([loadIssueTypes(), loadStatusList(), loadPriorities(), getUsers()]).then(axios.spread((issueTypes, statusLists, prioritys, users) => {
       this.setState({
         issueTypes: issueTypes.map(item => ({
@@ -188,6 +137,27 @@ class Issue extends Component {
     });
   }
 
+  axiosGetMyFilterList = () => {
+    const { userInfo: { id } } = AppState;
+    IssueStore.setLoading(true);
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/query_all/${id}`).then((myFilters) => {
+      IssueStore.setLoading(false);
+      this.setState({
+        myFilters,
+        editFilterInfo: _.map(_.map(myFilters, item => ({
+          filterId: item.filterId,
+        })), (item, index) => ({
+          ...item,
+          isEditing: false,
+          isEditingIndex: index,
+        })),
+      });
+    }).catch(() => {
+      IssueStore.setLoading(false);
+      Choerodon.prompt('获取我的筛选列表失败');
+    });
+  }
+
   /**
    * 输出 excel
    */
@@ -203,20 +173,13 @@ class Issue extends Component {
       });
   };
 
-  /**
-   * 快速搜索函数（内容变动时触发）
-   * @param boolean => onlyMeChecked 点击仅我的
-   * @param boolean => onlyStoryChecked 点击仅故事
-   * @param Array => moreChecked 点击其余选项
-   */
-  onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
+ 
+  handleMyFilterSelectChange = (value) => {
     this.filterControler = new IssueFilterControler();
-    this.filterControler.quickSearchFilterUpdate(
-      onlyMeChecked,
-      onlyStoryChecked,
-      moreChecked,
-      AppState.userInfo.id,
-    );
+    // console.log(myFilters.filter(item => _.map(value, 'key').includes(item.filterId)));
+    this.setState({
+      selectMyFilter: _.map(value, 'key'),
+    });
     IssueStore.setLoading(true);
     this.filterControler.update().then(
       (res) => {
@@ -227,54 +190,140 @@ class Issue extends Component {
         }, res.content);
       },
     );
-  };
+  }
 
-  /**
-   * 经办人函数（经办人变动时触发）
-   * @param Number => value（经办人ID）
-   */
-  onAssigneeChange = (value) => {
+  handleIssueTypeSelectChange = (value) => {
+    const { selectedStatus, selectedPriority } = this.state;
+    this.setState({
+      selectedIssueType: _.map(value, 'key'),
+    });
     this.filterControler = new IssueFilterControler();
-    this.filterControler.assigneeFilterUpdate(value);
-    IssueStore.setLoading(true);
-    this.filterControler.update().then(
-      (res) => {
-        IssueStore.updateFiltedIssue({
-          current: res.number + 1,
-          pageSize: res.size,
-          total: res.totalElements,
-        }, res.content);
-      },
-    );
-  };
+    this.filterControler.advancedSearchArgsFilterUpdate(_.map(value, 'key'), selectedStatus, selectedPriority);
+    this.updateIssues(this.filterControler);
+  }
 
-  handleCreateDateRangeChange = () => {
+  handleStatusSelectChange = (value) => {
+    const { selectedIssueType, selectedPriority } = this.state;
+    this.setState({
+      selectedStatus: _.map(value, 'key'),
+    });
+    this.filterControler = new IssueFilterControler();
+    this.filterControler.advancedSearchArgsFilterUpdate(selectedIssueType, _.map(value, 'key'), selectedPriority);
+    this.updateIssues(this.filterControler);
+  }
+
+  handlePrioritySelectChange = (value) => {
+    const { selectedIssueType, selectedStatus } = this.state;
+    this.setState({
+      selectedPriority: _.map(value, 'key'),
+    });
+    this.filterControler = new IssueFilterControler();
+    this.filterControler.advancedSearchArgsFilterUpdate(selectedIssueType, selectedStatus, _.map(value, 'key'));
+    this.updateIssues(this.filterControler);
+  }
+
+  handleAssigneeSelectChange = (value) => {
+    this.setState({
+      selectedAssignee: _.map(value, 'key'),
+    });
+    this.filterControler = new IssueFilterControler();
+    this.filterControler.assigneeFilterUpdate(_.map(value, 'key'));
+    this.updateIssues(this.filterControler);
+  }
+  
+  handleCreateDateRangeChange = (dates, datesStrings) => {
+    const createStartDate = `${moment(dates[0]).format('YYYY-MM-DD')} 00:00:00`;
+    const createEndDate = `${moment(dates[1]).format('YYYY-MM-DD')} 23:59:59`;
     this.setState({
       saveFilterVisible: false,
+      createStartDate,
+      createEndDate,
     });
+    this.filterControler = new IssueFilterControler();
+    this.filterControler.searchArgsFilterUpdate(createStartDate, createEndDate);
+    this.updateIssues(this.filterControler);
+  }
+
+  updateIssues = (filterControler) => {
+    IssueStore.setLoading(true);
+    filterControler.update().then(
+      (res) => {
+        IssueStore.updateFiltedIssue({
+          current: res.number + 1,
+          pageSize: res.size,
+          total: res.totalElements,
+        }, res.content);
+      },
+    );
   }
 
   handleSaveFilterOk = () => {
-    this.setState({
-      saveFilterVisible: false,
-    });
+    const {
+      selectedIssueType,
+      selectedStatus,
+      selectedPriority,
+      selectedAssignee,
+      createStartDate,
+      createEndDate,
+    } = this.state;
     const { form } = this.props;
 
     form.validateFields((err, value, modify) => {
       if (!err) {
-        this.setState({
-          filterName: value.filterName,
-        });
-        // axios.put(`/agile/v1/projects/${data.projectId}/board/${data.boardId}?boardName=${encodeURIComponent(data.name)}`, data)
-        //   .then((res) => {
-        //     this.setState({
-        //       loading: false,
-        //     });
-        //     ScrumBoardStore.setBoardList(ScrumBoardStore.getSelectedBoard, res);
-        //     Choerodon.prompt('保存成功');
-        //     // history.push(`/agile/scrumboard?type=project&id=${data.projectId}&name=${encodeURIComponent(AppState.currentMenuType.name)}&organizationId=${AppState.currentMenuType.organizationId}`);
-        //   });
+        const createData = {
+          filterId: 0,
+          objectVersionNumber: 0,
+          name: value.filterName,
+          personalFilterSearchDTO: {
+            advancedSearchArgs: {
+              issueTypeId: selectedIssueType,
+              statusId: selectedStatus,
+              assigneeIds: selectedAssignee,
+              priorityId: selectedPriority,
+            },
+            searchArgs: {
+              createEndDate,
+              createStartDate,
+            },
+            projectId: AppState.currentMenuType.id,
+            userId: AppState.userInfo.id,
+          },
+        };
+        IssueStore.setLoading(true);
+        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter`, createData)
+          .then((res) => {
+            this.axiosGetMyFilterList();
+            this.setState({
+              // loading: false,
+              saveFilterVisible: false,
+            });
+            form.setFieldsValue({ filterName: '' });
+            Choerodon.prompt('保存成功');
+          }).catch(() => {
+            IssueStore.setLoading(false);
+            Choerodon.prompt('保存失败');
+          });
       }
+    });
+  }
+
+  handleFNIBlurOrPreseeEnter = (filter, filterField) => {
+    const { form } = this.props;
+    const { myFilters } = this.state;
+    IssueStore.setLoading(true);
+    const updateData = {
+      filterId: filter.filterId,
+      objectVersionNumber: _.find(myFilters, item => item.filterId === filter.filterId).objectVersionNumber,
+      name: form.getFieldValue(filterField),
+      projectId: AppState.currentMenuType.id,
+      userId: AppState.userInfo.id,
+    };
+    axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/${filter.filterId}`, updateData).then((res) => {
+      this.axiosGetMyFilterList();
+      Choerodon.prompt('修改成功');
+    }).catch(() => {
+      IssueStore.setLoading(false);
+      Choerodon.prompt('修改失败');
     });
   }
 
@@ -292,9 +341,11 @@ class Issue extends Component {
   // ExpandCssControler => 用于向 IssueTable 注入 CSS 样式
   render() {
     const {
-      issueTypes, statusLists, prioritys, users, myFilters, saveFilterVisible, filterName, filterListVisible, editFilterInfo,
+      issueTypes, statusLists, prioritys, users, myFilters, saveFilterVisible, editFilterInfo, createStartDate, createEndDate,
     } = this.state;
-    const { getFieldDecorator } = this.props.form;
+    const { form } = this.props;
+    const { getFieldDecorator } = form;
+    const filterListVisible = IssueStore.getFilterListVisible;
     // 清除整页滚动条
     if (document && document.getElementsByClassName('page-body').length) {
       // document.getElementsByClassName('page-body')[0].style.overflow = 'hidden';
@@ -359,12 +410,12 @@ class Issue extends Component {
                   maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
                   filter
                   optionFilterProp="children"
-                  onChange={this.handleAssigneeChange}
+                  onChange={this.handleMyFilterSelectChange}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
                   {
                     myFilters.length && myFilters.map(item => (
-                      <Option key={item.id} value={item.id} title={item.filterName}>{item.filterName}</Option>
+                      <Option key={item.filterId} value={item.filterId} title={item.name}>{item.name}</Option>
                     ))
                   }
                 </Select>
@@ -379,7 +430,7 @@ class Issue extends Component {
                   labelInValue
                   maxTagCount={0}
                   maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
-                  onChange={this.handleAssigneeChange}
+                  onChange={this.handleIssueTypeSelectChange}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
                   {
@@ -399,7 +450,7 @@ class Issue extends Component {
                   labelInValue
                   maxTagCount={0}
                   maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
-                  onChange={this.handleAssigneeChange}
+                  onChange={this.handleStatusSelectChange}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
                   {
@@ -419,7 +470,7 @@ class Issue extends Component {
                   labelInValue
                   maxTagCount={0}
                   maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
-                  onChange={this.handleAssigneeChange}
+                  onChange={this.handlePrioritySelectChange}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
                   {
@@ -462,7 +513,7 @@ class Issue extends Component {
                       }, this);
                     }
                   }}
-                  onChange={this.handleAssigneeChange}
+                  onChange={this.handleAssigneeSelectChange}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
                   {
@@ -474,6 +525,8 @@ class Issue extends Component {
                 
                 <div className="c7n-createRange">
                   <RangePicker
+                    value={[moment(createStartDate), moment(createEndDate)]}
+                    format="YYYY-MM-DD hh:mm:ss"
                     ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
                     onChange={this.handleCreateDateRangeChange}
                     placeholder={['创建时间', '']}
@@ -488,6 +541,7 @@ class Issue extends Component {
                     this.setState({
                       saveFilterVisible: true,
                     });
+                    IssueStore.setFilterListVisible(false);
                   }}
                 >
                   {'保存筛选'}
@@ -497,8 +551,9 @@ class Issue extends Component {
                   style={{ color: '#3F51B5' }}
                   onClick={() => {
                     this.setState({
-                      filterListVisible: !filterListVisible,
+                      saveFilterVisible: false,
                     });
+                    IssueStore.setFilterListVisible(!filterListVisible);
                   }}
                 >
                   {'筛选管理'}
@@ -508,6 +563,7 @@ class Issue extends Component {
                   visible={saveFilterVisible}
                   onOk={this.handleSaveFilterOk}
                   onCancel={() => {
+                    form.setFieldsValue({ filterName: '' });
                     this.setState({
                       saveFilterVisible: false,
                     });
@@ -522,11 +578,6 @@ class Issue extends Component {
                       })(
                         <Input
                           label="筛选名称"
-                          // onChange={(e) => {
-                          //   this.setState({
-                          //     filterName: e.target.value,
-                          //   });
-                          // }} 
                           maxLength={10}
                         />,
                       )}
@@ -546,9 +597,7 @@ class Issue extends Component {
                   <Icon 
                     type="close"
                     onClick={() => {
-                      this.setState({
-                        filterListVisible: false,
-                      });
+                      IssueStore.setFilterListVisible(false);
                     }}
                   />
                 </div>
@@ -557,19 +606,22 @@ class Issue extends Component {
                     <ul className="c7n-filterList-content">
                       {
                         myFilters.map(filter => (
-                          <li key={filter.id} className="c7n-filterList-item">
+                          <li key={filter.filterId} className="c7n-filterList-item">
                             {
-                              filter && editFilterInfo && editFilterInfo.find(item => item.id === filter.id).isEditing ? (
+                              filter && editFilterInfo && editFilterInfo.find(item => item.filterId === filter.filterId) && editFilterInfo.find(item => item.filterId === filter.filterId).isEditing ? (
                                 <Form className="c7n-filterNameForm">
                                   <FormItem>
-                                    {getFieldDecorator(`filterName_${filter.id}`, {
+                                    {getFieldDecorator(`filterName_${filter.filterId}`, {
                                       rules: [{
                                         required: true, message: '请输入筛选名称',
                                       }],
                                       initialValue: filter.name,
                                     })(
                                       <Input
+                                        className="c7n-filterNameInput"
                                         maxLength={10}
+                                        onBlur={this.handleFNIBlurOrPreseeEnter.bind(this, filter, `filterName_${filter.filterId}`)}
+                                        onPressEnter={this.handleFNIBlurOrPreseeEnter.bind(this, filter, `filterName_${filter.filterId}`)}
                                       />,
                                     )}
                                   </FormItem>
@@ -577,29 +629,40 @@ class Issue extends Component {
                               ) : (<span>{filter.name}</span>)
                             }
                             <span className="c7n-filterAction">
-                              <Icon
-                                type="mode_edit"
-                                onClick={() => {
-                                  const { isEditingIndex } = editFilterInfo.find(item => item.id === filter.id);
-                                  this.setState({
-                                    editFilterInfo: [...(_.map(editFilterInfo, (item, index) => {
-                                      if (index !== isEditingIndex) {
-                                        return {
-                                          ...item,
-                                          isEditing: false,
-                                        };
-                                      }
-                                    })), {
-                                      id: filter.id,
-                                      isEditingIndex,
-                                      isEditing: true,
-                                    }],
-                                  }, () => {
-                                    console.log(this.state.editFilterInfo);
-                                  });
-                                }}
-                              />
-                              <Icon type="delete_forever" />
+                              <Tooltip title="修改筛选名称">
+                                <Icon
+                                  type="mode_edit"
+                                  onClick={() => {
+                                    const { isEditingIndex } = editFilterInfo.find(item => item.filterId === filter.filterId);
+                                    this.setState({
+                                      editFilterInfo: [...(_.map(_.filter(editFilterInfo, item => item.isEditingIndex !== isEditingIndex), item => ({
+                                        ...item,
+                                        isEditing: false,
+                                      }))), {
+                                        filterId: filter.filterId,
+                                        isEditing: true,
+                                        isEditingIndex,
+                                      }],
+                                    });
+                                  }}
+                                />
+                              </Tooltip>
+                              <Tooltip title="删除筛选">
+                                <Icon 
+                                  type="delete_forever" 
+                                  onClick={() => {
+                                    IssueStore.setLoading(true);
+                                    axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/${filter.filterId}`)
+                                      .then((res) => {
+                                        this.axiosGetMyFilterList();
+                                        Choerodon.prompt('删除成功');
+                                      }).catch(() => {
+                                        IssueStore.setLoading(false);
+                                        Choerodon.prompt('删除失败');
+                                      });
+                                  }}
+                                />
+                              </Tooltip>
                             </span>
                           </li>
                         ))

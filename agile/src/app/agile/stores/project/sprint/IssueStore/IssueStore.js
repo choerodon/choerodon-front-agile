@@ -94,6 +94,17 @@ class SprintCommonStore {
   // 项目类型
   @observable issueTypes = [];
 
+  // 筛选列表是否显示
+  @observable filterListVisible = false;
+
+  @computed get getFilterListVisible() {
+    return this.filterListVisible;
+  }
+
+  @action setFilterListVisible(data) {
+    this.filterListVisible = data;
+  }
+
   /**
    * 跳转至问题管理页时设定传入参数
    * @param paramSelected => Boolean => 单个任务跳转
