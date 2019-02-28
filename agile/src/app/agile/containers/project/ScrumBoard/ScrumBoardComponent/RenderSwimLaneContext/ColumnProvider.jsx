@@ -18,12 +18,11 @@ export default class ColumnProvider extends React.Component {
       <React.Fragment key={columnObj.columnId}>
         <ColumnCouldDragOn keyId={keyId} dragOn={ScrumBoardStore.getCurrentDrag === keyId} />
         <div
-          className={classnames('c7n-swimlaneContext-itemBodyColumn', {
+          className={classnames('c7n-swimlaneContext-itemBodyColumn', `${className} ${keyId}`, {
             greaterThanMax: columnObj.maxNum && ScrumBoardStore.getAllColumnCount.get(columnObj.columnId) > columnObj.maxNum,
             lessThanMin: columnObj.minNum && ScrumBoardStore.getAllColumnCount.get(columnObj.columnId) < columnObj.minNum,
           })}
         >
-          {/* <div className={`${className} ${keyId}`}> */}
           {children(subStatusArr, columnObj.columnId)}
         </div>
       </React.Fragment>
