@@ -9,6 +9,19 @@ const { Panel } = Collapse;
 @inject('AppState')
 @observer
 class SwimLaneContext extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeKey: [],
+    };
+  }
+
+  componentWillReceiveProps(nextProps, nextContext) {
+    this.setState({
+      activeKey: [],
+    });
+  }
+
   getPanelKey = (mode, issue) => {
     const modeMap = new Map([
       ['swimlane_none', 'swimlaneContext-all'],
@@ -47,6 +60,12 @@ class SwimLaneContext extends React.Component {
     );
   };
 
+  panelOnChange = (arr) => {
+    this.setState({
+      activeKey: arr,
+    });
+  };
+
   keyConverter = (key, mode) => {
     const { epicPrefix } = this.props;
     const retMap = new Map([
@@ -62,14 +81,16 @@ class SwimLaneContext extends React.Component {
 
   render() {
     const { parentIssueArr, otherIssueWithoutParent, mode } = this.props;
+    const { activeKey } = this.state;
     return (
       <Collapse
-        defaultActiveKey={this.getDefaultExpanded(mode, [...parentIssueArr.values(), otherIssueWithoutParent])}
+        activeKey={activeKey.length ? activeKey : this.getDefaultExpanded(mode, [...parentIssueArr.values(), otherIssueWithoutParent])}
+        onChange={this.panelOnChange}
         bordered={false}
         forceRender
       >
         {Array.from(parentIssueArr).map(([key, value]) => this.getPanelItem(key, value))}
-        {this.getPanelItem('other', otherIssueWithoutParent, 'fromOther')}
+        {otherIssueWithoutParent.length && this.getPanelItem('other', otherIssueWithoutParent, 'fromOther')}
       </Collapse>
     );
   }

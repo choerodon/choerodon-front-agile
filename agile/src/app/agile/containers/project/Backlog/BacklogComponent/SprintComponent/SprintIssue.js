@@ -68,18 +68,6 @@ class SprintIssue extends Component {
           <div className="c7n-backlog-sprintSideRightItems">
             <div
               style={{
-                maxWidth: 34,
-                marginLeft: !_.isNull(item.priorityDTO && item.priorityDTO.name) && !issueDisplay ? '12px' : 0,
-              }}
-              label="sprintIssue"
-              className="c7n-backlog-sprintIssueRight"
-            >
-              <Tooltip title={`优先级: ${item.priorityDTO ? item.priorityDTO.name : ''}`}>
-                <PriorityTag priority={item.priorityDTO} />
-              </Tooltip>
-            </div>
-            <div
-              style={{
                 padding: '0 3px',
                 maxWidth: 50,
                 marginLeft: item.versionNames.length ? '12px' : 0,
@@ -125,8 +113,6 @@ class SprintIssue extends Component {
                 </Tooltip>
               ) : ''}
             </div>
-          </div>
-          <div className="c7n-backlog-sprintSideRightItems">
             <div
               style={{
                 maxWidth: 105,
@@ -147,8 +133,9 @@ class SprintIssue extends Component {
                   }}
                 />
               )}
-
             </div>
+          </div>
+          <div className="c7n-backlog-sprintSideRightItems">
             <div
               style={{
                 width: 63,
@@ -164,12 +151,23 @@ class SprintIssue extends Component {
                   />
                 </div>
               </Tooltip>
-
+            </div>
+            <div
+              style={{
+                maxWidth: 34,
+                // marginLeft: !_.isNull(item.priorityDTO && item.priorityDTO.name) && !issueDisplay ? '12px' : 0,
+              }}
+              label="sprintIssue"
+              className="c7n-backlog-sprintIssueRight"
+            >
+              <Tooltip title={`优先级: ${item.priorityDTO ? item.priorityDTO.name : ''}`}>
+                <PriorityTag priority={item.priorityDTO} />
+              </Tooltip>
             </div>
             <div
               style={{
                 minWidth: 27,
-                marginLeft: '12px',
+                marginLeft: '10px',
               }}
               label="sprintIssue"
               className="c7n-backlog-sprintIssueRight"
