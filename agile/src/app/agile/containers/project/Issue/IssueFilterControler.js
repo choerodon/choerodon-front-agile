@@ -178,6 +178,11 @@ export default class IssueFilterControler {
             Object.assign(filter.searchArgs, data),
           );
           break;
+        case 'args': 
+          this.updateCache(
+            Object.assign(filter, data),
+          );
+          break;
         default:
           break;
       }

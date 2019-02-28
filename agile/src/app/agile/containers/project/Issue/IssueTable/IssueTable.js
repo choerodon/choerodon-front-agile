@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Table } from 'choerodon-ui';
 import { observer } from 'mobx-react';
 import { trace } from 'mobx';
+import _ from 'lodash';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import IssueFilterControler from '../IssueFilterControler';
 import {
@@ -31,21 +32,44 @@ class IssueTable extends Component {
    * @param setArgs => function => 设置参数时需要调用的闭包函数
    */
   filterConvert = (filters, setArgs) => {
+    // const convertedFilter = Object.keys(filters).map((key) => {
+    //   let filterField = filters[key].map(item => JSON.parse(item));
+    //   if (filterField.find(item => item.select)) {
+    //     filterField = _.map(filterField, 'id');
+    //   }
+    //   return filterField;
+    // });
+    // console.log(convertedFilter);
+
     // 循环遍历 Object 中的每个键
     Object.keys(filters).forEach((key) => {
       // 根据对应的 key 传入对应的 mode
       switch (key) {
-        case 'statusId':
-        case 'priorityId':
-        case 'issueTypeId':
-          setArgs('advArgs', filters);
-          break;
+        // case 'statusId':
+        // case 'priorityId':
+        // case 'issueTypeId':
+        //   setArgs('advArgs', filters);
+        //   break;
         case 'label':
         case 'component':
         case 'version':
         case 'epic':
         case 'sprint':
-          setArgs('otherArgs', filters);
+          // setArgs('otherArgs', filters);
+          if (filters.sprint.length > 0) {
+            const filtersSprint = filters.sprint.map(item => JSON.parse(item));
+            console.log(filtersSprint);
+            if (filtersSprint.find(item => item.select)) {
+              console.log(Object.assign(filters, { sprint: filtersSprint.map(item => item.id) }));
+              setArgs('otherArgs', Object.assign(filters, { sprint: filtersSprint.map(item => item.id.toString()) }));
+            // setArgs('searchArgs', Object.assign(filters, { sprint: '' }));
+            } else {
+            // setArgs('otherArgs', Object.assign(filters, { sprint: [] }));
+              setArgs('searchArgs', Object.assign(filters, { sprint: filtersSprint[0].toString() }));
+            }
+          } else {
+            setArgs('otherArgs', Object.assign(filters, { sprint: [] }));
+          }
           break;
         default:
           setArgs('searchArgs', {

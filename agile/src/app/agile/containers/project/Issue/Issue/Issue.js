@@ -11,6 +11,7 @@ import {
 import _ from 'lodash';
 import './Issue.scss';
 import moment from 'moment';
+import { _allowStateChangesInsideComputed } from 'mobx';
 import { loadIssueTypes, loadStatusList, loadPriorities } from '../../../../api/NewIssueApi';
 import { getUsers } from '../../../../api/CommonApi';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
@@ -42,12 +43,14 @@ class Issue extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      projectInfo: {},
       issueTypes: [],
       statusLists: [],
       prioritys: [],
       users: [],
       myFilters: [],
-      selectMyFilter: [],
+      selectedFilterId: undefined,
+      selectedMyFilterInfo: {},
       selectedIssueType: [],
       selectedStatus: [],
       selectedPriority: [],
@@ -56,7 +59,7 @@ class Issue extends Component {
       createEndDate: moment().format('YYYY-MM-DD hh:mm:ss'),
       saveFilterVisible: false,
       editFilterInfo: [],
-    
+      updateFilterName: '',
     };
     this.filterControler = new IssueFilterControler();
   }
@@ -82,12 +85,7 @@ class Issue extends Component {
     }).catch((e) => {
       Choerodon.prompt(e);
     });
-    
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`).then((res) => {
-      this.setState({
-        createStartDate: moment(res.creationDate).format('YYYY-MM-DD HH:mm:ss'),
-      });
-    });
+    this.axiosGetProjectInfo();
     this.axiosGetMyFilterList();
     axios.all([loadIssueTypes(), loadStatusList(), loadPriorities(), getUsers()]).then(axios.spread((issueTypes, statusLists, prioritys, users) => {
       this.setState({
@@ -137,10 +135,19 @@ class Issue extends Component {
     });
   }
 
+  axiosGetProjectInfo = () => {
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`).then((res) => {
+      this.setState({
+        projectInfo: res,
+        createStartDate: moment(res.creationDate).format('YYYY-MM-DD HH:mm:ss'),
+      });
+    });
+  }
+
   axiosGetMyFilterList = () => {
     const { userInfo: { id } } = AppState;
     IssueStore.setLoading(true);
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/query_all/${id}`).then((myFilters) => {
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/query_all/${id}`).then((myFilters) => {
       IssueStore.setLoading(false);
       this.setState({
         myFilters,
@@ -152,9 +159,52 @@ class Issue extends Component {
           isEditingIndex: index,
         })),
       });
+      return myFilters;
     }).catch(() => {
       IssueStore.setLoading(false);
       Choerodon.prompt('获取我的筛选列表失败');
+    });
+  }
+
+  axiosSearchFilter = (filterId) => {
+    this.filterControler = new IssueFilterControler();
+    const { projectInfo } = this.state;
+    if (filterId) {
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/${filterId}`).then((filterInfo) => {
+        const { advancedSearchArgs, searchArgs } = filterInfo.personalFilterSearchDTO;
+        this.setState({
+          selectedMyFilterInfo: filterInfo,
+          selectedIssueType: advancedSearchArgs.issueTypeId || [],
+          selectedStatus: advancedSearchArgs.statusId || [],
+          selectedPriority: advancedSearchArgs.priorityId || [],
+          selectedAssignee: advancedSearchArgs.assigneeIds || [],
+          createStartDate: moment(searchArgs.createStartDate).format('YYYY-MM-DD HH:mm:ss'),
+          createEndDate: moment(searchArgs.createEndDate).format('YYYY-MM-DD HH:mm:ss'),
+        }, () => {
+          this.filterControler.advancedSearchArgsFilterUpdate(this.state.selectedIssueType, this.state.selectedStatus, this.state.selectedPriority);
+          this.filterControler.searchArgsFilterUpdate(this.state.createStartDate, this.state.createEndDate);
+          this.updateIssues(this.filterControler);
+        });
+      });
+    } else {
+      this.resetFilterSelect();
+      this.filterControler.advancedSearchArgsFilterUpdate([], [], []);
+      this.filterControler.searchArgsFilterUpdate(moment(projectInfo.creationDate).format('YYYY-MM-DD hh:mm:ss'), moment().format('YYYY-MM-DD hh:mm:ss'));
+      this.updateIssues(this.filterControler);
+    }
+  }
+
+  resetFilterSelect = () => {
+    const { projectInfo } = this.state;
+    this.setState({
+      selectedMyFilterInfo: {},
+      selectedIssueType: [],
+      selectedStatus: [],
+      selectedPriority: [],
+      selectedAssignee: [],
+      createStartDate: moment(projectInfo.creationDate).format('YYYY-MM-DD hh:mm:ss'),
+      createEndDate: moment().format('YYYY-MM-DD hh:mm:ss'),
+      updateFilterName: '',
     });
   }
 
@@ -175,21 +225,21 @@ class Issue extends Component {
 
  
   handleMyFilterSelectChange = (value) => {
-    this.filterControler = new IssueFilterControler();
-    // console.log(myFilters.filter(item => _.map(value, 'key').includes(item.filterId)));
+    // this.filterControler = new IssueFilterControler();
     this.setState({
-      selectMyFilter: _.map(value, 'key'),
+      selectedFilterId: (value && value.key) || undefined,
     });
-    IssueStore.setLoading(true);
-    this.filterControler.update().then(
-      (res) => {
-        IssueStore.updateFiltedIssue({
-          current: res.number + 1,
-          pageSize: res.size,
-          total: res.totalElements,
-        }, res.content);
-      },
-    );
+    this.axiosSearchFilter((value && value.key) || undefined);
+    // IssueStore.setLoading(true);
+    // this.filterControler.update().then(
+    //   (res) => {
+    //     IssueStore.updateFiltedIssue({
+    //       current: res.number + 1,
+    //       pageSize: res.size,
+    //       total: res.totalElements,
+    //     }, res.content);
+    //   },
+    // );
   }
 
   handleIssueTypeSelectChange = (value) => {
@@ -257,6 +307,35 @@ class Issue extends Component {
     );
   }
 
+  checkMyFilterNameRepeat = filterName => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/check_name?userId=${AppState.userInfo.id}&name=${filterName}`)
+
+  checkMyFilterNameRepeatCreating = (rule, value, callback) => {
+    this.checkMyFilterNameRepeat(value).then((res) => {
+      if (res) {
+        // Choerodon.prompt('筛选名称重复');
+        callback('筛选名称重复');
+      } else {
+        callback();
+      }
+    });
+  }
+
+  checkMyFilterNameRepeatUpdating = (rule, value, callback) => {
+    const { updateFilterName } = this.state;
+    if (updateFilterName === value) {
+      callback();
+    } else {
+      this.checkMyFilterNameRepeat(value).then((res) => {
+        if (res) {
+          // Choerodon.prompt('筛选名称重复');
+          callback('筛选名称重复');
+        } else {
+          callback();
+        }
+      });
+    }
+  }
+
   handleSaveFilterOk = () => {
     const {
       selectedIssueType,
@@ -268,11 +347,10 @@ class Issue extends Component {
     } = this.state;
     const { form } = this.props;
 
-    form.validateFields((err, value, modify) => {
+    form.validateFields(['filterName'], (err, value, modify) => {
       if (!err) {
-        const createData = {
-          filterId: 0,
-          objectVersionNumber: 0,
+        const createFilterData = IssueStore.getCreateFilterData;
+        IssueStore.setCreateFilterData(createFilterData, {
           name: value.filterName,
           personalFilterSearchDTO: {
             advancedSearchArgs: {
@@ -285,16 +363,19 @@ class Issue extends Component {
               createEndDate,
               createStartDate,
             },
-            projectId: AppState.currentMenuType.id,
-            userId: AppState.userInfo.id,
           },
-        };
+        });
+        console.log(IssueStore.getCreateFilterData);
+
         IssueStore.setLoading(true);
-        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter`, createData)
+        axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter`, IssueStore.getCreateFilterData)
           .then((res) => {
-            this.axiosGetMyFilterList();
+            this.axiosGetMyFilterList().then((filterList) => {
+              this.setState({
+                selectedFilterId: filterList[filterList.length - 1].filterId,
+              });
+            });
             this.setState({
-              // loading: false,
               saveFilterVisible: false,
             });
             form.setFieldsValue({ filterName: '' });
@@ -307,23 +388,33 @@ class Issue extends Component {
     });
   }
 
-  handleFNIBlurOrPreseeEnter = (filter, filterField) => {
+  handleFNIBlurOrPressEnter = (filter, filterField) => {
+    const { editFilterInfo } = this.state;
     const { form } = this.props;
-    const { myFilters } = this.state;
-    IssueStore.setLoading(true);
-    const updateData = {
-      filterId: filter.filterId,
-      objectVersionNumber: _.find(myFilters, item => item.filterId === filter.filterId).objectVersionNumber,
-      name: form.getFieldValue(filterField),
-      projectId: AppState.currentMenuType.id,
-      userId: AppState.userInfo.id,
-    };
-    axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/${filter.filterId}`, updateData).then((res) => {
-      this.axiosGetMyFilterList();
-      Choerodon.prompt('修改成功');
-    }).catch(() => {
-      IssueStore.setLoading(false);
-      Choerodon.prompt('修改失败');
+    form.validateFields([filterField], (err, value, modify) => {
+      if (!err && modify) {
+        const { myFilters } = this.state;
+        IssueStore.setLoading(true);
+        const updateData = {
+          filterId: filter.filterId,
+          objectVersionNumber: _.find(myFilters, item => item.filterId === filter.filterId).objectVersionNumber,
+          // name: form.getFieldValue(filterField),
+          name: value[filterField],
+          projectId: AppState.currentMenuType.id,
+          userId: AppState.userInfo.id,
+        };
+        axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/${filter.filterId}`, updateData).then((res) => {
+          this.axiosGetMyFilterList();
+          Choerodon.prompt('修改成功');
+        }).catch(() => {
+          IssueStore.setLoading(false);
+          Choerodon.prompt('修改失败');
+        });
+      } else if (!modify) {
+        this.setState({
+          editFilterInfo: _.map(editFilterInfo, item => Object.assign(item, { isEditing: false })),
+        });
+      }
     });
   }
 
@@ -341,7 +432,10 @@ class Issue extends Component {
   // ExpandCssControler => 用于向 IssueTable 注入 CSS 样式
   render() {
     const {
-      issueTypes, statusLists, prioritys, users, myFilters, saveFilterVisible, editFilterInfo, createStartDate, createEndDate,
+      issueTypes, statusLists, prioritys, users, myFilters, saveFilterVisible, editFilterInfo, selectedFilterId, selectedMyFilterInfo, createStartDate, createEndDate, selectedIssueType,
+      selectedStatus,
+      selectedPriority,
+      selectedAssignee,
     } = this.state;
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -401,7 +495,7 @@ class Issue extends Component {
                 <Select
                   key="myFilterSelect"
                   className="myFilterSelect"
-                  mode="multiple"
+                  allowClear
                   dropdownClassName="myFilterSelect-dropdown"
                   dropdownMatchSelectWidth={false}
                   placeholder="我的筛选"
@@ -411,6 +505,7 @@ class Issue extends Component {
                   filter
                   optionFilterProp="children"
                   onChange={this.handleMyFilterSelectChange}
+                  value={selectedFilterId ? { key: selectedFilterId, label: selectedMyFilterInfo.name } : undefined}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
                   {
@@ -424,6 +519,7 @@ class Issue extends Component {
                   key="issueTypeSelect"
                   className="issueTypeSelect"
                   mode="multiple"
+                  allowClear
                   dropdownClassName="issueTypeSelect-dropdown"
                   dropdownMatchSelectWidth={false}
                   placeholder="问题类型"
@@ -431,6 +527,12 @@ class Issue extends Component {
                   maxTagCount={0}
                   maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
                   onChange={this.handleIssueTypeSelectChange}
+                  value={_.map(selectedIssueType, key => (
+                    {
+                      key,
+                      name: _.map(issueTypes, item => item.id === key).name,
+                    }
+                  ))}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
                   {
@@ -444,6 +546,7 @@ class Issue extends Component {
                   key="statusSelect"
                   className="statusSelect"
                   mode="multiple"
+                  allowClear
                   dropdownClassName="statusSelect-dropdown"
                   dropdownMatchSelectWidth={false}
                   placeholder="状态"
@@ -451,6 +554,12 @@ class Issue extends Component {
                   maxTagCount={0}
                   maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
                   onChange={this.handleStatusSelectChange}
+                  value={_.map(selectedStatus, key => (
+                    {
+                      key,
+                      name: _.map(statusLists, item => item.id === key).name,
+                    }
+                  ))}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
                   {
@@ -466,11 +575,18 @@ class Issue extends Component {
                   mode="multiple"
                   dropdownClassName="prioritySelect-dropdown"
                   dropdownMatchSelectWidth={false}
+                  allowClear
                   placeholder="优先级"
                   labelInValue
                   maxTagCount={0}
                   maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
                   onChange={this.handlePrioritySelectChange}
+                  value={_.map(selectedPriority, key => (
+                    {
+                      key,
+                      name: _.map(prioritys, item => item.id === key).name,
+                    }
+                  ))}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
                   {
@@ -484,6 +600,7 @@ class Issue extends Component {
                   key="assigneeSelect"
                   className="assigneeSelect"
                   mode="multiple"
+                  allowClear
                   dropdownClassName="assigneeSelect-dropdown"
                   dropdownMatchSelectWidth={false}
                   placeholder="经办人"
@@ -514,6 +631,12 @@ class Issue extends Component {
                     }
                   }}
                   onChange={this.handleAssigneeSelectChange}
+                  value={_.map(selectedAssignee, key => (
+                    {
+                      key,
+                      name: _.map(users, item => item.id === key).realName,
+                    }
+                  ))}
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
                   {
@@ -527,7 +650,8 @@ class Issue extends Component {
                   <RangePicker
                     value={[moment(createStartDate), moment(createEndDate)]}
                     format="YYYY-MM-DD hh:mm:ss"
-                    ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
+                    allowClear={false}
+                    // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
                     onChange={this.handleCreateDateRangeChange}
                     placeholder={['创建时间', '']}
                   />
@@ -546,6 +670,7 @@ class Issue extends Component {
                 >
                   {'保存筛选'}
                 </Button>
+                {myFilters && myFilters.length > 0 && (
                 <Button 
                   funcType="flat" 
                   style={{ color: '#3F51B5' }}
@@ -558,6 +683,7 @@ class Issue extends Component {
                 >
                   {'筛选管理'}
                 </Button>
+                )}
                 <Modal
                   title="保存筛选"
                   visible={saveFilterVisible}
@@ -574,7 +700,8 @@ class Issue extends Component {
                       {getFieldDecorator('filterName', {
                         rules: [{
                           required: true, message: '请输入筛选名称',
-                        }],
+                        }, { validator: this.checkMyFilterNameRepeatCreating }],
+                        validateTrigger: 'onChange',
                       })(
                         <Input
                           label="筛选名称"
@@ -614,14 +741,16 @@ class Issue extends Component {
                                     {getFieldDecorator(`filterName_${filter.filterId}`, {
                                       rules: [{
                                         required: true, message: '请输入筛选名称',
+                                      }, {
+                                        validator: this.checkMyFilterNameRepeatUpdating,
                                       }],
                                       initialValue: filter.name,
                                     })(
                                       <Input
                                         className="c7n-filterNameInput"
                                         maxLength={10}
-                                        onBlur={this.handleFNIBlurOrPreseeEnter.bind(this, filter, `filterName_${filter.filterId}`)}
-                                        onPressEnter={this.handleFNIBlurOrPreseeEnter.bind(this, filter, `filterName_${filter.filterId}`)}
+                                        onBlur={this.handleFNIBlurOrPressEnter.bind(this, filter, `filterName_${filter.filterId}`)}
+                                        onPressEnter={this.handleFNIBlurOrPressEnter.bind(this, filter, `filterName_${filter.filterId}`)}
                                       />,
                                     )}
                                   </FormItem>
@@ -643,6 +772,7 @@ class Issue extends Component {
                                         isEditing: true,
                                         isEditingIndex,
                                       }],
+                                      updateFilterName: filter.name,
                                     });
                                   }}
                                 />

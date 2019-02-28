@@ -14,6 +14,7 @@ import CreateIssue from '../../../../components/CreateIssueNew';
 import './BacklogHome.scss';
 import SprintItem from '../BacklogComponent/SprintComponent/SprintItem';
 import QuickSearch from '../../../../components/QuickSearch';
+import Injecter from '../../../../components/Injecter';
 
 const { AppState } = stores;
 
@@ -25,7 +26,6 @@ class BacklogHome extends Component {
       spinIf: false,
       versionVisible: false,
       epicVisible: false,
-      newIssueVisible: false,
     };
   }
 
@@ -33,8 +33,9 @@ class BacklogHome extends Component {
     const { BacklogStore, location } = this.props;
     // magic, don't touch it
     document.addEventListener('click', (e) => {
-      if (!BacklogStore.isInner) {
+      if (!BacklogStore.isInner && BacklogStore.getSelectIssue && BacklogStore.getSelectIssue.length > 0) {
         // 取消选择
+
         BacklogStore.setSelectIssue([]);
       }
     });
@@ -544,11 +545,14 @@ class BacklogHome extends Component {
       });
   };
 
+  handleClickCBtn = () => {
+    const { BacklogStore } = this.props;
+    BacklogStore.setNewIssueVisible(true);
+  }
+
   handleCreateIssue = (res) => {
-    const { newIssueVisible } = this.state;
-    this.setState({
-      newIssueVisible: !newIssueVisible,
-    });
+    const { BacklogStore } = this.props;
+    BacklogStore.setNewIssueVisible(false);
     // 创建issue后刷新
     if (res) {
       this.refresh(false, res);
@@ -558,7 +562,7 @@ class BacklogHome extends Component {
   render() {
     const { BacklogStore } = this.props;
     const {
-      epicVisible, versionVisible, spinIf, newIssueVisible,
+      epicVisible, versionVisible, spinIf,
     } = this.state;
     return (
       <Page
@@ -572,7 +576,7 @@ class BacklogHome extends Component {
           <Button
             className="leftBtn"
             funcType="flat"
-            onClick={this.handleCreateIssue}
+            onClick={this.handleClickCBtn}
           >
             <Icon type="playlist_add icon" />
             <span>创建问题</span>
@@ -706,19 +710,20 @@ class BacklogHome extends Component {
                 }}
                 cancelCallback={this.resetSprintChose}
               />
-              {newIssueVisible
-                ? (
-                  <CreateIssue
-                    visible={newIssueVisible}
-                    onCancel={() => {
-                      this.setState({
-                        newIssueVisible: false,
-                      });
-                    }}
-                    onOk={this.handleCreateIssue}
-                  />
-                ) : null
-              }
+    
+              <Injecter store={BacklogStore} item="newIssueVisible">
+                {
+                  visible => (
+                    <CreateIssue
+                      visible={visible}
+                      onCancel={() => {
+                        BacklogStore.setNewIssueVisible(false);
+                      }}
+                      onOk={this.handleCreateIssue}
+                    />
+                  )
+                }
+              </Injecter>
             </div>
           </div>
         </div>

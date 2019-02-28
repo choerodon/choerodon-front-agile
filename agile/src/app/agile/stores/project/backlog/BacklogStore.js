@@ -64,6 +64,16 @@ class BacklogStore {
 
   @observable cleanQuickSearch = false;
 
+  @observable newIssueVisible = false;
+
+  @computed get getNewIssueVisible() {
+    return this.newIssueVisible;
+  }
+
+  @action setNewIssueVisible(data) {
+    this.newIssueVisible = data;
+  }
+
   @computed get asJson() {
     return {
       sprintData: this.sprintData,

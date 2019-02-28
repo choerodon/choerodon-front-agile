@@ -73,6 +73,7 @@ class SprintItem extends Component {
     window.removeEventListener('keyup', this.onKeyUp);
   }
 
+
   /**
    *父组件修改该组件state的方法
    *
@@ -1111,7 +1112,7 @@ class SprintItem extends Component {
                   )}
                 </Droppable>
               ) : ''}
-                        </div>); 
+            </div>); 
           }
         } else {
           result = (
