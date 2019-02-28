@@ -2,6 +2,7 @@ import {
   observable, action, computed, toJS,
 } from 'mobx';
 import { store, stores } from 'choerodon-front-boot';
+import moment from 'moment';
 
 const { AppState } = stores;
 // 当前跳转是否需要单选信息（跳转单个任务时使用）
@@ -106,6 +107,53 @@ class SprintCommonStore {
   }
 
   /**
+   * 创建筛选时传递的数据(筛选的条件数据)
+   */
+  @observable createFilterData = {
+    filterId: 0,
+    objectVersionNumber: 0,
+    name: '',
+    personalFilterSearchDTO: {
+      advancedSearchArgs: {
+        issueTypeId: [],
+        statusId: [],
+        assigneeIds: [],
+        priorityId: [],
+      },
+      searchArgs: {
+        createStartDate: moment().format('YYYY-MM-DD hh:mm:ss'),
+        createEndDate: moment().format('YYYY-MM-DD hh:mm:ss'),
+        summary: '',
+        component: '',
+        sprint: '',
+        issueNum: '',
+        epic: '',
+        reporter: '',
+        assignee: '',
+        label: '',
+        version: '',
+      },
+      otherArgs: {
+        component: [],
+        sprint: [],
+        epic: [],
+        label: [],
+        version: [],
+      },
+    },
+    projectId: AppState.currentMenuType.id,
+    userId: AppState.userInfo.id,
+  }
+
+  @computed get getCreateFilterData() {
+    return this.createFilterData;
+  }
+
+  @action setCreateFilterData(target, origin) {
+    this.createFilterData = Object.assign(target, origin);
+  }
+
+  /**
    * 跳转至问题管理页时设定传入参数
    * @param paramSelected => Boolean => 单个任务跳转
    * @param paramName => String => 跳转时 paramName 信息
@@ -181,7 +229,8 @@ class SprintCommonStore {
       [
         'sprint', this.issueSprints.map(item => ({
           text: item.sprintName,
-          value: item.sprintId.toString(),
+          // value: item.sprintId.toString(),
+          value: JSON.stringify({id: item.sprintId.toString(), select: true}),
         }))
       ],
     ]);
@@ -242,6 +291,8 @@ class SprintCommonStore {
   }
 
   @action setBarFilter(data) {
+    console.log('barFilter:');
+    console.log(data);
     this.barFilter = data;
   }
 
