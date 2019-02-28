@@ -155,7 +155,7 @@ export default class IssueFilterControler {
             Object.assign(filter.otherArgs, data),
           );
           break;
-        case 'content':
+        case 'contents':
         case 'onlyStory':
         case 'quickSearch':
         case 'assigneeSearch':
@@ -176,6 +176,11 @@ export default class IssueFilterControler {
         case 'searchArgs':
           this.updateCache(
             Object.assign(filter.searchArgs, data),
+          );
+          break;
+        case 'args': 
+          this.updateCache(
+            Object.assign(filter, data),
           );
           break;
         default:
@@ -199,12 +204,12 @@ export default class IssueFilterControler {
     if (IssueStore.getParamFilter && barFilters.indexOf(IssueStore.getParamFilter) === -1) {
       const filter = this.cache.get('userFilter');
       Object.assign(filter.otherArgs, {
-        assigneeId: [],
+        // assigneeId: [],
         component: [],
         epic: [],
-        issueIds: [],
+        // issueIds: [],
         label: [],
-        reporter: [],
+        // reporter: [],
         summary: [],
         version: [],
       });

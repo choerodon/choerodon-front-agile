@@ -546,24 +546,44 @@
     align-items: center;
     justify-content: space-between;
   .ant-select {
-    min-width: 100px;
+    min-width: 90px;
     margin-right: 10px;
-    .ant-select-selection__placeholder{
-      color: #4a4a4a;
+    .ant-select-selection__rendered {
+      padding-right: 27px;
+      .ant-select-selection__placeholder{
+        color: #4a4a4a;
+      }
     }
+   
     .ant-select-selection__choice__content {
-      max-width: 120px;
+      max-width: 100px;
     }
     .ant-select-underline {
       display: none;
     }
     .icon{
-      margin-top: -10px;
+      margin-top: -14px;
+    }
+    .ant-btn .icon {
+      margin-top: 0;
     }
   }
   .myFilterSelect {
-    .ant-select-selection__placeholder{
-      color: #3F51B5;
+    .ant-select-selection__rendered {
+      padding-right: 35px;
+      margin-top: 2px;
+      .ant-select-selection-selected-value {
+        max-width: 70px;
+      }
+      .ant-select-selection__placeholder{
+        color: #3F51B5;
+      }
+    }
+    .ant-select-selection__choice__content {
+      max-width: 130px;
+    }
+    .icon {
+      margin-top: 0,
     }
   }
   .c7n-createRange {

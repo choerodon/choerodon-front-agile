@@ -2,6 +2,7 @@ import {
   observable, action, computed, toJS,
 } from 'mobx';
 import { store, stores } from 'choerodon-front-boot';
+import moment from 'moment';
 
 const { AppState } = stores;
 // 当前跳转是否需要单选信息（跳转单个任务时使用）
@@ -32,11 +33,11 @@ class SprintCommonStore {
         quickFilterIds: [],
         assigneeFilterIds: null,
         otherArgs: {
+          issueIds: [],
+          reporter: [],
           component: [],
           epic: [],
-          issueIds: [],
           label: [],
-          reporter: [],
           summary: [],
           version: [],
         },
@@ -106,6 +107,61 @@ class SprintCommonStore {
   }
 
   /**
+   * 创建筛选时传递的数据(筛选的条件数据)
+   */
+  @observable createFilterData = {
+    filterId: 0,
+    objectVersionNumber: 0,
+    name: '',
+    personalFilterSearchDTO: {
+      advancedSearchArgs: {
+        issueTypeId: [],
+        statusId: [],
+        assigneeIds: [],
+        priorityId: [],
+      },
+      searchArgs: {
+        createStartDate: moment().format('YYYY-MM-DD hh:mm:ss'),
+        createEndDate: moment().format('YYYY-MM-DD hh:mm:ss'),
+        summary: '',
+        issueNum: '',
+        reporter: '',
+        component: '',
+        sprint: '',
+        epic: '',
+        label: '',
+        version: '',
+      },
+      otherArgs: {
+        component: [],
+        sprint: [],
+        epic: [],
+        label: [],
+        version: [],
+      },
+    },
+    projectId: AppState.currentMenuType.id,
+    userId: AppState.userInfo.id,
+  }
+
+  @computed get getCreateFilterData() {
+    return toJS(this.createFilterData);
+  }
+
+  @action setCreateFilterData(target, origin) {
+    this.createFilterData = Object.assign(target, origin);
+  }
+
+  @action setCFDArgs(advArgsData, searchArgsData, otherArgsData, contentsData) {
+    const { personalFilterSearchDTO } = this.createFilterData;
+    if (advArgsData) { personalFilterSearchDTO.advancedSearchArgs = advArgsData; }
+    if (searchArgsData) { Object.assign(personalFilterSearchDTO.searchArgs, searchArgsData); }
+    if (otherArgsData) { Object.assign(personalFilterSearchDTO.otherArgs, otherArgsData); }
+    if (contentsData) { Object.assign(personalFilterSearchDTO.contents, contentsData); }
+    return personalFilterSearchDTO;
+  }
+
+  /**
    * 跳转至问题管理页时设定传入参数
    * @param paramSelected => Boolean => 单个任务跳转
    * @param paramName => String => 跳转时 paramName 信息
@@ -157,31 +213,36 @@ class SprintCommonStore {
       [
         'label', this.tagData.map(item => ({
           text: item.labelName,
-          value: item.labelId.toString(),
+          // value: item.labelId.toString(),
+          value: JSON.stringify({id: item.labelId, select: true}),
         }))
       ],
       [
         'component', this.issueComponents.content.map(item => ({
           text: item.name,
-          value: item.componentId.toString(),
+          // value: item.componentId.toString(),
+          value: JSON.stringify({id: item.componentId, select: true}),
         }))
       ],
       [
         'version', this.issueVersions.map(item => ({
           text: item.name,
-          value: item.versionId.toString(),
+          // value: item.versionId.toString(),
+          value: JSON.stringify({id: item.versionId.toString(), select: true}),
         }))
       ],
       [
         'epic', this.issueEpics.map(item => ({
           text: item.epicName,
-          value: item.issueId.toString(),
+          // value: item.issueId.toString(),
+          value: JSON.stringify({id: item.issueId.toString(), select: true}),
         }))
       ],
       [
         'sprint', this.issueSprints.map(item => ({
           text: item.sprintName,
-          value: item.sprintId.toString(),
+          // value: item.sprintId.toString(),
+          value: JSON.stringify({id: item.sprintId.toString(), select: true}),
         }))
       ],
     ]);
@@ -242,6 +303,8 @@ class SprintCommonStore {
   }
 
   @action setBarFilter(data) {
+    console.log('barFilter:');
+    console.log(data);
     this.barFilter = data;
   }
 
