@@ -32,6 +32,15 @@ class IssueTable extends Component {
    * @param setArgs => function => 设置参数时需要调用的闭包函数
    */
   filterConvert = (filters, setArgs) => {
+    // const convertedFilter = Object.keys(filters).map((key) => {
+    //   let filterField = filters[key].map(item => JSON.parse(item));
+    //   if (filterField.find(item => item.select)) {
+    //     filterField = _.map(filterField, 'id');
+    //   }
+    //   return filterField;
+    // });
+    // console.log(convertedFilter);
+
     // 循环遍历 Object 中的每个键
     Object.keys(filters).forEach((key) => {
       // 根据对应的 key 传入对应的 mode

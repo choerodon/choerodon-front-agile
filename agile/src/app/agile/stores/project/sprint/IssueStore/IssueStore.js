@@ -139,7 +139,6 @@ class SprintCommonStore {
         label: [],
         version: [],
       },
-      contents: [],
     },
     projectId: AppState.currentMenuType.id,
     userId: AppState.userInfo.id,
@@ -304,6 +303,8 @@ class SprintCommonStore {
   }
 
   @action setBarFilter(data) {
+    console.log('barFilter:');
+    console.log(data);
     this.barFilter = data;
   }
 

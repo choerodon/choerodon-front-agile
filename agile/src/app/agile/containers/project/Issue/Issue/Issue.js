@@ -12,7 +12,6 @@ import _ from 'lodash';
 import './Issue.scss';
 import moment from 'moment';
 import { _allowStateChangesInsideComputed } from 'mobx';
-import { object } from 'prop-types';
 import { loadIssueTypes, loadStatusList, loadPriorities } from '../../../../api/NewIssueApi';
 import { getUsers } from '../../../../api/CommonApi';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
