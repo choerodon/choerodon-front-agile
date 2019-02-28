@@ -5,15 +5,6 @@ import { Droppable } from 'react-beautiful-dnd';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import StatusCouldDragOn from './StatusCouldDragOn';
 
-const getDragOver = isDraggingOver => ({
-  background: isDraggingOver ? '#f2f9f4' : 'none',
-  borderColor: isDraggingOver ? '#1ab16f' : 'inherit',
-});
-
-const getStatusNameStyle = isDraggingOver => ({
-  color: isDraggingOver ? '#1ab16f' : '#26348b',
-});
-
 @observer
 export default class StatusProvider extends Component {
   getStatus({
