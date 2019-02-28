@@ -4,7 +4,9 @@ import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import ColumnCouldDragOn from './ColumnCouldDragOn';
+import CSSBlackMagic from '../../../../../components/CSSBlackMagic';
 
+@CSSBlackMagic
 @observer
 export default class ColumnProvider extends React.Component {
   getColumn(columnObj) {
@@ -14,8 +16,7 @@ export default class ColumnProvider extends React.Component {
     const subStatusArr = column_status_RelationMap.get(columnObj.columnId);
     return (
       <React.Fragment key={columnObj.columnId}>
-        <ColumnCouldDragOn keyId={keyId} dragOn={ScrumBoardStore.getCurrentDrag === keyId} />
-        <div className={className}>
+        <div className={`${className} ${keyId}`}>
           {children(subStatusArr, columnObj.columnId)}
         </div>
       </React.Fragment>

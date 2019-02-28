@@ -5,7 +5,7 @@ import '../../../Backlog/BacklogComponent/IssueDetailComponent/IssueDetail.scss'
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 // import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
-@inject('AppState')
+@inject('AppState', 'HeaderStore')
 @observer
 class IssueDetail extends Component {
   constructor(props) {
@@ -18,14 +18,14 @@ class IssueDetail extends Component {
   };
 
   render() {
-    const { visible, refresh } = this.props;
-    return visible ? (
+    const { refresh, HeaderStore } = this.props;
+    return ScrumBoardStore.getClickedIssue ? (
       <EditIssue
         store={ScrumBoardStore}
         onRef={this.onRef}
         backUrl="scrumboard"
         style={{
-          height: 'calc(100vh - 156px)',
+          height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
           width: '440px',
         }}
         issueId={ScrumBoardStore.getClickIssueDetail.issueId}
