@@ -77,6 +77,14 @@
     margin: 1px 0;
     display: flex;
     flex-grow: 1;
+    &-dragOver {
+      background: #f2f9f4;
+      border-color: #1ab16f !important;
+    }
+    &-notDragOver {
+      background: none;
+      border-color: inherit;
+    }
     &-noneIssue {
       flex-grow: 1;
       min-height: 83px;
@@ -85,12 +93,21 @@
       transition: all 0.2ms;
       width: 100%;
       min-height: 83px;
+      &-dragOn {
+        border-color: #1ab16f;
+      }
       &-statusName {
         transition: all 0.2ms;
         visibility: hidden;
         height: 14px;
         display: block;
         font-size: 12px;
+        &-nameDragOn {
+          color: #1ab16f;
+        }
+        &-nameNotDragOn {
+          color: #26348b;
+        }
       }
     }
   }

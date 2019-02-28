@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import classnames from 'classnames';
 import { Droppable } from 'react-beautiful-dnd';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import StatusCouldDragOn from './StatusCouldDragOn';
@@ -35,13 +36,17 @@ export default class StatusProvider extends Component {
               <StatusCouldDragOn statusId={statusId} />
               <div
                 ref={provided.innerRef}
-                className="c7n-swimlaneContext-itemBodyStatus-container"
-                style={getDragOver(snapshot.isDraggingOver)}
+                className={classnames('c7n-swimlaneContext-itemBodyStatus-container', {
+                  'c7n-swimlaneContext-itemBodyStatus-dragOver': snapshot.isDraggingOver,
+                  'c7n-swimlaneContext-itemBodyStatus-notDragOver': !snapshot.isDraggingOver,
+                })}
                 {...provided.droppableProps}
               >
                 <span
-                  className="c7n-swimlaneContext-itemBodyStatus-container-statusName"
-                  style={getStatusNameStyle(snapshot.isDraggingOver)}
+                  className={classnames('c7n-swimlaneContext-itemBodyStatus-container-statusName', {
+                    'c7n-swimlaneContext-itemBodyStatus-container-statusName-nameDragOn': snapshot.isDraggingOver,
+                    'c7n-swimlaneContext-itemBodyStatus-container-statusName-nameNotDragOn': !snapshot.isDraggingOver,
+                  })}
                 >
                   {statusName}
                 </span>
