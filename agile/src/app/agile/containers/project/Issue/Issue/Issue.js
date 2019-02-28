@@ -12,6 +12,7 @@ import _ from 'lodash';
 import './Issue.scss';
 import moment from 'moment';
 import { _allowStateChangesInsideComputed } from 'mobx';
+import { object } from 'prop-types';
 import { loadIssueTypes, loadStatusList, loadPriorities } from '../../../../api/NewIssueApi';
 import { getUsers } from '../../../../api/CommonApi';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
@@ -55,11 +56,12 @@ class Issue extends Component {
       selectedStatus: [],
       selectedPriority: [],
       selectedAssignee: [],
-      createStartDate: moment().format('YYYY-MM-DD hh:mm:ss'),
-      createEndDate: moment().format('YYYY-MM-DD hh:mm:ss'),
+      createStartDate: `${moment().format('YYYY-MM-DD')} 00:00:00`,
+      createEndDate: `${moment().format('YYYY-MM-DD')} 23:59:59`,
       saveFilterVisible: false,
       editFilterInfo: [],
       updateFilterName: '',
+      isExistFilter: true,
     };
     this.filterControler = new IssueFilterControler();
   }
@@ -139,7 +141,7 @@ class Issue extends Component {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`).then((res) => {
       this.setState({
         projectInfo: res,
-        createStartDate: moment(res.creationDate).format('YYYY-MM-DD HH:mm:ss'),
+        createStartDate: `${moment(res.creationDate).format('YYYY-MM-DD')} 00:00:00`,
       });
     });
   }
@@ -166,28 +168,29 @@ class Issue extends Component {
     });
   }
 
-  axiosSearchFilter = (filterId) => {
+  getSearchFilter = (filterId) => {
     this.filterControler = new IssueFilterControler();
-    const { projectInfo } = this.state;
+    const { projectInfo, myFilters } = this.state;
     if (filterId) {
-      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/${filterId}`).then((filterInfo) => {
-        const { advancedSearchArgs, searchArgs } = filterInfo.personalFilterSearchDTO;
-        this.setState({
-          selectedMyFilterInfo: filterInfo,
-          selectedIssueType: advancedSearchArgs.issueTypeId || [],
-          selectedStatus: advancedSearchArgs.statusId || [],
-          selectedPriority: advancedSearchArgs.priorityId || [],
-          selectedAssignee: advancedSearchArgs.assigneeIds || [],
-          createStartDate: moment(searchArgs.createStartDate).format('YYYY-MM-DD HH:mm:ss'),
-          createEndDate: moment(searchArgs.createEndDate).format('YYYY-MM-DD HH:mm:ss'),
-        }, () => {
-          this.filterControler.advancedSearchArgsFilterUpdate(this.state.selectedIssueType, this.state.selectedStatus, this.state.selectedPriority);
-          this.filterControler.searchArgsFilterUpdate(this.state.createStartDate, this.state.createEndDate);
-          this.updateIssues(this.filterControler);
-        });
+      const searchFilterInfo = myFilters.find(item => item.filterId === filterId);
+      const { advancedSearchArgs, searchArgs } = searchFilterInfo.personalFilterSearchDTO;
+      this.setState({
+        selectedMyFilterInfo: searchFilterInfo,
+        selectedIssueType: advancedSearchArgs.issueTypeId || [],
+        selectedStatus: advancedSearchArgs.statusId || [],
+        selectedPriority: advancedSearchArgs.priorityId || [],
+        selectedAssignee: advancedSearchArgs.assigneeIds || [],
+        createStartDate: moment(searchArgs.createStartDate).format('YYYY-MM-DD HH:mm:ss'),
+        createEndDate: moment(searchArgs.createEndDate).format('YYYY-MM-DD HH:mm:ss'),
+      }, () => {
+        this.filterControler.advancedSearchArgsFilterUpdate(this.state.selectedIssueType, this.state.selectedStatus, this.state.selectedPriority);
+        this.filterControler.searchArgsFilterUpdate(this.state.createStartDate, this.state.createEndDate);
+        this.filterControler.assigneeFilterUpdate(this.state.selectedAssignee);
+        this.updateIssues(this.filterControler);
       });
     } else {
       this.resetFilterSelect();
+      IssueStore.setBarFilter([]);
       this.filterControler.advancedSearchArgsFilterUpdate([], [], []);
       this.filterControler.searchArgsFilterUpdate(moment(projectInfo.creationDate).format('YYYY-MM-DD hh:mm:ss'), moment().format('YYYY-MM-DD hh:mm:ss'));
       this.updateIssues(this.filterControler);
@@ -202,9 +205,10 @@ class Issue extends Component {
       selectedStatus: [],
       selectedPriority: [],
       selectedAssignee: [],
-      createStartDate: moment(projectInfo.creationDate).format('YYYY-MM-DD hh:mm:ss'),
-      createEndDate: moment().format('YYYY-MM-DD hh:mm:ss'),
+      createStartDate: `${moment(projectInfo.creationDate).format('YYYY-MM-DD')} 00:00:00`,
+      createEndDate: `${moment().format('YYYY-MM-DD')} 23:59:59`,
       updateFilterName: '',
+      isExistFilter: true,
     });
   }
 
@@ -223,39 +227,74 @@ class Issue extends Component {
       });
   };
 
+  judgeConditionWithFilter = (selectedIssueType, selectedStatus, selectedPriority, selectedAssignee, createStartDate, createEndDate) => {
+    const { myFilters } = this.state;
+    if (myFilters.length === 0) {
+      this.setState({
+        isExistFilter: false,
+      });
+    } else {
+      for (let i = 0; i < myFilters.length; i++) {
+        const { advancedSearchArgs, searchArgs } = myFilters[i].personalFilterSearchDTO;
+        const itemIsEqual = (
+          _.isEqual(advancedSearchArgs.issueTypeId.sort(), selectedIssueType.sort()) && (
+            _.isEqual(advancedSearchArgs.statusId.sort(), selectedStatus.sort())
+          ) && (
+            _.isEqual(advancedSearchArgs.priorityId.sort(), selectedPriority.sort())
+          ) && (
+            _.isEqual(advancedSearchArgs.assigneeIds.sort(), selectedAssignee.sort())
+          ) && (
+            moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(createStartDate).format('YYYY-MM-DD') && moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(createEndDate).format('YYYY-MM-DD')
+          )
+        );
+  
+        if (itemIsEqual) {
+          this.setState({
+            selectedFilterId: myFilters[i].filterId,
+            isExistFilter: true,
+          });
+          break;
+        } else if (i === myFilters.length - 1 && !itemIsEqual) {
+          this.setState({
+            selectedFilterId: undefined,
+            isExistFilter: false,
+          });
+        }
+      }
+    }
+  }
+
  
   handleMyFilterSelectChange = (value) => {
-    // this.filterControler = new IssueFilterControler();
     this.setState({
       selectedFilterId: (value && value.key) || undefined,
     });
-    this.axiosSearchFilter((value && value.key) || undefined);
-    // IssueStore.setLoading(true);
-    // this.filterControler.update().then(
-    //   (res) => {
-    //     IssueStore.updateFiltedIssue({
-    //       current: res.number + 1,
-    //       pageSize: res.size,
-    //       total: res.totalElements,
-    //     }, res.content);
-    //   },
-    // );
+    this.getSearchFilter((value && value.key) || undefined);
   }
 
   handleIssueTypeSelectChange = (value) => {
-    const { selectedStatus, selectedPriority } = this.state;
+    const {
+      selectedStatus, selectedPriority, selectedAssignee, createStartDate, createEndDate, 
+    } = this.state;
     this.setState({
       selectedIssueType: _.map(value, 'key'),
+    }, () => {
+      this.judgeConditionWithFilter(this.state.selectedIssueType, selectedStatus, selectedPriority, selectedAssignee, createStartDate, createEndDate);
     });
+    
     this.filterControler = new IssueFilterControler();
     this.filterControler.advancedSearchArgsFilterUpdate(_.map(value, 'key'), selectedStatus, selectedPriority);
     this.updateIssues(this.filterControler);
   }
 
   handleStatusSelectChange = (value) => {
-    const { selectedIssueType, selectedPriority } = this.state;
+    const {
+      selectedIssueType, selectedPriority, selectedAssignee, createStartDate, createEndDate, 
+    } = this.state;
     this.setState({
       selectedStatus: _.map(value, 'key'),
+    }, () => {
+      this.judgeConditionWithFilter(selectedIssueType, this.state.selectedStatus, selectedPriority, selectedAssignee, createStartDate, createEndDate);
     });
     this.filterControler = new IssueFilterControler();
     this.filterControler.advancedSearchArgsFilterUpdate(selectedIssueType, _.map(value, 'key'), selectedPriority);
@@ -263,9 +302,13 @@ class Issue extends Component {
   }
 
   handlePrioritySelectChange = (value) => {
-    const { selectedIssueType, selectedStatus } = this.state;
+    const {
+      selectedIssueType, selectedStatus, selectedAssignee, createStartDate, createEndDate, 
+    } = this.state;
     this.setState({
       selectedPriority: _.map(value, 'key'),
+    }, () => {
+      this.judgeConditionWithFilter(selectedIssueType, selectedStatus, this.state.selectedPriority, selectedAssignee, createStartDate, createEndDate);
     });
     this.filterControler = new IssueFilterControler();
     this.filterControler.advancedSearchArgsFilterUpdate(selectedIssueType, selectedStatus, _.map(value, 'key'));
@@ -273,8 +316,13 @@ class Issue extends Component {
   }
 
   handleAssigneeSelectChange = (value) => {
+    const {
+      selectedIssueType, selectedStatus, selectedPriority, createStartDate, createEndDate, 
+    } = this.state;
     this.setState({
       selectedAssignee: _.map(value, 'key'),
+    }, () => {
+      this.judgeConditionWithFilter(selectedIssueType, selectedStatus, selectedPriority, this.state.selectedAssignee, createStartDate, createEndDate);
     });
     this.filterControler = new IssueFilterControler();
     this.filterControler.assigneeFilterUpdate(_.map(value, 'key'));
@@ -282,12 +330,17 @@ class Issue extends Component {
   }
   
   handleCreateDateRangeChange = (dates, datesStrings) => {
+    const {
+      selectedIssueType, selectedStatus, selectedPriority, selectedAssignee, 
+    } = this.state;
     const createStartDate = `${moment(dates[0]).format('YYYY-MM-DD')} 00:00:00`;
     const createEndDate = `${moment(dates[1]).format('YYYY-MM-DD')} 23:59:59`;
     this.setState({
       saveFilterVisible: false,
       createStartDate,
       createEndDate,
+    }, () => {
+      this.judgeConditionWithFilter(selectedIssueType, selectedStatus, selectedPriority, selectedAssignee, createStartDate, createEndDate);
     });
     this.filterControler = new IssueFilterControler();
     this.filterControler.searchArgsFilterUpdate(createStartDate, createEndDate);
@@ -350,21 +403,32 @@ class Issue extends Component {
     form.validateFields(['filterName'], (err, value, modify) => {
       if (!err) {
         const createFilterData = IssueStore.getCreateFilterData;
-        IssueStore.setCreateFilterData(createFilterData, {
-          name: value.filterName,
-          personalFilterSearchDTO: {
-            advancedSearchArgs: {
-              issueTypeId: selectedIssueType,
-              statusId: selectedStatus,
-              assigneeIds: selectedAssignee,
-              priorityId: selectedPriority,
-            },
-            searchArgs: {
-              createEndDate,
-              createStartDate,
-            },
-          },
-        });
+        // IssueStore.setCreateFilterData(createFilterData, {
+        //   name: value.filterName,
+        //   personalFilterSearchDTO: {
+        //     advancedSearchArgs: {
+        //       issueTypeId: selectedIssueType,
+        //       statusId: selectedStatus,
+        //       assigneeIds: selectedAssignee,
+        //       priorityId: selectedPriority,
+        //     },
+        //     searchArgs: {
+        //       createEndDate,
+        //       createStartDate,
+        //     },
+        //   },
+        // });
+        console.log(IssueStore.getFilterMap.get('userFilter'));
+        const personalFilterSearchDTO = IssueStore.setCFDArgs({
+          issueTypeId: selectedIssueType,
+          statusId: selectedStatus,
+          assigneeIds: selectedAssignee,
+          priorityId: selectedPriority,
+        }, Object.assign(IssueStore.getFilterMap.get('userFilter').searchArgs, {
+          createEndDate,
+          createStartDate,
+        }), IssueStore.getFilterMap.get('userFilter').otherArgs, IssueStore.getFilterMap.get('userFilter').contents);
+        IssueStore.setCreateFilterData(createFilterData, { name: value.filterName, personalFilterSearchDTO });
         console.log(IssueStore.getCreateFilterData);
 
         IssueStore.setLoading(true);
@@ -377,6 +441,7 @@ class Issue extends Component {
             });
             this.setState({
               saveFilterVisible: false,
+              isExistFilter: true,
             });
             form.setFieldsValue({ filterName: '' });
             Choerodon.prompt('保存成功');
@@ -436,6 +501,7 @@ class Issue extends Component {
       selectedStatus,
       selectedPriority,
       selectedAssignee,
+      isExistFilter,
     } = this.state;
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -658,18 +724,22 @@ class Issue extends Component {
                 </div>
               </div>
               <div className="c7n-mySearchManage">
-                <Button 
-                  funcType="raised" 
-                  style={{ color: '#fff', background: '#3F51B5', marginRight: 10 }}
-                  onClick={() => {
-                    this.setState({
-                      saveFilterVisible: true,
-                    });
-                    IssueStore.setFilterListVisible(false);
-                  }}
-                >
-                  {'保存筛选'}
-                </Button>
+                {
+                  !false && (
+                  <Button 
+                    funcType="raised" 
+                    style={{ color: '#fff', background: '#3F51B5', marginRight: 10 }}
+                    onClick={() => {
+                      this.setState({
+                        saveFilterVisible: true,
+                      });
+                      IssueStore.setFilterListVisible(false);
+                    }}
+                  >
+                    {'保存筛选'}
+                  </Button>
+                  )
+                }
                 {myFilters && myFilters.length > 0 && (
                 <Button 
                   funcType="flat" 

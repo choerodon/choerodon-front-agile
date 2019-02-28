@@ -32,15 +32,6 @@ class IssueTable extends Component {
    * @param setArgs => function => 设置参数时需要调用的闭包函数
    */
   filterConvert = (filters, setArgs) => {
-    // const convertedFilter = Object.keys(filters).map((key) => {
-    //   let filterField = filters[key].map(item => JSON.parse(item));
-    //   if (filterField.find(item => item.select)) {
-    //     filterField = _.map(filterField, 'id');
-    //   }
-    //   return filterField;
-    // });
-    // console.log(convertedFilter);
-
     // 循环遍历 Object 中的每个键
     Object.keys(filters).forEach((key) => {
       // 根据对应的 key 传入对应的 mode
@@ -55,21 +46,9 @@ class IssueTable extends Component {
         case 'version':
         case 'epic':
         case 'sprint':
-          // setArgs('otherArgs', filters);
-          if (filters.sprint.length > 0) {
-            const filtersSprint = filters.sprint.map(item => JSON.parse(item));
-            console.log(filtersSprint);
-            if (filtersSprint.find(item => item.select)) {
-              console.log(Object.assign(filters, { sprint: filtersSprint.map(item => item.id) }));
-              setArgs('otherArgs', Object.assign(filters, { sprint: filtersSprint.map(item => item.id.toString()) }));
-            // setArgs('searchArgs', Object.assign(filters, { sprint: '' }));
-            } else {
-            // setArgs('otherArgs', Object.assign(filters, { sprint: [] }));
-              setArgs('searchArgs', Object.assign(filters, { sprint: filtersSprint[0].toString() }));
-            }
-          } else {
-            setArgs('otherArgs', Object.assign(filters, { sprint: [] }));
-          }
+          const { fieldSelected, fieldInput } = this.convertSelectOrInput(filters);
+          setArgs('otherArgs', fieldSelected);
+          setArgs('searchArgs', fieldInput);
           break;
         default:
           setArgs('searchArgs', {
@@ -79,6 +58,28 @@ class IssueTable extends Component {
       }
     });
   };
+
+  convertSelectOrInput = (filters) => {
+    const fieldSelected = {}; // {sprint: [1,2]}
+    const fieldInput = {}; // {sprint: 'shjh'}
+    Object.keys(filters).forEach((key) => {
+      fieldSelected[key] = []; // 选中
+      fieldInput[key] = ''; // 输入
+      filters[key].forEach((fieldValue) => {
+        try {
+          const selected = JSON.parse(fieldValue);
+          if (selected.id) {
+            fieldSelected[key].push(selected.id);
+          } else {
+            throw new Error('没有id');
+          }
+        } catch (e) {
+          fieldInput[key] = fieldValue;
+        }
+      });
+    });
+    return { fieldSelected, fieldInput };
+  }
 
   /**
    *
@@ -92,8 +93,7 @@ class IssueTable extends Component {
     if (barFilters.indexOf(IssueStore.getParamFilter) !== -1) {
       temp.shift();
     }
-    setArgs('content', {
-      // content: temp.join(''),
+    setArgs('contents', {
       contents: temp,
     });
   };
@@ -211,6 +211,7 @@ class IssueTable extends Component {
         className: 'sprint',
         width: 128,
         filters: IssueStore.getColumnFilter.get('sprint'),
+        filteredValue: [],
         filterMultiple: true,
         render: record => (
           <Sprint
@@ -320,7 +321,7 @@ class IssueTable extends Component {
         loading={IssueStore.getLoading}
         pagination={IssueStore.getPagination}
         footer={() => (<QuickCreateIssue />)}
-        onChange={this.handleFilterChange}
+        // onChange={this.handleFilterChange}
         className="c7n-Issue-table"
         onRow={record => ({
           onClick: (e) => {

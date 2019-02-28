@@ -33,11 +33,11 @@ class SprintCommonStore {
         quickFilterIds: [],
         assigneeFilterIds: null,
         otherArgs: {
+          issueIds: [],
+          reporter: [],
           component: [],
           epic: [],
-          issueIds: [],
           label: [],
-          reporter: [],
           summary: [],
           version: [],
         },
@@ -124,12 +124,11 @@ class SprintCommonStore {
         createStartDate: moment().format('YYYY-MM-DD hh:mm:ss'),
         createEndDate: moment().format('YYYY-MM-DD hh:mm:ss'),
         summary: '',
+        issueNum: '',
+        reporter: '',
         component: '',
         sprint: '',
-        issueNum: '',
         epic: '',
-        reporter: '',
-        assignee: '',
         label: '',
         version: '',
       },
@@ -140,17 +139,27 @@ class SprintCommonStore {
         label: [],
         version: [],
       },
+      contents: [],
     },
     projectId: AppState.currentMenuType.id,
     userId: AppState.userInfo.id,
   }
 
   @computed get getCreateFilterData() {
-    return this.createFilterData;
+    return toJS(this.createFilterData);
   }
 
   @action setCreateFilterData(target, origin) {
     this.createFilterData = Object.assign(target, origin);
+  }
+
+  @action setCFDArgs(advArgsData, searchArgsData, otherArgsData, contentsData) {
+    const { personalFilterSearchDTO } = this.createFilterData;
+    if (advArgsData) { personalFilterSearchDTO.advancedSearchArgs = advArgsData; }
+    if (searchArgsData) { Object.assign(personalFilterSearchDTO.searchArgs, searchArgsData); }
+    if (otherArgsData) { Object.assign(personalFilterSearchDTO.otherArgs, otherArgsData); }
+    if (contentsData) { Object.assign(personalFilterSearchDTO.contents, contentsData); }
+    return personalFilterSearchDTO;
   }
 
   /**
@@ -205,25 +214,29 @@ class SprintCommonStore {
       [
         'label', this.tagData.map(item => ({
           text: item.labelName,
-          value: item.labelId.toString(),
+          // value: item.labelId.toString(),
+          value: JSON.stringify({id: item.labelId, select: true}),
         }))
       ],
       [
         'component', this.issueComponents.content.map(item => ({
           text: item.name,
-          value: item.componentId.toString(),
+          // value: item.componentId.toString(),
+          value: JSON.stringify({id: item.componentId, select: true}),
         }))
       ],
       [
         'version', this.issueVersions.map(item => ({
           text: item.name,
-          value: item.versionId.toString(),
+          // value: item.versionId.toString(),
+          value: JSON.stringify({id: item.versionId.toString(), select: true}),
         }))
       ],
       [
         'epic', this.issueEpics.map(item => ({
           text: item.epicName,
-          value: item.issueId.toString(),
+          // value: item.issueId.toString(),
+          value: JSON.stringify({id: item.issueId.toString(), select: true}),
         }))
       ],
       [
@@ -291,8 +304,6 @@ class SprintCommonStore {
   }
 
   @action setBarFilter(data) {
-    console.log('barFilter:');
-    console.log(data);
     this.barFilter = data;
   }
 
