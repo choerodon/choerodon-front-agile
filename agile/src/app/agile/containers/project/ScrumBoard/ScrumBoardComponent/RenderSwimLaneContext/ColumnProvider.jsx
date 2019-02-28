@@ -4,7 +4,9 @@ import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import ColumnCouldDragOn from './ColumnCouldDragOn';
+import CSSBlackMagic from '../../../../../components/CSSBlackMagic';
 
+@CSSBlackMagic
 @observer
 export default class ColumnProvider extends React.Component {
   getColumn(columnObj) {
@@ -21,6 +23,7 @@ export default class ColumnProvider extends React.Component {
             lessThanMin: columnObj.minNum && ScrumBoardStore.getAllColumnCount.get(columnObj.columnId) < columnObj.minNum,
           })}
         >
+          {/* <div className={`${className} ${keyId}`}> */}
           {children(subStatusArr, columnObj.columnId)}
         </div>
       </React.Fragment>

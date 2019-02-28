@@ -1,30 +1,21 @@
 .ant-collapse-item.c7n-swimlaneContext-container.shouldBeIndent > .ant-collapse-header {
   padding: 0 16px !important;
 }
-.onColumnDragOn + .c7n-swimlaneContext-itemBodyColumn {
-  background-color: rgba(140, 158, 255, 0.12) !important;
-  .c7n-swimlaneContext-itemBodyStatus-container {
-    border-width: 2px;
-    border-style: dashed;
-    border-color: #26348b;
+.statusCantDragOn + .c7n-swimlaneContext-itemBodyStatus-container {
+  background-color: #fff7f7 !important;
+  border-color: #ef2a27 !important;
+
+  &:after {
+    color: #ef2a27 !important;
+    content: '工作流限制，无法拖动至此';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-45%, -45%);
   }
-  .statusCantDragOn + .c7n-swimlaneContext-itemBodyStatus-container {
-    background-color: #fff7f7 !important;
-    border-color: #ef2a27 !important;
-    &:after {
-      color: #ef2a27 !important;
-      content: '工作流限制，无法拖动至此';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-45%, -45%);
-    }
-    .c7n-swimlaneContext-itemBodyStatus-container-statusName {
-      color: #ef2a27 !important;
-    }
-  }
+
   .c7n-swimlaneContext-itemBodyStatus-container-statusName {
-    visibility: visible;
+    color: #ef2a27 !important;
   }
 }
 //.c7n-swimlaneContext-itemBodyStatus-container.onStatusDragOn:first-child {
@@ -80,15 +71,20 @@
   .notDrag {
     display: none;
   }
-  .onDragStart + &-itemBodyColumn {
-    border: 1px solid #000;
-  }
   &-itemBodyStatus {
     position: relative;
     min-height: 83px;
     margin: 1px 0;
     display: flex;
     flex-grow: 1;
+    &-dragOver {
+      background: #f2f9f4;
+      border-color: #1ab16f !important;
+    }
+    &-notDragOver {
+      background: none;
+      border-color: inherit;
+    }
     &-noneIssue {
       flex-grow: 1;
       min-height: 83px;
@@ -97,12 +93,21 @@
       transition: all 0.2ms;
       width: 100%;
       min-height: 83px;
+      &-dragOn {
+        border-color: #1ab16f;
+      }
       &-statusName {
         transition: all 0.2ms;
         visibility: hidden;
         height: 14px;
         display: block;
         font-size: 12px;
+        &-nameDragOn {
+          color: #1ab16f;
+        }
+        &-nameNotDragOn {
+          color: #26348b;
+        }
       }
     }
   }

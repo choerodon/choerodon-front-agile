@@ -3,9 +3,8 @@ import { observer, inject } from 'mobx-react';
 import {
   Page, Header, Content, stores,
 } from 'choerodon-front-boot';
-import { trace, toJS } from 'mobx';
 import {
-  Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip, Affix,
+  Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip,
 } from 'choerodon-ui';
 import ScrumBoardDataController from './ScrumBoardDataController';
 import ScrumBoardStore from '../../../../stores/project/scrumBoard/ScrumBoardStore';
@@ -18,6 +17,7 @@ import QuickSearch from '../../../../components/QuickSearch';
 import NoneSprint from '../ScrumBoardComponent/NoneSprint/NoneSprint';
 import '../ScrumBoardComponent/RenderSwimLaneContext/RenderSwimLaneContext.scss';
 import SwimLane from '../ScrumBoardComponent/RenderSwimLaneContext/SwimLane';
+import CSSBlackMagic from '../../../../components/CSSBlackMagic/CSSBlackMagic';
 
 const { Option } = Select;
 const { Sidebar } = Modal;
@@ -25,7 +25,22 @@ const FormItem = Form.Item;
 const { AppState } = stores;
 const { confirm } = Modal;
 
-@inject('AppState')
+const style = swimLaneId => `
+  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn {
+    background-color: rgba(140, 158, 255, 0.12) !important;
+  }
+  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus >  .c7n-swimlaneContext-itemBodyStatus-container {
+    border-width: 2px;
+    border-style: dashed;
+    border-color: #26348b;
+  }
+  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus > .c7n-swimlaneContext-itemBodyStatus-container > .c7n-swimlaneContext-itemBodyStatus-container-statusName {
+      visibility: visible !important;
+  } 
+`;
+
+@CSSBlackMagic
+@inject('AppState', 'HeaderStore')
 @observer
 class ScrumBoardHome extends Component {
   constructor(props) {
@@ -162,19 +177,19 @@ class ScrumBoardHome extends Component {
   };
 
   onDragStart = (result) => {
-    const [SwimLaneId, issueId] = result.draggableId.split(['/']);
-    const allDataMap = this.dataConverter.getAllDataMap();
-    const { issueTypeId } = allDataMap.get(+issueId);
-    const statusId = parseInt(result.source.droppableId.split(['/']).shift(), 10);
-    ScrumBoardStore.setCurrentDrag(SwimLaneId);
-    ScrumBoardStore.setWhichCanNotDragOn(statusId, issueTypeId);
+    const { headerStyle } = this.props;
+    const { draggableId } = result;
+    const [SwimLaneId, issueId] = draggableId.split(['/']);
+    headerStyle.changeStyle(style(SwimLaneId));
   };
 
   onDragEnd = (result) => {
+    const { headerStyle } = this.props;
     const { destination, source, draggableId } = result;
     const [SwimLaneId, issueId] = draggableId.split(['/']);
     const allDataMap = ScrumBoardStore.getAllDataMap;
-    ScrumBoardStore.setCurrentDrag(null);
+    ScrumBoardStore.resetCanDragOn();
+    headerStyle.unMountStyle();
     if (!destination) {
       return;
     }
@@ -214,8 +229,6 @@ class ScrumBoardHome extends Component {
       }
     });
     ScrumBoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, false);
-
-    // Todo: reorder our column
   };
 
   refresh(defaultBoard, url, boardListData) {
@@ -240,7 +253,7 @@ class ScrumBoardHome extends Component {
   }
 
   render() {
-    const { form: { getFieldDecorator }, history } = this.props;
+    const { form: { getFieldDecorator }, history, HeaderStore } = this.props;
     const {
       closeSprintVisible,
       addBoard,
@@ -383,7 +396,7 @@ class ScrumBoardHome extends Component {
           </div>
           <Spin spinning={ScrumBoardStore.getSpinIf}>
             <div style={{ display: 'flex', width: '100%' }}>
-              <div className="c7n-scrumboard">
+              <div className="c7n-scrumboard" style={HeaderStore.announcementClosed ? {} : { height: 'calc(100vh - 208px)' }}>
                 <div className="c7n-scrumboard-header">
                   <StatusColumn />
                 </div>
@@ -406,7 +419,6 @@ class ScrumBoardHome extends Component {
                 )}
               </div>
               <IssueDetail
-                visible={ScrumBoardStore.getClickedIssue}
                 refresh={this.refresh.bind(this)}
               />
             </div>
@@ -451,6 +463,7 @@ class ScrumBoardHome extends Component {
                 }).catch((error) => {
                 });
               }}
+              disableOk={!ScrumBoardStore.getTransformToCompleted.length}
             >
               <p>
                 {'任务'}
