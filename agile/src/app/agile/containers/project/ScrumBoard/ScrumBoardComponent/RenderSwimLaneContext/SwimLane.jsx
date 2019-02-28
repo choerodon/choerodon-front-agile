@@ -4,7 +4,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import classnames from 'classnames';
 import './SwimLane.scss';
 import RenderSwimLaneContext from './index';
 import ColumnProvider from './ColumnProvider';
@@ -38,11 +37,8 @@ class SwimLane extends Component {
    */
   renderParentWithSub = (mode, fromEpic = null, parentIssue = null, epicPrefix = null, style = {}) => (
     <RenderSwimLaneContext
-      // key={issue.issueId}
       parentIssueArr={fromEpic ? parentIssue.interConnectedDataMap : ScrumBoardStore.getInterconnectedData}
       otherIssueWithoutParent={fromEpic ? parentIssue.unInterConnectedDataMap : ScrumBoardStore.getOtherQuestion}
-      // mapStructure={mapStructure}
-      // style={style}
       fromEpic={fromEpic}
       epicPrefix={epicPrefix}
       mode={mode}
@@ -52,7 +48,9 @@ class SwimLane extends Component {
   );
 
   renderSwimLane = (key) => {
-    const { mapStructure, onDragEnd, onDragStart } = this.props;
+    const {
+      mapStructure, onDragEnd, onDragStart, onBeforeDragStart,
+    } = this.props;
     return (
       <DragDropContext
         onDragEnd={(start) => {
@@ -72,7 +70,7 @@ class SwimLane extends Component {
               columnId={columnId}
               keyId={key}
             >
-              {(keyId, id, issueProvider) => <CardProvider keyId={keyId} id={id} issueProvider={issueProvider} />}
+              {(keyId, id, completed, statusName, categoryCode) => <CardProvider keyId={keyId} id={id} completed={completed} statusName={statusName} categoryCode={categoryCode} />}
             </StatusProvider>
           )}
         </ColumnProvider>

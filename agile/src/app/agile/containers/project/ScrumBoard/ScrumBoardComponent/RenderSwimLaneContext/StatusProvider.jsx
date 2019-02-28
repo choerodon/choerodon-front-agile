@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { inject, observer } from 'mobx-react';
-import classnames from 'classnames';
+import { observer } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import StatusCouldDragOn from './StatusCouldDragOn';
@@ -29,7 +28,7 @@ export default class StatusProvider extends Component {
       >
         <Droppable
           droppableId={`${statusId}/${columnId}`}
-          // isDropDisabled={ScrumBoardStore.getCanDragOn.get(statusId)}
+          isDropDisabled={ScrumBoardStore.getCanDragOn.get(statusId)}
         >
           {(provided, snapshot) => (
             <React.Fragment>
@@ -46,11 +45,7 @@ export default class StatusProvider extends Component {
                 >
                   {statusName}
                 </span>
-                {children(keyId, statusId, {
-                  completed,
-                  statusName,
-                  categoryCode,
-                })}
+                {children(keyId, statusId, completed, statusName, categoryCode)}
                 {provided.placeholder}
               </div>
             </React.Fragment>

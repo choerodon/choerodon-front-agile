@@ -59,8 +59,6 @@ class ScrumBoardStore {
 
   @observable otherIssue = [];
 
-  @observable swimLaneData = new Map();
-
   @observable boardData = [];
 
   @observable parentIds = [];
@@ -884,7 +882,7 @@ class ScrumBoardStore {
     this.currentDrag = data;
   }
 
-  @action setWhichCanNotDragOn(statusId, typeId) {
+  @action setWhichCanNotDragOn(statusId, { id: typeId }) {
     [...this.canDragOn.keys()].forEach((status) => {
       if (this.stateMachineMap[typeId]) {
         if (this.stateMachineMap[typeId][statusId].find(issue => issue.endStatusId === status)) {
@@ -902,6 +900,11 @@ class ScrumBoardStore {
 
   @computed get getCanDragOn() {
     return this.canDragOn;
+  }
+
+  @computed get getCanDragOnToJS() {
+    // console.log(toJS(this.canDragOn));
+    return toJS(this.canDragOn);
   }
 
   @computed get getIssueWithStatus() {
@@ -943,10 +946,16 @@ class ScrumBoardStore {
   @action setSwimLaneData(startSwimLane, startStatus, startStatusIndex, destinationSwimLane, destinationStatus, destinationStatusIndex, issue, revert) {
     if (!revert) {
       this.swimLaneData[startSwimLane][startStatus].splice(startStatusIndex, 1);
-      this.swimLaneData[startSwimLane][destinationStatus].splice(destinationStatusIndex, 0, issue);
+      this.swimLaneData[startSwimLane][destinationStatus].splice(destinationStatusIndex, 0, {
+        ...issue,
+        statusId: destinationStatus,
+      });
     } else {
       this.swimLaneData[startSwimLane][destinationStatus].splice(startStatusIndex, 1);
-      this.swimLaneData[startSwimLane][startStatus].splice(destinationStatusIndex, 0, issue);
+      this.swimLaneData[startSwimLane][startStatus].splice(destinationStatusIndex, 0, {
+        ...issue,
+        statusId: startStatus,
+      });
     }
   }
 
