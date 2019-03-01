@@ -3,10 +3,13 @@ import { Content, stores, WSHandler } from 'choerodon-front-boot';
 import {
   Modal, Button, Icon, Tag, Progress, Input, Tooltip,
 } from 'choerodon-ui';
-import _ from 'lodash';
-import moment from 'moment';
 import FileSaver from 'file-saver';
-import { exportExcelTmpl, importIssue } from '../../../../api/NewIssueApi';
+import {
+  exportExcelTmpl,
+  importIssue,
+  cancelImport,
+  queryImportHistory,
+} from '../../../../api/NewIssueApi';
 import './ImportIssue.scss';
 
 
@@ -15,28 +18,41 @@ const { AppState } = stores;
 
 class ImportIssue extends Component {
   state = {
-    loading: true,
     visible: false,
     step: 1,
-    file: '',
-    importVisible: false,
     wsData: {},
+    historyId: false,
+    ovn: false,
+  };
+
+  loadLatestImport = () => {
+    queryImportHistory().then((res) => {
+      if (res) {
+        this.setState({
+          historyId: res.status === 'doing' ? res.id : false,
+          ovn: res.objectVersionNumber,
+          step: res.status === 'doing' ? 3 : 1,
+        });
+      }
+    });
   };
 
   open = () => {
     this.setState({
       visible: true,
-      loading: true,
     });
+    this.loadLatestImport();
   };
 
   onCancel = () => {
-    this.setState({
-      visible: false,
-    });
+    const { historyId, ovn } = this.state;
+    if (historyId) {
+      cancelImport(historyId, ovn);
+    }
+    this.finish();
   };
 
-  exportExcelTmpl = () => {
+  exportExcel = () => {
     exportExcelTmpl().then((excel) => {
       const blob = new Blob([excel], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const fileName = '敏捷导入模板.xlsx';
@@ -45,27 +61,16 @@ class ImportIssue extends Component {
   };
 
   importExcel = () => {
-    this.setState({
-      importVisible: true,
-    });
-  };
-
-  handleClose = () => {
-    this.setState({
-      importVisible: false,
-    });
+    this.uploadInput.click();
   };
 
   beforeUpload = (e) => {
     if (e.target.files[0]) {
-      this.setState({
-        file: e.target.files[0],
-      });
+      this.upload(e.target.files[0]);
     }
   };
 
-  upload = () => {
-    const { file } = this.state;
+  upload = (file) => {
     if (!file) {
       Choerodon.prompt('请选择文件');
       return;
@@ -75,21 +80,33 @@ class ImportIssue extends Component {
     this.setState({
       uploading: true,
     });
-    this.changeStep(1);
-    importIssue(formData).then(() => {
-      this.uploadInput.value = '';
+    importIssue(formData).then((res) => {
+      this.changeStep(1);
+      // this.uploadInput.value = '';
       this.setState({
-        file: null,
         uploading: false,
-        importVisible: false,
       });
-    }).catch(() => {
+    }).catch((e) => {
       this.setState({
         uploading: false,
-        importVisible: false,
       });
       Choerodon.prompt('网络错误');
     });
+  };
+
+  handleMessage = (data) => {
+    if (data) {
+      this.setState({
+        wsData: data,
+        historyId: data.id,
+        ovn: data.objectVersionNumber,
+      });
+      if (data.status === 'failed') {
+        if (data.fileUrl) {
+          window.location.href = data.fileUrl;
+        }
+      }
+    }
   };
 
   changeStep = (value) => {
@@ -99,8 +116,17 @@ class ImportIssue extends Component {
     });
   };
 
+  finish = () => {
+    this.setState({
+      visible: false,
+      step: 1,
+      wsData: {},
+      historyId: false,
+    });
+  };
+
   footer = () => {
-    const { step } = this.state;
+    const { step, wsData } = this.state;
     if (step === 1) {
       return [
         <Button type="primary" funcType="raised" onClick={() => this.changeStep(1)}>下一步</Button>,
@@ -114,15 +140,9 @@ class ImportIssue extends Component {
     } else {
       return [
         <Button type="primary" funcType="raised" onClick={this.finish}>完成</Button>,
-        <Button funcType="raised" onClick={this.onCancel}>取消</Button>,
+        <Button funcType="raised" disabled={wsData.status !== 'doing'} onClick={this.onCancel}>取消上传</Button>,
       ];
     }
-  };
-
-  handleMessage = (data) => {
-    this.setState({
-      wsData: data,
-    });
   };
 
   renderProgress = () => {
@@ -146,37 +166,54 @@ class ImportIssue extends Component {
     } else if (status === 'failed') {
       return (
         <div>
-          导入失败
+          {'导入失败 '}
           <span style={{ color: '#FF0000' }}>{failCount}</span>
-          问题
+          {' 问题'}
+        </div>
+      );
+    } else if (status === 'success') {
+      return (
+        <div>
+          {'导入成功 '}
+          <span style={{ color: '#0000FF' }}>{successCount}</span>
+          {' 问题'}
         </div>
       );
     } else {
       return (
         <div>
-          导入成功
-          <span style={{ color: '#0000FF' }}>{successCount}</span>
-          问题
+          {'正在查询导入信息，请稍后'}
         </div>
       );
     }
   };
 
   renderForm = () => {
-    const { step, file } = this.state;
+    const { step, uploading } = this.state;
     if (step === 1) {
       return (
-        <Button type="primary" funcType="flat" onClick={() => this.exportExcelTmpl()}>
+        <Button type="primary" funcType="flat" onClick={() => this.exportExcel()}>
           <Icon type="get_app icon" />
           <span>下载模板</span>
         </Button>
       );
     } else if (step === 2) {
       return (
-        <Button type="primary" funcType="flat" onClick={() => this.importExcel()}>
-          <Icon type="archive icon" />
-          <span>导入问题</span>
-        </Button>
+        <React.Fragment>
+          <Button loading={uploading} type="primary" funcType="flat" onClick={() => this.importExcel()}>
+            <Icon type="archive icon" />
+            <span>导入问题</span>
+          </Button>
+          <input
+            ref={
+              (uploadInput) => { this.uploadInput = uploadInput; }
+            }
+            type="file"
+            onChange={this.beforeUpload}
+            style={{ display: 'none' }}
+            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          />
+        </React.Fragment>
       );
     } else {
       return (
@@ -192,8 +229,7 @@ class ImportIssue extends Component {
 
   render() {
     const {
-      visible, loading,
-      file, importVisible,
+      visible,
     } = this.state;
     return (
       <Sidebar
@@ -201,7 +237,6 @@ class ImportIssue extends Component {
         title="导入问题"
         visible={visible}
         onCancel={this.onCancel}
-        confirmLoading={loading}
         footer={this.footer()}
         destroyOnClose
       >
@@ -212,30 +247,6 @@ class ImportIssue extends Component {
         >
           {this.renderForm()}
         </Content>
-        <Modal
-          title="导入用例"
-          visible={importVisible}
-          onOk={this.upload}
-          onCancel={this.handleClose}
-        >
-          <div className="c7ntest-center" style={{ marginBottom: 20 }}>
-            <Input
-              style={{ width: 400, margin: '17px 0 0 18px' }}
-              value={file && file.name}
-              prefix={<Icon type="attach_file" style={{ color: 'black', fontSize: '14px' }} />}
-              suffix={<Tooltip title="选择文件"><Icon type="create_new_folder" style={{ color: 'black', cursor: 'pointer' }} onClick={() => { this.uploadInput.click(); }} /></Tooltip>}
-            />
-          </div>
-          <input
-            ref={
-              (uploadInput) => { this.uploadInput = uploadInput; }
-            }
-            type="file"
-            onChange={this.beforeUpload}
-            style={{ display: 'none' }}
-            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          />
-        </Modal>
       </Sidebar>
     );
   }
