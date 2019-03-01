@@ -16,6 +16,7 @@ import { loadIssueTypes, loadStatusList, loadPriorities } from '../../../../api/
 import { getUsers } from '../../../../api/CommonApi';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import IssueFilterControler from '../IssueFilterControler';
+import ImportIssue from '../ImportIssue';
 
 // 快速搜索
 import QuickSearch from '../../../../components/QuickSearch';
@@ -493,6 +494,10 @@ class Issue extends Component {
     };
   };
 
+  saveRef = name => (ref) => {
+    this[name] = ref;
+  };
+
   // ExpandCssControler => 用于向 IssueTable 注入 CSS 样式
   render() {
     const {
@@ -530,8 +535,12 @@ class Issue extends Component {
             <Icon type="playlist_add icon" />
             <span>创建问题</span>
           </Button>
+          <Button className="leftBtn" funcType="flat" onClick={() => this.importIssue.open()}>
+            <Icon type="archive icon" />
+            <span>导入问题</span>
+          </Button>
           <Button className="leftBtn" funcType="flat" onClick={() => this.exportExcel()}>
-            <Icon type="file_upload icon" />
+            <Icon type="get_app icon" />
             <span>导出</span>
           </Button>
           <Button
@@ -876,6 +885,7 @@ class Issue extends Component {
             issueRefresh={this.Refresh}
           />
           <CreateIssueModal />
+          <ImportIssue ref={this.saveRef('importIssue')} />
         </Content>
       </Page>
     );

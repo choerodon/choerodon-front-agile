@@ -222,3 +222,48 @@ export function loadLinkIssues(issueId) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/agile/v1/projects/${projectId}/issue_links/${issueId}?no_issue_test=true`);
 }
+
+/**
+ *下载导入模板
+ *
+ * @export
+ * @returns
+ */
+export function exportExcelTmpl() {
+  const projectId = AppState.currentMenuType.id;
+  const orgId = AppState.currentMenuType.organizationId;
+  return axios.get(`/agile/v1/projects/${projectId}/excel/download?organizationId=${orgId}`, { responseType: 'arraybuffer' });
+}
+
+/**
+ * 导入issue
+ * @param data
+ * @returns {*}
+ */
+export function importIssue(data) {
+  const axiosConfig = {
+    headers: { 'content-type': 'multipart/form-data' },
+  };
+  const projectId = AppState.currentMenuType.id;
+  const orgId = AppState.currentMenuType.organizationId;
+  const userId = AppState.getUserId;
+  return axios.post(`/agile/v1/projects/${projectId}/excel/import?organizationId=${orgId}&userId=${userId}`, data, axiosConfig);
+}
+
+/**
+ * 查询最新的导入记录
+ * @returns {V|*}
+ */
+export function queryImportHistory() {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/projects/${projectId}/excel/latest`);
+}
+
+/**
+ * 取消导入
+ * @returns {V|*}
+ */
+export function cancelImport(id, ovn) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.put(`/agile/v1/projects/${projectId}/excel/cancel?id=${id}&objectVersionNumber=${ovn}`);
+}
