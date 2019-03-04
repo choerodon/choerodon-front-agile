@@ -161,7 +161,7 @@ class EpicCard extends Component {
     const progress = !epic.issueCount ? 0 : epic.doneIssueCount / epic.issueCount;
     return (
       <Draggable
-        draggableId={index}
+        draggableId={String(index)}
         index={index}
         disableInteractiveElementBlocking={!isEdit}
       >
