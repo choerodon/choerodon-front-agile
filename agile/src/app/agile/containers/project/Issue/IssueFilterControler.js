@@ -271,6 +271,14 @@ export default class IssueFilterControler {
     );
   }
 
+  myFilterUpdate(otherArgs, contents, searchArgs) {
+    const setArg = this.initArgsFilter();
+    setArg('otherArgs', otherArgs);
+    setArg('contents', { contents });
+    setArg('searchArgs', searchArgs);
+    IssueStore.setFilterMap(this.cache);
+  }
+
   /**
    * 更新经办人的函数
    * @param value => Number => 当前经办人 ID
@@ -344,6 +352,7 @@ export default class IssueFilterControler {
             reporter: [],
             summary: [],
             version: [],
+            sprint: [],
           },
           searchArgs: {
             assignee: '',
