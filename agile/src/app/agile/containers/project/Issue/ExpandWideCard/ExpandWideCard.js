@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import EditIssue from '../../../../components/EditIssueWide';
 import { loadIssue } from '../../../../api/NewIssueApi';
 import IssueFilterControler from '../IssueFilterControler';
 
+@inject('AppState', 'HeaderStore')
 @observer
 class ExpandWideCard extends Component {
   // 更新 Issue 时
@@ -14,15 +15,16 @@ class ExpandWideCard extends Component {
   };
 
   render() {
+    const { HeaderStore } = this.props;
     return IssueStore.getExpand ? (
       <div
         style={{
           width: IssueStore.getExpand ? '64%' : 0,
           display: 'block',
           overflow: 'hidden',
-          height: 'calc(100vh - 154px)',
           marginTop: 48,
           borderTop: '1px solid rgb(211, 211, 211)',
+          height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
         }}
       >
         <EditIssue
