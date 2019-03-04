@@ -148,10 +148,6 @@ class Issue extends Component {
 
   // ExpandCssControler => 用于向 IssueTable 注入 CSS 样式
   render() {
-    // 清除整页滚动条
-    if (document && document.getElementsByClassName('page-body').length) {
-      // document.getElementsByClassName('page-body')[0].style.overflow = 'hidden';
-    }
     return (
       <Page
         className="c7n-Issue"

@@ -12,6 +12,7 @@ export default class CardProvider extends React.Component {
     return ScrumBoardStore.getSwimLaneData[keyId][id].map(
       (issueObj, index) => issueObj && (
         <Card
+          key={issueObj.issueId}
           draggableId={`${keyId}/${issueObj.issueId}`}
           index={index}
           issue={issueObj}
