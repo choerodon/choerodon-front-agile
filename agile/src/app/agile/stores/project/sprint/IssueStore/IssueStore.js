@@ -3,6 +3,7 @@ import {
 } from 'mobx';
 import { store, stores } from 'choerodon-front-boot';
 import moment from 'moment';
+import _ from 'lodash';
 
 const { AppState } = stores;
 // 当前跳转是否需要单选信息（跳转单个任务时使用）
@@ -40,6 +41,7 @@ class SprintCommonStore {
           label: [],
           summary: [],
           version: [],
+          sprint: [],
         },
         searchArgs: {
           assignee: '',
@@ -157,8 +159,41 @@ class SprintCommonStore {
     if (advArgsData) { personalFilterSearchDTO.advancedSearchArgs = advArgsData; }
     if (searchArgsData) { Object.assign(personalFilterSearchDTO.searchArgs, searchArgsData); }
     if (otherArgsData) { Object.assign(personalFilterSearchDTO.otherArgs, otherArgsData); }
-    if (contentsData) { Object.assign(personalFilterSearchDTO.contents, contentsData); }
+    if (contentsData) { personalFilterSearchDTO.contents = contentsData; }
     return personalFilterSearchDTO;
+  }
+
+  // 控制保存按钮是否显示
+  @observable isExistFilter = true;
+
+  @computed get getIsExistFilter() {
+    return this.isExistFilter;
+  }
+
+  @action setIsExistFilter(data) {
+    this.isExistFilter = data;
+  }
+
+  // 我的筛选列表
+  @observable myFilters = [];
+
+  @computed get getMyFilters() {
+    return this.myFilters;
+  }
+
+  @action setMyFilters(data) {
+    this.myFilters = data;
+  }
+
+  // 被选中的筛选Id
+  @observable selectedFilterId = undefined;
+
+  @computed get getSelectedFilterId() {
+    return this.selectedFilterId;
+  }
+
+  @action setSelectedFilterId(data) {
+    this.selectedFilterId = data;
   }
 
   /**
@@ -214,35 +249,35 @@ class SprintCommonStore {
         'label', this.tagData.map(item => ({
           text: item.labelName,
           // value: item.labelId.toString(),
-          value: JSON.stringify({id: item.labelId, select: true}),
+          value: JSON.stringify({id: item.labelId.toString()}),
         }))
       ],
       [
         'component', this.issueComponents.content.map(item => ({
           text: item.name,
           // value: item.componentId.toString(),
-          value: JSON.stringify({id: item.componentId, select: true}),
+          value: JSON.stringify({id: item.componentId.toString()}),
         }))
       ],
       [
         'version', this.issueVersions.map(item => ({
           text: item.name,
           // value: item.versionId.toString(),
-          value: JSON.stringify({id: item.versionId.toString(), select: true}),
+          value: JSON.stringify({id: item.versionId.toString()}),
         }))
       ],
       [
         'epic', this.issueEpics.map(item => ({
           text: item.epicName,
           // value: item.issueId.toString(),
-          value: JSON.stringify({id: item.issueId.toString(), select: true}),
+          value: JSON.stringify({id: item.issueId.toString()}),
         }))
       ],
       [
         'sprint', this.issueSprints.map(item => ({
           text: item.sprintName,
           // value: item.sprintId.toString(),
-          value: JSON.stringify({id: item.sprintId.toString(), select: true}),
+          value: JSON.stringify({id: item.sprintId.toString()}),
         }))
       ],
     ]);
@@ -411,6 +446,42 @@ class SprintCommonStore {
 
   @action setDefaultPriorityId(data) {
     this.defaultPriorityId = data;
+  }
+
+  judgeConditionWithFilter = () => {
+    const myFilters = this.getMyFilters;
+    if (myFilters.length === 0) {
+      this.setIsExistFilter(false);
+    } else {
+      for (let i = 0; i < myFilters.length; i++) {
+        const {
+          advancedSearchArgs, searchArgs, otherArgs, contents, 
+        } = myFilters[i].personalFilterSearchDTO;
+        const userFilter = this.getFilterMap.get('userFilter');
+        const userFilterAdvancedSearchArgs = userFilter.advancedSearchArgs;
+        const userFilterSearchArgs = userFilter.searchArgs;
+        const userFilterOtherArgs = userFilter.otherArgs;
+        const userFilterContents = userFilter.contents || [];
+        const advancedSearchArgsIsEqual = _.pull(Object.keys(advancedSearchArgs), 'reporterIds', 'assigneeIds').every(key => _.isEqual(advancedSearchArgs[key].sort(), userFilterAdvancedSearchArgs[key].sort()));
+        const assigneeIdsIsEqual = _.isEqual(advancedSearchArgs.assigneeIds.sort(), (userFilter.assigneeFilterIds || []).sort());
+        const createStartDateIsEqual = !userFilterSearchArgs.createStartDate || moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(userFilterSearchArgs.createStartDate).format('YYYY-MM-DD');
+        const createEndDateIsEqual = !userFilterSearchArgs.createEndDate || moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(userFilterSearchArgs.createEndDate).format('YYYY-MM-DD');
+        const searchArgsIsEqual = createStartDateIsEqual && createEndDateIsEqual && _.pull(Object.keys(searchArgs), 'createStartDate', 'createEndDate', 'assignee').every(key => (searchArgs[key] || '') === (userFilterSearchArgs[key] || ''));
+        const otherArgsIsEqual = (otherArgs === null && Object.keys(userFilterOtherArgs).every(key => userFilterOtherArgs[key].length === 0)) || Object.keys(otherArgs).every(key => _.isEqual(otherArgs[key].sort(), userFilterOtherArgs[key].sort()));
+        const contentsIsEqual = (contents === null && userFilterContents.length === 0) || _.isEqual(contents.sort(), userFilterContents.sort());
+        
+        const itemIsEqual = advancedSearchArgsIsEqual && assigneeIdsIsEqual && searchArgsIsEqual && otherArgsIsEqual && contentsIsEqual;
+  
+        if (itemIsEqual) {
+          this.setSelectedFilterId(myFilters[i].filterId);
+          this.setIsExistFilter(true);
+          break;
+        } else if (i === myFilters.length - 1 && !itemIsEqual) {
+          this.setSelectedFilterId(undefined);
+          this.setIsExistFilter(false);
+        }
+      }
+    }
   }
 }
 const sprintCommonStore = new SprintCommonStore();

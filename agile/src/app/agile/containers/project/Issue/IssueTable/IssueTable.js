@@ -32,15 +32,6 @@ class IssueTable extends Component {
    * @param setArgs => function => 设置参数时需要调用的闭包函数
    */
   filterConvert = (filters, setArgs) => {
-    // const convertedFilter = Object.keys(filters).map((key) => {
-    //   let filterField = filters[key].map(item => JSON.parse(item));
-    //   if (filterField.find(item => item.select)) {
-    //     filterField = _.map(filterField, 'id');
-    //   }
-    //   return filterField;
-    // });
-    // console.log(convertedFilter);
-
     // 循环遍历 Object 中的每个键
     Object.keys(filters).forEach((key) => {
       // 根据对应的 key 传入对应的 mode
@@ -136,8 +127,37 @@ class IssueTable extends Component {
     );
   };
 
+  getFieldFilteredValue = (field) => {
+    const userFilter = IssueStore.getFilterMap.get('userFilter');
+    const userFilterIsEmptyObj = Object.keys(userFilter).length === 0;
+    let fieldFilteredValue = [];
+    if (!userFilterIsEmptyObj) {
+      const searchArgsField = userFilter.searchArgs[field];
+      if (['sprint', 'version', 'component', 'epic', 'label'].find(item => item === field)) {
+        const fieldIsEmptyArr = userFilter.otherArgs[field].length === 0;
+        const FieldColumnFilter = IssueStore.getColumnFilter.get(field);
+        const otherArgsField = userFilter.otherArgs[field];
+        fieldFilteredValue = (fieldIsEmptyArr && !searchArgsField) ? [] : (!searchArgsField ? _.map(FieldColumnFilter.filter(item => otherArgsField.find(id => JSON.parse(item.value).id === id.toString())), 'value') : [..._.map(FieldColumnFilter.filter(item => otherArgsField.find(id => JSON.parse(item.value).id === id.toString())), 'value'), searchArgsField]);
+      } else {
+        fieldFilteredValue = !searchArgsField ? [] : [searchArgsField];
+      }
+    } else {
+      fieldFilteredValue = [];
+    }
+
+    return fieldFilteredValue;
+  }
+
   render() {
     // Table 列配置
+    const issueNumFieldValue = this.getFieldFilteredValue('issueNum');
+    const summaryFilterValue = this.getFieldFilteredValue('summary');
+    const reporterFilterValue = this.getFieldFilteredValue('reporter');
+    const sprintFilterValue = this.getFieldFilteredValue('sprint');
+    const versionFilterValue = this.getFieldFilteredValue('version');
+    const componentFilterValue = this.getFieldFilteredValue('component');
+    const epicFilterValue = this.getFieldFilteredValue('epic');
+    const labelFilterValue = this.getFieldFilteredValue('label');
     const columns = [
       {
         title: '问题编号',
@@ -148,6 +168,7 @@ class IssueTable extends Component {
         width: 128,
         sorter: true,
         filters: [],
+        filteredValue: issueNumFieldValue,
         // fixed: true,
         render: text => <IssueNum text={text} />,
       },
@@ -173,6 +194,7 @@ class IssueTable extends Component {
         className: 'summary',
         key: 'summary',
         filters: [],
+        filteredValue: summaryFilterValue,
         // fixed: true,
         render: text => <Summary text={text} />,
       },
@@ -220,7 +242,9 @@ class IssueTable extends Component {
         className: 'sprint',
         width: 128,
         filters: IssueStore.getColumnFilter.get('sprint'),
-        filteredValue: [],
+        // filteredValue: ['1315'],
+        // filteredValue: ['{"id":"1044"}', '{"id":"1016"}'],
+        filteredValue: sprintFilterValue,
         filterMultiple: true,
         render: record => (
           <Sprint
@@ -248,6 +272,7 @@ class IssueTable extends Component {
         dataIndex: 'reporterName',
         key: 'reporter',
         filters: [],
+        filteredValue: reporterFilterValue,
         hidden: true,
         render: (text, record) => (
           <Assignee
@@ -262,6 +287,7 @@ class IssueTable extends Component {
         key: 'version',
         filters: IssueStore.getColumnFilter.get('version'),
         filterMultiple: true,
+        filteredValue: versionFilterValue,
         hidden: true,
         render: record => (
           <Sprint
@@ -278,6 +304,7 @@ class IssueTable extends Component {
         key: 'component',
         filters: IssueStore.getColumnFilter.get('component'),
         filterMultiple: true,
+        filteredValue: componentFilterValue,
         hidden: true,
         render: record => (
           <Sprint
@@ -296,6 +323,7 @@ class IssueTable extends Component {
         key: 'epic',
         filters: IssueStore.getColumnFilter.get('epic'),
         filterMultiple: true,
+        filteredValue: epicFilterValue,
         hidden: true,
         render: (text, record) => <Epic name={record.epicName} color={record.epicColor} />,
       },
@@ -303,10 +331,13 @@ class IssueTable extends Component {
         title: '标签',
         key: 'label',
         filters: IssueStore.getColumnFilter.get('label'),
+        filteredValue: labelFilterValue,
         filterMultiple: true,
         hidden: true,
       },
     ];
+    console.log('barFilters:');
+    console.log(IssueStore.getBarFilter);
     // 表格列配置
     return (
       <Table
@@ -330,7 +361,7 @@ class IssueTable extends Component {
         loading={IssueStore.getLoading}
         pagination={IssueStore.getPagination}
         footer={() => (<QuickCreateIssue />)}
-        // onChange={this.handleFilterChange}
+        onChange={this.handleFilterChange}
         className="c7n-Issue-table"
         onRow={record => ({
           onClick: (e) => {
