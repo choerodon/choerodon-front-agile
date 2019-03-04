@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import _ from 'lodash';
 /**
  * IssueFilterControler
  * 用于拼接 Issue 整体页面的请求，根据页面函数需求返回相应的请求结果
@@ -220,10 +221,8 @@ export default class ScrumBoardDataController {
 
   convertDataWithStructure(data) {
     const structureMap = JSON.parse(JSON.stringify(this.statusStructureMap));
-    data.forEach((issue) => {
-      const statusArr = structureMap[issue.statusId];
-      statusArr.push(issue);
-      structureMap[issue.statusId] = statusArr;
+    Object.keys(structureMap).forEach((status) => {
+      structureMap[status] = _.sortBy(data.filter(issue => issue.statusId === status * 1), o => o.rank);
     });
     return structureMap;
   }
