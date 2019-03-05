@@ -14,8 +14,8 @@ class StatusColumn extends Component {
     return [...ScrumBoardStore.getHeaderData.values()].filter(column => column.hasStatus).map(column => (
       <div
         className={classnames('c7n-scrumboard-statusHeader', {
-          greaterThanMax: columnConstraintsIsOn && column.maxNum && ScrumBoardStore.getAllColumnCount.get(column.columnId) > column.maxNum,
-          lessThanMin: columnConstraintsIsOn && column.minNum && ScrumBoardStore.getAllColumnCount.get(column.columnId) < column.minNum,
+          greaterThanMax: columnConstraintsIsOn && column.maxNum !== null && ScrumBoardStore.getAllColumnCount.get(column.columnId) > column.maxNum,
+          lessThanMin: columnConstraintsIsOn && column.minNum !== null && ScrumBoardStore.getAllColumnCount.get(column.columnId) < column.minNum,
         })}
         key={column.columnId}
       >
@@ -30,16 +30,16 @@ class StatusColumn extends Component {
         {
           columnConstraintsIsOn ? (
             <div className="c7n-scrumboard-statusHeader-columnConstraint">
-              {column.minNum && (
+              {column.minNum !== null ? (
                 <p className="c7n-scrumboard-statusHeader-columnConstraint-min">
                   {`最小：${column.minNum}`}
                 </p>
-              )}
-              {column.maxNum && (
+              ) : null}
+              {column.maxNum !== null ? (
                 <p className="c7n-scrumboard-statusHeader-columnConstraint-max">
                   {`最大：${column.maxNum}`}
                 </p>
-              )}
+              ) : null}
             </div>
           ) : null
         }
