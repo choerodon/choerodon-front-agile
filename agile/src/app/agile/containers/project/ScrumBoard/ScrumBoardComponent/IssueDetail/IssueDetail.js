@@ -3,7 +3,6 @@ import { observer, inject } from 'mobx-react';
 import EditIssue from '../../../../../components/EditIssueNarrow';
 import '../../../Backlog/BacklogComponent/IssueDetailComponent/IssueDetail.scss';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
-// import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
 @inject('AppState', 'HeaderStore')
 @observer
@@ -28,7 +27,7 @@ class IssueDetail extends Component {
           height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
           width: '440px',
         }}
-        issueId={ScrumBoardStore.getClickIssueDetail.issueId}
+        issueId={ScrumBoardStore.getCurrentClickId}
         onCancel={() => {
           ScrumBoardStore.resetClickedIssue();
         }}

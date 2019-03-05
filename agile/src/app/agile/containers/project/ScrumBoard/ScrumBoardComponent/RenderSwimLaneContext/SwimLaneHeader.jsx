@@ -73,7 +73,7 @@ export default class SwimLaneHeader extends Component {
         />
         <span
           className="c7n-parentIssue-summary"
-          style={JSON.stringify(ScrumBoardStore.getClickIssueDetail) !== '{}' ? {
+          style={JSON.stringify(ScrumBoardStore.getCurrentClickId) !== '{}' ? {
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             textOverflow: 'ellipsis',

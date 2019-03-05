@@ -2,7 +2,6 @@ import {
   observable, action, computed, toJS, get, set,
 } from 'mobx';
 import axios from 'axios';
-import _ from 'lodash';
 import { store, stores } from 'choerodon-front-boot';
 
 const { AppState } = stores;
@@ -412,7 +411,10 @@ class ScrumBoardStore {
     }
     this.currentClickTarget = null;
     this.currentClick = parentIssueId;
-    this.clickIssueDetail = this.allDataMap.get(parentIssueId);
+    if (this.allDataMap.get(parentIssueId)) {
+      this.clickIssueDetail = this.allDataMap.get(parentIssueId);
+    }
+    // this.clickIssueDetail = this.allDataMap.get(parentIssueId);
   }
 
   @action resetDataBeforeUnmount() {
