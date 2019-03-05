@@ -70,7 +70,7 @@ class WorkCalendar extends Component {
       sundayWork ? null : '日',
     ];
     let dateStyle;
-   
+
     const workDayStyle = {
       color: '#000', background: '#EFEFEF',
     };
@@ -344,7 +344,7 @@ class WorkCalendar extends Component {
     return (
       <div className="c7n-workCalendar">
         <Calendar
-          defaultValue={moment(startDate)}
+          defaultValue={moment(new Date())}
           showDateInput={false}
           showToday={false}
           locale={zhCN}
