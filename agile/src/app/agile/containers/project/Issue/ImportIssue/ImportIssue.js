@@ -23,12 +23,14 @@ class ImportIssue extends Component {
     wsData: {},
     historyId: false,
     ovn: false,
+    latestInfo: false,
   };
 
   loadLatestImport = () => {
     queryImportHistory().then((res) => {
       if (res) {
         this.setState({
+          latestInfo: res,
           historyId: res.status === 'doing' ? res.id : false,
           ovn: res.objectVersionNumber,
           step: res.status === 'doing' ? 3 : 1,
@@ -151,12 +153,15 @@ class ImportIssue extends Component {
       process = 0,
       status,
       failCount,
+      fileUrl,
       successCount,
     } = wsData;
     if (status === 'doing') {
       return (
         <div style={{ width: 512 }}>
+          <span style={{ marginRight: 10 }}>正在导入</span>
           <Progress
+            style={{ width: 450 }}
             percent={(process * 100).toFixed(0)}
             size="small"
             status="active"
@@ -169,6 +174,10 @@ class ImportIssue extends Component {
           {'导入失败 '}
           <span style={{ color: '#FF0000' }}>{failCount}</span>
           {' 问题'}
+          <a href={fileUrl}>
+            {' '}
+            点击下载失败详情
+          </a>
         </div>
       );
     } else if (status === 'success') {
@@ -189,18 +198,54 @@ class ImportIssue extends Component {
   };
 
   renderForm = () => {
-    const { step, uploading } = this.state;
+    const { step, uploading, latestInfo } = this.state;
+    const { failCount, fileUrl } = latestInfo;
     if (step === 1) {
       return (
-        <Button type="primary" funcType="flat" onClick={() => this.exportExcel()}>
-          <Icon type="get_app icon" />
-          <span>下载模板</span>
-        </Button>
+        <React.Fragment>
+          <Button
+            type="primary"
+            funcType="flat"
+            onClick={() => this.exportExcel()}
+          >
+            <Icon type="get_app icon" />
+            <span>下载模板</span>
+          </Button>
+          {failCount
+            ? (
+              <div style={{ marginTop: 10 }}>
+                {failCount && failCount !== 0
+                  ? (
+                    <span>
+                      {'导入失败 '}
+                      <span style={{ color: '#F44336' }}>
+                        {failCount}
+                      </span>
+                      {' 问题，'}
+                    </span>
+                  ) : ''
+              }
+                {fileUrl && (
+                <a href={fileUrl}>
+                  {' '}
+                  点击下载失败详情
+                </a>
+                )}
+              </div>
+            ) : ''
+          }
+        </React.Fragment>
       );
     } else if (step === 2) {
       return (
         <React.Fragment>
-          <Button loading={uploading} type="primary" funcType="flat" onClick={() => this.importExcel()}>
+          <Button
+            loading={uploading}
+            type="primary"
+            funcType="flat"
+            onClick={() => this.importExcel()}
+            style={{ marginBottom: 2 }}
+          >
             <Icon type="archive icon" />
             <span>导入问题</span>
           </Button>

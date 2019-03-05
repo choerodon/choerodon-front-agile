@@ -10,9 +10,6 @@ import DragIssueItem from './DragIssueItem';
 
 @observer
 class IssueItem extends Component {
-  componentDidUpdate() {
-    console.log('didUpdate');
-  }
 
   render() {
     const {

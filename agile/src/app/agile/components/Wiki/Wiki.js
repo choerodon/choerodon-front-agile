@@ -45,7 +45,7 @@ class Wiki extends Component {
       postData.menuId = id;
     }
     const dataSource = [];
-    const newData = await axios.post(`agile/v1/projects/${proId}/wiki_relation/menus`, postData);
+    const newData = await axios.post(`/wiki/v1/projects/${proId}/space/menus`, postData);
     if (newData && !newData.failed) {
       let idIndex = idAddress;
       newData.forEach((item, index) => {

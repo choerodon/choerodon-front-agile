@@ -337,8 +337,6 @@ class IssueTable extends Component {
         hidden: true,
       },
     ];
-    console.log('barFilters:');
-    console.log(IssueStore.getBarFilter);
     // 表格列配置
     return (
       <Table
