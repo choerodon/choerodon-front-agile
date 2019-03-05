@@ -10,12 +10,12 @@ import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoard
 @observer
 class StatusColumn extends Component {
   render() {
-    // const { columnData } = this.props;
+    const columnConstraintsIsOn = ScrumBoardStore.getAllColumnCount.size;
     return [...ScrumBoardStore.getHeaderData.values()].filter(column => column.hasStatus).map(column => (
       <div
         className={classnames('c7n-scrumboard-statusHeader', {
-          greaterThanMax: column.maxNum && ScrumBoardStore.getAllColumnCount.get(column.columnId) > column.maxNum,
-          lessThanMin: column.minNum && ScrumBoardStore.getAllColumnCount.get(column.columnId) < column.minNum,
+          greaterThanMax: columnConstraintsIsOn && column.maxNum && ScrumBoardStore.getAllColumnCount.get(column.columnId) > column.maxNum,
+          lessThanMin: columnConstraintsIsOn && column.minNum && ScrumBoardStore.getAllColumnCount.get(column.columnId) < column.minNum,
         })}
         key={column.columnId}
       >
@@ -27,18 +27,22 @@ class StatusColumn extends Component {
             {`(${column.columnIssueCount})`}
           </p>
         </div>
-        <div className="c7n-scrumboard-statusHeader-columnConstraint">
-          {column.minNum && (
-            <p className="c7n-scrumboard-statusHeader-columnConstraint-min">
-              {`最小：${column.minNum}`}
-            </p>
-          )}
-          {column.maxNum && (
-            <p className="c7n-scrumboard-statusHeader-columnConstraint-max">
-              {`最大：${column.maxNum}`}
-            </p>
-          )}
-        </div>
+        {
+          columnConstraintsIsOn ? (
+            <div className="c7n-scrumboard-statusHeader-columnConstraint">
+              {column.minNum && (
+                <p className="c7n-scrumboard-statusHeader-columnConstraint-min">
+                  {`最小：${column.minNum}`}
+                </p>
+              )}
+              {column.maxNum && (
+                <p className="c7n-scrumboard-statusHeader-columnConstraint-max">
+                  {`最大：${column.maxNum}`}
+                </p>
+              )}
+            </div>
+          ) : null
+        }
       </div>
     ));
   }
