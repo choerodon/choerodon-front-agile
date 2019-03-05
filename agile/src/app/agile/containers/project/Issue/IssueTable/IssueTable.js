@@ -109,6 +109,7 @@ class IssueTable extends Component {
     const setArgs = this.filterControler.initArgsFilter();
     this.filterConvert(filters, setArgs);
     this.barFilterConvert(barFilters, setArgs);
+    IssueStore.judgeConditionWithFilter();
     IssueStore.setLoading(true);
     // 更新函数
     this.filterControler.update(
