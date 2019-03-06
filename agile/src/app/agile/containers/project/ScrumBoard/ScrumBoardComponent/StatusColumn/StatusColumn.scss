@@ -2,8 +2,11 @@
   height: 48px;
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  .alignToCenter {
+    align-items: center;
+    height: 100%;
+  }
   font-size: 12px;
   font-weight: 500;
   overflow: hidden;
@@ -12,6 +15,7 @@
   min-width: 200px;
   &-columnMsg {
     display: flex;
+    margin-top: 4px;
     min-width: 90px;
     line-height: 20px;
     &-name {
@@ -31,8 +35,12 @@
     align-items: center;
     min-width: 110px;
     line-height: 20px;
-    &-max {
-      margin-right: 12px;
+    .display-in-oneline {
+      margin-left: 12px;
+      max-width: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; //文本不换行，这样超出一行的部分被截取，显示..
     }
   }
 }
