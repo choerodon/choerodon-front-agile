@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
-import _ from 'lodash';
 import { stores, Permission } from 'choerodon-front-boot';
 import {
   Input, message, Icon, Modal,
@@ -18,8 +17,6 @@ class SettingColumn extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      editMax: false,
-      editMin: false,
       visible: false,
     };
   }
@@ -36,90 +33,93 @@ class SettingColumn extends Component {
 
   updateColumnMaxMin(type, value) {
     let totalIssues = 0;
-    for (let index = 0, len = this.props.data.subStatuses.length; index < len; index += 1) {
-      for (let index2 = 0, len2 = this.props.data.subStatuses[index].issues.length; index2 < len2; index2 += 1) {
+    const { data: propData, refresh } = this.props;
+    for (let index = 0, len = propData.subStatuses.length; index < len; index += 1) {
+      for (let index2 = 0, len2 = propData.subStatuses[index].issues.length; index2 < len2; index2 += 1) {
         if (ScrumBoardStore.getCurrentConstraint === 'issue') {
           totalIssues += 1;
-        } else if (this.props.data.subStatuses[index].issues[index2].typeCode !== 'sub_task') {
+        } else if (propData.subStatuses[index].issues[index2].typeCode !== 'sub_task') {
           totalIssues += 1;
         }
       }
     }
     const maxminObj = {};
     if (type === 'maxNum') {
-      if (this.props.data.minNum) {
-        if (parseInt(value, 10) < parseInt(this.props.data.minNum, 10)) {
-          Choerodon.prompt('最大值不能小于最小值');
-          return;
-        }
-      }
-      if (parseInt(value, 10) < totalIssues) {
-        Choerodon.prompt('最大值不能小于当前已有issue数');
-        return;
-      }
+      // if (this.props.data.minNum) {
+      //   if (parseInt(value, 10) < parseInt(this.props.data.minNum, 10)) {
+      //     Choerodon.prompt('最大值不能小于最小值');
+      //     return;
+      //   }
+      // }
+      // if (parseInt(value, 10) < totalIssues) {
+      //   Choerodon.prompt('最大值不能小于当前已有issue数');
+      //   return;
+      // }
       maxminObj.maxNum = value;
-      maxminObj.minNum = this.props.data.minNum;
+      maxminObj.minNum = propData.minNum;
     }
     if (type === 'minNum') {
-      if (this.props.data.maxNum) {
-        if (parseInt(value, 10) > parseInt(this.props.data.maxNum, 10)) {
-          Choerodon.prompt('最小值不能大于最大值');
-          return;
-        }
-      }
-      if (parseInt(value, 10) > totalIssues) {
-        Choerodon.prompt('最小值不能大于当前已有issue数');
-        return;
-      }
+      // if (this.props.data.maxNum) {
+      //   if (parseInt(value, 10) > parseInt(this.props.data.maxNum, 10)) {
+      //     Choerodon.prompt('最小值不能大于最大值');
+      //     return;
+      //   }
+      // }
+      // if (parseInt(value, 10) > totalIssues) {
+      //   Choerodon.prompt('最小值不能大于当前已有issue数');
+      //   return;
+      // }
       maxminObj.minNum = value;
-      maxminObj.maxNum = this.props.data.maxNum;
+      maxminObj.maxNum = propData.maxNum;
     }
     const data = {
       boardId: ScrumBoardStore.getSelectedBoard,
-      columnId: this.props.data.columnId,
-      objectVersionNumber: this.props.data.objectVersionNumber,
+      columnId: propData.columnId,
+      objectVersionNumber: propData.objectVersionNumber,
       projectId: AppState.currentMenuType.id,
       ...maxminObj,
     };
     ScrumBoardStore.axiosUpdateMaxMinNum(
-      this.props.data.columnId, data,
+      propData.columnId, data,
     ).then((res) => {
-      this.props.refresh();
+      refresh();
     }).catch((error) => {
     });
   }
 
   handleSaveColumnName(name) {
+    const { data: propData, index } = this.props;
     const data = {
-      columnId: this.props.data.columnId,
-      objectVersionNumber: this.props.data.objectVersionNumber,
+      columnId: propData.columnId,
+      objectVersionNumber: propData.objectVersionNumber,
       name,
       projectId: AppState.currentMenuType.id,
       boardId: ScrumBoardStore.getSelectedBoard,
     };
     ScrumBoardStore.axiosUpdateColumn(
-      this.props.data.columnId, data, ScrumBoardStore.getSelectedBoard,
+      propData.columnId, data, ScrumBoardStore.getSelectedBoard,
     ).then((res) => {
       const originData = ScrumBoardStore.getBoardData;
-      originData[this.props.index].objectVersionNumber = res.objectVersionNumber;
-      originData[this.props.index].name = res.name;
+      originData[index].objectVersionNumber = res.objectVersionNumber;
+      originData[index].name = res.name;
       ScrumBoardStore.setBoardData(originData);
     }).catch((error) => {
     });
   }
 
   renderStatus() {
-    const list = this.props.data.subStatuses;
+    const { data, draggabled, refresh } = this.props;
+    const list = data.subStatuses;
     const result = [];
     for (let index = 0, len = list.length; index < len; index += 1) {
       result.push(
         <StatusCard
-          draggabled={this.props.draggabled}
-          key={`${this.props.data.columnId}-${index}`}
-          columnId={this.props.data.columnId}
+          draggabled={draggabled}
+          key={`${data.columnId}-${index}`}
+          columnId={data.columnId}
           data={list[index]}
           index={index}
-          refresh={this.props.refresh.bind(this)}
+          refresh={refresh.bind(this)}
           // setLoading={this.props.setLoading}
         />,
       );
@@ -129,9 +129,13 @@ class SettingColumn extends Component {
 
   render() {
     const menu = AppState.currentMenuType;
+    const {
+      data, disabled, refresh, objectVersionNumber, columnId, index, draggabled,
+    } = this.props;
+    const { visible } = this.state;
     const { type, id: projectId, organizationId: orgId } = menu;
 
-    if (this.props.disabled) {
+    if (disabled) {
       return (
         <div
           className="c7n-scrumsetting-column"
@@ -151,7 +155,7 @@ class SettingColumn extends Component {
                 <div
                   className="c7n-scrumsetting-icons"
                   style={{
-                    visibility: this.props.data.columnId === 'unset' ? 'hidden' : 'visible',
+                    visibility: data.columnId === 'unset' ? 'hidden' : 'visible',
                   }}
                 >
                   <Icon
@@ -170,13 +174,13 @@ class SettingColumn extends Component {
                   />
                   <Modal
                     title="删除列"
-                    visible={this.state.visible || false}
+                    visible={visible || false}
                     onOk={() => {
                       this.setState({
                         visible: false,
                       });
-                      ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
-                        this.props.refresh();
+                      ScrumBoardStore.axiosDeleteColumn(data.columnId).then(() => {
+                        refresh();
                       }).catch((err) => {
                       });
                     }}
@@ -188,20 +192,17 @@ class SettingColumn extends Component {
                     okText="确定"
                     cancelText="取消"
                   >
-
                     {'确定要删除该列？'}
-
                   </Modal>
-
                 </div>
               </Permission>
 
               <div className="c7n-scrumsetting-columnStatus">
-                {this.props.data.name}
+                {data.name}
               </div>
               <div style={{ borderBottom: '3px solid rgba(0,0,0,0.26)' }} className="c7n-scrumsetting-columnBottom">
                 {
-                  this.props.data.columnId === 'unset' ? (
+                  data.columnId === 'unset' ? (
                     <div>
                       <span>无该问题的状态</span>
                     </div>
@@ -209,22 +210,22 @@ class SettingColumn extends Component {
                     <div>
                       <span style={{ cursor: 'pointer' }}>
                         {'最大值：'}
-                        {this.props.data.maxNum}
+                        {data.maxNum}
                       </span>
                       <span style={{ cursor: 'pointer' }}>
                         {'最小值：'}
-                        {this.props.data.maxNum}
+                        {data.maxNum}
                       </span>
                     </div>
                   )
                 }
               </div>
             </div>
-            
+
             <div className="c7n-scrumsetting-columnDrop">
               <Droppable
                 type="status"
-                droppableId={`${this.props.data.categoryCode},${this.props.data.columnId}`}
+                droppableId={`${data.categoryCode},${data.columnId}`}
               >
                 {(provided, snapshot) => (
                   <div
@@ -247,12 +248,12 @@ class SettingColumn extends Component {
     } else {
       return (
         <Draggable
-          isDragDisabled={this.props.draggabled}
-          key={this.props.data.columnId}
-          index={this.props.index}
+          isDragDisabled={draggabled}
+          key={data.columnId}
+          index={index}
           draggableId={JSON.stringify({
-            columnId: this.props.data.columnId,
-            objectVersionNumber: this.props.data.objectVersionNumber,
+            columnId: data.columnId,
+            objectVersionNumber: data.objectVersionNumber,
           })}
           type="columndrop"
         >
@@ -271,7 +272,7 @@ class SettingColumn extends Component {
                 <div className="c7n-scrumsetting-columnTop">
                   <div
                     style={{
-                      visibility: this.props.data.columnId === 'unset' ? 'hidden' : 'visible',
+                      visibility: data.columnId === 'unset' ? 'hidden' : 'visible',
                     }}
                   >
                     <div
@@ -281,7 +282,7 @@ class SettingColumn extends Component {
                         type="open_with"
                         style={{
                           cursor: 'move',
-                          display: this.props.draggabled && 'none',
+                          display: draggabled && 'none',
                         }}
                         {...provided1.dragHandleProps}
                       />
@@ -289,7 +290,7 @@ class SettingColumn extends Component {
                         type="delete"
                         style={{
                           cursor: 'pointer',
-                          display: this.props.draggabled && 'none',
+                          display: draggabled && 'none',
                         }}
                         role="none"
                         onClick={this.handleDeleteColumn.bind(this)}
@@ -297,13 +298,13 @@ class SettingColumn extends Component {
                     </div>
                     <Modal
                       title="删除列"
-                      visible={this.state.visible || false}
+                      visible={visible || false}
                       onOk={() => {
                         this.setState({
                           visible: false,
                         });
-                        ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
-                          this.props.refresh();
+                        ScrumBoardStore.axiosDeleteColumn(data.columnId).then(() => {
+                          refresh();
                         }).catch((err) => {
                         });
                       }}
@@ -325,26 +326,26 @@ class SettingColumn extends Component {
                       organizationId={orgId}
                       service={['agile-service.board.deleteScrumBoard']}
                       noAccessChildren={(
-                        this.props.data.name
+                        data.name
                     )}
                     >
                       <EasyEdit
                         type="input"
-                        defaultValue={this.props.data.name}
+                        defaultValue={data.name}
                         enterOrBlur={this.handleSaveColumnName.bind(this)}
                       >
-                        {this.props.data.name}
+                        {data.name}
                       </EasyEdit>
                     </Permission>
                   </div>
                   <div
                     className="c7n-scrumsetting-columnBottom"
                     style={{
-                      borderBottom: this.props.data.color ? `3px solid ${this.props.data.color}` : '3px solid rgba(0,0,0,0.26)',
+                      borderBottom: data.color ? `3px solid ${data.color}` : '3px solid rgba(0,0,0,0.26)',
                     }}
                   >
                     {
-                      this.props.data.columnId === 'unset' ? (
+                      data.columnId === 'unset' ? (
                         <div>
                           <span>无该问题的状态</span>
                         </div>
@@ -367,15 +368,15 @@ class SettingColumn extends Component {
                                 style={{ minWidth: '110px' }}
                               >
                                 {'最大值：'}
-                                {typeof this.props.data.maxNum === 'number' ? this.props.data.maxNum : '没有最大'}
+                                {typeof data.maxNum === 'number' ? data.maxNum : '没有最大'}
                               </span>
                             )}
                           >
                             <EasyEdit
                               className="editSpan"
                               type="input"
-                              defaultValue={this.props.data.maxNum
-                                ? this.props.data.maxNum : null}
+                              defaultValue={data.maxNum
+                                ? data.maxNum : null}
                               enterOrBlur={(value) => {
                                 this.updateColumnMaxMin('maxNum', value);
                               }}
@@ -384,7 +385,7 @@ class SettingColumn extends Component {
                                 style={{ cursor: 'pointer', minWidth: '110px' }}
                               >
                                 {'最大值：'}
-                                {typeof this.props.data.maxNum === 'number' ? this.props.data.maxNum : '没有最大'}
+                                {typeof data.maxNum === 'number' ? data.maxNum : '没有最大'}
                               </span>
                             </EasyEdit>
                           </Permission>
@@ -398,15 +399,15 @@ class SettingColumn extends Component {
                                 style={{ minWidth: '110px' }}
                               >
                                 {'最小值：'}
-                                {typeof this.props.data.minNum === 'number' ? this.props.data.minNum : '没有最小'}
+                                {typeof data.minNum === 'number' ? data.minNum : '没有最小'}
                               </span>
                             )}
                           >
                             <EasyEdit
                               className="editSpan"
                               type="input"
-                              defaultValue={this.props.data.minNum
-                                ? this.props.data.minNum : null}
+                              defaultValue={data.minNum
+                                ? data.minNum : null}
                               enterOrBlur={(value) => {
                                 this.updateColumnMaxMin('minNum', value);
                               }}
@@ -415,7 +416,7 @@ class SettingColumn extends Component {
                                 style={{ cursor: 'pointer', minWidth: '110px' }}
                               >
                                 {'最小值：'}
-                                {typeof this.props.data.minNum === 'number' ? this.props.data.minNum : '没有最小'}
+                                {typeof data.minNum === 'number' ? data.minNum : '没有最小'}
                               </span>
                             </EasyEdit>
                           </Permission>
@@ -427,7 +428,7 @@ class SettingColumn extends Component {
                 <div className="c7n-scrumsetting-columnDrop">
                   <Droppable
                     type="status"
-                    droppableId={`${this.props.data.categoryCode},${this.props.data.columnId},${this.props.data.minNum},${this.props.data.maxNum}`}
+                    droppableId={`${data.categoryCode},${data.columnId},${data.minNum},${data.maxNum}`}
                   >
                     {(provided, snapshot) => (
                       <div

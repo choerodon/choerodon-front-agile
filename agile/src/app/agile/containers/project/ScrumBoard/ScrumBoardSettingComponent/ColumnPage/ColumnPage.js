@@ -95,13 +95,13 @@ class ColumnPage extends Component {
               }
             }
           }/* eslint-disable */
-          if (!isNaN(minNum)) {
-            /* eslint-enable */
-            if (parseInt(totalNum, 10) < parseInt(minNum, 10)) {
-              Choerodon.prompt('剩余状态issue数小于列的最小issue数，无法移动状态');
-              return;
-            }
-          }
+          // if (!isNaN(minNum)) {
+          //   /* eslint-enable */
+          //   if (parseInt(totalNum, 10) < parseInt(minNum, 10)) {
+          //     Choerodon.prompt('剩余状态issue数小于列的最小issue数，无法移动状态');
+          //     return;
+          //   }
+          // }
         }
         for (let index = 0, len = newState.length; index < len; index += 1) {
           if (String(newState[index].columnId) === String(result.destination.droppableId.split(',')[1])) {
@@ -151,13 +151,13 @@ class ColumnPage extends Component {
             }
           }
           /* eslint-disable */
-          if (!isNaN(minNum)) {
-            /* eslint-enable */
-            if (parseInt(totalNum, 10) < parseInt(minNum, 10)) {
-              Choerodon.prompt('剩余状态issue数小于列的最小issue数，无法移动状态');
-              return;
-            }
-          }
+          // if (!isNaN(minNum)) {
+          //   /* eslint-enable */
+          //   if (parseInt(totalNum, 10) < parseInt(minNum, 10)) {
+          //     Choerodon.prompt('剩余状态issue数小于列的最小issue数，无法移动状态');
+          //     return;
+          //   }
+          // }
           let destinationTotal = 0;
           for (let index = 0, len = newState.length; index < len; index += 1) {
             if (parseInt(newState[index].columnId, 10) === parseInt(columnId, 10)) {
@@ -186,10 +186,10 @@ class ColumnPage extends Component {
               draggableTotal += 1;
             }
           }
-          if ((destinationTotal + draggableTotal) > parseInt(maxNum, 10)) {
-            Choerodon.prompt('移动至目标列后的issue数大于目标列的最大issue数，无法移动状态');
-            return;
-          }
+          // if ((destinationTotal + draggableTotal) > parseInt(maxNum, 10)) {
+          //   Choerodon.prompt('移动至目标列后的issue数大于目标列的最大issue数，无法移动状态');
+          //   return;
+          // }
         }
         for (let index = 0, len = newState.length; index < len; index += 1) {
           if (String(newState[index].columnId) === String(result.destination.droppableId.split(',')[1])) {
