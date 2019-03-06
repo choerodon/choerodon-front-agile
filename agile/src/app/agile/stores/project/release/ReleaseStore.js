@@ -49,6 +49,8 @@ class ReleaseStore {
     ['0', {}],
   ]);
 
+  @observable deleteReleaseVisible = false;
+
   @action setSearchContent(data) {
     if (data) {
       this.filters.contents = data;
@@ -211,6 +213,14 @@ class ReleaseStore {
     return toJS(this.issueStatus);
   }
 
+  @action setDeleteReleaseVisible(data) {
+    this.deleteReleaseVisible = data;
+  }
+
+  @computed get getDeleteReleaseVisible() {
+    return this.deleteReleaseVisible;
+  }
+
   axiosAddRelease(data) {
     return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version`, data);
   }
@@ -221,11 +231,14 @@ class ReleaseStore {
 
   axiosDeleteVersion(data) {
     let stringData = '';
-    if (data.fixTargetVersionId) {
-      stringData += `fixTargetVersionId=${data.fixTargetVersionId}&`;
-    }
-    if (data.influenceTargetVersionId) {
-      stringData += `influenceTargetVersionId=${data.influenceTargetVersionId}`;
+    // if (data.fixTargetVersionId) {
+    //   stringData += `fixTargetVersionId=${data.fixTargetVersionId}&`;
+    // }
+    // if (data.influenceTargetVersionId) {
+    //   stringData += `influenceTargetVersionId=${data.influenceTargetVersionId}`;
+    // }
+    if (data.targetVersionId) {
+      stringData += `targetVersionId=${data.targetVersionId}`;
     }
     return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version/delete/${data.versionId}?${stringData}`);
   }

@@ -4,6 +4,7 @@ import {
 import { store, stores, axios } from 'choerodon-front-boot';
 import moment from 'moment';
 import _ from 'lodash';
+import { empty } from 'rxjs/Observer';
 
 const { AppState } = stores;
 // 当前跳转是否需要单选信息（跳转单个任务时使用）
@@ -198,6 +199,18 @@ class SprintCommonStore {
       this.saveFilterVisible = data;
     }
 
+    // 控制清除筛选按钮是否显示
+
+    @observable emptyBtnVisible = false;
+
+    @computed get getEmptyBtnVisible() {
+      return this.emptyBtnVisible;
+    }
+  
+    @action setEmptyBtnVisible(data) {
+      this.emptyBtnVisible = data;
+    }
+
     // 我的筛选列表
     @observable myFilters = [];
   
@@ -283,7 +296,7 @@ class SprintCommonStore {
     @observable selectedAssignee = [];
 
     @computed get getSelectedAssignee() {
-      return this.selectedAssignee;
+      return toJS(this.selectedAssignee);
     }
             
     @action setSelectedAssignee(data) {
@@ -319,10 +332,10 @@ class SprintCommonStore {
     @action initPram(paramSelected, paramName = null, paramUrl) {
       paramIssueSelected = paramSelected;
       this.paramUrl = paramUrl;
-      if (paramName) {
-        this.paramFilter = paramName;
-        this.barFilter = [paramName];
-      }
+      // if (paramName) {
+      //   this.paramFilter = paramName;
+      //   this.barFilter = [paramName];
+      // }
     }
   
     /**
@@ -334,7 +347,8 @@ class SprintCommonStore {
       this.issueTypes = issueTypes;
       this.issueStatus = issueStatus;
       this.issuePriority = issuePriority;
-      this.users = users.content;
+      // this.users = users.content;
+      this.users = [...users.content, {id: 'none', realName: '未分配'}];
       this.tagData = tagData;
       this.issueComponents = issueComponents;
       this.issueVersions = issueVersions;
@@ -591,6 +605,7 @@ class SprintCommonStore {
 
     resetFilterSelect = (filterControler) => {
       const projectInfo = this.getProjectInfo;
+      this.setSelectedFilterId(undefined);
       this.setSelectedMyFilterInfo({});
       this.setSelectedIssueType([]);
       this.setSelectedStatus([]);
@@ -636,36 +651,58 @@ class SprintCommonStore {
       );
     }
 
+    judgeFilterConditionIsEmpty = () => {
+      const userFilter = this.getFilterMap.get('userFilter');
+      const userFilterAdvancedSearchArgs = _.pick(userFilter.advancedSearchArgs, ['issueTypeId', 'priorityId', 'statusId']);
+      const userFilterSearchArgs = _.pick(userFilter.searchArgs, ['issueNum', 'summary', 'reporter', 'component', 'epic', 'version', 'sprint', 'label']);
+      const userFilterOtherArgs = _.pick(userFilter.otherArgs, ['assigneeId', 'component', 'epic', 'version', 'sprint', 'label']);
+      const userFilterContents = userFilter.contents || [];
+      const userFilterAssigneeFilterIds = userFilter.assigneeFilterIds || [];
+      const userFilterCreateStartDate = userFilter.searchArgs.createStartDate;
+      const userFilterCreateEndDate = userFilter.searchArgs.createEndDate;
+
+      const userFilterAdvEveryFieldIsEmpty = Object.keys(userFilterAdvancedSearchArgs).every(key => userFilterAdvancedSearchArgs[key].length === 0);
+      const userFilterAssigneeIsEmpty = userFilterAssigneeFilterIds.length === 0;
+      const userFilterSeaArgsFieldIsEmpty = Object.keys(userFilterSearchArgs).every(key => !userFilterSearchArgs[key]);
+      const userFilterOtherArgsFieldIsEmpty = Object.keys(userFilterOtherArgs).every(key => userFilterOtherArgs[key].length === 0);
+      const userFilterContentsIsEmpty = userFilterContents.length === 0;
+      const uFCreateStartDateIsProjectStartDate = !userFilterCreateStartDate || moment(userFilterCreateStartDate).format('YYYY-MM-DD') === moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD');
+      const uFCreateEndDateIsProjectEndDate = !userFilterCreateEndDate || moment(userFilterCreateEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD');
+
+      this.setEmptyBtnVisible(!userFilterAdvEveryFieldIsEmpty || !userFilterAssigneeIsEmpty || !userFilterSeaArgsFieldIsEmpty || !userFilterOtherArgsFieldIsEmpty || !userFilterContentsIsEmpty || !uFCreateStartDateIsProjectStartDate || !uFCreateEndDateIsProjectEndDate);
+    }
+
     judgeConditionWithFilter = () => {
       const myFilters = this.getMyFilters;
       if (myFilters.length === 0) {
         this.setIsExistFilter(false);
       } else {
-        const userFilter = this.getFilterMap.get('userFilter');
-        const userFilterAdvancedSearchArgs = _.pick(userFilter.advancedSearchArgs, ['issueTypeId', 'priorityId', 'statusId']);
-        const userFilterSearchArgs = _.pick(userFilter.searchArgs, ['issueNum', 'summary', 'reporter', 'component', 'epic', 'version', 'sprint', 'label']);
-        const userFilterOtherArgs = _.pick(userFilter.otherArgs, ['component', 'epic', 'version', 'sprint', 'label']);
-        const userFilterContents = userFilter.contents || [];
-        const userFilterAssigneeFilterIds = userFilter.assigneeFilterIds || [];
-        const userFilterCreateStartDate = userFilter.searchArgs.createStartDate;
-        const userFilterCreateEndDate = userFilter.searchArgs.createEndDate;
+        const filter = this.getFilterMap.get('userFilter');
+        const filterAdvancedSearchArgs = _.pick(filter.advancedSearchArgs, ['issueTypeId', 'priorityId', 'statusId']);
+        const filterAssigneeFilterIds = filter.assigneeFilterIds || [];
+        const filterOtherAssignee = filter.otherArgs.assigneeId || [];
+        const filterSearchArgs = _.pick(filter.searchArgs, ['issueNum', 'summary', 'reporter', 'component', 'epic', 'version', 'sprint', 'label']);
+        const filterOtherArgs = _.pick(filter.otherArgs, ['component', 'epic', 'version', 'sprint', 'label']);
+        const filterContents = filter.contents || [];
+        const filterCreateStartDate = filter.searchArgs.createStartDate;
+        const filterCreateEndDate = filter.searchArgs.createEndDate;
 
-        const userFilterAdvEveryFieldIsEmpty = Object.keys(userFilterAdvancedSearchArgs).every(key => userFilterAdvancedSearchArgs[key].length === 0);
-        const userFilterAssigneeIsEmpty = userFilterAssigneeFilterIds.length === 0;
-        const userFilterSeaArgsFieldIsEmpty = Object.keys(userFilterSearchArgs).every(key => !userFilterSearchArgs[key]);
-        const userFilterOtherArgsFieldIsEmpty = Object.keys(userFilterOtherArgs).every(key => userFilterOtherArgs[key].length === 0);
-        const userFilterContentsIsEmpty = userFilterContents.length === 0;
+        const filterAdvEveryFieldIsEmpty = Object.keys(filterAdvancedSearchArgs).every(key => filterAdvancedSearchArgs[key].length === 0);
+        const filterAssigneeIsEmpty = filterAssigneeFilterIds.length === 0;
+        const filterSeaArgsFieldIsEmpty = Object.keys(filterSearchArgs).every(key => !filterSearchArgs[key]);
+        const filterOtherArgsFieldIsEmpty = Object.keys(filterOtherArgs).every(key => filterOtherArgs[key].length === 0);
+        const filterContentsIsEmpty = filterContents.length === 0;
 
-        if (userFilterAdvEveryFieldIsEmpty && userFilterAssigneeIsEmpty && userFilterSeaArgsFieldIsEmpty && userFilterOtherArgsFieldIsEmpty && userFilterContentsIsEmpty) {
+        if (filterAdvEveryFieldIsEmpty && filterAssigneeIsEmpty && filterOtherAssignee.length === 0 && filterSeaArgsFieldIsEmpty && filterOtherArgsFieldIsEmpty && filterContentsIsEmpty) {
           for (let i = 0; i < myFilters.length; i++) {
             const { searchArgs } = myFilters[i].personalFilterSearchDTO;
-            const createStartDateIsEqual = userFilterCreateStartDate && moment(userFilterCreateStartDate).format('YYYY-MM-DD') !== moment(this.getProjectInfo.createStartDate).format('YYYY-MM-DD') && moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(userFilterCreateStartDate).format('YYYY-MM-DD');
-            const createEndDateIsEqual = userFilterCreateEndDate && moment(userFilterCreateEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD') && moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(userFilterCreateEndDate).format('YYYY-MM-DD');
+            const createStartDateIsEqual = filterCreateStartDate && moment(filterCreateStartDate).format('YYYY-MM-DD') !== moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD') && moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterCreateStartDate).format('YYYY-MM-DD');
+            const createEndDateIsEqual = filterCreateEndDate && moment(filterCreateEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD') && moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterCreateEndDate).format('YYYY-MM-DD');
             if (createStartDateIsEqual && createEndDateIsEqual) { // 其他条件都为空 & 创建时间范围和已有筛选一样
               this.setSelectedFilterId(myFilters[i].filterId);
               this.setIsExistFilter(true);
               break;
-            } else if (i === myFilters.length - 1 && (!userFilterCreateStartDate || moment(userFilterCreateStartDate).format('YYYY-MM-DD') === moment(this.getProjectInfo.createStartDate).format('YYYY-MM-DD')) && (!userFilterCreateEndDate || moment(userFilterCreateEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD'))) { // 直到最后一项，创建时间范围为项目开始时间到今天
+            } else if (i === myFilters.length - 1 && (!filterCreateStartDate || moment(filterCreateStartDate).format('YYYY-MM-DD') === moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD')) && (!filterCreateEndDate || moment(filterCreateEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD'))) { // 直到最后一项，创建时间范围为项目开始时间到今天
               this.setSelectedFilterId(undefined);
               this.setIsExistFilter(true);
             } else { // 和已有筛选时间范围都不一样 且 范围不是项目创建时间到今天
@@ -674,23 +711,31 @@ class SprintCommonStore {
             }
           }
         } else {
+          this.setSelectedAssignee(filterAssigneeFilterIds.map(item => Number(item)));
+          this.setSelectedIssueType(filterAdvancedSearchArgs.issueTypeId ? filterAdvancedSearchArgs.issueTypeId.map(item => Number(item)) : []);
+          this.setSelectedPriority(filterAdvancedSearchArgs.priorityId ? filterAdvancedSearchArgs.priorityId.map(item => Number(item)) : []);
+          this.setSelectedStatus(filterAdvancedSearchArgs.statusId ? filterAdvancedSearchArgs.statusId.map(item => Number(item)) : []);
+
           for (let i = 0; i < myFilters.length; i++) {
             const {
               advancedSearchArgs, searchArgs, otherArgs, contents, 
             } = myFilters[i].personalFilterSearchDTO;
           
-            const advancedSearchArgsIsEqual = _.pull(Object.keys(advancedSearchArgs), 'reporterIds', 'assigneeIds').every(key => _.isEqual(advancedSearchArgs[key].sort(), userFilterAdvancedSearchArgs[key].sort()));
-            const assigneeIdsIsEqual = _.isEqual(advancedSearchArgs.assigneeIds.sort(), userFilterAssigneeFilterIds.sort());
-            const createStartDateIsEqual = !userFilterSearchArgs.createStartDate || moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(userFilterSearchArgs.createStartDate).format('YYYY-MM-DD');
-            const createEndDateIsEqual = !userFilterSearchArgs.createEndDate || moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(userFilterSearchArgs.createEndDate).format('YYYY-MM-DD');
-            const searchArgsIsEqual = createStartDateIsEqual && createEndDateIsEqual && _.pull(Object.keys(searchArgs), 'createStartDate', 'createEndDate', 'assignee').every(key => (searchArgs[key] || '') === (userFilterSearchArgs[key] || ''));
-            const otherArgsIsEqual = (otherArgs === null && Object.keys(userFilterOtherArgs).every(key => userFilterOtherArgs[key].length === 0)) || (Boolean(otherArgs) && Object.keys(otherArgs).every(key => _.isEqual(otherArgs[key].map(value => value.toString()).sort(), userFilterOtherArgs[key].sort())));
-            const contentsIsEqual = (contents === null && userFilterContents.length === 0) || (Boolean(contents) && _.isEqual(contents.sort(), userFilterContents.sort()));
+            const advancedSearchArgsIsEqual = _.pull(Object.keys(advancedSearchArgs), 'reporterIds', 'assigneeIds').every(key => _.isEqual(advancedSearchArgs[key].sort(), filterAdvancedSearchArgs[key].map(item => Number(item)).sort()));
+            const assigneeIdsIsEqual = _.isEqual(advancedSearchArgs.assigneeIds.sort(), filterAssigneeFilterIds.map(item => Number(item)).sort());
+            const createStartDateIsEqual = !filterSearchArgs.createStartDate || moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createStartDate).format('YYYY-MM-DD');
+            const createEndDateIsEqual = !filterSearchArgs.createEndDate || moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createEndDate).format('YYYY-MM-DD');
+            const searchArgsIsEqual = createStartDateIsEqual && createEndDateIsEqual && _.pull(Object.keys(searchArgs), 'createStartDate', 'createEndDate', 'assignee').every(key => (searchArgs[key] || '') === (filterSearchArgs[key] || ''));
+            const otherArgsIsEqual = (otherArgs === null && Object.keys(filterOtherArgs).every(key => filterOtherArgs[key].length === 0)) || (Boolean(otherArgs) && Object.keys(otherArgs).every(key => _.isEqual(otherArgs[key].sort(), filterOtherArgs[key].map(item => Number(item)).sort())));
+            const contentsIsEqual = (contents === null && filterContents.length === 0) || (Boolean(contents) && _.isEqual(contents.sort(), filterContents.sort()));
           
             const itemIsEqual = advancedSearchArgsIsEqual && assigneeIdsIsEqual && searchArgsIsEqual && otherArgsIsEqual && contentsIsEqual;
     
             if (itemIsEqual) {
-              this.setSelectedFilterId(myFilters[i].filterId);
+              const { filterId, personalFilterSearchDTO } = myFilters[i];
+              // const advSearchArgs = personalFilterSearchDTO.advancedSearchArgs;
+              this.setSelectedFilterId(filterId);
+             
               this.setIsExistFilter(true);
               break;
             } else if (i === myFilters.length - 1 && !itemIsEqual) {
@@ -701,6 +746,73 @@ class SprintCommonStore {
         }
       }
     }
+    
+
+    // judgeConditionWithFilter = () => {
+    //   const myFilters = this.getMyFilters;
+    //   if (myFilters.length === 0) {
+    //     this.setIsExistFilter(false);
+    //   } else {
+    //     const userFilter = this.getFilterMap.get('userFilter');
+    //     const userFilterAdvancedSearchArgs = _.pick(userFilter.advancedSearchArgs, ['issueTypeId', 'priorityId', 'statusId']);
+    //     const userFilterSearchArgs = _.pick(userFilter.searchArgs, ['issueNum', 'summary', 'reporter', 'component', 'epic', 'version', 'sprint', 'label']);
+    //     const userFilterOtherArgs = _.pick(userFilter.otherArgs, ['component', 'epic', 'version', 'sprint', 'label']);
+    //     const userFilterContents = userFilter.contents || [];
+    //     const userFilterAssigneeFilterIds = userFilter.assigneeFilterIds || [];
+    //     const userFilterCreateStartDate = userFilter.searchArgs.createStartDate;
+    //     const userFilterCreateEndDate = userFilter.searchArgs.createEndDate;
+
+    //     const userFilterAdvEveryFieldIsEmpty = Object.keys(userFilterAdvancedSearchArgs).every(key => userFilterAdvancedSearchArgs[key].length === 0);
+    //     const userFilterAssigneeIsEmpty = userFilterAssigneeFilterIds.length === 0;
+    //     const userFilterSeaArgsFieldIsEmpty = Object.keys(userFilterSearchArgs).every(key => !userFilterSearchArgs[key]);
+    //     const userFilterOtherArgsFieldIsEmpty = Object.keys(userFilterOtherArgs).every(key => userFilterOtherArgs[key].length === 0);
+    //     const userFilterContentsIsEmpty = userFilterContents.length === 0;
+
+    //     if (userFilterAdvEveryFieldIsEmpty && userFilterAssigneeIsEmpty && userFilterSeaArgsFieldIsEmpty && userFilterOtherArgsFieldIsEmpty && userFilterContentsIsEmpty) {
+    //       for (let i = 0; i < myFilters.length; i++) {
+    //         const { searchArgs } = myFilters[i].personalFilterSearchDTO;
+    //         const createStartDateIsEqual = userFilterCreateStartDate && moment(userFilterCreateStartDate).format('YYYY-MM-DD') !== moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD') && moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(userFilterCreateStartDate).format('YYYY-MM-DD');
+    //         const createEndDateIsEqual = userFilterCreateEndDate && moment(userFilterCreateEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD') && moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(userFilterCreateEndDate).format('YYYY-MM-DD');
+    //         if (createStartDateIsEqual && createEndDateIsEqual) { // 其他条件都为空 & 创建时间范围和已有筛选一样
+    //           this.setSelectedFilterId(myFilters[i].filterId);
+    //           this.setIsExistFilter(true);
+    //           break;
+    //         } else if (i === myFilters.length - 1 && (!userFilterCreateStartDate || moment(userFilterCreateStartDate).format('YYYY-MM-DD') === moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD')) && (!userFilterCreateEndDate || moment(userFilterCreateEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD'))) { // 直到最后一项，创建时间范围为项目开始时间到今天
+    //           this.setSelectedFilterId(undefined);
+    //           this.setIsExistFilter(true);
+    //         } else { // 和已有筛选时间范围都不一样 且 范围不是项目创建时间到今天
+    //           this.setSelectedFilterId(undefined);
+    //           this.setIsExistFilter(false);
+    //         }
+    //       }
+    //     } else {
+    //       for (let i = 0; i < myFilters.length; i++) {
+    //         const {
+    //           advancedSearchArgs, searchArgs, otherArgs, contents, 
+    //         } = myFilters[i].personalFilterSearchDTO;
+          
+    //         const advancedSearchArgsIsEqual = _.pull(Object.keys(advancedSearchArgs), 'reporterIds', 'assigneeIds').every(key => _.isEqual(advancedSearchArgs[key].sort(), userFilterAdvancedSearchArgs[key].sort()));
+    //         const assigneeIdsIsEqual = _.isEqual(advancedSearchArgs.assigneeIds.sort(), userFilterAssigneeFilterIds.sort());
+    //         const createStartDateIsEqual = !userFilterSearchArgs.createStartDate || moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(userFilterSearchArgs.createStartDate).format('YYYY-MM-DD');
+    //         const createEndDateIsEqual = !userFilterSearchArgs.createEndDate || moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(userFilterSearchArgs.createEndDate).format('YYYY-MM-DD');
+    //         const searchArgsIsEqual = createStartDateIsEqual && createEndDateIsEqual && _.pull(Object.keys(searchArgs), 'createStartDate', 'createEndDate', 'assignee').every(key => (searchArgs[key] || '') === (userFilterSearchArgs[key] || ''));
+    //         const otherArgsIsEqual = (otherArgs === null && Object.keys(userFilterOtherArgs).every(key => userFilterOtherArgs[key].length === 0)) || (Boolean(otherArgs) && Object.keys(otherArgs).every(key => _.isEqual(otherArgs[key].map(value => value.toString()).sort(), userFilterOtherArgs[key].sort())));
+    //         const contentsIsEqual = (contents === null && userFilterContents.length === 0) || (Boolean(contents) && _.isEqual(contents.sort(), userFilterContents.sort()));
+          
+    //         const itemIsEqual = advancedSearchArgsIsEqual && assigneeIdsIsEqual && searchArgsIsEqual && otherArgsIsEqual && contentsIsEqual;
+    
+    //         if (itemIsEqual) {
+    //           this.setSelectedFilterId(myFilters[i].filterId);
+    //           this.setIsExistFilter(true);
+    //           break;
+    //         } else if (i === myFilters.length - 1 && !itemIsEqual) {
+    //           this.setSelectedFilterId(undefined);
+    //           this.setIsExistFilter(false);
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   }
 const sprintCommonStore = new SprintCommonStore();
 export default sprintCommonStore;

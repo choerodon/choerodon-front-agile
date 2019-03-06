@@ -283,10 +283,6 @@ class ReleaseDetail extends Component {
             key: 'version',
             name: '版本',
           }, 
-          // {
-          //   key: 'timeRange',
-          //   name: '时间',
-          // },
         ],
       });
     } else if (value === 'version') {
@@ -296,10 +292,6 @@ class ReleaseDetail extends Component {
             key: 'sprint',
             name: '冲刺',
           }, 
-          // {
-          //   key: 'timeRange',
-          //   name: '时间',
-          // },
         ],
       });
     } else {
@@ -312,10 +304,6 @@ class ReleaseDetail extends Component {
             key: 'version',
             name: '版本',
           }, 
-          // {
-          //   key: 'timeRange',
-          //   name: '时间',
-          // },
         ],
       });
     }
@@ -341,14 +329,13 @@ class ReleaseDetail extends Component {
     const QUERY = {
       assignee: 'paramType=assigneeId&paramId=',
       component: 'paramType=component&paramId=',
-      typeCode: 'paramIssueType=',
+      typeCode: 'paramType=typeCode&paramId=',
       version: 'paramType=fixVersion&paramId=',
-      priority: 'paramPriority=',
+      priority: 'paramType=priority&paramId=',
       status: 'paramType=statusId&paramId=',
       sprint: 'paramType=sprint&paramId=',
       epic: 'paramType=epic&paramId=',
       label: 'paramType=label&paramId=',
-      resolution: 'paramType=resolution&paramId=',
     };
     if (!QUERY[type]) return null;
     return `${QUERY[type]}${value === null ? '0' : value}`;
@@ -386,10 +373,6 @@ class ReleaseDetail extends Component {
     if (currentChooseDimension === 'version') {
       paramName += `、版本为${sprintAndVersion.version.find(versionItem => versionItem.versionId === currentVersionChoose).name}`;
     }
-
-    // if (currentChooseDimension === 'timeRange' && startDate && endDate) {
-    //   paramName += `、时间范围为${startDate.format().substring(0, 10)}到${endDate.format().substring(0, 10)}`;
-    // }
 
     paramName += '下的问题';
 
@@ -546,7 +529,6 @@ class ReleaseDetail extends Component {
       { title: '冲刺', value: 'sprint' },
       { title: '史诗', value: 'epic' },
       { title: '标签', value: 'label' },
-      // { title: '解决结果', value: 'resolution' },
     ];
 
     return (

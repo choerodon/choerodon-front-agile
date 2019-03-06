@@ -322,16 +322,19 @@ class CreateSprint extends Component {
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
+
   isInLook(ele) {
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
     return a + ele.offsetHeight > target.scrollTop;
   }
+
   isInLook(ele) {
     const a = ele.offsetTop;
     const target = document.getElementById('scroll-area');
     return a + ele.offsetHeight > target.scrollTop;
   }
+
   scrollToAnchor = (anchorName) => {
     if (anchorName) {
       const anchorElement = document.getElementById(anchorName);
@@ -2653,7 +2656,11 @@ class CreateSprint extends Component {
                         {typeCode === 'bug' ? (
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
-                              <span className="c7n-property">影响的版本：</span>
+                              <Tooltip title="对于非当前版本所发现的缺陷进行版本选择">
+                                <span className="c7n-property">
+                                  {'影响的版本：'}
+                                </span>
+                              </Tooltip>
                             </div>
                             <div className="c7n-value-wrapper">
                               <ReadAndEdit

@@ -67,7 +67,19 @@ class Issue extends Component {
       Choerodon.prompt(e);
     });
     this.axiosGetProjectInfo();
-    IssueStore.axiosGetMyFilterList();
+    IssueStore.axiosGetMyFilterList().then((res) => {
+      this.filterControler = new IssueFilterControler();
+      const paramFilter = IssueStore.getFilterMap.get('paramFilter');
+      if (Object.keys(paramFilter).length) {
+        this.filterControler.cache.set('userFilter', paramFilter);
+        this.filterControler.cache.set('filter', paramFilter);
+        IssueStore.setFilterMap(this.filterControler.cache);
+        IssueStore.setEmptyBtnVisible(true);
+        IssueStore.judgeConditionWithFilter();
+      }
+    });
+    
+    IssueStore.setFilterListVisible(false);
   }
 
   /**
@@ -76,6 +88,7 @@ class Issue extends Component {
   componentWillUnmount() {
     document.getElementsByClassName('page-body')[0].style.overflow = '';
     this.filterControler = new IssueFilterControler();
+    IssueStore.resetFilterSelect(this.filterControler);
     this.filterControler.resetCacheMap();
     IssueStore.setBarFilter([]);
   }

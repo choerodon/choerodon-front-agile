@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Select, DatePicker, Button, Modal, 
+  Select, DatePicker, Button, Modal, Tooltip, 
 } from 'choerodon-ui';
 import { stores, axios } from 'choerodon-front-boot';
 import moment from 'moment';
@@ -20,6 +20,7 @@ class AdvancedSearch extends Component {
       const projectInfo = IssueStore.getProjectInfo;
       const myFilters = IssueStore.getMyFilters;
       IssueStore.setIsExistFilter(true);
+      IssueStore.setEmptyBtnVisible(true);
       if (filterId) {
         const searchFilterInfo = myFilters.find(item => item.filterId === filterId);
         const {
@@ -40,6 +41,7 @@ class AdvancedSearch extends Component {
         IssueStore.updateIssues(this.filterControler, contents);
       } else {
         IssueStore.resetFilterSelect(this.filterControler);
+        IssueStore.setEmptyBtnVisible(false);
       }
     }
   
@@ -56,6 +58,7 @@ class AdvancedSearch extends Component {
       this.filterControler = new IssueFilterControler();
       this.filterControler.advancedSearchArgsFilterUpdate(_.map(value, 'key'), selectedStatus, selectedPriority);
       IssueStore.judgeConditionWithFilter();
+      IssueStore.judgeFilterConditionIsEmpty();
       IssueStore.updateIssues(this.filterControler);
     }
   
@@ -66,6 +69,7 @@ class AdvancedSearch extends Component {
       this.filterControler = new IssueFilterControler();
       this.filterControler.advancedSearchArgsFilterUpdate(selectedIssueType, _.map(value, 'key'), selectedPriority);
       IssueStore.judgeConditionWithFilter();
+      IssueStore.judgeFilterConditionIsEmpty();
       IssueStore.updateIssues(this.filterControler);
     }
   
@@ -76,26 +80,47 @@ class AdvancedSearch extends Component {
       this.filterControler = new IssueFilterControler();
       this.filterControler.advancedSearchArgsFilterUpdate(selectedIssueType, selectedStatus, _.map(value, 'key'));
       IssueStore.judgeConditionWithFilter();
+      IssueStore.judgeFilterConditionIsEmpty();
       IssueStore.updateIssues(this.filterControler);
     }
   
     handleAssigneeSelectChange = (value) => {
-      IssueStore.setSelectedAssignee(_.map(value, 'key'));
       this.filterControler = new IssueFilterControler();
-      this.filterControler.assigneeFilterUpdate(_.map(value, 'key'));
+      const setArgs = this.filterControler.initArgsFilter();
+      IssueStore.setSelectedAssignee(_.map(value, 'key'));
+      if (value.length) {
+        for (let i = 0; i < value.length; i++) {
+          if (value[i].key === 'none') {
+            this.filterControler.cache.get('userFilter').otherArgs.assigneeId = ['0'];
+            IssueStore.setFilterMap(this.filterControler.cache);
+            break;
+          } 
+        }
+      } else {
+        setArgs('otherArgs', { assigneeId: [] });
+      }
+      this.filterControler.assigneeFilterUpdate(_.map(_.filter(value, item => item.key !== 'none'), 'key'));
+      IssueStore.judgeFilterConditionIsEmpty();
       IssueStore.judgeConditionWithFilter();
       IssueStore.updateIssues(this.filterControler);
     }
     
     handleCreateDateRangeChange = (dates) => {
-      const createStartDate = `${moment(dates[0]).format('YYYY-MM-DD')} 00:00:00`;
-      const createEndDate = `${moment(dates[1]).format('YYYY-MM-DD')} 23:59:59`;
+      if (dates.length) {
+        const createStartDate = `${moment(dates[0]).format('YYYY-MM-DD')} 00:00:00`;
+        const createEndDate = `${moment(dates[1]).format('YYYY-MM-DD')} 23:59:59`;
+        IssueStore.setCreateStartDate(createStartDate);
+        IssueStore.setCreateEndDate(createEndDate);
+      } else {
+        const projectInfo = IssueStore.getProjectInfo;
+        IssueStore.setCreateStartDate(`${moment(projectInfo.creationDate).format('YYYY-MM-DD')} 00:00:00`);
+        IssueStore.setCreateEndDate(`${moment().format('YYYY-MM-DD')} 23:59:59`);
+      }
       IssueStore.setSaveFilterVisible(false);
-      IssueStore.setCreateStartDate(createStartDate);
-      IssueStore.setCreateEndDate(createEndDate);
       this.filterControler = new IssueFilterControler();
-      this.filterControler.searchArgsFilterUpdate(createStartDate, createEndDate);
+      this.filterControler.searchArgsFilterUpdate(IssueStore.getCreateStartDate, IssueStore.getCreateEndDate);
       IssueStore.judgeConditionWithFilter();
+      IssueStore.judgeFilterConditionIsEmpty();
       IssueStore.updateIssues(this.filterControler);
     }
     
@@ -113,6 +138,7 @@ class AdvancedSearch extends Component {
    
     render() {
       const editFilterInfo = IssueStore.getEditFilterInfo;
+      const projectInfo = IssueStore.getProjectInfo;
       const issueTypes = IssueStore.getIssueTypes;
       const statusLists = IssueStore.getIssueStatus;
       const prioritys = IssueStore.getIssuePriority;
@@ -128,6 +154,8 @@ class AdvancedSearch extends Component {
       const isExistFilter = IssueStore.getIsExistFilter;
       const myFilters = IssueStore.getMyFilters;
       const filterListVisible = IssueStore.getFilterListVisible;
+      const emptyBtnVisible = IssueStore.getEmptyBtnVisible;
+      const filterControler = new IssueFilterControler();
 
       const debounceCallback = this.deBounce(500);
 
@@ -276,7 +304,7 @@ class AdvancedSearch extends Component {
               value={_.map(selectedAssignee, key => (
                 {
                   key,
-                  name: _.map(users, item => item.id === key).realName,
+                  label: _.find(users, item => item.id === key).realName,
                 }
               ))}
               getPopupContainer={triggerNode => triggerNode.parentNode}
@@ -288,18 +316,38 @@ class AdvancedSearch extends Component {
               }
             </Select>
             
-            <div className="c7n-createRange">
-              <RangePicker
-                value={[moment(createStartDate), moment(createEndDate)]}
-                format="YYYY-MM-DD hh:mm:ss"
-                allowClear={false}
+            <Tooltip title={`创建问题时间范围为${moment(createStartDate).format('YYYY-MM-DD')} ~ ${moment(createEndDate).format('YYYY-MM-DD')}`}>
+              <div className="c7n-createRange">
+
+                <RangePicker
+                  value={[moment(createStartDate), moment(createEndDate)]}
+                  format="YYYY-MM-DD hh:mm:ss"
+                  allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
                 // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
-                onChange={this.handleCreateDateRangeChange}
-                placeholder={['创建时间', '']}
-              />
-            </div>
+                  onChange={this.handleCreateDateRangeChange}
+                  placeholder={['创建时间', '']}
+                />
+              </div>
+
+            </Tooltip>
           </div>
           <div className="c7n-mySearchManage">
+            {
+              emptyBtnVisible && (
+              <Button 
+                funcType="raised" 
+                style={{ color: '#fff', background: '#3F51B5', marginRight: 10 }}
+                onClick={() => {
+                  IssueStore.setSaveFilterVisible(false);
+                  IssueStore.setFilterListVisible(false);
+                  IssueStore.setEmptyBtnVisible(false);
+                  IssueStore.resetFilterSelect(filterControler);
+                }}
+              >
+                {'清空筛选'}
+              </Button>
+              )
+            }
             {
               !isExistFilter && (
               <Button 

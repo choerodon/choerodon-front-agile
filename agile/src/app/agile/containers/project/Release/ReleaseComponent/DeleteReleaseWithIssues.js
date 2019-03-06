@@ -9,7 +9,6 @@ import {
 import _ from 'lodash';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
 
-const { Sidebar } = Modal;
 const { AppState } = stores;
 const RadioGroup = Radio.Group;
 const { Option } = Select;
@@ -19,35 +18,22 @@ class DeleteReleaseWithIssue extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      influenceRadio: 0,
-      fixTargetRadio: 0,
-      influenceTargetVersionId: '',
-      fixTargetVersionId: '',
-      planning: [],
+      distributed: true,
+      targetVersionId: '',
     };
   }
 
-  componentDidMount() {
-    const { versionDelInfo } = this.props;
-    ReleaseStore.axiosGetVersionListWithoutPage().then((res) => {
-      this.setState({
-        planning: res,
-      });
-    });
-  }
-
   componentWillReceiveProps(nextProps) {
-    const { versionDelInfo } = this.props;
     if (nextProps.versionDelInfo.versionNames) {
       if (nextProps.versionDelInfo.versionNames.length > 0) {
         this.setState({
-          influenceTargetVersionId: nextProps.versionDelInfo.versionNames[0].versionId,
-          fixTargetVersionId: nextProps.versionDelInfo.versionNames[0].versionId,
+          targetVersionId: nextProps.versionDelInfo.versionNames[0].versionId,
+          distributed: true,
         });
       } else {
         this.setState({
-          influenceRadio: 1,
-          fixTargetRadio: 1,
+          targetVersionId: '',
+          distributed: false,
         });
       }
     }
@@ -58,20 +44,15 @@ class DeleteReleaseWithIssue extends Component {
       versionDelInfo, onCancel, refresh, 
     } = this.props;
     const {
-      influenceRadio, influenceTargetVersionId, fixTargetRadio, fixTargetVersionId,
+      distributed, targetVersionId,
     } = this.state;
     const data2 = {
       projectId: AppState.currentMenuType.id,
       versionId: versionDelInfo.versionId,
     };
-    if (versionDelInfo.influenceIssueCount) {
-      if (!influenceRadio) {
-        data2.influenceTargetVersionId = influenceTargetVersionId;
-      }
-    }
-    if (versionDelInfo.fixIssueCount) {
-      if (!fixTargetRadio) {
-        data2.fixTargetVersionId = fixTargetVersionId;
+    if (versionDelInfo.agileIssueCount) {
+      if (distributed) {
+        data2.targetVersionId = targetVersionId;
       }
     }
     ReleaseStore.axiosDeleteVersion(data2).then((data) => {
@@ -82,163 +63,97 @@ class DeleteReleaseWithIssue extends Component {
   }
 
   render() {
-    const { planning } = this.state;
-    const { versionDelInfo, onCancel, hasTestCase } = this.props;
-    const filteredVersion = planning.filter(item => item.versionId !== versionDelInfo.versionId);
+    const {
+      visible, versionDelInfo, onCancel, 
+    } = this.props;
     return (
-      <Sidebar
-        title={`删除版本 ${JSON.stringify(versionDelInfo) !== '{}' ? versionDelInfo.versionName : ''}`}
-        closable={false}
-        visible={JSON.stringify(versionDelInfo) !== '{}'}
+      <Modal
+        title="删除版本"
+        visible={visible}
         okText="删除"
         cancelText="取消"
         onCancel={onCancel.bind(this)}
         onOk={this.handleOk.bind(this)}
       >
-        <p>您想对分配给此版本的任何问题做什么?</p>
+        <p>
+          {`您正在删除 ${Object.keys(versionDelInfo).length ? versionDelInfo.versionName : ''} 版本`}
+        </p>
         <div style={{ marginTop: 25 }}>
           {
-            versionDelInfo.influenceIssueCount ? (
+            versionDelInfo.agileIssueCount > 0 || versionDelInfo.testCaseCount > 0 ? (
               <div style={{ marginBottom: '20px' }}>
                 <p style={{ flex: 1 }}>
-                  {`此版本影响问题数：${versionDelInfo.influenceIssueCount}`}
+                  <Icon type="warning" />
+                  {'此版本有'}
+                  {
+                    versionDelInfo.agileIssueCount ? (
+                      <span>
+                        <span style={{ color: 'red' }}>{` ${versionDelInfo.agileIssueCount} `}</span>
+                        {'个问题'}
+                      </span>
+                    ) : ''
+                  }
+                  {
+                    versionDelInfo.testCaseCount ? (
+                      <span>
+                        <span style={{ color: 'red' }}>{` ${versionDelInfo.testCaseCount} `}</span>
+                        {'个测试用例'}
+                      </span>
+                    ) : ''
+                  }
+                  {'。'}
                 </p>
-                {
-                  versionDelInfo.versionNames.length > 0 ? (
-                    <div
-                      style={{
-                        flex: 4,
-                      }}
-                    >
-                      <RadioGroup
-                        defaultValue={0}
-                        onChange={(e) => {
-                          this.setState({
-                            influenceRadio: e.target.value,
-                          });
-                        }}
-                      >
-                        <Radio
-                          style={{
-                            display: 'block',
-                            height: '30px',
-                            lineHeight: '30px',
-                          }}
-                          value={0}
-                        >
-                          {'将它们分配给此版本'}
-                          <Select
-                            style={{
-                              width: 250,
-                              marginLeft: 10,
-                            }}
-                            onChange={(value) => {
-                              this.setState({
-                                influenceTargetVersionId: value,
-                              });
-                            }}
-                            defaultValue={versionDelInfo.versionNames
-                              && filteredVersion.length > 0 ? filteredVersion[0].versionId : undefined}
-                          >
-                            {versionDelInfo.versionNames ? (
-                              filteredVersion
-                                .map(item => (
-                                  <Option value={item.versionId}>{item.name}</Option>
-                                ))
-                            ) : ''}
-                          </Select>
-                        </Radio>
-                        <Radio
-                          style={{
-                            display: 'block',
-                            height: '30px',
-                            lineHeight: '30px',
-                          }}
-                          value={1}
-                        >
-                          {'删除版本'}
-                        </Radio>
-                      </RadioGroup>
-                    </div>
-                  ) : ''
-                }
               </div>
             ) : ''
           }
           {
-            versionDelInfo.fixIssueCount ? (
-              <div>
-                <p style={{ flex: 1 }}>
-                  {`此版本修复问题数：${versionDelInfo.fixIssueCount}`}
-                </p>
-                {
-                  versionDelInfo.versionNames.length > 0 ? (
-                    <div style={{ flex: 4 }}>
-                      <RadioGroup
-                        defaultValue={0}
-                        onChange={(e) => {
-                          this.setState({
-                            fixTargetRadio: e.target.value,
-                          });
-                        }}
-                      >
-                        <Radio
-                          style={{
-                            display: 'block',
-                            height: '30px',
-                            lineHeight: '30px',
-                          }}
-                          value={0}
-                        >
-                          {'将它们分配给此版本'}
-                          <Select
-                            style={{
-                              width: 250,
-                              marginLeft: 10,
-                            }}
-                            onChange={(value) => {
-                              this.setState({
-                                fixTargetVersionId: value,
-                              });
-                            }}
-                            defaultValue={versionDelInfo.versionNames
-                              && filteredVersion.length > 0 ? filteredVersion[0].versionId : undefined}
-                          >
-                            {versionDelInfo.versionNames ? (
-                              filteredVersion.map(item => (
-                                <Option value={item.versionId}>{item.name}</Option>
-                              ))
-                            ) : ''}
-                          </Select>
-                        </Radio>
-                        <Radio
-                          style={{
-                            display: 'block',
-                            height: '30px',
-                            lineHeight: '30px',
-                          }}
-                          value={1}
-                        >
-                          {'删除版本'}
-                        </Radio>
-                      </RadioGroup>
-                    </div>
-                  ) : ''
-                }
-              </div>
-            ) : ''
-          }
-          {
-            hasTestCase ? (
+            versionDelInfo.testCaseCount ? (
               <div>
                 <p style={{ marginTop: 10 }}>
-                  {'此版本下的测试用例将会被同时删除'}
+                  {'注意：删除后与版本相关的测试用例会一并删除。相关的问题请移动到其他版本中。'}
                 </p>
+              </div>
+            ) : ''
+          }
+          {
+            Object.keys(versionDelInfo).length && versionDelInfo.versionNames.length && versionDelInfo.agileIssueCount ? (
+              <div>
+                {
+                  <div style={{ flex: 4 }}>
+                    <Select
+                      style={{
+                        width: '100%',
+                      }}
+                      label="版本"
+                      onChange={(value) => {
+                        this.setState({
+                          targetVersionId: value,
+                        });
+                        if (value === -1) {
+                          this.setState({
+                            distributed: false,
+                          });
+                        } else {
+                          this.setState({
+                            distributed: true,
+                          });
+                        }
+                      }}
+                      defaultValue={versionDelInfo.versionNames[0].versionId}
+                    >
+                      {
+                          [...versionDelInfo.versionNames, { versionId: -1, name: '无' }].map(item => (
+                            <Option value={item.versionId}>{item.name}</Option>
+                          ))
+                        }
+                    </Select>
+                  </div>
+                }
               </div>
             ) : ''
           }
         </div>
-      </Sidebar>
+      </Modal>
     );
   }
 }

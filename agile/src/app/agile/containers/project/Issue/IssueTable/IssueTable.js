@@ -20,6 +20,10 @@ class IssueTable extends Component {
     this.filterControler = new IssueFilterControler();
   }
 
+  componentDidMount() {
+    this.getAssigneeDistributed();
+  }
+
   componentWillUnmount() {
     IssueStore.setClickedRow({
       selectedIssue: {},
@@ -87,6 +91,7 @@ class IssueTable extends Component {
    * @param setArgs => function => 设置参数时会调用到的闭包函数
    */
   barFilterConvert = (barFilters, setArgs) => {
+    IssueStore.setBarFilter(barFilters);
     // 复制 Array
     const temp = barFilters.slice();
     // 如果 paramFilter 在当前 barFilter 中能找到，则不调用模糊搜索
@@ -110,6 +115,7 @@ class IssueTable extends Component {
     this.filterConvert(filters, setArgs);
     this.barFilterConvert(barFilters, setArgs);
     IssueStore.judgeConditionWithFilter();
+    IssueStore.judgeFilterConditionIsEmpty();
     IssueStore.setLoading(true);
     // 更新函数
     this.filterControler.update(
@@ -128,17 +134,47 @@ class IssueTable extends Component {
     );
   };
 
+  /**
+   * 其他页面链入问题管理页面经办人为未分配
+   *
+   * @memberof IssueTable
+   */
+  getAssigneeDistributed = () => {
+    const userFilter = IssueStore.getFilterMap.get('userFilter');
+    const paramFilter = IssueStore.getFilterMap.get('paramFilter');
+    const userFilterOrParamFilter = Object.keys(paramFilter).length ? paramFilter : userFilter;
+    let fieldValue;
+    if (Object.keys(userFilterOrParamFilter).length >= 0 && userFilterOrParamFilter.otherArgs) {
+      fieldValue = userFilterOrParamFilter.otherArgs.assigneeId || [];
+      if (fieldValue.length === 1 && fieldValue[0] === '0') {
+        // IssueStore.setBarFilter(['经办人未分配']);
+        IssueStore.setSelectedAssignee(['none']);
+      }
+    }
+  }
+
   getFieldFilteredValue = (field) => {
     const userFilter = IssueStore.getFilterMap.get('userFilter');
-    const userFilterIsEmptyObj = Object.keys(userFilter).length === 0;
+    const paramFilter = IssueStore.getFilterMap.get('paramFilter');
+    const userFilterOrParamFilter = Object.keys(paramFilter).length ? paramFilter : userFilter;
+    const userFilterAndParamFilterIsEmptyObj = Object.keys(userFilterOrParamFilter).length === 0;
+    let fieldValue;
+    if (Object.keys(userFilterOrParamFilter).length >= 0 && userFilterOrParamFilter.otherArgs) {
+      fieldValue = field === 'version' ? (userFilterOrParamFilter.otherArgs.fixVersion || userFilterOrParamFilter.otherArgs.version) : (userFilterOrParamFilter.otherArgs[field] || []);
+    }
+
     let fieldFilteredValue = [];
-    if (!userFilterIsEmptyObj) {
-      const searchArgsField = userFilter.searchArgs[field];
+    if (!userFilterAndParamFilterIsEmptyObj) {
+      const searchArgsField = userFilterOrParamFilter.searchArgs[field];
       if (['sprint', 'version', 'component', 'epic', 'label'].find(item => item === field)) {
-        const fieldIsEmptyArr = userFilter.otherArgs[field].length === 0;
-        const FieldColumnFilter = IssueStore.getColumnFilter.get(field);
-        const otherArgsField = userFilter.otherArgs[field];
-        fieldFilteredValue = (fieldIsEmptyArr && !searchArgsField) ? [] : (!searchArgsField ? _.map(FieldColumnFilter.filter(item => otherArgsField.find(id => JSON.parse(item.value).id === id.toString())), 'value') : [..._.map(FieldColumnFilter.filter(item => otherArgsField.find(id => JSON.parse(item.value).id === id.toString())), 'value'), searchArgsField]);
+        if (fieldValue.length === 0 && !searchArgsField) {
+          fieldFilteredValue = [];
+        } else if (fieldValue.length === 1 && fieldValue[0] === '0') { // otherArgs[filed]为['0']
+          fieldFilteredValue = ['未分配'];
+        } else {
+          const FieldColumnFilter = IssueStore.getColumnFilter.get(field);
+          fieldFilteredValue = !searchArgsField ? _.map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value') : [..._.map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value'), searchArgsField];
+        }
       } else {
         fieldFilteredValue = !searchArgsField ? [] : [searchArgsField];
       }
@@ -151,6 +187,7 @@ class IssueTable extends Component {
 
   render() {
     // Table 列配置
+    // const assigneeFilterValue = this.getFieldFilteredValue('assigneeId');
     const issueNumFieldValue = this.getFieldFilteredValue('issueNum');
     const summaryFilterValue = this.getFieldFilteredValue('summary');
     const reporterFilterValue = this.getFieldFilteredValue('reporter');
@@ -229,6 +266,7 @@ class IssueTable extends Component {
         key: 'assignee',
         sorterId: 'assigneeId',
         sorter: true,
+        // filteredValue: assigneeFilterValue,
         render: (text, record) => (
           <Assignee
             text={text}
