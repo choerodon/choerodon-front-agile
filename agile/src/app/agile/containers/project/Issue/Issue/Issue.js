@@ -184,7 +184,7 @@ class Issue extends Component {
             issueRefresh={this.Refresh}
           />
           <CreateIssueModal />
-          <ImportIssue ref={this.saveRef('importIssue')} />
+          <ImportIssue ref={this.saveRef('importIssue')} onFinish={this.Refresh} />
         </Content>
       </Page>
     );

@@ -2109,7 +2109,7 @@ class CreateSprint extends Component {
                               this.needBlur = false;
                             }}
                           >
-                            {originPriorities.map(priority => (
+                            {originPriorities.filter(p => p.enable || p.id === priorityId).map(priority => (
                               <Option key={priority.id} value={priority.id}>
                                 <div
                                   style={{

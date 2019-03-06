@@ -8,28 +8,6 @@ import pic2 from '../EmptyPics/no_version.svg';
 import './Priority.scss';
 
 const { AppState } = stores;
-const PRIORITY_MAP = {
-  medium: {
-    color: '#3575df',
-    bgColor: 'rgba(77, 144, 254, 0.2)',
-    name: '中',
-  },
-  high: {
-    color: '#f44336',
-    bgColor: 'rgba(244, 67, 54, 0.2)',
-    name: '高',
-  },
-  low: {
-    color: 'rgba(0, 0, 0, 0.36)',
-    bgColor: 'rgba(0, 0, 0, 0.08)',
-    name: '低',
-  },
-  default: {
-    color: 'transparent',
-    bgColor: 'transparent',
-    name: '',
-  },
-};
 
 class Priority extends Component {
   constructor(props) {
@@ -104,9 +82,9 @@ class Priority extends Component {
     return (
       <div className="lists">
         <h3 className="title">已完成/总计数</h3>
-        {
-          priorityInfo.map(priority => this.renderList(priority))
-        }
+        <div className="wrapper">
+          {priorityInfo.map(priority => this.renderList(priority))}
+        </div>
       </div>
     );
   }
