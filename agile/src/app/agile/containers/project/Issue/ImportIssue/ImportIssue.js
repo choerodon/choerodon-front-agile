@@ -119,6 +119,10 @@ class ImportIssue extends Component {
   };
 
   finish = () => {
+    const { onFinish } = this.props;
+    if (onFinish) {
+      onFinish();
+    }
     this.setState({
       visible: false,
       step: 1,

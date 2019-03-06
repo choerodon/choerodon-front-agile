@@ -1,4 +1,5 @@
 .c7n-agile-reportBoard-priority {
+  height: 233px;
   .text-overflow-hidden {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -26,6 +27,12 @@
       font-size: 13px;
       line-height: 18px;
       color: rgba(0, 0, 0, 0.64);
+    }
+
+    .wrapper {
+      height: 185px;
+      overflow-y: scroll;
+      padding-right: 5px;
     }
 
     .list {

@@ -2081,7 +2081,7 @@ class CreateSprint extends Component {
                               }}
                             >
                               {
-                                originPriorities.map(priority => (
+                                originPriorities.filter(p => p.enable || p.id === priorityId).map(priority => (
                                   <Option key={priority.id} value={priority.id}>
                                     <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                       <div

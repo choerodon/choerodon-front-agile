@@ -71,14 +71,6 @@ class ProjectSetting extends Component {
       });
   }
 
-  loadPriorities() {
-    loadPriorities().then((res) => {
-      this.setState({
-        originPriorities: res,
-      });
-    });
-  }
-
   loadUser(assigneeId) {
     getUser(assigneeId).then((res) => {
       this.setState({

@@ -582,17 +582,19 @@ class AddComponent extends Component {
     if (filter === 'priority') {
       if (operation === 'in' || operation === 'notIn' || operation === 'not in') {
         const arr = value.slice(1, -1).split(',');
-        return arr.map(v => ({
-          key: v * 1,
-          label: _.find(state[OPTION_FILTER[filter].state],
-            { id: v * 1 }).name,
-        }));
+        return arr.map((v) => {
+          const priority = _.find(state[OPTION_FILTER[filter].state], { id: v * 1 });
+          return {
+            key: v * 1,
+            label: priority ? priority.name : v,
+          };
+        });
       } else {
         const k = value;
+        const priority = _.find(state[OPTION_FILTER[filter].state], { [OPTION_FILTER[filter].id]: k * 1 });
         return ({
           key: k,
-          label: _.find(state[OPTION_FILTER[filter].state],
-            { [OPTION_FILTER[filter].id]: k * 1 }).name,
+          label: priority ? priority.name : k,
         });
       }
     } else if (filter === 'issue_type') {

@@ -302,7 +302,7 @@ class CreateSubIssue extends Component {
                   label="优先级"
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                 >
-                  {originPriorities.map(priority => (
+                  {originPriorities.filter(p => p.enable).map(priority => (
                     <Option key={priority.id} value={priority.id}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                         <span>{priority.name}</span>
