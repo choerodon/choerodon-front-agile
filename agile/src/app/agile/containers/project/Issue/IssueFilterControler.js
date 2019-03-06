@@ -47,49 +47,61 @@ export default class IssueFilterControler {
         [paramKey]: paramValue,
       });
     });
-    // 版本跳转 => otherArgs 设置对应 tpye 所需信息
-    if (paramObj.paramType && paramObj.paramId) {
-      filter.otherArgs[paramObj.paramType] = [paramObj.paramId];
+
+    const { 
+      paramChoose, paramCurrentVersion, paramCurrentSprint, paramId, paramType, paramIssueId, paramName,
+    } = paramObj;
+    
+    if (paramChoose) {
+      if (paramChoose === 'version' && paramCurrentVersion) {
+        filter.otherArgs[paramChoose] = [paramCurrentVersion];
+      }
+      if (paramChoose === 'sprint' && paramCurrentSprint) {
+        filter.otherArgs[paramChoose] = [paramCurrentSprint];
+      }
     }
+
+    switch (paramType) {
+      case 'assigneeId':
+        if (paramId !== '0') {
+          filter.assigneeFilterIds = [paramId];
+        } else {
+          filter.otherArgs.assigneeId = [paramId];
+        }
+        break;
+      case 'typeCode':
+        filter.advancedSearchArgs.issueTypeId = [paramId];
+        break;
+      case 'priority':
+        filter.advancedSearchArgs.priorityId = [paramId];
+        break;
+      case 'statusId':
+        filter.advancedSearchArgs.statusId = [paramId];
+        break;
+      case 'fixVersion':
+      case 'version':
+        if (paramId !== '0') {
+          filter.otherArgs.version = [paramId];
+        } else {
+          filter.otherArgs.fixVersion = [paramId];
+        }
+        break;
+      case 'component':
+      case 'sprint':
+      case 'epic':
+      case 'label':
+        filter.otherArgs[paramType] = [paramId];
+        break;
+      default:
+        break;
+    }
+
     // 单个任务跳转 => otherArgs 设置 issueId，将任务设定为展开模式
-    if (paramObj.paramIssueId) {
-      filter.otherArgs.issueIds = [paramObj.paramIssueId.toString()];
+    if (paramIssueId) {
+      filter.searchArgs.issueNum = paramName;
       paramIssueSelected = true;
     }
 
-    // 饼图选择版本或冲刺或时间维度设置相应的filter
-    const { paramChoose } = paramObj;
-    if (paramChoose) {
-      if (paramChoose === 'sprint') {
-        filter.otherArgs.sprint = [paramObj.paramCurrentSprint];
-      }
-      if (paramChoose === 'version') {
-        filter.otherArgs.version = [paramObj.paramCurrentVersion];
-      }
-      if (paramChoose === 'timeRange') {
-        filter.searchArgs.createStartDate = `${paramObj.paramStartDate} 00:00:00`;
-        filter.searchArgs.createEndDate = `${paramObj.paramEndDate} 23:59:59`;
-      }
-    }
-
-    // 饼图选择了问题类型或者优先级后的跳转
-    const { paramPriority, paramIssueType } = paramObj;
-    if (paramPriority) {
-      filter.advancedSearchArgs.priorityId = [paramPriority];
-    }
-    if (paramIssueType) {
-      filter.advancedSearchArgs.issueTypeId = [paramIssueType];
-    }
-
-    // 饼图选择了解决未解决后的跳转
-    const { paramType, paramId } = paramObj;
-    if (paramType === 'resolution') {
-      filter.otherArgs.resolution = (paramId === '1' ? 'true' : 'false');
-    }
-
-    // 暂时未知的跳转
-    // filter.otherArgs.resolution = paramObj.resolution;
-    // 缓存初始化过的 filter，存入 store
     this.cache.set('paramFilter', filter);
     IssueStore.setFilterMap(this.cache);
     // 将 URL 中的 paramName 转码，传入 initPram 进行处理/存取
