@@ -19,7 +19,10 @@ class StatusColumn extends Component {
         })}
         key={column.columnId}
       >
-        <div className="c7n-scrumboard-statusHeader-columnMsg">
+        <div className={classnames('c7n-scrumboard-statusHeader-columnMsg', {
+          alignToCenter: !columnConstraintsIsOn || (column.minNum === null && column.maxNum === null),
+        })}
+        >
           <p className="c7n-scrumboard-statusHeader-columnMsg-name">
             {column.columnName}
           </p>
@@ -31,12 +34,12 @@ class StatusColumn extends Component {
           columnConstraintsIsOn ? (
             <div className="c7n-scrumboard-statusHeader-columnConstraint">
               {column.minNum !== null ? (
-                <p className="c7n-scrumboard-statusHeader-columnConstraint-min">
+                <p className="c7n-scrumboard-statusHeader-columnConstraint-min display-in-oneline">
                   {`最小：${column.minNum}`}
                 </p>
               ) : null}
               {column.maxNum !== null ? (
-                <p className="c7n-scrumboard-statusHeader-columnConstraint-max">
+                <p className="c7n-scrumboard-statusHeader-columnConstraint-max display-in-oneline">
                   {`最大：${column.maxNum}`}
                 </p>
               ) : null}
