@@ -146,7 +146,7 @@ class ImportIssue extends Component {
     } else {
       return [
         <Button type="primary" funcType="raised" onClick={this.finish}>完成</Button>,
-        <Button funcType="raised" disabled={wsData.status !== 'doing'} onClick={this.onCancel}>取消上传</Button>,
+        <Button funcType="raised" disabled={wsData.status && wsData.status !== 'doing'} onClick={this.onCancel}>取消上传</Button>,
       ];
     }
   };
