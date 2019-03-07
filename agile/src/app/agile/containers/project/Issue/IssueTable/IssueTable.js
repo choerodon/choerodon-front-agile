@@ -134,6 +134,13 @@ class IssueTable extends Component {
     );
   };
 
+  // table列选择时触发
+  handleColumnFilterChange=(info) => {
+    const { selectedKeys } = info;
+    IssueStore.setTableShowColumns(selectedKeys);
+    console.log(info);
+  }
+
   /**
    * 其他页面链入问题管理页面经办人为未分配
    *
@@ -407,6 +414,7 @@ class IssueTable extends Component {
         onChange={this.handleFilterChange}
         className="c7n-Issue-table"
         scroll={{ x: true }}
+        onColumnFilterChange={this.handleColumnFilterChange}
         onRow={record => ({
           onClick: (e) => {
             // 点击时设置当前点击元素 style
