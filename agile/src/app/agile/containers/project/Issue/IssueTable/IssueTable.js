@@ -203,7 +203,7 @@ class IssueTable extends Component {
         key: 'issueNum',
         className: 'issueId',
         sorterId: 'issueId',
-        width: 128,
+        width: 100,
         sorter: true,
         filters: [],
         filteredValue: issueNumFieldValue,
@@ -215,7 +215,7 @@ class IssueTable extends Component {
         key: 'issueTypeId',
         className: 'issueType',
         sorterId: 'issueTypeId',
-        width: 128,
+        width: 100,
         sorter: true,
         // filters: IssueStore.getColumnFilter.get('typeId'),
         // filterMultiple: true,
@@ -231,6 +231,7 @@ class IssueTable extends Component {
         dataIndex: 'summary',
         className: 'summary',
         key: 'summary',
+        width: 240,
         filters: [],
         filteredValue: summaryFilterValue,
         // fixed: true,
@@ -241,7 +242,7 @@ class IssueTable extends Component {
         key: 'statusId',
         className: 'status',
         sorterId: 'statusId',
-        width: 128,
+        width: 100,
         sorter: true,
         // filters: IssueStore.getColumnFilter.get('statusId'),
         // filterMultiple: true,
@@ -253,7 +254,7 @@ class IssueTable extends Component {
         className: 'priority',
         sorterId: 'priorityId',
         sorter: true,
-        width: 108,
+        width: 100,
         // filters: IssueStore.getColumnFilter.get('priorityId'),
         // filterMultiple: true,
         render: (text, record) => <Priority record={record} />,
@@ -262,7 +263,7 @@ class IssueTable extends Component {
         title: '经办人',
         dataIndex: 'assigneeName',
         className: 'assignee',
-        width: 168,
+        width: 140,
         key: 'assignee',
         sorterId: 'assigneeId',
         sorter: true,
@@ -302,7 +303,7 @@ class IssueTable extends Component {
         className: 'lastUpdateDate',
         key: 'lastUpdateDate',
         sorterId: 'lastUpdateDate',
-        width: 160,
+        width: 154,
         sorter: true,
         render: text => <LastUpdateTime text={text} />,
       },
@@ -310,6 +311,7 @@ class IssueTable extends Component {
         title: '报告人',
         dataIndex: 'reporterName',
         key: 'reporter',
+        width: 140,
         filters: [],
         filteredValue: reporterFilterValue,
         hidden: true,
@@ -324,6 +326,7 @@ class IssueTable extends Component {
       {
         title: '版本',       
         key: 'version',
+        width: 128,
         filters: IssueStore.getColumnFilter.get('version'),
         filterMultiple: true,
         filteredValue: versionFilterValue,
@@ -341,6 +344,7 @@ class IssueTable extends Component {
       {
         title: '模块',
         key: 'component',
+        width: 128,
         filters: IssueStore.getColumnFilter.get('component'),
         filterMultiple: true,
         filteredValue: componentFilterValue,
@@ -360,6 +364,7 @@ class IssueTable extends Component {
         title: '史诗',
         dataIndex: 'epicName',
         key: 'epic',
+        width: 128,
         filters: IssueStore.getColumnFilter.get('epic'),
         filterMultiple: true,
         filteredValue: epicFilterValue,
@@ -369,6 +374,7 @@ class IssueTable extends Component {
       {
         title: '标签',
         key: 'label',
+        width: 128,
         filters: IssueStore.getColumnFilter.get('label'),
         filteredValue: labelFilterValue,
         filterMultiple: true,
@@ -400,6 +406,7 @@ class IssueTable extends Component {
         footer={() => (<QuickCreateIssue />)}
         onChange={this.handleFilterChange}
         className="c7n-Issue-table"
+        scroll={{ x: true }}
         onRow={record => ({
           onClick: (e) => {
             // 点击时设置当前点击元素 style

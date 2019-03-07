@@ -726,7 +726,7 @@ class SprintCommonStore {
             const createStartDateIsEqual = !filterSearchArgs.createStartDate || moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createStartDate).format('YYYY-MM-DD');
             const createEndDateIsEqual = !filterSearchArgs.createEndDate || moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createEndDate).format('YYYY-MM-DD');
             const searchArgsIsEqual = createStartDateIsEqual && createEndDateIsEqual && _.pull(Object.keys(searchArgs), 'createStartDate', 'createEndDate', 'assignee').every(key => (searchArgs[key] || '') === (filterSearchArgs[key] || ''));
-            const otherArgsIsEqual = (otherArgs === null && Object.keys(filterOtherArgs).every(key => filterOtherArgs[key].length === 0)) || (Boolean(otherArgs) && Object.keys(otherArgs).every(key => _.isEqual(otherArgs[key].sort(), filterOtherArgs[key].map(item => Number(item)).sort())));
+            const otherArgsIsEqual = (otherArgs === null && Object.keys(filterOtherArgs).every(key => filterOtherArgs[key].length === 0)) || (Boolean(otherArgs) && Object.keys(otherArgs).length === Object.keys(filterOtherArgs).length && Object.keys(otherArgs).every(key => _.isEqual(otherArgs[key].sort(), filterOtherArgs[key].map(item => Number(item)).sort())));
             const contentsIsEqual = (contents === null && filterContents.length === 0) || (Boolean(contents) && _.isEqual(contents.sort(), filterContents.sort()));
           
             const itemIsEqual = advancedSearchArgsIsEqual && assigneeIdsIsEqual && searchArgsIsEqual && otherArgsIsEqual && contentsIsEqual;

@@ -75,15 +75,15 @@ class DeleteReleaseWithIssue extends Component {
         onCancel={onCancel.bind(this)}
         onOk={this.handleOk.bind(this)}
       >
-        <p>
+        <p style={{ marginTop: 20, marginBottom: 0 }}>
           {`您正在删除 ${Object.keys(versionDelInfo).length ? versionDelInfo.versionName : ''} 版本`}
         </p>
-        <div style={{ marginTop: 25 }}>
+        <div style={{ marginTop: 10 }}>
           {
             versionDelInfo.agileIssueCount > 0 || versionDelInfo.testCaseCount > 0 ? (
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ flex: 1 }}>
-                  <Icon type="warning" />
+              <div style={{ marginBottom: 0 }}>
+                <p style={{ flex: 1, marginBottom: 10 }}>
+                  <Icon type="error" style={{ display: 'inline-block', marginRight: 10, marginTop: -3 }} />
                   {'此版本有'}
                   {
                     versionDelInfo.agileIssueCount ? (
@@ -96,6 +96,7 @@ class DeleteReleaseWithIssue extends Component {
                   {
                     versionDelInfo.testCaseCount ? (
                       <span>
+                        {','}
                         <span style={{ color: 'red' }}>{` ${versionDelInfo.testCaseCount} `}</span>
                         {'个测试用例'}
                       </span>
@@ -109,7 +110,7 @@ class DeleteReleaseWithIssue extends Component {
           {
             versionDelInfo.testCaseCount ? (
               <div>
-                <p style={{ marginTop: 10 }}>
+                <p>
                   {'注意：删除后与版本相关的测试用例会一并删除。相关的问题请移动到其他版本中。'}
                 </p>
               </div>

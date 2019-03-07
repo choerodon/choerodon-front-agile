@@ -126,8 +126,13 @@
   //left: 20px;
   animation: 0.5s slidein;
   // 暂时隐藏筛选按钮
-  .ant-table-columns-chooser {
-    display: none;
+  // .ant-table-columns-chooser {
+  //   display: none;
+  // }
+  .ant-table {
+    td{
+      white-space: nowrap; 
+    }
   }
   .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
     padding: 6px 4px;
