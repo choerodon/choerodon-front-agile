@@ -199,6 +199,17 @@ class SprintCommonStore {
       this.saveFilterVisible = data;
     }
 
+    // 控制导出模态框是否显示
+    @observable exportModalVisible = false;
+
+    @computed get getExportModalVisible() {
+      return this.exportModalVisible;
+    }
+  
+    @action setExportModalVisible(visible) {
+      this.exportModalVisible = visible;
+    }
+
     // 控制清除筛选按钮是否显示
 
     @observable emptyBtnVisible = false;
