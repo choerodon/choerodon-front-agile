@@ -80,11 +80,7 @@ export default class IssueFilterControler {
         break;
       case 'fixVersion':
       case 'version':
-        if (paramId !== '0') {
-          filter.otherArgs.version = [paramId];
-        } else {
-          filter.otherArgs.fixVersion = [paramId];
-        }
+        filter.otherArgs.version = [paramId];
         break;
       case 'component':
       case 'sprint':
