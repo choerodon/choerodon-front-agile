@@ -13,7 +13,7 @@ export default class ColumnProvider extends React.Component {
     const {
       children, column_status_RelationMap, className, keyId,
     } = this.props;
-    const columnConstraintsIsOn = ScrumBoardStore.getAllColumnCount.size;
+    const columnConstraintsIsOn = ScrumBoardStore.getAllColumnCount.size > 0;
     const subStatusArr = column_status_RelationMap.get(columnObj.columnId);
     return (
       <React.Fragment key={columnObj.columnId}>

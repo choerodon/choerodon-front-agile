@@ -223,7 +223,7 @@ class ScrumBoardHome extends Component {
           ScrumBoardStore.getEditRef.reloadIssue();
         }
         if (startColumn !== destinationColumn) {
-          ScrumBoardStore.resetHeaderData(startColumn, destinationColumn);
+          ScrumBoardStore.resetHeaderData(startColumn, destinationColumn, issue.issueTypeDTO.typeCode);
         }
         ScrumBoardStore.rewriteObjNumber(data, issueId, issue);
       }
