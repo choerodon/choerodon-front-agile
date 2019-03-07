@@ -27,6 +27,8 @@ import IssueTable from '../IssueTable/IssueTable';
 import ExpandWideCard from '../ExpandWideCard';
 // 创建问题按钮
 import CreateIssueModal from '../CreateIssueModal';
+// 导出用例
+import ExportIssue from '../ExportIssue';
 
 const FileSaver = require('file-saver');
 
@@ -108,20 +110,9 @@ class Issue extends Component {
     });
   }
 
-  /**
-   * 输出 excel
-   */
-  exportExcel = () => {
-    const projectId = AppState.currentMenuType.id;
-    const orgId = AppState.currentMenuType.organizationId;
-    const searchParam = IssueStore.getFilterMap.get('userFilter');
-    axios.post(`/zuul/agile/v1/projects/${projectId}/issues/export?organizationId=${orgId}`, searchParam, { responseType: 'arraybuffer' })
-      .then((data) => {
-        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const fileName = `${AppState.currentMenuType.name}.xlsx`;
-        FileSaver.saveAs(blob, fileName);
-      });
-  };
+  openExport=() => {
+    IssueStore.setExportModalVisible(true);
+  }
 
   axiosGetProjectInfo = () => {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`).then((res) => {
@@ -163,7 +154,7 @@ class Issue extends Component {
             <Icon type="archive icon" />
             <span>导入问题</span>
           </Button>
-          <Button className="leftBtn" funcType="flat" onClick={() => this.exportExcel()}>
+          <Button className="leftBtn" funcType="flat" onClick={this.openExport}>
             <Icon type="get_app icon" />
             <span>导出</span>
           </Button>
@@ -188,6 +179,7 @@ class Issue extends Component {
               padding: '0px 18px',
             }}
           >
+            <ExportIssue />
             <AdvancedSearch />
             <SaveFilterModal />
             <FilterManage />
