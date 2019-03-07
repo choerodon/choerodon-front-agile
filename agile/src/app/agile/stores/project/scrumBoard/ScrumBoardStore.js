@@ -845,21 +845,29 @@ class ScrumBoardStore {
     return this.headerData;
   }
 
-  @action resetHeaderData(startColumnId, destinationColumnId) {
+  @action resetHeaderData(startColumnId, destinationColumnId, issueType) {
     const startColumnData = this.headerData.get(startColumnId);
-    const startColumnCount = this.allColumnCount.get(startColumnId);
     const destinationColumnData = this.headerData.get(destinationColumnId);
-    const destinationColumnCount = this.allColumnCount.get(destinationColumnId);
     this.headerData.set(+startColumnId, {
       ...startColumnData,
       columnIssueCount: startColumnData.columnIssueCount - 1,
     });
-    this.allColumnCount.set(+startColumnId, startColumnCount - 1);
     this.headerData.set(+destinationColumnId, {
       ...destinationColumnData,
       columnIssueCount: destinationColumnData.columnIssueCount + 1,
     });
-    this.allColumnCount.set(+destinationColumnId, destinationColumnCount + 1);
+    if (this.getAllColumnCount.size > 0) {
+      this.setColumnConstrint(startColumnId, destinationColumnId, issueType);
+    }
+  }
+
+  @action setColumnConstrint(startColumnId, destinationColumnId, issueType) {
+    const startColumnCount = this.allColumnCount.get(startColumnId);
+    const destinationColumnCount = this.allColumnCount.get(destinationColumnId);
+    if ((this.currentConstraint === 'issue_without_sub_task' && issueType !== 'sub_task') || this.currentConstraint === 'issue') {
+      this.allColumnCount.set(+startColumnId, startColumnCount - 1);
+      this.allColumnCount.set(+destinationColumnId, destinationColumnCount + 1);
+    }
   }
 
   @computed get getStateMachineMap() {
