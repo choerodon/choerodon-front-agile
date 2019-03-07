@@ -41,7 +41,6 @@ class AdvancedSearch extends Component {
         IssueStore.updateIssues(this.filterControler, contents);
       } else {
         IssueStore.resetFilterSelect(this.filterControler);
-        IssueStore.setEmptyBtnVisible(false);
       }
     }
   
@@ -340,7 +339,6 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(false);
                   IssueStore.setFilterListVisible(false);
-                  IssueStore.setEmptyBtnVisible(false);
                   IssueStore.resetFilterSelect(filterControler);
                 }}
               >

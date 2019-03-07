@@ -22,7 +22,6 @@ class ExpandWideCard extends Component {
           width: IssueStore.getExpand ? '64%' : 0,
           display: 'block',
           overflow: 'hidden',
-          marginTop: 48,
           borderTop: '1px solid rgb(211, 211, 211)',
           height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
         }}

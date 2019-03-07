@@ -387,6 +387,14 @@ class IssueTable extends Component {
         filterMultiple: true,
         hidden: true,
       },
+      {
+        title: '故事点',
+        key: 'storyPoints',
+        className: 'storyPoints',
+        width: 50,
+        hidden: true,
+        render: (text, record) => (<span>{record.storyPoints ? record.storyPoints : '-'}</span>),
+      },
     ];
     // 表格列配置
     return (
