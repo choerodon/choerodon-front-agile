@@ -14,7 +14,10 @@ import PriorityTag from '../../../../components/PriorityTag/PriorityTag';
 export function IssueNum({ text }) {
   return (
     <Tooltip mouseEnterDelay={0.5} title={`问题编号： ${text}`}>
-      <a style={{ display: 'block', minWidth: 85 }}>
+      <a style={{
+        display: 'block', minWidth: 85, overflow: 'hidden', textOverflow: 'ellipsis', 
+      }}
+      >
         {text}
       </a>
     </Tooltip>

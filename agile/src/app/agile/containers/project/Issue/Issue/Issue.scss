@@ -644,17 +644,11 @@
         i {
           cursor: pointer;
         }
-        .icon-mode_edit {
+        .icon-mode_edit, .icon-check {
           margin-right: 8px;
         }
       }
       .c7n-filterNameForm {
-        // .c7n-filterNameInput {
-        //   margin-top: 6px;
-        // }
-        // .ant-input-icon {
-        //   margin-top: 6px;
-        // }
         .ant-input-content {
           display: flex;
           margin-top: 12px;
@@ -663,6 +657,9 @@
           display: none;
         }
         .ant-form-item-control.has-success {
+          margin-top: 14px;
+        }
+        .ant-form-item-control.has-feedback {
           margin-top: 14px;
         }
         .ant-form-item-control.has-error {
