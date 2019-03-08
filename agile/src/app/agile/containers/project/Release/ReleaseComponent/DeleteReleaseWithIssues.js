@@ -83,7 +83,12 @@ class DeleteReleaseWithIssue extends Component {
             versionDelInfo.agileIssueCount > 0 || versionDelInfo.testCaseCount > 0 ? (
               <div style={{ marginBottom: 0 }}>
                 <p style={{ flex: 1, marginBottom: 10 }}>
-                  <Icon type="error" style={{ display: 'inline-block', marginRight: 10, marginTop: -3 }} />
+                  <Icon
+                    type="error"
+                    style={{
+                      display: 'inline-block', marginRight: 10, marginTop: -3, color: 'red', 
+                    }}
+                  />
                   {'此版本有'}
                   {
                     versionDelInfo.agileIssueCount ? (

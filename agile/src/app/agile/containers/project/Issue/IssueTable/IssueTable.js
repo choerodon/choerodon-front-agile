@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table } from 'choerodon-ui';
+import { Table, Tooltip } from 'choerodon-ui';
 import { observer } from 'mobx-react';
 import { trace } from 'mobx';
 import _ from 'lodash';
@@ -346,13 +346,19 @@ class IssueTable extends Component {
         filteredValue: versionFilterValue,
         hidden: true,
         render: record => (
-          <Sprint
-            objArray={record.versionIssueRelDTOS}
-            name={
+          record.versionIssueRelDTOS && record.versionIssueRelDTOS.length > 0 && (
+          <Tooltip title={() => record.versionIssueRelDTOS.map(item => item.name).join(',')}>
+            <div>
+              <Sprint
+                objArray={record.versionIssueRelDTOS}
+                name={
             record.versionIssueRelDTOS && record.versionIssueRelDTOS.length
               ? record.versionIssueRelDTOS[0].name
               : null}
-          />
+              />
+            </div>
+          </Tooltip>
+          )
         ),
       },
       {
@@ -364,14 +370,20 @@ class IssueTable extends Component {
         filteredValue: componentFilterValue,
         hidden: true,
         render: record => (
-          <Sprint
-            objArray={record.componentIssueRelDTOList}
-            name={
-              record.componentIssueRelDTOList && record.componentIssueRelDTOList.length
-                ? record.componentIssueRelDTOList[0].name
+          record.issueComponentBriefDTOS && record.issueComponentBriefDTOS.length > 0 && (
+          <Tooltip title={() => record.issueComponentBriefDTOS.map(item => item.name).join(',')}>
+            <div>
+              <Sprint
+                objArray={record.issueComponentBriefDTOS}
+                name={
+              record.issueComponentBriefDTOS && record.issueComponentBriefDTOS.length
+                ? record.issueComponentBriefDTOS[0].name
                 : null
             }
-          />
+              />
+            </div>
+          </Tooltip>
+          )
         ),
       },
       {
@@ -393,6 +405,20 @@ class IssueTable extends Component {
         filteredValue: labelFilterValue,
         filterMultiple: true,
         hidden: true,
+        render: record => record.labelIssueRelDTOS && record.labelIssueRelDTOS.length > 0 && (
+        <Tooltip title={() => record.labelIssueRelDTOS.map(item => item.labelName).join(',')}>
+          <div>
+            <Sprint
+              objArray={record.labelIssueRelDTOS}
+              name={
+                  record.labelIssueRelDTOS && record.labelIssueRelDTOS.length
+                    ? record.labelIssueRelDTOS[0].labelName
+                    : null
+                }
+            />
+          </div>
+        </Tooltip>
+        ),
       },
       {
         title: '故事点',

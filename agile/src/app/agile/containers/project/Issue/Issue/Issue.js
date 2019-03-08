@@ -168,6 +168,7 @@ class Issue extends Component {
           </Button>
         </Header>
         <Content className="c7n-Issue">
+          <ExportIssue />
           <div className="c7n-advancedSearch">
             <AdvancedSearch />
             <SaveFilterModal />
