@@ -141,10 +141,10 @@ class IssueTable extends Component {
   };
 
   // table列选择时触发
-  handleColumnFilterChange=(info) => {
+  handleColumnFilterChange = (info) => {
     const { selectedKeys } = info;
     IssueStore.setTableShowColumns(selectedKeys);
-    console.log(info);
+    // console.log(info);
   }
 
   /**
@@ -199,6 +199,17 @@ class IssueTable extends Component {
     return fieldFilteredValue;
   }
 
+  shouldColumnShow = (column) => {
+    if (column.title === '' || !column.key) {
+      return true;
+    }
+    const filteredColumns = IssueStore.tableShowColumns.slice();
+    // console.log(filteredColumns);
+    return filteredColumns.length === 0 ? true : filteredColumns.includes(column.key);
+  }
+
+  manageVisible = columns => columns.map(column => (this.shouldColumnShow(column) ? { ...column, hidden: false } : { ...column, hidden: true }))
+
   render() {
     // Table 列配置
     // const assigneeFilterValue = this.getFieldFilteredValue('assigneeId');
@@ -210,7 +221,7 @@ class IssueTable extends Component {
     const componentFilterValue = this.getFieldFilteredValue('component');
     const epicFilterValue = this.getFieldFilteredValue('epic');
     const labelFilterValue = this.getFieldFilteredValue('label');
-    const columns = [
+    const columns = this.manageVisible([
       {
         title: '问题编号',
         dataIndex: 'issueNum',
@@ -338,7 +349,7 @@ class IssueTable extends Component {
         ),
       },
       {
-        title: '版本',       
+        title: '版本',
         key: 'version',
         width: 128,
         filters: IssueStore.getColumnFilter.get('version'),
@@ -347,17 +358,17 @@ class IssueTable extends Component {
         hidden: true,
         render: record => (
           record.versionIssueRelDTOS && record.versionIssueRelDTOS.length > 0 && (
-          <Tooltip title={() => record.versionIssueRelDTOS.map(item => item.name).join(',')}>
-            <div>
-              <Sprint
-                objArray={record.versionIssueRelDTOS}
-                name={
-            record.versionIssueRelDTOS && record.versionIssueRelDTOS.length
-              ? record.versionIssueRelDTOS[0].name
-              : null}
-              />
-            </div>
-          </Tooltip>
+            <Tooltip title={() => record.versionIssueRelDTOS.map(item => item.name).join(',')}>
+              <div>
+                <Sprint
+                  objArray={record.versionIssueRelDTOS}
+                  name={
+                    record.versionIssueRelDTOS && record.versionIssueRelDTOS.length
+                      ? record.versionIssueRelDTOS[0].name
+                      : null}
+                />
+              </div>
+            </Tooltip>
           )
         ),
       },
@@ -371,18 +382,18 @@ class IssueTable extends Component {
         hidden: true,
         render: record => (
           record.issueComponentBriefDTOS && record.issueComponentBriefDTOS.length > 0 && (
-          <Tooltip title={() => record.issueComponentBriefDTOS.map(item => item.name).join(',')}>
-            <div>
-              <Sprint
-                objArray={record.issueComponentBriefDTOS}
-                name={
-              record.issueComponentBriefDTOS && record.issueComponentBriefDTOS.length
-                ? record.issueComponentBriefDTOS[0].name
-                : null
-            }
-              />
-            </div>
-          </Tooltip>
+            <Tooltip title={() => record.issueComponentBriefDTOS.map(item => item.name).join(',')}>
+              <div>
+                <Sprint
+                  objArray={record.issueComponentBriefDTOS}
+                  name={
+                    record.issueComponentBriefDTOS && record.issueComponentBriefDTOS.length
+                      ? record.issueComponentBriefDTOS[0].name
+                      : null
+                  }
+                />
+              </div>
+            </Tooltip>
           )
         ),
       },
@@ -406,18 +417,18 @@ class IssueTable extends Component {
         filterMultiple: true,
         hidden: true,
         render: record => record.labelIssueRelDTOS && record.labelIssueRelDTOS.length > 0 && (
-        <Tooltip title={() => record.labelIssueRelDTOS.map(item => item.labelName).join(',')}>
-          <div>
-            <Sprint
-              objArray={record.labelIssueRelDTOS}
-              name={
+          <Tooltip title={() => record.labelIssueRelDTOS.map(item => item.labelName).join(',')}>
+            <div>
+              <Sprint
+                objArray={record.labelIssueRelDTOS}
+                name={
                   record.labelIssueRelDTOS && record.labelIssueRelDTOS.length
                     ? record.labelIssueRelDTOS[0].labelName
                     : null
                 }
-            />
-          </div>
-        </Tooltip>
+              />
+            </div>
+          </Tooltip>
         ),
       },
       {
@@ -428,7 +439,7 @@ class IssueTable extends Component {
         hidden: true,
         render: (text, record) => (<span>{record.storyPoints ? record.storyPoints : '-'}</span>),
       },
-    ];
+    ]);
     // 表格列配置
     return (
       <Table
@@ -445,7 +456,7 @@ class IssueTable extends Component {
             title="根据当前搜索条件没有查询到问题"
             des="尝试修改您的过滤选项或者在下面创建新的问题"
           />
-          )}
+        )}
         filterBarPlaceholder="过滤表"
         noFilter
         filters={IssueStore.getBarFilter}
@@ -482,7 +493,7 @@ class IssueTable extends Component {
             e.currentTarget.style.borderLeft = '';
           },
         })
-          }
+        }
       />
     );
   }
