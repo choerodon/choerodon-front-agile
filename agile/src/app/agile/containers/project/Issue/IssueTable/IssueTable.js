@@ -78,7 +78,13 @@ class IssueTable extends Component {
             throw new Error('没有id');
           }
         } catch (e) {
-          fieldInput[key] = fieldValue;
+          if (fieldValue === '未分配') {
+            fieldSelected[key].push('0');
+          } else {
+            fieldInput[key] = fieldValue;
+          }
+
+          // fieldInput[key] = fieldValue;
         }
       });
     });
@@ -167,7 +173,7 @@ class IssueTable extends Component {
     const userFilterAndParamFilterIsEmptyObj = Object.keys(userFilterOrParamFilter).length === 0;
     let fieldValue;
     if (Object.keys(userFilterOrParamFilter).length >= 0 && userFilterOrParamFilter.otherArgs) {
-      fieldValue = field === 'version' ? (userFilterOrParamFilter.otherArgs.fixVersion || userFilterOrParamFilter.otherArgs.version) : (userFilterOrParamFilter.otherArgs[field] || []);
+      fieldValue = userFilterOrParamFilter.otherArgs[field] || [];
     }
 
     let fieldFilteredValue = [];
@@ -180,7 +186,8 @@ class IssueTable extends Component {
           fieldFilteredValue = ['未分配'];
         } else {
           const FieldColumnFilter = IssueStore.getColumnFilter.get(field);
-          fieldFilteredValue = !searchArgsField ? _.map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value') : [..._.map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value'), searchArgsField];
+          const otherFieldFilteredValue = _.map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value').concat(fieldValue.find(value => value === '0') ? ['未分配'] : []);
+          fieldFilteredValue = !searchArgsField ? otherFieldFilteredValue : [...otherFieldFilteredValue, searchArgsField];
         }
       } else {
         fieldFilteredValue = !searchArgsField ? [] : [searchArgsField];
@@ -386,6 +393,14 @@ class IssueTable extends Component {
         filteredValue: labelFilterValue,
         filterMultiple: true,
         hidden: true,
+      },
+      {
+        title: '故事点',
+        key: 'storyPoints',
+        className: 'storyPoints',
+        width: 50,
+        hidden: true,
+        render: (text, record) => (<span>{record.storyPoints ? record.storyPoints : '-'}</span>),
       },
     ];
     // 表格列配置

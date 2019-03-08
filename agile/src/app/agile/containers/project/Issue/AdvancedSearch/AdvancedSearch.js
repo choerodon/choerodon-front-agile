@@ -41,7 +41,6 @@ class AdvancedSearch extends Component {
         IssueStore.updateIssues(this.filterControler, contents);
       } else {
         IssueStore.resetFilterSelect(this.filterControler);
-        IssueStore.setEmptyBtnVisible(false);
       }
     }
   
@@ -86,20 +85,16 @@ class AdvancedSearch extends Component {
   
     handleAssigneeSelectChange = (value) => {
       this.filterControler = new IssueFilterControler();
-      const setArgs = this.filterControler.initArgsFilter();
       IssueStore.setSelectedAssignee(_.map(value, 'key'));
-      if (value.length) {
-        for (let i = 0; i < value.length; i++) {
-          if (value[i].key === 'none') {
-            this.filterControler.cache.get('userFilter').otherArgs.assigneeId = ['0'];
-            IssueStore.setFilterMap(this.filterControler.cache);
-            break;
-          } 
-        }
+      if (value.find(item => item.key === 'none')) {
+        this.filterControler.assigneeFilterUpdate([]);
+        this.filterControler.cache.get('userFilter').otherArgs.assigneeId = ['0'].concat(_.map(_.filter(value, item => item.key !== 'none'), 'key'));
+        // IssueStore.setFilterMap(this.filterControler.cache);
       } else {
-        setArgs('otherArgs', { assigneeId: [] });
+        this.filterControler.cache.get('userFilter').otherArgs.assigneeId = [];
+        // IssueStore.setFilterMap(this.filterControler.cache);
+        this.filterControler.assigneeFilterUpdate(_.map(value, 'key'));
       }
-      this.filterControler.assigneeFilterUpdate(_.map(_.filter(value, item => item.key !== 'none'), 'key'));
       IssueStore.judgeFilterConditionIsEmpty();
       IssueStore.judgeConditionWithFilter();
       IssueStore.updateIssues(this.filterControler);
@@ -158,7 +153,6 @@ class AdvancedSearch extends Component {
       const filterControler = new IssueFilterControler();
 
       const debounceCallback = this.deBounce(500);
-
       return (
         <div className="c7n-mySearch">
           <div style={{ display: 'flex' }}>
@@ -301,12 +295,19 @@ class AdvancedSearch extends Component {
                 }
               }}
               onChange={this.handleAssigneeSelectChange}
-              value={_.map(selectedAssignee, key => (
-                {
-                  key,
-                  label: _.find(users, item => item.id === key).realName,
+              value={_.map(selectedAssignee, (key) => {
+                if (key === 'none') {
+                  return ({
+                    key,
+                    label: '未分配',
+                  });
+                } else {
+                  return ({
+                    key,
+                    label: _.find(users, item => item.id === key).realName,
+                  });
                 }
-              ))}
+              })}
               getPopupContainer={triggerNode => triggerNode.parentNode}
             >
               {
@@ -340,7 +341,6 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(false);
                   IssueStore.setFilterListVisible(false);
-                  IssueStore.setEmptyBtnVisible(false);
                   IssueStore.resetFilterSelect(filterControler);
                 }}
               >

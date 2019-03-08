@@ -135,7 +135,11 @@ class FilterManage extends Component {
                             IssueStore.setLoading(true);
                             axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/${filter.filterId}`)
                               .then((res) => {
-                                IssueStore.axiosGetMyFilterList();
+                                IssueStore.axiosGetMyFilterList().then(() => {
+                                  if (IssueStore.getMyFilters.length === 0) {
+                                    IssueStore.setFilterListVisible(false);
+                                  }
+                                });
                                 if (filter.filterId === selectedFilterId) {
                                   IssueStore.setSelectedFilterId(undefined);
                                   IssueStore.resetFilterSelect(filterControler);

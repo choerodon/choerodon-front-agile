@@ -92,7 +92,6 @@ class Issue extends Component {
     this.filterControler = new IssueFilterControler();
     IssueStore.resetFilterSelect(this.filterControler);
     this.filterControler.resetCacheMap();
-    IssueStore.setBarFilter([]);
   }
 
   /**
@@ -169,25 +168,32 @@ class Issue extends Component {
           </Button>
         </Header>
         <Content className="c7n-Issue">
-          <ExpandCssControler />
-          <div
-            className="c7n-content-issue"
-            style={{
-              display: 'block',
-              overflowY: 'auto',
-              // overflowX: 'hidden',
-              padding: '0px 18px',
-            }}
-          >
-            <ExportIssue />
+          <div className="c7n-advancedSearch">
             <AdvancedSearch />
             <SaveFilterModal />
             <FilterManage />
-            <IssueTable style={{ marginTop: 48 }} filterControler={this.filterControler} />
           </div>
-          <ExpandWideCard
-            issueRefresh={this.Refresh}
-          />
+          <div style={{ display: 'flex' }}>
+            
+            <ExpandCssControler />
+            
+            <div
+              className="c7n-content-issue"
+              style={{
+                display: 'block',
+                overflowY: 'auto',
+                position: 'relative',
+                // overflowX: 'hidden',
+                padding: '0px 18px',
+              }}
+            >
+              
+              <IssueTable filterControler={this.filterControler} />
+            </div>
+            <ExpandWideCard
+              issueRefresh={this.Refresh}
+            />
+          </div>
           <CreateIssueModal />
           <ImportIssue ref={this.saveRef('importIssue')} onFinish={this.Refresh} />
         </Content>

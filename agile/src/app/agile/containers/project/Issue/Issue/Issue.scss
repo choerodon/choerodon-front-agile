@@ -103,6 +103,9 @@
       min-width: 0 !important;
     }
   }
+  .storyPoints {
+    display: none;
+  }
   .c7n-priorityTag-container{
     padding: 0;
   }
@@ -121,6 +124,7 @@
 
 .c7n-Issue {
   display: flex;
+  flex-direction: column;
   padding: 0;
   width: 100%;
   //left: 20px;
@@ -537,17 +541,18 @@
   background: #c5cbe8;
   color: #6473c3;
 }
-
-.c7n-mySearch {
-    position: fixed;
+.c7n-advancedSearch {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  background: #fff;
+  z-index: 9999;
+  .c7n-mySearch {
+    margin-left: 18px;
     background: #fff;
-    top: 105px;
-    right: 0;
-    left: 268px;
-    z-index: 2;
     display: flex;
     height: 48px;
-    padding-right: 38px;
+    padding-right: 20px;
     align-items: center;
     justify-content: space-between;
   .ant-select {
@@ -615,6 +620,9 @@
     }
   }
 }
+}
+
+
 .issueTypeSelect-dropdown, .statusSelect-dropdown, .prioritySelect-dropdown{
   .ant-select-dropdown-select-all-none {
     display: none;
