@@ -50,6 +50,8 @@ class ExportIssue extends Component {
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const fileName = `${AppState.currentMenuType.name}.xlsx`;
         FileSaver.saveAs(blob, fileName);
+        Choerodon.prompt('导出成功');
+        IssueStore.setExportModalVisible(false);
       });
   };
 
@@ -65,12 +67,16 @@ class ExportIssue extends Component {
         onCancel={this.handleCancel}
       >
         <div style={{ margin: '10px 0' }}>
+
+
           您正在导出
           {' '}
           <span style={{ fontWeight: 500 }}>{projectName}</span>
           {' '}
+
+
           的问题，请选择你需要导出的字段
-        </div>
+                </div>
         <RadioGroup onChange={this.handleExportChange} value={mode}>
           <Radio style={radioStyle} value="show">当前页面显示字段</Radio>
           <Radio style={radioStyle} value="all">全部字段</Radio>
