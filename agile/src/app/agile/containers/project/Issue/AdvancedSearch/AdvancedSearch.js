@@ -19,25 +19,29 @@ class AdvancedSearch extends Component {
       this.filterControler = new IssueFilterControler();
       const projectInfo = IssueStore.getProjectInfo;
       const myFilters = IssueStore.getMyFilters;
-      IssueStore.setIsExistFilter(true);
-      IssueStore.setEmptyBtnVisible(true);
+      
       if (filterId) {
+        IssueStore.setIsExistFilter(true);
+        IssueStore.setEmptyBtnVisible(true);
         const searchFilterInfo = myFilters.find(item => item.filterId === filterId);
         const {
           advancedSearchArgs, searchArgs, otherArgs, contents, 
         } = searchFilterInfo.personalFilterSearchDTO;
+        if (otherArgs.assigneeId && otherArgs.assigneeId.includes(0)) {
+          otherArgs.assigneeId = otherArgs.assigneeId.map(item => (item === 0 ? '0' : item));
+        }
         IssueStore.setSelectedMyFilterInfo(searchFilterInfo);
         IssueStore.setSelectedIssueType(advancedSearchArgs.issueTypeId || []);
         IssueStore.setSelectedStatus(advancedSearchArgs.statusId || []);
         IssueStore.setSelectedPriority(advancedSearchArgs.priorityId || []);
-        IssueStore.setSelectedAssignee(advancedSearchArgs.assigneeIds || []);
+        IssueStore.setSelectedAssignee(advancedSearchArgs.assigneeIds.concat(otherArgs.assigneeId && otherArgs.assigneeId.length > 0 ? ['none'] : []) || []);
         IssueStore.setCreateStartDate(moment(searchArgs.createStartDate).format('YYYY-MM-DD HH:mm:ss'));
         IssueStore.setCreateEndDate(moment(searchArgs.createEndDate).format('YYYY-MM-DD HH:mm:ss'));
         IssueStore.setBarFilter(contents || []);
         this.filterControler.searchArgsFilterUpdate(IssueStore.setCreateStartDate, IssueStore.getCreateEndDate);
         this.filterControler.myFilterUpdate(otherArgs, contents, searchArgs);
         this.filterControler.advancedSearchArgsFilterUpdate(IssueStore.getSelectedIssueType, IssueStore.getSelectedStatus, IssueStore.getSelectedPriority);
-        this.filterControler.assigneeFilterUpdate(IssueStore.getSelectedAssignee);
+        this.filterControler.assigneeFilterUpdate(IssueStore.getSelectedAssignee.filter(assigneeId => assigneeId !== 'none'));
         IssueStore.updateIssues(this.filterControler, contents);
       } else {
         IssueStore.resetFilterSelect(this.filterControler);

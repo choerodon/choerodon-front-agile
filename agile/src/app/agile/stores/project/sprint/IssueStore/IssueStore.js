@@ -672,7 +672,9 @@ class SprintCommonStore {
     this.setUpdateFilterName('');
     this.setBarFilter([]);
     this.setIsExistFilter(true);
+    this.setEmptyBtnVisible(false);
     filterControler.myFilterUpdate({
+      assigneeId: [],
       component: [],
       sprint: [],
       epic: [],
@@ -720,7 +722,7 @@ class SprintCommonStore {
     const userFilterAdvEveryFieldIsEmpty = Object.keys(userFilterAdvancedSearchArgs).every(key => userFilterAdvancedSearchArgs[key].length === 0);
     const userFilterAssigneeIsEmpty = userFilterAssigneeFilterIds.length === 0;
     const userFilterSeaArgsFieldIsEmpty = Object.keys(userFilterSearchArgs).every(key => !userFilterSearchArgs[key]);
-    const userFilterOtherArgsFieldIsEmpty = Object.keys(userFilterOtherArgs).every(key => userFilterOtherArgs[key].length === 0);
+    const userFilterOtherArgsFieldIsEmpty = Object.keys(userFilterOtherArgs).every(key => !userFilterOtherArgs[key] || userFilterOtherArgs[key].length === 0);
     const userFilterContentsIsEmpty = userFilterContents.length === 0;
     const uFCreateStartDateIsProjectStartDate = !userFilterCreateStartDate || moment(userFilterCreateStartDate).format('YYYY-MM-DD') === moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD');
     const uFCreateEndDateIsProjectEndDate = !userFilterCreateEndDate || moment(userFilterCreateEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD');
