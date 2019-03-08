@@ -24,6 +24,7 @@ class ImportIssue extends Component {
     historyId: false,
     ovn: false,
     latestInfo: false,
+    fileName: false,
   };
 
   loadLatestImport = () => {
@@ -57,7 +58,7 @@ class ImportIssue extends Component {
   exportExcel = () => {
     exportExcelTmpl().then((excel) => {
       const blob = new Blob([excel], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const fileName = '敏捷导入模板.xlsx';
+      const fileName = '问题导入模板.xlsx';
       FileSaver.saveAs(blob, fileName);
     });
   };
@@ -81,6 +82,7 @@ class ImportIssue extends Component {
     formData.append('file', file);
     this.setState({
       uploading: true,
+      fileName: file.name,
     });
     importIssue(formData).then((res) => {
       this.changeStep(1);
@@ -152,7 +154,7 @@ class ImportIssue extends Component {
   };
 
   renderProgress = () => {
-    const { wsData } = this.state;
+    const { wsData, fileName } = this.state;
     const {
       process = 0,
       status,
@@ -163,33 +165,64 @@ class ImportIssue extends Component {
     if (status === 'doing') {
       return (
         <div style={{ width: 512 }}>
-          <span style={{ marginRight: 10 }}>正在导入</span>
+          {fileName
+            ? (
+              <span className="c7n-importIssue-fileName">
+                <Icon type="folder_open" className="c7n-importIssue-icon" />
+                <span>{fileName}</span>
+              </span>
+            )
+            : ''
+          }
+          <span className="c7n-importIssue-text">正在导入</span>
           <Progress
-            style={{ width: 450 }}
+            className="c7n-importIssue-progress"
             percent={(process * 100).toFixed(0)}
             size="small"
             status="active"
+            showInfo={false}
           />
         </div>
       );
     } else if (status === 'failed') {
       return (
         <div>
-          {'导入失败 '}
-          <span style={{ color: '#FF0000' }}>{failCount}</span>
-          {' 问题'}
-          <a href={fileUrl}>
-            {' '}
-            点击下载失败详情
-          </a>
+          {fileName
+            ? (
+              <span className="c7n-importIssue-fileName">
+                <Icon type="folder_open" className="c7n-importIssue-icon" />
+                <span>{fileName}</span>
+              </span>
+            )
+            : ''
+          }
+          <span className="c7n-importIssue-text">
+            {'导入失败 '}
+            <span style={{ color: '#FF0000' }}>{failCount}</span>
+            {' 问题'}
+            <a href={fileUrl}>
+              {' 点击下载失败详情'}
+            </a>
+          </span>
         </div>
       );
     } else if (status === 'success') {
       return (
         <div>
-          {'导入成功 '}
-          <span style={{ color: '#0000FF' }}>{successCount}</span>
-          {' 问题'}
+          {fileName
+            ? (
+              <span className="c7n-importIssue-fileName">
+                <Icon type="folder_open" className="c7n-importIssue-icon" />
+                <span>{fileName}</span>
+              </span>
+            )
+            : ''
+          }
+          <span className="c7n-importIssue-text">
+            {'导入成功 '}
+            <span style={{ color: '#0000FF' }}>{successCount}</span>
+            {' 问题'}
+          </span>
         </div>
       );
     } else {
@@ -231,8 +264,7 @@ class ImportIssue extends Component {
               }
                 {fileUrl && (
                 <a href={fileUrl}>
-                  {' '}
-                  点击下载失败详情
+                  {' 点击下载失败详情'}
                 </a>
                 )}
               </div>

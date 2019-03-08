@@ -137,6 +137,16 @@ class ScrumBoardStore {
 
   @observable assigneeFilterIds = [];
 
+  @observable isDragging = false;
+
+  @computed get getIsDragging() {
+    return this.isDragging;
+  }
+
+  @action setIsDragging(data) {
+    this.isDragging = data;
+  }
+
   @computed get getAssigneeFilterIds() {
     return this.assigneeFilterIds;
   }
