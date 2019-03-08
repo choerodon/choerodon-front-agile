@@ -336,6 +336,7 @@ class IssueTable extends Component {
         title: '报告人',
         dataIndex: 'reporterName',
         key: 'reporter',
+        className: 'reporter',
         width: 140,
         filters: [],
         filteredValue: reporterFilterValue,
@@ -351,6 +352,7 @@ class IssueTable extends Component {
       {
         title: '版本',
         key: 'version',
+        className: 'version',
         width: 128,
         filters: IssueStore.getColumnFilter.get('version'),
         filterMultiple: true,
@@ -375,6 +377,7 @@ class IssueTable extends Component {
       {
         title: '模块',
         key: 'component',
+        className: 'component',
         width: 128,
         filters: IssueStore.getColumnFilter.get('component'),
         filterMultiple: true,
@@ -401,6 +404,7 @@ class IssueTable extends Component {
         title: '史诗',
         dataIndex: 'epicName',
         key: 'epic',
+        className: 'epic',
         width: 128,
         filters: IssueStore.getColumnFilter.get('epic'),
         filterMultiple: true,
@@ -411,6 +415,7 @@ class IssueTable extends Component {
       {
         title: '标签',
         key: 'label',
+        className: 'label',
         width: 128,
         filters: IssueStore.getColumnFilter.get('label'),
         filteredValue: labelFilterValue,
