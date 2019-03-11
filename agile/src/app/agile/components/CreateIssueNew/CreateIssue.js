@@ -323,8 +323,7 @@ class CreateIssue extends Component {
           Object.keys(values.linkTypeId).forEach((link, index) => {
             if (values.linkTypeId[link] && values.linkIssues[link]) {
               const currentLinkType = _.find(originLinks, { linkTypeId: values.linkTypeId[link].split('+')[0] * 1 });
-              values.linkIssues[link].forEach((issueNum, i, issues) => {
-                const { issueId } = _.find(originIssues, { issueNum });
+              values.linkIssues[link].forEach((issueId, i, issues) => {                
                 if (currentLinkType.inWard === values.linkTypeId[link].split('+')[1]) {
                   issueLinkCreateDTOList.push({
                     linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
@@ -818,7 +817,7 @@ class CreateIssue extends Component {
                               label="问题"
                               mode="multiple"
                               loading={selectLoading}
-                              optionLabelProp="value"
+                              optionLabelProp="showName"
                               filter
                               filterOption={false}
                               onFilterChange={this.onIssueSelectFilterChange.bind(this)}
@@ -826,7 +825,8 @@ class CreateIssue extends Component {
                               {originIssues.map(issue => (
                                 <Option
                                   key={issue.issueId}
-                                  value={issue.issueNum}
+                                  value={issue.issueId}
+                                  showName={issue.issueNum}
                                 >
                                   <div style={{
                                     display: 'inline-flex',
