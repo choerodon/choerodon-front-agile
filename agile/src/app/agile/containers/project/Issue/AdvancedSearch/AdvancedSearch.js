@@ -95,6 +95,9 @@ class AdvancedSearch extends Component {
         this.filterControler.cache.get('userFilter').otherArgs.assigneeId = ['0'].concat(_.map(_.filter(value, item => item.key !== 'none'), 'key'));
         // IssueStore.setFilterMap(this.filterControler.cache);
       } else {
+        if (!this.filterControler.cache.get('userFilter').otherArgs) {
+          this.filterControler.cache.get('userFilter').otherArgs = {};
+        }
         this.filterControler.cache.get('userFilter').otherArgs.assigneeId = [];
         // IssueStore.setFilterMap(this.filterControler.cache);
         this.filterControler.assigneeFilterUpdate(_.map(value, 'key'));
