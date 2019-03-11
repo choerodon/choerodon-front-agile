@@ -330,6 +330,7 @@ class AdvancedSearch extends Component {
                 <RangePicker
                   value={[moment(createStartDate), moment(createEndDate)]}
                   format="YYYY-MM-DD hh:mm:ss"
+                  disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
                   allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
                 // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
                   onChange={this.handleCreateDateRangeChange}
