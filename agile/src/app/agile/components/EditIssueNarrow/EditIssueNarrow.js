@@ -3228,6 +3228,7 @@ class CreateSprint extends Component {
           createSubTaskShow ? (
             <CreateSubTask
               issueId={origin.issueId}
+              parentSummary={origin.summary}
               visible={createSubTaskShow}
               onCancel={() => this.setState({ createSubTaskShow: false })}
               onOk={this.handleCreateSubIssue.bind(this)}

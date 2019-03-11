@@ -248,7 +248,7 @@ class CreateSubIssue extends Component {
 
   render() {
     const {
-      visible, onCancel, form,
+      visible, onCancel, form, parentSummary,
     } = this.props;
     const { getFieldDecorator } = form;
     const {
@@ -284,12 +284,15 @@ class CreateSubIssue extends Component {
           <p style={{ width: 520, marginBottom: 24 }}>
             {' 请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。'}
           </p>
+          <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
+            <Input label="父任务概要" value={parentSummary} disabled />
+          </div>
           <Form layout="vertical">
-            <FormItem label="概要" style={{ width: 520 }}>
+            <FormItem label="子任务概要" style={{ width: 520 }}>
               {getFieldDecorator('summary', {
-                rules: [{ required: true, message: '概要为必输项' }],
+                rules: [{ required: true, message: '子任务概要为必输项' }],
               })(
-                <Input label="概要" maxLength={44} />,
+                <Input label="子任务概要" maxLength={44} />,
               )}
             </FormItem>
 
