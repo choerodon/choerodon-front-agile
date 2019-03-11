@@ -775,30 +775,32 @@ class SprintCommonStore {
         this.setSelectedStatus(filterAdvancedSearchArgs.statusId ? filterAdvancedSearchArgs.statusId.map(item => Number(item)) : []);
 
         for (let i = 0; i < myFilters.length; i++) {
-          const {
-            advancedSearchArgs, searchArgs, otherArgs, contents, 
-          } = myFilters[i].personalFilterSearchDTO;
-          
-          const advancedSearchArgsIsEqual = _.pull(Object.keys(advancedSearchArgs), 'reporterIds', 'assigneeIds').every(key => _.isEqual(advancedSearchArgs[key].sort(), filterAdvancedSearchArgs[key].map(item => Number(item)).sort()));
-          const assigneeIdsIsEqual = _.isEqual(advancedSearchArgs.assigneeIds.sort(), filterAssigneeFilterIds.map(item => Number(item)).sort());
-          const createStartDateIsEqual = !filterSearchArgs.createStartDate || moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createStartDate).format('YYYY-MM-DD');
-          const createEndDateIsEqual = !filterSearchArgs.createEndDate || moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createEndDate).format('YYYY-MM-DD');
-          const searchArgsIsEqual = createStartDateIsEqual && createEndDateIsEqual && _.pull(Object.keys(searchArgs), 'createStartDate', 'createEndDate', 'assignee').every(key => (searchArgs[key] || '') === (filterSearchArgs[key] || ''));
-          const otherArgsIsEqual = (otherArgs === null && Object.keys(filterOtherArgs).every(key => filterOtherArgs[key].length === 0)) || (Boolean(otherArgs) && Object.keys(_.pick(otherArgs, ['component', 'epic', 'version', 'sprint', 'label'])).every(key => _.isEqual(otherArgs[key].sort(), filterOtherArgs[key].map(item => Number(item)).sort())));
-          const contentsIsEqual = (contents === null && filterContents.length === 0) || (Boolean(contents) && _.isEqual(contents.sort(), filterContents.sort()));
-          
-          const itemIsEqual = advancedSearchArgsIsEqual && assigneeIdsIsEqual && searchArgsIsEqual && otherArgsIsEqual && contentsIsEqual;
-    
-          if (itemIsEqual) {
-            const { filterId, personalFilterSearchDTO } = myFilters[i];
-            // const advSearchArgs = personalFilterSearchDTO.advancedSearchArgs;
-            this.setSelectedFilterId(filterId);
-             
-            this.setIsExistFilter(true);
-            break;
-          } else if (i === myFilters.length - 1 && !itemIsEqual) {
-            this.setSelectedFilterId(undefined);
-            this.setIsExistFilter(false);
+          if (myFilters[i].personalFilterSearchDTO) {
+            const {
+              advancedSearchArgs, searchArgs, otherArgs, contents, 
+            } = myFilters[i].personalFilterSearchDTO;
+            
+            const advancedSearchArgsIsEqual = _.pull(Object.keys(advancedSearchArgs), 'reporterIds', 'assigneeIds').every(key => _.isEqual(advancedSearchArgs[key].sort(), filterAdvancedSearchArgs[key].map(item => Number(item)).sort()));
+            const assigneeIdsIsEqual = _.isEqual(advancedSearchArgs.assigneeIds.sort(), filterAssigneeFilterIds.map(item => Number(item)).sort());
+            const createStartDateIsEqual = !filterSearchArgs.createStartDate || moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createStartDate).format('YYYY-MM-DD');
+            const createEndDateIsEqual = !filterSearchArgs.createEndDate || moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createEndDate).format('YYYY-MM-DD');
+            const searchArgsIsEqual = createStartDateIsEqual && createEndDateIsEqual && _.pull(Object.keys(searchArgs), 'createStartDate', 'createEndDate', 'assignee').every(key => (searchArgs[key] || '') === (filterSearchArgs[key] || ''));
+            const otherArgsIsEqual = (otherArgs === null && Object.keys(filterOtherArgs).every(key => filterOtherArgs[key].length === 0)) || (Boolean(otherArgs) && Object.keys(_.pick(otherArgs, ['component', 'epic', 'version', 'sprint', 'label'])).every(key => _.isEqual(otherArgs[key].sort(), filterOtherArgs[key].map(item => Number(item)).sort())));
+            const contentsIsEqual = (contents === null && filterContents.length === 0) || (Boolean(contents) && _.isEqual(contents.sort(), filterContents.sort()));
+            
+            const itemIsEqual = advancedSearchArgsIsEqual && assigneeIdsIsEqual && searchArgsIsEqual && otherArgsIsEqual && contentsIsEqual;
+      
+            if (itemIsEqual) {
+              const { filterId, personalFilterSearchDTO } = myFilters[i];
+              // const advSearchArgs = personalFilterSearchDTO.advancedSearchArgs;
+              this.setSelectedFilterId(filterId);
+               
+              this.setIsExistFilter(true);
+              break;
+            } else if (i === myFilters.length - 1 && !itemIsEqual) {
+              this.setSelectedFilterId(undefined);
+              this.setIsExistFilter(false);
+            }
           }
         }
       }
