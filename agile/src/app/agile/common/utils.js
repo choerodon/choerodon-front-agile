@@ -1,8 +1,10 @@
 /* eslint-disable no-unused-vars */
+import { stores } from 'choerodon-front-boot';
 import { DeltaOperation } from 'react-quill';
 import { uploadImage, uploadFile } from '../api/FileApi';
 import { SERVICES_URL } from './Constant';
 
+const { AppState } = stores;
 const QuillDeltaToHtmlConverter = require('quill-delta-to-html');
 
 /**
@@ -239,4 +241,18 @@ export function randomString(len = 32) {
     code += chars.charAt(Math.floor(Math.random() * (maxPos + 1)));
   }
   return code;
+}
+export function commonLink(link) {
+  const menu = AppState.currentMenuType;
+  const {
+    type, id: projectId, name, organizationId,
+  } = menu;
+
+  return encodeURI(`/agile${link}?type=${type}&id=${projectId}&organizationId=${organizationId}&name=${name}`);
+}
+export function createArtLink() { 
+  return commonLink('/art/create');
+}
+export function artListLink() { 
+  return commonLink('/art');
 }

@@ -24,6 +24,8 @@ const REPORTBOARD = asyncRouter(() => import('./project/ReportBoard'));
 const WORKCALENDARINDEX = asyncRouter(() => import('./organization/WorkCalendar'));
 
 const MESSAGENOTIFICATION = asyncRouter(() => import('./project/MessageNotification')); 
+
+const ART = asyncRouter(() => import('./program/Art')); 
 class AGILEIndex extends React.Component {
   render() {
     const { match } = this.props;
@@ -61,6 +63,7 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/messageNotification`} component={MESSAGENOTIFICATION} />
 
           <Route path={`${match.url}/workCalendar`} component={WORKCALENDARINDEX} />
+          <Route path={`${match.url}/art`} component={ART} />          
           <Route path="*" component={nomatch} />
         </Switch>
       </IntlProviderAsync>
