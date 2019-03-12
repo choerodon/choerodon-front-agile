@@ -2596,7 +2596,7 @@ class CreateSprint extends Component {
                                   label="活跃冲刺"
                                   value={sprintId || undefined}
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
-                                  style={{ width: '150px' }}
+                                  style={{ width: '172px' }}
                                   // onBlur={() => this.statusOnChange()}
                                   onPopupFocus={(e) => {
                                     this.componentRef.rcSelect.focus();
@@ -2621,19 +2621,13 @@ class CreateSprint extends Component {
                                       sprintId: value,
                                       // sprintName: sprint.sprintName,
                                     });
-                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    // this.needBlur = false;
-                                    // if (this.changeTimer > 0) {
-                                    //   clearTimeout(this.changeTimer);
-                                    //   this.changeTimer = 0;
-                                    // }
-                                    // this.changeTimer = setTimeout(() => {
-                                    //   this.needBlur = true;
-                                    // }, 1000);
                                   }}
                                 >
-                                  {originSprints.map(sprint => <Option key={`${sprint.sprintId}`} value={sprint.sprintId}>{sprint.sprintName}</Option>)}
+                                  {originSprints.map(sprint => (
+                                    <Option key={`${sprint.sprintId}`} value={sprint.sprintId}>
+                                      <Tooltip placement="left" title={sprint.sprintName}>{sprint.sprintName}</Tooltip>
+                                    </Option>
+                                  ))}
                                 </Select>
                               </ReadAndEdit>
                             ) : (

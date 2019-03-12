@@ -2241,7 +2241,7 @@ class CreateSprint extends Component {
                             <Select
                               value={sprintId || undefined}
                               // getPopupContainer={triggerNode => triggerNode.parentNode}
-                              style={{ width: '110px' }}
+                              style={{ width: '150px' }}
                               allowClear
                               loading={selectLoading}
                               onFocus={() => {
@@ -2264,7 +2264,7 @@ class CreateSprint extends Component {
                             >
                               {originSprints.map(sprint => (
                                 <Option key={`${sprint.sprintId}`} value={sprint.sprintId}>
-                                  {sprint.sprintName}
+                                  <Tooltip placement="left" title={sprint.sprintName}>{sprint.sprintName}</Tooltip>
                                 </Option>
                               ))}
                             </Select>
