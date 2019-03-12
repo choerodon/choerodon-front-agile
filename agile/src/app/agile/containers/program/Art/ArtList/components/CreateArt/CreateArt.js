@@ -12,11 +12,18 @@ const { Sidebar } = Modal;
 
 const propTypes = {
   visible: PropTypes.bool.isRequired,
-  loading: PropTypes.bool.isRequired, 
+  loading: PropTypes.bool.isRequired,
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
 };
 class CreateArt extends Component {
+  componentDidUpdate(prevProps, prevState) {
+    const { form, visible } = this.props;
+    if (!prevProps.visible && visible) {
+      form.resetFields();
+    }
+  }
+
   handleOk = () => {
     const { onSubmit, form } = this.props;
     form.validateFieldsAndScroll((err, values) => {
@@ -65,8 +72,8 @@ class CreateArt extends Component {
             {getFieldDecorator('fromDate', {
               rules: [{
                 required: true,
-                message: '请选择日期!',                
-              }],              
+                message: '请选择日期!',
+              }],
             })(
               <DatePicker
                 format="YYYY-MM-DD"

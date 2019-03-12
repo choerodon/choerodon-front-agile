@@ -1,7 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
 import moment from 'moment';
 import {
   Form, Input, Tabs, DatePicker, Checkbox,
@@ -21,6 +20,10 @@ const Fields = {
 function NumberFormatter(value) {
   return value && !isNaN(parseInt(value)) ? parseInt(value) : null;// eslint-disable-line
 }
+const propTypes = {
+  initValue: PropTypes.shape({}).isRequired,
+  onSave: PropTypes.func.isRequired,
+};
 class ArtForm extends Component {
   state = {
     currentTab: '1',
@@ -43,7 +46,6 @@ class ArtForm extends Component {
     const { onSave, form } = this.props;
     const { currentTab } = this.state;
     const fields = Fields[currentTab];
-    console.log(fields);
     form.validateFieldsAndScroll(fields, (err, values) => {
       if (!err) {
         window.console.log('Received values of form: ', values);
@@ -60,7 +62,6 @@ class ArtForm extends Component {
     fields.forEach((field) => {
       values[field] = initValue[field];
     });
-    console.log(values);
     form.setFieldsValue(values);
   }
 
@@ -69,7 +70,7 @@ class ArtForm extends Component {
     return (
       <Form>
         <Tabs defaultActiveKey="1" onChange={this.handleTabChange}>
-          <TabPane tab="ART设置" key="1">
+          <TabPane tab="ART设置" key="1">            
             <FormItem>
               {getFieldDecorator('enginner')(
                 <SelectFocusLoad allowClear type="user" label="发布火车工程师" style={{ width: 500 }} />,
@@ -172,12 +173,10 @@ class ArtForm extends Component {
   }
 }
 
-ArtForm.propTypes = {
-
-};
+ArtForm.propTypes = propTypes;
 
 export default Form.create({
-  onValuesChange(props, changedValues, allValues) {
-    props.onChange(changedValues, allValues);
+  onValuesChange(props, ...args) {
+    props.onChange(...args);
   },
 })(ArtForm);

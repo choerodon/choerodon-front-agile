@@ -8,6 +8,7 @@ import { artListLink } from '../../../../common/utils';
 import { ArtSetting } from './components';
 
 function formatter(values) {
+  // eslint-disable-next-line no-param-reassign
   values.fromDate = moment(values.fromDate).format('YYYY-MM-DD');
   return values;
 }
@@ -18,11 +19,11 @@ class EditArt extends Component {
   }
 
   componentDidMount() {
+    // eslint-disable-next-line react/destructuring-assignment
     const { id } = this.props.match.params;
-    console.log(id);    
     this.setState({
       data: {
-        enginner: 1,
+        enginner: 7631,
         fromDate: '2018-03-22',
         isActive: true,
 
@@ -49,12 +50,10 @@ class EditArt extends Component {
         isModified: false,
       });
     }     
-    console.log('change');
   }
 
   handleClearModify=() => {
     const { data } = this.state;
-    console.log(data);
     // 触发form的重置
     this.setState({
       data: { ...data },

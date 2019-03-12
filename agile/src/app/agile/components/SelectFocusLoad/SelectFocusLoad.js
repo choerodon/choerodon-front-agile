@@ -11,11 +11,38 @@ class SelectFocusLoad extends Component {
     loading: false,
     List: [],
   }
+
+  componentDidMount() {
+    this.avoidShowError();    
+  }
   
+  componentDidUpdate(prevProps, prevState) {
+    // eslint-disable-next-line react/destructuring-assignment
+    if (prevProps.value !== this.props.value) {
+      this.avoidShowError();
+    }
+  }
+
+  // 防止取值不在option列表中，比如user
+  avoidShowError=() => {
+    const { type } = this.props;  
+    const Type = Types[type];
+    if (Type.avoidShowError) {
+      const { List } = this.state;
+      Type.avoidShowError(this.props, List).then((newList) => {
+        if (newList) {
+          this.setState({
+            List: newList,
+          });
+        }
+      });
+    }
+  }
+
   render() {
     const { loading, List } = this.state;
-    const { type } = this.props;  
-    const Type = Types[type];  
+    const { type, onChange } = this.props;  
+    const Type = Types[type];
     const { render, request } = Type;
     const Options = List.map(render);
     return (
