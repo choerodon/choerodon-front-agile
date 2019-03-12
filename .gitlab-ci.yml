@@ -1,51 +1,24 @@
-image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cifront:0.7.0
-
 stages:
-  - node_build
-  - docker_build
+  - build
+  - release
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-node_build:
-  stage: node_build
+build:
+  image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cifront:0.8.0
+  stage: build
   script:
     - node_module agile
     - node_build build
-    - cp -r dist /cache/${CI_PROJECT_NAME}-${CI_PROJECT_ID}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}/dist
-    - cp -r node_modules/choerodon-front-boot/structure /cache/${CI_PROJECT_NAME}-${CI_PROJECT_ID}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}/structure
-    - cp -r agile-structure /cache/${CI_PROJECT_NAME}-${CI_PROJECT_ID}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}/agile-structure
+    - cd $CI_PROJECT_DIR
+    - kaniko -c $CI_PROJECT_DIR -f $CI_PROJECT_DIR/Dockerfile -d ${DOCKER_REGISTRY}/${GROUP_NAME}/${PROJECT_NAME}:${CI_COMMIT_TAG}
 
-  only:
-    - master
-    - /^release-.*$/
-    - /^hotfix-.*$/
-    - tags
-
-node_build_dev:
-  stage: node_build
+release:
+  image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cibase:0.8.0
+  stage: release
   script:
-    - node_module agile
-    - node_build build
-    - rm -rf /cache/${CI_PROJECT_NAME}-${CI_PROJECT_ID}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
-  except:
-    - master
-    - /^release-.*$/
-    - /^hotfix-.*$/
-    - tags
-
-docker_build:
-  image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cibase:0.7.0
-  stage: docker_build
-  script:
-    - docker_build
-    - rm -rf /cache/${CI_PROJECT_NAME}-${CI_PROJECT_ID}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
     - chart_build
-  only:
-    - master
-    - /^release-.*$/
-    - /^hotfix-.*$/
-    - tags
 
 .auto_devops: &auto_devops |
     http_status_code=`curl -o .auto_devops.sh -s -m 10 --connect-timeout 10 -w %{http_code} "${CHOERODON_URL}/devops/ci?token=${Token}&type=front"`
@@ -55,12 +28,11 @@ docker_build:
     fi
     source .auto_devops.sh    
     function node_module(){
-        cd ${1} && npm install -registry https://nexus.choerodon.com.cn/repository/choerodon-npm/ --sass-binary-site=http://npm.taobao.org/mirrors/node-sass && cd ..
-        mkdir -p /cache/${CI_PROJECT_NAME}-${CI_PROJECT_ID}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
-        python ./${1}/node_modules/choerodon-front-boot/structure/configAuto.py ${1}
-        cp -r config.yml /cache/${CI_PROJECT_NAME}-${CI_PROJECT_ID}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}/
-        python ./${1}/node_modules/choerodon-front-boot/structure/dashboard.py -o yml -m ${1}
-        cp -r dashboard.yml /cache/${CI_PROJECT_NAME}-${CI_PROJECT_ID}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}/
+        cd ${1}
+        npm install -registry https://nexus.choerodon.com.cn/repository/choerodon-npm/ --sass-binary-site=http://npm.taobao.org/mirrors/node-sass
+        cd ..
+        python ./${1}/node_modules/choerodon-front-boot/structure/menu/__init__.py -o yml -m ${1}
+        python ./${1}/node_modules/choerodon-front-boot/structure/dashboard/__init__.py -o yml -m ${1}
         cd ${1}
     }
 
@@ -68,12 +40,6 @@ docker_build:
         chmod -R 777 node_modules
         npm run ${1:-"build"}
         find dist -name '*.js' | xargs sed -i "s/localhost:version/$CI_COMMIT_TAG/g"
-    }
-
-    function docker_build(){
-        cp -r /cache/${CI_PROJECT_NAME}-${CI_PROJECT_ID}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}/* ${1:-"."}
-        docker build --pull -t ${DOCKER_REGISTRY}/${GROUP_NAME}/${PROJECT_NAME}:${CI_COMMIT_TAG} ${1:-"."}
-        docker push ${DOCKER_REGISTRY}/${GROUP_NAME}/${PROJECT_NAME}:${CI_COMMIT_TAG}
     }
 
 before_script:
