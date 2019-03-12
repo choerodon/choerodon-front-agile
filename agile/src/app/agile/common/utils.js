@@ -250,8 +250,8 @@ export function commonLink(link) {
 
   return encodeURI(`/agile${link}?type=${type}&id=${projectId}&organizationId=${organizationId}&name=${name}`);
 }
-export function createArtLink() { 
-  return commonLink('/art/create');
+export function editArtLink(artId) { 
+  return commonLink(`/art/edit/${artId}`);
 }
 export function artListLink() { 
   return commonLink('/art');

@@ -6,11 +6,11 @@ import {
 import { asyncRouter, nomatch } from 'choerodon-front-boot';
 
 const ArtList = asyncRouter(() => (import('./ArtList')));
-const CreateArt = asyncRouter(() => (import('./CreateArt')));
+const EditArt = asyncRouter(() => (import('./EditArt')));
 const ArtIndex = ({ match }) => (
   <Switch>
     <Route exact path={`${match.url}`} component={ArtList} />
-    <Route exact path={`${match.url}/create`} component={CreateArt} />
+    <Route exact path={`${match.url}/edit/:id?`} component={EditArt} />
     <Route path="*" component={nomatch} />
   </Switch>
 );
