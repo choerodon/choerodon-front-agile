@@ -256,3 +256,10 @@ export function editArtLink(artId) {
 export function artListLink() { 
   return commonLink('/art');
 }
+
+export function PIDetailLink(id) { 
+  return commonLink(`/pi/detail/${id}`);
+}
+export function PIListLink() { 
+  return commonLink('/pi');
+}
