@@ -14,8 +14,9 @@ const ArtTable = ({
 }) => {
   const columns = [{
     title: '编号',
-    dataIndex: 'seqNumber',
-    key: 'seqNumber',    
+    dataIndex: 'code',
+    key: 'code',  
+    render: (code, record) => `#${code}-${record.id}`,  
   }, {
     title: '名称',
     dataIndex: 'name',

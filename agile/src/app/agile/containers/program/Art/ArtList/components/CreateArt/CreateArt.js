@@ -50,6 +50,15 @@ class CreateArt extends Component {
       >
         <Form>
           <FormItem>
+            {getFieldDecorator('code', {
+              rules: [{
+                required: true, message: '请输入ART的code!',
+              }],
+            })(
+              <Input style={{ width: 500 }} maxLength={30} label="Code" placeholder="请输入ART的code" />,
+            )}
+          </FormItem>
+          <FormItem>
             {getFieldDecorator('name', {
               rules: [{
                 required: true, message: '请输入ART名称!',
