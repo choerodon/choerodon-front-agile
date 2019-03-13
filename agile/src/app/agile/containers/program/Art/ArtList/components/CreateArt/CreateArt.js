@@ -60,7 +60,7 @@ class CreateArt extends Component {
           </FormItem>
           <FormItem>
             {getFieldDecorator('description')(
-              <Input style={{ width: 500 }} maxLength={30} label="描述" placeholder="请输入ART的详细描述" />,
+              <Input style={{ width: 500 }} maxLength={44} label="描述" placeholder="请输入ART的详细描述" />,
             )}
           </FormItem>
           <FormItem>

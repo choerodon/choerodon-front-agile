@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Table } from 'choerodon-ui';
 import moment from 'moment';
+import StatusTag from '../../../../../../components/StatusTag';
 
 const propTypes = {
   dataSource: PropTypes.shape({}).isRequired,
@@ -27,9 +28,9 @@ const ArtTable = ({
     render: startDate => moment(startDate).format('YYYY-MM-DD'),
   }, {
     title: '状态',
-    dataIndex: 'status',
-    key: 'status',
-    render: status => status,
+    dataIndex: 'enabled',
+    key: 'enabled',
+    render: enabled => <StatusTag categoryCode={enabled ? 'doing' : 'todo'} name={enabled ? '进行中' : '未启用'} />,
   }, {
     title: '创建日期',
     dataIndex: 'createDate',
