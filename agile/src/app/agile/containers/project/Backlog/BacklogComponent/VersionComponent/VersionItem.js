@@ -265,7 +265,7 @@ class VersionItem extends Component {
                       onPressEnter={this.handleBlurName.bind(this)}
                       onBlur={this.handleBlurName.bind(this)}
                       onClick={e => e.stopPropagation()}
-                      maxLength={10}
+                      maxLength={15}
                     />
                     
                   ) : (

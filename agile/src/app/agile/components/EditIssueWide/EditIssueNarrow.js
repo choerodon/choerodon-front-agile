@@ -1093,6 +1093,20 @@ class CreateSprint extends Component {
     }
   }
 
+  handleVersionChange = (value, tag) => {
+    const { originVersions } = this.state;
+    const versions = value.filter(v => v && v.trim()).map((item) => {
+      if (_.find(originVersions, { name: item })) {
+        return item;
+      } else {
+        return item.trim().substr(0, 15);
+      }
+    });
+    this.setState({
+      [tag]: versions,
+    });
+  };
+
   renderWiki = () => {
     const { wikies } = this.state;
     return (
@@ -2632,16 +2646,6 @@ class CreateSprint extends Component {
                                       item => item.substr(0, 10),
                                     ),
                                   });
-                                  // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                  // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                  // this.needBlur = false;
-                                  // if (this.changeTimer > 0) {
-                                  //   clearTimeout(this.changeTimer);
-                                  //   this.changeTimer = 0;
-                                  // }
-                                  // this.changeTimer = setTimeout(() => {
-                                  //   this.needBlur = true;
-                                  // }, 500);
                                 }}
                               >
                                 {originLabels.map(label => (
@@ -2725,14 +2729,7 @@ class CreateSprint extends Component {
                                       });
                                     });
                                   }}
-                                  onChange={(value) => {
-                                    this.needBlur = false;
-                                    this.setState({
-                                      influenceVersions: value.filter(v => v && v.trim()).map(
-                                        item => item.trim().substr(0, 10),
-                                      ),
-                                    });
-                                  }}
+                                  onChange={value => this.handleVersionChange(value, 'influenceVersions')}
                                 >
                                   {originVersions.map(version => (
                                     <Option key={version.name} value={version.name}>
@@ -2819,13 +2816,7 @@ class CreateSprint extends Component {
                                     });
                                   });
                                 }}
-                                onChange={(value) => {
-                                  this.setState({
-                                    fixVersions: value.filter(v => v && v.trim()).map(
-                                      item => item.trim().substr(0, 10),
-                                    ),
-                                  });
-                                }}
+                                onChange={value => this.handleVersionChange(value, 'fixVersions')}
                               >
                                 {originVersions.map(version => (
                                   <Option key={version.name} value={version.name}>
@@ -2918,15 +2909,6 @@ class CreateSprint extends Component {
                                       epicId: value,
                                       // epicName: epic.epicName,
                                     });
-                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    // if (this.changeTimer > 0) {
-                                    //   clearTimeout(this.changeTimer);
-                                    //   this.changeTimer = 0;
-                                    // }
-                                    // this.changeTimer = setTimeout(() => {
-                                    //   this.needBlur = true;
-                                    // }, 500);
                                   }}
                                 >
                                   {originEpics.map(epic => (

@@ -124,7 +124,7 @@ render() {
                 validator: this.checkVersionNameRepeat,
               }],
             })(
-              <Input maxLength={10} label="版本名称" />,
+              <Input maxLength={15} label="版本名称" />,
             )}
           </FormItem>
           <FormItem>
