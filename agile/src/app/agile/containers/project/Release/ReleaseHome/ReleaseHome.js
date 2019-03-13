@@ -239,7 +239,7 @@ class ReleaseHome extends Component {
           <div
             role="none"
             style={{
-              maxWidth: '94px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              maxWidth: '120px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}
           >
             <a

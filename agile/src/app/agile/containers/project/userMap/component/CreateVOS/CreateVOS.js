@@ -144,7 +144,7 @@ class CreateVOS extends Component {
                 label={`${type === 'sprint' ? '冲刺' : '版本'}名称`}
                 // defaultValue={this.state.nextSprintName}
                 onPressEnter={this.handleCreate}
-                maxLength={30}
+                maxLength={type === 'sprint' ? 30 : 15}
               />,
             )}
           </FormItem>

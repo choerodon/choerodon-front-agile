@@ -120,7 +120,7 @@ class EditRelease extends Component {
                       validator: this.checkName,
                     }],
                   })(
-                    <Input label="版本名称" maxLength={30} />,
+                    <Input label="版本名称" maxLength={15} />,
                   )}
                 </FormItem>
                 <FormItem>
