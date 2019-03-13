@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import {
   Form, Input, Tabs, DatePicker, Checkbox,
-  Icon, Button, Divider, InputNumber,
+  Icon, Button, Divider, InputNumber, Select,
 } from 'choerodon-ui';
 
 import SelectFocusLoad from '../../../../../../components/SelectFocusLoad';
 
 
+const { Option } = Select;
 const { TabPane } = Tabs;
 const FormItem = Form.Item;
 const Fields = {
@@ -18,7 +19,7 @@ const Fields = {
   3: ['piCodePrefix', 'piCodeNumber'],
 };
 function NumberFormatter(value) {
-  return value && !isNaN(parseInt(value)) ? parseInt(value) : null;// eslint-disable-line
+  return value && !isNaN(parseInt(value)) && parseInt(value) > 0 ? parseInt(value) : null;// eslint-disable-line
 }
 const propTypes = {
   initValue: PropTypes.shape({}).isRequired,
@@ -30,10 +31,10 @@ class ArtForm extends Component {
   }
 
   componentDidMount() {
-    const { form, initValue } = this.props;    
+    const { form, initValue } = this.props;
     form.setFieldsValue(initValue);
   }
-  
+
   componentDidUpdate(prevProps, prevState) {
     const { form, initValue } = this.props;
     if (prevProps.initValue !== initValue) {
@@ -53,7 +54,6 @@ class ArtForm extends Component {
     const fields = Fields[currentTab];
     form.validateFieldsAndScroll(fields, (err, values) => {
       if (!err) {
-        window.console.log('Received values of form: ', values);
         onSave(values);
       }
     });
@@ -75,7 +75,7 @@ class ArtForm extends Component {
     return (
       <Form>
         <Tabs defaultActiveKey="1" onChange={this.handleTabChange}>
-          <TabPane tab="ART设置" key="1">            
+          <TabPane tab="ART设置" key="1">
             <FormItem>
               {getFieldDecorator('rteId')(
                 <SelectFocusLoad allowClear type="user" label="发布火车工程师" style={{ width: 500 }} />,
@@ -137,15 +137,14 @@ class ArtForm extends Component {
             <FormItem>
               {getFieldDecorator('interationWorkdays', {
                 rules: [{
-                  required: true, message: '请输入每个迭代的工作天数!',
+                  required: true, message: '请选择每个迭代的工作周数!',
                 }],
               })(
-                <InputNumber
-                  formatter={NumberFormatter}
-                  style={{ width: 500 }}
-                  label="迭代工作日"
-                  placeholder="请输入每个迭代的工作天数"
-                />,
+                <Select style={{ width: 500 }} label="迭代工作周" placeholder="请选择每个迭代的工作周数">
+                  {
+                    [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
+                  }
+                </Select>,
               )}
             </FormItem>
           </TabPane>

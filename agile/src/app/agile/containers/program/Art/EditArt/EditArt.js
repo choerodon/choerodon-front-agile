@@ -7,10 +7,12 @@ import {
 } from 'choerodon-ui';
 import moment from 'moment';
 import { artListLink } from '../../../../common/utils';
-import { ArtSetting, ReleaseArt } from './components';
+import { ArtInfo, ArtSetting, ReleaseArt } from './components';
+
 import { getArtById, editArt, releaseArt } from '../../../../api/ArtApi';
 import './EditArt.scss';
 
+const requiredFields = ['startDate', 'ipWorkdays', 'interationCount', 'interationWorkdays', 'piCodePrefix', 'piCodeNumber'];
 function formatter(values) {
   const data = { ...values };
   Object.keys(data).forEach((key) => {
@@ -26,6 +28,7 @@ class EditArt extends Component {
     formData: {},
     data: {},
     isModified: false,
+    canRelease: false,
     releaseArtVisible: false,
   }
 
@@ -50,22 +53,26 @@ class EditArt extends Component {
         rteId,
         startDate,
       } = data;
+      const formData = {
+        enabled,
+        interationCount,
+        interationWorkdays,
+        ipWorkdays,
+        piCodeNumber,
+        piCodePrefix,
+        rteId,
+        startDate,
+      };
       this.setState({
         loading: false,
-        formData: {
-          enabled,
-          interationCount,
-          interationWorkdays,
-          ipWorkdays,
-          piCodeNumber,
-          piCodePrefix,
-          rteId,
-          startDate,
-        },
+        formData,
         data,
+        canRelease: this.checkCanRelease(formData),
       });
     });
   }
+
+  checkCanRelease = data => !requiredFields.some(field => data[field] == undefined)
 
   handleFormChange = (changedValues, allValues) => {
     const { formData, isModified } = this.state;
@@ -93,8 +100,7 @@ class EditArt extends Component {
 
   handleSave = (newValues) => {
     const { data } = this.state;
-    const artDTO = { ...data, ...formatter(newValues) };
-    console.log(newValues, artDTO);
+    const artDTO = { ...data, ...formatter(newValues) };    
     editArt(artDTO).then((res) => {
       this.loadArt();
     });
@@ -108,15 +114,9 @@ class EditArt extends Component {
 
   handleReleaseOk = (PINum) => {
     const { data, formData } = this.state;
-    const requiredFields = ['startDate', 'ipWorkdays', 'interationCount', 'interationWorkdays', 'piCodePrefix', 'piCodeNumber'];
-    // 如果有字段没输入
-    if (requiredFields.some(field => !formData[field])) {
-      Choerodon.prompt('请完善信息再发布！');
-    } else {
-      releaseArt(data.id, PINum).then((res) => {
+    releaseArt(data.id, PINum).then((res) => {
 
-      });
-    }
+    });
   }
 
   handleReleaseCancel = () => {
@@ -127,9 +127,12 @@ class EditArt extends Component {
 
   render() {
     const {
-      formData, isModified, releaseArtVisible, data, loading,
+      formData, isModified, canRelease,
+      releaseArtVisible, data, loading,
     } = this.state;
-    const { id, name, description } = data;
+    const {
+      id, name, description, enabled, 
+    } = data;
     return (
       <Page className="c7nagile-EditArt">
         <Header
@@ -144,25 +147,16 @@ class EditArt extends Component {
                 onOk={this.handleReleaseOk}
                 onCancel={this.handleReleaseCancel}
               />
-              <div style={{ display: 'flex' }}>
-                <div><Icon type="warning" style={{ color: '#FADB14' }} /></div>
-                <div style={{ width: 500, marginLeft: 5 }}>
-                  注意：此ART正在进行中。你正在编辑
-                  <span className="weight">{name}</span>
-                  ，如果编辑后的修改需要生效，请点击
-                  <span className="weight">发布</span>
-                  。
-                  <span className="weight">清除修改</span>
-                  点击后恢复为当前设置。
-                </div>
-                <div style={{ flex: 1, visibility: 'hidden' }} />
-                <div>
-                  {!isModified && <Button type="primary" funcType="raised" onClick={this.handleReleaseClick}>发布</Button>}
-                  {isModified && <Button funcType="raised" style={{ marginLeft: 10 }} onClick={this.handleClearModify}>清除修改</Button>}
-                </div>
-              </div>
-              <div style={{ fontSize: '18px', fontWeight: 500, margin: '20px 0 10px' }}>{name}</div>
-              <div style={{ marginBottom: 20 }}>{description}</div>
+              <ArtInfo 
+                enabled={enabled}
+                canRelease={canRelease}
+                isModified={isModified}  
+                onSubmit={this.handleSave}
+                name={name}
+                description={description}
+                onReleaseClick={this.handleReleaseClick}
+                onClearModify={this.handleClearModify}
+              />
               <ArtSetting
                 initValue={formData}
                 onFormChange={this.handleFormChange}

@@ -22,6 +22,7 @@ class ArtList extends Component {
   state = {
     loading: true,
     data: [],
+    createDisabled: true,
     createArtVisible: false,
     createArtLoading: false,
   }
@@ -38,6 +39,7 @@ class ArtList extends Component {
       this.setState({
         loading: false,
         data: res.content,
+        createDisabled: res.content && res.content.length > 0,
       });
     });
   }
@@ -87,14 +89,14 @@ class ArtList extends Component {
 
   render() {
     const {
-      data, createArtVisible, createArtLoading, pagination, loading,
+      data, createArtVisible, createArtLoading, pagination, loading, createDisabled,
     } = this.state;
     return (
       <Page className="c7ntest-Issue c7ntest-region">
         <Header
           title="ART列表"
         >
-          <Button icon="playlist_add" onClick={this.handleCreateArtClick}>
+          <Button icon="playlist_add" onClick={this.handleCreateArtClick} disabled={createDisabled}>
             创建ART
           </Button>
         </Header>
