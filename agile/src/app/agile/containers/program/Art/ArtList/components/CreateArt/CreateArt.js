@@ -50,7 +50,7 @@ class CreateArt extends Component {
       >
         <Form>
           <FormItem>
-            {getFieldDecorator('artName', {
+            {getFieldDecorator('name', {
               rules: [{
                 required: true, message: '请输入ART名称!',
               }],
@@ -59,17 +59,17 @@ class CreateArt extends Component {
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('artDescription')(
+            {getFieldDecorator('description')(
               <Input style={{ width: 500 }} maxLength={30} label="描述" placeholder="请输入ART的详细描述" />,
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('enginner')(
+            {getFieldDecorator('rteId')(
               <SelectFocusLoad allowClear type="user" label="发布火车工程师" style={{ width: 500 }} />,
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('fromDate', {
+            {getFieldDecorator('startDate', {
               rules: [{
                 required: true,
                 message: '请选择日期!',
@@ -83,7 +83,7 @@ class CreateArt extends Component {
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('isActive', {
+            {getFieldDecorator('enabled', {
               valuePropName: 'checked',
             })(
               <Checkbox>启用</Checkbox>,

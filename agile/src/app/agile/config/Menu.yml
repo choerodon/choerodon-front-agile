@@ -76,6 +76,20 @@
         sort: 12
         permission:
           - 'agile-service.issue-link-type.updateIssueLinkType'
+    - "ART"
+        icon: train
+        category: PROGRAM
+        Routes: /agile/art
+        sort: 13
+        permission:
+          - 'agile-service.art.queryArtList'      
+    - "PI"
+        icon: center_focus_strong
+        category: PROGRAM
+        Routes: /agile/pi
+        sort: 14
+        permission:
+          - 'agile-service.pi.queryAll'     
 
 "platform-reports":
   icon: bar_chart

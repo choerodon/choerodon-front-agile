@@ -1,79 +1,121 @@
 import React, { Component } from 'react';
-import { Page, Header, Content } from 'choerodon-front-boot';
-import { Button, Icon, Table } from 'choerodon-ui';
-import PropTypes from 'prop-types';
+import {
+  Page, Header, Content, stores, 
+} from 'choerodon-front-boot';
+import { Button, Spin } from 'choerodon-ui';
+import moment from 'moment';
 import { editArtLink } from '../../../../common/utils';
 import { ArtTable, CreateArt } from './components';
+import { getArtsByProjectId, createArt } from '../../../../api/ArtApi';
 
+function formatter(values) {
+  const data = { ...values };
+  Object.keys(data).forEach((key) => {
+    if (moment.isMoment(data[key])) {
+      data[key] = moment(data[key]).format('YYYY-MM-DD HH:mm:ss');
+    }
+  });
+  return data;
+}
+const { AppState } = stores;
 class ArtList extends Component {
-  state={
-    data: [{
-      id: 1,
-      num: '#PRO-1',
-      status: '进行中',
-      name: '项目A敏捷发布火车',
-      startDate: '2019-02-24',
-      createDate: '2019-02-24',
-    }],
+  state = {
+    loading: true,
+    data: [],
     createArtVisible: false,
     createArtLoading: false,
   }
 
-  handleCreateArtClick=() => {
+  componentDidMount() {
+    this.loadArts();
+  }
+
+  loadArts = () => {
+    this.setState({
+      loading: true,
+    });
+    getArtsByProjectId().then((res) => {
+      this.setState({
+        loading: false,
+        data: res.content,
+      });
+    });
+  }
+
+  handleCreateArtClick = () => {
     this.setState({
       createArtVisible: true,
     });
   }
 
-  handleCreateArt=() => {
-    
+  handleCreateArt = (data) => {
+    const projectId = AppState.currentMenuType.id;
+    const Data = { ...formatter(data), programId: projectId };
+    this.setState({
+      createArtLoading: true,
+    });
+    createArt(Data).then((res) => {
+      this.setState({
+        createArtVisible: false,
+        createArtLoading: false,
+      });
+      this.loadArts();
+    }).catch((err) => {
+      console.log(err);
+      this.setState({
+        createArtVisible: false,
+        createArtLoading: false,
+      });
+    });
   }
 
-  handleArtCreateCancel=() => {
+  handleArtCreateCancel = () => {
     this.setState({
       createArtVisible: false,
     });
   }
 
-  handleEditArtClick=(record) => {
-    const { id: artId } = record;    
+  handleEditArtClick = (record) => {
+    const { id: artId } = record;
     const { history } = this.props;
     history.push(editArtLink(artId));
   }
 
+  handlePaginationChange = (pagination) => {
+    this.loadArts(pagination);
+  }
+
   render() {
-    const { data, createArtVisible, createArtLoading } = this.state;
+    const {
+      data, createArtVisible, createArtLoading, pagination, loading,
+    } = this.state;
     return (
       <Page className="c7ntest-Issue c7ntest-region">
         <Header
           title="ART列表"
-        >          
+        >
           <Button icon="playlist_add" onClick={this.handleCreateArtClick}>
-           创建ART
+            创建ART
           </Button>
-          {/* <Button icon="autorenew">           
-            刷新
-          </Button> */}
         </Header>
-        <Content>          
-          <CreateArt 
-            visible={createArtVisible} 
-            loading={createArtLoading}
-            onCancel={this.handleArtCreateCancel}
-            onSubmit={this.handleCreateArt}
-          />
-          <ArtTable 
-            dataSource={data}
-            onEditArtClick={this.handleEditArtClick}
-          />
+        <Content>
+          <Spin spinning={loading}>
+            <CreateArt
+              visible={createArtVisible}
+              loading={createArtLoading}
+              onCancel={this.handleArtCreateCancel}
+              onSubmit={this.handleCreateArt}
+            />
+            <ArtTable         
+              dataSource={data}
+              onEditArtClick={this.handleEditArtClick}
+            />
+          </Spin>
         </Content>
       </Page>
     );
   }
 }
 
-ArtList.propTypes = {
-
-};
 
 export default ArtList;

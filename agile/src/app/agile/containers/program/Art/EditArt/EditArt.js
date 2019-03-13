@@ -1,45 +1,75 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Page, Header, Content } from 'choerodon-front-boot';
 import PropTypes from 'prop-types';
 import { isEqual } from 'lodash';
-import { Icon, Button } from 'choerodon-ui';
+import {
+  Icon, Button, Progress, Spin,
+} from 'choerodon-ui';
 import moment from 'moment';
 import { artListLink } from '../../../../common/utils';
-import { ArtSetting } from './components';
+import { ArtSetting, ReleaseArt } from './components';
+import { getArtById, editArt, releaseArt } from '../../../../api/ArtApi';
+import './EditArt.scss';
 
 function formatter(values) {
-  // eslint-disable-next-line no-param-reassign
-  values.fromDate = moment(values.fromDate).format('YYYY-MM-DD');
-  return values;
+  const data = { ...values };
+  Object.keys(data).forEach((key) => {
+    if (moment.isMoment(data[key])) {
+      data[key] = moment(data[key]).format('YYYY-MM-DD HH:mm:ss');
+    }
+  });
+  return data;
 }
 class EditArt extends Component {
   state = {
+    loading: true,
+    formData: {},
     data: {},
     isModified: false,
+    releaseArtVisible: false,
   }
 
   componentDidMount() {
+    this.loadArt();
+  }
+
+  loadArt = () => {
     // eslint-disable-next-line react/destructuring-assignment
     const { id } = this.props.match.params;
     this.setState({
-      data: {
-        enginner: 7631,
-        fromDate: '2018-03-22',
-        isActive: true,
-
-        ipDays: 5,
-        sprintNum: 5,
-        sprintWorkDays: 5,
-
-        piPrefix: 'pre',
-        piStartNum: '5',
-      },
+      loading: true,
+    });
+    getArtById(id).then((data) => {
+      const {
+        enabled,
+        interationCount,
+        interationWorkdays,
+        ipWorkdays,
+        piCodeNumber,
+        piCodePrefix,
+        rteId,
+        startDate,
+      } = data;
+      this.setState({
+        loading: false,
+        formData: {
+          enabled,
+          interationCount,
+          interationWorkdays,
+          ipWorkdays,
+          piCodeNumber,
+          piCodePrefix,
+          rteId,
+          startDate,
+        },
+        data,
+      });
     });
   }
 
   handleFormChange = (changedValues, allValues) => {
-    const { data, isModified } = this.state;   
-    if (!isEqual(formatter(allValues), data)) {
+    const { formData, isModified } = this.state;
+    if (!isEqual(formatter(allValues), formData)) {
       if (!isModified) {
         this.setState({
           isModified: true,
@@ -49,50 +79,97 @@ class EditArt extends Component {
       this.setState({
         isModified: false,
       });
-    }     
+    }
   }
 
-  handleClearModify=() => {
-    const { data } = this.state;
+  handleClearModify = () => {
+    const { formData } = this.state;
     // 触发form的重置
     this.setState({
-      data: { ...data },
+      formData: { ...formData },
       isModified: false,
     });
   }
 
-  handleSave = () => {
+  handleSave = (newValues) => {
+    const { data } = this.state;
+    const artDTO = { ...data, ...formatter(newValues) };
+    console.log(newValues, artDTO);
+    editArt(artDTO).then((res) => {
+      this.loadArt();
+    });
+  }
 
+  handleReleaseClick = () => {
+    this.setState({
+      releaseArtVisible: true,
+    });
+  }
+
+  handleReleaseOk = (PINum) => {
+    const { data, formData } = this.state;
+    const requiredFields = ['startDate', 'ipWorkdays', 'interationCount', 'interationWorkdays', 'piCodePrefix', 'piCodeNumber'];
+    // 如果有字段没输入
+    if (requiredFields.some(field => !formData[field])) {
+      Choerodon.prompt('请完善信息再发布！');
+    } else {
+      releaseArt(data.id, PINum).then((res) => {
+
+      });
+    }
+  }
+
+  handleReleaseCancel = () => {
+    this.setState({
+      releaseArtVisible: false,
+    });
   }
 
   render() {
-    const { data, isModified } = this.state;
+    const {
+      formData, isModified, releaseArtVisible, data, loading,
+    } = this.state;
+    const { id, name, description } = data;
     return (
-      <Page className="c7ntest-Issue c7ntest-region">
+      <Page className="c7nagile-EditArt">
         <Header
           title="编辑ART"
           backPath={artListLink()}
         />
         <Content>
-          <div style={{ display: 'flex' }}>
-            <div><Icon type="warning" style={{ color: '#FADB14' }} /></div>
-            <div style={{ width: 500, marginLeft: 5 }}>
-              注意：此ART正在进行中。你正在编辑 项目A敏捷发布火车 ，如果编辑后的修
-              改需要生效，请点击 发布 。清除修改 点击后恢复为当前设置。
-            </div>
-            <div style={{ flex: 1, visibility: 'hidden' }} />
-            <div>
-              {!isModified && <Button type="primary" funcType="raised">发布</Button>}
-              {isModified && <Button funcType="raised" style={{ marginLeft: 10 }} onClick={this.handleClearModify}>清除修改</Button>}
-            </div>
-          </div>
-          <div style={{ fontSize: '18px', fontWeight: 500, margin: '20px 0 10px' }}>项目A敏捷发布火车</div>
-          <div style={{ marginBottom: 20 }}>项目A敏捷发布火车的各种机会机会计划计划计划</div>
-          <ArtSetting
-            initValue={data}
-            onFormChange={this.handleFormChange}
-            onSave={this.handleSave}
-          />
+          {id ? (
+            <Spin spinning={loading}>
+              <ReleaseArt
+                visible={releaseArtVisible}
+                onOk={this.handleReleaseOk}
+                onCancel={this.handleReleaseCancel}
+              />
+              <div style={{ display: 'flex' }}>
+                <div><Icon type="warning" style={{ color: '#FADB14' }} /></div>
+                <div style={{ width: 500, marginLeft: 5 }}>
+                  注意：此ART正在进行中。你正在编辑
+                  <span className="weight">{name}</span>
+                  ，如果编辑后的修改需要生效，请点击
+                  <span className="weight">发布</span>
+                  。
+                  <span className="weight">清除修改</span>
+                  点击后恢复为当前设置。
+                </div>
+                <div style={{ flex: 1, visibility: 'hidden' }} />
+                <div>
+                  {!isModified && <Button type="primary" funcType="raised" onClick={this.handleReleaseClick}>发布</Button>}
+                  {isModified && <Button funcType="raised" style={{ marginLeft: 10 }} onClick={this.handleClearModify}>清除修改</Button>}
+                </div>
+              </div>
+              <div style={{ fontSize: '18px', fontWeight: 500, margin: '20px 0 10px' }}>{name}</div>
+              <div style={{ marginBottom: 20 }}>{description}</div>
+              <ArtSetting
+                initValue={formData}
+                onFormChange={this.handleFormChange}
+                onSave={this.handleSave}
+              />
+            </Spin>
+          ) : <Progress type="loading" className="spin-container" />}
         </Content>
       </Page>
     );

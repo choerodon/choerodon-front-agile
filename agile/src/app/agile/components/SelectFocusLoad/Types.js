@@ -17,7 +17,7 @@ export default {
     avoidShowError: (props, List) => new Promise((resolve) => {
       const { value } = props;
       const UserList = [...List];
-      console.log(List, find(List, { id: value }));
+      
       if (value && !find(UserList, { id: value })) {
         getUser(value).then((res) => {
           if (res.content && res.content.length > 0) {

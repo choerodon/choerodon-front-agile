@@ -13,9 +13,9 @@ import SelectFocusLoad from '../../../../../../components/SelectFocusLoad';
 const { TabPane } = Tabs;
 const FormItem = Form.Item;
 const Fields = {
-  1: ['enginner', 'fromDate', 'isActive'],
-  2: ['ipDays', 'sprintNum', 'sprintWorkDays'],
-  3: ['piPrefix', 'piStartNum'],
+  1: ['rteId', 'startDate', 'enabled'],
+  2: ['ipWorkdays', 'interationCount', 'interationWorkdays'],
+  3: ['piCodePrefix', 'piCodeNumber'],
 };
 function NumberFormatter(value) {
   return value && !isNaN(parseInt(value)) ? parseInt(value) : null;// eslint-disable-line
@@ -29,6 +29,11 @@ class ArtForm extends Component {
     currentTab: '1',
   }
 
+  componentDidMount() {
+    const { form, initValue } = this.props;    
+    form.setFieldsValue(initValue);
+  }
+  
   componentDidUpdate(prevProps, prevState) {
     const { form, initValue } = this.props;
     if (prevProps.initValue !== initValue) {
@@ -72,12 +77,12 @@ class ArtForm extends Component {
         <Tabs defaultActiveKey="1" onChange={this.handleTabChange}>
           <TabPane tab="ART设置" key="1">            
             <FormItem>
-              {getFieldDecorator('enginner')(
+              {getFieldDecorator('rteId')(
                 <SelectFocusLoad allowClear type="user" label="发布火车工程师" style={{ width: 500 }} />,
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('fromDate', {
+              {getFieldDecorator('startDate', {
                 rules: [{
                   required: true,
                   message: '请选择日期!',
@@ -93,7 +98,7 @@ class ArtForm extends Component {
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('isActive', {
+              {getFieldDecorator('enabled', {
                 valuePropName: 'checked',
               })(
                 <Checkbox>启用</Checkbox>,
@@ -102,7 +107,7 @@ class ArtForm extends Component {
           </TabPane>
           <TabPane tab="ART节奏" key="2">
             <FormItem>
-              {getFieldDecorator('ipDays', {
+              {getFieldDecorator('ipWorkdays', {
                 rules: [{
                   required: true, message: '请选择日期!',
                 }],
@@ -116,7 +121,7 @@ class ArtForm extends Component {
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('sprintNum', {
+              {getFieldDecorator('interationCount', {
                 rules: [{
                   required: true, message: '请输入ART中每个PI的迭代数!',
                 }],
@@ -130,7 +135,7 @@ class ArtForm extends Component {
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('sprintWorkDays', {
+              {getFieldDecorator('interationWorkdays', {
                 rules: [{
                   required: true, message: '请输入每个迭代的工作天数!',
                 }],
@@ -146,7 +151,7 @@ class ArtForm extends Component {
           </TabPane>
           <TabPane tab="PI规则" key="3">
             <FormItem>
-              {getFieldDecorator('piPrefix', {
+              {getFieldDecorator('piCodePrefix', {
                 rules: [{
                   required: true, message: '请输入PI前缀!',
                 }],
@@ -155,7 +160,7 @@ class ArtForm extends Component {
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('piStartNum', {
+              {getFieldDecorator('piCodeNumber', {
                 rules: [{
                   required: true, message: '请输入PI起始编号!',
                 }],

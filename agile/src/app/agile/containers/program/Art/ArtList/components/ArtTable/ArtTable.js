@@ -7,14 +7,14 @@ const propTypes = {
   dataSource: PropTypes.shape({}).isRequired,
   onEditArtClick: PropTypes.func.isRequired,
 };
-const ArtTable = ({
+const ArtTable = ({ 
   dataSource,
   onEditArtClick,
 }) => {
   const columns = [{
     title: '编号',
-    dataIndex: 'num',
-    key: 'num',    
+    dataIndex: 'seqNumber',
+    key: 'seqNumber',    
   }, {
     title: '名称',
     dataIndex: 'name',
@@ -44,7 +44,8 @@ const ArtTable = ({
   return (
     <Table
       rowKey="id"
-      filterBar={false}
+      filterBar={false}   
+      pagination={false}
       columns={columns}
       dataSource={dataSource}
     />
