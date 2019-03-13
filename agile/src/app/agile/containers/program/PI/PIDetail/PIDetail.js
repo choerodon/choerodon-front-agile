@@ -1,0 +1,226 @@
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import {
+  Button, Icon, Table, Radio, Divider, Form, Input, Card, Tooltip, Spin,
+} from 'choerodon-ui';
+import {
+  stores, Page, Header, Content,  
+} from 'choerodon-front-boot';
+import CreatePI from '../CreatePI';
+import PIStore from '../../../../stores/Program/PI/PIStore';
+import { PIListLink } from '../../../../common/utils';
+import { 
+  createPIAims, getPIAims, upDatePIAmix, deletePIAims,
+} from '../../../../api/PIApi';
+
+import './PIDetail.scss';
+import EditPI from '../EditPI';
+
+const FormItem = Form.Item;
+const RadioGroup = Radio.Group;
+const RadioButton = Radio.Button;
+const { AppState } = stores;
+const amisColumns = [
+  {
+    title: 'PI目标名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '计划商业价值',
+    dataIndex: 'planBv',
+    render: text => text || '-',
+  },
+  {
+    title: '实际商业价值',
+    dataIndex: 'actualBv',
+    render: text => text || '-',
+  },
+];
+@observer
+class PIDetail extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showType: 'list',
+      piName: undefined,
+      editingPiAimsInfo: {},
+    };
+  }
+
+  componentDidMount() {
+    let { PiList } = PIStore;
+    PiList = JSON.parse(sessionStorage.PiList) || PiList;
+    const pi = PiList.find(item => item.id === Number(this.props.match.params.id));
+    PIStore.setPIDetailLoading(true);
+    getPIAims(pi.id).then((res) => {
+      PIStore.setPIDetailLoading(false);
+      PIStore.setPiAims(res);
+      PIStore.setEditPiAimsCtrl(res.program.map((item, index) => (
+        {
+          isEditing: false,
+          editingId: item.id,
+          editingIndex: index,  
+        }
+      )));
+      this.setState({
+        piName: pi.name,
+      });
+    });
+  }
+
+  handleRadioChange = (e) => {
+    this.setState({
+      showType: e.target.value,
+    });
+  }
+
+  handleEditPiAims = (record) => {
+    const { editPiAimsCtrl } = PIStore;
+    const { PiAims } = PIStore;
+    const { editingIndex } = editPiAimsCtrl.find(item => item.editingId === record.id);
+    editPiAimsCtrl.forEach((item) => {
+      item.isEditing = false;
+    });
+    editPiAimsCtrl[editingIndex].isEditing = true;
+    PIStore.setEditPiAimsCtrl(editPiAimsCtrl);
+    this.setState({
+      editingPiAimsInfo: PiAims.program[editingIndex],
+    }, () => {
+      PIStore.setEditPIVisible(true);
+    });
+  }
+
+  handledeletePiAims = (record) => {
+    PIStore.setPIDetailLoading(true);
+    deletePIAims(record.id).then(() => {
+      getPIAims(record.piId).then((piAims) => {
+        PIStore.setPIDetailLoading(false);
+        PIStore.setPiAims(piAims);
+        PIStore.setEditPiAimsCtrl(piAims.program.map((item, index) => (
+          {
+            isEditing: false,
+            editingId: item.id,
+            editingIndex: index,  
+          }
+        )));
+      });
+      Choerodon.prompt('删除成功');
+    }).catch(() => {
+      PIStore.setPIDetailLoading(false);
+      Choerodon.prompt('删除失败');
+    });
+  }
+
+  handldLinkToPIDetail = () => {
+    const { history } = this.props;
+    const urlParams = AppState.currentMenuType;
+    history.push(`/agile/pi?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+  }
+
+  handleCreateFeatureBtnClick = () => {
+    PIStore.setCreatePIVisible(true);
+  }
+
+  renderPIAimsTable = () => {
+    const { PiAims } = PIStore;
+    const columns = [
+      ...amisColumns,
+      {
+        key: 'action',
+        render: (text, record) => (
+          <div className="c7n-pi-action">
+            <Tooltip title="修改PI目标">
+              <Icon
+                role="none" 
+                type="mode_edit"
+                onClick={this.handleEditPiAims.bind(this, record)}
+              />
+            </Tooltip>
+            <Tooltip title="删除PI目标">
+              <Icon 
+                role="none" 
+                type="delete"
+                onClick={this.handledeletePiAims.bind(this, record)}
+              />
+            </Tooltip>
+          </div>
+        ),
+      },
+    ];
+    return (
+      <Table
+        filterBar={false}
+        rowKey={record => record.id}
+        columns={columns}
+        dataSource={PiAims.program}
+        pagination={false}
+      />
+    );
+  }
+
+  renderTeamPIAimsTable = dataSource => (
+    <Table
+      filterBar={false}
+      rowKey={record => record.id}
+      columns={amisColumns}
+      dataSource={dataSource}
+      pagination={false}
+    />
+  )
+
+  render() {
+    const {
+      showType, piName, editingPiAimsInfo,
+    } = this.state;
+    const piId = this.props.match.params.id;
+    const { PiList, PiAims, PIDetailLoading } = PIStore;
+    const teamDataSource = PiAims.teamAims;
+    const teamAimsColumns = [{
+      title: '团队名称',
+      dataIndex: 'teamName',
+    }];
+    return (
+      <Page className="c7n-pi-detail">
+        <Header title={`${piName} PI目标`} backPath={PIListLink()}>
+          <Button funcType="flat" onClick={this.handleCreateFeatureBtnClick}>
+            <Icon type="playlist_add" />
+            <span>创建PI目标</span>
+          </Button>
+        </Header>
+        <Content>
+          <RadioGroup className="c7n-pi-showTypeRadioGroup" onChange={this.handleRadioChange} defaultValue="list">
+            <RadioButton value="list">列表</RadioButton>
+            <RadioButton value="card">卡片</RadioButton>
+          </RadioGroup>
+          <Divider style={{ margin: '7px 0 20px' }} />
+          <Spin spinning={PIDetailLoading}>
+            {
+            showType === 'list' && (
+              <div>
+                {this.renderPIAimsTable()}
+                {/* <div className="c7n-pi-teamAims" style={{ marginTop: 20 }}>
+                  <Table 
+                    filterBar={false}
+                    rowKey={record => record.teamId}
+                    columns={teamAimsColumns}
+                    dataSource={teamDataSource}
+                    pagination={false}
+                    expandedRowRender={record => this.renderTeamPIAimsTable.bind(this, record.teamProgramAims)()}
+                  />
+                </div> */}
+              </div>
+            )
+            }
+          </Spin>
+          <CreatePI 
+            piId={piId}
+            page="PIDetail"
+          />
+          <EditPI editingPiAimsInfo={editingPiAimsInfo} />
+        </Content>
+      </Page>
+    );
+  }
+}
+
+export default Form.create()(PIDetail);
