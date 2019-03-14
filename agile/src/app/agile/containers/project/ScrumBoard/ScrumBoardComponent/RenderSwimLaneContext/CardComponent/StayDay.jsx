@@ -22,7 +22,7 @@ export default class StayDay extends Component {
     const { stayDay, completed } = this.props;
     return stayDay >= 3 && !completed ? (
       <Tooltip title={`卡片停留 ${stayDay} 天`}>
-        <div>
+        <div className="rate-wrapper">
           <Rate
             character={<Icon type="brightness_1" />}
             allowHalf

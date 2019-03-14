@@ -17,7 +17,6 @@
   border-right: 1px solid rgba(0, 0, 0, 0.20);
   border-bottom: 1px solid rgba(0, 0, 0, 0.20);
   border-top: 1px solid rgba(0, 0, 0, 0.20);
-  margin: 0 2px;
   min-height: 102px;
 
   .c7n-scrumboard-issueSide {
@@ -40,9 +39,12 @@
       align-items: center;
       flex-shrink: 0;
     }
+    .rate-wrapper {
+      margin-right: 5px;
+    }
     .ant-rate {
       font-size: 12px !important;
-      min-width: 36px;
+      min-width: 28px;
       display: flex;
       flex-direction: row-reverse;
       float: left;
