@@ -53,6 +53,7 @@ class ArtList extends Component {
   handleCreateArt = (data) => {
     const projectId = AppState.currentMenuType.id;
     const Data = { ...formatter(data), programId: projectId };
+    // console.log(Data);
     this.setState({
       createArtLoading: true,
     });
