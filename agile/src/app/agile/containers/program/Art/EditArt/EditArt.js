@@ -12,7 +12,7 @@ import { ArtInfo, ArtSetting, ReleaseArt } from './components';
 import { getArtById, editArt, releaseArt } from '../../../../api/ArtApi';
 import './EditArt.scss';
 
-const requiredFields = ['startDate', 'ipWorkdays', 'interationCount', 'interationWorkdays', 'piCodePrefix', 'piCodeNumber'];
+const requiredFields = ['startDate', 'ipWorkdays', 'interationCount', 'interationWeeks', 'piCodePrefix', 'piCodeNumber'];
 function formatter(values) {
   const data = { ...values };
   Object.keys(data).forEach((key) => {
@@ -46,7 +46,7 @@ class EditArt extends Component {
       const {
         enabled,
         interationCount,
-        interationWorkdays,
+        interationWeeks,
         ipWorkdays,
         piCodeNumber,
         piCodePrefix,
@@ -56,7 +56,7 @@ class EditArt extends Component {
       const formData = {
         enabled,
         interationCount,
-        interationWorkdays,
+        interationWeeks,
         ipWorkdays,
         piCodeNumber,
         piCodePrefix,

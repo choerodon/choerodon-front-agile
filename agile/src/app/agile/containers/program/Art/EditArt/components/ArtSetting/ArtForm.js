@@ -15,7 +15,7 @@ const { TabPane } = Tabs;
 const FormItem = Form.Item;
 const Fields = {
   1: ['rteId', 'startDate', 'enabled'],
-  2: ['ipWorkdays', 'interationCount', 'interationWorkdays'],
+  2: ['ipWorkdays', 'interationCount', 'interationWeeks'],
   3: ['piCodePrefix', 'piCodeNumber'],
 };
 function NumberFormatter(value) {
@@ -135,7 +135,7 @@ class ArtForm extends Component {
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('interationWorkdays', {
+              {getFieldDecorator('interationWeeks', {
                 rules: [{
                   required: true, message: '请选择每个迭代的工作周数!',
                 }],
