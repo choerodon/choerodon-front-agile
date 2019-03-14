@@ -57,10 +57,13 @@ class CalendarHeader extends Component {
           {
             weeks.map((week, i) => (
               <div className="c7nagile-CalendarHeader-week" style={{ flex: i === weeks.length - 1 ? this.calculateLastWeek(week) : 7 }}>
-                <div>
+                <div className="c7nagile-CalendarHeader-week-num">
                   {`${week.week()}周`}
                 </div>
-                {`${week.format('MM月DD日')}~${week.add(i === weeks.length - 1 ? this.calculateLastWeek(week) - 1 : 6, 'days').format('MM月DD日')}`}
+                <div className="c7nagile-CalendarHeader-week-during">
+                  {`${week.format('MM月DD日')} ~ ${week.add(i === weeks.length - 1 ? this.calculateLastWeek(week) - 1 : 6, 'days').format('MM月DD日')}`}
+                </div>
+                
               </div>
             ))
           }

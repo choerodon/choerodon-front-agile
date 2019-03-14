@@ -8,6 +8,8 @@
   }
   .c7nagile-CalendarHeader-year {
     border-left: 1px solid #E0E0E0;
+    font-weight: 500;
+    font-size: 14px;
     height: 22px;
     line-height: 22px;
     padding-left: 8px;
@@ -18,7 +20,25 @@
   }
   .c7nagile-CalendarHeader-week {
     flex: 7;
+    height: 55px;
+    font-size: 14px;
     text-align: center;
     border-left: 1px solid #E0E0E0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    &-num {
+      color: rgba(0, 0, 0, 0.60);
+      margin: 2px 0 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &-during {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
   }
 }

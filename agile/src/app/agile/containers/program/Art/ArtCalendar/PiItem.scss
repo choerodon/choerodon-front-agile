@@ -1,15 +1,17 @@
 .PiItem {
   background: white;
-  position: relative;
   background: #F4F4F4;
   padding: 10px 0;
   &-pi {
+    position: relative;
+    z-index: 2;
     &-title {
       height: 30px;
       line-height: 30px;
       padding: 0 10px;
       border: 1px solid #393E46;
       border-left-width: 2px;
+      border-right: none;
     }
     &-sprints {
       height: 24px;

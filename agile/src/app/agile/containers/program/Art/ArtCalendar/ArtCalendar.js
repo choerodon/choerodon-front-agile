@@ -53,7 +53,7 @@ class ArtCalendar extends Component {
       data, loading, startDate,
       endDate,
     } = this.state;
-    console.log(data);
+    // console.log(data);
     return (
       <Page className="c7nagile-ArtCalendar">
         <Header
@@ -68,7 +68,8 @@ class ArtCalendar extends Component {
           
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div className="c7nagile-ArtCalendar-bar">
-                {'项目A敏捷发布火车'}
+                <span style={{ fontSize: '16px' }}>项目A敏捷发布火车</span>
+                
               </div>
               <div className="c7nagile-ArtCalendar-scroller">
                 <div className="c7nagile-ArtCalendar-calendar">

@@ -11,15 +11,16 @@ class CalendarBody extends Component {
     const { startDate, endDate, data } = this.props;
     const range = moment.range(startDate, endDate);
     const totalDays = range.diff('days');
+    const todayPos = moment.range(moment(), moment(startDate)).diff('days');
     return (
-      <div className="c7nagile-CalendarBody">        
+      <div className="c7nagile-CalendarBody">
         <div className="c7nagile-CalendarBody-days">
           {
-              Array(totalDays).fill(0).map(() => (
-                <div className="c7nagile-CalendarBody-day" />
-              ))
-            }
-        </div>        
+            Array(totalDays).fill(0).map((a, i) => (
+              <div className={i === todayPos ? 'c7nagile-CalendarBody-day today' : 'c7nagile-CalendarBody-day'} />
+            ))
+          }
+        </div>
         <div className="c7nagile-CalendarBody-pis">
           {
             data.map(pi => <PiItem pi={pi} />)
