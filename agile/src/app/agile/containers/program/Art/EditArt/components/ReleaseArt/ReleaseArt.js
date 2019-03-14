@@ -26,11 +26,13 @@ class ReleaseArt extends PureComponent {
       visible,
       onOk,
       onCancel,
+      loading,
     } = this.props;
     const { PINum } = this.state;
     return (
       <Modal
         title="发布ART"
+        confirmLoading={loading}
         visible={visible}
         onOk={this.handleOk}
         onCancel={onCancel}
