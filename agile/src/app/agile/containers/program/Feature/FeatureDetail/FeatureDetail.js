@@ -33,6 +33,12 @@ import TypeTag from '../../../../components/TypeTag';
 
 import '../../../../components/EditIssueNarrow/EditIssueNarrow.scss';
 
+const FEATURESTATUS = { 
+  ...STATUS,
+  ...{
+    prepare: '#ea9413',
+  }, 
+};
 
 const { AppState } = stores;
 const { Option, blur } = Select;
@@ -74,7 +80,10 @@ class FeatureDetail extends Component {
       createLinkTaskShow: false,
       editDesShow: false,
       copyIssueShow: false,
-      origin: {},
+      // origin: {},
+      origin: {
+
+      },
       loading: true,
       nav: 'detail',
       editDes: undefined,
@@ -110,10 +119,11 @@ class FeatureDetail extends Component {
   }
 
   componentDidMount() {
-    const { onRef, issueId } = this.props;
-    if (onRef) {
-      onRef(this);
-    }
+    // const { onRef, issueId } = this.props;
+    const issueId = 39755;
+    // if (onRef) {
+    //   onRef(this);
+    // }
     this.firstLoadIssue(issueId);
     document.getElementById('scroll-area').addEventListener('scroll', (e) => {
       if (sign) {
@@ -147,15 +157,15 @@ class FeatureDetail extends Component {
       }));
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { issueId } = this.props;
-    if (nextProps.issueId && nextProps.issueId !== issueId) {
-      this.setState({
-        currentRae: undefined,
-      });
-      this.firstLoadIssue(nextProps.issueId);
-    }
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   const { issueId } = this.props;
+  //   if (nextProps.issueId && nextProps.issueId !== issueId) {
+  //     this.setState({
+  //       currentRae: undefined,
+  //     });
+  //     this.firstLoadIssue(nextProps.issueId);
+  //   }
+  // }
 
   onFilterChange(input) {
     if (!filterSign) {
@@ -254,33 +264,19 @@ class FeatureDetail extends Component {
     }));
     this.setState({
       origin: issue,
-      activeSprint: activeSprint || {},
-      assigneeId,
-      assigneeName,
-      assigneeImageUrl,
-      closeSprint,
-      componentIssueRelDTOList,
       creationDate,
       editDes: description,
       description,
       epicId,
       epicName,
       epicColor,
-      estimateTime,
       fileList,
       issueCommentDTOList,
       issueId,
       issueLinkDTOList,
       issueNum,
-      labelIssueRelDTOList,
       lastUpdateDate,
       objectVersionNumber,
-      parentIssueId,
-      parentIssueNum,
-      priorityDTO,
-      priorityId: priorityDTO.id,
-      priorityName: priorityDTO.name,
-      priorityColor: priorityDTO.colour,
       projectId,
       reporterId,
       reporterName,
@@ -323,16 +319,13 @@ class FeatureDetail extends Component {
     const { issueNum, subIssueDTOList } = this.state;
     confirm({
       width: 560,
-      title: `删除问题${issueNum}`,
+      title: `删除feature${issueNum}`,
       content:
         (
           <div>
-            <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
-            <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
-            <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
-            {
-              subIssueDTOList.length ? <p style={{ color: '#d50000' }}>{`注意：问题的${subIssueDTOList.length}子任务将被删除。`}</p> : null
-            }
+            <p style={{ marginBottom: 10 }}>请确认您要删除这个feature。</p>
+            <p style={{ marginBottom: 10 }}>这个feature将会被彻底删除。包括所有附件和评论。</p>
+            <p style={{ marginBottom: 10 }}>如果您完成了这个feature，通常是已解决或者已关闭，而不是删除。</p>
           </div>
         ),
       onOk() {
@@ -402,7 +395,7 @@ class FeatureDetail extends Component {
     } = this.state;
     const typeId = issueTypeDTO.id;
     this.setAnIssueToState();
-    loadStatus(origin.statusId, issueId, typeId).then((res) => {
+    loadStatus(origin.statusId, issueId, typeId, 'program').then((res) => {
       this.setState({
         originStatus: res,
         selectLoading: false,
@@ -462,7 +455,7 @@ class FeatureDetail extends Component {
         });
     } else if (pro === 'statusId') {
       if (transformId) {
-        updateStatus(transformId, issueId, origin.objectVersionNumber)
+        updateStatus(transformId, issueId, origin.objectVersionNumber, AppState.currentMenuType.id, 'program')
           .then((res) => {
             this.reloadIssue();
             if (onUpdate) {
@@ -585,7 +578,7 @@ class FeatureDetail extends Component {
       editDes: undefined,
       editCommentId: undefined,
       editComment: undefined,
-      issueLoading: true,
+      // issueLoading: true,
     }, () => {
       loadIssue(issueId).then((res) => {
         this.setAnIssueToState(res);
@@ -838,6 +831,7 @@ class FeatureDetail extends Component {
     //     && t.typeCode !== typeCode && t.typeCode !== 'sub_task'
     //   ));
     // }
+
     const getMenu = () => {
       const { createdById } = this.state;
       return (
@@ -1009,9 +1003,9 @@ class FeatureDetail extends Component {
                     cursor: 'pointer', fontSize: '13px', lineHeight: '20px', display: 'flex', alignItems: 'center',
                   }}
                   role="none"
-                  onClick={() => {
-                    onCancel();
-                  }}
+                  // onClick={() => {
+                  //   onCancel();
+                  // }}
                 >
                   <Icon type="last_page" style={{ fontSize: '18px', fontWeight: '500' }} />
                   <span>隐藏详情</span>
@@ -1054,50 +1048,48 @@ class FeatureDetail extends Component {
               </div>
               <div className="line-start">
                 {
-                    issueId && typeCode === 'story' ? (
-                      <div style={{ display: 'flex', marginRight: 25 }}>
-                        <span>故事点：</span>
-                        <div style={{ maxWidth: 130 }}>
-                          <ReadAndEdit
-                            callback={this.changeRae.bind(this)}
-                            thisType="storyPoints"
-                            current={currentRae}
-                            handleEnter
-                            origin={origin.storyPoints}
-                            onInit={() => this.setAnIssueToState(origin)}
-                            onOk={this.updateIssue.bind(this, 'storyPoints')}
-                            onCancel={this.resetStoryPoints.bind(this)}
-                            readModeContent={(
-                              <span>
-                                {storyPoints === undefined || storyPoints === null ? '无' : `${storyPoints} 点`}
-                              </span>
-                            )}
-                          >
-                            <Select
-                              value={storyPoints && storyPoints.toString()}
-                              mode="combobox"
+                  <div style={{ display: 'flex', marginRight: 25 }}>
+                    <span>故事点：</span>
+                    <div style={{ maxWidth: 130 }}>
+                      <ReadAndEdit
+                        callback={this.changeRae.bind(this)}
+                        thisType="storyPoints"
+                        current={currentRae}
+                        handleEnter
+                        origin={origin.storyPoints}
+                        onInit={() => this.setAnIssueToState(origin)}
+                        onOk={this.updateIssue.bind(this, 'storyPoints')}
+                        onCancel={this.resetStoryPoints.bind(this)}
+                        readModeContent={(
+                          <span>
+                            {storyPoints === undefined || storyPoints === null ? '无' : `${storyPoints} 点`}
+                          </span>
+                        )}
+                      >
+                        <Select
+                          value={storyPoints && storyPoints.toString()}
+                          mode="combobox"
                               // onBlur={e => this.statusOnChange(e)}
-                              ref={(e) => {
-                                this.componentRef = e;
-                              }}
-                              onPopupFocus={(e) => {
-                                this.componentRef.rcSelect.focus();
-                              }}
-                              tokenSeparators={[',']}
+                          ref={(e) => {
+                            this.componentRef = e;
+                          }}
+                          onPopupFocus={(e) => {
+                            this.componentRef.rcSelect.focus();
+                          }}
+                          tokenSeparators={[',']}
                               // getPopupContainer={triggerNode => triggerNode.parentNode}
-                              style={{ marginTop: 0, paddingTop: 0 }}
-                              onChange={value => this.handleChangeStoryPoint(value)}
-                            >
-                              {storyPointList.map(sp => (
-                                <Option key={sp.toString()} value={sp}>
-                                  {sp}
-                                </Option>
-                              ))}
-                            </Select>
-                          </ReadAndEdit>
-                        </div>
-                      </div>
-                    ) : null
+                          style={{ marginTop: 0, paddingTop: 0 }}
+                          onChange={value => this.handleChangeStoryPoint(value)}
+                        >
+                          {storyPointList.map(sp => (
+                            <Option key={sp.toString()} value={sp}>
+                              {sp}
+                            </Option>
+                          ))}
+                        </Select>
+                      </ReadAndEdit>
+                    </div>
+                  </div>
                   }
               </div>
               
@@ -1124,6 +1116,22 @@ class FeatureDetail extends Component {
                     <div className="line-start mt-10">
                       <div className="c7n-property-wrapper">
                         <span className="c7n-property">
+                          {'特性类型：'}
+                        </span>
+                      </div>
+                      <div className="c7n-value-wrapper">
+                        <ReadAndEdit
+                          readOnly
+                          readModeContent={(
+                            <span>特性</span>
+                            )}
+                         />
+                      </div>
+                    </div>
+                   
+                    <div className="line-start mt-10">
+                      <div className="c7n-property-wrapper">
+                        <span className="c7n-property">
                           {'状态：'}
                         </span>
                       </div>
@@ -1143,7 +1151,7 @@ class FeatureDetail extends Component {
                                   statusId ? (
                                     <div
                                       style={{
-                                        background: STATUS[statusCode],
+                                        background: FEATURESTATUS[statusCode],
                                         color: '#fff',
                                         borderRadius: '2px',
                                         padding: '0 8px',
@@ -1187,33 +1195,32 @@ class FeatureDetail extends Component {
                         </ReadAndEdit>
                       </div>
                     </div>
-                    {
-                        typeCode !== 'issue_epic' && typeCode !== 'sub_task' ? (
-                          <div className="line-start mt-10">
-                            <div className="c7n-property-wrapper">
-                              <span className="c7n-property">
-                                {'史诗：'}
-                              </span>
-                            </div>
-                            <div className="c7n-value-wrapper">
-                              <ReadAndEdit
-                                callback={this.changeRae.bind(this)}
-                                thisType="epicId"
-                                current={currentRae}
-                                origin={epicId}
-                                onOk={this.updateIssue.bind(this, 'epicId')}
-                                onCancel={this.resetEpicId.bind(this)}
-                                onInit={() => {
-                                  this.setAnIssueToState(origin);
-                                  loadEpics().then((res) => {
-                                    this.setState({
-                                      originEpics: res,
-                                    });
-                                  });
-                                }}
-                                readModeContent={(
-                                  <div>
-                                    {
+                   
+                    <div className="line-start mt-10">
+                      <div className="c7n-property-wrapper">
+                        <span className="c7n-property">
+                          {'史诗：'}
+                        </span>
+                      </div>
+                      <div className="c7n-value-wrapper">
+                        <ReadAndEdit
+                          callback={this.changeRae.bind(this)}
+                          thisType="epicId"
+                          current={currentRae}
+                          origin={epicId}
+                          onOk={this.updateIssue.bind(this, 'epicId')}
+                          onCancel={this.resetEpicId.bind(this)}
+                          onInit={() => {
+                            this.setAnIssueToState(origin);
+                            loadEpics().then((res) => {
+                              this.setState({
+                                originEpics: res,
+                              });
+                            });
+                          }}
+                          readModeContent={(
+                            <div>
+                              {
                                       epicId ? (
                                         <div
                                           style={{
@@ -1232,97 +1239,50 @@ class FeatureDetail extends Component {
                                         </div>
                                       ) : '无'
                                     }
-                                  </div>
+                            </div>
                                 )}
-                              >
-                                <Select
-                                  value={
+                        >
+                          <Select
+                            value={
                                     originEpics.length
                                       ? epicId || undefined
                                       : epicName || undefined
                                   }
-                                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                                  style={{ width: '150px' }}
+                            getPopupContainer={triggerNode => triggerNode.parentNode}
+                            style={{ width: '150px' }}
                                   // onBlur={() => this.statusOnChange()}
-                                  allowClear
-                                  loading={selectLoading}
-                                  onFocus={() => {
-                                    this.setState({
-                                      selectLoading: true,
-                                    });
-                                    loadEpics().then((res) => {
-                                      this.setState({
-                                        originEpics: res,
-                                        selectLoading: false,
-                                      });
-                                    });
-                                  }}
-                                  onChange={(value) => {
-                                    const epic = _.find(originEpics,
-                                      { issueId: value * 1 });
-                                    this.setState({
-                                      epicId: value,
-                                      // epicName: epic.epicName,
-                                    });
-                                    this.needBlur = false;
-                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    // setTimeout(() => { this.needBlur = true; }, 100);
-                                  }}
-                                >
-                                  {originEpics.map(epic => <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>)}
-                                </Select>
-                              </ReadAndEdit>
-                            </div>
-                          </div>
-                        ) : null
-                      }
-                    {
-                        typeCode === 'issue_epic' ? (
-                          <div className="line-start mt-10">
-                            <div className="c7n-property-wrapper">
-                              <span className="c7n-property">
-                                {'Epic名：'}
-                              </span>
-                            </div>
-                            <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                              <ReadAndEdit
-                                callback={this.changeRae.bind(this)}
-                                thisType="epicName"
-                                current={currentRae}
-                                handleEnter
-                                line
-                                origin={epicName}
-                                onInit={() => this.setAnIssueToState()}
-                                onOk={this.updateIssue.bind(this, 'epicName')}
-                                onCancel={this.resetEpicName.bind(this)}
-                                readModeContent={(
-                                  <div>
-                                    <p style={{ wordBreak: 'break-word', marginBottom: 0 }}>
-                                      {epicName}
-                                    </p>
-                                  </div>
-                                )}
-                              >
-                                <TextArea
-                                  maxLength={10}
-                                  style={{ width: '200px' }}
-                                  value={epicName}
-                                  size="small"
-                                  autosize={{ minRows: 2, maxRows: 6 }}
-                                  onChange={this.handleEpicNameChange.bind(this)}
-                                  onPressEnter={() => {
-                                    this.updateIssue('epicName');
-                                    this.setState({
-                                      currentRae: undefined,
-                                    });
-                                  }}
-                                />
-                              </ReadAndEdit>
-                            </div>
-                          </div>
-                        ) : null
-                      }
+                            allowClear
+                            loading={selectLoading}
+                            onFocus={() => {
+                              this.setState({
+                                selectLoading: true,
+                              });
+                              loadEpics().then((res) => {
+                                this.setState({
+                                  originEpics: res,
+                                  selectLoading: false,
+                                });
+                              });
+                            }}
+                            onChange={(value) => {
+                              const epic = _.find(originEpics,
+                                { issueId: value * 1 });
+                              this.setState({
+                                epicId: value,
+                                // epicName: epic.epicName,
+                              });
+                              this.needBlur = false;
+                              // 由于 OnChange 和 OnBlur 几乎同时执行，
+                              // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+                              // setTimeout(() => { this.needBlur = true; }, 100);
+                            }}
+                          >
+                            {originEpics.map(epic => <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>)}
+                          </Select>
+                        </ReadAndEdit>
+                      </div>
+                    </div>
+                       
                     <div className="line-start mt-10">
                       <div className="c7n-property-wrapper">
                         <span className="c7n-subtitle">
@@ -1396,15 +1356,15 @@ class FeatureDetail extends Component {
                             {originUsers.filter(u => u.enabled).map(user => (
                               <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
                                 <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                                    <UserHead
-                                      user={{
-                                        id: user && user.id,
-                                        loginName: user && user.loginName,
-                                        realName: user && user.realName,
-                                        avatar: user && user.imageUrl,
-                                      }}
-                                    />
-                                  </div>
+                                  <UserHead
+                                    user={{
+                                      id: user && user.id,
+                                      loginName: user && user.loginName,
+                                      realName: user && user.realName,
+                                      avatar: user && user.imageUrl,
+                                    }}
+                                  />
+                                </div>
                               </Option>
                             ))}
                           </Select>
@@ -1571,6 +1531,7 @@ class FeatureDetail extends Component {
               visible={copyIssueShow}
               onCancel={() => this.setState({ copyIssueShow: false })}
               onOk={this.handleCopyIssue.bind(this)}
+              copyFeature
             />
           ) : null
         }

@@ -37,7 +37,7 @@ class FeatureList extends Component {
           visible={createFeatureVisible} 
           callback={this.onOKOrCancel}
         />
-        {/* <FeatureDetail /> */}
+        <FeatureDetail />
       </div>
     );
   }
