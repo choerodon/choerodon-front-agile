@@ -94,6 +94,7 @@ class CreateArt extends Component {
           <FormItem>
             {getFieldDecorator('enabled', {
               valuePropName: 'checked',
+              initialValue: false,
             })(
               <Checkbox>启用</Checkbox>,
             )}
