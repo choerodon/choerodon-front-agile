@@ -16,6 +16,9 @@ const requiredFields = ['startDate', 'ipWorkdays', 'interationCount', 'interatio
 function formatter(values) {
   const data = { ...values };
   Object.keys(data).forEach((key) => {
+    if (key === 'rteId' && data[key] == undefined) {
+      data[key] = 0;
+    }
     if (moment.isMoment(data[key])) {
       data[key] = moment(data[key]).format('YYYY-MM-DD HH:mm:ss');
     }
