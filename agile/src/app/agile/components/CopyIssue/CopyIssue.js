@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
-import { Modal, Form, Input, Checkbox } from 'choerodon-ui';
+import {
+  Modal, Form, Input, Checkbox, 
+} from 'choerodon-ui';
 
 import './CopyIssue.scss';
 
@@ -16,13 +18,21 @@ class CopyIssue extends Component {
     };
   }
 
-  handleCopyIssue = () => {
+  handleCopyIssue = (applyType = 'agile') => {
+    const { copyFeature } = this.props;
+    if (copyFeature) {
+      applyType = 'program';
+    }
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const projectId = AppState.currentMenuType.id;
         const orgId = AppState.currentMenuType.organizationId;
-        const { visible, onCancel, onOk, issueId, issueNum } = this.props;
-        const { issueSummary, copySubIssue, copyLinkIssue, sprint } = values;
+        const {
+          visible, onCancel, onOk, issueId, issueNum, 
+        } = this.props;
+        const {
+          issueSummary, copySubIssue, copyLinkIssue, sprint, 
+        } = values;
         const copyConditionDTO = {
           issueLink: copyLinkIssue || false,
           sprintValues: sprint || false,
@@ -32,7 +42,7 @@ class CopyIssue extends Component {
         this.setState({
           loading: true,
         });
-        axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/clone_issue?organizationId=${orgId}&applyType=agile`, copyConditionDTO)
+        axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/clone_issue?organizationId=${orgId}&applyType=${applyType}`, copyConditionDTO)
           .then((res) => {
             this.setState({
               loading: false,
@@ -44,7 +54,9 @@ class CopyIssue extends Component {
   };
 
   render() {
-    const { visible, onCancel, onOk, issueId, issueNum, issueSummary } = this.props;
+    const {
+      visible, onCancel, onOk, issueId, issueNum, issueSummary, 
+    } = this.props;
     const { getFieldDecorator } = this.props.form;
   
     return (
@@ -76,8 +88,10 @@ class CopyIssue extends Component {
               <FormItem>
                 {getFieldDecorator('sprint', {})(
                   <Checkbox>
+
+
                     是否复制冲刺
-                  </Checkbox>,
+                                    </Checkbox>,
                 )}
               </FormItem>
             ) : null
@@ -87,8 +101,10 @@ class CopyIssue extends Component {
               <FormItem>
                 {getFieldDecorator('copySubIssue', {})(
                   <Checkbox>
+
+
                     是否复制子任务
-                  </Checkbox>,
+                                    </Checkbox>,
                 )}
               </FormItem>
             ) : null
@@ -98,8 +114,10 @@ class CopyIssue extends Component {
               <FormItem>
                 {getFieldDecorator('copyLinkIssue', {})(
                   <Checkbox>
+
+
                     是否复制关联任务
-                  </Checkbox>,
+                                    </Checkbox>,
                 )}
               </FormItem>
             ) : null

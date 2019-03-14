@@ -45,7 +45,7 @@ class ReadAndEdit extends Component {
     const {
       current, thisType, style, line,
       origin, onInit, callback, children,
-      readModeContent, onOk, onCancel,
+      readModeContent, onOk, onCancel, readOnly,
     } = this.props;
     return (
       <div
@@ -58,7 +58,7 @@ class ReadAndEdit extends Component {
         }}
       >
         {
-          current !== thisType && (
+          !readOnly && current !== thisType && (
             <div
               role="none"
               onClick={() => {
@@ -89,14 +89,14 @@ class ReadAndEdit extends Component {
           )
         }
         {
-          (current === thisType) && (
+          (!readOnly && current === thisType) && (
             <section>
               {children}
             </section>
           )
         }
         {
-          (current === thisType) && (
+          (!readOnly && current === thisType) && (
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <div
                 style={{
@@ -147,6 +147,13 @@ class ReadAndEdit extends Component {
                 </span>
               </div>
             </div>
+          )
+        }
+        {
+          readOnly && (
+            <section>
+              {readModeContent}
+            </section>
           )
         }
       </div>

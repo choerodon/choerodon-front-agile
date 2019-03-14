@@ -87,10 +87,10 @@ export function loadChartData(id, type) {
   return axios.get(`/agile/v1/projects/${projectId}/reports/${id}/burn_down_report?type=${type}&ordinalType=asc`);
 }
 
-export function loadStatus(statusId, issueId, typeId) {
+export function loadStatus(statusId, issueId, typeId, applyType = 'agile') {
   const projectId = AppState.currentMenuType.id;
   return axios.get(
-    `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&apply_type=agile`,
+    `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&apply_type=${applyType}`,
   );
 }
 export function loadStatusList() {
@@ -120,8 +120,8 @@ export function updateIssue(data, projectId = AppState.currentMenuType.id) {
   return axios.put(`/agile/v1/projects/${projectId}/issues`, data);
 }
 
-export function updateStatus(transformId, issueId, objVerNum, proId = AppState.currentMenuType.id) {
-  return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=agile&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objVerNum}`);
+export function updateStatus(transformId, issueId, objVerNum, proId = AppState.currentMenuType.id, applyType = 'agile') {
+  return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=${applyType}&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objVerNum}`);
 }
 
 export function createSubIssue(issueId, obj, projectId = AppState.currentMenuType.id) {
