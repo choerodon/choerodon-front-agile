@@ -324,21 +324,36 @@ class AdvancedSearch extends Component {
               }
             </Select>
             
-            <Tooltip title={`创建问题时间范围为${moment(createStartDate).format('YYYY-MM-DD')} ~ ${moment(createEndDate).format('YYYY-MM-DD')}`}>
-              <div className="c7n-createRange">
-
-                <RangePicker
-                  value={[moment(createStartDate), moment(createEndDate)]}
-                  format="YYYY-MM-DD hh:mm:ss"
-                  disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
-                  allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
+            {
+              moment(createStartDate).format('YYYY-MM-DD') === moment(projectInfo.creationDate).format('YYYY-MM-DD') && moment(createEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') ? (
+                <div className="c7n-createRange">
+                  <RangePicker
+                  // value={[moment(createStartDate), moment(createEndDate)]}
+                    format="YYYY-MM-DD hh:mm:ss"
+                    disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
+                    allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
                 // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
-                  onChange={this.handleCreateDateRangeChange}
-                  placeholder={['创建时间', '']}
-                />
-              </div>
-
-            </Tooltip>
+                    onChange={this.handleCreateDateRangeChange}
+                    placeholder={['创建时间', '']}
+                  />
+                </div>
+              ) : (
+                <Tooltip title={`创建问题时间范围为${moment(createStartDate).format('YYYY-MM-DD')} ~ ${moment(createEndDate).format('YYYY-MM-DD')}`}>
+                  <div className="c7n-createRange">
+                    <RangePicker
+                      value={[moment(createStartDate), moment(createEndDate)]}
+                      format="YYYY-MM-DD hh:mm:ss"
+                      disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
+                      allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
+                // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
+                      onChange={this.handleCreateDateRangeChange}
+                      placeholder={['创建时间', '']}
+                    />
+                  </div>
+                </Tooltip>
+              )
+            }
+            
           </div>
           <div className="c7n-mySearchManage">
             {

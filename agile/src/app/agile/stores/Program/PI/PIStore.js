@@ -83,6 +83,16 @@ class PIStore {
     @action setEditPiAimsCtrl(data) {
       this.editPiAimsCtrl = data;
     }
+
+    @observable createStretch = false;
+
+    @computed get getCreateStretch() {
+      return toJS(this.createStretch);
+    }
+
+    @action setCreateStretch(data) {
+      this.createStretch = data;
+    }
 }
 
 const piStore = new PIStore();

@@ -9,46 +9,30 @@ import {
 } from 'choerodon-ui';
 import {
   STATUS, COLOR, TYPE, ICON, TYPE_NAME,
-} from '../../common/Constant';
-import './EditIssueNarrow.scss';
+} from '../../../../common/Constant';
 import {
   UploadButtonNow, ReadAndEdit, IssueDescription, DatetimeAgo,
-} from '../CommonComponent';
+} from '../../../../components/CommonComponent';
 import {
   delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload,
-} from '../../common/utils';
+} from '../../../../common/utils';
 import {
-  loadBranchs, loadDatalogs, updateStatus, loadLinkIssues, loadLabels,
-  loadIssue, loadWorklogs, updateIssue, loadPriorities,
-  loadComponents, loadVersions, loadEpics, createCommit,
-  deleteIssue, updateIssueType, loadSprints, loadStatus,
-  loadWikies, deleteWiki,
-} from '../../api/NewIssueApi';
-import { getSelf, getUsers, getUser } from '../../api/CommonApi';
-import WYSIWYGEditor from '../WYSIWYGEditor';
-import FullEditor from '../FullEditor';
-import DailyLog from '../DailyLog';
-import CreateSubTask from '../CreateSubTask';
-import CreateLinkTask from '../CreateLinkTask';
-import UserHead from '../UserHead';
-import Comment from './Component/Comment';
-import WikiItem from './Component/WikiItem';
-import Log from './Component/Log';
-import DataLogs from './Component/DataLogs';
-import DataLog from './Component/DataLog';
-import IssueList from './Component/IssueList';
-import LinkList from './Component/LinkList';
-import CopyIssue from '../CopyIssue';
-import TransformSubIssue from '../TransformSubIssue';
-import TransformFromSubIssue from '../TransformFromSubIssue';
-import CreateBranch from '../CreateBranch';
-import Commits from '../Commits';
-import MergeRequest from '../MergeRequest';
-import Assignee from '../Assignee';
-import ChangeParent from '../ChangeParent';
-import TypeTag from '../TypeTag';
-import Wiki from '../Wiki';
-import ScrumBoardStore from '../../stores/project/scrumBoard/ScrumBoardStore';
+  loadBranchs, loadDatalogs, updateStatus, loadLinkIssues,
+  loadIssue, loadWorklogs, updateIssue, loadEpics,
+  deleteIssue, loadStatus,
+  loadWikies, loadIssueTypes,
+} from '../../../../api/NewIssueApi';
+import { getSelf, getUsers, getUser } from '../../../../api/CommonApi';
+import WYSIWYGEditor from '../../../../components/WYSIWYGEditor';
+import FullEditor from '../../../../components/FullEditor';
+import CreateLinkTask from '../../../../components/CreateLinkTask';
+import UserHead from '../../../../components/UserHead';
+import LinkList from '../../../../components/EditIssueNarrow/Component/IssueList';
+import CopyIssue from '../../../../components/CopyIssue';
+import TypeTag from '../../../../components/TypeTag';
+
+import '../../../../components/EditIssueNarrow/EditIssueNarrow.scss';
+
 
 const { AppState } = stores;
 const { Option, blur } = Select;
@@ -56,12 +40,6 @@ const { TextArea } = Input;
 const { confirm } = Modal;
 let sign = true;
 let filterSign = false;
-const STATUS_SHOW = {
-  opened: '开放',
-  merged: '已合并',
-  closed: '关闭',
-};
-
 const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
 
 let loginUserId;
@@ -84,50 +62,33 @@ class FeatureDetail extends Component {
     this.needBlur = true;
     this.componentRef = React.createRef();
     this.state = {
+      issueTypes: [],
       createdById: undefined,
       issueLoading: false,
       flag: undefined,
       selectLoading: true,
       saveLoading: false,
-      rollup: false,
       edit: false,
       addCommit: false,
       addCommitDes: '',
-      dailyLogShow: false,
-      createLoading: false,
-      createSubTaskShow: false,
       createLinkTaskShow: false,
-      createBranchShow: false,
-      assigneeShow: false,
-      changeParentShow: false,
       editDesShow: false,
       copyIssueShow: false,
-      transformSubIssueShow: false,
       origin: {},
       loading: true,
       nav: 'detail',
       editDes: undefined,
       editCommentId: undefined,
       editComment: undefined,
-      editLogId: undefined,
-      editLog: undefined,
       currentRae: undefined,
       issueId: undefined,
-      assigneeId: undefined,
-      assigneeName: '',
-      assigneeImageUrl: undefined,
       epicId: undefined,
-      estimateTime: undefined,
-      remainingTime: undefined,
       epicName: '',
       issueNum: undefined,
       typeCode: 'story',
       issueTypeDTO: {},
-      parentIssueId: undefined,
       reporterId: undefined,
       reporterImageUrl: undefined,
-      sprintId: undefined,
-      sprintName: '',
       statusId: undefined,
       statusCode: undefined,
       statusMapDTO: {},
@@ -135,43 +96,16 @@ class FeatureDetail extends Component {
       creationDate: undefined,
       lastUpdateDate: undefined,
       statusName: '',
-      priorityName: '',
-      priorityId: false,
-      priorityColor: '#FFFFFF',
-      priorityDTO: {},
       reporterName: '',
       summary: '',
       description: '',
-      versionIssueRelDTOList: [],
-      componentIssueRelDTOList: [],
-      activeSprint: {},
-      closeSprint: [],
-      worklogs: [],
-      datalogs: [],
       fileList: [],
-      issueCommentDTOList: [],
       issueLinkDTOList: [],
-      labelIssueRelDTOList: [],
-      subIssueDTOList: [],
       linkIssues: [],
-      fixVersions: [],
-      influenceVersions: [],
-      fixVersionsFixed: [],
-      influenceVersionsFixed: [],
-      branchs: {},
       originStatus: [],
-      originPriorities: [],
-      originComponents: [],
-      originVersions: [],
-      originLabels: [],
       originEpics: [],
       originUsers: [],
-      originSprints: [],
-      originFixVersions: [],
-      originInfluenceVersions: [],
       transformId: false,
-      addWiki: false,
-      wikies: [],
     };
   }
 
@@ -201,10 +135,15 @@ class FeatureDetail extends Component {
         projectId: AppState.currentMenuType.id,
         resourceType: 'project',
       }]),
+      loadIssueTypes('program'),
     ])
-      .then(axios.spread((users, permission) => {
+      .then(axios.spread((users, permission, issueTypes) => {
         loginUserId = users.id;
         hasPermission = permission[0].approve;
+        this.setState({
+          issueTypes,
+          issueTypeDTO: issueTypes.find(item => item.typeCode === 'feature'),
+        });
       }));
   }
 
@@ -236,13 +175,7 @@ class FeatureDetail extends Component {
   }
 
   getCurrentNav = (e) => {
-    const { issueTypeDTO } = this.state;
-    let eles;
-    if (issueTypeDTO && issueTypeDTO.typeCode === 'sub_task') {
-      eles = ['detail', 'des', 'attachment', 'wiki', 'commit', 'log', 'branch'];
-    } else {
-      eles = ['detail', 'des', 'attachment', 'wiki', 'commit', 'log', 'sub_task', 'link_task', 'branch'];
-    }
+    const eles = ['detail', 'des', 'attachment', 'commit', 'link_task'];
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   }
 
@@ -319,12 +252,6 @@ class FeatureDetail extends Component {
       name: issueAttachment.fileName,
       url: issueAttachment.url,
     }));
-    const fixVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
-    const fixVersionsFixed = _.filter(fixVersionsTotal, { statusCode: 'archived' }) || [];
-    const fixVersions = _.filter(fixVersionsTotal, v => v.statusCode !== 'archived') || [];
-    const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
-    // const influenceVersionsFixed = _.filter(influenceVersionsTotal, { statusCode: 'archived' }) || [];
-    // const influenceVersions = _.filter(influenceVersionsTotal, v => v.statusCode !== 'archived') || [];
     this.setState({
       origin: issue,
       activeSprint: activeSprint || {},
@@ -355,12 +282,9 @@ class FeatureDetail extends Component {
       priorityName: priorityDTO.name,
       priorityColor: priorityDTO.colour,
       projectId,
-      remainingTime,
       reporterId,
       reporterName,
       reporterImageUrl,
-      sprintId,
-      sprintName,
       statusId: statusMapDTO.id,
       statusCode: statusMapDTO.type,
       statusName: statusMapDTO.name,
@@ -368,11 +292,6 @@ class FeatureDetail extends Component {
       summary,
       typeCode,
       issueTypeDTO,
-      versionIssueRelDTOList,
-      subIssueDTOList,
-      fixVersions,
-      influenceVersions,
-      fixVersionsFixed,
       issueLoading: false,
     });
   }
@@ -397,60 +316,6 @@ class FeatureDetail extends Component {
       };
       handleFileUpload(arr, this.addFileToFileList, config);
     }
-  };
-
-  onDeleteWiki = async (id) => {
-    const { origin } = this.state;
-    const { issueId } = origin;
-    await deleteWiki(id);
-    const res = await loadWikies(issueId);
-    this.setState({
-      wikies: res || [],
-    });
-  };
-
-  onWikiCreate = async () => {
-    const { origin } = this.state;
-    const { issueId } = origin;
-    this.setState({ addWiki: false });
-    const res = await loadWikies(issueId);
-    this.setState({
-      wikies: res || [],
-    });
-  };
-
-  renderWiki = () => {
-    const { wikies } = this.state;
-    return (
-      <div>
-        {
-          wikies && wikies.wikiRelationList
-          && wikies.wikiRelationList.map(wiki => (
-            <WikiItem
-              key={wiki.id}
-              wiki={wiki}
-              onDeleteWiki={this.onDeleteWiki}
-              wikiHost={wikies.wikiHost}
-              type="narrow"
-            />
-          ))
-        }
-      </div>
-    );
-  };
-
-
-  /**
-   * Comment
-   */
-  createCommit = (commit) => {
-    createCommit(commit).then((res) => {
-      this.reloadIssue();
-      this.setState({
-        addCommit: false,
-        addCommitDes: '',
-      });
-    });
   };
 
   handleDeleteIssue = (issueId) => {
@@ -497,10 +362,6 @@ class FeatureDetail extends Component {
     this.setState({ storyPoints: (e && (e > 999.9 ? 999.9 : e)) || '' });
   };
 
-  handleRemainingTimeChange = (e) => {
-    this.setState({ remainingTime: (e && (e > 999.9 ? 999.9 : e)) || '' });
-  };
-
   handleChangeStoryPoint = (value) => {
     const { storyPoints } = this.state;
     // 只允许输入整数，选择时可选0.5
@@ -523,48 +384,12 @@ class FeatureDetail extends Component {
     }
   };
 
-  handleChangeRemainingTime = (value) => {
-    const { remainingTime } = this.state;
-    // 只允许输入整数，选择时可选0.5
-    if (value === '0.5') {
-      this.setState({
-        remainingTime: '0.5',
-      });
-    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
-      this.setState({
-        remainingTime: String(value).slice(0, 3), // 限制最长三位,
-      });
-    } else if (value.toString().charAt(value.length - 1) === '.') {
-      this.setState({
-        remainingTime: value.slice(0, -1),
-      });
-    } else {
-      this.setState({
-        remainingTime,
-      });
-    }
-  };
-
-  getWorkloads = () => {
-    const { worklogs } = this.state;
-    if (!Array.isArray(worklogs)) {
-      return 0;
-    }
-    const workTimeArr = _.reduce(worklogs, (sum, v) => sum + (v.workTime || 0), 0);
-    return workTimeArr;
-  };
-
   refresh = () => {
     const { origin } = this.state;
     loadIssue(origin.issueId).then((res) => {
       this.setAnIssueToState(res);
       this.setState({
         createdById: res.createdBy,
-      });
-    });
-    loadWorklogs(origin.issueId).then((res) => {
-      this.setState({
-        worklogs: res,
       });
     });
   };
@@ -596,57 +421,6 @@ class FeatureDetail extends Component {
         }
       }, 10);
     }
-  };
-
-  updateVersionSelect = (originPros, pros) => {
-    const { state } = this;
-    const { issueId, origin: { objectVersionNumber } } = this.state;
-    const { onUpdate, onCreateVersion } = this.props;
-    const obj = {
-      issueId,
-      objectVersionNumber,
-      versionType: pros === 'fixVersions' ? 'fix' : 'influence',
-    };
-    const origin = state[originPros];
-    let target;
-    let transPros;
-    let newSign = false;
-    if (!state[pros].length) {
-      transPros = [];
-    } else if (typeof state[pros][0] !== 'string') {
-      transPros = this.transToArr(state[pros], 'name', 'array');
-    } else {
-      transPros = state[pros];
-    }
-    const out = _.map(transPros, (pro) => {
-      if (origin.length && origin[0].name) {
-        target = _.find(origin, { name: pro });
-      }
-      if (target) {
-        return ({
-          ...target,
-          relationType: pros === 'fixVersions' ? 'fix' : 'influence',
-        });
-      } else {
-        newSign = true;
-        return ({
-          name: pro,
-          relationType: pros === 'fixVersions' ? 'fix' : 'influence',
-          projectId: AppState.currentMenuType.id,
-        });
-      }
-    });
-    obj.versionIssueRelDTOList = out;
-    updateIssue(obj)
-      .then((res) => {
-        this.reloadIssue();
-        if (onUpdate) {
-          onUpdate();
-        }
-        if (newSign && onCreateVersion) {
-          onCreateVersion();
-        }
-      });
   };
 
   updateIssue = (pro) => {
@@ -781,14 +555,6 @@ class FeatureDetail extends Component {
     this.setState({ storyPoints: value });
   }
 
-  resetRemainingTime(value) {
-    this.setState({ remainingTime: value });
-  }
-
-  resetAssigneeId(value) {
-    this.setState({ assigneeId: value });
-  }
-
   resetReporterId(value) {
     this.setState({ reporterId: value });
   }
@@ -801,36 +567,12 @@ class FeatureDetail extends Component {
     this.setState({ epicName: value });
   }
 
-  resetPriorityId(value) {
-    this.setState({ priorityId: value });
-  }
-
   resetStatusId(value) {
     this.setState({ statusId: value });
   }
 
   resetEpicId(value) {
     this.setState({ epicId: value });
-  }
-
-  resetSprintId(value) {
-    this.setState({ sprintId: value });
-  }
-
-  resetComponentIssueRelDTOList(value) {
-    this.setState({ componentIssueRelDTOList: value });
-  }
-
-  resetInfluenceVersions(value) {
-    this.setState({ influenceVersions: value });
-  }
-
-  resetFixVersions(value) {
-    this.setState({ fixVersions: value });
-  }
-
-  resetlabelIssueRelDTOList(value) {
-    this.setState({ labelIssueRelDTOList: value });
   }
 
   firstLoadIssue(paramIssueId) {
@@ -843,14 +585,10 @@ class FeatureDetail extends Component {
       editDes: undefined,
       editCommentId: undefined,
       editComment: undefined,
-      editLogId: undefined,
-      editLog: undefined,
       issueLoading: true,
-      addWiki: false,
     }, () => {
       loadIssue(issueId).then((res) => {
         this.setAnIssueToState(res);
-        // store.setClickIssueDetail(res);
         this.setState({
           createdById: res.createdBy,
           creationDate: res.creationDate,
@@ -895,19 +633,6 @@ class FeatureDetail extends Component {
     }
   }
 
-  /**
-   * Comment
-   */
-
-  handleCreateCommit() {
-    const { addCommitDes, origin: { issueId: extra } } = this.state;
-    if (addCommitDes) {
-      beforeTextUpload(addCommitDes, { issueId: extra, commentText: '' }, this.createCommit, 'commentText');
-    } else {
-      this.createCommit({ issueId: extra, commentText: '' });
-    }
-  }
-
   transToArr(arr, pro, type = 'string') {
     if (!arr.length) {
       return type === 'string' ? '无' : [];
@@ -918,16 +643,6 @@ class FeatureDetail extends Component {
     }
   }
 
-  handleCreateSubIssue(subIssue) {
-    const { onUpdate } = this.props;
-    this.reloadIssue();
-    this.setState({
-      createSubTaskShow: false,
-    });
-    if (onUpdate) {
-      onUpdate();
-    }
-  }
 
   handleCreateLinkIssue() {
     const { onUpdate } = this.props;
@@ -954,189 +669,21 @@ class FeatureDetail extends Component {
     }
   }
 
-  handleTransformSubIssue() {
-    const { onUpdate } = this.props;
-    this.reloadIssue();
-    this.setState({
-      transformSubIssueShow: false,
-    });
-    if (onUpdate) {
-      onUpdate();
-    }
-    if (onUpdate) {
-      onUpdate();
-    }
-  }
-
-  handleTransformFromSubIssue() {
-    const { onUpdate } = this.props;
-    this.reloadIssue();
-    this.setState({
-      transformFromSubIssueShow: false,
-    });
-    if (onUpdate) {
-      onUpdate();
-    }
-    if (onUpdate) {
-      onUpdate();
-    }
-  }
 
   handleClickMenu(e) {
     const { origin: { issueId } } = this.state;
-    if (e.key === '0') {
-      this.setState({ dailyLogShow: true });
-    } else if (e.key === '1') {
+    if (e.key === '1') {
       const { createdById } = this.state;
       this.handleDeleteIssue(issueId);
     } else if (e.key === '2') {
-      this.setState({ createSubTaskShow: true });
-    } else if (e.key === '3') {
       this.setState({ copyIssueShow: true });
-    } else if (e.key === '4') {
-      this.setState({ transformSubIssueShow: true });
-    } else if (e.key === '5') {
-      this.setState({ transformFromSubIssueShow: true });
-    } else if (e.key === '6') {
-      this.setState({ createBranchShow: true });
-    } else if (e.key === '7') {
-      this.setState({ assigneeShow: true });
-    } else if (e.key === '8') {
-      this.setState({ changeParentShow: true });
     }
-  }
-
-  handleChangeType(type) {
-    const { issueId, summary, origin } = this.state;
-    const { issueId: id, onUpdate } = this.props;
-    const issueupdateTypeDTO = {
-      epicName: type.key === 'issue_epic' ? summary : undefined,
-      issueId,
-      objectVersionNumber: origin.objectVersionNumber,
-      typeCode: type.key,
-      issueTypeId: type.item.props.value,
-    };
-    updateIssueType(issueupdateTypeDTO)
-      .then((res) => {
-        loadIssue(id).then((response) => {
-          this.setState({
-            createdById: res.createdBy,
-          });
-          this.reloadIssue(origin.issueId);
-          onUpdate();
-        });
-      });
   }
 
   changeRae(currentRae) {
     this.setState({
       currentRae,
     });
-  }
-
-  /**
-   * Comment
-   */
-  renderCommits() {
-    const { addCommitDes, addCommit, issueCommentDTOList } = this.state;
-    const delta = text2Delta(addCommitDes);
-    return (
-      <div>
-        {
-          addCommit && (
-            <div className="line-start mt-10">
-              <WYSIWYGEditor
-                bottomBar
-                value={delta}
-                style={{ height: 200, width: '100%' }}
-                onChange={(value) => {
-                  this.setState({ addCommitDes: value });
-                }}
-                handleDelete={() => {
-                  this.setState({
-                    addCommit: false,
-                    addCommitDes: '',
-                  });
-                }}
-                handleSave={() => this.handleCreateCommit()}
-                handleClickOutSide={() => this.handleCreateCommit()}
-              />
-            </div>
-          )
-        }
-        {
-          issueCommentDTOList.map(comment => (
-            <Comment
-              key={comment.commentId}
-              comment={comment}
-              onDeleteComment={() => this.reloadIssue()}
-              onUpdateComment={() => this.reloadIssue()}
-            />
-          ))
-        }
-      </div>
-    );
-  }
-
-  /**
-   * Log
-   */
-  renderLogs() {
-    const { worklogs } = this.state;
-    return (
-      <div>
-        {
-          worklogs.map(worklog => (
-            <Log
-              key={worklog.logId}
-              worklog={worklog}
-              onDeleteLog={() => this.reloadIssue()}
-              onUpdateLog={() => this.reloadIssue()}
-            />
-          ))
-        }
-      </div>
-    );
-  }
-
-  /**
-   * DataLog
-   */
-  renderDataLogs() {
-    const {
-      datalogs: stateDatalogs, typeCode, createdById, creationDate, origin,
-    } = this.state;
-    const datalogs = _.filter(stateDatalogs, v => v.field !== 'Version');
-    const {
-      createdBy,
-      createrImageUrl, createrEmail,
-      createrName, issueTypeDTO,
-    } = origin;
-    const createLog = {
-      email: createrEmail,
-      field: issueTypeDTO && issueTypeDTO.typeCode,
-      imageUrl: createrImageUrl,
-      name: createrName,
-      lastUpdateDate: origin.creationDate,
-      lastUpdatedBy: createdBy,
-      newString: 'issueNum',
-      newValue: 'issueNum',
-    };
-    return <DataLogs datalogs={[...datalogs, createLog]} typeCode={typeCode} createdById={createdById} creationDate={creationDate} />;
-  }
-
-  /**
-   * SubIssue
-   */
-  renderSubIssues() {
-    const { subIssueDTOList } = this.state;
-    return (
-      <div className="c7n-tasks">
-        {
-          subIssueDTOList.map((subIssue, i) => this.renderIssueList(subIssue, i))
-        }
-      </div>
-    );
   }
 
   renderLinkIssues() {
@@ -1155,31 +702,6 @@ class FeatureDetail extends Component {
           ))
         }
       </div>
-    );
-  }
-
-  /**
-   * IssueList
-   * @param {*} issue
-   * @param {*} i
-   */
-  renderIssueList(issue, i) {
-    const { origin } = this.state;
-    return (
-      <IssueList
-        key={issue.issueId}
-        issue={{
-          ...issue,
-          typeCode: issue.typeCode || 'sub_task',
-        }}
-        i={i}
-        onOpen={() => {
-          this.reloadIssue(issue.issueId);
-        }}
-        onRefresh={() => {
-          this.reloadIssue(origin.issueId);
-        }}
-      />
     );
   }
 
@@ -1260,117 +782,6 @@ class FeatureDetail extends Component {
     }
   }
 
-  renderBranchs() {
-    const { branchs } = this.state;
-    return (
-      <div>
-        {
-          branchs.branchCount ? (
-            <div>
-              {
-                [].length === 0 ? (
-                  <div style={{
-                    borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px',
-                  }}
-                  >
-                    <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
-                      <span
-                        style={{ color: '#3f51b5', cursor: 'pointer' }}
-                        role="none"
-                        onClick={() => {
-                          this.setState({
-                            commitShow: true,
-                          });
-                        }}
-                      >
-                        {branchs.totalCommit || '0'}
-                        {'提交'}
-                      </span>
-                    </div>
-                    <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
-                      <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
-                      <span style={{ width: 60, display: 'inline-block' }}>
-                        {
-                          branchs.commitUpdateTime ? (
-                            <Popover
-                              title="提交修改时间"
-                              content={branchs.commitUpdateTime}
-                              placement="left"
-                            >
-                              <TimeAgo
-                                datetime={branchs.commitUpdateTime}
-                                locale={Choerodon.getMessage('zh_CN', 'en')}
-                              />
-                            </Popover>
-                          ) : ''
-                        }
-                      </span>
-                    </div>
-                  </div>
-                ) : null
-              }
-              {
-                branchs.totalMergeRequest ? (
-                  <div style={{
-                    borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px',
-                  }}
-                  >
-                    <div style={{ display: 'inline-flex', justifyContent: 'space-between', flex: 1 }}>
-                      <span
-                        style={{ color: '#3f51b5', cursor: 'pointer' }}
-                        role="none"
-                        onClick={() => {
-                          this.setState({
-                            mergeRequestShow: true,
-                          });
-                        }}
-                      >
-                        {branchs.totalMergeRequest}
-                        {'合并请求'}
-                      </span>
-                      <span style={{
-                        width: 36, height: 20, borderRadius: '2px', color: '#fff', background: '#4d90fe', textAlign: 'center',
-                      }}
-                      >
-                        {['opened', 'merged', 'closed'].includes(branchs.mergeRequestStatus) ? STATUS_SHOW[branchs.mergeRequestStatus] : ''}
-                      </span>
-                    </div>
-                    <div style={{ display: 'inline-flex', justifyContent: 'space-between' }}>
-                      <span style={{ marginRight: 12, marginLeft: 63 }}>已更新</span>
-                      <span style={{ width: 60, display: 'inline-block' }}>
-                        {
-                          branchs.mergeRequestUpdateTime ? (
-                            <Popover
-                              title="合并请求修改时间"
-                              content={branchs.mergeRequestUpdateTime}
-                              placement="left"
-                            >
-                              <TimeAgo
-                                datetime={branchs.mergeRequestUpdateTime}
-                                locale={Choerodon.getMessage('zh_CN', 'en')}
-                              />
-                            </Popover>
-                          ) : ''
-                        }
-                      </span>
-                    </div>
-                  </div>
-                ) : null
-              }
-            </div>
-          ) : (
-            <div style={{
-              borderBottom: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', padding: '8px 26px', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px',
-            }}
-            >
-              <span style={{ marginRight: 12 }}>暂无</span>
-            </div>
-          )
-        }
-      </div>
-    );
-  }
-
   render() {
     const menu = AppState.currentMenuType;
     this.needBlur = true;
@@ -1384,40 +795,22 @@ class FeatureDetail extends Component {
       resetIssue,
     } = this.props;
     const {
-      activeSprint,
-      branchs,
-      closeSprint,
-      sprintId,
-      originSprints,
       issueTypeDTO,
       flag,
-      assigneeId,
-      assigneeName,
-      assigneeImageUrl,
-      assigneeShow,
       fileList,
       createLinkTaskShow,
-      createSubTaskShow,
-      mergeRequestShow,
-      changeParentShow,
       copyIssueShow,
       editDes,
       edit,
       linkIssues,
-      createBranchShow,
-      originPriorities,
       selectLoading,
       currentRae,
-      priorityId,
-      priorityName,
-      priorityColor,
       issueId,
       originStatus,
       statusId,
       statusCode,
       statusName,
       creationDate,
-      dailyLogShow,
       lastUpdateDate,
       reporterId,
       reporterName,
@@ -1430,44 +823,25 @@ class FeatureDetail extends Component {
       description,
       nav,
       issueLoading,
-      transformSubIssueShow,
-      transformFromSubIssueShow,
-      commitShow,
       issueNum,
-      parentIssueId,
-      parentIssueNum,
       summary,
       storyPoints,
-      remainingTime,
-      originComponents,
       originUsers,
-      componentIssueRelDTOList,
-      labelIssueRelDTOList,
-      originLabels,
-      influenceVersions,
-      originVersions,
-      fixVersionsFixed,
-      fixVersions,
-      addWiki,
-      wikies,
+      issueTypes,
     } = this.state;
-    const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
+    // const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
     const typeId = issueTypeDTO ? issueTypeDTO.id : '';
-    const currentType = issueTypeData.find(t => t.id === typeId);
-    let issueTypes = [];
-    if (currentType) {
-      issueTypes = issueTypeData.filter(t => (t.stateMachineId === currentType.stateMachineId
-        && t.typeCode !== typeCode && t.typeCode !== 'sub_task'
-      ));
-    }
+    // const currentType = issueTypeData.find(t => t.id === typeId);
+    // if (currentType) {
+    //   issueTypes = issueTypeData.filter(t => (t.stateMachineId === currentType.stateMachineId
+    //     && t.typeCode !== typeCode && t.typeCode !== 'sub_task'
+    //   ));
+    // }
     const getMenu = () => {
       const { createdById } = this.state;
       return (
         <Menu onClick={this.handleClickMenu.bind(this)}>
-          <Menu.Item key="0">
-            {'登记工作日志'}
-          </Menu.Item>
           {
             <Menu.Item
               key="1"
@@ -1476,43 +850,9 @@ class FeatureDetail extends Component {
               {'删除'}
             </Menu.Item>
           }
-          {
-            typeCode !== 'sub_task' && (
-              <Menu.Item key="2">
-                {'创建子任务'}
-              </Menu.Item>
-            )
-          }
-          <Menu.Item key="3">
-            {'复制问题'}
+          <Menu.Item key="2">
+            {'复制feature'}
           </Menu.Item>
-          {
-            typeCode !== 'sub_task' && origin.subIssueDTOList && origin.subIssueDTOList.length === 0 && (
-              <Menu.Item key="4">
-                {'转化为子任务'}
-              </Menu.Item>
-            )
-          }
-          {
-            typeCode === 'sub_task' && (
-              <Menu.Item key="5">
-                {'转化为任务'}
-              </Menu.Item>
-            )
-          }
-          <Menu.Item key="6">
-            {'创建分支'}
-          </Menu.Item>
-          <Menu.Item key="7">
-            {'分配问题'}
-          </Menu.Item>
-          {
-            typeCode === 'sub_task' && (
-              <Menu.Item key="8">
-                {'修改父级'}
-              </Menu.Item>
-            )
-          }
         </Menu>
       );
     };
@@ -1535,7 +875,6 @@ class FeatureDetail extends Component {
           borderRadius: '2px',
           // marginTop: 50,
         }}
-        onClick={this.handleChangeType.bind(this)}
       >
         {
           issueTypes.map(t => (
@@ -1574,7 +913,7 @@ class FeatureDetail extends Component {
         }
         <div className="c7n-nav">
           <div>
-            <Dropdown overlay={typeList} trigger={['click']} disabled={typeCode === 'sub_task'}>
+            <Dropdown overlay={typeList} trigger={['click']} disabled={typeCode === 'feature'}>
               <div
                 style={{
                   height: 50,
@@ -1666,105 +1005,55 @@ class FeatureDetail extends Component {
             <div className="c7n-header-editIssue">
               <div className="c7n-content-editIssue" style={{ overflowY: 'hidden' }}>
                 <div
-                  className="line-justify"
                   style={{
-                    height: '28px',
-                    alignItems: 'center',
-                    marginTop: '10px',
-                    marginBottom: '3px',
+                    cursor: 'pointer', fontSize: '13px', lineHeight: '20px', display: 'flex', alignItems: 'center',
+                  }}
+                  role="none"
+                  onClick={() => {
+                    onCancel();
                   }}
                 >
-                  <div style={{ fontSize: 16, lineHeight: '28px', fontWeight: 500 }}>
-                    {
-                      typeCode === 'sub_task' ? (
-                        <span>
-                          <span
-                            role="none"
-                            style={{ color: 'rgb(63, 81, 181)', cursor: 'pointer' }}
-                            onClick={() => {
-                              this.firstLoadIssue(parentIssueId);
-                              if (resetIssue) {
-                                resetIssue(parentIssueId);
-                              }
-                            }
-                            }
-                          >
-                            {parentIssueNum}
-                          </span>
-                          <span style={{ paddingLeft: 10, paddingRight: 10 }}>/</span>
-                        </span>
-                      ) : null
-                    }
-                    {
-                      typeCode === 'sub_task' ? (
-                        <span>
-                          {issueNum}
-                        </span>
-                      ) : (
-                        <a
-                          role="none"
-                          onClick={() => {
-                            // const backUrl = this.props.backUrl || 'backlog';
-                            history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${origin.issueNum}&paramIssueId=${origin.issueId}&paramUrl=${backUrl || 'backlog'}`);
-                            return false;
-                          }}
-                        >
-                          {issueNum}
-                        </a>
-                      )
-                    }
-                  </div>
-                  <div
-                    style={{
-                      cursor: 'pointer', fontSize: '13px', lineHeight: '20px', display: 'flex', alignItems: 'center',
-                    }}
-                    role="none"
-                    onClick={() => {
-                      onCancel();
-                    }}
-                  >
-                    <Icon type="last_page" style={{ fontSize: '18px', fontWeight: '500' }} />
-                    <span>隐藏详情</span>
-                  </div>
+                  <Icon type="last_page" style={{ fontSize: '18px', fontWeight: '500' }} />
+                  <span>隐藏详情</span>
                 </div>
-                <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
-                  <ReadAndEdit
-                    callback={this.changeRae.bind(this)}
-                    thisType="summary"
-                    line
-                    current={currentRae}
-                    origin={origin.summary}
-                    onInit={() => this.setAnIssueToState()}
-                    onOk={this.updateIssue.bind(this, 'summary')}
-                    onCancel={this.resetSummary.bind(this)}
-                    readModeContent={(
-                      <div className="c7n-summary">
-                        {summary}
-                      </div>
+              </div>
+              <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
+                <ReadAndEdit
+                  callback={this.changeRae.bind(this)}
+                  thisType="summary"
+                  line
+                  current={currentRae}
+                  origin={origin.summary}
+                  onInit={() => this.setAnIssueToState()}
+                  onOk={this.updateIssue.bind(this, 'summary')}
+                  onCancel={this.resetSummary.bind(this)}
+                  readModeContent={(
+                    <div className="c7n-summary">
+                      {summary}
+                    </div>
                     )}
-                  >
-                    <TextArea
-                      maxLength={44}
-                      value={summary}
-                      size="small"
-                      onChange={this.handleTitleChange.bind(this)}
-                      onPressEnter={() => {
-                        this.updateIssue('summary');
-                        this.setState({
-                          currentRae: undefined,
-                        });
-                      }}
-                    // onBlur={() => this.statusOnChange()}
-                    />
-                  </ReadAndEdit>
-                  <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
-                    <Dropdown overlay={getMenu()} trigger={['click']}>
-                      <Button icon="more_vert" />
-                    </Dropdown>
-                  </div>
+                >
+                  <TextArea
+                    maxLength={44}
+                    value={summary}
+                    size="small"
+                    onChange={this.handleTitleChange.bind(this)}
+                    onPressEnter={() => {
+                      this.updateIssue('summary');
+                      this.setState({
+                        currentRae: undefined,
+                      });
+                    }}
+                  />
+                </ReadAndEdit>
+                <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
+                  <Dropdown overlay={getMenu()} trigger={['click']}>
+                    <Button icon="more_vert" />
+                  </Dropdown>
                 </div>
-                <div className="line-start">
-                  {
+              </div>
+              <div className="line-start">
+                {
                     issueId && typeCode === 'story' ? (
                       <div style={{ display: 'flex', marginRight: 25 }}>
                         <span>故事点：</span>
@@ -1810,89 +1099,47 @@ class FeatureDetail extends Component {
                       </div>
                     ) : null
                   }
-                  {
-                    issueId && typeCode !== 'issue_epic' ? (
-                      <div style={{ display: 'flex' }}>
-                        <span>预估时间：</span>
-                        <div style={{ maxWidth: 150 }}>
-                          <ReadAndEdit
-                            callback={this.changeRae.bind(this)}
-                            thisType="remainingTime"
-                            current={currentRae}
-                            handleEnter
-                            origin={remainingTime}
-                            onInit={() => this.setAnIssueToState(origin)}
-                            onOk={this.updateIssue.bind(this, 'remainingTime')}
-                            onCancel={this.resetRemainingTime.bind(this)}
-                            readModeContent={(
-                              <span>
-                                {remainingTime === undefined || remainingTime === null ? '无' : `${remainingTime} 小时`}
-                              </span>
-                            )}
-                          >
-                            <Select
-                              value={remainingTime && remainingTime.toString()}
-                              mode="combobox"
-                              ref={(e) => {
-                                this.componentRef = e;
-                              }}
-                              onPopupFocus={(e) => {
-                                this.componentRef.rcSelect.focus();
-                              }}
-                              tokenSeparators={[',']}
-                              style={{ marginTop: 0, paddingTop: 0 }}
-                              onChange={value => this.handleChangeRemainingTime(value)}
-                            >
-                              {storyPointList.map(sp => (
-                                <Option key={sp.toString()} value={sp}>
-                                  {sp}
-                                </Option>
-                              ))}
-                            </Select>
-                          </ReadAndEdit>
-                        </div>
-                      </div>
-                    ) : null
-                  }
-                </div>
               </div>
+              
             </div>
           </div>
-          <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
-            <section className="c7n-body-editIssue">
-              <div className="c7n-content-editIssue">
-                <div className="c7n-details">
-                  <div id="detail">
-                    <div className="c7n-title-wrapper" style={{ marginTop: 0 }}>
-                      <div className="c7n-title-left">
-                        <Icon type="error_outline c7n-icon-title" />
-                        <span>详情</span>
-                      </div>
-                      <div style={{
-                        flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
-                      }}
-                      />
+        </div>
+        <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
+          <section className="c7n-body-editIssue">
+            <div className="c7n-content-editIssue">
+              <div className="c7n-details">
+                <div id="detail">
+                  <div className="c7n-title-wrapper" style={{ marginTop: 0 }}>
+                    <div className="c7n-title-left">
+                      <Icon type="error_outline c7n-icon-title" />
+                      <span>详情</span>
                     </div>
-                    <div className="c7n-content-wrapper">
-                      <div className="line-start mt-10">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-property">
-                            {'状态：'}
-                          </span>
-                        </div>
-                        <div className="c7n-value-wrapper">
-                          <ReadAndEdit
-                            callback={this.changeRae.bind(this)}
-                            thisType="statusId"
-                            current={currentRae}
-                            handleEnter
-                            origin={statusId}
-                            onOk={this.updateIssue.bind(this, 'statusId')}
-                            onCancel={this.resetStatusId.bind(this)}
-                            onInit={this.loadIssueStatus}
-                            readModeContent={(
-                              <div>
-                                {
+                    <div style={{
+                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
+                    }}
+                    />
+                  </div>
+
+                  <div className="c7n-content-wrapper">
+                    <div className="line-start mt-10">
+                      <div className="c7n-property-wrapper">
+                        <span className="c7n-property">
+                          {'状态：'}
+                        </span>
+                      </div>
+                      <div className="c7n-value-wrapper">
+                        <ReadAndEdit
+                          callback={this.changeRae.bind(this)}
+                          thisType="statusId"
+                          current={currentRae}
+                          handleEnter
+                          origin={statusId}
+                          onOk={this.updateIssue.bind(this, 'statusId')}
+                          onCancel={this.resetStatusId.bind(this)}
+                          onInit={this.loadIssueStatus}
+                          readModeContent={(
+                            <div>
+                              {
                                   statusId ? (
                                     <div
                                       style={{
@@ -1908,26 +1155,26 @@ class FeatureDetail extends Component {
                                     </div>
                                   ) : '无'
                                 }
-                              </div>
+                            </div>
                             )}
-                          >
-                            <Select
-                              value={originStatus.length ? statusId : statusName}
-                              style={{ width: 150 }}
-                              loading={selectLoading}
-                              getPopupContainer={triggerNode => triggerNode.parentNode}
+                        >
+                          <Select
+                            value={originStatus.length ? statusId : statusName}
+                            style={{ width: 150 }}
+                            loading={selectLoading}
+                            getPopupContainer={triggerNode => triggerNode.parentNode}
                               // onBlur={() => this.statusOnChange()}
-                              onChange={(value, item) => {
-                                this.setState({
-                                  statusId: value,
-                                  transformId: item.key,
-                                });
-                                this.needBlur = false;
-                                // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                // setTimeout(() => { this.needBlur = true; }, 100);
-                              }}
-                            >
-                              {
+                            onChange={(value, item) => {
+                              this.setState({
+                                statusId: value,
+                                transformId: item.key,
+                              });
+                              this.needBlur = false;
+                              // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+                              // setTimeout(() => { this.needBlur = true; }, 100);
+                            }}
+                          >
+                            {
                                 originStatus && originStatus.length
                                   ? originStatus.map(transform => (transform.statusDTO ? (
                                     <Option key={transform.id} value={transform.endStatusId}>
@@ -1936,439 +1183,11 @@ class FeatureDetail extends Component {
                                   ) : ''))
                                   : null
                               }
-                            </Select>
-                          </ReadAndEdit>
-                        </div>
+                          </Select>
+                        </ReadAndEdit>
                       </div>
-                      <div className="line-start mt-10">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-property">
-                            {'优先级：'}
-                          </span>
-                        </div>
-                        <div className="c7n-value-wrapper">
-                          <ReadAndEdit
-                            callback={this.changeRae.bind(this)}
-                            thisType="priorityId"
-                            current={currentRae}
-                            origin={priorityId}
-                            handleEnter
-                            onOk={this.updateIssue.bind(this, 'priorityId')}
-                            onCancel={this.resetPriorityId.bind(this)}
-                            onInit={() => {
-                              this.setAnIssueToState();
-                              loadPriorities().then((res) => {
-                                this.setState({
-                                  originPriorities: res,
-                                });
-                              });
-                            }}
-                            readModeContent={(
-                              <div>
-                                {priorityId ? (
-                                  <div
-                                    className="c7n-level"
-                                    style={{
-                                      backgroundColor: `${priorityColor}1F`,
-                                      color: priorityColor,
-                                      borderRadius: '2px',
-                                      padding: '0 8px',
-                                      display: 'inline-block',
-                                    }}
-                                  >
-                                    {priorityName}
-                                  </div>
-                                ) : '无'
-                                }
-                              </div>
-                            )}
-                          >
-                            <Select
-                              dropdownStyle={{ minWidth: 185 }}
-                              value={originPriorities.length ? priorityId : priorityName}
-                              style={{ width: '150px' }}
-                              loading={selectLoading}
-                              // onBlur={() => this.statusOnChange()}
-                              getPopupContainer={triggerNode => triggerNode.parentNode}
-                              onFocus={() => {
-                                this.setState({
-                                  selectLoading: true,
-                                });
-                                loadPriorities().then((res) => {
-                                  this.setState({
-                                    originPriorities: res,
-                                    selectLoading: false,
-                                  });
-                                });
-                              }}
-                              onChange={(value) => {
-                                const priority = _.find(originPriorities,
-                                  { id: value });
-                                this.setState({
-                                  priorityId: value,
-                                  priorityName: priority.name,
-                                });
-                                // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-
-                                // setTimeout(() => { this.needBlur = true; }, 10);
-                              }}
-                            >
-                              {
-                                originPriorities.filter(p => p.enable || p.id === priorityId).map(priority => (
-                                  <Option key={priority.id} value={priority.id}>
-                                    <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                                      <div
-                                        className="c7n-level"
-                                        style={{
-                                          borderRadius: '2px',
-                                          padding: '0 8px',
-                                          display: 'inline-block',
-                                        }}
-                                      >
-                                        {priority.name}
-                                      </div>
-                                    </div>
-                                  </Option>
-                                ))
-                              }
-                            </Select>
-                          </ReadAndEdit>
-                        </div>
-                      </div>
-                      {
-                        typeCode !== 'sub_task' ? (
-                          <div className="line-start mt-10">
-                            <div className="c7n-property-wrapper">
-                              <span className="c7n-property">
-                                {'模块：'}
-                              </span>
-                            </div>
-                            <div className="c7n-value-wrapper c7n-value-component-wrapper">
-                              <ReadAndEdit
-                                callback={this.changeRae.bind(this)}
-                                thisType="componentIssueRelDTOList"
-                                handleEnter
-                                current={currentRae}
-                                origin={componentIssueRelDTOList}
-                                onInit={() => this.setAnIssueToState(origin)}
-                                onOk={this.updateIssueSelect.bind(this, 'originComponents', 'componentIssueRelDTOList')}
-                                onCancel={this.resetComponentIssueRelDTOList.bind(this)}
-                                readModeContent={(
-                                  <div style={{ color: '#3f51b5' }}>
-                                    <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginTop: 2 }}>
-                                      {this.transToArr(componentIssueRelDTOList, 'name')}
-                                    </p>
-                                  </div>
-                                )}
-                              >
-                                <Select
-                                  value={this.transToArr(componentIssueRelDTOList, 'name', 'array')}
-                                  loading={selectLoading}
-                                  ref={(e) => {
-                                    this.componentRef = e;
-                                  }}
-                                  mode={hasPermission ? 'tags' : 'multiple'}
-                                  onPopupFocus={(e) => {
-                                    this.componentRef.rcSelect.focus();
-                                  }}
-                                  // onBlur={e => this.statusOnChange(e)}
-                                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                                  tokenSeparators={[',']}
-                                  style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
-                                  onFocus={() => {
-                                    this.setState({
-                                      selectLoading: true,
-                                    });
-                                    loadComponents().then((res) => {
-                                      this.setState({
-                                        originComponents: res.content,
-                                        selectLoading: false,
-                                      });
-                                    });
-                                  }}
-                                  onChange={(value) => {
-                                    this.setState({
-                                      componentIssueRelDTOList: value.filter(v => v && v.trim()).map(
-                                        item => item.trim().substr(0, 10),
-                                      ),
-                                    });
-                                  }}
-                                >
-                                  {originComponents && originComponents.map(component => (
-                                    <Option
-                                      key={component.name}
-                                      value={component.name}
-                                    >
-                                      {component.name}
-                                    </Option>
-                                  ))}
-                                </Select>
-                              </ReadAndEdit>
-                            </div>
-                          </div>
-                        ) : null
-                      }
-                      <div className="line-start mt-10">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-property">
-                            {'标签'}
-                          </span>
-                        </div>
-                        <div className="c7n-value-wrapper">
-                          <ReadAndEdit
-                            callback={this.changeRae.bind(this)}
-                            thisType="labelIssueRelDTOList"
-                            current={currentRae}
-                            origin={labelIssueRelDTOList}
-                            onInit={() => this.setAnIssueToState(origin)}
-                            onOk={this.updateIssueSelect.bind(this, 'originLabels', 'labelIssueRelDTOList')}
-                            onCancel={this.resetlabelIssueRelDTOList.bind(this)}
-                            readModeContent={(
-                              <div>
-                                {
-                                  labelIssueRelDTOList.length > 0 ? (
-                                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                      {
-                                        this.transToArr(labelIssueRelDTOList, 'labelName', 'array').map(label => (
-                                          <div
-                                            key={label}
-                                            style={{
-                                              color: '#000',
-                                              borderRadius: '100px',
-                                              fontSize: '13px',
-                                              lineHeight: '24px',
-                                              padding: '2px 12px',
-                                              background: 'rgba(0, 0, 0, 0.08)',
-                                              marginRight: '8px',
-                                              marginBottom: 3,
-                                            }}
-                                          >
-                                            {label}
-                                          </div>
-                                        ))
-                                      }
-                                    </div>
-                                  ) : '无'
-                                }
-                              </div>
-                            )}
-                          >
-                            <Select
-                              value={this.transToArr(labelIssueRelDTOList, 'labelName', 'array')}
-                              mode="tags"
-                              loading={selectLoading}
-                              onPopupFocus={(e) => {
-                                this.componentRef.rcSelect.focus();
-                              }}
-                              tokenSeparators={[',']}
-                              getPopupContainer={triggerNode => triggerNode.parentNode}
-                              style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
-                              // onBlur={() => this.statusOnChange()}
-                              onFocus={() => {
-                                this.setState({
-                                  selectLoading: true,
-                                });
-                                loadLabels().then((res) => {
-                                  this.setState({
-                                    originLabels: res,
-                                    selectLoading: false,
-                                  });
-                                });
-                              }}
-                              onChange={(value) => {
-                                this.setState({
-                                  labelIssueRelDTOList: value.map(
-                                    item => item.substr(0, 10),
-                                  ),
-                                });
-                                // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                // this.needBlur = false;
-                                // if (this.changeTimer > 0) {
-                                //   clearTimeout(this.changeTimer);
-                                //   this.changeTimer = 0;
-                                // }
-                                // this.changeTimer = setTimeout(() => {
-                                //   this.needBlur = true;
-                                // }, 1000);
-                              }}
-                            >
-                              {originLabels.map(label => (
-                                <Option
-                                  key={label.labelName}
-                                  value={label.labelName}
-                                >
-                                  {label.labelName}
-                                </Option>
-                              ))}
-                            </Select>
-                          </ReadAndEdit>
-                        </div>
-                      </div>
-                      {
-                        typeCode === 'bug' ? (
-                          <div className="line-start mt-10">
-                            <div className="c7n-property-wrapper">
-                              <Tooltip title="对于非当前版本所发现的缺陷进行版本选择">
-                                <span className="c7n-property">
-                                  {'影响的版本：'}
-                                </span>
-                              </Tooltip>
-                            </div>
-                            <div className="c7n-value-wrapper">
-                              <ReadAndEdit
-                                callback={this.changeRae.bind(this)}
-                                thisType="influenceVersions"
-                                current={currentRae}
-                                origin={influenceVersions}
-                                onInit={() => this.setAnIssueToState(origin)}
-                                onOk={this.updateVersionSelect.bind(this, 'originVersions', 'influenceVersions')}
-                                onCancel={this.resetInfluenceVersions.bind(this)}
-                                readModeContent={(
-                                  <div>
-                                    {
-                                      !influenceVersions.length ? '无' : (
-                                        <div>
-                                          <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
-                                            {_.map(influenceVersions, 'name').join(' , ')}
-                                          </p>
-                                        </div>
-                                      )
-                                    }
-                                  </div>
-                                )}
-                              >
-                                <Select
-                                  label="影响的版本"
-                                  value={this.transToArr(influenceVersions, 'name', 'array')}
-                                  mode={hasPermission ? 'tags' : 'multiple'}
-                                  // onBlur={() => this.statusOnChange()}
-                                  onPopupFocus={(e) => {
-                                    this.componentRef.rcSelect.focus();
-                                  }}
-                                  loading={selectLoading}
-                                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                                  tokenSeparators={[',']}
-                                  style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
-                                  onFocus={() => {
-                                    this.setState({
-                                      selectLoading: true,
-                                    });
-                                    loadVersions([]).then((res) => {
-                                      this.setState({
-                                        originVersions: res,
-                                        selectLoading: false,
-                                      });
-                                    });
-                                  }}
-                                  onChange={(value) => {
-                                    this.setState({
-                                      influenceVersions: value.filter(v => v && v.trim()).map(
-                                        item => item.trim().substr(0, 10),
-                                      ),
-                                    });
-                                  }}
-                                >
-                                  {originVersions.map(version => (
-                                    <Option
-                                      key={version.name}
-                                      value={version.name}
-                                    >
-                                      {version.name}
-                                    </Option>
-                                  ))}
-                                </Select>
-                              </ReadAndEdit>
-                            </div>
-                          </div>
-                        ) : null
-                      }
-                      <div className="line-start mt-10">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-property">
-                            {'版本：'}
-                          </span>
-                        </div>
-                        <div className="c7n-value-wrapper">
-                          <ReadAndEdit
-                            callback={this.changeRae.bind(this)}
-                            thisType="fixVersions"
-                            current={currentRae}
-                            origin={fixVersions}
-                            onInit={() => this.setAnIssueToState(origin)}
-                            onOk={this.updateVersionSelect.bind(this, 'originVersions', 'fixVersions')}
-                            onCancel={this.resetFixVersions.bind(this)}
-                            readModeContent={(
-                              <div style={{ color: '#3f51b5' }}>
-                                {
-                                  !fixVersionsFixed.length && !fixVersions.length ? '无' : (
-                                    <div>
-                                      <div style={{ color: '#000' }}>
-                                        {_.map(fixVersionsFixed, 'name').join(' , ')}
-                                      </div>
-                                      <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
-                                        {_.map(fixVersions, 'name').join(' , ')}
-                                      </p>
-                                    </div>
-                                  )
-                                }
-                              </div>
-                            )}
-                          >
-                            {
-                              fixVersionsFixed.length ? (
-                                <div>
-                                  <span>已归档版本：</span>
-                                  <span>
-                                    {_.map(fixVersionsFixed, 'name').join(' , ')}
-                                  </span>
-                                </div>
-                              ) : null
-                            }
-                            <Select
-                              label="未归档版本"
-                              value={this.transToArr(fixVersions, 'name', 'array')}
-                              mode={hasPermission ? 'tags' : 'multiple'}
-                              loading={selectLoading}
-                              // onBlur={() => this.statusOnChange()}
-                              onPopupFocus={(e) => {
-                                this.componentRef.rcSelect.focus();
-                              }}
-                              tokenSeparators={[',']}
-                              getPopupContainer={triggerNode => triggerNode.parentNode}
-                              style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
-                              onFocus={() => {
-                                this.setState({
-                                  selectLoading: true,
-                                });
-                                loadVersions(['version_planning', 'released']).then((res) => {
-                                  this.setState({
-                                    originVersions: res,
-                                    selectLoading: false,
-                                  });
-                                });
-                              }}
-                              onChange={(value) => {
-                                this.setState({
-                                  fixVersions: value.filter(v => v && v.trim()).map(
-                                    item => item.trim().substr(0, 10),
-                                  ),
-                                });
-                              }}
-                            >
-                              {originVersions.map(version => (
-                                <Option
-                                  key={version.name}
-                                  value={version.name}
-                                >
-                                  {version.name}
-                                </Option>
-                              ))}
-                            </Select>
-                          </ReadAndEdit>
-                        </div>
-                      </div>
-                      {
+                    </div>
+                    {
                         typeCode !== 'issue_epic' && typeCode !== 'sub_task' ? (
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
@@ -2458,183 +1277,7 @@ class FeatureDetail extends Component {
                           </div>
                         ) : null
                       }
-                      <div className="line-start mt-10">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-property">
-                            {'冲刺：'}
-                          </span>
-                        </div>
-                        <div className="c7n-value-wrapper">
-                          {
-                            typeCode !== 'sub_task' ? (
-                              <ReadAndEdit
-                                callback={this.changeRae.bind(this)}
-                                thisType="sprintId"
-                                current={currentRae}
-                                origin={activeSprint.sprintId}
-                                onOk={this.updateIssue.bind(this, 'sprintId')}
-                                onCancel={this.resetSprintId.bind(this)}
-                                onInit={() => {
-                                  this.setAnIssueToState(origin);
-                                  loadSprints(['sprint_planning', 'started']).then((res) => {
-                                    this.setState({
-                                      originSprints: res,
-                                      sprintId: activeSprint.sprintId,
-                                    });
-                                  });
-                                }}
-                                readModeContent={(
-                                  <div>
-                                    {
-                                      !closeSprint.length && !activeSprint.sprintId ? '无' : (
-                                        <div>
-                                          <div>
-                                            {_.map(closeSprint, 'sprintName').join(' , ')}
-                                          </div>
-                                          {
-                                            activeSprint.sprintId && (
-                                              <div
-                                                style={{
-                                                  color: '#4d90fe',
-                                                  // border: '1px solid #4d90fe',
-                                                  // borderRadius: '2px',
-                                                  fontSize: '13px',
-                                                  lineHeight: '20px',
-                                                  // padding: '0 8px',
-                                                  display: 'inline-block',
-                                                  marginTop: 5,
-                                                }}
-                                              >
-                                                {activeSprint.sprintName}
-                                              </div>
-                                            )
-                                          }
-                                        </div>
-                                      )
-                                    }
-                                  </div>
-                                )}
-                              >
-                                {
-                                  closeSprint.length ? (
-                                    <div>
-                                      <span>已结束冲刺：</span>
-                                      <span>
-                                        {_.map(closeSprint, 'sprintName').join(' , ')}
-                                      </span>
-                                    </div>
-                                  ) : null
-                                }
-                                <Select
-                                  label="活跃冲刺"
-                                  value={sprintId || undefined}
-                                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                                  style={{ width: '150px' }}
-                                  // onBlur={() => this.statusOnChange()}
-                                  onPopupFocus={(e) => {
-                                    this.componentRef.rcSelect.focus();
-                                  }}
-                                  allowClear
-                                  loading={selectLoading}
-                                  onFocus={() => {
-                                    this.setState({
-                                      selectLoading: true,
-                                    });
-                                    loadSprints(['sprint_planning', 'started']).then((res) => {
-                                      this.setState({
-                                        originSprints: res,
-                                        selectLoading: false,
-                                      });
-                                    });
-                                  }}
-                                  onChange={(value) => {
-                                    const sprint = _.find(originSprints,
-                                      { sprintId: value * 1 });
-                                    this.setState({
-                                      sprintId: value,
-                                      // sprintName: sprint.sprintName,
-                                    });
-                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    // this.needBlur = false;
-                                    // if (this.changeTimer > 0) {
-                                    //   clearTimeout(this.changeTimer);
-                                    //   this.changeTimer = 0;
-                                    // }
-                                    // this.changeTimer = setTimeout(() => {
-                                    //   this.needBlur = true;
-                                    // }, 1000);
-                                  }}
-                                >
-                                  {originSprints.map(sprint => <Option key={`${sprint.sprintId}`} value={sprint.sprintId}>{sprint.sprintName}</Option>)}
-                                </Select>
-                              </ReadAndEdit>
-                            ) : (
-                              <div>
-                                {
-                                    activeSprint.sprintId ? (
-                                      <div
-                                        style={{
-                                          color: '#4d90fe',
-                                          // border: '1px solid #4d90fe',
-                                          // borderRadius: '2px',
-                                          fontSize: '13px',
-                                          lineHeight: '20px',
-                                          // padding: '0 8px',
-                                          display: 'inline-block',
-                                        }}
-                                      >
-                                        {activeSprint.sprintName}
-                                      </div>
-                                    ) : '无'
-                                  }
-                              </div>
-                            )
-                          }
-                        </div>
-                      </div>
-                      <div className="line-start mt-10">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-property">
-                            {'时间跟踪：'}
-                          </span>
-                        </div>
-                        <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                          <Progress
-                            style={{ width: 100 }}
-                            percent={
-                              this.getWorkloads() !== 0
-                                ? (this.getWorkloads() * 100)
-                                / (this.getWorkloads() + (origin.remainingTime || 0))
-                                : 0
-                            }
-                            size="small"
-                            status="success"
-                          />
-                          <span>
-                            {this.getWorkloads()}
-                            {'小时/'}
-                            {this.getWorkloads() + (origin.remainingTime || 0)}
-                            {'小时'}
-                          </span>
-                          <span
-                            role="none"
-                            style={{
-                              marginLeft: '8px',
-                              color: '#3f51b5',
-                              cursor: 'pointer',
-                            }}
-                            onClick={() => {
-                              this.setState({
-                                dailyLogShow: true,
-                              });
-                            }}
-                          >
-                            {'登记工作'}
-                          </span>
-                        </div>
-                      </div>
-                      {
+                    {
                         typeCode === 'issue_epic' ? (
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
@@ -2680,49 +1323,49 @@ class FeatureDetail extends Component {
                           </div>
                         ) : null
                       }
-                      <div className="line-start mt-10">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-subtitle">
-                            {'人员'}
-                          </span>
-                        </div>
+                    <div className="line-start mt-10">
+                      <div className="c7n-property-wrapper">
+                        <span className="c7n-subtitle">
+                          {'人员'}
+                        </span>
                       </div>
-                      <div className="line-start mt-10 assignee">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-property">报告人：</span>
-                        </div>
-                        <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                          <ReadAndEdit
-                            style={{ marginBottom: 5 }}
-                            callback={this.changeRae.bind(this)}
-                            thisType="reporterId"
-                            current={currentRae}
-                            origin={reporterId}
-                            onOk={this.updateIssue.bind(this, 'reporterId')}
-                            onCancel={this.resetReporterId.bind(this)}
-                            onInit={() => {
-                              this.setAnIssueToState(origin);
-                              if (reporterId) {
+                    </div>
+                    <div className="line-start mt-10 assignee">
+                      <div className="c7n-property-wrapper">
+                        <span className="c7n-property">报告人：</span>
+                      </div>
+                      <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <ReadAndEdit
+                          style={{ marginBottom: 5 }}
+                          callback={this.changeRae.bind(this)}
+                          thisType="reporterId"
+                          current={currentRae}
+                          origin={reporterId}
+                          onOk={this.updateIssue.bind(this, 'reporterId')}
+                          onCancel={this.resetReporterId.bind(this)}
+                          onInit={() => {
+                            this.setAnIssueToState(origin);
+                            if (reporterId) {
+                              this.setState({
+                                flag: 'loading',
+                              });
+                              getUser(reporterId).then((res) => {
                                 this.setState({
-                                  flag: 'loading',
+                                  reporterId: JSON.stringify(res.content[0]),
+                                  originUsers: res.content.length ? [res.content[0]] : [],
+                                  flag: 'finish',
                                 });
-                                getUser(reporterId).then((res) => {
-                                  this.setState({
-                                    reporterId: JSON.stringify(res.content[0]),
-                                    originUsers: res.content.length ? [res.content[0]] : [],
-                                    flag: 'finish',
-                                  });
-                                });
-                              } else {
-                                this.setState({
-                                  reporterId: undefined,
-                                  originUsers: [],
-                                });
-                              }
-                            }}
-                            readModeContent={(
-                              <div>
-                                {
+                              });
+                            } else {
+                              this.setState({
+                                reporterId: undefined,
+                                originUsers: [],
+                              });
+                            }
+                          }}
+                          readModeContent={(
+                            <div>
+                              {
                                   reporterId && reporterName ? (
                                     <UserHead
                                       user={{
@@ -2734,25 +1377,25 @@ class FeatureDetail extends Component {
                                     />
                                   ) : '无'
                                 }
-                              </div>
+                            </div>
                             )}
-                          >
-                            <Select
-                              value={flag === 'loading' ? undefined : reporterId || undefined}
-                              style={{ width: 150 }}
-                              loading={selectLoading}
+                        >
+                          <Select
+                            value={flag === 'loading' ? undefined : reporterId || undefined}
+                            style={{ width: 150 }}
+                            loading={selectLoading}
                               // onBlur={() => this.statusOnChange()}
-                              allowClear
-                              filter
-                              onFilterChange={this.onFilterChange.bind(this)}
-                              getPopupContainer={triggerNode => triggerNode.parentNode}
-                              onChange={(value) => {
-                                this.setState({ reporterId: value });
-                              }}
-                            >
-                              {originUsers.filter(u => u.enabled).map(user => (
-                                <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
-                                  <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                            allowClear
+                            filter
+                            onFilterChange={this.onFilterChange.bind(this)}
+                            getPopupContainer={triggerNode => triggerNode.parentNode}
+                            onChange={(value) => {
+                              this.setState({ reporterId: value });
+                            }}
+                          >
+                            {originUsers.filter(u => u.enabled).map(user => (
+                              <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
+                                <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                     <UserHead
                                       user={{
                                         id: user && user.id,
@@ -2762,249 +1405,140 @@ class FeatureDetail extends Component {
                                       }}
                                     />
                                   </div>
-                                </Option>
-                              ))}
-                            </Select>
-                          </ReadAndEdit>
-                          <span
-                            role="none"
-                            style={{
-                              color: '#3f51b5',
-                              cursor: 'pointer',
-                              marginTop: '-5px',
-                              display: 'inline-block',
-                              marginBottom: 5,
-                            }}
-                            onClick={() => {
-                              getSelf().then((res) => {
-                                if (res.id !== reporterId) {
-                                  this.setState({
-                                    currentRae: undefined,
-                                    reporterId: JSON.stringify(res),
-                                    reporterName: `${res.loginName}${res.realName}`,
-                                    reporterImageUrl: res.imageUrl,
-                                  }, () => {
-                                    this.updateIssue('reporterId');
-                                  });
-                                }
-                              });
-                            }}
-                          >
-                            {'分配给我'}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="line-start mt-10 assignee">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-property">经办人：</span>
-                        </div>
-                        <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                          <ReadAndEdit
-                            style={{ marginBottom: 5 }}
-                            callback={this.changeRae.bind(this)}
-                            thisType="assigneeId"
-                            current={currentRae}
-                            origin={assigneeId}
-                            onOk={this.updateIssue.bind(this, 'assigneeId')}
-                            onCancel={this.resetAssigneeId.bind(this)}
-                            onInit={() => {
-                              this.setAnIssueToState(origin);
-                              if (assigneeId) {
+                              </Option>
+                            ))}
+                          </Select>
+                        </ReadAndEdit>
+                        <span
+                          role="none"
+                          style={{
+                            color: '#3f51b5',
+                            cursor: 'pointer',
+                            marginTop: '-5px',
+                            display: 'inline-block',
+                            marginBottom: 5,
+                          }}
+                          onClick={() => {
+                            getSelf().then((res) => {
+                              if (res.id !== reporterId) {
                                 this.setState({
-                                  flag: 'loading',
-                                });
-                                getUser(assigneeId).then((res) => {
-                                  this.setState({
-                                    assigneeId: JSON.stringify(res.content[0]),
-                                    originUsers: res.content.length ? [res.content[0]] : [],
-                                    flag: 'finish',
-                                  });
-                                });
-                              } else {
-                                this.setState({
-                                  assigneeId: undefined,
-                                  originUsers: [],
+                                  currentRae: undefined,
+                                  reporterId: JSON.stringify(res),
+                                  reporterName: `${res.loginName}${res.realName}`,
+                                  reporterImageUrl: res.imageUrl,
+                                }, () => {
+                                  this.updateIssue('reporterId');
                                 });
                               }
-                            }}
-                            readModeContent={(
-                              <div>
-                                {
-                                  assigneeId && assigneeName ? (
-                                    <UserHead
-                                      user={{
-                                        id: assigneeId,
-                                        loginName: '',
-                                        realName: assigneeName,
-                                        avatar: assigneeImageUrl,
-                                      }}
-                                    />
-                                  ) : '无'
-                                }
-                              </div>
-                            )}
-                          >
-                            <Select
-                              value={flag === 'loading' ? undefined : assigneeId || undefined}
-                              style={{ width: 150 }}
-                              loading={selectLoading}
-                              allowClear
-                              filter
-                              onFilterChange={this.onFilterChange.bind(this)}
-                              getPopupContainer={triggerNode => triggerNode.parentNode}
-                              onChange={(value) => {
-                                this.setState({ assigneeId: value });
-                              }}
-                            >
-                              {originUsers.filter(u => u.enabled).map(user => (
-                                <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
-                                  <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                                    <UserHead
-                                      user={{
-                                        id: user && user.id,
-                                        loginName: user && user.loginName,
-                                        realName: user && user.realName,
-                                        avatar: user && user.imageUrl,
-                                      }}
-                                    />
-                                  </div>
-                                </Option>
-                              ))}
-                            </Select>
-                          </ReadAndEdit>
-                          <span
-                            role="none"
-                            style={{
-                              color: '#3f51b5',
-                              cursor: 'pointer',
-                              marginTop: '-5px',
-                              display: 'inline-block',
-                              marginBottom: 5,
-                            }}
-                            onClick={() => {
-                              getSelf().then((res) => {
-                                if (res.id !== assigneeId) {
-                                  this.setState({
-                                    currentRae: undefined,
-                                    assigneeId: JSON.stringify(res),
-                                    assigneeName: `${res.loginName}${res.realName}`,
-                                    assigneeImageUrl: res.imageUrl,
-                                  }, () => {
-                                    this.updateIssue('assigneeId');
-                                  });
-                                }
-                              });
-                            }}
-                          >
-                            {'分配给我'}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="line-start mt-10">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-subtitle">日期</span>
-                        </div>
-                      </div>
-                      <div className="line-start mt-10">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-property">创建时间：</span>
-                        </div>
-                        <div className="c7n-value-wrapper">
-                          <DatetimeAgo
-                            date={creationDate}
-                          />
-                        </div>
-                      </div>
-                      <div className="line-start mt-10">
-                        <div className="c7n-property-wrapper">
-                          <span className="c7n-property">更新时间：</span>
-                        </div>
-                        <div className="c7n-value-wrapper">
-                          <DatetimeAgo
-                            date={lastUpdateDate}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div id="des">
-                    <div className="c7n-title-wrapper">
-                      <div className="c7n-title-left">
-                        <Icon type="subject c7n-icon-title" />
-                        <span>描述</span>
-                      </div>
-                      <div style={{
-                        flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
-                      }}
-                      />
-                      <div className="c7n-title-right" style={{ marginLeft: '14px', position: 'relative' }}>
-                        <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })}>
-                          <Icon type="zoom_out_map icon" style={{ marginRight: 2 }} />
-                          <span>全屏编辑</span>
-                        </Button>
-                        <Icon
-                          className="c7n-des-edit"
-                          style={{ position: 'absolute', top: 8, right: -20 }}
-                          role="none"
-                          type="mode_edit mlr-3 pointer"
-                          onClick={() => {
-                            this.setState({
-                              editDesShow: true,
-                              editDes: description,
                             });
                           }}
+                        >
+                          {'分配给我'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="line-start mt-10">
+                      <div className="c7n-property-wrapper">
+                        <span className="c7n-subtitle">日期</span>
+                      </div>
+                    </div>
+                    <div className="line-start mt-10">
+                      <div className="c7n-property-wrapper">
+                        <span className="c7n-property">创建时间：</span>
+                      </div>
+                      <div className="c7n-value-wrapper">
+                        <DatetimeAgo
+                          date={creationDate}
                         />
                       </div>
                     </div>
-                    {this.renderDes()}
+                    <div className="line-start mt-10">
+                      <div className="c7n-property-wrapper">
+                        <span className="c7n-property">更新时间：</span>
+                      </div>
+                      <div className="c7n-value-wrapper">
+                        <DatetimeAgo
+                          date={lastUpdateDate}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div id="attachment">
+                <div id="des">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
-                      <Icon type="attach_file c7n-icon-title" />
-                      <span>附件</span>
+                      <Icon type="subject c7n-icon-title" />
+                      <span>描述</span>
                     </div>
                     <div style={{
-                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px',
+                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
                     }}
                     />
-                  </div>
-                  <div className="c7n-content-wrapper" style={{ marginTop: '-47px' }}>
-                    <UploadButtonNow
-                      onRemove={this.setFileList}
-                      onBeforeUpload={this.setFileList}
-                      updateNow={this.onChangeFileList}
-                      fileList={fileList}
-                    />
-                  </div>
-                </div>
-                {
-                  typeCode !== 'sub_task' && (
-                    <div id="link_task">
-                      <div className="c7n-title-wrapper">
-                        <div className="c7n-title-left">
-                          <Icon type="link c7n-icon-title" />
-                          <span>问题链接</span>
-                        </div>
-                        <div style={{
-                          flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
+                    <div className="c7n-title-right" style={{ marginLeft: '14px', position: 'relative' }}>
+                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })}>
+                        <Icon type="zoom_out_map icon" style={{ marginRight: 2 }} />
+                        <span>全屏编辑</span>
+                      </Button>
+                      <Icon
+                        className="c7n-des-edit"
+                        style={{ position: 'absolute', top: 8, right: -20 }}
+                        role="none"
+                        type="mode_edit mlr-3 pointer"
+                        onClick={() => {
+                          this.setState({
+                            editDesShow: true,
+                            editDes: description,
+                          });
                         }}
-                        />
-                        <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                          <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
-                            <Icon type="relate icon" />
-                            <span>创建链接</span>
-                          </Button>
-                        </div>
-                      </div>
-                      {this.renderLinkIssues()}
+                      />
                     </div>
-                  )
-                }
+                  </div>
+                  {this.renderDes()}
+                </div>
               </div>
-            </section>
-          </div>
+              <div id="attachment">
+                <div className="c7n-title-wrapper">
+                  <div className="c7n-title-left">
+                    <Icon type="attach_file c7n-icon-title" />
+                    <span>附件</span>
+                  </div>
+                  <div style={{
+                    flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px',
+                  }}
+                  />
+                </div>
+                <div className="c7n-content-wrapper" style={{ marginTop: '-47px' }}>
+                  <UploadButtonNow
+                    onRemove={this.setFileList}
+                    onBeforeUpload={this.setFileList}
+                    updateNow={this.onChangeFileList}
+                    fileList={fileList}
+                  />
+                </div>
+              </div>
+              {
+                <div id="link_task">
+                  <div className="c7n-title-wrapper">
+                    <div className="c7n-title-left">
+                      <Icon type="link c7n-icon-title" />
+                      <span>问题链接</span>
+                    </div>
+                    <div style={{
+                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
+                    }}
+                    />
+                    <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ createLinkTaskShow: true })}>
+                        <Icon type="relate icon" />
+                        <span>创建链接</span>
+                      </Button>
+                    </div>
+                  </div>
+                  {this.renderLinkIssues()}
+                </div>
+                }
+            </div>
+          </section>
         </div>
         {
           edit ? (
@@ -3037,108 +1571,6 @@ class FeatureDetail extends Component {
               visible={copyIssueShow}
               onCancel={() => this.setState({ copyIssueShow: false })}
               onOk={this.handleCopyIssue.bind(this)}
-            />
-          ) : null
-        }
-        {
-          transformSubIssueShow ? (
-            <TransformSubIssue
-              visible={transformSubIssueShow}
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              ovn={origin.objectVersionNumber}
-              onCancel={() => this.setState({ transformSubIssueShow: false })}
-              onOk={this.handleTransformSubIssue.bind(this)}
-              store={store}
-            />
-          ) : null
-        }
-        {
-          transformFromSubIssueShow ? (
-            <TransformFromSubIssue
-              visible={transformFromSubIssueShow}
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              ovn={origin.objectVersionNumber}
-              onCancel={() => this.setState({ transformFromSubIssueShow: false })}
-              onOk={this.handleTransformFromSubIssue.bind(this)}
-              store={store}
-            />
-          ) : null
-        }
-        {
-          createBranchShow ? (
-            <CreateBranch
-              issueId={origin.issueId}
-              typeCode={typeCode}
-              issueNum={origin.issueNum}
-              onOk={() => {
-                this.setState({ createBranchShow: false });
-                this.reloadIssue();
-              }}
-              onCancel={() => this.setState({ createBranchShow: false })}
-              visible={createBranchShow}
-            />
-          ) : null
-        }
-        {
-          commitShow ? (
-            <Commits
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              time={branchs.commitUpdateTime}
-              onCancel={() => {
-                this.setState({ commitShow: false });
-              }}
-              visible={commitShow}
-            />
-          ) : null
-        }
-        {
-          mergeRequestShow ? (
-            <MergeRequest
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              num={branchs.totalMergeRequest}
-              onCancel={() => {
-                this.setState({ mergeRequestShow: false });
-              }}
-              visible={mergeRequestShow}
-            />
-          ) : null
-        }
-        {
-          assigneeShow ? (
-            <Assignee
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              visible={assigneeShow}
-              assigneeId={assigneeId}
-              objectVersionNumber={origin.objectVersionNumber}
-              onOk={() => {
-                this.setState({ assigneeShow: false });
-                this.reloadIssue();
-              }}
-              onCancel={() => {
-                this.setState({ assigneeShow: false });
-              }}
-            />
-          ) : null
-        }
-        {
-          changeParentShow ? (
-            <ChangeParent
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              visible={changeParentShow}
-              objectVersionNumber={origin.objectVersionNumber}
-              onOk={() => {
-                this.setState({ changeParentShow: false });
-                this.reloadIssue();
-              }}
-              onCancel={() => {
-                this.setState({ changeParentShow: false });
-              }}
             />
           ) : null
         }

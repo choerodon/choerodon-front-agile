@@ -2,16 +2,16 @@ import { stores, axios } from 'choerodon-front-boot';
 
 const { AppState } = stores;
 
-export function createIssue(issueObj, projectId = AppState.currentMenuType.id) {
+export function createIssue(issueObj, applyType = 'agile', projectId = AppState.currentMenuType.id) {
   const issue = {
     projectId,
     ...issueObj,
   };
-  return axios.post(`/agile/v1/projects/${projectId}/issues?applyType=agile`, issue);
+  return axios.post(`/agile/v1/projects/${projectId}/issues?applyType=${applyType}`, issue);
 }
-export function loadIssueTypes() {
+export function loadIssueTypes(applyType) {
   const projectId = AppState.currentMenuType.id;
-  return axios.get(`/issue/v1/projects/${projectId}/schemes/query_issue_types_with_sm_id?apply_type=agile`);
+  return axios.get(`/issue/v1/projects/${projectId}/schemes/query_issue_types_with_sm_id?apply_type=${applyType || 'agile'}`);
 }
 export function loadLabels() {
   const projectId = AppState.currentMenuType.id;

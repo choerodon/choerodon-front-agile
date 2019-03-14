@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Icon, Table, Radio, Divider, Form, Input, Card, Tooltip, Spin,
+  Button, Icon, Table, Radio, Divider, Form, Input, Card, Tooltip, Spin, Modal,
 } from 'choerodon-ui';
 import {
   stores, Page, Header, Content,  
 } from 'choerodon-front-boot';
+import moment from 'moment';
+
 import CreatePI from '../CreatePI';
 import PIStore from '../../../../stores/Program/PI/PIStore';
 import { PIListLink } from '../../../../common/utils';
@@ -22,7 +24,7 @@ const RadioButton = Radio.Button;
 const { AppState } = stores;
 const amisColumns = [
   {
-    title: 'PI目标名称',
+    title: 'PI目标',
     dataIndex: 'name',
   },
   {
@@ -35,6 +37,16 @@ const amisColumns = [
     dataIndex: 'actualBv',
     render: text => text || '-',
   },
+  {
+    title: '创建时间',
+    dataIndex: 'creationDate',
+    render: text => moment(text).format('YYYY-MM-DD') || '-',
+  },
+  {
+    title: '最后更新时间',
+    dataIndex: 'lastUpdateDate',
+    render: text => moment(text).format('YYYY-MM-DD') || '-',
+  },
 ];
 @observer
 class PIDetail extends Component {
@@ -44,6 +56,8 @@ class PIDetail extends Component {
       showType: 'list',
       piName: undefined,
       editingPiAimsInfo: {},
+      deletePIAimsModalVisible: false,
+      deleteRecord: undefined,
     };
   }
 
@@ -91,9 +105,17 @@ class PIDetail extends Component {
   }
 
   handledeletePiAims = (record) => {
+    this.setState({
+      deletePIAimsModalVisible: true,
+      deleteRecord: record,
+    });
+  }
+
+  handleDeleteOk = () => {
+    const { deleteRecord } = this.state;
     PIStore.setPIDetailLoading(true);
-    deletePIAims(record.id).then(() => {
-      getPIAims(record.piId).then((piAims) => {
+    deletePIAims(deleteRecord.id).then(() => {
+      getPIAims(deleteRecord.piId).then((piAims) => {
         PIStore.setPIDetailLoading(false);
         PIStore.setPiAims(piAims);
         PIStore.setEditPiAimsCtrl(piAims.program.map((item, index) => (
@@ -104,10 +126,21 @@ class PIDetail extends Component {
           }
         )));
       });
+      this.setState({
+        deletePIAimsModalVisible: false,
+        deleteRecord: undefined,
+      });
       Choerodon.prompt('删除成功');
     }).catch(() => {
       PIStore.setPIDetailLoading(false);
       Choerodon.prompt('删除失败');
+    });
+  }
+
+  handleDeleteCancel = () => {
+    this.setState({
+      deletePIAimsModalVisible: false,
+      deleteRecord: undefined,
     });
   }
 
@@ -170,10 +203,12 @@ class PIDetail extends Component {
 
   render() {
     const {
-      showType, piName, editingPiAimsInfo,
+      showType, piName, editingPiAimsInfo, deletePIAimsModalVisible, deleteRecord,
     } = this.state;
     const piId = this.props.match.params.id;
-    const { PiList, PiAims, PIDetailLoading } = PIStore;
+    const {
+      PiList, PiAims, PIDetailLoading, editPIVisible, 
+    } = PIStore;
     const teamDataSource = PiAims.teamAims;
     const teamAimsColumns = [{
       title: '团队名称',
@@ -181,24 +216,24 @@ class PIDetail extends Component {
     }];
     return (
       <Page className="c7n-pi-detail">
-        <Header title={`${piName} PI目标`} backPath={PIListLink()}>
+        <Header title={`${piName || ''}目标`} backPath={PIListLink()}>
           <Button funcType="flat" onClick={this.handleCreateFeatureBtnClick}>
             <Icon type="playlist_add" />
             <span>创建PI目标</span>
           </Button>
         </Header>
         <Content>
-          <RadioGroup className="c7n-pi-showTypeRadioGroup" onChange={this.handleRadioChange} defaultValue="list">
+          {/* <RadioGroup className="c7n-pi-showTypeRadioGroup" onChange={this.handleRadioChange} defaultValue="list">
             <RadioButton value="list">列表</RadioButton>
             <RadioButton value="card">卡片</RadioButton>
           </RadioGroup>
-          <Divider style={{ margin: '7px 0 20px' }} />
+          <Divider style={{ margin: '7px 0 20px' }} /> */}
           <Spin spinning={PIDetailLoading}>
-            {
-            showType === 'list' && (
-              <div>
-                {this.renderPIAimsTable()}
-                {/* <div className="c7n-pi-teamAims" style={{ marginTop: 20 }}>
+            {/* {
+            showType === 'list' && ( */}
+            <div>
+              {this.renderPIAimsTable()}
+              {/* <div className="c7n-pi-teamAims" style={{ marginTop: 20 }}>
                   <Table 
                     filterBar={false}
                     rowKey={record => record.teamId}
@@ -208,15 +243,24 @@ class PIDetail extends Component {
                     expandedRowRender={record => this.renderTeamPIAimsTable.bind(this, record.teamProgramAims)()}
                   />
                 </div> */}
-              </div>
-            )
-            }
+            </div>
+            {/* )
+            } */}
           </Spin>
           <CreatePI 
             piId={piId}
             page="PIDetail"
           />
-          <EditPI editingPiAimsInfo={editingPiAimsInfo} />
+          <EditPI editingPiAimsInfo={editingPiAimsInfo} editPIVisible={editPIVisible} />
+          <Modal
+            title="删除PI目标"
+            visible={deletePIAimsModalVisible}
+            onOk={this.handleDeleteOk}
+            onCancel={this.handleDeleteCancel}
+            center
+          >
+            <p>{`确定要删除 ${deleteRecord && deleteRecord.name} 吗？`}</p>
+          </Modal>
         </Content>
       </Page>
     );

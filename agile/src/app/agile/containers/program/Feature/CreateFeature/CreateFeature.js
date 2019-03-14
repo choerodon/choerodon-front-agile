@@ -8,10 +8,15 @@ import WYSIWYGEditor from '../../../../components/WYSIWYGEditor';
 import FullEditor from '../../../../components/FullEditor';
 import UploadButton from '../../../../components/CommonComponent/UploadButton';
 import TypeTag from '../../../../components/TypeTag';
-import { loadEpics, loadIssueTypes } from '../../../../api/NewIssueApi';
+import {
+  loadPriorities, loadEpics, loadIssueTypes, createIssue, 
+} from '../../../../api/NewIssueApi';
+import { beforeTextUpload, handleFileUpload } from '../../../../common/utils';
 import './CreateFeature.scss';
 
 const { AppState } = stores;
+console.log('appState:');
+console.log(AppState);
 const FormItem = Form.Item;
 const { Sidebar } = Modal;
 const { Option } = Select;
@@ -25,35 +30,117 @@ class CreateFeature extends Component {
     super(props);
     this.state = {
       originEpics: [],
-      featureType: undefined,
+      selectedIssueType: undefined,
+      defaultPriority: undefined,
+      featureType: 'enabler',
       storyPoints: '',
       fullEdit: false,
       delta: '',
-      selectLoading: false,
       fileList: [],
+      selectLoading: false,
     };
   }
 
   componentDidMount() {
-    loadIssueTypes().then((res) => {
+    loadIssueTypes('program').then((res) => {
       this.setState({
-        featureType: res.find(item => item.typeCode === 'feature'),
+        selectedIssueType: res.find(item => item.typeCode === 'feature'),
+      });
+    });
+
+    loadPriorities().then((res) => {
+      this.setState({
+        defaultPriority: res.find(item => item.default) || res[0],
       });
     });
   }
 
   handleOnOk = () => {
-    const { callback } = this.props;
-    callback();
+    const { callback, form } = this.props;
+    const {
+      selectedIssueType, defaultPriority, featureType, storyPoints, delta,
+    } = this.state;
+    form.validateFields((err, values) => {
+      if (!err) {
+        const issueObj = {
+          projectId: AppState.currentMenuType.id,
+          programId: AppState.currentMenuType.id,
+          issueTypeId: selectedIssueType.id,
+          typeCode: 'feature',
+          summary: values.summary,
+          priorityId: defaultPriority.id,
+          priorityCode: `priority-${defaultPriority.id}`,
+          epicId: values.epicId || 0,
+          parentIssueId: 0,
+          storyPoints,
+          featureDTO: {
+            benfitHypothesis: values.benfitHypothesis,
+            acceptanceCritera: values.acceptanceCritera,
+            featureType,
+          },
+        };
+
+        const deltaOps = delta;
+        if (deltaOps) {
+          beforeTextUpload(deltaOps, issueObj, this.handleCreateFeature);
+        } else {
+          issueObj.description = '';
+          this.handleCreateFeature(issueObj);
+        }
+      }
+    });
+  }
+
+  handleCreateFeature = (issueObj) => {
+    const { form, callback } = this.props;
+    const { fileList } = this.state;
+    const fileUpdateCallback = () => {
+      this.setState({ fileList: [] });
+    };
+      
+    createIssue(issueObj, 'program').then((res) => {
+      if (fileList.length > 0) {
+        const config = {
+          issueType: res.statusId,
+          issueId: res.issueId,
+          fileName: fileList[0].name,
+          projectId: AppState.currentMenuType.id,
+        };
+        if (fileList.some(one => !one.url)) {
+          handleFileUpload(fileList, fileUpdateCallback, config);
+        }
+      }
+      Choerodon.prompt('创建成功');
+      form.resetFields();
+      this.resetForm();
+      callback();
+    }).catch(() => {
+      Choerodon.prompt('创建失败');
+    });
+  }
+ 
+  resetForm = () => {
+    const { form } = this.props;
+    form.resetFields();
+    this.setState({
+      storyPoints: '',
+      delta: '',
+      fileList: [],
+      featureType: 'enabler',
+    });
+    this.editor.setEditorContents(this.editor.getEditor(), '');
   }
 
   handleOnCancel = () => {
     const { callback } = this.props;
     callback();
+    this.resetForm();
   }
 
-  handleRadioChange = (value) => {
-
+  handleFeatureTypeChange = (e) => {
+    this.setState({
+      featureType: e.target.value,
+    });
   }
 
   handleEpicFilterChange = () => {
@@ -112,7 +199,7 @@ class CreateFeature extends Component {
     const { form } = this.props;
     const { getFieldDecorator } = form;
     const {
-      fullEdit, delta, selectLoading, originEpics, featureType, storyPoints, fileList,
+      fullEdit, delta, selectLoading, originEpics, selectedIssueType, storyPoints, fileList, featureType,
     } = this.state;
     return (
       <Sidebar
@@ -130,32 +217,36 @@ class CreateFeature extends Component {
           link=""
         >
           <Form>
-            {/* <FormItem label="问题类型" style={{ width: 520 }}>
+            {selectedIssueType && (
+            <FormItem label="问题类型" style={{ width: 520 }}>
               {getFieldDecorator('typeId', {
                 rules: [{ required: true, message: '问题类型为必输项' }],
+                initialValue: selectedIssueType.id,
               })(
                 <Select
                   label="问题类型"
                   getPopupContainer={triggerNode => triggerNode.parentNode}
                   disabled
-                  value={featureType && featureType.id}
                 >
-                  <Option key={featureType.id} value={featureType.id}>
-                    <TypeTag
-                      data={featureType}
-                      showName
-                    />
+                  <Option key={selectedIssueType.id} value={selectedIssueType.id}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                      <TypeTag
+                        data={selectedIssueType}
+                        showName
+                      />
+                    </div>
                   </Option>
                 </Select>,
               )}
-            </FormItem> */}
-            <RadioDroup onChange={this.handleRadioChange}>
+            </FormItem>
+            )}
+            <RadioDroup label="特性类型" style={{ display: 'flex', flexDirection: 'column', marginBottom: 5 }} value={featureType} onChange={this.handleFeatureTypeChange}>
               <Radio value="business">业务</Radio>
-              <Radio value="enable">使能</Radio>
+              <Radio value="enabler">使能</Radio>
             </RadioDroup>
 
-            <FormItem label="特性名称" style={{ width: 520 }}>
-              {getFieldDecorator('featureName', {
+            <FormItem label="特性名称" style={{ width: 520, marginBottom: 20 }}>
+              {getFieldDecorator('summary', {
                 rules: [{ required: true, message: '特性名称为必输项' }],
               })(
                 <Input label="特性名称" maxLength={44} />,
@@ -176,6 +267,7 @@ class CreateFeature extends Component {
                   !fullEdit && (
                     <div className="clear-p-mw">
                       <WYSIWYGEditor
+                        saveRef={(editor) => { this.editor = editor; }}
                         value={delta}
                         style={{ height: 200, width: '100%' }}
                         onChange={(value) => {
@@ -235,27 +327,16 @@ class CreateFeature extends Component {
                 ))}
               </Select>
             </div>
-            <FormItem>
-              {getFieldDecorator('featureValue', {
+            <FormItem style={{ width: 520 }}>
+              {getFieldDecorator('benfitHypothesis', {
               })(
-                <TextArea
-                  maxLength={44}
-                  size="small"
-                  onPressEnter={() => {
-                   
-                  }}
-                />,
+                <Input label="特性价值" placeholder="请输入特性价值" maxLength={44} />,
               )}
             </FormItem>
-            <FormItem>
-              {getFieldDecorator('featureStandard', {
+            <FormItem style={{ width: 520 }}>
+              {getFieldDecorator('acceptanceCritera', {
               })(
-                <TextArea
-                  maxLength={44}
-                  size="small"
-                  onPressEnter={() => {
-                  }}
-                />,
+                <Input label="验收标准" placeholder="请输入验收标准" maxLength={44} />,
               )}
             </FormItem>
           </Form>

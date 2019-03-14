@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { Button } from 'choerodon-ui';
 import { store } from 'choerodon-front-boot';
 import CreateFeature from '../CreateFeature';
+import FeatureDetail from '../FeatureDetail';
 
 @observer
 class FeatureList extends Component {
@@ -36,6 +37,7 @@ class FeatureList extends Component {
           visible={createFeatureVisible} 
           callback={this.onOKOrCancel}
         />
+        {/* <FeatureDetail /> */}
       </div>
     );
   }

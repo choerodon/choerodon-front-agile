@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Icon } from 'choerodon-ui';
 import './TypeTag.scss';
 
-const initTypes = ['agile_epic', 'agile_story', 'agile_fault', 'agile_task', 'agile_subtask'];
+const initTypes = ['agile_epic', 'agile_story', 'agile_fault', 'agile_task', 'agile_subtask', 'agile_feature'];
 
 class TypeTag extends Component {
   render() {
@@ -18,7 +18,7 @@ class TypeTag extends Component {
                 fontSize: '26px',
                 color: data ? data.colour : '#fab614',
               }}
-              type={data ? data.icon : 'help'}
+              type={data ? 'agile_task' : 'help'}
             />)
           : (
             <div

@@ -165,7 +165,8 @@ class TransformFromSubIssue extends Component {
                           showName
                         />
                       </div>
-                    </Option>))}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>

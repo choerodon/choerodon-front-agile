@@ -71,7 +71,7 @@ class PIList extends Component {
     ];
     return (
       <Page>
-        <Header title="PI目标">
+        <Header title="PI列表">
           <Button funcType="flat" onClick={this.handleCreateFeatureBtnClick}>
             <Icon type="playlist_add" />
             <span>创建PI目标</span>

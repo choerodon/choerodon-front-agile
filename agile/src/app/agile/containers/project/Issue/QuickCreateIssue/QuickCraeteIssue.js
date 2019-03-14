@@ -104,7 +104,7 @@ class QuickCreateIssue extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          issueTypes.filter(t => t.typeCode !== 'sub_task').map(type => (
+          issueTypes.filter(t => t.typeCode !== 'sub_task' && t.typeCode !== 'feature').map(type => (
             <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
