@@ -30,6 +30,7 @@ class EditArt extends Component {
     isModified: false,
     canRelease: false,
     releaseArtVisible: false,
+    releaseLoading: false,
   }
 
   componentDidMount() {
@@ -114,8 +115,20 @@ class EditArt extends Component {
 
   handleReleaseOk = (PINum) => {
     const { data, formData } = this.state;
+    this.setState({
+      releaseLoading: true,
+    });
     releaseArt(data.id, PINum).then((res) => {
-
+      Choerodon.prompt('发布成功');
+      this.setState({
+        releaseArtVisible: false,
+        releaseLoading: false,
+      });
+    }).catch((err) => {
+      Choerodon.error('发布失败');
+      this.setState({      
+        releaseLoading: false,
+      });
     });
   }
 
@@ -128,7 +141,7 @@ class EditArt extends Component {
   render() {
     const {
       formData, isModified, canRelease,
-      releaseArtVisible, data, loading,
+      releaseArtVisible, data, loading, releaseLoading,
     } = this.state;
     const {
       id, name, description, enabled, 
@@ -143,6 +156,7 @@ class EditArt extends Component {
           {id ? (
             <Spin spinning={loading}>
               <ReleaseArt
+                loading={releaseLoading}
                 visible={releaseArtVisible}
                 onOk={this.handleReleaseOk}
                 onCancel={this.handleReleaseCancel}
