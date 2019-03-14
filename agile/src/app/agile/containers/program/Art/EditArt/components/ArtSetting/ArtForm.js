@@ -77,7 +77,9 @@ class ArtForm extends Component {
         <Tabs defaultActiveKey="1" onChange={this.handleTabChange}>
           <TabPane tab="ART设置" key="1">
             <FormItem>
-              {getFieldDecorator('rteId')(
+              {getFieldDecorator('rteId', {
+                normalize: value => (value === 0 ? null : value),
+              })(
                 <SelectFocusLoad allowClear type="user" label="发布火车工程师" style={{ width: 500 }} />,
               )}
             </FormItem>
