@@ -180,7 +180,7 @@ class CreateIssue extends Component {
     axios.get(`/issue/v1/projects/${AppState.currentMenuType.projectId}/schemes/query_issue_types_with_sm_id?apply_type=agile`)
       .then((res) => {
         this.setState({
-          originIssueTypes: res,
+          originIssueTypes: res.filter(item => item.typeCode !== 'feature'),
         });
       });
   };

@@ -23,8 +23,18 @@ class EditPI extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      stretch: true,
+      stretch: false,
     };
+  }
+
+  // eslint-disable-next-line react/sort-comp
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { editingPiAimsInfo } = this.props;
+    if (this.props.editPIVisible === false && nextProps.editPIVisible === true) {
+      this.setState({
+        stretch: editingPiAimsInfo.stretch,
+      });
+    }
   }
 
   handleCheckboxChange = (e) => {
@@ -78,11 +88,14 @@ class EditPI extends Component {
     PIStore.setEditPIVisible(false);
   }
 
+  
   render() {
-    const { form, editingPiAimsInfo } = this.props;
+    const { form, editingPiAimsInfo, editPIVisible } = this.props;
     const { stretch } = this.state;
     const { getFieldDecorator } = form;
-    const { editPIVisible } = PIStore;
+    // const { editPIVisible } = PIStore;
+    console.log('editingPiAimsInfoStretch:');
+    console.log(editingPiAimsInfo.stretch);
     return (
       <Sidebar
         className="c7n-pi-createPISideBar"
@@ -128,7 +141,8 @@ class EditPI extends Component {
                 )
               }
           </FormItem>
-          <Checkbox defaultChecked={editingPiAimsInfo.stretch} checked={stretch} onChange={this.handleCheckboxChange}>延伸目标</Checkbox>
+          
+          <Checkbox checked={stretch} onChange={this.handleCheckboxChange}>延伸目标</Checkbox>
         </Form>
       </Sidebar>
     );

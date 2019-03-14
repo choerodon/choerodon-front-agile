@@ -740,7 +740,7 @@ class SprintItem extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          issueTypes.map(type => (
+          issueTypes.filter(item => item.typeCode !== 'feature').map(type => (
             <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
@@ -1112,7 +1112,7 @@ class SprintItem extends Component {
                   )}
                 </Droppable>
               ) : ''}
-            </div>); 
+                        </div>); 
           }
         } else {
           result = (
@@ -1162,7 +1162,7 @@ class SprintItem extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          issueTypes.map(type => (
+          issueTypes.filter(item => item.typeCode !== 'feature').map(type => (
             <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag

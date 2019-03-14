@@ -87,6 +87,7 @@ class WYSIWYGEditor extends Component {
       bottomBar,
       handleDelete,
       handleSave,
+      saveRef,
     } = this.props;
     const { loading } = this.state;
     const newStyle = { ...this.defaultStyle, ...style };
@@ -95,6 +96,7 @@ class WYSIWYGEditor extends Component {
       <div style={{ width: '100%' }}>
         <div style={newStyle} className="react-quill-editor">
           <ReactQuill
+            ref={saveRef} 
             theme="snow"
             modules={this.modules}
             formats={this.formats}
@@ -122,7 +124,7 @@ class WYSIWYGEditor extends Component {
                   handleDelete();
                 }}
               >
-                取消
+                {'取消'}
               </Button>
               <Button
                 type="primary"
@@ -132,7 +134,7 @@ class WYSIWYGEditor extends Component {
                   handleSave();
                 }}
               >
-                保存
+                {'保存'}
               </Button>
             </div>
           )

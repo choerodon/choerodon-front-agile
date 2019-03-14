@@ -1,13 +1,12 @@
 import { stores, axios } from 'choerodon-front-boot';
 
 const { AppState } = stores;
-const projectId = AppState.currentMenuType.id;
 
 /**
  * 获取PI列表
  */
 export function getPIList() {
-  return axios.get(`/agile/v1/projects/${projectId}/pi/list`);
+  return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/list`);
 }
 
 /**
@@ -15,7 +14,7 @@ export function getPIList() {
  * @param {*} piId 
  */
 export function getPIAims(piId) {
-  return axios.get(`/agile/v1/projects/${projectId}/pi_objective/list?piId=${piId}`);
+  return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/pi_objective/list?piId=${piId}`);
 }
 
 /**
@@ -26,7 +25,7 @@ export function getPIAims(piId) {
  * @returns
  */
 export function upDatePIAmix(piObjectiveDTO) {
-  return axios.put(`/agile/v1/projects/${projectId}/pi_objective`, piObjectiveDTO);
+  return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/pi_objective`, piObjectiveDTO);
 }
 
 
@@ -38,7 +37,7 @@ export function upDatePIAmix(piObjectiveDTO) {
  * @returns
  */
 export function deletePIAims(piId) {
-  return axios.delete(`/agile/v1/projects/${projectId}/pi_objective/${piId}`);
+  return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/pi_objective/${piId}`);
 }
 
 /**
@@ -49,5 +48,5 @@ export function deletePIAims(piId) {
  * @returns
  */
 export function createPIAims(piObjectiveDTO) {
-  return axios.post(`/agile/v1/projects/${projectId}/pi_objective`, piObjectiveDTO);
+  return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/pi_objective`, piObjectiveDTO);
 }

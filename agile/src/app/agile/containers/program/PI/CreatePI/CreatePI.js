@@ -18,22 +18,13 @@ const { Option } = Select;
 const BV = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 @observer
 class CreatePI extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      stretch: true,
-    };
-  }
-
   handleCheckboxChange = (e) => {
-    this.setState({
-      stretch: e.target.checked,
-    });
+    PIStore.setCreateStretch(e.target.checked);
   }
 
   handleOnOk = () => {
-    const {form, piId, page } = this.props;
-    const { stretch } = this.state;
+    const { form, piId, page } = this.props;
+    const { createStretch } = PIStore;
     form.validateFields((err, values) => {
       if (!err) {
         if (page === 'PIList') {
@@ -49,7 +40,7 @@ class CreatePI extends Component {
           name: values.name,
           planBv: values.planBv,
           actualBv: values.actualBv,
-          stretch,
+          stretch: createStretch,
         };
         createPIAims(piObjectiveDTO).then(() => {
           Promise.all([getPIList(), getPIAims(values.piId || piId)]).then(([piList, piAims]) => {
@@ -75,6 +66,7 @@ class CreatePI extends Component {
             }
             form.resetFields();
             PIStore.setCreatePIVisible(false);
+            PIStore.setCreateStretch(false);
           });
         });
       }
@@ -85,13 +77,13 @@ class CreatePI extends Component {
     const { form } = this.props;
     form.resetFields();
     PIStore.setCreatePIVisible(false);
+    PIStore.setCreateStretch(false);
   }
 
   render() {
     const { page, form } = this.props;
-    const { stretch } = this.state;
     const { getFieldDecorator } = form;
-    const { PiList, createPIVisible } = PIStore;
+    const { PiList, createPIVisible, createStretch } = PIStore;
     return (
       <Sidebar
         className="c7n-pi-createPISideBar"
@@ -156,7 +148,7 @@ class CreatePI extends Component {
                )
               }
           </FormItem>
-          <Checkbox checked={stretch} onChange={this.handleCheckboxChange}>延伸目标</Checkbox>
+          <Checkbox checked={createStretch} onChange={this.handleCheckboxChange}>延伸目标</Checkbox>
         </Form>
       </Sidebar>
     );
