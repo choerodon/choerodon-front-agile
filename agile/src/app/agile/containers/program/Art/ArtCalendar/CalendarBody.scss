@@ -1,0 +1,27 @@
+.c7nagile-CalendarBody {
+  width: 100%;
+  flex: 1;
+  position: relative;
+  .c7nagile-CalendarBody-days {
+
+    width: 100%;
+    height: 100%;
+    display: flex;
+    border-bottom: 1px solid #E0E0E0;
+  }
+  .c7nagile-CalendarBody-day {
+    min-width: 20px;
+    border-left: 1px dashed #E0E0E0;
+  }
+  .c7nagile-CalendarBody-day:nth-child(7n+1) {
+    border-left-style: solid;
+    border-left-color: #D6D6D6;
+  }
+  .c7nagile-CalendarBody-pis {
+    display: flex;
+    margin-top: 10px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+}

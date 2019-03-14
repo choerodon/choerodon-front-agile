@@ -1,0 +1,24 @@
+.c7nagile-CalendarHeader {
+  width: fit-content;
+  min-width: 100%;
+  .c7nagile-CalendarHeader-years {
+    display: flex;
+    border-top: 1px solid #E0E0E0;
+    border-bottom: 1px solid #E0E0E0;
+  }
+  .c7nagile-CalendarHeader-year {
+    border-left: 1px solid #E0E0E0;
+    height: 22px;
+    line-height: 22px;
+    padding-left: 8px;
+  }
+  .c7nagile-CalendarHeader-weeks {
+    display: flex;
+    border-bottom: 1px solid #E0E0E0;
+  }
+  .c7nagile-CalendarHeader-week {
+    flex: 7;
+    text-align: center;
+    border-left: 1px solid #E0E0E0;
+  }
+}

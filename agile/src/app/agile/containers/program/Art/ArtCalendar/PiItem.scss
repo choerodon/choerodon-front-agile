@@ -1,0 +1,25 @@
+.PiItem {
+  background: white;
+  position: relative;
+  background: #F4F4F4;
+  padding: 10px 0;
+  &-pi {
+    &-title {
+      height: 30px;
+      line-height: 30px;
+      padding: 0 10px;
+      border: 1px solid #393E46;
+      border-left-width: 2px;
+    }
+    &-sprints {
+      height: 24px;
+      line-height: 24px;
+      background: white;
+    }
+    &-sprint {
+      height: 100%;
+      padding: 0 10px;
+      border-left: 2px solid #C0C0C0;    
+    }
+  }
+}
