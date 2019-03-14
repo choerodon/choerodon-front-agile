@@ -1,3 +1,8 @@
+.ant-collapse-item.c7n-swimlaneContext-container.noArrow {
+  .ant-collapse-expand-icon.ant-collapse-expanded {
+    display: none;
+  }
+}
 .ant-collapse-item.c7n-swimlaneContext-container.shouldBeIndent > .ant-collapse-header {
   padding: 0 16px !important;
 }
