@@ -36,7 +36,7 @@ const SprintItem = ({
       content={<CardBody />}
       title={
         <CardTitle name={sprint.name} status="进行中" fromDate="2018-12-03" endDate="2018-12-03" />
-      }
+        }
       placement="bottomLeft"
     >
       <div>
@@ -51,19 +51,23 @@ const CardTitle = ({
   fromDate,
   endDate,
 }) => (
-  <div>
+  <div style={{ height: 63, padding: 10 }}>
     <div style={{ display: 'flex' }}>
       <div>{name}</div>
+      <div style={{ flex: 1, visibility: 'hidden' }} />
       <div>{status}</div>
     </div>
-    {fromDate}    
-    <span>~</span>   
-    {endDate}
+    <div style={{ margin: '10px 0', color: '#9B9B9B' }}>
+      {`${fromDate} ~ ${endDate}`}        
+    </div>    
   </div>
 );
 const CardBody = () => (
   <div>
     <Progress percent={50} strokeColor="#4D90FE" />
+    <div style={{ margin: '10px 0' }}>
+     故事点:68 / 120       
+    </div>
   </div>
 );
 class PiItem extends Component {
