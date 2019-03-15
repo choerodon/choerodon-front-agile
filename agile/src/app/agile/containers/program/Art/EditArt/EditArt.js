@@ -76,7 +76,7 @@ class EditArt extends Component {
     });
   }
 
-  checkCanRelease = data => !requiredFields.some(field => data[field] == undefined)
+  checkCanRelease = data => !requiredFields.some(field => data[field] == undefined) && data.enabled
 
   handleFormChange = (changedValues, allValues) => {
     const { formData, isModified } = this.state;
