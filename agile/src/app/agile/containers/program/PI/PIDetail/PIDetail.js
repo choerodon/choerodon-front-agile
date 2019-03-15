@@ -62,6 +62,10 @@ class PIDetail extends Component {
   }
 
   componentDidMount() {
+    this.getPIAims();
+  }
+
+  getPIAims = () => {
     let { PiList } = PIStore;
     PiList = JSON.parse(sessionStorage.PiList) || PiList;
     const pi = PiList.find(item => item.id === Number(this.props.match.params.id));
@@ -220,6 +224,10 @@ class PIDetail extends Component {
           <Button funcType="flat" onClick={this.handleCreateFeatureBtnClick}>
             <Icon type="playlist_add" />
             <span>创建PI目标</span>
+          </Button>
+          <Button funcType="flat" onClick={this.getPIAims}>
+            <Icon type="refresh icon" />
+            <span>刷新</span>
           </Button>
         </Header>
         <Content>

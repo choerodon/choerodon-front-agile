@@ -1653,7 +1653,7 @@ class CreateSprint extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          issueTypes.map(t => (
+           issueTypes.filter(item => item.typeCode !== 'feature').map(t => (
             <Menu.Item key={t.typeCode} value={t.id}>
               <TypeTag
                 data={t}
