@@ -34,7 +34,7 @@ const ArtTable = ({
     title: '状态',
     dataIndex: 'enabled',
     key: 'enabled',
-    render: enabled => <StatusTag categoryCode={enabled ? 'doing' : 'todo'} name={enabled ? '进行中' : '未启用'} />,
+    render: enabled => <StatusTag categoryCode={enabled ? 'doing' : 'todo'} name={enabled ? '启用' : '未启用'} />,
   }, {
     title: '创建日期',
     dataIndex: 'createDate',
