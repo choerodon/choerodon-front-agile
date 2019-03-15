@@ -80,7 +80,6 @@ class EditArt extends Component {
 
   handleFormChange = (changedValues, allValues) => {
     const { formData, isModified } = this.state;
-    console.log(formatter(allValues), formData);
     if (!isEqual(formatter(allValues), formData)) {
       if (!isModified) {
         this.setState({

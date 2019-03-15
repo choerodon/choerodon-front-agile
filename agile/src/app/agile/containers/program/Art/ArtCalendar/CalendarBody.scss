@@ -12,7 +12,7 @@
     // &:first-child {
     //   border-left: none;
     // }
-    :nth-child(7n+1) {
+    &:nth-child(7n+1) {
       border-left-style: solid;
       border-left-color: #D6D6D6;
     }
