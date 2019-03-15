@@ -16,7 +16,7 @@ const requiredFields = ['startDate', 'ipWorkdays', 'interationCount', 'interatio
 function formatter(values) {
   const data = { ...values };
   Object.keys(data).forEach((key) => {
-    if (key === 'rteId' && data[key] == undefined) {
+    if (key === 'rteId' && data[key] === undefined) {
       data[key] = 0;
     }
     if (moment.isMoment(data[key])) {
@@ -46,16 +46,16 @@ class EditArt extends Component {
     this.setState({
       loading: true,
     });
-    getArtById(id).then((data) => {
+    getArtById(id).then((data) => { 
       const {
         enabled,
         interationCount,
         interationWeeks,
         ipWorkdays,
         piCodeNumber,
-        piCodePrefix,
-        rteId,
+        piCodePrefix,      
         startDate,
+        rteId,
       } = data;
       const formData = {
         enabled,
@@ -80,6 +80,7 @@ class EditArt extends Component {
 
   handleFormChange = (changedValues, allValues) => {
     const { formData, isModified } = this.state;
+    console.log(formatter(allValues), formData);
     if (!isEqual(formatter(allValues), formData)) {
       if (!isModified) {
         this.setState({

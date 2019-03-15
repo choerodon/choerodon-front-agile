@@ -27,7 +27,7 @@ class CalendarHeader extends Component {
 
   calculateLastWeek=(week) => {
     const { startDate, endDate } = this.props;
-    return moment.range(moment(week).startOf('day'), endDate).diff('days');
+    return moment.range(moment(week).startOf('day'), endDate).diff('days') + 1;
   }
 
   render() {

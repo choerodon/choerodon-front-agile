@@ -48,7 +48,7 @@ class ArtCalendar extends Component {
 
   getDuring = (data) => {
     const startDate = data.length > 0 ? data[0].startDate : moment();
-    const endDate = data.length > 0 ? data[data.length - 1].endDate : moment();
+    const endDate = data.length > 0 ? data[data.length - 1].endDate : moment().subtract(1, 'days');
     return {
       startDate,
       endDate,

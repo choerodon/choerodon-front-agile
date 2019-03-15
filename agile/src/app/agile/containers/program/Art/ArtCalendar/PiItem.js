@@ -21,41 +21,48 @@ const STATUSNAMES = {
 const STATUS = {
   cancel: {
     borderColor: '#393E46',
+    PIColor: 'black',
     backgroundColor: '#EBEBEB',
     sprintBorder: '#C0C0C0',
   },
   todo: {
     borderColor: '#FFB100',
+    PIColor: ' #FFB100',   
     backgroundColor: '#FFF8E7',
     sprintBorder: '#F9D88E',
   },
   doing: {
     borderColor: '#4D90FE',
+    PIColor: 'black',
     backgroundColor: '#E9F1FF',
     sprintBorder: '#A2C1F6',
   },
   done: {
     borderColor: '#00BFA5',
+    PIColor: 'black',
     backgroundColor: '#E5F9F6',
     sprintBorder: '#98D8CF',
   },
 };
 const SprintItem = ({
   borderColor, sprint,
-}) => (
-  <div className="PiItem-pi-sprint" style={{ borderColor }}>
-    <Popover
-      getPopupContainer={triggerNode => triggerNode.parentNode}
-      content={<CardTitle data={sprint} type="sprint" />}
-      title={null}
-      placement="bottomLeft"
-    >
-      <div>
-        {sprint.sprintName}
-      </div>
-    </Popover>
-  </div>
-);
+}) => {
+  const isDoing = sprint.statusCode === 'started';
+  return (
+    <div className="PiItem-pi-sprint" style={{ borderColor, background: isDoing && '#4D90FE', color: isDoing && 'white' }}>
+      <Popover
+        getPopupContainer={triggerNode => triggerNode.parentNode}
+        content={<CardTitle data={sprint} type="sprint" />}
+        title={null}
+        placement="bottomLeft"
+      >
+        <div>
+          {sprint.sprintName}
+        </div>
+      </Popover>
+    </div>
+  );
+};
 const CardTitle = ({
   data,
   type,
@@ -102,7 +109,7 @@ class PiItem extends Component {
         }}
       >
         <div className="PiItem-pi">
-          <div className="PiItem-pi-title" style={{ borderColor: style.borderColor, background: style.backgroundColor }}>
+          <div className="PiItem-pi-title" style={{ borderColor: style.borderColor, background: style.backgroundColor, color: style.PIColor }}>
  
             <Popover
               // autoAdjustOverflow={false}

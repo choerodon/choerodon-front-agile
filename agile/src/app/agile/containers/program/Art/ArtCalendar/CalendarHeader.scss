@@ -8,6 +8,9 @@
     border-bottom: 1px solid #D6D6D6;
   }
   .c7nagile-CalendarHeader-year {
+    // &:first-child {
+    //   border-left: none;
+    // }
     border-left: 1px solid #D6D6D6;
     font-weight: 500;
     font-size: 14px;
@@ -15,11 +18,15 @@
     line-height: 22px;
     padding-left: 8px;
   }
+
   .c7nagile-CalendarHeader-weeks {
     display: flex;
     border-bottom: 1px solid #D6D6D6;
   }
   .c7nagile-CalendarHeader-week {
+    // &:first-child {
+    //   border-left: none;
+    // }
     flex: 7;
     height: 55px;
     font-size: 14px;

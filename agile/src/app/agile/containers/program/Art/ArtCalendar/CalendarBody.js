@@ -10,13 +10,13 @@ class CalendarBody extends Component {
   render() {
     const { startDate, endDate, data } = this.props;
     const range = moment.range(startDate, endDate);
-    const totalDays = range.diff('days');
+    const days = Array.from(range.by('days'));
     const todayPos = moment.range(moment(startDate), moment()).diff('days');
     return (
       <div className="c7nagile-CalendarBody">
         <div className="c7nagile-CalendarBody-days">
           {
-            Array(totalDays).fill(0).map((a, i) => (
+            days.map((a, i) => (
               <div className={i === todayPos ? 'c7nagile-CalendarBody-day today' : 'c7nagile-CalendarBody-day'} />
             ))
           }
