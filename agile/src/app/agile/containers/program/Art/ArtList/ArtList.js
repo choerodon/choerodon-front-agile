@@ -4,7 +4,7 @@ import {
 } from 'choerodon-front-boot';
 import { Button, Spin } from 'choerodon-ui';
 import moment from 'moment';
-import { editArtLink } from '../../../../common/utils';
+import { editArtLink, PICalendarLink } from '../../../../common/utils';
 import { ArtTable, CreateArt } from './components';
 import { getArtsByProjectId, createArt } from '../../../../api/ArtApi';
 
@@ -84,6 +84,12 @@ class ArtList extends Component {
     history.push(editArtLink(artId));
   }
 
+  handleArtNameClick = (record) => {
+    const { id: artId, name: ArtName } = record;
+    const { history } = this.props;
+    history.push(PICalendarLink(artId, ArtName));
+  }
+  
   handlePaginationChange = (pagination) => {
     this.loadArts(pagination);
   }
@@ -112,6 +118,7 @@ class ArtList extends Component {
             <ArtTable         
               dataSource={data}
               onEditArtClick={this.handleEditArtClick}
+              onArtNameClick={this.handleArtNameClick}
             />
           </Spin>
         </Content>

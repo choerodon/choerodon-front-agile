@@ -7,10 +7,13 @@ import StatusTag from '../../../../../../components/StatusTag';
 const propTypes = {
   dataSource: PropTypes.shape({}).isRequired,
   onEditArtClick: PropTypes.func.isRequired,
+  onArtNameClick: PropTypes.func.isRequired,
+  
 };
 const ArtTable = ({ 
   dataSource,
   onEditArtClick,
+  onArtNameClick,
 }) => {
   const columns = [{
     title: '编号',
@@ -21,7 +24,7 @@ const ArtTable = ({
     title: '名称',
     dataIndex: 'name',
     key: 'name',   
-    render: name => <span style={{ color: '#3F51B5' }}>{name}</span>,
+    render: (name, record) => <span role="none" onClick={() => { onArtNameClick(record); }} style={{ color: '#3F51B5', cursor: 'pointer' }}>{name}</span>,
   }, {
     title: '开始日期',
     dataIndex: 'startDate',

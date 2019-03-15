@@ -183,7 +183,17 @@ export function delta2Html(description) {
 export function escape(str) {
   return str.replace(/<\/script/g, '<\\/script').replace(/<!--/g, '<\\!--');
 }
-
+export function getParams(url) {
+  const theRequest = {};
+  if (url.indexOf('?') !== -1) {
+    const str = url.split('?')[1];
+    const strs = str.split('&');
+    for (let i = 0; i < strs.length; i += 1) {
+      theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+    }
+  }
+  return theRequest;
+}
 export function formatDate(str) {
   const MONTH = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'];
   if (!str) {
@@ -259,6 +269,13 @@ export function artListLink() {
 
 export function PIDetailLink(id) { 
   return commonLink(`/pi/detail/${id}`);
+}
+export function PICalendarLink(id, ArtName) { 
+  const menu = AppState.currentMenuType;
+  const {
+    type, id: projectId, name, organizationId,
+  } = menu;
+  return encodeURI(`/agile/art/calendar/${id}?type=${type}&id=${projectId}&organizationId=${organizationId}&name=${name}&ArtName=${ArtName}`);
 }
 export function PIListLink() { 
   return commonLink('/pi');

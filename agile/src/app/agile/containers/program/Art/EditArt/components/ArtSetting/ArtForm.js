@@ -79,7 +79,7 @@ class ArtForm extends Component {
           <TabPane tab="ART设置" key="1">
             <FormItem>
               {getFieldDecorator('rteId', {
-                normalize: value => (value === 0 ? null : value),
+                normalize: value => (value === 0 ? undefined : value),
               })(
                 <SelectFocusLoad allowClear type="user" label="发布火车工程师" style={{ width: 500 }} />,
               )}

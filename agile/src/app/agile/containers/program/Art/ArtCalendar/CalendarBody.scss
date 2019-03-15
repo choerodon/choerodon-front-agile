@@ -1,0 +1,61 @@
+.c7nagile-CalendarBody {
+  width: 100%;
+  flex: 1;
+  position: relative;
+  .c7nagile-CalendarBody-days {
+    // width: 100%;
+    height: 100%;
+    display: flex;
+    border-bottom: 1px solid #D6D6D6;
+  }
+  .c7nagile-CalendarBody-day {
+    // &:first-child {
+    //   border-left: none;
+    // }
+    :nth-child(7n+1) {
+      border-left-style: solid;
+      border-left-color: #D6D6D6;
+    }
+    min-width: 20px;
+    border-left: 1px dashed #D6D6D6;
+  }
+  .c7nagile-CalendarBody-day.today {
+    // border-color: #CF3030;
+    // border-left-style: solid;
+    position: relative;
+  }
+  .c7nagile-CalendarBody-day.today:before {
+    /*做一个书签效果*/
+    position: absolute;
+    /*必须*/
+    top: 0;
+    left: 0px;
+    z-index: 1;
+    height: 0;
+    padding-right: 1px;
+    font-weight: bold;
+    line-height: 0;
+    color: #000;
+    border: 6px solid #CF3030;
+    border-right-color: transparent;
+    /*右边框透明，变成空缺的角*/
+    content: '';
+  } // 当前日期竖线
+  .c7nagile-CalendarBody-day.today:after {
+    position: absolute;
+    top: 0;
+    left: -1px;
+    z-index: 1;
+    height: 100%;
+    width: 1px;
+    background: #CF3030;
+    content: '';
+  }
+  .c7nagile-CalendarBody-pis {
+    display: flex;
+    margin-top: 12px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+}
