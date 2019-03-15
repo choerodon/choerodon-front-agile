@@ -128,7 +128,7 @@ class IssueType extends Component {
             <tbody>
               {
                 issueTypeInfo.map((item, index) => (
-                  <tr key={`tr_${_.random(0, 10)}`}>
+                  <tr key={`tr_${_.random(0, 100)}`}>
                     <td style={{ width: '115px' }}>
                       <span
                         className="item-icon"

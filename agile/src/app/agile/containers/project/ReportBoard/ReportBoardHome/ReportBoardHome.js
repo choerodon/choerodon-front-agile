@@ -11,7 +11,7 @@ import EpicProgress from '../ReportBoardComponent/EpicProgress';
 import Assignee from '../ReportBoardComponent/Assignee';
 import Status from '../ReportBoardComponent/Status';
 import Priority from '../ReportBoardComponent/Priority';
-import Accumulation from '../ReportBoardComponent/Accumulation';
+import BurnDown from '../ReportBoardComponent/BurnDown';
 import './ReportBoardHome.scss';
 
 class ReportBoardHome extends Component {
@@ -23,8 +23,8 @@ class ReportBoardHome extends Component {
           <div className="c7n-reportBoard">
             <Row>
               <Col span={24}>
-                <Accumulation
-                  link="reporthost/accumulation"
+                <BurnDown
+                  link="reporthost/burndownchart"
                 />
               </Col>
             </Row>
