@@ -68,13 +68,13 @@ const CardTitle = ({
   type,
 }) => {
   const {
-    name, sprintName, statusCode, startDate, endDate, 
+    name, code, sprintName, statusCode, startDate, endDate, 
   } = data;
   const status = type === 'sprint' ? STATUSCODES[statusCode] : statusCode;
   return (
     <div style={{ height: 63, padding: 10 }}>
       <div style={{ display: 'flex' }}>
-        <div>{type === 'sprint' ? sprintName : name}</div>
+        <div>{type === 'sprint' ? sprintName : `${code}-${name}`}</div>
         <div style={{ flex: 1, visibility: 'hidden' }} />
         <StatusTag categoryCode={status} name={STATUSNAMES[status]} />
       </div>
@@ -96,7 +96,7 @@ class PiItem extends Component {
   render() {
     const { pi } = this.props;
     const {
-      startDate, endDate, name, statusCode, sprintCalendarDOList, isLast,
+      startDate, endDate, code, name, statusCode, sprintCalendarDOList, isLast,
     } = pi;
     const flex = moment.range(startDate, endDate).diff('days');
     const title = 'PI-001';   
@@ -119,7 +119,7 @@ class PiItem extends Component {
               placement="bottomLeft"
             >
               <div>
-                {name}
+                {`${code}-${name}`}
               </div>
             </Popover>
           </div>
