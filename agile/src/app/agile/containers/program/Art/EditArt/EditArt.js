@@ -123,6 +123,7 @@ class EditArt extends Component {
     });
     releaseArt(data.id, PINum).then((res) => {
       Choerodon.prompt('发布成功');
+      this.loadArt();
       this.setState({
         releaseArtVisible: false,
         releaseLoading: false,
