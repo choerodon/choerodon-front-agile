@@ -13,7 +13,7 @@ class CalendarHeader extends Component {
       const { startDate, endDate } = this.props;
       return years.map((year, i) => {
         if (i === 0) {         
-          return moment.range(moment(startDate), moment(year).endOf('year')).diff('days') + 1;
+          return moment.range(moment(startDate), moment(year).endOf('year')).diff('days') + 2;
         } else if (i === years.length - 1) {
           return moment.range(moment(year).startOf('year'), moment(endDate)).diff('days');
         } else {
@@ -47,7 +47,7 @@ class CalendarHeader extends Component {
             {
               years.map((year, i) => (
                 <div style={{ flex: YearFlexs[i] }} className="c7nagile-CalendarHeader-year">
-                  {`${year.format('YYYY')}`}
+                  <span style={{ paddingLeft: 8 }}>{year.format('YYYY')}</span>                  
                 </div>
               ))
             }
