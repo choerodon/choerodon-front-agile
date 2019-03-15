@@ -96,16 +96,16 @@ class PiItem extends Component {
   render() {
     const { pi } = this.props;
     const {
-      startDate, endDate, name, statusCode, sprintCalendarDOList,
+      startDate, endDate, name, statusCode, sprintCalendarDOList, isLast,
     } = pi;
     const flex = moment.range(startDate, endDate).diff('days');
     const title = 'PI-001';   
-    const style = STATUS[statusCode];
+    const style = STATUS[statusCode];    
     return (
       <div
         className="PiItem"
         style={{
-          flex,
+          flex: isLast ? flex + 1 : flex,
         }}
       >
         <div className="PiItem-pi">

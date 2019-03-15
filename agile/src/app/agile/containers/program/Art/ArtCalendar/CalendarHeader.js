@@ -13,7 +13,7 @@ class CalendarHeader extends Component {
       const { startDate, endDate } = this.props;
       return years.map((year, i) => {
         if (i === 0) {         
-          return moment.range(moment(startDate), moment(year).endOf('year')).diff('days') + 2;
+          return moment.range(moment(startDate), moment(year).endOf('year')).diff('days') + 1;
         } else if (i === years.length - 1) {
           return moment.range(moment(year).startOf('year'), moment(endDate)).diff('days');
         } else {
@@ -27,7 +27,7 @@ class CalendarHeader extends Component {
 
   calculateLastWeek=(week) => {
     const { startDate, endDate } = this.props;
-    return moment.range(moment(week).startOf('day'), endDate).diff('days') + 1;
+    return moment.range(moment(week).startOf('day'), endDate).diff('days');
   }
 
   render() {
@@ -56,7 +56,7 @@ class CalendarHeader extends Component {
         <div className="c7nagile-CalendarHeader-weeks">
           {
             weeks.map((week, i) => (
-              <div className="c7nagile-CalendarHeader-week" style={{ flex: i === weeks.length - 1 ? this.calculateLastWeek(week) : 7 }}>
+              <div className="c7nagile-CalendarHeader-week" style={{ flex: i === weeks.length - 1 ? this.calculateLastWeek(week) - 1 : 7 }}>
                 <div className="c7nagile-CalendarHeader-week-num">
                   {`${week.week()}周`}
                 </div>
