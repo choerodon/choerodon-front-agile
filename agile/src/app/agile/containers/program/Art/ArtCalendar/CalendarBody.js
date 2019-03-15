@@ -10,7 +10,7 @@ class CalendarBody extends Component {
   render() {
     const { startDate, endDate, data } = this.props;
     const range = moment.range(startDate, endDate);
-    const days = range.diff('days');
+    const days = range.diff('days') - 1;
     const todayPos = moment.range(moment(startDate), moment()).diff('days');
     return (
       <div className="c7nagile-CalendarBody">
