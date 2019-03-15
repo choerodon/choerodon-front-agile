@@ -20,32 +20,8 @@ const BV = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 @observer
 class EditPI extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      stretch: false,
-    };
-  }
-
-  // eslint-disable-next-line react/sort-comp
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { editingPiAimsInfo } = this.props;
-    if (this.props.editPIVisible === false && nextProps.editPIVisible === true) {
-      this.setState({
-        stretch: editingPiAimsInfo.stretch,
-      });
-    }
-  }
-
-  handleCheckboxChange = (e) => {
-    this.setState({
-      stretch: e.target.checked,
-    });
-  }
-
   handleOnOk = () => {
     const { editingPiAimsInfo, form } = this.props;
-    const { stretch } = this.state;
     PIStore.setPIDetailLoading(true);
     form.validateFields((err, values) => {
       if (!err) {
@@ -56,7 +32,7 @@ class EditPI extends Component {
           name: values.name,
           planBv: values.planBv,
           actualBv: values.actualBv,
-          stretch,
+          stretch: values.stretch,
           levelCode: 'program',
           programId: AppState.currentMenuType.projectId,
           projectId: AppState.currentMenuType.projectId,
@@ -91,11 +67,7 @@ class EditPI extends Component {
   
   render() {
     const { form, editingPiAimsInfo, editPIVisible } = this.props;
-    const { stretch } = this.state;
     const { getFieldDecorator } = form;
-    // const { editPIVisible } = PIStore;
-    console.log('editingPiAimsInfoStretch:');
-    console.log(editingPiAimsInfo.stretch);
     return (
       <Sidebar
         className="c7n-pi-createPISideBar"
@@ -105,6 +77,7 @@ class EditPI extends Component {
         okText="保存"
         onOk={this.handleOnOk}
         onCancel={this.handleOnCancel}
+        destroyOnClose
       >
         <Form>
           <FormItem style={{ width: 520 }}>
@@ -141,8 +114,16 @@ class EditPI extends Component {
                 )
               }
           </FormItem>
-          
-          <Checkbox checked={stretch} onChange={this.handleCheckboxChange}>延伸目标</Checkbox>
+          <FormItem>
+            {
+                getFieldDecorator('stretch', {
+                  initialValue: editingPiAimsInfo.stretch,
+                  valuePropName: 'checked',
+                })(
+                  <Checkbox>延伸目标</Checkbox>,
+                )
+              }
+          </FormItem>
         </Form>
       </Sidebar>
     );

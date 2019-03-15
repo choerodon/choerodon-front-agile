@@ -11,6 +11,7 @@ import CreatePI from '../CreatePI';
 import PIStore from '../../../../stores/Program/PI/PIStore';
 import { PIDetailLink } from '../../../../common/utils';
 import { createPIAims, getPIList } from '../../../../api/PIApi';
+import PIListTable from './component/PIListTable';
 
 const formatter = 'YYYY-MM-DD';
 const { AppState } = stores;
@@ -98,12 +99,16 @@ class PIList extends Component {
         </Header>
         <Content>
           <Spin spinning={PIListLoading}>
-            <Table
+            {/* <Table
               filterBar={false}
               rowKey={record => record.id}
               columns={columns}
               dataSource={PiList}
               PIListLoading={PIListLoading}
+            /> */}
+            <PIListTable 
+              columns={columns}
+              dataSource={PiList}
             />
           </Spin>
           <CreatePI 

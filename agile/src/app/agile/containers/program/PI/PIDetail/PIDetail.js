@@ -14,6 +14,7 @@ import { PIListLink } from '../../../../common/utils';
 import { 
   createPIAims, getPIAims, upDatePIAmix, deletePIAims,
 } from '../../../../api/PIApi';
+import ProgramAimsTable from './component/ProgramAimsTable';
 
 import './PIDetail.scss';
 import EditPI from '../EditPI';
@@ -158,43 +159,6 @@ class PIDetail extends Component {
     PIStore.setCreatePIVisible(true);
   }
 
-  renderPIAimsTable = () => {
-    const { PiAims } = PIStore;
-    const columns = [
-      ...amisColumns,
-      {
-        key: 'action',
-        render: (text, record) => (
-          <div className="c7n-pi-action">
-            <Tooltip title="修改PI目标">
-              <Icon
-                role="none" 
-                type="mode_edit"
-                onClick={this.handleEditPiAims.bind(this, record)}
-              />
-            </Tooltip>
-            <Tooltip title="删除PI目标">
-              <Icon 
-                role="none" 
-                type="delete"
-                onClick={this.handledeletePiAims.bind(this, record)}
-              />
-            </Tooltip>
-          </div>
-        ),
-      },
-    ];
-    return (
-      <Table
-        filterBar={false}
-        rowKey={record => record.id}
-        columns={columns}
-        dataSource={PiAims.program}
-        pagination={false}
-      />
-    );
-  }
-
   renderTeamPIAimsTable = dataSource => (
     <Table
       filterBar={false}
@@ -240,7 +204,13 @@ class PIDetail extends Component {
             {/* {
             showType === 'list' && ( */}
             <div>
-              {this.renderPIAimsTable()}
+              <ProgramAimsTable
+                amisColumns={amisColumns}
+                dataSource={PiAims.program}
+                onEditPiAims={this.handleEditPiAims}
+                onDeletePiAims={this.handledeletePiAims}
+              />
+
               {/* <div className="c7n-pi-teamAims" style={{ marginTop: 20 }}>
                   <Table 
                     filterBar={false}
