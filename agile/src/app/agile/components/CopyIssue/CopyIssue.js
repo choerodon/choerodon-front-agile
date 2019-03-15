@@ -88,10 +88,8 @@ class CopyIssue extends Component {
               <FormItem>
                 {getFieldDecorator('sprint', {})(
                   <Checkbox>
-
-
-                    是否复制冲刺
-                                    </Checkbox>,
+                    {'是否复制冲刺'}
+                  </Checkbox>,
                 )}
               </FormItem>
             ) : null
@@ -101,10 +99,8 @@ class CopyIssue extends Component {
               <FormItem>
                 {getFieldDecorator('copySubIssue', {})(
                   <Checkbox>
-
-
-                    是否复制子任务
-                                    </Checkbox>,
+                    {'是否复制子任务'}
+                  </Checkbox>,
                 )}
               </FormItem>
             ) : null
@@ -114,10 +110,8 @@ class CopyIssue extends Component {
               <FormItem>
                 {getFieldDecorator('copyLinkIssue', {})(
                   <Checkbox>
-
-
-                    是否复制关联任务
-                                    </Checkbox>,
+                    {'是否复制关联任务'}
+                  </Checkbox>,
                 )}
               </FormItem>
             ) : null

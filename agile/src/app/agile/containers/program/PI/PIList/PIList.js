@@ -21,6 +21,10 @@ class PIList extends Component {
   }
 
   componentDidMount() {
+    this.getPIList();
+  }
+
+  getPIList = () => {
     PIStore.setPIListLoading(true);
     getPIList().then((res) => {
       PIStore.setPIListLoading(false);
@@ -28,10 +32,21 @@ class PIList extends Component {
         Object.assign(item, {
           startDate: moment(item.startDate).format(formatter),
           endDate: moment(item.endDate).format(formatter),
-          remainDays: moment(item.endDate).diff(moment(), 'days') > 0 ? moment(item.endDate).diff(moment(), 'days') : 0,
+          remainDays: this.calcRemainDays(item),
         })
       )));
     });
+  }
+
+  calcRemainDays = (item) => {
+    let diff = 0;
+    if (moment(item.startDate).diff(moment()) > 0) {
+      diff = moment(item.endDate).diff(moment(item.startDate), 'days');
+      return diff > 0 ? diff : 0;
+    } else {
+      diff = moment(item.endDate).diff(moment(), 'days');
+      return diff > 0 ? diff : 0;
+    }
   }
 
   handldLinkToPIDetail = (record) => {
@@ -54,7 +69,7 @@ class PIList extends Component {
       {
         title: 'PI名称',
         dataIndex: 'name',
-        render: (text, record) => (<a role="none" onClick={this.handldLinkToPIDetail.bind(this, record)}>{text}</a>),
+        render: (text, record) => (<a role="none" onClick={this.handldLinkToPIDetail.bind(this, record)}>{`${record.code}-${record.name}`}</a>),
       },
       {
         title: '剩余天数',
@@ -75,6 +90,10 @@ class PIList extends Component {
           <Button funcType="flat" onClick={this.handleCreateFeatureBtnClick}>
             <Icon type="playlist_add" />
             <span>创建PI目标</span>
+          </Button>
+          <Button funcType="flat" onClick={this.getPIList}>
+            <Icon type="refresh icon" />
+            <span>刷新</span>
           </Button>
         </Header>
         <Content>

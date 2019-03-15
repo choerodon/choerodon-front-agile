@@ -20,7 +20,7 @@ import {
   loadBranchs, loadDatalogs, updateStatus, loadLinkIssues,
   loadIssue, loadWorklogs, updateIssue, loadEpics,
   deleteIssue, loadStatus,
-  loadWikies, loadIssueTypes,
+  loadWikies, loadIssueTypes, createCommit,
 } from '../../../../api/NewIssueApi';
 import { getSelf, getUsers, getUser } from '../../../../api/CommonApi';
 import WYSIWYGEditor from '../../../../components/WYSIWYGEditor';
@@ -28,6 +28,7 @@ import FullEditor from '../../../../components/FullEditor';
 import CreateLinkTask from '../../../../components/CreateLinkTask';
 import UserHead from '../../../../components/UserHead';
 import LinkList from '../../../../components/EditIssueNarrow/Component/IssueList';
+import Comment from '../../../../components/EditIssueNarrow/Component/Comment';
 import CopyIssue from '../../../../components/CopyIssue';
 import TypeTag from '../../../../components/TypeTag';
 
@@ -36,7 +37,7 @@ import '../../../../components/EditIssueNarrow/EditIssueNarrow.scss';
 const FEATURESTATUS = { 
   ...STATUS,
   ...{
-    prepare: '#ea9413',
+    prepare: '#F67F5A',
   }, 
 };
 
@@ -109,18 +110,22 @@ class FeatureDetail extends Component {
       summary: '',
       description: '',
       fileList: [],
+      issueCommentDTOList: [],
       issueLinkDTOList: [],
       linkIssues: [],
       originStatus: [],
       originEpics: [],
       originUsers: [],
       transformId: false,
+      benfitHypothesis: '',
+      acceptanceCritera: '',
+      featureDTO: {},
     };
   }
 
   componentDidMount() {
     // const { onRef, issueId } = this.props;
-    const issueId = 39755;
+    const issueId = 39756;
     // if (onRef) {
     //   onRef(this);
     // }
@@ -256,7 +261,9 @@ class FeatureDetail extends Component {
       issueTypeDTO,
       versionIssueRelDTOList,
       subIssueDTOList,
+      featureDTO,
     } = issue;
+    const { benfitHypothesis, acceptanceCritera } = featureDTO;
     const fileList = _.map(issue.issueAttachmentDTOList, issueAttachment => ({
       uid: issueAttachment.attachmentId,
       name: issueAttachment.fileName,
@@ -289,6 +296,9 @@ class FeatureDetail extends Component {
       typeCode,
       issueTypeDTO,
       issueLoading: false,
+      benfitHypothesis,
+      acceptanceCritera,
+      featureDTO,
     });
   }
 
@@ -346,6 +356,20 @@ class FeatureDetail extends Component {
     // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
     setTimeout(() => { this.needBlur = true; }, 100);
   };
+
+  handleBenfitHypothesisChange = (e) => {
+    this.setState({ benfitHypothesis: e.target.value });
+    this.needBlur = false;
+    // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+    setTimeout(() => { this.needBlur = true; }, 100);
+  }
+
+  handleAcceptanceCriteraChange = (e) => {
+    this.setState({ acceptanceCritera: e.target.value });
+    this.needBlur = false;
+    // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
+    setTimeout(() => { this.needBlur = true; }, 100);
+  }
 
   handleEpicNameChange = (e) => {
     this.setState({ epicName: e.target.value });
@@ -422,6 +446,7 @@ class FeatureDetail extends Component {
       origin,
       issueId,
       transformId,
+      featureDTO,
     } = this.state;
     const { onUpdate } = this.props;
     const obj = {
@@ -466,6 +491,21 @@ class FeatureDetail extends Component {
             });
           });
       }
+    } else if (pro === 'benfitHypothesis' || pro === 'acceptanceCritera') {
+      if (!obj.featureDTO) {
+        obj.featureDTO = {};
+      }
+      obj.featureDTO[pro] = state[pro] === '' ? null : state[pro];
+      obj.featureDTO.id = featureDTO.id;
+      obj.featureDTO.objectVersionNumber = featureDTO.objectVersionNumber;
+      obj.featureDTO.issueId = featureDTO.issueId;
+      updateIssue(obj)
+        .then((res) => {
+          this.reloadIssue();
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
     } else {
       obj[pro] = state[pro] || 0;
       updateIssue(obj)
@@ -546,6 +586,14 @@ class FeatureDetail extends Component {
 
   resetStoryPoints(value) {
     this.setState({ storyPoints: value });
+  }
+
+  resetBenfitHypothesis(value) {
+    this.setState({ benfitHypothesis: value });
+  }
+
+  resetAcceptanceCritera(value) {
+    this.setState({ acceptanceCritera: value });
   }
 
   resetReporterId(value) {
@@ -775,6 +823,70 @@ class FeatureDetail extends Component {
     }
   }
 
+  /**
+   * Comment
+   */
+  createReply = (commit) => {
+    createCommit(commit).then((res) => {
+      this.reloadIssue();
+      this.setState({
+        addCommit: false,
+        addCommitDes: '',
+      });
+    });
+  };
+
+  handleCreateCommit() {
+    const { addCommitDes, origin: { issueId: extra } } = this.state;
+    if (addCommitDes) {
+      beforeTextUpload(addCommitDes, { issueId: extra, commentText: '' }, this.createReply, 'commentText');
+    } else {
+      this.createReply({ issueId: extra, commentText: '' });
+    }
+  }
+
+  /**
+   * Comment
+   */
+  renderCommits() {
+    const { addCommitDes, addCommit, issueCommentDTOList } = this.state;
+    const delta = text2Delta(addCommitDes);
+    return (
+      <div>
+        {addCommit && (
+          <div className="line-start mt-10">
+            <WYSIWYGEditor
+              bottomBar
+              value={delta}
+              style={{ height: 200, width: '100%' }}
+              onChange={(value) => {
+                this.setState({ addCommitDes: value });
+              }}
+              handleDelete={() => {
+                this.setState({
+                  addCommit: false,
+                  addCommitDes: '',
+                });
+              }}
+              handleSave={() => this.handleCreateCommit()}
+              handleClickOutSide={() => this.handleCreateCommit()}
+            />
+          </div>
+        )}
+        {issueCommentDTOList.map(comment => (
+          <Comment
+            key={comment.commentId}
+            comment={comment}
+            onDeleteComment={() => this.reloadIssue()}
+            onUpdateComment={() => this.reloadIssue()}
+            isWide
+          />
+        ))}
+      </div>
+    );
+  }
+
+
   render() {
     const menu = AppState.currentMenuType;
     this.needBlur = true;
@@ -821,6 +933,8 @@ class FeatureDetail extends Component {
       storyPoints,
       originUsers,
       issueTypes,
+      benfitHypothesis,
+      acceptanceCritera,
     } = this.state;
     // const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
@@ -976,22 +1090,18 @@ class FeatureDetail extends Component {
                 />
               </li>
             </Tooltip>
-            {
-              typeCode !== 'sub_task' && (
-                <Tooltip placement="right" title="问题链接">
-                  <li id="LINK_TASKS-nav" className={`c7n-li ${nav === 'link_task' ? 'c7n-li-active' : ''}`}>
-                    <Icon
-                      type="link c7n-icon-li"
-                      role="none"
-                      onClick={() => {
-                        this.setState({ nav: 'link_task' });
-                        this.scrollToAnchor('link_task');
-                      }}
-                    />
-                  </li>
-                </Tooltip>
-              )
-            }
+            {/* <Tooltip placement="right" title="问题链接">
+              <li id="LINK_TASKS-nav" className={`c7n-li ${nav === 'link_task' ? 'c7n-li-active' : ''}`}>
+                <Icon
+                  type="link c7n-icon-li"
+                  role="none"
+                  onClick={() => {
+                    this.setState({ nav: 'link_task' });
+                    this.scrollToAnchor('link_task');
+                  }}
+                />
+              </li>
+            </Tooltip> */}
           </ul>
         </div>
         <div className="c7n-content">
@@ -1088,6 +1198,7 @@ class FeatureDetail extends Component {
                           ))}
                         </Select>
                       </ReadAndEdit>
+                   
                     </div>
                   </div>
                   }
@@ -1095,10 +1206,9 @@ class FeatureDetail extends Component {
               
             </div>
           </div>
-        </div>
-        <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
-          <section className="c7n-body-editIssue">
-            <div className="c7n-content-editIssue">
+          <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
+            <section className="c7n-body-editIssue">
+              <div className="c7n-content-editIssue">
               <div className="c7n-details">
                 <div id="detail">
                   <div className="c7n-title-wrapper" style={{ marginTop: 0 }}>
@@ -1125,7 +1235,7 @@ class FeatureDetail extends Component {
                           readModeContent={(
                             <span>特性</span>
                             )}
-                         />
+                        />
                       </div>
                     </div>
                    
@@ -1397,6 +1507,76 @@ class FeatureDetail extends Component {
                         </span>
                       </div>
                     </div>
+                    <div className="line-start mt-10 benfitHypothesis">
+                      <div className="c7n-property-wrapper">
+                        <span className="c7n-property">特性价值：</span>
+                      </div>
+                      <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <ReadAndEdit
+                          callback={this.changeRae.bind(this)}
+                          thisType="benfitHypothesis"
+                          current={currentRae}
+                          handleEnter
+                          origin={origin.benfitHypothesis}
+                          onInit={() => this.setAnIssueToState(origin)}
+                          onOk={this.updateIssue.bind(this, 'benfitHypothesis')}
+                          onCancel={this.resetBenfitHypothesis.bind(this)}
+                          readModeContent={(
+                            <span>
+                              {benfitHypothesis === undefined || benfitHypothesis === null ? '-' : `${benfitHypothesis}`}
+                            </span>
+                        )}
+                        >
+                          <TextArea
+                            maxLength={44}
+                            value={benfitHypothesis}
+                            size="small"
+                            onChange={this.handleBenfitHypothesisChange.bind(this)}
+                            onPressEnter={() => {
+                              this.updateIssue('benfitHypothesis');
+                              this.setState({
+                                currentRae: undefined,
+                              });
+                            }}
+                          />
+                        </ReadAndEdit>
+                      </div>
+                    </div>
+                    <div className="line-start mt-10 acceptanceCritera">
+                      <div className="c7n-property-wrapper">
+                        <span className="c7n-property">验收标准：</span>
+                      </div>
+                      <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <ReadAndEdit
+                          callback={this.changeRae.bind(this)}
+                          thisType="acceptanceCritera"
+                          current={currentRae}
+                          handleEnter
+                          origin={origin.acceptanceCritera}
+                          onInit={() => this.setAnIssueToState(origin)}
+                          onOk={this.updateIssue.bind(this, 'acceptanceCritera')}
+                          onCancel={this.resetAcceptanceCritera.bind(this)}
+                          readModeContent={(
+                            <span>
+                              {acceptanceCritera === undefined || acceptanceCritera === null ? '-' : `${acceptanceCritera}`}
+                            </span>
+                        )}
+                        >
+                          <TextArea
+                            maxLength={44}
+                            value={acceptanceCritera}
+                            size="small"
+                            onChange={this.handleAcceptanceCriteraChange.bind(this)}
+                            onPressEnter={() => {
+                              this.updateIssue('acceptanceCritera');
+                              this.setState({
+                                currentRae: undefined,
+                              });
+                            }}
+                          />
+                        </ReadAndEdit>
+                      </div>
+                    </div>
                     <div className="line-start mt-10">
                       <div className="c7n-property-wrapper">
                         <span className="c7n-subtitle">日期</span>
@@ -1476,7 +1656,40 @@ class FeatureDetail extends Component {
                   />
                 </div>
               </div>
-              {
+              <div id="commit">
+                <div
+                  className="c7n-title-wrapper"
+                  style={{
+                    marginBottom: 2,
+                  }}
+                >
+                  <div className="c7n-title-left">
+                    <Icon type="sms_outline c7n-icon-title" />
+                    <span>评论</span>
+                  </div>
+                  <div
+                    style={{
+                      flex: 1,
+                      height: 1,
+                      borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+                      marginLeft: '14px',
+                    }}
+                  />
+                  <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                    <Button
+                      className="leftBtn"
+                      funcType="flat"
+                      onClick={() => this.setState({ addCommit: true })}
+                    >
+                      <Icon type="playlist_add icon" />
+                      <span>添加评论</span>
+                    </Button>
+                  </div>
+                </div>
+                {this.renderCommits()}
+              </div>
+               
+              {/* {
                 <div id="link_task">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
@@ -1496,10 +1709,12 @@ class FeatureDetail extends Component {
                   </div>
                   {this.renderLinkIssues()}
                 </div>
-                }
+                } */}
             </div>
-          </section>
+            </section>
+          </div>
         </div>
+       
         {
           edit ? (
             <FullEditor
