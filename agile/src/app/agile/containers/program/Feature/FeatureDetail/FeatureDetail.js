@@ -18,7 +18,7 @@ import {
 } from '../../../../common/utils';
 import {
   loadBranchs, loadDatalogs, updateStatus, loadLinkIssues,
-  loadIssue, loadWorklogs, updateIssue, loadEpics,
+  loadIssue, loadWorklogs, updateIssue, loadProgramEpics,
   deleteIssue, loadStatus,
   loadWikies, loadIssueTypes, createCommit,
 } from '../../../../api/NewIssueApi';
@@ -125,7 +125,7 @@ class FeatureDetail extends Component {
 
   componentDidMount() {
     // const { onRef, issueId } = this.props;
-    const issueId = 39756;
+    const issueId = 39765;
     // if (onRef) {
     //   onRef(this);
     // }
@@ -1209,8 +1209,8 @@ class FeatureDetail extends Component {
           <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
             <section className="c7n-body-editIssue">
               <div className="c7n-content-editIssue">
-              <div className="c7n-details">
-                <div id="detail">
+                <div className="c7n-details">
+                  <div id="detail">
                   <div className="c7n-title-wrapper" style={{ marginTop: 0 }}>
                     <div className="c7n-title-left">
                       <Icon type="error_outline c7n-icon-title" />
@@ -1322,7 +1322,7 @@ class FeatureDetail extends Component {
                           onCancel={this.resetEpicId.bind(this)}
                           onInit={() => {
                             this.setAnIssueToState(origin);
-                            loadEpics().then((res) => {
+                            loadProgramEpics().then((res) => {
                               this.setState({
                                 originEpics: res,
                               });
@@ -1367,7 +1367,7 @@ class FeatureDetail extends Component {
                               this.setState({
                                 selectLoading: true,
                               });
-                              loadEpics().then((res) => {
+                              loadProgramEpics().then((res) => {
                                 this.setState({
                                   originEpics: res,
                                   selectLoading: false,
@@ -1604,7 +1604,7 @@ class FeatureDetail extends Component {
                     </div>
                   </div>
                 </div>
-                <div id="des">
+                  <div id="des">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
                       <Icon type="subject c7n-icon-title" />
@@ -1635,9 +1635,9 @@ class FeatureDetail extends Component {
                   </div>
                   {this.renderDes()}
                 </div>
-              </div>
-              <div id="attachment">
-                <div className="c7n-title-wrapper">
+                </div>
+                <div id="attachment">
+                  <div className="c7n-title-wrapper">
                   <div className="c7n-title-left">
                     <Icon type="attach_file c7n-icon-title" />
                     <span>附件</span>
@@ -1647,7 +1647,7 @@ class FeatureDetail extends Component {
                   }}
                   />
                 </div>
-                <div className="c7n-content-wrapper" style={{ marginTop: '-47px' }}>
+                  <div className="c7n-content-wrapper" style={{ marginTop: '-47px' }}>
                   <UploadButtonNow
                     onRemove={this.setFileList}
                     onBeforeUpload={this.setFileList}
@@ -1655,9 +1655,9 @@ class FeatureDetail extends Component {
                     fileList={fileList}
                   />
                 </div>
-              </div>
-              <div id="commit">
-                <div
+                </div>
+                <div id="commit">
+                  <div
                   className="c7n-title-wrapper"
                   style={{
                     marginBottom: 2,
@@ -1686,10 +1686,10 @@ class FeatureDetail extends Component {
                     </Button>
                   </div>
                 </div>
-                {this.renderCommits()}
-              </div>
+                  {this.renderCommits()}
+                </div>
                
-              {/* {
+                {/* {
                 <div id="link_task">
                   <div className="c7n-title-wrapper">
                     <div className="c7n-title-left">
@@ -1710,7 +1710,7 @@ class FeatureDetail extends Component {
                   {this.renderLinkIssues()}
                 </div>
                 } */}
-            </div>
+              </div>
             </section>
           </div>
         </div>

@@ -63,6 +63,16 @@ export function loadEpics() {
 }
 
 /**
+ * 在项目群中获取史诗列表
+ */
+export function loadProgramEpics() {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(
+    `/agile/v1/projects/${projectId}/issues/epics/select_program_data`,
+  );
+}
+
+/**
  * 根据冲刺状态获取冲刺，["started", "sprint_planning", "closed"]
  * @param {*} arr
  */

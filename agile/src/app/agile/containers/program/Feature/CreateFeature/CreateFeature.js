@@ -9,7 +9,7 @@ import FullEditor from '../../../../components/FullEditor';
 import UploadButton from '../../../../components/CommonComponent/UploadButton';
 import TypeTag from '../../../../components/TypeTag';
 import {
-  loadPriorities, loadEpics, loadIssueTypes, createIssue, 
+  loadPriorities, loadProgramEpics, loadIssueTypes, createIssue, 
 } from '../../../../api/NewIssueApi';
 import { beforeTextUpload, handleFileUpload } from '../../../../common/utils';
 import './CreateFeature.scss';
@@ -147,7 +147,7 @@ class CreateFeature extends Component {
     this.setState({
       selectLoading: true,
     });
-    loadEpics().then((res) => {
+    loadProgramEpics().then((res) => {
       this.setState({
         originEpics: res,
         selectLoading: false,
