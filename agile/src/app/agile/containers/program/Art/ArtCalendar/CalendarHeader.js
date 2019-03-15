@@ -27,7 +27,7 @@ class CalendarHeader extends Component {
 
   calculateLastWeek=(week) => {
     const { startDate, endDate } = this.props;
-    return moment.range(moment(week).startOf('day'), endDate).diff('days') + 1;
+    return moment.range(moment(week).startOf('day'), endDate).diff('days');
   }
 
   render() {
@@ -47,7 +47,7 @@ class CalendarHeader extends Component {
             {
               years.map((year, i) => (
                 <div style={{ flex: YearFlexs[i] }} className="c7nagile-CalendarHeader-year">
-                  {`${year.format('YYYY')}`}
+                  <span style={{ paddingLeft: 8 }}>{year.format('YYYY')}</span>                  
                 </div>
               ))
             }
