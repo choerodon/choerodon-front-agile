@@ -23,3 +23,7 @@ export function releaseArt(artId, piNumber) {
   const projectId = AppState.currentMenuType.id;
   return axios.post(`/agile/v1/projects/${projectId}/art/release_art?artId=${artId}&piNumber=${piNumber}`);
 }
+export function getArtCalendar(artId) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/projects/${projectId}/art/art_calendar?id=${artId}`);
+}

@@ -1,20 +1,22 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Page, Header, Content } from 'choerodon-front-boot';
-import { isEqual } from 'lodash';
+import { find } from 'lodash';
 import {
   Icon, Button, Progress, Spin,
 } from 'choerodon-ui';
 import moment from 'moment';
-import { artListLink } from '../../../../common/utils';
-import { getPIList } from '../../../../api/PIApi';
+import { artListLink, getParams } from '../../../../common/utils';
+import { getArtCalendar } from '../../../../api/ArtApi';
 import CalendarHeader from './CalendarHeader';
 import CalendarBody from './CalendarBody';
 import './ArtCalendar.scss';
 
 class ArtCalendar extends Component {
-  state={
+  state = {
+    ArtName: null,
     data: null,
+    currentPI: null,
     startDate: null,
     endDate: null,
   }
@@ -24,22 +26,27 @@ class ArtCalendar extends Component {
   }
 
   loadArt = () => {
-    this.setState({
-      loading: true,
-    });
-    getPIList().then((res) => {
-      const data = res.content.reverse();
+    const { id } = this.props.match.params;
+    const { ArtName } = getParams(window.location.href);
+    // this.setState({
+    //   loading: true,
+    // });
+    getArtCalendar(id).then((res) => {
+      const data = res;
       const { startDate, endDate } = this.getDuring(data);
+
       this.setState({
-        loading: false,      
+        // loading: false,
         data,
-        startDate, 
+        ArtName,
+        currentPI: find(data, { statusCode: 'doing' }),
+        startDate,
         endDate,
       });
     });
   }
 
-  getDuring=(data) => {
+  getDuring = (data) => {
     const startDate = data.length > 0 ? data[0].startDate : moment();
     const endDate = data.length > 0 ? data[data.length - 1].endDate : moment();
     return {
@@ -50,7 +57,8 @@ class ArtCalendar extends Component {
 
   render() {
     const {
-      data, loading, startDate,
+      data, loading, startDate, 
+      currentPI, ArtName,
       endDate,
     } = this.state;
     // console.log(data);
@@ -65,11 +73,20 @@ class ArtCalendar extends Component {
           // <Spin spinning={loading}>
           //   sss
           // </Spin>
-          
+
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div className="c7nagile-ArtCalendar-bar">
-                <span style={{ fontSize: '16px' }}>项目A敏捷发布火车</span>
-                
+                <span style={{ fontSize: '16px' }}>{ArtName && ArtName}</span>
+                <span style={{ margin: '0 40px' }}>
+                  开始日期：
+                  {startDate && moment(startDate).format('YYYY-MM-DD')}
+                </span>
+                {currentPI && (
+                  <span>
+                    正在进行中的PI：
+                    {currentPI.name}
+                  </span>
+                )}
               </div>
               <div className="c7nagile-ArtCalendar-scroller">
                 <div className="c7nagile-ArtCalendar-calendar">

@@ -10,14 +10,14 @@ class CalendarHeader extends Component {
     if (years.length === 0) {
       return 1;
     } else {
+      const { startDate, endDate } = this.props;
       return years.map((year, i) => {
-        if (i === 0) {
-          // console.log(year.format('YYYY-MM-DD'), year.endOf('year').format('YYYY-MM-DD'), moment.range(year, year.endOf('year')).diff('days'));
-          return moment.range(moment(year), moment(year).endOf('year')).diff('days');
+        if (i === 0) {         
+          return moment.range(moment(startDate), moment(year).endOf('year')).diff('days') + 1;
         } else if (i === years.length - 1) {
-          return moment.range(moment(year).startOf('year'), moment(year)).diff('days');
+          return moment.range(moment(year).startOf('year'), moment(endDate)).diff('days');
         } else {
-          return moment.range(moment(year).startOf('year'), moment(year).endOf('year')).diff('days');
+          return moment.range(moment(year).startOf('year'), moment(year).endOf('year')).diff('days') + 1;
         }
       });
     }
@@ -35,11 +35,11 @@ class CalendarHeader extends Component {
     const range = moment.range(startDate, endDate);
     const totalDays = range.diff('days');
 
-    const years = Array.from(range.by('years')).map(year => year.format('YYYY-MM-DD'));
+    const years = Array.from(range.by('years'));
     const weeks = Array.from(range.by('weeks'));
-    console.log(years, weeks);
+    // console.log(years, weeks);
     const YearFlexs = this.caculateYearFlex(years);
-    console.log(YearFlexs);
+    // console.log(YearFlexs);
     return (
       <div className="c7nagile-CalendarHeader">
         {
@@ -47,7 +47,7 @@ class CalendarHeader extends Component {
             {
               years.map((year, i) => (
                 <div style={{ flex: YearFlexs[i] }} className="c7nagile-CalendarHeader-year">
-                  {`${moment(year).format('YYYY')}`}
+                  {`${year.format('YYYY')}`}
                 </div>
               ))
             }

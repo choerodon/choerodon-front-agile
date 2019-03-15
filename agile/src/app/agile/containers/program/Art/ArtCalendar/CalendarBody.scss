@@ -6,11 +6,11 @@
     width: 100%;
     height: 100%;
     display: flex;
-    border-bottom: 1px solid #E0E0E0;
+    border-bottom: 1px solid #D6D6D6;
   }
   .c7nagile-CalendarBody-day {
     min-width: 20px;
-    border-left: 1px dashed #E0E0E0;
+    border-left: 1px dashed #D6D6D6;
   }
   .c7nagile-CalendarBody-day:nth-child(7n+1) {
     border-left-style: solid;
@@ -38,12 +38,11 @@
     /*右边框透明，变成空缺的角*/
     content: '';
   }
-  .c7nagile-CalendarBody-day.today:after {
-    
+  // 当前日期竖线
+  .c7nagile-CalendarBody-day.today:after {    
     position: absolute;
-    /*必须*/
     top: 0;
-    left: 0px;
+    left: -1px;
     z-index: 1;
     height: 100%;
     width: 1px;

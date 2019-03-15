@@ -3,9 +3,21 @@ import PropTypes from 'prop-types';
 import Moment from 'moment';
 import { Popover, Progress } from 'choerodon-ui';
 import { extendMoment } from 'moment-range';
+import StatusTag from '../../../../components/StatusTag';
+
 import './PiItem.scss';
 
 const moment = extendMoment(Moment);
+const STATUSCODES = {
+  sprint_planning: 'todo',
+  started: 'doing',
+  closed: 'done',
+};
+const STATUSNAMES = {
+  todo: '未开启',
+  doing: '进行中',
+  done: '已完成',
+};
 const STATUS = {
   cancel: {
     borderColor: '#393E46',
@@ -33,35 +45,38 @@ const SprintItem = ({
 }) => (
   <div className="PiItem-pi-sprint" style={{ borderColor }}>
     <Popover
-      content={<CardBody />}
-      title={
-        <CardTitle name={sprint.name} status="进行中" fromDate="2018-12-03" endDate="2018-12-03" />
-        }
+      getPopupContainer={triggerNode => triggerNode.parentNode}
+      content={<CardTitle data={sprint} type="sprint" />}
+      title={null}
       placement="bottomLeft"
     >
       <div>
-        {sprint.name}
+        {sprint.sprintName}
       </div>
     </Popover>
   </div>
 );
 const CardTitle = ({
-  name,
-  status,
-  fromDate,
-  endDate,
-}) => (
-  <div style={{ height: 63, padding: 10 }}>
-    <div style={{ display: 'flex' }}>
-      <div>{name}</div>
-      <div style={{ flex: 1, visibility: 'hidden' }} />
-      <div>{status}</div>
+  data,
+  type,
+}) => {
+  const {
+    name, sprintName, statusCode, startDate, endDate, 
+  } = data;
+  const status = type === 'sprint' ? STATUSCODES[statusCode] : statusCode;
+  return (
+    <div style={{ height: 63, padding: 10 }}>
+      <div style={{ display: 'flex' }}>
+        <div>{type === 'sprint' ? sprintName : name}</div>
+        <div style={{ flex: 1, visibility: 'hidden' }} />
+        <StatusTag categoryCode={status} name={STATUSNAMES[status]} />
+      </div>
+      <div style={{ margin: '10px 0', color: '#9B9B9B' }}>
+        {`${moment(startDate).format('YYYY-MM-DD')} ~ ${moment(endDate).format('YYYY-MM-DD')}`}        
+      </div>    
     </div>
-    <div style={{ margin: '10px 0', color: '#9B9B9B' }}>
-      {`${fromDate} ~ ${endDate}`}        
-    </div>    
-  </div>
-);
+  );
+};
 const CardBody = () => (
   <div>
     <Progress percent={50} strokeColor="#4D90FE" />
@@ -73,13 +88,12 @@ const CardBody = () => (
 class PiItem extends Component {
   render() {
     const { pi } = this.props;
-    const { startDate, endDate, name } = pi;
+    const {
+      startDate, endDate, name, statusCode, sprintCalendarDOList,
+    } = pi;
     const flex = moment.range(startDate, endDate).diff('days');
-    const title = 'PI-001';
-    const sprints = [{
-      name: 'S-1',
-    }];
-    const style = STATUS.done;
+    const title = 'PI-001';   
+    const style = STATUS[statusCode];
     return (
       <div
         className="PiItem"
@@ -89,10 +103,21 @@ class PiItem extends Component {
       >
         <div className="PiItem-pi">
           <div className="PiItem-pi-title" style={{ borderColor: style.borderColor, background: style.backgroundColor }}>
-            {name}
+ 
+            <Popover
+              // autoAdjustOverflow={false}
+              getPopupContainer={triggerNode => triggerNode.parentNode}
+              content={<CardTitle data={pi} type="pi" />}
+              title={null}
+              placement="bottomLeft"
+            >
+              <div>
+                {name}
+              </div>
+            </Popover>
           </div>
           <div className="PiItem-pi-sprints">
-            {sprints.map(sprint => (
+            {sprintCalendarDOList.map(sprint => (
               <SprintItem borderColor={style.sprintBorder} sprint={sprint} />
             ))}
           </div>
