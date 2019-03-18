@@ -28,15 +28,10 @@ class ArtCalendar extends Component {
   loadArt = () => {
     const { id } = this.props.match.params;
     const { ArtName } = getParams(window.location.href);
-    // this.setState({
-    //   loading: true,
-    // });
     getArtCalendar(id).then((res) => {
       const data = res;
       const { startDate, endDate } = this.getDuring(data);
-
       this.setState({
-        // loading: false,
         data,
         ArtName,
         currentPI: find(data, { statusCode: 'doing' }),
@@ -57,11 +52,10 @@ class ArtCalendar extends Component {
 
   render() {
     const {
-      data, loading, startDate, 
+      data, startDate, 
       currentPI, ArtName,
       endDate,
     } = this.state;
-    // console.log(data);
     return (
       <Page className="c7nagile-ArtCalendar">
         <Header
@@ -70,10 +64,6 @@ class ArtCalendar extends Component {
         />
         <Content style={{ display: 'flex', flexDirection: 'column', padding: 0 }}>
           {data ? (
-          // <Spin spinning={loading}>
-          //   sss
-          // </Spin>
-
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div className="c7nagile-ArtCalendar-bar">
                 <span style={{ fontSize: '16px' }}>{ArtName && ArtName}</span>

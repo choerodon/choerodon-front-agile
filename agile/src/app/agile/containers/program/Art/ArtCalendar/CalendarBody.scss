@@ -1,6 +1,6 @@
 .c7nagile-CalendarBody {
   width: 100%;
-  flex: 1;
+  height: calc(100% - 80px);
   position: relative;
   .c7nagile-CalendarBody-days {
     // width: 100%;
