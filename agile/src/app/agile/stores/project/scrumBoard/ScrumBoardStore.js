@@ -87,6 +87,8 @@ class ScrumBoardStore {
 
   @observable sprintId = null;
 
+  @observable sprintName = null;
+
   @observable interconnectedData = new Map();
 
   @observable parentId = [];
