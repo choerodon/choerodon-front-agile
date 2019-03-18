@@ -27,7 +27,7 @@ const STATUS = {
   },
   todo: {
     borderColor: '#FFB100',
-    PIColor: ' #FFB100',   
+    PIColor: ' #FFB100',
     backgroundColor: '#FFF8E7',
     sprintBorder: '#F9D88E',
   },
@@ -49,14 +49,19 @@ const SprintItem = ({
 }) => {
   const isDoing = sprint.statusCode === 'started';
   return (
-    <div className="PiItem-pi-sprint" style={{ borderColor, background: isDoing && '#4D90FE', color: isDoing && 'white' }}>
+    <div
+      className="PiItem-pi-sprint"
+      style={{
+        borderColor, background: isDoing && '#4D90FE', color: isDoing && 'white', flex: moment.range(sprint.startDate, sprint.endDate).diff('days'),
+      }}
+    >
       <Popover
         getPopupContainer={triggerNode => triggerNode.parentNode}
         content={<CardTitle data={sprint} type="sprint" />}
         title={null}
         placement="bottomLeft"
       >
-        <div>
+        <div style={{ padding: '0 10px' }}>
           {sprint.sprintName}
         </div>
       </Popover>
@@ -68,7 +73,7 @@ const CardTitle = ({
   type,
 }) => {
   const {
-    name, code, sprintName, statusCode, startDate, endDate, 
+    name, code, sprintName, statusCode, startDate, endDate,
   } = data;
   const status = type === 'sprint' ? STATUSCODES[statusCode] : statusCode;
   return (
@@ -79,8 +84,8 @@ const CardTitle = ({
         <StatusTag categoryCode={status} name={STATUSNAMES[status]} />
       </div>
       <div style={{ margin: '10px 0', color: '#9B9B9B' }}>
-        {`${moment(startDate).format('YYYY-MM-DD')} ~ ${moment(endDate).format('YYYY-MM-DD')}`}        
-      </div>    
+        {`${moment(startDate).format('YYYY-MM-DD')} ~ ${moment(endDate).format('YYYY-MM-DD')}`}
+      </div>
     </div>
   );
 };
@@ -88,7 +93,7 @@ const CardBody = () => (
   <div>
     <Progress percent={50} strokeColor="#4D90FE" />
     <div style={{ margin: '10px 0' }}>
-     故事点:68 / 120       
+      故事点:68 / 120
     </div>
   </div>
 );
@@ -99,8 +104,9 @@ class PiItem extends Component {
       startDate, endDate, code, name, statusCode, sprintCalendarDOList, isLast,
     } = pi;
     const flex = moment.range(startDate, endDate).diff('days');
-    const title = 'PI-001';   
-    const style = STATUS[statusCode];    
+    const ipWorkdays = sprintCalendarDOList && sprintCalendarDOList.length > 0 ? moment.range(sprintCalendarDOList[sprintCalendarDOList.length - 1].endDate, endDate).diff('days') : 0;
+
+    const style = STATUS[statusCode];
     return (
       <div
         className="PiItem"
@@ -110,7 +116,7 @@ class PiItem extends Component {
       >
         <div className="PiItem-pi">
           <div className="PiItem-pi-title" style={{ borderColor: style.borderColor, background: style.backgroundColor, color: style.PIColor }}>
- 
+
             <Popover
               // autoAdjustOverflow={false}
               getPopupContainer={triggerNode => triggerNode.parentNode}
@@ -127,6 +133,11 @@ class PiItem extends Component {
             {sprintCalendarDOList.map(sprint => (
               <SprintItem borderColor={style.sprintBorder} sprint={sprint} />
             ))}
+            <div className="PiItem-pi-sprint" style={{ flex: ipWorkdays, borderColor: style.sprintBorder }}>
+              <div style={{ padding: '0 10px' }}>
+                IP
+              </div>
+            </div>
           </div>
         </div>
       </div>
