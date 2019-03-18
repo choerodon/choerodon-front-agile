@@ -76,7 +76,7 @@
         sort: 12
         permission:
           - 'agile-service.issue-link-type.updateIssueLinkType'
-     - "feature":
+    - "feature":
         icon: baseline-vertical_split
         category: PROGRAM
         Routes: /agile/feature
