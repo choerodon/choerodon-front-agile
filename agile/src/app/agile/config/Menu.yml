@@ -101,14 +101,14 @@
         icon: train
         category: PROGRAM
         Routes: /agile/art
-        sort: 14
+        sort: 16
         permission:
           - 'agile-service.art.queryArtList'
     - "programSetting":
         icon: folder_shared
         category: PROGRAM
         Routes: /agile/programSetting
-        sort: 9
+        sort: 17
         permission:
           - 'agile-service.art.queryArtList'
 
