@@ -6,7 +6,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 build:
-  image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cifront:0.8.0
+  image: registry-vpc.cn-shanghai.aliyuncs.com/choerodon-tools/cifront:0.8.0
   stage: build
   script:
     - node_module agile
@@ -15,7 +15,7 @@ build:
     - kaniko -c $CI_PROJECT_DIR -f $CI_PROJECT_DIR/Dockerfile -d ${DOCKER_REGISTRY}/${GROUP_NAME}/${PROJECT_NAME}:${CI_COMMIT_TAG}
 
 release:
-  image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cibase:0.8.0
+  image: registry-vpc.cn-shanghai.aliyuncs.com/choerodon-tools/cibase:0.8.0
   stage: release
   script:
     - chart_build
