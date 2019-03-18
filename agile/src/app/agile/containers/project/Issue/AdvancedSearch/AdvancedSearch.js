@@ -162,7 +162,7 @@ class AdvancedSearch extends Component {
       const debounceCallback = this.deBounce(500);
       return (
         <div className="c7n-mySearch">
-          <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <Select
               key="myFilterSelect"
               className="myFilterSelect"
@@ -331,8 +331,9 @@ class AdvancedSearch extends Component {
                   // value={[moment(createStartDate), moment(createEndDate)]}
                     format="YYYY-MM-DD hh:mm:ss"
                     disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
-                    allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
+                    // allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
                 // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
+                    allowClear
                     onChange={this.handleCreateDateRangeChange}
                     placeholder={['创建时间', '']}
                   />
@@ -344,7 +345,8 @@ class AdvancedSearch extends Component {
                       value={[moment(createStartDate), moment(createEndDate)]}
                       format="YYYY-MM-DD hh:mm:ss"
                       disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
-                      allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
+                      allowClear
+                      // allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
                 // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
                       onChange={this.handleCreateDateRangeChange}
                       placeholder={['创建时间', '']}

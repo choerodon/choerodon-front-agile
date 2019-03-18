@@ -182,9 +182,7 @@ class Issue extends Component {
               className="c7n-content-issue"
               style={{
                 display: 'block',
-                overflowY: 'auto',
                 position: 'relative',
-                // overflowX: 'hidden',
                 padding: '0px 18px',
               }}
             >

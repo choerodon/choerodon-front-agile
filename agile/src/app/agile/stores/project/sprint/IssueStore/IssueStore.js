@@ -753,19 +753,21 @@ class SprintCommonStore {
 
     if (filterAdvEveryFieldIsEmpty && filterAssigneeIsEmpty && filterOtherAssignee.length === 0 && filterSeaArgsFieldIsEmpty && filterOtherArgsFieldIsEmpty && filterContentsIsEmpty) {
       for (let i = 0; i < myFilters.length; i++) {
-        const { searchArgs } = myFilters[i].personalFilterSearchDTO;
-        const createStartDateIsEqual = filterCreateStartDate && moment(filterCreateStartDate).format('YYYY-MM-DD') !== moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD') && moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterCreateStartDate).format('YYYY-MM-DD');
-        const createEndDateIsEqual = filterCreateEndDate && moment(filterCreateEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD') && moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterCreateEndDate).format('YYYY-MM-DD');
-        if (createStartDateIsEqual && createEndDateIsEqual) { // 其他条件都为空 & 创建时间范围和已有筛选一样
-          this.setSelectedFilterId(myFilters[i].filterId);
-          this.setIsExistFilter(true);
-          break;
-        } else if (i === myFilters.length - 1 && (!filterCreateStartDate || moment(filterCreateStartDate).format('YYYY-MM-DD') === moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD')) && (!filterCreateEndDate || moment(filterCreateEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD'))) { // 直到最后一项，创建时间范围为项目开始时间到今天
-          this.setSelectedFilterId(undefined);
-          this.setIsExistFilter(true);
-        } else { // 和已有筛选时间范围都不一样 且 范围不是项目创建时间到今天
-          this.setSelectedFilterId(undefined);
-          this.setIsExistFilter(false);
+        if (myFilters[i].personalFilterSearchDTO) {
+          const { searchArgs } = myFilters[i].personalFilterSearchDTO;
+          const createStartDateIsEqual = filterCreateStartDate && moment(filterCreateStartDate).format('YYYY-MM-DD') !== moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD') && moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterCreateStartDate).format('YYYY-MM-DD');
+          const createEndDateIsEqual = filterCreateEndDate && moment(filterCreateEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD') && moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterCreateEndDate).format('YYYY-MM-DD');
+          if (createStartDateIsEqual && createEndDateIsEqual) { // 其他条件都为空 & 创建时间范围和已有筛选一样
+            this.setSelectedFilterId(myFilters[i].filterId);
+            this.setIsExistFilter(true);
+            break;
+          } else if (i === myFilters.length - 1 && (!filterCreateStartDate || moment(filterCreateStartDate).format('YYYY-MM-DD') === moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD')) && (!filterCreateEndDate || moment(filterCreateEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD'))) { // 直到最后一项，创建时间范围为项目开始时间到今天
+            this.setSelectedFilterId(undefined);
+            this.setIsExistFilter(true);
+          } else { // 和已有筛选时间范围都不一样 且 范围不是项目创建时间到今天
+            this.setSelectedFilterId(undefined);
+            this.setIsExistFilter(false);
+          }
         }
       }
     } else {
