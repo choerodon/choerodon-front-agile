@@ -76,20 +76,42 @@
         sort: 12
         permission:
           - 'agile-service.issue-link-type.updateIssueLinkType'
-    - "art":
-        icon: train
+     - "feature":
+        icon: baseline-vertical_split
         category: PROGRAM
-        Routes: /agile/art
+        Routes: /agile/feature
         sort: 13
         permission:
-          - 'agile-service.art.queryArtList'      
+          - 'agile-service.art.queryArtList'
+    - "artCalendar":
+        icon: insert_invitation
+        category: PROGRAM
+        Routes: /agile/artCalendar
+        sort: 14
+        permission:
+          - 'agile-service.pi.queryAll'
     - "pi":
         icon: center_focus_strong
         category: PROGRAM
         Routes: /agile/pi
-        sort: 14
+        sort: 15
         permission:
-          - 'agile-service.pi.queryAll'     
+          - 'agile-service.pi.queryAll'
+    - "art":
+        icon: train
+        category: PROGRAM
+        Routes: /agile/art
+        sort: 16
+        permission:
+          - 'agile-service.art.queryArtList'
+    - "programSetting":
+        icon: folder_shared
+        category: PROGRAM
+        Routes: /agile/programSetting
+        sort: 17
+        permission:
+          - 'agile-service.art.queryArtList'
+
 
 "platform-reports":
   icon: bar_chart

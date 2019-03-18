@@ -12,8 +12,11 @@
 'agile.userStoryMap': 故事地图
 'agile.iterationBoard': 迭代控制台
 'agile.messageNotification': 通知设置
-'agile.art': ART
+'agile.feature': 特性列表
+'agile.artCalendar': ART日历
 'agile.pi': PI目标
+'agile.art': ART设置
+'agile.programSetting': 项目设置
 
 "rentsetting": "组织设置"
 "rentsetting.workCalendar": "工作日历"
