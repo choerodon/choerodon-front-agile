@@ -727,8 +727,9 @@ class SprintItem extends Component {
    */
   renderSprint = () => {
     const { state, props: { store }, state: { selectIssueType, loading } } = this;
-    const issueTypes = store.getIssueTypes
+    let issueTypes = store.getIssueTypes
       .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
+    issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? issueTypes : issueTypes.filter(item => item.typeCode !== 'feature');
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
       <Menu
@@ -740,7 +741,7 @@ class SprintItem extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          issueTypes.filter(item => item.typeCode !== 'feature').map(type => (
+          issueTypes.map(type => (
             <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
@@ -1149,8 +1150,9 @@ class SprintItem extends Component {
    */
   renderBacklog=() => {
     const { state, props: { store }, state: { selectIssueType, backlogExpand, loading } } = this;
-    const issueTypes = store.getIssueTypes
+    let issueTypes = store.getIssueTypes
       .filter(t => filterIssueTypeCode.indexOf(t.typeCode) === -1);
+    issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? issueTypes : issueTypes.filter(item => item.typeCode !== 'feature');
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
       <Menu
@@ -1162,7 +1164,7 @@ class SprintItem extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          issueTypes.filter(item => item.typeCode !== 'feature').map(type => (
+          issueTypes.map(type => (
             <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag

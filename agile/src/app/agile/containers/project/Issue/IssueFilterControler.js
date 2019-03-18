@@ -93,7 +93,7 @@ export default class IssueFilterControler {
     }
 
     // 单个任务跳转 => otherArgs 设置 issueId，将任务设定为展开模式
-    if (paramIssueId) {
+    if (paramName) {
       filter.searchArgs.issueNum = paramName;
       paramIssueSelected = true;
     }

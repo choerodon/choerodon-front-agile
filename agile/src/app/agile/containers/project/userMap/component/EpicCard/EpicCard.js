@@ -138,17 +138,17 @@ class EpicCard extends Component {
 
   getEpicIssueCountBackground() {
     const { epic } = this.props;
-    const epicType =  epic.statusMapDTO.type;
-    switch(epicType) {
+    const epicType = epic.statusMapDTO && epic.statusMapDTO.type;
+    switch (epicType) {
       case 'todo': {
-        return 'rgb(77, 144, 254)'
-      };
+        return 'rgb(77, 144, 254)';
+      }
       case 'doing': {
         return 'rgb(255, 177, 0)';
-      };
+      }
       case 'done': {
         return 'rgb(0, 191, 165)';
-      };
+      }
       default: {
         return 'rgba(0, 0, 0, 0.26)';
       }
@@ -235,7 +235,7 @@ class EpicCard extends Component {
                     name={epic.statusName}
                     color={epic.statusColor}
                   />
-                  <span className="c7n-issueCount" style={{ background: this.getEpicIssueCountBackground()}}>{epic.totalEstimate}</span>
+                  <span className="c7n-issueCount" style={{ background: this.getEpicIssueCountBackground() }}>{epic.totalEstimate}</span>
                 </div>
                 <span
                   className="c7n-issueNum"

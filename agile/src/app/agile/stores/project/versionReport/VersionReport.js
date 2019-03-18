@@ -126,6 +126,7 @@ class VersionReportStore {
             }
           }
           this.setColors(colors);
+          data = AppState.currentMenuType.category === 'PROGRAM' ? data : data.filter(item => !item.jsonObject.icon || item.jsonObject.icon !== 'agile_feature');
           this.setSourceData(data);
           const bigData = data.filter(item => item.percent >= 2);
           const otherData = {

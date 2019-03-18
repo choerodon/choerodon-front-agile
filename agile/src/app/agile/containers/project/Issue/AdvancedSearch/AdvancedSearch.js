@@ -141,7 +141,7 @@ class AdvancedSearch extends Component {
     render() {
       const editFilterInfo = IssueStore.getEditFilterInfo;
       const projectInfo = IssueStore.getProjectInfo;
-      const issueTypes = IssueStore.getIssueTypes;
+      const issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? IssueStore.getIssueTypes : IssueStore.getIssueTypes.filter(item => item.typeCode !== 'feature');
       const statusLists = IssueStore.getIssueStatus;
       const prioritys = IssueStore.getIssuePriority;
       const users = IssueStore.getUsers;
@@ -365,6 +365,11 @@ class AdvancedSearch extends Component {
                   IssueStore.setSaveFilterVisible(false);
                   IssueStore.setFilterListVisible(false);
                   IssueStore.resetFilterSelect(filterControler);
+                  IssueStore.setClickedRow({
+                    expand: false,
+                    selectedIssue: {},
+                    checkCreateIssue: false,
+                  });
                 }}
               >
                 {'清空筛选'}

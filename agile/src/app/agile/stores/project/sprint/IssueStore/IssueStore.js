@@ -734,73 +734,72 @@ class SprintCommonStore {
     const myFilters = this.getMyFilters;
     if (myFilters.length === 0) {
       this.setIsExistFilter(false);
+    } 
+    const filter = this.getFilterMap.get('userFilter');
+    const filterAdvancedSearchArgs = _.pick(filter.advancedSearchArgs, ['issueTypeId', 'priorityId', 'statusId']);
+    const filterAssigneeFilterIds = filter.assigneeFilterIds || [];
+    const filterOtherAssignee = filter.otherArgs.assigneeId || [];
+    const filterSearchArgs = _.pick(filter.searchArgs, ['issueNum', 'summary', 'reporter', 'component', 'epic', 'version', 'sprint', 'label']);
+    const filterOtherArgs = _.pick(filter.otherArgs, ['component', 'epic', 'version', 'sprint', 'label']);
+    const filterContents = filter.contents || [];
+    const filterCreateStartDate = filter.searchArgs.createStartDate;
+    const filterCreateEndDate = filter.searchArgs.createEndDate;
+
+    const filterAdvEveryFieldIsEmpty = Object.keys(filterAdvancedSearchArgs).every(key => filterAdvancedSearchArgs[key].length === 0);
+    const filterAssigneeIsEmpty = filterAssigneeFilterIds.length === 0;
+    const filterSeaArgsFieldIsEmpty = Object.keys(filterSearchArgs).every(key => !filterSearchArgs[key]);
+    const filterOtherArgsFieldIsEmpty = Object.keys(filterOtherArgs).every(key => filterOtherArgs[key].length === 0);
+    const filterContentsIsEmpty = filterContents.length === 0;
+
+    if (filterAdvEveryFieldIsEmpty && filterAssigneeIsEmpty && filterOtherAssignee.length === 0 && filterSeaArgsFieldIsEmpty && filterOtherArgsFieldIsEmpty && filterContentsIsEmpty) {
+      for (let i = 0; i < myFilters.length; i++) {
+        const { searchArgs } = myFilters[i].personalFilterSearchDTO;
+        const createStartDateIsEqual = filterCreateStartDate && moment(filterCreateStartDate).format('YYYY-MM-DD') !== moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD') && moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterCreateStartDate).format('YYYY-MM-DD');
+        const createEndDateIsEqual = filterCreateEndDate && moment(filterCreateEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD') && moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterCreateEndDate).format('YYYY-MM-DD');
+        if (createStartDateIsEqual && createEndDateIsEqual) { // 其他条件都为空 & 创建时间范围和已有筛选一样
+          this.setSelectedFilterId(myFilters[i].filterId);
+          this.setIsExistFilter(true);
+          break;
+        } else if (i === myFilters.length - 1 && (!filterCreateStartDate || moment(filterCreateStartDate).format('YYYY-MM-DD') === moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD')) && (!filterCreateEndDate || moment(filterCreateEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD'))) { // 直到最后一项，创建时间范围为项目开始时间到今天
+          this.setSelectedFilterId(undefined);
+          this.setIsExistFilter(true);
+        } else { // 和已有筛选时间范围都不一样 且 范围不是项目创建时间到今天
+          this.setSelectedFilterId(undefined);
+          this.setIsExistFilter(false);
+        }
+      }
     } else {
-      const filter = this.getFilterMap.get('userFilter');
-      const filterAdvancedSearchArgs = _.pick(filter.advancedSearchArgs, ['issueTypeId', 'priorityId', 'statusId']);
-      const filterAssigneeFilterIds = filter.assigneeFilterIds || [];
-      const filterOtherAssignee = filter.otherArgs.assigneeId || [];
-      const filterSearchArgs = _.pick(filter.searchArgs, ['issueNum', 'summary', 'reporter', 'component', 'epic', 'version', 'sprint', 'label']);
-      const filterOtherArgs = _.pick(filter.otherArgs, ['component', 'epic', 'version', 'sprint', 'label']);
-      const filterContents = filter.contents || [];
-      const filterCreateStartDate = filter.searchArgs.createStartDate;
-      const filterCreateEndDate = filter.searchArgs.createEndDate;
+      this.setSelectedAssignee(filterOtherAssignee.length === 0 ? filterAssigneeFilterIds.map(item => Number(item)) : _.map(filterOtherAssignee, id => (id === '0' ? 'none' : id)));
+      this.setSelectedIssueType(filterAdvancedSearchArgs.issueTypeId ? filterAdvancedSearchArgs.issueTypeId.map(item => Number(item)) : []);
+      this.setSelectedPriority(filterAdvancedSearchArgs.priorityId ? filterAdvancedSearchArgs.priorityId.map(item => Number(item)) : []);
+      this.setSelectedStatus(filterAdvancedSearchArgs.statusId ? filterAdvancedSearchArgs.statusId.map(item => Number(item)) : []);
 
-      const filterAdvEveryFieldIsEmpty = Object.keys(filterAdvancedSearchArgs).every(key => filterAdvancedSearchArgs[key].length === 0);
-      const filterAssigneeIsEmpty = filterAssigneeFilterIds.length === 0;
-      const filterSeaArgsFieldIsEmpty = Object.keys(filterSearchArgs).every(key => !filterSearchArgs[key]);
-      const filterOtherArgsFieldIsEmpty = Object.keys(filterOtherArgs).every(key => filterOtherArgs[key].length === 0);
-      const filterContentsIsEmpty = filterContents.length === 0;
-
-      if (filterAdvEveryFieldIsEmpty && filterAssigneeIsEmpty && filterOtherAssignee.length === 0 && filterSeaArgsFieldIsEmpty && filterOtherArgsFieldIsEmpty && filterContentsIsEmpty) {
-        for (let i = 0; i < myFilters.length; i++) {
-          const { searchArgs } = myFilters[i].personalFilterSearchDTO;
-          const createStartDateIsEqual = filterCreateStartDate && moment(filterCreateStartDate).format('YYYY-MM-DD') !== moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD') && moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterCreateStartDate).format('YYYY-MM-DD');
-          const createEndDateIsEqual = filterCreateEndDate && moment(filterCreateEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD') && moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterCreateEndDate).format('YYYY-MM-DD');
-          if (createStartDateIsEqual && createEndDateIsEqual) { // 其他条件都为空 & 创建时间范围和已有筛选一样
-            this.setSelectedFilterId(myFilters[i].filterId);
+      for (let i = 0; i < myFilters.length; i++) {
+        if (myFilters[i].personalFilterSearchDTO) {
+          const {
+            advancedSearchArgs, searchArgs, otherArgs, contents, 
+          } = myFilters[i].personalFilterSearchDTO;
+            
+          const advancedSearchArgsIsEqual = _.pull(Object.keys(advancedSearchArgs), 'reporterIds', 'assigneeIds').every(key => _.isEqual(advancedSearchArgs[key].sort(), filterAdvancedSearchArgs[key].map(item => Number(item)).sort()));
+          const assigneeIdsIsEqual = _.isEqual(advancedSearchArgs.assigneeIds.sort(), filterAssigneeFilterIds.map(item => Number(item)).sort());
+          const createStartDateIsEqual = !filterSearchArgs.createStartDate || moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createStartDate).format('YYYY-MM-DD');
+          const createEndDateIsEqual = !filterSearchArgs.createEndDate || moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createEndDate).format('YYYY-MM-DD');
+          const searchArgsIsEqual = createStartDateIsEqual && createEndDateIsEqual && _.pull(Object.keys(searchArgs), 'createStartDate', 'createEndDate', 'assignee').every(key => (searchArgs[key] || '') === (filterSearchArgs[key] || ''));
+          const otherArgsIsEqual = (otherArgs === null && Object.keys(filterOtherArgs).every(key => filterOtherArgs[key].length === 0)) || (Boolean(otherArgs) && Object.keys(_.pick(otherArgs, ['component', 'epic', 'version', 'sprint', 'label'])).every(key => _.isEqual(otherArgs[key].sort(), filterOtherArgs[key].map(item => Number(item)).sort())));
+          const contentsIsEqual = (contents === null && filterContents.length === 0) || (Boolean(contents) && _.isEqual(contents.sort(), filterContents.sort()));
+            
+          const itemIsEqual = advancedSearchArgsIsEqual && assigneeIdsIsEqual && searchArgsIsEqual && otherArgsIsEqual && contentsIsEqual;
+      
+          if (itemIsEqual) {
+            const { filterId, personalFilterSearchDTO } = myFilters[i];
+            // const advSearchArgs = personalFilterSearchDTO.advancedSearchArgs;
+            this.setSelectedFilterId(filterId);
+               
             this.setIsExistFilter(true);
             break;
-          } else if (i === myFilters.length - 1 && (!filterCreateStartDate || moment(filterCreateStartDate).format('YYYY-MM-DD') === moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD')) && (!filterCreateEndDate || moment(filterCreateEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD'))) { // 直到最后一项，创建时间范围为项目开始时间到今天
-            this.setSelectedFilterId(undefined);
-            this.setIsExistFilter(true);
-          } else { // 和已有筛选时间范围都不一样 且 范围不是项目创建时间到今天
+          } else if (i === myFilters.length - 1 && !itemIsEqual) {
             this.setSelectedFilterId(undefined);
             this.setIsExistFilter(false);
-          }
-        }
-      } else {
-        this.setSelectedAssignee(filterOtherAssignee.length === 0 ? filterAssigneeFilterIds.map(item => Number(item)) : _.map(filterOtherAssignee, id => (id === '0' ? 'none' : id)));
-        this.setSelectedIssueType(filterAdvancedSearchArgs.issueTypeId ? filterAdvancedSearchArgs.issueTypeId.map(item => Number(item)) : []);
-        this.setSelectedPriority(filterAdvancedSearchArgs.priorityId ? filterAdvancedSearchArgs.priorityId.map(item => Number(item)) : []);
-        this.setSelectedStatus(filterAdvancedSearchArgs.statusId ? filterAdvancedSearchArgs.statusId.map(item => Number(item)) : []);
-
-        for (let i = 0; i < myFilters.length; i++) {
-          if (myFilters[i].personalFilterSearchDTO) {
-            const {
-              advancedSearchArgs, searchArgs, otherArgs, contents, 
-            } = myFilters[i].personalFilterSearchDTO;
-            
-            const advancedSearchArgsIsEqual = _.pull(Object.keys(advancedSearchArgs), 'reporterIds', 'assigneeIds').every(key => _.isEqual(advancedSearchArgs[key].sort(), filterAdvancedSearchArgs[key].map(item => Number(item)).sort()));
-            const assigneeIdsIsEqual = _.isEqual(advancedSearchArgs.assigneeIds.sort(), filterAssigneeFilterIds.map(item => Number(item)).sort());
-            const createStartDateIsEqual = !filterSearchArgs.createStartDate || moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createStartDate).format('YYYY-MM-DD');
-            const createEndDateIsEqual = !filterSearchArgs.createEndDate || moment(searchArgs.createEndDate).format('YYYY-MM-DD') === moment(filterSearchArgs.createEndDate).format('YYYY-MM-DD');
-            const searchArgsIsEqual = createStartDateIsEqual && createEndDateIsEqual && _.pull(Object.keys(searchArgs), 'createStartDate', 'createEndDate', 'assignee').every(key => (searchArgs[key] || '') === (filterSearchArgs[key] || ''));
-            const otherArgsIsEqual = (otherArgs === null && Object.keys(filterOtherArgs).every(key => filterOtherArgs[key].length === 0)) || (Boolean(otherArgs) && Object.keys(_.pick(otherArgs, ['component', 'epic', 'version', 'sprint', 'label'])).every(key => _.isEqual(otherArgs[key].sort(), filterOtherArgs[key].map(item => Number(item)).sort())));
-            const contentsIsEqual = (contents === null && filterContents.length === 0) || (Boolean(contents) && _.isEqual(contents.sort(), filterContents.sort()));
-            
-            const itemIsEqual = advancedSearchArgsIsEqual && assigneeIdsIsEqual && searchArgsIsEqual && otherArgsIsEqual && contentsIsEqual;
-      
-            if (itemIsEqual) {
-              const { filterId, personalFilterSearchDTO } = myFilters[i];
-              // const advSearchArgs = personalFilterSearchDTO.advancedSearchArgs;
-              this.setSelectedFilterId(filterId);
-               
-              this.setIsExistFilter(true);
-              break;
-            } else if (i === myFilters.length - 1 && !itemIsEqual) {
-              this.setSelectedFilterId(undefined);
-              this.setIsExistFilter(false);
-            }
           }
         }
       }

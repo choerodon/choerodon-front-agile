@@ -18,8 +18,9 @@ class TypeTag extends Component {
                 fontSize: '26px',
                 color: data ? data.colour : '#fab614',
               }}
-              type={data ? 'agile_task' : 'help'}
-            />)
+              type={data ? data.icon : 'help'}
+            />
+          )
           : (
             <div
               className="icon-wapper"
@@ -33,7 +34,8 @@ class TypeTag extends Component {
                 style={{ fontSize: '16px' }}
                 type={data ? data.icon : 'help'}
               />
-            </div>)
+            </div>
+          )
         }
         {
           showName && (

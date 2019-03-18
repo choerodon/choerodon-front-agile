@@ -92,7 +92,8 @@ class QuickCreateIssue extends Component {
     const {
       checkCreateIssue, createLoading, selectIssueType, createIssueValue,
     } = this.state;
-    const issueTypes = IssueStore.getIssueTypes;
+    let issueTypes = IssueStore.getIssueTypes;
+    issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? issueTypes : issueTypes.filter(item => item.typeCode !== 'feature');
     const currentType = issueTypes.find(t => t.typeCode === selectIssueType);
     const typeList = (
       <Menu
@@ -104,7 +105,7 @@ class QuickCreateIssue extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          issueTypes.filter(t => t.typeCode !== 'sub_task' && t.typeCode !== 'feature').map(type => (
+          issueTypes.filter(t => t.typeCode !== 'sub_task').map(type => (
             <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
