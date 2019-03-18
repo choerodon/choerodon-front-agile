@@ -12,8 +12,11 @@
 'agile.userStoryMap': Story Map
 'agile.iterationBoard': Iteration Board
 'agile.messageNotification': Notification Setting
-'agile.art': ART
+'agile.feature': Feature
+'agile.artCalendar': ART Calendar
 'agile.pi': PI Objective
+'agile.art': ART Setting
+'agile.programSetting': Program Setting
 
 "rentsetting": "Organization Settings"
 "rentsetting.workCalendar": "Work Calendar"
