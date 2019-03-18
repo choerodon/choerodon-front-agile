@@ -29,6 +29,7 @@ import CreateLinkTask from '../../../../components/CreateLinkTask';
 import UserHead from '../../../../components/UserHead';
 import LinkList from '../../../../components/EditIssueNarrow/Component/IssueList';
 import Comment from '../../../../components/EditIssueNarrow/Component/Comment';
+import TextEditToggle from '../../../../components/TextEditToggle';
 import CopyIssue from '../../../../components/CopyIssue';
 import TypeTag from '../../../../components/TypeTag';
 
@@ -45,6 +46,7 @@ const { AppState } = stores;
 const { Option, blur } = Select;
 const { TextArea } = Input;
 const { confirm } = Modal;
+const { Text, Edit } = TextEditToggle;
 let sign = true;
 let filterSign = false;
 const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
@@ -120,6 +122,7 @@ class FeatureDetail extends Component {
       benfitHypothesis: '',
       acceptanceCritera: '',
       featureDTO: {},
+      featureType: 'enabler',
     };
   }
 
@@ -263,7 +266,7 @@ class FeatureDetail extends Component {
       subIssueDTOList,
       featureDTO,
     } = issue;
-    const { benfitHypothesis, acceptanceCritera } = featureDTO;
+    const { benfitHypothesis, acceptanceCritera, featureType } = featureDTO;
     const fileList = _.map(issue.issueAttachmentDTOList, issueAttachment => ({
       uid: issueAttachment.attachmentId,
       name: issueAttachment.fileName,
@@ -298,6 +301,7 @@ class FeatureDetail extends Component {
       issueLoading: false,
       benfitHypothesis,
       acceptanceCritera,
+      featureType,
       featureDTO,
     });
   }
@@ -371,6 +375,12 @@ class FeatureDetail extends Component {
     setTimeout(() => { this.needBlur = true; }, 100);
   }
 
+  handleFeatureTypeChange = (e) => {
+    this.setState({
+      featureType: e.target.value,
+    });
+  }
+
   handleEpicNameChange = (e) => {
     this.setState({ epicName: e.target.value });
   };
@@ -440,7 +450,7 @@ class FeatureDetail extends Component {
     }
   };
 
-  updateIssue = (pro) => {
+  updateIssue = (pro, value) => {
     const { state } = this;
     const {
       origin,
@@ -491,11 +501,11 @@ class FeatureDetail extends Component {
             });
           });
       }
-    } else if (pro === 'benfitHypothesis' || pro === 'acceptanceCritera') {
+    } else if (pro === 'benfitHypothesis' || pro === 'acceptanceCritera' || pro === 'featureType') {
       if (!obj.featureDTO) {
         obj.featureDTO = {};
       }
-      obj.featureDTO[pro] = state[pro] === '' ? null : state[pro];
+      obj.featureDTO[pro] = value || (state[pro] === '' ? null : state[pro]);
       obj.featureDTO.id = featureDTO.id;
       obj.featureDTO.objectVersionNumber = featureDTO.objectVersionNumber;
       obj.featureDTO.issueId = featureDTO.issueId;
@@ -594,6 +604,12 @@ class FeatureDetail extends Component {
 
   resetAcceptanceCritera(value) {
     this.setState({ acceptanceCritera: value });
+  }
+
+  resetFeatureType(value) {
+    this.setState({
+      featureType: value,
+    });
   }
 
   resetReporterId(value) {
@@ -935,6 +951,7 @@ class FeatureDetail extends Component {
       issueTypes,
       benfitHypothesis,
       acceptanceCritera,
+      featureType,
     } = this.state;
     // const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
@@ -1211,53 +1228,68 @@ class FeatureDetail extends Component {
               <div className="c7n-content-editIssue">
                 <div className="c7n-details">
                   <div id="detail">
-                  <div className="c7n-title-wrapper" style={{ marginTop: 0 }}>
-                    <div className="c7n-title-left">
-                      <Icon type="error_outline c7n-icon-title" />
-                      <span>详情</span>
+                    <div className="c7n-title-wrapper" style={{ marginTop: 0 }}>
+                      <div className="c7n-title-left">
+                        <Icon type="error_outline c7n-icon-title" />
+                        <span>详情</span>
+                      </div>
+                      <div style={{
+                        flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
+                      }}
+                      />
                     </div>
-                    <div style={{
-                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
-                    }}
-                    />
-                  </div>
 
-                  <div className="c7n-content-wrapper">
-                    <div className="line-start mt-10">
-                      <div className="c7n-property-wrapper">
-                        <span className="c7n-property">
-                          {'特性类型：'}
-                        </span>
-                      </div>
-                      <div className="c7n-value-wrapper">
-                        <ReadAndEdit
-                          readOnly
-                          readModeContent={(
-                            <span>特性</span>
-                            )}
-                        />
-                      </div>
-                    </div>
-                   
-                    <div className="line-start mt-10">
-                      <div className="c7n-property-wrapper">
-                        <span className="c7n-property">
-                          {'状态：'}
-                        </span>
-                      </div>
-                      <div className="c7n-value-wrapper">
-                        <ReadAndEdit
-                          callback={this.changeRae.bind(this)}
-                          thisType="statusId"
-                          current={currentRae}
-                          handleEnter
-                          origin={statusId}
-                          onOk={this.updateIssue.bind(this, 'statusId')}
-                          onCancel={this.resetStatusId.bind(this)}
-                          onInit={this.loadIssueStatus}
-                          readModeContent={(
-                            <div>
+                    <div className="c7n-content-wrapper">
+                      <div className="line-start mt-10">
+                        <div className="c7n-property-wrapper">
+                          <span className="c7n-property">
+                            {'特性类型：'}
+                          </span>
+                        </div>
+                        <div className="c7n-value-wrapper">
+                          <TextEditToggle
+                            style={{ width: 150 }}
+                            formKey="featureType"
+                            onSubmit={(value) => { this.updateIssue('featureType', value); }}
+                            originData={featureType}
+                          >
+                            <Text>
                               {
+                                featureType => (featureType === 'business' ? '业务' : '使能')
+                              }
+                            </Text>
+                            <Edit>
+                              <Select
+                                getPopupContainer={triggerNode => triggerNode.parentNode}
+                                style={{ width: '150px' }}
+                              >
+                                <Option key="business" value="business">业务</Option>
+                                <Option key="enabler" value="enabler">使能</Option>
+                              </Select>
+                            </Edit>
+                          </TextEditToggle>
+                        </div>
+                      </div>
+                   
+                      <div className="line-start mt-10">
+                        <div className="c7n-property-wrapper">
+                          <span className="c7n-property">
+                            {'状态：'}
+                          </span>
+                        </div>
+                        <div className="c7n-value-wrapper">
+                          <ReadAndEdit
+                            callback={this.changeRae.bind(this)}
+                            thisType="statusId"
+                            current={currentRae}
+                            handleEnter
+                            origin={statusId}
+                            onOk={this.updateIssue.bind(this, 'statusId')}
+                            onCancel={this.resetStatusId.bind(this)}
+                            onInit={this.loadIssueStatus}
+                            readModeContent={(
+                              <div>
+                                {
                                   statusId ? (
                                     <div
                                       style={{
@@ -1273,26 +1305,26 @@ class FeatureDetail extends Component {
                                     </div>
                                   ) : '无'
                                 }
-                            </div>
+                              </div>
                             )}
-                        >
-                          <Select
-                            value={originStatus.length ? statusId : statusName}
-                            style={{ width: 150 }}
-                            loading={selectLoading}
-                            getPopupContainer={triggerNode => triggerNode.parentNode}
+                          >
+                            <Select
+                              value={originStatus.length ? statusId : statusName}
+                              style={{ width: 150 }}
+                              loading={selectLoading}
+                              getPopupContainer={triggerNode => triggerNode.parentNode}
                               // onBlur={() => this.statusOnChange()}
-                            onChange={(value, item) => {
-                              this.setState({
-                                statusId: value,
-                                transformId: item.key,
-                              });
-                              this.needBlur = false;
+                              onChange={(value, item) => {
+                                this.setState({
+                                  statusId: value,
+                                  transformId: item.key,
+                                });
+                                this.needBlur = false;
                               // 由于 OnChange 和 OnBlur 几乎同时执行，不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                               // setTimeout(() => { this.needBlur = true; }, 100);
-                            }}
-                          >
-                            {
+                              }}
+                            >
+                              {
                                 originStatus && originStatus.length
                                   ? originStatus.map(transform => (transform.statusDTO ? (
                                     <Option key={transform.id} value={transform.endStatusId}>
@@ -1301,36 +1333,36 @@ class FeatureDetail extends Component {
                                   ) : ''))
                                   : null
                               }
-                          </Select>
-                        </ReadAndEdit>
+                            </Select>
+                          </ReadAndEdit>
+                        </div>
                       </div>
-                    </div>
                    
-                    <div className="line-start mt-10">
-                      <div className="c7n-property-wrapper">
-                        <span className="c7n-property">
-                          {'史诗：'}
-                        </span>
-                      </div>
-                      <div className="c7n-value-wrapper">
-                        <ReadAndEdit
-                          callback={this.changeRae.bind(this)}
-                          thisType="epicId"
-                          current={currentRae}
-                          origin={epicId}
-                          onOk={this.updateIssue.bind(this, 'epicId')}
-                          onCancel={this.resetEpicId.bind(this)}
-                          onInit={() => {
-                            this.setAnIssueToState(origin);
-                            loadProgramEpics().then((res) => {
-                              this.setState({
-                                originEpics: res,
+                      <div className="line-start mt-10">
+                        <div className="c7n-property-wrapper">
+                          <span className="c7n-property">
+                            {'史诗：'}
+                          </span>
+                        </div>
+                        <div className="c7n-value-wrapper">
+                          <ReadAndEdit
+                            callback={this.changeRae.bind(this)}
+                            thisType="epicId"
+                            current={currentRae}
+                            origin={epicId}
+                            onOk={this.updateIssue.bind(this, 'epicId')}
+                            onCancel={this.resetEpicId.bind(this)}
+                            onInit={() => {
+                              this.setAnIssueToState(origin);
+                              loadProgramEpics().then((res) => {
+                                this.setState({
+                                  originEpics: res,
+                                });
                               });
-                            });
-                          }}
-                          readModeContent={(
-                            <div>
-                              {
+                            }}
+                            readModeContent={(
+                              <div>
+                                {
                                       epicId ? (
                                         <div
                                           style={{
@@ -1349,93 +1381,85 @@ class FeatureDetail extends Component {
                                         </div>
                                       ) : '无'
                                     }
-                            </div>
+                              </div>
                                 )}
-                        >
-                          <Select
-                            value={
+                          >
+                            <Select
+                              value={
                                     originEpics.length
                                       ? epicId || undefined
                                       : epicName || undefined
                                   }
-                            getPopupContainer={triggerNode => triggerNode.parentNode}
-                            style={{ width: '150px' }}
+                              getPopupContainer={triggerNode => triggerNode.parentNode}
+                              style={{ width: '150px' }}
                                   // onBlur={() => this.statusOnChange()}
-                            allowClear
-                            loading={selectLoading}
-                            onFocus={() => {
-                              this.setState({
-                                selectLoading: true,
-                              });
-                              loadProgramEpics().then((res) => {
+                              allowClear
+                              loading={selectLoading}
+                              onFocus={() => {
                                 this.setState({
-                                  originEpics: res,
-                                  selectLoading: false,
+                                  selectLoading: true,
                                 });
-                              });
-                            }}
-                            onChange={(value) => {
-                              const epic = _.find(originEpics,
-                                { issueId: value * 1 });
-                              this.setState({
-                                epicId: value,
+                                loadProgramEpics().then((res) => {
+                                  this.setState({
+                                    originEpics: res,
+                                    selectLoading: false,
+                                  });
+                                });
+                              }}
+                              onChange={(value) => {
+                                const epic = _.find(originEpics,
+                                  { issueId: value * 1 });
+                                this.setState({
+                                  epicId: value,
                                 // epicName: epic.epicName,
-                              });
-                              this.needBlur = false;
+                                });
+                                this.needBlur = false;
                               // 由于 OnChange 和 OnBlur 几乎同时执行，
                               // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
                               // setTimeout(() => { this.needBlur = true; }, 100);
-                            }}
-                          >
-                            {originEpics.map(epic => <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>)}
-                          </Select>
-                        </ReadAndEdit>
+                              }}
+                            >
+                              {originEpics.map(epic => <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>)}
+                            </Select>
+                          </ReadAndEdit>
+                        </div>
                       </div>
-                    </div>
-                       
-                    <div className="line-start mt-10">
-                      <div className="c7n-property-wrapper">
-                        <span className="c7n-subtitle">
-                          {'人员'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="line-start mt-10 assignee">
-                      <div className="c7n-property-wrapper">
-                        <span className="c7n-property">报告人：</span>
-                      </div>
-                      <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <ReadAndEdit
-                          style={{ marginBottom: 5 }}
-                          callback={this.changeRae.bind(this)}
-                          thisType="reporterId"
-                          current={currentRae}
-                          origin={reporterId}
-                          onOk={this.updateIssue.bind(this, 'reporterId')}
-                          onCancel={this.resetReporterId.bind(this)}
-                          onInit={() => {
-                            this.setAnIssueToState(origin);
-                            if (reporterId) {
-                              this.setState({
-                                flag: 'loading',
-                              });
-                              getUser(reporterId).then((res) => {
+                      <div className="line-start mt-10 assignee">
+                        <div className="c7n-property-wrapper">
+                          <span className="c7n-property">报告人：</span>
+                        </div>
+                        <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                          <ReadAndEdit
+                            style={{ marginBottom: 5 }}
+                            callback={this.changeRae.bind(this)}
+                            thisType="reporterId"
+                            current={currentRae}
+                            origin={reporterId}
+                            onOk={this.updateIssue.bind(this, 'reporterId')}
+                            onCancel={this.resetReporterId.bind(this)}
+                            onInit={() => {
+                              this.setAnIssueToState(origin);
+                              if (reporterId) {
                                 this.setState({
-                                  reporterId: JSON.stringify(res.content[0]),
-                                  originUsers: res.content.length ? [res.content[0]] : [],
-                                  flag: 'finish',
+                                  flag: 'loading',
                                 });
-                              });
-                            } else {
-                              this.setState({
-                                reporterId: undefined,
-                                originUsers: [],
-                              });
-                            }
-                          }}
-                          readModeContent={(
-                            <div>
-                              {
+                                getUser(reporterId).then((res) => {
+                                  this.setState({
+                                    reporterId: JSON.stringify(res.content[0]),
+                                    originUsers: res.content.length ? [res.content[0]] : [],
+                                    flag: 'finish',
+                                  });
+                                });
+                              } else {
+                                this.setState({
+                                  reporterId: undefined,
+                                  originUsers: [],
+                                });
+                              }
+                            }}
+                            readModeContent={(
+                              <div>
+                                {
                                   reporterId && reporterName ? (
                                     <UserHead
                                       user={{
@@ -1447,245 +1471,235 @@ class FeatureDetail extends Component {
                                     />
                                   ) : '无'
                                 }
-                            </div>
+                              </div>
                             )}
-                        >
-                          <Select
-                            value={flag === 'loading' ? undefined : reporterId || undefined}
-                            style={{ width: 150 }}
-                            loading={selectLoading}
+                          >
+                            <Select
+                              value={flag === 'loading' ? undefined : reporterId || undefined}
+                              style={{ width: 150 }}
+                              loading={selectLoading}
                               // onBlur={() => this.statusOnChange()}
-                            allowClear
-                            filter
-                            onFilterChange={this.onFilterChange.bind(this)}
-                            getPopupContainer={triggerNode => triggerNode.parentNode}
-                            onChange={(value) => {
-                              this.setState({ reporterId: value });
+                              allowClear
+                              filter
+                              onFilterChange={this.onFilterChange.bind(this)}
+                              getPopupContainer={triggerNode => triggerNode.parentNode}
+                              onChange={(value) => {
+                                this.setState({ reporterId: value });
+                              }}
+                            >
+                              {originUsers.filter(u => u.enabled).map(user => (
+                                <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
+                                  <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                                    <UserHead
+                                      user={{
+                                        id: user && user.id,
+                                        loginName: user && user.loginName,
+                                        realName: user && user.realName,
+                                        avatar: user && user.imageUrl,
+                                      }}
+                                    />
+                                  </div>
+                                </Option>
+                              ))}
+                            </Select>
+                          </ReadAndEdit>
+                          <span
+                            role="none"
+                            style={{
+                              color: '#3f51b5',
+                              cursor: 'pointer',
+                              marginTop: '-5px',
+                              display: 'inline-block',
+                              marginBottom: 5,
+                            }}
+                            onClick={() => {
+                              getSelf().then((res) => {
+                                if (res.id !== reporterId) {
+                                  this.setState({
+                                    currentRae: undefined,
+                                    reporterId: JSON.stringify(res),
+                                    reporterName: `${res.loginName}${res.realName}`,
+                                    reporterImageUrl: res.imageUrl,
+                                  }, () => {
+                                    this.updateIssue('reporterId');
+                                  });
+                                }
+                              });
                             }}
                           >
-                            {originUsers.filter(u => u.enabled).map(user => (
-                              <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
-                                <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                                  <UserHead
-                                    user={{
-                                      id: user && user.id,
-                                      loginName: user && user.loginName,
-                                      realName: user && user.realName,
-                                      avatar: user && user.imageUrl,
-                                    }}
-                                  />
-                                </div>
-                              </Option>
-                            ))}
-                          </Select>
-                        </ReadAndEdit>
-                        <span
-                          role="none"
-                          style={{
-                            color: '#3f51b5',
-                            cursor: 'pointer',
-                            marginTop: '-5px',
-                            display: 'inline-block',
-                            marginBottom: 5,
-                          }}
-                          onClick={() => {
-                            getSelf().then((res) => {
-                              if (res.id !== reporterId) {
-                                this.setState({
-                                  currentRae: undefined,
-                                  reporterId: JSON.stringify(res),
-                                  reporterName: `${res.loginName}${res.realName}`,
-                                  reporterImageUrl: res.imageUrl,
-                                }, () => {
-                                  this.updateIssue('reporterId');
-                                });
+                            {'分配给我'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="line-start mt-10">
+                        <div className="c7n-property-wrapper">
+                          <span className="c7n-property">
+                            {'特性价值：'}
+                          </span>
+                        </div>
+                        <div className="c7n-value-wrapper">
+                          <TextEditToggle
+                            style={{ width: 150 }}
+                            formKey="benfitHypothesis"
+                            onSubmit={(value) => { this.updateIssue('benfitHypothesis', value); }}
+                            originData={benfitHypothesis}
+                          >
+                            <Text>
+                              {
+                                benfitHypothesis => (
+                                  <span>
+                                    {benfitHypothesis === undefined || benfitHypothesis === null ? '-' : `${benfitHypothesis}`}
+                                  </span>
+                                )
                               }
+                            </Text>
+                            <Edit>
+                              <TextArea
+                                maxLength={44}
+                                value={benfitHypothesis}
+                                size="small"
+                              />
+                            </Edit>
+                          </TextEditToggle>
+                        </div>
+                      </div>
+                      <div className="line-start mt-10">
+                        <div className="c7n-property-wrapper">
+                          <span className="c7n-property">
+                            {'验收标准：'}
+                          </span>
+                        </div>
+                        <div className="c7n-value-wrapper">
+                          <TextEditToggle
+                            style={{ width: 150 }}
+                            formKey="acceptanceCritera"
+                            onSubmit={(value) => { this.updateIssue('acceptanceCritera', value); }}
+                            originData={acceptanceCritera}
+                          >
+                            <Text>
+                              {
+                                acceptanceCritera => (
+                                  <span>
+                                    {acceptanceCritera === undefined || acceptanceCritera === null ? '-' : `${acceptanceCritera}`}
+                                  </span>
+                                )
+                              }
+                            </Text>
+                            <Edit>
+                              <TextArea
+                                maxLength={44}
+                                value={acceptanceCritera}
+                                size="small"
+                              />
+                            </Edit>
+                          </TextEditToggle>
+                        
+                        </div>
+                      </div>
+                      <div className="line-start mt-10">
+                        <div className="c7n-property-wrapper">
+                          <span className="c7n-property">创建时间：</span>
+                        </div>
+                        <div className="c7n-value-wrapper">
+                          <DatetimeAgo
+                            date={creationDate}
+                          />
+                        </div>
+                      </div>
+                      <div className="line-start mt-10">
+                        <div className="c7n-property-wrapper">
+                          <span className="c7n-property">更新时间：</span>
+                        </div>
+                        <div className="c7n-value-wrapper">
+                          <DatetimeAgo
+                            date={lastUpdateDate}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="des">
+                    <div className="c7n-title-wrapper">
+                      <div className="c7n-title-left">
+                        <Icon type="subject c7n-icon-title" />
+                        <span>描述</span>
+                      </div>
+                      <div style={{
+                        flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
+                      }}
+                      />
+                      <div className="c7n-title-right" style={{ marginLeft: '14px', position: 'relative' }}>
+                        <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })}>
+                          <Icon type="zoom_out_map icon" style={{ marginRight: 2 }} />
+                          <span>全屏编辑</span>
+                        </Button>
+                        <Icon
+                          className="c7n-des-edit"
+                          style={{ position: 'absolute', top: 8, right: -20 }}
+                          role="none"
+                          type="mode_edit mlr-3 pointer"
+                          onClick={() => {
+                            this.setState({
+                              editDesShow: true,
+                              editDes: description,
                             });
                           }}
-                        >
-                          {'分配给我'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="line-start mt-10 benfitHypothesis">
-                      <div className="c7n-property-wrapper">
-                        <span className="c7n-property">特性价值：</span>
-                      </div>
-                      <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <ReadAndEdit
-                          callback={this.changeRae.bind(this)}
-                          thisType="benfitHypothesis"
-                          current={currentRae}
-                          handleEnter
-                          origin={origin.benfitHypothesis}
-                          onInit={() => this.setAnIssueToState(origin)}
-                          onOk={this.updateIssue.bind(this, 'benfitHypothesis')}
-                          onCancel={this.resetBenfitHypothesis.bind(this)}
-                          readModeContent={(
-                            <span>
-                              {benfitHypothesis === undefined || benfitHypothesis === null ? '-' : `${benfitHypothesis}`}
-                            </span>
-                        )}
-                        >
-                          <TextArea
-                            maxLength={44}
-                            value={benfitHypothesis}
-                            size="small"
-                            onChange={this.handleBenfitHypothesisChange.bind(this)}
-                            onPressEnter={() => {
-                              this.updateIssue('benfitHypothesis');
-                              this.setState({
-                                currentRae: undefined,
-                              });
-                            }}
-                          />
-                        </ReadAndEdit>
-                      </div>
-                    </div>
-                    <div className="line-start mt-10 acceptanceCritera">
-                      <div className="c7n-property-wrapper">
-                        <span className="c7n-property">验收标准：</span>
-                      </div>
-                      <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <ReadAndEdit
-                          callback={this.changeRae.bind(this)}
-                          thisType="acceptanceCritera"
-                          current={currentRae}
-                          handleEnter
-                          origin={origin.acceptanceCritera}
-                          onInit={() => this.setAnIssueToState(origin)}
-                          onOk={this.updateIssue.bind(this, 'acceptanceCritera')}
-                          onCancel={this.resetAcceptanceCritera.bind(this)}
-                          readModeContent={(
-                            <span>
-                              {acceptanceCritera === undefined || acceptanceCritera === null ? '-' : `${acceptanceCritera}`}
-                            </span>
-                        )}
-                        >
-                          <TextArea
-                            maxLength={44}
-                            value={acceptanceCritera}
-                            size="small"
-                            onChange={this.handleAcceptanceCriteraChange.bind(this)}
-                            onPressEnter={() => {
-                              this.updateIssue('acceptanceCritera');
-                              this.setState({
-                                currentRae: undefined,
-                              });
-                            }}
-                          />
-                        </ReadAndEdit>
-                      </div>
-                    </div>
-                    <div className="line-start mt-10">
-                      <div className="c7n-property-wrapper">
-                        <span className="c7n-subtitle">日期</span>
-                      </div>
-                    </div>
-                    <div className="line-start mt-10">
-                      <div className="c7n-property-wrapper">
-                        <span className="c7n-property">创建时间：</span>
-                      </div>
-                      <div className="c7n-value-wrapper">
-                        <DatetimeAgo
-                          date={creationDate}
                         />
                       </div>
                     </div>
-                    <div className="line-start mt-10">
-                      <div className="c7n-property-wrapper">
-                        <span className="c7n-property">更新时间：</span>
-                      </div>
-                      <div className="c7n-value-wrapper">
-                        <DatetimeAgo
-                          date={lastUpdateDate}
-                        />
-                      </div>
-                    </div>
+                    {this.renderDes()}
                   </div>
-                </div>
-                  <div id="des">
-                  <div className="c7n-title-wrapper">
-                    <div className="c7n-title-left">
-                      <Icon type="subject c7n-icon-title" />
-                      <span>描述</span>
-                    </div>
-                    <div style={{
-                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px',
-                    }}
-                    />
-                    <div className="c7n-title-right" style={{ marginLeft: '14px', position: 'relative' }}>
-                      <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })}>
-                        <Icon type="zoom_out_map icon" style={{ marginRight: 2 }} />
-                        <span>全屏编辑</span>
-                      </Button>
-                      <Icon
-                        className="c7n-des-edit"
-                        style={{ position: 'absolute', top: 8, right: -20 }}
-                        role="none"
-                        type="mode_edit mlr-3 pointer"
-                        onClick={() => {
-                          this.setState({
-                            editDesShow: true,
-                            editDes: description,
-                          });
-                        }}
-                      />
-                    </div>
-                  </div>
-                  {this.renderDes()}
-                </div>
                 </div>
                 <div id="attachment">
                   <div className="c7n-title-wrapper">
-                  <div className="c7n-title-left">
-                    <Icon type="attach_file c7n-icon-title" />
-                    <span>附件</span>
+                    <div className="c7n-title-left">
+                      <Icon type="attach_file c7n-icon-title" />
+                      <span>附件</span>
+                    </div>
+                    <div style={{
+                      flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px',
+                    }}
+                    />
                   </div>
-                  <div style={{
-                    flex: 1, height: 1, borderTop: '1px solid rgba(0, 0, 0, 0.08)', marginLeft: '14px', marginRight: '114.67px',
-                  }}
-                  />
-                </div>
                   <div className="c7n-content-wrapper" style={{ marginTop: '-47px' }}>
-                  <UploadButtonNow
-                    onRemove={this.setFileList}
-                    onBeforeUpload={this.setFileList}
-                    updateNow={this.onChangeFileList}
-                    fileList={fileList}
-                  />
-                </div>
+                    <UploadButtonNow
+                      onRemove={this.setFileList}
+                      onBeforeUpload={this.setFileList}
+                      updateNow={this.onChangeFileList}
+                      fileList={fileList}
+                    />
+                  </div>
                 </div>
                 <div id="commit">
                   <div
-                  className="c7n-title-wrapper"
-                  style={{
-                    marginBottom: 2,
-                  }}
-                >
-                  <div className="c7n-title-left">
-                    <Icon type="sms_outline c7n-icon-title" />
-                    <span>评论</span>
-                  </div>
-                  <div
+                    className="c7n-title-wrapper"
                     style={{
-                      flex: 1,
-                      height: 1,
-                      borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-                      marginLeft: '14px',
+                      marginBottom: 2,
                     }}
-                  />
-                  <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
-                    <Button
-                      className="leftBtn"
-                      funcType="flat"
-                      onClick={() => this.setState({ addCommit: true })}
-                    >
-                      <Icon type="playlist_add icon" />
-                      <span>添加评论</span>
-                    </Button>
+                  >
+                    <div className="c7n-title-left">
+                      <Icon type="sms_outline c7n-icon-title" />
+                      <span>评论</span>
+                    </div>
+                    <div
+                      style={{
+                        flex: 1,
+                        height: 1,
+                        borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+                        marginLeft: '14px',
+                      }}
+                    />
+                    <div className="c7n-title-right" style={{ marginLeft: '14px' }}>
+                      <Button
+                        className="leftBtn"
+                        funcType="flat"
+                        onClick={() => this.setState({ addCommit: true })}
+                      >
+                        <Icon type="playlist_add icon" />
+                        <span>添加评论</span>
+                      </Button>
+                    </div>
                   </div>
-                </div>
                   {this.renderCommits()}
                 </div>
                

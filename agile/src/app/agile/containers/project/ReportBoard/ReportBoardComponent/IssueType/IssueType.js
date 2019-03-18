@@ -77,7 +77,7 @@ class IssueType extends Component {
         });
         if (res && res.length) {
           this.setState({
-            issueTypeInfo: res,
+            issueTypeInfo: AppState.currentMenuType.category === 'PROGRAM' ? res : res.filter(item => item.jsonObject.icon !== 'agile_feature'),
           });
         }
       })

@@ -1474,6 +1474,7 @@ class CreateSprint extends Component {
       issueTypes = issueTypeData.filter(t => (t.stateMachineId === currentType.stateMachineId
         && t.typeCode !== typeCode && t.typeCode !== 'sub_task'
       ));
+      issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? issueTypes : issueTypes.filter(item => item.typeCode !== 'feature');
     }
     const getMenu = () => {
       const { createdById } = this.state;
@@ -1552,7 +1553,7 @@ class CreateSprint extends Component {
         onClick={this.handleChangeType.bind(this)}
       >
         {
-          issueTypes.filter(item => item.typeCode !== 'feature').map(t => (
+          issueTypes.map(t => (
             <Menu.Item key={t.typeCode} value={t.id}>
               <TypeTag
                 data={t}
