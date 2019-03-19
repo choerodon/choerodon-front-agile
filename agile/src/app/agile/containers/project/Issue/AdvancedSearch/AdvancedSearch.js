@@ -311,7 +311,7 @@ class AdvancedSearch extends Component {
                 } else {
                   return ({
                     key,
-                    label: _.find(users, item => item.id === key).realName,
+                    label: _.map(users, item => item.id === key) && _.find(users, item => item.id === key).realName,
                   });
                 }
               })}

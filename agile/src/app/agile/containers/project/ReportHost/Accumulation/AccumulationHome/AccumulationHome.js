@@ -20,7 +20,7 @@ import SwithChart from '../../Component/switchChart';
 
 const { AppState } = stores;
 const { RangePicker } = DatePicker;
-const Option = Select.Option;
+const {Option} = Select;
 let backUrl;
 
 @observer
@@ -487,9 +487,10 @@ class AccumulationHome extends Component {
         >
           <div className="c7n-accumulation-filter">
             <RangePicker
+              // value={[moment(AccumulationStore.getProjectInfo.creationDate), moment()]}
               value={[AccumulationStore.getStartDate && moment(AccumulationStore.getStartDate), AccumulationStore.getEndDate && moment(AccumulationStore.getEndDate)]}
               allowClear={false}
-              disabledDate={current => current && (current < AccumulationStore.getStartDate || current > AccumulationStore.getEndDate)}
+              disabledDate={(current) => current && (current < moment(AccumulationStore.getProjectInfo.creationDate).subtract(1, 'days').endOf('day')|| current > moment().endOf('day'))}
               onChange={(date, dateString) => {
                 AccumulationStore.setStartDate(moment(dateString[0]));
                 AccumulationStore.setEndDate(moment(dateString[1]));

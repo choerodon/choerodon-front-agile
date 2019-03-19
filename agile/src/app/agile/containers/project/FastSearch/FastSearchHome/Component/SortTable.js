@@ -171,7 +171,7 @@ class SortTable extends Component {
         rowClassName="table-row"
         columns={columns}
         dataSource={dataSource}
-        pagination={dataSource.length <= 10 ? false : pagination}
+        pagination={dataSource && dataSource.length <= 10 ? false : pagination}
         onChange={onChange}
         components={this.components}
         filterBarPlaceholder="过滤表"

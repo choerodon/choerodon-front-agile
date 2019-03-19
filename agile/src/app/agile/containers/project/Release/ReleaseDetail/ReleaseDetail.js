@@ -182,7 +182,7 @@ class ReleaseDetail extends Component {
             role="none"
             onClick={() => {
               const { history } = this.props;
-              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${encodeURIComponent(`${ReleaseStore.getVersionDetail.name}下的问题`)}&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
+              history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=fixVersion&paramId=${ReleaseStore.getVersionDetail.versionId}&paramName=${encodeURIComponent(`${ReleaseStore.getVersionDetail.name}下的问题`)}&paramUrl=release/detail/${ReleaseStore.getVersionDetail.versionId}`);
             }}
           >
             {'在“问题管理中”查看'}
