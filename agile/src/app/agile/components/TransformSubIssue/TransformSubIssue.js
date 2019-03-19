@@ -179,7 +179,7 @@ class TransformSubIssue extends Component {
                       key={issue.issueId}
                       value={issue.issueId}
                     >
-                      <div style={{ display: 'inline-flex', width: '100%', flex: 1 }}>
+                      <div style={{ display: 'inline-flex', width: 'calc(100% - 30px)', flex: 1 }}>
                         <div>
                           <TypeTag
                             data={issue.issueTypeDTO}
@@ -209,7 +209,8 @@ class TransformSubIssue extends Component {
                           </p>
                         </div>
                       </div>
-                    </Option>))}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
