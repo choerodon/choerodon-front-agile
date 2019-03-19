@@ -42,6 +42,7 @@ class CopyIssue extends Component {
         this.setState({
           loading: true,
         });
+        console.log(applyType);
         axios.post(`/agile/v1/projects/${projectId}/issues/${issueId}/clone_issue?organizationId=${orgId}&applyType=${applyType}`, copyConditionDTO)
           .then((res) => {
             this.setState({
@@ -64,7 +65,7 @@ class CopyIssue extends Component {
         className="c7n-copyIssue"
         title={`复制问题${issueNum}`}
         visible={visible || false}
-        onOk={this.handleCopyIssue}
+        onOk={this.handleCopyIssue.bind(this, 'agile')}
         onCancel={onCancel}
         okText="复制"
         cancelText="取消"

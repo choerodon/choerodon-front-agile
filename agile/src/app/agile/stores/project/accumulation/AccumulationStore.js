@@ -48,6 +48,8 @@ class AccumulationStore {
 
   @observable endDate = '';
 
+  @observable projectCreationDate = '';
+
   @observable accumulationData = {};
 
   @observable boardList = [];

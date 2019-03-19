@@ -142,40 +142,41 @@ class ComponentHome extends Component {
         dataIndex: 'issueCount',
         width: '10%',
         render: (issueCount, record) => (
-          <div
-            style={{
-              width: '100%',
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              cursor: 'pointer',
-              color: '#3f51b5',
-            }}
-            role="none"
-            onClick={() => {
-              this.props.history.push(
-                `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
-                  encodeURIComponent(urlParams.name)
-                }&organizationId=${urlParams.organizationId}&paramType=component&paramId=${
-                  record.componentId
-                }&paramName=模块"${record.name}"下的问题&paramUrl=component`,
-              );
-            }}
-          >
-            <span
+          issueCount ? (
+            <div
               style={{
-                display: 'inline-block',
+                width: '100%',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                textAlign: 'left',
+                display: 'flex',
+                alignItems: 'center',
+                cursor: 'pointer',
+                color: '#3f51b5',
+              }}
+              role="none"
+              onClick={() => {
+                this.props.history.push(
+                  `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
+                    encodeURIComponent(urlParams.name)
+                  }&organizationId=${urlParams.organizationId}&paramType=component&paramId=${
+                    record.componentId
+                  }&paramName=模块"${record.name}"下的问题&paramUrl=component`,
+                );
               }}
             >
-              {issueCount || 0}
-              {'issues'}
-            </span>
-            {/* <span>{issueCount}issues</span> */}
-          </div>
+              <span
+                style={{
+                  display: 'inline-block',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'left',
+                }}
+              >
+                {issueCount}
+                {'issues'}
+              </span>
+            </div>
+          ) : 0
         ),
       },
       {

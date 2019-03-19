@@ -14,6 +14,7 @@ import './EditIssueNarrow.scss';
 import {
   UploadButtonNow, ReadAndEdit, IssueDescription, DatetimeAgo,
 } from '../CommonComponent';
+import TextEditToggle from '../TextEditToggle';
 import {
   delta2Html, handleFileUpload, text2Delta, beforeTextUpload, formatDate, returnBeforeTextUpload,
 } from '../../common/utils';
@@ -54,6 +55,8 @@ const { AppState } = stores;
 const { Option, blur } = Select;
 const { TextArea } = Input;
 const { confirm } = Modal;
+const { Text, Edit } = TextEditToggle;
+
 let sign = true;
 let filterSign = false;
 const STATUS_SHOW = {
@@ -649,7 +652,7 @@ class CreateSprint extends Component {
       });
   };
 
-  updateIssue = (pro) => {
+  updateIssue = (pro, value) => {
     const { state } = this;
     const {
       origin,
@@ -668,8 +671,17 @@ class CreateSprint extends Component {
             this.reloadIssue(state.origin.issueId);
           });
       }
-    } else if (pro === 'assigneeId' || pro === 'reporterId') {
+    } else if (pro === 'assigneeId') {
       obj[pro] = state[pro] ? JSON.parse(state[pro]).id || 0 : 0;
+      updateIssue(obj)
+        .then((res) => {
+          this.reloadIssue();
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
+    } else if (pro === 'reporterId') {
+      obj[pro] = value || 0;
       updateIssue(obj)
         .then((res) => {
           this.reloadIssue();
@@ -1565,6 +1577,22 @@ class CreateSprint extends Component {
       </Menu>
     );
     const urlParams = AppState.currentMenuType;
+    const targetUser = _.find(originUsers, { id: reporterId });
+    let reportShowUser = reporterId || '无';
+    // 当存在用户且列表没找到
+    if (reporterId && !targetUser) {
+      reportShowUser = (
+        <UserHead
+          user={{
+            id: reporterId,
+            loginName: '',
+            realName: reporterName,
+            avatar: reporterImageUrl,
+          }}
+        />
+      );
+    }
+
     return (
       <div className="choerodon-modal-editIssue" style={style}>
         {
@@ -2746,106 +2774,76 @@ class CreateSprint extends Component {
                           <span className="c7n-property">报告人：</span>
                         </div>
                         <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                          <ReadAndEdit
-                            style={{ marginBottom: 5 }}
-                            callback={this.changeRae.bind(this)}
-                            thisType="reporterId"
-                            current={currentRae}
-                            origin={reporterId}
-                            onOk={this.updateIssue.bind(this, 'reporterId')}
-                            onCancel={this.resetReporterId.bind(this)}
-                            onInit={() => {
-                              this.setAnIssueToState(origin);
-                              if (reporterId) {
-                                this.setState({
-                                  flag: 'loading',
-                                });
-                                getUser(reporterId).then((res) => {
-                                  this.setState({
-                                    reporterId: JSON.stringify(res.content[0]),
-                                    originUsers: res.content.length ? [res.content[0]] : [],
-                                    flag: 'finish',
-                                  });
-                                });
-                              } else {
-                                this.setState({
-                                  reporterId: undefined,
-                                  originUsers: [],
-                                });
-                              }
-                            }}
-                            readModeContent={(
-                              <div>
+                          <TextEditToggle
+                            disabled={reporterId !== loginUserId && !hasPermission}
+                            formKey="reporterId"
+                            onSubmit={(value) => { this.updateIssue('reporterId', value); }}
+                            originData={reportShowUser}
+                          >
+                            <Text>
                                 {
-                                  reporterId && reporterName ? (
-                                    <UserHead
-                                      user={{
-                                        id: reporterId,
-                                        loginName: '',
-                                        realName: reporterName,
-                                        avatar: reporterImageUrl,
-                                      }}
-                                    />
-                                  ) : '无'
-                                }
-                              </div>
-                            )}
-                          >
-                            <Select
-                              value={flag === 'loading' ? undefined : reporterId || undefined}
-                              style={{ width: 150 }}
-                              loading={selectLoading}
-                              // onBlur={() => this.statusOnChange()}
-                              allowClear
-                              filter
-                              onFilterChange={this.onFilterChange.bind(this)}
-                              getPopupContainer={triggerNode => triggerNode.parentNode}
-                              onChange={(value) => {
-                                this.setState({ reporterId: value });
-                              }}
-                            >
-                              {originUsers.filter(u => u.enabled).map(user => (
-                                <Option key={JSON.stringify(user)} value={JSON.stringify(user)}>
-                                  <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                                    <UserHead
-                                      user={{
-                                        id: user && user.id,
-                                        loginName: user && user.loginName,
-                                        realName: user && user.realName,
-                                        avatar: user && user.imageUrl,
-                                      }}
-                                    />
+                                  <div>
+                                    {
+                                        reporterId && reporterName ? (
+                                          <UserHead
+                                            user={{
+                                              id: reporterId,
+                                              loginName: '',
+                                              realName: reporterName,
+                                              avatar: reporterImageUrl,
+                                            }}
+                                          />
+                                        ) : '无'
+                                      }
                                   </div>
-                                </Option>
-                              ))}
-                            </Select>
-                          </ReadAndEdit>
-                          <span
-                            role="none"
-                            style={{
-                              color: '#3f51b5',
-                              cursor: 'pointer',
-                              marginTop: '-5px',
-                              display: 'inline-block',
-                              marginBottom: 5,
-                            }}
-                            onClick={() => {
-                              getSelf().then((res) => {
-                                if (res.id !== reporterId) {
-                                  this.setState({
-                                    currentRae: undefined,
-                                    reporterId: JSON.stringify(res),
-                                    reporterName: `${res.loginName}${res.realName}`,
-                                    reporterImageUrl: res.imageUrl,
-                                  }, () => {
-                                    this.updateIssue('reporterId');
+                                  }
+                              </Text>
+                            <Edit>
+                                <Select
+                                  style={{ width: 150 }}
+                                  loading={selectLoading}
+                                  allowClear
+                                  filter
+                                  onFilterChange={this.onFilterChange.bind(this)}
+                                  getPopupContainer={triggerNode => triggerNode.parentNode}
+                                >
+                                  {originUsers.filter(u => u.enabled).map(user => (
+                                    <Option key={user.id} value={user.id}>
+                                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                                        <UserHead
+                                            user={{
+                                              id: user && user.id,
+                                              loginName: user && user.loginName,
+                                              realName: user && user.realName,
+                                              avatar: user && user.imageUrl,
+                                            }}
+                                          />
+                                      </div>
+                                    </Option>
+                                  ))}
+                                </Select>
+                              </Edit>
+                          </TextEditToggle>
+                          {reporterId === loginUserId || hasPermission ? (
+                            <span
+                                role="none"
+                                style={{
+                                  color: '#3f51b5',
+                                  cursor: 'pointer',
+                                  display: 'inline-block',
+                                  marginBottom: 5,
+                                }}
+                                onClick={() => {
+                                  getSelf().then((res) => {
+                                    if (res.id !== reporterId) {
+                                      this.updateIssue('reporterId', res.id);
+                                    }
                                   });
-                                }
-                              });
-                            }}
-                          >
-                            {'分配给我'}
-                          </span>
+                                }}
+                              >
+                                {'分配给我'}
+                              </span>
+                          ) : null}
                         </div>
                       </div>
                       <div className="line-start mt-10 assignee">

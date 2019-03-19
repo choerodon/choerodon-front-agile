@@ -8,7 +8,7 @@ import { createComponent } from '../../../../api/ComponentApi';
 import { loadComponents, deleteComponent } from '../../../../api/ComponentApi';
 import './component.scss';
 
-const confirm = Modal.confirm;
+const { confirm } = Modal;
 const RadioGroup = Radio.Group;
 const { Option } = Select;
 const { AppState } = stores;
@@ -145,31 +145,36 @@ class DeleteComponent extends Component {
             type="error"
           />
           <div style={{ marginLeft: 20, width: 400, 'line-height': '26px' }}>
-
-            如果有问题与该模块相关联，一旦删除，所有相关的问题可以选择关联到其他模块，或不关联模块。
-</div>
+            {'如果有问题与该模块相关联，一旦删除，所有相关的问题可以选择关联到其他模块，或不关联模块。'}
+          </div>
         </div>
         <ul style={{ margin: '20px 0 20px 20px', paddingLeft: '20px' }}>
           <li>
-            <span
-              style={{ color: '#303f9f', cursor: 'pointer' }}
-              role="none"
-              onClick={() => {
-                this.props.history.push(
-                  `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
-                    encodeURIComponent(urlParams.name)
-                  }&organizationId=${urlParams.organizationId}&paramType=component&paramId=${
-                    this.state.component.componentId
-                  }&paramName=${this.state.component.name}&paramUrl=component`,
-                );
-              }}
-            >
-
-              相关的问题（
-{this.state.component.issueCount || 0}
-
-）
-</span>
+            {
+              this.state.component.issueCount ? (
+                <span
+                  style={{ color: '#303f9f', cursor: 'pointer' }}
+                  role="none"
+                  onClick={() => {
+                    this.props.history.push(
+                      `/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${
+                        encodeURIComponent(urlParams.name)
+                      }&organizationId=${urlParams.organizationId}&paramType=component&paramId=${
+                        this.state.component.componentId
+                      }&paramName=${this.state.component.name}&paramUrl=component`,
+                    );
+                  }}
+                >
+                  {'相关的问题（'}
+                  {this.state.component.issueCount || 0}
+                  {'）'}
+                </span>
+              ) : (
+                <span>
+                  {'相关的问题（0）'}
+                </span>
+              )
+            }
           </li>
         </ul>
         {this.state.component.issueCount ? <div>{this.renderDelete()}</div> : null}
