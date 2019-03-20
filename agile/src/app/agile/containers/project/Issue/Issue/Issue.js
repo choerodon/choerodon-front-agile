@@ -174,7 +174,7 @@ class Issue extends Component {
             <SaveFilterModal />
             <FilterManage />
           </div>
-          <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', flex: 1 }}>
             
             <ExpandCssControler />
             
@@ -184,6 +184,8 @@ class Issue extends Component {
                 display: 'block',
                 position: 'relative',
                 padding: '0px 18px',
+                height: '100%',
+                overflowY: 'auto',
               }}
             >
               
