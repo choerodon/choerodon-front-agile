@@ -129,6 +129,7 @@ class QuickCreateIssue extends Component {
           display: 'flex',
           alignItems: 'center',
           borderBottom: '1px solid #e8e8e8',
+          borderTop: '1px solid #e8e8e8',
         }}
       >
         {checkCreateIssue ? (

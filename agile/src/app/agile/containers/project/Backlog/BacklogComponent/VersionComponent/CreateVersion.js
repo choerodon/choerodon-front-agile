@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Modal, Form, Input, DatePicker, Icon, 
+  Modal, Form, Input, DatePicker, Icon,
 } from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
 import moment from 'moment';
@@ -24,7 +24,7 @@ class CreateVersion extends Component {
     };
   }
 
-  
+
 /**
  *验证版本名称是否重复
  *
@@ -35,9 +35,8 @@ checkVersionNameRepeat = (rule, value, callback) => {
     .then((res) => {
       if (res) {
         callback('版本名称重复');
-      } else {
-        callback();
       }
+      callback();
     });
 };
 
@@ -49,10 +48,10 @@ checkVersionNameRepeat = (rule, value, callback) => {
    */
 handleCreateVersion(e) {
   e.preventDefault();
-  const { form } = this.props;
+  const { form, onCancel, store } = this.props;
   form.validateFieldsAndScroll((err, value) => {
     if (!err) {
-      const data = {
+      const req = {
         description: value.description,
         name: value.name,
         projectId: AppState.currentMenuType.id,
@@ -62,21 +61,17 @@ handleCreateVersion(e) {
       this.setState({
         loading: true,
       });
-      ReleaseStore.axiosAddRelease(data).then((res) => {
+      ReleaseStore.axiosAddRelease(req).then((res) => {
         this.setState({
           loading: false,
         });
         if (res.failed) {
           Choerodon.prompt(res.message);
         } else {
-          this.props.form.resetFields();
-          this.props.onCancel();
-          this.props.store.axiosGetVersion().then((data2) => {
-            const newVersion = [...data2];
-            for (let index = 0, len = newVersion.length; index < len; index += 1) {
-              newVersion[index].expand = false;
-            }
-            this.props.store.setVersionData(newVersion);
+          form.resetFields();
+          onCancel();
+          store.axiosGetVersion().then((data) => {
+            store.setVersionData(data);
           }).catch((error) => {
           });
         }
@@ -84,26 +79,27 @@ handleCreateVersion(e) {
         this.setState({
           loading: false,
         });
-        this.props.onCancel();
+        onCancel();
       });
     }
   });
 }
- 
+
 
 render() {
-  const { getFieldDecorator } = this.props.form;
+  const { form: { getFieldDecorator, resetFields }, onCancel, visible } = this.props;
+  const { loading, expectReleaseDate, startDate } = this.state;
   return (
     <Sidebar
       title="创建版本"
-      visible={this.props.visible}
+      visible={visible}
       okText="创建"
       cancelText="取消"
       onCancel={() => {
-        this.props.form.resetFields();
-        this.props.onCancel();
+        resetFields();
+        onCancel();
       }}
-      confirmLoading={this.state.loading}
+      confirmLoading={loading}
       onOk={this.handleCreateVersion.bind(this)}
     >
       <Content
@@ -135,14 +131,14 @@ render() {
           <FormItem>
             {getFieldDecorator('startDate', {})(
               <DatePicker
-                style={{ width: '100%' }} 
+                style={{ width: '100%' }}
                 label="开始日期"
                 onChange={(date) => {
                   this.setState({
                     startDate: date,
                   });
                 }}
-                disabledDate={this.state.expectReleaseDate ? current => current > moment(this.state.expectReleaseDate) : ''}
+                disabledDate={expectReleaseDate ? current => current > moment(expectReleaseDate) : ''}
               />,
             )}
           </FormItem>
@@ -156,7 +152,7 @@ render() {
                     expectReleaseDate: date,
                   });
                 }}
-                disabledDate={this.state.startDate ? current => current < moment(this.state.startDate) : ''}
+                disabledDate={startDate ? current => current < moment(startDate) : ''}
               />,
             )}
           </FormItem>

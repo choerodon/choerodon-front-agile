@@ -36,7 +36,8 @@ class IssueDetail extends Component {
 
   render() {
     // const { paramOpenIssueId } = this.state;
-    const { visible, cancelCallback, refresh } = this.props;
+    const { cancelCallback, refresh } = this.props;
+    const visible = Object.keys(BacklogStore.getClickIssueDetail).length > 0;
     return (
       <div
         className={visible ? 'c7n-issueDetail-container' : ''}

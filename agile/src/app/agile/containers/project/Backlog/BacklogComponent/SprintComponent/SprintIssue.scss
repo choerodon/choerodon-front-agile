@@ -1,0 +1,87 @@
+.IssueCard-selected {
+  background: #3f51b5 !important;
+}
+
+//@media (min-width: 500px) {
+//  .c7n-backlog-IssueCard {
+//    display: flex;
+//    flex-wrap: wrap;
+//  }
+//}
+
+.c7n-backlog-IssueCard {
+  display: flex;
+  justify-content: space-between;
+  &-left {
+    display: flex;
+    flex-grow: 2;
+    overflow: hidden;
+    &-summaryContainer {
+      margin-left: 8px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      height: 20px;
+      word-break: break-all;
+    }
+    &-issueNum {
+      margin-right: 4px;
+    }
+  }
+  .line-two-left {
+    display: flex;
+  }
+  .line-two-right {
+    display: flex;
+  }
+  &-right {
+    display: flex;
+    justify-content: flex-end;
+    flex-grow: 1;
+    min-width: 360px;
+    .container {
+      border-radius: 2px;
+      color: #0000005c;
+      height: 20px;
+      display: block;
+      padding: 0 3px;
+      max-width: 50px;
+      margin: 0 6px;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    &-version {
+      border: 1px solid #0000005c;
+    }
+    &-epic {
+      border: 1px solid #f953ba;
+      margin-right: 12px;
+    }
+    &-status {
+      margin-left: 12px;
+      margin-right: 8px;
+    }
+    &-storyPoint {
+      // 以后要用到的话，可以把这边直接提取出来
+      visibility: hidden;
+      padding: 0 2px;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 100px;
+      background: #00000014;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #000000a6;
+      margin-left: 12px;
+    }
+    .story-container {
+      // 提取到这边
+    }
+    .visible {
+      visibility: visible !important;
+    }
+  }
+}
