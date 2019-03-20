@@ -879,9 +879,12 @@ class CreateSprint extends Component {
     this.refresh();
   }
 
-  resetPriorityId(value) {
-    this.setState({ priorityId: value });
-    this.refresh();
+  resetPriorityId(priority) {
+    this.setState({
+      priorityId: priority.id,
+      priorityColor: priority.colour,
+      priorityName: priority.name,
+    });
   }
 
   resetStatusId(value) {
@@ -905,13 +908,16 @@ class CreateSprint extends Component {
   }
 
   resetInfluenceVersions(value) {
-    this.setState({ influenceVersions: value });
-    this.refresh();
+    const { versionIssueRelDTOList } = this.state;
+    const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
+    this.setState({ influenceVersions });
   }
 
   resetFixVersions(value) {
-    this.setState({ fixVersions: value });
-    this.refresh();
+    const { versionIssueRelDTOList } = this.state;
+    const fixVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
+    const fixVersions = _.filter(fixVersionsTotal, v => v.statusCode !== 'archived') || [];
+    this.setState({ fixVersions });
   }
 
   resetlabelIssueRelDTOList(value) {
@@ -2111,7 +2117,7 @@ class CreateSprint extends Component {
                           callback={this.changeRae.bind(this)}
                           thisType="priorityId"
                           current={currentRae}
-                          origin={priorityId}
+                          origin={origin.priorityDTO}
                           onOk={this.updateIssue.bind(this, 'priorityId')}
                           onCancel={this.resetPriorityId.bind(this)}
                           onInit={() => {
@@ -2539,7 +2545,7 @@ class CreateSprint extends Component {
                                 callback={this.changeRae.bind(this)}
                                 thisType="componentIssueRelDTOList"
                                 current={currentRae}
-                                origin={componentIssueRelDTOList}
+                                origin={origin.componentIssueRelDTOList}
                                 onInit={() => this.setAnIssueToState(origin)}
                                 onOk={this.updateIssueSelect.bind(
                                   this,
@@ -2618,7 +2624,7 @@ class CreateSprint extends Component {
                               callback={this.changeRae.bind(this)}
                               thisType="labelIssueRelDTOList"
                               current={currentRae}
-                              origin={labelIssueRelDTOList}
+                              origin={origin.labelIssueRelDTOList}
                               onInit={() => this.setAnIssueToState(origin)}
                               onOk={this.updateIssueSelect.bind(
                                 this,
@@ -2884,7 +2890,7 @@ class CreateSprint extends Component {
                                 callback={this.changeRae.bind(this)}
                                 thisType="epicId"
                                 current={currentRae}
-                                origin={epicId}
+                                origin={origin.epicId}
                                 onOk={this.updateIssue.bind(this, 'epicId')}
                                 onCancel={this.resetEpicId.bind(this)}
                                 onInit={() => {
@@ -2927,7 +2933,6 @@ class CreateSprint extends Component {
                                   }
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '200px' }}
-                                  // onBlur={e => this.statusOnChange(e)}
                                   ref={(e) => {
                                     this.componentRef = e;
                                   }}
@@ -3061,7 +3066,6 @@ class CreateSprint extends Component {
                           </div>
                         ) : null}
                       </div>
-                      {/* --- */}
                       <div style={{ flex: 1 }}>
                         <div className="line-start mt-10">
                           <div className="c7n-property-wrapper">
@@ -3086,19 +3090,19 @@ class CreateSprint extends Component {
                                 {
                                   <div>
                                     {
-                                        reporterId && reporterName ? (
-                                          <UserHead
-                                            user={{
-                                              id: reporterId,
-                                              loginName: '',
-                                              realName: reporterName,
-                                              avatar: reporterImageUrl,
-                                            }}
-                                          />
-                                        ) : '无'
-                                      }
+                                      reporterId && reporterName ? (
+                                        <UserHead
+                                          user={{
+                                            id: reporterId,
+                                            loginName: '',
+                                            realName: reporterName,
+                                            avatar: reporterImageUrl,
+                                          }}
+                                        />
+                                      ) : '无'
+                                    }
                                   </div>
-                                  }
+                                }
                               </Text>
                               <Edit>
                                 <Select
@@ -3113,13 +3117,13 @@ class CreateSprint extends Component {
                                     <Option key={user.id} value={user.id}>
                                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
                                         <UserHead
-                                            user={{
-                                              id: user && user.id,
-                                              loginName: user && user.loginName,
-                                              realName: user && user.realName,
-                                              avatar: user && user.imageUrl,
-                                            }}
-                                          />
+                                          user={{
+                                            id: user && user.id,
+                                            loginName: user && user.loginName,
+                                            realName: user && user.realName,
+                                            avatar: user && user.imageUrl,
+                                          }}
+                                        />
                                       </div>
                                     </Option>
                                   ))}
@@ -3162,7 +3166,7 @@ class CreateSprint extends Component {
                               callback={this.changeRae.bind(this)}
                               thisType="assigneeId"
                               current={currentRae}
-                              origin={assigneeId}
+                              origin={origin.assigneeId}
                               onOk={this.updateIssue.bind(this, 'assigneeId')}
                               onCancel={this.resetAssigneeId.bind(this)}
                               onInit={() => {

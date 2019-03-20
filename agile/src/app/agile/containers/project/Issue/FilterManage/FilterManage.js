@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Form, Input, Icon, Tooltip,
+  Form, Input, Icon, Tooltip, Modal,
 } from 'choerodon-ui';
 import { stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
@@ -11,6 +11,8 @@ import './FilterManage.scss';
 
 const { AppState } = stores;
 const FormItem = Form.Item;
+const { confirm } = Modal;
+
 @observer
 class FilterManage extends Component {
     checkMyFilterNameRepeatUpdating = (rule, value, callback) => {
@@ -57,17 +59,58 @@ class FilterManage extends Component {
           IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
         }
       });
-    }
+    };
 
+    handleDelete = (filter) => {
+      const that = this;
+      confirm({
+        title: '删除筛选',
+        content: (
+          <div>
+            <p style={{ marginBottom: 10 }}>
+              {'确认要删除筛选 '}
+              {filter.name}
+              {' ？'}
+            </p>
+          </div>
+        ),
+        onOk() {
+          that.deleteFilter(filter);
+        },
+        onCancel() {},
+        okText: '删除',
+        okType: 'danger',
+      });
+    };
+
+    deleteFilter = (filter) => {
+      const selectedFilterId = IssueStore.getSelectedFilterId;
+      const filterControler = new IssueFilterControler();
+      IssueStore.setLoading(true);
+      axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/${filter.filterId}`)
+        .then((res) => {
+          IssueStore.axiosGetMyFilterList().then(() => {
+            if (IssueStore.getMyFilters.length === 0) {
+              IssueStore.setFilterListVisible(false);
+            }
+          });
+          if (filter.filterId === selectedFilterId) {
+            IssueStore.setSelectedFilterId(undefined);
+            IssueStore.resetFilterSelect(filterControler);
+          }
+          Choerodon.prompt('删除成功');
+        }).catch(() => {
+          IssueStore.setLoading(false);
+          Choerodon.prompt('删除失败');
+        });
+    };
       
     render() {
       const filterListVisible = IssueStore.getFilterListVisible;
       const editFilterInfo = IssueStore.getEditFilterInfo;
       const myFilters = IssueStore.getMyFilters;
-      const selectedFilterId = IssueStore.getSelectedFilterId;
       const { form } = this.props;
       const { getFieldDecorator } = form;
-      const filterControler = new IssueFilterControler();
       return (
         <div 
           className="c7n-filterList"
@@ -139,25 +182,7 @@ class FilterManage extends Component {
                         <Tooltip title="删除筛选">
                           <Icon 
                             type="delete_forever" 
-                            onClick={() => {
-                              IssueStore.setLoading(true);
-                              axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter/${filter.filterId}`)
-                                .then((res) => {
-                                  IssueStore.axiosGetMyFilterList().then(() => {
-                                    if (IssueStore.getMyFilters.length === 0) {
-                                      IssueStore.setFilterListVisible(false);
-                                    }
-                                  });
-                                  if (filter.filterId === selectedFilterId) {
-                                    IssueStore.setSelectedFilterId(undefined);
-                                    IssueStore.resetFilterSelect(filterControler);
-                                  }
-                                  Choerodon.prompt('删除成功');
-                                }).catch(() => {
-                                  IssueStore.setLoading(false);
-                                  Choerodon.prompt('删除失败');
-                                });
-                            }}
+                            onClick={() => this.handleDelete(filter)}
                           />
                         </Tooltip>
                       </span>
