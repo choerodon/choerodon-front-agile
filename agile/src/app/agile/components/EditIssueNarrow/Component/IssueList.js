@@ -98,7 +98,7 @@ class IssueList extends Component {
               }}
               role="none"
               onClick={() => {
-                this.props.onOpen(issue);
+                this.props.onOpen(issue.issueId);
               }}
             >
               {`${issue.issueNum} ${issue.summary}`}
@@ -134,7 +134,7 @@ class IssueList extends Component {
           width: '48px', marginRight: '15px', display: 'flex', justifyContent: 'flex-end', 
         }}
         >
-          <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusMapDTO.name}`}>
+          <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusMapDTO && issue.statusMapDTO.name}`}>
             <div>
               <StatusTag
                 data={issue.statusMapDTO}

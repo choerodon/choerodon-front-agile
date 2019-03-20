@@ -49,13 +49,14 @@ class SprintReport extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { location: { search } } = this.props;
     const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
     this.setState({
       linkFromParamUrl,
     });
     this.getDefaultSprintId();
+    console.log(this.state.defaultSprint);
     this.getSprintData();
     ReportStore.init();
   }
@@ -64,7 +65,7 @@ class SprintReport extends Component {
     const { location: { search } } = this.props;
     if (search.lastIndexOf('sprintId') !== -1) {
       const arr = search.split('&');
-      const sprintId = arr[arr.length - 2].split('=')[1];
+      const sprintId = arr.find(item => item.split('=')[0] === 'sprintId').split('=')[1];
       this.setState({
         defaultSprint: _.parseInt(sprintId),
       });

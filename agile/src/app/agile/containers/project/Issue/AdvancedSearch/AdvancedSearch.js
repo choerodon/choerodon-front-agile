@@ -30,6 +30,20 @@ class AdvancedSearch extends Component {
         if (otherArgs.assigneeId && otherArgs.assigneeId.includes(0)) {
           otherArgs.assigneeId = otherArgs.assigneeId.map(item => (item === 0 ? '0' : item));
         }
+
+        // 从统计图链接过来如果未分配，传入的0应该改为"0"
+        ['component', 'epic', 'version', 'label', 'sprint'].forEach((key, index) => {
+          if (otherArgs[key] && otherArgs[key].includes(0)) {
+            otherArgs[key] = otherArgs[key].map((value) => {
+              if (value === 0) {
+                return '0';
+              } else {
+                return value;
+              }
+            }); 
+          }
+        });
+
         IssueStore.setSelectedMyFilterInfo(searchFilterInfo);
         IssueStore.setSelectedIssueType(advancedSearchArgs.issueTypeId || []);
         IssueStore.setSelectedStatus(advancedSearchArgs.statusId || []);
@@ -115,8 +129,8 @@ class AdvancedSearch extends Component {
         IssueStore.setCreateEndDate(createEndDate);
       } else {
         const projectInfo = IssueStore.getProjectInfo;
-        IssueStore.setCreateStartDate(`${moment(projectInfo.creationDate).format('YYYY-MM-DD')} 00:00:00`);
-        IssueStore.setCreateEndDate(`${moment().format('YYYY-MM-DD')} 23:59:59`);
+        IssueStore.setCreateStartDate('');
+        IssueStore.setCreateEndDate('');
       }
       IssueStore.setSaveFilterVisible(false);
       this.filterControler = new IssueFilterControler();
@@ -325,14 +339,11 @@ class AdvancedSearch extends Component {
             </Select>
             
             {
-              moment(createStartDate).format('YYYY-MM-DD') === moment(projectInfo.creationDate).format('YYYY-MM-DD') && moment(createEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') ? (
+              (moment(createStartDate).format('YYYY-MM-DD') === moment(projectInfo.creationDate).format('YYYY-MM-DD') || createStartDate === '') && (moment(createEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') || createEndDate === '') ? (
                 <div className="c7n-createRange">
                   <RangePicker
-                  // value={[moment(createStartDate), moment(createEndDate)]}
                     format="YYYY-MM-DD hh:mm:ss"
                     disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
-                    // allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
-                // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
                     allowClear
                     onChange={this.handleCreateDateRangeChange}
                     placeholder={['创建时间', '']}
@@ -346,8 +357,6 @@ class AdvancedSearch extends Component {
                       format="YYYY-MM-DD hh:mm:ss"
                       disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
                       allowClear
-                      // allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
-                // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
                       onChange={this.handleCreateDateRangeChange}
                       placeholder={['创建时间', '']}
                     />

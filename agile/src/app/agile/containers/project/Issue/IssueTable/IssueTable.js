@@ -186,7 +186,7 @@ class IssueTable extends Component {
           fieldFilteredValue = ['未分配'];
         } else {
           const FieldColumnFilter = IssueStore.getColumnFilter.get(field);
-          const otherFieldFilteredValue = _.map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value').concat(fieldValue.find(value => value === '0') ? ['未分配'] : []);
+          const otherFieldFilteredValue = FieldColumnFilter && _.map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value').concat(fieldValue.find(value => value === '0') ? ['未分配'] : []);
           fieldFilteredValue = !searchArgsField ? otherFieldFilteredValue : [...otherFieldFilteredValue, searchArgsField];
         }
       } else {
@@ -212,7 +212,6 @@ class IssueTable extends Component {
 
   render() {
     // Table 列配置
-    // const assigneeFilterValue = this.getFieldFilteredValue('assigneeId');
     const issueNumFieldValue = this.getFieldFilteredValue('issueNum');
     const summaryFilterValue = this.getFieldFilteredValue('summary');
     const reporterFilterValue = this.getFieldFilteredValue('reporter');

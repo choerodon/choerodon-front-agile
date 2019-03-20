@@ -137,8 +137,8 @@ class SprintCommonStore {
         priorityId: [],
       },
       searchArgs: {
-        createStartDate: moment().format('YYYY-MM-DD hh:mm:ss'),
-        createEndDate: moment().format('YYYY-MM-DD hh:mm:ss'),
+        createStartDate: '',
+        createEndDate: '',
         summary: '',
         issueNum: '',
         reporter: '',
@@ -292,7 +292,7 @@ class SprintCommonStore {
   @observable projectInfo = {};
 
   @computed get getProjectInfo() {
-    return this.projectInfo;
+    return toJS(this.projectInfo);
   }
 
   @action setProjectInfo(data) {
@@ -359,7 +359,7 @@ class SprintCommonStore {
     this.selectedAssignee = data;
   }
 
-  @observable createStartDate = `${moment().format('YYYY-MM-DD')} 00:00:00`;
+  @observable createStartDate = '';
 
   @computed get getCreateStartDate() {
     return this.createStartDate;
@@ -369,7 +369,7 @@ class SprintCommonStore {
     this.createStartDate = data;
   }
 
-  @observable createEndDate = `${moment().format('YYYY-MM-DD')} 23:59:59`;
+  @observable createEndDate = '';
 
   @computed get getCreateEndDate() {
     return this.createEndDate;
@@ -667,8 +667,8 @@ class SprintCommonStore {
     this.setSelectedStatus([]);
     this.setSelectedPriority([]);
     this.setSelectedAssignee([]);
-    this.setCreateStartDate(`${moment(projectInfo.creationDate).format('YYYY-MM-DD')} 00:00:00`);
-    this.setCreateEndDate(`${moment().format('YYYY-MM-DD')} 23:59:59`);
+    this.setCreateStartDate('');
+    this.setCreateEndDate('');
     this.setUpdateFilterName('');
     this.setBarFilter([]);
     this.setIsExistFilter(true);
@@ -692,7 +692,7 @@ class SprintCommonStore {
     });
     filterControler.assigneeFilterUpdate([]);
     filterControler.advancedSearchArgsFilterUpdate([], [], []);
-    filterControler.searchArgsFilterUpdate(moment(projectInfo.creationDate).format('YYYY-MM-DD hh:mm:ss'), moment().format('YYYY-MM-DD hh:mm:ss'));
+    filterControler.searchArgsFilterUpdate('', '');
     this.updateIssues(filterControler, []);
   }
 

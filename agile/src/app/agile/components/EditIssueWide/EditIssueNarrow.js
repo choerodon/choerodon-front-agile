@@ -230,12 +230,28 @@ class CreateSprint extends Component {
     };
   }
 
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
+  }
+
   componentDidMount() {
     const { onRef, issueId } = this.props;
+    const { location: { search } } = this.props;
+    const theRequest = this.GetRequest(search);
+    const { paramIssueId, paramOpenIssueId } = theRequest;
+
     if (onRef) {
       onRef(this);
     }
-    this.firstLoadIssue(issueId);
+    this.firstLoadIssue(issueId || paramOpenIssueId);
     document.getElementById('scroll-area').addEventListener('scroll', (e) => {
       if (sign) {
         const { nav } = this.state;
@@ -1274,7 +1290,7 @@ class CreateSprint extends Component {
         i={i}
         showAssignee
         onOpen={(issueId, linkedIssueId) => {
-          this.reloadIssue(issue.issueId);
+          this.reloadIssue(issueId);
         }}
         onRefresh={() => {
           this.reloadIssue(origin.issueId);
@@ -3067,9 +3083,9 @@ class CreateSprint extends Component {
                               originData={reportShowUser}
                             >
                               <Text>
-                                  {
-                                    <div>
-                                      {
+                                {
+                                  <div>
+                                    {
                                         reporterId && reporterName ? (
                                           <UserHead
                                             user={{
@@ -3081,22 +3097,22 @@ class CreateSprint extends Component {
                                           />
                                         ) : '无'
                                       }
-                                    </div>
+                                  </div>
                                   }
-                                </Text>
+                              </Text>
                               <Edit>
-                                  <Select
-                                    style={{ width: 150 }}
-                                    loading={selectLoading}
-                                    allowClear
-                                    filter
-                                    onFilterChange={this.onFilterChange.bind(this)}
-                                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                                  >
-                                    {originUsers.filter(u => u.enabled).map(user => (
-                                      <Option key={user.id} value={user.id}>
-                                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                                          <UserHead
+                                <Select
+                                  style={{ width: 150 }}
+                                  loading={selectLoading}
+                                  allowClear
+                                  filter
+                                  onFilterChange={this.onFilterChange.bind(this)}
+                                  getPopupContainer={triggerNode => triggerNode.parentNode}
+                                >
+                                  {originUsers.filter(u => u.enabled).map(user => (
+                                    <Option key={user.id} value={user.id}>
+                                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                                        <UserHead
                                             user={{
                                               id: user && user.id,
                                               loginName: user && user.loginName,
@@ -3104,31 +3120,31 @@ class CreateSprint extends Component {
                                               avatar: user && user.imageUrl,
                                             }}
                                           />
-                                        </div>
-                                      </Option>
-                                    ))}
-                                  </Select>
-                                </Edit>
+                                      </div>
+                                    </Option>
+                                  ))}
+                                </Select>
+                              </Edit>
                             </TextEditToggle>
                             {reporterId === loginUserId || hasPermission ? (
                               <span
-                                  role="none"
-                                  style={{
-                                    color: '#3f51b5',
-                                    cursor: 'pointer',
-                                    display: 'inline-block',
-                                    marginBottom: 5,
-                                  }}
-                                  onClick={() => {
-                                    getSelf().then((res) => {
-                                      if (res.id !== reporterId) {
-                                        this.updateIssue('reporterId', res.id);
-                                      }
-                                    });
-                                  }}
-                                >
-                                  {'分配给我'}
-                                </span>
+                                role="none"
+                                style={{
+                                  color: '#3f51b5',
+                                  cursor: 'pointer',
+                                  display: 'inline-block',
+                                  marginBottom: 5,
+                                }}
+                                onClick={() => {
+                                  getSelf().then((res) => {
+                                    if (res.id !== reporterId) {
+                                      this.updateIssue('reporterId', res.id);
+                                    }
+                                  });
+                                }}
+                              >
+                                {'分配给我'}
+                              </span>
                             ) : null}
                           </div>
                         

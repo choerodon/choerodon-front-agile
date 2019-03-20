@@ -582,7 +582,7 @@ class VersionBurndown extends Component {
                 onClick={() => {
                   const { history } = this.props;
                   const urlParams = AppState.currentMenuType;
-                  history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramUrl=reporthost/epicBurndown`);
+                  history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramUrl=reporthost/VersionBurndown`);
                 }}
               >
                 {'待办事项'}
@@ -671,9 +671,9 @@ class VersionBurndown extends Component {
                               const { history } = this.props;
                               const urlParams = AppState.currentMenuType;
                               if (item.statusCode === 'started') {
-                                history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+                                history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramUrl=reporthost/VersionBurndown`);
                               } else {
-                                history.push(`/agile/reporthost/sprintReport?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&sprintId=${item.sprintId}`);
+                                history.push(`/agile/reporthost/sprintReport?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&sprintId=${item.sprintId}&paramUrl=reporthost/VersionBurndown`);
                               }
                             }
                           }
@@ -965,7 +965,7 @@ class VersionBurndown extends Component {
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-                        history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+                        history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramUrl=reporthost/VersionBurndown`);
                       }}
                     >
                       {'待办事项'}
@@ -975,7 +975,7 @@ class VersionBurndown extends Component {
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramUrl=reporthost/VersionBurndown`);
                       }}
                     >
                       {'问题管理'}
