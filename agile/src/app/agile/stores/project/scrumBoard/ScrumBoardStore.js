@@ -432,7 +432,7 @@ class ScrumBoardStore {
   @action resetDataBeforeUnmount() {
     this.spinIf = true;
     this.clickIssueDetail = {};
-    this.swimLaneData = {};
+    this.swimLaneData = null;
     this.headerData = new Map();
     this.clickedIssue = false;
     // this.swimlaneBasedCode = null;
@@ -738,7 +738,7 @@ class ScrumBoardStore {
   };
 
   @computed get getIssueTypes() {
-    return this.issueTypes.slice();
+    return toJS(this.issueTypes);
   }
 
   @action setIssueTypes(data) {

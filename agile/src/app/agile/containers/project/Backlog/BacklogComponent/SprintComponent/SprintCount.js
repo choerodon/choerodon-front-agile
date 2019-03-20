@@ -1,32 +1,23 @@
 import React, { Component } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
 import { observer, inject } from 'mobx-react';
+import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
 @observer
-class SprintCount extends Component {
-  shouldComponentUpdate(nextProps, nextState, nextContext) {
-    if (JSON.stringify(nextProps) === JSON.stringify(this.props)) {
-      return false;
-    }
-    return true;
-  }
-
+export default WrappedComponent => class SprintCount extends Component {
   render() {
-    const {
-      item, draggableId, selected,
-    } = this.props;
     return (
-      <div
-        className="c7n-backlog-sprintCount"
-        style={{
-          display: String(draggableId) === String(item.issueId) && selected.issueIds.length > 0 ? 'flex' : 'none',
-        }}
-        label="sprintIssue"
-      >
-        {selected.issueIds.length}
-      </div>
+      <React.Fragment>
+        <div
+          className="c7n-backlog-sprintCount"
+          style={{
+            display: BacklogStore.getMultiSelected.size > 0 ? 'flex' : 'none',
+          }}
+          label="sprintIssue"
+        >
+          {BacklogStore.getMultiSelected.size}
+        </div>
+        <WrappedComponent {...this.props} />
+      </React.Fragment>
     );
   }
-}
-
-export default SprintCount;
+};

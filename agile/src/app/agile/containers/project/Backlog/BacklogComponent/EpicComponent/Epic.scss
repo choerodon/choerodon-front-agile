@@ -1,5 +1,5 @@
 .c7n-backlog-epic {
-  flex: 1;
+  width: 200px;
   border-right: 1px solid #d3d3d3;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -23,8 +23,11 @@
       padding: 0 12px 0 16px;
       justify-content: space-between;
       flex-wrap: wrap;
-
+      &:hover .c7n-backlog-epicRight{
+        display: flex !important;
+      }
       .c7n-backlog-epicRight {
+        display: none;
         align-items: center;
         justify-content: space-between;
       }
