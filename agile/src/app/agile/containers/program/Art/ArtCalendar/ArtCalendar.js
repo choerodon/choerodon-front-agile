@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Page, Header, Content } from 'choerodon-front-boot';
 import { find } from 'lodash';
-import {
-  Icon, Button, Progress, Spin,
-} from 'choerodon-ui';
+import { Progress } from 'choerodon-ui';
 import moment from 'moment';
 import { artListLink, getParams } from '../../../../common/utils';
 import { getArtCalendar } from '../../../../api/ArtApi';

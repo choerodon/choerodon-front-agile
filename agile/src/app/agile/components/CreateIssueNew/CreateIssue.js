@@ -829,9 +829,9 @@ class CreateIssue extends Component {
                                   showName={issue.issueNum}
                                 >
                                   <div style={{
-                                    display: 'inline-flex',
-                                    width: '100%',
+                                    display: 'inline-flex',                            
                                     flex: 1,
+                                    width: 'calc(100% - 30px)',
                                     alignItems: 'center',
                                     verticalAlign: 'bottom',
                                   }}
