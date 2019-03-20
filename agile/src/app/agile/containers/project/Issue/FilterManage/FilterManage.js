@@ -7,6 +7,7 @@ import { stores, axios } from 'choerodon-front-boot';
 import _ from 'lodash';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import IssueFilterControler from '../IssueFilterControler';
+import './FilterManage.scss';
 
 const { AppState } = stores;
 const FormItem = Form.Item;
@@ -20,7 +21,7 @@ class FilterManage extends Component {
         this.checkMyFilterNameRepeat(value).then((res) => {
           if (res) {
             // Choerodon.prompt('筛选名称重复');
-            callback('筛选名称重复');
+            callback('名称重复');
           } else {
             callback();
           }
@@ -95,7 +96,7 @@ class FilterManage extends Component {
                               <FormItem>
                                 {getFieldDecorator(`filterName_${filter.filterId}`, {
                                   rules: [{
-                                    required: true, message: '请输入筛选名称',
+                                    required: true, message: '名称必填',
                                   }, {
                                     validator: this.checkMyFilterNameRepeatUpdating,
                                   }],
@@ -119,7 +120,7 @@ class FilterManage extends Component {
                             // type="mode_edit"
                             onClick={() => {
                               if (isEditing) {
-                                this.handleFNIBlurOrPressEnter.bind(this, filter, `filterName_${filter.filterId}`);
+                                this.handleFNIBlurOrPressEnter(filter, `filterName_${filter.filterId}`);
                               } else {
                                 const { isEditingIndex } = editFilterInfo.find(item => item.filterId === filter.filterId);
                                 IssueStore.setUpdateFilterName(filter.name);

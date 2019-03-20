@@ -107,18 +107,18 @@ class Issue extends Component {
         IssueStore.refreshTrigger(data);
       }
     });
-  }
+  };
 
   openExport=() => {
     IssueStore.setExportModalVisible(true);
-  }
+  };
 
   axiosGetProjectInfo = () => {
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`).then((res) => {
       IssueStore.setCreateStartDate(`${moment(res.creationDate).format('YYYY-MM-DD')} 00:00:00`);
       IssueStore.setProjectInfo(res);
     });
-  }
+  };
 
   saveRef = name => (ref) => {
     this[name] = ref;

@@ -528,9 +528,13 @@
         .ant-select-selection__placeholder {
           color: #4a4a4a;
         }
+        .ant-select-clear {
+          top: -1px;
+        }
       }
       .ant-select-selection__choice__content {
         max-width: 100px;
+        line-height: 20px;
       }
       .ant-select-underline {
         display: none;
@@ -545,9 +549,11 @@
     .myFilterSelect {
       .ant-select-selection__rendered {
         padding-right: 35px;
-        margin-top: 2px;
+        margin-bottom: 6px;
         .ant-select-selection-selected-value {
           max-width: 70px;
+          margin-right: 5px;
+          margin-top: 1px;
         }
         .ant-select-selection__placeholder {
           color: #3F51B5;
@@ -557,7 +563,7 @@
         max-width: 130px;
       }
       .icon {
-        margin-top: 0,
+        margin-top: 0;
       }
     }
     .c7n-createRange {
@@ -569,6 +575,7 @@
       .ant-calendar-picker-icon {
         // display: none;
         right: -45px;
+        bottom: 1px;
       }
       .ant-calendar-range-picker-input {
         width: 65px;
