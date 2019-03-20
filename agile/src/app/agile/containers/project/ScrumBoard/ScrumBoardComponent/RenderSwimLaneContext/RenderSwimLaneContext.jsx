@@ -12,14 +12,8 @@ class SwimLaneContext extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeKey: [],
+      activeKey: this.getDefaultExpanded(props.mode, [...props.parentIssueArr.values(), props.otherIssueWithoutParent]),
     };
-  }
-
-  componentWillReceiveProps(nextProps, nextContext) {
-    this.setState({
-      activeKey: [],
-    });
   }
 
   getPanelKey = (mode, issue) => {
@@ -27,7 +21,7 @@ class SwimLaneContext extends React.Component {
       ['swimlane_none', 'swimlaneContext-all'],
       ['assignee', `swimlaneContext-${issue.assigneeId || issue.type}`],
       ['swimlane_epic', `swimlaneContext-${issue.epicId || issue.type}`],
-      ['parent_child', `swimlaneContext-${issue.issueId || issue.type}`],
+      ['parent_child', `swimlaneContext-${issue.issueId || issue.type || 'other'}`],
     ]);
     return modeMap.get(mode);
   };
@@ -61,6 +55,7 @@ class SwimLaneContext extends React.Component {
   };
 
   panelOnChange = (arr) => {
+    debugger;
     this.setState({
       activeKey: arr,
     });
@@ -84,7 +79,7 @@ class SwimLaneContext extends React.Component {
     const { activeKey } = this.state;
     return (
       <Collapse
-        activeKey={activeKey.length ? activeKey : this.getDefaultExpanded(mode, [...parentIssueArr.values(), otherIssueWithoutParent])}
+        activeKey={activeKey}
         onChange={this.panelOnChange}
         bordered={false}
         forceRender
