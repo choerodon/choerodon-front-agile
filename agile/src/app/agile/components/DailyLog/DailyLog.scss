@@ -9,8 +9,12 @@
 
     .line-info {
       display: flex;
-      margin-bottom: 32px;
       align-items: flex-end;
     }
+  }
+
+  .error-text {
+    color: #d50000;
+    margin-top: 2px;
   }
 }
