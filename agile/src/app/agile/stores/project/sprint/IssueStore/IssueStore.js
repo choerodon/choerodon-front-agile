@@ -244,7 +244,7 @@ class SprintCommonStore {
       version: 'versionName',
       epic: 'epicName',
       label: 'labelName',
-      //  "storyPoints": 
+      storyPoints: 'storyPoints',
       component: 'componentName',
     };
 
