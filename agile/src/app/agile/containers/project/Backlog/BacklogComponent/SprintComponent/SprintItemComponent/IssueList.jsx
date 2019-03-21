@@ -7,7 +7,6 @@ import _ from 'lodash';
 import Typetag from '../../../../../../components/TypeTag';
 import UserHead from '../../../../../../components/UserHead';
 import { STATUS } from '../../../../../../common/Constant';
-import DragIssueItem from '../DragIssueItem';
 import SideBorder from '../SideBorder';
 import SprintCount from '../SprintCount';
 import SprintIssue from '../SprintIssue';
@@ -33,10 +32,6 @@ class IssueList extends Component {
     // } else {
     // }
   };
-
-  componentWillUpdate(nextProps, nextState, nextContext) {
-    debugger;
-  }
 
   render() {
     const { sprintId } = this.props;

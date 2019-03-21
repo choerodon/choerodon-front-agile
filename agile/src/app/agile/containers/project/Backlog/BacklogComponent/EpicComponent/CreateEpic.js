@@ -30,7 +30,9 @@ class CreateEpic extends Component {
    * @memberof CreateEpic
    */
   handleCreateEpic =(e) => {
-    const { form, store, onCancel } = this.props;
+    const {
+      form, store, onCancel, refresh,
+    } = this.props;
     const issueTypes = BacklogStore.getIssueTypes || [];
     const defaultPriorityId = BacklogStore.getDefaultPriority ? BacklogStore.getDefaultPriority.id : '';
     e.preventDefault();
@@ -54,11 +56,8 @@ class CreateEpic extends Component {
             loading: false,
           });
           form.resetFields();
+          refresh();
           onCancel();
-          BacklogStore.axiosGetEpic().then((data) => {
-            BacklogStore.setEpicData(data);
-          }).catch((error) => {
-          });
         }).catch((error) => {
           this.setState({
             loading: false,

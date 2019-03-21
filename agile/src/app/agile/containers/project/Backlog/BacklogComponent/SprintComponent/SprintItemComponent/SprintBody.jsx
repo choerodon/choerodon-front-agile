@@ -65,7 +65,6 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task'];
           expand: false,
           loading: false,
         });
-        debugger;
         BacklogStore.createIssue({
           ...res,
           versionIds: res.versionIssueRelDTOList.length ? [res.versionIssueRelDTOList[0].versionId] : [],

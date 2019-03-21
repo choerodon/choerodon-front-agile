@@ -28,7 +28,6 @@ class CreateArt extends Component {
     const { onSubmit, form } = this.props;
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        window.console.log('Received values of form: ', values);
         onSubmit(values);
       }
     });

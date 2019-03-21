@@ -31,21 +31,23 @@ const { confirm } = Modal;
   }
 
   handleBlurName = (value) => {
-    const { data, AppState } = this.props;
-    const { objectVersionNumber } = this.state;
-    const req = {
-      objectVersionNumber,
-      projectId: AppState.currentMenuType.id,
-      sprintId: data.sprintId,
-      sprintName: value,
-    };
-    BacklogStore.axiosUpdateSprint(req).then((res) => {
-      this.setState({
+    if (value) {
+      const { data, AppState } = this.props;
+      const { objectVersionNumber } = this.state;
+      const req = {
+        objectVersionNumber,
+        projectId: AppState.currentMenuType.id,
+        sprintId: data.sprintId,
         sprintName: value,
-        objectVersionNumber: res.objectVersionNumber,
+      };
+      BacklogStore.axiosUpdateSprint(req).then((res) => {
+        this.setState({
+          sprintName: value,
+          objectVersionNumber: res.objectVersionNumber,
+        });
+      }).catch((error) => {
       });
-    }).catch((error) => {
-    });
+    }
   };
 
   handleChangeDateRange = (type, dateString) => {
@@ -157,20 +159,22 @@ const { confirm } = Modal;
     return (
       <div className="c7n-backlog-sprintTop">
         <div className="c7n-backlog-springTitle">
-          <div className="c7n-backlog-sprintTitleSide">
-            <SprintName
-              type="sprint"
-              expand={expand}
-              sprintName={sprintName}
-              toggleSprint={toggleSprint}
-              handleBlurName={this.handleBlurName}
-            />
-            <SprintVisibleIssue
-              issueCount={issueCount}
-            />
+          <div className="c7n-backlog-sprintTitleSide" style={{ flex: 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <SprintName
+                type="sprint"
+                expand={expand}
+                sprintName={sprintName}
+                toggleSprint={toggleSprint}
+                handleBlurName={this.handleBlurName}
+              />
+              <SprintVisibleIssue
+                issueCount={issueCount}
+              />
+            </div>
             <ClearFilter />
           </div>
-          <div style={{ flexGrow: 1 }}>
+          <div style={{ flex: 9 }}>
             <SprintStatus
               sprintId={sprintId}
               refresh={refresh}

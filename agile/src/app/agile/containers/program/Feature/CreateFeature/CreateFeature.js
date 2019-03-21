@@ -15,8 +15,6 @@ import { beforeTextUpload, handleFileUpload } from '../../../../common/utils';
 import './CreateFeature.scss';
 
 const { AppState } = stores;
-console.log('appState:');
-console.log(AppState);
 const FormItem = Form.Item;
 const { Sidebar } = Modal;
 const { Option } = Select;

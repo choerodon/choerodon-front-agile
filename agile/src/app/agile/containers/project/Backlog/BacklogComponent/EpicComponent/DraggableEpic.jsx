@@ -156,7 +156,7 @@ class DraggableEpic extends Component {
           className="c7n-backlog-epicItemTitle"
         >
           <Icon
-            type={item.expand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
+            type={expand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
             role="none"
             onClick={this.toggleExpand}
           />

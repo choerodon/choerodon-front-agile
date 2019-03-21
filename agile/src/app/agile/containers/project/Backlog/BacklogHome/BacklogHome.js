@@ -113,12 +113,11 @@ class BacklogHome extends Component {
     // }
     this.getSprint(isCreate, issue);
     const { versionVisible, epicVisible } = this.state;
-    // if (versionVisible) {
-    //   this.loadVersion();
-    // }
-    // if (epicVisible) {
-    //   this.loadEpic();
-    // }
+    if (BacklogStore.getCurrentVisible === 'version') {
+      this.loadVersion();
+    } else {
+      this.loadEpic();
+    }
   };
 
   /**
@@ -321,14 +320,16 @@ class BacklogHome extends Component {
                   if (destination) {
                     const { droppableId: destinationId, index: destinationIndex } = destination;
                     const { droppableId: sourceId, index: sourceIndex } = source;
-                    if (result.reason !== 'CANCEL' || destinationIndex !== sourceIndex) {
+                    if (destinationId === sourceId && destinationIndex === sourceIndex) {
+                      return;
+                    }
+                    if (result.reason !== 'CANCEL') {
                       const item = BacklogStore.getIssueMap.get(sourceId)[sourceIndex];
-                      if (BacklogStore.getMultiSelected.size > 1) {
+                      if (BacklogStore.getMultiSelected.size > 1 && !BacklogStore.getMultiSelected.has(BacklogStore.getIssueMap.get(destinationId)[destinationIndex].issueId)) {
                         BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi');
                       } else {
                         BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single');
                       }
-                      // BacklogStore.axiosUpdateIssuesToSprint();
                     }
                   }
                 }}

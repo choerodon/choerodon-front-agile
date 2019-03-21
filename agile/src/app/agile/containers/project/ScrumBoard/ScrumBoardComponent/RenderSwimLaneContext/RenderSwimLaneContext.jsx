@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import classnames from 'classnames';
 import { Collapse } from 'choerodon-ui';
 import './RenderSwimLaneContext.scss';
 import SwimLaneHeader from './SwimLaneHeader.jsx';
@@ -14,6 +15,12 @@ class SwimLaneContext extends React.Component {
     this.state = {
       activeKey: this.getDefaultExpanded(props.mode, [...props.parentIssueArr.values(), props.otherIssueWithoutParent]),
     };
+  }
+
+  componentWillReceiveProps(nextProps, nextState) {
+    this.setState({
+      activeKey: this.getDefaultExpanded(nextProps.mode, [...nextProps.parentIssueArr.values(), nextProps.otherIssueWithoutParent]),
+    });
   }
 
   getPanelKey = (mode, issue) => {
@@ -35,11 +42,17 @@ class SwimLaneContext extends React.Component {
   };
 
   getPanelItem = (key, parentIssue = null) => {
-    const { children, mode, fromEpic } = this.props;
+    const {
+      children, mode, fromEpic, parentIssueArr,
+    } = this.props;
     return (
       <Panel
+        showArrow={mode !== 'swimlane_none'}
         key={this.getPanelKey(mode, parentIssue, key)}
-        className={`c7n-swimlaneContext-container ${fromEpic ? 'shouldBeIndent' : ''}`}
+        className={classnames('c7n-swimlaneContext-container', {
+          shouldBeIndent: fromEpic,
+          noStoryInEpic: fromEpic && Array.from(parentIssueArr).length === 0,
+        })}
         header={(
           <SwimLaneHeader
             parentIssue={parentIssue}
@@ -55,7 +68,6 @@ class SwimLaneContext extends React.Component {
   };
 
   panelOnChange = (arr) => {
-    debugger;
     this.setState({
       activeKey: arr,
     });
