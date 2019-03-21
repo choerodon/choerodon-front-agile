@@ -39,7 +39,7 @@ class SwimLaneContext extends React.Component {
     return (
       <Panel
         key={this.getPanelKey(mode, parentIssue, key)}
-        className={`c7n-swimlaneContext-container ${mode === 'swimlane_none' ? 'noArrow ' : ''}${fromEpic ? 'shouldBeIndent' : ''}`}
+        className={`c7n-swimlaneContext-container ${fromEpic ? 'shouldBeIndent' : ''}`}
         header={(
           <SwimLaneHeader
             parentIssue={parentIssue}
