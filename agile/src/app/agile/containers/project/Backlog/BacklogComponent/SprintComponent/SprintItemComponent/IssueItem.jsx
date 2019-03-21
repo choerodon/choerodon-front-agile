@@ -7,7 +7,6 @@ import _ from 'lodash';
 import Typetag from '../../../../../../components/TypeTag';
 import UserHead from '../../../../../../components/UserHead';
 import { STATUS } from '../../../../../../common/Constant';
-import DragIssueItem from '../DragIssueItem';
 import SideBorder from '../SideBorder';
 import SprintCount from '../SprintCount';
 import SprintIssue from '../SprintIssue';
@@ -16,6 +15,7 @@ import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore'
 @observer
 class IssueItem extends Component {
   handleClick = (e) => {
+    e.stopPropagation();
     const { onClick, item } = this.props;
     onClick(e, item);
   };

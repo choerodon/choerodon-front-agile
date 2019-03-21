@@ -19,12 +19,8 @@
       padding: 0 12px 0 16px;
       justify-content: space-between;
       flex-wrap: wrap;
-      &:hover .c7n-backlog-versionRight {
-        display: flex !important;
-      }
-
       .c7n-backlog-versionRight {
-        display: none;
+        display: flex;
         align-items: center;
         justify-content: space-between;
       }
@@ -40,6 +36,7 @@
       }
 
       .c7n-backlog-versionItems {
+        background: white;
         padding: 8px 5px 8px 16px;
         cursor: pointer;
       }
@@ -49,8 +46,6 @@
       }
 
       .c7n-backlog-versionItemTitle {
-
-
         display: flex;
         align-items: baseline;
         cursor: move;
@@ -62,13 +57,13 @@
           cursor: pointer;
         }
       }
-      .c7n-backlog-ItemsHead{
+      .c7n-backlog-ItemsHead {
         word-break: break-all;
         flex-grow: 1;
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        .ant-input-underline{
+        .ant-input-underline {
           display: none;
         }
         i {
@@ -97,11 +92,9 @@
           display: flex;
           justify-content: space-between;
           margin-top: 10px;
-
           .c7n-backlog-versionItemParamKey {
             color: rgba(0, 0, 0, 0.65);
           }
-
           .c7n-backlog-versionItemParamValue {
             border-radius: 100px;
             background: rgba(0, 0, 0, 0.08);

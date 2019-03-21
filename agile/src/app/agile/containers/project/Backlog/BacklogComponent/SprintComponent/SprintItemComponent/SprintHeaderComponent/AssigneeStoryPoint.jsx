@@ -33,8 +33,7 @@ import AssigneeModal from './AssigneeModal';
     const { assigneeIssues, data } = this.props;
     const { expand } = this.state;
     return (
-      <div className="c7n-backlog-sprintName">
-      </div>
+      <div className="c7n-backlog-sprintName" />
     );
   }
 }

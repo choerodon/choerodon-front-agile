@@ -56,7 +56,6 @@ class SprintReport extends Component {
       linkFromParamUrl,
     });
     this.getDefaultSprintId();
-    console.log(this.state.defaultSprint);
     this.getSprintData();
     ReportStore.init();
   }
@@ -475,7 +474,6 @@ class SprintReport extends Component {
   }
 
   renderDoneIssue(column) {
-    console.log(ReportStore.donePagination);
     return (
       <div>
         <Table

@@ -60,6 +60,9 @@ import AssigneeModal from './AssigneeModal';
               <UserHead
                 hiddenText
                 size={24}
+                style={{
+                  marginBottom: 6,
+                }}
                 user={{
                   id: existAssignee.assigneeId,
                   loginName: existAssignee.assigneeName,

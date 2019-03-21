@@ -46,7 +46,7 @@ const FormItem = Form.Item;
   };
 
   render() {
-    const { issueType, form } = this.props;
+    const { issueType, form, backlog } = this.props;
     const { getFieldDecorator } = form;
     const { expand, currentType, loading } = this.state;
     const typeList = (
