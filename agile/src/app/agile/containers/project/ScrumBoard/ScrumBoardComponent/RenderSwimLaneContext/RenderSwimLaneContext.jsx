@@ -17,6 +17,12 @@ class SwimLaneContext extends React.Component {
     };
   }
 
+  componentWillReceiveProps(nextProps, nextState) {
+    this.setState({
+      activeKey: this.getDefaultExpanded(nextProps.mode, [...nextProps.parentIssueArr.values(), nextProps.otherIssueWithoutParent]),
+    });
+  }
+
   getPanelKey = (mode, issue) => {
     const modeMap = new Map([
       ['swimlane_none', 'swimlaneContext-all'],
