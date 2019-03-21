@@ -310,7 +310,7 @@ class VelocityChart extends Component {
                   encodeURIComponent(urlParams.name)
                 }&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${
                   record.sprintId
-                }&paramName=${sprintName}下的问题&paramUrl=reporthost/velocityChart`,
+                }&paramName=${encodeURIComponent(`${sprintName}下的问题`)}&paramUrl=reporthost/velocityChart`,
               );
             }}
           >
