@@ -20,7 +20,7 @@ class ScrumBoardStore {
 
   @observable calanderCouldUse = false;
 
-  @observable currentSprintExist = false;
+  @observable currentSprintExist = true;
 
   @observable prevClick = {};
 

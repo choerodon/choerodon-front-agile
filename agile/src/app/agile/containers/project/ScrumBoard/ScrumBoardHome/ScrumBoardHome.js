@@ -332,6 +332,7 @@ class ScrumBoardHome extends Component {
                 style={{
                   marginTop: 2,
                 }}
+                disabled={!ScrumBoardStore.didCurrentSprintExist}
                 className="leftBtn2"
                 funcType="flat"
                 onClick={() => {

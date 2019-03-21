@@ -9,7 +9,7 @@ import {
 import { stores, axios } from 'choerodon-front-boot';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 import { loadSprints } from '../../../../../api/NewIssueApi';
-import pic from './no_sprint.svg';
+import pic from '../../../../../assets/image/emptyChart.svg';
 import lineLegend from './Line.svg';
 import './BurnDown.scss';
 
@@ -35,7 +35,7 @@ class BurnDown extends Component {
     loadSprints(['started', 'closed']).then(res => {
       this.setState({
         sprint: res[0],
-        sprintId: res[0].sprintId,
+        sprintId: res[0] && res[0].sprintId,
       }, () => {
         this.loadChartData(this.state.sprintId);
       })
@@ -312,7 +312,8 @@ class BurnDown extends Component {
   };
 
   loadChartData(sprintId, unit = 'remainingEstimatedTime') {
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${unit}&ordinalType=asc`)
+    if(sprintId) {
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${unit}&ordinalType=asc`)
       .then((res) => {
         const dataDates = Object.keys(res.coordinate);
         const [dataMinDate, dataMaxDate] = [dataDates[0], dataDates[dataDates.length - 1]];
@@ -390,6 +391,12 @@ class BurnDown extends Component {
           markAreaData,
         });
       });
+    } else {
+      this.setState({
+        loading: false,
+      })
+    }
+    
   }
 
   handleChangeUnit({ key }) {
@@ -410,7 +417,7 @@ class BurnDown extends Component {
   };
 
   renderContent() {
-    const { loading, sprint: { sprintId } } = this.state;
+    const { loading, sprintId } = this.state;
     if (loading) {
       return (
         <div className="loading-wrap">
@@ -437,7 +444,7 @@ class BurnDown extends Component {
   }
 
   render() {
-    const { loading, sprint: { sprintId } } = this.state;
+    const { loading, sprintId } = this.state;
     const menu = (
       <Menu onClick={this.handleChangeUnit.bind(this)}>
         <Menu.Item key="remainingEstimatedTime">剩余时间</Menu.Item>
