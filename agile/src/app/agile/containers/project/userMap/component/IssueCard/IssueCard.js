@@ -300,6 +300,7 @@ class IssueCard extends Component {
                   onDoubleClick={this.handleClickTextArea}
                   onBlur={this.updateIssueName}
                   spellCheck="false"
+                  maxLength={44}
                 />
               </div>
               <div className="c7n-footer">

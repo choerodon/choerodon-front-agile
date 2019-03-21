@@ -553,10 +553,16 @@ class UserMapStore {
 
   freshIssue = (issueId, objectVersionNumber, summary) => {
     const index = this.issues.findIndex(issue => issue.issueId === issueId);
-    if (index === -1) return;
-    this.issues[index].objectVersionNumber = objectVersionNumber;
-    this.issues[index].summary = summary;
-  }
+    const cacheIndex = this.cacheIssues.findIndex(issue => issue.issueId === issueId);
+    if (index !== -1) {
+      this.issues[index].objectVersionNumber = objectVersionNumber;
+      this.issues[index].summary = summary;
+    }
+    if (cacheIndex !== -1) {
+      this.cacheIssues[cacheIndex].objectVersionNumber = objectVersionNumber;
+      this.cacheIssues[cacheIndex].summary = summary;
+    }
+  };
 
   handleEpicDrag = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data)
     .then((res) => {
