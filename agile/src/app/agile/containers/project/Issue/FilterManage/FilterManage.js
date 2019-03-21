@@ -122,6 +122,7 @@ class FilterManage extends Component {
               type="close"
               onClick={() => {
                 IssueStore.setFilterListVisible(false);
+                IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
               }}
             />
           </div>
@@ -157,7 +158,7 @@ class FilterManage extends Component {
                           ) : (<span>{filter.name}</span>)
                       }
                       <span className="c7n-filterAction">
-                        <Tooltip title="修改筛选名称">
+                        <Tooltip title={isEditing ? '保存' : '修改'}>
                           <Icon
                             type={isEditing ? 'check' : 'mode_edit'}
                             // type="mode_edit"
@@ -179,10 +180,21 @@ class FilterManage extends Component {
                             }}
                           />
                         </Tooltip>
-                        <Tooltip title="删除筛选">
+                        <Tooltip title={isEditing ? '取消' : '删除'}>
                           <Icon 
-                            type="delete_forever" 
-                            onClick={() => this.handleDelete(filter)}
+                            type={isEditing ? 'close' : 'delete_forever'}
+                            onClick={() => {
+                              if (isEditing) {
+                                IssueStore.setEditFilterInfo(
+                                  _.map(editFilterInfo, item => ({
+                                    ...item,
+                                    isEditing: false,
+                                  })),
+                                );
+                              } else {
+                                this.handleDelete(filter);
+                              }
+                            }}
                           />
                         </Tooltip>
                       </span>

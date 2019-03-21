@@ -35,6 +35,11 @@
     padding: 8px 12px 2px;
     border-radius: 2px;
 
+    // 隐藏字数限制提示
+    .ant-input-length-info {
+      display: none;
+    }
+
     .c7n-epicName-read {
       height: 48px;
       overflow-y: hidden;

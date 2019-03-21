@@ -56,6 +56,18 @@
     border: 1px dashed transparent;
     border-radius: 2px;
 
+    // 隐藏字数限制提示
+    .ant-input-length-info {
+      display: none;
+    }
+
+    .ant-input-has-value {
+      max-height: 50px;
+      &.ant-input-focus {
+        max-height: 200px;
+      }
+    }
+
     &:hover {
       // border-color: #3F51B5;
       // box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);

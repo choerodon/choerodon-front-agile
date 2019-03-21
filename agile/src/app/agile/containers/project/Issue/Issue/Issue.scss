@@ -257,6 +257,7 @@
   .ant-table-footer {
     background: none;
     border-bottom: 1px solid rgb(232, 232, 232);
+    border-top: none;
   }
   .c7n-backlog-sprintIssue {
     border-bottom: none !important;
@@ -638,8 +639,8 @@
   .c7n-filterList-content {
     list-style: none;
     padding: 0;
-    max-height: 400px;
-    overflow-y: auto;
+    height: 400px;
+    overflow-y: scroll;
     .c7n-filterList-item {
       display: flex;
       height: 36px;
