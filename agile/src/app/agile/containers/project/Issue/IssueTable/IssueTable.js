@@ -220,6 +220,7 @@ class IssueTable extends Component {
     const componentFilterValue = this.getFieldFilteredValue('component');
     const epicFilterValue = this.getFieldFilteredValue('epic');
     const labelFilterValue = this.getFieldFilteredValue('label');
+    const editFilterInfo = IssueStore.getEditFilterInfo;
     const columns = this.manageVisible([
       {
         title: '问题编号',
@@ -490,6 +491,7 @@ class IssueTable extends Component {
               expand: true,
             });
             IssueStore.setFilterListVisible(false);
+            IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
           },
           onBlur: (e) => {
             // 点击隐藏详情时无法触发 onClick，所以需要利用 onBlur 触发

@@ -122,6 +122,7 @@ class FilterManage extends Component {
               type="close"
               onClick={() => {
                 IssueStore.setFilterListVisible(false);
+                IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
               }}
             />
           </div>

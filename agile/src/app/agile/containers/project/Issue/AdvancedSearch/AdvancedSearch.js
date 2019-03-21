@@ -375,6 +375,7 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(false);
                   IssueStore.setFilterListVisible(false);
+                  IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
                   IssueStore.resetFilterSelect(filterControler);
                   IssueStore.setClickedRow({
                     expand: false,
@@ -395,6 +396,7 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(true);
                   IssueStore.setFilterListVisible(false);
+                  IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
                 }}
               >
                 {'保存筛选'}
@@ -408,6 +410,7 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(false);
                   IssueStore.setFilterListVisible(!filterListVisible);
+                  IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
                 }}
               >
                 {'筛选管理'}
