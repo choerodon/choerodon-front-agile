@@ -49,8 +49,8 @@ class AdvancedSearch extends Component {
         IssueStore.setSelectedStatus(advancedSearchArgs.statusId || []);
         IssueStore.setSelectedPriority(advancedSearchArgs.priorityId || []);
         IssueStore.setSelectedAssignee(advancedSearchArgs.assigneeIds.concat(otherArgs.assigneeId && otherArgs.assigneeId.length > 0 ? ['none'] : []) || []);
-        IssueStore.setCreateStartDate(moment(searchArgs.createStartDate).format('YYYY-MM-DD HH:mm:ss'));
-        IssueStore.setCreateEndDate(moment(searchArgs.createEndDate).format('YYYY-MM-DD HH:mm:ss'));
+        IssueStore.setCreateStartDate(searchArgs.createStartDate ? moment(searchArgs.createStartDate).format('YYYY-MM-DD HH:mm:ss') : '');
+        IssueStore.setCreateEndDate(searchArgs.createEndDate ? moment(searchArgs.createEndDate).format('YYYY-MM-DD HH:mm:ss') : '');
         IssueStore.setBarFilter(contents || []);
         this.filterControler.searchArgsFilterUpdate(IssueStore.setCreateStartDate, IssueStore.getCreateEndDate);
         this.filterControler.myFilterUpdate(otherArgs, contents, searchArgs);
@@ -163,8 +163,8 @@ class AdvancedSearch extends Component {
       const selectedStatus = IssueStore.getSelectedStatus;
       const selectedPriority = IssueStore.getSelectedPriority;
       const selectedAssignee = IssueStore.getSelectedAssignee;
-      const createStartDate = IssueStore.getCreateStartDate;
-      const createEndDate = IssueStore.getCreateEndDate;
+      const createStartDate = IssueStore.getCreateStartDate || '';
+      const createEndDate = IssueStore.getCreateEndDate || '';
       const selectedMyFilterInfo = IssueStore.getSelectedMyFilterInfo;
       const selectedFilterId = IssueStore.getSelectedFilterId;
       const isExistFilter = IssueStore.getIsExistFilter;
@@ -353,7 +353,7 @@ class AdvancedSearch extends Component {
                 <Tooltip title={`创建问题时间范围为${moment(createStartDate).format('YYYY-MM-DD')} ~ ${moment(createEndDate).format('YYYY-MM-DD')}`}>
                   <div className="c7n-createRange">
                     <RangePicker
-                      value={[moment(createStartDate), moment(createEndDate)]}
+                      value={[createStartDate && moment(createStartDate), createEndDate && moment(createEndDate)]}
                       format="YYYY-MM-DD hh:mm:ss"
                       disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
                       allowClear
