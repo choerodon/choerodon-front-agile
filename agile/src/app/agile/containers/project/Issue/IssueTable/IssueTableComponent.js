@@ -62,10 +62,12 @@ export function Summary({ text }) {
 export function Priority({ record }) {
   return (
     <Tooltip mouseEnterDelay={0.5} title={`优先级： ${record.priorityDTO ? record.priorityDTO.name : ''}`}>
-      <PriorityTag
-        priority={record.priorityDTO}
-        style={{ minWidth: 65 }}
-      />
+      <div>
+        <PriorityTag
+          priority={record.priorityDTO}
+          style={{ minWidth: 65 }}
+        />
+      </div>
     </Tooltip>
   );
 }
@@ -146,6 +148,7 @@ export function Sprint({ objArray, name }) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
+              cursor: 'auto',
             }}
           >
             {name}
