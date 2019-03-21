@@ -124,16 +124,14 @@ class QuickCreateIssue extends Component {
         style={{
           userSelect: 'none',
           background: 'white',
-          padding: '12px 0 12px 19px',
           fontSize: 13,
           display: 'flex',
           alignItems: 'center',
           borderBottom: '1px solid #e8e8e8',
-          borderTop: '1px solid #e8e8e8',
         }}
       >
         {checkCreateIssue ? (
-          <div className="c7n-add" style={{ display: 'block', width: '100%' }}>
+          <div className="c7n-add" style={{ display: 'block', width: '100%', marginTop: 8 }}>
             <div style={{ display: 'flex' }}>
               <Dropdown overlay={typeList} trigger={['click']}>
                 <div style={{ display: 'flex', alignItem: 'center' }}>
