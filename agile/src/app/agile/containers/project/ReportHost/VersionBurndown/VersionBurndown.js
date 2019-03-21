@@ -587,7 +587,7 @@ class VersionBurndown extends Component {
               >
                 {'待办事项'}
               </a>
-              {'中预估故事点。'}
+              {'中创建故事并预估故事点。'}
             </p>
           </div>
         </div>
