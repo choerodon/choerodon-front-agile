@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Icon, Dropdown, Menu } from 'choerodon-ui';
+import moment from 'moment';
 import classnames from 'classnames';
 import CloseSprint from '../../CloseSprint';
 import StartSprint from '../../StartSprint';
@@ -76,6 +77,8 @@ import StartSprint from '../../StartSprint';
                     this.setState({
                       startSprintVisible: true,
                     });
+                    const year = moment().year();
+                    store.axiosGetWorkSetting(year);
                     store.axiosGetOpenSprintDetail(data.sprintId).then((res) => {
                       store.setOpenSprintDetail(res);
                     }).catch((error) => {

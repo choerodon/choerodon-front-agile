@@ -115,7 +115,17 @@ export default class SwimLaneHeader extends Component {
       if (mode === 'swimlane_epic') {
         return `无史诗问题（${subIssueDataLength}）`;
       } else if (mode === 'swimlane_none') {
-        return `所有问题（${subIssueDataLength}）`;
+        return (
+          <div
+            className="c7n-swimlaneHeader"
+            role="none"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            {`所有问题（${subIssueDataLength}）`}
+          </div>
+        );
       } else {
         return `其他问题(${subIssueDataLength} 任务)`;
       }
