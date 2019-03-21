@@ -1,10 +1,8 @@
-.ant-collapse-item.c7n-swimlaneContext-container.noArrow {
-  .ant-collapse-expand-icon.ant-collapse-expanded {
-    display: none;
-  }
-}
 .ant-collapse-item.c7n-swimlaneContext-container.shouldBeIndent > .ant-collapse-header {
   padding: 0 16px !important;
+}
+.ant-collapse-item.c7n-swimlaneContext-container.noStoryInEpic > .ant-collapse-header {
+  display: none !important;
 }
 .statusCantDragOn + .c7n-swimlaneContext-itemBodyStatus-container {
   background-color: #fff7f7 !important;
@@ -23,9 +21,6 @@
     color: #ef2a27 !important;
   }
 }
-//.c7n-swimlaneContext-itemBodyStatus-container.onStatusDragOn:first-child {
-//  visibility: visible;
-//}
 .c7n-swimlaneContext {
   &-container {
     border: none !important;

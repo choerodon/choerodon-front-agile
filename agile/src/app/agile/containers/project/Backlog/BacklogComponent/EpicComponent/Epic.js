@@ -10,7 +10,6 @@ import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EpicItem from './EpicItem';
 import './Epic.scss';
 import CreateEpic from './CreateEpic';
-import Backlog from "../../../userMap/component/Backlog/Backlog";
 
 @observer
 class Epic extends Component {
@@ -22,6 +21,10 @@ class Epic extends Component {
   }
 
   componentWillMount() {
+    this.epicRefresh();
+  }
+
+  epicRefresh = () => {
     Promise.all([BacklogStore.axiosGetEpic(), BacklogStore.axiosGetColorLookupValue()]).then(([epicList, lookupValues]) => {
       BacklogStore.initEpicList(epicList, lookupValues);
     });
@@ -60,7 +63,7 @@ class Epic extends Component {
                 创建史诗
               </p>
               <Icon
-                type="close"
+                type="first_page"
                 role="none"
                 onClick={() => {
                   BacklogStore.toggleVisible(null);
@@ -74,7 +77,7 @@ class Epic extends Component {
           </div>
           <div className="c7n-backlog-epicChoice">
             <div
-              className="c7n-backlog-epicItems"
+              className="c7n-backlog-epicItems-first"
               style={{
                 color: '#3F51B5',
                 background: BacklogStore.getChosenEpic === 'all' ? 'rgba(140, 158, 255, 0.08)' : '',
@@ -116,6 +119,7 @@ class Epic extends Component {
               </Droppable>
             </DragDropContext>
             <div
+              className="c7n-backlog-epicItems-last"
               style={{
                 background: BacklogStore.getChosenEpic === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
               }}
@@ -159,7 +163,7 @@ class Epic extends Component {
                 addEpic: false,
               });
             }}
-            refresh={this.props.refresh}
+            refresh={this.epicRefresh}
           />
         </div>
       </div>

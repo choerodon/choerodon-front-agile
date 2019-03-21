@@ -5,7 +5,8 @@ import BacklogStore from '../../../../../../../stores/project/backlog/BacklogSto
 
 @inject('AppState', 'HeaderStore')
 @observer class ClearAllFilter extends Component {
-  clearFilter() {
+  clearFilter(e) {
+    e.stopPropagation();
     BacklogStore.hideQuickSearch();
     setTimeout(() => {
       BacklogStore.showQuickSearch();

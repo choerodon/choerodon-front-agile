@@ -46,7 +46,8 @@ import StartSprint from '../../StartSprint';
               <p
                 className="c7n-backlog-closeSprint"
                 role="none"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   store.axiosGetSprintCompleteMessage(sprintId).then((res) => {
                     store.setSprintCompleteMessage(res);
                   }).catch((error) => {
@@ -71,7 +72,8 @@ import StartSprint from '../../StartSprint';
                   'c7n-backlog-canCloseSprint': store.getHasActiveSprint || !data.issueSearchDTOList || data.issueSearchDTOList.length === 0,
                 })}
                 role="none"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   if (!store.getHasActiveSprint && data.issueSearchDTOList && data.issueSearchDTOList.length > 0) {
                     this.setState({
                       startSprintVisible: true,

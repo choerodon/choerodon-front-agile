@@ -370,6 +370,9 @@ class BacklogStore {
   }
 
   @action setChosenVersion(data) {
+    if (data === 'all') {
+      this.filterSelected = false;
+    }
     this.spinIf = true;
     this.addToVersionFilter(data);
     this.chosenVersion = data;
@@ -380,6 +383,9 @@ class BacklogStore {
   }
 
   @action setChosenEpic(data) {
+    if (data === 'all') {
+      this.filterSelected = false;
+    }
     this.spinIf = true;
     this.addToEpicFilter(data);
     this.chosenEpic = data;
@@ -399,6 +405,7 @@ class BacklogStore {
 
   @action setSprintData({ backlogData, sprintData }) {
     this.spinIf = false;
+    this.multiSelected.clear();
     this.issueMap.set('0', backlogData.backLogIssue);
     this.backlogData = backlogData;
     sprintData.forEach((sprint) => {
@@ -514,7 +521,7 @@ class BacklogStore {
     if (priorityArrData && !priorityArrData.failed) {
       this.defaultPriority = priorityArrData;
     }
-    this.issueMap.set('0', backlogData.backLogIssue);
+    this.issueMap.set('0', backlogData.backLogIssue ? backlogData.backLogIssue : []);
     this.backlogData = backlogData;
     sprintData.forEach((sprint) => {
       this.issueMap.set(sprint.sprintId.toString(), sprint.issueSearchDTOList);
@@ -647,12 +654,31 @@ class BacklogStore {
     return result;
   };
 
+  findOutsetIssue = (sourceIndex, destinationIndex, sourceId, destinationId, destinationArr) => {
+    // 看不懂就去让后端给你逐字逐句解释去, 解释不通就怼他
+    if (sourceId === destinationId) {
+      if (sourceIndex < destinationIndex) {
+        return destinationArr[destinationIndex];
+      } else if (destinationIndex === 0) {
+        return destinationArr[destinationIndex];
+      } else {
+        return destinationArr[destinationIndex - 1];
+      }
+    } else {
+      if (destinationIndex === 0 && destinationArr.length) {
+        return destinationArr[destinationIndex];
+      } else {
+        return destinationArr[destinationIndex - 1];
+      }
+    }
+  };
+
   @action moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, issueItem, type) {
     const sourceArr = this.issueMap.get(sourceId);
     // const revertSourceArr = sourceArr.slice();
     const destinationArr = this.issueMap.get(destinationId);
     // const revertDestinationArr = destinationArr.slice();
-    const prevIssue = destinationIndex === 0 ? destinationArr[1] : destinationArr[destinationIndex - 1];
+    const prevIssue = this.findOutsetIssue(sourceIndex, destinationIndex, sourceId, destinationId, destinationArr);
     const modifiedArr = this.getModifiedArr(issueItem, type);
 
     if (type === 'single') {
@@ -675,7 +701,7 @@ class BacklogStore {
       before: destinationIndex === 0,
       issueIds: modifiedArr,
       outsetIssueId: prevIssue ? prevIssue.issueId : 0,
-      rankIndex: destinationId * 1 === 0,
+      rankIndex: destinationId * 1 === 0 || (destinationId === sourceId && destinationId !== 0),
     }).then(this.axiosGetSprint).then((res) => {
       this.setSprintData(res);
     });
@@ -874,6 +900,11 @@ class BacklogStore {
 
   @computed get getIssueCantDrag() {
     return this.issueCantDrag;
+  }
+
+  @action onBlurClick() {
+    this.multiSelected.clear();
+    this.clickIssueDetail = {};
   }
 }
 
