@@ -9,7 +9,16 @@ import { empty } from 'rxjs/Observer';
 const { AppState } = stores;
 // 当前跳转是否需要单选信息（跳转单个任务时使用）
 let paramIssueSelected = false;
-
+const defaultTableShowColumns = [
+  'issueNum',
+  'issueTypeId',
+  'summary',
+  'statusId',
+  'priorityId',
+  'assignee',
+  'sprint',
+  'lastUpdateDate',    
+];
 @store('SprintCommonStore')
 class SprintCommonStore {
   // 任务信息
@@ -211,16 +220,7 @@ class SprintCommonStore {
   }
 
   // table列显示存储
-  @observable tableShowColumns = [
-    'issueNum',
-    'issueTypeId',
-    'summary',
-    'statusId',
-    'priorityId',
-    'assignee',
-    'sprint',
-    'lastUpdateDate',    
-  ];
+  @observable tableShowColumns = defaultTableShowColumns
 
   @computed get getTableShowColumns() {
     const transform = {
@@ -253,6 +253,10 @@ class SprintCommonStore {
 
   @action setTableShowColumns(tableShowColumns) {
     this.tableShowColumns = tableShowColumns;
+  }
+
+  @action setDefaultTableShowColumns() {
+    this.tableShowColumns = defaultTableShowColumns;
   }
 
   // 控制清除筛选按钮是否显示
@@ -752,7 +756,7 @@ class SprintCommonStore {
     const filterContentsIsEmpty = filterContents.length === 0;
 
     if (filterAdvEveryFieldIsEmpty && filterAssigneeIsEmpty && filterOtherAssignee.length === 0 && filterSeaArgsFieldIsEmpty && filterOtherArgsFieldIsEmpty && filterContentsIsEmpty) {
-      for (let i = 0; i < myFilters.length; i++) {
+      for (let i = 0; i < myFilters.length; i += 1) {
         if (myFilters[i].personalFilterSearchDTO) {
           const { searchArgs } = myFilters[i].personalFilterSearchDTO;
           const createStartDateIsEqual = filterCreateStartDate && moment(filterCreateStartDate).format('YYYY-MM-DD') !== moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD') && moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterCreateStartDate).format('YYYY-MM-DD');
@@ -776,7 +780,7 @@ class SprintCommonStore {
       this.setSelectedPriority(filterAdvancedSearchArgs.priorityId ? filterAdvancedSearchArgs.priorityId.map(item => Number(item)) : []);
       this.setSelectedStatus(filterAdvancedSearchArgs.statusId ? filterAdvancedSearchArgs.statusId.map(item => Number(item)) : []);
 
-      for (let i = 0; i < myFilters.length; i++) {
+      for (let i = 0; i < myFilters.length; i += 1) {
         if (myFilters[i].personalFilterSearchDTO) {
           const {
             advancedSearchArgs, searchArgs, otherArgs, contents, 

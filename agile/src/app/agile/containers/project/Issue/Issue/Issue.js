@@ -51,7 +51,7 @@ class Issue extends Component {
    * 处理传入的 Param（如果有的话）
    * 利用 filterControler 类中的 refresh 方法发出初始化请求（包含优先级，状态，类型，标签数据）
    */
-  componentDidMount() {
+  componentDidMount() {    
     this.axiosGetProjectInfo().then(() => {
       const { location } = this.props;
       if (location.search.indexOf('param') !== -1) {
@@ -89,6 +89,7 @@ class Issue extends Component {
     this.filterControler = new IssueFilterControler();
     IssueStore.resetFilterSelect(this.filterControler);
     this.filterControler.resetCacheMap();
+    IssueStore.setDefaultTableShowColumns(); // 列配置恢复默认
   }
 
   /**
@@ -110,13 +111,11 @@ class Issue extends Component {
     IssueStore.setExportModalVisible(true);
   };
 
-  axiosGetProjectInfo = () => {
-    return new Promise((resolve, reject) => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`).then((res) => {
-      IssueStore.setCreateStartDate('');
-      IssueStore.setProjectInfo(res);
-      resolve();
-    }));
-  }
+  axiosGetProjectInfo = () => new Promise((resolve, reject) => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`).then((res) => {
+    IssueStore.setCreateStartDate('');
+    IssueStore.setProjectInfo(res);
+    resolve();
+  }))
 
   saveRef = name => (ref) => {
     this[name] = ref;
