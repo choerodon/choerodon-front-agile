@@ -38,7 +38,8 @@
   }
   &-right {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    min-width: 360px;
     flex: 1;
     margin-bottom: 2px;
     .container {

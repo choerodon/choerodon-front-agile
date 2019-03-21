@@ -60,17 +60,27 @@ class SprintItem extends Component {
 
   render() {
     const { refresh } = this.props;
+    const arr = BacklogStore.getSprintData;
     return (
       <div
         role="none"
+        style={{
+          display: 'flex',
+          flex: 1,
+          flexDirection: 'column',
+        }}
         onClick={() => {
-          BacklogStore.onBlurClick();
+          debugger;
+          if (!BacklogStore.isDragging) {
+            BacklogStore.onBlurClick();
+          }
         }}
       >
         {
-          BacklogStore.getSprintData.length
-            ? BacklogStore.getSprintData.map(sprintItem => (
+          arr.length
+            ? arr.map(sprintItem => (
               <SprintContainer
+                isCreated={sprintItem.isCreated}
                 refresh={refresh}
                 key={sprintItem.sprintId}
                 data={sprintItem}

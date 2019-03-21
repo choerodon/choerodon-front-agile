@@ -32,7 +32,7 @@ class SprintIssue extends Component {
             data={item.issueTypeDTO}
           />
           <div className="c7n-backlog-IssueCard-left-summaryContainer">
-            <span className="c7n-backlog-IssueCard-left-issueNum">
+            <span className="c7n-backlog-IssueCard-left-issueNum" style={{ textDecoration: item.statusMapDTO.code === 'complete' ? 'line-through' : 'none' }}>
               {`${item.issueNum}`}
             </span>
             <Tooltip title={item.summary} placement="topLeft">

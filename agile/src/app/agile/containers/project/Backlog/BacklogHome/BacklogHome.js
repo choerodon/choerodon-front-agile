@@ -16,6 +16,7 @@ import SprintItem from '../BacklogComponent/SprintComponent/SprintItem';
 import QuickSearch from '../../../../components/QuickSearch';
 import Injecter from '../../../../components/Injecter';
 import Backlog from '../../userMap/component/Backlog/Backlog';
+import ClearFilter from '../BacklogComponent/SprintComponent/SprintItemComponent/SprintHeaderComponent/ClearAllFilter';
 
 const { AppState } = stores;
 
@@ -55,7 +56,6 @@ class BacklogHome extends Component {
     BacklogStore.axiosGetIssueTypes();
     BacklogStore.axiosGetDefaultPriority();
     Promise.all([BacklogStore.axiosGetQuickSearchList(), BacklogStore.axiosGetIssueTypes(), BacklogStore.axiosGetDefaultPriority(), BacklogStore.axiosGetSprint()]).then(([quickSearch, issueTypes, priorityArr, backlogData]) => {
-
       BacklogStore.initBacklogData(quickSearch.content, issueTypes, priorityArr, backlogData);
     });
   };
@@ -139,10 +139,12 @@ class BacklogHome extends Component {
       projectId: AppState.currentMenuType.id,
     };
     BacklogStore.axiosCreateSprint(data).then((res) => {
+      debugger;
+      BacklogStore.setCreatedSprint(res.sprintId);
       this.setState({
         loading: false,
       });
-      this.refresh(true);
+      this.refresh();
       Choerodon.prompt('创建成功');
       // const anchorElement = document.getElementById('sprint_new');
       // if (anchorElement) {
@@ -261,12 +263,18 @@ class BacklogHome extends Component {
           </Button>
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
-          <div className="backlogTools" style={{ paddingLeft: 24 }}>
+          <div
+            className="backlogTools"
+            style={{
+              paddingLeft: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            }}
+          >
             <QuickSearch
               onQuickSearchChange={this.onQuickSearchChange}
               resetFilter={BacklogStore.getQuickSearchClean}
               onAssigneeChange={this.onAssigneeChange}
             />
+            <ClearFilter />
           </div>
           <div className="c7n-backlog">
             <div className="c7n-backlog-side">
@@ -311,37 +319,42 @@ class BacklogHome extends Component {
                 this.IssueDetail.refreshIssueDetail();
               }}
             />
-            <div className="c7n-backlog-content">
-              <DragDropContext
-                onDragEnd={(result) => {
-                  BacklogStore.setIsDragging(false);
-                  const { destination, source, draggableId } = result;
-
-                  if (destination) {
-                    const { droppableId: destinationId, index: destinationIndex } = destination;
-                    const { droppableId: sourceId, index: sourceIndex } = source;
-                    if (destinationId === sourceId && destinationIndex === sourceIndex) {
-                      return;
-                    }
-                    if (result.reason !== 'CANCEL') {
-                      const item = BacklogStore.getIssueMap.get(sourceId)[sourceIndex];
-                      if (BacklogStore.getMultiSelected.size > 1 && !BacklogStore.getMultiSelected.has(BacklogStore.getIssueMap.get(destinationId)[destinationIndex].issueId)) {
-                        BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi');
-                      } else {
-                        BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single');
-                      }
-                    }
-                  }
-                }}
-                onDragStart={(result) => {
-                  BacklogStore.setIsDragging(true);
-                  const { source, draggableId } = result;
-                  const { droppableId: sourceId, index: sourceIndex } = source;
-                  const item = BacklogStore.getIssueMap.get(sourceId)[sourceIndex];
-                  BacklogStore.setIssueWithEpicOrVersion(item);
+            <Spin spinning={BacklogStore.getSpinIf}>
+              <div
+                className="c7n-backlog-content"
+                onScroll={() => {
+                  debugger;
                 }}
               >
-                <Spin spinning={BacklogStore.getSpinIf}>
+                <DragDropContext
+                  onDragEnd={(result) => {
+                    BacklogStore.setIsDragging(null);
+                    const { destination, source, draggableId } = result;
+                    if (destination) {
+                      debugger;
+                      const { droppableId: destinationId, index: destinationIndex } = destination;
+                      const { droppableId: sourceId, index: sourceIndex } = source;
+                      if (destinationId === sourceId && destinationIndex === sourceIndex) {
+                        return;
+                      }
+                      if (result.reason !== 'CANCEL') {
+                        const item = BacklogStore.getIssueMap.get(sourceId)[sourceIndex];
+                        if (BacklogStore.getMultiSelected.size > 1 && !BacklogStore.getMultiSelected.has(BacklogStore.getIssueMap.get(destinationId)[destinationIndex === BacklogStore.getIssueMap.get(destinationId).length ? destinationIndex - 1 : destinationIndex].issueId)) {
+                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi');
+                        } else {
+                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single');
+                        }
+                      }
+                    }
+                  }}
+                  onDragStart={(result) => {
+                    const { source, draggableId } = result;
+                    const { droppableId: sourceId, index: sourceIndex } = source;
+                    const item = BacklogStore.getIssueMap.get(sourceId)[sourceIndex];
+                    BacklogStore.setIsDragging(item.issueId);
+                    BacklogStore.setIssueWithEpicOrVersion(item);
+                  }}
+                >
                   <SprintItem
                     epicVisible={BacklogStore.getEpicVisible}
                     versionVisible={BacklogStore.getVersionVisible}
@@ -350,20 +363,20 @@ class BacklogHome extends Component {
                     }}
                     refresh={this.refresh}
                   />
-                </Spin>
-              </DragDropContext>
-              <Injecter store={BacklogStore} item="newIssueVisible">
-                {visible => (
-                  <CreateIssue
-                    visible={visible}
-                    onCancel={() => {
-                      BacklogStore.setNewIssueVisible(false);
-                    }}
-                    onOk={this.handleCreateIssue}
-                  />
-                )}
-              </Injecter>
-            </div>
+                </DragDropContext>
+                <Injecter store={BacklogStore} item="newIssueVisible">
+                  {visible => (
+                    <CreateIssue
+                      visible={visible}
+                      onCancel={() => {
+                        BacklogStore.setNewIssueVisible(false);
+                      }}
+                      onOk={this.handleCreateIssue}
+                    />
+                  )}
+                </Injecter>
+              </div>
+            </Spin>
             <IssueDetail
               refresh={this.refresh}
               onRef={(ref) => {
