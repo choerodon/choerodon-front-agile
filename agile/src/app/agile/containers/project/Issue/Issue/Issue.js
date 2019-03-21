@@ -127,6 +127,8 @@ class Issue extends Component {
     if (document && document.getElementsByClassName('page-body').length) {
       // document.getElementsByClassName('page-body')[0].style.overflow = 'hidden';
     }
+
+    console.log(IssueStore.getBackUrl);
     return (
       <Page
         className="c7n-Issue"

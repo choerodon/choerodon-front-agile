@@ -37,8 +37,8 @@ class SideBarContent extends Component {
           boardId: ScrumBoardStore.getSelectedBoard,
           name: values.name,
           projectId: AppState.currentMenuType.id,
-          maxNum: 1,
-          minNum: 1,
+          // maxNum: 1,
+          // minNum: 1,
           categoryCode: values.categoryCode,
           sequence: ScrumBoardStore.getBoardData.length - 1,
         };
@@ -108,6 +108,7 @@ class SideBarContent extends Component {
   checkStatusName(rule, value, callback) {
     if (!value) {
       callback();
+      return;
     }
     const { store, form } = this.props;
     if (this.checkStatusDebounce) {
