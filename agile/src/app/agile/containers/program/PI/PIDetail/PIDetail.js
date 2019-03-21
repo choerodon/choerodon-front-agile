@@ -152,7 +152,7 @@ class PIDetail extends Component {
   handldLinkToPIDetail = () => {
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
-    history.push(`/agile/pi?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+    history.push(encodeURI(`/agile/pi?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}`));
   }
 
   handleCreateFeatureBtnClick = () => {
