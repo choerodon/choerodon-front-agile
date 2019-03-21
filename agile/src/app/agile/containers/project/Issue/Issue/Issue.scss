@@ -639,8 +639,8 @@
   .c7n-filterList-content {
     list-style: none;
     padding: 0;
-    max-height: 400px;
-    overflow-y: auto;
+    height: 400px;
+    overflow-y: scroll;
     .c7n-filterList-item {
       display: flex;
       height: 36px;
