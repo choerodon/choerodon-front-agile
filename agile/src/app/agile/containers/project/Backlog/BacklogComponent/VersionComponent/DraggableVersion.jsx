@@ -152,7 +152,8 @@ class VersionItem extends Component {
     });
   }
 
-  toggleExpand = () => {
+  toggleExpand = (e) => {
+    e.stopPropagation();
     const { expand } = this.state;
     this.setState({
       expand: !expand,

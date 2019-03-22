@@ -20,7 +20,6 @@ const { confirm } = Modal;
 @observer class SprintHeader extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       sprintName: props.data.sprintName,
       startDate: props.data.startDate,
@@ -30,8 +29,18 @@ const { confirm } = Modal;
     };
   }
 
+  componentWillReceiveProps(nextProps, nextContext) {
+    this.setState({
+      sprintName: nextProps.data.sprintName,
+      startDate: nextProps.data.startDate,
+      endDate: nextProps.data.endDate,
+      sprintGoal: nextProps.data.sprintGoal,
+      objectVersionNumber: nextProps.data.objectVersionNumber,
+    });
+  }
+
   handleBlurName = (value) => {
-    if (value) {
+    if (/[^\s]+/.test(value)) {
       const { data, AppState } = this.props;
       const { objectVersionNumber } = this.state;
       const req = {
@@ -133,21 +142,6 @@ const { confirm } = Modal;
     }
   };
 
-  componentWillReceiveProps(nextProps, nextContext) {
-
-    this.setState({
-      sprintName: nextProps.data.sprintName,
-      startDate: nextProps.data.startDate,
-      endDate: nextProps.data.endDate,
-      sprintGoal: nextProps.data.sprintGoal,
-      objectVersionNumber: nextProps.data.objectVersionNumber,
-    });
-  }
-
-  componentWillUpdate(nextProps, nextState, nextContext) {
-
-  }
-
   render() {
     const {
       data, expand, toggleSprint, sprintId, issueCount, refresh,
@@ -172,7 +166,6 @@ const { confirm } = Modal;
                 issueCount={issueCount}
               />
             </div>
-            <ClearFilter />
           </div>
           <div style={{ flex: 9 }}>
             <SprintStatus

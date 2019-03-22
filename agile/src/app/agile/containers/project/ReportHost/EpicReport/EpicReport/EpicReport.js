@@ -725,7 +725,7 @@ class EpicReport extends Component {
                               }}
                               role="none"
                               onClick={() => {
-                                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题&paramUrl=reporthost/EpicReport`);
+                                history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=epic&paramId=${ES.currentEpicId}&paramName=${encodeURIComponent(`${ES.epics.find(x => x.issueId === ES.currentEpicId).epicName}下的问题`)}&paramUrl=reporthost/EpicReport`);
                               }}
                             >
                               {'在“问题管理”中查看'}

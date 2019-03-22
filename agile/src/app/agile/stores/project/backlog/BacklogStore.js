@@ -8,6 +8,8 @@ const { AppState } = stores;
 
 @store('BacklogStore')
 class BacklogStore {
+  @observable createdSprint = '';
+
   @observable hasActiveSprint = false;
 
   @observable issueCantDrag = false;
@@ -60,7 +62,7 @@ class BacklogStore {
 
   @observable recent = false;
 
-  @observable isDragging = false;
+  @observable isDragging = '';
 
   @observable isLeaveSprint = false;
 
@@ -514,6 +516,7 @@ class BacklogStore {
 
   @action initBacklogData(quickSearchData, issueTypesData, priorityArrData, { backlogData, sprintData }) {
     this.issueCantDrag = false;
+    this.multiSelected.clear();
     this.quickSearchList = quickSearchData;
     if (issueTypesData && !issueTypesData.failed) {
       this.issueTypes = issueTypesData;
@@ -523,7 +526,11 @@ class BacklogStore {
     }
     this.issueMap.set('0', backlogData.backLogIssue ? backlogData.backLogIssue : []);
     this.backlogData = backlogData;
-    sprintData.forEach((sprint) => {
+    sprintData.forEach((sprint, index) => {
+      if (sprint.sprintId === this.createdSprint) {
+        // eslint-disable-next-line no-param-reassign
+        sprintData[index].isCreated = true;
+      }
       this.issueMap.set(sprint.sprintId.toString(), sprint.issueSearchDTOList);
     });
     this.sprintData = sprintData;
@@ -629,6 +636,7 @@ class BacklogStore {
   }
 
   @action resetData() {
+    this.createdSprint = '';
     this.issueMap = observable.map();
     this.whichVisible = null;
     this.assigneeFilterIds = [];
@@ -898,6 +906,10 @@ class BacklogStore {
   @action onBlurClick() {
     this.multiSelected.clear();
     this.clickIssueDetail = {};
+  }
+
+  @action setCreatedSprint(data) {
+    this.createdSprint = data;
   }
 }
 

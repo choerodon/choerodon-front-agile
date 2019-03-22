@@ -8,7 +8,7 @@
   }
   padding-bottom: 9px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  background: rgba(0, 0, 0, 0.02);
+  background: #fff;
   padding-top: 8px;
 
   .c7n-backlog-sprintName {
@@ -49,15 +49,6 @@
 
       .not-visible {
         display: none;
-      }
-
-      .c7n-backlog-clearFilter {
-        margin-left: 18px;
-        font-size: 13px;
-        line-height: 20px;
-        white-space: nowrap;
-        color: rgb(48, 63, 159);
-        cursor: pointer;
       }
 
       .c7n-backlog-sprintStatus {
@@ -180,6 +171,8 @@
   .c7n-backlog-sprintCount {
     width: 20px;
     height: 20px;
+    line-height: 20px;
+    text-align: center;
     background: red;
     color: white;
     border-radius: 50%;
@@ -197,6 +190,7 @@
     overflow: hidden;
     // width: 0;
     .ant-form-item {
+      //flex: 1;
       margin-bottom: 0 !important;
     }
     .c7n-backlog-sprintSideRightItems {

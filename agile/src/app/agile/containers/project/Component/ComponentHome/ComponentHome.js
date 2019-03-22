@@ -159,7 +159,7 @@ class ComponentHome extends Component {
                     encodeURIComponent(urlParams.name)
                   }&organizationId=${urlParams.organizationId}&paramType=component&paramId=${
                     record.componentId
-                  }&paramName=模块"${record.name}"下的问题&paramUrl=component`,
+                  }&paramName=${encodeURIComponent(`模块"${record.name}"下的问题`)}&paramUrl=component`,
                 );
               }}
             >

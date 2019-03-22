@@ -23,8 +23,18 @@
   display: flex;
   width: 100%;
   border-top: 1px solid #d3d3d3;
-  overflow: hidden;
-  height: 100vh;
+  height: calc(100vh - 156px);
+  .ant-spin-nested-loading {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    .ant-spin-container {
+      flex-direction: column;
+      display: flex;
+      flex: 1;
+      width: 100%;
+    }
+  }
   p {
     margin-bottom: 0;
   }
@@ -69,18 +79,17 @@
 .c7n-backlog-content {
   //position: absolute;
   //left: 24px;
-  overflow: auto;
+  overflow-x: unset;
+  overflow-y: auto;
   flex: 1;
   display: flex;
-  .ant-spin-nested-loading {
-    display: flex;
-    flex: 1;
-    width: 100%;
-    .ant-spin-container {
-      width: 100%;
-      flex-direction: column;
-      display: flex;
-      flex: 1;
-    }
-  }
+}
+
+.c7n-backlog-clearFilter {
+  margin-left: 18px;
+  font-size: 13px;
+  line-height: 20px;
+  white-space: nowrap;
+  color: rgb(48, 63, 159);
+  cursor: pointer;
 }

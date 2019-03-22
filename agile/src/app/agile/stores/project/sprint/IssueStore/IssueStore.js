@@ -113,6 +113,9 @@ class SprintCommonStore {
   // 筛选列表是否显示
   @observable filterListVisible = false;
 
+  // 跳入问题列表的url,用于返回
+  @observable paramUrl = false;
+
   @computed get getFilterListVisible() {
     return this.filterListVisible;
   }
@@ -661,9 +664,10 @@ class SprintCommonStore {
       this.setLoading(false);
       Choerodon.prompt('获取我的筛选列表失败');
     });
-  }
+  };
 
-  resetFilterSelect = (filterControler) => {
+  // noLoad: Issue卸载时，只需要清空筛选，不用加载数据
+  resetFilterSelect = (filterControler, noLoad) => {
     const projectInfo = this.getProjectInfo;
     this.setSelectedFilterId(undefined);
     this.setSelectedMyFilterInfo({});
@@ -697,8 +701,10 @@ class SprintCommonStore {
     filterControler.assigneeFilterUpdate([]);
     filterControler.advancedSearchArgsFilterUpdate([], [], []);
     filterControler.searchArgsFilterUpdate('', '');
-    this.updateIssues(filterControler, []);
-  }
+    if (!noLoad) {
+      this.updateIssues(filterControler, []);
+    }
+  };
 
   updateIssues = (filterControler, barFilter) => {
     this.setLoading(true);

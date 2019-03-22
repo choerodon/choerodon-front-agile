@@ -94,7 +94,6 @@ class QuickSearch extends Component {
   };
 
   render() {
-    // debugger;
     // 防抖函数
     const debounceCallback = this.deBounce(500);
     const { style, AppState } = this.props;

@@ -34,11 +34,10 @@ class IssueItem extends Component {
         onClick={this.handleClick}
         role="none"
       >
-        {/* <SprintCount
-                item={item}
-                // draggableId={draggableId}
-                // selected={selected}
-              /> */}
+        <SprintCount
+          key={item.issueId}
+          issueId={item.issueId}
+        />
         <SprintIssue
           key={item.issueId}
           ref={((e) => {
