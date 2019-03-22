@@ -407,7 +407,7 @@ class BacklogStore {
 
   @action setSprintData({ backlogData, sprintData }) {
     this.spinIf = false;
-    this.multiSelected = observable.map();
+    // this.multiSelected = observable.map();
     this.issueMap.set('0', backlogData.backLogIssue);
     this.backlogData = backlogData;
     sprintData.forEach((sprint) => {
@@ -701,14 +701,16 @@ class BacklogStore {
         destinationArr.unshift(issueItem);
       }
       if (sourceId === destinationId) {
+        debugger;
         const dragInSingleSprint = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
-        dragInSingleSprint.splice(destinationIndex, 0, ...[...this.multiSelected.values()])
+        dragInSingleSprint.splice(destinationIndex, 0, ...[...this.multiSelected.values()]);
         this.issueMap.set(destinationId, dragInSingleSprint);
       } else {
         this.issueMap.set(sourceId, modifiedSourceArr);
         this.issueMap.set(destinationId, destinationArr);
       }
     }
+    this.multiSelected = observable.map();
     axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/issues/to_sprint/${destinationId}`, {
       before: destinationIndex === 0,
       issueIds: modifiedArr,

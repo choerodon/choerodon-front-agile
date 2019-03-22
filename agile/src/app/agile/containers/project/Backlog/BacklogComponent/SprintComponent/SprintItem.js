@@ -65,10 +65,7 @@ class SprintItem extends Component {
       <div
         role="none"
         style={{
-          display: 'flex',
-          flex: 1,
-          // width: '100%',
-          flexDirection: 'column',
+          width: '100%',
         }}
         onClick={() => {
           if (!BacklogStore.isDragging) {

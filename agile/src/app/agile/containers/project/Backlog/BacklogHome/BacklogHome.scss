@@ -24,10 +24,12 @@
   width: 100%;
   border-top: 1px solid #d3d3d3;
   .ant-spin-nested-loading {
+    overflow-x: hidden;
     display: flex;
     flex: 1;
     width: 100%;
     .ant-spin-container {
+      overflow-x: hidden;
       flex-direction: column;
       display: flex;
       flex: 1;
@@ -78,10 +80,11 @@
 .c7n-backlog-content {
   //position: absolute;
   //left: 24px;
-  overflow-x: unset;
+  overflow-x: hidden;
   overflow-y: auto;
   flex: 1;
   display: flex;
+  width: 100%;
 }
 
 .c7n-backlog-clearFilter {
