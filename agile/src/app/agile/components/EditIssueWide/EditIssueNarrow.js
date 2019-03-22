@@ -1598,6 +1598,7 @@ class CreateSprint extends Component {
       fixVersions,
       addWiki,
       wikies,
+      createdById,
     } = this.state;
     const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
@@ -1610,9 +1611,7 @@ class CreateSprint extends Component {
       ));
       issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? issueTypes : issueTypes.filter(item => item.typeCode !== 'feature');
     }
-    const getMenu = () => {
-      const { createdById } = this.state;
-      return (
+    const getMenu = () => (
         <Menu onClick={this.handleClickMenu.bind(this)}>
           <Menu.Item key="0">登记工作日志</Menu.Item>
           {
@@ -1662,7 +1661,6 @@ class CreateSprint extends Component {
           }
         </Menu>
       );
-    };
     const callback = (value) => {
       this.setState(
         {
@@ -3081,7 +3079,7 @@ class CreateSprint extends Component {
                             style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}
                           >
                             <TextEditToggle
-                              disabled={reporterId !== loginUserId && !hasPermission}
+                              disabled={createdById !== loginUserId && !hasPermission}
                               formKey="reporterId"
                               onSubmit={(value) => { this.updateIssue('reporterId', value); }}
                               originData={reportShowUser}
