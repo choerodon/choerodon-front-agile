@@ -37,8 +37,6 @@ class SideBarContent extends Component {
           boardId: ScrumBoardStore.getSelectedBoard,
           name: values.name,
           projectId: AppState.currentMenuType.id,
-          // maxNum: 1,
-          // minNum: 1,
           categoryCode: values.categoryCode,
           sequence: ScrumBoardStore.getBoardData.length - 1,
         };
@@ -129,9 +127,10 @@ class SideBarContent extends Component {
           this.setState({
             statusType: false,
           }, () => {
-            form.setFieldsValue({
-              categoryCode: '',
-            });
+            // form.setFieldsValue({
+            //   categoryCode: '',
+            // });
+            // form.validateFields(['categoryCode']);
           });
         }
         callback();
@@ -212,11 +211,13 @@ class SideBarContent extends Component {
               {getFieldDecorator('name', {
                 rules: [{
                   required: true, message: `${modifiedName}名称是必填的`,
-                }, {
-                  validator: this.checkStatusName.bind(this),
-                }],
+                },
+                {
+                  validator: type === 'Status' && this.checkStatusName.bind(this),
+                },
+                ],
               })(
-                <Input label={`${modifiedName}名称`} placeholder={`请输入${modifiedName}名称`} maxLength={30} />,
+                <Input label={`${modifiedName}名称`} placeholder={`请输入${modifiedName}名称`} maxLength={10} />,
               )}
             </FormItem>
             <FormItem>
@@ -228,7 +229,7 @@ class SideBarContent extends Component {
                 <Select
                   label="类别"
                   placeholder="请选择类别"
-                  disabled={!!statusType}
+                  disabled={type === 'Status' ? !!statusType : false}
                 >
                   {this.renderOptions()}
                 </Select>,
