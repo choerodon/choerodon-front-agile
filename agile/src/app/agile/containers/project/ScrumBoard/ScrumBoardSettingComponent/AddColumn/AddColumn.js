@@ -26,7 +26,6 @@ class AddColumn extends Component {
 
   checkStatusName(rule, value, callback) {
     const { store, form } = this.props;
-    console.log(0);
     if (this.checkStatusDebounce) {
       clearTimeout(this.checkStatusDebounce);
       this.checkStatusDebounce = null;
