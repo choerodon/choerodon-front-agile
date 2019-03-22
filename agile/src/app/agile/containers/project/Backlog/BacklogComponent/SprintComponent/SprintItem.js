@@ -71,7 +71,6 @@ class SprintItem extends Component {
           flexDirection: 'column',
         }}
         onClick={() => {
-          debugger;
           if (!BacklogStore.isDragging) {
             BacklogStore.onBlurClick();
           }

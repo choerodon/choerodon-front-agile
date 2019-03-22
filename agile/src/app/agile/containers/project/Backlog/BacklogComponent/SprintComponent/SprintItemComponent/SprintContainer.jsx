@@ -25,9 +25,7 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
 
   componentDidMount() {
     const { isCreated } = this.props;
-    debugger;
     if (isCreated) {
-      debugger;
       setTimeout(() => {
         this.ref.scrollIntoView();
         this.ref.style.background = 'white';

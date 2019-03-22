@@ -6,7 +6,6 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import {
   Button, Spin, message, Icon,
 } from 'choerodon-ui';
-import _ from 'lodash';
 import Version from '../BacklogComponent/VersionComponent/Version';
 import Epic from '../BacklogComponent/EpicComponent/Epic';
 import IssueDetail from '../BacklogComponent/IssueDetailComponent/IssueDetail';
@@ -15,11 +14,11 @@ import './BacklogHome.scss';
 import SprintItem from '../BacklogComponent/SprintComponent/SprintItem';
 import QuickSearch from '../../../../components/QuickSearch';
 import Injecter from '../../../../components/Injecter';
-import Backlog from '../../userMap/component/Backlog/Backlog';
 import ClearFilter from '../BacklogComponent/SprintComponent/SprintItemComponent/SprintHeaderComponent/ClearAllFilter';
 
 const { AppState } = stores;
 
+@inject('HeaderStore')
 @observer
 class BacklogHome extends Component {
   constructor(props) {
@@ -32,7 +31,6 @@ class BacklogHome extends Component {
   }
 
   componentDidMount() {
-    const { BacklogStore, location } = this.props;
     this.refresh();
   }
 
@@ -40,11 +38,6 @@ class BacklogHome extends Component {
     const { BacklogStore } = this.props;
     BacklogStore.resetData();
   }
-
-  // 加载问题类型和默认优先级
-  loadProperty = () => {
-
-  };
 
   /**
    * 加载选择快速搜索的冲刺数据
@@ -108,11 +101,7 @@ class BacklogHome extends Component {
     const url = this.paramConverter(location.search);
     const { BacklogStore } = this.props;
     BacklogStore.setSpinIf(true);
-    // if (url.paramIssueId) {
-    //   BacklogStore.setClickIssueDetail({ issueId: url.paramIssueId });
-    // }
     this.getSprint(isCreate, issue);
-    const { versionVisible, epicVisible } = this.state;
     if (BacklogStore.getCurrentVisible === 'version') {
       this.loadVersion();
     } else {
@@ -139,24 +128,12 @@ class BacklogHome extends Component {
       projectId: AppState.currentMenuType.id,
     };
     BacklogStore.axiosCreateSprint(data).then((res) => {
-      debugger;
       BacklogStore.setCreatedSprint(res.sprintId);
       this.setState({
         loading: false,
       });
       this.refresh();
       Choerodon.prompt('创建成功');
-      // const anchorElement = document.getElementById('sprint_new');
-      // if (anchorElement) {
-      //   anchorElement.scrollIntoView({
-      //     behavior: 'smooth',
-      //     block: 'start',
-      //   });
-      // }
-      // if (document.getElementById('sprint_new')) {
-      //   document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop
-      // = document.getElementById('sprint_new').offsetTop - 224;
-      // }
     }).catch((error) => {
       this.setState({
         loading: false,
@@ -228,7 +205,7 @@ class BacklogHome extends Component {
   };
 
   render() {
-    const { BacklogStore } = this.props;
+    const { BacklogStore, HeaderStore } = this.props;
     return (
       <Page
         service={[
@@ -276,7 +253,12 @@ class BacklogHome extends Component {
             />
             <ClearFilter />
           </div>
-          <div className="c7n-backlog">
+          <div
+            className="c7n-backlog"
+            style={{
+              height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
+            }}
+          >
             <div className="c7n-backlog-side">
               <p
                 role="none"
@@ -300,9 +282,6 @@ class BacklogHome extends Component {
             </div>
             <Version
               store={BacklogStore}
-              onRef={(ref) => {
-                this.versionRef = ref;
-              }}
               refresh={this.refresh}
               visible={BacklogStore.getCurrentVisible}
               issueRefresh={() => {
@@ -310,9 +289,6 @@ class BacklogHome extends Component {
               }}
             />
             <Epic
-              onRef={(ref) => {
-                this.epicRef = ref;
-              }}
               refresh={this.refresh}
               visible={BacklogStore.getCurrentVisible}
               issueRefresh={() => {
@@ -320,18 +296,12 @@ class BacklogHome extends Component {
               }}
             />
             <Spin spinning={BacklogStore.getSpinIf}>
-              <div
-                className="c7n-backlog-content"
-                onScroll={() => {
-                  debugger;
-                }}
-              >
+              <div className="c7n-backlog-content">
                 <DragDropContext
                   onDragEnd={(result) => {
                     BacklogStore.setIsDragging(null);
                     const { destination, source, draggableId } = result;
                     if (destination) {
-                      debugger;
                       const { droppableId: destinationId, index: destinationIndex } = destination;
                       const { droppableId: sourceId, index: sourceIndex } = source;
                       if (destinationId === sourceId && destinationIndex === sourceIndex) {

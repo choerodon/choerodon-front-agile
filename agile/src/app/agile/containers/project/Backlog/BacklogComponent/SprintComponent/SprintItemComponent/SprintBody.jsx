@@ -1,29 +1,11 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import moment from 'moment';
 import { Droppable } from 'react-beautiful-dnd';
-import TypeTag from '../../../../../../components/TypeTag';
-import EasyEdit from '../../../../../../components/EasyEdit/EasyEdit';
-import UserHead from '../../../../../../components/UserHead';
-import AssigneeModal from './SprintHeaderComponent/AssigneeModal';
-import EmptyBacklog from '../../../../../../assets/image/emptyBacklog.svg';
 import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore';
-import SprintName from './SprintHeaderComponent/SprintName';
-import SprintVisibleIssue from './SprintHeaderComponent/SprintVisibleIssue';
-import SprintStatus from './SprintHeaderComponent/SprintStatus';
-import StoryPointContainer from './SprintHeaderComponent/StoryPointContainer';
-import AssigneeStoryPoint from './SprintHeaderComponent/AssigneeStoryPoint';
-import AssigneeInfo from './SprintHeaderComponent/AssigneeInfo';
-import SprintDateRange from './SprintHeaderComponent/SprintDateRange';
-import SprintGoal from './SprintHeaderComponent/SprintGoal';
-import ClearFilter from './SprintHeaderComponent/ClearAllFilter';
-import SprintHeader from './SprintHeader';
 import QuickCreateIssue from './QuickCreateIssue';
 import IssueList from './IssueList';
-import NoneIssue from './NoneIssue';
 import { deBounce } from '../Utils';
 
-const shouldContainTypeCode = ['issue_epic', 'sub_task'];
 const debounceCallback = deBounce(500);
 
 @inject('AppState')
@@ -81,42 +63,40 @@ const debounceCallback = deBounce(500);
     } = this.props;
 
     return (
-      <div ref={e => this.ref = e} className={this.props.isCreated ? 'creaed' : ''}>
-        <Droppable
-          droppableId={sprintId}
-          isDropDisabled={BacklogStore.getIssueCantDrag}
-        >
-          {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-              style={{
-                display: expand ? 'block' : 'none',
-                background: snapshot.isDraggingOver ? '#e9e9e9' : 'inherit',
-                padding: 'grid',
-                borderBottom: '1px solid rgba(0,0,0,0.12)',
-              }}
-            >
-              {issueCount ? (
-                <IssueList
-                  sprintItemRef={this.sprintItemRef}
-                  versionVisible={versionVisible}
-                  epicVisible={epicVisible}
-                  sprintId={sprintId}
-                />
-              ) : <EmptyIssueComponent />
-              }
-              {provided.placeholder}
-              <QuickCreateIssue
-                defaultPriority={defaultPriority}
+      <Droppable
+        droppableId={sprintId}
+        isDropDisabled={BacklogStore.getIssueCantDrag}
+      >
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            style={{
+              display: expand ? 'block' : 'none',
+              background: snapshot.isDraggingOver ? '#e9e9e9' : 'inherit',
+              padding: 'grid',
+              borderBottom: '1px solid rgba(0,0,0,0.12)',
+            }}
+          >
+            {issueCount ? (
+              <IssueList
+                sprintItemRef={this.sprintItemRef}
+                versionVisible={versionVisible}
+                epicVisible={epicVisible}
                 sprintId={sprintId}
-                issueType={issueType}
-                defaultType={defaultType}
-                handleCreateIssue={this.handleCreateIssue}
               />
-            </div>
-          )}
-        </Droppable>
-      </div>
+            ) : <EmptyIssueComponent />
+              }
+            {provided.placeholder}
+            <QuickCreateIssue
+              defaultPriority={defaultPriority}
+              sprintId={sprintId}
+              issueType={issueType}
+              defaultType={defaultType}
+              handleCreateIssue={this.handleCreateIssue}
+            />
+          </div>
+        )}
+      </Droppable>
     );
   }
 }
