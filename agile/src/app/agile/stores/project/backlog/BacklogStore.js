@@ -368,7 +368,7 @@ class BacklogStore {
   }
 
   @computed get getChosenVersion() {
-    return toJS(this.chosenVersion);
+    return this.chosenVersion;
   }
 
   @action setChosenVersion(data) {
@@ -381,7 +381,7 @@ class BacklogStore {
   }
 
   @computed get getChosenEpic() {
-    return toJS(this.chosenEpic);
+    return this.chosenEpic;
   }
 
   @action setChosenEpic(data) {
@@ -407,7 +407,7 @@ class BacklogStore {
 
   @action setSprintData({ backlogData, sprintData }) {
     this.spinIf = false;
-    this.multiSelected.clear();
+    this.multiSelected = observable.map();
     this.issueMap.set('0', backlogData.backLogIssue);
     this.backlogData = backlogData;
     sprintData.forEach((sprint) => {
@@ -516,7 +516,7 @@ class BacklogStore {
 
   @action initBacklogData(quickSearchData, issueTypesData, priorityArrData, { backlogData, sprintData }) {
     this.issueCantDrag = false;
-    this.multiSelected.clear();
+    this.multiSelected = observable.map();
     this.quickSearchList = quickSearchData;
     if (issueTypesData && !issueTypesData.failed) {
       this.issueTypes = issueTypesData;
@@ -607,7 +607,7 @@ class BacklogStore {
 
   @action clickedOnce(sprintId, currentClick) {
     const index = this.issueMap.get(sprintId).findIndex(issue => issue.issueId === currentClick.issueId);
-    this.multiSelected.clear();
+    this.multiSelected = observable.map();
     this.multiSelected.set(currentClick.issueId, currentClick);
     this.prevClickedIssue = {
       ...currentClick,
@@ -693,14 +693,21 @@ class BacklogStore {
       this.issueMap.set(sourceId, sourceArr);
       this.issueMap.set(destinationId, destinationArr);
     } else if (type === 'multi') {
+      debugger;
       const modifiedSourceArr = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
       destinationArr.splice(destinationIndex, 0, ...[...this.multiSelected.values()]);
       if (!this.multiSelected.has(issueItem.issueId)) {
         modifiedSourceArr.splice(sourceIndex, 1);
         destinationArr.unshift(issueItem);
       }
-      this.issueMap.set(sourceId, modifiedSourceArr);
-      this.issueMap.set(destinationId, destinationArr);
+      if (sourceId === destinationId) {
+        const dragInSingleSprint = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
+        dragInSingleSprint.splice(destinationIndex, 0, ...[...this.multiSelected.values()])
+        this.issueMap.set(destinationId, dragInSingleSprint);
+      } else {
+        this.issueMap.set(sourceId, modifiedSourceArr);
+        this.issueMap.set(destinationId, destinationArr);
+      }
     }
     axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/issues/to_sprint/${destinationId}`, {
       before: destinationIndex === 0,
@@ -859,6 +866,8 @@ class BacklogStore {
   @action resetFilter() {
     this.spinIf = true;
     this.filter = { advancedSearchArgs: {} };
+    this.versionFilter = 'all';
+    this.epicFilter = 'all';
     this.quickFilters = [];
     this.assigneeFilterIds = [];
   }
@@ -904,7 +913,7 @@ class BacklogStore {
   }
 
   @action onBlurClick() {
-    this.multiSelected.clear();
+    this.multiSelected = observable.map();
     this.clickIssueDetail = {};
   }
 

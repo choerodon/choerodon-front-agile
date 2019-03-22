@@ -20,14 +20,21 @@
     width: 100%;
     &-summaryContainer {
       margin-left: 8px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
       height: 20px;
       word-break: break-all;
+      width: 100%;
+      display: flex;
+      text-overflow: ellipsis;
     }
     &-issueNum {
-      margin-right: 4px;
+      white-space: nowrap;
+      margin: 0 4px;
+    }
+    &-issueSummary {
+      white-space: normal;
+      overflow: hidden;
+      -ms-text-overflow: ellipsis;
+      text-overflow: ellipsis;
     }
   }
   .line-two-left {

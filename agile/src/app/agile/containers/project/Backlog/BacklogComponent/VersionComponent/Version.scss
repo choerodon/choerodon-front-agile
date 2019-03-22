@@ -41,6 +41,10 @@
         cursor: pointer;
       }
 
+      .c7n-backlog-versionItems.onClickVersion {
+        background: rgba(140, 158, 255, 0.08) !important;
+      }
+
       .c7n-backlog-versionItems:hover {
         background: rgba(140, 158, 255, 0.08);
       }

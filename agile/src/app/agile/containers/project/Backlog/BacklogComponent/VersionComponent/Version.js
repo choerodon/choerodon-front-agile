@@ -118,7 +118,6 @@ class Version extends Component {
                     ref={provided.innerRef}
                     style={{
                       background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                      padding: 'grid',
                     }}
                   >
                     <VersionItem
