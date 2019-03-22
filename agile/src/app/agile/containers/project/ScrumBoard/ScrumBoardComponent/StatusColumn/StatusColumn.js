@@ -14,8 +14,8 @@ class StatusColumn extends Component {
     return [...ScrumBoardStore.getHeaderData.values()].filter(column => column.hasStatus).map(column => (
       <div
         className={classnames('c7n-scrumboard-statusHeader', {
-          greaterThanMax: !ScrumBoardStore.didCurrentSprintExist && columnConstraintsIsOn && column.maxNum !== null && ScrumBoardStore.getAllColumnCount.get(column.columnId) > column.maxNum,
-          lessThanMin: !ScrumBoardStore.didCurrentSprintExist && columnConstraintsIsOn && column.minNum !== null && ScrumBoardStore.getAllColumnCount.get(column.columnId) < column.minNum,
+          greaterThanMax: ScrumBoardStore.didCurrentSprintExist && columnConstraintsIsOn && column.maxNum !== null && ScrumBoardStore.getAllColumnCount.get(column.columnId) > column.maxNum,
+          lessThanMin: ScrumBoardStore.didCurrentSprintExist && columnConstraintsIsOn && column.minNum !== null && ScrumBoardStore.getAllColumnCount.get(column.columnId) < column.minNum,
         })}
         key={column.columnId}
       >
