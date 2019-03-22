@@ -5,7 +5,6 @@ import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 @observer
 export default class SprintCount extends Component {
   render() {
-    debugger;
     const { issueId } = this.props;
     return BacklogStore.getIsDragging === issueId && BacklogStore.getMultiSelected.size > 0 ? (
       <span

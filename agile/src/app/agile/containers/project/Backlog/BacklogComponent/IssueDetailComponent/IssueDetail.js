@@ -69,7 +69,7 @@ class IssueDetail extends Component {
               }).catch((error) => {
               });
             }}
-            onUpdate={this.handleIssueUpdate.bind(this)}
+            onUpdate={refresh}
           />
         ) : ''}
       </div>

@@ -46,7 +46,15 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
     const { expand } = this.state;
     const issueCount = BacklogStore.getIssueMap.get('0') ? BacklogStore.getIssueMap.get('0').length : 0;
     return (
-      <React.Fragment>
+      <div
+        ref={e => this.ref = e}
+        style={{
+          // background: isCreated ? '#eee' : 'white',
+          transition: 'all 2s',
+          width: '100%',
+        }}
+        // key={sprintItem.sprintId}
+      >
         <BacklogHeader
           issueCount={issueCount}
           data={backlogData}
@@ -64,7 +72,7 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
           droppableId="backlogData"
           EmptyIssueComponent={NoneBacklog}
         />
-      </React.Fragment>
+      </div>
     );
   };
 

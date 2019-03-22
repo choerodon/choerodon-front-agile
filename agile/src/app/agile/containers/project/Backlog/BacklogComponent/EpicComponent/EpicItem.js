@@ -44,7 +44,6 @@ class EpicItem extends Component {
           }}
           onMouseUp={(e) => {
             if (BacklogStore.getIsDragging) {
-
               BacklogStore.toggleIssueDrag(false);
               e.currentTarget.style.border = 'none';
               BacklogStore.axiosUpdateIssuesToEpic(

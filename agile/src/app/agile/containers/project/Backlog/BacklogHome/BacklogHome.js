@@ -266,7 +266,7 @@ class BacklogHome extends Component {
           <div
             className="backlogTools"
             style={{
-              paddingLeft: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              paddingLeft: 24, display: 'flex', alignItems: 'center',
             }}
           >
             <QuickSearch

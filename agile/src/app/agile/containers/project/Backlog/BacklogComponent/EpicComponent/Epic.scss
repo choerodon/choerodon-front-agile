@@ -50,6 +50,9 @@
           padding: 8px 6px 8px 16px !important;
         }
       }
+      .c7n-backlog-epicItems.onClickEpic {
+        background: rgba(140, 158, 255, 0.08) !important;
+      }
 
       .c7n-backlog-epicItems:hover {
         background: rgba(140, 158, 255, 0.08);

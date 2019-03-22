@@ -67,6 +67,7 @@ class SprintItem extends Component {
         style={{
           display: 'flex',
           flex: 1,
+          // width: '100%',
           flexDirection: 'column',
         }}
         onClick={() => {
