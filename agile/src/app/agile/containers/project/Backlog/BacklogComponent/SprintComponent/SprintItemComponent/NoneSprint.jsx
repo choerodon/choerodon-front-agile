@@ -18,11 +18,11 @@ import EmptyBacklog from '../../../../../../assets/image/emptyBacklog.svg';
       >
         <img style={{ width: 172 }} alt="emptybacklog" src={EmptyBacklog} />
         <div style={{ marginLeft: 40 }}>
-          <p style={{ color: 'rgba(0,0,0,0.65)' }}>用问题填充您的冲刺</p>
+          <p style={{ color: 'rgba(0,0,0,0.65)' }}>用问题填充您的待办事项</p>
           <p style={{ fontSize: 16, lineHeight: '28px', marginTop: 8 }}>
-            {'这是您的冲刺区域。创建并预估新的问题，并通'}
+            {'这是您的团队待办事项。创建并预估新的问题，并通'}
             <br />
-            {'过上下拖动来对冲刺问题排优先级'}
+            {'过上下拖动来对待办事项排优先级'}
           </p>
         </div>
       </div>
