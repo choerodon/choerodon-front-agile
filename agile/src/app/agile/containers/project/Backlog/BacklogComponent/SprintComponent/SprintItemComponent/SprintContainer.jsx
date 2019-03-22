@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import classnames from 'classnames';
 import SprintHeader from './SprintHeader';
 import SprintBody from './SprintBody';
-import NoneSprint from './NoneSprint';
+import NoneIssue from './NoneIssue';
 import NoneBacklog from './NoneBacklog';
 import BacklogHeader from './BacklogHeader';
 import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore';
@@ -106,7 +106,7 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
           expand={expand}
           sprintId={sprintItem.sprintId.toString()}
           droppableId={sprintItem.sprintId.toString()}
-          EmptyIssueComponent={NoneSprint}
+          EmptyIssueComponent={NoneIssue}
         />
       </div>
     );

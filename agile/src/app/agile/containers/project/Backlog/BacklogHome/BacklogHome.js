@@ -339,7 +339,16 @@ class BacklogHome extends Component {
                       }
                       if (result.reason !== 'CANCEL') {
                         const item = BacklogStore.getIssueMap.get(sourceId)[sourceIndex];
-                        if (BacklogStore.getMultiSelected.size > 1 && !BacklogStore.getMultiSelected.has(BacklogStore.getIssueMap.get(destinationId)[destinationIndex === BacklogStore.getIssueMap.get(destinationId).length ? destinationIndex - 1 : destinationIndex].issueId)) {
+                        const destinationArr = BacklogStore.getIssueMap.get(destinationId);
+                        let destinationItem;
+                        if (destinationIndex === 0) {
+                          destinationItem = null;
+                        } else if (destinationIndex === BacklogStore.getIssueMap.get(destinationId).length) {
+                          destinationItem = destinationArr[destinationIndex - 1];
+                        } else {
+                          destinationItem = destinationArr[destinationIndex];
+                        }
+                        if (BacklogStore.getMultiSelected.size > 1 && !BacklogStore.getMultiSelected.has(destinationItem)) {
                           BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi');
                         } else {
                           BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single');

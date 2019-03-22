@@ -1,7 +1,9 @@
 export function deBounce(delay) {
   let timeout;
+  debugger;
   return (fn, that) => {
     if (timeout) {
+      console.log(timeout);
       clearTimeout(timeout);
       timeout = null;
     }

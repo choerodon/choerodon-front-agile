@@ -914,7 +914,7 @@ class BacklogStore {
 
   @action onBlurClick() {
     this.multiSelected = observable.map();
-    this.clickIssueDetail = {};
+    // this.clickIssueDetail = {};
   }
 
   @action setCreatedSprint(data) {

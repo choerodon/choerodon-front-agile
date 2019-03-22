@@ -20,23 +20,16 @@ import ClearFilter from './SprintHeaderComponent/ClearAllFilter';
 import SprintHeader from './SprintHeader';
 import QuickCreateIssue from './QuickCreateIssue';
 import IssueList from './IssueList';
-import NoneSprint from './NoneSprint';
+import NoneIssue from './NoneIssue';
 import { deBounce } from '../Utils';
-import Backlog from "../../../../userMap/component/Backlog/Backlog";
 
 const shouldContainTypeCode = ['issue_epic', 'sub_task'];
+const debounceCallback = deBounce(500);
 
 @inject('AppState')
 @observer class SprintBody extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
   handleCreateIssue(currentType, inputValue) {
     const { defaultPriority, AppState, sprintId } = this.props;
-    const debounceCallback = deBounce(500);
     // 防抖函数
     debounceCallback(() => {
       const req = {
@@ -86,7 +79,6 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task'];
       defaultType, issueType, defaultPriority,
       isCreated,
     } = this.props;
-    const { selected, draggableId } = this.state;
 
     return (
       <div ref={e => this.ref = e} className={this.props.isCreated ? 'creaed' : ''}>

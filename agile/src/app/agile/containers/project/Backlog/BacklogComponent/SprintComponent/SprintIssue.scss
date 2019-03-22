@@ -17,7 +17,7 @@
     display: flex;
     flex: 9;
     margin-bottom: 2px;
-    width: 100%;
+    min-width: 220px;
     &-summaryContainer {
       margin-left: 8px;
       height: 20px;
@@ -31,7 +31,7 @@
       margin: 0 4px;
     }
     &-issueSummary {
-      white-space: normal;
+      white-space: nowrap;
       overflow: hidden;
       -ms-text-overflow: ellipsis;
       text-overflow: ellipsis;
