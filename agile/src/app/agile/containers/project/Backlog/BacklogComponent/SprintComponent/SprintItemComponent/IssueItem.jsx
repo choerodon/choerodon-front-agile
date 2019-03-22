@@ -35,7 +35,7 @@ class IssueItem extends Component {
         role="none"
       >
         <SprintCount
-          key={item.issueId}
+          key={`${item.issueId}-count`}
           issueId={item.issueId}
         />
         <SprintIssue

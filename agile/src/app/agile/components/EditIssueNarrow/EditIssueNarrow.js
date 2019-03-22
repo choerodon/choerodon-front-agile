@@ -2572,35 +2572,40 @@ class CreateSprint extends Component {
                                   });
                                 }}
                                 readModeContent={(
-                                  <div>
-                                    {
-                                      !closeSprint.length && !activeSprint.sprintId ? '无' : (
-                                        <div>
+                                  <Tooltip
+                                    placement="top"
+                                    title={`该问题经历迭代数：${closeSprint.length + (activeSprint.sprintId ? 1 : 0)}`}
+                                  >
+                                    <div>
+                                      {
+                                        !closeSprint.length && !activeSprint.sprintId ? '无' : (
                                           <div>
-                                            {_.map(closeSprint, 'sprintName').join(' , ')}
+                                            <div>
+                                              {_.map(closeSprint, 'sprintName').join(' , ')}
+                                            </div>
+                                            {
+                                              activeSprint.sprintId && (
+                                                <div
+                                                  style={{
+                                                    color: '#4d90fe',
+                                                    // border: '1px solid #4d90fe',
+                                                    // borderRadius: '2px',
+                                                    fontSize: '13px',
+                                                    lineHeight: '20px',
+                                                    // padding: '0 8px',
+                                                    display: 'inline-block',
+                                                    marginTop: 5,
+                                                  }}
+                                                >
+                                                  {activeSprint.sprintName}
+                                                </div>
+                                              )
+                                            }
                                           </div>
-                                          {
-                                            activeSprint.sprintId && (
-                                              <div
-                                                style={{
-                                                  color: '#4d90fe',
-                                                  // border: '1px solid #4d90fe',
-                                                  // borderRadius: '2px',
-                                                  fontSize: '13px',
-                                                  lineHeight: '20px',
-                                                  // padding: '0 8px',
-                                                  display: 'inline-block',
-                                                  marginTop: 5,
-                                                }}
-                                              >
-                                                {activeSprint.sprintName}
-                                              </div>
-                                            )
-                                          }
-                                        </div>
-                                      )
-                                    }
-                                  </div>
+                                        )
+                                      }
+                                    </div>
+                                  </Tooltip>
                                 )}
                               >
                                 {
@@ -2721,7 +2726,7 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
-                                {'Epic名：'}
+                                {'史诗名：'}
                               </span>
                             </div>
                             <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -2736,7 +2741,7 @@ class CreateSprint extends Component {
                                 onOk={this.updateIssue.bind(this, 'epicName')}
                                 onCancel={this.resetEpicName.bind(this)}
                                 readModeContent={(
-                                  <div>
+                                  <div style={{ minWidth: '150px' }}>
                                     <p style={{ wordBreak: 'break-word', marginBottom: 0 }}>
                                       {epicName}
                                     </p>

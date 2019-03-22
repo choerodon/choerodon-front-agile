@@ -693,7 +693,6 @@ class BacklogStore {
       this.issueMap.set(sourceId, sourceArr);
       this.issueMap.set(destinationId, destinationArr);
     } else if (type === 'multi') {
-      debugger;
       const modifiedSourceArr = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
       destinationArr.splice(destinationIndex, 0, ...[...this.multiSelected.values()]);
       if (!this.multiSelected.has(issueItem.issueId)) {
@@ -701,7 +700,6 @@ class BacklogStore {
         destinationArr.unshift(issueItem);
       }
       if (sourceId === destinationId) {
-        debugger;
         const dragInSingleSprint = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
         dragInSingleSprint.splice(destinationIndex, 0, ...[...this.multiSelected.values()]);
         this.issueMap.set(destinationId, dragInSingleSprint);
