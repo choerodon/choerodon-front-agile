@@ -2721,7 +2721,7 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
-                                {'Epic名：'}
+                                {'史诗名：'}
                               </span>
                             </div>
                             <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -2736,7 +2736,7 @@ class CreateSprint extends Component {
                                 onOk={this.updateIssue.bind(this, 'epicName')}
                                 onCancel={this.resetEpicName.bind(this)}
                                 readModeContent={(
-                                  <div>
+                                  <div style={{ minWidth: '150px' }}>
                                     <p style={{ wordBreak: 'break-word', marginBottom: 0 }}>
                                       {epicName}
                                     </p>
