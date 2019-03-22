@@ -95,14 +95,14 @@
     padding-bottom: 0 !important;
   }
   .status {
-    order: 3;
+    order: 4;
     padding-right: 7px !important;
     .c7n-statusTag {
       vertical-align: -6px !important;
     }
   }
   .priority {
-    order: 4;
+    order: 5;
     padding-right: 7px !important;
     .c7n-priorityTag-container {
       min-width: 0 !important;
@@ -115,7 +115,7 @@
     padding: 0;
   }
   .assignee {
-    order: 5;
+    order: 3;
     width: 128px; // padding: 0 4px 4px;
   }
   .reporter {
