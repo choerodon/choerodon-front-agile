@@ -2206,21 +2206,26 @@ class CreateSprint extends Component {
                     display: 'flex', flex: 1.2, flexShrink: 0, width: 0,
                   }}
                   >
-                    <span
-                      style={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: '50%',
-                        background: '#d8d8d8',
-                        marginRight: 12,
-                        flexShrink: 0,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
+                    <Tooltip
+                      placement="top"
+                      title={`该问题经历迭代数：${closeSprint.length + (activeSprint.sprintId ? 1 : 0)}`}
                     >
-                      <Icon type="directions_run" style={{ fontSize: '24px' }} />
-                    </span>
+                      <span
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: '50%',
+                          background: '#d8d8d8',
+                          marginRight: 12,
+                          flexShrink: 0,
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Icon type="directions_run" style={{ fontSize: '24px' }} />
+                      </span>
+                    </Tooltip>
                     <div style={{ overflow: 'hidden' }}>
                       <div
                         style={{
