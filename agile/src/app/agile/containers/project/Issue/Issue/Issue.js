@@ -87,7 +87,7 @@ class Issue extends Component {
   componentWillUnmount() {
     document.getElementsByClassName('page-body')[0].style.overflow = '';
     this.filterControler = new IssueFilterControler();
-    IssueStore.resetFilterSelect(this.filterControler);
+    IssueStore.resetFilterSelect(this.filterControler, true);
     this.filterControler.resetCacheMap();
     IssueStore.setDefaultTableShowColumns(); // 列配置恢复默认
   }
@@ -127,6 +127,7 @@ class Issue extends Component {
     if (document && document.getElementsByClassName('page-body').length) {
       // document.getElementsByClassName('page-body')[0].style.overflow = 'hidden';
     }
+
     return (
       <Page
         className="c7n-Issue"

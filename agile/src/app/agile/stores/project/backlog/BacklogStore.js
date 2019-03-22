@@ -8,6 +8,8 @@ const { AppState } = stores;
 
 @store('BacklogStore')
 class BacklogStore {
+  @observable createdSprint = '';
+
   @observable hasActiveSprint = false;
 
   @observable issueCantDrag = false;
@@ -60,7 +62,7 @@ class BacklogStore {
 
   @observable recent = false;
 
-  @observable isDragging = false;
+  @observable isDragging = '';
 
   @observable isLeaveSprint = false;
 
@@ -366,20 +368,26 @@ class BacklogStore {
   }
 
   @computed get getChosenVersion() {
-    return toJS(this.chosenVersion);
+    return this.chosenVersion;
   }
 
   @action setChosenVersion(data) {
+    if (data === 'all') {
+      this.filterSelected = false;
+    }
     this.spinIf = true;
     this.addToVersionFilter(data);
     this.chosenVersion = data;
   }
 
   @computed get getChosenEpic() {
-    return toJS(this.chosenEpic);
+    return this.chosenEpic;
   }
 
   @action setChosenEpic(data) {
+    if (data === 'all') {
+      this.filterSelected = false;
+    }
     this.spinIf = true;
     this.addToEpicFilter(data);
     this.chosenEpic = data;
@@ -399,6 +407,7 @@ class BacklogStore {
 
   @action setSprintData({ backlogData, sprintData }) {
     this.spinIf = false;
+    this.multiSelected = observable.map();
     this.issueMap.set('0', backlogData.backLogIssue);
     this.backlogData = backlogData;
     sprintData.forEach((sprint) => {
@@ -507,6 +516,7 @@ class BacklogStore {
 
   @action initBacklogData(quickSearchData, issueTypesData, priorityArrData, { backlogData, sprintData }) {
     this.issueCantDrag = false;
+    this.multiSelected = observable.map();
     this.quickSearchList = quickSearchData;
     if (issueTypesData && !issueTypesData.failed) {
       this.issueTypes = issueTypesData;
@@ -514,12 +524,15 @@ class BacklogStore {
     if (priorityArrData && !priorityArrData.failed) {
       this.defaultPriority = priorityArrData;
     }
-    this.issueMap.set('0', backlogData.backLogIssue);
+    this.issueMap.set('0', backlogData.backLogIssue ? backlogData.backLogIssue : []);
     this.backlogData = backlogData;
-    sprintData.forEach((sprint) => {
+    sprintData.forEach((sprint, index) => {
+      if (sprint.sprintId === this.createdSprint) {
+        // eslint-disable-next-line no-param-reassign
+        sprintData[index].isCreated = true;
+      }
       this.issueMap.set(sprint.sprintId.toString(), sprint.issueSearchDTOList);
     });
-    debugger;
     this.sprintData = sprintData;
     this.hasActiveSprint = Boolean(sprintData.find(element => element.statusCode === 'started'));
     this.loadCompleted = true;
@@ -594,7 +607,7 @@ class BacklogStore {
 
   @action clickedOnce(sprintId, currentClick) {
     const index = this.issueMap.get(sprintId).findIndex(issue => issue.issueId === currentClick.issueId);
-    this.multiSelected.clear();
+    this.multiSelected = observable.map();
     this.multiSelected.set(currentClick.issueId, currentClick);
     this.prevClickedIssue = {
       ...currentClick,
@@ -623,6 +636,7 @@ class BacklogStore {
   }
 
   @action resetData() {
+    this.createdSprint = '';
     this.issueMap = observable.map();
     this.whichVisible = null;
     this.assigneeFilterIds = [];
@@ -632,7 +646,6 @@ class BacklogStore {
   }
 
   @computed get getIssueMap() {
-    debugger;
     return this.issueMap;
   }
 
@@ -647,12 +660,31 @@ class BacklogStore {
     return result;
   };
 
+  findOutsetIssue = (sourceIndex, destinationIndex, sourceId, destinationId, destinationArr) => {
+    // 看不懂就去让后端给你逐字逐句解释去, 解释不通就怼他
+    if (sourceId === destinationId) {
+      if (sourceIndex < destinationIndex) {
+        return destinationArr[destinationIndex];
+      } else if (destinationIndex === 0) {
+        return destinationArr[destinationIndex];
+      } else {
+        return destinationArr[destinationIndex - 1];
+      }
+    } else {
+      if (destinationIndex === 0 && destinationArr.length) {
+        return destinationArr[destinationIndex];
+      } else {
+        return destinationArr[destinationIndex - 1];
+      }
+    }
+  };
+
   @action moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, issueItem, type) {
     const sourceArr = this.issueMap.get(sourceId);
     // const revertSourceArr = sourceArr.slice();
     const destinationArr = this.issueMap.get(destinationId);
     // const revertDestinationArr = destinationArr.slice();
-    const prevIssue = destinationIndex === 0 ? destinationArr[1] : destinationArr[destinationIndex - 1];
+    const prevIssue = this.findOutsetIssue(sourceIndex, destinationIndex, sourceId, destinationId, destinationArr);
     const modifiedArr = this.getModifiedArr(issueItem, type);
 
     if (type === 'single') {
@@ -661,21 +693,27 @@ class BacklogStore {
       this.issueMap.set(sourceId, sourceArr);
       this.issueMap.set(destinationId, destinationArr);
     } else if (type === 'multi') {
+      debugger;
       const modifiedSourceArr = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
       destinationArr.splice(destinationIndex, 0, ...[...this.multiSelected.values()]);
       if (!this.multiSelected.has(issueItem.issueId)) {
         modifiedSourceArr.splice(sourceIndex, 1);
         destinationArr.unshift(issueItem);
       }
-      this.issueMap.set(sourceId, modifiedSourceArr);
-      this.issueMap.set(destinationId, destinationArr);
+      if (sourceId === destinationId) {
+        const dragInSingleSprint = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
+        dragInSingleSprint.splice(destinationIndex, 0, ...[...this.multiSelected.values()])
+        this.issueMap.set(destinationId, dragInSingleSprint);
+      } else {
+        this.issueMap.set(sourceId, modifiedSourceArr);
+        this.issueMap.set(destinationId, destinationArr);
+      }
     }
-    debugger;
     axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/issues/to_sprint/${destinationId}`, {
       before: destinationIndex === 0,
       issueIds: modifiedArr,
       outsetIssueId: prevIssue ? prevIssue.issueId : 0,
-      rankIndex: destinationId * 1 === 0,
+      rankIndex: destinationId * 1 === 0 || (destinationId === sourceId && destinationId !== 0),
     }).then(this.axiosGetSprint).then((res) => {
       this.setSprintData(res);
     });
@@ -690,13 +728,11 @@ class BacklogStore {
   }
 
   @action createIssue(issue, sprintId) {
-    debugger;
     this.clickIssueDetail = issue;
     if (this.clickIssueDetail) {
       this.clickIssueId = issue.issueId;
     }
     const modifiedArr = [...this.issueMap.get(sprintId), issue];
-    console.log(this.issueMap.get(sprintId));
     this.issueMap.set(sprintId, modifiedArr);
   }
 
@@ -714,7 +750,6 @@ class BacklogStore {
   }
 
   @action updateEpic(epic) {
-    debugger;
     const updateIndex = this.epicList.findIndex(item => epic.issueId === item.issueId);
     this.epicList[updateIndex].name = epic.name;
     this.epicList[updateIndex].objectVersionNumber = epic.objectVersionNumber;
@@ -814,7 +849,6 @@ class BacklogStore {
   }
 
   @action addToVersionFilter(data) {
-    debugger;
     this.filterSelected = true;
     if (data === 'unset') {
       delete this.filter.advancedSearchArgs.versionId;
@@ -832,6 +866,8 @@ class BacklogStore {
   @action resetFilter() {
     this.spinIf = true;
     this.filter = { advancedSearchArgs: {} };
+    this.versionFilter = 'all';
+    this.epicFilter = 'all';
     this.quickFilters = [];
     this.assigneeFilterIds = [];
   }
@@ -874,6 +910,15 @@ class BacklogStore {
 
   @computed get getIssueCantDrag() {
     return this.issueCantDrag;
+  }
+
+  @action onBlurClick() {
+    this.multiSelected = observable.map();
+    this.clickIssueDetail = {};
+  }
+
+  @action setCreatedSprint(data) {
+    this.createdSprint = data;
   }
 }
 

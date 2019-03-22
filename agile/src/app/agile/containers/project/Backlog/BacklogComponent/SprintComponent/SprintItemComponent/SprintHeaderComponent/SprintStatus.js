@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Icon, Dropdown, Menu } from 'choerodon-ui';
+import moment from 'moment';
 import classnames from 'classnames';
 import CloseSprint from '../../CloseSprint';
 import StartSprint from '../../StartSprint';
@@ -46,7 +47,8 @@ import StartSprint from '../../StartSprint';
               <p
                 className="c7n-backlog-closeSprint"
                 role="none"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   store.axiosGetSprintCompleteMessage(sprintId).then((res) => {
                     store.setSprintCompleteMessage(res);
                   }).catch((error) => {
@@ -71,11 +73,14 @@ import StartSprint from '../../StartSprint';
                   'c7n-backlog-canCloseSprint': store.getHasActiveSprint || !data.issueSearchDTOList || data.issueSearchDTOList.length === 0,
                 })}
                 role="none"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   if (!store.getHasActiveSprint && data.issueSearchDTOList && data.issueSearchDTOList.length > 0) {
                     this.setState({
                       startSprintVisible: true,
                     });
+                    const year = moment().year();
+                    store.axiosGetWorkSetting(year);
                     store.axiosGetOpenSprintDetail(data.sprintId).then((res) => {
                       store.setOpenSprintDetail(res);
                     }).catch((error) => {

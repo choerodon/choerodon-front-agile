@@ -57,9 +57,13 @@ import AssigneeModal from './AssigneeModal';
                 </div>
               )}
             >
+              <div style={{ display: 'none' }}>Magic</div>
               <UserHead
                 hiddenText
                 size={24}
+                style={{
+                  marginBottom: 6,
+                }}
                 user={{
                   id: existAssignee.assigneeId,
                   loginName: existAssignee.assigneeName,

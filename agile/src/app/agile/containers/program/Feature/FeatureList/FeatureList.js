@@ -27,7 +27,6 @@ class FeatureList extends Component {
   componentDidMount() {
     Promise.all(FeatureStore.getCurrentEpicList(), FeatureStore.getFeatureListData())
       .then((featureList, epicList) => {
-        debugger;
       })
   }
 

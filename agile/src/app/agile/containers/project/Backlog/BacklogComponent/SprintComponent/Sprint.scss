@@ -8,7 +8,7 @@
   }
   padding-bottom: 9px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  background: rgba(0, 0, 0, 0.02);
+  background: #fff;
   padding-top: 8px;
 
   .c7n-backlog-sprintName {
@@ -21,11 +21,13 @@
   .c7n-backlog-springTitle {
     display: flex;
     margin-right: 20px;
+    flex-wrap: wrap;
 
     .c7n-backlog-sprintTitleSide {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 4px;
       p {
         margin-bottom: 0;
       }
@@ -34,27 +36,19 @@
         line-height: 20px;
         display: flex;
         align-items: center;
+        flex-wrap: nowrap;
       }
 
       .c7n-backlog-sprintQuestion {
         font-size: 13px;
         color: rgba(0, 0, 0, 0.65);
         line-height: 20px;
-        margin-left: 38px;
+        margin-left: 26px;
         white-space: nowrap;
       }
 
       .not-visible {
         display: none;
-      }
-
-      .c7n-backlog-clearFilter {
-        margin-left: 18px;
-        font-size: 13px;
-        line-height: 20px;
-        white-space: nowrap;
-        color: rgb(48, 63, 159);
-        cursor: pointer;
       }
 
       .c7n-backlog-sprintStatus {
@@ -64,6 +58,8 @@
         background: rgba(0, 191, 165, 0.08);
         padding: 1px 10px;
         white-space: nowrap;
+        height: 21px;
+        line-height: 21px;
       }
 
       .c7n-backlog-sprintStatus2 {
@@ -73,6 +69,8 @@
         background: #d3d3d3;
         padding: 1px 10px;
         white-space: nowrap;
+        height: 21px;
+        line-height: 21px;
       }
 
       .c7n-backlog-closeSprint {
@@ -98,7 +96,7 @@
     margin: 10px 20px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: end;
 
     .c7n-backlog-sprintIcon {
       width: 20px;
@@ -156,7 +154,6 @@
 }
 
 .c7n-backlog-sprintIssue {
-  transition: all 1s;
   .c7n-backlog-sprintIssueItem {
     user-select: none;
     background: #fff;
@@ -165,9 +162,7 @@
     font-size: 13px;
     align-items: center;
     cursor: move;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    overflow: hidden;
+    //flex-wrap: nowrap;
     width: 100%;
   }
   .issue-selected {
@@ -176,6 +171,8 @@
   .c7n-backlog-sprintCount {
     width: 20px;
     height: 20px;
+    line-height: 20px;
+    text-align: center;
     background: red;
     color: white;
     border-radius: 50%;
@@ -193,6 +190,7 @@
     overflow: hidden;
     // width: 0;
     .ant-form-item {
+      //flex: 1;
       margin-bottom: 0 !important;
     }
     .c7n-backlog-sprintSideRightItems {
@@ -329,5 +327,4 @@
 
 .c7n-noissue-wapper {
   padding: 16px 20px 16px 43px;
-  transition: all 1s;
 }

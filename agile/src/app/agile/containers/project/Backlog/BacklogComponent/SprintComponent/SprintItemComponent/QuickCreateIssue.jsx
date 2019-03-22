@@ -46,7 +46,7 @@ const FormItem = Form.Item;
   };
 
   render() {
-    const { issueType, form } = this.props;
+    const { issueType, form, backlog } = this.props;
     const { getFieldDecorator } = form;
     const { expand, currentType, loading } = this.state;
     const typeList = (
@@ -86,8 +86,8 @@ const FormItem = Form.Item;
           {expand ? (
             <div className="c7n-backlog-sprintIssueSide" style={{ display: 'block', width: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Form onSubmit={this.handleBlurCreateIssue} className="login-form">
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Form onSubmit={this.handleBlurCreateIssue} style={{ width: 640 }}>
+                  <div style={{ display: 'flex' }}>
                     <Dropdown overlay={typeList} trigger={['click']} getPopupContainer={trigger => trigger.parentNode}>
                       <div style={{ display: 'flex', alignItem: 'center' }}>
                         <TypeTag
@@ -99,7 +99,7 @@ const FormItem = Form.Item;
                         />
                       </div>
                     </Dropdown>
-                    <FormItem label="summary">
+                    <FormItem label="summary" style={{ flex: 1 }}>
                       {getFieldDecorator('summary', {
                         rules: [{ required: true, message: '请输入任务概要！' }],
                       })(

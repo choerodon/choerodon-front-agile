@@ -20,7 +20,6 @@ const { confirm } = Modal;
 @observer class SprintHeader extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       sprintName: props.data.sprintName,
       startDate: props.data.startDate,
@@ -30,22 +29,34 @@ const { confirm } = Modal;
     };
   }
 
-  handleBlurName = (value) => {
-    const { data, AppState } = this.props;
-    const { objectVersionNumber } = this.state;
-    const req = {
-      objectVersionNumber,
-      projectId: AppState.currentMenuType.id,
-      sprintId: data.sprintId,
-      sprintName: value,
-    };
-    BacklogStore.axiosUpdateSprint(req).then((res) => {
-      this.setState({
-        sprintName: value,
-        objectVersionNumber: res.objectVersionNumber,
-      });
-    }).catch((error) => {
+  componentWillReceiveProps(nextProps, nextContext) {
+    this.setState({
+      sprintName: nextProps.data.sprintName,
+      startDate: nextProps.data.startDate,
+      endDate: nextProps.data.endDate,
+      sprintGoal: nextProps.data.sprintGoal,
+      objectVersionNumber: nextProps.data.objectVersionNumber,
     });
+  }
+
+  handleBlurName = (value) => {
+    if (/[^\s]+/.test(value)) {
+      const { data, AppState } = this.props;
+      const { objectVersionNumber } = this.state;
+      const req = {
+        objectVersionNumber,
+        projectId: AppState.currentMenuType.id,
+        sprintId: data.sprintId,
+        sprintName: value,
+      };
+      BacklogStore.axiosUpdateSprint(req).then((res) => {
+        this.setState({
+          sprintName: value,
+          objectVersionNumber: res.objectVersionNumber,
+        });
+      }).catch((error) => {
+      });
+    }
   };
 
   handleChangeDateRange = (type, dateString) => {
@@ -131,21 +142,6 @@ const { confirm } = Modal;
     }
   };
 
-  componentWillReceiveProps(nextProps, nextContext) {
-
-    this.setState({
-      sprintName: nextProps.data.sprintName,
-      startDate: nextProps.data.startDate,
-      endDate: nextProps.data.endDate,
-      sprintGoal: nextProps.data.sprintGoal,
-      objectVersionNumber: nextProps.data.objectVersionNumber,
-    });
-  }
-
-  componentWillUpdate(nextProps, nextState, nextContext) {
-
-  }
-
   render() {
     const {
       data, expand, toggleSprint, sprintId, issueCount, refresh,
@@ -157,20 +153,21 @@ const { confirm } = Modal;
     return (
       <div className="c7n-backlog-sprintTop">
         <div className="c7n-backlog-springTitle">
-          <div className="c7n-backlog-sprintTitleSide">
-            <SprintName
-              type="sprint"
-              expand={expand}
-              sprintName={sprintName}
-              toggleSprint={toggleSprint}
-              handleBlurName={this.handleBlurName}
-            />
-            <SprintVisibleIssue
-              issueCount={issueCount}
-            />
-            <ClearFilter />
+          <div className="c7n-backlog-sprintTitleSide" style={{ flex: 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <SprintName
+                type="sprint"
+                expand={expand}
+                sprintName={sprintName}
+                toggleSprint={toggleSprint}
+                handleBlurName={this.handleBlurName}
+              />
+              <SprintVisibleIssue
+                issueCount={issueCount}
+              />
+            </div>
           </div>
-          <div style={{ flexGrow: 1 }}>
+          <div style={{ flex: 9 }}>
             <SprintStatus
               sprintId={sprintId}
               refresh={refresh}

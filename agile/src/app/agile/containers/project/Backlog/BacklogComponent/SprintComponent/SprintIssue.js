@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Tooltip } from 'choerodon-ui';
 import classnames from 'classnames';
+import { findDOMNode } from 'react-dom';
 import _ from 'lodash';
 import TypeTag from '../../../../../components/TypeTag';
 import UserHead from '../../../../../components/UserHead';
@@ -20,9 +21,7 @@ class SprintIssue extends Component {
   }
 
   render() {
-    const {
-      item, epicVisible, versionVisible, issueDisplay, selected,
-    } = this.props;
+    const { item } = this.props;
     return (
       <div className={classnames('c7n-backlog-IssueCard')}>
         <div
@@ -33,14 +32,13 @@ class SprintIssue extends Component {
             data={item.issueTypeDTO}
           />
           <div className="c7n-backlog-IssueCard-left-summaryContainer">
-            <span className="c7n-backlog-IssueCard-left-issueNum">
+            <div className="c7n-backlog-IssueCard-left-issueNum" style={{ textDecoration: item.statusMapDTO.code === 'complete' ? 'line-through' : 'none' }}>
               {`${item.issueNum}`}
-            </span>
+            </div>
             <Tooltip title={item.summary} placement="topLeft">
-              <span className="c7n-backlog-IssueCard-left-issueSummary">{item.summary}</span>
+              <div className="c7n-backlog-IssueCard-left-issueSummary">{item.summary}</div>
             </Tooltip>
           </div>
-
         </div>
         <div
           className={classnames('c7n-backlog-IssueCard-right')}

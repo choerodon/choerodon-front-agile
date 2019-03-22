@@ -6,7 +6,7 @@ import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore'
 @inject('AppState')
 @observer class NoneSprint extends Component {
   render() {
-    return BacklogStore.getChosenEpic !== 'all' || BacklogStore.getChosenVersion !== 'all' ? (
+    return BacklogStore.hasFilter ? (
       <div className="c7n-noissue-wapper">
         <div className="c7n-noissue-notzero">在sprint中所有问题已筛选</div>
       </div>

@@ -25,6 +25,7 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
         />
         {type !== 'backlog' ? (
           <EasyEdit
+            width={150}
             maxLength={30}
             type="input"
             defaultValue={sprintName}

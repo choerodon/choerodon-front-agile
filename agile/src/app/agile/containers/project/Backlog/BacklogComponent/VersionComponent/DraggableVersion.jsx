@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
 import moment from 'moment';
+import classnames from 'classnames';
 import { stores, Permission, axios } from 'choerodon-front-boot';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import {
@@ -9,7 +10,6 @@ import {
 } from 'choerodon-ui';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
-import Backlog from '../../../userMap/component/Backlog/Backlog';
 import DraggableEpic from '../EpicComponent/EpicItem';
 
 const { AppState } = stores;
@@ -152,7 +152,8 @@ class VersionItem extends Component {
     });
   }
 
-  toggleExpand = () => {
+  toggleExpand = (e) => {
+    e.stopPropagation();
     const { expand } = this.state;
     this.setState({
       expand: !expand,
@@ -171,7 +172,9 @@ class VersionItem extends Component {
         ref={draggableProvided.innerRef}
         {...draggableProvided.draggableProps}
         {...draggableProvided.dragHandleProps}
-        className="c7n-backlog-versionItems"
+        className={classnames('c7n-backlog-versionItems', {
+          onClickVersion: BacklogStore.getChosenVersion === item.versionId,
+        })}
         style={{
           paddingLeft: 0,
           cursor: 'move',

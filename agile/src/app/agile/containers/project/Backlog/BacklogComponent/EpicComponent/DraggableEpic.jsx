@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { stores, axios, store } from 'choerodon-front-boot';
 import { observer, inject } from 'mobx-react';
+import classnames from 'classnames';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import {
   Dropdown, Menu, Input, Icon, message,
 } from 'choerodon-ui';
 import _ from 'lodash';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
-import Backlog from "../../../userMap/component/Backlog/Backlog";
 
 const { AppState } = stores;
 // @inject('AppState')
@@ -149,14 +149,16 @@ class DraggableEpic extends Component {
         ref={draggableProvided.innerRef}
         {...draggableProvided.draggableProps}
         {...draggableProvided.dragHandleProps}
-        className="c7n-backlog-epicItems"
+        className={classnames('c7n-backlog-epicItems', {
+          onClickEpic: BacklogStore.getChosenEpic === item.issueId,
+        })}
         role="none"
       >
         <div
           className="c7n-backlog-epicItemTitle"
         >
           <Icon
-            type={item.expand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
+            type={expand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
             role="none"
             onClick={this.toggleExpand}
           />

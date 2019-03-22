@@ -23,6 +23,18 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
     ]);
   }
 
+  componentDidMount() {
+    const { isCreated } = this.props;
+    debugger;
+    if (isCreated) {
+      debugger;
+      setTimeout(() => {
+        this.ref.scrollIntoView();
+        this.ref.style.background = 'white';
+      }, 10, this);
+    }
+  }
+
   toggleSprint = () => {
     const { expand } = this.state;
     this.setState({
@@ -34,7 +46,15 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
     const { expand } = this.state;
     const issueCount = BacklogStore.getIssueMap.get('0') ? BacklogStore.getIssueMap.get('0').length : 0;
     return (
-      <React.Fragment>
+      <div
+        ref={e => this.ref = e}
+        style={{
+          // background: isCreated ? '#eee' : 'white',
+          transition: 'all 2s',
+          width: '100%',
+        }}
+        // key={sprintItem.sprintId}
+      >
         <BacklogHeader
           issueCount={issueCount}
           data={backlogData}
@@ -52,16 +72,22 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
           droppableId="backlogData"
           EmptyIssueComponent={NoneBacklog}
         />
-      </React.Fragment>
+      </div>
     );
   };
 
   renderSprint = (sprintItem) => {
-    const { refresh } = this.props;
+    const { refresh, isCreated } = this.props;
     const { expand } = this.state;
     const issueCount = BacklogStore.getIssueMap.get(sprintItem.sprintId.toString()) ? BacklogStore.getIssueMap.get(sprintItem.sprintId.toString()).length : 0;
     return (
-      <React.Fragment
+      <div
+        ref={e => this.ref = e}
+        style={{
+          background: isCreated ? '#eee' : 'white',
+          transition: 'all 2s',
+          width: '100%',
+        }}
         key={sprintItem.sprintId}
       >
         <SprintHeader
@@ -82,7 +108,7 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
           droppableId={sprintItem.sprintId.toString()}
           EmptyIssueComponent={NoneSprint}
         />
-      </React.Fragment>
+      </div>
     );
   };
 

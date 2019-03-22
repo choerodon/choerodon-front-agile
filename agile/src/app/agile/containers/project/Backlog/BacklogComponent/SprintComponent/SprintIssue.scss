@@ -11,21 +11,30 @@
 
 .c7n-backlog-IssueCard {
   display: flex;
-  justify-content: space-between;
+  //justify-content: space-between;
+  flex-wrap: wrap;
   &-left {
     display: flex;
-    flex-grow: 2;
-    overflow: hidden;
+    flex: 9;
+    margin-bottom: 2px;
+    width: 100%;
     &-summaryContainer {
       margin-left: 8px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
       height: 20px;
       word-break: break-all;
+      width: 100%;
+      display: flex;
+      text-overflow: ellipsis;
     }
     &-issueNum {
-      margin-right: 4px;
+      white-space: nowrap;
+      margin: 0 4px;
+    }
+    &-issueSummary {
+      white-space: normal;
+      overflow: hidden;
+      -ms-text-overflow: ellipsis;
+      text-overflow: ellipsis;
     }
   }
   .line-two-left {
@@ -37,8 +46,9 @@
   &-right {
     display: flex;
     justify-content: flex-end;
-    flex-grow: 1;
     min-width: 360px;
+    flex: 1;
+    margin-bottom: 2px;
     .container {
       border-radius: 2px;
       color: #0000005c;

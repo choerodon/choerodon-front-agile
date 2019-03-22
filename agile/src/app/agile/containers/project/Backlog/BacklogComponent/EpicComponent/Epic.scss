@@ -23,11 +23,8 @@
       padding: 0 12px 0 16px;
       justify-content: space-between;
       flex-wrap: wrap;
-      &:hover .c7n-backlog-epicRight{
-        display: flex !important;
-      }
       .c7n-backlog-epicRight {
-        display: none;
+        display: flex;
         align-items: center;
         justify-content: space-between;
       }
@@ -43,8 +40,18 @@
       }
 
       .c7n-backlog-epicItems {
-        padding: 8px 6px 8px 16px;
+        background: white;
+        padding: 8px 8px 8px 0;
         cursor: pointer;
+        &-first {
+          padding: 8px 6px 8px 16px;
+        }
+        &-last {
+          padding: 8px 6px 8px 16px !important;
+        }
+      }
+      .c7n-backlog-epicItems.onClickEpic {
+        background: rgba(140, 158, 255, 0.08) !important;
       }
 
       .c7n-backlog-epicItems:hover {

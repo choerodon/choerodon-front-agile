@@ -5,7 +5,8 @@ import BacklogStore from '../../../../../../../stores/project/backlog/BacklogSto
 
 @inject('AppState', 'HeaderStore')
 @observer class ClearAllFilter extends Component {
-  clearFilter() {
+  clearFilter(e) {
+    e.stopPropagation();
     BacklogStore.hideQuickSearch();
     setTimeout(() => {
       BacklogStore.showQuickSearch();
@@ -16,9 +17,12 @@ import BacklogStore from '../../../../../../../stores/project/backlog/BacklogSto
   render() {
     return (
       <p
-        className={classnames('c7n-backlog-clearFilter', {
-          'not-visible': !BacklogStore.hasFilter,
-        })}
+        className={classnames('c7n-backlog-clearFilter')}
+        style={{
+          display: !BacklogStore.hasFilter ? 'none' : 'block',
+          margin: 0,
+          paddingRight: 16,
+        }}
         role="none"
         onClick={this.clearFilter}
       >

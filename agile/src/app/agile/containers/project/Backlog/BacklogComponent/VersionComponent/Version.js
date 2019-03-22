@@ -10,7 +10,6 @@ import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import VersionItem from './VersionItem';
 import './Version.scss';
 import AddRelease from '../../../Release/ReleaseComponent/AddRelease';
-import Backlog from '../../../userMap/component/Backlog/Backlog';
 import EpicItem from '../EpicComponent/Epic';
 
 const { AppState } = stores;
@@ -26,17 +25,15 @@ class Version extends Component {
     };
   }
 
-
   componentWillMount() {
+    this.versionRefresh();
+  }
+
+  versionRefresh = () => {
     BacklogStore.axiosGetVersion().then((res) => {
       BacklogStore.setVersionData(res);
     });
-  }
-
-  componentDidMount() {
-    const { onRef } = this.props;
-    onRef(this);
-  }
+  };
 
   /**
    *点击versionItem事件
@@ -80,7 +77,7 @@ class Version extends Component {
                 </p>
               </Permission>
               <Icon
-                type="close"
+                type="first_page"
                 role="none"
                 style={{
                   cursor: 'pointer',
@@ -113,7 +110,6 @@ class Version extends Component {
                 const { droppableId: destinationId, index: destinationIndex } = destination;
                 const { droppableId: sourceId, index: sourceIndex } = source;
                 BacklogStore.moveVersion(sourceIndex, destinationIndex);
-
               }}
             >
               <Droppable droppableId="version" type="VERSION">
@@ -122,7 +118,6 @@ class Version extends Component {
                     ref={provided.innerRef}
                     style={{
                       background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-                      padding: 'grid',
                     }}
                   >
                     <VersionItem
@@ -161,13 +156,14 @@ class Version extends Component {
             </div>
           </div>
           <AddRelease
+            store={BacklogStore}
             visible={addRelease}
             onCancel={() => {
               this.setState({
                 addRelease: false,
               });
             }}
-            refresh={refresh.bind(this)}
+            refresh={this.versionRefresh}
           />
         </div>
       </div>

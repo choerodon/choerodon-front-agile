@@ -64,7 +64,6 @@ class ArtList extends Component {
       });
       this.loadArts();
     }).catch((err) => {
-      console.log(err);
       this.setState({
         createArtVisible: false,
         createArtLoading: false,

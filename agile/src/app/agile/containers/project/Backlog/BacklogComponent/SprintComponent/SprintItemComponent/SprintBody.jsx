@@ -65,7 +65,6 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task'];
           expand: false,
           loading: false,
         });
-        debugger;
         BacklogStore.createIssue({
           ...res,
           versionIds: res.versionIssueRelDTOList.length ? [res.versionIssueRelDTOList[0].versionId] : [],
@@ -85,45 +84,47 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task'];
       expand, versionVisible, epicVisible,
       issueCount, sprintId, EmptyIssueComponent,
       defaultType, issueType, defaultPriority,
+      isCreated,
     } = this.props;
     const { selected, draggableId } = this.state;
 
     return (
-      <Droppable
-        droppableId={sprintId}
-        isDropDisabled={BacklogStore.getIssueCantDrag}
-      >
-        {(provided, snapshot) => (
-          <div
-            ref={provided.innerRef}
-            style={{
-              display: expand ? 'block' : 'none',
-              background: snapshot.isDraggingOver ? '#e9e9e9' : 'white',
-              // background: 'white',
-              padding: 'grid',
-              borderBottom: '1px solid rgba(0,0,0,0.12)',
-            }}
-          >
-            {issueCount ? (
-              <IssueList
-                sprintItemRef={this.sprintItemRef}
-                versionVisible={versionVisible}
-                epicVisible={epicVisible}
+      <div ref={e => this.ref = e} className={this.props.isCreated ? 'creaed' : ''}>
+        <Droppable
+          droppableId={sprintId}
+          isDropDisabled={BacklogStore.getIssueCantDrag}
+        >
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              style={{
+                display: expand ? 'block' : 'none',
+                background: snapshot.isDraggingOver ? '#e9e9e9' : 'inherit',
+                padding: 'grid',
+                borderBottom: '1px solid rgba(0,0,0,0.12)',
+              }}
+            >
+              {issueCount ? (
+                <IssueList
+                  sprintItemRef={this.sprintItemRef}
+                  versionVisible={versionVisible}
+                  epicVisible={epicVisible}
+                  sprintId={sprintId}
+                />
+              ) : <EmptyIssueComponent />
+              }
+              {provided.placeholder}
+              <QuickCreateIssue
+                defaultPriority={defaultPriority}
                 sprintId={sprintId}
+                issueType={issueType}
+                defaultType={defaultType}
+                handleCreateIssue={this.handleCreateIssue}
               />
-            ) : <EmptyIssueComponent />
-            }
-            {provided.placeholder}
-            <QuickCreateIssue
-              defaultPriority={defaultPriority}
-              sprintId={sprintId}
-              issueType={issueType}
-              defaultType={defaultType}
-              handleCreateIssue={this.handleCreateIssue}
-            />
-          </div>
-        )}
-      </Droppable>
+            </div>
+          )}
+        </Droppable>
+      </div>
     );
   }
 }

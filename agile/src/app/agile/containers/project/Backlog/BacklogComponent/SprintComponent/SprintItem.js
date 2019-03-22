@@ -18,11 +18,6 @@ class SprintItem extends Component {
     onRef(this);
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.onKeyDown);
-    window.removeEventListener('keyup', this.onKeyUp);
-  }
-
   /**
    *删除冲刺事件
    *
@@ -65,12 +60,28 @@ class SprintItem extends Component {
 
   render() {
     const { refresh } = this.props;
+    const arr = BacklogStore.getSprintData;
     return (
-      <React.Fragment>
+      <div
+        role="none"
+        style={{
+          display: 'flex',
+          flex: 1,
+          // width: '100%',
+          flexDirection: 'column',
+        }}
+        onClick={() => {
+          debugger;
+          if (!BacklogStore.isDragging) {
+            BacklogStore.onBlurClick();
+          }
+        }}
+      >
         {
-          BacklogStore.getSprintData.length
-            ? BacklogStore.getSprintData.map(sprintItem => (
+          arr.length
+            ? arr.map(sprintItem => (
               <SprintContainer
+                isCreated={sprintItem.isCreated}
                 refresh={refresh}
                 key={sprintItem.sprintId}
                 data={sprintItem}
@@ -83,7 +94,7 @@ class SprintItem extends Component {
           data={BacklogStore.getBacklogData}
           type="backlog"
         />
-      </React.Fragment>
+      </div>
     );
   }
 }
