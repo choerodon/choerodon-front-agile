@@ -50,7 +50,6 @@
     "jsx-a11y/anchor-has-content": "off",
     "jsx-a11y/href-no-hash": "off",
     "react/require-default-props": "off",
-    "no-unused-vars": "off",
     "no-console": "error",
     "jsx-a11y/anchor-is-valid": [
       "warn",
