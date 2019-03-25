@@ -56,7 +56,7 @@ export default class StatusProvider extends Component {
   };
 
   render() {
-    const { statusData, keyId } = this.props;
+    const { statusData } = this.props;
     return statusData.map(status => this.getStatus(status));
   }
 }

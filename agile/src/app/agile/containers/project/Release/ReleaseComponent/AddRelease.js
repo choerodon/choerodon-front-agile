@@ -6,6 +6,7 @@ import {
 import moment from 'moment';
 import { Content, stores } from 'choerodon-front-boot';
 import ReleaseStore from '../../../../stores/project/release/ReleaseStore';
+import BacklogStore from "../../../../stores/project/backlog/BacklogStore";
 
 const { Sidebar } = Modal;
 const { TextArea } = Input;

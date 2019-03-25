@@ -31,7 +31,7 @@ class BurndownChartHome extends Component {
       xAxis: [],
       yAxis: [],
       select: 'remainingEstimatedTime',
-      defaultSprint: '',
+      defaultSprintId: '',
       loading: false,
       chartLoading: true,
       tableLoading: true,
@@ -107,12 +107,13 @@ class BurndownChartHome extends Component {
   getSprintData() {
     BurndownChartStore.axiosGetSprintList().then((res) => {
       BurndownChartStore.setSprintList(res);
+      const defaultSprint = res.find(item => item.statusCode === 'started') || res[0]; // 如果有活跃冲刺就展示活跃冲刺否则就展示第一个
       this.setState({
-        defaultSprint: res[0].sprintId,
-        endDate: res[0].endDate,
-        startDate: res[0].startDate,
+        defaultSprintId: defaultSprint.sprintId,
+        endDate: defaultSprint.endDate,
+        startDate: defaultSprint.startDate,
       }, () => {
-        if (this.state.defaultSprint) {
+        if (this.state.defaultSprintId) {
           this.getChartData();
           this.axiosGetRestDays();
         }
@@ -122,7 +123,7 @@ class BurndownChartHome extends Component {
   }
 
   axiosGetRestDays = () => {
-    BurndownChartStore.axiosGetRestDays(this.state.defaultSprint).then((res) => {
+    BurndownChartStore.axiosGetRestDays(this.state.defaultSprintId).then((res) => {
       this.setState({
         restDays: res.map(date => moment(date).format('YYYY-MM-DD')),
       }, () => {
@@ -133,7 +134,7 @@ class BurndownChartHome extends Component {
 
   getChartCoordinate() {
     this.setState({ chartLoading: true });
-    BurndownChartStore.axiosGetBurndownCoordinate(this.state.defaultSprint, this.state.select).then((res) => {
+    BurndownChartStore.axiosGetBurndownCoordinate(this.state.defaultSprintId, this.state.select).then((res) => {
       this.setState({
         expectCount: res.expectCount,
         chartLoading: false,
@@ -228,7 +229,7 @@ class BurndownChartHome extends Component {
       tableLoading: true,
     });
     BurndownChartStore
-      .axiosGetBurndownChartReport(this.state.defaultSprint, this.state.select).then((res) => {
+      .axiosGetBurndownChartReport(this.state.defaultSprintId, this.state.select).then((res) => {
         const data = res;
         const newData = [];
         // 将操作日期相同的合并
@@ -694,7 +695,7 @@ class BurndownChartHome extends Component {
                   const { history } = this.props;
                   const urlParams = AppState.currentMenuType;
                   if (item.parentIssueId) {
-                    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${item.parentIssueNum}&paramIssueId=${item.parentIssueId}&paramOpenIssueId=${item.issueId}&paramUrl=reporthost/burndownchart`);
+                    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${item.issueNum}&paramIssueId=${item.parentIssueId}&paramOpenIssueId=${item.issueId}&paramUrl=reporthost/burndownchart`);
                   } else {
                     history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${item.issueNum}&paramIssueId=${item.issueId}&paramOpenIssueId=${item.issueId}&paramUrl=reporthost/burndownchart`);
                   }
@@ -775,7 +776,7 @@ class BurndownChartHome extends Component {
     }];
     let sprintName;
     for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
-      if (BurndownChartStore.getSprintList[index].sprintId === this.state.defaultSprint) {
+      if (BurndownChartStore.getSprintList[index].sprintId === this.state.defaultSprintId) {
         sprintName = BurndownChartStore.getSprintList[index].sprintName;
       }
     }
@@ -819,7 +820,7 @@ class BurndownChartHome extends Component {
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     style={{ width: 244 }}
                     label="迭代冲刺"
-                    value={this.state.defaultSprint}
+                    value={this.state.defaultSprintId}
                     onChange={(value) => {
                       let endDate;
                       let startDate;
@@ -830,7 +831,7 @@ class BurndownChartHome extends Component {
                         }
                       }
                       this.setState({
-                        defaultSprint: value,
+                        defaultSprintId: value,
                         endDate,
                         startDate,
                       }, () => {
@@ -842,7 +843,7 @@ class BurndownChartHome extends Component {
                   >
                     {BurndownChartStore.getSprintList.length > 0
                       ? BurndownChartStore.getSprintList.map(item => (
-                        <Option value={item.sprintId}>{item.sprintName}</Option>
+                        <Option key={item.sprintId} value={item.sprintId}>{item.sprintName}</Option>
                       )) : ''}
                   </Select>
                   <Select

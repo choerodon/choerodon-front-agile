@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import classnames from 'classnames';
 import { Collapse } from 'choerodon-ui';
 import './RenderSwimLaneContext.scss';
 import SwimLaneHeader from './SwimLaneHeader.jsx';
@@ -12,13 +13,13 @@ class SwimLaneContext extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeKey: [],
+      activeKey: this.getDefaultExpanded(props.mode, [...props.parentIssueArr.values(), props.otherIssueWithoutParent]),
     };
   }
 
-  componentWillReceiveProps(nextProps, nextContext) {
+  componentWillReceiveProps(nextProps, nextState) {
     this.setState({
-      activeKey: [],
+      activeKey: this.getDefaultExpanded(nextProps.mode, [...nextProps.parentIssueArr.values(), nextProps.otherIssueWithoutParent]),
     });
   }
 
@@ -27,7 +28,7 @@ class SwimLaneContext extends React.Component {
       ['swimlane_none', 'swimlaneContext-all'],
       ['assignee', `swimlaneContext-${issue.assigneeId || issue.type}`],
       ['swimlane_epic', `swimlaneContext-${issue.epicId || issue.type}`],
-      ['parent_child', `swimlaneContext-${issue.issueId || issue.type}`],
+      ['parent_child', `swimlaneContext-${issue.issueId || issue.type || 'other'}`],
     ]);
     return modeMap.get(mode);
   };
@@ -41,11 +42,17 @@ class SwimLaneContext extends React.Component {
   };
 
   getPanelItem = (key, parentIssue = null) => {
-    const { children, mode, fromEpic } = this.props;
+    const {
+      children, mode, fromEpic, parentIssueArr,
+    } = this.props;
     return (
       <Panel
+        showArrow={mode !== 'swimlane_none'}
         key={this.getPanelKey(mode, parentIssue, key)}
-        className={`c7n-swimlaneContext-container ${mode === 'swimlane_none' ? 'noArrow ' : ''}${fromEpic ? 'shouldBeIndent' : ''}`}
+        className={classnames('c7n-swimlaneContext-container', {
+          shouldBeIndent: fromEpic,
+          noStoryInEpic: fromEpic && Array.from(parentIssueArr).length === 0,
+        })}
         header={(
           <SwimLaneHeader
             parentIssue={parentIssue}
@@ -84,7 +91,7 @@ class SwimLaneContext extends React.Component {
     const { activeKey } = this.state;
     return (
       <Collapse
-        activeKey={activeKey.length ? activeKey : this.getDefaultExpanded(mode, [...parentIssueArr.values(), otherIssueWithoutParent])}
+        activeKey={activeKey}
         onChange={this.panelOnChange}
         bordered={false}
         forceRender

@@ -81,7 +81,8 @@ class SettingColumn extends Component {
     };
     ScrumBoardStore.axiosUpdateMaxMinNum(
       propData.columnId, data,
-    ).then((res) => {
+    ).then(() => {
+      Choerodon.prompt('设置成功');
       refresh();
     }).catch((error) => {
     });

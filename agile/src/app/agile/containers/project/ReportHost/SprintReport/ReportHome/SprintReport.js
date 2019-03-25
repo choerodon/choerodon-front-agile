@@ -49,7 +49,7 @@ class SprintReport extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { location: { search } } = this.props;
     const linkFromParamUrl = _.last(search.split('&')).split('=')[0] === 'paramUrl' ? _.last(search.split('&')).split('=')[1] : undefined;
     this.setState({
@@ -64,7 +64,7 @@ class SprintReport extends Component {
     const { location: { search } } = this.props;
     if (search.lastIndexOf('sprintId') !== -1) {
       const arr = search.split('&');
-      const sprintId = arr[arr.length - 2].split('=')[1];
+      const sprintId = arr.find(item => item.split('=')[0] === 'sprintId').split('=')[1];
       this.setState({
         defaultSprint: _.parseInt(sprintId),
       });
@@ -314,7 +314,7 @@ class SprintReport extends Component {
           let content = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}${item.value? ' 点' : ''}`;
+              content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}${item.value? ' 个' : ''}`;
             }
           });
           return content;
@@ -533,20 +533,6 @@ class SprintReport extends Component {
     );
   }
 
-  renderChartTitle() {
-    let result = '';
-    if (this.state.select === 'remainingEstimatedTime') {
-      result = '剩余预估时间';
-    }
-    if (this.state.select === 'storyPoints') {
-      result = '故事点';
-    }
-    if (this.state.select === 'issueCount') {
-      result = '问题计数';
-    }
-    return result;
-  }
-
   onCheckChange = (e) => {
     this.setState({
       restDayShow: e.target.checked,
@@ -655,7 +641,7 @@ class SprintReport extends Component {
         ),
       }, {
         width: '10%',
-        title: '故事点(点)',
+        title: '故事点(个)',
         dataIndex: 'storyPoints',
         render: (storyPoints, record) => (
           <div style={{ minWidth: 15 }}>
@@ -711,6 +697,21 @@ class SprintReport extends Component {
                       value={this.state.defaultSprint}
                       onChange={(value) => {
                         ReportStore.changeCurrentSprint(value);
+                        ReportStore.setDonePagination({
+                          current: 0, 
+                          pageSize: 10, 
+                          total: undefined,
+                        });
+                        ReportStore.setTodoPagination({
+                          current: 0, 
+                          pageSize: 10, 
+                          total: undefined,
+                        });
+                        ReportStore.setRemovePagination({
+                          current: 0, 
+                          pageSize: 10, 
+                          total: undefined,
+                        });
                         let endDate;
                         let startDate;
                         for (let index = 0, len = BurndownChartStore.getSprintList.length; index < len; index += 1) {
@@ -762,7 +763,7 @@ class SprintReport extends Component {
                         }}
                         role="none"
                         onClick={() => {
-                          this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${ReportStore.currentSprint.sprintName}下的问题&paramUrl=reporthost/sprintreport`);
+                          this.props.history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=sprint&paramId=${ReportStore.currentSprint.sprintId}&paramName=${encodeURIComponent(`${ReportStore.currentSprint.sprintName}下的问题`)}&paramUrl=reporthost/sprintreport`);
                         }}
                       >
                         {'在“问题管理中”查看'}

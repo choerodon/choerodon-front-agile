@@ -47,40 +47,37 @@ class Issue extends Component {
     this.filterControler = new IssueFilterControler();
   }
 
-  componentWillMount() {
-    const { location } = this.props;
-    if (location.search.indexOf('param') !== -1) {
-      this.filterControler.paramConverter(location.search);
-    }
-  }
-
   /**
    * 处理传入的 Param（如果有的话）
    * 利用 filterControler 类中的 refresh 方法发出初始化请求（包含优先级，状态，类型，标签数据）
    */
-  componentDidMount() {
-    this.filterControler.refresh('init').then((data) => {
-      if (data.failed) {
-        Choerodon.prompt(data.message);
-      } else {
-        IssueStore.setCurrentSetting(data);
+  componentDidMount() {    
+    this.axiosGetProjectInfo().then(() => {
+      const { location } = this.props;
+      if (location.search.indexOf('param') !== -1) {
+        this.filterControler.paramConverter(location.search);
       }
-    }).catch((e) => {
-      Choerodon.prompt(e);
+      this.filterControler.refresh('init').then((data) => {
+        if (data.failed) {
+          Choerodon.prompt(data.message);
+        } else {
+          IssueStore.setCurrentSetting(data);
+        }
+      }).catch((e) => {
+        Choerodon.prompt(e);
+      });
+
+      IssueStore.axiosGetMyFilterList().then((res) => {
+        const paramFilter = IssueStore.getFilterMap.get('paramFilter');
+        if (Object.keys(paramFilter).length) {
+          this.filterControler.cache.set('userFilter', paramFilter);
+          this.filterControler.cache.set('filter', paramFilter);
+          IssueStore.setFilterMap(this.filterControler.cache);
+          IssueStore.setEmptyBtnVisible(true);
+          IssueStore.judgeConditionWithFilter();
+        }
+      });
     });
-    this.axiosGetProjectInfo();
-    IssueStore.axiosGetMyFilterList().then((res) => {
-      this.filterControler = new IssueFilterControler();
-      const paramFilter = IssueStore.getFilterMap.get('paramFilter');
-      if (Object.keys(paramFilter).length) {
-        this.filterControler.cache.set('userFilter', paramFilter);
-        this.filterControler.cache.set('filter', paramFilter);
-        IssueStore.setFilterMap(this.filterControler.cache);
-        IssueStore.setEmptyBtnVisible(true);
-        IssueStore.judgeConditionWithFilter();
-      }
-    });
-    
     IssueStore.setFilterListVisible(false);
   }
 
@@ -90,8 +87,9 @@ class Issue extends Component {
   componentWillUnmount() {
     document.getElementsByClassName('page-body')[0].style.overflow = '';
     this.filterControler = new IssueFilterControler();
-    IssueStore.resetFilterSelect(this.filterControler);
+    IssueStore.resetFilterSelect(this.filterControler, true);
     this.filterControler.resetCacheMap();
+    IssueStore.setDefaultTableShowColumns(); // 列配置恢复默认
   }
 
   /**
@@ -107,18 +105,17 @@ class Issue extends Component {
         IssueStore.refreshTrigger(data);
       }
     });
-  }
+  };
 
   openExport=() => {
     IssueStore.setExportModalVisible(true);
-  }
+  };
 
-  axiosGetProjectInfo = () => {
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`).then((res) => {
-      IssueStore.setCreateStartDate(`${moment(res.creationDate).format('YYYY-MM-DD')} 00:00:00`);
-      IssueStore.setProjectInfo(res);
-    });
-  }
+  axiosGetProjectInfo = () => new Promise((resolve, reject) => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`).then((res) => {
+    IssueStore.setCreateStartDate('');
+    IssueStore.setProjectInfo(res);
+    resolve();
+  }))
 
   saveRef = name => (ref) => {
     this[name] = ref;
@@ -130,6 +127,7 @@ class Issue extends Component {
     if (document && document.getElementsByClassName('page-body').length) {
       // document.getElementsByClassName('page-body')[0].style.overflow = 'hidden';
     }
+
     return (
       <Page
         className="c7n-Issue"

@@ -30,13 +30,27 @@ class AdvancedSearch extends Component {
         if (otherArgs.assigneeId && otherArgs.assigneeId.includes(0)) {
           otherArgs.assigneeId = otherArgs.assigneeId.map(item => (item === 0 ? '0' : item));
         }
+
+        // 从统计图链接过来如果未分配，传入的0应该改为"0"
+        ['component', 'epic', 'version', 'label', 'sprint'].forEach((key, index) => {
+          if (otherArgs[key] && otherArgs[key].includes(0)) {
+            otherArgs[key] = otherArgs[key].map((value) => {
+              if (value === 0) {
+                return '0';
+              } else {
+                return value;
+              }
+            }); 
+          }
+        });
+
         IssueStore.setSelectedMyFilterInfo(searchFilterInfo);
         IssueStore.setSelectedIssueType(advancedSearchArgs.issueTypeId || []);
         IssueStore.setSelectedStatus(advancedSearchArgs.statusId || []);
         IssueStore.setSelectedPriority(advancedSearchArgs.priorityId || []);
         IssueStore.setSelectedAssignee(advancedSearchArgs.assigneeIds.concat(otherArgs.assigneeId && otherArgs.assigneeId.length > 0 ? ['none'] : []) || []);
-        IssueStore.setCreateStartDate(moment(searchArgs.createStartDate).format('YYYY-MM-DD HH:mm:ss'));
-        IssueStore.setCreateEndDate(moment(searchArgs.createEndDate).format('YYYY-MM-DD HH:mm:ss'));
+        IssueStore.setCreateStartDate(searchArgs.createStartDate ? moment(searchArgs.createStartDate).format('YYYY-MM-DD HH:mm:ss') : '');
+        IssueStore.setCreateEndDate(searchArgs.createEndDate ? moment(searchArgs.createEndDate).format('YYYY-MM-DD HH:mm:ss') : '');
         IssueStore.setBarFilter(contents || []);
         this.filterControler.searchArgsFilterUpdate(IssueStore.setCreateStartDate, IssueStore.getCreateEndDate);
         this.filterControler.myFilterUpdate(otherArgs, contents, searchArgs);
@@ -115,8 +129,8 @@ class AdvancedSearch extends Component {
         IssueStore.setCreateEndDate(createEndDate);
       } else {
         const projectInfo = IssueStore.getProjectInfo;
-        IssueStore.setCreateStartDate(`${moment(projectInfo.creationDate).format('YYYY-MM-DD')} 00:00:00`);
-        IssueStore.setCreateEndDate(`${moment().format('YYYY-MM-DD')} 23:59:59`);
+        IssueStore.setCreateStartDate('');
+        IssueStore.setCreateEndDate('');
       }
       IssueStore.setSaveFilterVisible(false);
       this.filterControler = new IssueFilterControler();
@@ -149,8 +163,8 @@ class AdvancedSearch extends Component {
       const selectedStatus = IssueStore.getSelectedStatus;
       const selectedPriority = IssueStore.getSelectedPriority;
       const selectedAssignee = IssueStore.getSelectedAssignee;
-      const createStartDate = IssueStore.getCreateStartDate;
-      const createEndDate = IssueStore.getCreateEndDate;
+      const createStartDate = IssueStore.getCreateStartDate || '';
+      const createEndDate = IssueStore.getCreateEndDate || '';
       const selectedMyFilterInfo = IssueStore.getSelectedMyFilterInfo;
       const selectedFilterId = IssueStore.getSelectedFilterId;
       const isExistFilter = IssueStore.getIsExistFilter;
@@ -325,14 +339,11 @@ class AdvancedSearch extends Component {
             </Select>
             
             {
-              moment(createStartDate).format('YYYY-MM-DD') === moment(projectInfo.creationDate).format('YYYY-MM-DD') && moment(createEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') ? (
+              (moment(createStartDate).format('YYYY-MM-DD') === moment(projectInfo.creationDate).format('YYYY-MM-DD') || createStartDate === '') && (moment(createEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') || createEndDate === '') ? (
                 <div className="c7n-createRange">
                   <RangePicker
-                  // value={[moment(createStartDate), moment(createEndDate)]}
                     format="YYYY-MM-DD hh:mm:ss"
                     disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
-                    // allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
-                // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
                     allowClear
                     onChange={this.handleCreateDateRangeChange}
                     placeholder={['创建时间', '']}
@@ -342,12 +353,10 @@ class AdvancedSearch extends Component {
                 <Tooltip title={`创建问题时间范围为${moment(createStartDate).format('YYYY-MM-DD')} ~ ${moment(createEndDate).format('YYYY-MM-DD')}`}>
                   <div className="c7n-createRange">
                     <RangePicker
-                      value={[moment(createStartDate), moment(createEndDate)]}
+                      value={[createStartDate && moment(createStartDate), createEndDate && moment(createEndDate)]}
                       format="YYYY-MM-DD hh:mm:ss"
                       disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
                       allowClear
-                      // allowClear={moment(createStartDate).format('YYYY-MM-DD') !== moment(projectInfo.creationDate).format('YYYY-MM-DD') || moment(createEndDate).format('YYYY-MM-DD') !== moment().format('YYYY-MM-DD')}
-                // ranges={{ Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
                       onChange={this.handleCreateDateRangeChange}
                       placeholder={['创建时间', '']}
                     />
@@ -366,6 +375,7 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(false);
                   IssueStore.setFilterListVisible(false);
+                  IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
                   IssueStore.resetFilterSelect(filterControler);
                   IssueStore.setClickedRow({
                     expand: false,
@@ -386,6 +396,7 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(true);
                   IssueStore.setFilterListVisible(false);
+                  IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
                 }}
               >
                 {'保存筛选'}
@@ -399,6 +410,7 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(false);
                   IssueStore.setFilterListVisible(!filterListVisible);
+                  IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
                 }}
               >
                 {'筛选管理'}

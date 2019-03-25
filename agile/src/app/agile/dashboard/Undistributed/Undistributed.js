@@ -56,7 +56,7 @@ class Undistributed extends Component {
           onClick={() => {
             const { history } = this.props;
             const urlParams = AppState.currentMenuType;
-            history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}`);
+            history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issue.issueNum}&paramIssueId=${issue.issueId}`);
           }}
         >
           {issue.issueNum}

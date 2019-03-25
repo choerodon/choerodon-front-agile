@@ -813,8 +813,12 @@ class CreateSprint extends Component {
     this.setState({ epicName: value });
   }
 
-  resetPriorityId(value) {
-    this.setState({ priorityId: value });
+  resetPriorityId(priority) {
+    this.setState({
+      priorityId: priority.id,
+      priorityColor: priority.colour,
+      priorityName: priority.name,
+    });
   }
 
   resetStatusId(value) {
@@ -834,11 +838,16 @@ class CreateSprint extends Component {
   }
 
   resetInfluenceVersions(value) {
-    this.setState({ influenceVersions: value });
+    const { versionIssueRelDTOList } = this.state;
+    const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
+    this.setState({ influenceVersions });
   }
 
   resetFixVersions(value) {
-    this.setState({ fixVersions: value });
+    const { versionIssueRelDTOList } = this.state;
+    const fixVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
+    const fixVersions = _.filter(fixVersionsTotal, v => v.statusCode !== 'archived') || [];
+    this.setState({ fixVersions });
   }
 
   resetlabelIssueRelDTOList(value) {
@@ -1476,6 +1485,7 @@ class CreateSprint extends Component {
       fixVersions,
       addWiki,
       wikies,
+      createdById,
     } = this.state;
     const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
@@ -1488,9 +1498,7 @@ class CreateSprint extends Component {
       ));
       issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? issueTypes : issueTypes.filter(item => item.typeCode !== 'feature');
     }
-    const getMenu = () => {
-      const { createdById } = this.state;
-      return (
+    const getMenu = () => (
         <Menu onClick={this.handleClickMenu.bind(this)}>
           <Menu.Item key="0">
             {'登记工作日志'}
@@ -1542,7 +1550,6 @@ class CreateSprint extends Component {
           }
         </Menu>
       );
-    };
     const callback = (value) => {
       this.setState({
         description: value,
@@ -2061,7 +2068,7 @@ class CreateSprint extends Component {
                             callback={this.changeRae.bind(this)}
                             thisType="priorityId"
                             current={currentRae}
-                            origin={priorityId}
+                            origin={origin.priorityDTO}
                             handleEnter
                             onOk={this.updateIssue.bind(this, 'priorityId')}
                             onCancel={this.resetPriorityId.bind(this)}
@@ -2159,7 +2166,7 @@ class CreateSprint extends Component {
                                 thisType="componentIssueRelDTOList"
                                 handleEnter
                                 current={currentRae}
-                                origin={componentIssueRelDTOList}
+                                origin={origin.componentIssueRelDTOList}
                                 onInit={() => this.setAnIssueToState(origin)}
                                 onOk={this.updateIssueSelect.bind(this, 'originComponents', 'componentIssueRelDTOList')}
                                 onCancel={this.resetComponentIssueRelDTOList.bind(this)}
@@ -2229,7 +2236,7 @@ class CreateSprint extends Component {
                             callback={this.changeRae.bind(this)}
                             thisType="labelIssueRelDTOList"
                             current={currentRae}
-                            origin={labelIssueRelDTOList}
+                            origin={origin.labelIssueRelDTOList}
                             onInit={() => this.setAnIssueToState(origin)}
                             onOk={this.updateIssueSelect.bind(this, 'originLabels', 'labelIssueRelDTOList')}
                             onCancel={this.resetlabelIssueRelDTOList.bind(this)}
@@ -2469,7 +2476,7 @@ class CreateSprint extends Component {
                                 callback={this.changeRae.bind(this)}
                                 thisType="epicId"
                                 current={currentRae}
-                                origin={epicId}
+                                origin={origin.epicId}
                                 onOk={this.updateIssue.bind(this, 'epicId')}
                                 onCancel={this.resetEpicId.bind(this)}
                                 onInit={() => {
@@ -2512,7 +2519,6 @@ class CreateSprint extends Component {
                                   }
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '150px' }}
-                                  // onBlur={() => this.statusOnChange()}
                                   allowClear
                                   loading={selectLoading}
                                   onFocus={() => {
@@ -2527,16 +2533,10 @@ class CreateSprint extends Component {
                                     });
                                   }}
                                   onChange={(value) => {
-                                    const epic = _.find(originEpics,
-                                      { issueId: value * 1 });
                                     this.setState({
                                       epicId: value,
-                                      // epicName: epic.epicName,
                                     });
                                     this.needBlur = false;
-                                    // 由于 OnChange 和 OnBlur 几乎同时执行，
-                                    // 不能确定先后顺序，所以需要 setTimeout 修改事件循环先后顺序
-                                    // setTimeout(() => { this.needBlur = true; }, 100);
                                   }}
                                 >
                                   {originEpics.map(epic => <Option key={`${epic.issueId}`} value={epic.issueId}>{epic.epicName}</Option>)}
@@ -2572,35 +2572,40 @@ class CreateSprint extends Component {
                                   });
                                 }}
                                 readModeContent={(
-                                  <div>
-                                    {
-                                      !closeSprint.length && !activeSprint.sprintId ? '无' : (
-                                        <div>
+                                  <Tooltip
+                                    placement="top"
+                                    title={`该问题经历迭代数：${closeSprint.length + (activeSprint.sprintId ? 1 : 0)}`}
+                                  >
+                                    <div>
+                                      {
+                                        !closeSprint.length && !activeSprint.sprintId ? '无' : (
                                           <div>
-                                            {_.map(closeSprint, 'sprintName').join(' , ')}
+                                            <div>
+                                              {_.map(closeSprint, 'sprintName').join(' , ')}
+                                            </div>
+                                            {
+                                              activeSprint.sprintId && (
+                                                <div
+                                                  style={{
+                                                    color: '#4d90fe',
+                                                    // border: '1px solid #4d90fe',
+                                                    // borderRadius: '2px',
+                                                    fontSize: '13px',
+                                                    lineHeight: '20px',
+                                                    // padding: '0 8px',
+                                                    display: 'inline-block',
+                                                    marginTop: 5,
+                                                  }}
+                                                >
+                                                  {activeSprint.sprintName}
+                                                </div>
+                                              )
+                                            }
                                           </div>
-                                          {
-                                            activeSprint.sprintId && (
-                                              <div
-                                                style={{
-                                                  color: '#4d90fe',
-                                                  // border: '1px solid #4d90fe',
-                                                  // borderRadius: '2px',
-                                                  fontSize: '13px',
-                                                  lineHeight: '20px',
-                                                  // padding: '0 8px',
-                                                  display: 'inline-block',
-                                                  marginTop: 5,
-                                                }}
-                                              >
-                                                {activeSprint.sprintName}
-                                              </div>
-                                            )
-                                          }
-                                        </div>
-                                      )
-                                    }
-                                  </div>
+                                        )
+                                      }
+                                    </div>
+                                  </Tooltip>
                                 )}
                               >
                                 {
@@ -2721,7 +2726,7 @@ class CreateSprint extends Component {
                           <div className="line-start mt-10">
                             <div className="c7n-property-wrapper">
                               <span className="c7n-property">
-                                {'Epic名：'}
+                                {'史诗名：'}
                               </span>
                             </div>
                             <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -2736,7 +2741,7 @@ class CreateSprint extends Component {
                                 onOk={this.updateIssue.bind(this, 'epicName')}
                                 onCancel={this.resetEpicName.bind(this)}
                                 readModeContent={(
-                                  <div>
+                                  <div style={{ minWidth: '150px' }}>
                                     <p style={{ wordBreak: 'break-word', marginBottom: 0 }}>
                                       {epicName}
                                     </p>
@@ -2775,74 +2780,74 @@ class CreateSprint extends Component {
                         </div>
                         <div className="c7n-value-wrapper" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                           <TextEditToggle
-                            disabled={reporterId !== loginUserId && !hasPermission}
+                            disabled={createdById !== loginUserId && !hasPermission}
                             formKey="reporterId"
                             onSubmit={(value) => { this.updateIssue('reporterId', value); }}
                             originData={reportShowUser}
                           >
                             <Text>
-                                {
-                                  <div>
-                                    {
-                                        reporterId && reporterName ? (
-                                          <UserHead
-                                            user={{
-                                              id: reporterId,
-                                              loginName: '',
-                                              realName: reporterName,
-                                              avatar: reporterImageUrl,
-                                            }}
-                                          />
-                                        ) : '无'
-                                      }
-                                  </div>
+                              {
+                                <div>
+                                  {
+                                    reporterId && reporterName ? (
+                                      <UserHead
+                                        user={{
+                                          id: reporterId,
+                                          loginName: '',
+                                          realName: reporterName,
+                                          avatar: reporterImageUrl,
+                                        }}
+                                      />
+                                    ) : '无'
                                   }
-                              </Text>
+                                </div>
+                              }
+                            </Text>
                             <Edit>
-                                <Select
-                                  style={{ width: 150 }}
-                                  loading={selectLoading}
-                                  allowClear
-                                  filter
-                                  onFilterChange={this.onFilterChange.bind(this)}
-                                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                                >
-                                  {originUsers.filter(u => u.enabled).map(user => (
-                                    <Option key={user.id} value={user.id}>
-                                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                                        <UserHead
-                                            user={{
-                                              id: user && user.id,
-                                              loginName: user && user.loginName,
-                                              realName: user && user.realName,
-                                              avatar: user && user.imageUrl,
-                                            }}
-                                          />
-                                      </div>
-                                    </Option>
-                                  ))}
-                                </Select>
-                              </Edit>
+                              <Select
+                                style={{ width: 150 }}
+                                loading={selectLoading}
+                                allowClear
+                                filter
+                                onFilterChange={this.onFilterChange.bind(this)}
+                                getPopupContainer={triggerNode => triggerNode.parentNode}
+                              >
+                                {originUsers.filter(u => u.enabled).map(user => (
+                                  <Option key={user.id} value={user.id}>
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                                      <UserHead
+                                        user={{
+                                          id: user && user.id,
+                                          loginName: user && user.loginName,
+                                          realName: user && user.realName,
+                                          avatar: user && user.imageUrl,
+                                        }}
+                                      />
+                                    </div>
+                                  </Option>
+                                ))}
+                              </Select>
+                            </Edit>
                           </TextEditToggle>
                           {reporterId === loginUserId || hasPermission ? (
                             <span
-                                role="none"
-                                style={{
-                                  color: '#3f51b5',
-                                  cursor: 'pointer',
-                                  display: 'inline-block',
-                                  marginBottom: 5,
-                                }}
-                                onClick={() => {
-                                  getSelf().then((res) => {
-                                    if (res.id !== reporterId) {
-                                      this.updateIssue('reporterId', res.id);
-                                    }
-                                  });
-                                }}
-                              >
-                                {'分配给我'}
-                              </span>
+                              role="none"
+                              style={{
+                                color: '#3f51b5',
+                                cursor: 'pointer',
+                                display: 'inline-block',
+                                marginBottom: 5,
+                              }}
+                              onClick={() => {
+                                getSelf().then((res) => {
+                                  if (res.id !== reporterId) {
+                                    this.updateIssue('reporterId', res.id);
+                                  }
+                                });
+                              }}
+                            >
+                              {'分配给我'}
+                            </span>
                           ) : null}
                         </div>
                       </div>
@@ -2856,7 +2861,7 @@ class CreateSprint extends Component {
                             callback={this.changeRae.bind(this)}
                             thisType="assigneeId"
                             current={currentRae}
-                            origin={assigneeId}
+                            origin={origin.assigneeId}
                             onOk={this.updateIssue.bind(this, 'assigneeId')}
                             onCancel={this.resetAssigneeId.bind(this)}
                             onInit={() => {

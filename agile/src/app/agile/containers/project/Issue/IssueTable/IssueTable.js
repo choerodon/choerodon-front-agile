@@ -186,7 +186,7 @@ class IssueTable extends Component {
           fieldFilteredValue = ['未分配'];
         } else {
           const FieldColumnFilter = IssueStore.getColumnFilter.get(field);
-          const otherFieldFilteredValue = _.map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value').concat(fieldValue.find(value => value === '0') ? ['未分配'] : []);
+          const otherFieldFilteredValue = FieldColumnFilter && _.map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value').concat(fieldValue.find(value => value === '0') ? ['未分配'] : []);
           fieldFilteredValue = !searchArgsField ? otherFieldFilteredValue : [...otherFieldFilteredValue, searchArgsField];
         }
       } else {
@@ -212,7 +212,6 @@ class IssueTable extends Component {
 
   render() {
     // Table 列配置
-    // const assigneeFilterValue = this.getFieldFilteredValue('assigneeId');
     const issueNumFieldValue = this.getFieldFilteredValue('issueNum');
     const summaryFilterValue = this.getFieldFilteredValue('summary');
     const reporterFilterValue = this.getFieldFilteredValue('reporter');
@@ -221,6 +220,7 @@ class IssueTable extends Component {
     const componentFilterValue = this.getFieldFilteredValue('component');
     const epicFilterValue = this.getFieldFilteredValue('epic');
     const labelFilterValue = this.getFieldFilteredValue('label');
+    const editFilterInfo = IssueStore.getEditFilterInfo;
     const columns = this.manageVisible([
       {
         title: '问题编号',
@@ -491,6 +491,7 @@ class IssueTable extends Component {
               expand: true,
             });
             IssueStore.setFilterListVisible(false);
+            IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
           },
           onBlur: (e) => {
             // 点击隐藏详情时无法触发 onClick，所以需要利用 onBlur 触发

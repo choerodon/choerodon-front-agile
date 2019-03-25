@@ -230,12 +230,28 @@ class CreateSprint extends Component {
     };
   }
 
+  GetRequest(url) {
+    const theRequest = {};
+    if (url.indexOf('?') !== -1) {
+      const str = url.split('?')[1];
+      const strs = str.split('&');
+      for (let i = 0; i < strs.length; i += 1) {
+        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
+      }
+    }
+    return theRequest;
+  }
+
   componentDidMount() {
     const { onRef, issueId } = this.props;
+    const { location: { search } } = this.props;
+    const theRequest = this.GetRequest(search);
+    const { paramIssueId, paramOpenIssueId } = theRequest;
+
     if (onRef) {
       onRef(this);
     }
-    this.firstLoadIssue(issueId);
+    this.firstLoadIssue(issueId || paramOpenIssueId);
     document.getElementById('scroll-area').addEventListener('scroll', (e) => {
       if (sign) {
         const { nav } = this.state;
@@ -863,9 +879,12 @@ class CreateSprint extends Component {
     this.refresh();
   }
 
-  resetPriorityId(value) {
-    this.setState({ priorityId: value });
-    this.refresh();
+  resetPriorityId(priority) {
+    this.setState({
+      priorityId: priority.id,
+      priorityColor: priority.colour,
+      priorityName: priority.name,
+    });
   }
 
   resetStatusId(value) {
@@ -889,13 +908,16 @@ class CreateSprint extends Component {
   }
 
   resetInfluenceVersions(value) {
-    this.setState({ influenceVersions: value });
-    this.refresh();
+    const { versionIssueRelDTOList } = this.state;
+    const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
+    this.setState({ influenceVersions });
   }
 
   resetFixVersions(value) {
-    this.setState({ fixVersions: value });
-    this.refresh();
+    const { versionIssueRelDTOList } = this.state;
+    const fixVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
+    const fixVersions = _.filter(fixVersionsTotal, v => v.statusCode !== 'archived') || [];
+    this.setState({ fixVersions });
   }
 
   resetlabelIssueRelDTOList(value) {
@@ -1274,7 +1296,7 @@ class CreateSprint extends Component {
         i={i}
         showAssignee
         onOpen={(issueId, linkedIssueId) => {
-          this.reloadIssue(issue.issueId);
+          this.reloadIssue(issueId);
         }}
         onRefresh={() => {
           this.reloadIssue(origin.issueId);
@@ -1576,6 +1598,7 @@ class CreateSprint extends Component {
       fixVersions,
       addWiki,
       wikies,
+      createdById,
     } = this.state;
     const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
@@ -1588,9 +1611,7 @@ class CreateSprint extends Component {
       ));
       issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? issueTypes : issueTypes.filter(item => item.typeCode !== 'feature');
     }
-    const getMenu = () => {
-      const { createdById } = this.state;
-      return (
+    const getMenu = () => (
         <Menu onClick={this.handleClickMenu.bind(this)}>
           <Menu.Item key="0">登记工作日志</Menu.Item>
           {
@@ -1640,7 +1661,6 @@ class CreateSprint extends Component {
           }
         </Menu>
       );
-    };
     const callback = (value) => {
       this.setState(
         {
@@ -2095,7 +2115,7 @@ class CreateSprint extends Component {
                           callback={this.changeRae.bind(this)}
                           thisType="priorityId"
                           current={currentRae}
-                          origin={priorityId}
+                          origin={origin.priorityDTO}
                           onOk={this.updateIssue.bind(this, 'priorityId')}
                           onCancel={this.resetPriorityId.bind(this)}
                           onInit={() => {
@@ -2186,21 +2206,26 @@ class CreateSprint extends Component {
                     display: 'flex', flex: 1.2, flexShrink: 0, width: 0,
                   }}
                   >
-                    <span
-                      style={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: '50%',
-                        background: '#d8d8d8',
-                        marginRight: 12,
-                        flexShrink: 0,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
+                    <Tooltip
+                      placement="top"
+                      title={`该问题经历迭代数：${closeSprint.length + (activeSprint.sprintId ? 1 : 0)}`}
                     >
-                      <Icon type="directions_run" style={{ fontSize: '24px' }} />
-                    </span>
+                      <span
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: '50%',
+                          background: '#d8d8d8',
+                          marginRight: 12,
+                          flexShrink: 0,
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Icon type="directions_run" style={{ fontSize: '24px' }} />
+                      </span>
+                    </Tooltip>
                     <div style={{ overflow: 'hidden' }}>
                       <div
                         style={{
@@ -2523,7 +2548,7 @@ class CreateSprint extends Component {
                                 callback={this.changeRae.bind(this)}
                                 thisType="componentIssueRelDTOList"
                                 current={currentRae}
-                                origin={componentIssueRelDTOList}
+                                origin={origin.componentIssueRelDTOList}
                                 onInit={() => this.setAnIssueToState(origin)}
                                 onOk={this.updateIssueSelect.bind(
                                   this,
@@ -2602,7 +2627,7 @@ class CreateSprint extends Component {
                               callback={this.changeRae.bind(this)}
                               thisType="labelIssueRelDTOList"
                               current={currentRae}
-                              origin={labelIssueRelDTOList}
+                              origin={origin.labelIssueRelDTOList}
                               onInit={() => this.setAnIssueToState(origin)}
                               onOk={this.updateIssueSelect.bind(
                                 this,
@@ -2868,7 +2893,7 @@ class CreateSprint extends Component {
                                 callback={this.changeRae.bind(this)}
                                 thisType="epicId"
                                 current={currentRae}
-                                origin={epicId}
+                                origin={origin.epicId}
                                 onOk={this.updateIssue.bind(this, 'epicId')}
                                 onCancel={this.resetEpicId.bind(this)}
                                 onInit={() => {
@@ -2911,7 +2936,6 @@ class CreateSprint extends Component {
                                   }
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   style={{ width: '200px' }}
-                                  // onBlur={e => this.statusOnChange(e)}
                                   ref={(e) => {
                                     this.componentRef = e;
                                   }}
@@ -3045,7 +3069,6 @@ class CreateSprint extends Component {
                           </div>
                         ) : null}
                       </div>
-                      {/* --- */}
                       <div style={{ flex: 1 }}>
                         <div className="line-start mt-10">
                           <div className="c7n-property-wrapper">
@@ -3061,74 +3084,74 @@ class CreateSprint extends Component {
                             style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}
                           >
                             <TextEditToggle
-                              disabled={reporterId !== loginUserId && !hasPermission}
+                              disabled={createdById !== loginUserId && !hasPermission}
                               formKey="reporterId"
                               onSubmit={(value) => { this.updateIssue('reporterId', value); }}
                               originData={reportShowUser}
                             >
                               <Text>
-                                  {
-                                    <div>
-                                      {
-                                        reporterId && reporterName ? (
-                                          <UserHead
-                                            user={{
-                                              id: reporterId,
-                                              loginName: '',
-                                              realName: reporterName,
-                                              avatar: reporterImageUrl,
-                                            }}
-                                          />
-                                        ) : '无'
-                                      }
-                                    </div>
-                                  }
-                                </Text>
+                                {
+                                  <div>
+                                    {
+                                      reporterId && reporterName ? (
+                                        <UserHead
+                                          user={{
+                                            id: reporterId,
+                                            loginName: '',
+                                            realName: reporterName,
+                                            avatar: reporterImageUrl,
+                                          }}
+                                        />
+                                      ) : '无'
+                                    }
+                                  </div>
+                                }
+                              </Text>
                               <Edit>
-                                  <Select
-                                    style={{ width: 150 }}
-                                    loading={selectLoading}
-                                    allowClear
-                                    filter
-                                    onFilterChange={this.onFilterChange.bind(this)}
-                                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                                  >
-                                    {originUsers.filter(u => u.enabled).map(user => (
-                                      <Option key={user.id} value={user.id}>
-                                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                                          <UserHead
-                                            user={{
-                                              id: user && user.id,
-                                              loginName: user && user.loginName,
-                                              realName: user && user.realName,
-                                              avatar: user && user.imageUrl,
-                                            }}
-                                          />
-                                        </div>
-                                      </Option>
-                                    ))}
-                                  </Select>
-                                </Edit>
+                                <Select
+                                  style={{ width: 150 }}
+                                  loading={selectLoading}
+                                  allowClear
+                                  filter
+                                  onFilterChange={this.onFilterChange.bind(this)}
+                                  getPopupContainer={triggerNode => triggerNode.parentNode}
+                                >
+                                  {originUsers.filter(u => u.enabled).map(user => (
+                                    <Option key={user.id} value={user.id}>
+                                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                                        <UserHead
+                                          user={{
+                                            id: user && user.id,
+                                            loginName: user && user.loginName,
+                                            realName: user && user.realName,
+                                            avatar: user && user.imageUrl,
+                                          }}
+                                        />
+                                      </div>
+                                    </Option>
+                                  ))}
+                                </Select>
+                              </Edit>
                             </TextEditToggle>
                             {reporterId === loginUserId || hasPermission ? (
                               <span
-                                  role="none"
-                                  style={{
-                                    color: '#3f51b5',
-                                    cursor: 'pointer',
-                                    display: 'inline-block',
-                                    marginBottom: 5,
-                                  }}
-                                  onClick={() => {
-                                    getSelf().then((res) => {
-                                      if (res.id !== reporterId) {
-                                        this.updateIssue('reporterId', res.id);
-                                      }
-                                    });
-                                  }}
-                                >
-                                  {'分配给我'}
-                                </span>
+                                role="none"
+                                style={{
+                                  color: '#3f51b5',
+                                  cursor: 'pointer',
+                                  display: 'inline-block',
+                                  marginBottom: 5,
+                                }}
+                                onClick={() => {
+                                  getSelf().then((res) => {
+                                    if (res.id !== reporterId) {
+                                      this.updateIssue('reporterId', res.id);
+                                    }
+                                  });
+                                }}
+                              >
+                                {'分配给我'}
+                              </span>
                             ) : null}
                           </div>
                         
@@ -3146,7 +3169,7 @@ class CreateSprint extends Component {
                               callback={this.changeRae.bind(this)}
                               thisType="assigneeId"
                               current={currentRae}
-                              origin={assigneeId}
+                              origin={origin.assigneeId}
                               onOk={this.updateIssue.bind(this, 'assigneeId')}
                               onCancel={this.resetAssigneeId.bind(this)}
                               onInit={() => {

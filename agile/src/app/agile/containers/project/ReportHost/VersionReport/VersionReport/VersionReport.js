@@ -690,7 +690,8 @@ class EpicReport extends Component {
                     }}
                     role="none"
                     onClick={() => {
-                      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`);
+                      // history.push(encodeURI(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${urlParams.name}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${VS.getCurrentVersion.name}下的问题&paramUrl=reporthost/VersionReport`));
+                      history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramType=version&paramId=${VS.currentVersionId}&paramName=${encodeURIComponent(`${VS.getCurrentVersion.name}下的问题`)}&paramUrl=reporthost/VersionReport`);
                     }}
                   >
                     {'在“问题管理中”查看'}
@@ -748,9 +749,8 @@ class EpicReport extends Component {
                         history.push(`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
                       }}
                     >
-
-                      发布版本
-</span>
+                      {'发布版本'}
+                    </span>
                     <span>中创建一个版本</span>
                   </div>
                 )}

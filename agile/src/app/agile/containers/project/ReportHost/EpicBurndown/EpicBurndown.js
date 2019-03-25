@@ -615,7 +615,7 @@ class EpicBurndown extends Component {
               >
                 {'待办事项'}
               </a>
-              {'中预估故事点。'}
+              {'中创建故事并预估故事点。'}
             </p>
           </div>
           {/* {'当前史诗下没有故事点'} */}
@@ -699,9 +699,9 @@ class EpicBurndown extends Component {
                               const { history } = this.props;
                               const urlParams = AppState.currentMenuType;
                               if (item.statusCode === 'started') {
-                                history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+                                history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramUrl=reporthost/EpicBurndown`);
                               } else {
-                                history.push(`/agile/reporthost/sprintReport?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&sprintId=${item.sprintId}`);
+                                history.push(`/agile/reporthost/sprintReport?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&sprintId=${item.sprintId}&paramUrl=reporthost/EpicBurndown`);
                               }
                             }
                           }
@@ -939,7 +939,7 @@ class EpicBurndown extends Component {
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-                        history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+                        history.push(`/agile/backlog?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramUrl=reporthost/EpicBurndown`);
                       }}
                     >
                       {'待办事项'}
@@ -949,7 +949,7 @@ class EpicBurndown extends Component {
                       style={{ color: '#3f51b5', margin: '0 5px', cursor: 'pointer' }}
                       role="none"
                       onClick={() => {
-                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`);
+                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramUrl=reporthost/EpicBurndown`);
                       }}
                     >
                       {'问题管理'}

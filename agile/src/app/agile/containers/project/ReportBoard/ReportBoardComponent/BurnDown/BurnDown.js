@@ -9,7 +9,7 @@ import {
 import { stores, axios } from 'choerodon-front-boot';
 import EmptyBlockDashboard from '../../../../../components/EmptyBlockDashboard';
 import { loadSprints } from '../../../../../api/NewIssueApi';
-import pic from './no_sprint.svg';
+import pic from '../../../../../assets/image/emptyChart.svg';
 import lineLegend from './Line.svg';
 import './BurnDown.scss';
 
@@ -32,14 +32,7 @@ class BurnDown extends Component {
   }
 
   componentDidMount() {
-    loadSprints(['started', 'closed']).then(res => {
-      this.setState({
-        sprint: res[0],
-        sprintId: res[0].sprintId,
-      }, () => {
-        this.loadChartData(this.state.sprintId);
-      })
-    })
+    this.loadSprints()
   }
 
 
@@ -98,13 +91,13 @@ class BurnDown extends Component {
           let curUnit = '';
           params.forEach((item) => {
             if (item.seriesName === '剩余值') {
-              if(item.value && unit === 'remainingEstimatedTime') {
+              if (item.value && unit === 'remainingEstimatedTime') {
                 curUnit = ' 小时';
               }
-              if(item.value && unit === 'storyPoints') {
+              if (item.value && unit === 'storyPoints') {
                 curUnit = ' 点';
               }
-              if(item.value && unit === 'issueCount') {
+              if (item.value && unit === 'issueCount') {
                 curUnit = ' 个';
               }
               content = `${item.axisValue || '冲刺开启'}<br />${item.marker}${item.seriesName} : ${(item.value || item.value === 0) ? item.value : '-'}${curUnit && curUnit}`;
@@ -278,14 +271,18 @@ class BurnDown extends Component {
     return { result, rest };
   }
 
-  loadSprints(sprintId, unit) {
+  loadSprints(unit = this.state.unit) {
     const projectId = AppState.currentMenuType.id;
     this.setState({ loading: true });
     axios.post(`/agile/v1/projects/${projectId}/sprint/names`, ['started', 'closed'])
       .then((res) => {
-        if (res && res.length) {
-          const sprint = res.find(v => v.sprintId === sprintId);
-          this.setState({ sprint });
+        const sprint = res.find(v => v.statusCode === 'started');
+        if (res && res.length && sprint) {
+          const sprintId = sprint.sprintId;
+          this.setState({
+            sprint,
+            sprintId
+          });
           this.getRestDays(sprintId, unit);
         } else {
           this.setState({ loading: false });
@@ -312,7 +309,8 @@ class BurnDown extends Component {
   };
 
   loadChartData(sprintId, unit = 'remainingEstimatedTime') {
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${unit}&ordinalType=asc`)
+    if(sprintId) {
+      axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/reports/${sprintId}/burn_down_report/coordinate?type=${unit}&ordinalType=asc`)
       .then((res) => {
         const dataDates = Object.keys(res.coordinate);
         const [dataMinDate, dataMaxDate] = [dataDates[0], dataDates[dataDates.length - 1]];
@@ -337,7 +335,6 @@ class BurnDown extends Component {
         let markAreaData = [];
         let exportAxisData = [res.expectCount];
         const { restDayShow } = this.state;
-
         // 如果展示非工作日，期望为一条连续斜线
         if (!restDayShow) {
           if (allDate.length) {
@@ -363,7 +360,7 @@ class BurnDown extends Component {
               // 非工作日
               markAreaData.push([
                 {
-                  xAxis: index === 0 ? '' : allDate[index -1 ].split(' ')[0].slice(5).replace('-', '/'),
+                  xAxis: index === 0 ? '' : allDate[index - 1].split(' ')[0].slice(5).replace('-', '/'),
                 },
                 {
                   xAxis: allDate[index].split(' ')[0].slice(5).replace('-', '/'),
@@ -390,6 +387,12 @@ class BurnDown extends Component {
           markAreaData,
         });
       });
+    } else {
+      this.setState({
+        loading: false,
+      })
+    }
+    
   }
 
   handleChangeUnit({ key }) {
@@ -410,7 +413,7 @@ class BurnDown extends Component {
   };
 
   renderContent() {
-    const { loading, sprint: { sprintId } } = this.state;
+    const { loading, sprintId } = this.state;
     if (loading) {
       return (
         <div className="loading-wrap">
@@ -437,7 +440,7 @@ class BurnDown extends Component {
   }
 
   render() {
-    const { loading, sprint: { sprintId } } = this.state;
+    const { loading, sprintId } = this.state;
     const menu = (
       <Menu onClick={this.handleChangeUnit.bind(this)}>
         <Menu.Item key="remainingEstimatedTime">剩余时间</Menu.Item>

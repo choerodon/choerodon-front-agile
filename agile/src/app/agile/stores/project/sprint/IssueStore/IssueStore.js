@@ -9,7 +9,16 @@ import { empty } from 'rxjs/Observer';
 const { AppState } = stores;
 // 当前跳转是否需要单选信息（跳转单个任务时使用）
 let paramIssueSelected = false;
-
+const defaultTableShowColumns = [
+  'issueNum',
+  'issueTypeId',
+  'summary',
+  'statusId',
+  'priorityId',
+  'assignee',
+  'sprint',
+  'lastUpdateDate',    
+];
 @store('SprintCommonStore')
 class SprintCommonStore {
   // 任务信息
@@ -104,6 +113,9 @@ class SprintCommonStore {
   // 筛选列表是否显示
   @observable filterListVisible = false;
 
+  // 跳入问题列表的url,用于返回
+  @observable paramUrl = false;
+
   @computed get getFilterListVisible() {
     return this.filterListVisible;
   }
@@ -137,8 +149,8 @@ class SprintCommonStore {
         priorityId: [],
       },
       searchArgs: {
-        createStartDate: moment().format('YYYY-MM-DD hh:mm:ss'),
-        createEndDate: moment().format('YYYY-MM-DD hh:mm:ss'),
+        createStartDate: '',
+        createEndDate: '',
         summary: '',
         issueNum: '',
         reporter: '',
@@ -211,16 +223,7 @@ class SprintCommonStore {
   }
 
   // table列显示存储
-  @observable tableShowColumns = [
-    'issueNum',
-    'issueTypeId',
-    'summary',
-    'statusId',
-    'priorityId',
-    'assignee',
-    'sprint',
-    'lastUpdateDate',    
-  ];
+  @observable tableShowColumns = defaultTableShowColumns
 
   @computed get getTableShowColumns() {
     const transform = {
@@ -253,6 +256,10 @@ class SprintCommonStore {
 
   @action setTableShowColumns(tableShowColumns) {
     this.tableShowColumns = tableShowColumns;
+  }
+
+  @action setDefaultTableShowColumns() {
+    this.tableShowColumns = defaultTableShowColumns;
   }
 
   // 控制清除筛选按钮是否显示
@@ -292,7 +299,7 @@ class SprintCommonStore {
   @observable projectInfo = {};
 
   @computed get getProjectInfo() {
-    return this.projectInfo;
+    return toJS(this.projectInfo);
   }
 
   @action setProjectInfo(data) {
@@ -359,7 +366,7 @@ class SprintCommonStore {
     this.selectedAssignee = data;
   }
 
-  @observable createStartDate = `${moment().format('YYYY-MM-DD')} 00:00:00`;
+  @observable createStartDate = '';
 
   @computed get getCreateStartDate() {
     return this.createStartDate;
@@ -369,7 +376,7 @@ class SprintCommonStore {
     this.createStartDate = data;
   }
 
-  @observable createEndDate = `${moment().format('YYYY-MM-DD')} 23:59:59`;
+  @observable createEndDate = '';
 
   @computed get getCreateEndDate() {
     return this.createEndDate;
@@ -657,9 +664,10 @@ class SprintCommonStore {
       this.setLoading(false);
       Choerodon.prompt('获取我的筛选列表失败');
     });
-  }
+  };
 
-  resetFilterSelect = (filterControler) => {
+  // noLoad: Issue卸载时，只需要清空筛选，不用加载数据
+  resetFilterSelect = (filterControler, noLoad) => {
     const projectInfo = this.getProjectInfo;
     this.setSelectedFilterId(undefined);
     this.setSelectedMyFilterInfo({});
@@ -667,8 +675,8 @@ class SprintCommonStore {
     this.setSelectedStatus([]);
     this.setSelectedPriority([]);
     this.setSelectedAssignee([]);
-    this.setCreateStartDate(`${moment(projectInfo.creationDate).format('YYYY-MM-DD')} 00:00:00`);
-    this.setCreateEndDate(`${moment().format('YYYY-MM-DD')} 23:59:59`);
+    this.setCreateStartDate('');
+    this.setCreateEndDate('');
     this.setUpdateFilterName('');
     this.setBarFilter([]);
     this.setIsExistFilter(true);
@@ -692,9 +700,11 @@ class SprintCommonStore {
     });
     filterControler.assigneeFilterUpdate([]);
     filterControler.advancedSearchArgsFilterUpdate([], [], []);
-    filterControler.searchArgsFilterUpdate(moment(projectInfo.creationDate).format('YYYY-MM-DD hh:mm:ss'), moment().format('YYYY-MM-DD hh:mm:ss'));
-    this.updateIssues(filterControler, []);
-  }
+    filterControler.searchArgsFilterUpdate('', '');
+    if (!noLoad) {
+      this.updateIssues(filterControler, []);
+    }
+  };
 
   updateIssues = (filterControler, barFilter) => {
     this.setLoading(true);
@@ -752,7 +762,7 @@ class SprintCommonStore {
     const filterContentsIsEmpty = filterContents.length === 0;
 
     if (filterAdvEveryFieldIsEmpty && filterAssigneeIsEmpty && filterOtherAssignee.length === 0 && filterSeaArgsFieldIsEmpty && filterOtherArgsFieldIsEmpty && filterContentsIsEmpty) {
-      for (let i = 0; i < myFilters.length; i++) {
+      for (let i = 0; i < myFilters.length; i += 1) {
         if (myFilters[i].personalFilterSearchDTO) {
           const { searchArgs } = myFilters[i].personalFilterSearchDTO;
           const createStartDateIsEqual = filterCreateStartDate && moment(filterCreateStartDate).format('YYYY-MM-DD') !== moment(this.getProjectInfo.creationDate).format('YYYY-MM-DD') && moment(searchArgs.createStartDate).format('YYYY-MM-DD') === moment(filterCreateStartDate).format('YYYY-MM-DD');
@@ -776,7 +786,7 @@ class SprintCommonStore {
       this.setSelectedPriority(filterAdvancedSearchArgs.priorityId ? filterAdvancedSearchArgs.priorityId.map(item => Number(item)) : []);
       this.setSelectedStatus(filterAdvancedSearchArgs.statusId ? filterAdvancedSearchArgs.statusId.map(item => Number(item)) : []);
 
-      for (let i = 0; i < myFilters.length; i++) {
+      for (let i = 0; i < myFilters.length; i += 1) {
         if (myFilters[i].personalFilterSearchDTO) {
           const {
             advancedSearchArgs, searchArgs, otherArgs, contents, 

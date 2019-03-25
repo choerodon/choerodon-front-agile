@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
-import { Form, Modal, Input, Select } from 'choerodon-ui';
+import {
+  Form, Modal, Input, Select, 
+} from 'choerodon-ui';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 
 const FormItem = Form.Item;
 const { Sidebar } = Modal;
-const Option = Select.Option;
+const { Option } = Select;
 const { AppState } = stores;
 
 @observer
@@ -18,6 +20,7 @@ class EditStatus extends Component {
       changeName: false,
     };
   }
+
   handleEditStatus(e) {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
@@ -37,6 +40,7 @@ class EditStatus extends Component {
       }
     });
   }
+
   checkStatusName(rule, value, callback) {
     ScrumBoardStore.axiosCheckRepeatName(value).then((res) => {
       if (res) {
@@ -51,6 +55,7 @@ class EditStatus extends Component {
     }).catch((error) => {
     });
   }
+
   renderOptions() {
     const result = [];
     if (JSON.stringify(ScrumBoardStore.getStatusCategory) !== '{}') {
@@ -94,6 +99,7 @@ class EditStatus extends Component {
     }
     return result;
   }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     let name;
@@ -142,8 +148,8 @@ class EditStatus extends Component {
             </FormItem>
             <FormItem>
               {getFieldDecorator('categoryCode', {
-                initialValue: this.props.data.categoryCode ?
-                  this.props.data.categoryCode : undefined,
+                initialValue: this.props.data.categoryCode
+                  ? this.props.data.categoryCode : undefined,
                 rules: [{
                   required: true, message: '类别是必填的',
                 }],
@@ -165,4 +171,3 @@ class EditStatus extends Component {
 }
 
 export default Form.create()(EditStatus);
-

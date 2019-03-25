@@ -74,7 +74,7 @@ class AssigneeModal extends Component {
     let remainingStoryPoints = 0;
     let totalTime = 0;
     let totalRemainTime = 0;
-    if (Array.isArray(assignData)) {
+    if (Array.isArray([...assignData])) {
       for (let index = 0, lens = assignData.length; index < lens; index += 1) {
         if (assignData[index].issueCount) {
           totalIssue += assignData[index].issueCount;
@@ -119,30 +119,30 @@ class AssigneeModal extends Component {
         okCancel={false}
       >
         {data.assigneeIssues && (
-        <Content
-          style={{
-            padding: 0,
-            overflow: 'hidden',
-          }}
-          title={`“${data.sprintName}”的经办人工作量`}
-          description="您可以在这里查看当前冲刺中问题的分配情况，包括每位成员的问题数量、故事点数总和、剩余预估时间总和等信息。"
-        >
-          <Table
-            pagination={dataSource + 1 > 10}
-            dataSource={_.concat(dataSource, {
-              assigneeName: '合计',
-              issueCount: this.dealDecimal(total.totalIssue),
-              remainingIssueCount: this.dealDecimal(total.totalRemainIssueCount),
-              totalStoryPoints: this.dealDecimal(total.totalStoryPoints),
-              remainingStoryPoints: this.dealDecimal(total.remainingStoryPoints),
-              totalRemainingTime: this.dealDecimal(total.totalTime),
-              remainingTime: this.dealDecimal(total.totalRemainTime),
-            })}
-            columns={columns}
-            filterBar={false}
-            rowKey="assigneeName"
-          />
-        </Content>
+          <Content
+            style={{
+              padding: 0,
+              overflow: 'hidden',
+            }}
+            title={`“${data.sprintName}”的经办人工作量`}
+            description="您可以在这里查看当前冲刺中问题的分配情况，包括每位成员的问题数量、故事点数总和、剩余预估时间总和等信息。"
+          >
+            <Table
+              pagination={dataSource + 1 > 10}
+              dataSource={_.concat(dataSource, {
+                assigneeName: '合计',
+                issueCount: this.dealDecimal(total.totalIssue),
+                remainingIssueCount: this.dealDecimal(total.totalRemainIssueCount),
+                totalStoryPoints: this.dealDecimal(total.totalStoryPoints),
+                remainingStoryPoints: this.dealDecimal(total.remainingStoryPoints),
+                totalRemainingTime: this.dealDecimal(total.totalTime),
+                remainingTime: this.dealDecimal(total.totalRemainTime),
+              })}
+              columns={columns}
+              filterBar={false}
+              rowKey="assigneeName"
+            />
+          </Content>
         )}
       </Sidebar>
     );

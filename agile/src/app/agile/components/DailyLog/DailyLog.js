@@ -38,6 +38,8 @@ class DailyLog extends Component {
       reduceUnit: '小时',
       delta: '',
       createLoading: false,
+      dissipateNull: false,
+      startTimeNull: false,
     };
   }
 
@@ -57,8 +59,11 @@ class DailyLog extends Component {
       dissipate, startTime, radio, delta,
     } = this.state;
     const { issueId } = this.props;
-    if (typeof dissipate === 'undefined' || dissipate === '' || startTime == null) {
-      message.warning('请输入耗费时间和工作日期');
+    if (!dissipate || !startTime) {
+      this.setState({
+        dissipateNull: !dissipate,
+        startTimeNull: !startTime,
+      });
       return;
     }
     this.setState({ createLoading: true });
@@ -120,7 +125,7 @@ class DailyLog extends Component {
 
   changeEndTime = (value) => {
     const startTime = this.transTime(value);
-    this.setState({ startTime: value });
+    this.setState({ startTime: value, startTimeNull: !value });
   }
 
   handleChangeDissipate = (value) => {
@@ -129,18 +134,22 @@ class DailyLog extends Component {
     if (value === '0.5') {
       this.setState({
         dissipate: '0.5',
+        dissipateNull: false,
       });
     } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
       this.setState({
         dissipate: String(value).slice(0, 3), // 限制最长三位,
+        dissipateNull: !value,
       });
     } else if (value.toString().charAt(value.length - 1) === '.') {
       this.setState({
         dissipate: value.slice(0, -1),
+        dissipateNull: !value.slice(0, -1),
       });
     } else {
       this.setState({
         dissipate,
+        dissipateNull: !dissipate,
       });
     }
   };
@@ -229,7 +238,7 @@ class DailyLog extends Component {
     const {
       createLoading, dissipate, dissipateUnit,
       startTime, radio, time, timeUnit, reduce,
-      reduceUnit, delta, edit,
+      reduceUnit, delta, edit, startTimeNull, dissipateNull,
     } = this.state;
     const radioStyle = {
       display: 'block',
@@ -296,10 +305,14 @@ class DailyLog extends Component {
                   <Option key={type} value={type}>{type}</Option>))}
               </Select>
             </div>
+            {dissipateNull
+              ? <div className="error-text">耗费时间必填</div>
+              : ''
+            }
             <div
               className="dataPicker"
               style={{
-                width: 218, marginBottom: 32, display: 'flex', flexDirection: 'column', position: 'relative',
+                width: 218, margin: '32px 0', display: 'flex', flexDirection: 'column', position: 'relative',
               }}
             >
               <DatePicker
@@ -308,8 +321,11 @@ class DailyLog extends Component {
                 format={DATA_FORMAT}
                 onChange={this.changeEndTime}
               />
+              {startTimeNull
+                ? <div className="error-text">工作日期必填</div>
+                : ''
+              }
             </div>
-
             <div className="line-info">
               <RadioGroup label="剩余的估计" onChange={this.onRadioChange} value={radio}>
                 <Radio style={radioStyle} value={1}>自动调整</Radio>

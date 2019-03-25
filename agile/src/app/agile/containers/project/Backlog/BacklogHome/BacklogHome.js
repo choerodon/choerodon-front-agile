@@ -6,7 +6,6 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import {
   Button, Spin, message, Icon,
 } from 'choerodon-ui';
-import _ from 'lodash';
 import Version from '../BacklogComponent/VersionComponent/Version';
 import Epic from '../BacklogComponent/EpicComponent/Epic';
 import IssueDetail from '../BacklogComponent/IssueDetailComponent/IssueDetail';
@@ -15,9 +14,11 @@ import './BacklogHome.scss';
 import SprintItem from '../BacklogComponent/SprintComponent/SprintItem';
 import QuickSearch from '../../../../components/QuickSearch';
 import Injecter from '../../../../components/Injecter';
+import ClearFilter from '../BacklogComponent/SprintComponent/SprintItemComponent/SprintHeaderComponent/ClearAllFilter';
 
 const { AppState } = stores;
 
+@inject('HeaderStore')
 @observer
 class BacklogHome extends Component {
   constructor(props) {
@@ -30,39 +31,13 @@ class BacklogHome extends Component {
   }
 
   componentDidMount() {
-    const { BacklogStore, location } = this.props;
-    // magic, don't touch it
-    document.addEventListener('click', (e) => {
-      if (!BacklogStore.isInner && BacklogStore.getSelectIssue && BacklogStore.getSelectIssue.length > 0) {
-        // 取消选择
-
-        BacklogStore.setSelectIssue([]);
-      }
-    });
-    BacklogStore.clearSprintFilter();
     this.refresh();
-    this.loadQuickFilter();
-    const url = this.handleRequest(location.search);
-    this.loadProperty();
-    if (url.paramIssueId) {
-      BacklogStore.setClickIssueDetail({ issueId: url.paramIssueId });
-    }
   }
 
   componentWillUnmount() {
     const { BacklogStore } = this.props;
-    BacklogStore.dispose();
-    BacklogStore.setClickIssueDetail({});
-    BacklogStore.setAssigneeFilterIds([]);
-    BacklogStore.setSprintData({});
+    BacklogStore.resetData();
   }
-
-  // 加载问题类型和默认优先级
-  loadProperty = () => {
-    const { BacklogStore } = this.props;
-    BacklogStore.axiosGetIssueTypes();
-    BacklogStore.axiosGetDefaultPriority();
-  };
 
   /**
    * 加载选择快速搜索的冲刺数据
@@ -71,86 +46,17 @@ class BacklogHome extends Component {
    */
   getSprint = (isCreate = false, issue) => {
     const { BacklogStore } = this.props;
-    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
-      .then((data) => {
-        let arrAssignee = [];
-        data.sprintData.forEach((sprintItem) => {
-          const sprintDataItemAssignees = _.map(sprintItem.assigneeIssues, issueItem => _.pick(issueItem, ['assigneeId', 'assigneeName']));
-
-          _.forEach(sprintDataItemAssignees, (item) => {
-            if (item.assigneeId && item.assigneeName) {
-              arrAssignee.push({
-                id: item.assigneeId,
-                realName: item.assigneeName.replace(/[0-9]/ig, ''),
-              });
-            }
-          });
-        });
-        _.forEach(data.backlogData.backLogIssue, (item) => {
-          if (item.assigneeId && item.assigneeName) {
-            arrAssignee.push({
-              id: item.assigneeId,
-              realName: item.assigneeName.replace(/[0-9]/ig, ''),
-            });
-          }
-        });
-
-        arrAssignee = _.map(_.uniq(_.map(arrAssignee, JSON.stringify)), JSON.parse);
-        BacklogStore.setAssigneeProps(arrAssignee);
-        BacklogStore.setSprintData(data);
-        this.setState({
-          spinIf: false,
-        }, () => {
-          if (isCreate && document.getElementById('sprint_new')) {
-            const sprintWapper = document.querySelector('#sprint_new .c7n-noissue-wapper');
-            const sprint = document.querySelector('#sprint_new .c7n-backlog-sprintIssue');
-            document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop = document.getElementById('sprint_new').offsetTop;
-            if (sprintWapper && sprintWapper.style) {
-              sprintWapper.style.backgroundColor = '#E9ECFB';
-            }
-            if (sprint && sprint.style) {
-              sprint.style.backgroundColor = '#E9ECFB';
-            }
-            setTimeout(() => {
-              if (sprintWapper && sprintWapper.style) {
-                sprintWapper.style.backgroundColor = 'white';
-              }
-              if (sprint && sprint.style) {
-                sprint.style.backgroundColor = 'white';
-              }
-            }, 2000);
-          } else if (issue && issue.issueId) {
-            BacklogStore.setClickIssueDetail(issue);
-            const anchorElement = document.getElementById(issue.issueId);
-            if (anchorElement) {
-              anchorElement.scrollIntoView({
-                // behavior: 'smooth',
-                block: 'start',
-                inline: 'end',
-              });
-            }
-          }
-        });
-      }).catch((error2) => {
-      });
+    BacklogStore.axiosGetIssueTypes();
+    BacklogStore.axiosGetDefaultPriority();
+    Promise.all([BacklogStore.axiosGetQuickSearchList(), BacklogStore.axiosGetIssueTypes(), BacklogStore.axiosGetDefaultPriority(), BacklogStore.axiosGetSprint()]).then(([quickSearch, issueTypes, priorityArr, backlogData]) => {
+      BacklogStore.initBacklogData(quickSearch.content, issueTypes, priorityArr, backlogData);
+    });
   };
-
-  handleRequest =(url) => {
-    const theRequest = {};
-    if (url.indexOf('?') !== -1) {
-      const str = url.split('?')[1];
-      const strs = str.split('&');
-      for (let i = 0; i < strs.length; i += 1) {
-        theRequest[strs[i].split('=')[0]] = decodeURI(strs[i].split('=')[1]);
-      }
-    }
-    return theRequest;
-  }
 
   /**
    * 加载版本数据
    */
-  loadVersion =() => {
+  loadVersion = () => {
     const { BacklogStore } = this.props;
     BacklogStore.axiosGetVersion().then((data2) => {
       const newVersion = [...data2];
@@ -165,7 +71,7 @@ class BacklogHome extends Component {
   /**
    * 加载史诗
    */
-  loadEpic =() => {
+  loadEpic = () => {
     const { BacklogStore } = this.props;
     BacklogStore.axiosGetEpic().then((data3) => {
       const newEpic = [...data3];
@@ -177,16 +83,28 @@ class BacklogHome extends Component {
     });
   };
 
-  refresh =(isCreate, issue) => {
-    this.setState({
-      spinIf: true,
+  paramConverter = (url) => {
+    const reg = /[^?&]([^=&#]+)=([^&#]*)/g;
+    const retObj = {};
+    url.match(reg).forEach((item) => {
+      const [tempKey, paramValue] = item.split('=');
+      const paramKey = tempKey[0] !== '&' ? tempKey : tempKey.substring(1);
+      Object.assign(retObj, {
+        [paramKey]: paramValue,
+      });
     });
+    return retObj;
+  };
+
+  refresh = (isCreate, issue) => {
+    const { location } = this.props;
+    const url = this.paramConverter(location.search);
+    const { BacklogStore } = this.props;
+    BacklogStore.setSpinIf(true);
     this.getSprint(isCreate, issue);
-    const { versionVisible, epicVisible } = this.state;
-    if (versionVisible) {
+    if (BacklogStore.getCurrentVisible === 'version') {
       this.loadVersion();
-    }
-    if (epicVisible) {
+    } else {
       this.loadEpic();
     }
   };
@@ -195,28 +113,13 @@ class BacklogHome extends Component {
    * 加载快速搜索
    */
   loadQuickFilter = () => {
-    const { BacklogStore } = this.props;
-    BacklogStore.axiosGetQuickSearchList().then((res) => {
-      BacklogStore.setQuickSearchList(res.content);
-    }).catch((error) => {
-    });
-  };
 
-  /**
-   *
-   * @param state
-   * @param value
-   */
-  changeState =(state, value) => {
-    this.setState({
-      [state]: value,
-    });
   };
 
   /**
    * 创建冲刺
-    */
-  handleCreateSprint =() => {
+   */
+  handleCreateSprint = () => {
     const { BacklogStore } = this.props;
     this.setState({
       loading: true,
@@ -225,22 +128,12 @@ class BacklogHome extends Component {
       projectId: AppState.currentMenuType.id,
     };
     BacklogStore.axiosCreateSprint(data).then((res) => {
+      BacklogStore.setCreatedSprint(res.sprintId);
       this.setState({
         loading: false,
       });
-      this.refresh(true);
+      this.refresh();
       Choerodon.prompt('创建成功');
-      // const anchorElement = document.getElementById('sprint_new');
-      // if (anchorElement) {
-      //   anchorElement.scrollIntoView({
-      //     behavior: 'smooth',
-      //     block: 'start',
-      //   });
-      // }
-      // if (document.getElementById('sprint_new')) {
-      //   document.getElementsByClassName('c7n-backlog-sprint')[0].scrollTop
-      // = document.getElementById('sprint_new').offsetTop - 224;
-      // }
     }).catch((error) => {
       this.setState({
         loading: false,
@@ -249,14 +142,14 @@ class BacklogHome extends Component {
     });
   };
 
-  resetSprintChose =() => {
+  resetSprintChose = () => {
     this.resetMuilterChose();
   };
 
   /**
    * issue详情回退关闭详情侧边栏
    */
-  resetMuilterChose=() => {
+  resetMuilterChose = () => {
     this.setState({
       selected: {
         droppableId: '',
@@ -265,269 +158,12 @@ class BacklogHome extends Component {
     });
   };
 
-  onDragEnd=(result) => {
-    // this.props.changeEpicStat();
-    const { BacklogStore } = this.props;
-    this.versionRef.changeState([]);
-    this.epicRef.changeState([]);
-    BacklogStore.setIsDragging(false);
-    this.sprintItemRef.onChangeState('draggableId', '');
-    if (!result.destination) {
-      return;
-    }
-    const sourceId = result.source.droppableId;
-    const endId = result.destination.droppableId;
-    const endIndex = result.destination.index;
-    const originData = JSON.parse(JSON.stringify(BacklogStore.getSprintData));
-    const newData = JSON.parse(JSON.stringify(BacklogStore.getSprintData));
-    if (String(endId).indexOf('epic') !== -1) {
-      // 移动到epic
-    } else if (String(endId).indexOf('version') !== -1) {
-      // 移到version
-    } else {
-      // 移动到sprint
-      this.dragToSprint(result, sourceId, endId, endIndex, originData, newData);
-    }
-  };
-
-  /**
-   *获取多选拖动结束的数据
-   *
-   * @param {*} endId
-   * @param {*} endIndex
-   * @param {*} newData
-   * @returns
-   * @memberof BacklogHome
-   */
-  getDestinationData =(endId, endIndex, newData) => {
-    let destinationData = {};
-    if (endId !== 'backlog') {
-      for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
-        if (String(newData.sprintData[index].sprintId) === String(endId)) {
-          if (newData.sprintData[index].issueSearchDTOList) {
-            if (newData.sprintData[index].issueSearchDTOList.length > 0) {
-              if (endIndex >= newData.sprintData[index].issueSearchDTOList.length) {
-                destinationData = newData.sprintData[index].issueSearchDTOList[
-                  newData.sprintData[index].issueSearchDTOList.length - 1];
-              } else {
-                destinationData = newData.sprintData[index].issueSearchDTOList[endIndex];
-              }
-            }
-          }
-        }
-      }
-    } else if (newData.backlogData.backLogIssue.length > 0) {
-      if (endIndex >= newData.backlogData.backLogIssue.length) {
-        destinationData = newData.backlogData.backLogIssue[
-          newData.backlogData.backLogIssue - 1];
-      } else {
-        destinationData = newData.backlogData.backLogIssue[endIndex];
-      }
-    }
-    return destinationData;
-  };
-
-  /**
-   *拖动到冲刺中的事件
-   *
-   * @param {*} result
-   * @param {*} sourceId
-   * @param {*} endId
-   * @param {*} endIndex
-   * @param {*} originData
-   * @param {*} newData1
-   * @memberof BacklogHome
-   */
-  dragToSprint=(result, sourceId, endId, endIndex, originData, newData1) => {
-    const newData = _.clone(newData1);
-    const { BacklogStore } = this.props;
-    // 如果是多选
-    if (this.sprintItemRef.getCurrentState('selected').issueIds.length > 0) {
-      const destinationData = this.getDestinationData(endId, endIndex, newData);
-      let spliceDatas = [];
-      // 起始如果是sprint
-      if (sourceId !== 'backlog') {
-        for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
-          if (String(newData.sprintData[index].sprintId) === String(sourceId)) {
-            spliceDatas = _.remove(newData.sprintData[index].issueSearchDTOList,
-              n => this.sprintItemRef.getCurrentState('selected').issueIds.indexOf(n.issueId) !== -1);
-          }
-        }
-      } else {
-        // 起始如果是backlog
-        spliceDatas = _.remove(newData.backlogData.backLogIssue,
-          n => this.sprintItemRef.getCurrentState('selected').issueIds.indexOf(n.issueId) !== -1);
-      }
-      const axiosParam = {};
-      // 如果移动到sprint
-      if (endId !== 'backlog') {
-        let afIndex;
-        for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
-          if (String(newData.sprintData[index].sprintId) === String(endId)) {
-            if (_.isNull(newData.sprintData[index].issueSearchDTOList)) {
-              newData.sprintData[index].issueSearchDTOList = [];
-            }
-            if (endIndex !== 0) {
-              const len2 = newData.sprintData[index].issueSearchDTOList.length;
-              for (let aindex = 0; aindex < len2; aindex += 1) {
-                if (destinationData.issueId) {
-                  if (newData.sprintData[index].issueSearchDTOList[aindex].issueId
-                      === destinationData.issueId) {
-                    afIndex = aindex + 1;
-                  }
-                }
-              }
-              newData.sprintData[index].issueSearchDTOList.splice(afIndex, 0, spliceDatas);
-              newData.sprintData[index].issueSearchDTOList = _.flattenDeep(newData.sprintData[index]
-                .issueSearchDTOList);
-            } else {
-              newData.sprintData[index].issueSearchDTOList.splice(endIndex, 0, spliceDatas);
-              newData.sprintData[index].issueSearchDTOList = _.flattenDeep(newData.sprintData[index]
-                .issueSearchDTOList);
-            }
-            axiosParam.before = endIndex === 0;
-            axiosParam.rankIndex = result.source.index > result.destination.index;
-            axiosParam.issueIds = this.sprintItemRef.getCurrentState('selected').issueIds;
-            axiosParam.outsetIssueId = destinationData.issueId;
-            BacklogStore.setSprintData(newData);
-          }
-        }
-      } else {
-        // 如果移动到backlog
-        if (_.isNull(newData.backlogData.backLogIssue)) {
-          newData.backlogData.backLogIssue = [];
-        }
-        let afIndex;
-        if (endIndex !== 0) {
-          const len = newData.backlogData.backLogIssue.length;
-          for (let aindex = 0; aindex < len; aindex += 1) {
-            if (destinationData.issueId) {
-              if (newData.backlogData.backLogIssue[aindex].issueId === destinationData.issueId) {
-                afIndex = aindex + 1;
-              }
-            }
-          }
-          newData.backlogData.backLogIssue.splice(afIndex, 0, spliceDatas);
-          newData.backlogData.backLogIssue = _.flattenDeep(newData.backlogData.backLogIssue);
-        } else {
-          newData.backlogData.backLogIssue.splice(endIndex, 0, spliceDatas);
-          newData.backlogData.backLogIssue = _.flattenDeep(newData.backlogData.backLogIssue);
-        }
-        axiosParam.before = endIndex === 0;
-        axiosParam.rankIndex = result.source.index > result.destination.index;
-        axiosParam.issueIds = this.sprintItemRef.getCurrentState('selected').issueIds;
-        axiosParam.outsetIssueId = destinationData.issueId;
-        BacklogStore.setSprintData(newData);
-      }
-      this.sprintItemRef.onChangeState('selected', {
-        droppableId: '',
-        issueIds: [],
-      });
-      BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog'
-        ? 0 : endId, axiosParam).then((res) => {
-        this.IssueDetail.refreshIssueDetail();
-        this.getSprint();
-      }).catch((error) => {
-        BacklogStore.setSprintData(originData);
-      });
-    } else {
-      // 如果不是多选
-      const axiosParam = {};
-      const sourceIndex = result.source.index;
-      let spliceData = {};
-      if (sourceId !== 'backlog') {
-        // newData.sprintData.forEach((item) => {
-        //   if (String(item.sprintId) === String(sourceId)) {
-        //     spliceData = item.issueSearchDTOList.splice(sourceIndex, 1)[0];
-        //   }
-        // })
-        for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
-          if (String(newData.sprintData[index].sprintId) === String(sourceId)) {
-            // 取第一个
-            [spliceData] = newData.sprintData[index].issueSearchDTOList.splice(sourceIndex, 1);
-          }
-        }
-      } else {
-        [spliceData] = newData.backlogData.backLogIssue.splice(sourceIndex, 1);
-      }
-      if (endId !== 'backlog') {
-        for (let index = 0, len = newData.sprintData.length; index < len; index += 1) {
-          if (String(newData.sprintData[index].sprintId) === String(endId)) {
-            if (_.isNull(newData.sprintData[index].issueSearchDTOList)) {
-              newData.sprintData[index].issueSearchDTOList = [];
-            }
-            newData.sprintData[index].issueSearchDTOList.splice(endIndex, 0, spliceData);
-            axiosParam.before = endIndex === 0;
-            axiosParam.rankIndex = result.source.index > result.destination.index;
-            axiosParam.issueIds = [result.draggableId];
-            if (endIndex === 0) {
-              if (newData.sprintData[index].issueSearchDTOList.length === 1) {
-                axiosParam.outsetIssueId = 0;
-              } else {
-                axiosParam.outsetIssueId = newData
-                  .sprintData[index].issueSearchDTOList[endIndex + 1].issueId;
-              }
-            } else {
-              axiosParam.outsetIssueId = newData
-                .sprintData[index].issueSearchDTOList[endIndex - 1].issueId;
-            }
-            BacklogStore.setSprintData(newData);
-            BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog'
-              ? 0 : endId, axiosParam).then((res) => {
-              // newData.sprintData[index].issueSearchDTOList[endIndex] = res[0];
-              this.IssueDetail.refreshIssueDetail();
-              BacklogStore.setSprintData(newData);
-              this.getSprint();
-            }).catch((error) => {
-              BacklogStore.setSprintData(originData);
-            });
-          }
-        }
-      } else {
-        if (_.isNull(newData.backlogData.backLogIssue)) {
-          newData.backlogData.backLogIssue = [];
-        }
-        newData.backlogData.backLogIssue.splice(endIndex, 0, spliceData);
-        axiosParam.before = endIndex === 0;
-        axiosParam.rankIndex = result.source.index > result.destination.index;
-        axiosParam.issueIds = [result.draggableId];
-        if (endIndex === 0) {
-          if (newData.backlogData.backLogIssue.length === 1) {
-            axiosParam.outsetIssueId = 0;
-          } else {
-            axiosParam.outsetIssueId = newData.backlogData.backLogIssue[endIndex + 1].issueId;
-          }
-        } else {
-          axiosParam.outsetIssueId = newData.backlogData.backLogIssue[endIndex - 1].issueId;
-        }
-        BacklogStore.setSprintData(newData);
-        BacklogStore.axiosUpdateIssuesToSprint(endId === 'backlog'
-          ? 0 : endId, axiosParam).then((res) => {
-          // newData.backlogData.backLogIssue[endIndex] = res[0];
-          this.IssueDetail.refreshIssueDetail();
-          BacklogStore.setSprintData(newData);
-          this.getSprint();
-        }).catch((error) => {
-          BacklogStore.setSprintData(originData);
-        });
-      }
-    }
-  };
-
   onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
     const { BacklogStore } = this.props;
-    this.setState({
-      spinIf: true,
-    });
-    BacklogStore.setOnlyMe(onlyMeChecked);
-    BacklogStore.setRecent(onlyStoryChecked);
-    BacklogStore.setQuickFilters(moreChecked || []);
-    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
+    BacklogStore.setQuickFilters(onlyMeChecked, onlyStoryChecked, moreChecked);
+    BacklogStore.axiosGetSprint()
       .then((res) => {
         BacklogStore.setSprintData(res);
-        this.setState({
-          spinIf: false,
-        });
       }).catch((error) => {
       });
   }
@@ -535,7 +171,7 @@ class BacklogHome extends Component {
   onAssigneeChange = (data) => {
     const { BacklogStore } = this.props;
     BacklogStore.setAssigneeFilterIds(data);
-    BacklogStore.axiosGetSprint(BacklogStore.getSprintFilter())
+    BacklogStore.axiosGetSprint()
       .then((res) => {
         BacklogStore.setSprintData(res);
         this.setState({
@@ -559,11 +195,17 @@ class BacklogHome extends Component {
     }
   };
 
-  render() {
+  toggleCurrentVisible = (type) => {
     const { BacklogStore } = this.props;
-    const {
-      epicVisible, versionVisible, spinIf,
-    } = this.state;
+    if (BacklogStore.getCurrentVisible === type) {
+      BacklogStore.toggleVisible(null);
+    } else {
+      BacklogStore.toggleVisible(type);
+    }
+  };
+
+  render() {
+    const { BacklogStore, HeaderStore } = this.props;
     return (
       <Page
         service={[
@@ -598,122 +240,111 @@ class BacklogHome extends Component {
           </Button>
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
-          <div className="backlogTools" style={{ paddingLeft: 24 }}>
+          <div
+            className="backlogTools"
+            style={{
+              paddingLeft: 24, display: 'flex', alignItems: 'center',
+            }}
+          >
             <QuickSearch
               onQuickSearchChange={this.onQuickSearchChange}
               resetFilter={BacklogStore.getQuickSearchClean}
               onAssigneeChange={this.onAssigneeChange}
             />
+            <ClearFilter />
           </div>
-          <div className="c7n-backlog">
+          <div
+            className="c7n-backlog"
+            style={{
+              height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
+            }}
+          >
             <div className="c7n-backlog-side">
-              {versionVisible ? '' : (
-                <p
-                  role="none"
-                  onClick={() => {
-                    this.loadVersion();
-                    this.setState({
-                      versionVisible: true,
-                    });
-                  }}
-                >
-                  {'版本'}
-                </p>
-              )}
-              {epicVisible ? '' : (
-                <p
-                  style={{
-                    marginTop: 12,
-                  }}
-                  role="none"
-                  onClick={() => {
-                    this.loadEpic();
-                    this.setState({
-                      epicVisible: true,
-                    });
-                  }}
-                >
-                  {'史诗'}
-                </p>
-              )}
-            </div>
-            <div className="c7n-backlog-content">
-              <div style={{ display: 'flex', flexGrow: 1 }}>
-                <Version
-                  store={BacklogStore}
-                  onRef={(ref) => {
-                    this.versionRef = ref;
-                  }}
-                  refresh={this.refresh}
-                  visible={versionVisible}
-                  changeVisible={this.changeState}
-                  issueRefresh={() => {
-                    this.IssueDetail.refreshIssueDetail();
-                  }}
-                />
-                <Epic
-                  store={BacklogStore}
-                  onRef={(ref) => {
-                    this.epicRef = ref;
-                  }}
-                  refresh={this.refresh}
-                  visible={epicVisible}
-                  changeVisible={this.changeState}
-                  issueRefresh={() => {
-                    this.IssueDetail.refreshIssueDetail();
-                  }}
-                />
-                <DragDropContext
-                  onDragEnd={this.onDragEnd}
-                  onDragStart={(result) => {
-                    BacklogStore.setIsDragging(true);
-                    this.sprintItemRef.onChangeState('draggableId', result.draggableId);
-                    if (this.sprintItemRef.getCurrentState('selected').issueIds.indexOf(result.draggableId) === -1) {
-                      this.sprintItemRef.onChangeState('selected', {
-                        droppableId: '',
-                        issueIds: [],
-                      });
-                    }
-                    if (this.sprintItemRef.getCurrentState('selected').issueIds.length > 0) {
-                      this.versionRef.changeState(this.sprintItemRef.getCurrentState('selected').issueIds);
-                      this.epicRef.changeState(this.sprintItemRef.getCurrentState('selected').issueIds);
-                    } else {
-                      this.versionRef.changeState([result.draggableId]);
-                      this.epicRef.changeState([result.draggableId]);
-                    }
-                  }}
-                >
-                  <div
-                    role="none"
-                    className="c7n-backlog-sprint"
-                  >
-                    <Spin spinning={spinIf}>
-                      <SprintItem
-                        store={BacklogStore}
-                        loading={spinIf}
-                        epicVisible={epicVisible}
-                        versionVisible={versionVisible}
-                        onRef={(ref) => {
-                          this.sprintItemRef = ref;
-                        }}
-                        refresh={this.refresh}
-                      />
-                    </Spin>
-                  </div>
-                </DragDropContext>
-              </div>
-              <IssueDetail
-                visible={JSON.stringify(BacklogStore.getClickIssueDetail) !== '{}'}
-                refresh={this.refresh}
-                onRef={(ref) => {
-                  this.IssueDetail = ref;
+              <p
+                role="none"
+                onClick={() => {
+                  this.toggleCurrentVisible('version');
                 }}
-                cancelCallback={this.resetSprintChose}
-              />
-    
-              <Injecter store={BacklogStore} item="newIssueVisible">
-                {
-                  visible => (
+              >
+                {'版本'}
+              </p>
+              <p
+                style={{
+                  marginTop: 12,
+                }}
+                role="none"
+                onClick={() => {
+                  this.toggleCurrentVisible('epic');
+                }}
+              >
+                {'史诗'}
+              </p>
+            </div>
+            <Version
+              store={BacklogStore}
+              refresh={this.refresh}
+              visible={BacklogStore.getCurrentVisible}
+              issueRefresh={() => {
+                this.IssueDetail.refreshIssueDetail();
+              }}
+            />
+            <Epic
+              refresh={this.refresh}
+              visible={BacklogStore.getCurrentVisible}
+              issueRefresh={() => {
+                this.IssueDetail.refreshIssueDetail();
+              }}
+            />
+            <Spin spinning={BacklogStore.getSpinIf}>
+              <div className="c7n-backlog-content">
+                <DragDropContext
+                  onDragEnd={(result) => {
+                    BacklogStore.setIsDragging(null);
+                    const { destination, source, draggableId } = result;
+                    if (destination) {
+                      const { droppableId: destinationId, index: destinationIndex } = destination;
+                      const { droppableId: sourceId, index: sourceIndex } = source;
+                      if (destinationId === sourceId && destinationIndex === sourceIndex) {
+                        return;
+                      }
+                      if (result.reason !== 'CANCEL') {
+                        const item = BacklogStore.getIssueMap.get(sourceId)[sourceIndex];
+                        const destinationArr = BacklogStore.getIssueMap.get(destinationId);
+                        let destinationItem;
+                        if (destinationIndex === 0) {
+                          destinationItem = null;
+                        } else if (destinationIndex === BacklogStore.getIssueMap.get(destinationId).length) {
+                          destinationItem = destinationArr[destinationIndex - 1];
+                        } else {
+                          destinationItem = destinationArr[destinationIndex];
+                        }
+                        if (BacklogStore.getMultiSelected.size > 1 && !BacklogStore.getMultiSelected.has(destinationItem)) {
+                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi');
+                        } else {
+                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single');
+                        }
+                      }
+                    }
+                  }}
+                  onDragStart={(result) => {
+                    const { source, draggableId } = result;
+                    const { droppableId: sourceId, index: sourceIndex } = source;
+                    const item = BacklogStore.getIssueMap.get(sourceId)[sourceIndex];
+                    BacklogStore.setIsDragging(item.issueId);
+                    BacklogStore.setIssueWithEpicOrVersion(item);
+                  }}
+                >
+                  <SprintItem
+                    epicVisible={BacklogStore.getEpicVisible}
+                    versionVisible={BacklogStore.getVersionVisible}
+                    onRef={(ref) => {
+                      this.sprintItemRef = ref;
+                    }}
+                    refresh={this.refresh}
+                  />
+                </DragDropContext>
+                <Injecter store={BacklogStore} item="newIssueVisible">
+                  {visible => (
                     <CreateIssue
                       visible={visible}
                       onCancel={() => {
@@ -721,10 +352,17 @@ class BacklogHome extends Component {
                       }}
                       onOk={this.handleCreateIssue}
                     />
-                  )
-                }
-              </Injecter>
-            </div>
+                  )}
+                </Injecter>
+              </div>
+            </Spin>
+            <IssueDetail
+              refresh={this.refresh}
+              onRef={(ref) => {
+                this.IssueDetail = ref;
+              }}
+              cancelCallback={this.resetSprintChose}
+            />
           </div>
         </div>
       </Page>

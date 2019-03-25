@@ -1,5 +1,5 @@
 .c7n-backlog-version {
-  flex: 1;
+  width: 200px;
   border-right: 1px solid #d3d3d3;
   // overflow: auto;
   overflow-y: scroll;
@@ -19,8 +19,8 @@
       padding: 0 12px 0 16px;
       justify-content: space-between;
       flex-wrap: wrap;
-
       .c7n-backlog-versionRight {
+        display: flex;
         align-items: center;
         justify-content: space-between;
       }
@@ -36,8 +36,13 @@
       }
 
       .c7n-backlog-versionItems {
+        background: white;
         padding: 8px 5px 8px 16px;
         cursor: pointer;
+      }
+
+      .c7n-backlog-versionItems.onClickVersion {
+        background: rgba(140, 158, 255, 0.08) !important;
       }
 
       .c7n-backlog-versionItems:hover {
@@ -45,8 +50,6 @@
       }
 
       .c7n-backlog-versionItemTitle {
-         
-
         display: flex;
         align-items: baseline;
         cursor: move;
@@ -58,13 +61,13 @@
           cursor: pointer;
         }
       }
-      .c7n-backlog-ItemsHead{
+      .c7n-backlog-ItemsHead {
         word-break: break-all;
         flex-grow: 1;
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        .ant-input-underline{
+        .ant-input-underline {
           display: none;
         }
         i {
@@ -93,11 +96,9 @@
           display: flex;
           justify-content: space-between;
           margin-top: 10px;
-
           .c7n-backlog-versionItemParamKey {
             color: rgba(0, 0, 0, 0.65);
           }
-
           .c7n-backlog-versionItemParamValue {
             border-radius: 100px;
             background: rgba(0, 0, 0, 0.08);

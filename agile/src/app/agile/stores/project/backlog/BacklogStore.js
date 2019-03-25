@@ -8,7 +8,45 @@ const { AppState } = stores;
 
 @store('BacklogStore')
 class BacklogStore {
+  @observable createdSprint = '';
+
+  @observable hasActiveSprint = false;
+
+  @observable issueCantDrag = false;
+
+  @observable epicFilter = {};
+
+  @observable versionFilter = {};
+
+  @observable filter = { advancedSearchArgs: {} };
+
+  @observable filterSelected = false;
+
+  @observable epicList = [];
+
+  @observable epicMap = observable.map();
+
+  @observable selectedIssueId = [];
+
+  @observable issueMap = observable.map();
+
+  @observable currentDrag = observable.map();
+
   @observable showRealQuickSearch = true;
+
+  @observable ctrlClicked = false;
+
+  @observable shiftClicked = false;
+
+  @observable multiSelected = observable.map();
+
+  @observable prevClickedIssue = null;
+
+  @observable loadCompleted = false;
+
+  @observable spinIf = false;
+
+  @observable whichVisible = '';
 
   @observable sprintData = {};
 
@@ -24,7 +62,7 @@ class BacklogStore {
 
   @observable recent = false;
 
-  @observable isDragging = false;
+  @observable isDragging = '';
 
   @observable isLeaveSprint = false;
 
@@ -135,10 +173,6 @@ class BacklogStore {
     return toJS(this.quickFilters);
   }
 
-  @action setQuickFilters(data) {
-    this.quickFilters = data;
-  }
-
   @action setQuickSearchClean(data) {
     this.cleanQuickSearch = data;
   }
@@ -196,14 +230,6 @@ class BacklogStore {
     return data;
   }
 
-  @action clearSprintFilter() {
-    this.chosenEpic = 'all';
-    this.chosenVersion = 'all';
-    this.onlyMe = false;
-    this.recent = false;
-    this.quickFilters = [];
-  }
-
   axiosDeleteSprint(id) {
     return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/${id}`);
   }
@@ -213,7 +239,7 @@ class BacklogStore {
   }
 
   @computed get getColorLookupValue() {
-    return toJS(this.colorLookupValue);
+    return this.colorLookupValue;
   }
 
   @action setColorLookupValue(data) {
@@ -294,18 +320,15 @@ class BacklogStore {
   }
 
   @computed get getClickIssueDetail() {
-    return toJS(this.clickIssueDetail);
+    return this.clickIssueDetail;
   }
 
   @computed get getClickIssueId() {
     return toJS(this.clickIssueId);
   }
 
-  @action setClickIssueDetail(data) {
-    this.clickIssueDetail = data;
-    if (this.clickIssueDetail) {
-      this.clickIssueId = data.issueId;
-    }
+  @computed get getPrevClickedIssue() {
+    return this.prevClickedIssue;
   }
 
   axiosUpdateIssuesToVersion(versionId, ids) {
@@ -345,51 +368,52 @@ class BacklogStore {
   }
 
   @computed get getChosenVersion() {
-    return toJS(this.chosenVersion);
+    return this.chosenVersion;
   }
 
   @action setChosenVersion(data) {
+    if (data === 'all') {
+      this.filterSelected = false;
+    }
+    this.spinIf = true;
+    this.addToVersionFilter(data);
     this.chosenVersion = data;
   }
 
   @computed get getChosenEpic() {
-    return toJS(this.chosenEpic);
+    return this.chosenEpic;
   }
 
   @action setChosenEpic(data) {
+    if (data === 'all') {
+      this.filterSelected = false;
+    }
+    this.spinIf = true;
+    this.addToEpicFilter(data);
     this.chosenEpic = data;
   }
 
-  @computed get getEpicData() {
-    return toJS(this.epicData);
-  }
-
   @action setEpicData(data) {
-    this.epicData = data;
+    this.epicList = data;
   }
 
   axiosGetEpic() {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epics`);
   }
 
-  @computed get getVersionData() {
-    return toJS(this.versionData);
-  }
-
-  @action setVersionData(data) {
-    this.versionData = data;
-  }
-
   axiosGetVersion() {
     return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/product_version`);
   }
 
-  @computed get getSprintData() {
-    return toJS(this.sprintData);
-  }
-
-  @action setSprintData(data) {
-    this.sprintData = data;
+  @action setSprintData({ backlogData, sprintData }) {
+    this.spinIf = false;
+    // this.multiSelected = observable.map();
+    this.issueMap.set('0', backlogData.backLogIssue);
+    this.backlogData = backlogData;
+    sprintData.forEach((sprint) => {
+      this.issueMap.set(sprint.sprintId.toString(), sprint.issueSearchDTOList);
+    });
+    this.sprintData = sprintData;
   }
 
   @computed get getQuickSearchList() {
@@ -414,12 +438,14 @@ class BacklogStore {
   }
 
   @action setAssigneeFilterIds(data) {
+    this.spinIf = true;
+    this.filterSelected = true;
     this.assigneeFilterIds = data;
   }
 
-  axiosGetSprint(data) {
+  axiosGetSprint = () => {
     const orgId = AppState.currentMenuType.organizationId;
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?organizationId=${orgId}&quickFilterIds=${this.quickFilters}${this.assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${this.assigneeFilterIds}` : ''}`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/sprint/issues?organizationId=${orgId}&quickFilterIds=${this.quickFilters}${this.assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${this.assigneeFilterIds}` : ''}`, this.filter);
   }
 
   handleEpicDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data);
@@ -454,22 +480,12 @@ class BacklogStore {
   }
 
   @computed get getIssueTypes() {
-    return this.issueTypes.slice();
-  }
-
-  @action setIssueTypes(data) {
-    this.issueTypes = data;
+    return this.issueTypes;
   }
 
   axiosGetIssueTypes() {
     const proId = AppState.currentMenuType.id;
-    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?apply_type=agile`).then((data) => {
-      if (data && !data.failed) {
-        this.setIssueTypes(data);
-      } else {
-        this.setIssueTypes([]);
-      }
-    });
+    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?apply_type=agile`);
   }
 
   @computed get getDefaultPriority() {
@@ -482,17 +498,427 @@ class BacklogStore {
 
   axiosGetDefaultPriority() {
     const proId = AppState.currentMenuType.id;
-    return axios.get(`/issue/v1/projects/${proId}/priority/default`).then((data) => {
-      if (data && !data.failed) {
-        this.setDefaultPriority(data);
-      } else {
-        this.setDefaultPriority(false);
-      }
-    });
+    return axios.get(`/issue/v1/projects/${proId}/priority/default`);
   }
 
   checkSprintName(proId, name) {
     return axios.get(`/agile/v1/projects/${proId}/sprint/check_name?sprintName=${name}`);
+  }
+
+  @action setSpinIf(data) {
+    this.loadCompleted = false;
+    this.spinIf = data;
+  }
+
+  @computed get getSpinIf() {
+    return this.spinIf;
+  }
+
+  @action initBacklogData(quickSearchData, issueTypesData, priorityArrData, { backlogData, sprintData }) {
+    this.issueCantDrag = false;
+    this.multiSelected = observable.map();
+    this.quickSearchList = quickSearchData;
+    if (issueTypesData && !issueTypesData.failed) {
+      this.issueTypes = issueTypesData;
+    }
+    if (priorityArrData && !priorityArrData.failed) {
+      this.defaultPriority = priorityArrData;
+    }
+    this.issueMap.set('0', backlogData.backLogIssue ? backlogData.backLogIssue : []);
+    this.backlogData = backlogData;
+    sprintData.forEach((sprint, index) => {
+      if (sprint.sprintId === this.createdSprint) {
+        // eslint-disable-next-line no-param-reassign
+        sprintData[index].isCreated = true;
+      }
+      this.issueMap.set(sprint.sprintId.toString(), sprint.issueSearchDTOList);
+    });
+    this.sprintData = sprintData;
+    this.hasActiveSprint = Boolean(sprintData.find(element => element.statusCode === 'started'));
+    this.loadCompleted = true;
+    this.spinIf = false;
+  }
+
+  @computed get getHasActiveSprint() {
+    return this.hasActiveSprint;
+  }
+
+  @computed get getLoadCompleted() {
+    return this.loadCompleted;
+  }
+
+  @computed get getBacklogData() {
+    return this.backlogData;
+  }
+
+  @computed get getSprintData() {
+    return this.sprintData;
+  }
+
+  @action toggleVisible(data) {
+    this.whichVisible = data;
+  }
+
+  @computed get getCurrentVisible() {
+    return this.whichVisible;
+  }
+
+  checkStartAndEnd = (prevIndex, currentIndex) => (prevIndex > currentIndex ? [currentIndex, prevIndex] : [prevIndex, currentIndex]);
+
+  @action dealWithMultiSelect(sprintId, currentClick, type) {
+    const data = this.issueMap.get(sprintId);
+    const currentIndex = data.findIndex(issue => currentClick.issueId === issue.issueId);
+    if (this.prevClickedIssue && this.prevClickedIssue.sprintId === currentClick.sprintId) {
+      // 如果以后想利用 ctrl 从多个冲刺中选取 issue，可以把判断条件2直接挪到 shift 上
+      // 但是请考虑清楚操作多个数组可能带来的性能开销问题
+      if (type === 'shift') {
+        this.dealWithShift(data, currentIndex);
+      } else if (type === 'ctrl') {
+        this.dealWithCtrl(data, currentIndex, currentClick);
+      }
+    } else {
+      this.clickedOnce(currentClick, currentIndex);
+    }
+  }
+
+  @action dealWithShift(data, currentIndex) {
+    const [startIndex, endIndex] = this.checkStartAndEnd(this.prevClickedIssue.index, currentIndex);
+    for (let i = startIndex; i <= endIndex; i += 1) {
+      this.multiSelected.set(data[i].issueId, data[i]);
+    }
+  }
+
+  @action dealWithCtrl(data, currentIndex, item) {
+    if (this.multiSelected.has(item.issueId)) {
+      const prevClickedStatus = this.multiSelected.get(item.issueId);
+      if (prevClickedStatus) {
+        this.multiSelected.delete(item.issueId);
+      } else {
+        this.multiSelected.set(item.issueId, item);
+      }
+    } else {
+      this.multiSelected.set(data[currentIndex].issueId, data[currentIndex]);
+    }
+    this.prevClickedIssue = {
+      ...item,
+      index: currentIndex,
+    };
+  }
+
+  @action clickedOnce(sprintId, currentClick) {
+    const index = this.issueMap.get(sprintId).findIndex(issue => issue.issueId === currentClick.issueId);
+    this.multiSelected = observable.map();
+    this.multiSelected.set(currentClick.issueId, currentClick);
+    this.prevClickedIssue = {
+      ...currentClick,
+      index,
+    };
+    this.setClickIssueDetail(currentClick);
+  }
+
+  @action setClickIssueDetail(data) {
+    this.clickIssueDetail = data;
+    if (this.clickIssueDetail) {
+      this.clickIssueId = data.issueId;
+    }
+  }
+
+  @computed get getMultiSelected() {
+    return this.multiSelected;
+  }
+
+  @action setCurrentDrag(issueId) {
+    this.currentDrag.set(issueId, true);
+  }
+
+  @computed get getCurrentDrag() {
+    return this.currentDrag;
+  }
+
+  @action resetData() {
+    this.createdSprint = '';
+    this.issueMap = observable.map();
+    this.whichVisible = null;
+    this.assigneeFilterIds = [];
+    this.multiSelected = observable.map();
+    this.sprintData = {};
+    this.clickIssueDetail = {};
+  }
+
+  @computed get getIssueMap() {
+    return this.issueMap;
+  }
+
+  getModifiedArr = (dragItem, type) => {
+    const result = [];
+    if (!this.multiSelected.has(dragItem.issueId) || type === 'single') {
+      result.push(dragItem.issueId);
+    }
+    if (type === 'multi') {
+      result.push(...this.multiSelected.keys());
+    }
+    return result;
+  };
+
+  findOutsetIssue = (sourceIndex, destinationIndex, sourceId, destinationId, destinationArr) => {
+    // 看不懂就去让后端给你逐字逐句解释去, 解释不通就怼他
+    if (sourceId === destinationId) {
+      if (sourceIndex < destinationIndex) {
+        return destinationArr[destinationIndex];
+      } else if (destinationIndex === 0) {
+        return destinationArr[destinationIndex];
+      } else {
+        return destinationArr[destinationIndex - 1];
+      }
+    } else {
+      if (destinationIndex === 0 && destinationArr.length) {
+        return destinationArr[destinationIndex];
+      } else {
+        return destinationArr[destinationIndex - 1];
+      }
+    }
+  };
+
+  @action moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, issueItem, type) {
+    const sourceArr = this.issueMap.get(sourceId);
+    // const revertSourceArr = sourceArr.slice();
+    const destinationArr = this.issueMap.get(destinationId);
+    // const revertDestinationArr = destinationArr.slice();
+    const prevIssue = this.findOutsetIssue(sourceIndex, destinationIndex, sourceId, destinationId, destinationArr);
+    const modifiedArr = this.getModifiedArr(issueItem, type);
+
+    if (type === 'single') {
+      sourceArr.splice(sourceIndex, 1);
+      destinationArr.splice(destinationIndex, 0, issueItem);
+      this.issueMap.set(sourceId, sourceArr);
+      this.issueMap.set(destinationId, destinationArr);
+    } else if (type === 'multi') {
+      const modifiedSourceArr = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
+      destinationArr.splice(destinationIndex, 0, ...[...this.multiSelected.values()]);
+      if (!this.multiSelected.has(issueItem.issueId)) {
+        modifiedSourceArr.splice(sourceIndex, 1);
+        destinationArr.unshift(issueItem);
+      }
+      if (sourceId === destinationId) {
+        const dragInSingleSprint = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
+        dragInSingleSprint.splice(destinationIndex, 0, ...[...this.multiSelected.values()]);
+        this.issueMap.set(destinationId, dragInSingleSprint);
+      } else {
+        this.issueMap.set(sourceId, modifiedSourceArr);
+        this.issueMap.set(destinationId, destinationArr);
+      }
+    }
+    this.multiSelected = observable.map();
+    axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/issues/to_sprint/${destinationId}`, {
+      before: destinationIndex === 0,
+      issueIds: modifiedArr,
+      outsetIssueId: prevIssue ? prevIssue.issueId : 0,
+      rankIndex: destinationId * 1 === 0 || (destinationId === sourceId && destinationId !== 0),
+    }).then(this.axiosGetSprint).then((res) => {
+      this.setSprintData(res);
+    });
+  }
+
+  @action setIssueWithEpicOrVersion(item) {
+    this.selectedIssueId = this.getModifiedArr(item, this.multiSelected.size > 1 ? 'multi' : 'single');
+  }
+
+  @computed get getIssueWithEpicOrVersion() {
+    return this.selectedIssueId;
+  }
+
+  @action createIssue(issue, sprintId) {
+    this.clickIssueDetail = issue;
+    if (this.clickIssueDetail) {
+      this.clickIssueId = issue.issueId;
+    }
+    const modifiedArr = [...this.issueMap.get(sprintId), issue];
+    this.issueMap.set(sprintId, modifiedArr);
+  }
+
+  @action addEpic(data) {
+    this.epicList.unshift(data);
+  }
+
+  @action initEpicList(epiclist, { lookupValues }) {
+    this.colorLookupValue = lookupValues;
+    this.epicList = epiclist;
+  }
+
+  @computed get getEpicData() {
+    return this.epicList;
+  }
+
+  @action updateEpic(epic) {
+    const updateIndex = this.epicList.findIndex(item => epic.issueId === item.issueId);
+    this.epicList[updateIndex].name = epic.name;
+    this.epicList[updateIndex].objectVersionNumber = epic.objectVersionNumber;
+  }
+
+  @action moveEpic(sourceIndex, destinationIndex) {
+    const movedItem = this.epicList[sourceIndex];
+    const { issueId, objectVersionNumber } = movedItem;
+    this.epicList.splice(sourceIndex, 1);
+    this.epicList.splice(destinationIndex, 0, movedItem);
+    const req = {
+      beforeSequence: destinationIndex !== 0 ? this.epicList[destinationIndex - 1].epicSequence : null,
+      afterSequence: destinationIndex !== (this.epicList.length - 1) ? this.epicList[destinationIndex + 1].epicSequence : null,
+      epicId: issueId,
+      objectVersionNumber,
+    };
+    this.handleEpicDrap(req).then(
+      action('fetchSuccess', (res) => {
+        if (!res.message) {
+          this.epicList[destinationIndex] = {
+            ...movedItem,
+            epicSequence: res.epicSequence,
+            objectVersionNumber: res.objectVersionNumber,
+          };
+        } else {
+          this.epicList.splice(destinationIndex, 1);
+          this.epicList.splice(sourceIndex, 0, movedItem);
+        }
+      }),
+    );
+  }
+
+  @action addVersion(data) {
+    this.versionData.unshift(data);
+  }
+
+  @action setVersionData(data) {
+    this.versionData = data;
+  }
+
+  @computed get getVersionData() {
+    return this.versionData;
+  }
+
+  @action updateVersion(version, type) {
+    const updateIndex = this.versionData.findIndex(item => item.versionId === version.versionId);
+    if (type === 'name') {
+      this.versionData[updateIndex].name = version.name;
+    } else if (type === 'description') {
+      this.versionData[updateIndex].description = version.description;
+    } else if (type === 'date') {
+      this.versionData[updateIndex].startDate = version.startDate;
+      this.versionData[updateIndex].expectReleaseDate = version.expectReleaseDate;
+    }
+    this.versionData[updateIndex].objectVersionNumber = version.objectVersionNumber;
+  }
+
+  @action moveVersion(sourceIndex, destinationIndex) {
+    const movedItem = this.versionData[sourceIndex];
+    const { versionId, objectVersionNumber } = movedItem;
+    this.versionData.splice(sourceIndex, 1);
+    this.versionData.splice(destinationIndex, 0, movedItem);
+    const req = {
+      beforeSequence: destinationIndex !== 0 ? this.versionData[destinationIndex - 1].sequence : null,
+      afterSequence: destinationIndex !== (this.versionData.length - 1) ? this.versionData[destinationIndex + 1].sequence : null,
+      epicId: versionId,
+      objectVersionNumber,
+    };
+    this.handleEpicDrap(req).then(
+      action('fetchSuccess', (res) => {
+        if (!res.message) {
+          this.versionData[destinationIndex] = {
+            ...movedItem,
+            sequence: res.sequence,
+            objectVersionNumber: res.objectVersionNumber,
+          };
+        } else {
+          this.versionData.splice(destinationIndex, 1);
+          this.versionData.splice(sourceIndex, 0, movedItem);
+        }
+      }),
+    );
+  }
+
+  @action addToEpicFilter(data) {
+    this.filterSelected = true;
+    if (data === 'unset') {
+      delete this.filter.advancedSearchArgs.epicId;
+      this.filter.advancedSearchArgs.noEpic = 'true';
+    } else if (typeof data === 'number') {
+      delete this.filter.advancedSearchArgs.noEpic;
+      this.filter.advancedSearchArgs.epicId = data;
+    } else {
+      delete this.filter.advancedSearchArgs.noEpic;
+      delete this.filter.advancedSearchArgs.epicId;
+    }
+  }
+
+  @action addToVersionFilter(data) {
+    this.filterSelected = true;
+    if (data === 'unset') {
+      delete this.filter.advancedSearchArgs.versionId;
+      this.filter.advancedSearchArgs.noVersion = 'true';
+    } else if (typeof data === 'number') {
+      delete this.filter.advancedSearchArgs.noVersion;
+      this.filter.advancedSearchArgs.versionId = data;
+    } else {
+      this.filterSelected = false;
+      delete this.filter.advancedSearchArgs.noVersion;
+      delete this.filter.advancedSearchArgs.versionId;
+    }
+  }
+
+  @action resetFilter() {
+    this.spinIf = true;
+    this.filter = { advancedSearchArgs: {} };
+    this.versionFilter = 'all';
+    this.epicFilter = 'all';
+    this.quickFilters = [];
+    this.assigneeFilterIds = [];
+  }
+
+  @computed get hasFilter() {
+    return this.filterSelected;
+  }
+
+  @action clearSprintFilter() {
+    this.filterSelected = false;
+    this.resetFilter();
+    this.axiosGetSprint().then(action('fetchSuccess', (res) => {
+      this.setSprintData(res);
+    }));
+  }
+
+  @action setQuickFilters(onlyMeChecked, onlyStoryChecked, moreChecked = []) {
+    this.spinIf = true;
+    if (onlyMeChecked) {
+      this.filter.advancedSearchArgs.ownIssue = 'true';
+      this.filterSelected = true;
+    } else {
+      delete this.filter.advancedSearchArgs.ownIssue;
+    }
+    if (onlyStoryChecked) {
+      this.filter.advancedSearchArgs.onlyStory = 'true';
+      this.filterSelected = true;
+    } else {
+      delete this.filter.advancedSearchArgs.onlyStory;
+    }
+    this.quickFilters = moreChecked;
+    if (moreChecked.length) {
+      this.filterSelected = true;
+    }
+  }
+
+  @action toggleIssueDrag(data) {
+    this.issueCantDrag = data;
+  }
+
+  @computed get getIssueCantDrag() {
+    return this.issueCantDrag;
+  }
+
+  @action onBlurClick() {
+    this.multiSelected = observable.map();
+    // this.clickIssueDetail = {};
+  }
+
+  @action setCreatedSprint(data) {
+    this.createdSprint = data;
   }
 }
 

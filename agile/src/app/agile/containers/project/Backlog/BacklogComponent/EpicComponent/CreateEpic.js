@@ -4,6 +4,7 @@ import {
   Modal, Form, Select, Icon, Input,
 } from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
+import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import TypeTag from '../../../../../components/TypeTag';
 
 const { AppState } = stores;
@@ -12,6 +13,7 @@ const FormItem = Form.Item;
 const { Option } = Select.Option;
 const { TextArea } = Input;
 
+@Form.create({})
 @observer
 class CreateEpic extends Component {
   constructor(props) {
@@ -28,14 +30,16 @@ class CreateEpic extends Component {
    * @memberof CreateEpic
    */
   handleCreateEpic =(e) => {
-    const { form, store, onCancel } = this.props;
-    const issueTypes = store.getIssueTypes || [];
-    const defaultPriorityId = store.getDefaultPriority ? store.getDefaultPriority.id : '';
+    const {
+      form, store, onCancel, refresh,
+    } = this.props;
+    const issueTypes = BacklogStore.getIssueTypes || [];
+    const defaultPriorityId = BacklogStore.getDefaultPriority ? BacklogStore.getDefaultPriority.id : '';
     e.preventDefault();
     form.validateFieldsAndScroll((err, value) => {
       if (!err) {
         const epicType = issueTypes.find(t => t.typeCode === 'issue_epic');
-        const data = {
+        const req = {
           projectId: AppState.currentMenuType.id,
           epicName: value.name,
           summary: value.summary,
@@ -47,20 +51,13 @@ class CreateEpic extends Component {
         this.setState({
           loading: true,
         });
-        store.axiosEasyCreateIssue(data).then((res) => {
+        BacklogStore.axiosEasyCreateIssue(req).then((res) => {
           this.setState({
             loading: false,
           });
           form.resetFields();
+          refresh();
           onCancel();
-          store.axiosGetEpic().then((data3) => {
-            const newEpic = [...data3];
-            for (let index = 0, len = newEpic.length; index < len; index += 1) {
-              newEpic[index].expand = false;
-            }
-            store.setEpicData(newEpic);
-          }).catch((error3) => {
-          });
         }).catch((error) => {
           this.setState({
             loading: false,
@@ -85,7 +82,7 @@ class CreateEpic extends Component {
     const {
       form, onCancel, visible, store,
     } = this.props;
-    const issueTypes = store.getIssueTypes || [];
+    const issueTypes = BacklogStore.getIssueTypes || [];
     const epicType = issueTypes.find(t => t.typeCode === 'issue_epic');
     const { loading } = this.state;
     const { getFieldDecorator } = form;
@@ -142,4 +139,4 @@ class CreateEpic extends Component {
   }
 }
 
-export default Form.create()(CreateEpic);
+export default CreateEpic;

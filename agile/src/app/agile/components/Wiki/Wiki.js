@@ -184,7 +184,7 @@ class Wiki extends Component {
 
     return (
       <Sidebar
-        className="c7n-dailyLog"
+        className="c7n-wikiDoc"
         title="添加wiki文档"
         visible={visible || false}
         onOk={this.handleCreateWiki}

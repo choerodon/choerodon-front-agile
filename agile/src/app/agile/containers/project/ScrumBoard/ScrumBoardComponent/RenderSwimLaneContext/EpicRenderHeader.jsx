@@ -13,6 +13,13 @@ const { Panel } = Collapse;
 @inject('AppState')
 @observer
 class EpicRenderHeader extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeKey: this.getDefaultExpanded([...props.parentIssueArr.values(), props.otherIssueWithoutParent]),
+    };
+  }
+
   getPanelKey = (key) => {
     if (key === 'other') {
       return 'swimlane_epic-other';
@@ -43,11 +50,19 @@ class EpicRenderHeader extends Component {
     );
   };
 
+  panelOnChange = (arr) => {
+    this.setState({
+      activeKey: arr,
+    });
+  };
+
   render() {
     const { parentIssueArr, otherIssueWithoutParent } = this.props;
+    const { activeKey } = this.state;
     return (
       <Collapse
-        defaultActiveKey={this.getDefaultExpanded([...parentIssueArr.values()], otherIssueWithoutParent)}
+        activeKey={activeKey}
+        onChange={this.panelOnChange}
         forceRender
         bordered={false}
       >

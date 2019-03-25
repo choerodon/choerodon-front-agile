@@ -225,6 +225,23 @@ class ImportIssue extends Component {
           </span>
         </div>
       );
+    } else if (status === 'template_error') {
+      return (
+        <div>
+          {fileName
+            ? (
+              <span className="c7n-importIssue-fileName">
+                <Icon type="folder_open" className="c7n-importIssue-icon" />
+                <span>{fileName}</span>
+              </span>
+            )
+            : ''
+          }
+          <span className="c7n-importIssue-text">
+            {'导入模板错误，请勿修改模板结构。'}
+          </span>
+        </div>
+      );
     } else {
       return (
         <div>

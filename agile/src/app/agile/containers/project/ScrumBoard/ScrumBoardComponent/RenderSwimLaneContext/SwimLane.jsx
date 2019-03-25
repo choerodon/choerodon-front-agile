@@ -3,7 +3,7 @@
  */
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext } from 'react-beautiful-dnd';
 import './SwimLane.scss';
 import RenderSwimLaneContext from './index';
 import ColumnProvider from './ColumnProvider';
@@ -15,11 +15,6 @@ import EpicRenderHeader from './EpicRenderHeader';
 @inject('AppState')
 @observer
 class SwimLane extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
   renderEpicLane = mode => (
     <EpicRenderHeader
       parentIssueArr={ScrumBoardStore.getInterconnectedData}
@@ -35,7 +30,7 @@ class SwimLane extends Component {
    * 渲染被分配的任务列
    * @returns {Array}
    */
-  renderParentWithSub = (mode, fromEpic = null, parentIssue = null, epicPrefix = null, style = {}) => (
+  renderParentWithSub = (mode, fromEpic = null, parentIssue = null, epicPrefix = null) => (
     <RenderSwimLaneContext
       parentIssueArr={fromEpic ? parentIssue.interConnectedDataMap : ScrumBoardStore.getInterconnectedData}
       otherIssueWithoutParent={fromEpic ? parentIssue.unInterConnectedDataMap : ScrumBoardStore.getOtherQuestion}
@@ -48,9 +43,7 @@ class SwimLane extends Component {
   );
 
   renderSwimLane = (key) => {
-    const {
-      mapStructure, onDragEnd, onDragStart, onBeforeDragStart,
-    } = this.props;
+    const { mapStructure, onDragEnd, onDragStart } = this.props;
     return (
       <DragDropContext
         onDragEnd={(start) => {
