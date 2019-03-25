@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Form, Input, Select, Modal, Radio, 
+  Form, Input, Select, Modal, Radio, Button, Icon,
 } from 'choerodon-ui';
 import { Content } from 'choerodon-front-boot';
 import SelectFocusLoad from '../SelectFocusLoad';
 import WYSIWYGEditor from '../WYSIWYGEditor';
+import FullEditor from '../FullEditor';
 import UploadControl from '../UploadControl';
 import SelectNumber from '../SelectNumber';
 
@@ -30,6 +31,28 @@ const radioStyle = {
 };
 @Form.create()
 class CreateFeature extends Component {
+  state = {
+    fullEditorVisible: false,
+  }
+
+  handleModalCancel = () => {
+    this.setState({
+      fullEditorVisible: false,
+    });
+  }
+
+  handleModalOk = () => {
+    this.setState({
+      fullEditorVisible: false,
+    });
+  }
+
+  handleShowFullEditor=() => {
+    this.setState({
+      fullEditorVisible: true,
+    });
+  }
+
   handleOk = () => {
     const { onSubmit, form } = this.props;
     form.validateFieldsAndScroll((err, values) => {
@@ -41,8 +64,9 @@ class CreateFeature extends Component {
 
   render() {
     const {
-      visible, onCancel, loading, form,
+      visible, onCancel, loading, form, 
     } = this.props;
+    const { fullEditorVisible } = this.state;
     const { getFieldDecorator } = form;
     return (
       <Sidebar
@@ -97,13 +121,31 @@ class CreateFeature extends Component {
                 <Input style={{ width: 500 }} maxLength={30} label="特性名称" />,
               )}
             </FormItem>
+            <div style={{ display: 'flex', marginBottom: 3, alignItems: 'center' }}>
+              <div style={{ fontWeight: 'bold' }}>描述</div>
+              <div style={{ marginLeft: 80 }}>
+                <Button className="leftBtn" funcType="flat" onClick={this.handleShowFullEditor} style={{ display: 'flex', alignItems: 'center' }}>
+                  <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: 12 }} />
+                  <span style={{ color: '#3f51b5' }}>全屏编辑</span>
+                </Button>
+              </div>
+            </div>
             <FormItem>
               {getFieldDecorator('description', {
               })(
                 <WYSIWYGEditor />,
               )}
             </FormItem>
-
+            <FormItem>
+              {getFieldDecorator('description', {
+              })(
+                <FullEditor
+                  visible={fullEditorVisible} 
+                  onCancel={this.handleModalCancel}
+                  onOk={this.handleModalOk}
+                />,
+              )}
+            </FormItem>            
             <FormItem>
               {getFieldDecorator('epicId', {
 
@@ -130,13 +172,13 @@ class CreateFeature extends Component {
                 <Input style={{ width: 500 }} maxLength={30} label="验收标准" />,
               )}
             </FormItem>
-            <Form.Item>                       
+            <Form.Item>
               {getFieldDecorator('upload', {
-                valuePropName: 'fileList',                
+                valuePropName: 'fileList',
               })(
-                <UploadControl />,                 
-              )}              
-            </Form.Item>            
+                <UploadControl />,
+              )}
+            </Form.Item>
           </Form>
         </Content>
       </Sidebar>

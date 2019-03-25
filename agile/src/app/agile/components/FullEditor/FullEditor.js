@@ -14,34 +14,39 @@ class FullEditor extends Component {
     this.initValue();
   }
 
+  handleOk = () => {
+    const { onOk } = this.props;
+    const { delta } = this.state;
+    onOk(delta);
+  }
+
   initValue() {
+    const { initValue } = this.state;
     this.setState({
-      delta: this.props.initValue,
+      delta: initValue,
     });
   }
 
-  handleOk = () => {
-    this.props.onOk(this.state.delta);
-  }
 
   render() {
-    const { visible, onCancel, onOk } = this.props;
-
+    const { visible, onCancel } = this.props;
+    const { delta } = this.state;
     return (
       <Modal
         title="编辑任务描述"
         visible={visible || false}
         maskClosable={false}
         width={1200}
-        onCancel={this.props.onCancel}
+        onCancel={onCancel}
         onOk={this.handleOk}
       >
         <WYSIWYGEditor
-          value={this.state.delta}
+          value={delta}
           style={{ height: 368, width: '100%', marginTop: 20 }}
           onChange={(value) => {
             this.setState({ delta: value });
           }}
+          {...this.props}
         />
       </Modal>
     );
