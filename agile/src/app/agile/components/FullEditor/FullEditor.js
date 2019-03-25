@@ -21,7 +21,7 @@ class FullEditor extends Component {
   }
 
   initValue() {
-    const { initValue } = this.state;
+    const { initValue } = this.props;
     this.setState({
       delta: initValue,
     });
