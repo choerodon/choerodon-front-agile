@@ -43,7 +43,7 @@ class SelectFocusLoad extends Component {
     const { loading, List } = this.state;
     const { type, onChange } = this.props;  
     const Type = Types[type];
-    const { render, request } = Type;
+    const { render, request, props } = Type;
     const Options = List.map(render);
     return (
       <Select
@@ -57,11 +57,12 @@ class SelectFocusLoad extends Component {
           });
           request(value).then((Data) => {
             this.setState({
-              List: Data.content,
+              List: Data,
               loading: false,
             });
           });
         }}
+        {...props}
         {...this.props}
       >
         {Options}

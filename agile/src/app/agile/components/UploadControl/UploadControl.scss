@@ -1,0 +1,16 @@
+.sign-upload {
+  .ant-upload {
+    display: flex !important;
+    margin-left: 40px;
+  }
+  .ant-btn {
+    color: #3f51b5;
+  }
+  .ant-upload-list-item {
+    display: inline-block;
+  }
+  .ant-upload-list-item-info {
+    padding-right: 20px;
+    max-width: 100%;
+  }
+}

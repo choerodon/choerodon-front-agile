@@ -280,3 +280,6 @@ export function PICalendarLink(id, ArtName) {
 export function PIListLink() { 
   return commonLink('/pi');
 }
+export const getProjectId = () => AppState.currentMenuType.id;
+export const getProjectName = () => AppState.currentMenuType.name;
+export const getOrganizationId = () => AppState.currentMenuType.organizationId;

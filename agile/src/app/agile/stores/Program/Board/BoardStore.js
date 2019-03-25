@@ -140,6 +140,8 @@ class BoardStore {
 
   @observable isDragging = false;
 
+  @observable createFeatureVisible = false;
+
   @computed get getIsDragging() {
     return this.isDragging;
   }
@@ -1008,6 +1010,10 @@ class BoardStore {
 
   @computed get getEditRef() {
     return this.editRef;
+  }
+
+  @action setCreateFeatureVisible = (visible) => {
+    this.createFeatureVisible = visible;
   }
 }
 

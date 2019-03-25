@@ -7,7 +7,7 @@ import {
 import {
   Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip,
 } from 'choerodon-ui';
-import { StatusColumn, NoneSprint } from './components';
+import { StatusColumn, NoneSprint, CreateFeatureContainer } from './components';
 import SwimLane from './components/RenderSwimLaneContext/SwimLane';
 import BoardDataController from './BoardDataController';
 import QuickSearch from '../../../../components/QuickSearch';
@@ -43,6 +43,10 @@ class BoardHome extends Component {
     }
   }
 
+  handleCreateFeatureClick=() => {
+    BoardStore.setCreateFeatureVisible(true);
+  }
+
   refresh(defaultBoard, url, boardListData) {
     BoardStore.setSpinIf(true);
     Promise.all([BoardStore.axiosGetIssueTypes(), BoardStore.axiosGetStateMachine(), BoardStore.axiosGetBoardData(defaultBoard.boardId), BoardStore.axiosGetAllEpicData()]).then(([issueTypes, stateMachineMap, defaultBoardData, epicData]) => {
@@ -64,6 +68,7 @@ class BoardHome extends Component {
     });
   }
 
+
   render() {
     const { history, HeaderStore } = this.props;
     return (
@@ -74,6 +79,7 @@ class BoardHome extends Component {
           <Button
             funcType="flat"
             icon="playlist_add"
+            onClick={this.handleCreateFeatureClick}
           >           
           创建特性
           </Button>
@@ -142,6 +148,7 @@ class BoardHome extends Component {
             
           </Spin>   
         </div>
+        <CreateFeatureContainer />
       </Page>
     );
   }
