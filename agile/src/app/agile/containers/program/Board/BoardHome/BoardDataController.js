@@ -62,21 +62,16 @@ export default class BoardDataController {
 
   setSourceData(epicData, boardData) {
     const {
-      assigneeIds, epicInfo, parentWithSubs, parentCompleted, parentIssues,
+      epicInfo,
     } = boardData;
     this.dataConvertToFlatten(boardData);
-    this.epicDataMap = this.addEpicLabelToFlattenData(this.flattenedArr, epicInfo, parentWithSubs, parentIssues, parentCompleted);
-    this.assigneeDataMap = this.addAssigneeLabelToFlattenData(this.flattenedArr, assigneeIds);
-    this.parentWithSubsDataMapCollection = this.addParentIdsLabelToFlattenData(this.flattenedArr, parentWithSubs, parentIssues, parentCompleted);
+    this.epicDataMap = this.addEpicLabelToFlattenData(this.flattenedArr, epicInfo);   
+    this.parentWithSubsDataMapCollection = this.addParentIdsLabelToFlattenData(this.flattenedArr);
     this.dataReady = true;
   }
 
-  addEpicLabelToFlattenData(flattenedArr, epicInfo, parentWithSubs, parentIssues, parentCompleted) {
-    const combinedIssueArr = [...flattenedArr, ...parentIssues.filter(issue => !this.flattenedArrSet.has(issue.issueId)).map(issue => ({
-      ...issue,
-      statusName: issue.statusMapDTO.name,
-      categoryCode: issue.statusMapDTO.type,
-    }))];
+  addEpicLabelToFlattenData(flattenedArr, epicInfo) {
+    const combinedIssueArr = [...flattenedArr];
     // 遍历 epicInfo，找出与史诗相对应的 issue 组成 Arr
     return {
       interConnectedDataMap: epicInfo ? epicInfo.map(({ epicId, epicName }) => [epicId, {
@@ -84,23 +79,20 @@ export default class BoardDataController {
         epicName,
         issueArrLength: combinedIssueArr.filter(issue => issue.epicId === epicId).length,
         // 父子任务关系处理
-        subIssueData: {
-          ...this.addParentIdsLabelToFlattenData(
-            combinedIssueArr.filter(issue => issue.epicId === epicId),
-            parentWithSubs,
-            parentIssues,
-            parentCompleted,
-            `swimlane_epic-${epicId}`,
-          ),
-        },
+        // subIssueData: {
+        //   ...this.addParentIdsLabelToFlattenData(
+        //     combinedIssueArr.filter(issue => issue.epicId === epicId),
+        //     parentWithSubs,
+        //     parentIssues,
+        //     parentCompleted,
+        //     `swimlane_epic-${epicId}`,
+        //   ),
+        // },
       }]) : [],
       unInterConnectedDataMap: {
         issueArrLength: combinedIssueArr.filter(issue => !issue.epicId).length,
         ...this.addParentIdsLabelToFlattenData(
-          combinedIssueArr.filter(issue => !issue.epicId),
-          parentWithSubs,
-          parentIssues,
-          parentCompleted,
+          combinedIssueArr.filter(issue => !issue.epicId),       
           'swimlane_epic-unInterconnected',
         ),
       },
@@ -157,49 +149,24 @@ export default class BoardDataController {
     if (mode !== 'parent_child') {
       combinedIssueArr = flattenedArr;
     } else {
-      combinedIssueArr = [...flattenedArr, ...parentIssues.filter(issue => !this.flattenedArrSet.has(issue.issueId)).map(issue => ({
-        ...issue,
-        statusName: issue.statusMapDTO.name,
-        categoryCode: issue.statusMapDTO.type,
-      }))];
+      combinedIssueArr = [...flattenedArr];
       this.combinedIssueArr = combinedIssueArr;
     }
     // 第一个 Map，issue Id 与 issue 相对应（临时 Map）
     const issueIdDataMap = new Map(combinedIssueArr.map(issue => [issue.issueId, issue]));
-    const issueIdFullDataMap = new Map(this.flattenedArr.map(issue => [issue.issueId, issue]));
+    const issueIdFullDataMap = new Map(this.flattenedArr.map(issue => [issue.issueId, issue]));    
+    
+    const noParentIssueIdsSet = new Set(combinedIssueArr.filter(issue => !issue.parentIssueId).map(issue => issue.issueId));
 
-    const parentCompletedSet = new Set(parentCompleted);
-    const parentIdsSet = new Set(parentIssues.map(issue => issue.issueId));
-    const parentIssueIdsSet = new Set(combinedIssueArr.filter(issue => !issue.parentIssueId && parentIdsSet.has(issue.issueId)).map(issue => issue.issueId));
-    const noParentIssueIdsSet = new Set(combinedIssueArr.filter(issue => !issue.parentIssueId && !parentIdsSet.has(issue.issueId)).map(issue => issue.issueId));
-    let parentDataMap = new Map();
-    let parentDataArr = [];
     let otherIssueWithoutParent = [];
 
-    if (parentIssueIdsSet.size) {
-      const unCompletedArr = [...parentIssueIdsSet].filter(id => !parentCompletedSet.has(id)).map(id => [id, {
-        isComplish: false,
-        canMoveToComplish: parentWithSubs[id].every(subId => issueIdFullDataMap.get(subId).categoryCode === 'done'),
-        subIssueData: parentWithSubs[id].map(subId => issueIdFullDataMap.get(subId)),
-        ...issueIdDataMap.get(id),
-      }] || []);
-      const completedArr = [...parentIssueIdsSet].filter(id => parentCompletedSet.has(id)).map(id => [id, {
-        isComplish: true,
-        canMoveToComplish: parentWithSubs[id].every(subId => issueIdFullDataMap.get(subId).categoryCode === 'done'),
-        subIssueData: parentWithSubs[id].map(subId => issueIdFullDataMap.get(subId)),
-        ...issueIdDataMap.get(id),
-      }] || []);
-      parentDataArr = [...unCompletedArr, ...completedArr];
-      parentDataMap = new Map([...unCompletedArr, ...completedArr]);
-    }
     if (noParentIssueIdsSet.size) {
       // parentIssueId 没有值可能为 null，也可能为 0（后端返回数据不可信）
       otherIssueWithoutParent = combinedIssueArr.filter(issue => (issue.parentIssueId === 0 || issue.parentIssueId === null) && noParentIssueIdsSet.has(issue.issueId));
     }
 
     return {
-      swimLaneData: this.swimLaneDataConstructor([...parentDataMap.values()], otherIssueWithoutParent, mode, 'issueId'),
-      interConnectedDataMap: mode.includes('swimlane_epic') ? parentDataMap : parentDataArr,
+      swimLaneData: this.swimLaneDataConstructor([], otherIssueWithoutParent, mode, 'issueId'),      
       unInterConnectedDataMap: otherIssueWithoutParent,
     };
   }
@@ -235,7 +202,7 @@ export default class BoardDataController {
     const statusMap = [];
     const canDragOn = [];
     const column_StatusStructureMap = new Map();
-    data.columnsData.columns.forEach((columnObj) => {
+    data.columnsData.forEach((columnObj) => {
       columnStructureMap.push(columnObj);
       column_StatusStructureMap.set(columnObj.columnId, columnObj.subStatuses);
       columnObj.subStatuses.forEach((subStatusObj) => {

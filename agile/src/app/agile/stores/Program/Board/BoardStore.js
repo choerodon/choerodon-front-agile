@@ -1,9 +1,10 @@
 import {
-  observable, action, computed, toJS, get, set,
+  observable, action, computed, toJS, 
 } from 'mobx';
 import axios from 'axios';
-import _ from 'lodash';
-import { store, stores } from 'choerodon-front-boot';
+
+import { stores } from 'choerodon-front-boot';
+import { loadBoardData } from '../../../api/BoardApi';
 
 const { AppState } = stores;
 
@@ -619,10 +620,10 @@ class BoardStore {
   }
 
   axiosGetBoardData(boardId) {
-    const {
-      onlyMe, onlyStory, quickSearchArray, assigneeFilterIds,
-    } = this.quickSearchObj;
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?${onlyMe ? `assigneeId=${AppState.getUserId}&` : ''}onlyStory=${onlyStory}&quickFilterIds=${quickSearchArray}${assigneeFilterIds.length > 0 ? `&assigneeFilterIds=${assigneeFilterIds}` : ''}`);
+    // const {
+    //   onlyMe, onlyStory, quickSearchArray, assigneeFilterIds,
+    // } = this.quickSearchObj;
+    return loadBoardData(boardId, this.quickSearchObj);
   }
 
   axiosFilterBoardData(boardId, assign, recent) {
@@ -748,19 +749,19 @@ class BoardStore {
 
   axiosGetIssueTypes() {
     const proId = AppState.currentMenuType.id;
-    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?apply_type=agile`);
+    return axios.get(`/issue/v1/projects/${proId}/schemes/query_issue_types_with_sm_id?apply_type=program`);
   }
 
   loadTransforms = (statusId, issueId, typeId) => {
     const projectId = AppState.currentMenuType.id;
     return axios.get(
-      `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&apply_type=agile`,
+      `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&apply_type=program`,
     );
   }
 
   loadStatus = () => {
     const projectId = AppState.currentMenuType.id;
-    axios.get(`/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=agile`).then((data) => {
+    axios.get(`/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=program`).then((data) => {
       if (data && !data.failed) {
         this.setStatusList(data);
       } else {
@@ -804,7 +805,7 @@ class BoardStore {
     return this.spinIf;
   }
 
-  @action scrumBoardInit(AppStates, url = null, boardListData = null, { boardId, userDefaultBoard, columnConstraint }, { currentSprint, allColumnNum }, quickSearchList, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData) {
+  @action scrumBoardInit(AppStates, url = null, boardListData = null, { boardId, userDefaultBoard, columnConstraint }, { currentSprint, allColumnNum = [] }, quickSearchList, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData) {
     this.boardData = [];
     this.spinIf = false;
     // this.currentClick = 0;
@@ -821,14 +822,14 @@ class BoardStore {
     this.currentConstraint = columnConstraint;
     this.quickSearchList = quickSearchList;
     this.allColumnCount = observable.map(allColumnNum.map(({ columnId, issueCount }) => [columnId, issueCount]));
-    if (currentSprint) {
-      this.currentSprintExist = true;
-      this.dayRemain = currentSprint.dayRemain;
-      this.sprintId = currentSprint.sprintId;
-      this.sprintName = currentSprint.sprintName;
-    } else {
-      this.currentSprintExist = false;
-    }
+    // if (currentSprint) {
+    //   this.currentSprintExist = true;
+    //   this.dayRemain = currentSprint.dayRemain;
+    //   this.sprintId = currentSprint.sprintId;
+    //   this.sprintName = currentSprint.sprintName;
+    // } else {
+    //   this.currentSprintExist = false;
+    // }
     this.allDataMap = allDataMap;
     this.mapStructure = mapStructure;
     if (url && url.paramIssueId) {

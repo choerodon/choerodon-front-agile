@@ -49,7 +49,7 @@ class BoardHome extends Component {
 
   refresh(defaultBoard, url, boardListData) {
     BoardStore.setSpinIf(true);
-    Promise.all([BoardStore.axiosGetIssueTypes(), BoardStore.axiosGetStateMachine(), BoardStore.axiosGetBoardData(defaultBoard.boardId), BoardStore.axiosGetAllEpicData()]).then(([issueTypes, stateMachineMap, defaultBoardData, epicData]) => {
+    Promise.all([BoardStore.axiosGetBoardData(defaultBoard.boardId), BoardStore.axiosGetAllEpicData()]).then(([defaultBoardData, epicData]) => {
       this.dataConverter.setSourceData(epicData, defaultBoardData);
       const renderDataMap = new Map([
         ['parent_child', this.dataConverter.getParentWithSubData],
@@ -64,7 +64,7 @@ class BoardHome extends Component {
       const mapStructure = this.dataConverter.getMapStructure();
       const allDataMap = this.dataConverter.getAllDataMap(defaultBoard.userDefaultBoard);
       const headerData = this.dataConverter.getHeaderData();
-      BoardStore.scrumBoardInit(AppState, url, boardListData, defaultBoard, defaultBoardData, null, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData);
+      BoardStore.scrumBoardInit(AppState, url, boardListData, defaultBoard, defaultBoardData, null, [], [], canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData);
     });
   }
 
