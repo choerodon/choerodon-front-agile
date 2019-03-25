@@ -104,6 +104,13 @@
         sort: 16
         permission:
           - 'agile-service.art.queryArtList'
+    - "programBoard":
+        icon: table_chart
+        category: PROGRAM
+        Routes: /agile/board
+        sort: 16
+        permission:
+          - 'agile-service.art.queryArtList'
     - "programSetting":
         icon: folder_shared
         category: PROGRAM

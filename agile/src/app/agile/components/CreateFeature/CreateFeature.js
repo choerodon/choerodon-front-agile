@@ -34,7 +34,8 @@ class CreateFeature extends Component {
   state = {
     fullEditorVisible: false,
   }
-
+  
+  
   handleModalCancel = () => {
     this.setState({
       fullEditorVisible: false,
@@ -75,6 +76,7 @@ class CreateFeature extends Component {
         onOk={this.handleOk}
         onCancel={onCancel}
         confirmLoading={loading}
+        destroyOnClose
       >
         <Content
           style={{
@@ -131,7 +133,7 @@ class CreateFeature extends Component {
               </div>
             </div>
             <FormItem>
-              {getFieldDecorator('description', {
+              {getFieldDecorator('description', {                
               })(
                 <WYSIWYGEditor />,
               )}
