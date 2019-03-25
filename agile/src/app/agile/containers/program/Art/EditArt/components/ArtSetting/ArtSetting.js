@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 
-import ArtForm from './ArtForm';
+import ArtForm from './component/ArtForm';
 
 const propTypes = {
   initValue: PropTypes.shape({}).isRequired,

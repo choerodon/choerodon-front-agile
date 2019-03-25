@@ -28,7 +28,8 @@ const MESSAGENOTIFICATION = asyncRouter(() => import('./project/MessageNotificat
 const ART = asyncRouter(() => import('./program/Art')); 
 const BOARD = asyncRouter(() => import('./program/Board')); 
 const FEATURE = asyncRouter(() => import('./program/Feature'));
-const PI = asyncRouter(() => import('./program/PI'));
+const PIAIMS = asyncRouter(() => import('./program/PI'));
+const PROGRAMSETTING = asyncRouter(() => import('./program/ProgramSetting'));
 class AGILEIndex extends React.Component {
   render() {
     const { match } = this.props;
@@ -69,7 +70,8 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/art`} component={ART} />
           <Route path={`${match.url}/board`} component={BOARD} />          
           <Route path={`${match.url}/feature`} component={FEATURE} /> 
-          <Route path={`${match.url}/pi`} component={PI} /> 
+          <Route path={`${match.url}/pi`} component={PIAIMS} />
+          <Route path={`${match.url}/programSetting`} component={PROGRAMSETTING} /> 
 
           <Route path="*" component={nomatch} />
         </Switch>

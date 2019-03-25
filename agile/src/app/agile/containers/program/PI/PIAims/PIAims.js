@@ -20,12 +20,12 @@ import emptyPI from '../../../../assets/image/emptyPI.svg';
 import CreatePIAims from '../CreatePIAims/CreatePIAims';
 
 import './PIAims.scss';
-import EditPI from '../EditPI';
+import EditPIAims from '../EditPIAims';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const RadioButton = Radio.Button;
-const Option = { Select };
+const { Option } = Select;
 const { AppState } = stores;
 const amisColumns = [
   {
@@ -59,7 +59,6 @@ class PIAims extends Component {
     super(props);
     this.state = {
       showType: 'list',
-      piName: undefined,
       editingPiAimsInfo: {},
       deletePIAimsModalVisible: false,
       deleteRecord: undefined,
@@ -82,7 +81,7 @@ class PIAims extends Component {
     if (id) {
       getPIAims(id).then((res) => {
         PIStore.setPIAimsLoading(false);
-        PIStore.setPiAims(res);
+        PIStore.setPIAims(res);
         PIStore.setEditPiAimsCtrl(res.program.map((item, index) => (
           {
             isEditing: false,
@@ -103,6 +102,7 @@ class PIAims extends Component {
     }, () => {
       this.getPIAims(value);
     });
+    this.getPIAims(e.target.value);
   }
 
   handleRadioChange = (e) => {
@@ -113,7 +113,7 @@ class PIAims extends Component {
 
   handleEditPiAims = (record) => {
     const { editPiAimsCtrl } = PIStore;
-    const { PiAims } = PIStore;
+    const { PIAims } = PIStore;
     const { editingIndex } = editPiAimsCtrl.find(item => item.editingId === record.id);
     editPiAimsCtrl.forEach((item) => {
       // eslint-disable-next-line no-param-reassign
@@ -122,7 +122,7 @@ class PIAims extends Component {
     editPiAimsCtrl[editingIndex].isEditing = true;
     PIStore.setEditPiAimsCtrl(editPiAimsCtrl);
     this.setState({
-      editingPiAimsInfo: PiAims.program[editingIndex],
+      editingPiAimsInfo: PIAims.program[editingIndex],
     }, () => {
       PIStore.setEditPIVisible(true);
     });
@@ -141,7 +141,7 @@ class PIAims extends Component {
     deletePIAims(deleteRecord.id).then(() => {
       getPIAims(deleteRecord.piId).then((piAims) => {
         PIStore.setPIAimsLoading(false);
-        PIStore.setPiAims(piAims);
+        PIStore.setPIAims(piAims);
         PIStore.setEditPiAimsCtrl(piAims.program.map((item, index) => (
           {
             isEditing: false,
@@ -203,12 +203,12 @@ class PIAims extends Component {
     }];
     return (
       <Page className="c7n-pi-detail">
-        <Header title={`${piName || ''}目标`} backPath={PIListLink()}>
+        <Header title="PI目标">
           <Button funcType="flat" onClick={this.handleCreateFeatureBtnClick}>
             <Icon type="playlist_add" />
             <span>创建PI目标</span>
           </Button>
-          <Button funcType="flat" onClick={this.getPIAims}>
+          <Button funcType="flat" onClick={this.getPIAims.bind(this, selectedPIId)}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -243,7 +243,7 @@ class PIAims extends Component {
                     <div>
                       <ProgramAimsTable
                         amisColumns={amisColumns}
-                        dataSource={PiAims.program}
+                        dataSource={PIAims.program}
                         onEditPiAims={this.handleEditPiAims}
                         onDeletePiAims={this.handledeletePiAims}
                       />
@@ -285,7 +285,7 @@ class PIAims extends Component {
           <CreatePIAims 
             piId={selectedPIId}
           />
-          <EditPI editingPiAimsInfo={editingPiAimsInfo} editPIVisible={editPIVisible} />
+          <EditPIAims editingPiAimsInfo={editingPiAimsInfo} editPIVisible={editPIVisible} />
           <Modal
             title="删除PI目标"
             visible={deletePIAimsModalVisible}

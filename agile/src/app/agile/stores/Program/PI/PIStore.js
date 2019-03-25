@@ -11,16 +11,6 @@ const format = 'YYYY-MM-DD';
 
 @store('PIStore')
 class PIStore {
-    @observable PIListLoading = false;
-
-    @computed get getPIListLoading() {
-      return toJS(this.PIListLoading);
-    }
-
-    @action setPIListLoading(data) {
-      this.PIListLoading = data;
-    }
-
     @observable PIAimsLoading = false;
 
     @computed get getPIAimsLoading() {
@@ -31,24 +21,24 @@ class PIStore {
       this.PIAimsLoading = data;
     }
 
-    @observable PiList = [];
+    @observable PIList = [];
     
-    @computed get getPiList() {
-      return toJS(this.PiList);
+    @computed get getPIList() {
+      return toJS(this.PIList);
     }
 
-    @action setPiList(data) {
-      this.PiList = data;
+    @action setPIList(data) {
+      this.PIList = data;
     }
 
-    @observable PiAims = {}
+    @observable PIAims = {}
       
-    @computed get getPiAims() {
-      return toJS(this.PiAims);
+    @computed get getPIAims() {
+      return toJS(this.PIAims);
     }
   
-    @action setPiAims(data) {
-      this.PiAims = data;
+    @action setPIAims(data) {
+      this.PIAims = data;
     }
 
     @observable editPIVisible=false;

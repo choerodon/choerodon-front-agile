@@ -23,15 +23,11 @@ class CreatePIAims extends Component {
   }
 
   handleOnOk = () => {
-    const { form, piId, page } = this.props;
+    const { form, piId } = this.props;
     const { createStretch } = PIStore;
     form.validateFields((err, values) => {
       if (!err) {
-        if (page === 'PIList') {
-          PIStore.setPIListLoading(true);
-        } else {
-          PIStore.setPIAimsLoading(true);
-        }
+        PIStore.setPIAimsLoading(true);
         const piObjectiveDTO = {
           levelCode: 'program',
           programId: AppState.currentMenuType.id,
@@ -43,15 +39,15 @@ class CreatePIAims extends Component {
           stretch: createStretch,
         };
         createPIAims(piObjectiveDTO).then(() => {
-          Promise.all([getPIList(), getPIAims(values.piId || piId)]).then(([piList, piAims]) => {
-            PIStore.setPiList(piList.content.map(item => (
+          Promise.all([getPIList(), getPIAims(values.piId || piId)]).then(([PIList, piAims]) => {
+            PIStore.setPIList(PIList.content.map(item => (
               Object.assign(item, {
                 startDate: moment(item.startDate).format(formatter),
                 endDate: moment(item.endDate).format(formatter),
                 remainDays: moment(item.endDate).diff(moment(), 'days') > 0 ? moment(item.endDate).diff(moment(), 'days') : 0,
               })
             )));
-            PIStore.setPiAims(piAims);
+            PIStore.setPIAims(piAims);
             PIStore.setEditPiAimsCtrl(piAims.program.map((item, index) => (
               {
                 isEditing: false,
@@ -59,11 +55,7 @@ class CreatePIAims extends Component {
                 editingIndex: index,  
               }
             )));
-            if (page === 'PIList') {
-              PIStore.setPIListLoading(false);
-            } else {
-              PIStore.setPIAimsLoading(false);
-            }
+            PIStore.setPIAimsLoading(false);
             form.resetFields();
             PIStore.setCreatePIVisible(false);
             PIStore.setCreateStretch(false);
@@ -81,9 +73,9 @@ class CreatePIAims extends Component {
   }
 
   render() {
-    const { page, form } = this.props;
+    const { form } = this.props;
     const { getFieldDecorator } = form;
-    const { PiList, createPIVisible, createStretch } = PIStore;
+    const { PIList, createPIVisible, createStretch } = PIStore;
     return (
       <Sidebar
         className="c7n-pi-createPISideBar"
@@ -95,7 +87,6 @@ class CreatePIAims extends Component {
         onCancel={this.handleOnCancel}
       >
         <Form>
-          {page === 'PIList' && (
           <FormItem label="PI" style={{ width: 520 }}>
             {getFieldDecorator('piId', {
               rules: [{ required: true, message: 'PI为必选项' }],
@@ -105,7 +96,7 @@ class CreatePIAims extends Component {
                 allowClear
                 getPopupContainer={triggerNode => triggerNode.parentNode}
               >
-                {PiList.map(
+                {PIList.map(
                   pi => (
                     <Option
                       key={pi.id}
@@ -118,7 +109,6 @@ class CreatePIAims extends Component {
               </Select>,
             )}
           </FormItem>
-          )}
           <FormItem style={{ width: 520 }}>
             {getFieldDecorator('name', {
               rules: [{ required: true, message: 'PI目标名称为必输项' }],
@@ -131,7 +121,7 @@ class CreatePIAims extends Component {
                 getFieldDecorator('planBv')(
                   <Select label="计划商业价值">
                     {
-                      BV.map(value => (<Option value={value}>{value}</Option>))
+                      BV.map(value => (<Option key={value} value={value}>{value}</Option>))
                     }
                   </Select>,
                 )
@@ -142,7 +132,7 @@ class CreatePIAims extends Component {
                getFieldDecorator('actualBv')(
                  <Select label="实际商业价值">
                    {
-                    BV.map(value => (<Option value={value}>{value}</Option>))
+                    BV.map(value => (<Option key={value} value={value}>{value}</Option>))
                   }
                  </Select>,
                )
