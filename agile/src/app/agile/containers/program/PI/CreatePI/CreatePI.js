@@ -111,7 +111,7 @@ class CreatePI extends Component {
                       key={pi.id}
                       value={pi.id}
                     >
-                      {pi.name}
+                      {`${pi.code}-${pi.name}`}
                     </Option>
                   ),
                 )}

@@ -16,7 +16,7 @@ const { TabPane } = Tabs;
 const FormItem = Form.Item;
 const Fields = {
   1: ['rteId', 'startDate', 'enabled'],
-  2: ['ipWorkdays', 'interationCount', 'interationWeeks'],
+  2: ['ipWeeks', 'interationCount', 'interationWeeks'],
   3: ['piCodePrefix', 'piCodeNumber'],
 };
 function NumberFormatter(value) {
@@ -73,10 +73,23 @@ class ArtForm extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+<<<<<<< Updated upstream:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/ArtForm.js
+=======
+    const { initValue } = this.props;
+>>>>>>> Stashed changes:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/component/ArtForm.js
     return (
       <Form className="c7nagile-ArtForm">
         <Tabs defaultActiveKey="1" onChange={this.handleTabChange}>
           <TabPane tab="ART设置" key="1">
+            <FormItem>
+              {getFieldDecorator('code', {
+                rules: [{
+                  required: true, message: '请输入ART的编号!',
+                }],
+              })(
+                <Input style={{ width: 500 }} maxLength={30} label="编号" placeholder="请输入ART的编号" />,
+              )}
+            </FormItem>
             <FormItem>
               {getFieldDecorator('rteId', {
                 normalize: value => (value === 0 ? undefined : value),
@@ -101,6 +114,25 @@ class ArtForm extends Component {
               )}
             </FormItem>
             <FormItem>
+<<<<<<< Updated upstream:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/ArtForm.js
+=======
+              {
+                getFieldDecorator('piCount', {
+                  rules: [{
+                    required: true,
+                    message: '请选择初始PI生成个数',
+                  }],
+                })(
+                  <Select style={{ width: 500, marginBottom: 15 }} label="请选择初始PI生成个数">
+                    {
+                      [1, 2, 3, 4, 5, 6, 7, 8].map(value => <Option key={value} value={value}>{value}</Option>)
+                    }
+                  </Select>,
+                )
+              }
+            </FormItem>
+            <FormItem>
+>>>>>>> Stashed changes:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/component/ArtForm.js
               {getFieldDecorator('enabled', {
                 valuePropName: 'checked',
               })(
@@ -150,7 +182,11 @@ class ArtForm extends Component {
               </Tooltip>
             </FormItem>
             <FormItem>
+<<<<<<< Updated upstream:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/ArtForm.js
               {getFieldDecorator('interationWeeks', {
+=======
+              {getFieldDecorator('ipWeeks', {
+>>>>>>> Stashed changes:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/component/ArtForm.js
                 rules: [{
                   required: true, message: '请选择每个迭代的工作周数!',
                 }],
@@ -184,11 +220,18 @@ class ArtForm extends Component {
                 rules: [{
                   required: true, message: '请输入PI起始编号!',
                 }],
+                normalize: value => (value ? value.toString().replace(/[^\d]/g, '') : value),
               })(
-                <Input style={{ width: 500 }} label="PI起始编号" placeholder="请输入PI起始编号" />,
+                <Input style={{ width: 500 }} label="PI起始编号" maxLength={3} placeholder="请输入PI起始编号" />,
               )}
             </FormItem>
           </TabPane>
+<<<<<<< Updated upstream:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/ArtForm.js
+=======
+          <TabPane tab="PI列表" key="4">
+            <PIList name={initValue.name} artId={initValue.id} />
+          </TabPane>
+>>>>>>> Stashed changes:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/component/ArtForm.js
         </Tabs>
         <Divider />
         <Button onClick={this.onSave} type="primary" funcType="raised">保存</Button>

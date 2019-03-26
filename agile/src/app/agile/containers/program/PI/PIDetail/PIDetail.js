@@ -63,7 +63,18 @@ class PIDetail extends Component {
   }
 
   componentDidMount() {
+<<<<<<< Updated upstream:agile/src/app/agile/containers/program/PI/PIDetail/PIDetail.js
     this.getPIAims();
+=======
+    PIStore.setPIAimsLoading(true);
+    getPIList().then((PIList) => {
+      PIStore.setPIList(PIList.content);
+      this.setState({
+        selectedPIId: PIList.content[0].id,
+      });
+      this.getPIAims(PIList.content[0] && PIList.content[0].id);
+    });
+>>>>>>> Stashed changes:agile/src/app/agile/containers/program/PI/PIAims/PIAims.js
   }
 
   getPIAims = () => {
@@ -84,6 +95,20 @@ class PIDetail extends Component {
       this.setState({
         piName: pi.name,
       });
+<<<<<<< Updated upstream:agile/src/app/agile/containers/program/PI/PIDetail/PIDetail.js
+=======
+    } else {
+      PIStore.setPIAimsLoading(false);
+    }
+  }
+
+  handlePISelectChange = (value) => {
+    this.setState({
+      selectedPIId: value,
+      showType: 'list',
+    }, () => {
+      this.getPIAims(value);
+>>>>>>> Stashed changes:agile/src/app/agile/containers/program/PI/PIAims/PIAims.js
     });
   }
 
@@ -173,11 +198,15 @@ class PIDetail extends Component {
     const {
       showType, piName, editingPiAimsInfo, deletePIAimsModalVisible, deleteRecord,
     } = this.state;
-    const piId = this.props.match.params.id;
     const {
       PiList, PiAims, PIDetailLoading, editPIVisible, 
     } = PIStore;
+<<<<<<< Updated upstream:agile/src/app/agile/containers/program/PI/PIDetail/PIDetail.js
     const teamDataSource = PiAims.teamAims;
+=======
+    const teamDataSource = PIAims.teamAims;
+    const selectedPI = PIList.find(item => item.id === selectedPIId);
+>>>>>>> Stashed changes:agile/src/app/agile/containers/program/PI/PIAims/PIAims.js
     const teamAimsColumns = [{
       title: '团队名称',
       dataIndex: 'teamName',
@@ -195,6 +224,7 @@ class PIDetail extends Component {
           </Button>
         </Header>
         <Content>
+<<<<<<< Updated upstream:agile/src/app/agile/containers/program/PI/PIDetail/PIDetail.js
           {/* <RadioGroup className="c7n-pi-showTypeRadioGroup" onChange={this.handleRadioChange} defaultValue="list">
             <RadioButton value="list">列表</RadioButton>
             <RadioButton value="card">卡片</RadioButton>
@@ -228,6 +258,78 @@ class PIDetail extends Component {
           <CreatePI 
             piId={piId}
             page="PIDetail"
+=======
+          <Spin spinning={PIAimsLoading}>
+            {
+              PIList && PIList.length > 0 ? (
+                <div>
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between', height: 32, marginBottom: 20, 
+                  }}
+                  >
+                    <Select onChange={this.handlePISelectChange} value={selectedPIId} dropdownClassName="c7n-pi-piSelect">
+                      {
+                        PIList && PIList.map(pi => (
+                          <Option key={pi.id} value={pi.id}>{`${pi.code}-${pi.name}`}</Option>
+                        ))
+                      }
+                    </Select>
+                    {
+                      PIAims.program && PIAims.program.length > 0 && (
+                        <RadioGroup className="c7n-pi-showTypeRadioGroup" onChange={this.handleRadioChange} defaultValue="list">
+                          <RadioButton value="list">列表</RadioButton>
+                          <RadioButton value="card">卡片</RadioButton>
+                        </RadioGroup>
+                      )
+                    }
+                  </div>
+                  {
+                  showType === 'list' ? (
+                    <div>
+                      <ProgramAimsTable
+                        amisColumns={amisColumns}
+                        dataSource={PIAims.program}
+                        onEditPiAims={this.handleEditPiAims}
+                        onDeletePiAims={this.handledeletePiAims}
+                      />
+
+                      {/* <div className="c7n-pi-teamAims" style={{ marginTop: 20 }}>
+                        <Table 
+                          filterBar={false}
+                          rowKey={record => record.teamId}
+                          columns={teamAimsColumns}
+                          dataSource={teamDataSource}
+                          pagination={false}
+                          expandedRowRender={record => this.renderTeamPIAimsTable.bind(this, record.teamProgramAims)()}
+                        />
+                      </div> */}
+                    </div>
+                  ) : (
+                    <PIAimsCard 
+                      aimsCategory="program"
+                      piName={`${selectedPI.code}-${selectedPI.name}`}
+                      aimsInfo={PIAims.program.filter(item => !item.stretch)}
+                      stretchAimsInfo={PIAims.program.filter(item => item.stretch)}
+                    />
+                  )
+                }
+                </div>
+              ) : (
+                <EmptyBlock
+                  style={{ marginTop: 60 }} 
+                  pic={emptyPI}
+                  border
+                  textWidth={421}
+                  title="设置各个阶段的PI目标"
+                  des="这是您的PI目标列表。您可以创建各个阶段的PI目标，用数字衡量目标的价值，并随时调整。"
+                />
+              )
+            }
+          </Spin>
+         
+          <CreatePIAims 
+            piId={selectedPIId}
+>>>>>>> Stashed changes:agile/src/app/agile/containers/program/PI/PIAims/PIAims.js
           />
           <EditPI editingPiAimsInfo={editingPiAimsInfo} editPIVisible={editPIVisible} />
           <Modal

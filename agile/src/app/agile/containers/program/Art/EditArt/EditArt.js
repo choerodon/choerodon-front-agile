@@ -12,7 +12,11 @@ import { ArtInfo, ArtSetting, ReleaseArt } from './components';
 import { getArtById, editArt, releaseArt } from '../../../../api/ArtApi';
 import './EditArt.scss';
 
+<<<<<<< Updated upstream
 const requiredFields = ['startDate', 'ipWorkdays', 'interationCount', 'interationWeeks', 'piCodePrefix', 'piCodeNumber'];
+=======
+const requiredFields = ['startDate', 'ipWeeks', 'interationCount', 'interationWeeks', 'piCodePrefix', 'piCodeNumber'];
+>>>>>>> Stashed changes
 function formatter(values) {
   const data = { ...values };
   Object.keys(data).forEach((key) => {
@@ -51,21 +55,35 @@ class EditArt extends Component {
         enabled,
         interationCount,
         interationWeeks,
-        ipWorkdays,
+        ipWeeks,
         piCodeNumber,
         piCodePrefix,      
         startDate,
         rteId,
+<<<<<<< Updated upstream
+=======
+        name,
+        code,
+        piCount,
+        id,
+>>>>>>> Stashed changes
       } = data;
       const formData = {
         enabled,
         interationCount,
         interationWeeks,
-        ipWorkdays,
+        ipWeeks,
         piCodeNumber,
         piCodePrefix,
         rteId,
         startDate,
+<<<<<<< Updated upstream
+=======
+        name,
+        code,
+        piCount,
+        id,
+>>>>>>> Stashed changes
       };
       this.setState({
         loading: false,
@@ -166,14 +184,8 @@ class EditArt extends Component {
                 onCancel={this.handleReleaseCancel}
               />
               <ArtInfo 
-                enabled={enabled}
-                canRelease={canRelease}
-                isModified={isModified}  
                 onSubmit={this.handleSave}
                 name={name}
-                description={description}
-                onReleaseClick={this.handleReleaseClick}
-                onClearModify={this.handleClearModify}
               />
               <ArtSetting
                 initValue={formData}
