@@ -4,15 +4,19 @@ import {
   Form, Input, Select, Modal, Radio, Button, Icon,
 } from 'choerodon-ui';
 import { Content } from 'choerodon-front-boot';
+import { find } from 'lodash';
 import SelectFocusLoad from '../SelectFocusLoad';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import UploadControl from '../UploadControl';
 import SelectNumber from '../SelectNumber';
+import {
+  createIssue, loadPriorities,
+} from '../../api/NewIssueApi';
+import { handleFileUpload, getProjectId, beforeTextUpload } from '../../common/utils';
 
 const FormItem = Form.Item;
 const { Sidebar } = Modal;
-const { Option } = Select;
 const RadioGroup = Radio.Group;
 const defaultProps = {
 
@@ -22,7 +26,7 @@ const propTypes = {
   visible: PropTypes.bool.isRequired,
   loading: PropTypes.bool.isRequired,
   onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
+  onCreate: PropTypes.func,
 };
 const radioStyle = {
   display: 'block',
@@ -33,6 +37,15 @@ const radioStyle = {
 class CreateFeature extends Component {
   state = {
     fullEditorVisible: false,
+    defaultPriority: null,
+  }
+
+  componentDidMount() {
+    loadPriorities().then((res) => {
+      this.setState({
+        defaultPriority: res.find(item => item.default) || res[0],
+      });
+    });
   }
   
   
@@ -55,12 +68,72 @@ class CreateFeature extends Component {
   }
 
   handleOk = () => {
-    const { onSubmit, form } = this.props;
+    const { form } = this.props;
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        onSubmit(values);
+        const {
+          issueTypeId, storyPoints, epicId, summary, benfitHypothesis, acceptanceCritera, featureType, fileList,
+          description,
+        } = values;
+        const { defaultPriority } = this.state;
+        const issueObj = {
+          projectId: getProjectId(),
+          programId: getProjectId(),
+          issueTypeId,
+          typeCode: 'feature',
+          summary,
+          priorityId: defaultPriority.id,
+          priorityCode: `priority-${defaultPriority.id}`,
+          epicId: epicId || 0,
+          parentIssueId: 0,
+          storyPoints,
+          featureDTO: {
+            benfitHypothesis,
+            acceptanceCritera,
+            featureType,
+          },
+        };
+
+       
+        if (description) {
+          beforeTextUpload(description, issueObj, this.handleCreateFeature);
+        } else {
+          issueObj.description = '';
+          this.handleCreateFeature(issueObj, fileList);
+        }
+        // onSubmit(values);
       }
     });
+  }
+
+  handleCreateFeature = (issueObj, fileList) => {
+    const { onCreate } = this.props;
+    createIssue(issueObj, 'program').then((res) => {
+      if (fileList && fileList.length > 0) {
+        const config = {
+          issueType: res.statusId,
+          issueId: res.issueId,
+          fileName: fileList[0].name,
+          projectId: getProjectId(),
+        };
+        if (fileList.some(one => !one.url)) {
+          handleFileUpload(fileList, () => {}, config);
+        }
+      }
+      Choerodon.prompt('创建成功');
+      if (onCreate) {
+        onCreate();
+      }
+    }).catch((error) => {
+      console.log(error);
+      Choerodon.prompt('创建失败');
+    });
+  }
+
+  handleTypesLoaded=(issueTypes) => {
+    const { form } = this.props;
+    const defaultType = find(issueTypes, { typeCode: 'feature' }).id;
+    form.setFieldsValue({ issueTypeId: defaultType });
   }
 
   render() {
@@ -87,16 +160,12 @@ class CreateFeature extends Component {
         >
           <Form>
             <FormItem>
-              {getFieldDecorator('statusType', {
-                initialValue: 'CYCLE_CASE',
+              {getFieldDecorator('issueTypeId', {                
                 rules: [{
                   required: true, message: '请选择类型!',
                 }],
               })(
-                <Select label="问题类型" style={{ width: 500 }}>
-                  <Option value="CYCLE_CASE">特性</Option>
-                  <Option value="CASE_STEP">步骤状态</Option>
-                </Select>,
+                <SelectFocusLoad afterLoad={this.handleTypesLoaded} loadWhenMount disabled type="issue_type_program" label="问题类型" style={{ width: 500 }} />,
               )}
             </FormItem>
             <FormItem>
@@ -104,18 +173,18 @@ class CreateFeature extends Component {
                 rules: [{
                   required: true, message: '请选择特性类型!',
                 }],
-                initialValue: '1',
+                initialValue: 'business',
               })(
                 <RadioGroup label="特性类型">
-                  <Radio value="1" style={radioStyle}>业务</Radio>
-                  <Radio value="2" style={radioStyle}>使能</Radio>
+                  <Radio value="business" style={radioStyle}>业务</Radio>
+                  <Radio value="enabler" style={radioStyle}>使能</Radio>
                 </RadioGroup>,
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('statusName', {
+              {getFieldDecorator('summary', {
                 rules: [{
-                  required: true, message: '请输入状态名称',
+                  required: true, message: '请输入特性名称',
                 }, {
                   validator: this.handleCheckStatusRepeat,
                 }],
@@ -152,7 +221,7 @@ class CreateFeature extends Component {
               {getFieldDecorator('epicId', {
 
               })(
-                <SelectFocusLoad type="epic" style={{ width: 500 }} label="史诗" />,
+                <SelectFocusLoad type="epic_program" style={{ width: 500 }} label="史诗" />,
               )}
             </FormItem>
             <FormItem>
@@ -163,13 +232,13 @@ class CreateFeature extends Component {
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('featureWorth', {
+              {getFieldDecorator('benfitHypothesis', {
               })(
                 <Input style={{ width: 500 }} maxLength={30} label="特性价值" />,
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('limit', {
+              {getFieldDecorator('acceptanceCritera', {
               })(
                 <Input style={{ width: 500 }} maxLength={30} label="验收标准" />,
               )}

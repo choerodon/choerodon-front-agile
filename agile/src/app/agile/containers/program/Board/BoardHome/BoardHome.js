@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
 import {
-  Page, Header, Content, stores,
+  Page, Header, stores,
 } from 'choerodon-front-boot';
-import {
-  Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip,
-} from 'choerodon-ui';
+import { Button, Spin } from 'choerodon-ui';
 import {
   StatusColumn, NoneSprint, CreateFeatureContainer, IssueDetail,
 } from './components';
+import { ProgramBoardSettingLink } from '../../../../common/utils';
 import SwimLane from './components/RenderSwimLaneContext/SwimLane';
 import BoardDataController from './BoardDataController';
 import QuickSearch from '../../../../components/QuickSearch';
@@ -49,9 +47,7 @@ class BoardHome extends Component {
     BoardStore.resetDataBeforeUnmount();
   }
 
-  async getBoard() {
-    const { location } = this.props;
-
+  async getBoard() {    
     const boardListData = await BoardStore.axiosGetBoardList();
     const defaultBoard = boardListData.find(item => item.userDefault) || boardListData[0];
     if (defaultBoard.boardId) {
@@ -61,6 +57,11 @@ class BoardHome extends Component {
 
   handleCreateFeatureClick = () => {
     BoardStore.setCreateFeatureVisible(true);
+  }
+
+  handleSettingClick=() => {
+    const { history } = this.props;
+    history.push(ProgramBoardSettingLink());
   }
 
   onDragStart = (result) => {
@@ -120,9 +121,12 @@ class BoardHome extends Component {
     BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, false);
   };
 
+  handleCreate=() => {
+    BoardStore.setCreateFeatureVisible(false);
+    this.refresh(BoardStore.getBoardList.get(BoardStore.getSelectedBoard));
+  }
+
   refresh(defaultBoard, url, boardListData) {
-    defaultBoard.userDefaultBoard = 'feature';
-  
     BoardStore.setSpinIf(true);
     Promise.all([BoardStore.axiosGetIssueTypes(), BoardStore.axiosGetStateMachine(), BoardStore.axiosGetBoardData(defaultBoard.boardId), BoardStore.axiosGetAllEpicData()]).then(([issueTypes, stateMachineMap, defaultBoardData, epicData]) => {
       this.dataConverter.setSourceData(epicData, defaultBoardData);
@@ -146,7 +150,7 @@ class BoardHome extends Component {
 
 
   render() {
-    const { history, HeaderStore } = this.props;
+    const { HeaderStore } = this.props;
     return (
       <Page
         className="c7nagile-board-page"
@@ -183,13 +187,10 @@ class BoardHome extends Component {
             >
               <Button
                 funcType="flat"
-                onClick={() => {
-                  const urlParams = AppState.currentMenuType;
-                  // history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&boardId=${BoardStore.getSelectedBoard}`);
-                }}
+                icon="settings"
+                onClick={this.handleSettingClick}
               >
-                <Icon type="settings icon" />
-                <span style={{ marginLeft: 0 }}>配置</span>
+                配置
               </Button>
             </div>
           </div>
@@ -224,7 +225,7 @@ class BoardHome extends Component {
 
           </Spin>
         </div>
-        <CreateFeatureContainer />
+        <CreateFeatureContainer onCreate={this.handleCreate} />
       </Page>
     );
   }

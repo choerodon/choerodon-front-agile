@@ -3,7 +3,8 @@ import { Select } from 'choerodon-ui';
 import { find } from 'lodash';
 import User from '../User';
 import { getUsers, getUser } from '../../api/CommonApi';
-import { loadEpics } from '../../api/NewIssueApi';
+import { loadEpics, loadProgramEpics, loadIssueTypes } from '../../api/NewIssueApi';
+import TypeTag from '../TypeTag';
 
 const { Option } = Select;
 
@@ -51,6 +52,50 @@ export default {
         value={epic.issueId}
       >
         {epic.epicName}
+      </Option>
+    ),
+  },
+  epic_program: {
+    props: {
+      filterOption:
+        (input, option) => option.props.children
+          && option.props.children.toLowerCase().indexOf(
+            input.toLowerCase(),
+          ) >= 0,
+    },
+    request: loadProgramEpics,
+    render: epic => (
+      <Option
+        key={epic.issueId}
+        value={epic.issueId}
+      >
+        {epic.epicName}
+      </Option>
+    ),
+  },  
+  issue_type_program: {
+    props: {
+      filterOption:
+        (input, option) => option.props.children
+          && option.props.children.toLowerCase().indexOf(
+            input.toLowerCase(),
+          ) >= 0,
+    },
+    request: () => new Promise(resolve => loadIssueTypes('program').then((issueTypes) => { 
+      const defaultType = find(issueTypes, { typeCode: 'feature' }).id; 
+      resolve(issueTypes, defaultType); 
+    })),
+    render: issueType => (
+      <Option
+        key={issueType.id}
+        value={issueType.id}
+      >
+        <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+          <TypeTag
+            data={issueType}
+            showName
+          />
+        </div>
       </Option>
     ),
   },

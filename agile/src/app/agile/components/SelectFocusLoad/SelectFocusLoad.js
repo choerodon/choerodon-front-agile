@@ -13,7 +13,8 @@ class SelectFocusLoad extends Component {
   }
 
   componentDidMount() {
-    this.avoidShowError();    
+    this.avoidShowError();   
+    this.loadData(); 
   }
   
   componentDidUpdate(prevProps, prevState) {
@@ -34,6 +35,30 @@ class SelectFocusLoad extends Component {
           this.setState({
             List: newList,
           });
+        }
+      });
+    }
+  }
+
+  loadData=() => {
+    const {
+      type, afterLoad, loadWhenMount, 
+    } = this.props;  
+    const Type = Types[type];
+    const {
+      request,   
+    } = Type;
+    if (loadWhenMount) {
+      this.setState({
+        loading: true,
+      });
+      request().then((Data) => {
+        this.setState({
+          List: Data,
+          loading: false,
+        });
+        if (afterLoad) {
+          afterLoad(Data);
         }
       });
     }

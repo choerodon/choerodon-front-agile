@@ -6,12 +6,12 @@ import {
 import { asyncRouter, nomatch } from 'choerodon-front-boot';
 
 const BoardHome = asyncRouter(() => (import('./BoardHome')));
-// const EditArt = asyncRouter(() => (import('./EditArt')));
-// const ArtCalendar = asyncRouter(() => (import('./ArtCalendar')));
+const BoardSetting = asyncRouter(() => (import('./BoardSetting')));
+
 const BoardIndex = ({ match }) => (
   <Switch>
     <Route exact path={`${match.url}`} component={BoardHome} />    
-    {/* <Route exact path={`${match.url}/calendar/:id?`} component={ArtCalendar} /> */}
+    <Route exact path={`${match.url}/setting`} component={BoardSetting} />
     <Route path="*" component={nomatch} />
   </Switch>
 );

@@ -444,7 +444,7 @@ class BoardStore {
       quickSearchArray: [],
       assigneeFilterIds: [],
     };
-    this.currentSprintExist = false;
+    this.currentSprintExist = true;
   }
 
   @computed get getDayRemain() {
@@ -616,7 +616,7 @@ class BoardStore {
 
   // eslint-disable-next-line consistent-return
   axiosGetBoardDataBySetting(boardId) {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}`);
+    return loadBoardData(boardId);
   }
 
   axiosGetBoardData(boardId) {
@@ -628,9 +628,9 @@ class BoardStore {
 
   axiosFilterBoardData(boardId, assign, recent) {
     if (assign === 0) {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?onlyStory=${recent}`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data_program/${AppState.currentMenuType.organizationId}?onlyStory=${recent}`);
     } else {
-      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data/${AppState.currentMenuType.organizationId}?assigneeId=${assign}&onlyStory=${recent}`);
+      return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/board/${boardId}/all_data_program/${AppState.currentMenuType.organizationId}?assigneeId=${assign}&onlyStory=${recent}`);
     }
   }
 

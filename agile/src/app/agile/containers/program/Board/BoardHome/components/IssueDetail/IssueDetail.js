@@ -22,7 +22,7 @@ class IssueDetail extends Component {
       <EditIssue
         store={BoardStore}
         onRef={this.onRef}
-        backUrl="scrumboard"
+        backUrl="board"
         style={{
           height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
           width: '440px',
