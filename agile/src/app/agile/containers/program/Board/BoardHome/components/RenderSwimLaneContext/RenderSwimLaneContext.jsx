@@ -27,6 +27,7 @@ class SwimLaneContext extends Component {
     const modeMap = new Map([
       ['swimlane_none', 'swimlaneContext-all'],
       ['assignee', `swimlaneContext-${issue.assigneeId || issue.type}`],
+      ['feature', `swimlaneContext-${issue.featureType}`],
       ['swimlane_epic', `swimlaneContext-${issue.epicId || issue.type}`],
       ['parent_child', `swimlaneContext-${issue.issueId || issue.type || 'other'}`],
     ]);
@@ -78,6 +79,7 @@ class SwimLaneContext extends Component {
     const retMap = new Map([
       ['parent_child', `parent_child-${key}`],
       ['assignee', `assignee-${key}`],
+      ['feature', `feature-${key}`],
       ['swimlane_none', 'swimlane_none-other'],
     ]);
     if (epicPrefix) {

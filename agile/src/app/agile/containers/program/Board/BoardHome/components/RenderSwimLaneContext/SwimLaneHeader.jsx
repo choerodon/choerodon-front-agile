@@ -16,11 +16,13 @@ export default class SwimLaneHeader extends Component {
     const switchMap = new Map([
       ['parent_child', this.renderStoryComponent],
       ['assignee', this.renderAssigneeComponent],
+      ['feature', this.renderFeatureComponent],
       ['swimlane_epic', this.renderEpicComponent],
     ]);
     const strMap = new Map([
       ['parent_child', '子任务'],
       ['assignee', '任务'],
+      ['feature', '问题'],
       ['swimlane_epic', '子任务'],
       ['swimlane_none', '子任务'],
     ]);
@@ -102,6 +104,14 @@ export default class SwimLaneHeader extends Component {
       <span>{assigneeName}</span>
     </React.Fragment>
   );
+
+  renderFeatureComponent=({ featureType }) => (
+    <React.Fragment>
+      <div>
+        {featureType === 'enabler' ? '使能' : '特性'}
+      </div>
+    </React.Fragment>
+  )
 
   renderEpicComponent = ({ epicName }) => (
     <span>{epicName}</span>

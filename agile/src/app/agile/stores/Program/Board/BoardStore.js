@@ -774,13 +774,13 @@ class BoardStore {
 
   axiosGetStateMachine = () => {
     const projectId = AppState.currentMenuType.id;
-    return axios.get(`/issue/v1/projects/${projectId}/schemes/query_transforms_map?apply_type=agile`);
+    return axios.get(`/issue/v1/projects/${projectId}/schemes/query_transforms_map?apply_type=program`);
   }
 
   axiosUpdateIssue(data) {
     const proId = AppState.currentMenuType.id;
     const { issueId, objectVersionNumber, transformId } = data;
-    return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=agile&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objectVersionNumber}`);
+    return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=program&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objectVersionNumber}`);
   }
 
   // 校验看板名称是否重复

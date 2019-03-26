@@ -13,6 +13,7 @@ export default class BoardDataController {
     this.flattenedArr = [];
     this.epicDataMap = [];
     this.assigneeDataMap = [];
+    this.featureDataMap = [];
     this.parentWithSubsDataMapCollection = {};
     this.columnStructureMap = new Map();
     this.statusStructureMap = new Map();
@@ -66,6 +67,8 @@ export default class BoardDataController {
     } = boardData;
     this.dataConvertToFlatten(boardData);
     this.epicDataMap = this.addEpicLabelToFlattenData(this.flattenedArr, epicInfo);   
+    this.assigneeDataMap = this.addAssigneeLabelToFlattenData(this.flattenedArr, []);
+    this.featureDataMap = this.addFeatureLabelToFlattenData(this.flattenedArr, []);
     this.parentWithSubsDataMapCollection = this.addParentIdsLabelToFlattenData(this.flattenedArr);
     this.dataReady = true;
   }
@@ -140,8 +143,26 @@ export default class BoardDataController {
     };
   }
 
+  addFeatureLabelToFlattenData(flattenedArr) {
+    const issueWithFeatureArr = ['enabler', 'business'].map(featureType => ({
+      featureType,      
+      subIssueData: flattenedArr.filter(issue => issue.featureType === featureType),
+    }));
+    const issueWithAssigneeMap = issueWithFeatureArr.map(featureTypeDTO => [featureTypeDTO.featureType, featureTypeDTO]);    
+   
+    return {
+      swimLaneData: this.swimLaneDataConstructor(issueWithFeatureArr, [], 'feature', 'featureType'),
+      interConnectedDataMap: issueWithAssigneeMap,
+      unInterConnectedDataMap: [],
+    };
+  }
+
   getAssigneeData = () => ({
     ...this.assigneeDataMap,
+  });
+
+  getFeatureData = () => ({
+    ...this.featureDataMap,
   });
 
   addParentIdsLabelToFlattenData(flattenedArr, parentWithSubs, parentIssues, parentCompleted, mode = 'parent_child') {

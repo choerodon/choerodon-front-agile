@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import {
-  CardTypeTag, IssueNum, StayDay, StatusName, Priority, Assignee, Summary,
-} from './CardComponent/index';
+  CardTypeTag, IssueNum, StatusName, Summary,
+} from './CardComponent';
 import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
 import './StatusIssue.scss';
 
@@ -88,8 +88,7 @@ export default class CardProvider extends Component {
                         }}
                       >
                         <CardTypeTag issueTypeDTO={issue.issueTypeDTO} />
-                        <IssueNum issueNum={issue.issueNum} completed={completed} />
-                        <StayDay stayDay={issue.stayDay} completed={completed} />
+                        <IssueNum issueNum={issue.issueNum} completed={completed} />                       
                       </div>
                       <div style={{
                         display: 'flex',
@@ -101,17 +100,9 @@ export default class CardProvider extends Component {
                         <StatusName
                           categoryCode={categoryCode}
                           statusName={statusName}
-                        />
-                        <Priority
-                          priorityDTO={issue.priorityDTO}
-                        />
+                        />                       
                       </div>
-                    </div>
-                    <Assignee
-                      assigneeName={issue.assigneeName}
-                      assigneeId={issue.assigneeId}
-                      imageUrl={issue.imageUrl}
-                    />
+                    </div>                   
                   </div>
                   <div className="c7n-scrumboard-issueBottom">
                     <Summary summary={issue.summary} />

@@ -76,12 +76,12 @@ class SwimLane extends Component {
   renderContext = (mode) => {
     switch (mode) {
       case 'assignee':
+      case 'feature':
       case 'parent_child':
-        return this.renderParentWithSub(mode);
-      case 'swimlane_epic':
-        return this.renderEpicLane(mode);
       case 'swimlane_none':
         return this.renderParentWithSub(mode);
+      case 'swimlane_epic':
+        return this.renderEpicLane(mode);      
       default:
         return null;
     }

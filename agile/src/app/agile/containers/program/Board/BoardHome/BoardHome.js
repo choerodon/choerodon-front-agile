@@ -7,15 +7,31 @@ import {
 import {
   Button, Select, Spin, message, Icon, Modal, Input, Form, Tooltip,
 } from 'choerodon-ui';
-import { StatusColumn, NoneSprint, CreateFeatureContainer } from './components';
+import {
+  StatusColumn, NoneSprint, CreateFeatureContainer, IssueDetail,
+} from './components';
 import SwimLane from './components/RenderSwimLaneContext/SwimLane';
 import BoardDataController from './BoardDataController';
 import QuickSearch from '../../../../components/QuickSearch';
-
+import CSSBlackMagic from '../../../../components/CSSBlackMagic/CSSBlackMagic';
 import BoardStore from '../../../../stores/Program/Board/BoardStore';
 import './BoardHome.scss';
 
 const { AppState } = stores;
+const style = swimLaneId => `
+  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn {
+    background-color: rgba(140, 158, 255, 0.12) !important;
+  }
+  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus >  .c7n-swimlaneContext-itemBodyStatus-container {
+    border-width: 2px;
+    border-style: dashed;
+    border-color: #26348b;
+  }
+  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus > .c7n-swimlaneContext-itemBodyStatus-container > .c7n-swimlaneContext-itemBodyStatus-container-statusName {
+      visibility: visible !important;
+  } 
+`;
+@CSSBlackMagic
 @inject('AppState', 'HeaderStore')
 @observer
 class BoardHome extends Component {
@@ -35,7 +51,7 @@ class BoardHome extends Component {
 
   async getBoard() {
     const { location } = this.props;
-    
+
     const boardListData = await BoardStore.axiosGetBoardList();
     const defaultBoard = boardListData.find(item => item.userDefault) || boardListData[0];
     if (defaultBoard.boardId) {
@@ -43,18 +59,79 @@ class BoardHome extends Component {
     }
   }
 
-  handleCreateFeatureClick=() => {
+  handleCreateFeatureClick = () => {
     BoardStore.setCreateFeatureVisible(true);
   }
 
+  onDragStart = (result) => {
+    const { headerStyle } = this.props;
+    const { draggableId } = result;
+    const [SwimLaneId, issueId] = draggableId.split(['/']);
+    headerStyle.changeStyle(style(SwimLaneId));
+    BoardStore.setIsDragging(true);
+  };
+
+  onDragEnd = (result) => {
+    const { headerStyle } = this.props;
+    const { destination, source, draggableId } = result;
+    const [SwimLaneId, issueId] = draggableId.split(['/']);
+    const allDataMap = BoardStore.getAllDataMap;
+    BoardStore.resetCanDragOn();
+    BoardStore.setIsDragging(true);
+    headerStyle.unMountStyle();
+    if (!destination) {
+      return;
+    }
+
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+      return;
+    }
+
+    const [startStatus, startColumn] = source.droppableId.split(['/']).map(id => parseInt(id, 10));
+    const startStatusIndex = source.index;
+
+    const [destinationStatus, destinationColumn] = destination.droppableId.split(['/']).map(id => parseInt(id, 10));
+    const destinationStatusIndex = destination.index;
+
+    const issue = {
+      ...allDataMap.get(+issueId),
+      stayDay: 0,
+    };
+
+    const [type, parentId] = SwimLaneId.split('-');
+
+    BoardStore.updateIssue(issue, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId).then((data) => {
+      if (data.failed) {
+        Choerodon.prompt(data.message);
+        BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, true);
+      } else {
+        if (BoardStore.getSwimLaneCode === 'parent_child' && parentId !== 'other') {
+          BoardStore.judgeMoveParentToDone(destinationStatus, SwimLaneId, +parentId, BoardStore.getStatusMap.get(destinationStatus).categoryCode === 'done');
+        }
+        if (data.issueId === BoardStore.getCurrentClickId) {
+          BoardStore.getEditRef.reloadIssue();
+        }
+        if (startColumn !== destinationColumn) {
+          BoardStore.resetHeaderData(startColumn, destinationColumn, issue.issueTypeDTO.typeCode);
+        }
+        BoardStore.rewriteObjNumber(data, issueId, issue);
+      }
+    });
+    BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, false);
+  };
+
   refresh(defaultBoard, url, boardListData) {
+    defaultBoard.userDefaultBoard = 'feature',
+  
     BoardStore.setSpinIf(true);
-    Promise.all([BoardStore.axiosGetBoardData(defaultBoard.boardId), BoardStore.axiosGetAllEpicData()]).then(([defaultBoardData, epicData]) => {
+    Promise.all([BoardStore.axiosGetIssueTypes(), BoardStore.axiosGetStateMachine(), BoardStore.axiosGetBoardData(defaultBoard.boardId), BoardStore.axiosGetAllEpicData()]).then(([issueTypes, stateMachineMap, defaultBoardData, epicData]) => {
       this.dataConverter.setSourceData(epicData, defaultBoardData);
       const renderDataMap = new Map([
+
         ['parent_child', this.dataConverter.getParentWithSubData],
         ['swimlane_epic', this.dataConverter.getEpicData],
         ['assignee', this.dataConverter.getAssigneeData],
+        ['feature', this.dataConverter.getFeatureData],
         ['swimlane_none', this.dataConverter.getAllData],
       ]);
       const renderData = renderDataMap.get(defaultBoard.userDefaultBoard)();
@@ -64,7 +141,7 @@ class BoardHome extends Component {
       const mapStructure = this.dataConverter.getMapStructure();
       const allDataMap = this.dataConverter.getAllDataMap(defaultBoard.userDefaultBoard);
       const headerData = this.dataConverter.getHeaderData();
-      BoardStore.scrumBoardInit(AppState, url, boardListData, defaultBoard, defaultBoardData, null, [], [], canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData);
+      BoardStore.scrumBoardInit(AppState, url, boardListData, defaultBoard, defaultBoardData, null, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData);
     });
   }
 
@@ -73,15 +150,15 @@ class BoardHome extends Component {
     const { history, HeaderStore } = this.props;
     return (
       <Page
-        className="c7nagile-board-page"        
+        className="c7nagile-board-page"
       >
         <Header title="项目群看板">
           <Button
             funcType="flat"
             icon="playlist_add"
             onClick={this.handleCreateFeatureClick}
-          >           
-          创建特性
+          >
+            创建特性
           </Button>
           <Button
             className="leftBtn2"
@@ -90,8 +167,8 @@ class BoardHome extends Component {
             onClick={() => {
               this.refresh(BoardStore.getBoardList.get(BoardStore.getSelectedBoard));
             }}
-          >           
-         刷新
+          >
+            刷新
           </Button>
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
@@ -109,7 +186,7 @@ class BoardHome extends Component {
                 funcType="flat"
                 onClick={() => {
                   const urlParams = AppState.currentMenuType;
-                  // history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&boardId=${ScrumBoardStore.getSelectedBoard}`);
+                  // history.push(`/agile/scrumboard/setting?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&boardId=${BoardStore.getSelectedBoard}`);
                 }}
               >
                 <Icon type="settings icon" />
@@ -141,12 +218,12 @@ class BoardHome extends Component {
                   </div>
                 )}
               </div>
-              {/* <IssueDetail
+              <IssueDetail
                 refresh={this.refresh.bind(this)}
-              /> */}
+              />
             </div>
-            
-          </Spin>   
+
+          </Spin>
         </div>
         <CreateFeatureContainer />
       </Page>
