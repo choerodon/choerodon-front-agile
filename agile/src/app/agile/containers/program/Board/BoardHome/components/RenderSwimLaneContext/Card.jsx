@@ -32,6 +32,9 @@ export default class CardProvider extends Component {
     const {
       completed, issue, index, draggableId, statusName, categoryCode, onClick, clicked, ...otherProps
     } = this.props;
+    const {
+      featureType, issueId, issueNum, issueTypeDTO,
+    } = issue;
     return (
       <Draggable draggableId={draggableId} index={index} key={draggableId}>
         {(provided) => {
@@ -47,7 +50,7 @@ export default class CardProvider extends Component {
           })();
           return (
             <div
-              key={issue.issueId}
+              key={issueId}
               role="none"
               className="c7n-swimlaneContext-itemBodyCard"
               ref={provided.innerRef}
@@ -87,8 +90,8 @@ export default class CardProvider extends Component {
                           marginBottom: 4,
                         }}
                       >
-                        <CardTypeTag issueTypeDTO={issue.issueTypeDTO} />
-                        <IssueNum issueNum={issue.issueNum} completed={completed} />                       
+                        <CardTypeTag issueTypeDTO={{ ...issueTypeDTO, colour: featureType === 'enabler' ? '#FFCA28' : '#29B6F6' }} />
+                        <IssueNum issueNum={issueNum} completed={completed} />
                       </div>
                       <div style={{
                         display: 'flex',
@@ -100,9 +103,9 @@ export default class CardProvider extends Component {
                         <StatusName
                           categoryCode={categoryCode}
                           statusName={statusName}
-                        />                       
+                        />
                       </div>
-                    </div>                   
+                    </div>
                   </div>
                   <div className="c7n-scrumboard-issueBottom">
                     <Summary summary={issue.summary} />

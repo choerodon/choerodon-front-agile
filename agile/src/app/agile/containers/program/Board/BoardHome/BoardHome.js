@@ -100,34 +100,33 @@ class BoardHome extends Component {
 
     const [type, parentId] = SwimLaneId.split('-');
 
-    BoardStore.updateIssue(issue, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId).then((data) => {
-      if (data.failed) {
-        Choerodon.prompt(data.message);
-        BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, true);
-      } else {
-        if (BoardStore.getSwimLaneCode === 'parent_child' && parentId !== 'other') {
-          BoardStore.judgeMoveParentToDone(destinationStatus, SwimLaneId, +parentId, BoardStore.getStatusMap.get(destinationStatus).categoryCode === 'done');
-        }
-        if (data.issueId === BoardStore.getCurrentClickId) {
-          BoardStore.getEditRef.reloadIssue();
-        }
-        if (startColumn !== destinationColumn) {
-          BoardStore.resetHeaderData(startColumn, destinationColumn, issue.issueTypeDTO.typeCode);
-        }
-        BoardStore.rewriteObjNumber(data, issueId, issue);
-      }
-    });
+    // BoardStore.updateIssue(issue, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId).then((data) => {
+    //   if (data.failed) {
+    //     Choerodon.prompt(data.message);
+    //     BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, true);
+    //   } else {
+    //     if (BoardStore.getSwimLaneCode === 'parent_child' && parentId !== 'other') {
+    //       BoardStore.judgeMoveParentToDone(destinationStatus, SwimLaneId, +parentId, BoardStore.getStatusMap.get(destinationStatus).categoryCode === 'done');
+    //     }
+    //     if (data.issueId === BoardStore.getCurrentClickId) {
+    //       BoardStore.getEditRef.reloadIssue();
+    //     }
+    //     if (startColumn !== destinationColumn) {
+    //       BoardStore.resetHeaderData(startColumn, destinationColumn, issue.issueTypeDTO.typeCode);
+    //     }
+    //     BoardStore.rewriteObjNumber(data, issueId, issue);
+    //   }
+    // });
     BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, false);
   };
 
   refresh(defaultBoard, url, boardListData) {
-    defaultBoard.userDefaultBoard = 'feature',
+    defaultBoard.userDefaultBoard = 'feature';
   
     BoardStore.setSpinIf(true);
     Promise.all([BoardStore.axiosGetIssueTypes(), BoardStore.axiosGetStateMachine(), BoardStore.axiosGetBoardData(defaultBoard.boardId), BoardStore.axiosGetAllEpicData()]).then(([issueTypes, stateMachineMap, defaultBoardData, epicData]) => {
       this.dataConverter.setSourceData(epicData, defaultBoardData);
       const renderDataMap = new Map([
-
         ['parent_child', this.dataConverter.getParentWithSubData],
         ['swimlane_epic', this.dataConverter.getEpicData],
         ['assignee', this.dataConverter.getAssigneeData],

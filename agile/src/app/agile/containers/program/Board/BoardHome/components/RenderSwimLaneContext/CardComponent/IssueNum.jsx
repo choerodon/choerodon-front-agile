@@ -7,7 +7,7 @@ import React, { Component } from 'react';
  * @param completed
  */
 export default class IssueNum extends Component {
-  shouldComponentUpdate(nextProps, nextState, nextContext) {
+  shouldComponentUpdate(nextProps) {
     const { issueNum, completed } = this.props;
     return nextProps.issueNum !== issueNum || nextProps.completed !== completed;
   }
@@ -15,12 +15,12 @@ export default class IssueNum extends Component {
   render() {
     const { issueNum, completed } = this.props;
     return (
-      <p
+      <div
         style={{ marginLeft: 5, textDecoration: completed ? 'line-through' : '' }}
         className="textDisplayOneColumn"
       >
         {issueNum}
-      </p>
+      </div>
     );
   }
 }

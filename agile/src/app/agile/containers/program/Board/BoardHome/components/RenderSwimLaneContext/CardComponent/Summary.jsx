@@ -7,7 +7,7 @@ import { Tooltip } from 'choerodon-ui';
  * @param summary
  */
 export default class Summary extends Component {
-  shouldComponentUpdate(nextProps, nextState, nextContext) {
+  shouldComponentUpdate(nextProps) {
     const { summary } = this.props;
     return nextProps.summary !== summary;
   }
@@ -16,9 +16,9 @@ export default class Summary extends Component {
     const { summary } = this.props;
     return (
       <Tooltip title={summary} placement="topLeft">
-        <p className="textDisplayTwoColumn">
+        <div className="textDisplayOneColumn">
           {summary}
-        </p>
+        </div>
       </Tooltip>
     );
   }

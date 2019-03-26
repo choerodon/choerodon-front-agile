@@ -144,7 +144,7 @@ export default class BoardDataController {
   }
 
   addFeatureLabelToFlattenData(flattenedArr) {
-    const issueWithFeatureArr = ['enabler', 'business'].map(featureType => ({
+    const issueWithFeatureArr = ['business', 'enabler'].map(featureType => ({
       featureType,      
       subIssueData: flattenedArr.filter(issue => issue.featureType === featureType),
     }));
