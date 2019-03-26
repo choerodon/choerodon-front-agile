@@ -727,7 +727,9 @@ class BacklogStore {
     return this.selectedIssueId;
   }
 
-  @action createIssue(issue, sprintId) {
+  @action createIssue(issue, sprintId, { backlogData, sprintData }) {
+    this.backlogData = backlogData;
+    this.sprintData = sprintData;
     this.clickIssueDetail = issue;
     if (this.clickIssueDetail) {
       this.clickIssueId = issue.issueId;

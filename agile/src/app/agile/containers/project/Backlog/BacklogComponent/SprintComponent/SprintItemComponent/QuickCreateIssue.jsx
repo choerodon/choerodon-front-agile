@@ -46,7 +46,9 @@ const FormItem = Form.Item;
   };
 
   render() {
-    const { issueType, form, backlog } = this.props;
+    const {
+      issueType, form, backlog, defaultType,
+    } = this.props;
     const { getFieldDecorator } = form;
     const { expand, currentType, loading } = this.state;
     const typeList = (
@@ -91,7 +93,7 @@ const FormItem = Form.Item;
                     <Dropdown overlay={typeList} trigger={['click']} getPopupContainer={trigger => trigger.parentNode}>
                       <div style={{ display: 'flex', alignItem: 'center' }}>
                         <TypeTag
-                          data={currentType}
+                          data={currentType || defaultType}
                         />
                         <Icon
                           type="arrow_drop_down"
