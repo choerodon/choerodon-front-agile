@@ -60,23 +60,25 @@ class AddColumn extends Component {
       const data = ScrumBoardStore.getStatusCategory.lookupValues;
       data.sort();
       for (let index = 0, len = data.length; index < len; index += 1) {
-        result.push(
-          <Option value={data[index].valueCode}>
-            <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-              <div style={{
-                width: 15,
-                height: 15,
-                borderRadius: 2,
-                marginRight: 5,
-                background: STATUS[data[index].valueCode] || 'rgb(255, 177, 0)',
-              }}
-              />
-              <span>
-                {` ${data[index].name}`}
-              </span>
-            </div>
-          </Option>,
-        );
+        if (data[index].valueCode !== 'prepare') {
+          result.push(
+            <Option value={data[index].valueCode}>
+              <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                <div style={{
+                  width: 15,
+                  height: 15,
+                  borderRadius: 2,
+                  marginRight: 5,
+                  background: STATUS[data[index].valueCode] || 'rgb(255, 177, 0)',
+                }}
+                />
+                <span>
+                  {` ${data[index].name}`}
+                </span>
+              </div>
+            </Option>,
+          );
+        }
       }
     }
     return result;

@@ -12,7 +12,7 @@ import { ArtInfo, ArtSetting, ReleaseArt } from '../../Art/EditArt/components';
 import QuickSearch from '../../../../components/QuickSearch';
 import Injecter from '../../../../components/Injecter';
 import CreateIssue from '../../../../components/CreateIssueNew';
-import FeatureDetail from "../FeatureDetail/FeatureDetail";
+import FeatureDetail from '../FeatureDetail/FeatureDetail';
 import FeatureStore from '../../../../stores/Program/PI/FeatureStore';
 
 @observer
@@ -27,7 +27,7 @@ class FeatureList extends Component {
   componentDidMount() {
     Promise.all(FeatureStore.getCurrentEpicList(), FeatureStore.getFeatureListData())
       .then((featureList, epicList) => {
-      })
+      });
   }
 
   handleCreateFeatureBtnClick = () => {
@@ -65,7 +65,7 @@ class FeatureList extends Component {
             <div className="backlogTools" style={{ paddingLeft: 24 }}>
               <QuickSearch
                 onQuickSearchChange={this.onQuickSearchChange}
-                resetFilter={BacklogStore.getQuickSearchClean}
+                // resetFilter={BacklogStore.getQuickSearchClean}
                 onAssigneeChange={this.onAssigneeChange}
               />
             </div>
@@ -88,18 +88,18 @@ class FeatureList extends Component {
               </div>
               <div className="c7n-backlog-content">
                 <div style={{ display: 'flex', flexGrow: 1 }}>
-                  {/*<Epic*/}
-                    {/*store={BacklogStore}*/}
-                    {/*onRef={(ref) => {*/}
-                      {/*this.epicRef = ref;*/}
-                    {/*}}*/}
-                    {/*refresh={this.refresh}*/}
-                    {/*visible={epicVisible}*/}
-                    {/*changeVisible={this.changeState}*/}
-                    {/*issueRefresh={() => {*/}
-                      {/*this.IssueDetail.refreshIssueDetail();*/}
-                    {/*}}*/}
-                  {/*/>*/}
+                  {/* <Epic */}
+                  {/* store={BacklogStore} */}
+                  {/* onRef={(ref) => { */}
+                  {/* this.epicRef = ref; */}
+                  {/* }} */}
+                  {/* refresh={this.refresh} */}
+                  {/* visible={epicVisible} */}
+                  {/* changeVisible={this.changeState} */}
+                  {/* issueRefresh={() => { */}
+                  {/* this.IssueDetail.refreshIssueDetail(); */}
+                  {/* }} */}
+                  {/* /> */}
                   <DragDropContext
                     onDragEnd={(result) => {
 
@@ -113,33 +113,33 @@ class FeatureList extends Component {
                       className="c7n-backlog-sprint"
                     >
                       <Spin spinning={FeatureStore.getSpinIf}>
-                        {/*<SprintItem*/}
-                          {/*store={BacklogStore}*/}
-                          {/*loading={spinIf}*/}
-                          {/*epicVisible={epicVisible}*/}
-                          {/*versionVisible={versionVisible}*/}
-                          {/*onRef={(ref) => {*/}
-                            {/*this.sprintItemRef = ref;*/}
-                          {/*}}*/}
-                          {/*refresh={this.refresh}*/}
-                        {/*/>*/}
+                        {/* <SprintItem */}
+                        {/* store={BacklogStore} */}
+                        {/* loading={spinIf} */}
+                        {/* epicVisible={epicVisible} */}
+                        {/* versionVisible={versionVisible} */}
+                        {/* onRef={(ref) => { */}
+                        {/* this.sprintItemRef = ref; */}
+                        {/* }} */}
+                        {/* refresh={this.refresh} */}
+                        {/* /> */}
                       </Spin>
                     </div>
                   </DragDropContext>
                 </div>
-                <FeatureDetail
+                {/* <FeatureDetail
                   visible={JSON.stringify(FeatureStore.getClickIssueDetail) !== '{}'}
                   refresh={this.refresh}
                   onRef={(ref) => {
                     this.IssueDetail = ref;
                   }}
                   cancelCallback={this.resetSprintChose}
-                />
+                /> */}
                 <CreateIssue
-                  visible={visible}
-                  onCancel={() => {
-                    BacklogStore.setNewIssueVisible(false);
-                  }}
+                  // visible={visible}
+                  // onCancel={() => {
+                  //   BacklogStore.setNewIssueVisible(false);
+                  // }}
                   onOk={this.handleCreateIssue}
                 />
               </div>

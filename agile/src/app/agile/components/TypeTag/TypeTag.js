@@ -18,32 +18,6 @@ class TypeTag extends Component {
           }}
           type={data ? data.icon : 'help'}
         />
-        {/* {initTypes.indexOf(data ? data.icon : '') !== -1 */}
-        {/* ? ( */}
-        {/* <Icon */}
-        {/* style={{ */}
-        {/* fontSize: '26px', */}
-        {/* color: data ? data.colour : '#fab614', */}
-        {/* }} */}
-        {/* type={data ? data.icon : 'help'} */}
-        {/* /> */}
-        {/* ) */}
-        {/* : ( */}
-        {/* <div */}
-        {/* className="icon-wapper" */}
-        {/* style={{ */}
-        {/* backgroundColor: data ? data.colour : '#fab614', */}
-        {/* padding: '2px', */}
-        {/* margin: '3px', */}
-        {/* }} */}
-        {/* > */}
-        {/* <Icon */}
-        {/* style={{ fontSize: '16px' }} */}
-        {/* type={data ? data.icon : 'help'} */}
-        {/* /> */}
-        {/* </div> */}
-        {/* ) */}
-        {/* } */}
         {
           showName && (
             <span className="name">{data ? data.name : ''}</span>

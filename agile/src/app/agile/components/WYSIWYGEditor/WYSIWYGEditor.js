@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button } from 'choerodon-ui';
+import PropTypes from 'prop-types';
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ImageDrop from './ImageDrop';
@@ -7,43 +8,68 @@ import './WYSIWYGEditor.scss';
 import cls from '../CommonComponent/ClickOutSide';
 
 Quill.register('modules/imageDrop', ImageDrop);
+const modules = {
+  toolbar: [
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['image'],
+    [{ color: [] }],
+  ],
+  imageDrop: true,
+};
 
+const formats = [
+  'bold',
+  'italic',
+  'underline',
+  'strike',
+  'blockquote',
+  'list',
+  'bullet',
+  'image',
+  'color',
+];
+
+const defaultStyle = {
+  width: 498,
+  height: 200,
+  borderRight: 'none',
+};
+const defaultProps = {
+
+};
+
+const propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  value: PropTypes.any,  
+  placeholder: PropTypes.string,      
+  toolbarHeight: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
+  style: PropTypes.shape({}),
+  bottomBar: PropTypes.bool,
+  onChange: PropTypes.func,
+  handleDelete: PropTypes.func,
+  handleSave: PropTypes.func,
+  saveRef: PropTypes.func,
+};
 class WYSIWYGEditor extends Component {
-  modules = {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      ['image'],
-      [{ color: [] }],
-      // ['clean'],
-    ],
-    imageDrop: true,
-  };
-
-  formats = [
-    'bold',
-    'italic',
-    'underline',
-    'strike',
-    'blockquote',
-    'list',
-    'bullet',
-    'image',
-    'color',
-  ];
-
-  defaultStyle = {
-    width: 498,
-    height: 200,
-    borderRight: 'none',
-  };
-
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
+      value: props.value || '',
     };
-    this.handleChange = this.handleChange.bind(this);
+  }
+
+  static getDerivedStateFromProps(nextProps) {
+    if ('value' in nextProps) {
+      return {
+        value: nextProps.value,   
+      };
+    }
+    return null;
   }
 
   isHasImg = (delta) => {
@@ -71,7 +97,7 @@ class WYSIWYGEditor extends Component {
     onChange(undefined);
   };
 
-  handleClickOutside = (evt) => {
+  handleClickOutside = () => {
     const { handleClickOutSide } = this.props;
     if (handleClickOutSide) {
       handleClickOutSide();
@@ -80,8 +106,7 @@ class WYSIWYGEditor extends Component {
 
   render() {
     const {
-      placeholder,
-      value,
+      placeholder,      
       toolbarHeight,
       style,
       bottomBar,
@@ -89,8 +114,8 @@ class WYSIWYGEditor extends Component {
       handleSave,
       saveRef,
     } = this.props;
-    const { loading } = this.state;
-    const newStyle = { ...this.defaultStyle, ...style };
+    const { loading, value } = this.state;
+    const newStyle = { ...defaultStyle, ...style };
     const editHeight = newStyle.height - (toolbarHeight || 42);
     return (
       <div style={{ width: '100%' }}>
@@ -98,8 +123,8 @@ class WYSIWYGEditor extends Component {
           <ReactQuill
             ref={saveRef} 
             theme="snow"
-            modules={this.modules}
-            formats={this.formats}
+            modules={modules}
+            formats={formats}
             style={{ height: editHeight }}
             placeholder={placeholder || '描述'}
             defaultValue={value}
@@ -143,5 +168,6 @@ class WYSIWYGEditor extends Component {
     );
   }
 }
-
+WYSIWYGEditor.defaultProps = defaultProps;
+WYSIWYGEditor.propTypes = propTypes;
 export default cls(WYSIWYGEditor);
