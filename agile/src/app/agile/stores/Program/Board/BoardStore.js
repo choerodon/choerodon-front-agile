@@ -22,6 +22,8 @@ class BoardStore {
 
   @observable currentSprintExist = true;
 
+  @observable activePi = null;
+
   @observable prevClick = {};
 
   @observable currentDrag = null;
@@ -657,16 +659,16 @@ class BoardStore {
 
     if (destinationStatusIndex !== 0) {
       // 从另一个列拖过来传，目标位置-1的id
-      if (startStatus !== destinationStatus) {        
+      if (startStatus !== destinationStatus) {
         outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId;
         // 从同一列的前面拖过来传，目标位置的id
       } else if (startStatusIndex < destinationStatusIndex) {
-        outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex].issueId;         
+        outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex].issueId;
         // 从同一列的后面拖过来传，目标位置-1的id
       } else if (startStatusIndex > destinationStatusIndex) {
-        outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId;         
+        outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId;
       }
-    } 
+    }
     // debugger;
     const data = {
       issueId,
@@ -678,7 +680,7 @@ class BoardStore {
       before: destinationStatusIndex === 0,
       outsetIssueId,
       piId, // 从准备拖到其他或从其他拖到其他传piId,其他情况传0，没有活跃也传0
-      rank,     
+      rank,
       piChange,
     };
     const { id: transformId } = this.stateMachineMap[issueTypeId] ? this.stateMachineMap[issueTypeId][startStatus].find(issue => issue.endStatusId === parseInt(destinationStatus, 10)) : this.stateMachineMap[0][startStatus].find(issue => issue.endStatusId === parseInt(destinationStatus, 10));
