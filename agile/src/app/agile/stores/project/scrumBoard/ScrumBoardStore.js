@@ -426,7 +426,10 @@ class ScrumBoardStore {
     }
     this.currentClickTarget = null;
     this.currentClick = parentIssueId;
-    this.clickIssueDetail = this.allDataMap.get(parentIssueId);
+    if (this.allDataMap.get(parentIssueId)) {
+      this.clickIssueDetail = this.allDataMap.get(parentIssueId);
+    }
+    // this.clickIssueDetail = this.allDataMap.get(parentIssueId);
   }
 
   @action resetDataBeforeUnmount() {
