@@ -17,7 +17,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const BV = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 @observer
-class CreatePI extends Component {
+class CreatePIAims extends Component {
   handleCheckboxChange = (e) => {
     PIStore.setCreateStretch(e.target.checked);
   }
@@ -30,7 +30,7 @@ class CreatePI extends Component {
         if (page === 'PIList') {
           PIStore.setPIListLoading(true);
         } else {
-          PIStore.setPIDetailLoading(true);
+          PIStore.setPIAimsLoading(true);
         }
         const piObjectiveDTO = {
           levelCode: 'program',
@@ -62,7 +62,7 @@ class CreatePI extends Component {
             if (page === 'PIList') {
               PIStore.setPIListLoading(false);
             } else {
-              PIStore.setPIDetailLoading(false);
+              PIStore.setPIAimsLoading(false);
             }
             form.resetFields();
             PIStore.setCreatePIVisible(false);
@@ -111,7 +111,7 @@ class CreatePI extends Component {
                       key={pi.id}
                       value={pi.id}
                     >
-                      {pi.name}
+                      {`${pi.code}-${pi.name}`}
                     </Option>
                   ),
                 )}
@@ -155,4 +155,4 @@ class CreatePI extends Component {
   }
 }
 
-export default Form.create()(CreatePI);
+export default Form.create()(CreatePIAims);

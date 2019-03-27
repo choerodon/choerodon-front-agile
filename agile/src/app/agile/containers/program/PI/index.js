@@ -5,12 +5,10 @@ import {
 } from 'react-router-dom';
 import { asyncRouter, nomatch } from 'choerodon-front-boot';
 
-const PIList = asyncRouter(() => (import('./PIList')));
-const PIDetail = asyncRouter(() => (import('./PIDetail')));
+const PIAims = asyncRouter(() => (import('./PIAims')));
 const FeatureIndex = ({ match }) => (
   <Switch>
-    <Route exact path={`${match.url}`} component={PIList} />
-    <Route exact path={`${match.url}/detail/:id`} component={PIDetail} />
+    <Route exact path={`${match.url}`} component={PIAims} />
     <Route path="*" component={nomatch} />
   </Switch>
 );

@@ -21,14 +21,14 @@ class PIStore {
       this.PIListLoading = data;
     }
 
-    @observable PIDetailLoading = false;
+    @observable PIAimsLoading = false;
 
-    @computed get getPIDetailLoading() {
-      return toJS(this.PIDetailLoading);
+    @computed get getPIAimsLoading() {
+      return toJS(this.PIAimsLoading);
     }
 
-    @action setPIDetailLoading(data) {
-      this.PIDetailLoading = data;
+    @action setPIAimsLoading(data) {
+      this.PIAimsLoading = data;
     }
 
     @observable PiList = [];
@@ -39,9 +39,6 @@ class PIStore {
 
     @action setPiList(data) {
       this.PiList = data;
-      if (window.sessionStorage) {
-        sessionStorage.PiList = JSON.stringify(data);
-      }
     }
 
     @observable PiAims = {}

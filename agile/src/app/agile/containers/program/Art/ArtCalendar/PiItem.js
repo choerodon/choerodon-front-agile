@@ -93,7 +93,7 @@ const CardBody = () => (
   <div>
     <Progress percent={50} strokeColor="#4D90FE" />
     <div style={{ margin: '10px 0' }}>
-      故事点:68 / 120
+      {'故事点:68 / 120'}
     </div>
   </div>
 );
@@ -104,7 +104,7 @@ class PiItem extends Component {
       startDate, endDate, code, name, statusCode, sprintCalendarDOList, isLast,
     } = pi;
     const flex = moment.range(startDate, endDate).diff('days');
-    const ipWorkdays = sprintCalendarDOList && sprintCalendarDOList.length > 0 ? moment.range(sprintCalendarDOList[sprintCalendarDOList.length - 1].endDate, endDate).diff('days') : 0;
+    const ipWeeks = sprintCalendarDOList && sprintCalendarDOList.length > 0 ? moment.range(sprintCalendarDOList[sprintCalendarDOList.length - 1].endDate, endDate).diff('days') : 0;
 
     const style = STATUS[statusCode];
     return (
@@ -133,10 +133,13 @@ class PiItem extends Component {
             {sprintCalendarDOList.map(sprint => (
               <SprintItem borderColor={style.sprintBorder} sprint={sprint} />
             ))}
-            <div className="PiItem-pi-sprint" style={{ flex: ipWorkdays, borderColor: style.sprintBorder }}>
+            <div className="PiItem-pi-sprint" style={{ flex: ipWeeks, borderColor: style.sprintBorder }}>
               <div style={{ padding: '0 10px' }}>
+
+
+
                 IP
-              </div>
+</div>
             </div>
           </div>
         </div>

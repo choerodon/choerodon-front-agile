@@ -6,7 +6,6 @@ import {
 import {
   stores, Page, Header, Content,  
 } from 'choerodon-front-boot';
-import { values } from 'mobx';
 import PIStore from '../../../../stores/Program/PI/PIStore';
 import {
   createPIAims, getPIList, getPIAims, upDatePIAmix, 
@@ -22,7 +21,7 @@ const BV = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 class EditPI extends Component {
   handleOnOk = () => {
     const { editingPiAimsInfo, form } = this.props;
-    PIStore.setPIDetailLoading(true);
+    PIStore.setPIAimsLoading(true);
     form.validateFields((err, values) => {
       if (!err) {
         const piObjectiveDTO = {
@@ -47,13 +46,13 @@ class EditPI extends Component {
                 editingIndex: index,  
               }
             )));
-            PIStore.setPIDetailLoading(false);
+            PIStore.setPIAimsLoading(false);
             PIStore.setEditPIVisible(false);
           });
           Choerodon.prompt('修改成功');
           form.resetFields();
         }).catch(() => {
-          PIStore.setPIDetailLoading(false);
+          PIStore.setPIAimsLoading(false);
           Choerodon.prompt('修改失败');
         });
       }
