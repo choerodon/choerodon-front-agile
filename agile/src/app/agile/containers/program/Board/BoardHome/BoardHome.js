@@ -31,6 +31,19 @@ const style = swimLaneId => `
       visibility: visible !important;
   } 
 `;
+const cannotDrop = swimLaneId => `
+  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn {
+    background-color: rgba(140, 158, 255, 0.12) !important;
+  }
+  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus >  .c7n-swimlaneContext-itemBodyStatus-container {
+    border-width: 2px;
+    border-style: dashed;
+    border-color: #26348b;
+  }
+  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus > .c7n-swimlaneContext-itemBodyStatus-container > .c7n-swimlaneContext-itemBodyStatus-container-statusName {
+      visibility: visible !important;
+  } 
+`;
 @CSSBlackMagic
 @inject('AppState', 'HeaderStore')
 @observer
@@ -102,18 +115,19 @@ class BoardHome extends Component {
     };
     // BoardStore.getSwimLaneData
     const destinationColumnData = find(toJS(BoardStore.getMapStructure.columnStructure), { columnId: destinationColumn });
+    const { categoryCode: destinationColumnStatusCode } = destinationColumnData;
     const destinationSwimLineData = toJS(BoardStore.getSwimLaneData[SwimLaneId][destinationStatus]);
     const activePi = toJS(BoardStore.activePi);
-    console.log(destinationSwimLineData, destinationColumnData, activePi.id);
-    const rank = destinationStatusCode !== 'prepare';
+    console.log(destinationSwimLineData, destinationColumnData, activePi);
+    const rank = destinationColumnStatusCode !== 'prepare';
     let piId;
 
-    if (destinationStatusCode === 'prepare' && startStatusCode === 'prepare') {
+    if (destinationColumnStatusCode === 'prepare' && destinationColumnStatusCode === 'prepare') {
       piId = undefined;
     } else if (destinationSwimLineData.length > 0) {
       piId = destinationSwimLineData[0].piId;
     } else {
-      piId = activePi.id;
+      piId = activePi ? activePi.id : undefined;
     }
 
     const [type, parentId] = SwimLaneId.split('-');
@@ -194,11 +208,7 @@ class BoardHome extends Component {
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div className="c7n-scrumTools">
-            <QuickSearch
-              // onQuickSearchChange={this.onQuickSearchChange}
-              // onAssigneeChange={this.onAssigneeChange}
-              style={{ height: 32 }}
-            />
+            <div />
             <div
               className="c7n-scrumTools-right"
               style={{ display: 'flex', alignItems: 'center', color: 'rgba(0,0,0,0.54)' }}

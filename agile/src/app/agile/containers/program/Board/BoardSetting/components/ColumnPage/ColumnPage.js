@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Content, stores, Permission } from 'choerodon-front-boot';
-import {
-  Button, Select, Icon, message,
-} from 'choerodon-ui';
-import _ from 'lodash';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Button, Icon } from 'choerodon-ui';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import SettingColumn from '../SettingColumn/SettingColumn';
 import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
 import SideBarContent from '../SideBarContent/SideBarContent';
 
 const { AppState } = stores;
-const { Option } = Select;
 
 @observer
 class ColumnPage extends Component {
@@ -30,7 +26,6 @@ class ColumnPage extends Component {
     if (JSON.stringify(BoardStore.getStatusCategory) === '{}') {
       BoardStore.axiosGetStatusCategory().then((data) => {
         BoardStore.setStatusCategory(data);
-      }).catch((error) => {
       });
     }
   }
@@ -57,9 +52,9 @@ class ColumnPage extends Component {
       };
       BoardStore.axiosUpdateColumnSequence(
         BoardStore.getSelectedBoard, data,
-      ).then((res) => {
+      ).then(() => {
         refresh();
-      }).catch((error) => {
+      }).catch(() => {
         BoardStore.setBoardData(originState2);
       });
     } else {
@@ -249,16 +244,16 @@ class ColumnPage extends Component {
               draggabled
               data={data[index]}
               refresh={refresh.bind(this)}
-          // setLoading={this.props.setLoading.bind}
+              // setLoading={this.props.setLoading.bind}
               index={index}
               styleValue={`${parseFloat(parseFloat(1 / data.length) * 100)}%`}
             />
-      )}
+          )}
         >
           <SettingColumn
             data={data[index]}
             refresh={refresh.bind(this)}
-          // setLoading={this.props.setLoading.bind}
+            // setLoading={this.props.setLoading.bind}
             index={index}
             styleValue={`${parseFloat(parseFloat(1 / data.length) * 100)}%`}
           />
@@ -289,7 +284,7 @@ class ColumnPage extends Component {
                 index={BoardData.length - 1}
                 disabled
               />
-          )}
+            )}
           >
             <SettingColumn
               data={BoardData[BoardData.length - 1]}
@@ -305,7 +300,7 @@ class ColumnPage extends Component {
   }
 
   render() {
-    const BoardData = JSON.parse(JSON.stringify(BoardStore.getBoardData)).sort((a,b)=>a.sequence-b.sequence);
+    const BoardData = JSON.parse(JSON.stringify(BoardStore.getBoardData)).sort((a, b) => a.sequence - b.sequence);
     const { refresh } = this.props;
     const { addStatus, addColumn } = this.state;
     if (BoardData.length > 0) {
@@ -328,32 +323,32 @@ class ColumnPage extends Component {
         }}
         link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
       >
-          <div>
-            {
-              BoardStore.getCanAddStatus ? (
-                <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.createStatus']}>
-                  <Button
-                    funcType="flat"
-                    type="primary"
-                    onClick={this.handleAddStatus.bind(this)}
-                  >
-                    <Icon type="playlist_add" />
-                    <span>添加状态</span>
-                  </Button>
-                </Permission>
-              ) : ''
-            }
-            <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.board-column.createBoardColumn']}>
-              <Button
-                funcType="flat"
-                type="primary"
-                onClick={this.handleAddColumn.bind(this)}
-              >
-                <Icon type="playlist_add" />
-                <span>添加列</span>
-              </Button>
-            </Permission>
-          </div>     
+        <div>
+          {
+            BoardStore.getCanAddStatus ? (
+              <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.createStatus']}>
+                <Button
+                  funcType="flat"
+                  type="primary"
+                  onClick={this.handleAddStatus.bind(this)}
+                >
+                  <Icon type="playlist_add" />
+                  <span>添加状态</span>
+                </Button>
+              </Permission>
+            ) : ''
+          }
+          <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.board-column.createBoardColumn']}>
+            <Button
+              funcType="flat"
+              type="primary"
+              onClick={this.handleAddColumn.bind(this)}
+            >
+              <Icon type="playlist_add" />
+              <span>添加列</span>
+            </Button>
+          </Permission>
+        </div>
         <div
           className="c7n-scrumsetting"
           style={{

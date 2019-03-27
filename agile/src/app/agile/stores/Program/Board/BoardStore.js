@@ -4,7 +4,7 @@ import {
 import axios from 'axios';
 
 import { stores } from 'choerodon-front-boot';
-import { loadBoardData } from '../../../api/BoardApi';
+import { loadBoardData, sortColumn, deleteColumn } from '../../../api/BoardApi';
 
 const { AppState } = stores;
 
@@ -444,7 +444,7 @@ class BoardStore {
       quickSearchArray: [],
       assigneeFilterIds: [],
     };
-    this.currentSprintExist = true;
+    this.currentSprintExist = false;
   }
 
   @computed get getDayRemain() {
@@ -599,11 +599,11 @@ class BoardStore {
   }
 
   axiosUpdateColumnSequence(boardId, data) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column/column_sort`, data);
+    return sortColumn(data);
   }
 
   axiosDeleteColumn(columnId) {
-    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column/${columnId}`);
+    return deleteColumn(columnId);
   }
 
   axiosAddColumn(categoryCode, data) {
@@ -844,6 +844,7 @@ class BoardStore {
     // } else {
     //   this.currentSprintExist = false;
     // }
+    this.currentSprintExist = true;
     this.allDataMap = allDataMap;
     this.mapStructure = mapStructure;
     if (url && url.paramIssueId) {

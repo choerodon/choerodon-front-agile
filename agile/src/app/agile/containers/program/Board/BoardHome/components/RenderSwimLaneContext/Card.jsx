@@ -76,8 +76,7 @@ export default class CardProvider extends Component {
                   >
                     <div
                       style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
+                        display: 'flex',                     
                         justifyContent: 'space-between',
                         flex: 1,
                         alignItems: 'center',

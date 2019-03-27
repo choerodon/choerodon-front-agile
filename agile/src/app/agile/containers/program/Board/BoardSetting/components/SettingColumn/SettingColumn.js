@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { stores, Permission } from 'choerodon-front-boot';
-import {
-  Input, message, Icon, Modal,
-} from 'choerodon-ui';
+import { Icon, Modal } from 'choerodon-ui';
 import StatusCard from '../StatusCard/StatusCard';
 import './SettingColumn.scss';
 import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
@@ -25,10 +23,6 @@ class SettingColumn extends Component {
     this.setState({
       visible: true,
     });
-    // BoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
-    //   this.props.refresh();
-    // }).catch((err) => {
-    // });
   }
 
   updateColumnMaxMin(type, value) {
@@ -131,8 +125,10 @@ class SettingColumn extends Component {
   render() {
     const menu = AppState.currentMenuType;
     const {
-      data, disabled, refresh, objectVersionNumber, columnId, index, draggabled,
+      data, disabled, refresh, index, draggabled,
     } = this.props;
+    const { categoryCode } = data;
+    const isPrepare = categoryCode === 'prepare';
     const { visible } = this.state;
     const { type, id: projectId, organizationId: orgId } = menu;
 
@@ -165,6 +161,7 @@ class SettingColumn extends Component {
                       cursor: 'pointer',
                     }}
                   />
+                  {!isPrepare && (
                   <Icon
                     type="delete"
                     style={{
@@ -173,6 +170,7 @@ class SettingColumn extends Component {
                     role="none"
                     onClick={this.handleDeleteColumn.bind(this)}
                   />
+                  )}
                   <Modal
                     title="删除列"
                     visible={visible || false}
@@ -258,7 +256,7 @@ class SettingColumn extends Component {
           })}
           type="columndrop"
         >
-          {(provided1, snapshot1) => (
+          {provided1 => (
             <div
               className="c7n-scrumsetting-column"
               ref={provided1.innerRef}
@@ -287,6 +285,7 @@ class SettingColumn extends Component {
                         }}
                         {...provided1.dragHandleProps}
                       />
+                      {!isPrepare && (
                       <Icon
                         type="delete"
                         style={{
@@ -296,6 +295,7 @@ class SettingColumn extends Component {
                         role="none"
                         onClick={this.handleDeleteColumn.bind(this)}
                       />
+                      )}
                     </div>
                     <Modal
                       title="删除列"
@@ -306,7 +306,6 @@ class SettingColumn extends Component {
                         });
                         BoardStore.axiosDeleteColumn(data.columnId).then(() => {
                           refresh();
-                        }).catch((err) => {
                         });
                       }}
                       onCancel={() => {
