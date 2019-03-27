@@ -28,7 +28,7 @@ class IssueDetail extends Component {
           height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
           width: '440px',
         }}
-        issueId={ScrumBoardStore.getClickIssueDetail.issueId}
+        issueId={ScrumBoardStore.getCurrentClickId}
         onCancel={() => {
           ScrumBoardStore.resetClickedIssue();
         }}
