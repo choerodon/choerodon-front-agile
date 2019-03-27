@@ -13,6 +13,7 @@ class StatusCouldDragOn extends Component {
   render() {
     const { statusId } = this.props;
     const cantDragOn = BoardStore.getCanDragOn.get(statusId);
+    const hasActivePi = BoardStore.getActivePi;
     const isDragging = BoardStore.getIsDragging;
     return (
       <div className={cantDragOn && isDragging ? 'statusCantDragOn' : ''} />

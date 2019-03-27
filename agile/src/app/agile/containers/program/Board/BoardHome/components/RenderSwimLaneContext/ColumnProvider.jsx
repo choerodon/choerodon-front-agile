@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+
 import React from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
@@ -13,18 +13,19 @@ export default class ColumnProvider extends React.Component {
     const {
       children, column_status_RelationMap, className, keyId,
     } = this.props;
+    const { columnId, categoryCode } = columnObj;
     // const columnConstraintsIsOn = BoardStore.getAllColumnCount.size > 0;
-    const subStatusArr = column_status_RelationMap.get(columnObj.columnId);
+    const subStatusArr = column_status_RelationMap.get(columnId);
     return (
-      <React.Fragment key={columnObj.columnId}>
+      <React.Fragment key={columnId}>
         <ColumnCouldDragOn keyId={keyId} dragOn={BoardStore.getCurrentDrag === keyId} />
         <div
-          className={classnames('c7n-swimlaneContext-itemBodyColumn', `${className} ${keyId}`, {
+          className={classnames('c7n-swimlaneContext-itemBodyColumn', `${className} ${keyId} ${categoryCode}`, {
             // greaterThanMax: columnConstraintsIsOn && columnObj.maxNum !== null && BoardStore.getAllColumnCount.get(columnObj.columnId) > columnObj.maxNum,
             // lessThanMin: columnConstraintsIsOn && columnObj.minNum !== null && BoardStore.getAllColumnCount.get(columnObj.columnId) < columnObj.minNum,
           })}
         >
-          {children(subStatusArr, columnObj.columnId)}
+          {children(subStatusArr, columnId, categoryCode)}
         </div>
       </React.Fragment>
     );

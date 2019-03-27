@@ -875,6 +875,10 @@ class BoardStore {
     return this.headerData;
   }
 
+  @computed get getActivePi() {
+    return this.activePi;
+  }
+
   @action resetHeaderData(startColumnId, destinationColumnId, issueType) {
     const startColumnData = this.headerData.get(startColumnId);
     const destinationColumnData = this.headerData.get(destinationColumnId);

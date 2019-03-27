@@ -10,7 +10,9 @@ export default class StatusProvider extends Component {
   getStatus({
     completed, name: statusName, categoryCode, statusId,
   }) {
-    const { children, keyId, columnId } = this.props;
+    const {
+      children, keyId, columnId, columnCategoryCode, 
+    } = this.props;
     return (
       <div
         key={statusId}
@@ -20,7 +22,7 @@ export default class StatusProvider extends Component {
       >
         <Droppable
           droppableId={`${statusId}/${columnId}/${categoryCode}`}
-          isDropDisabled={BoardStore.getCanDragOn.get(statusId)}
+          isDropDisabled={BoardStore.getCanDragOn.get(statusId) || (!BoardStore.getActivePi && columnCategoryCode !== 'prepare')}
         >
           {(provided, snapshot) => (
             <React.Fragment>

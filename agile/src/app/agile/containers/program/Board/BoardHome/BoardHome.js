@@ -31,16 +31,16 @@ const style = swimLaneId => `
       visibility: visible !important;
   } 
 `;
-const cannotDrop = swimLaneId => `
-  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn {
+const canDropWhenNoPi = (swimLaneId, columnCategoryCode) => `
+  .${swimLaneId}.${columnCategoryCode}.c7n-swimlaneContext-itemBodyColumn {
     background-color: rgba(140, 158, 255, 0.12) !important;
   }
-  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus >  .c7n-swimlaneContext-itemBodyStatus-container {
+  .${swimLaneId}.${columnCategoryCode}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus >  .c7n-swimlaneContext-itemBodyStatus-container {
     border-width: 2px;
     border-style: dashed;
     border-color: #26348b;
   }
-  .${swimLaneId}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus > .c7n-swimlaneContext-itemBodyStatus-container > .c7n-swimlaneContext-itemBodyStatus-container-statusName {
+  .${swimLaneId}.${columnCategoryCode}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus > .c7n-swimlaneContext-itemBodyStatus-container > .c7n-swimlaneContext-itemBodyStatus-container-statusName {
       visibility: visible !important;
   } 
 `;
@@ -82,12 +82,18 @@ class BoardHome extends Component {
   onDragStart = (result) => {
     const { headerStyle } = this.props;
     const { draggableId } = result;
-    const [SwimLaneId, issueId] = draggableId.split(['/']);
-    headerStyle.changeStyle(style(SwimLaneId));
+    const [SwimLaneId, issueId, columnCategoryCode] = draggableId.split(['/']);    
+    // 没有活跃pi，只能在当前列拖动
+    if (!BoardStore.getActivePi) {      
+      // headerStyle.changeStyle(canDropWhenNoPi(SwimLaneId));
+      headerStyle.changeStyle(canDropWhenNoPi(SwimLaneId, columnCategoryCode));
+    } else {    
+      headerStyle.changeStyle(style(SwimLaneId));
+    }    
     BoardStore.setIsDragging(true);
   };
 
-  onDragEnd = (result) => {
+  onDragEnd = (result) => {   
     const { headerStyle } = this.props;
     const { destination, source, draggableId } = result;
     const [SwimLaneId, issueId] = draggableId.split(['/']);
@@ -98,7 +104,7 @@ class BoardHome extends Component {
     if (!destination) {
       return;
     }
-
+    
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }

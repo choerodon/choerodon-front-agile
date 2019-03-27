@@ -57,14 +57,14 @@ class SwimLane extends Component {
           keyId={key}
           {...mapStructure}
         >
-          {(statusArr, columnId) => (
-            
+          {(statusArr, columnId, columnCategoryCode) => (            
             <StatusProvider
+              columnCategoryCode={columnCategoryCode}
               statusData={statusArr}
               columnId={columnId}
               keyId={key}
             >
-              {(keyId, id, completed, statusName, categoryCode) => <CardProvider keyId={keyId} id={id} completed={completed} statusName={statusName} categoryCode={categoryCode} />}
+              {(keyId, id, completed, statusName, categoryCode) => <CardProvider keyId={keyId} id={id} completed={completed} statusName={statusName} categoryCode={categoryCode} columnCategoryCode={columnCategoryCode} />}
             </StatusProvider>              
             
           )}
