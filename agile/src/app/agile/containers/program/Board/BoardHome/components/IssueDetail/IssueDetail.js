@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import EditIssue from '../../../../../../components/EditIssueNarrow';
+import FeatureDetail from '../../../../Feature/FeatureDetail';
 import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
 import './IssueDetail.scss';
 
@@ -19,7 +19,7 @@ class IssueDetail extends Component {
   render() {
     const { refresh, HeaderStore } = this.props;
     return BoardStore.getClickedIssue ? (
-      <EditIssue
+      <FeatureDetail
         store={BoardStore}
         onRef={this.onRef}
         backUrl="board"

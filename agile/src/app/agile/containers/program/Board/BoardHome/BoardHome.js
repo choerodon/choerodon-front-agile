@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import { toJS } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import {
   Page, Header, stores,
 } from 'choerodon-front-boot';
 import { Button, Spin } from 'choerodon-ui';
+import { find } from 'lodash';
 import {
   StatusColumn, NoneSprint, CreateFeatureContainer, IssueDetail,
 } from './components';
@@ -88,36 +90,52 @@ class BoardHome extends Component {
       return;
     }
 
-    const [startStatus, startColumn] = source.droppableId.split(['/']).map(id => parseInt(id, 10));
+    const [startStatus, startColumn, startStatusCode] = source.droppableId.split(['/']).map(id => (isNaN(id) ? id : parseInt(id, 10)));
     const startStatusIndex = source.index;
 
-    const [destinationStatus, destinationColumn] = destination.droppableId.split(['/']).map(id => parseInt(id, 10));
+    const [destinationStatus, destinationColumn, destinationStatusCode] = destination.droppableId.split(['/']).map(id => (isNaN(id) ? id : parseInt(id, 10)));
     const destinationStatusIndex = destination.index;
 
     const issue = {
       ...allDataMap.get(+issueId),
       stayDay: 0,
     };
+    // BoardStore.getSwimLaneData
+    const destinationColumnData = find(toJS(BoardStore.getMapStructure.columnStructure), { columnId: destinationColumn });
+    const destinationSwimLineData = toJS(BoardStore.getSwimLaneData[SwimLaneId][destinationStatus]);
+    const activePi = toJS(BoardStore.activePi);
+    console.log(destinationSwimLineData, destinationColumnData, activePi.id);
+    const rank = destinationStatusCode !== 'prepare';
+    let piId;
+
+    if (destinationStatusCode === 'prepare' && startStatusCode === 'prepare') {
+      piId = undefined;
+    } else if (destinationSwimLineData.length > 0) {
+      piId = destinationSwimLineData[0].piId;
+    } else {
+      piId = activePi.id;
+    }
 
     const [type, parentId] = SwimLaneId.split('-');
-
-    // BoardStore.updateIssue(issue, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId).then((data) => {
-    //   if (data.failed) {
-    //     Choerodon.prompt(data.message);
-    //     BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, true);
-    //   } else {
-    //     if (BoardStore.getSwimLaneCode === 'parent_child' && parentId !== 'other') {
-    //       BoardStore.judgeMoveParentToDone(destinationStatus, SwimLaneId, +parentId, BoardStore.getStatusMap.get(destinationStatus).categoryCode === 'done');
-    //     }
-    //     if (data.issueId === BoardStore.getCurrentClickId) {
-    //       BoardStore.getEditRef.reloadIssue();
-    //     }
-    //     if (startColumn !== destinationColumn) {
-    //       BoardStore.resetHeaderData(startColumn, destinationColumn, issue.issueTypeDTO.typeCode);
-    //     }
-    //     BoardStore.rewriteObjNumber(data, issueId, issue);
-    //   }
-    // });
+    const piChange = piId !== issue.piId;
+    debugger;
+    BoardStore.updateIssue(issue, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId, piId, rank, piChange).then((data) => {
+      if (data.failed) {
+        Choerodon.prompt(data.message);
+        BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, true);
+      } else {
+        if (BoardStore.getSwimLaneCode === 'parent_child' && parentId !== 'other') {
+          BoardStore.judgeMoveParentToDone(destinationStatus, SwimLaneId, +parentId, BoardStore.getStatusMap.get(destinationStatus).categoryCode === 'done');
+        }
+        if (data.issueId === BoardStore.getCurrentClickId) {
+          BoardStore.getEditRef.reloadIssue();
+        }
+        if (startColumn !== destinationColumn) {
+          BoardStore.resetHeaderData(startColumn, destinationColumn, issue.issueTypeDTO.typeCode);
+        }
+        BoardStore.rewriteObjNumber(data, issueId, issue);
+      }
+    });
     BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, false);
   };
 

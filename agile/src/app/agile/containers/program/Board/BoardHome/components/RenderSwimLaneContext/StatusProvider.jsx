@@ -19,7 +19,7 @@ export default class StatusProvider extends Component {
         role="none"
       >
         <Droppable
-          droppableId={`${statusId}/${columnId}`}
+          droppableId={`${statusId}/${columnId}/${categoryCode}`}
           isDropDisabled={BoardStore.getCanDragOn.get(statusId)}
         >
           {(provided, snapshot) => (

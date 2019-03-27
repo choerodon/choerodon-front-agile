@@ -1,5 +1,5 @@
 import {
-  observable, action, computed, toJS, 
+  observable, action, computed, toJS,
 } from 'mobx';
 import axios from 'axios';
 
@@ -649,8 +649,8 @@ class BoardStore {
   updateIssue = (
     {
       issueId, objectVersionNumber, boardId, originColumnId, columnId,
-      before, outsetIssueId, sprintId, rank, issueTypeId,
-    }, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId,
+      before, outsetIssueId, sprintId, issueTypeId,
+    }, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId, piId, rank, piChange,
   ) => {
     const proId = AppState.currentMenuType.id;
     const data = {
@@ -664,11 +664,12 @@ class BoardStore {
       outsetIssueId:
         destinationStatusIndex === 0 ? ''
           : this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId,
-      sprintId: this.sprintId,
-      rank: true,
+      piId, // 从准备拖到其他或从其他拖到其他传piId,其他情况传0，没有活跃也传0
+      rank,     
+      piChange,
     };
     const { id: transformId } = this.stateMachineMap[issueTypeId] ? this.stateMachineMap[issueTypeId][startStatus].find(issue => issue.endStatusId === parseInt(destinationStatus, 10)) : this.stateMachineMap[0][startStatus].find(issue => issue.endStatusId === parseInt(destinationStatus, 10));
-    return axios.post(`/agile/v1/projects/${proId}/board/issue/${issueId}/move?transformId=${transformId}`, data);
+    return axios.post(`/agile/v1/projects/${proId}/board/feature/${issueId}/move?transformId=${transformId}`, data);
   };
 
   moveStatusToUnset(code, data) {
@@ -805,7 +806,7 @@ class BoardStore {
     return this.spinIf;
   }
 
-  @action scrumBoardInit(AppStates, url = null, boardListData = null, { boardId, userDefaultBoard, columnConstraint }, { currentSprint, allColumnNum = [] }, quickSearchList, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData) {
+  @action scrumBoardInit(AppStates, url = null, boardListData = null, { boardId, userDefaultBoard, columnConstraint }, { currentSprint, allColumnNum = [], activePi }, quickSearchList, issueTypes, stateMachineMap, canDragOn, statusColumnMap, allDataMap, mapStructure, statusMap, renderData, headerData) {
     this.boardData = [];
     this.spinIf = false;
     // this.currentClick = 0;
@@ -849,6 +850,7 @@ class BoardStore {
     this.swimLaneData = swimLaneData;
     this.statusMap = observable.map(statusMap);
     this.headerData = observable.map(headerData);
+    this.activePi = activePi;
   }
 
   @computed get getAllColumnCount() {
