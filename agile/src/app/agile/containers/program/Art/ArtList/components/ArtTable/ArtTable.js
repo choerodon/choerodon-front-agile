@@ -19,6 +19,7 @@ const ArtTable = ({
   dataSource,
   onEditArtClick,
   onArtNameClick,
+  onFinishArtClick,
 }) => {
   const columns = [{
     title: '编号',
@@ -40,7 +41,8 @@ const ArtTable = ({
     dataIndex: 'statusCode',
     key: 'statusCode',
     render: (statusCode, record) => {
-      if (!record.enable) {
+      if (!record.enabled) {
+        // eslint-disable-next-line no-param-reassign
         statusCode = 'discontinueUse';
       }
       return (<StatusTag categoryCode={statusCode} name={STATUS[statusCode]} />);
@@ -53,7 +55,12 @@ const ArtTable = ({
   }, {
     title: '',
     key: 'action',
-    render: (text, record) => (<Button shape="circle" icon="mode_edit" onClick={() => { onEditArtClick(record); }} />),
+    render: (text, record) => (
+      <div>
+        <Button shape="circle" icon="mode_edit" onClick={() => { onEditArtClick(record); }} />
+        <Button shape="circle" disabled={record.enabled && record.statusCode === 'done'} icon="finished" onClick={() => { onFinishArtClick(record); }} />
+      </div>
+    ),
   }];
 
   return (

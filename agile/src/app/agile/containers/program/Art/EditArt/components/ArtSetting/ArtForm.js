@@ -9,13 +9,14 @@ import {
 import './ArtForm.scss';
 
 import SelectFocusLoad from '../../../../../../components/SelectFocusLoad';
+import PIList from './component/PIList';
 
 
 const { Option } = Select;
 const { TabPane } = Tabs;
 const FormItem = Form.Item;
 const Fields = {
-  1: ['rteId', 'startDate', 'enabled'],
+  1: ['code', 'piCount', 'rteId', 'startDate', 'enabled'],
   2: ['ipWeeks', 'interationCount', 'interationWeeks'],
   3: ['piCodePrefix', 'piCodeNumber'],
 };
@@ -73,10 +74,7 @@ class ArtForm extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-<<<<<<< Updated upstream:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/ArtForm.js
-=======
     const { initValue } = this.props;
->>>>>>> Stashed changes:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/component/ArtForm.js
     return (
       <Form className="c7nagile-ArtForm">
         <Tabs defaultActiveKey="1" onChange={this.handleTabChange}>
@@ -114,8 +112,6 @@ class ArtForm extends Component {
               )}
             </FormItem>
             <FormItem>
-<<<<<<< Updated upstream:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/ArtForm.js
-=======
               {
                 getFieldDecorator('piCount', {
                   rules: [{
@@ -132,7 +128,6 @@ class ArtForm extends Component {
               }
             </FormItem>
             <FormItem>
->>>>>>> Stashed changes:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/component/ArtForm.js
               {getFieldDecorator('enabled', {
                 valuePropName: 'checked',
               })(
@@ -154,12 +149,12 @@ class ArtForm extends Component {
                   placeholder="请输入IP工作日天数"
                 />,
               )}
-              <Tooltip title="为团队提供规律、有节奏的时间，让团队可以有机会开展一些在持续不断的增量价值发布的环境中很难进行的工作。通常设为1周">
+              {/* <Tooltip title="为团队提供规律、有节奏的时间，让团队可以有机会开展一些在持续不断的增量价值发布的环境中很难进行的工作。通常设为1周">
                 <Icon
                   type="error"
                   className="tooltip-icon after-input"
                 />
-              </Tooltip>
+              </Tooltip> */}
             </FormItem>
             <FormItem>
               {getFieldDecorator('interationCount', {
@@ -182,11 +177,15 @@ class ArtForm extends Component {
               </Tooltip>
             </FormItem>
             <FormItem>
-<<<<<<< Updated upstream:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/ArtForm.js
-              {getFieldDecorator('interationWeeks', {
-=======
+              {getFieldDecorator('interationWeeks', {})(
+                <Select style={{ width: 500 }} label="迭代工作周" placeholder="请选择每个迭代的工作周数">
+                  {
+                  [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
+                }
+                </Select>,
+              )}
+
               {getFieldDecorator('ipWeeks', {
->>>>>>> Stashed changes:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/component/ArtForm.js
                 rules: [{
                   required: true, message: '请选择每个迭代的工作周数!',
                 }],
@@ -197,12 +196,12 @@ class ArtForm extends Component {
                   }
                 </Select>,
               )}
-              <Tooltip title="规划一个迭代的时长，通常是2周或者4周。">
+              {/* <Tooltip title="规划一个迭代的时长，通常是2周或者4周。">
                 <Icon
                   type="error"
                   className="tooltip-icon"
                 />
-              </Tooltip>
+              </Tooltip> */}
             </FormItem>
           </TabPane>
           <TabPane tab="PI规则" key="3">
@@ -226,12 +225,9 @@ class ArtForm extends Component {
               )}
             </FormItem>
           </TabPane>
-<<<<<<< Updated upstream:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/ArtForm.js
-=======
           <TabPane tab="PI列表" key="4">
             <PIList name={initValue.name} artId={initValue.id} />
           </TabPane>
->>>>>>> Stashed changes:agile/src/app/agile/containers/program/Art/EditArt/components/ArtSetting/component/ArtForm.js
         </Tabs>
         <Divider />
         <Button onClick={this.onSave} type="primary" funcType="raised">保存</Button>

@@ -35,3 +35,7 @@ export function createPI(artId, startDate) {
     startDate,
   });
 }
+export function beforeArtFinish(artId) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/projects/${projectId}/art/before_complete?id=${artId}`);
+}

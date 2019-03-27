@@ -1,27 +1,31 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Icon, Table, Radio, Divider, Form, Input, Card, Tooltip, Spin, Modal,
+  Button, Icon, Table, Radio, Divider, Form, Input, Card, Tooltip, Spin, Modal, Select,
 } from 'choerodon-ui';
 import {
   stores, Page, Header, Content,  
 } from 'choerodon-front-boot';
 import moment from 'moment';
 
-import CreatePI from '../CreatePI';
 import PIStore from '../../../../stores/Program/PI/PIStore';
 import { PIListLink } from '../../../../common/utils';
 import { 
-  createPIAims, getPIAims, upDatePIAmix, deletePIAims,
+  createPIAims, getPIAims, upDatePIAmix, deletePIAims, getPIList,
 } from '../../../../api/PIApi';
 import ProgramAimsTable from './component/ProgramAimsTable';
+import PIAimsCard from './component/PIAimsCard';
+import EmptyBlock from '../../../../components/EmptyBlock';
+import emptyPI from '../../../../assets/image/emptyPI.svg';
+import CreatePIAims from '../CreatePIAims/CreatePIAims';
 
-import './PIDetail.scss';
+import './PIAims.scss';
 import EditPI from '../EditPI';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const RadioButton = Radio.Button;
+const Option = { Select };
 const { AppState } = stores;
 const amisColumns = [
   {
@@ -50,7 +54,7 @@ const amisColumns = [
   },
 ];
 @observer
-class PIDetail extends Component {
+class PIAims extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -59,44 +63,34 @@ class PIDetail extends Component {
       editingPiAimsInfo: {},
       deletePIAimsModalVisible: false,
       deleteRecord: undefined,
+      selectedPIId: undefined,
     };
   }
 
   componentDidMount() {
-<<<<<<< Updated upstream:agile/src/app/agile/containers/program/PI/PIDetail/PIDetail.js
-    this.getPIAims();
-=======
     PIStore.setPIAimsLoading(true);
-    getPIList().then((PIList) => {
-      PIStore.setPIList(PIList.content);
+    getPIList().then((PiList) => {
+      PIStore.setPiList(PiList.content);
       this.setState({
-        selectedPIId: PIList.content[0].id,
+        selectedPIId: PiList.content[0].id,
       });
-      this.getPIAims(PIList.content[0] && PIList.content[0].id);
+      this.getPIAims(PiList.content[0] && PiList.content[0].id);
     });
->>>>>>> Stashed changes:agile/src/app/agile/containers/program/PI/PIAims/PIAims.js
   }
 
-  getPIAims = () => {
-    let { PiList } = PIStore;
-    PiList = JSON.parse(sessionStorage.PiList) || PiList;
-    const pi = PiList.find(item => item.id === Number(this.props.match.params.id));
-    PIStore.setPIDetailLoading(true);
-    getPIAims(pi.id).then((res) => {
-      PIStore.setPIDetailLoading(false);
-      PIStore.setPiAims(res);
-      PIStore.setEditPiAimsCtrl(res.program.map((item, index) => (
-        {
-          isEditing: false,
-          editingId: item.id,
-          editingIndex: index,  
-        }
-      )));
-      this.setState({
-        piName: pi.name,
+  getPIAims = (id) => {
+    if (id) {
+      getPIAims(id).then((res) => {
+        PIStore.setPIAimsLoading(false);
+        PIStore.setPiAims(res);
+        PIStore.setEditPiAimsCtrl(res.program.map((item, index) => (
+          {
+            isEditing: false,
+            editingId: item.id,
+            editingIndex: index,  
+          }
+        )));
       });
-<<<<<<< Updated upstream:agile/src/app/agile/containers/program/PI/PIDetail/PIDetail.js
-=======
     } else {
       PIStore.setPIAimsLoading(false);
     }
@@ -108,7 +102,6 @@ class PIDetail extends Component {
       showType: 'list',
     }, () => {
       this.getPIAims(value);
->>>>>>> Stashed changes:agile/src/app/agile/containers/program/PI/PIAims/PIAims.js
     });
   }
 
@@ -123,6 +116,7 @@ class PIDetail extends Component {
     const { PiAims } = PIStore;
     const { editingIndex } = editPiAimsCtrl.find(item => item.editingId === record.id);
     editPiAimsCtrl.forEach((item) => {
+      // eslint-disable-next-line no-param-reassign
       item.isEditing = false;
     });
     editPiAimsCtrl[editingIndex].isEditing = true;
@@ -143,10 +137,10 @@ class PIDetail extends Component {
 
   handleDeleteOk = () => {
     const { deleteRecord } = this.state;
-    PIStore.setPIDetailLoading(true);
+    PIStore.setPIAimsLoading(true);
     deletePIAims(deleteRecord.id).then(() => {
       getPIAims(deleteRecord.piId).then((piAims) => {
-        PIStore.setPIDetailLoading(false);
+        PIStore.setPIAimsLoading(false);
         PIStore.setPiAims(piAims);
         PIStore.setEditPiAimsCtrl(piAims.program.map((item, index) => (
           {
@@ -162,7 +156,7 @@ class PIDetail extends Component {
       });
       Choerodon.prompt('删除成功');
     }).catch(() => {
-      PIStore.setPIDetailLoading(false);
+      PIStore.setPIAimsLoading(false);
       Choerodon.prompt('删除失败');
     });
   }
@@ -196,17 +190,13 @@ class PIDetail extends Component {
 
   render() {
     const {
-      showType, piName, editingPiAimsInfo, deletePIAimsModalVisible, deleteRecord,
+      showType, piName, editingPiAimsInfo, deletePIAimsModalVisible, deleteRecord, selectedPIId,
     } = this.state;
     const {
-      PiList, PiAims, PIDetailLoading, editPIVisible, 
+      PiList, PiAims, PIAimsLoading, editPIVisible, 
     } = PIStore;
-<<<<<<< Updated upstream:agile/src/app/agile/containers/program/PI/PIDetail/PIDetail.js
     const teamDataSource = PiAims.teamAims;
-=======
-    const teamDataSource = PIAims.teamAims;
-    const selectedPI = PIList.find(item => item.id === selectedPIId);
->>>>>>> Stashed changes:agile/src/app/agile/containers/program/PI/PIAims/PIAims.js
+    const selectedPI = PiList.find(item => item.id === selectedPIId);
     const teamAimsColumns = [{
       title: '团队名称',
       dataIndex: 'teamName',
@@ -224,44 +214,9 @@ class PIDetail extends Component {
           </Button>
         </Header>
         <Content>
-<<<<<<< Updated upstream:agile/src/app/agile/containers/program/PI/PIDetail/PIDetail.js
-          {/* <RadioGroup className="c7n-pi-showTypeRadioGroup" onChange={this.handleRadioChange} defaultValue="list">
-            <RadioButton value="list">列表</RadioButton>
-            <RadioButton value="card">卡片</RadioButton>
-          </RadioGroup>
-          <Divider style={{ margin: '7px 0 20px' }} /> */}
-          <Spin spinning={PIDetailLoading}>
-            {/* {
-            showType === 'list' && ( */}
-            <div>
-              <ProgramAimsTable
-                amisColumns={amisColumns}
-                dataSource={PiAims.program}
-                onEditPiAims={this.handleEditPiAims}
-                onDeletePiAims={this.handledeletePiAims}
-              />
-
-              {/* <div className="c7n-pi-teamAims" style={{ marginTop: 20 }}>
-                  <Table 
-                    filterBar={false}
-                    rowKey={record => record.teamId}
-                    columns={teamAimsColumns}
-                    dataSource={teamDataSource}
-                    pagination={false}
-                    expandedRowRender={record => this.renderTeamPIAimsTable.bind(this, record.teamProgramAims)()}
-                  />
-                </div> */}
-            </div>
-            {/* )
-            } */}
-          </Spin>
-          <CreatePI 
-            piId={piId}
-            page="PIDetail"
-=======
           <Spin spinning={PIAimsLoading}>
             {
-              PIList && PIList.length > 0 ? (
+              PiList && PiList.length > 0 ? (
                 <div>
                   <div style={{
                     display: 'flex', justifyContent: 'space-between', height: 32, marginBottom: 20, 
@@ -269,13 +224,13 @@ class PIDetail extends Component {
                   >
                     <Select onChange={this.handlePISelectChange} value={selectedPIId} dropdownClassName="c7n-pi-piSelect">
                       {
-                        PIList && PIList.map(pi => (
+                        PiList && PiList.map(pi => (
                           <Option key={pi.id} value={pi.id}>{`${pi.code}-${pi.name}`}</Option>
                         ))
                       }
                     </Select>
                     {
-                      PIAims.program && PIAims.program.length > 0 && (
+                      PiAims.program && PiAims.program.length > 0 && (
                         <RadioGroup className="c7n-pi-showTypeRadioGroup" onChange={this.handleRadioChange} defaultValue="list">
                           <RadioButton value="list">列表</RadioButton>
                           <RadioButton value="card">卡片</RadioButton>
@@ -288,7 +243,7 @@ class PIDetail extends Component {
                     <div>
                       <ProgramAimsTable
                         amisColumns={amisColumns}
-                        dataSource={PIAims.program}
+                        dataSource={PiAims.program}
                         onEditPiAims={this.handleEditPiAims}
                         onDeletePiAims={this.handledeletePiAims}
                       />
@@ -308,8 +263,8 @@ class PIDetail extends Component {
                     <PIAimsCard 
                       aimsCategory="program"
                       piName={`${selectedPI.code}-${selectedPI.name}`}
-                      aimsInfo={PIAims.program.filter(item => !item.stretch)}
-                      stretchAimsInfo={PIAims.program.filter(item => item.stretch)}
+                      aimsInfo={PiAims.program.filter(item => !item.stretch)}
+                      stretchAimsInfo={PiAims.program.filter(item => item.stretch)}
                     />
                   )
                 }
@@ -329,7 +284,6 @@ class PIDetail extends Component {
          
           <CreatePIAims 
             piId={selectedPIId}
->>>>>>> Stashed changes:agile/src/app/agile/containers/program/PI/PIAims/PIAims.js
           />
           <EditPI editingPiAimsInfo={editingPiAimsInfo} editPIVisible={editPIVisible} />
           <Modal
@@ -347,4 +301,4 @@ class PIDetail extends Component {
   }
 }
 
-export default Form.create()(PIDetail);
+export default Form.create()(PIAims);

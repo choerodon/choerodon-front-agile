@@ -25,7 +25,7 @@ class PIList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      PIList: [],
+      PiList: [],
       createPIModalVisible: false,
     };
   }
@@ -37,7 +37,7 @@ class PIList extends Component {
   getPIList = () => {
     getPIList().then((res) => {
       this.setState({
-        PIList: res.content.map(item => (
+        PiList: res.content.map(item => (
           Object.assign(item, {
             startDate: moment(item.startDate).format(formatter),
             endDate: moment(item.endDate).format(formatter),
@@ -75,6 +75,7 @@ class PIList extends Component {
   handleCreatePIOK = (startDate) => {
     const { artId } = this.props;
     createPI(artId, startDate).then((res) => {
+      this.getPIList();
       this.setState({
         createPIModalVisible: false,
       });
@@ -82,7 +83,7 @@ class PIList extends Component {
   }
 
   render() {
-    const { PIList, createPIModalVisible } = this.state;
+    const { PiList, createPIModalVisible } = this.state;
     const { name } = this.props;
     const columns = [
       {
@@ -112,9 +113,9 @@ class PIList extends Component {
       <React.Fragment>
         <PIListTable 
           columns={columns}
-          dataSource={PIList}
+          dataSource={PiList}
         />
-        <Button funcType="flat" onClick={this.handleCreatePIClick}>
+        <Button funcType="flat" style={{ marginTop: 15, color: '#3F51B5' }} onClick={this.handleCreatePIClick}>
           <Icon type="playlist_add" />
           <span>添加PI</span>
         </Button>

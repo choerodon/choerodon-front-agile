@@ -1,3 +1,4 @@
+
 import React, { Component, Fragment } from 'react';
 import { Page, Header, Content } from 'choerodon-front-boot';
 import PropTypes from 'prop-types';
@@ -12,11 +13,7 @@ import { ArtInfo, ArtSetting, ReleaseArt } from './components';
 import { getArtById, editArt, releaseArt } from '../../../../api/ArtApi';
 import './EditArt.scss';
 
-<<<<<<< Updated upstream
-const requiredFields = ['startDate', 'ipWorkdays', 'interationCount', 'interationWeeks', 'piCodePrefix', 'piCodeNumber'];
-=======
 const requiredFields = ['startDate', 'ipWeeks', 'interationCount', 'interationWeeks', 'piCodePrefix', 'piCodeNumber'];
->>>>>>> Stashed changes
 function formatter(values) {
   const data = { ...values };
   Object.keys(data).forEach((key) => {
@@ -60,13 +57,9 @@ class EditArt extends Component {
         piCodePrefix,      
         startDate,
         rteId,
-<<<<<<< Updated upstream
-=======
         name,
         code,
         piCount,
-        id,
->>>>>>> Stashed changes
       } = data;
       const formData = {
         enabled,
@@ -77,13 +70,10 @@ class EditArt extends Component {
         piCodePrefix,
         rteId,
         startDate,
-<<<<<<< Updated upstream
-=======
         name,
         code,
         piCount,
         id,
->>>>>>> Stashed changes
       };
       this.setState({
         loading: false,
@@ -94,7 +84,7 @@ class EditArt extends Component {
     });
   }
 
-  checkCanRelease = data => !requiredFields.some(field => data[field] == undefined) && data.enabled
+  checkCanRelease = data => !requiredFields.some(field => data[field] === undefined) && data.enabled
 
   handleFormChange = (changedValues, allValues) => {
     const { formData, isModified } = this.state;

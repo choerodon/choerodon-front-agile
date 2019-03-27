@@ -7,7 +7,9 @@ import './PIAimsCard.scss';
 const propTypes = {
   aimsCategory: PropTypes.oneOf(['team', 'program']).isRequired,
   piName: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
   aimsInfo: PropTypes.array.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
   stretchAimsInfo: PropTypes.array,
 };
 const PIAimsCard = ({ 
@@ -18,40 +20,43 @@ const PIAimsCard = ({
   const percent = Number.isInteger(totalActualBv) && Number.isInteger(totalActualBv) ? `${(totalActualBv / totalPlanBv * 100).toFix(2)}}%` : '0%';
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
-      {
-      aimsInfo && aimsInfo.length > 0 && (
       <div className="c7n-pi-card" style={{ borderTop: `5px solid ${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}` }}>
-        <table style={{ width: '100%' }}>
-          <thead>
-            <tr>
-              <th style={{ width: '60%' }}>{piName}</th>
-              <th style={{ width: '20%' }}>计划BV</th>
-              <th style={{ width: '20%' }}>实际BV</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-           aimsInfo && aimsInfo.length > 0 && aimsInfo.map(item => (
-             <tr key={item.id}>
-               <td>
-                 <span style={{
-                   display: 'inline-block', marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: `${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}`, 
-                 }}
-                 />
-                 {item.name}
-               </td>
-               <td>{item.planBv ? item.planBv : '-'}</td>
-               <td>{item.actualBv ? item.actualBv : '-'}</td>
-             </tr>
-           ))
-         }
-          </tbody>
-        </table>
-
+        {
+          aimsInfo && aimsInfo.length > 0 && (
+          <table style={{ width: '100%' }}>
+            <thead>
+              <tr>
+                <th style={{ width: '60%' }}>{piName}</th>
+                <th style={{ width: '20%' }}>计划BV</th>
+                <th style={{ width: '20%' }}>实际BV</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                aimsInfo && aimsInfo.length > 0 && aimsInfo.map(item => (
+                  <tr key={item.id}>
+                    <td style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={{
+                        display: 'inline-block', marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: `${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}`, 
+                      }}
+                      />
+                      {item.name}
+                    </td>
+                    <td>{item.planBv ? item.planBv : '-'}</td>
+                    <td>{item.actualBv ? item.actualBv : '-'}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+          )}
+        {
+          aimsCategory === 'program' && stretchAimsInfo && stretchAimsInfo.length > 0 && aimsInfo && aimsInfo.length > 0 && (<Divider style={{ margin: '15px 0' }} />)
+        }
         {
             aimsCategory === 'program' && stretchAimsInfo && stretchAimsInfo.length > 0 && (
               <div>
-                <Divider />
+                
                 <table style={{ width: '100%' }}>
                   <thead>
                     <tr>
@@ -64,9 +69,9 @@ const PIAimsCard = ({
                     {
                     stretchAimsInfo.map(item => (
                       <tr>
-                        <td>
+                        <td style={{ display: 'flex', alignItems: 'center' }}>
                           <span style={{
-                            width: 5, height: 5, borderRadius: '50%', background: `${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}`, 
+                            display: 'inline-block', marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: '#9B9B9B', 
                           }}
                           />
                           {item.name}
@@ -104,8 +109,6 @@ const PIAimsCard = ({
           )
         }
       </div>
-      )
-    }
     </div>
   );
 };

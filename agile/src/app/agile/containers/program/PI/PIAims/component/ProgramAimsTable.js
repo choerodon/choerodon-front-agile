@@ -41,7 +41,9 @@ const ProgramAimsTable = ({
 };
 
 ProgramAimsTable.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
   amisColumns: ProTypes.array.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
   dataSource: ProTypes.array.isRequired,
   onEditPiAims: ProTypes.func.isRequired,
   onDeletePiAims: ProTypes.func.isRequired,

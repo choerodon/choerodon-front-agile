@@ -12,7 +12,9 @@ const PIListTable = ({ columns, dataSource }) => (
   />
 );
 PIListTable.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
   columns: propTypes.array.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
   dataSource: propTypes.array.isRequired,
 };
 export default memo(PIListTable);
