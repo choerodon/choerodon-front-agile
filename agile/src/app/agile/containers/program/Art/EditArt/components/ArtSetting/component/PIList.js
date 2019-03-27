@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import {
-  Button, Icon, Table, Spin,
-} from 'choerodon-ui';
-import {
-  stores, Page, Header, Content,  
-} from 'choerodon-front-boot';
+import { Button, Icon } from 'choerodon-ui';
 import moment from 'moment';
 import { getPIList } from '../../../../../../../api/PIApi';
 import { createPI } from '../../../../../../../api/ArtApi';
@@ -14,7 +9,6 @@ import CreatePIModal from './CreatePIModal';
 import StatusTag from '../../../../../../../components/StatusTag';
 
 const formatter = 'YYYY-MM-DD';
-const { AppState } = stores;
 const STATUS = {
   todo: '未启用',
   doing: '进行中',
@@ -25,7 +19,7 @@ class PIList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      PiList: [],
+      PIList: [],
       createPIModalVisible: false,
     };
   }
@@ -37,7 +31,7 @@ class PIList extends Component {
   getPIList = () => {
     getPIList().then((res) => {
       this.setState({
-        PiList: res.content.map(item => (
+        PIList: res.content.map(item => (
           Object.assign(item, {
             startDate: moment(item.startDate).format(formatter),
             endDate: moment(item.endDate).format(formatter),
@@ -74,7 +68,7 @@ class PIList extends Component {
 
   handleCreatePIOK = (startDate) => {
     const { artId } = this.props;
-    createPI(artId, startDate).then((res) => {
+    createPI(artId, startDate).then(() => {
       this.getPIList();
       this.setState({
         createPIModalVisible: false,
@@ -83,7 +77,8 @@ class PIList extends Component {
   }
 
   render() {
-    const { PiList, createPIModalVisible } = this.state;
+    // eslint-disable-next-line no-shadow
+    const { PIList, createPIModalVisible } = this.state;
     const { name } = this.props;
     const columns = [
       {
@@ -94,7 +89,7 @@ class PIList extends Component {
       {
         title: '状态',
         dataIndex: 'statusCode',
-        render: (statusCode, record) => <StatusTag categoryCode={statusCode} name={STATUS[statusCode]} />,
+        render: statusCode => <StatusTag categoryCode={statusCode} name={STATUS[statusCode]} />,
       },
       {
         title: '剩余天数',
@@ -113,7 +108,7 @@ class PIList extends Component {
       <React.Fragment>
         <PIListTable 
           columns={columns}
-          dataSource={PiList}
+          dataSource={PIList}
         />
         <Button funcType="flat" style={{ marginTop: 15, color: '#3F51B5' }} onClick={this.handleCreatePIClick}>
           <Icon type="playlist_add" />

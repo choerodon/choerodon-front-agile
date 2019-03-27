@@ -1,10 +1,9 @@
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Page, Header, Content } from 'choerodon-front-boot';
-import PropTypes from 'prop-types';
 import { isEqual } from 'lodash';
 import {
-  Icon, Button, Progress, Spin,
+  Progress, Spin,
 } from 'choerodon-ui';
 import moment from 'moment';
 import { artListLink } from '../../../../common/utils';
@@ -13,7 +12,6 @@ import { ArtInfo, ArtSetting, ReleaseArt } from './components';
 import { getArtById, editArt, releaseArt } from '../../../../api/ArtApi';
 import './EditArt.scss';
 
-const requiredFields = ['startDate', 'ipWeeks', 'interationCount', 'interationWeeks', 'piCodePrefix', 'piCodeNumber'];
 function formatter(values) {
   const data = { ...values };
   Object.keys(data).forEach((key) => {
@@ -32,7 +30,6 @@ class EditArt extends Component {
     formData: {},
     data: {},
     isModified: false,
-    canRelease: false,
     releaseArtVisible: false,
     releaseLoading: false,
   }
@@ -79,12 +76,9 @@ class EditArt extends Component {
         loading: false,
         formData,
         data,
-        canRelease: this.checkCanRelease(formData),
       });
     });
   }
-
-  checkCanRelease = data => !requiredFields.some(field => data[field] === undefined) && data.enabled
 
   handleFormChange = (changedValues, allValues) => {
     const { formData, isModified } = this.state;
@@ -113,7 +107,7 @@ class EditArt extends Component {
   handleSave = (newValues) => {
     const { data } = this.state;
     const artDTO = { ...data, ...formatter(newValues) };    
-    editArt(artDTO).then((res) => {
+    editArt(artDTO).then(() => {
       this.loadArt();
     });
   }
@@ -125,18 +119,18 @@ class EditArt extends Component {
   }
 
   handleReleaseOk = (PINum) => {
-    const { data, formData } = this.state;
+    const { data } = this.state;
     this.setState({
       releaseLoading: true,
     });
-    releaseArt(data.id, PINum).then((res) => {
+    releaseArt(data.id, PINum).then(() => {
       Choerodon.prompt('发布成功');
       this.loadArt();
       this.setState({
         releaseArtVisible: false,
         releaseLoading: false,
       });
-    }).catch((err) => {
+    }).catch(() => {
       Choerodon.error('发布失败');
       this.setState({      
         releaseLoading: false,
@@ -152,11 +146,10 @@ class EditArt extends Component {
 
   render() {
     const {
-      formData, isModified, canRelease,
-      releaseArtVisible, data, loading, releaseLoading,
+      formData, releaseArtVisible, data, loading, releaseLoading,
     } = this.state;
     const {
-      id, name, description, enabled, 
+      id, name, 
     } = data;
     return (
       <Page className="c7nagile-EditArt">

@@ -39,6 +39,18 @@ class CreateArt extends Component {
     }
   }
 
+  handlePrevStep = () => {
+    this.setState({
+      currentStep: --this.state.currentStep,
+    });
+  }
+
+  handleNextStep = () => {
+    this.setState({
+      currentStep: ++this.state.currentStep,
+    });
+  }
+
   handleOk = () => {
     const { onSubmit, form } = this.props;
     form.validateFieldsAndScroll((err, values) => {
@@ -162,12 +174,6 @@ class CreateArt extends Component {
                   </Select>,
 
                 )}
-                {/* <Tooltip title="规划一个pi中team的迭代数量。">
-                <Icon
-                  type="error"
-                  className="tooltip-icon after-input"
-                />
-              </Tooltip> */}
               </FormItem>
               <FormItem>
                 {getFieldDecorator('interationWeeks', {
@@ -241,8 +247,26 @@ class CreateArt extends Component {
       <Sidebar
         title="创建ART"
         visible={visible}
-        onOk={this.handleOk}
-        onCancel={onCancel}
+        footer={(
+          <div className="c7n-art-stepBtn">
+            {
+              currentStep > 0 && (
+                <Button type="primary" onClick={() => this.handlePrevStep()}>上一步</Button>
+              )
+            }
+            {
+              currentStep < steps.length - 1 && (
+                <Button type="primary" funcType="raised" onClick={() => this.handleNextStep()}>下一步</Button>
+              )
+            }
+            {
+              currentStep === steps.length - 1 && (
+              <Button type="primary" funcType="raised" onClick={() => { this.handleOk(); }}>保存</Button>
+              )
+            }
+            <Button onClick={onCancel} funcType="raised" style={{ marginLeft: 10 }}>取消</Button>
+          </div>
+          )}
         confirmLoading={loading}
         footer={(
           <div className="c7n-art-stepBtn">
@@ -279,7 +303,6 @@ class CreateArt extends Component {
           }
           </Tabs>
         </div>
-
       </Sidebar>
     );
   }

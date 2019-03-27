@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Divider } from 'choerodon-ui';
 import _ from 'lodash';
@@ -15,9 +15,9 @@ const propTypes = {
 const PIAimsCard = ({ 
   aimsCategory, piName, aimsInfo, stretchAimsInfo, 
 }) => {
-  const totalPlanBv = (aimsCategory === 'team' && aimsInfo && _.reduce(_.map(aimsInfo, 'planBv'), (sum, n) => sum + n, 0)) || '-';
-  const totalActualBv = (aimsCategory === 'team' && aimsInfo && stretchAimsInfo && _.reduce(_.map(aimsInfo, 'actualBv'), (sum, n) => sum + n, 0) + _.reduce(_.map(aimsInfo, 'actualBv'), (sum, n) => sum + n, 0)) || '-';
-  const percent = Number.isInteger(totalActualBv) && Number.isInteger(totalActualBv) ? `${(totalActualBv / totalPlanBv * 100).toFix(2)}}%` : '0%';
+  const totalPlanBv = (aimsCategory === 'program' && aimsInfo && _.reduce(_.map(aimsInfo, 'planBv'), (sum, n) => sum + n, 0)) || '-';
+  const totalActualBv = (aimsCategory === 'program' && aimsInfo && stretchAimsInfo && _.reduce(_.map(aimsInfo, 'actualBv'), (sum, n) => sum + n, 0) + _.reduce(_.map(stretchAimsInfo, 'actualBv'), (sum, n) => sum + n, 0)) || '-';
+  const percent = Number.isInteger(totalActualBv) && Number.isInteger(totalActualBv) ? `${(totalActualBv / totalPlanBv * 100).toFixed(2)}%` : '0%';
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
       <div className="c7n-pi-card" style={{ borderTop: `5px solid ${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}` }}>

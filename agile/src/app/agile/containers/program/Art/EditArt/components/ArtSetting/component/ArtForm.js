@@ -8,8 +8,8 @@ import {
 } from 'choerodon-ui';
 import './ArtForm.scss';
 
-import SelectFocusLoad from '../../../../../../components/SelectFocusLoad';
-import PIList from './component/PIList';
+import SelectFocusLoad from '../../../../../../../components/SelectFocusLoad';
+import PIList from './PIList';
 
 
 const { Option } = Select;
@@ -108,10 +108,11 @@ class ArtForm extends Component {
                   format="YYYY-MM-DD"
                   style={{ width: 500 }}
                   label="开始日期"
+                  disabled
                 />,
               )}
             </FormItem>
-            <FormItem>
+            <FormItem style={{ marginBottom: 16 }}>
               {
                 getFieldDecorator('piCount', {
                   rules: [{
@@ -134,74 +135,48 @@ class ArtForm extends Component {
                 <Checkbox>启用</Checkbox>,
               )}
             </FormItem>
+         
           </TabPane>
           <TabPane tab="ART节奏" key="2">
+            <div style={{ display: 'flex', width: 500 }}>
+              <FormItem style={{ marginRight: 20 }}>
+                {getFieldDecorator('interationCount', {
+                  rules: [{
+                    required: true, message: '请输入ART中每个PI的迭代数!',
+                  }],
+                })(
+                  <Select style={{ width: 180 }} label="迭代数" placeholder="请输入ART中每个PI的迭代数">
+                    {
+                      [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
+                    }
+                  </Select>,
+
+                )}
+              </FormItem>
+              <FormItem>
+                {getFieldDecorator('interationWeeks', {})(
+                  <Select style={{ width: 300 }} label="迭代时长（周）" placeholder="请选择每个迭代的工作周数">
+                    {
+                  [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
+                }
+                  </Select>,
+                )}
+              </FormItem>
+            </div>
+           
             <FormItem>
-              {getFieldDecorator('ipWorkdays', {
+              {getFieldDecorator('ipWeeks', {
                 rules: [{
                   required: true, message: '请选择日期!',
                 }],
               })(
-                <InputNumber
-                  formatter={NumberFormatter}
-                  style={{ width: 500 }}
-                  label="IP工作日"
-                  placeholder="请输入IP工作日天数"
-                />,
-              )}
-              {/* <Tooltip title="为团队提供规律、有节奏的时间，让团队可以有机会开展一些在持续不断的增量价值发布的环境中很难进行的工作。通常设为1周">
-                <Icon
-                  type="error"
-                  className="tooltip-icon after-input"
-                />
-              </Tooltip> */}
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator('interationCount', {
-                rules: [{
-                  required: true, message: '请输入ART中每个PI的迭代数!',
-                }],
-              })(
-                <InputNumber
-                  formatter={NumberFormatter}
-                  style={{ width: 500 }}
-                  label="迭代数"
-                  placeholder="请输入ART中每个PI的迭代数"
-                />,
-              )}
-              <Tooltip title="规划一个pi中team的迭代数量。">
-                <Icon
-                  type="error"
-                  className="tooltip-icon after-input"
-                />
-              </Tooltip>
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator('interationWeeks', {})(
-                <Select style={{ width: 500 }} label="迭代工作周" placeholder="请选择每个迭代的工作周数">
-                  {
-                  [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
-                }
-                </Select>,
-              )}
-
-              {getFieldDecorator('ipWeeks', {
-                rules: [{
-                  required: true, message: '请选择每个迭代的工作周数!',
-                }],
-              })(
-                <Select style={{ width: 500 }} label="迭代工作周" placeholder="请选择每个迭代的工作周数">
+                <Select style={{ width: 500 }} label="IP时长（周）" placeholder="请选择IP时长">
                   {
                     [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
                   }
                 </Select>,
+
               )}
-              {/* <Tooltip title="规划一个迭代的时长，通常是2周或者4周。">
-                <Icon
-                  type="error"
-                  className="tooltip-icon"
-                />
-              </Tooltip> */}
             </FormItem>
           </TabPane>
           <TabPane tab="PI规则" key="3">

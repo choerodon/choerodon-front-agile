@@ -18,7 +18,7 @@ const { Option } = Select;
 const BV = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 @observer
-class EditPI extends Component {
+class EditPIAims extends Component {
   handleOnOk = () => {
     const { editingPiAimsInfo, form } = this.props;
     PIStore.setPIAimsLoading(true);
@@ -38,7 +38,7 @@ class EditPI extends Component {
         };
         upDatePIAmix(piObjectiveDTO).then((res) => {
           getPIAims(editingPiAimsInfo.piId).then((piAims) => {
-            PIStore.setPiAims(piAims);
+            PIStore.setPIAims(piAims);
             PIStore.setEditPiAimsCtrl(piAims.program.map((item, index) => (
               {
                 isEditing: false,
@@ -129,4 +129,4 @@ class EditPI extends Component {
   }
 }
 
-export default Form.create()(EditPI);
+export default Form.create()(EditPIAims);
