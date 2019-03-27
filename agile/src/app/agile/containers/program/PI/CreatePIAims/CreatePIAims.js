@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Icon, Modal, Form, Select, Input, Checkbox,
+  Modal, Form, Select, Input, Checkbox,
 } from 'choerodon-ui';
 import {
-  stores, Page, Header, Content,  
+  stores,
 } from 'choerodon-front-boot';
 import moment from 'moment';
 import PIStore from '../../../../stores/Program/PI/PIStore';
@@ -75,6 +75,7 @@ class CreatePIAims extends Component {
   render() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
+    // eslint-disable-next-line no-unused-vars
     const { PIList, createPIVisible, createStretch } = PIStore;
     return (
       <Sidebar
@@ -87,7 +88,7 @@ class CreatePIAims extends Component {
         onCancel={this.handleOnCancel}
       >
         <Form>
-          <FormItem label="PI" style={{ width: 520 }}>
+          {/* <FormItem label="PI" style={{ width: 520 }}>
             {getFieldDecorator('piId', {
               rules: [{ required: true, message: 'PI为必选项' }],
             })(
@@ -108,7 +109,7 @@ class CreatePIAims extends Component {
                 )}
               </Select>,
             )}
-          </FormItem>
+          </FormItem> */}
           <FormItem style={{ width: 520 }}>
             {getFieldDecorator('name', {
               rules: [{ required: true, message: 'PI目标名称为必输项' }],

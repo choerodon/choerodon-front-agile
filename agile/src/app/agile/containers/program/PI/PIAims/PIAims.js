@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Icon, Table, Radio, Divider, Form, Input, Card, Tooltip, Spin, Modal, Select,
+  Button, Icon, Table, Radio, Form, Spin, Modal, Select,
 } from 'choerodon-ui';
 import {
   stores, Page, Header, Content,  
@@ -9,9 +9,8 @@ import {
 import moment from 'moment';
 
 import PIStore from '../../../../stores/Program/PI/PIStore';
-import { PIListLink } from '../../../../common/utils';
 import { 
-  createPIAims, getPIAims, upDatePIAmix, deletePIAims, getPIList,
+  getPIAims, deletePIAims, getPIList,
 } from '../../../../api/PIApi';
 import ProgramAimsTable from './component/ProgramAimsTable';
 import PIAimsCard from './component/PIAimsCard';
@@ -22,7 +21,6 @@ import CreatePIAims from '../CreatePIAims/CreatePIAims';
 import './PIAims.scss';
 import EditPIAims from '../EditPIAims';
 
-const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const RadioButton = Radio.Button;
 const { Option } = Select;
@@ -68,12 +66,12 @@ class PIAims extends Component {
 
   componentDidMount() {
     PIStore.setPIAimsLoading(true);
-    getPIList().then((PiList) => {
-      PIStore.setPiList(PiList.content);
+    getPIList().then((PIList) => {
+      PIStore.setPIList(PIList.content);
       this.setState({
-        selectedPIId: PiList.content[0] && PiList.content[0].id,
+        selectedPIId: PIList.content[0] && PIList.content[0].id,
       });
-      this.getPIAims(PiList.content[0] && PiList.content[0].id);
+      this.getPIAims(PIList.content[0] && PIList.content[0].id);
     });
   }
 
@@ -103,7 +101,6 @@ class PIAims extends Component {
     }, () => {
       this.getPIAims(value);
     });
-    this.getPIAims(e.target.value);
   }
 
   handleRadioChange = (e) => {
@@ -114,6 +111,7 @@ class PIAims extends Component {
 
   handleEditPiAims = (record) => {
     const { editPiAimsCtrl } = PIStore;
+    // eslint-disable-next-line no-shadow
     const { PIAims } = PIStore;
     const { editingIndex } = editPiAimsCtrl.find(item => item.editingId === record.id);
     editPiAimsCtrl.forEach((item) => {
@@ -191,21 +189,18 @@ class PIAims extends Component {
 
   render() {
     const {
-      showType, piName, editingPiAimsInfo, deletePIAimsModalVisible, deleteRecord, selectedPIId,
+      showType, editingPiAimsInfo, deletePIAimsModalVisible, deleteRecord, selectedPIId,
     } = this.state;
     const {
-      PiList, PiAims, PIAimsLoading, editPIVisible, 
+      // eslint-disable-next-line no-shadow
+      PIList, PIAims, PIAimsLoading, editPIVisible, 
     } = PIStore;
-    const teamDataSource = PiAims.teamAims;
-    const selectedPI = selectedPIId && PiList.find(item => item.id === selectedPIId);
-    const teamAimsColumns = [{
-      title: '团队名称',
-      dataIndex: 'teamName',
-    }];
+    const selectedPI = selectedPIId && PIList.find(item => item.id === selectedPIId);
+    
     return (
       <Page className="c7n-pi-detail">
         <Header title="PI目标">
-          <Button funcType="flat" disabled={!PiList || !PiList.length} onClick={this.handleCreateFeatureBtnClick}>
+          <Button funcType="flat" disabled={!PIList || !PIList.length} onClick={this.handleCreateFeatureBtnClick}>
             <Icon type="playlist_add" />
             <span>创建PI目标</span>
           </Button>
@@ -217,7 +212,7 @@ class PIAims extends Component {
         <Content>
           <Spin spinning={PIAimsLoading}>
             {
-              PiList && PiList.length > 0 ? (
+              PIList && PIList.length > 0 ? (
                 <div>
                   <div style={{
                     display: 'flex', justifyContent: 'space-between', height: 32, marginBottom: 20, 
@@ -225,13 +220,13 @@ class PIAims extends Component {
                   >
                     <Select onChange={this.handlePISelectChange} value={selectedPIId} dropdownClassName="c7n-pi-piSelect">
                       {
-                        PiList.map(pi => (
+                        PIList.map(pi => (
                           <Option key={pi.id} value={pi.id}>{`${pi.code}-${pi.name}`}</Option>
                         ))
                       }
                     </Select>
                     {
-                      PiAims.program && PiAims.program.length > 0 && (
+                      PIAims.program && PIAims.program.length > 0 && (
                         <RadioGroup className="c7n-pi-showTypeRadioGroup" onChange={this.handleRadioChange} defaultValue="list">
                           <RadioButton value="list">列表</RadioButton>
                           <RadioButton value="card">卡片</RadioButton>
@@ -264,8 +259,8 @@ class PIAims extends Component {
                     <PIAimsCard 
                       aimsCategory="program"
                       piName={`${selectedPI.code}-${selectedPI.name}`}
-                      aimsInfo={PiAims.program.filter(item => !item.stretch)}
-                      stretchAimsInfo={PiAims.program.filter(item => item.stretch)}
+                      aimsInfo={PIAims.program.filter(item => !item.stretch)}
+                      stretchAimsInfo={PIAims.program.filter(item => item.stretch)}
                     />
                   )
                 }
