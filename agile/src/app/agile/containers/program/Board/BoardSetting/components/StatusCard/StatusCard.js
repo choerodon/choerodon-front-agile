@@ -5,7 +5,7 @@ import {
   Radio, Icon, Tooltip, Modal,
 } from 'choerodon-ui';
 import { stores, Permission } from 'choerodon-front-boot';
-import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
+import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
 import EditStatus from '../EditStatus/EditStatus';
 import './StatusCard.scss';
 
@@ -23,7 +23,7 @@ class StatusCard extends Component {
   }
 
   getStatusNumber() {
-    const data = ScrumBoardStore.getBoardData;
+    const data = BoardStore.getBoardData;
     let length = 0;
     for (let index = 0, len = data.length; index < len; index += 1) {
       length += data[index].subStatuses.length;
@@ -34,7 +34,7 @@ class StatusCard extends Component {
   handleDeleteClick = async () => {
     const { data } = this.props;
     const deleteCode = data.statusId;
-    const canBeDeleted = await ScrumBoardStore.axiosStatusCanBeDelete(deleteCode);
+    const canBeDeleted = await BoardStore.axiosStatusCanBeDelete(deleteCode);
     const that = this;
     if (canBeDeleted) {
       confirm({
@@ -57,8 +57,8 @@ class StatusCard extends Component {
 
   async handleDeleteStatus() {
     const { data: propData, refresh } = this.props;
-    const originData = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
-    const data = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
+    const originData = JSON.parse(JSON.stringify(BoardStore.getBoardData));
+    const data = JSON.parse(JSON.stringify(BoardStore.getBoardData));
     const deleteCode = propData.statusId;
     let deleteIndex = '';
     for (let index = 0, len = data[data.length - 1].subStatuses.length; index < len; index += 1) {
@@ -67,11 +67,11 @@ class StatusCard extends Component {
       }
     }
     data[data.length - 1].subStatuses.splice(deleteIndex, 1);
-    ScrumBoardStore.setBoardData(data);
+    BoardStore.setBoardData(data);
     try {
-      await ScrumBoardStore.axiosDeleteStatus(deleteCode);
+      await BoardStore.axiosDeleteStatus(deleteCode);
     } catch (err) {
-      ScrumBoardStore.setBoardData(originData);
+      BoardStore.setBoardData(originData);
     }
     refresh();
   }
@@ -141,9 +141,9 @@ class StatusCard extends Component {
                   type="settings"
                   role="none"
                   onClick={() => {
-                    if (JSON.stringify(ScrumBoardStore.getStatusCategory) === '{}') {
-                      ScrumBoardStore.axiosGetStatusCategory().then((backData) => {
-                        ScrumBoardStore.setStatusCategory(backData);
+                    if (JSON.stringify(BoardStore.getStatusCategory) === '{}') {
+                      BoardStore.axiosGetStatusCategory().then((backData) => {
+                        BoardStore.setStatusCategory(backData);
                         this.setState({
                           visible: true,
                         });
@@ -157,7 +157,7 @@ class StatusCard extends Component {
                   }}
                 />
               </Permission>
-              {ScrumBoardStore.getCanAddStatus ? (
+              {BoardStore.getCanAddStatus ? (
                 <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.deleteStatus']}>
                   <Icon
                     style={{
@@ -217,7 +217,7 @@ class StatusCard extends Component {
                       this.setState({
                         disabled: true,
                       });
-                      ScrumBoardStore.axiosUpdateIssueStatus(
+                      BoardStore.axiosUpdateIssueStatus(
                         data.id, clickData,
                       ).then((res) => {
                         refresh();

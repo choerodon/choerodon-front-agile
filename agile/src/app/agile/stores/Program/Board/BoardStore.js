@@ -176,7 +176,7 @@ class BoardStore {
   }
 
   axiosCanAddStatus() {
-    axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/check_create_status_for_agile`)
+    axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/check_create_status_for_agile?applyType=program`)
       .then((data) => {
         this.setCanAddStatus(data);
       })
@@ -607,11 +607,11 @@ class BoardStore {
   }
 
   axiosAddColumn(categoryCode, data) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column?categoryCode=${categoryCode}`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column?categoryCode=${categoryCode}&applyType=program`, data);
   }
 
   axiosAddStatus(data) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status?applyType=program`, data);
   }
 
   // eslint-disable-next-line consistent-return
@@ -635,11 +635,11 @@ class BoardStore {
   }
 
   axiosGetUnsetData(boardId) {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list_by_options?boardId=${boardId}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list_by_options?boardId=${boardId}&applyType=program`);
   }
 
   axiosStatusCanBeDelete(code) {
-    return axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/check_remove_status_for_agile?status_id=${code}`);
+    return axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/check_remove_status_for_agile?status_id=${code}&applyType=program`);
   }
 
   axiosDeleteStatus(code) {
@@ -649,10 +649,25 @@ class BoardStore {
   updateIssue = (
     {
       issueId, objectVersionNumber, boardId, originColumnId, columnId,
-      before, outsetIssueId, sprintId, issueTypeId,
-    }, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId, piId, rank, piChange,
+      before, sprintId, issueTypeId,
+    }, startStatus, startStatusIndex, destinationStatus, destinationStatusIndex, SwimLaneId, piId, rank, piChange,
   ) => {
     const proId = AppState.currentMenuType.id;
+    let outsetIssueId = '';
+
+    if (destinationStatusIndex !== 0) {
+      // 从另一个列拖过来传，目标位置-1的id
+      if (startStatus !== destinationStatus) {        
+        outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId;
+        // 从同一列的前面拖过来传，目标位置的id
+      } else if (startStatusIndex < destinationStatusIndex) {
+        outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex].issueId;         
+        // 从同一列的后面拖过来传，目标位置-1的id
+      } else if (startStatusIndex > destinationStatusIndex) {
+        outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId;         
+      }
+    } 
+    // debugger;
     const data = {
       issueId,
       objectVersionNumber,
@@ -661,9 +676,7 @@ class BoardStore {
       originColumnId: this.statusColumnMap.get(startStatus),
       columnId: this.statusColumnMap.get(destinationStatus),
       before: destinationStatusIndex === 0,
-      outsetIssueId:
-        destinationStatusIndex === 0 ? ''
-          : this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId,
+      outsetIssueId,
       piId, // 从准备拖到其他或从其他拖到其他传piId,其他情况传0，没有活跃也传0
       rank,     
       piChange,

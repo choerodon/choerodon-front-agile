@@ -4,7 +4,7 @@ import { axios, Content, stores } from 'choerodon-front-boot';
 import {
   Form, Modal, Input, Select,
 } from 'choerodon-ui';
-import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
+import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
 import { STATUS } from '../../../../../common/Constant';
 
 const FormItem = Form.Item;
@@ -56,8 +56,8 @@ class AddColumn extends Component {
 
   renderOptions() {
     const result = [];
-    if (JSON.stringify(ScrumBoardStore.getStatusCategory) !== '{}') {
-      const data = ScrumBoardStore.getStatusCategory.lookupValues;
+    if (JSON.stringify(BoardStore.getStatusCategory) !== '{}') {
+      const data = BoardStore.getStatusCategory.lookupValues;
       data.sort();
       for (let index = 0, len = data.length; index < len; index += 1) {
         result.push(
@@ -93,7 +93,7 @@ class AddColumn extends Component {
       statusType,
     } = this.state;
     const { getFieldDecorator } = form;
-    const { name: kanbanName } = ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard);
+    const { name: kanbanName } = BoardStore.getBoardList.get(BoardStore.getSelectedBoard);
     return (
       <Sidebar
         title="添加列"

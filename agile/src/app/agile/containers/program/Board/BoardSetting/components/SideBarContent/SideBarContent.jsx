@@ -4,8 +4,8 @@ import { Content, stores, axios } from 'choerodon-front-boot';
 import {
   Form, Modal, Input, Select, message,
 } from 'choerodon-ui';
-import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
-import { STATUS } from '../../../../../common/Constant';
+import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
+import { STATUS } from '../../../../../../common/Constant';
 
 const FormItem = Form.Item;
 const { Sidebar, confirm } = Modal;
@@ -34,18 +34,18 @@ class SideBarContent extends Component {
         const status = statusDate.find(s => s.name === values.name);
         const { categoryCode } = values;
         const data = {
-          boardId: ScrumBoardStore.getSelectedBoard,
+          boardId: BoardStore.getSelectedBoard,
           name: values.name,
           projectId: AppState.currentMenuType.id,
           categoryCode: values.categoryCode,
-          sequence: ScrumBoardStore.getBoardData.length - 1,
+          sequence: BoardStore.getBoardData.length - 1,
         };
         if (status) {
           confirm({
             title: '警告',
             content: `已存在状态“${values.name}”，如果创建该列，不会创建同名状态`,
             onOk() {
-              ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
+              BoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
                 onChangeVisible(false);
                 refresh();
               }).catch((error) => {
@@ -55,7 +55,7 @@ class SideBarContent extends Component {
             },
           });
         } else {
-          ScrumBoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
+          BoardStore.axiosAddColumn(categoryCode, data).then((res2) => {
             onChangeVisible(false);
             refresh();
             this.setState({
@@ -85,7 +85,7 @@ class SideBarContent extends Component {
           enable: true,
           categoryCode: values.categoryCode,
         };
-        ScrumBoardStore.axiosAddStatus(params).then((data) => {
+        BoardStore.axiosAddStatus(params).then((data) => {
           if (data && data.failed && data.code === 'error.status.exist') {
             Choerodon.prompt(`状态 ${values.name} 已经存在。`, 'error');
           }
@@ -139,8 +139,8 @@ class SideBarContent extends Component {
   }
 
   renderOptions() {
-    if (JSON.stringify(ScrumBoardStore.getStatusCategory) !== '{}') {
-      return ScrumBoardStore.getStatusCategory.lookupValues.sort().map(item => (
+    if (JSON.stringify(BoardStore.getStatusCategory) !== '{}') {
+      return BoardStore.getStatusCategory.lookupValues.sort().map(item => (
         <Option value={item.valueCode}>
           <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
             <div style={{
@@ -174,7 +174,7 @@ class SideBarContent extends Component {
       statusType,
     } = this.state;
     const { getFieldDecorator } = form;
-    const { name: kanbanName } = ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard);
+    const { name: kanbanName } = BoardStore.getBoardList.get(BoardStore.getSelectedBoard);
     const modifiedMap = new Map([
       ['Status', {
         name: '状态',

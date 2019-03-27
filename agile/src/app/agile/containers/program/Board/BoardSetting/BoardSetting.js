@@ -10,7 +10,8 @@ import {
 import { withRouter } from 'react-router-dom';
 import { ProgramBoardLink } from '../../../../common/utils';
 import BoardStore from '../../../../stores/Program/Board/BoardStore';
-import { SwimLanePage } from './components';
+import { SwimLanePage, ColumnPage } from './components';
+import './BoardSetting.scss';
 
 const { TabPane } = Tabs;
 
@@ -92,9 +93,9 @@ class BoardSetting extends Component {
           >
             <TabPane tab="列配置" key="1">
               <Spin spinning={loading}>
-                {/* <ColumnPage
+                <ColumnPage
                   refresh={this.refresh.bind(this)}
-                /> */}
+                />
               </Spin>
             </TabPane>
             <TabPane tab="泳道" key="2">

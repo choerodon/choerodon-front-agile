@@ -110,7 +110,7 @@
         Routes: /agile/board
         sort: 16
         permission:
-          - 'agile-service.art.queryArtList'
+          - 'agile-service.board.queryByOptionsInProgram'
     - "programSetting":
         icon: folder_shared
         category: PROGRAM

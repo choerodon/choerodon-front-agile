@@ -7,8 +7,8 @@ import {
 } from 'choerodon-ui';
 import StatusCard from '../StatusCard/StatusCard';
 import './SettingColumn.scss';
-import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
-import EasyEdit from '../../../../../components/EasyEdit/EasyEdit';
+import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
+import EasyEdit from '../../../../../../components/EasyEdit/EasyEdit';
 
 const { AppState } = stores;
 
@@ -25,7 +25,7 @@ class SettingColumn extends Component {
     this.setState({
       visible: true,
     });
-    // ScrumBoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
+    // BoardStore.axiosDeleteColumn(this.props.data.columnId).then((data) => {
     //   this.props.refresh();
     // }).catch((err) => {
     // });
@@ -36,7 +36,7 @@ class SettingColumn extends Component {
     const { data: propData, refresh } = this.props;
     for (let index = 0, len = propData.subStatuses.length; index < len; index += 1) {
       for (let index2 = 0, len2 = propData.subStatuses[index].issues.length; index2 < len2; index2 += 1) {
-        if (ScrumBoardStore.getCurrentConstraint === 'issue') {
+        if (BoardStore.getCurrentConstraint === 'issue') {
           totalIssues += 1;
         } else if (propData.subStatuses[index].issues[index2].typeCode !== 'sub_task') {
           totalIssues += 1;
@@ -73,13 +73,13 @@ class SettingColumn extends Component {
       maxminObj.maxNum = propData.maxNum;
     }
     const data = {
-      boardId: ScrumBoardStore.getSelectedBoard,
+      boardId: BoardStore.getSelectedBoard,
       columnId: propData.columnId,
       objectVersionNumber: propData.objectVersionNumber,
       projectId: AppState.currentMenuType.id,
       ...maxminObj,
     };
-    ScrumBoardStore.axiosUpdateMaxMinNum(
+    BoardStore.axiosUpdateMaxMinNum(
       propData.columnId, data,
     ).then(() => {
       Choerodon.prompt('设置成功');
@@ -95,15 +95,15 @@ class SettingColumn extends Component {
       objectVersionNumber: propData.objectVersionNumber,
       name,
       projectId: AppState.currentMenuType.id,
-      boardId: ScrumBoardStore.getSelectedBoard,
+      boardId: BoardStore.getSelectedBoard,
     };
-    ScrumBoardStore.axiosUpdateColumn(
-      propData.columnId, data, ScrumBoardStore.getSelectedBoard,
+    BoardStore.axiosUpdateColumn(
+      propData.columnId, data, BoardStore.getSelectedBoard,
     ).then((res) => {
-      const originData = ScrumBoardStore.getBoardData;
+      const originData = BoardStore.getBoardData;
       originData[index].objectVersionNumber = res.objectVersionNumber;
       originData[index].name = res.name;
-      ScrumBoardStore.setBoardData(originData);
+      BoardStore.setBoardData(originData);
     }).catch((error) => {
     });
   }
@@ -180,7 +180,7 @@ class SettingColumn extends Component {
                       this.setState({
                         visible: false,
                       });
-                      ScrumBoardStore.axiosDeleteColumn(data.columnId).then(() => {
+                      BoardStore.axiosDeleteColumn(data.columnId).then(() => {
                         refresh();
                       }).catch((err) => {
                       });
@@ -304,7 +304,7 @@ class SettingColumn extends Component {
                         this.setState({
                           visible: false,
                         });
-                        ScrumBoardStore.axiosDeleteColumn(data.columnId).then(() => {
+                        BoardStore.axiosDeleteColumn(data.columnId).then(() => {
                           refresh();
                         }).catch((err) => {
                         });
@@ -353,7 +353,7 @@ class SettingColumn extends Component {
                       ) : (
                         <div
                           style={{
-                            visibility: ScrumBoardStore.getCurrentConstraint === 'constraint_none' ? 'hidden' : 'visible',
+                            visibility: BoardStore.getCurrentConstraint === 'constraint_none' ? 'hidden' : 'visible',
                             display: 'flex',
                             justifyContent: 'space-between',
                             flexWrap: 'wrap',

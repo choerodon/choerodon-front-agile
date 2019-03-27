@@ -7,7 +7,7 @@ import {
 import _ from 'lodash';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import SettingColumn from '../SettingColumn/SettingColumn';
-import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
+import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
 import SideBarContent from '../SideBarContent/SideBarContent';
 
 const { AppState } = stores;
@@ -27,9 +27,9 @@ class ColumnPage extends Component {
     this.setState({
       addStatus: true,
     });
-    if (JSON.stringify(ScrumBoardStore.getStatusCategory) === '{}') {
-      ScrumBoardStore.axiosGetStatusCategory().then((data) => {
-        ScrumBoardStore.setStatusCategory(data);
+    if (JSON.stringify(BoardStore.getStatusCategory) === '{}') {
+      BoardStore.axiosGetStatusCategory().then((data) => {
+        BoardStore.setStatusCategory(data);
       }).catch((error) => {
       });
     }
@@ -42,30 +42,30 @@ class ColumnPage extends Component {
     const { refresh } = this.props;
     // 移动列
     if (result.destination.droppableId === 'columndrop') {
-      const originState2 = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
-      const newState2 = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
+      const originState2 = JSON.parse(JSON.stringify(BoardStore.getBoardData));
+      const newState2 = JSON.parse(JSON.stringify(BoardStore.getBoardData));
       let draggableData2 = {};
       [draggableData2] = newState2.splice(result.source.index, 1);
       newState2.splice(result.destination.index, 0, draggableData2);
-      ScrumBoardStore.setBoardData(newState2);
+      BoardStore.setBoardData(newState2);
       const data = {
-        boardId: ScrumBoardStore.getSelectedBoard,
+        boardId: BoardStore.getSelectedBoard,
         columnId: JSON.parse(result.draggableId).columnId,
         projectId: parseInt(AppState.currentMenuType.id, 10),
         sequence: result.destination.index,
         objectVersionNumber: JSON.parse(result.draggableId).objectVersionNumber,
       };
-      ScrumBoardStore.axiosUpdateColumnSequence(
-        ScrumBoardStore.getSelectedBoard, data,
+      BoardStore.axiosUpdateColumnSequence(
+        BoardStore.getSelectedBoard, data,
       ).then((res) => {
         refresh();
       }).catch((error) => {
-        ScrumBoardStore.setBoardData(originState2);
+        BoardStore.setBoardData(originState2);
       });
     } else {
       // 移动状态
-      const originState = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
-      const newState = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
+      const originState = JSON.parse(JSON.stringify(BoardStore.getBoardData));
+      const newState = JSON.parse(JSON.stringify(BoardStore.getBoardData));
       let draggableData = {};
       let columnIndex;
       for (let index = 0, len = newState.length; index < len; index += 1) {
@@ -79,7 +79,7 @@ class ColumnPage extends Component {
         const columnId = result.source.droppableId.split(',')[1];
         const minNum = result.source.droppableId.split(',')[2];
         let totalNum = 0;
-        if (ScrumBoardStore.getCurrentConstraint !== 'constraint_none') {
+        if (BoardStore.getCurrentConstraint !== 'constraint_none') {
           for (
             let index = 0, len = newState[columnIndex].subStatuses.length;
             index < len;
@@ -88,7 +88,7 @@ class ColumnPage extends Component {
               let index2 = 0, len2 = newState[columnIndex].subStatuses[index].issues.length;
               index2 < len2;
               index2 += 1) {
-              if (ScrumBoardStore.getCurrentConstraint === 'issue') {
+              if (BoardStore.getCurrentConstraint === 'issue') {
                 totalNum += 1;
               } else if (newState[columnIndex].subStatuses[index].issues[index2].issueTypeDTO.typeCode !== 'sub_task') {
                 totalNum += 1;
@@ -108,8 +108,8 @@ class ColumnPage extends Component {
             newState[index].subStatuses.splice(result.destination.index, 0, draggableData);
           }
         }
-        ScrumBoardStore.setBoardData(newState);
-        ScrumBoardStore.moveStatusToUnset(code, {
+        BoardStore.setBoardData(newState);
+        BoardStore.moveStatusToUnset(code, {
           columnId,
         }).then((data) => {
           const newData = data;
@@ -119,10 +119,10 @@ class ColumnPage extends Component {
               newState[index].subStatuses.splice(result.destination.index, 1, newData);
             }
           }
-          ScrumBoardStore.setBoardData(newState);
+          BoardStore.setBoardData(newState);
           refresh();
         }).catch((error) => {
-          ScrumBoardStore.setBoardData(originState);
+          BoardStore.setBoardData(originState);
         });
       } else {
         const code = result.draggableId.split(',')[0];
@@ -134,7 +134,7 @@ class ColumnPage extends Component {
         const minNum = result.source.droppableId.split(',')[2];
         const maxNum = result.destination.droppableId.split(',')[3];
         let totalNum = 0;
-        if (ScrumBoardStore.getCurrentConstraint !== 'constraint_none') {
+        if (BoardStore.getCurrentConstraint !== 'constraint_none') {
           for (
             let index = 0, len = newState[columnIndex].subStatuses.length;
             index < len;
@@ -143,7 +143,7 @@ class ColumnPage extends Component {
               let index2 = 0, len2 = newState[columnIndex].subStatuses[index].issues.length;
               index2 < len2;
               index2 += 1) {
-              if (ScrumBoardStore.getCurrentConstraint === 'issue') {
+              if (BoardStore.getCurrentConstraint === 'issue') {
                 totalNum += 1;
               } else if (newState[columnIndex].subStatuses[index].issues[index2].issueTypeDTO.typeCode !== 'sub_task') {
                 totalNum += 1;
@@ -169,7 +169,7 @@ class ColumnPage extends Component {
                   let index3 = 0, len3 = newState[index].subStatuses[index2].issues.length;
                   index3 < len3;
                   index3 += 1) {
-                  if (ScrumBoardStore.getCurrentConstraint === 'issue') {
+                  if (BoardStore.getCurrentConstraint === 'issue') {
                     destinationTotal += 1;
                   } else if (newState[index].subStatuses[index2].issues[index3].issueTypeDTO.typeCode !== 'sub_task') {
                     destinationTotal += 1;
@@ -180,7 +180,7 @@ class ColumnPage extends Component {
           }
           let draggableTotal = 0;
           for (let index = 0, len = draggableData.issues.length; index < len; index += 1) {
-            if (ScrumBoardStore.getCurrentConstraint === 'issue') {
+            if (BoardStore.getCurrentConstraint === 'issue') {
               draggableTotal += 1;
             } else if (draggableData.issues[index].issueTypeDTO.typeCode !== 'sub_task') {
               draggableTotal += 1;
@@ -196,8 +196,8 @@ class ColumnPage extends Component {
             newState[index].subStatuses.splice(result.destination.index, 0, draggableData);
           }
         }
-        ScrumBoardStore.setBoardData(newState);
-        ScrumBoardStore.moveStatusToColumn(code, {
+        BoardStore.setBoardData(newState);
+        BoardStore.moveStatusToColumn(code, {
           // categorycode,
           columnId,
           position,
@@ -211,10 +211,10 @@ class ColumnPage extends Component {
               newState[index].subStatuses.splice(result.destination.index, 1, newData);
             }
           }
-          ScrumBoardStore.setBoardData(newState);
+          BoardStore.setBoardData(newState);
           refresh();
         }).catch((error) => {
-          ScrumBoardStore.setBoardData(originState);
+          BoardStore.setBoardData(originState);
         });
       }
     }
@@ -224,9 +224,9 @@ class ColumnPage extends Component {
     this.setState({
       addColumn: true,
     });
-    if (JSON.stringify(ScrumBoardStore.getStatusCategory) === '{}') {
-      ScrumBoardStore.axiosGetStatusCategory().then((data) => {
-        ScrumBoardStore.setStatusCategory(data);
+    if (JSON.stringify(BoardStore.getStatusCategory) === '{}') {
+      BoardStore.axiosGetStatusCategory().then((data) => {
+        BoardStore.setStatusCategory(data);
       }).catch((error) => {
       });
     }
@@ -271,7 +271,7 @@ class ColumnPage extends Component {
   renderUnsetColumn() {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
-    const BoardData = ScrumBoardStore.getBoardData;
+    const BoardData = BoardStore.getBoardData;
     const { refresh } = this.props;
     if (BoardData.length > 0) {
       if (BoardData[BoardData.length - 1].columnId === 'unset') {
@@ -305,7 +305,7 @@ class ColumnPage extends Component {
   }
 
   render() {
-    const BoardData = JSON.parse(JSON.stringify(ScrumBoardStore.getBoardData));
+    const BoardData = JSON.parse(JSON.stringify(BoardStore.getBoardData)).sort((a,b)=>a.sequence-b.sequence);
     const { refresh } = this.props;
     const { addStatus, addColumn } = this.state;
     if (BoardData.length > 0) {
@@ -328,66 +328,9 @@ class ColumnPage extends Component {
         }}
         link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/"
       >
-        <div
-          style={{
-            marginTop: 16,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Permission
-            type={type}
-            projectId={projectId}
-            organizationId={orgId}
-            service={['agile-service.project-info.updateProjectInfo']}
-            noAccessChildren={(
-              <Select
-                value={ScrumBoardStore.getCurrentConstraint}
-                label="列约束"
-                style={{ width: 512 }}
-                disabled
-              >
-                {
-                  ScrumBoardStore.getLookupValue.constraint ? (
-                    ScrumBoardStore.getLookupValue.constraint.map(item => (
-                      <Option key={item.valueCode} value={item.valueCode}>{item.name}</Option>
-                    ))
-                  ) : ''
-                }
-              </Select>
-            )}
-          >
-            <Select
-              value={ScrumBoardStore.getCurrentConstraint}
-              label="列约束"
-              style={{ width: 512 }}
-              onChange={(value) => {
-                const oldData = ScrumBoardStore.getBoardList.get(ScrumBoardStore.getSelectedBoard);
-                ScrumBoardStore.axiosUpdateBoard({
-                  boardId: ScrumBoardStore.getSelectedBoard,
-                  columnConstraint: value,
-                  projectId: AppState.currentMenuType.id,
-                  objectVersionNumber: oldData.objectVersionNumber,
-                }).then((res) => {
-                  ScrumBoardStore.setBoardList(ScrumBoardStore.getSelectedBoard, res);
-                  ScrumBoardStore.setCurrentConstraint(value);
-                }).catch((error) => {
-                });
-              }}
-            >
-              {
-                ScrumBoardStore.getLookupValue.constraint ? (
-                  ScrumBoardStore.getLookupValue.constraint.map(item => (
-                    <Option key={item.valueCode} value={item.valueCode}>{item.name}</Option>
-                  ))
-                ) : ''
-              }
-            </Select>
-          </Permission>
           <div>
             {
-              ScrumBoardStore.getCanAddStatus ? (
+              BoardStore.getCanAddStatus ? (
                 <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.issue-status.createStatus']}>
                   <Button
                     funcType="flat"
@@ -410,8 +353,7 @@ class ColumnPage extends Component {
                 <span>添加列</span>
               </Button>
             </Permission>
-          </div>
-        </div>
+          </div>     
         <div
           className="c7n-scrumsetting"
           style={{
@@ -454,7 +396,7 @@ class ColumnPage extends Component {
                 });
               }}
               refresh={refresh.bind(this)}
-              store={ScrumBoardStore}
+              store={BoardStore}
             />
           ) : ''
         }
@@ -469,7 +411,7 @@ class ColumnPage extends Component {
                 });
               }}
               refresh={refresh.bind(this)}
-              store={ScrumBoardStore}
+              store={BoardStore}
             />
           ) : ''
         }

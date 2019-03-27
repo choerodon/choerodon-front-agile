@@ -174,7 +174,7 @@ class ScrumBoardStore {
   }
 
   axiosCanAddStatus() {
-    axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/check_create_status_for_agile`)
+    axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/check_create_status_for_agile?applyType=agile`)
       .then((data) => {
         this.setCanAddStatus(data);
       })
@@ -609,7 +609,7 @@ class ScrumBoardStore {
   }
 
   axiosAddStatus(data) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status?applyType=agile`, data);
   }
 
   // eslint-disable-next-line consistent-return
@@ -633,11 +633,11 @@ class ScrumBoardStore {
   }
 
   axiosGetUnsetData(boardId) {
-    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list_by_options?boardId=${boardId}`);
+    return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/list_by_options?boardId=${boardId}&applyType=agile`);
   }
 
   axiosStatusCanBeDelete(code) {
-    return axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/check_remove_status_for_agile?status_id=${code}`);
+    return axios.get(`/issue/v1/projects/${AppState.currentMenuType.id}/schemes/check_remove_status_for_agile?status_id=${code}&applyType=agile`);
   }
 
   axiosDeleteStatus(code) {

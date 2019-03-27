@@ -118,8 +118,8 @@ class BoardHome extends Component {
 
     const [type, parentId] = SwimLaneId.split('-');
     const piChange = piId !== issue.piId;
-    debugger;
-    BoardStore.updateIssue(issue, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId, piId, rank, piChange).then((data) => {
+    // debugger;
+    BoardStore.updateIssue(issue, startStatus, startStatusIndex, destinationStatus, destinationStatusIndex, SwimLaneId, piId, rank, piChange).then((data) => {
       if (data.failed) {
         Choerodon.prompt(data.message);
         BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, true);

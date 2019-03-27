@@ -5,7 +5,7 @@ import _ from 'lodash';
 import {
   Form, Modal, Input, Select, 
 } from 'choerodon-ui';
-import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
+import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
 
 const FormItem = Form.Item;
 const { Sidebar } = Modal;
@@ -32,7 +32,7 @@ class EditStatus extends Component {
           projectId: AppState.currentMenuType.id,
           categoryCode: values.categoryCode,
         };
-        ScrumBoardStore.axiosUpdateIssueStatus(this.props.data.id, params).then((data) => {
+        BoardStore.axiosUpdateIssueStatus(this.props.data.id, params).then((data) => {
           this.props.onChangeVisible(false);
           this.props.refresh();
         }).catch((error) => {
@@ -42,7 +42,7 @@ class EditStatus extends Component {
   }
 
   checkStatusName(rule, value, callback) {
-    ScrumBoardStore.axiosCheckRepeatName(value).then((res) => {
+    BoardStore.axiosCheckRepeatName(value).then((res) => {
       if (res) {
         if (this.state.changeName) {
           callback('状态名称重复');
@@ -58,8 +58,8 @@ class EditStatus extends Component {
 
   renderOptions() {
     const result = [];
-    if (JSON.stringify(ScrumBoardStore.getStatusCategory) !== '{}') {
-      const data = ScrumBoardStore.getStatusCategory.lookupValues;
+    if (JSON.stringify(BoardStore.getStatusCategory) !== '{}') {
+      const data = BoardStore.getStatusCategory.lookupValues;
       data.sort((x, y) => {
         if (x.valueCode === 'todo') {
           return -1;
@@ -103,9 +103,9 @@ class EditStatus extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     let name;
-    for (let index = 0, len = ScrumBoardStore.getBoardList.length; index < len; index += 1) {
-      if (ScrumBoardStore.getBoardList[index].boardId === ScrumBoardStore.getSelectedBoard) {
-        name = ScrumBoardStore.getBoardList[index].name;
+    for (let index = 0, len = BoardStore.getBoardList.length; index < len; index += 1) {
+      if (BoardStore.getBoardList[index].boardId === BoardStore.getSelectedBoard) {
+        name = BoardStore.getBoardList[index].name;
       }
     }
     return (
