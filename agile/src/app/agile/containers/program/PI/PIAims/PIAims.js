@@ -71,7 +71,7 @@ class PIAims extends Component {
     getPIList().then((PiList) => {
       PIStore.setPiList(PiList.content);
       this.setState({
-        selectedPIId: PiList.content[0].id,
+        selectedPIId: PiList.content[0] && PiList.content[0].id,
       });
       this.getPIAims(PiList.content[0] && PiList.content[0].id);
     });
@@ -79,6 +79,7 @@ class PIAims extends Component {
 
   getPIAims = (id) => {
     if (id) {
+      PIStore.setPIAimsLoading(true);
       getPIAims(id).then((res) => {
         PIStore.setPIAimsLoading(false);
         PIStore.setPIAims(res);
@@ -196,7 +197,7 @@ class PIAims extends Component {
       PiList, PiAims, PIAimsLoading, editPIVisible, 
     } = PIStore;
     const teamDataSource = PiAims.teamAims;
-    const selectedPI = PiList.find(item => item.id === selectedPIId);
+    const selectedPI = selectedPIId && PiList.find(item => item.id === selectedPIId);
     const teamAimsColumns = [{
       title: '团队名称',
       dataIndex: 'teamName',
@@ -204,11 +205,11 @@ class PIAims extends Component {
     return (
       <Page className="c7n-pi-detail">
         <Header title="PI目标">
-          <Button funcType="flat" onClick={this.handleCreateFeatureBtnClick}>
+          <Button funcType="flat" disabled={!PiList || !PiList.length} onClick={this.handleCreateFeatureBtnClick}>
             <Icon type="playlist_add" />
             <span>创建PI目标</span>
           </Button>
-          <Button funcType="flat" onClick={this.getPIAims.bind(this, selectedPIId)}>
+          <Button funcType="flat" onClick={() => { this.getPIAims(selectedPIId); }}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -224,7 +225,7 @@ class PIAims extends Component {
                   >
                     <Select onChange={this.handlePISelectChange} value={selectedPIId} dropdownClassName="c7n-pi-piSelect">
                       {
-                        PiList && PiList.map(pi => (
+                        PiList.map(pi => (
                           <Option key={pi.id} value={pi.id}>{`${pi.code}-${pi.name}`}</Option>
                         ))
                       }

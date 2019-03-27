@@ -30,7 +30,6 @@ const ArtTable = ({
     title: '名称',
     dataIndex: 'name',
     key: 'name',   
-    render: (name, record) => <span role="none" onClick={() => { onArtNameClick(record); }} style={{ color: '#3F51B5', cursor: 'pointer' }}>{name}</span>,
   }, {
     title: '开始日期',
     dataIndex: 'startDate',

@@ -108,10 +108,11 @@ class ArtForm extends Component {
                   format="YYYY-MM-DD"
                   style={{ width: 500 }}
                   label="开始日期"
+                  disabled
                 />,
               )}
             </FormItem>
-            <FormItem>
+            <FormItem style={{ marginBottom: 16 }}>
               {
                 getFieldDecorator('piCount', {
                   rules: [{
@@ -137,43 +138,33 @@ class ArtForm extends Component {
          
           </TabPane>
           <TabPane tab="ART节奏" key="2">
-            <FormItem>
-              {getFieldDecorator('ipWorkdays', {
-                rules: [{
-                  required: true, message: '请选择日期!',
-                }],
-              })(
-                <InputNumber
-                  formatter={NumberFormatter}
-                  style={{ width: 500 }}
-                  label="IP工作日"
-                  placeholder="请输入IP工作日天数"
-                />,
-              )}
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator('interationCount', {
-                rules: [{
-                  required: true, message: '请输入ART中每个PI的迭代数!',
-                }],
-              })(
-                <InputNumber
-                  formatter={NumberFormatter}
-                  style={{ width: 500 }}
-                  label="迭代数"
-                  placeholder="请输入ART中每个PI的迭代数"
-                />,
-              )}
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator('interationWeeks', {})(
-                <Select style={{ width: 500 }} label="迭代工作周" placeholder="请选择每个迭代的工作周数">
-                  {
+            <div style={{ display: 'flex', width: 500 }}>
+              <FormItem style={{ marginRight: 20 }}>
+                {getFieldDecorator('interationCount', {
+                  rules: [{
+                    required: true, message: '请输入ART中每个PI的迭代数!',
+                  }],
+                })(
+                  <Select style={{ width: 180 }} label="迭代数" placeholder="请输入ART中每个PI的迭代数">
+                    {
+                      [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
+                    }
+                  </Select>,
+
+                )}
+              </FormItem>
+              <FormItem>
+                {getFieldDecorator('interationWeeks', {})(
+                  <Select style={{ width: 300 }} label="迭代时长（周）" placeholder="请选择每个迭代的工作周数">
+                    {
                   [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
                 }
-                </Select>,
-              )}
-
+                  </Select>,
+                )}
+              </FormItem>
+            </div>
+           
+            <FormItem>
               {getFieldDecorator('ipWeeks', {
                 rules: [{
                   required: true, message: '请选择日期!',
@@ -186,12 +177,6 @@ class ArtForm extends Component {
                 </Select>,
 
               )}
-              {/* <Tooltip title="规划一个迭代的时长，通常是2周或者4周。">
-                <Icon
-                  type="error"
-                  className="tooltip-icon after-input"
-                />
-              </Tooltip> */}
             </FormItem>
           </TabPane>
           <TabPane tab="PI规则" key="3">

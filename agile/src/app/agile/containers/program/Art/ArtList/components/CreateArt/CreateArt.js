@@ -174,12 +174,6 @@ class CreateArt extends Component {
                   </Select>,
 
                 )}
-                {/* <Tooltip title="规划一个pi中team的迭代数量。">
-                <Icon
-                  type="error"
-                  className="tooltip-icon after-input"
-                />
-              </Tooltip> */}
               </FormItem>
               <FormItem>
                 {getFieldDecorator('interationWeeks', {
