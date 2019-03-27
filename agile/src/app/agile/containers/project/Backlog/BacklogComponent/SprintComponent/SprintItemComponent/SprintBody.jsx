@@ -40,11 +40,13 @@ const debounceCallback = deBounce(500);
           expand: false,
           loading: false,
         });
-        BacklogStore.createIssue({
-          ...res,
-          versionIds: res.versionIssueRelDTOList.length ? [res.versionIssueRelDTOList[0].versionId] : [],
-          versionNames: res.versionIssueRelDTOList.length ? [res.versionIssueRelDTOList[0].name] : [],
-        }, sprintId);
+        BacklogStore.axiosGetSprint().then((sprintDate) => {
+          BacklogStore.createIssue({
+            ...res,
+            versionIds: res.versionIssueRelDTOList.length ? [res.versionIssueRelDTOList[0].versionId] : [],
+            versionNames: res.versionIssueRelDTOList.length ? [res.versionIssueRelDTOList[0].name] : [],
+          }, sprintId, sprintDate);
+        });
       }).catch((error) => {
         this.setState({
           loading: false,

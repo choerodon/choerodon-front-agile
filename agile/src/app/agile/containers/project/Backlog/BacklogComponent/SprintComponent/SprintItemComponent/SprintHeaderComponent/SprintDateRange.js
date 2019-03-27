@@ -6,24 +6,30 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
 
 @inject('AppState', 'HeaderStore')
 @observer class SprintDateRange extends Component {
+  componentWillUpdate(nextProps, nextState, nextContext) {
+
+  }
+
   handleUpdateDate = (type, dateString) => {
     const { handleChangeDateRange } = this.props;
     handleChangeDateRange(type, dateString);
   };
 
-  componentWillUpdate(nextProps, nextState, nextContext) {
-
-  }
+  onClick = (e) => {
+    e.stopPropagation();
+  };
 
   render() {
     const { statusCode, startDate, endDate } = this.props;
     return statusCode === 'started' ? (
       <div
+        onClick={this.onClick}
         className="c7n-backlog-sprintData"
         style={{
           display: 'flex',
           flexWrap: 'wrap',
         }}
+        role="none"
       >
         <EasyEdit
           type="date"
@@ -54,6 +60,7 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
           }}
         >
           <div
+            onClick={this.onClick}
             className="c7n-backlog-sprintDataItem"
             role="none"
           >
