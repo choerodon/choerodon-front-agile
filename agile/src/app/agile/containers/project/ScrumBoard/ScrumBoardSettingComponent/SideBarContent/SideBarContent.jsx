@@ -140,7 +140,7 @@ class SideBarContent extends Component {
 
   renderOptions() {
     if (JSON.stringify(ScrumBoardStore.getStatusCategory) !== '{}') {
-      return ScrumBoardStore.getStatusCategory.lookupValues.sort().filter(item => item.valueCode === 'prepare').map(item => (
+      return ScrumBoardStore.getStatusCategory.lookupValues.sort().filter(item => item.valueCode !== 'prepare').map(item => (
         <Option value={item.valueCode}>
           <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
             <div style={{
