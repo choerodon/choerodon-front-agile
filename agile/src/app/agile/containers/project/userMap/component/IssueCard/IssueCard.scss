@@ -55,6 +55,8 @@
     padding: 0;
     border: 1px dashed transparent;
     border-radius: 2px;
+    overflow-y: hidden;
+    max-height: 85px;
 
     // 隐藏字数限制提示
     .ant-input-length-info {

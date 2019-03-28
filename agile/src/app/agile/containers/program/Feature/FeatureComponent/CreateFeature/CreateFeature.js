@@ -4,14 +4,14 @@ import {
   Select, Input, Icon, Radio, Form, Modal, Button,
 } from 'choerodon-ui';
 import { stores, axios, Content } from 'choerodon-front-boot';
-import WYSIWYGEditor from '../../../../components/WYSIWYGEditor';
-import FullEditor from '../../../../components/FullEditor';
-import UploadButton from '../../../../components/CommonComponent/UploadButton';
-import TypeTag from '../../../../components/TypeTag';
+import WYSIWYGEditor from '../../../../../components/WYSIWYGEditor';
+import FullEditor from '../../../../../components/FullEditor';
+import UploadButton from '../../../../../components/CommonComponent/UploadButton';
+import TypeTag from '../../../../../components/TypeTag';
 import {
   loadPriorities, loadProgramEpics, loadIssueTypes, createIssue, 
-} from '../../../../api/NewIssueApi';
-import { beforeTextUpload, handleFileUpload } from '../../../../common/utils';
+} from '../../../../../api/NewIssueApi';
+import { beforeTextUpload, handleFileUpload } from '../../../../../common/utils';
 import './CreateFeature.scss';
 
 const { AppState } = stores;
@@ -30,7 +30,6 @@ class CreateFeature extends Component {
       originEpics: [],
       selectedIssueType: undefined,
       defaultPriority: undefined,
-      featureType: 'enabler',
       storyPoints: '',
       fullEdit: false,
       delta: '',
@@ -56,7 +55,7 @@ class CreateFeature extends Component {
   handleOnOk = () => {
     const { callback, form } = this.props;
     const {
-      selectedIssueType, defaultPriority, featureType, storyPoints, delta,
+      selectedIssueType, defaultPriority, storyPoints, delta, fileList,
     } = this.state;
     form.validateFields((err, values) => {
       if (!err) {
@@ -74,10 +73,9 @@ class CreateFeature extends Component {
           featureDTO: {
             benfitHypothesis: values.benfitHypothesis,
             acceptanceCritera: values.acceptanceCritera,
-            featureType,
+            featureType: values.featureType,
           },
         };
-
         const deltaOps = delta;
         if (deltaOps) {
           beforeTextUpload(deltaOps, issueObj, this.handleCreateFeature);
@@ -87,10 +85,10 @@ class CreateFeature extends Component {
         }
       }
     });
-  }
+  };
 
   handleCreateFeature = (issueObj) => {
-    const { form, callback } = this.props;
+    const { form, onOk } = this.props;
     const { fileList } = this.state;
     const fileUpdateCallback = () => {
       this.setState({ fileList: [] });
@@ -109,13 +107,14 @@ class CreateFeature extends Component {
         }
       }
       Choerodon.prompt('创建成功');
-      form.resetFields();
       this.resetForm();
-      callback();
-    }).catch(() => {
+      if (onOk) {
+        onOk();
+      }
+    }).catch((e) => {
       Choerodon.prompt('创建失败');
     });
-  }
+  };
  
   resetForm = () => {
     const { form } = this.props;
@@ -124,22 +123,17 @@ class CreateFeature extends Component {
       storyPoints: '',
       delta: '',
       fileList: [],
-      featureType: 'enabler',
     });
     this.editor.setEditorContents(this.editor.getEditor(), '');
-  }
+  };
 
   handleOnCancel = () => {
-    const { callback } = this.props;
-    callback();
+    const { onCancel } = this.props;
     this.resetForm();
-  }
-
-  handleFeatureTypeChange = (e) => {
-    this.setState({
-      featureType: e.target.value,
-    });
-  }
+    if (onCancel) {
+      onCancel();
+    }
+  };
 
   handleEpicFilterChange = () => {
     this.setState({
@@ -151,7 +145,7 @@ class CreateFeature extends Component {
         selectLoading: false,
       });
     });
-  }
+  };
 
   handleChangeStoryPoint = (value) => {
     const { storyPoints } = this.state;
@@ -180,13 +174,13 @@ class CreateFeature extends Component {
       delta: value,
       fullEdit: false,
     });
-  }
+  };
 
   handleFullEditonCancel = () => {
     this.setState({
       fullEdit: false,
     });
-  }
+  };
 
   setFileList = (data) => {
     this.setState({ fileList: data });
@@ -197,7 +191,7 @@ class CreateFeature extends Component {
     const { form } = this.props;
     const { getFieldDecorator } = form;
     const {
-      fullEdit, delta, selectLoading, originEpics, selectedIssueType, storyPoints, fileList, featureType,
+      fullEdit, delta, selectLoading, originEpics, selectedIssueType, storyPoints, fileList,
     } = this.state;
     return (
       <Sidebar
@@ -215,34 +209,44 @@ class CreateFeature extends Component {
           link=""
         >
           <Form>
-            {selectedIssueType && (
-            <FormItem label="问题类型" style={{ width: 520 }}>
-              {getFieldDecorator('typeId', {
-                rules: [{ required: true, message: '问题类型为必输项' }],
-                initialValue: selectedIssueType.id,
+            {selectedIssueType ? (
+              <FormItem label="问题类型" style={{ width: 520, marginBottom: 20 }}>
+                {getFieldDecorator('typeId', {
+                  rules: [{ required: true, message: '问题类型为必输项' }],
+                  initialValue: selectedIssueType.id,
+                })(
+                  <Select
+                    label="问题类型"
+                    getPopupContainer={triggerNode => triggerNode.parentNode}
+                    disabled
+                  >
+                    <Option key={selectedIssueType.id} value={selectedIssueType.id}>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: '0 2px' }}>
+                        <TypeTag
+                          data={selectedIssueType}
+                          showName
+                        />
+                      </div>
+                    </Option>
+                  </Select>,
+                )}
+              </FormItem>
+            ) : ''
+            }
+            <FormItem label="特性类型" style={{ width: 520, marginBottom: 10 }}>
+              {getFieldDecorator('featureType', {
+                rules: [{ required: true, message: '特性类型为必输项' }],
+                initialValue: 'business',
               })(
-                <Select
-                  label="问题类型"
-                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                  disabled
+                <RadioDroup
+                  label="特性类型"
+                  style={{ display: 'flex', flexDirection: 'column', marginBottom: 5 }}
                 >
-                  <Option key={selectedIssueType.id} value={selectedIssueType.id}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                      <TypeTag
-                        data={selectedIssueType}
-                        showName
-                      />
-                    </div>
-                  </Option>
-                </Select>,
+                  <Radio value="business" style={{ marginBottom: 5 }}>业务</Radio>
+                  <Radio value="enabler">使能</Radio>
+                </RadioDroup>,
               )}
             </FormItem>
-            )}
-            <RadioDroup label="特性类型" style={{ display: 'flex', flexDirection: 'column', marginBottom: 5 }} value={featureType} onChange={this.handleFeatureTypeChange}>
-              <Radio value="business">业务</Radio>
-              <Radio value="enabler">使能</Radio>
-            </RadioDroup>
-
             <FormItem label="特性名称" style={{ width: 520, marginBottom: 20 }}>
               {getFieldDecorator('summary', {
                 rules: [{ required: true, message: '特性名称为必输项' }],
@@ -262,22 +266,22 @@ class CreateFeature extends Component {
                 </div>
               </div>
               {
-                  !fullEdit && (
-                    <div className="clear-p-mw">
-                      <WYSIWYGEditor
-                        saveRef={(editor) => { this.editor = editor; }}
-                        value={delta}
-                        style={{ height: 200, width: '100%' }}
-                        onChange={(value) => {
-                          this.setState({ delta: value });
-                        }}
-                      />
-                    </div>
-                  )
-                }
+                !fullEdit && (
+                  <div className="clear-p-mw">
+                    <WYSIWYGEditor
+                      saveRef={(editor) => { this.editor = editor; }}
+                      value={delta}
+                      style={{ height: 200, width: '100%' }}
+                      onChange={(value) => {
+                        this.setState({ delta: value });
+                      }}
+                    />
+                  </div>
+                )
+              }
             </div>
             
-            <FormItem label="史诗" style={{ width: 520 }}>
+            <FormItem label="史诗" style={{ width: 520, marginBottom: 15 }}>
               {getFieldDecorator('epicId', {})(
                 <Select
                   label="史诗"
@@ -325,7 +329,7 @@ class CreateFeature extends Component {
                 ))}
               </Select>
             </div>
-            <FormItem style={{ width: 520 }}>
+            <FormItem style={{ width: 520, marginBottom: 15 }}>
               {getFieldDecorator('benfitHypothesis', {
               })(
                 <Input label="特性价值" placeholder="请输入特性价值" maxLength={44} />,
@@ -339,7 +343,7 @@ class CreateFeature extends Component {
             </FormItem>
           </Form>
         
-          <div className="c7n-feature-signUpload" style={{ marginTop: 20 }}>
+          <div className="c7n-feature-signUpload" style={{ marginTop: 20, height: 33 }}>
             <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
               <div style={{ fontWeight: 'bold' }}>附件</div>
             </div>
