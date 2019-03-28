@@ -2,28 +2,78 @@
   background: white;
   background: #F4F4F4;
   padding: 10px 0;
+
   &-pi {
     position: relative;
     z-index: 2;
+
     &-title {
       height: 30px;
       line-height: 30px;
       padding: 0 10px;
       border: 1px solid #393E46;
-      border-left-width: 3px;
+      border-left: none;
       border-right: none;
     }
+
     &-sprints {
       height: 24px;
       line-height: 24px;
       background: white;
       display: flex;
     }
+
     &-sprint {
       flex: 1;
       height: 100%;
       // padding: 0 10px;
-      border-left: 3px solid #C0C0C0;    
+      border-left: 3px solid #C0C0C0;
+    }
+  }
+
+  .BorderLeft {
+    position: relative;
+
+    &:after {
+      content: "";
+      width: 0;
+      border-left: 3px solid currentColor;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+
+  .BorderLeft.cancel {
+    position: relative;
+
+    &:after {
+      border-color: #393E46;
+    }
+  }
+
+  .BorderLeft.todo {
+    position: relative;
+
+    &:after {
+      border-color: #FFB100;
+    }
+  }
+
+  .BorderLeft.doing {
+    position: relative;
+
+    &:after {
+      border-color: #4D90FE;
+    }
+  }
+
+  .BorderLeft.done {
+    position: relative;
+
+    &:after {
+      border-color: #00BFA5;
     }
   }
 }
