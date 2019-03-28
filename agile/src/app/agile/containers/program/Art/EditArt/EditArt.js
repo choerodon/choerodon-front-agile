@@ -46,7 +46,6 @@ class EditArt extends Component {
     });
     getArtById(id).then((data) => { 
       const {
-        enabled,
         interationCount,
         interationWeeks,
         ipWeeks,
@@ -59,7 +58,6 @@ class EditArt extends Component {
         piCount,
       } = data;
       const formData = {
-        enabled,
         interationCount,
         interationWeeks,
         ipWeeks,

@@ -7,25 +7,21 @@ import StatusTag from '../../../../../../components/StatusTag';
 const propTypes = {
   dataSource: PropTypes.shape({}).isRequired,
   onEditArtClick: PropTypes.func.isRequired,
-  onArtNameClick: PropTypes.func.isRequired,
 };
 const STATUS = {
-  todo: '未启用',
+  todo: '未启动',
   doing: '进行中',
-  done: '已完成',
-  discontinueUse: '停用',
+  stop: '停用',
 };
 const ArtTable = ({ 
   dataSource,
   onEditArtClick,
-  onArtNameClick,
-  onFinishArtClick,
 }) => {
   const columns = [{
     title: '编号',
     dataIndex: 'code',
     key: 'code',  
-    render: (code, record) => `#${code}`,  
+    render: code => `#${code}`,  
   }, {
     title: '名称',
     dataIndex: 'name',
@@ -39,13 +35,7 @@ const ArtTable = ({
     title: '状态',
     dataIndex: 'statusCode',
     key: 'statusCode',
-    render: (statusCode, record) => {
-      if (!record.enabled) {
-        // eslint-disable-next-line no-param-reassign
-        statusCode = 'discontinueUse';
-      }
-      return (<StatusTag categoryCode={statusCode} name={STATUS[statusCode]} />);
-    },
+    render: statusCode => (<StatusTag categoryCode={statusCode} name={STATUS[statusCode]} />),
   }, {
     title: '创建日期',
     dataIndex: 'createDate',
@@ -57,7 +47,6 @@ const ArtTable = ({
     render: (text, record) => (
       <div>
         <Button shape="circle" icon="mode_edit" onClick={() => { onEditArtClick(record); }} />
-        <Button shape="circle" disabled={record.enabled && record.statusCode === 'done'} icon="finished" onClick={() => { onFinishArtClick(record); }} />
       </div>
     ),
   }];

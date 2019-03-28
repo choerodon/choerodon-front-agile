@@ -4,10 +4,10 @@ import {
 } from 'choerodon-front-boot';
 import { Button, Spin } from 'choerodon-ui';
 import moment from 'moment';
-import { editArtLink, PICalendarLink } from '../../../../common/utils';
+import { editArtLink } from '../../../../common/utils';
 import { ArtTable, CreateArt } from './components';
 import {
-  getArtsByProjectId, createArt, beforeArtFinish, editArt, getArtById,
+  getArtsByProjectId, createArt,
 } from '../../../../api/ArtApi';
 
 function formatter(values) {
@@ -59,13 +59,13 @@ class ArtList extends Component {
     this.setState({
       createArtLoading: true,
     });
-    createArt(Data).then((res) => {
+    createArt(Data).then(() => {
       this.setState({
         createArtVisible: false,
         createArtLoading: false,
       });
       this.loadArts();
-    }).catch((err) => {
+    }).catch(() => {
       this.setState({
         createArtVisible: false,
         createArtLoading: false,
@@ -85,40 +85,14 @@ class ArtList extends Component {
     history.push(editArtLink(artId));
   }
 
-  handleArtNameClick = (record) => {
-    const { id: artId, name: ArtName } = record;
-    const { history } = this.props;
-    history.push(PICalendarLink(artId, ArtName));
-  }
-
-  handleFinishArtClick = (record) => {
-    const { id: artId } = record;
-    this.setState({
-      loading: true,
-    });
-    beforeArtFinish(artId).then((res) => {
-      if (res) {
-        getArtById(artId).then((artInfo) => {
-          editArt(Object.assign(artInfo, { statusCode: 'done' })).then(() => {
-            this.loadArts();
-          });
-        });
-      } else {
-        this.setState({
-          loading: false,
-        });
-        Choerodon.prompt('请确保所有PI完成后再完成ART');
-      }
-    });
-  }
-  
   handlePaginationChange = (pagination) => {
     this.loadArts(pagination);
   }
 
   render() {
     const {
-      data, createArtVisible, createArtLoading, pagination, loading, createDisabled,
+      // eslint-disable-next-line no-unused-vars
+      data, createArtVisible, createArtLoading, loading, createDisabled,
     } = this.state;
     return (
       <Page className="c7ntest-Issue c7ntest-region">
@@ -141,8 +115,6 @@ class ArtList extends Component {
             <ArtTable         
               dataSource={data}
               onEditArtClick={this.handleEditArtClick}
-              onArtNameClick={this.handleArtNameClick}
-              onFinishArtClick={this.handleFinishArtClick}
             />
           </Spin>
         </Content>

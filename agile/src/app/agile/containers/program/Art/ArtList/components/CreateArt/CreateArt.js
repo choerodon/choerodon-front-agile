@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Form, Input, Modal, DatePicker, Checkbox, Select, Steps, Button, Tabs,
+  Form, Input, Modal, DatePicker, Select, Steps, Button, Tabs,
 } from 'choerodon-ui';
-import moment from 'moment';
 import SelectFocusLoad from '../../../../../../components/SelectFocusLoad';
 import './CreateArt.scss';
 
@@ -28,6 +27,7 @@ class CreateArt extends Component {
     };
   }
 
+  // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState) {
     const { form, visible } = this.props;
     if (!prevProps.visible && visible) {
@@ -40,14 +40,18 @@ class CreateArt extends Component {
   }
 
   handlePrevStep = () => {
+    const { currentStep } = this.state;
+    const prevStep = currentStep - 1;
     this.setState({
-      currentStep: --this.state.currentStep,
+      currentStep: prevStep,
     });
   }
 
   handleNextStep = () => {
+    const { currentStep } = this.state;
+    const nextStep = currentStep + 1;
     this.setState({
-      currentStep: ++this.state.currentStep,
+      currentStep: nextStep,
     });
   }
 
@@ -120,10 +124,10 @@ class CreateArt extends Component {
                   required: true,
                   message: '请选择日期!',
                 }],
-                normalize: value => moment(value),
+             
               })(
                 <DatePicker
-                  allowClear={false}
+                  allowClear
                   format="YYYY-MM-DD"
                   style={{ width: 500 }}
                   label="开始日期"
@@ -146,14 +150,14 @@ class CreateArt extends Component {
                 )
               }
             </FormItem>
-            <FormItem>
+            {/* <FormItem>
               {getFieldDecorator('enabled', {
                 valuePropName: 'checked',
                 initialValue: false,
               })(
                 <Checkbox>启用</Checkbox>,
               )}
-            </FormItem>
+            </FormItem> */}
           </div>),
       },
       {
@@ -206,7 +210,6 @@ class CreateArt extends Component {
                     [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
                   }
                 </Select>,
-
               )}
               {/* <Tooltip title="为团队提供规律、有节奏的时间，让团队可以有机会开展一些在持续不断的增量价值发布的环境中很难进行的工作。通常设为1周">
                 <Icon
@@ -268,6 +271,7 @@ class CreateArt extends Component {
           </div>
           )}
         confirmLoading={loading}
+        // eslint-disable-next-line react/jsx-no-duplicate-props
         footer={(
           <div className="c7n-art-stepBtn">
             {
