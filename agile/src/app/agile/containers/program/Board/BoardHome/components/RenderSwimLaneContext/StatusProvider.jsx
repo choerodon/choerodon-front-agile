@@ -22,7 +22,7 @@ export default class StatusProvider extends Component {
       >
         <Droppable
           droppableId={`${statusId}/${columnId}/${categoryCode}`}
-          isDropDisabled={BoardStore.getCanDragOn.get(statusId) || (!BoardStore.getActivePi && columnCategoryCode !== 'prepare')}
+          isDropDisabled={BoardStore.getCanDragOn.get(statusId) || (!BoardStore.getActivePi && !['prepare', 'todo'].includes(columnCategoryCode))}
         >
           {(provided, snapshot) => (
             <React.Fragment>

@@ -213,7 +213,7 @@ class ScrumBoardHome extends Component {
 
     const [type, parentId] = SwimLaneId.split('-');
 
-    ScrumBoardStore.updateIssue(issue, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId).then((data) => {
+    ScrumBoardStore.updateIssue(issue, startStatus, startStatusIndex, destinationStatus, destinationStatusIndex, SwimLaneId).then((data) => {
       if (data.failed) {
         Choerodon.prompt(data.message);
         ScrumBoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, true);

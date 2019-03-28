@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import React, { Component } from 'react';
 import { toJS } from 'mobx';
 import { observer, inject } from 'mobx-react';
@@ -31,18 +32,29 @@ const style = swimLaneId => `
       visibility: visible !important;
   } 
 `;
-const canDropWhenNoPi = (swimLaneId, columnCategoryCode) => `
-  .${swimLaneId}.${columnCategoryCode}.c7n-swimlaneContext-itemBodyColumn {
+const canDropWhenNoPi = swimLaneId => `
+  .${swimLaneId}.prepare.c7n-swimlaneContext-itemBodyColumn {
     background-color: rgba(140, 158, 255, 0.12) !important;
   }
-  .${swimLaneId}.${columnCategoryCode}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus >  .c7n-swimlaneContext-itemBodyStatus-container {
+  .${swimLaneId}.prepare.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus >  .c7n-swimlaneContext-itemBodyStatus-container {
     border-width: 2px;
     border-style: dashed;
     border-color: #26348b;
   }
-  .${swimLaneId}.${columnCategoryCode}.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus > .c7n-swimlaneContext-itemBodyStatus-container > .c7n-swimlaneContext-itemBodyStatus-container-statusName {
+  .${swimLaneId}.prepare.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus > .c7n-swimlaneContext-itemBodyStatus-container > .c7n-swimlaneContext-itemBodyStatus-container-statusName {
       visibility: visible !important;
   } 
+  .${swimLaneId}.todo.c7n-swimlaneContext-itemBodyColumn {
+    background-color: rgba(140, 158, 255, 0.12) !important;
+  }
+  .${swimLaneId}.todo.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus >  .c7n-swimlaneContext-itemBodyStatus-container {
+    border-width: 2px;
+    border-style: dashed;
+    border-color: #26348b;
+  }
+  .${swimLaneId}.todo.c7n-swimlaneContext-itemBodyColumn > .c7n-swimlaneContext-itemBodyStatus > .c7n-swimlaneContext-itemBodyStatus-container > .c7n-swimlaneContext-itemBodyStatus-container-statusName {
+      visibility: visible !important;
+  }
 `;
 @CSSBlackMagic
 @inject('AppState', 'HeaderStore')
@@ -62,7 +74,7 @@ class BoardHome extends Component {
     BoardStore.resetDataBeforeUnmount();
   }
 
-  async getBoard() {    
+  async getBoard() {
     const boardListData = await BoardStore.axiosGetBoardList();
     const defaultBoard = boardListData.find(item => item.userDefault) || boardListData[0];
     if (defaultBoard.boardId) {
@@ -74,7 +86,7 @@ class BoardHome extends Component {
     BoardStore.setCreateFeatureVisible(true);
   }
 
-  handleSettingClick=() => {
+  handleSettingClick = () => {
     const { history } = this.props;
     history.push(ProgramBoardSettingLink());
   }
@@ -82,18 +94,18 @@ class BoardHome extends Component {
   onDragStart = (result) => {
     const { headerStyle } = this.props;
     const { draggableId } = result;
-    const [SwimLaneId, issueId, columnCategoryCode] = draggableId.split(['/']);    
+    const [SwimLaneId, issueId, columnCategoryCode] = draggableId.split(['/']);
     // 没有活跃pi，只能在当前列拖动
-    if (!BoardStore.getActivePi) {      
+    if (!BoardStore.getActivePi) {
       // headerStyle.changeStyle(canDropWhenNoPi(SwimLaneId));
-      headerStyle.changeStyle(canDropWhenNoPi(SwimLaneId, columnCategoryCode));
-    } else {    
+      headerStyle.changeStyle(canDropWhenNoPi(SwimLaneId));
+    } else {
       headerStyle.changeStyle(style(SwimLaneId));
-    }    
+    }
     BoardStore.setIsDragging(true);
   };
 
-  onDragEnd = (result) => {   
+  onDragEnd = (result) => {
     const { headerStyle } = this.props;
     const { destination, source, draggableId } = result;
     const [SwimLaneId, issueId] = draggableId.split(['/']);
@@ -104,7 +116,7 @@ class BoardHome extends Component {
     if (!destination) {
       return;
     }
-    
+
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }
@@ -114,7 +126,10 @@ class BoardHome extends Component {
 
     const [destinationStatus, destinationColumn, destinationStatusCode] = destination.droppableId.split(['/']).map(id => (isNaN(id) ? id : parseInt(id, 10)));
     const destinationStatusIndex = destination.index;
-
+    // 同一列且同一个状态拖动，不处理
+    if (startColumn === destinationColumn && startStatus === destinationStatus) {
+      return;
+    }
     const issue = {
       ...allDataMap.get(+issueId),
       stayDay: 0,
@@ -124,13 +139,13 @@ class BoardHome extends Component {
     const { categoryCode: destinationColumnStatusCode } = destinationColumnData;
     const destinationSwimLineData = toJS(BoardStore.getSwimLaneData[SwimLaneId][destinationStatus]);
     const activePi = toJS(BoardStore.activePi);
-    console.log(destinationSwimLineData, destinationColumnData, activePi);
     const rank = destinationColumnStatusCode !== 'prepare';
     let piId;
 
     if (destinationColumnStatusCode === 'prepare' && destinationColumnStatusCode === 'prepare') {
       piId = undefined;
     } else if (destinationSwimLineData.length > 0) {
+      // eslint-disable-next-line prefer-destructuring
       piId = destinationSwimLineData[0].piId;
     } else {
       piId = activePi ? activePi.id : undefined;
@@ -144,9 +159,9 @@ class BoardHome extends Component {
         Choerodon.prompt(data.message);
         BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, true);
       } else {
-        if (BoardStore.getSwimLaneCode === 'parent_child' && parentId !== 'other') {
-          BoardStore.judgeMoveParentToDone(destinationStatus, SwimLaneId, +parentId, BoardStore.getStatusMap.get(destinationStatus).categoryCode === 'done');
-        }
+        // if (BoardStore.getSwimLaneCode === 'parent_child' && parentId !== 'other') {
+        //   BoardStore.judgeMoveParentToDone(destinationStatus, SwimLaneId, +parentId, BoardStore.getStatusMap.get(destinationStatus).categoryCode === 'done');
+        // }
         if (data.issueId === BoardStore.getCurrentClickId) {
           BoardStore.getEditRef.reloadIssue();
         }
@@ -159,7 +174,7 @@ class BoardHome extends Component {
     BoardStore.setSwimLaneData(SwimLaneId, startStatus, startStatusIndex, SwimLaneId, destinationStatus, destinationStatusIndex, issue, false);
   };
 
-  handleCreate=() => {
+  handleCreate = () => {
     BoardStore.setCreateFeatureVisible(false);
     this.refresh(BoardStore.getBoardList.get(BoardStore.getSelectedBoard));
   }

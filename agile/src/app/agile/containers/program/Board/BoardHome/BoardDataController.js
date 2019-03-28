@@ -210,7 +210,9 @@ export default class BoardDataController {
   convertDataWithStructure(data) {
     const structureMap = JSON.parse(JSON.stringify(this.statusStructureMap));
     Object.keys(structureMap).forEach((status) => {
-      structureMap[status] = _.sortBy(data.filter(issue => issue.statusId === status * 1), o => o.rank);
+      // 先去掉排序
+      // structureMap[status] = _.sortBy(data.filter(issue => issue.statusId === status * 1), o => o.rank);
+      structureMap[status] = data.filter(issue => issue.statusId === status * 1);
     });
     return structureMap;
   }

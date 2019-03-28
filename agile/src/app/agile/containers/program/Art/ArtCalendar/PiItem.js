@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import Moment from 'moment';
-import { Popover, Progress } from 'choerodon-ui';
+import { Popover } from 'choerodon-ui';
 import { extendMoment } from 'moment-range';
 import StatusTag from '../../../../components/StatusTag';
 
@@ -89,14 +89,14 @@ const CardTitle = ({
     </div>
   );
 };
-const CardBody = () => (
-  <div>
-    <Progress percent={50} strokeColor="#4D90FE" />
-    <div style={{ margin: '10px 0' }}>
-      {'故事点:68 / 120'}
-    </div>
-  </div>
-);
+// const CardBody = () => (
+//   <div>
+//     <Progress percent={50} strokeColor="#4D90FE" />
+//     <div style={{ margin: '10px 0' }}>
+//       {'故事点:68 / 120'}
+//     </div>
+//   </div>
+// );
 class PiItem extends Component {
   render() {
     const { pi } = this.props;
@@ -115,7 +115,7 @@ class PiItem extends Component {
         }}
       >
         <div className="PiItem-pi">
-          <div className="PiItem-pi-title" style={{ borderColor: style.borderColor, background: style.backgroundColor, color: style.PIColor }}>
+          <div className={`PiItem-pi-title BorderLeft ${statusCode}`} style={{ borderColor: style.borderColor, background: style.backgroundColor, color: style.PIColor }}>
 
             <Popover
               // autoAdjustOverflow={false}
@@ -135,11 +135,8 @@ class PiItem extends Component {
             ))}
             <div className="PiItem-pi-sprint" style={{ flex: ipWeeks, borderColor: style.sprintBorder }}>
               <div style={{ padding: '0 10px' }}>
-
-
-
                 IP
-</div>
+              </div>
             </div>
           </div>
         </div>

@@ -127,11 +127,11 @@ class FeatureDetail extends Component {
   }
 
   componentDidMount() {
-    // const { onRef, issueId } = this.props;
-    const issueId = 39765;
-    // if (onRef) {
-    //   onRef(this);
-    // }
+    const { onRef, issueId } = this.props;
+    // const issueId = 39765;
+    if (onRef) {
+      onRef(this);
+    }
     this.firstLoadIssue(issueId);
     document.getElementById('scroll-area').addEventListener('scroll', (e) => {
       if (sign) {
@@ -666,11 +666,6 @@ class FeatureDetail extends Component {
           datalogs: res,
         });
       });
-      loadBranchs(issueId).then((res) => {
-        this.setState({
-          branchs: res || {},
-        });
-      });
       loadWikies(issueId).then((res) => {
         this.setState({
           wikies: res || [],
@@ -1126,101 +1121,123 @@ class FeatureDetail extends Component {
             <div className="c7n-header-editIssue">
               <div className="c7n-content-editIssue" style={{ overflowY: 'hidden' }}>
                 <div
+                  className="line-justify"
                   style={{
-                    cursor: 'pointer', fontSize: '13px', lineHeight: '20px', display: 'flex', alignItems: 'center',
+                    height: '28px',
+                    alignItems: 'center',
+                    marginTop: '10px',
+                    marginBottom: '3px',
                   }}
-                  role="none"
-                  // onClick={() => {
-                  //   onCancel();
-                  // }}
                 >
-                  <Icon type="last_page" style={{ fontSize: '18px', fontWeight: '500' }} />
-                  <span>隐藏详情</span>
-                </div>
-              </div>
-              <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
-                <ReadAndEdit
-                  callback={this.changeRae.bind(this)}
-                  thisType="summary"
-                  line
-                  current={currentRae}
-                  origin={origin.summary}
-                  onInit={() => this.setAnIssueToState()}
-                  onOk={this.updateIssue.bind(this, 'summary')}
-                  onCancel={this.resetSummary.bind(this)}
-                  readModeContent={(
-                    <div className="c7n-summary">
-                      {summary}
-                    </div>
-                    )}
-                >
-                  <TextArea
-                    maxLength={44}
-                    value={summary}
-                    size="small"
-                    onChange={this.handleTitleChange.bind(this)}
-                    onPressEnter={() => {
-                      this.updateIssue('summary');
-                      this.setState({
-                        currentRae: undefined,
-                      });
-                    }}
-                  />
-                </ReadAndEdit>
-                <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
-                  <Dropdown overlay={getMenu()} trigger={['click']}>
-                    <Button icon="more_vert" />
-                  </Dropdown>
-                </div>
-              </div>
-              <div className="line-start">
-                {
-                  <div style={{ display: 'flex', marginRight: 25 }}>
-                    <span>故事点：</span>
-                    <div style={{ maxWidth: 130 }}>
-                      <ReadAndEdit
-                        callback={this.changeRae.bind(this)}
-                        thisType="storyPoints"
-                        current={currentRae}
-                        handleEnter
-                        origin={origin.storyPoints}
-                        onInit={() => this.setAnIssueToState(origin)}
-                        onOk={this.updateIssue.bind(this, 'storyPoints')}
-                        onCancel={this.resetStoryPoints.bind(this)}
-                        readModeContent={(
-                          <span>
-                            {storyPoints === undefined || storyPoints === null ? '无' : `${storyPoints} 点`}
-                          </span>
-                        )}
-                      >
-                        <Select
-                          value={storyPoints && storyPoints.toString()}
-                          mode="combobox"
-                              // onBlur={e => this.statusOnChange(e)}
-                          ref={(e) => {
-                            this.componentRef = e;
-                          }}
-                          onPopupFocus={(e) => {
-                            this.componentRef.rcSelect.focus();
-                          }}
-                          tokenSeparators={[',']}
-                              // getPopupContainer={triggerNode => triggerNode.parentNode}
-                          style={{ marginTop: 0, paddingTop: 0 }}
-                          onChange={value => this.handleChangeStoryPoint(value)}
-                        >
-                          {storyPointList.map(sp => (
-                            <Option key={sp.toString()} value={sp}>
-                              {sp}
-                            </Option>
-                          ))}
-                        </Select>
-                      </ReadAndEdit>
-                   
-                    </div>
+                  <div style={{ fontSize: 16, lineHeight: '28px', fontWeight: 500 }}>  
+                    <a
+                      role="none"
+                      onClick={() => {
+                      // const backUrl = this.props.backUrl || 'backlog';
+                        history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${origin.issueNum}&paramIssueId=${origin.issueId}&paramUrl=${backUrl || 'backlog'}`);
+                        return false;
+                      }}
+                    >
+                      {issueNum}
+                    </a>
                   </div>
-                  }
-              </div>
+                  <div
+                    style={{
+                      cursor: 'pointer', fontSize: '13px', lineHeight: '20px', display: 'flex', alignItems: 'center',
+                    }}
+                    role="none"
+                    onClick={() => {
+                      onCancel();
+                    }}
+                  >
+                    <Icon type="last_page" style={{ fontSize: '18px', fontWeight: '500' }} />
+                    <span>隐藏详情</span>
+                  </div>
+                </div>
               
+                <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
+                  <ReadAndEdit
+                    callback={this.changeRae.bind(this)}
+                    thisType="summary"
+                    line
+                    current={currentRae}
+                    origin={origin.summary}
+                    onInit={() => this.setAnIssueToState()}
+                    onOk={this.updateIssue.bind(this, 'summary')}
+                    onCancel={this.resetSummary.bind(this)}
+                    readModeContent={(
+                      <div className="c7n-summary">
+                        {summary}
+                      </div>
+                    )}
+                  >
+                    <TextArea
+                      maxLength={44}
+                      value={summary}
+                      size="small"
+                      onChange={this.handleTitleChange.bind(this)}
+                      onPressEnter={() => {
+                        this.updateIssue('summary');
+                        this.setState({
+                          currentRae: undefined,
+                        });
+                      }}
+                    />
+                  </ReadAndEdit>
+                  <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
+                    <Dropdown overlay={getMenu()} trigger={['click']}>
+                      <Button icon="more_vert" />
+                    </Dropdown>
+                  </div>
+                </div>
+                <div className="line-start">
+                  {
+                    <div style={{ display: 'flex', marginRight: 25 }}>
+                      <span>故事点：</span>
+                      <div style={{ maxWidth: 130 }}>
+                        <ReadAndEdit
+                          callback={this.changeRae.bind(this)}
+                          thisType="storyPoints"
+                          current={currentRae}
+                          handleEnter
+                          origin={origin.storyPoints}
+                          onInit={() => this.setAnIssueToState(origin)}
+                          onOk={this.updateIssue.bind(this, 'storyPoints')}
+                          onCancel={this.resetStoryPoints.bind(this)}
+                          readModeContent={(
+                            <span>
+                              {storyPoints === undefined || storyPoints === null ? '无' : `${storyPoints} 点`}
+                            </span>
+                        )}
+                        >
+                          <Select
+                            value={storyPoints && storyPoints.toString()}
+                            mode="combobox"
+                              // onBlur={e => this.statusOnChange(e)}
+                            ref={(e) => {
+                              this.componentRef = e;
+                            }}
+                            onPopupFocus={(e) => {
+                              this.componentRef.rcSelect.focus();
+                            }}
+                            tokenSeparators={[',']}
+                              // getPopupContainer={triggerNode => triggerNode.parentNode}
+                            style={{ marginTop: 0, paddingTop: 0 }}
+                            onChange={value => this.handleChangeStoryPoint(value)}
+                          >
+                            {storyPointList.map(sp => (
+                              <Option key={sp.toString()} value={sp}>
+                                {sp}
+                              </Option>
+                            ))}
+                          </Select>
+                        </ReadAndEdit>
+                   
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
             </div>
           </div>
           <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
