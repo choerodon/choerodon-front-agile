@@ -6,7 +6,9 @@ import { Button, Spin } from 'choerodon-ui';
 import moment from 'moment';
 import { editArtLink, PICalendarLink } from '../../../../common/utils';
 import { ArtTable, CreateArt } from './components';
-import { getArtsByProjectId, createArt } from '../../../../api/ArtApi';
+import {
+  getArtsByProjectId, createArt, beforeArtFinish, editArt, getArtById,
+} from '../../../../api/ArtApi';
 
 function formatter(values) {
   const data = { ...values };
@@ -88,6 +90,27 @@ class ArtList extends Component {
     const { history } = this.props;
     history.push(PICalendarLink(artId, ArtName));
   }
+
+  handleFinishArtClick = (record) => {
+    const { id: artId } = record;
+    this.setState({
+      loading: true,
+    });
+    beforeArtFinish(artId).then((res) => {
+      if (res) {
+        getArtById(artId).then((artInfo) => {
+          editArt(Object.assign(artInfo, { statusCode: 'done' })).then(() => {
+            this.loadArts();
+          });
+        });
+      } else {
+        this.setState({
+          loading: false,
+        });
+        Choerodon.prompt('请确保所有PI完成后再完成ART');
+      }
+    });
+  }
   
   handlePaginationChange = (pagination) => {
     this.loadArts(pagination);
@@ -102,8 +125,9 @@ class ArtList extends Component {
         <Header
           title="ART列表"
         >
-          <Button icon="playlist_add" onClick={this.handleCreateArtClick} disabled={createDisabled}>
-            创建ART
+          {/* <Button icon="playlist_add" onClick={this.handleCreateArtClick} disabled={createDisabled}> */}
+          <Button icon="playlist_add" onClick={this.handleCreateArtClick}>
+            {'创建ART'}
           </Button>
         </Header>
         <Content>
@@ -118,6 +142,7 @@ class ArtList extends Component {
               dataSource={data}
               onEditArtClick={this.handleEditArtClick}
               onArtNameClick={this.handleArtNameClick}
+              onFinishArtClick={this.handleFinishArtClick}
             />
           </Spin>
         </Content>

@@ -11,47 +11,34 @@ const format = 'YYYY-MM-DD';
 
 @store('PIStore')
 class PIStore {
-    @observable PIListLoading = false;
+    @observable PIAimsLoading = false;
 
-    @computed get getPIListLoading() {
-      return toJS(this.PIListLoading);
+    @computed get getPIAimsLoading() {
+      return toJS(this.PIAimsLoading);
     }
 
-    @action setPIListLoading(data) {
-      this.PIListLoading = data;
+    @action setPIAimsLoading(data) {
+      this.PIAimsLoading = data;
     }
 
-    @observable PIDetailLoading = false;
-
-    @computed get getPIDetailLoading() {
-      return toJS(this.PIDetailLoading);
-    }
-
-    @action setPIDetailLoading(data) {
-      this.PIDetailLoading = data;
-    }
-
-    @observable PiList = [];
+    @observable PIList = [];
     
-    @computed get getPiList() {
-      return toJS(this.PiList);
+    @computed get getPIList() {
+      return toJS(this.PIList);
     }
 
-    @action setPiList(data) {
-      this.PiList = data;
-      if (window.sessionStorage) {
-        sessionStorage.PiList = JSON.stringify(data);
-      }
+    @action setPIList(data) {
+      this.PIList = data;
     }
 
-    @observable PiAims = {}
+    @observable PIAims = {}
       
-    @computed get getPiAims() {
-      return toJS(this.PiAims);
+    @computed get getPIAims() {
+      return toJS(this.PIAims);
     }
   
-    @action setPiAims(data) {
-      this.PiAims = data;
+    @action setPIAims(data) {
+      this.PIAims = data;
     }
 
     @observable editPIVisible=false;

@@ -1,75 +1,59 @@
-import React, { Fragment } from 'react';
-import { Icon, Button, Input } from 'choerodon-ui';
-import TextEditToggle from '../../../../../../components/TextEditToggle';
+import React, { Component } from 'react';
+import { Icon } from 'choerodon-ui';
+import EditArtNameSidebar from './EditArtNameSidebar';
 
-const { Text, Edit } = TextEditToggle;
-const ArtInfo = ({
-  enabled,
-  canRelease,
-  isModified,
-  onReleaseClick,
-  onClearModify,
-  onSubmit,
-  name,
-  description,
-}) => (
-  <Fragment>
-    <div style={{ display: 'flex', height: 40 }}>
-      {
-          enabled && (
-            <Fragment>
-              <div><Icon type="warning" style={{ color: '#FADB14' }} /></div>
-              <div style={{ width: 500, marginLeft: 5 }}>
-                注意：此ART正在进行中。你正在编辑
-                <span className="weight">{name}</span>
-                ，如果编辑后的修改需要生效，请点击
-                <span className="weight">发布</span>
-                。
-                <span className="weight">清除修改</span>
-                点击后恢复为当前设置。
-              </div>
-            </Fragment>
-          )
-        }
-      <div style={{ flex: 1, visibility: 'hidden' }} />
-      <div>
-        {canRelease && <Button type="primary" funcType="raised" onClick={onReleaseClick}>发布</Button>}
-        {isModified && <Button funcType="raised" style={{ marginLeft: 10 }} onClick={onClearModify}>清除修改</Button>}
+class ArtInfo extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      editNameVisible: false,
+    };
+  }
+
+  handleEditArtNameOk = (newName) => {
+    const { onSubmit } = this.props;
+    onSubmit({ name: newName });
+    this.setState({
+      editNameVisible: false,
+    });
+  }
+
+  handleEditArtNameCancel = () => {
+    this.setState({
+      editNameVisible: false,
+    });
+  }
+
+  render() {
+    const { name } = this.props;
+    const { editNameVisible } = this.state;
+    return (
+      <div style={{ fontSize: '18px', fontWeight: 500, margin: '20px 0 10px' }}>
+        <span>{name}</span>
+        <Icon
+          role="none"
+          type="mode_edit mlr-3 pointer"
+          style={{
+            color: '#3F51B5',
+            marginLeft: 5,
+            cursor: 'pointer',
+          }}
+          onClick={() => {
+            this.setState({
+              editNameVisible: true,
+            });
+          }}
+        />
+
+        <EditArtNameSidebar
+          name={name}
+          visible={editNameVisible}
+          onOk={this.handleEditArtNameOk}
+          onCancel={this.handleEditArtNameCancel}
+        /> 
       </div>
-    </div>
-    <div style={{ fontSize: '18px', fontWeight: 500, margin: '20px 0 10px' }}>
-      <TextEditToggle
-        style={{ width: 420 }}
-        formKey="name"
-        onSubmit={(newName) => { onSubmit({ name: newName }); }}
-        originData={name}
-        rules={[{
-          required: true, message: '请输入ART名称!',
-        }]}
-      >
-        <Text>
-          {name}
-        </Text>
-        <Edit>
-          <Input autoFocus maxLength={30} />
-        </Edit>
-      </TextEditToggle>
-    </div>
-    <div style={{ marginBottom: 20 }}>
-      <TextEditToggle
-        style={{ width: 420 }}
-        formKey="description"
-        onSubmit={(newDescription) => { onSubmit({ description: newDescription }); }}
-        originData={description}
-      >
-        <Text>
-          {description}
-        </Text>
-        <Edit>
-          <Input.TextArea autoFocus maxLength={44} />
-        </Edit>
-      </TextEditToggle>
-    </div>
-  </Fragment>
-);
+    );
+  }
+}
+
 export default ArtInfo;

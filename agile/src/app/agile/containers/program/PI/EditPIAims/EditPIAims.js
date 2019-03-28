@@ -6,7 +6,6 @@ import {
 import {
   stores, Page, Header, Content,  
 } from 'choerodon-front-boot';
-import { values } from 'mobx';
 import PIStore from '../../../../stores/Program/PI/PIStore';
 import {
   createPIAims, getPIList, getPIAims, upDatePIAmix, 
@@ -19,10 +18,10 @@ const { Option } = Select;
 const BV = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 @observer
-class EditPI extends Component {
+class EditPIAims extends Component {
   handleOnOk = () => {
     const { editingPiAimsInfo, form } = this.props;
-    PIStore.setPIDetailLoading(true);
+    PIStore.setPIAimsLoading(true);
     form.validateFields((err, values) => {
       if (!err) {
         const piObjectiveDTO = {
@@ -39,7 +38,7 @@ class EditPI extends Component {
         };
         upDatePIAmix(piObjectiveDTO).then((res) => {
           getPIAims(editingPiAimsInfo.piId).then((piAims) => {
-            PIStore.setPiAims(piAims);
+            PIStore.setPIAims(piAims);
             PIStore.setEditPiAimsCtrl(piAims.program.map((item, index) => (
               {
                 isEditing: false,
@@ -47,13 +46,13 @@ class EditPI extends Component {
                 editingIndex: index,  
               }
             )));
-            PIStore.setPIDetailLoading(false);
+            PIStore.setPIAimsLoading(false);
             PIStore.setEditPIVisible(false);
           });
           Choerodon.prompt('修改成功');
           form.resetFields();
         }).catch(() => {
-          PIStore.setPIDetailLoading(false);
+          PIStore.setPIAimsLoading(false);
           Choerodon.prompt('修改失败');
         });
       }
@@ -130,4 +129,4 @@ class EditPI extends Component {
   }
 }
 
-export default Form.create()(EditPI);
+export default Form.create()(EditPIAims);

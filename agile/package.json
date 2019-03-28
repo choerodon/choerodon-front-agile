@@ -42,5 +42,10 @@
       "npm run lint-staged:es"
     ],
     "src/**/*.scss": "stylelint --syntax scss"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }

@@ -8,23 +8,28 @@ const propTypes = {
   dataSource: PropTypes.shape({}).isRequired,
   onEditArtClick: PropTypes.func.isRequired,
   onArtNameClick: PropTypes.func.isRequired,
-  
+};
+const STATUS = {
+  todo: '未启用',
+  doing: '进行中',
+  done: '已完成',
+  discontinueUse: '停用',
 };
 const ArtTable = ({ 
   dataSource,
   onEditArtClick,
   onArtNameClick,
+  onFinishArtClick,
 }) => {
   const columns = [{
     title: '编号',
     dataIndex: 'code',
     key: 'code',  
-    render: (code, record) => `#${code}-${record.id}`,  
+    render: (code, record) => `#${code}`,  
   }, {
     title: '名称',
     dataIndex: 'name',
     key: 'name',   
-    render: (name, record) => <span role="none" onClick={() => { onArtNameClick(record); }} style={{ color: '#3F51B5', cursor: 'pointer' }}>{name}</span>,
   }, {
     title: '开始日期',
     dataIndex: 'startDate',
@@ -32,9 +37,15 @@ const ArtTable = ({
     render: startDate => moment(startDate).format('YYYY-MM-DD'),
   }, {
     title: '状态',
-    dataIndex: 'enabled',
-    key: 'enabled',
-    render: enabled => <StatusTag categoryCode={enabled ? 'doing' : 'todo'} name={enabled ? '启用' : '未启用'} />,
+    dataIndex: 'statusCode',
+    key: 'statusCode',
+    render: (statusCode, record) => {
+      if (!record.enabled) {
+        // eslint-disable-next-line no-param-reassign
+        statusCode = 'discontinueUse';
+      }
+      return (<StatusTag categoryCode={statusCode} name={STATUS[statusCode]} />);
+    },
   }, {
     title: '创建日期',
     dataIndex: 'createDate',
@@ -43,7 +54,12 @@ const ArtTable = ({
   }, {
     title: '',
     key: 'action',
-    render: (text, record) => (<Button shape="circle" icon="mode_edit" onClick={() => { onEditArtClick(record); }} />),
+    render: (text, record) => (
+      <div>
+        <Button shape="circle" icon="mode_edit" onClick={() => { onEditArtClick(record); }} />
+        <Button shape="circle" disabled={record.enabled && record.statusCode === 'done'} icon="finished" onClick={() => { onFinishArtClick(record); }} />
+      </div>
+    ),
   }];
 
   return (

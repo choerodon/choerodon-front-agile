@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Icon, Modal, Form, Select, Input, Checkbox,
+  Modal, Form, Select, Input, Checkbox,
 } from 'choerodon-ui';
 import {
-  stores, Page, Header, Content,  
+  stores,
 } from 'choerodon-front-boot';
 import moment from 'moment';
 import PIStore from '../../../../stores/Program/PI/PIStore';
@@ -17,21 +17,17 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const BV = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 @observer
-class CreatePI extends Component {
+class CreatePIAims extends Component {
   handleCheckboxChange = (e) => {
     PIStore.setCreateStretch(e.target.checked);
   }
 
   handleOnOk = () => {
-    const { form, piId, page } = this.props;
+    const { form, piId } = this.props;
     const { createStretch } = PIStore;
     form.validateFields((err, values) => {
       if (!err) {
-        if (page === 'PIList') {
-          PIStore.setPIListLoading(true);
-        } else {
-          PIStore.setPIDetailLoading(true);
-        }
+        PIStore.setPIAimsLoading(true);
         const piObjectiveDTO = {
           levelCode: 'program',
           programId: AppState.currentMenuType.id,
@@ -43,15 +39,15 @@ class CreatePI extends Component {
           stretch: createStretch,
         };
         createPIAims(piObjectiveDTO).then(() => {
-          Promise.all([getPIList(), getPIAims(values.piId || piId)]).then(([piList, piAims]) => {
-            PIStore.setPiList(piList.content.map(item => (
+          Promise.all([getPIList(), getPIAims(values.piId || piId)]).then(([PIList, piAims]) => {
+            PIStore.setPIList(PIList.content.map(item => (
               Object.assign(item, {
                 startDate: moment(item.startDate).format(formatter),
                 endDate: moment(item.endDate).format(formatter),
                 remainDays: moment(item.endDate).diff(moment(), 'days') > 0 ? moment(item.endDate).diff(moment(), 'days') : 0,
               })
             )));
-            PIStore.setPiAims(piAims);
+            PIStore.setPIAims(piAims);
             PIStore.setEditPiAimsCtrl(piAims.program.map((item, index) => (
               {
                 isEditing: false,
@@ -59,11 +55,7 @@ class CreatePI extends Component {
                 editingIndex: index,  
               }
             )));
-            if (page === 'PIList') {
-              PIStore.setPIListLoading(false);
-            } else {
-              PIStore.setPIDetailLoading(false);
-            }
+            PIStore.setPIAimsLoading(false);
             form.resetFields();
             PIStore.setCreatePIVisible(false);
             PIStore.setCreateStretch(false);
@@ -81,9 +73,10 @@ class CreatePI extends Component {
   }
 
   render() {
-    const { page, form } = this.props;
+    const { form } = this.props;
     const { getFieldDecorator } = form;
-    const { PiList, createPIVisible, createStretch } = PIStore;
+    // eslint-disable-next-line no-unused-vars
+    const { PIList, createPIVisible, createStretch } = PIStore;
     return (
       <Sidebar
         className="c7n-pi-createPISideBar"
@@ -95,8 +88,7 @@ class CreatePI extends Component {
         onCancel={this.handleOnCancel}
       >
         <Form>
-          {page === 'PIList' && (
-          <FormItem label="PI" style={{ width: 520 }}>
+          {/* <FormItem label="PI" style={{ width: 520 }}>
             {getFieldDecorator('piId', {
               rules: [{ required: true, message: 'PI为必选项' }],
             })(
@@ -105,20 +97,19 @@ class CreatePI extends Component {
                 allowClear
                 getPopupContainer={triggerNode => triggerNode.parentNode}
               >
-                {PiList.map(
+                {PIList.map(
                   pi => (
                     <Option
                       key={pi.id}
                       value={pi.id}
                     >
-                      {pi.name}
+                      {`${pi.code}-${pi.name}`}
                     </Option>
                   ),
                 )}
               </Select>,
             )}
-          </FormItem>
-          )}
+          </FormItem> */}
           <FormItem style={{ width: 520 }}>
             {getFieldDecorator('name', {
               rules: [{ required: true, message: 'PI目标名称为必输项' }],
@@ -131,7 +122,7 @@ class CreatePI extends Component {
                 getFieldDecorator('planBv')(
                   <Select label="计划商业价值">
                     {
-                      BV.map(value => (<Option value={value}>{value}</Option>))
+                      BV.map(value => (<Option key={value} value={value}>{value}</Option>))
                     }
                   </Select>,
                 )
@@ -142,7 +133,7 @@ class CreatePI extends Component {
                getFieldDecorator('actualBv')(
                  <Select label="实际商业价值">
                    {
-                    BV.map(value => (<Option value={value}>{value}</Option>))
+                    BV.map(value => (<Option key={value} value={value}>{value}</Option>))
                   }
                  </Select>,
                )
@@ -155,4 +146,4 @@ class CreatePI extends Component {
   }
 }
 
-export default Form.create()(CreatePI);
+export default Form.create()(CreatePIAims);

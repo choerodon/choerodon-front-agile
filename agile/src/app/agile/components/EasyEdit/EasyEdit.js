@@ -31,7 +31,9 @@ class EasyEdit extends Component {
   }
 
   handleOnOk(e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const { onChange } = this.props;
     const { date, dateString } = this.state;
     /* eslint-disable */
