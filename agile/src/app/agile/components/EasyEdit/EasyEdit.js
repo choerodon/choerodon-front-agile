@@ -155,7 +155,7 @@ class EasyEdit extends Component {
       >
         {
           edit || editIf ? this.renderEdit() : (
-            <div>
+            <div style={{ minWidth: 70 }}>
               {children}
               <div
                 style={{
