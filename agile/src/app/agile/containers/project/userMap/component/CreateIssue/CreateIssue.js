@@ -121,6 +121,7 @@ class CreateIssue extends Component {
               className="c7n-textArea"
               autosize={{ minRows: 3, maxRows: 3 }}
               placeholder="在此创建新内容"
+              maxLength={44}
             />
           </div>
           <div className="c7n-footer">
