@@ -20,6 +20,7 @@ class IssueDetail extends Component {
     const { refresh, HeaderStore } = this.props;
     return BoardStore.getClickedIssue ? (
       <FeatureDetail
+        key={BoardStore.getClickIssueDetail.issueId}
         store={BoardStore}
         onRef={this.onRef}
         backUrl="board"
