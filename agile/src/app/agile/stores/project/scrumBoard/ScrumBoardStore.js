@@ -650,10 +650,24 @@ class ScrumBoardStore {
   updateIssue = (
     {
       issueId, objectVersionNumber, boardId, originColumnId, columnId,
-      before, outsetIssueId, sprintId, rank, issueTypeId,
-    }, startStatus, destinationStatus, destinationStatusIndex, SwimLaneId,
+      before, sprintId, rank, issueTypeId,
+    }, startStatus, startStatusIndex, destinationStatus, destinationStatusIndex, SwimLaneId,
   ) => {
     const proId = AppState.currentMenuType.id;
+    let outsetIssueId = '';
+
+    if (destinationStatusIndex !== 0) {
+      // 从另一个列拖过来传，目标位置-1的id
+      if (startStatus !== destinationStatus) {
+        outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId;
+        // 从同一列的前面拖过来传，目标位置的id
+      } else if (startStatusIndex < destinationStatusIndex) {
+        outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex].issueId;
+        // 从同一列的后面拖过来传，目标位置-1的id
+      } else if (startStatusIndex > destinationStatusIndex) {
+        outsetIssueId = this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId;
+      }
+    }
     const data = {
       issueId,
       objectVersionNumber,
@@ -662,9 +676,7 @@ class ScrumBoardStore {
       originColumnId: this.statusColumnMap.get(startStatus),
       columnId: this.statusColumnMap.get(destinationStatus),
       before: destinationStatusIndex === 0,
-      outsetIssueId:
-        destinationStatusIndex === 0 ? ''
-          : this.swimLaneData[SwimLaneId][destinationStatus][destinationStatusIndex - 1].issueId,
+      outsetIssueId,
       sprintId: this.sprintId,
       rank: true,
     };

@@ -2,7 +2,7 @@ import {
   observable, action, computed, toJS,
 } from 'mobx';
 import axios from 'axios';
-
+import { find, findIndex } from 'lodash';
 import { stores } from 'choerodon-front-boot';
 import { loadBoardData, sortColumn, deleteColumn } from '../../../api/BoardApi';
 
@@ -677,10 +677,10 @@ class BoardStore {
       boardId: this.selectedBoardId,
       originColumnId: this.statusColumnMap.get(startStatus),
       columnId: this.statusColumnMap.get(destinationStatus),
-      before: destinationStatusIndex === 0,
-      outsetIssueId,
+      // before: destinationStatusIndex === 0,
+      // outsetIssueId,
       piId, // 从准备拖到其他或从其他拖到其他传piId,其他情况传0，没有活跃也传0
-      rank,
+      // rank,
       piChange,
     };
     const { id: transformId } = this.stateMachineMap[issueTypeId] ? this.stateMachineMap[issueTypeId][startStatus].find(issue => issue.endStatusId === parseInt(destinationStatus, 10)) : this.stateMachineMap[0][startStatus].find(issue => issue.endStatusId === parseInt(destinationStatus, 10));
@@ -988,18 +988,36 @@ class BoardStore {
   }
 
   @action setSwimLaneData(startSwimLane, startStatus, startStatusIndex, destinationSwimLane, destinationStatus, destinationStatusIndex, issue, revert) {
+    const startLine = this.swimLaneData[startSwimLane][startStatus];
+    const destinationLine = this.swimLaneData[startSwimLane][destinationStatus];
+    const { issueId } = issue;
+    // 插入
     if (!revert) {
-      this.swimLaneData[startSwimLane][startStatus].splice(startStatusIndex, 1);
-      this.swimLaneData[startSwimLane][destinationStatus].splice(destinationStatusIndex, 0, {
+      let index = 0;
+      // eslint-disable-next-line prefer-destructuring
+      const length = destinationLine.length;
+      // 按id排序，插入到适当位置
+      for (let i = 0; i < length; i += 1) {
+        if (destinationLine[i].issueId < issueId && (!destinationLine[i + 1] || destinationLine[i + 1].issueId > issueId)) {
+          index = i + 1;
+          break;
+        }
+      }      
+      startLine.splice(startStatusIndex, 1);
+      destinationLine.splice(index, 0, {
         ...issue,
         statusId: destinationStatus,
       });
     } else {
-      this.swimLaneData[startSwimLane][destinationStatus].splice(startStatusIndex, 1);
-      this.swimLaneData[startSwimLane][startStatus].splice(destinationStatusIndex, 0, {
-        ...issue,
-        statusId: startStatus,
-      });
+      // 重置
+      const index = findIndex(destinationLine, { issueId });
+      if (index !== null) {
+        destinationLine.splice(index, 1); 
+        startLine.splice(destinationStatusIndex, 0, {
+          ...issue,
+          statusId: startStatus,
+        });
+      }
     }
   }
 
