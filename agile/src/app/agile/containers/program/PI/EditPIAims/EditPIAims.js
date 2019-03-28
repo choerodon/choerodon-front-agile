@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Icon, Modal, Form, Select, Input, Checkbox,
+  Modal, Form, Select, Input, Checkbox,
 } from 'choerodon-ui';
 import {
-  stores, Page, Header, Content,  
+  stores,
 } from 'choerodon-front-boot';
 import PIStore from '../../../../stores/Program/PI/PIStore';
 import {
-  createPIAims, getPIList, getPIAims, upDatePIAmix, 
+  getPIAims, upDatePIAmix, 
 } from '../../../../api/PIApi';
 
 const { AppState } = stores;
@@ -36,7 +36,7 @@ class EditPIAims extends Component {
           programId: AppState.currentMenuType.projectId,
           projectId: AppState.currentMenuType.projectId,
         };
-        upDatePIAmix(piObjectiveDTO).then((res) => {
+        upDatePIAmix(piObjectiveDTO).then(() => {
           getPIAims(editingPiAimsInfo.piId).then((piAims) => {
             PIStore.setPIAims(piAims);
             PIStore.setEditPiAimsCtrl(piAims.program.map((item, index) => (
@@ -105,7 +105,7 @@ class EditPIAims extends Component {
                 getFieldDecorator('actualBv', {
                   initialValue: editingPiAimsInfo.actualBv,
                 })(
-                  <Select label="计划商业价值">
+                  <Select label="实际商业价值">
                     {
                       BV.map(value => (<Option value={value}>{value}</Option>))
                     }

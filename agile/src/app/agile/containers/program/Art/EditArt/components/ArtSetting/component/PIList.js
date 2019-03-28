@@ -10,7 +10,7 @@ import StatusTag from '../../../../../../../components/StatusTag';
 
 const formatter = 'YYYY-MM-DD';
 const STATUS = {
-  todo: '未启用',
+  todo: '未启动',
   doing: '进行中',
   done: '已完成',
 };

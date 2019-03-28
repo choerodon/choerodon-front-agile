@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import {
-  Form, Input, Tabs, DatePicker, Checkbox,
-  Icon, Button, Divider, InputNumber, Select, Tooltip,
+  Form, Input, Tabs, DatePicker,
+  Button, Divider, Select,
 } from 'choerodon-ui';
 import './ArtForm.scss';
 
@@ -16,13 +16,10 @@ const { Option } = Select;
 const { TabPane } = Tabs;
 const FormItem = Form.Item;
 const Fields = {
-  1: ['code', 'piCount', 'rteId', 'startDate', 'enabled'],
+  1: ['code', 'piCount', 'rteId', 'startDate'],
   2: ['ipWeeks', 'interationCount', 'interationWeeks'],
   3: ['piCodePrefix', 'piCodeNumber'],
 };
-function NumberFormatter(value) {
-  return value && !isNaN(parseInt(value)) && parseInt(value) > 0 ? parseInt(value) : null;// eslint-disable-line
-}
 const propTypes = {
   initValue: PropTypes.shape({}).isRequired,
   onSave: PropTypes.func.isRequired,
@@ -37,6 +34,7 @@ class ArtForm extends Component {
     form.setFieldsValue(initValue);
   }
 
+  // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState) {
     const { form, initValue } = this.props;
     if (prevProps.initValue !== initValue) {
@@ -128,14 +126,13 @@ class ArtForm extends Component {
                 )
               }
             </FormItem>
-            <FormItem>
+            {/* <FormItem>
               {getFieldDecorator('enabled', {
                 valuePropName: 'checked',
               })(
                 <Checkbox>启用</Checkbox>,
               )}
-            </FormItem>
-         
+            </FormItem> */}
           </TabPane>
           <TabPane tab="ART节奏" key="2">
             <div style={{ display: 'flex', width: 500 }}>
