@@ -30,6 +30,7 @@ class ClosePI extends Component {
     const data = {
       programId: AppState.currentMenuType.id,
       id: propData.id,
+      artId: propData.artId,
       targetPiId: selectChose,
       objectVersionNumber: propData.objectVersionNumber,
     };
@@ -66,11 +67,11 @@ class ClosePI extends Component {
             link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/pi/close-pi/"
           >
             <p className="c7n-closeSprint-message">
-              <span>{!_.isNull(completeMessage) ? completeMessage.partiallyCompleteIssues : ''}</span>
+              <span>{!_.isNull(completeMessage) ? completeMessage.completedCount : ''}</span>
               {' 个特性 已经完成'}
             </p>
             <p style={{ marginTop: 24 }} className="c7n-closeSprint-message">
-              <span>{!_.isNull(completeMessage) ? completeMessage.incompleteIssues : ''}</span>
+              <span>{!_.isNull(completeMessage) ? completeMessage.unCompletedCount : ''}</span>
               {' 个特性 未完成'}
             </p>
             <p style={{ fontSize: 14, marginTop: 36 }}>选择该PI未完成的问题：</p>
@@ -85,8 +86,8 @@ class ClosePI extends Component {
               }}
             >
               {!_.isNull(completeMessage) ? (
-                completeMessage.pitNames.map(item => (
-                  <Option value={item.id}>{item.name}</Option>
+                completeMessage.piTodoDTOList.map(item => (
+                  <Option value={item.id}>{`${item.code}-${item.name}`}</Option>
                 ))
               ) : ''}
               <Option value="0">待办事项</Option>

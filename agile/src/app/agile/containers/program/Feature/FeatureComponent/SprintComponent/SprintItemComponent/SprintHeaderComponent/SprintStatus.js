@@ -27,10 +27,10 @@ const { AppState } = stores;
   );
 
   handleFinish = (e) => {
-    const { store, piId } = this.props;
+    const { store, data } = this.props;
     e.stopPropagation();
-    store.axiosGetSprintCompleteMessage(piId).then((res) => {
-      store.setSprintCompleteMessage(res);
+    store.axiosGetPICompleteMessage(data.id, data.artId).then((res) => {
+      store.setPICompleteMessage(res);
     }).catch((error) => {
     });
     this.setState({
@@ -39,16 +39,18 @@ const { AppState } = stores;
   };
 
   handleOpen = (e) => {
-    const { store, data } = this.props;
+    const { store, data, refresh } = this.props;
     e.stopPropagation();
-    if (!store.getHasActiveSprint && data.subFeatureDTOList && data.subFeatureDTOList.length > 0) {
+    if (!store.getHasActivePI && data.subFeatureDTOList && data.subFeatureDTOList.length > 0) {
       const pi = {
         programId: AppState.currentMenuType.id,
         id: data.id,
         objectVersionNumber: data.objectVersionNumber,
+        artId: data.artId,
       };
       store.openPI(pi).then((res) => {
         if (res && !res.failed) {
+          refresh();
           Choerodon.prompt('PI开启成功！');
         }
       }).catch((error) => {
@@ -87,7 +89,7 @@ const { AppState } = stores;
             <div style={{ display: 'flex' }}>
               <p
                 className={classnames('c7n-backlog-closeSprint', {
-                  'c7n-backlog-canCloseSprint': store.getHasActiveSprint || !data.subFeatureDTOList || data.subFeatureDTOList.length === 0,
+                  'c7n-backlog-canCloseSprint': store.getHasActivePI || !data.subFeatureDTOList || data.subFeatureDTOList.length === 0,
                 })}
                 role="none"
                 onClick={this.handleOpen}

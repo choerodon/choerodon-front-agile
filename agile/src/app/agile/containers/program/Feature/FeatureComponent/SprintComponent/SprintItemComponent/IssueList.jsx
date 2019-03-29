@@ -21,7 +21,6 @@ class IssueList extends Component {
 
   render() {
     const { sprintId, piId, store } = this.props;
-    // const getSelect = store.getSelectIssue;
 
     return store.getIssueMap.get(sprintId || piId).map((item, index) => (
       <Draggable key={item.issueId} draggableId={item.issueId} index={index}>
@@ -37,6 +36,7 @@ class IssueList extends Component {
               key={item.issueId}
               item={item}
               onClick={this.myOnMouseDown}
+              store={store}
             />
             {provided.placeholder}
           </div>

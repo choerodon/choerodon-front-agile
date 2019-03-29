@@ -1,16 +1,8 @@
 import React, { Component } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Tooltip } from 'choerodon-ui';
-import _ from 'lodash';
-import Typetag from '../../../../../../components/TypeTag';
-import UserHead from '../../../../../../components/UserHead';
-import { STATUS } from '../../../../../../common/Constant';
-import SideBorder from '../SideBorder';
 import SprintCount from '../PICount';
 import SprintIssue from '../PIIssue';
-import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore';
 
 @observer
 class IssueItem extends Component {
@@ -22,12 +14,12 @@ class IssueItem extends Component {
 
   render() {
     const {
-      epicVisible, versionVisible, item, onClick,
+      item, store,
     } = this.props;
     return (
       <div
         className={classnames('c7n-backlog-sprintIssueItem', {
-          'issue-selected': BacklogStore.getMultiSelected.get(item.issueId),
+          'issue-selected': store.getMultiSelected.get(item.issueId),
         })}
         key={item.issueId}
         label="sprintIssue"
