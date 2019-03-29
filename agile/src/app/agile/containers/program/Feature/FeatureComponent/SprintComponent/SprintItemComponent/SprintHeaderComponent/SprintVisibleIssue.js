@@ -9,7 +9,7 @@ import '../../PI.scss';
     return (
       <p className="c7n-backlog-sprintQuestion">
         {
-          `${issueCount}个问题可见`
+          `${issueCount}个特性`
         }
       </p>
     );

@@ -98,8 +98,9 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
           issueCount={issueCount}
           data={pi}
           expand={expand}
-          sprintId={pi.id.toString()}
+          piId={pi.id.toString()}
           toggleSprint={this.toggleSprint}
+          store={store}
         />
         <PIBody
           issueType={store.getIssueTypes.filter(type => shouldContainTypeCode.indexOf(type.typeCode) === -1)}

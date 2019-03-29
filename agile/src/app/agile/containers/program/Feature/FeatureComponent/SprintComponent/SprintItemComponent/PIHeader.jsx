@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Modal } from 'choerodon-ui';
 import SprintName from './SprintHeaderComponent/SprintName';
 import SprintVisibleIssue from './SprintHeaderComponent/SprintVisibleIssue';
+import PILastDays from './SprintHeaderComponent/PILastDays';
 import SprintStatus from './SprintHeaderComponent/SprintStatus';
-import SprintDateRange from './SprintHeaderComponent/PIDateRange';
+import PIDateRange from './SprintHeaderComponent/PIDateRange';
 import '../PI.scss';
-import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore';
 
 @inject('AppState', 'HeaderStore')
 @observer class SprintHeader extends Component {
@@ -31,7 +30,7 @@ import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore'
 
   handleBlurName = (value) => {
     if (/[^\s]+/.test(value)) {
-      const { data, AppState } = this.props;
+      const { data, AppState, store } = this.props;
       const { objectVersionNumber } = this.state;
       const req = {
         objectVersionNumber,
@@ -39,7 +38,7 @@ import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore'
         sprintId: data.sprintId,
         piName: value,
       };
-      BacklogStore.axiosUpdateSprint(req).then((res) => {
+      store.axiosUpdateSprint(req).then((res) => {
         this.setState({
           piName: value,
           objectVersionNumber: res.objectVersionNumber,
@@ -51,10 +50,10 @@ import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore'
 
   render() {
     const {
-      data, expand, toggleSprint, sprintId, issueCount, refresh,
+      data, expand, toggleSprint, piId, issueCount, refresh, store,
     } = this.props;
     const {
-      piName, startDate, endDate, sprintGoal,
+      piName, startDate, endDate,
     } = this.state;
 
     return (
@@ -72,13 +71,17 @@ import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore'
               <SprintVisibleIssue
                 issueCount={issueCount}
               />
+              <PILastDays
+                startDate={startDate}
+                endDate={endDate}
+              />
             </div>
           </div>
           <div style={{ flex: 9 }}>
             <SprintStatus
-              sprintId={sprintId}
+              piId={piId}
               refresh={refresh}
-              store={BacklogStore}
+              store={store}
               data={data}
               statusCode={data.statusCode}
               type="pi"
@@ -88,11 +91,10 @@ import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore'
         <div
           className="c7n-backlog-sprintGoal"
           style={{
-            display: data.statusCode === 'started' ? 'flex' : 'none',
+            display: 'flex',
           }}
         >
-          <SprintDateRange
-            statusCode={data.statusCode}
+          <PIDateRange
             startDate={startDate}
             endDate={endDate}
           />

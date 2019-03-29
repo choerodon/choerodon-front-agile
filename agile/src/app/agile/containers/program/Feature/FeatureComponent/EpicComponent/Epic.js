@@ -140,7 +140,7 @@ class Epic extends Component {
               onMouseUp={(e) => {
                 if (store.getIsDragging) {
                   e.currentTarget.style.border = 'none';
-                  store.axiosUpdateIssuesToEpic(
+                  store.moveIssuesToEpic(
                     0, draggableIds,
                   ).then((res) => {
                     issueRefresh();

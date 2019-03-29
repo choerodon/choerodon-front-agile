@@ -32,6 +32,8 @@ class FeatureStore {
 
   @observable multiSelected = observable.map();
 
+  @observable prevClickedIssue = null;
+
   @observable clickIssueId = null;
 
   @observable clickIssueDetail = {};
@@ -94,6 +96,42 @@ class FeatureStore {
     return this.epicList;
   }
 
+  @action updateEpic(epic) {
+    const updateIndex = this.epicList.findIndex(item => epic.issueId === item.issueId);
+    this.epicList[updateIndex].epicName = epic.epicName;
+    this.epicList[updateIndex].objectVersionNumber = epic.objectVersionNumber;
+    this.epicList[updateIndex].color = epic.color;
+  }
+
+  @action moveEpic(sourceIndex, destinationIndex) {
+    const movedItem = this.epicList[sourceIndex];
+    const { issueId, objectVersionNumber } = movedItem;
+    this.epicList.splice(sourceIndex, 1);
+    this.epicList.splice(destinationIndex, 0, movedItem);
+    const req = {
+      beforeSequence: destinationIndex !== 0 ? this.epicList[destinationIndex - 1].epicSequence : null,
+      afterSequence: destinationIndex !== (this.epicList.length - 1) ? this.epicList[destinationIndex + 1].epicSequence : null,
+      epicId: issueId,
+      objectVersionNumber,
+    };
+    this.handleEpicDrap(req).then(
+      action('fetchSuccess', (res) => {
+        if (!res.message) {
+          this.epicList[destinationIndex] = {
+            ...movedItem,
+            epicSequence: res.epicSequence,
+            objectVersionNumber: res.objectVersionNumber,
+          };
+        } else {
+          this.epicList.splice(destinationIndex, 1);
+          this.epicList.splice(sourceIndex, 0, movedItem);
+        }
+      }),
+    );
+  }
+
+  handleEpicDrap = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/epic_drag`, data);
+
   @action setIssueTypes(data) {
     this.issueTypes = data;
   }
@@ -142,12 +180,15 @@ class FeatureStore {
     return this.issueMap;
   }
 
+  @computed get getPrevClickedIssue() {
+    return this.prevClickedIssue;
+  }
+
   @action setChosenEpic(data) {
     if (data === 'all') {
       this.filterSelected = false;
     }
     this.spinIf = true;
-    this.addToEpicFilter(data);
     this.chosenEpic = data;
   }
 
@@ -161,7 +202,17 @@ class FeatureStore {
     this.allPiList = allPiList;
   }
 
-  getFeatureListData = () => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/backlog_pi_list?organizationId=${AppState.currentMenuType.organizationId}`, {});
+  getFeatureListData = () => {
+    const args = {};
+    if (this.chosenEpic !== 'all') {
+      if (this.chosenEpic === 'unset') {
+        args.advancedSearchArgs.noEpic = 'true';
+      } else {
+        args.advancedSearchArgs.epicId = this.chosenEpic;
+      }
+    }
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/backlog_pi_list?organizationId=${AppState.currentMenuType.organizationId}`, args);
+  };
 
   getCurrentEpicList = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/program/epics`);
 
@@ -195,6 +246,48 @@ class FeatureStore {
     const proId = AppState.currentMenuType.id;
     return axios.get(`/issue/v1/projects/${proId}/priority/default`);
   };
+
+  checkStartAndEnd = (prevIndex, currentIndex) => (prevIndex > currentIndex ? [currentIndex, prevIndex] : [prevIndex, currentIndex]);
+
+  @action dealWithMultiSelect(sprintId, currentClick, type) {
+    const data = this.issueMap.get(sprintId);
+    const currentIndex = data.findIndex(issue => currentClick.issueId === issue.issueId);
+    if (this.prevClickedIssue && this.prevClickedIssue.sprintId === currentClick.sprintId) {
+      // 如果以后想利用 ctrl 从多个冲刺中选取 issue，可以把判断条件2直接挪到 shift 上
+      // 但是请考虑清楚操作多个数组可能带来的性能开销问题
+      if (type === 'shift') {
+        this.dealWithShift(data, currentIndex);
+      } else if (type === 'ctrl') {
+        this.dealWithCtrl(data, currentIndex, currentClick);
+      }
+    } else {
+      this.clickedOnce(currentClick, currentIndex);
+    }
+  }
+
+  @action dealWithShift(data, currentIndex) {
+    const [startIndex, endIndex] = this.checkStartAndEnd(this.prevClickedIssue.index, currentIndex);
+    for (let i = startIndex; i <= endIndex; i += 1) {
+      this.multiSelected.set(data[i].issueId, data[i]);
+    }
+  }
+
+  @action dealWithCtrl(data, currentIndex, item) {
+    if (this.multiSelected.has(item.issueId)) {
+      const prevClickedStatus = this.multiSelected.get(item.issueId);
+      if (prevClickedStatus) {
+        this.multiSelected.delete(item.issueId);
+      } else {
+        this.multiSelected.set(item.issueId, item);
+      }
+    } else {
+      this.multiSelected.set(data[currentIndex].issueId, data[currentIndex]);
+    }
+    this.prevClickedIssue = {
+      ...item,
+      index: currentIndex,
+    };
+  }
 
   @action clickedOnce(sprintId, currentClick) {
     const index = this.issueMap.get(sprintId).findIndex(issue => issue.issueId === currentClick.issueId);
@@ -315,6 +408,14 @@ class FeatureStore {
   }
 
   moveIssuesToEpic = (epicId, ids) => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/to_epic/${epicId}`, ids);
+
+  openPI = piData => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/start`, piData);
+
+  closePI = piData => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/close`, piData);
+
+  axiosUpdateIssue(data) {
+    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues`, data);
+  }
 }
 
 const featureStore = new FeatureStore();

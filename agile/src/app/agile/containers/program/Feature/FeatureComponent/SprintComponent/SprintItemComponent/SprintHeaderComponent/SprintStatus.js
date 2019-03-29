@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Icon, Dropdown, Menu } from 'choerodon-ui';
-import moment from 'moment';
+import { stores } from 'choerodon-front-boot';
 import classnames from 'classnames';
-import CloseSprint from '../../ClosePI';
-import StartSprint from '../../StartPI';
+import ClosePI from '../../ClosePI';
 
-@inject('AppState')
+const { AppState } = stores;
+
 @observer class SprintStatus extends Component {
   constructor(props) {
     super(props);
@@ -27,9 +27,9 @@ import StartSprint from '../../StartPI';
   );
 
   handleFinish = (e) => {
-    const { store, sprintId } = this.props;
+    const { store, piId } = this.props;
     e.stopPropagation();
-    store.axiosGetSprintCompleteMessage(sprintId).then((res) => {
+    store.axiosGetSprintCompleteMessage(piId).then((res) => {
       store.setSprintCompleteMessage(res);
     }).catch((error) => {
     });
@@ -41,14 +41,16 @@ import StartSprint from '../../StartPI';
   handleOpen = (e) => {
     const { store, data } = this.props;
     e.stopPropagation();
-    if (!store.getHasActiveSprint && data.issueSearchDTOList && data.issueSearchDTOList.length > 0) {
-      this.setState({
-        startSprintVisible: true,
-      });
-      const year = moment().year();
-      store.axiosGetWorkSetting(year);
-      store.axiosGetOpenSprintDetail(data.sprintId).then((res) => {
-        store.setOpenSprintDetail(res);
+    if (!store.getHasActiveSprint && data.subFeatureDTOList && data.subFeatureDTOList.length > 0) {
+      const pi = {
+        programId: AppState.currentMenuType.id,
+        id: data.id,
+        objectVersionNumber: data.objectVersionNumber,
+      };
+      store.openPI(pi).then((res) => {
+        if (res && !res.failed) {
+          Choerodon.prompt('PI开启成功！');
+        }
       }).catch((error) => {
       });
     }
@@ -62,7 +64,7 @@ import StartSprint from '../../StartPI';
     // TODO: 内部接口逻辑
     return (
       <div className="c7n-backlog-sprintTitleSide">
-        {statusCode === 'started' ? (
+        {statusCode === 'doing' ? (
           <React.Fragment>
             <p className="c7n-backlog-sprintStatus">
               {'活跃'}
@@ -85,7 +87,7 @@ import StartSprint from '../../StartPI';
             <div style={{ display: 'flex' }}>
               <p
                 className={classnames('c7n-backlog-closeSprint', {
-                  'c7n-backlog-canCloseSprint': store.getHasActiveSprint || !data.issueSearchDTOList || data.issueSearchDTOList.length === 0,
+                  'c7n-backlog-canCloseSprint': store.getHasActiveSprint || !data.subFeatureDTOList || data.subFeatureDTOList.length === 0,
                 })}
                 role="none"
                 onClick={this.handleOpen}
@@ -102,18 +104,7 @@ import StartSprint from '../../StartPI';
             </div>
           </React.Fragment>
         )}
-        <StartSprint
-          store={store}
-          visible={startSprintVisible}
-          onCancel={() => {
-            this.setState({
-              startSprintVisible: false,
-            });
-          }}
-          data={data}
-          refresh={refresh}
-        />
-        <CloseSprint
+        <ClosePI
           store={store}
           visible={finishSprintVisible}
           onCancel={() => {

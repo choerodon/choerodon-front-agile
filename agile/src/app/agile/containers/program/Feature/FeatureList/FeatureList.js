@@ -27,6 +27,10 @@ class FeatureList extends Component {
     this.refresh();
   }
 
+  componentWillUnmount() {
+    FeatureStore.setEpicVisible(false);
+  }
+
   refresh = () => {
     Promise.all([
       FeatureStore.axiosGetIssueTypes(),
@@ -129,9 +133,9 @@ class FeatureList extends Component {
               refresh={this.refresh}
               visible={FeatureStore.getEpicVisible}
               store={FeatureStore}
-              // issueRefresh={() => {
-              //   this.IssueDetail.refreshIssueDetail();
-              // }}
+              issueRefresh={() => {
+                this.IssueDetail.refreshIssueDetail();
+              }}
               onEpicClick={this.onEpicClick}
             />
             <Spin spinning={FeatureStore.getSpinIf}>

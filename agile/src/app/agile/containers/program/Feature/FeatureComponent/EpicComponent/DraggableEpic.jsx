@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { stores, axios, store } from 'choerodon-front-boot';
-import { observer, inject } from 'mobx-react';
+import { stores, axios } from 'choerodon-front-boot';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import {
   Dropdown, Menu, Input, Icon, message,
 } from 'choerodon-ui';
 import _ from 'lodash';
-import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
 const { AppState } = stores;
 // @inject('AppState')
@@ -21,14 +20,6 @@ class DraggableEpic extends Component {
     };
   }
 
-  // shouldComponentUpdate(nextProps, nextState, nextContext) {
-  //   if (JSON.stringify(nextProps) === JSON.stringify(this.props)) {
-  //     return false;
-  //   } else {
-  //     return true;
-  //   }
-  // }
-
   /**
    *menu的点击事件
    *
@@ -36,18 +27,21 @@ class DraggableEpic extends Component {
    * @memberof EpicItem
    */
   clickMenu = (e) => {
-    const { item } = this.props;
-
-    e.domEvent.stopPropagation();
+    const { item, store } = this.props;
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    } else if (e && e.domEvent && e.domEvent.stopPropagation) {
+      e.domEvent.stopPropagation();
+    }
     if (e.key === '1') {
       this.setState({
         editName: true,
       });
     }
     if (e.key === '2') {
-      BacklogStore.setClickIssueDetail(item);
+      store.setClickIssueDetail(item);
     }
-  }
+  };
 
   /**
    *每个epic 右侧下拉选择项的menu
@@ -55,14 +49,14 @@ class DraggableEpic extends Component {
    * @returns
    * @memberof EpicItem
    */
-  getmenu = () => {
-    const { item, refresh } = this.props;
+  getMenu = () => {
+    const { item, refresh, store } = this.props;
     return (
       <Menu onClick={this.clickMenu.bind(this)}>
         <div style={{ padding: '5px 12px' }}>
           {'颜色'}
           <div className="c7n-backlog-epicColor">
-            {BacklogStore.getColorLookupValue.map(color => (
+            {store.getColorLookupValue.map(color => (
               <div
                 key={color.name}
                 style={{ background: color.name }}
@@ -75,8 +69,8 @@ class DraggableEpic extends Component {
                     issueId: item.issueId,
                     objectVersionNumber: item.objectVersionNumber,
                   };
-                  BacklogStore.axiosUpdateIssue(inputData).then((res) => {
-                    BacklogStore.updateEpic(res);
+                  store.axiosUpdateIssue(inputData).then((res) => {
+                    store.updateEpic(res);
                     refresh();
                   }).catch((error) => {
                   });
@@ -90,7 +84,7 @@ class DraggableEpic extends Component {
         <Menu.Item key="2">查看史诗详情</Menu.Item>
       </Menu>
     );
-  }
+  };
 
   /**
    *epic名称保存事件
@@ -99,7 +93,9 @@ class DraggableEpic extends Component {
    * @memberof EpicItem
    */
   handleSave = (e) => {
-    const { item, index, refresh } = this.props;
+    const {
+      item, refresh, store,
+    } = this.props;
     e.stopPropagation();
     const { value } = e.target;
     if (item && item.epicName === value) {
@@ -120,15 +116,15 @@ class DraggableEpic extends Component {
               issueId: item.issueId,
               epicName: value,
             };
-            BacklogStore.axiosUpdateIssue(req).then((res) => {
-              BacklogStore.updateEpic(res);
+            store.axiosUpdateIssue(req).then((res) => {
+              store.updateEpic(res);
               refresh();
             }).catch((error) => {
             });
           }
         });
     }
-  }
+  };
 
   toggleExpand = (e) => {
     e.stopPropagation();
@@ -136,11 +132,11 @@ class DraggableEpic extends Component {
     this.setState({
       expand: !expand,
     });
-  }
+  };
 
   render() {
     const {
-      draggableProvided, item,
+      draggableProvided, item, store,
     } = this.props;
     const { expand, editName } = this.state;
 
@@ -150,7 +146,7 @@ class DraggableEpic extends Component {
         {...draggableProvided.draggableProps}
         {...draggableProvided.dragHandleProps}
         className={classnames('c7n-backlog-epicItems', {
-          onClickEpic: BacklogStore.getChosenEpic === item.issueId,
+          onClickEpic: store.getChosenEpic === item.issueId,
         })}
         role="none"
       >
@@ -179,7 +175,7 @@ class DraggableEpic extends Component {
               ) : (
                 <p>{item.epicName}</p>
               )}
-              <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
+              <Dropdown onClick={e => e.stopPropagation()} overlay={this.getMenu()} trigger={['click']}>
                 <Icon
                   style={{
                     width: 12,
