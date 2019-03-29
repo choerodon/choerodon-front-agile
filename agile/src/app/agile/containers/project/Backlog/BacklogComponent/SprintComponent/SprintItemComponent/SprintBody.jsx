@@ -43,6 +43,7 @@ const debounceCallback = deBounce(500);
         BacklogStore.axiosGetSprint().then((sprintDate) => {
           BacklogStore.createIssue({
             ...res,
+            imageUrl: res.assigneeImageUrl,
             versionIds: res.versionIssueRelDTOList.length ? [res.versionIssueRelDTOList[0].versionId] : [],
             versionNames: res.versionIssueRelDTOList.length ? [res.versionIssueRelDTOList[0].name] : [],
           }, sprintId, sprintDate);

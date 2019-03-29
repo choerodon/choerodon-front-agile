@@ -18,7 +18,7 @@ import '../PI.scss';
             <SprintName
               type="backlog"
               expand={expand}
-              sprintName="特性列表"
+              piName="特性列表"
               toggleSprint={toggleSprint}
             />
             <SprintVisibleIssue

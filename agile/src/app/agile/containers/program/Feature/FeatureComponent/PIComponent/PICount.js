@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
 @observer
-export default class SprintCount extends Component {
+export default class PICount extends Component {
   render() {
-    const { issueId } = this.props;
-    return BacklogStore.getIsDragging === issueId && BacklogStore.getMultiSelected.size > 0 ? (
+    const { issueId, store } = this.props;
+    return store.getIsDragging === issueId && store.getMultiSelected.size > 0 ? (
       <span
         className="c7n-backlog-sprintCount"
         label="sprintIssue"
       >
-        {BacklogStore.getMultiSelected.size}
+        {store.getMultiSelected.size}
       </span>
     ) : null;
   }

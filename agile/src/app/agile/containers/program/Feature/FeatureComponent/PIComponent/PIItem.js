@@ -87,6 +87,7 @@ class SprintItem extends Component {
           data={store.getBacklogData}
           type={type === 'pi' ? 'PIBacklog' : 'backlog'}
           store={store}
+          refresh={refresh}
         />
       </div>
     );

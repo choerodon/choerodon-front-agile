@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {
-  observable, action, computed, toJS, reaction,
+  observable, action, computed, toJS,
 } from 'mobx';
 import { store, stores } from 'choerodon-front-boot';
 
@@ -344,12 +344,10 @@ class FeatureStore {
       } else {
         return destinationArr[destinationIndex - 1];
       }
+    } else if (destinationIndex === 0 && destinationArr.length) {
+      return destinationArr[destinationIndex];
     } else {
-      if (destinationIndex === 0 && destinationArr.length) {
-        return destinationArr[destinationIndex];
-      } else {
-        return destinationArr[destinationIndex - 1];
-      }
+      return destinationArr[destinationIndex - 1];
     }
   };
 
@@ -429,6 +427,8 @@ class FeatureStore {
   }
 
   axiosGetPICompleteMessage = (piId, artId) => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/before_close?piId=${piId}&artId=${artId}`);
+
+  axiosUpdateSprint = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/pi`, data);
 }
 
 const featureStore = new FeatureStore();
