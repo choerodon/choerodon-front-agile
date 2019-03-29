@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
-import { observer, inject } from 'mobx-react';
-import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
+import { observer } from 'mobx-react';
 
 @observer
 class SideBorder extends Component {
-  shouldComponentUpdate(nextProps, nextState, nextContext) {
+  shouldComponentUpdate(nextProps) {
     if (JSON.stringify(nextProps) === JSON.stringify(this.props)) {
       return false;
     }

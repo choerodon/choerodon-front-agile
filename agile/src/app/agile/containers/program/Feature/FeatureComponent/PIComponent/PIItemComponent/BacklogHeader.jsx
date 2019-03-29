@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import SprintName from './SprintHeaderComponent/SprintName';
-import SprintVisibleIssue from './SprintHeaderComponent/SprintVisibleIssue';
+import SprintName from './PIHeaderComponent/PIName';
+import SprintVisibleIssue from './PIHeaderComponent/SprintVisibleIssue';
 import '../PI.scss';
-import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore';
 
 @inject('AppState', 'HeaderStore')
 @observer class BacklogHeader extends Component {
   render() {
     const {
-      data, expand, toggleSprint, sprintId, issueCount,
+      expand, toggleSprint, issueCount,
     } = this.props;
 
     return (
@@ -19,7 +18,7 @@ import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore'
             <SprintName
               type="backlog"
               expand={expand}
-              sprintName="待办事项"
+              sprintName="特性列表"
               toggleSprint={toggleSprint}
             />
             <SprintVisibleIssue

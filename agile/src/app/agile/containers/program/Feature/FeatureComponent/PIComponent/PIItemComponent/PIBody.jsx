@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
 import QuickCreateIssue from './QuickCreateIssue';
 import IssueList from './IssueList';
-import { deBounce } from '../Utils';
+import deBounce from '../Utils';
 
 const debounceCallback = deBounce(500);
 
@@ -11,6 +11,7 @@ const debounceCallback = deBounce(500);
 @observer class PIBody extends Component {
   constructor(props) {
     super(props);
+    this.state = {};
   }
 
   handleCreateIssue(currentType, inputValue) {

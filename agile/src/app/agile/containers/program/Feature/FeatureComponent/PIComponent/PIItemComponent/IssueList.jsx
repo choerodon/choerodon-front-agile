@@ -24,7 +24,7 @@ class IssueList extends Component {
 
     return store.getIssueMap.get(sprintId || piId).map((item, index) => (
       <Draggable key={item.issueId} draggableId={item.issueId} index={index}>
-        {(provided, snapshot) => (
+        {provided => (
           <div
             key={item.issueId}
             className="c7n-backlog-sprintIssue"

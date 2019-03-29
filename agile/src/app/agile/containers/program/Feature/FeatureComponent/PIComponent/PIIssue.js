@@ -2,18 +2,16 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Tooltip } from 'choerodon-ui';
 import classnames from 'classnames';
-import { findDOMNode } from 'react-dom';
 import _ from 'lodash';
 import TypeTag from '../../../../../components/TypeTag';
 import UserHead from '../../../../../components/UserHead';
 import StatusTag from '../../../../../components/StatusTag';
 import PriorityTag from '../../../../../components/PriorityTag';
 import './PIIssue.scss';
-import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
 @observer
 class SprintIssue extends Component {
-  shouldComponentUpdate(nextProps, nextState, nextContext) {
+  shouldComponentUpdate(nextProps) {
     if (JSON.stringify(nextProps) === JSON.stringify(this.props)) {
       return false;
     }

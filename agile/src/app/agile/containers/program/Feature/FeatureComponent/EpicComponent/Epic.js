@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Icon } from 'choerodon-ui';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { fromJS, is } from 'immutable';
-import { Content, stores } from 'choerodon-front-boot';
 import EpicItem from './EpicItem';
 import './Epic.scss';
 import CreateEpic from './CreateEpic';
@@ -91,9 +89,9 @@ class Epic extends Component {
             </div>
             <DragDropContext
               onDragEnd={(result) => {
-                const { destination, source, draggableId } = result;
-                const { droppableId: destinationId, index: destinationIndex } = destination;
-                const { droppableId: sourceId, index: sourceIndex } = source;
+                const { destination, source } = result;
+                const { index: destinationIndex } = destination;
+                const { index: sourceIndex } = source;
                 store.moveEpic(sourceIndex, destinationIndex);
               }}
             >
@@ -129,23 +127,26 @@ class Epic extends Component {
               }}
               onMouseEnter={(e) => {
                 if (store.isDragging) {
+                  store.toggleIssueDrag(true);
                   e.currentTarget.style.border = '2px dashed green';
                 }
               }}
               onMouseLeave={(e) => {
                 if (store.isDragging) {
+                  store.toggleIssueDrag(false);
                   e.currentTarget.style.border = 'none';
                 }
               }}
               onMouseUp={(e) => {
                 if (store.getIsDragging) {
+                  store.toggleIssueDrag(false);
                   e.currentTarget.style.border = 'none';
                   store.moveIssuesToEpic(
-                    0, draggableIds,
-                  ).then((res) => {
+                    0, store.getIssueWithEpic,
+                  ).then(() => {
                     issueRefresh();
                     refresh();
-                  }).catch((error) => {
+                  }).catch(() => {
                     issueRefresh();
                     refresh();
                   });

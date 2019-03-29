@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import {
-  Dropdown, Menu, Modal, Form, Input, Select, Icon, Spin,
+  Icon,
 } from 'choerodon-ui';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { fromJS, is } from 'immutable';
-import { Content, stores } from 'choerodon-front-boot';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import EpicItem from './EpicItem';
 import './Epic.scss';
@@ -28,7 +26,7 @@ class Epic extends Component {
     Promise.all([BacklogStore.axiosGetEpic(), BacklogStore.axiosGetColorLookupValue()]).then(([epicList, lookupValues]) => {
       BacklogStore.initEpicList(epicList, lookupValues);
     });
-  }
+  };
 
   /**
    *点击epicItem的事件
@@ -40,11 +38,13 @@ class Epic extends Component {
     BacklogStore.setChosenEpic(type);
     BacklogStore.axiosGetSprint().then((res) => {
       BacklogStore.setSprintData(res);
-    }).catch((error) => {
+    }).catch(() => {
     });
   };
 
   render() {
+    const { draggableIds, addEpic } = this.state;
+    const { refresh, issueRefresh } = this.props;
     return BacklogStore.getCurrentVisible === 'epic' ? (
       <div className="c7n-backlog-epic">
         <div className="c7n-backlog-epicContent">
@@ -91,11 +91,10 @@ class Epic extends Component {
             </div>
             <DragDropContext
               onDragEnd={(result) => {
-                const { destination, source, draggableId } = result;
-                const { droppableId: destinationId, index: destinationIndex } = destination;
-                const { droppableId: sourceId, index: sourceIndex } = source;
+                const { destination, source } = result;
+                const { index: destinationIndex } = destination;
+                const { index: sourceIndex } = source;
                 BacklogStore.moveEpic(sourceIndex, destinationIndex);
-
               }}
             >
               <Droppable droppableId="epic">
@@ -109,9 +108,9 @@ class Epic extends Component {
                   >
                     <EpicItem
                       clickEpic={this.handleClickEpic}
-                      draggableIds={this.state.draggableIds}
-                      refresh={this.props.refresh}
-                      issueRefresh={this.props.issueRefresh}
+                      draggableIds={draggableIds}
+                      refresh={refresh}
+                      issueRefresh={issueRefresh}
                     />
                     {provided.placeholder}
                   </div>
@@ -129,25 +128,28 @@ class Epic extends Component {
               }}
               onMouseEnter={(e) => {
                 if (BacklogStore.isDragging) {
+                  BacklogStore.toggleIssueDrag(true);
                   e.currentTarget.style.border = '2px dashed green';
                 }
               }}
               onMouseLeave={(e) => {
                 if (BacklogStore.isDragging) {
+                  BacklogStore.toggleIssueDrag(false);
                   e.currentTarget.style.border = 'none';
                 }
               }}
               onMouseUp={(e) => {
                 if (BacklogStore.getIsDragging) {
+                  BacklogStore.toggleIssueDrag(false);
                   e.currentTarget.style.border = 'none';
                   BacklogStore.axiosUpdateIssuesToEpic(
-                    0, this.state.draggableIds,
-                  ).then((res) => {
-                    this.props.issueRefresh();
-                    this.props.refresh();
-                  }).catch((error) => {
-                    this.props.issueRefresh();
-                    this.props.refresh();
+                    0, BacklogStore.getIssueWithEpicOrVersion,
+                  ).then(() => {
+                    issueRefresh();
+                    refresh();
+                  }).catch(() => {
+                    issueRefresh();
+                    refresh();
                   });
                 }
               }}
@@ -157,7 +159,7 @@ class Epic extends Component {
           </div>
           <CreateEpic
             store={BacklogStore}
-            visible={this.state.addEpic}
+            visible={addEpic}
             onCancel={() => {
               this.setState({
                 addEpic: false,

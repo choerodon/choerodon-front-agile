@@ -26,7 +26,7 @@ const data = {
   };
 
   render() {
-    const { store, type } = this.props;
+    const { store } = this.props;
     return store.hasFilter ? (
       <div className="c7n-noissue-wapper">
         <div className="c7n-noissue-notzero">{this.getSourceByType('hasFilter')}</div>

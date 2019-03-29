@@ -8,7 +8,7 @@
   }
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   background: #fff;
-  padding-top: 8px;
+  padding: 8px 0;
 
   .c7n-backlog-sprintName {
     flex-wrap: wrap;
@@ -131,7 +131,7 @@
     -webkit-justify-content: space-between;
     -ms-flex-pack: justify;
     justify-content: space-between;
-    margin: 10px 20px;
+    margin: 5px 20px 0 20px;
   }
 
   .c7n-backlog-sprintGoalSide {
