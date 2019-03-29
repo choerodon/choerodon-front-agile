@@ -21,6 +21,7 @@ class EpicItem extends Component {
     return (
       store.getEpicData.map((item, index) => (
         <div
+          key={item.issueId}
           role="none"
           onMouseEnter={(e) => {
             if (store.isDragging) {
@@ -56,6 +57,7 @@ class EpicItem extends Component {
           <Draggable draggableId={`epicItem-${index}`} key={item.issueId} index={index}>
             {(draggableProvided, draggableSnapshot) => (
               <DraggableEpic
+                store={store}
                 item={item}
                 refresh={refresh}
                 draggableProvided={draggableProvided}
