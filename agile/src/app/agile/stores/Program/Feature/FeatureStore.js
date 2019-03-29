@@ -10,6 +10,8 @@ const { AppState } = stores;
 class FeatureStore {
   @observable featureList = [];
 
+  @observable hasActivePI = false;
+
   @observable epics = [];
 
   @observable spinIf = false;
@@ -43,6 +45,8 @@ class FeatureStore {
   @observable selectedIssueId = [];
 
   @observable issueCantDrag = false;
+
+  @observable piCompleteMessage = {};
 
   @action setFeatureList(data) {
     this.featureList = data;
@@ -184,6 +188,10 @@ class FeatureStore {
     return this.prevClickedIssue;
   }
 
+  @computed get getHasActivePI() {
+    return this.hasActivePI;
+  }
+
   @action setChosenEpic(data) {
     if (data === 'all') {
       this.filterSelected = false;
@@ -200,6 +208,7 @@ class FeatureStore {
       this.issueMap.set(pi.id.toString(), pi.subFeatureDTOList || []);
     });
     this.allPiList = allPiList;
+    this.hasActivePI = Boolean(allPiList.find(element => element.statusCode === 'doing'));
   }
 
   getFeatureListData = () => {
@@ -249,10 +258,10 @@ class FeatureStore {
 
   checkStartAndEnd = (prevIndex, currentIndex) => (prevIndex > currentIndex ? [currentIndex, prevIndex] : [prevIndex, currentIndex]);
 
-  @action dealWithMultiSelect(sprintId, currentClick, type) {
-    const data = this.issueMap.get(sprintId);
+  @action dealWithMultiSelect(piId, currentClick, type) {
+    const data = this.issueMap.get(piId);
     const currentIndex = data.findIndex(issue => currentClick.issueId === issue.issueId);
-    if (this.prevClickedIssue && this.prevClickedIssue.sprintId === currentClick.sprintId) {
+    if (this.prevClickedIssue && this.prevClickedIssue.piId === currentClick.piId) {
       // 如果以后想利用 ctrl 从多个冲刺中选取 issue，可以把判断条件2直接挪到 shift 上
       // 但是请考虑清楚操作多个数组可能带来的性能开销问题
       if (type === 'shift') {
@@ -289,8 +298,8 @@ class FeatureStore {
     };
   }
 
-  @action clickedOnce(sprintId, currentClick) {
-    const index = this.issueMap.get(sprintId).findIndex(issue => issue.issueId === currentClick.issueId);
+  @action clickedOnce(piId, currentClick) {
+    const index = this.issueMap.get(piId).findIndex(issue => issue.issueId === currentClick.issueId);
     this.multiSelected = observable.map();
     this.multiSelected.set(currentClick.issueId, currentClick);
     this.prevClickedIssue = {
@@ -322,10 +331,6 @@ class FeatureStore {
 
   @computed get getClickIssueId() {
     return toJS(this.clickIssueId);
-  }
-
-  @computed get getPrevClickedIssue() {
-    return this.prevClickedIssue;
   }
 
   axiosEasyCreateIssue = data => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues?applyType=program`, data);
@@ -369,9 +374,9 @@ class FeatureStore {
         destinationArr.unshift(issueItem);
       }
       if (sourceId === destinationId) {
-        const dragInSingleSprint = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
-        dragInSingleSprint.splice(destinationIndex, 0, ...[...this.multiSelected.values()]);
-        this.issueMap.set(destinationId, dragInSingleSprint);
+        const dragInSinglePI = sourceArr.filter(issue => !this.multiSelected.has(issue.issueId));
+        dragInSinglePI.splice(destinationIndex, 0, ...[...this.multiSelected.values()]);
+        this.issueMap.set(destinationId, dragInSinglePI);
       } else {
         this.issueMap.set(sourceId, modifiedSourceArr);
         this.issueMap.set(destinationId, destinationArr);
@@ -413,9 +418,17 @@ class FeatureStore {
 
   closePI = piData => axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/close`, piData);
 
-  axiosUpdateIssue(data) {
-    return axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues`, data);
+  axiosUpdateIssue = data => axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/issues`, data);
+
+  @computed get getPICompleteMessage() {
+    return toJS(this.piCompleteMessage);
   }
+
+  @action setPICompleteMessage(data) {
+    this.piCompleteMessage = data;
+  }
+
+  axiosGetPICompleteMessage = (piId, artId) => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/before_close?piId=${piId}&artId=${artId}`);
 }
 
 const featureStore = new FeatureStore();
