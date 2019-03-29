@@ -10,7 +10,7 @@ import StatusTag from '../../../../../../../components/StatusTag';
 
 const formatter = 'YYYY-MM-DD';
 const STATUS = {
-  todo: '未启动',
+  todo: '未开启',
   doing: '进行中',
   done: '已完成',
 };
@@ -25,11 +25,12 @@ class PIList extends Component {
   }
 
   componentDidMount() {
-    this.getPIList();
+    const { artId } = this.props;
+    this.getPIList(artId);
   }
 
-  getPIList = () => {
-    getPIList().then((res) => {
+  getPIList = (artId) => {
+    getPIList(artId).then((res) => {
       this.setState({
         PIList: res.content.map(item => (
           Object.assign(item, {
@@ -69,7 +70,7 @@ class PIList extends Component {
   handleCreatePIOK = (startDate) => {
     const { artId } = this.props;
     createPI(artId, startDate).then(() => {
-      this.getPIList();
+      this.getPIList(artId);
       this.setState({
         createPIModalVisible: false,
       });
@@ -106,14 +107,14 @@ class PIList extends Component {
     ];
     return (
       <React.Fragment>
+        <Button funcType="flat" style={{ marginBottom: 15, color: '#3F51B5' }} onClick={this.handleCreatePIClick}>
+          <Icon type="playlist_add" />
+          <span>创建下一批PI</span>
+        </Button>
         <PIListTable 
           columns={columns}
           dataSource={PIList}
         />
-        <Button funcType="flat" style={{ marginTop: 15, color: '#3F51B5' }} onClick={this.handleCreatePIClick}>
-          <Icon type="playlist_add" />
-          <span>添加PI</span>
-        </Button>
         <CreatePIModal
           name={name} 
           visible={createPIModalVisible}

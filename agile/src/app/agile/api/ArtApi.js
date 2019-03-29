@@ -39,3 +39,18 @@ export function beforeArtFinish(artId) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/agile/v1/projects/${projectId}/art/before_complete?id=${artId}`);
 }
+
+export function beforeStop(artId) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/projects/${projectId}/art/before_stop?id=${artId}`);
+}
+
+export function stopArt(data) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.post(`agile/v1/projects/${projectId}/art/stop`, data);
+}
+
+export function startArt(data) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.post(`agile/v1/projects/${projectId}/art/start`, data);
+}

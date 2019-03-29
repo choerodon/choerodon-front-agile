@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
   Page, Header, Content, stores, 
 } from 'choerodon-front-boot';
-import { Button, Spin } from 'choerodon-ui';
+import { Button, Spin, Icon } from 'choerodon-ui';
 import moment from 'moment';
 import { editArtLink } from '../../../../common/utils';
 import { ArtTable, CreateArt } from './components';
@@ -102,6 +102,10 @@ class ArtList extends Component {
           {/* <Button icon="playlist_add" onClick={this.handleCreateArtClick} disabled={createDisabled}> */}
           <Button icon="playlist_add" onClick={this.handleCreateArtClick}>
             {'创建ART'}
+          </Button>
+          <Button funcType="flat" onClick={this.loadArts}>
+            <Icon type="refresh icon" />
+            <span>刷新</span>
           </Button>
         </Header>
         <Content>

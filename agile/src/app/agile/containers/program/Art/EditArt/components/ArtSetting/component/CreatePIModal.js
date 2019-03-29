@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import {
@@ -28,7 +28,7 @@ const handleCreatePICancel = (props) => {
 
 const CreatePIModal = (props) => {
   const {
-    visible, onCreatePIOk, onCreatePICancel, name, form, 
+    visible, name, form, 
   } = props;
   const { getFieldDecorator } = form; 
   return (
@@ -36,9 +36,9 @@ const CreatePIModal = (props) => {
       visible={visible}
       onOk={() => { handleCreatePIOk(props); }}
       onCancel={() => { handleCreatePICancel(props); }}
-      title="添加PI"
+      title="创建下一批PI"
     >
-      <p style={{ marginTop: 20 }}>{`您正在为 ${name} 添加新的PI，请选择新PI的开始时间`}</p>
+      <p style={{ marginTop: 20 }}>{`您正在为 ${name} 创建下一批PI, 默认开始时间为上一个PI的结束时间。`}</p>
       <Form>
         <FormItem>
           {
@@ -48,7 +48,7 @@ const CreatePIModal = (props) => {
                 }],
               })(<DatePicker
                 style={{ width: '100%' }}
-                label="添加PI开始时间"
+                label="PI开始时间"
                 allowClear
                 format="YYYY-MM-DD"
               />)
