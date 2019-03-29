@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Modal, Select } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
@@ -34,10 +34,10 @@ class ClosePI extends Component {
       targetPiId: selectChose,
       objectVersionNumber: propData.objectVersionNumber,
     };
-    store.closePI(data).then((res) => {
+    store.closePI(data).then(() => {
       onCancel();
       refresh();
-    }).catch((error) => {
+    }).catch(() => {
     });
   }
 

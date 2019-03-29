@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
-import { Droppable } from 'react-beautiful-dnd';
+import { observer } from 'mobx-react';
 import { Modal } from 'choerodon-ui';
 import './PI.scss';
-import SprintContainer from './SprintItemComponent/PIContainer';
-import NoneSprint from './SprintItemComponent/NonePI';
+import SprintContainer from './PIItemComponent/PIContainer';
+import NoneSprint from './PIItemComponent/NonePI';
 
 const { confirm } = Modal;
 
@@ -37,9 +36,9 @@ class SprintItem extends Component {
             </div>
           ),
           onOk() {
-            return that.props.store.axiosDeleteSprint(item.sprintId).then((res) => {
+            return that.props.store.axiosDeleteSprint(item.sprintId).then(() => {
               that.props.refresh();
-            }).catch((error) => {
+            }).catch(() => {
             });
           },
           onCancel() {},
@@ -47,9 +46,9 @@ class SprintItem extends Component {
           okType: 'danger',
         });
       } else {
-        store.axiosDeleteSprint(item.sprintId).then((res) => {
+        store.axiosDeleteSprint(item.sprintId).then(() => {
           refresh();
-        }).catch((error) => {
+        }).catch(() => {
         });
       }
     }

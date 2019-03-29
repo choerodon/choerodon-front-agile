@@ -11,7 +11,7 @@ import FeatureDetail from '../FeatureComponent/FeatureDetail/FeatureDetail';
 import CreateFeature from '../FeatureComponent/CreateFeature/CreateFeature';
 import FeatureStore from '../../../../stores/Program/Feature/FeatureStore';
 import Epic from '../FeatureComponent/EpicComponent/Epic';
-import SprintItem from '../FeatureComponent/SprintComponent/PIItem';
+import SprintItem from '../FeatureComponent/PIComponent/PIItem';
 
 @inject('HeaderStore')
 @observer
@@ -45,7 +45,7 @@ class FeatureList extends Component {
   onEpicClick = () => {
     FeatureStore.getFeatureListData().then((res) => {
       FeatureStore.setSprintData(res);
-    }).catch((error) => {
+    }).catch(() => {
     });
   };
 

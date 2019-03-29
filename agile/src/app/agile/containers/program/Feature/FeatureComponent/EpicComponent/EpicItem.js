@@ -41,10 +41,10 @@ class EpicItem extends Component {
               e.currentTarget.style.border = 'none';
               store.moveIssuesToEpic(
                 item.issueId, store.getIssueWithEpic,
-              ).then((w) => {
+              ).then(() => {
                 issueRefresh();
                 refresh();
-              }).catch((e) => {
+              }).catch(() => {
                 issueRefresh();
                 refresh();
               });

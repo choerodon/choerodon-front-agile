@@ -11,7 +11,6 @@ const { AppState } = stores;
   constructor(props) {
     super(props);
     this.state = {
-      startSprintVisible: false,
       finishSprintVisible: false,
     };
   }
@@ -31,7 +30,7 @@ const { AppState } = stores;
     e.stopPropagation();
     store.axiosGetPICompleteMessage(data.id, data.artId).then((res) => {
       store.setPICompleteMessage(res);
-    }).catch((error) => {
+    }).catch(() => {
     });
     this.setState({
       finishSprintVisible: true,
@@ -53,7 +52,7 @@ const { AppState } = stores;
           refresh();
           Choerodon.prompt('PI开启成功！');
         }
-      }).catch((error) => {
+      }).catch(() => {
       });
     }
   };
@@ -62,7 +61,7 @@ const { AppState } = stores;
     const {
       handleDeleteSprint, statusCode, data, store, refresh, type,
     } = this.props;
-    const { finishSprintVisible, startSprintVisible } = this.state;
+    const { finishSprintVisible } = this.state;
     // TODO: 内部接口逻辑
     return (
       <div className="c7n-backlog-sprintTitleSide">

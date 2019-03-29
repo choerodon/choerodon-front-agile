@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import SprintName from './SprintHeaderComponent/SprintName';
-import SprintVisibleIssue from './SprintHeaderComponent/SprintVisibleIssue';
-import PILastDays from './SprintHeaderComponent/PILastDays';
-import SprintStatus from './SprintHeaderComponent/SprintStatus';
-import PIDateRange from './SprintHeaderComponent/PIDateRange';
+import SprintName from './PIHeaderComponent/PIName';
+import SprintVisibleIssue from './PIHeaderComponent/SprintVisibleIssue';
+import PILastDays from './PIHeaderComponent/PILastDays';
+import SprintStatus from './PIHeaderComponent/PIStatus';
+import PIDateRange from './PIHeaderComponent/PIDateRange';
 import '../PI.scss';
 
 @inject('AppState', 'HeaderStore')
@@ -19,7 +19,7 @@ import '../PI.scss';
     };
   }
 
-  componentWillReceiveProps(nextProps, nextContext) {
+  componentWillReceiveProps(nextProps) {
     this.setState({
       piName: nextProps.data.name,
       startDate: nextProps.data.startDate,
@@ -43,7 +43,7 @@ import '../PI.scss';
           piName: value,
           objectVersionNumber: res.objectVersionNumber,
         });
-      }).catch((error) => {
+      }).catch(() => {
       });
     }
   };
