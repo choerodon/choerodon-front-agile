@@ -9,7 +9,7 @@ const FormItem = Form.Item;
 
 @Form.create({})
 @inject('AppState', 'HeaderStore')
-@observer class SprintHeader extends Component {
+@observer class QuickCreateIssue extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -17,6 +17,12 @@ const FormItem = Form.Item;
       expand: false,
       currentType: props.defaultType,
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      currentType: nextProps.defaultType,
+    });
   }
 
   handleChangeType = ({ key }) => {
@@ -164,4 +170,4 @@ const FormItem = Form.Item;
   }
 }
 
-export default SprintHeader;
+export default QuickCreateIssue;

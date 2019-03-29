@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Icon } from 'choerodon-ui';
 import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
-// import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
 @inject('AppState', 'HeaderStore')
-@observer class SprintHeader extends Component {
+@observer class PIName extends Component {
   handleChange = (value) => {
     const { handleBlurName } = this.props;
     handleBlurName(value);
@@ -13,7 +12,7 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
 
   render() {
     const {
-      expand, sprintName, toggleSprint, type,
+      expand, piName, toggleSprint,
     } = this.props;
     return (
       <div className="c7n-backlog-sprintName">
@@ -23,32 +22,15 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
           role="none"
           onClick={toggleSprint}
         />
-        {type !== 'backlog' ? (
-          <EasyEdit
-            width={150}
-            maxLength={30}
-            type="input"
-            defaultValue={sprintName}
-            enterOrBlur={this.handleChange}
-          >
-            <span
-              style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-              role="none"
-            >
-              {sprintName}
-            </span>
-          </EasyEdit>
-        ) : (
-          <span
-            style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-            role="none"
-          >
-            {sprintName}
-          </span>
-        )}
+        <span
+          style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
+          role="none"
+        >
+          {piName}
+        </span>
       </div>
     );
   }
 }
 
-export default SprintHeader;
+export default PIName;

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import SprintCount from '../PICount';
-import SprintIssue from '../PIIssue';
+import PICount from '../PICount';
+import PIIssue from '../PIIssue';
 
 @observer
 class IssueItem extends Component {
@@ -26,11 +26,12 @@ class IssueItem extends Component {
         onClick={this.handleClick}
         role="none"
       >
-        <SprintCount
+        <PICount
           key={`${item.issueId}-count`}
           issueId={item.issueId}
+          store={store}
         />
-        <SprintIssue
+        <PIIssue
           key={item.issueId}
           ref={((e) => {
             this.ref = e;

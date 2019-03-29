@@ -12,7 +12,7 @@ import '../PI.scss';
   constructor(props) {
     super(props);
     this.state = {
-      piName: props.data.name,
+      name: props.data.name,
       startDate: props.data.startDate,
       endDate: props.data.endDate,
       objectVersionNumber: props.data.objectVersionNumber,
@@ -21,7 +21,7 @@ import '../PI.scss';
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      piName: nextProps.data.name,
+      name: nextProps.data.name,
       startDate: nextProps.data.startDate,
       endDate: nextProps.data.endDate,
       objectVersionNumber: nextProps.data.objectVersionNumber,
@@ -34,13 +34,13 @@ import '../PI.scss';
       const { objectVersionNumber } = this.state;
       const req = {
         objectVersionNumber,
-        projectId: AppState.currentMenuType.id,
-        sprintId: data.sprintId,
-        piName: value,
+        programId: AppState.currentMenuType.id,
+        id: data.id,
+        name: value,
       };
       store.axiosUpdateSprint(req).then((res) => {
         this.setState({
-          piName: value,
+          name: value,
           objectVersionNumber: res.objectVersionNumber,
         });
       }).catch(() => {
@@ -53,7 +53,7 @@ import '../PI.scss';
       data, expand, toggleSprint, piId, issueCount, refresh, store,
     } = this.props;
     const {
-      piName, startDate, endDate,
+      name, startDate, endDate,
     } = this.state;
 
     return (
@@ -64,7 +64,7 @@ import '../PI.scss';
               <SprintName
                 type="sprint"
                 expand={expand}
-                sprintName={piName}
+                piName={name}
                 toggleSprint={toggleSprint}
                 handleBlurName={this.handleBlurName}
               />
