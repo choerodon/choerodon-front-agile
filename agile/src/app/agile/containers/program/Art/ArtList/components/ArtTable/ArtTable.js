@@ -9,7 +9,7 @@ const propTypes = {
   onEditArtClick: PropTypes.func.isRequired,
 };
 const STATUS = {
-  todo: '未启动',
+  todo: '未开启',
   doing: '进行中',
   stop: '停用',
 };

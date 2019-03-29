@@ -73,19 +73,11 @@ class ArtForm extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const { initValue } = this.props;
+    const { currentTab } = this.state;
     return (
       <Form className="c7nagile-ArtForm">
         <Tabs defaultActiveKey="1" onChange={this.handleTabChange}>
           <TabPane tab="ART设置" key="1">
-            <FormItem>
-              {getFieldDecorator('code', {
-                rules: [{
-                  required: true, message: '请输入ART的编号!',
-                }],
-              })(
-                <Input style={{ width: 500 }} maxLength={30} label="编号" placeholder="请输入ART的编号" />,
-              )}
-            </FormItem>
             <FormItem>
               {getFieldDecorator('rteId', {
                 normalize: value => (value === 0 ? undefined : value),
@@ -106,7 +98,7 @@ class ArtForm extends Component {
                   format="YYYY-MM-DD"
                   style={{ width: 500 }}
                   label="开始日期"
-                  disabled
+                  disabledDate={current => current < moment(initValue.startDate).endOf('day')}
                 />,
               )}
             </FormItem>
@@ -115,10 +107,10 @@ class ArtForm extends Component {
                 getFieldDecorator('piCount', {
                   rules: [{
                     required: true,
-                    message: '请选择初始PI生成个数',
+                    message: '请选择PI生成个数',
                   }],
                 })(
-                  <Select style={{ width: 500, marginBottom: 15 }} label="请选择初始PI生成个数">
+                  <Select style={{ width: 500, marginBottom: 15 }} label="PI生成个数">
                     {
                       [1, 2, 3, 4, 5, 6, 7, 8].map(value => <Option key={value} value={value}>{value}</Option>)
                     }
@@ -126,13 +118,6 @@ class ArtForm extends Component {
                 )
               }
             </FormItem>
-            {/* <FormItem>
-              {getFieldDecorator('enabled', {
-                valuePropName: 'checked',
-              })(
-                <Checkbox>启用</Checkbox>,
-              )}
-            </FormItem> */}
           </TabPane>
           <TabPane tab="ART节奏" key="2">
             <div style={{ display: 'flex', width: 500 }}>
@@ -202,8 +187,14 @@ class ArtForm extends Component {
           </TabPane>
         </Tabs>
         <Divider />
-        <Button onClick={this.onSave} type="primary" funcType="raised">保存</Button>
-        <Button onClick={this.handleCancel} funcType="raised" style={{ marginLeft: 10 }}>取消</Button>
+        {
+          currentTab !== '4' && (
+            <div>
+              <Button onClick={this.onSave} type="primary" funcType="raised">保存</Button>
+              <Button onClick={this.handleCancel} funcType="raised" style={{ marginLeft: 10 }}>取消</Button>
+            </div>
+          )
+        }
       </Form>
     );
   }

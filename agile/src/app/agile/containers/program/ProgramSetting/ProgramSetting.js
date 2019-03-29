@@ -3,16 +3,12 @@ import {
   stores, axios, Page, Header, Content, Permission,
 } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
-import _ from 'lodash';
 import {
-  Form, Input, Button, Icon, Select, Radio,
+  Form, Input, Button, Icon, 
 } from 'choerodon-ui';
 
 const { AppState } = stores;
-const { Option } = Select;
 const FormItem = Form.Item;
-const RadioGroup = Radio.Group;
-const sign = false;
 
 class ProgramSetting extends Component {
   constructor(props) {
@@ -29,23 +25,26 @@ class ProgramSetting extends Component {
   }
 
   getProgramSetting() {
+    const { form } = this.props;
     axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
       .then((res) => {
         this.setState({
           origin: res,
           shortName: res.projectCode,
         });
-        this.props.form.setFieldsValue({
+        form.setFieldsValue({
           shortName: res.projectCode,
         });
       });
   }
 
   handleUpdateProgramSetting = () => {
-    this.props.form.validateFields((err, values, modify) => {
+    const { form } = this.props;
+    const { origin } = this.state;
+    form.validateFields((err, values, modify) => {
       if (!err && modify) {
         const projectInfoDTO = {
-          ...this.state.origin,
+          ...origin,
           projectCode: values.shortName,
         };
         this.setState({
@@ -64,7 +63,7 @@ class ProgramSetting extends Component {
               Choerodon.prompt('修改成功');
             }
           })
-          .catch((error) => {
+          .catch(() => {
             this.setState({
               loading: false,
             });
@@ -75,14 +74,10 @@ class ProgramSetting extends Component {
   };
 
   render() {
-    const { getFieldDecorator, isModifiedFields, getFieldValue } = this.props.form;
+    const { form: { getFieldDecorator } } = this.props;
+    const { shortName, loading } = this.state;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
-    const radioStyle = {
-      display: 'block',
-      height: '30px',
-      lineHeight: '30px',
-    };
     return (
       <Page
         service={[
@@ -97,18 +92,18 @@ class ProgramSetting extends Component {
         </Header>
         <Content
           title="项目设置"
-          description="根据项目需求，你可以修改项目简称。"
+          description="根据项目需求，你可以修改项目编码。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/setup/project-setting/"
         >
           <div style={{ marginTop: 8 }}>
             <Form layout="vertical">
-              <FormItem label="项目简称" style={{ width: 512 }}>
+              <FormItem label="项目编码" style={{ width: 512 }}>
                 {getFieldDecorator('shortName', {
-                  rules: [{ required: true, message: '项目简称必填' }],
-                  initialValue: this.state.shortName,
+                  rules: [{ required: true, message: '项目编码必填' }],
+                  initialValue: shortName,
                 })(
                   <Input
-                    label="项目简称"
+                    label="项目编码"
                     maxLength={5}
                   />,
                 )}
@@ -119,7 +114,7 @@ class ProgramSetting extends Component {
                 <Button
                   type="primary"
                   funcType="raised"
-                  loading={this.state.loading}
+                  loading={loading}
                   onClick={() => this.handleUpdateProgramSetting()}
                 >
                   {'保存'}
