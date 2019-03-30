@@ -41,8 +41,8 @@ const defaultProps = {
 
 const propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  value: PropTypes.any,  
-  placeholder: PropTypes.string,      
+  value: PropTypes.any,
+  placeholder: PropTypes.string,
   toolbarHeight: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
@@ -66,7 +66,7 @@ class WYSIWYGEditor extends Component {
   static getDerivedStateFromProps(nextProps) {
     if ('value' in nextProps) {
       return {
-        value: nextProps.value,   
+        value: nextProps.value,
       };
     }
     return null;
@@ -106,7 +106,7 @@ class WYSIWYGEditor extends Component {
 
   render() {
     const {
-      placeholder,      
+      placeholder,
       toolbarHeight,
       style,
       bottomBar,
@@ -118,10 +118,10 @@ class WYSIWYGEditor extends Component {
     const newStyle = { ...defaultStyle, ...style };
     const editHeight = newStyle.height - (toolbarHeight || 42);
     return (
-      <div style={{ width: '100%' }}>
+      <div style={{ width: '100%', height: '100%' }}>
         <div style={newStyle} className="react-quill-editor">
           <ReactQuill
-            ref={saveRef} 
+            ref={saveRef}
             theme="snow"
             modules={modules}
             formats={formats}
@@ -142,7 +142,7 @@ class WYSIWYGEditor extends Component {
                 justifyContent: 'flex-end',
               }}
             >
-              <Button 
+              <Button
                 type="primary"
                 onClick={() => {
                   this.empty();

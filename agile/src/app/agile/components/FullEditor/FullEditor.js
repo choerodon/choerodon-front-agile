@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Modal } from 'choerodon-ui';
 import WYSIWYGEditor from '../WYSIWYGEditor';
+import './FullEditor.scss';
 
 class FullEditor extends Component {
   constructor(props) {
@@ -37,12 +38,18 @@ class FullEditor extends Component {
         visible={visible || false}
         maskClosable={false}
         width={1200}
+        wrapClassName="c7n-agile-editDescription"
+        style={{
+          height: '85%',
+        }}
         onCancel={onCancel}
         onOk={this.handleOk}
       >
         <WYSIWYGEditor
           value={delta}
-          style={{ height: 368, width: '100%', marginTop: 20 }}
+          style={{
+            width: '100%', marginTop: 20, height: '100%',
+          }}
           onChange={(value) => {
             this.setState({ delta: value });
           }}
