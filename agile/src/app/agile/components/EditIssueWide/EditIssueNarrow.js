@@ -1,3 +1,4 @@
+/* eslint-disable react/sort-comp */
 import React, { Component } from 'react';
 import { stores, axios, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
@@ -341,13 +342,7 @@ class CreateSprint extends Component {
       ];
     }
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
-  }
-
-  isInLook(ele) {
-    const a = ele.offsetTop;
-    const target = document.getElementById('scroll-area');
-    return a + ele.offsetHeight > target.scrollTop;
-  }
+  };
 
   isInLook(ele) {
     const a = ele.offsetTop;
@@ -783,7 +778,7 @@ class CreateSprint extends Component {
         selectLoading: false,
       });
     });
-  }
+  };
 
   onDeleteWiki = async (id) => {
     const { origin } = this.state;
@@ -1338,11 +1333,16 @@ class CreateSprint extends Component {
     if (!description || editDesShow) {
       delta = text2Delta(editDes);
       return (
-        <div className="line-start mt-10">
+        <div
+          className="line-start mt-10"
+          style={{
+            height: 190,
+          }}
+        >
           <WYSIWYGEditor
             bottomBar
             value={text2Delta(editDes)}
-            style={{ height: 200, width: '100%' }}
+            style={{ height: 'calc(100% - 32px)', width: '100%' }}
             onChange={(value) => {
               this.setState({ editDes: value });
             }}
@@ -1612,55 +1612,55 @@ class CreateSprint extends Component {
       issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? issueTypes : issueTypes.filter(item => item.typeCode !== 'feature');
     }
     const getMenu = () => (
-        <Menu onClick={this.handleClickMenu.bind(this)}>
-          <Menu.Item key="0">登记工作日志</Menu.Item>
-          {
-            <Menu.Item
-              key="1"
-              disabled={loginUserId !== createdById && !hasPermission}
-            >
-              {'删除'}
-            </Menu.Item>
+      <Menu onClick={this.handleClickMenu.bind(this)}>
+        <Menu.Item key="0">登记工作日志</Menu.Item>
+        {
+          <Menu.Item
+            key="1"
+            disabled={loginUserId !== createdById && !hasPermission}
+          >
+            {'删除'}
+          </Menu.Item>
           }
-          {
+        {
             typeCode !== 'sub_task' && (
               <Menu.Item key="2">
                 {'创建子任务'}
               </Menu.Item>
             )
           }
-          <Menu.Item key="3">
-            {'复制问题'}
-          </Menu.Item>
-          {
+        <Menu.Item key="3">
+          {'复制问题'}
+        </Menu.Item>
+        {
             typeCode !== 'sub_task' && origin.subIssueDTOList && origin.subIssueDTOList.length === 0 && (
               <Menu.Item key="4">
                 {'转化为子任务'}
               </Menu.Item>
             )
           }
-          {
+        {
             typeCode === 'sub_task' && (
               <Menu.Item key="5">
                 {'转化为任务'}
               </Menu.Item>
             )
           }
-          <Menu.Item key="6">
-            {'创建分支'}
-          </Menu.Item>
-          <Menu.Item key="7">
-            {' 分配问题'}
-          </Menu.Item>
-          {
+        <Menu.Item key="6">
+          {'创建分支'}
+        </Menu.Item>
+        <Menu.Item key="7">
+          {' 分配问题'}
+        </Menu.Item>
+        {
             typeCode === 'sub_task' && (
               <Menu.Item key="8">
                 {'修改父级'}
               </Menu.Item>
             )
           }
-        </Menu>
-      );
+      </Menu>
+    );
     const callback = (value) => {
       this.setState(
         {
@@ -3154,7 +3154,7 @@ class CreateSprint extends Component {
                               </span>
                             ) : null}
                           </div>
-                        
+
                         </div>
                         <div className="line-start mt-10 assignee">
                           <div className="c7n-property-wrapper">
