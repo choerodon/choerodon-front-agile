@@ -59,7 +59,7 @@ export default class CardProvider extends Component {
               onMouseDown={onMouseDown}
             >
               <div
-                className="c7n-scrumboard-issue"
+                className="c7n-board-issue"
                 role="none"
                 onClick={e => this.handleClick(e)}
                 ref={this.editRef}
@@ -68,7 +68,7 @@ export default class CardProvider extends Component {
               >
                 <div style={{ flexGrow: 1 }}>
                   <div
-                    className="c7n-scrumboard-issueTop"
+                    className="c7n-board-issueTop"
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -106,7 +106,7 @@ export default class CardProvider extends Component {
                       </div>
                     </div>
                   </div>
-                  <div className="c7n-scrumboard-issueBottom">
+                  <div className="c7n-board-issueBottom">
                     <Summary summary={issue.summary} />
                   </div>
                 </div>

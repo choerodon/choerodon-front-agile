@@ -1,7 +1,8 @@
-.c7n-scrumboard-issue.shouldBackgroundColorChange {
+.c7n-board-issue.shouldBackgroundColorChange {
   background: #edeff6 !important;
 }
-.c7n-scrumboard-issue {
+
+.c7n-board-issue {
   background: #fff;
   border-width: unset;
   border-style: unset;
@@ -17,7 +18,8 @@
   border-right: 1px solid rgba(0, 0, 0, 0.20);
   border-bottom: 1px solid rgba(0, 0, 0, 0.20);
   border-top: 1px solid rgba(0, 0, 0, 0.20);
-  .c7n-scrumboard-issueSide {
+
+  .c7n-board-issueSide {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -27,8 +29,8 @@
     align-items: center;
   }
 
-  .c7n-scrumboard-issueTop {
-    div.c7n-scrumboard-issueIcon {
+  .c7n-board-issueTop {
+    div.c7n-board-issueIcon {
       width: 20px;
       height: 20px;
       border-radius: 4px;
@@ -37,9 +39,11 @@
       align-items: center;
       flex-shrink: 0;
     }
+
     .rate-wrapper {
       margin-right: 5px;
     }
+
     .ant-rate {
       font-size: 12px !important;
       min-width: 28px;
@@ -47,20 +51,25 @@
       flex-direction: row-reverse;
       float: left;
     }
+
     .emergency {
       color: #f5222d !important;
     }
+
     .notEmergency {
       color: #faad14 !important;
     }
+
     .ant-rate-star {
       margin-right: 1px !important;
       width: 6px;
+
       .icon {
         font-size: 16px !important;
         transform: scale(0.3333333) !important;
       }
     }
+
     .ant-rate-star-first .ant-rate-star-second {
       font-size: 16px !important;
       transform: scale(0.3333333) !important;
@@ -72,9 +81,10 @@
     font-size: 16px;
   }
 
-  .c7n-scrumboard-issueBottom {
+  .c7n-board-issueBottom {
     margin-top: 8px;
     width: 100%;
+
     // margin-left: 26px;
     .textDisplayOneColumn {
       flex-basis: 90%;
@@ -82,11 +92,11 @@
       text-overflow: ellipsis;
       line-height: 20px;
       white-space: normal;
-      word-break: break-all;      
+      word-break: break-all;
     }
   }
 
-  .c7n-scrumboard-issueBorder {
+  .c7n-board-issueBorder {
     width: 3px;
     position: absolute;
     height: 100%;
@@ -96,13 +106,14 @@
   }
 }
 
-.c7n-itemBodyColumn .c7n-boardIssue:last-child .c7n-scrumboard-issue {
+.c7n-itemBodyColumn .c7n-boardIssue:last-child .c7n-board-issue {
   border-bottom: 1px solid rgba(0, 0, 0, 0.20);
 }
 
 .clickBackground {
   background: rgba(140, 158, 255, 0.08);
 }
+
 .c7n-agile-quickSearch-popover {
   .ant-checkbox-group-item {
     margin-bottom: 5px;
