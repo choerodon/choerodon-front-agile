@@ -1,3 +1,5 @@
+/* eslint-disable react/sort-comp */
+/* eslint-disable no-shadow */
 import React, { Component } from 'react';
 import { stores, axios, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
@@ -1044,7 +1046,7 @@ class FeatureDetail extends Component {
                 }}
               >
                 <TypeTag
-                  data={issueTypeDTO}
+                  data={{ ...issueTypeDTO, colour: featureType === 'enabler' ? '#FFCA28' : '#29B6F6' }}
                 />
                 <Icon
                   type="arrow_drop_down"
