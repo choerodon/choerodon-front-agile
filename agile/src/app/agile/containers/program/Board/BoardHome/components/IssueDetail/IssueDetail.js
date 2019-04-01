@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import FeatureDetail from '../../../../Feature/FeatureComponent/FeatureDetail';
+import FeatureDetail from '../../../../Feature/FeatureDetail';
 import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
 import './IssueDetail.scss';
 
