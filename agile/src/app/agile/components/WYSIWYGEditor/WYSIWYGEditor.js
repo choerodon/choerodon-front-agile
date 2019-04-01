@@ -11,9 +11,7 @@ Quill.register('modules/imageDrop', ImageDrop);
 const modules = {
   toolbar: [
     ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    ['image'],
-    [{ color: [] }],
+    [{ list: 'ordered' }, { list: 'bullet' }, 'image', 'link', { color: [] }],
   ],
   imageDrop: true,
 };
@@ -26,6 +24,7 @@ const formats = [
   'blockquote',
   'list',
   'bullet',
+  'link',
   'image',
   'color',
 ];
