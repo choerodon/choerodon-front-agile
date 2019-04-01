@@ -14,17 +14,19 @@ const propTypes = {
 let canStart = true;
 
 const renderPIName = (props) => {
-  const { data: { piCodePrefix, piCodeNumber, piCount } } = props;
-  if (piCount) {
+  const { data: { piCodePrefix, piCodeNumber, piCount }, PiList } = props;
+  const PiArr = PiList.sort((a, b) => a.id - b.id).map(item => <span key={item.name} style={{ marginRight: 5 }}>{`${item.code}-${item.name}`}</span>);
+  if ((PiArr && PiArr.length > 0) || (piCount && piCodePrefix && piCodeNumber)) {
     const piCodeNumArr = [];
     // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < piCount - 1; i++) {
+    for (let i = 0; i < piCount; i++) {
       piCodeNumArr.push(piCodeNumber + i);
     }
   
-    return piCodeNumArr.map(codeNum => (
-      <span key={codeNum} style={{ marginRight: 5 }}>{`${piCodePrefix}-${piCodeNumber}`}</span>
+    const newPi = piCodeNumArr.map(codeNum => (
+      <span key={codeNum} style={{ marginRight: 5 }}>{`${piCodePrefix}-${codeNum}`}</span>
     ));
+    return [...PiArr, ...newPi];
   } else {
     return (
       <span>-</span>
@@ -36,12 +38,16 @@ const renderPIName = (props) => {
 const renderStartArtModalContent = (props) => {
   const { data, artList, startArtShowInfo } = props;
   const doingArt = artList.find(item => item.statusCode === 'doing');
-  const nonEmpty = Object.keys(_.pick(data, ['startDate', 'piCount', 'interationCount', 'interationWeeks', 'ipWeeks'])).every(key => data[key]);
+  const nonEmpty = Object.keys(_.pick(data, ['startDate', 'piCount', 'piCodePrefix', 'piCodeNumber', 'interationCount', 'interationWeeks', 'ipWeeks'])).every(key => data[key]);
   canStart = nonEmpty && !doingArt;
   if (doingArt) {
     return (
       <div>
-        {` 你无法启动 ${data.name} ， ${doingArt.name} 正在进行中，可以先停止进行中的火车，再开启新的火车。`}
+        {` 你无法启动 ${data.name} ， `}
+        <span style={{ color: 'red' }}>
+          {doingArt.name}
+        </span>
+        {'  正在进行中，可以先停止进行中的火车，再开启新的火车。'}
       </div>
     );
   } else {
@@ -73,7 +79,7 @@ const renderStartArtModalContent = (props) => {
                 return (
                   <p key={key} style={{ marginBottom: 5 }}>
                     <span>{`${startArtShowInfo[key].name}：`}</span>
-                    <span style={{ color: data.piCount ? 'blue' : 'red' }}>
+                    <span style={{ color: data.piCount && data.piCodePrefix && data.piCodeNumber ? 'blue' : 'red' }}>
                       {
                       renderPIName(props)
                     }

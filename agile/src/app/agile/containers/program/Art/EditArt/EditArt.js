@@ -14,38 +14,13 @@ import { ArtInfo, ArtSetting, ReleaseArt } from './components';
 import {
   getArtById, editArt, getArtsByProjectId, beforeStop, stopArt, startArt,
 } from '../../../../api/ArtApi';
+import { getPIList } from '../../../../api/PIApi';
 import StartArtModal from './components/StartArtModal';
 import StopArtModal from './components/StopArtModal';
 
 import './EditArt.scss';
 
 const { AppState } = stores;
-const startArtShowInfo = {
-  startDate: {
-    name: '火车开始时间',
-    empty: false,
-  },
-  piCount: {
-    name: '生成PI数',
-    empty: false,
-  },
-  piName: {
-    name: 'PI名称',
-    empty: false,
-  },
-  interationCount: {
-    name: '迭代数',
-    empty: false,
-  },
-  interationWeeks: {
-    name: '迭代时长（周）',
-    empty: false,
-  },
-  ipWeeks: {
-    name: 'IP时长（周）',
-    empty: false,
-  },
-};
 
 function formatter(values) {
   const data = { ...values };
@@ -65,12 +40,39 @@ class EditArt extends Component {
     formData: {},
     data: {},
     artList: [],
+    PiList: [],
     isModified: false,
     releaseArtVisible: false,
     releaseLoading: false,
     startArtModalVisible: false,
     stopArtModalVisible: false,
     stopArtPIInfo: undefined,
+    startArtShowInfo: {
+      startDate: {
+        name: '火车开始时间',
+        empty: false,
+      },
+      piCount: {
+        name: '生成PI数',
+        empty: false,
+      },
+      piName: {
+        name: 'PI名称',
+        empty: false,
+      },
+      interationCount: {
+        name: '迭代数',
+        empty: false,
+      },
+      interationWeeks: {
+        name: '迭代时长（周）',
+        empty: false,
+      },
+      ipWeeks: {
+        name: 'IP时长（周）',
+        empty: false,
+      },
+    },
   }
 
   componentDidMount() {
@@ -82,7 +84,7 @@ class EditArt extends Component {
     this.setState({
       loading: true,
     });
-    Promise.all([getArtsByProjectId(), getArtById(id)]).then((ress) => {
+    Promise.all([getArtsByProjectId(), getArtById(id), getPIList(id)]).then((ress) => {
       const {
         interationCount,
         interationWeeks,
@@ -113,8 +115,40 @@ class EditArt extends Component {
         formData,
         data: ress[1],
         artList: ress[0].content,
+        PiList: ress[2].content.map(item => (
+          Object.assign(item, {
+            startDate: moment(item.startDate).format('YYYY-MM-DD'),
+            endDate: moment(item.endDate).format('YYYY-MM-DD'),
+            remainDays: this.calcRemainDays(item),
+          })
+        )),
       });
     });
+  }
+
+  getPIList = (artId) => {
+    getPIList(artId).then((res) => {
+      this.setState({
+        PiList: res.content.map(item => (
+          Object.assign(item, {
+            startDate: moment(item.startDate).format('YYYY-MM-DD'),
+            endDate: moment(item.endDate).format('YYYY-MM-DD'),
+            remainDays: this.calcRemainDays(item),
+          })
+        )),
+      });
+    });
+  }
+
+  calcRemainDays = (item) => {
+    let diff = 0;
+    if (moment(item.startDate).diff(moment()) > 0) {
+      diff = moment(item.endDate).diff(moment(item.startDate), 'days');
+      return diff > 0 ? diff : 0;
+    } else {
+      diff = moment(item.endDate).diff(moment(), 'days');
+      return diff > 0 ? diff : 0;
+    }
   }
 
   loadArt = () => {
@@ -188,7 +222,7 @@ class EditArt extends Component {
   }
 
   checkEmptyField = () => {
-    const { data } = this.state;
+    const { data, startArtShowInfo } = this.state;
     // eslint-disable-next-line array-callback-return
     Object.keys(startArtShowInfo).map((key) => {
       if (data[key]) {
@@ -196,6 +230,9 @@ class EditArt extends Component {
       } else {
         startArtShowInfo[key].empty = true;
       }
+    });
+    this.setState({
+      startArtShowInfo,
     });
   }
 
@@ -229,6 +266,7 @@ class EditArt extends Component {
         objectVersionNumber: data.objectVersionNumber,
       }).then(() => {
         this.loadArt();
+        this.getPIList(id);
         this.setState({
           startArtModalVisible: false,
         });
@@ -275,7 +313,7 @@ class EditArt extends Component {
 
   render() {
     const {
-      formData, releaseArtVisible, data, artList, loading, releaseLoading, startArtModalVisible, stopArtModalVisible, stopArtPIInfo,
+      formData, releaseArtVisible, data, artList, loading, releaseLoading, startArtModalVisible, stopArtModalVisible, stopArtPIInfo, startArtShowInfo, PiList,
     } = this.state;
     const {
       id, name, statusCode,
@@ -305,6 +343,10 @@ class EditArt extends Component {
               />
               <ArtSetting
                 initValue={formData}
+                data={data}
+                PiList={PiList}
+                onGetPIList={this.getPIList}
+                onGetArtInfo={this.loadArt}
                 onFormChange={this.handleFormChange}
                 onSave={this.handleSave}
               />
@@ -314,6 +356,7 @@ class EditArt extends Component {
                 onCancel={this.startArtCancel}
                 data={data}
                 artList={artList}
+                PiList={PiList}
                 startArtShowInfo={startArtShowInfo}
               />
               <StopArtModal

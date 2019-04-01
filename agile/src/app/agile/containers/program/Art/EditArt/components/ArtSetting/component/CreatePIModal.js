@@ -19,16 +19,13 @@ const handleCreatePIOk = (props) => {
 };
 
 const handleCreatePICancel = (props) => {
-  const { form, onCreatePICancel } = props;
-  form.setFieldsValue({
-    PIStartDate: '',
-  });
+  const { onCreatePICancel } = props;
   onCreatePICancel();
 };
 
 const CreatePIModal = (props) => {
   const {
-    visible, name, form, 
+    visible, name, form, defaultStartDate,
   } = props;
   const { getFieldDecorator } = form; 
   return (
@@ -46,6 +43,7 @@ const CreatePIModal = (props) => {
                 rules: [{
                   required: true, message: '请选择PI开始时间!',
                 }],
+                initialValue: moment(defaultStartDate),
               })(<DatePicker
                 style={{ width: '100%' }}
                 label="PI开始时间"

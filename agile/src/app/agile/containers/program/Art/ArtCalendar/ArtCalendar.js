@@ -14,7 +14,7 @@ import EmptyBlock from '../../../../components/EmptyBlock';
 
 class ArtCalendar extends Component {
   state = {
-    ArtList: [],
+    doingArt: undefined,
     ArtName: null,
     data: null,
     currentPI: null,
@@ -33,11 +33,11 @@ class ArtCalendar extends Component {
     });
     getArtsByProjectId().then((artList) => {
       this.setState({
-        ArtList: artList.content.filter(item => item.enabled && item.statusCode === 'doing'),
+        doingArt: artList.content.find(item => item.statusCode === 'doing'),
       }, () => {
-        const { ArtList } = this.state;
-        if (ArtList[0]) {
-          getArtCalendar(ArtList[0].id).then((res) => {
+        const { doingArt } = this.state;
+        if (doingArt) {
+          getArtCalendar(doingArt.id).then((res) => {
             this.setState({
               loading: false,
             });
@@ -45,7 +45,7 @@ class ArtCalendar extends Component {
             const { startDate, endDate } = this.getDuring(data);
             this.setState({
               data,
-              ArtName: ArtList[0].name,
+              ArtName: doingArt.name,
               currentPI: find(data, { statusCode: 'doing' }),
               startDate,
               endDate,
@@ -74,7 +74,7 @@ class ArtCalendar extends Component {
       data, startDate, 
       currentPI, ArtName,
       endDate,
-      ArtList,
+      doingArt,
       loading,
     } = this.state;
     return (
@@ -82,10 +82,10 @@ class ArtCalendar extends Component {
         <Header
           title="ART日历"
         />
-        <Content>
+        <Content style={{ padding: 0 }}>
           <Spin spinning={loading}>
             {
-              ArtList && ArtList.length > 0 && data ? (
+              doingArt && data ? (
                 <div style={{
                   display: 'flex', flexDirection: 'column', padding: 0, height: '100%', 
                 }}

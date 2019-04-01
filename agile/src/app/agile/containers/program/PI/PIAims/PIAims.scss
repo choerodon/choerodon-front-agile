@@ -1,6 +1,18 @@
 .c7n-pi-detail {
+    .ant-select {
+        border-radius: 3px;
+    }
+    .ant-select:hover {
+        background: rgba(0, 0, 0, 0.04);
+    }
+    .ant-select-selection-selected-value {
+        padding: 5px 7px;
+    }
     .ant-select-underline {
         display: none;
+    }
+    .ant-select-arrow {
+        bottom: 4px;
     }
     .c7n-pi-showTypeRadioGroup {
         .ant-radio-button-wrapper {
@@ -35,6 +47,7 @@
         }
     }
 }
-.c7n-pi-piSelect {
+.c7n-pi-piSelect, .c7n-pi-artSelect {
     width: 120px !important;
 }
+

@@ -17,46 +17,43 @@ const PIAimsCard = ({
 }) => {
   const totalPlanBv = (aimsCategory === 'program' && aimsInfo && _.reduce(_.map(aimsInfo, 'planBv'), (sum, n) => sum + n, 0)) || '-';
   const totalActualBv = (aimsCategory === 'program' && aimsInfo && stretchAimsInfo && _.reduce(_.map(aimsInfo, 'actualBv'), (sum, n) => sum + n, 0) + _.reduce(_.map(stretchAimsInfo, 'actualBv'), (sum, n) => sum + n, 0)) || '-';
-  const percent = Number.isInteger(totalActualBv) && Number.isInteger(totalActualBv) ? `${(totalActualBv / totalPlanBv * 100).toFixed(2)}%` : '0%';
+  // eslint-disable-next-line no-nested-ternary
+  const percent = Number.isInteger(totalPlanBv) ? (Number.isInteger(totalPlanBv) && Number.isInteger(totalActualBv) ? `${(totalActualBv / totalPlanBv * 100).toFixed(2)}%` : '0%') : '-';
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
       <div className="c7n-pi-card" style={{ borderTop: `5px solid ${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}` }}>
+        <table style={{ width: '100%' }}>
+          <thead>
+            <tr>
+              <th style={{ width: '60%' }}>{piName}</th>
+              <th style={{ width: '20%' }}>计划BV</th>
+              <th style={{ width: '20%' }}>实际BV</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              aimsInfo && aimsInfo.length > 0 && aimsInfo.map(item => (
+                <tr key={item.id}>
+                  <td style={{ display: 'flex', alignItems: 'center' }}>
+                    <span style={{
+                      display: 'inline-block', marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: `${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}`, 
+                    }}
+                    />
+                    {item.name}
+                  </td>
+                  <td>{item.planBv ? item.planBv : '-'}</td>
+                  <td>{item.actualBv ? item.actualBv : '-'}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
         {
-          aimsInfo && aimsInfo.length > 0 && (
-          <table style={{ width: '100%' }}>
-            <thead>
-              <tr>
-                <th style={{ width: '60%' }}>{piName}</th>
-                <th style={{ width: '20%' }}>计划BV</th>
-                <th style={{ width: '20%' }}>实际BV</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                aimsInfo && aimsInfo.length > 0 && aimsInfo.map(item => (
-                  <tr key={item.id}>
-                    <td style={{ display: 'flex', alignItems: 'center' }}>
-                      <span style={{
-                        display: 'inline-block', marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: `${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}`, 
-                      }}
-                      />
-                      {item.name}
-                    </td>
-                    <td>{item.planBv ? item.planBv : '-'}</td>
-                    <td>{item.actualBv ? item.actualBv : '-'}</td>
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
-          )}
-        {
-          aimsCategory === 'program' && stretchAimsInfo && stretchAimsInfo.length > 0 && aimsInfo && aimsInfo.length > 0 && (<Divider style={{ margin: '15px 0' }} />)
+          aimsCategory === 'program' && (<Divider style={{ margin: '15px 0' }} />)
         }
         {
-            aimsCategory === 'program' && stretchAimsInfo && stretchAimsInfo.length > 0 && (
+            aimsCategory === 'program' && (
               <div>
-                
                 <table style={{ width: '100%' }}>
                   <thead>
                     <tr>
@@ -67,20 +64,20 @@ const PIAimsCard = ({
                   </thead>
                   <tbody>
                     {
-                    stretchAimsInfo.map(item => (
-                      <tr>
-                        <td style={{ display: 'flex', alignItems: 'center' }}>
-                          <span style={{
-                            display: 'inline-block', marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: '#9B9B9B', 
-                          }}
-                          />
-                          {item.name}
-                        </td>
-                        <td>{item.planBv ? item.planBv : '-'}</td>
-                        <td>{item.actualBv ? item.actualBv : '-'}</td>
-                      </tr>
-                    ))
-                }
+                      stretchAimsInfo && stretchAimsInfo.length > 0 && stretchAimsInfo.map(item => (
+                        <tr>
+                          <td style={{ display: 'flex', alignItems: 'center' }}>
+                            <span style={{
+                              display: 'inline-block', marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: '#9B9B9B', 
+                            }}
+                            />
+                            {item.name}
+                          </td>
+                          <td>{item.planBv ? item.planBv : '-'}</td>
+                          <td>{item.actualBv ? item.actualBv : '-'}</td>
+                        </tr>
+                      ))
+                    }
                   </tbody>
                 </table>
               </div>
@@ -88,7 +85,7 @@ const PIAimsCard = ({
           }
 
         {
-          aimsCategory === 'program' && aimsInfo && aimsInfo.length > 0 && (
+          aimsCategory === 'program' && (
           <div>
             <Divider />
             <table style={{ width: '100%' }}>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Button, Icon, Table, Radio, Form, Spin, Modal, Select,
+  Button, Icon, Table, Radio, Form, Spin, Modal, Select, Divider,
 } from 'choerodon-ui';
 import {
   stores, Page, Header, Content,  
@@ -62,14 +62,27 @@ class PIAims extends Component {
       deletePIAimsModalVisible: false,
       deleteRecord: undefined,
       selectedPIId: undefined,
+      artId: undefined,
+      arts: [],
     };
   }
 
   componentDidMount() {
     PIStore.setPIAimsLoading(true);
     getArtsByProjectId().then((res) => {
+      const doingStopArt = res.content.filter(item => item.statusCode === 'doing' || item.statusCode === 'stop');
       const doingArt = res.content.find(item => item.statusCode === 'doing');
-      const artId = doingArt ? doingArt.id : res.content[0].id;
+      const artId = doingArt ? doingArt.id : (doingStopArt[0] && doingStopArt[0].id);
+      this.setState({
+        artId,
+        arts: doingStopArt,
+      });
+      this.getPIList(artId);
+    });
+  }
+
+  getPIList = (artId) => {
+    if (artId) {
       getPIList(artId).then((PIList) => {
         PIStore.setPIList(PIList.content);
         this.setState({
@@ -77,7 +90,9 @@ class PIAims extends Component {
         });
         this.getPIAims(PIList.content[0] && PIList.content[0].id);
       });
-    });
+    } else {
+      PIStore.setPIAimsLoading(false);
+    }
   }
 
   getPIAims = (id) => {
@@ -97,6 +112,14 @@ class PIAims extends Component {
     } else {
       PIStore.setPIAimsLoading(false);
     }
+  }
+
+  handleARTSelectChange = (value) => {
+    this.setState({
+      artId: value,
+      showType: 'list',
+    });
+    this.getPIList(value);
   }
 
   handlePISelectChange = (value) => {
@@ -194,7 +217,7 @@ class PIAims extends Component {
 
   render() {
     const {
-      showType, editingPiAimsInfo, deletePIAimsModalVisible, deleteRecord, selectedPIId,
+      showType, editingPiAimsInfo, deletePIAimsModalVisible, deleteRecord, selectedPIId, artId, arts,
     } = this.state;
     const {
       // eslint-disable-next-line no-shadow
@@ -205,7 +228,7 @@ class PIAims extends Component {
     return (
       <Page className="c7n-pi-detail">
         <Header title="PI目标">
-          <Button funcType="flat" disabled={!PIList || !PIList.length} onClick={this.handleCreateFeatureBtnClick}>
+          <Button funcType="flat" disabled={!selectedPI || selectedPI.statusCode === 'done'} onClick={this.handleCreateFeatureBtnClick}>
             <Icon type="playlist_add" />
             <span>创建PI目标</span>
           </Button>
@@ -214,22 +237,37 @@ class PIAims extends Component {
             <span>刷新</span>
           </Button>
         </Header>
-        <Content>
+        <Content style={{ padding: 0 }}>
           <Spin spinning={PIAimsLoading}>
             {
-              PIList && PIList.length > 0 ? (
+              arts && arts.length ? (
                 <div>
                   <div style={{
-                    display: 'flex', justifyContent: 'space-between', height: 32, marginBottom: 20, 
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 47, margin: '0 24px',
                   }}
                   >
-                    <Select onChange={this.handlePISelectChange} value={selectedPIId} dropdownClassName="c7n-pi-piSelect">
-                      {
-                        PIList.map(pi => (
-                          <Option key={pi.id} value={pi.id}>{`${pi.code}-${pi.name}`}</Option>
-                        ))
-                      }
-                    </Select>
+                    <div style={{ display: 'flex' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', marginRight: 10 }}>
+                        <span>ART：</span>
+                        <Select onChange={this.handleARTSelectChange} value={artId} dropdownClassName="c7n-pi-artSelect">
+                          {
+                          arts && arts.length > 0 && arts.map(art => (
+                            <Option key={art.id} value={art.id}>{art.name}</Option>
+                          ))
+                        }
+                        </Select>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span>PI：</span>
+                        <Select onChange={this.handlePISelectChange} value={selectedPIId} dropdownClassName="c7n-pi-piSelect">
+                          {
+                          PIList.map(pi => (
+                            <Option key={pi.id} value={pi.id}>{`${pi.code}-${pi.name}`}</Option>
+                          ))
+                        }
+                        </Select>
+                      </div>
+                    </div>
                     {
                       PIAims.program && PIAims.program.length > 0 && (
                         <RadioGroup className="c7n-pi-showTypeRadioGroup" onChange={this.handleRadioChange} defaultValue="list">
@@ -239,36 +277,27 @@ class PIAims extends Component {
                       )
                     }
                   </div>
-                  {
-                  showType === 'list' ? (
-                    <div>
-                      <ProgramAimsTable
-                        amisColumns={amisColumns}
-                        dataSource={PIAims.program}
-                        onEditPiAims={this.handleEditPiAims}
-                        onDeletePiAims={this.handledeletePiAims}
-                      />
-
-                      {/* <div className="c7n-pi-teamAims" style={{ marginTop: 20 }}>
-                        <Table 
-                          filterBar={false}
-                          rowKey={record => record.teamId}
-                          columns={teamAimsColumns}
-                          dataSource={teamDataSource}
-                          pagination={false}
-                          expandedRowRender={record => this.renderTeamPIAimsTable.bind(this, record.teamProgramAims)()}
+                  <Divider style={{ margin: '0 0 20px 0' }} />
+                  <div style={{ margin: '0 24px' }}>
+                    {
+                      showType === 'list' ? (
+                        <ProgramAimsTable
+                          amisColumns={amisColumns}
+                          dataSource={PIAims.program}
+                          onEditPiAims={this.handleEditPiAims}
+                          onDeletePiAims={this.handledeletePiAims}
                         />
-                      </div> */}
-                    </div>
-                  ) : (
-                    <PIAimsCard 
-                      aimsCategory="program"
-                      piName={`${selectedPI.code}-${selectedPI.name}`}
-                      aimsInfo={PIAims.program.filter(item => !item.stretch)}
-                      stretchAimsInfo={PIAims.program.filter(item => item.stretch)}
-                    />
-                  )
-                }
+                      ) : (
+                        <PIAimsCard 
+                          style={{ margin: '0 24px' }}
+                          aimsCategory="program"
+                          piName={`${selectedPI.code}-${selectedPI.name}`}
+                          aimsInfo={PIAims.program.filter(item => !item.stretch)}
+                          stretchAimsInfo={PIAims.program.filter(item => item.stretch)}
+                        />
+                      )
+                    }
+                  </div>
                 </div>
               ) : (
                 <EmptyBlock
@@ -285,6 +314,7 @@ class PIAims extends Component {
          
           <CreatePIAims 
             piId={selectedPIId}
+            artId={artId}
           />
           <EditPIAims editingPiAimsInfo={editingPiAimsInfo} editPIVisible={editPIVisible} />
           <Modal

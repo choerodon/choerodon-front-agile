@@ -30,13 +30,15 @@ const ProgramAimsTable = ({
     },
   ];
   return (
-    <Table
-      filterBar={false}
-      rowKey={record => record.id}
-      columns={columns}
-      dataSource={dataSource}
-      pagination={false}
-    />
+    <div style={{ magin: '0 24px' }}>
+      <Table
+        filterBar={false}
+        rowKey={record => record.id}
+        columns={columns}
+        dataSource={dataSource}
+        pagination={false}
+      />
+    </div>
   );
 };
 
