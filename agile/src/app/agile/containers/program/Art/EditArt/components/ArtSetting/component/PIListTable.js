@@ -8,7 +8,7 @@ const PIListTable = ({ columns, dataSource }) => (
     pagination={false}
     rowKey={record => record.id}
     columns={columns}
-    dataSource={dataSource}
+    dataSource={dataSource.sort((a, b) => b.id - a.id)}
   />
 );
 PIListTable.propTypes = {

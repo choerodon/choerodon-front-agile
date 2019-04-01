@@ -49,6 +49,7 @@ const CreatePIModal = (props) => {
                 label="PI开始时间"
                 allowClear
                 format="YYYY-MM-DD"
+                disabledDate={current => current < moment(defaultStartDate).endOf('day').subtract(1, 'days')}
               />)
           }
         </FormItem>

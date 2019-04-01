@@ -106,7 +106,7 @@ class PiItem extends Component {
         }}
       >
         <div className="PiItem-pi">
-          <div className="PiItem-pi-title" style={{ borderColor: style.borderColor, background: style.backgroundColor, color: style.PIColor }}>
+          <div className={`PiItem-pi-title BorderLeft ${statusCode}`} style={{ borderColor: style.borderColor, background: style.backgroundColor, color: style.PIColor }}>
             <Popover
               // autoAdjustOverflow={false}
               getPopupContainer={triggerNode => triggerNode.parentNode}

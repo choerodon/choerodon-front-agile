@@ -6,7 +6,23 @@ import PiItem from './PiItem';
 import './CalendarBody.scss';
 
 const moment = extendMoment(Moment);
+
+
 class CalendarBody extends Component {
+  renderPIItem = () => {
+    const { data } = this.props;
+    const itemArr = [];
+    data.forEach((pi, i, arr) => {
+      const range = arr[i + 1] && moment.range(moment(pi.endDate), moment(arr[i + 1].startDate));
+      const diff = range && range.diff('days');
+      itemArr.push(<PiItem pi={pi} />);
+      if (diff) {
+        itemArr.push(<div style={{ flex: `${diff}` }} />);
+      }
+    });
+    return itemArr;
+  };
+
   render() {
     const { startDate, endDate, data } = this.props;
     const range = moment.range(startDate, endDate);
@@ -23,7 +39,7 @@ class CalendarBody extends Component {
         </div>
         <div className="c7nagile-CalendarBody-pis">
           {
-            data.map(pi => <PiItem pi={pi} />)
+            this.renderPIItem()
           }
         </div>
       </div>
