@@ -73,7 +73,9 @@ class ArtForm extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     // eslint-disable-next-line no-shadow
-    const { initValue, PiList, onGetPIList } = this.props;
+    const {
+      initValue, PiList, onGetPIList, data, onGetArtInfo,
+    } = this.props;
     const { currentTab } = this.state;
     return (
       <Form className="c7nagile-ArtForm">
@@ -188,7 +190,7 @@ class ArtForm extends Component {
             </FormItem>
           </TabPane>
           <TabPane tab="PI列表" key="4">
-            <PIList name={initValue.name} artId={initValue.id} PiList={PiList} onGetPIList={onGetPIList} />
+            <PIList name={initValue.name} data={data} artId={initValue.id} PiList={PiList} onGetPIList={onGetPIList} onGetArtInfo={onGetArtInfo} />
           </TabPane>
         </Tabs>
         <Divider />

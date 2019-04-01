@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Button, Icon, Form } from 'choerodon-ui';
 import moment from 'moment';
+import _ from 'lodash';
 import { createPI } from '../../../../../../../api/ArtApi';
 import PIListTable from './PIListTable';
 import CreatePIModal from './CreatePIModal';
@@ -35,9 +36,10 @@ class PIList extends Component {
   }
 
   handleCreatePIOK = (startDate) => {
-    const { artId, onGetPIList } = this.props;
+    const { artId, onGetPIList, onGetArtInfo } = this.props;
     createPI(artId, startDate).then(() => {
       onGetPIList(artId);
+      onGetArtInfo(artId);
       this.setState({
         createPIModalVisible: false,
       });
@@ -47,7 +49,8 @@ class PIList extends Component {
   render() {
     const { createPIModalVisible } = this.state;
     // eslint-disable-next-line no-shadow
-    const { name, PiList } = this.props;
+    const { name, PiList, data } = this.props;
+    const nonEmpty = Object.keys(_.pick(data, ['startDate', 'piCount', 'piCodePrefix', 'piCodeNumber', 'interationCount', 'interationWeeks', 'ipWeeks'])).every(key => data[key]);
     const columns = [
       {
         title: 'PI名称',
@@ -74,7 +77,7 @@ class PIList extends Component {
     ];
     return (
       <React.Fragment>
-        <Button funcType="flat" style={{ marginBottom: 15, color: '#3F51B5' }} onClick={this.handleCreatePIClick}>
+        <Button funcType="flat" type="primary" style={{ marginBottom: 15 }} disabled={!nonEmpty} onClick={this.handleCreatePIClick}>
           <Icon type="playlist_add" />
           <span>创建下一批PI</span>
         </Button>
@@ -86,7 +89,7 @@ class PIList extends Component {
           ref={(form) => { this.form = form; }}
           name={name} 
           visible={createPIModalVisible}
-          defaultStartDate={PiList[0] && PiList[0].endDate}
+          defaultStartDate={PiList && PiList[0] && PiList[0].endDate}
           onCreatePIOk={this.handleCreatePIOK}
           onCreatePICancel={this.handleCreatePICancel}
         />

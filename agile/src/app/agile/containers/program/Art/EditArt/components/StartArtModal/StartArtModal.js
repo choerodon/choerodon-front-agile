@@ -15,7 +15,7 @@ let canStart = true;
 
 const renderPIName = (props) => {
   const { data: { piCodePrefix, piCodeNumber, piCount }, PiList } = props;
-  const PiArr = PiList.map(item => <span key={item.name} style={{ marginRight: 5 }}>{`${item.code}-${item.name}`}</span>);
+  const PiArr = PiList.sort((a, b) => a.id - b.id).map(item => <span key={item.name} style={{ marginRight: 5 }}>{`${item.code}-${item.name}`}</span>);
   if ((PiArr && PiArr.length > 0) || (piCount && piCodePrefix && piCodeNumber)) {
     const piCodeNumArr = [];
     // eslint-disable-next-line no-plusplus

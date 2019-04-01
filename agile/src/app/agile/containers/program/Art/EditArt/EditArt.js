@@ -343,8 +343,10 @@ class EditArt extends Component {
               />
               <ArtSetting
                 initValue={formData}
+                data={data}
                 PiList={PiList}
                 onGetPIList={this.getPIList}
+                onGetArtInfo={this.loadArt}
                 onFormChange={this.handleFormChange}
                 onSave={this.handleSave}
               />
