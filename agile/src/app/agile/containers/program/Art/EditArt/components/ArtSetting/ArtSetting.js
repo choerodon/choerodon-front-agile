@@ -10,11 +10,13 @@ const propTypes = {
 };
 const ArtSetting = ({
   initValue,
+  PiList,
   onSave,
   onFormChange,
+  onGetPIList,
 }) => (
   <div>
-    <ArtForm onChange={onFormChange} initValue={initValue} onSave={onSave} />
+    <ArtForm onChange={onFormChange} initValue={initValue} PiList={PiList} onSave={onSave} onGetPIList={onGetPIList} />
   </div>
 );
 

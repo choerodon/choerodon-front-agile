@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Icon } from 'choerodon-ui';
+import { Button, Icon, Form } from 'choerodon-ui';
 import moment from 'moment';
-import { getPIList } from '../../../../../../../api/PIApi';
 import { createPI } from '../../../../../../../api/ArtApi';
 import PIListTable from './PIListTable';
 import CreatePIModal from './CreatePIModal';
 import StatusTag from '../../../../../../../components/StatusTag';
 
-const formatter = 'YYYY-MM-DD';
 const STATUS = {
   todo: '未开启',
   doing: '进行中',
@@ -19,46 +17,15 @@ class PIList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      PIList: [],
       createPIModalVisible: false,
     };
   }
-
-  componentDidMount() {
-    const { artId } = this.props;
-    this.getPIList(artId);
-  }
-
-  getPIList = (artId) => {
-    getPIList(artId).then((res) => {
-      this.setState({
-        PIList: res.content.map(item => (
-          Object.assign(item, {
-            startDate: moment(item.startDate).format(formatter),
-            endDate: moment(item.endDate).format(formatter),
-            remainDays: this.calcRemainDays(item),
-          })
-        )),
-      });
-    });
-  }
-
-  calcRemainDays = (item) => {
-    let diff = 0;
-    if (moment(item.startDate).diff(moment()) > 0) {
-      diff = moment(item.endDate).diff(moment(item.startDate), 'days');
-      return diff > 0 ? diff : 0;
-    } else {
-      diff = moment(item.endDate).diff(moment(), 'days');
-      return diff > 0 ? diff : 0;
-    }
-  }
-
 
   handleCreatePIClick = () => {
     this.setState({
       createPIModalVisible: true,
     });
+    this.form.resetFields();
   }
 
   handleCreatePICancel = () => {
@@ -68,9 +35,9 @@ class PIList extends Component {
   }
 
   handleCreatePIOK = (startDate) => {
-    const { artId } = this.props;
+    const { artId, onGetPIList } = this.props;
     createPI(artId, startDate).then(() => {
-      this.getPIList(artId);
+      onGetPIList(artId);
       this.setState({
         createPIModalVisible: false,
       });
@@ -78,9 +45,9 @@ class PIList extends Component {
   }
 
   render() {
+    const { createPIModalVisible } = this.state;
     // eslint-disable-next-line no-shadow
-    const { PIList, createPIModalVisible } = this.state;
-    const { name } = this.props;
+    const { name, PiList } = this.props;
     const columns = [
       {
         title: 'PI名称',
@@ -113,11 +80,13 @@ class PIList extends Component {
         </Button>
         <PIListTable 
           columns={columns}
-          dataSource={PIList}
+          dataSource={PiList}
         />
         <CreatePIModal
+          ref={(form) => { this.form = form; }}
           name={name} 
           visible={createPIModalVisible}
+          defaultStartDate={PiList[0] && PiList[0].endDate}
           onCreatePIOk={this.handleCreatePIOK}
           onCreatePICancel={this.handleCreatePICancel}
         />

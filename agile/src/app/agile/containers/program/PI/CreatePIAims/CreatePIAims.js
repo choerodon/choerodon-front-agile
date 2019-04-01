@@ -23,7 +23,7 @@ class CreatePIAims extends Component {
   }
 
   handleOnOk = () => {
-    const { form, piId } = this.props;
+    const { form, piId, artId } = this.props;
     const { createStretch } = PIStore;
     form.validateFields((err, values) => {
       if (!err) {
@@ -39,7 +39,7 @@ class CreatePIAims extends Component {
           stretch: createStretch,
         };
         createPIAims(piObjectiveDTO).then(() => {
-          Promise.all([getPIList(), getPIAims(values.piId || piId)]).then(([PIList, piAims]) => {
+          Promise.all([getPIList(artId), getPIAims(values.piId || piId)]).then(([PIList, piAims]) => {
             PIStore.setPIList(PIList.content.map(item => (
               Object.assign(item, {
                 startDate: moment(item.startDate).format(formatter),

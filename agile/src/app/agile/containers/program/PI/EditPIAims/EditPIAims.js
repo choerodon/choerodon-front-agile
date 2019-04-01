@@ -50,7 +50,6 @@ class EditPIAims extends Component {
             PIStore.setEditPIVisible(false);
           });
           Choerodon.prompt('修改成功');
-          form.resetFields();
         }).catch(() => {
           PIStore.setPIAimsLoading(false);
           Choerodon.prompt('修改失败');

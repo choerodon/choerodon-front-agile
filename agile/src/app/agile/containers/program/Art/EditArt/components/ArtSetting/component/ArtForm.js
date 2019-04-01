@@ -72,7 +72,8 @@ class ArtForm extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { initValue } = this.props;
+    // eslint-disable-next-line no-shadow
+    const { initValue, PiList, onGetPIList } = this.props;
     const { currentTab } = this.state;
     return (
       <Form className="c7nagile-ArtForm">
@@ -136,7 +137,11 @@ class ArtForm extends Component {
                 )}
               </FormItem>
               <FormItem>
-                {getFieldDecorator('interationWeeks', {})(
+                {getFieldDecorator('interationWeeks', {
+                  rules: [{
+                    required: true, message: '请选择每个迭代的工作周数',
+                  }],
+                })(
                   <Select style={{ width: 300 }} label="迭代时长（周）" placeholder="请选择每个迭代的工作周数">
                     {
                   [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
@@ -183,7 +188,7 @@ class ArtForm extends Component {
             </FormItem>
           </TabPane>
           <TabPane tab="PI列表" key="4">
-            <PIList name={initValue.name} artId={initValue.id} />
+            <PIList name={initValue.name} artId={initValue.id} PiList={PiList} onGetPIList={onGetPIList} />
           </TabPane>
         </Tabs>
         <Divider />
