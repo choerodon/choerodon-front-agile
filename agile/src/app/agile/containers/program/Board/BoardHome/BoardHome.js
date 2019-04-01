@@ -245,17 +245,17 @@ class BoardHome extends Component {
           </div>
           <Spin spinning={BoardStore.getSpinIf}>
             <div style={{ display: 'flex', width: '100%' }}>
-              <div className="c7n-scrumboard">
-                <div className="c7n-scrumboard-header" style={HeaderStore.announcementClosed ? {} : { height: 'calc(100vh - 208px)' }}>
+              <div className="c7n-board">
+                <div className="c7n-board-header" style={HeaderStore.announcementClosed ? {} : { height: 'calc(100vh - 208px)' }}>
                   <StatusColumn />
                 </div>
                 {!BoardStore.didCurrentSprintExist ? (
                   <NoneSprint />
                 ) : (
                   <div
-                    className="c7n-scrumboard-content"
+                    className="c7n-board-content"
                   >
-                    <div className="c7n-scrumboard-container">
+                    <div className="c7n-board-container">
                       <SwimLane
                         mode={BoardStore.getSwimLaneCode}
                         allDataMap={this.dataConverter.getAllDataMap()}
