@@ -160,8 +160,7 @@ class SettingColumn extends Component {
                     style={{
                       cursor: 'pointer',
                     }}
-                  />
-                  {!isPrepare && (
+                  />         
                   <Icon
                     type="delete"
                     style={{
@@ -169,8 +168,7 @@ class SettingColumn extends Component {
                     }}
                     role="none"
                     onClick={this.handleDeleteColumn.bind(this)}
-                  />
-                  )}
+                  />           
                   <Modal
                     title="删除列"
                     visible={visible || false}
@@ -284,8 +282,7 @@ class SettingColumn extends Component {
                           display: draggabled && 'none',
                         }}
                         {...provided1.dragHandleProps}
-                      />
-                      {!isPrepare && (
+                      />                     
                       <Icon
                         type="delete"
                         style={{
@@ -294,8 +291,7 @@ class SettingColumn extends Component {
                         }}
                         role="none"
                         onClick={this.handleDeleteColumn.bind(this)}
-                      />
-                      )}
+                      />             
                     </div>
                     <Modal
                       title="删除列"
