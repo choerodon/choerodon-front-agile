@@ -6,7 +6,7 @@ import NoneIssue from './NoneIssue';
 import NoneBacklog from './NoneBacklog';
 import BacklogHeader from './BacklogHeader';
 
-const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
+const shouldContainTypeCode = ['feature'];
 
 @inject('AppState')
 @observer class SprintContainer extends Component {
@@ -62,7 +62,7 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
           toggleSprint={this.toggleSprint}
         />
         <PIBody
-          issueType={store.getIssueTypes.filter(type => shouldContainTypeCode.indexOf(type.typeCode) === -1)}
+          issueType={store.getIssueTypes.filter(type => shouldContainTypeCode.indexOf(type.typeCode) !== -1)}
           defaultType={store.getIssueTypes.find(type => type.typeCode === 'feature')}
           defaultPriority={store.getDefaultPriority}
           issueCount={!!issueCount}
@@ -103,7 +103,7 @@ const shouldContainTypeCode = ['issue_epic', 'sub_task', 'feature'];
           store={store}
         />
         <PIBody
-          issueType={store.getIssueTypes.filter(type => shouldContainTypeCode.indexOf(type.typeCode) === -1)}
+          issueType={store.getIssueTypes.filter(type => shouldContainTypeCode.indexOf(type.typeCode) !== -1)}
           defaultType={store.getIssueTypes.find(type => type.typeCode === 'feature')}
           defaultPriority={store.getDefaultPriority}
           issueCount={!!issueCount}

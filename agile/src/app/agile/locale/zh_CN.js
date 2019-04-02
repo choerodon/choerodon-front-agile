@@ -17,6 +17,20 @@ const pageDetail = {
 };
 
 const zh_CN = {
+  "issue.detail": '详情',
+  "issue.des": '描述',
+  "issue.attachment": '附件',
+  "issue.wiki": 'Wiki文档',
+  "issue.commit": '评论',
+  "issue.log": '工作日志',
+  "issue.data_log": '活动日志',
+  "issue.sub_task": '子任务',
+  "issue.link_task": '问题链接',
+  "issue.branch": '开发',
+  "issue.branch.create": '创建分支',
+  "issue.commit.create": '创建分支',
+  "issue.log.create": '登记工作',
+
   "learnmore": "了解更多",
   'branch.branch': '分支',
   'branch.tag': '标记',

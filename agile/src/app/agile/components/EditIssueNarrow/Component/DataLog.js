@@ -28,6 +28,7 @@ const PROP_SIMPLE = {
   bug: '缺陷',
   task: '任务',
   sub_task: '子任务',
+  feature: '特性',
   description: '描述',
   Attachment: '附件',
   timespent: '花费时间',
@@ -52,7 +53,7 @@ class DataLog extends Component {
     } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
-      if (['labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child', 'issue_epic', 'story', 'bug', 'task', 'sub_task'].includes(field)) {
+      if (['labels', 'Component', 'Fix Version', 'Epic Child', 'WorklogId', 'Epic Child', 'issue_epic', 'story', 'bug', 'task', 'sub_task', 'feature'].includes(field)) {
         return '创建';
       }
       if (['Attachment'].includes(field)) {

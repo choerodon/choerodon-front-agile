@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import EditIssue from '../../../../../components/EditIssueNarrow';
+import EditIssue from './EditFeature';
 
 @inject('AppState')
 @observer
@@ -20,7 +20,7 @@ class FeatureDetail extends Component {
   }
 
   render() {
-    const { cancelCallback, refresh, store } = this.props;
+    const { refresh, store } = this.props;
     const visible = Object.keys(store.getClickIssueDetail).length > 0;
     return (
       <div
@@ -35,12 +35,9 @@ class FeatureDetail extends Component {
             issueId={store.getClickIssueId}
             onCancel={() => {
               store.setClickIssueDetail({});
-              // store.setIsLeaveSprint(false);
-              // cancelCallback();
             }}
             onDeleteIssue={() => {
               store.setClickIssueDetail({});
-              // store.setIsLeaveSprint(false);
               refresh();
             }}
             onUpdate={refresh}
