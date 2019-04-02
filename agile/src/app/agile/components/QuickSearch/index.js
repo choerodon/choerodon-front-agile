@@ -1,6 +1,7 @@
 /**
  * Created by DouglasDong on 2018/10/31.
  */
-import QuickSearch from './QuickSearch';
+import QuickSearch, { ee } from './QuickSearch';
 
+export { ee };
 export default QuickSearch;

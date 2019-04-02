@@ -17,7 +17,7 @@
   }
 }
 
-.c7n-Issue-expand+.c7n-content-issue {
+.c7n-Issue-expand +.c7n-content-issue {
   width: 36%;
   animation: 1s slidein;
   .c7n-typeTag {
@@ -133,12 +133,8 @@
   .label {
     display: none;
   }
-  .ant-table-thead>tr>th,
-  .ant-table-tbody>tr>td {
-    padding: 4px 4px;
-  }
-  .ant-table-thead>tr>th,
-  .ant-table-tbody>tr>td {
+  .ant-table-thead >tr >th,
+  .ant-table-tbody >tr >td {
     padding: 4px 4px;
   }
 }
@@ -157,11 +153,11 @@
       white-space: nowrap;
     }
   }
-  .ant-table-thead>tr>th,
-  .ant-table-tbody>tr>td {
+  .ant-table-thead >tr >th,
+  .ant-table-tbody >tr >td {
     padding: 6px 4px;
   }
-  .ant-table-tbody>tr>td {
+  .ant-table-tbody >tr >td {
     transition: none;
   }
   &-advsearch {
@@ -488,8 +484,8 @@
   .ant-spin-nested-loading {
     width: 100% !important;
   }
-  .ant-table-thead>tr>th:focus,
-  .ant-table-tbody>tr>td:focus {
+  .ant-table-thead >tr >th:focus,
+  .ant-table-tbody >tr >td:focus {
     background-color: transparent;
   }
 }
@@ -507,94 +503,118 @@
   color: #6473c3;
 }
 
-.c7n-advancedSearch {
-  position: sticky;
-  position: -webkit-sticky;
-  top: 0;
-  background: #fff;
-  z-index: 2;
-  .c7n-mySearch {
-    margin-left: 18px;
+.c7n-Issue-search {
+  display: flex;
+
+  .c7n-agile-quickSearch {
+    margin-top: -2px;
+    p {
+      margin-right: 6px;
+    }
+    .quickSearchSelect {
+      margin-right: 0;
+      padding: 0;
+      min-width: 80px;
+      .ant-select-selection {
+        padding: 0;
+      }
+      .ant-select-arrow {
+        left: unset !important;
+      }
+      .ant-select-clear {
+        right: 6px;
+      }
+    }
+  }
+  .c7n-advancedSearch {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
     background: #fff;
-    display: flex;
-    height: 48px;
-    padding-right: 20px;
-    align-items: center;
-    justify-content: space-between;
-    .ant-select {
-      min-width: 90px;
-      margin-right: 10px;
-      .ant-select-selection__rendered {
-        padding-right: 27px;
-        .ant-select-selection__placeholder {
-          color: #4a4a4a;
-        }
-        .ant-select-clear {
-          top: -1px;
-        }
-      }
-      .ant-select-selection__choice__content {
-        max-width: 100px;
-        line-height: 20px;
-      }
-      .ant-select-underline {
-        display: none;
-      }
-      .icon {
-        margin-top: -14px;
-      }
-      .ant-btn .icon {
-        margin-top: 0;
-      }
-    }
-    .myFilterSelect {
-      .ant-select-selection__rendered {
-        padding-right: 35px;
-        margin-bottom: 6px;
-        .ant-select-selection-selected-value {
-          max-width: 70px;
-          margin-right: 5px;
-          margin-top: 1px;
-        }
-        .ant-select-selection__placeholder {
-          color: #3F51B5;
-        }
-      }
-      .ant-select-selection__choice__content {
-        max-width: 130px;
-      }
-      .icon {
-        margin-top: 0;
-      }
-    }
-    .c7n-createRange {
+    z-index: 2;
+    flex: 1;
+    .c7n-mySearch {
+      margin-left: 18px;
+      background: #fff;
       display: flex;
+      height: 48px;
+      padding-right: 20px;
       align-items: center;
-      .ant-calendar-underline {
-        display: none;
+      justify-content: space-between;
+      .ant-select {
+        min-width: 90px;
+        margin-right: 10px;
+        .ant-select-selection__rendered {
+          padding-right: 27px;
+          .ant-select-selection__placeholder {
+            color: #4a4a4a;
+          }
+          .ant-select-clear {
+            top: -1px;
+          }
+        }
+        .ant-select-selection__choice__content {
+          max-width: 100px;
+          line-height: 20px;
+        }
+        .ant-select-underline {
+          display: none;
+        }
+        .icon {
+          margin-top: -14px;
+        }
+        .ant-btn .icon {
+          margin-top: 0;
+        }
       }
-      .ant-calendar-picker-icon {
-        // display: none;
-        right: -45px;
-        bottom: 1px;
+      .myFilterSelect {
+        .ant-select-selection__rendered {
+          padding-right: 35px;
+          margin-bottom: 6px;
+          .ant-select-selection-selected-value {
+            max-width: 70px;
+            margin-right: 5px;
+            margin-top: 1px;
+          }
+          .ant-select-selection__placeholder {
+            color: #3F51B5;
+          }
+        }
+        .ant-select-selection__choice__content {
+          max-width: 130px;
+        }
+        .icon {
+          margin-top: 0;
+        }
       }
-      .ant-calendar-range-picker-input {
-        width: 65px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
-      .ant-calendar-picker-clear {
-        right: -24px;
-      }
-      .ant-calendar-range-picker-separator,
-      .ant-calendar-range-picker-input[placeholder=""] {
-        display: none;
+      .c7n-createRange {
+        display: flex;
+        align-items: center;
+        .ant-calendar-underline {
+          display: none;
+        }
+        .ant-calendar-picker-icon {
+          // display: none;
+          right: -45px;
+          bottom: 1px;
+        }
+        .ant-calendar-range-picker-input {
+          width: 65px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+        .ant-calendar-picker-clear {
+          right: -24px;
+        }
+        .ant-calendar-range-picker-separator,
+        .ant-calendar-range-picker-input[placeholder=""] {
+          display: none;
+        }
       }
     }
   }
 }
-
 .issueTypeSelect-dropdown,
 .statusSelect-dropdown,
 .prioritySelect-dropdown {
@@ -614,7 +634,6 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding: 12px 0 12px 12px;
   background: #fff;
   box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.20), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
   position: fixed;

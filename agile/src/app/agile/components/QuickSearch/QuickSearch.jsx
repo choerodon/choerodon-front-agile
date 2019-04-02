@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { axios } from 'choerodon-front-boot';
 import { Select } from 'choerodon-ui';
+import EventEmitter from 'wolfy87-eventemitter';
 
 import './QuickSearch.scss';
 import BacklogStore from '../../stores/project/backlog/BacklogStore';
 
 const { Option, OptGroup } = Select;
-
+const ee = new EventEmitter();
 @inject('AppState')
 @observer
 class QuickSearch extends Component {
@@ -16,6 +17,7 @@ class QuickSearch extends Component {
     this.state = {
       userDataArray: [],
       quickSearchArray: [],
+      selectQuickSearch: [],
     };
   }
 
@@ -25,6 +27,7 @@ class QuickSearch extends Component {
    * 2. 请求项目经办人信息
    */
   componentDidMount() {
+    ee.addListener('clearQuickSearchSelect', this.clearQuickSearch);
     const { AppState } = this.props;
     const axiosGetFilter = axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all`, {
       contents: [
@@ -55,6 +58,7 @@ class QuickSearch extends Component {
     this.setState({
       userDataArray: [],
       quickSearchArray: [],
+      selectQuickSearch: [],
     });
   }
 
@@ -67,6 +71,9 @@ class QuickSearch extends Component {
     const { onQuickSearchChange } = this.props;
     const flattenValue = value.map(item => item.key);
     const otherSearchId = flattenValue.filter(item => item >= 0);
+    this.setState({
+      selectQuickSearch: value,
+    });
     // -1 仅我的问题
     // -2 仅故事
     onQuickSearchChange(flattenValue.includes(-1), flattenValue.includes(-2), otherSearchId);
@@ -93,14 +100,24 @@ class QuickSearch extends Component {
     };
   };
 
+  clearQuickSearch = () => {
+    this.setState({
+      selectQuickSearch: [],
+    });
+  }
+
+
   render() {
     // 防抖函数
     const debounceCallback = this.deBounce(500);
-    const { style, AppState } = this.props;
+    const {
+      style, AppState, onAssigneeChange, quickSearchAllowClear, 
+    } = this.props;
     const { showRealQuickSearch } = BacklogStore;
     const {
       userDataArray,
       quickSearchArray,
+      selectQuickSearch,
     } = this.state;
     // showRealQuickSearch 用于在待办事项中销毁组件
     // 具体查看 Backlog/BacklogComponent/SprintComponent/SprintItem.js 中 clearFilter 方法
@@ -120,6 +137,8 @@ class QuickSearch extends Component {
               maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
               onChange={this.handleQuickSearchChange}
               getPopupContainer={triggerNode => triggerNode.parentNode}
+              allowClear={!!quickSearchAllowClear}
+              value={selectQuickSearch}
             >
               {
                 <OptGroup key="quickSearch" label="常用选项">
@@ -135,47 +154,51 @@ class QuickSearch extends Component {
             }
               </OptGroup>
             </Select>
-            <Select
-              key="assigneeSelect"
-              className="assigneeSelect"
-              mode="multiple"
-              dropdownClassName="assigneeSelect-dropdown"
-              placeholder="经办人"
-              labelInValue
-              maxTagCount={0}
-              maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
-              filter
-              optionFilterProp="children"
-              onFilterChange={(value) => {
-                if (value) {
-                  debounceCallback(() => {
-                    axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?size=40&param=${value}`).then((res) => {
-                      // Set 用于查询是否有 id 重复的，没有重复才往里加
-                      const temp = new Set(userDataArray.map(item => item.id));
-                      res.content.filter(item => item.enabled).forEach((item) => {
-                        if (!temp.has(item.id)) {
-                          userDataArray.push({
-                            id: item.id,
-                            realName: item.realName,
+            {
+              onAssigneeChange && (
+                <Select
+                  key="assigneeSelect"
+                  className="assigneeSelect"
+                  mode="multiple"
+                  dropdownClassName="assigneeSelect-dropdown"
+                  placeholder="经办人"
+                  labelInValue
+                  maxTagCount={0}
+                  maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
+                  filter
+                  optionFilterProp="children"
+                  onFilterChange={(value) => {
+                    if (value) {
+                      debounceCallback(() => {
+                        axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?size=40&param=${value}`).then((res) => {
+                        // Set 用于查询是否有 id 重复的，没有重复才往里加
+                          const temp = new Set(userDataArray.map(item => item.id));
+                          res.content.filter(item => item.enabled).forEach((item) => {
+                            if (!temp.has(item.id)) {
+                              userDataArray.push({
+                                id: item.id,
+                                realName: item.realName,
+                              });
+                            }
                           });
-                        }
-                      });
-                      this.setState({
-                        userDataArray,
-                      });
-                    });
-                  }, this);
-                }
-              }}
-              onChange={this.handleAssigneeChange}
-              getPopupContainer={triggerNode => triggerNode.parentNode}
-            >
-              {
-            userDataArray.length && userDataArray.map(item => (
-              <Option key={item.id} value={item.id} title={item.realName}>{item.realName}</Option>
-            ))
-              }
-            </Select>
+                          this.setState({
+                            userDataArray,
+                          });
+                        });
+                      }, this);
+                    }
+                  }}
+                  onChange={this.handleAssigneeChange}
+                  getPopupContainer={triggerNode => triggerNode.parentNode}
+                >
+                  {
+                    userDataArray.length && userDataArray.map(item => (
+                      <Option key={item.id} value={item.id} title={item.realName}>{item.realName}</Option>
+                    ))
+                  }
+                </Select>
+              )
+            }
           </React.Fragment>
         ) : (
           <React.Fragment>
@@ -188,4 +211,5 @@ class QuickSearch extends Component {
   }
 }
 
+export { ee };
 export default QuickSearch;
