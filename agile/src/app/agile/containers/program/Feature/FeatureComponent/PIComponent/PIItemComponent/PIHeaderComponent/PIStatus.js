@@ -59,7 +59,7 @@ const { AppState } = stores;
 
   render() {
     const {
-      handleDeleteSprint, statusCode, data, store, refresh, type,
+      handleDeleteSprint, statusCode, data, store, refresh, type, index,
     } = this.props;
     const { finishSprintVisible } = this.state;
     // TODO: 内部接口逻辑
@@ -88,7 +88,7 @@ const { AppState } = stores;
             <div style={{ display: 'flex' }}>
               <p
                 className={classnames('c7n-backlog-closeSprint', {
-                  'c7n-backlog-canCloseSprint': store.getHasActivePI || !data.subFeatureDTOList || data.subFeatureDTOList.length === 0,
+                  'c7n-backlog-canCloseSprint': store.getHasActivePI || !data.subFeatureDTOList || data.subFeatureDTOList.length === 0 || index !== 0,
                 })}
                 role="none"
                 onClick={this.handleOpen}

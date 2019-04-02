@@ -78,7 +78,7 @@ const shouldContainTypeCode = ['feature'];
   };
 
   renderPI = (pi) => {
-    const { refresh, isCreated, store } = this.props;
+    const { refresh, isCreated, store, index } = this.props;
     const { expand } = this.state;
     const issueCount = store.getIssueMap.get(pi.id.toString()) ? store.getIssueMap.get(pi.id.toString()).length : 0;
     return (
@@ -101,6 +101,7 @@ const shouldContainTypeCode = ['feature'];
           piId={pi.id.toString()}
           toggleSprint={this.toggleSprint}
           store={store}
+          index={index}
         />
         <PIBody
           issueType={store.getIssueTypes.filter(type => shouldContainTypeCode.indexOf(type.typeCode) !== -1)}

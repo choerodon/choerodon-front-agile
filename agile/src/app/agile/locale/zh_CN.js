@@ -28,7 +28,7 @@ const zh_CN = {
   "issue.link_task": '问题链接',
   "issue.branch": '开发',
   "issue.branch.create": '创建分支',
-  "issue.commit.create": '创建分支',
+  "issue.commit.create": '创建评论',
   "issue.log.create": '登记工作',
 
   "learnmore": "了解更多",

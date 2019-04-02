@@ -71,7 +71,7 @@ class SprintItem extends Component {
       >
         {
           arr.length
-            ? arr.map(item => (
+            ? arr.map((item, index) => (
               <SprintContainer
                 isCreated={item.isCreated}
                 refresh={refresh}
@@ -79,6 +79,7 @@ class SprintItem extends Component {
                 data={item}
                 type={type}
                 store={store}
+                index={index}
               />
             )) : <NoneSprint type={type} />
         }
