@@ -645,7 +645,7 @@ class BoardStore {
   }
 
   axiosDeleteStatus(code) {
-    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}`);
+    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}?applyType=program`);
   }
 
   updateIssue = (
