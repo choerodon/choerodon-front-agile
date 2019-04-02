@@ -5,18 +5,6 @@ import './ReadAndEdit.scss';
 const { Option } = Select;
 
 class ReadAndEdit extends Component {
-  // constructor(props, context) {
-  //   super(props, context);
-  //   // this.state = {
-  //   //   type: 'read',
-  //   //   origin: '',
-  //   // };
-  // }
-
-  // componentWillMount() {
-  //   this.saveShow();
-  // }
-
   componentDidMount() {
     window.addEventListener('keyup', this.handleEnter, false);
   }
@@ -32,14 +20,7 @@ class ReadAndEdit extends Component {
     ) {
       document.getElementsByClassName(current)[0].click();
     }
-  }
-
-  saveShow() {
-    // const { origin } = this.props;
-    // this.setState({
-    //   origin,
-    // });
-  }
+  };
 
   render() {
     const {
@@ -62,10 +43,6 @@ class ReadAndEdit extends Component {
             <div
               role="none"
               onClick={() => {
-                // this.setState({
-                //   type: 'edit',
-                //   origin,
-                // });
                 if (onInit) {
                   onInit();
                 }
@@ -115,7 +92,6 @@ class ReadAndEdit extends Component {
                   role="none"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // this.setState({ type: 'read' });
                     onOk();
                     callback(undefined);
                   }
@@ -135,10 +111,6 @@ class ReadAndEdit extends Component {
                   onClick={(e) => {
                     e.stopPropagation();
                     onCancel(origin);
-                    // this.setState({
-                    //   type: 'read',
-                    //   origin,
-                    // });
                     callback(undefined);
                   }
                   }

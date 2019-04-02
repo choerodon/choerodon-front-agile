@@ -1342,7 +1342,8 @@ class CreateSprint extends Component {
           <WYSIWYGEditor
             bottomBar
             value={text2Delta(editDes)}
-            style={{ height: 'calc(100% - 32px)', width: '100%' }}
+            toolbarHeight={32}
+            style={{ height: '100%', width: '100%' }}
             onChange={(value) => {
               this.setState({ editDes: value });
             }}

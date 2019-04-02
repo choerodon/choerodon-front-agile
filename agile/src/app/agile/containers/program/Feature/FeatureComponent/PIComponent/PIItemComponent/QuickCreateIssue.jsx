@@ -38,11 +38,17 @@ const FormItem = Form.Item;
     const { form, handleCreateIssue } = this.props;
     const { currentType } = this.state;
     form.validateFields((err, values) => {
-      if (!err) {
+      if (values.summary && values.summary.trim()) {
+        if (!err) {
+          this.setState({
+            loading: true,
+          });
+          handleCreateIssue.bind(this, currentType, values.summary)();
+        }
+      } else {
         this.setState({
-          loading: true,
+          expand: false,
         });
-        handleCreateIssue.bind(this, currentType, values.summary)();
       }
     });
   };
@@ -51,6 +57,24 @@ const FormItem = Form.Item;
     const { issueType, form } = this.props;
     const { getFieldDecorator } = form;
     const { expand, currentType, loading } = this.state;
+    let featureTypeList = [];
+    if (issueType && issueType.length && issueType.length === 1) {
+      featureTypeList = [
+        {
+          ...issueType[0],
+          colour: '#29B6F6',
+          featureType: 'business',
+          name: '特性',
+        }, {
+          ...issueType[0],
+          colour: '#FFCA28',
+          featureType: 'enabler',
+          name: '使能',
+        },
+      ];
+    } else {
+      featureTypeList = issueType;
+    }
     const typeList = (
       <Menu
         style={{
@@ -61,8 +85,8 @@ const FormItem = Form.Item;
         onClick={this.handleChangeType}
       >
         {
-          issueType.map(type => (
-            <Menu.Item key={type.typeCode}>
+          featureTypeList.map(type => (
+            <Menu.Item key={type.featureType || type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
                   data={type}
@@ -102,9 +126,7 @@ const FormItem = Form.Item;
                       </div>
                     </Dropdown>
                     <FormItem label="summary" style={{ flex: 1 }}>
-                      {getFieldDecorator('summary', {
-                        rules: [{ required: true, message: '请输入任务概要！' }],
-                      })(
+                      {getFieldDecorator('summary')(
                         <Input
                           autoFocus
                           maxLength={44}

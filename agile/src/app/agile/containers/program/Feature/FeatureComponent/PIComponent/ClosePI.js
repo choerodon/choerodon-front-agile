@@ -90,7 +90,7 @@ class ClosePI extends Component {
                   <Option value={item.id}>{`${item.code}-${item.name}`}</Option>
                 ))
               ) : ''}
-              <Option value="0">待办事项</Option>
+              <Option value="0">特性列表</Option>
             </Select>
           </Content>
         </Sidebar>
