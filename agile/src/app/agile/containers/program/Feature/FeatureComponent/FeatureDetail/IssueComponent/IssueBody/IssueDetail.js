@@ -19,9 +19,7 @@ import IssueField from './IssueField';
 
   render() {
     const { edit, editDes } = this.state;
-    const {
-      intl, store, description,
-    } = this.props;
+    const { store } = this.props;
 
     return (
       <div className="c7n-details">
@@ -36,7 +34,7 @@ import IssueField from './IssueField';
             }}
             />
           </div>
-          <IssueField />
+          <IssueField store={store} />
         </div>
       </div>
     );

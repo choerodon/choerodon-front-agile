@@ -156,7 +156,7 @@ const { Option } = Select;
       return renderReadMode(field);
     } else {
       return (
-        <span>{field.value}</span>
+        <span>{field.value || '无'}</span>
       );
     }
   };

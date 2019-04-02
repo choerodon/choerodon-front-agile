@@ -29,106 +29,101 @@ class ReadAndEdit extends Component {
       readModeContent, onOk, onCancel, readOnly,
     } = this.props;
     return (
-      <div
-        role="none"
-        className={`rae ${current !== thisType ? 'c7n-readAndEdit' : ''}`}
-        style={{
-          ...style,
-          position: 'relative',
-          width: line ? '100%' : 'auto',
-        }}
-      >
-        {
-          !readOnly && current !== thisType && (
+      <React.Fragment>
+        {readOnly
+          ? (
+            <section>
+              {readModeContent}
+            </section>
+          )
+          : (
             <div
               role="none"
-              onClick={() => {
-                if (onInit) {
-                  onInit();
-                }
-                if (callback) {
-                  callback(thisType);
-                }
+              className={`rae ${current !== thisType ? 'c7n-readAndEdit' : ''}`}
+              style={{
+                ...style,
+                position: 'relative',
+                width: line ? '100%' : 'auto',
               }}
             >
-              <span
-                className="edit"
-                style={{
-                  display: 'none',
-                  lineHeight: '20px',
-                  alignItems: 'center',
-                }}
-              >
-                <Icon type="mode_edit" />
-              </span>
-              {readModeContent}
-            </div>
-          )
-        }
-        {
-          (!readOnly && current === thisType) && (
-            <section>
-              {children}
-            </section>
-          )
-        }
-        {
-          (!readOnly && current === thisType) && (
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <div
-                style={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                }}
-              >
-                <span
-                  className={`${current} edit-edit`}
-                  style={{
-                    display: 'block-inline',
-                    marginRight: '4px',
-                    width: 20,
-                    height: 20,
-                    lineHeight: '16px',
-                  }}
+              {current !== thisType && (
+                <div
                   role="none"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOk();
-                    callback(undefined);
-                  }
-                  }
-                >
-                  <Icon style={{ fontSize: '14px' }} type="check" />
-                </span>
-                <span
-                  className="close"
-                  style={{
-                    display: 'block-inline',
-                    width: 20,
-                    height: 20,
-                    lineHeight: '16px',
+                  onClick={() => {
+                    if (onInit) {
+                      onInit();
+                    }
+                    if (callback) {
+                      callback(thisType);
+                    }
                   }}
-                  role="none"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCancel(origin);
-                    callback(undefined);
-                  }
-                  }
                 >
-                  <Icon style={{ fontSize: '14px' }} type="close" />
-                </span>
-              </div>
+                  <span
+                    className="edit"
+                    style={{
+                      display: 'none',
+                      lineHeight: '20px',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Icon type="mode_edit" />
+                  </span>
+                  {readModeContent}
+                </div>
+              )}
+              {(current === thisType) && (
+                <section>
+                  {children}
+                </section>
+              )}
+              {(current === thisType) && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <div
+                    style={{
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    }}
+                  >
+                    <span
+                      className={`${current} edit-edit`}
+                      style={{
+                        display: 'block-inline',
+                        marginRight: '4px',
+                        width: 20,
+                        height: 20,
+                        lineHeight: '16px',
+                      }}
+                      role="none"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOk();
+                        callback(undefined);
+                      }}
+                    >
+                      <Icon style={{ fontSize: '14px' }} type="check" />
+                    </span>
+                    <span
+                      className="close"
+                      style={{
+                        display: 'block-inline',
+                        width: 20,
+                        height: 20,
+                        lineHeight: '16px',
+                      }}
+                      role="none"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCancel(origin);
+                        callback(undefined);
+                      }}
+                    >
+                      <Icon style={{ fontSize: '14px' }} type="close" />
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
-          )
-        }
-        {
-          readOnly && (
-            <section>
-              {readModeContent}
-            </section>
-          )
-        }
-      </div>
+          )}
+      </React.Fragment>
     );
   }
 }

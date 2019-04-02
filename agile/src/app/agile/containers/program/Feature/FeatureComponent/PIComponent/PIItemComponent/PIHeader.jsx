@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import SprintName from './PIHeaderComponent/PIName';
 import SprintVisibleIssue from './PIHeaderComponent/SprintVisibleIssue';
 import PILastDays from './PIHeaderComponent/PILastDays';
-import SprintStatus from './PIHeaderComponent/PIStatus';
+import PIStatus from './PIHeaderComponent/PIStatus';
 import PIDateRange from './PIHeaderComponent/PIDateRange';
 import '../PI.scss';
 
@@ -50,7 +50,7 @@ import '../PI.scss';
 
   render() {
     const {
-      data, expand, toggleSprint, piId, issueCount, refresh, store,
+      data, expand, toggleSprint, piId, issueCount, refresh, store, index,
     } = this.props;
     const {
       name, startDate, endDate,
@@ -78,13 +78,14 @@ import '../PI.scss';
             </div>
           </div>
           <div style={{ flex: 9 }}>
-            <SprintStatus
+            <PIStatus
               piId={piId}
               refresh={refresh}
               store={store}
               data={data}
               statusCode={data.statusCode}
               type="pi"
+              index={index}
             />
           </div>
         </div>

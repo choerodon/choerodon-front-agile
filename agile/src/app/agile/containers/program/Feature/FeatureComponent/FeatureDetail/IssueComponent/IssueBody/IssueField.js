@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Tooltip, Icon } from 'choerodon-ui';
 import { injectIntl } from 'react-intl';
-import _ from 'lodash';
 import Field from './Field/Field';
+import { returnBeforeTextUpload } from '../../../../../../../common/utils';
+import { updateStatus, updateIssue } from '../../../../../../../api/NewIssueApi';
+import { DatetimeAgo } from '../../../../../../../components/CommonComponent';
+import { STATUS } from '../../../../../../../common/Constant';
 
-const readOnly = ['lastUpdateDate', 'lastUpdateDate'];
+const readOnly = ['creationDate', 'lastUpdateDate'];
 
 @inject('AppState')
 @observer class IssueField extends Component {
@@ -29,24 +31,87 @@ const readOnly = ['lastUpdateDate', 'lastUpdateDate'];
     });
   };
 
-  /**
-   * 更新字段值
-   * @param type
-   * @param value
-   */
   handleFieldChange = (field, value) => {
-
+    const { state } = this;
+    const { code, system } = field;
+    const {
+      origin,
+      issueId,
+      transformId,
+    } = this.state;
+    const { onUpdate } = this.props;
+    const obj = {
+      issueId,
+      objectVersionNumber: origin.objectVersionNumber,
+    };
+    if ((code === 'description') || (code === 'editDes')) {
+      if (state[code]) {
+        returnBeforeTextUpload(state[code], obj, updateIssue, 'description')
+          .then((res) => {
+            this.reloadIssue(state.origin.issueId);
+          });
+      }
+    } else if (code === 'assigneeId') {
+      obj[code] = state[code] ? JSON.parse(state[code]).id || 0 : 0;
+      updateIssue(obj)
+        .then((res) => {
+          this.reloadIssue();
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
+    } else if (code === 'reporterId') {
+      obj[code] = value || 0;
+      updateIssue(obj)
+        .then((res) => {
+          this.reloadIssue();
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
+    } else if (code === 'statusId') {
+      if (transformId) {
+        updateStatus(transformId, issueId, origin.objectVersionNumber)
+          .then((res) => {
+            this.reloadIssue();
+            if (onUpdate) {
+              onUpdate();
+            }
+            this.setState({
+              transformId: false,
+            });
+          });
+      }
+    } else {
+      obj[code] = state[code] || 0;
+      updateIssue(obj)
+        .then((res) => {
+          this.reloadIssue();
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
+    }
   };
 
   onInit = () => {
 
   };
 
+  setCurrentRae = (data) => {
+    const { store } = this.props;
+    store.setCurrentRae(data);
+  };
+
   render() {
-    const { currentRae } = this.state;
+    const { store } = this.props;
+    const issue = store.getIssue;
     const {
-      typeCode, intl,
-    } = this.props;
+      statusMapDTO = {}, activePi = {}, epicName, reporterName,
+      featureDTO = {}, creationDate, lastUpdateDate,
+    } = issue;
+
+    const currentRae = store.getCurrentRae;
 
     const fields = [
       {
@@ -140,41 +205,79 @@ const readOnly = ['lastUpdateDate', 'lastUpdateDate'];
         system: true,
         required: true,
         type: 'select',
+        value: statusMapDTO.name,
+        renderReadMode: data => (
+          <div
+            style={{
+              background: STATUS[statusMapDTO.code],
+              color: '#fff',
+              borderRadius: '2px',
+              padding: '0 8px',
+              display: 'inline-block',
+              margin: '2px auto 2px 0',
+            }}
+          >
+            {data.value}
+          </div>
+        ),
       }, {
         code: 'pi',
         name: 'PI',
         system: true,
         required: true,
+        value: activePi.name,
       }, {
         code: 'epic',
         name: '史诗',
         system: true,
         required: true,
+        value: epicName,
       }, {
         code: 'reporter',
         name: '报告人',
         system: true,
         required: true,
+        value: reporterName,
+        renderReadMode: data => (
+          <div
+            style={{
+              background: STATUS[statusMapDTO.code],
+              color: '#fff',
+              borderRadius: '2px',
+              padding: '0 8px',
+              display: 'inline-block',
+              margin: '2px auto 2px 0',
+            }}
+          >
+            {data.value}
+          </div>
+        ),
       }, {
         code: 'benfitHypothesis',
         name: '特性价值',
         system: true,
         required: true,
+        value: featureDTO.benfitHypothesis,
       }, {
         code: 'acceptanceCritera',
         name: '验收标准',
         system: true,
         required: true,
+        value: featureDTO.acceptanceCritera,
       }, {
         code: 'creationDate',
         name: '创建时间',
         system: true,
         required: true,
+        value: creationDate,
+        renderReadMode: data => (<DatetimeAgo date={data.value} />),
       }, {
         code: 'lastUpdateDate',
         name: '更新时间',
         system: true,
         required: true,
+        value: lastUpdateDate,
+        renderReadMode: data => (<DatetimeAgo date={data.value} />),
       },
     ];
 
@@ -191,11 +294,11 @@ const readOnly = ['lastUpdateDate', 'lastUpdateDate'];
               <Field
                 field={field}
                 readOnly={readOnly.indexOf(field.code) !== -1}
-                changeRae={this.changeRae}
+                changeRae={this.setCurrentRae}
                 currentRae={currentRae}
                 onOk={this.handleFieldChange}
                 onInit={this.onInit}
-                renderReadMode={this.renderReadMode}
+                renderReadMode={field.renderReadMode}
                 renderOption={this.renderOption}
               />
             </div>
