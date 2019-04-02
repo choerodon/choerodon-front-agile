@@ -644,7 +644,7 @@ class ScrumBoardStore {
   }
 
   axiosDeleteStatus(code) {
-    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}`);
+    return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/issue_status/${code}?applyType=agile`);
   }
 
   updateIssue = (
