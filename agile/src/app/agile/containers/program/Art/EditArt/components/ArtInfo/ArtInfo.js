@@ -31,7 +31,7 @@ class ArtInfo extends Component {
     const { editNameVisible } = this.state;
     return (
       <div style={{
-        display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: 500, margin: '20px 0 10px', 
+        display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: 500, margin: '0 0 20px', 
       }}
       >
         <div className="c7n-artInfo-name">

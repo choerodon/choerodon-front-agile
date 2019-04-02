@@ -27,6 +27,7 @@ const ProgramAimsTable = ({
           </Tooltip>
         </div>
       ),
+      width: 120,
     },
   ];
   return (

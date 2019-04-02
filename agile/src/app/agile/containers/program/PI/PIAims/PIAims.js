@@ -35,21 +35,25 @@ const amisColumns = [
     title: '计划商业价值',
     dataIndex: 'planBv',
     render: text => text || '-',
+    width: 120,
   },
   {
     title: '实际商业价值',
     dataIndex: 'actualBv',
     render: text => text || '-',
+    width: 120,
   },
   {
     title: '创建时间',
     dataIndex: 'creationDate',
     render: text => moment(text).format('YYYY-MM-DD') || '-',
+    width: 120,
   },
   {
     title: '最后更新时间',
     dataIndex: 'lastUpdateDate',
     render: text => moment(text).format('YYYY-MM-DD') || '-',
+    width: 120,
   },
 ];
 @observer
