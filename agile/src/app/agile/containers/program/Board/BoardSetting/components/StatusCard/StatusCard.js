@@ -90,14 +90,18 @@ class StatusCard extends Component {
 
   renderBackground() {
     const { data: { categoryCode } } = this.props;
-    if (categoryCode === 'todo') {
-      return 'rgb(255, 177, 0)';
-    } else if (categoryCode === 'doing') {
-      return 'rgb(77, 144, 254)';
-    } else if (categoryCode === 'done') {
-      return 'rgb(0, 191, 165)';
-    }
-    return '#d8d8d8';
+    switch (categoryCode) {
+      case 'todo':
+        return 'rgb(255, 177, 0)';
+      case 'doing':
+        return 'rgb(77, 144, 254)';
+      case 'done':
+        return 'rgb(0, 191, 165)';
+      case 'prepare':
+        return '#F67F5A';
+      default:
+        return 'gray';
+    }    
   }
 
   render() {
