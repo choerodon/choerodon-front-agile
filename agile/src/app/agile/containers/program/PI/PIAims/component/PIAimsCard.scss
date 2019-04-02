@@ -1,6 +1,22 @@
 .c7n-pi-card {
-    width: 362px;
-    padding: 20px 15px;
+    min-width: 362px;
+    padding: 15px 15px 20px;
     border: 1px solid #ccc;
     border-radius: 2px;
+    table {
+        thead {
+            tr {
+                th {
+                    padding-bottom: 10px;
+                }
+            }
+        }
+        tbody {
+            tr {
+                td {
+                    padding: 0 25px 8px 0;
+                }
+            }
+        }
+    }
 }

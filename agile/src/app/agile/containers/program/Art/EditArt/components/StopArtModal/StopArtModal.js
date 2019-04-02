@@ -17,8 +17,10 @@ const renderStopArtModalContent = (props) => {
   if (!canStop) {
     return (
       <p>
-        {`你无法停止 ${data.name} ，你需要手动关闭活跃的PI `}
-        <span style={{ color: 'red' }}>{`${stopArtPIInfo.activePiDTO.code}-${stopArtPIInfo.activePiDTO.name} `}</span>
+        {'你无法停止 '}
+        <span style={{ fontWeight: 600 }}>{data.name}</span>
+        {' ，你需要手动关闭活跃的PI '}
+        <span style={{ color: 'red', fontWeight: 600 }}>{`${stopArtPIInfo.activePiDTO.code}-${stopArtPIInfo.activePiDTO.name} `}</span>
         {'之后，才能停止火车。'}
       </p>
     );
@@ -27,24 +29,25 @@ const renderStopArtModalContent = (props) => {
       <div style={{ marginTop: 20 }}>
         <p>
           <Icon type="report" style={{ marginTop: -5, color: 'red' }} />
-          {`你将要停止 ${data.name} ，停止后火车下的PI会进行关闭删除，已关联PI的特性会被放入特性列表的待办事项，你可以重新规划。`}
+          {'你将要停止 '}
+          <span style={{ fontWeight: 600 }}>{data.name}</span>
+          {' ，停止后火车下的PI会进行关闭删除，已关联PI的特性会被放入特性列表的待办事项，你可以重新规划。'}
         </p>
         <p style={{ marginBottom: 5 }}>
           {'当前进行中的PI：'}
-          <span style={{ color: 'red' }}>无</span>
+          <span style={{ color: 'red', fontWeight: 600 }}>无</span>
         </p>
         <p style={{ marginBottom: 5 }}>
           {'已完成的PI个数：'}
-          <span style={{ color: 'red' }}>{stopArtPIInfo.completedPiCount ? stopArtPIInfo.completedPiCount : '无'}</span>
+          <span style={{ color: 'red', fontWeight: 600 }}>{stopArtPIInfo.completedPiCount ? stopArtPIInfo.completedPiCount : '无'}</span>
         </p>
         <p style={{ marginBottom: 5 }}>
           {'未开启的PI个数：'}
-          <span style={{ color: 'red' }}>{stopArtPIInfo.todoPiCount ? stopArtPIInfo.todoPiCount : '无'}</span>
+          <span style={{ color: 'red', fontWeight: 600 }}>{stopArtPIInfo.todoPiCount ? stopArtPIInfo.todoPiCount : '无'}</span>
         </p>
         <p style={{ marginBottom: 5 }}>
           {'关联PI的特性个数：'}
-          <span style={{ color: 'red' }}>{stopArtPIInfo.relatedFeatureCount ? stopArtPIInfo.relatedFeatureCount : '无'}</span>
-          {' '}
+          <span style={{ color: 'red', fontWeight: 600 }}>{stopArtPIInfo.relatedFeatureCount ? stopArtPIInfo.relatedFeatureCount : '无'}</span>
         </p>
       </div>
     );

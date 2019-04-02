@@ -25,7 +25,7 @@ const PIAimsCard = ({
         <table style={{ width: '100%' }}>
           <thead>
             <tr>
-              <th style={{ width: '60%' }}>{piName}</th>
+              <th className="th" style={{ width: '60%' }}>{piName}</th>
               <th style={{ width: '20%' }}>计划BV</th>
               <th style={{ width: '20%' }}>实际BV</th>
             </tr>
@@ -34,22 +34,22 @@ const PIAimsCard = ({
             {
               aimsInfo && aimsInfo.length > 0 && aimsInfo.map(item => (
                 <tr key={item.id}>
-                  <td style={{ display: 'flex', alignItems: 'center' }}>
+                  <td valign="top" style={{ display: 'flex' }}>
                     <span style={{
-                      display: 'inline-block', marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: `${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}`, 
+                      display: 'flex', flexShrink: 0, marginTop: 8, marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: `${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}`, 
                     }}
                     />
                     {item.name}
                   </td>
-                  <td>{item.planBv ? item.planBv : '-'}</td>
-                  <td>{item.actualBv ? item.actualBv : '-'}</td>
+                  <td valign="top">{item.planBv ? item.planBv : '-'}</td>
+                  <td valign="top">{item.actualBv ? item.actualBv : '-'}</td>
                 </tr>
               ))
             }
           </tbody>
         </table>
         {
-          aimsCategory === 'program' && (<Divider style={{ margin: '15px 0' }} />)
+          aimsCategory === 'program' && (<Divider style={{ margin: '7px 0 15px' }} />)
         }
         {
             aimsCategory === 'program' && (
@@ -66,15 +66,15 @@ const PIAimsCard = ({
                     {
                       stretchAimsInfo && stretchAimsInfo.length > 0 && stretchAimsInfo.map(item => (
                         <tr>
-                          <td style={{ display: 'flex', alignItems: 'center' }}>
+                          <td valign="top" style={{ display: 'flex' }}>
                             <span style={{
-                              display: 'inline-block', marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: '#9B9B9B', 
+                              display: 'flex', flexShrink: 0, marginTop: 8, marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: '#9B9B9B', 
                             }}
                             />
                             {item.name}
                           </td>
-                          <td>{item.planBv ? item.planBv : '-'}</td>
-                          <td>{item.actualBv ? item.actualBv : '-'}</td>
+                          <td valign="top">{item.planBv ? item.planBv : '-'}</td>
+                          <td valign="top">{item.actualBv ? item.actualBv : '-'}</td>
                         </tr>
                       ))
                     }
@@ -87,17 +87,17 @@ const PIAimsCard = ({
         {
           aimsCategory === 'program' && (
           <div>
-            <Divider />
+            <Divider style={{ margin: '7px 0 15px' }} />
             <table style={{ width: '100%' }}>
               <tbody>
                 <tr>
-                  <td style={{ width: '60%' }}>统计</td>
-                  <td style={{ width: '20%' }}>{totalPlanBv}</td>
-                  <td style={{ width: '20%' }}>{totalActualBv}</td>
+                  <td valign="top" style={{ width: '60%' }}>统计</td>
+                  <td valign="top" style={{ width: '20%' }}>{totalPlanBv}</td>
+                  <td valign="top" style={{ width: '20%' }}>{totalActualBv}</td>
                 </tr>
                 <tr>
                   <td />
-                  <td>{percent}</td>
+                  <td valign="top">{percent}</td>
                   <td />
                 </tr>
               </tbody>

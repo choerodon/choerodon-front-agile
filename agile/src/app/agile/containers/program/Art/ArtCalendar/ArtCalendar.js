@@ -100,7 +100,7 @@ class ArtCalendar extends Component {
                       {currentPI && (
                       <span>
                         {'正在进行中的PI：'}
-                        {currentPI.name}
+                        {`${currentPI.code}-${currentPI.name}`}
                       </span>
                       )}
                     </div>
