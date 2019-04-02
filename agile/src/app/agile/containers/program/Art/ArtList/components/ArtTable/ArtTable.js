@@ -21,7 +21,7 @@ const ArtTable = ({
     title: '编号',
     dataIndex: 'code',
     key: 'code',  
-    render: code => `#${code}`,  
+    render: (code, record) => `#${code}-${record.id}`,  
   }, {
     title: '名称',
     dataIndex: 'name',

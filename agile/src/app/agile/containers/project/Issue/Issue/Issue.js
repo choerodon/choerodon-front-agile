@@ -30,6 +30,8 @@ import CreateIssueModal from '../CreateIssueModal';
 // 导出用例
 import ExportIssue from '../ExportIssue';
 
+import QuickSearch from '../../../../components/QuickSearch';
+
 const FileSaver = require('file-saver');
 
 const { AppState } = stores;
@@ -121,6 +123,32 @@ class Issue extends Component {
     this[name] = ref;
   };
 
+  /**
+   * 快速搜索函数（内容变动时触发）
+   * @param boolean => onlyMeChecked 点击仅我的
+   * @param boolean => onlyStoryChecked 点击仅故事
+   * @param Array => moreChecked 点击其余选项
+   */
+  onQuickSearchChange = (onlyMeChecked, onlyStoryChecked, moreChecked) => {
+    this.filterControler = new IssueFilterControler();
+    this.filterControler.quickSearchFilterUpdate(
+      onlyMeChecked,
+      onlyStoryChecked,
+      moreChecked,
+      AppState.userInfo.id,
+    );
+    IssueStore.setLoading(true);
+    this.filterControler.update().then(
+      (res) => {
+        IssueStore.updateFiltedIssue({
+          current: res.number + 1,
+          pageSize: res.size,
+          total: res.totalElements,
+        }, res.content);
+      },
+    );
+  };
+
   // ExpandCssControler => 用于向 IssueTable 注入 CSS 样式
   render() {
     // 清除整页滚动条
@@ -167,10 +195,17 @@ class Issue extends Component {
         </Header>
         <Content className="c7n-Issue">
           <ExportIssue />
-          <div className="c7n-advancedSearch">
-            <AdvancedSearch />
-            <SaveFilterModal />
-            <FilterManage />
+          <div className="c7n-Issue-search">
+            <QuickSearch
+              style={{ paddingLeft: 24 }}
+              onQuickSearchChange={this.onQuickSearchChange}
+              quickSearchAllowClear
+            />
+            <div className="c7n-advancedSearch">
+              <AdvancedSearch />
+              <SaveFilterModal />
+              <FilterManage />
+            </div>
           </div>
           <div style={{ display: 'flex', flex: 1 }}>
             
