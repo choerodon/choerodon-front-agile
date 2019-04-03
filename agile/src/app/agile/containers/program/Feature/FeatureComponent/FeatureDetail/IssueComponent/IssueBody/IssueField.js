@@ -7,6 +7,8 @@ import { returnBeforeTextUpload } from '../../../../../../../common/utils';
 import { updateStatus, updateIssue } from '../../../../../../../api/NewIssueApi';
 import { DatetimeAgo } from '../../../../../../../components/CommonComponent';
 import { STATUS } from '../../../../../../../common/Constant';
+import { getSelf } from '../../../../../../../api/CommonApi';
+import UserHead from '../../../../../../../components/UserHead';
 
 const readOnly = ['creationDate', 'lastUpdateDate'];
 
@@ -33,16 +35,16 @@ const readOnly = ['creationDate', 'lastUpdateDate'];
 
   handleFieldChange = (field, value) => {
     const { state } = this;
+    const { onUpdate, store, reloadIssue } = this.props;
     const { code, system } = field;
+    const issue = store.getIssue;
     const {
-      origin,
-      issueId,
-      transformId,
-    } = this.state;
-    const { onUpdate } = this.props;
+      issueId, objectVersionNumber,
+    } = issue;
+
     const obj = {
       issueId,
-      objectVersionNumber: origin.objectVersionNumber,
+      objectVersionNumber,
     };
     if ((code === 'description') || (code === 'editDes')) {
       if (state[code]) {
@@ -55,7 +57,9 @@ const readOnly = ['creationDate', 'lastUpdateDate'];
       obj[code] = state[code] ? JSON.parse(state[code]).id || 0 : 0;
       updateIssue(obj)
         .then((res) => {
-          this.reloadIssue();
+          if (reloadIssue) {
+            reloadIssue();
+          }
           if (onUpdate) {
             onUpdate();
           }
@@ -64,16 +68,20 @@ const readOnly = ['creationDate', 'lastUpdateDate'];
       obj[code] = value || 0;
       updateIssue(obj)
         .then((res) => {
-          this.reloadIssue();
+          if (reloadIssue) {
+            reloadIssue();
+          }
           if (onUpdate) {
             onUpdate();
           }
         });
     } else if (code === 'statusId') {
-      if (transformId) {
-        updateStatus(transformId, issueId, origin.objectVersionNumber)
+      if (value) {
+        updateStatus(value, issueId, objectVersionNumber)
           .then((res) => {
-            this.reloadIssue();
+            if (reloadIssue) {
+              reloadIssue();
+            }
             if (onUpdate) {
               onUpdate();
             }
@@ -86,7 +94,9 @@ const readOnly = ['creationDate', 'lastUpdateDate'];
       obj[code] = state[code] || 0;
       updateIssue(obj)
         .then((res) => {
-          this.reloadIssue();
+          if (reloadIssue) {
+            reloadIssue();
+          }
           if (onUpdate) {
             onUpdate();
           }
@@ -108,7 +118,8 @@ const readOnly = ['creationDate', 'lastUpdateDate'];
     const issue = store.getIssue;
     const {
       statusMapDTO = {}, activePi = {}, epicName, reporterName,
-      featureDTO = {}, creationDate, lastUpdateDate,
+      featureDTO = {}, creationDate, lastUpdateDate, assigneeId,
+      reporterId, reporterImageUrl,
     } = issue;
 
     const currentRae = store.getCurrentRae;
@@ -239,18 +250,41 @@ const readOnly = ['creationDate', 'lastUpdateDate'];
         required: true,
         value: reporterName,
         renderReadMode: data => (
-          <div
+          <UserHead
+            user={{
+              id: reporterId,
+              loginName: '',
+              realName: reporterName,
+              avatar: reporterImageUrl,
+            }}
+          />
+        ),
+        suffix: (
+          <span
+            role="none"
             style={{
-              background: STATUS[statusMapDTO.code],
-              color: '#fff',
-              borderRadius: '2px',
-              padding: '0 8px',
+              color: '#3f51b5',
+              cursor: 'pointer',
+              marginTop: '-3px',
               display: 'inline-block',
-              margin: '2px auto 2px 0',
+            }}
+            onClick={() => {
+              getSelf().then((res) => {
+                if (res.id !== assigneeId) {
+                  this.setState({
+                    currentRae: undefined,
+                    assigneeId: JSON.stringify(res),
+                    assigneeName: `${res.loginName}${res.realName}`,
+                    assigneeImageUrl: res.imageUrl,
+                  }, () => {
+                    this.handleFieldChange({ code: 'assigneeId' });
+                  });
+                }
+              });
             }}
           >
-            {data.value}
-          </div>
+            {'分配给我'}
+          </span>
         ),
       }, {
         code: 'benfitHypothesis',
@@ -300,6 +334,7 @@ const readOnly = ['creationDate', 'lastUpdateDate'];
                 onInit={this.onInit}
                 renderReadMode={field.renderReadMode}
                 renderOption={this.renderOption}
+                suffix={field.suffix}
               />
             </div>
           </div>
