@@ -28,7 +28,7 @@ import IssueBranch from './IssueBranch/IssueBranch';
       <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
         <section className="c7n-body-editIssue">
           <div className="c7n-content-editIssue">
-            <IssueDetail store={store} />
+            <IssueDetail store={store} reloadIssue={reloadIssue} />
             <IssueDes store={store} />
             <IssueAttachment store={store} />
             {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1

@@ -19,7 +19,7 @@ import IssueField from './IssueField';
 
   render() {
     const { edit, editDes } = this.state;
-    const { store } = this.props;
+    const { store, reloadIssue } = this.props;
 
     return (
       <div className="c7n-details">
@@ -34,7 +34,7 @@ import IssueField from './IssueField';
             }}
             />
           </div>
-          <IssueField store={store} />
+          <IssueField store={store} reloadIssue={reloadIssue} />
         </div>
       </div>
     );

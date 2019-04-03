@@ -259,6 +259,9 @@
       }
 
       .c7n-value-wrapper {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
         min-width: initial;
       }
 
