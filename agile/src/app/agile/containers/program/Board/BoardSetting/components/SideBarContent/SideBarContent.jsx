@@ -4,6 +4,7 @@ import { Content, stores, axios } from 'choerodon-front-boot';
 import {
   Form, Modal, Input, Select, message,
 } from 'choerodon-ui';
+import { find } from 'lodash';
 import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
 import { STATUS } from '../../../../../../common/Constant';
 
@@ -11,7 +12,7 @@ const FormItem = Form.Item;
 const { Sidebar, confirm } = Modal;
 const { Option } = Select;
 const { AppState } = stores;
-
+const statusOrder = ['prepare', 'todo', 'doing', 'done'];
 @observer
 class SideBarContent extends Component {
   constructor(props) {
@@ -140,7 +141,9 @@ class SideBarContent extends Component {
 
   renderOptions() {
     if (JSON.stringify(BoardStore.getStatusCategory) !== '{}') {
-      return BoardStore.getStatusCategory.lookupValues.sort().map(item => (
+      const status = BoardStore.getStatusCategory.lookupValues;
+      const sortedStatus = status.map((item, i) => find(status, { valueCode: statusOrder[i] }));
+      return sortedStatus.map(item => (
         <Option value={item.valueCode}>
           <div style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center' }}>
             <div style={{
