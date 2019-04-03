@@ -15,9 +15,11 @@ class CalendarBody extends Component {
     data.forEach((pi, i, arr) => {
       const range = arr[i + 1] && moment.range(moment(pi.endDate), moment(arr[i + 1].startDate));
       const diff = range && range.diff('days');
-      itemArr.push(<PiItem pi={pi} />);
       if (diff) {
+        itemArr.push(<PiItem pi={pi} diff />);
         itemArr.push(<div style={{ flex: `${diff}` }} />);
+      } else {
+        itemArr.push(<PiItem pi={pi} />);
       }
     });
     return itemArr;

@@ -14,6 +14,7 @@ import EmptyBlock from '../../../../components/EmptyBlock';
 
 class ArtCalendar extends Component {
   state = {
+    artStartDate: null,
     doingArt: undefined,
     ArtName: null,
     data: null,
@@ -32,10 +33,11 @@ class ArtCalendar extends Component {
       loading: true,
     });
     getArtsByProjectId().then((artList) => {
+      const doingArt = artList.content.find(item => item.statusCode === 'doing');
       this.setState({
-        doingArt: artList.content.find(item => item.statusCode === 'doing'),
+        doingArt,
+        artStartDate: doingArt && doingArt.startDate,
       }, () => {
-        const { doingArt } = this.state;
         if (doingArt) {
           getArtCalendar(doingArt.id).then((res) => {
             this.setState({
@@ -76,6 +78,7 @@ class ArtCalendar extends Component {
       endDate,
       doingArt,
       loading,
+      artStartDate,
     } = this.state;
     return (
       <Page className="c7nagile-ArtCalendar">
@@ -95,7 +98,7 @@ class ArtCalendar extends Component {
                       <span style={{ fontSize: '16px' }}>{ArtName && ArtName}</span>
                       <span style={{ margin: '0 40px' }}>
                         {'开始日期：'}
-                        {startDate && moment(startDate).format('YYYY-MM-DD')}
+                        {artStartDate && moment(artStartDate).format('YYYY-MM-DD')}
                       </span>
                       {currentPI && (
                       <span>

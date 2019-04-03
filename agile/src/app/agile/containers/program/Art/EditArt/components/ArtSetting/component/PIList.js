@@ -50,7 +50,6 @@ class PIList extends Component {
     const { createPIModalVisible } = this.state;
     // eslint-disable-next-line no-shadow
     const { name, PiList, data } = this.props;
-    const nonEmpty = Object.keys(_.pick(data, ['startDate', 'piCount', 'piCodePrefix', 'piCodeNumber', 'interationCount', 'interationWeeks', 'ipWeeks'])).every(key => data[key]);
     const columns = [
       {
         title: 'PI名称',
@@ -77,7 +76,7 @@ class PIList extends Component {
     ];
     return (
       <React.Fragment>
-        <Button funcType="flat" type="primary" style={{ marginBottom: 15 }} disabled={!nonEmpty} onClick={this.handleCreatePIClick}>
+        <Button funcType="flat" type="primary" style={{ marginBottom: 15 }} disabled={data.statusCode === 'stop'} onClick={this.handleCreatePIClick}>
           <Icon type="playlist_add" />
           <span>创建下一批PI</span>
         </Button>
