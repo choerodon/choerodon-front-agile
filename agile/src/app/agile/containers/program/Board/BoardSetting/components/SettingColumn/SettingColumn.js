@@ -4,6 +4,7 @@ import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { stores, Permission } from 'choerodon-front-boot';
 import { Icon, Modal } from 'choerodon-ui';
 import StatusCard from '../StatusCard/StatusCard';
+import { STATUS } from '../../../../../../common/Constant';
 import './SettingColumn.scss';
 import BoardStore from '../../../../../../stores/Program/Board/BoardStore';
 import EasyEdit from '../../../../../../components/EasyEdit/EasyEdit';
@@ -337,7 +338,7 @@ class SettingColumn extends Component {
                   <div
                     className="c7n-scrumsetting-columnBottom"
                     style={{
-                      borderBottom: data.color ? `3px solid ${data.color}` : '3px solid rgba(0,0,0,0.26)',
+                      borderBottom: data.color ? `3px solid ${STATUS[data.categoryCode]}` : '3px solid rgba(0,0,0,0.26)',
                     }}
                   >
                     {
