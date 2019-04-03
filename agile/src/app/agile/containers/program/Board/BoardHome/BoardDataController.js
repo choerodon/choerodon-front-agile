@@ -226,7 +226,7 @@ export default class BoardDataController {
     const canDragOn = [];
     const column_StatusStructureMap = new Map();
     // 列排序
-    data.columnsData.sort((a, b) => a.sequence - b.sequence).forEach((columnObj) => {
+    data.columnsData.forEach((columnObj) => {
       columnStructureMap.push(columnObj);
       column_StatusStructureMap.set(columnObj.columnId, columnObj.subStatuses);
       columnObj.subStatuses.forEach((subStatusObj) => {

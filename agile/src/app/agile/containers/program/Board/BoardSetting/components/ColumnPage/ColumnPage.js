@@ -39,8 +39,8 @@ class ColumnPage extends Component {
     if (result.destination.droppableId === 'columndrop') {
       const originState2 = JSON.parse(JSON.stringify(BoardStore.getBoardData));
       const newState2 = JSON.parse(JSON.stringify(BoardStore.getBoardData));
-      let draggableData2 = {};
-      [draggableData2] = newState2.splice(result.source.index, 1);
+      
+      const [draggableData2] = newState2.splice(result.source.index, 1);
       newState2.splice(result.destination.index, 0, draggableData2);
       BoardStore.setBoardData(newState2);
       const data = {
@@ -300,7 +300,7 @@ class ColumnPage extends Component {
   }
 
   render() {
-    const BoardData = JSON.parse(JSON.stringify(BoardStore.getBoardData)).sort((a, b) => a.sequence - b.sequence);
+    const BoardData = JSON.parse(JSON.stringify(BoardStore.getBoardData));
     const { refresh } = this.props;
     const { addStatus, addColumn } = this.state;
     if (BoardData.length > 0) {
