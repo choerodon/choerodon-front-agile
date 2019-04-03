@@ -189,9 +189,11 @@ class ArtForm extends Component {
               )}
             </FormItem>
           </TabPane>
+          {data.statusCode !== 'todo' && (
           <TabPane tab="PI列表" key="4">
             <PIList name={initValue.name} data={data} artId={initValue.id} PiList={PiList} onGetPIList={onGetPIList} onGetArtInfo={onGetArtInfo} />
           </TabPane>
+          )}
         </Tabs>
         <Divider />
         {
