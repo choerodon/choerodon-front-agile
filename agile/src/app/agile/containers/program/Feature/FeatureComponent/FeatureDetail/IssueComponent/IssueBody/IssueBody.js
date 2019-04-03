@@ -20,7 +20,9 @@ import IssueBranch from './IssueBranch/IssueBranch';
   }
 
   render() {
-    const { store, reloadIssue } = this.props;
+    const {
+      store, reloadIssue, onUpdate, loginUserId, hasPermission,
+    } = this.props;
     const issue = store.getIssue;
     const { issueTypeDTO = {} } = issue;
 
@@ -28,7 +30,7 @@ import IssueBranch from './IssueBranch/IssueBranch';
       <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
         <section className="c7n-body-editIssue">
           <div className="c7n-content-editIssue">
-            <IssueDetail store={store} reloadIssue={reloadIssue} />
+            <IssueDetail {...this.props} />
             <IssueDes store={store} />
             <IssueAttachment store={store} />
             {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1

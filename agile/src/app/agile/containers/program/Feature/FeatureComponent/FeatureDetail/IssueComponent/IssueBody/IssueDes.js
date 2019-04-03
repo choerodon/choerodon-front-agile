@@ -23,6 +23,10 @@ import FullEditor from '../../../../../../../components/FullEditor';
   componentDidMount() {
   }
 
+  updateIssue = () => {
+
+  };
+
   renderDes() {
     const { editDesShow, description, editDes } = this.state;
     if (editDesShow === undefined) {

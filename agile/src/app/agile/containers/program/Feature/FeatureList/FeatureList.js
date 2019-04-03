@@ -29,6 +29,7 @@ class FeatureList extends Component {
 
   componentWillUnmount() {
     FeatureStore.setEpicVisible(false);
+    FeatureStore.setClickIssueDetail({});
   }
 
   refresh = () => {
@@ -44,7 +45,7 @@ class FeatureList extends Component {
 
   onEpicClick = () => {
     FeatureStore.getFeatureListData().then((res) => {
-      FeatureStore.setSprintData(res);
+      FeatureStore.setFeatureData(res);
     }).catch(() => {
     });
   };

@@ -130,7 +130,7 @@ export function updateIssue(data, projectId = AppState.currentMenuType.id) {
   return axios.put(`/agile/v1/projects/${projectId}/issues`, data);
 }
 
-export function updateStatus(transformId, issueId, objVerNum, proId = AppState.currentMenuType.id, applyType = 'agile') {
+export function updateStatus(transformId, issueId, objVerNum, applyType = 'agile', proId = AppState.currentMenuType.id) {
   return axios.put(`/agile/v1/projects/${proId}/issues/update_status?applyType=${applyType}&transformId=${transformId}&issueId=${issueId}&objectVersionNumber=${objVerNum}`);
 }
 
