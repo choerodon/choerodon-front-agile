@@ -3,6 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { Dropdown, Icon, Menu } from 'choerodon-ui';
 import IssueNav from './IssueNav';
 import TypeTag from '../../../../../../components/TypeTag';
+import { updateIssueType, updateIssue } from '../../../../../../api/NewIssueApi';
 
 @inject('AppState', 'HeaderStore')
 @observer class SprintHeader extends Component {
@@ -12,36 +13,79 @@ import TypeTag from '../../../../../../components/TypeTag';
     };
   }
 
-  // handleChangeType(type) {
-  //   const { issueId, summary, origin } = this.state;
-  //   const { issueId: id, onUpdate } = this.props;
-  //   const issueupdateTypeDTO = {
-  //     epicName: type.key === 'issue_epic' ? summary : undefined,
-  //     issueId,
-  //     objectVersionNumber: origin.objectVersionNumber,
-  //     typeCode: type.key,
-  //     issueTypeId: type.item.props.value,
-  //   };
-  //   updateIssueType(issueupdateTypeDTO)
-  //     .then((res) => {
-  //       loadIssue(id).then((response) => {
-  //         this.setState({
-  //           createdById: res.createdBy,
-  //         });
-  //         this.reloadIssue(origin.issueId);
-  //         onUpdate();
-  //       });
-  //     });
-  // }
+  handleChangeType = (type) => {
+    const {
+      store, reloadIssue, onUpdate,
+    } = this.props;
+    const issue = store.getIssue;
+    const {
+      issueTypeDTO = {}, issueId, objectVersionNumber, summary,
+    } = issue;
+    const { typeCode } = issueTypeDTO;
+    if (typeCode === 'feature') {
+      const issueUpdateDTO = {
+        issueId,
+        objectVersionNumber,
+        featureType: type.item.props.value,
+      };
+      updateIssue(issueUpdateDTO)
+        .then(() => {
+          if (reloadIssue) {
+            reloadIssue();
+          }
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
+    } else {
+      const issueUpdateTypeDTO = {
+        epicName: type.key === 'issue_epic' ? summary : undefined,
+        issueId,
+        objectVersionNumber,
+        typeCode: type.key,
+        issueTypeId: type.item.props.value,
+      };
+      updateIssueType(issueUpdateTypeDTO)
+        .then(() => {
+          if (reloadIssue) {
+            reloadIssue();
+          }
+          if (onUpdate) {
+            onUpdate();
+          }
+        });
+    }
+  };
 
   render() {
     const {
       store,
     } = this.props;
 
-    const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
+    let issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const issue = store.getIssue;
-    const { issueTypeDTO = {} } = issue;
+    const { issueTypeDTO = {}, featureDTO = {} } = issue;
+    const { typeCode } = issueTypeDTO;
+    const { featureType } = featureDTO;
+    let currentIssueType = issueTypeDTO;
+    if (typeCode === 'feature') {
+      issueTypeData = [
+        {
+          ...issueTypeDTO,
+          colour: '#29B6F6',
+          featureType: 'business',
+          name: '特性',
+          id: 'business',
+        }, {
+          ...issueTypeDTO,
+          colour: '#FFCA28',
+          featureType: 'enabler',
+          name: '使能',
+          id: 'enabler',
+        },
+      ];
+      currentIssueType = featureType === 'business' ? issueTypeData[0] : issueTypeData[1];
+    }
 
     const typeList = (
       <Menu
@@ -50,7 +94,7 @@ import TypeTag from '../../../../../../components/TypeTag';
           boxShadow: '0 5px 5px -3px rgba(0, 0, 0, 0.20), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12)',
           borderRadius: '2px',
         }}
-        // onClick={this.handleChangeType.bind(this)}
+        onClick={this.handleChangeType}
       >
         {
           issueTypeData.map(t => (
@@ -69,7 +113,7 @@ import TypeTag from '../../../../../../components/TypeTag';
       <div className="c7n-nav">
         {/* 转换类型 */}
         <div>
-          <Dropdown overlay={typeList} trigger={['click']} disabled={issueTypeDTO.code === 'sub_task'}>
+          <Dropdown overlay={typeList} trigger={['click']} disabled={issueTypeDTO.typeCode === 'sub_task'}>
             <div
               style={{
                 height: 50,
@@ -80,7 +124,7 @@ import TypeTag from '../../../../../../components/TypeTag';
               }}
             >
               <TypeTag
-                data={issueTypeDTO}
+                data={currentIssueType}
               />
               <Icon
                 type="arrow_drop_down"

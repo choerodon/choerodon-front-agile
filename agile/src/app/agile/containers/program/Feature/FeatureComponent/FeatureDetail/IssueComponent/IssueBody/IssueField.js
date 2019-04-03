@@ -2,15 +2,19 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { injectIntl } from 'react-intl';
-import Field from './Field/Field';
 import { returnBeforeTextUpload } from '../../../../../../../common/utils';
 import { updateStatus, updateIssue } from '../../../../../../../api/NewIssueApi';
 import { DatetimeAgo } from '../../../../../../../components/CommonComponent';
 import { STATUS } from '../../../../../../../common/Constant';
 import { getSelf } from '../../../../../../../api/CommonApi';
 import UserHead from '../../../../../../../components/UserHead';
+import {
+  Field, FieldAssignee, FieldVersion, FieldStatus, FieldSprint, FieldText,
+  FieldReporter, FieldPriority, FieldLabel, FieldFixVersion, FieldPI,
+  FieldEpicName, FieldEpic, FieldDateTime, FieldComponent, FieldTimeTrace,
+} from './Field';
 
-const readOnly = ['creationDate', 'lastUpdateDate'];
+const readOnly = ['creationDate', 'lastUpdateDate', 'pi'];
 
 @inject('AppState')
 @observer class IssueField extends Component {
@@ -31,6 +35,48 @@ const readOnly = ['creationDate', 'lastUpdateDate'];
     this.setState({
       currentRae: data,
     });
+  };
+
+  getFieldComponent = (field) => {
+    const { store } = this.props;
+    const issue = store.getIssue;
+    switch (field.code) {
+      case 'assignee':
+        return (<FieldAssignee {...this.props} />);
+      case 'influenceVersion':
+        return (<FieldVersion {...this.props} />);
+      case 'status':
+        return (<FieldStatus {...this.props} />);
+      case 'sprint':
+        return (<FieldSprint {...this.props} />);
+      case 'reporter':
+        return (<FieldReporter {...this.props} />);
+      case 'priority':
+        return (<FieldPriority {...this.props} />);
+      case 'label':
+        return (<FieldLabel {...this.props} />);
+      case 'version':
+        return (<FieldFixVersion {...this.props} />);
+      case 'epicName':
+        return (<FieldEpicName {...this.props} />);
+      case 'epic':
+        return (<FieldEpic {...this.props} />);
+      case 'creationDate':
+      case 'lastUpdateDate':
+        return (<FieldDateTime {...this.props} field={field} />);
+      case 'component':
+        return (<FieldComponent {...this.props} />);
+      case 'timeTrace':
+        return (<FieldTimeTrace {...this.props} />);
+      case 'pi':
+        return (<FieldPI {...this.props} />);
+      case 'benfitHypothesis':
+      case 'acceptanceCritera':
+      case 'summary':
+        return (<FieldText {...this.props} field={field} />);
+      default:
+        return (<Field {...this.props} />);
+    }
   };
 
   handleFieldChange = (field, value) => {
@@ -119,10 +165,8 @@ const readOnly = ['creationDate', 'lastUpdateDate'];
     const {
       statusMapDTO = {}, activePi = {}, epicName, reporterName,
       featureDTO = {}, creationDate, lastUpdateDate, assigneeId,
-      reporterId, reporterImageUrl,
+      reporterId, reporterImageUrl, issueId,
     } = issue;
-
-    const currentRae = store.getCurrentRae;
 
     const fields = [
       {
@@ -216,130 +260,48 @@ const readOnly = ['creationDate', 'lastUpdateDate'];
         system: true,
         required: true,
         type: 'select',
-        value: statusMapDTO.name,
-        renderReadMode: data => (
-          <div
-            style={{
-              background: STATUS[statusMapDTO.code],
-              color: '#fff',
-              borderRadius: '2px',
-              padding: '0 8px',
-              display: 'inline-block',
-              margin: '2px auto 2px 0',
-            }}
-          >
-            {data.value}
-          </div>
-        ),
       }, {
         code: 'pi',
         name: 'PI',
         system: true,
         required: true,
-        value: activePi.name,
       }, {
         code: 'epic',
         name: '史诗',
         system: true,
         required: true,
-        value: epicName,
       }, {
         code: 'reporter',
         name: '报告人',
         system: true,
         required: true,
-        value: reporterName,
-        renderReadMode: data => (
-          <UserHead
-            user={{
-              id: reporterId,
-              loginName: '',
-              realName: reporterName,
-              avatar: reporterImageUrl,
-            }}
-          />
-        ),
-        suffix: (
-          <span
-            role="none"
-            style={{
-              color: '#3f51b5',
-              cursor: 'pointer',
-              marginTop: '-3px',
-              display: 'inline-block',
-            }}
-            onClick={() => {
-              getSelf().then((res) => {
-                if (res.id !== assigneeId) {
-                  this.setState({
-                    currentRae: undefined,
-                    assigneeId: JSON.stringify(res),
-                    assigneeName: `${res.loginName}${res.realName}`,
-                    assigneeImageUrl: res.imageUrl,
-                  }, () => {
-                    this.handleFieldChange({ code: 'assigneeId' });
-                  });
-                }
-              });
-            }}
-          >
-            {'分配给我'}
-          </span>
-        ),
       }, {
         code: 'benfitHypothesis',
         name: '特性价值',
         system: true,
         required: true,
-        value: featureDTO.benfitHypothesis,
       }, {
         code: 'acceptanceCritera',
         name: '验收标准',
         system: true,
         required: true,
-        value: featureDTO.acceptanceCritera,
       }, {
         code: 'creationDate',
         name: '创建时间',
         system: true,
         required: true,
         value: creationDate,
-        renderReadMode: data => (<DatetimeAgo date={data.value} />),
       }, {
         code: 'lastUpdateDate',
         name: '更新时间',
         system: true,
         required: true,
-        value: lastUpdateDate,
-        renderReadMode: data => (<DatetimeAgo date={data.value} />),
       },
     ];
 
     return (
       <div className="c7n-content-wrapper">
-        {featureFields.map(field => (
-          <div className="line-start mt-10" key={field.code}>
-            <div className="c7n-property-wrapper">
-              <span className="c7n-property">
-                {`${field.name}：`}
-              </span>
-            </div>
-            <div className="c7n-value-wrapper">
-              <Field
-                field={field}
-                readOnly={readOnly.indexOf(field.code) !== -1}
-                changeRae={this.setCurrentRae}
-                currentRae={currentRae}
-                onOk={this.handleFieldChange}
-                onInit={this.onInit}
-                renderReadMode={field.renderReadMode}
-                renderOption={this.renderOption}
-                suffix={field.suffix}
-              />
-            </div>
-          </div>
-        ))
-        }
+        {issueId ? featureFields.map(field => (<span key={field.code}>{this.getFieldComponent(field)}</span>)) : ''}
       </div>
     );
   }
