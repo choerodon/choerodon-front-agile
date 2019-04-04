@@ -126,7 +126,7 @@ class EditArt extends Component {
     });
   }
 
-  getPIList = (artId) => {
+  getPIList = (artId, callback) => {
     getPIList(artId).then((res) => {
       this.setState({
         PiList: res.content.map(item => (
@@ -136,6 +136,10 @@ class EditArt extends Component {
             remainDays: this.calcRemainDays(item),
           })
         )),
+      }, () => {
+        if (callback) {
+          callback();
+        }
       });
     });
   }
@@ -270,9 +274,11 @@ class EditArt extends Component {
         objectVersionNumber: data.objectVersionNumber,
       }).then(() => {
         this.loadArt(() => {
-          ee.emitEvent('setCurrentTab');
+          this.getPIList(id, () => {
+            ee.emitEvent('setCurrentTab');
+          });
         });
-        this.getPIList(id);
+        
         this.setState({
           startArtModalVisible: false,
         });
