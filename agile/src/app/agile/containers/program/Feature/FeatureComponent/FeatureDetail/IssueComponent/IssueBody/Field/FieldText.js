@@ -25,17 +25,32 @@ const { TextArea } = Input;
   updateIssueField = () => {
     const { newValue } = this.state;
     const {
-      store, onUpdate, reloadIssue, field,
+      store, onUpdate, reloadIssue, field, feature,
     } = this.props;
     const { code } = field;
     const issue = store.getIssue;
-    const { issueId, objectVersionNumber, [code]: value } = issue;
+    const {
+      issueId, objectVersionNumber, [code]: value, featureDTO = {},
+    } = issue;
+    const { id, objectVersionNumber: featureObjNum } = featureDTO;
     if (newValue && newValue.trim() && value !== newValue.trim()) {
-      const obj = {
+      let obj = {
         issueId,
         objectVersionNumber,
-        [code]: newValue.trim(),
       };
+      if (feature) {
+        obj = {
+          ...obj,
+          featureDTO: {
+            id,
+            issueId,
+            objectVersionNumber: featureObjNum,
+            [code]: newValue.trim(),
+          },
+        };
+      } else {
+        obj[code] = newValue.trim();
+      }
       updateIssue(obj)
         .then(() => {
           if (onUpdate) {
@@ -49,10 +64,12 @@ const { TextArea } = Input;
   };
 
   render() {
-    const { store, field } = this.props;
+    const { store, field, feature } = this.props;
     const { code, name } = field;
     const issue = store.getIssue;
-    const { [code]: value } = issue;
+    const { featureDTO = {} } = issue;
+    const value = feature ? featureDTO[code] : issue[code];
+
     return (
       <div className="line-start mt-10">
         <div className="c7n-property-wrapper">
@@ -83,8 +100,8 @@ const { TextArea } = Input;
                   });
                 }}
                 onPressEnter={() => {
-                  this.updateIssueField();
                   if (this.TextEditToggle && this.TextEditToggle.leaveEditing) {
+                    this.updateIssueField();
                     this.TextEditToggle.leaveEditing();
                   }
                 }}

@@ -21,7 +21,7 @@ import IssueBranch from './IssueBranch/IssueBranch';
 
   render() {
     const {
-      store, reloadIssue, onUpdate, loginUserId, hasPermission,
+      store, reloadIssue,
     } = this.props;
     const issue = store.getIssue;
     const { issueTypeDTO = {} } = issue;
@@ -36,14 +36,17 @@ import IssueBranch from './IssueBranch/IssueBranch';
             {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1
               ? <IssueWiki store={store} /> : ''
             }
-            <IssueWiki store={store} />
             <IssueCommit store={store} reloadIssue={reloadIssue} />
-            <IssueWorkLog store={store} reloadIssue={reloadIssue} />
+            {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1
+              ? <IssueWorkLog store={store} reloadIssue={reloadIssue} /> : ''
+            }
             <IssueLog store={store} />
             {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1
               ? <SubTask store={store} /> : ''
             }
-            <IssueLink store={store} />
+            {issueTypeDTO.code && ['feature'].indexOf(issueTypeDTO.code) !== -1
+              ? <IssueLink store={store} /> : ''
+            }
             {issueTypeDTO.code && ['feature'].indexOf(issueTypeDTO.code) !== -1
               ? <IssueBranch store={store} /> : ''
             }

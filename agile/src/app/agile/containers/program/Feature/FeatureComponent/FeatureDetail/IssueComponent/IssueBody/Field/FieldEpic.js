@@ -92,7 +92,11 @@ const { Text, Edit } = TextEditToggle;
                   >
                     {epicName}
                   </div>
-                ) : '无'
+                ) : (
+                  <div>
+                    {'无'}
+                  </div>
+                )
               }
             </Text>
             <Edit>

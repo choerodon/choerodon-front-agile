@@ -3,9 +3,9 @@ import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { Select } from 'choerodon-ui';
 import { injectIntl } from 'react-intl';
+import _ from 'lodash';
 import TextEditToggle from '../../../../../../../../components/TextEditToggle';
-import { STATUS } from '../../../../../../../../common/Constant';
-import { loadStatus, updateStatus } from '../../../../../../../../api/NewIssueApi';
+import { loadComponents, updateStatus } from '../../../../../../../../api/NewIssueApi';
 
 const { Option } = Select;
 const { Text, Edit } = TextEditToggle;
@@ -15,7 +15,7 @@ const { Text, Edit } = TextEditToggle;
   constructor(props) {
     super(props);
     this.state = {
-      originStatus: [],
+      originComponents: [],
       selectLoading: true,
       transformId: undefined,
       newStatusId: undefined,
@@ -23,7 +23,7 @@ const { Text, Edit } = TextEditToggle;
   }
 
   componentDidMount() {
-    this.loadIssueStatus();
+    this.loadIssueComponents();
   }
 
   transToArr = (arr, pro, type = 'string') => {
@@ -36,30 +36,21 @@ const { Text, Edit } = TextEditToggle;
     }
   }
 
-  loadIssueStatus = () => {
-    const { store } = this.props;
-    const issue = store.getIssue;
-    const {
-      issueTypeDTO = {},
-      issueId,
-      statusId,
-    } = issue;
-    const typeId = issueTypeDTO.id;
-    loadStatus(statusId, issueId, typeId, 'program').then((res) => {
+  loadIssueComponents = () => {
+    loadComponents().then((res) => {
       this.setState({
-        originStatus: res,
+        originComponents: res.content,
         selectLoading: false,
-        newStatusId: statusId,
       });
     });
   };
 
-  updateIssueStatus = () => {
-    const { transformId } = this.state;
+  updateIssueComponents = () => {
+    const { newComponents } = this.state;
     const { store, onUpdate, reloadIssue } = this.props;
     const issue = store.getIssue;
     const { issueId, objectVersionNumber } = issue;
-    updateStatus(transformId, issueId, objectVersionNumber, 'programe')
+    updateStatus(newComponents, issueId, objectVersionNumber, 'programe')
       .then(() => {
         if (onUpdate) {
           onUpdate();
@@ -73,8 +64,18 @@ const { Text, Edit } = TextEditToggle;
       });
   };
 
+  transToArr(arr, pro, type = 'string') {
+    if (!arr.length) {
+      return type === 'string' ? '无' : [];
+    } else if (typeof arr[0] === 'object') {
+      return type === 'string' ? _.map(arr, pro).join() : _.map(arr, pro);
+    } else {
+      return type === 'string' ? arr.join() : arr;
+    }
+  }
+
   render() {
-    const { selectLoading, originStatus } = this.state;
+    const { selectLoading, originComponents } = this.state;
     const { store, hasPermission } = this.props;
     const issue = store.getIssue;
     const { componentIssueRelDTOList = {}, statusId } = issue;
@@ -88,7 +89,7 @@ const { Text, Edit } = TextEditToggle;
         <div className="c7n-value-wrapper">
           <TextEditToggle
             formKey="component"
-            onSubmit={this.updateIssueStatus}
+            onSubmit={this.updateIssueComponents}
             originData={componentIssueRelDTOList.map(component => component.id)}
           >
             <Text>
@@ -100,7 +101,6 @@ const { Text, Edit } = TextEditToggle;
             </Text>
             <Edit>
               <Select
-                value={this.transToArr(componentIssueRelDTOList, 'name', 'array')}
                 loading={selectLoading}
                 ref={(e) => {
                   this.componentRef = e;
@@ -112,20 +112,9 @@ const { Text, Edit } = TextEditToggle;
                 getPopupContainer={triggerNode => triggerNode.parentNode}
                 tokenSeparators={[',']}
                 style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
-                onFocus={() => {
-                  this.setState({
-                    selectLoading: true,
-                  });
-                  loadComponents().then((res) => {
-                    this.setState({
-                      originComponents: res.content,
-                      selectLoading: false,
-                    });
-                  });
-                }}
                 onChange={(value) => {
                   this.setState({
-                    componentIssueRelDTOList: value.filter(v => v && v.trim()).map(
+                    newComponents: value.filter(v => v && v.trim()).map(
                       item => item.trim().substr(0, 10),
                     ),
                   });

@@ -97,7 +97,11 @@ const { Text, Edit } = TextEditToggle;
                   >
                     {name}
                   </div>
-                ) : '无'
+                ) : (
+                  <div>
+                    {'无'}
+                  </div>
+                )
               }
             </Text>
             <Edit>

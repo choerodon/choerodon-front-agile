@@ -72,6 +72,7 @@ const readOnly = ['creationDate', 'lastUpdateDate', 'pi'];
         return (<FieldPI {...this.props} />);
       case 'benfitHypothesis':
       case 'acceptanceCritera':
+        return (<FieldText {...this.props} field={field} feature />);
       case 'summary':
         return (<FieldText {...this.props} field={field} />);
       default:

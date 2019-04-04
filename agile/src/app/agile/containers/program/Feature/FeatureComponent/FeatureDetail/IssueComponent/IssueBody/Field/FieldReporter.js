@@ -8,6 +8,7 @@ import TextEditToggle from '../../../../../../../../components/TextEditToggle';
 import UserHead from '../../../../../../../../components/UserHead';
 import { updateIssue } from '../../../../../../../../api/NewIssueApi';
 import { getUsers, getSelf } from '../../../../../../../../api/CommonApi';
+import './Field.scss';
 
 const { Option } = Select;
 const { Text, Edit } = TextEditToggle;
@@ -122,7 +123,11 @@ const { Text, Edit } = TextEditToggle;
                       avatar: reporterImageUrl,
                     }}
                   />
-                ) : '无'
+                ) : (
+                  <div>
+                    {'无'}
+                  </div>
+                )
               }
             </Text>
             <Edit>
