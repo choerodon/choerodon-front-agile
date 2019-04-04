@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Select } from 'choerodon-ui';
 import { injectIntl } from 'react-intl';
 import TextEditToggle from '../../../../../../../../components/TextEditToggle';
-import { STATUS } from '../../../../../../../../common/Constant';
-import { loadStatus, updateStatus } from '../../../../../../../../api/NewIssueApi';
 
-const { Option } = Select;
 const { Text, Edit } = TextEditToggle;
 
 @inject('AppState')

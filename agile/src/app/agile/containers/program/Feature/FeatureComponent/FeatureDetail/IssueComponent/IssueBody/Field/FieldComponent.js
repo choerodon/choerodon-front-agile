@@ -34,7 +34,7 @@ const { Text, Edit } = TextEditToggle;
     } else {
       return type === 'string' ? arr.join() : arr;
     }
-  }
+  };
 
   loadIssueComponents = () => {
     loadComponents().then((res) => {
@@ -50,7 +50,7 @@ const { Text, Edit } = TextEditToggle;
     const { store, onUpdate, reloadIssue } = this.props;
     const issue = store.getIssue;
     const { issueId, objectVersionNumber } = issue;
-    updateStatus(newComponents, issueId, objectVersionNumber, 'programe')
+    updateStatus(newComponents, issueId, objectVersionNumber, 'program')
       .then(() => {
         if (onUpdate) {
           onUpdate();
@@ -63,16 +63,6 @@ const { Text, Edit } = TextEditToggle;
         });
       });
   };
-
-  transToArr(arr, pro, type = 'string') {
-    if (!arr.length) {
-      return type === 'string' ? '无' : [];
-    } else if (typeof arr[0] === 'object') {
-      return type === 'string' ? _.map(arr, pro).join() : _.map(arr, pro);
-    } else {
-      return type === 'string' ? arr.join() : arr;
-    }
-  }
 
   render() {
     const { selectLoading, originComponents } = this.state;
