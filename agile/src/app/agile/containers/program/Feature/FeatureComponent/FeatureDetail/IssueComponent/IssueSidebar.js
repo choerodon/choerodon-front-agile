@@ -72,7 +72,7 @@ import { updateIssueType, updateIssue } from '../../../../../../api/NewIssueApi'
     const issue = store.getIssue;
     const { issueTypeDTO = {}, featureDTO = {} } = issue;
     const { typeCode } = issueTypeDTO;
-    const { featureType } = featureDTO;
+    const { featureType } = featureDTO || {};
     let currentIssueType = issueTypeDTO;
     if (typeCode === 'feature') {
       issueTypeData = [

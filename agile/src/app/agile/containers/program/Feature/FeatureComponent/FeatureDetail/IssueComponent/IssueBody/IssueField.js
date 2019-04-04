@@ -163,11 +163,7 @@ const readOnly = ['creationDate', 'lastUpdateDate', 'pi'];
   render() {
     const { store } = this.props;
     const issue = store.getIssue;
-    const {
-      statusMapDTO = {}, activePi = {}, epicName, reporterName,
-      featureDTO = {}, creationDate, lastUpdateDate, assigneeId,
-      reporterId, reporterImageUrl, issueId,
-    } = issue;
+    const { issueId } = issue;
 
     const fields = [
       {
@@ -204,6 +200,11 @@ const readOnly = ['creationDate', 'lastUpdateDate', 'pi'];
       }, {
         code: 'epic',
         name: '史诗',
+        system: true,
+        required: true,
+      }, {
+        code: 'pi',
+        name: 'PI',
         system: true,
         required: true,
       }, {
@@ -251,6 +252,11 @@ const readOnly = ['creationDate', 'lastUpdateDate', 'pi'];
         name: '特性类型',
         system: true,
         required: true,
+      }, {
+        code: 'timeTrace',
+        name: '时间跟踪',
+        system: true,
+        required: true,
       },
     ];
 
@@ -291,7 +297,6 @@ const readOnly = ['creationDate', 'lastUpdateDate', 'pi'];
         name: '创建时间',
         system: true,
         required: true,
-        value: creationDate,
       }, {
         code: 'lastUpdateDate',
         name: '更新时间',

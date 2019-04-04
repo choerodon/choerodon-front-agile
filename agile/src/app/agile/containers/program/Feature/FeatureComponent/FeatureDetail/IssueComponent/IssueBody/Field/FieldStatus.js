@@ -48,7 +48,7 @@ const { Text, Edit } = TextEditToggle;
     const issue = store.getIssue;
     const { issueId, objectVersionNumber } = issue;
     if (transformId) {
-      updateStatus(transformId, issueId, objectVersionNumber, 'programe')
+      updateStatus(transformId, issueId, objectVersionNumber, 'program')
         .then(() => {
           if (onUpdate) {
             onUpdate();

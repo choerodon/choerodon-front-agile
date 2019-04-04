@@ -33,14 +33,12 @@ const { TextArea } = Input;
       issueId, objectVersionNumber, [code]: value, featureDTO = {},
     } = issue;
     const { id, objectVersionNumber: featureObjNum } = featureDTO;
-    if (newValue && newValue.trim() && value !== newValue.trim()) {
-      let obj = {
-        issueId,
-        objectVersionNumber,
-      };
+    if (value !== newValue.trim()) {
+      let obj = false;
       if (feature) {
         obj = {
-          ...obj,
+          issueId,
+          objectVersionNumber,
           featureDTO: {
             id,
             issueId,
@@ -48,18 +46,24 @@ const { TextArea } = Input;
             [code]: newValue.trim(),
           },
         };
-      } else {
-        obj[code] = newValue.trim();
+      } else if (newValue.trim()) {
+        obj = {
+          issueId,
+          objectVersionNumber,
+          [code]: newValue.trim(),
+        };
       }
-      updateIssue(obj)
-        .then(() => {
-          if (onUpdate) {
-            onUpdate();
-          }
-          if (reloadIssue) {
-            reloadIssue();
-          }
-        });
+      if (obj) {
+        updateIssue(obj)
+          .then(() => {
+            if (onUpdate) {
+              onUpdate();
+            }
+            if (reloadIssue) {
+              reloadIssue();
+            }
+          });
+      }
     }
   };
 
@@ -79,7 +83,9 @@ const { TextArea } = Input;
         </div>
         <div className="c7n-value-wrapper">
           <TextEditToggle
-            ref={(e) => { this.TextEditToggle = e; }}
+            saveRef={(e) => {
+              this.TextEditToggle = e;
+            }}
             formKey={code}
             onSubmit={this.updateIssueField}
             originData={value}
