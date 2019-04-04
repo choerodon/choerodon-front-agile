@@ -6,11 +6,13 @@ import {
   Form, Input, Tabs, DatePicker,
   Button, Divider, Select,
 } from 'choerodon-ui';
+import EventEmitter from 'wolfy87-eventemitter';
 import './ArtForm.scss';
 
 import SelectFocusLoad from '../../../../../../../components/SelectFocusLoad';
 import PIList from './PIList';
 
+const ee = new EventEmitter();
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -32,6 +34,7 @@ class ArtForm extends Component {
   componentDidMount() {
     const { form, initValue } = this.props;
     form.setFieldsValue(initValue);
+    ee.addListener('setCurrentTab', this.handleSetCurrentTab);
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -70,6 +73,12 @@ class ArtForm extends Component {
     form.setFieldsValue(values);
   }
 
+  handleSetCurrentTab = () => {
+    this.setState({
+      currentTab: '4',
+    });
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     // eslint-disable-next-line no-shadow
@@ -79,7 +88,7 @@ class ArtForm extends Component {
     const { currentTab } = this.state;
     return (
       <Form className="c7nagile-ArtForm">
-        <Tabs defaultActiveKey="1" onChange={this.handleTabChange}>
+        <Tabs defaultActiveKey="1" activeKey={currentTab} onChange={this.handleTabChange}>
           <TabPane tab="ART设置" key="1">
             <FormItem>
               {getFieldDecorator('rteId', {
@@ -211,6 +220,7 @@ class ArtForm extends Component {
 
 ArtForm.propTypes = propTypes;
 
+export { ee };
 export default Form.create({
   onValuesChange(props, ...args) {
     props.onChange(...args);

@@ -10,7 +10,7 @@ import {
 import moment from 'moment';
 import { artListLink } from '../../../../common/utils';
 import { ArtInfo, ArtSetting, ReleaseArt } from './components';
-
+import { ee } from './components/ArtSetting';
 import {
   getArtById, editArt, getArtsByProjectId, beforeStop, stopArt, startArt,
 } from '../../../../api/ArtApi';
@@ -126,7 +126,7 @@ class EditArt extends Component {
     });
   }
 
-  getPIList = (artId) => {
+  getPIList = (artId, callback) => {
     getPIList(artId).then((res) => {
       this.setState({
         PiList: res.content.map(item => (
@@ -136,6 +136,10 @@ class EditArt extends Component {
             remainDays: this.calcRemainDays(item),
           })
         )),
+      }, () => {
+        if (callback) {
+          callback();
+        }
       });
     });
   }
@@ -151,7 +155,7 @@ class EditArt extends Component {
     }
   }
 
-  loadArt = () => {
+  loadArt = (callback) => {
     // eslint-disable-next-line react/destructuring-assignment
     const { id } = this.props.match.params;
     this.setState({
@@ -187,6 +191,10 @@ class EditArt extends Component {
         loading: false,
         formData,
         data,
+      }, () => {
+        if (callback) {
+          callback();
+        }
       });
     });
   }
@@ -265,8 +273,12 @@ class EditArt extends Component {
         id,
         objectVersionNumber: data.objectVersionNumber,
       }).then(() => {
-        this.loadArt();
-        this.getPIList(id);
+        this.loadArt(() => {
+          this.getPIList(id, () => {
+            ee.emitEvent('setCurrentTab');
+          });
+        });
+        
         this.setState({
           startArtModalVisible: false,
         });

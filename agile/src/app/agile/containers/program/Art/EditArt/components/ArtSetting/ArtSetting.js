@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 
-import ArtForm from './component/ArtForm';
+import ArtForm, { ee } from './component/ArtForm';
 
 const propTypes = {
   initValue: PropTypes.shape({}).isRequired,
@@ -24,4 +24,5 @@ const ArtSetting = ({
 
 ArtSetting.propTypes = propTypes;
 
+export { ee };
 export default memo(ArtSetting);
