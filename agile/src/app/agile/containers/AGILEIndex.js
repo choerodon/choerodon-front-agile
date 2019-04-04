@@ -26,7 +26,7 @@ const WORKCALENDARINDEX = asyncRouter(() => import('./organization/WorkCalendar'
 const MESSAGENOTIFICATION = asyncRouter(() => import('./project/MessageNotification')); 
 
 const ART = asyncRouter(() => import('./program/Art')); 
-const BOARD = asyncRouter(() => import('./program/Board')); 
+const KANBAN = asyncRouter(() => import('./program/Kanban')); 
 const FEATURE = asyncRouter(() => import('./program/Feature'));
 const PIAIMS = asyncRouter(() => import('./program/PI'));
 const PROGRAMSETTING = asyncRouter(() => import('./program/ProgramSetting'));
@@ -69,7 +69,7 @@ class AGILEIndex extends React.Component {
 
           <Route path={`${match.url}/workCalendar`} component={WORKCALENDARINDEX} />
           <Route path={`${match.url}/art`} component={ART} />
-          <Route path={`${match.url}/board`} component={BOARD} />          
+          <Route path={`${match.url}/kanban`} component={KANBAN} />          
           <Route path={`${match.url}/feature`} component={FEATURE} /> 
           <Route path={`${match.url}/pi`} component={PIAIMS} />
           <Route path={`${match.url}/programSetting`} component={PROGRAMSETTING} /> 

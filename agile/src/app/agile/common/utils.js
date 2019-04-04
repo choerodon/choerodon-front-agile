@@ -281,10 +281,10 @@ export function PIListLink() {
   return commonLink('/pi');
 }
 export function ProgramBoardLink() { 
-  return commonLink('/board');
+  return commonLink('/kanban');
 }
 export function ProgramBoardSettingLink() { 
-  return commonLink('/board/setting');
+  return commonLink('/kanban/setting');
 }
 export const getProjectId = () => AppState.currentMenuType.id;
 export const getProjectName = () => AppState.currentMenuType.name;
