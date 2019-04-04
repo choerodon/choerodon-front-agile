@@ -10,7 +10,7 @@ import {
 import moment from 'moment';
 import { artListLink } from '../../../../common/utils';
 import { ArtInfo, ArtSetting, ReleaseArt } from './components';
-
+import { ee } from './components/ArtSetting';
 import {
   getArtById, editArt, getArtsByProjectId, beforeStop, stopArt, startArt,
 } from '../../../../api/ArtApi';
@@ -151,7 +151,7 @@ class EditArt extends Component {
     }
   }
 
-  loadArt = () => {
+  loadArt = (callback) => {
     // eslint-disable-next-line react/destructuring-assignment
     const { id } = this.props.match.params;
     this.setState({
@@ -187,6 +187,10 @@ class EditArt extends Component {
         loading: false,
         formData,
         data,
+      }, () => {
+        if (callback) {
+          callback();
+        }
       });
     });
   }
@@ -265,7 +269,9 @@ class EditArt extends Component {
         id,
         objectVersionNumber: data.objectVersionNumber,
       }).then(() => {
-        this.loadArt();
+        this.loadArt(() => {
+          ee.emitEvent('setCurrentTab');
+        });
         this.getPIList(id);
         this.setState({
           startArtModalVisible: false,
