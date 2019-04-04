@@ -19,14 +19,20 @@ import { updateIssueType, updateIssue } from '../../../../../../api/NewIssueApi'
     } = this.props;
     const issue = store.getIssue;
     const {
-      issueTypeDTO = {}, issueId, objectVersionNumber, summary,
+      issueTypeDTO = {}, issueId, objectVersionNumber, summary, featureDTO = {},
     } = issue;
+    const { id, objectVersionNumber: featureObjNum } = featureDTO;
     const { typeCode } = issueTypeDTO;
     if (typeCode === 'feature') {
       const issueUpdateDTO = {
         issueId,
         objectVersionNumber,
-        featureType: type.item.props.value,
+        featureDTO: {
+          id,
+          issueId,
+          objectVersionNumber: featureObjNum,
+          featureType: type.item.props.value,
+        },
       };
       updateIssue(issueUpdateDTO)
         .then(() => {
@@ -134,7 +140,7 @@ import { updateIssueType, updateIssue } from '../../../../../../api/NewIssueApi'
           </Dropdown>
         </div>
         {/* 锚点 */}
-        <IssueNav typeCode={issueTypeDTO.code} />
+        <IssueNav typeCode={issueTypeDTO.typeCode} />
       </div>
     );
   }

@@ -52,7 +52,11 @@ const navIcon = {
     icon: 'branch',
   },
 };
-const subTaskNoNav = ['sub_task', 'link_task'];
+
+const noDisplay = {
+  sub_task: ['sub_task', 'link_task'],
+  feature: ['sub_task', 'wiki', 'branch', 'log', 'link_task'],
+};
 let sign = true;
 
 @inject('AppState')
@@ -88,7 +92,7 @@ let sign = true;
   getCurrentNav = () => {
     const { typeCode } = this.props;
     const eles = navList.filter(
-      item => typeCode !== 'sub_task' || subTaskNoNav.indexOf(item) === -1,
+      item => (noDisplay[typeCode] ? noDisplay[typeCode].indexOf(item) === -1 : true),
     );
     return _.find(eles, i => this.isInLook(document.getElementById(i)));
   };
@@ -119,7 +123,7 @@ let sign = true;
     return (
       <ul className="c7n-nav-ul" style={{ padding: 0 }}>
         {navList.filter(
-          item => typeCode !== 'sub_task' || subTaskNoNav.indexOf(item) === -1,
+          item => (noDisplay[typeCode] ? noDisplay[typeCode].indexOf(item) === -1 : true),
         ).map(navItem => (
           <Tooltip placement="right" title={intl.formatMessage({ id: `issue.${navItem}` })} key={navItem}>
             <li id={`${navItem}-nav`} className={`c7n-li ${nav === navItem ? 'c7n-li-active' : ''}`}>
