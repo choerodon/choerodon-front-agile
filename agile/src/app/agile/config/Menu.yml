@@ -83,10 +83,10 @@
         sort: 13
         permission:
           - 'agile-service.art.queryArtList'
-    - "programBoard":
+    - "programKanban":
         icon: table_chart
         category: PROGRAM
-        Routes: /agile/board
+        Routes: /agile/kanban
         sort: 14
         permission:
           - 'agile-service.board.queryByOptionsInProgram'
