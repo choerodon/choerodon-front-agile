@@ -273,7 +273,7 @@ const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
               </div>
             </div>
             {/* 主题 */}
-            <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
+            <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start', width: '360px' }}>
               <ReadAndEdit
                 callback={this.setCurrentRae}
                 thisType="summary"

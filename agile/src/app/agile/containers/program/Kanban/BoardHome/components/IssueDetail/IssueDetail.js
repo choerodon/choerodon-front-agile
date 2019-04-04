@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import FeatureDetail from '../../../../Feature/FeatureDetail';
+import EditIssue from '../../../../Feature/FeatureComponent/FeatureDetail/EditFeature';
 import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
 import './IssueDetail.scss';
 
@@ -19,7 +19,7 @@ class IssueDetail extends Component {
   render() {
     const { refresh, HeaderStore } = this.props;
     return KanbanStore.getClickedIssue ? (
-      <FeatureDetail
+      <EditIssue
         key={KanbanStore.getClickIssueDetail.issueId}
         store={KanbanStore}
         onRef={this.onRef}

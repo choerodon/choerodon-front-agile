@@ -169,23 +169,26 @@ const { Option } = Select;
 
   render() {
     const {
-      field, readOnly, currentRae, onOk,
+      field, readOnly, currentRae, onOk, suffix,
     } = this.props;
     return (
-      <ReadAndEdit
-        readOnly={readOnly}
-        callback={this.changeRae}
-        thisType={field.code}
-        current={currentRae}
-        handleEnter
-        origin={field.optionId || field.value}
-        onOk={onOk}
-        onCancel={this.resetValue}
-        onInit={this.onInit}
-        readModeContent={this.renderReadMode()}
-      >
-        {readOnly ? '' : this.renderField()}
-      </ReadAndEdit>
+      <React.Fragment>
+        <ReadAndEdit
+          readOnly={readOnly}
+          callback={this.changeRae}
+          thisType={field.code}
+          current={currentRae}
+          handleEnter
+          origin={field.optionId || field.value}
+          onOk={onOk}
+          onCancel={this.resetValue}
+          onInit={this.onInit}
+          readModeContent={this.renderReadMode()}
+        >
+          {readOnly ? '' : this.renderField()}
+        </ReadAndEdit>
+        {suffix}
+      </React.Fragment>
     );
   }
 }

@@ -89,10 +89,13 @@ class PIAims extends Component {
     if (artId) {
       getPIList(artId).then((PIList) => {
         PIStore.setPIList(PIList.content);
+        const doingPI = PIList.content.find(item => item.statusCode === 'doing');
         this.setState({
-          selectedPIId: PIList.content[0] && PIList.content[0].id,
+          selectedPIId: doingPI ? doingPI.id : (PIList.content[0] && PIList.content[0].id),
+        }, () => {
+          const { selectedPIId } = this.state;
+          this.getPIAims(selectedPIId);
         });
-        this.getPIAims(PIList.content[0] && PIList.content[0].id);
       });
     } else {
       PIStore.setPIAimsLoading(false);

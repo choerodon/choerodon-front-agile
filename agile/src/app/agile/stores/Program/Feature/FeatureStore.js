@@ -108,17 +108,6 @@ class FeatureStore {
     return this.changeParentShow;
   }
 
-  // 当前编辑
-  @observable currentRae = {};
-
-  @action setCurrentRae(data) {
-    this.currentRae = data;
-  }
-
-  @computed get getCurrentRae() {
-    return this.currentRae;
-  }
-
   // issue
   @observable issue = {};
 
@@ -395,7 +384,9 @@ class FeatureStore {
   }
 
   getFeatureListData = () => {
-    const args = {};
+    const args = {
+      advancedSearchArgs: {},
+    };
     if (this.chosenEpic !== 'all') {
       if (this.chosenEpic === 'unset') {
         args.advancedSearchArgs.noEpic = 'true';

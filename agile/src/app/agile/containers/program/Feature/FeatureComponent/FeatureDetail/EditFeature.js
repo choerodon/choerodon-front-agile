@@ -9,7 +9,6 @@ import {
   loadBranchs, loadDatalogs, loadLinkIssues,
   loadIssue, loadWorklogs, loadWikies,
 } from '../../../../../api/NewIssueApi';
-import { getUsers } from '../../../../../api/CommonApi';
 import CopyIssue from '../../../../../components/CopyIssue';
 import TransformSubIssue from '../../../../../components/TransformSubIssue';
 import TransformFromSubIssue from '../../../../../components/TransformFromSubIssue';
@@ -24,111 +23,19 @@ const { AppState } = stores;
 let loginUserId;
 let hasPermission;
 class CreateSprint extends Component {
-  debounceFilterIssues = _.debounce((input) => {
-    this.setState({
-      selectLoading: true,
-    });
-    getUsers(input).then((res) => {
-      this.setState({
-        originUsers: res.content,
-        selectLoading: false,
-      });
-    });
-  }, 500);
-
   constructor(props) {
     super(props);
     this.needBlur = true;
     this.componentRef = React.createRef();
     this.state = {
-      createdById: undefined,
       issueLoading: false,
-      flag: undefined,
-      selectLoading: true,
-      saveLoading: false,
-      rollup: false,
-      edit: false,
-      addCommit: false,
-      addCommitDes: '',
-      dailyLogShow: false,
-      createLoading: false,
-      createSubTaskShow: false,
-      createLinkTaskShow: false,
-      createBranchShow: false,
       assigneeShow: false,
       changeParentShow: false,
-      editDesShow: false,
       copyIssueShow: false,
       transformSubIssueShow: false,
       origin: {},
-      loading: true,
-      nav: 'detail',
-      editDes: undefined,
-      editCommentId: undefined,
-      editComment: undefined,
-      editLogId: undefined,
-      editLog: undefined,
-      currentRae: undefined,
-      issueId: undefined,
       assigneeId: undefined,
-      assigneeName: '',
-      assigneeImageUrl: undefined,
-      epicId: undefined,
-      estimateTime: undefined,
-      remainingTime: undefined,
-      epicName: '',
-      issueNum: undefined,
-      typeCode: 'story',
-      issueTypeDTO: {},
-      parentIssueId: undefined,
-      reporterId: undefined,
-      reporterImageUrl: undefined,
-      sprintId: undefined,
-      sprintName: '',
-      statusId: undefined,
-      statusCode: undefined,
-      statusMapDTO: {},
-      storyPoints: undefined,
-      creationDate: undefined,
-      lastUpdateDate: undefined,
-      statusName: '',
-      priorityName: '',
-      priorityId: false,
-      priorityColor: '#FFFFFF',
-      priorityDTO: {},
-      reporterName: '',
-      summary: '',
-      description: '',
-      versionIssueRelDTOList: [],
-      componentIssueRelDTOList: [],
-      activeSprint: {},
-      closeSprint: [],
-      worklogs: [],
-      datalogs: [],
-      fileList: [],
-      issueCommentDTOList: [],
-      issueLinkDTOList: [],
-      labelIssueRelDTOList: [],
-      subIssueDTOList: [],
       linkIssues: [],
-      fixVersions: [],
-      influenceVersions: [],
-      fixVersionsFixed: [],
-      influenceVersionsFixed: [],
-      branchs: {},
-      originStatus: [],
-      originPriorities: [],
-      originComponents: [],
-      originVersions: [],
-      originLabels: [],
-      originEpics: [],
-      originUsers: [],
-      originSprints: [],
-      originFixVersions: [],
-      originInfluenceVersions: [],
-      transformId: false,
-      addWiki: false,
-      wikies: [],
     };
   }
 
@@ -187,9 +94,7 @@ class CreateSprint extends Component {
   };
 
   render() {
-    const menu = AppState.currentMenuType;
     this.needBlur = true;
-    const { type, id: projectId, organizationId: orgId } = menu;
     const {
       store,
       backUrl,
@@ -198,41 +103,16 @@ class CreateSprint extends Component {
       onUpdate,
     } = this.props;
     const {
-      issueTypeDTO,
       assigneeId,
       assigneeShow,
       changeParentShow,
       copyIssueShow,
       linkIssues,
-      issueId,
-      reporterId,
-      reporterName,
-      reporterImageUrl,
       origin,
       issueLoading,
       transformSubIssueShow,
       transformFromSubIssueShow,
-      issueNum,
-      originUsers,
-      createdById,
-      parentIssueId,
-      parentIssueNum,
-      summary,
-      remainingTime,
-      storyPoints,
     } = this.state;
-    const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
-    const typeCode = issueTypeDTO ? issueTypeDTO.typeCode : '';
-    const typeId = issueTypeDTO ? issueTypeDTO.id : '';
-    const currentType = issueTypeData.find(t => t.id === typeId);
-    let issueTypes = [];
-    if (currentType) {
-      issueTypes = issueTypeData.filter(t => (t.stateMachineId === currentType.stateMachineId
-        && t.typeCode !== typeCode && t.typeCode !== 'sub_task'
-      ));
-      issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? issueTypes : issueTypes.filter(item => item.typeCode !== 'feature');
-    }
-
 
     return (
       <div className="choerodon-modal-editIssue" style={style}>
@@ -258,6 +138,8 @@ class CreateSprint extends Component {
         }
         <IssueSidebar
           store={store}
+          reloadIssue={this.loadIssueDetail}
+          onUpdate={onUpdate}
         />
         <div className="c7n-content">
           <IssueHeader
@@ -272,6 +154,9 @@ class CreateSprint extends Component {
           <IssueBody
             store={store}
             reloadIssue={this.loadIssueDetail}
+            onUpdate={onUpdate}
+            loginUserId={loginUserId}
+            hasPermission={hasPermission}
           />
         </div>
         {

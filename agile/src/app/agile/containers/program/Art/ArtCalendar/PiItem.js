@@ -44,7 +44,7 @@ const STATUS = {
   },
 };
 const SprintItem = ({
-  borderColor, sprint,
+  borderColor, sprint, todayIsBetween,
 }) => {
   const isDoing = sprint.statusCode === 'started';
   return (
@@ -55,12 +55,13 @@ const SprintItem = ({
       }}
     >
       <Popover
+        className={`PiItem-pi-sprintPopover ${STATUSCODES[sprint.statusCode]}`}
         getPopupContainer={triggerNode => triggerNode.parentNode}
         content={<CardTitle data={sprint} type="sprint" />}
         title={null}
         placement="bottomLeft"
       >
-        <div style={{ padding: '0 10px' }}>
+        <div style={{ padding: '0 10px', background: `${todayIsBetween ? '#4D90FE' : '#fff'}`, color: `${todayIsBetween ? '#fff' : '#000'}` }}>
           {sprint.sprintName}
         </div>
       </Popover>
@@ -76,13 +77,17 @@ const CardTitle = ({
   } = data;
   const status = type === 'sprint' ? STATUSCODES[statusCode] : statusCode;
   return (
-    <div style={{ height: 63, padding: 10 }}>
-      <div style={{ display: 'flex' }}>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
         <div>{type === 'sprint' ? sprintName : `${code}-${name}`}</div>
         <div style={{ flex: 1, visibility: 'hidden' }} />
-        <StatusTag categoryCode={status} name={STATUSNAMES[status]} />
+        {
+          type === 'pi' && (
+            <StatusTag categoryCode={status} name={STATUSNAMES[status]} />
+          )
+        }
       </div>
-      <div style={{ margin: '10px 0', color: '#9B9B9B' }}>
+      <div style={{ margin: '10px 0 0', color: '#9B9B9B', whiteSpace: 'nowrap' }}>
         {`${moment(startDate).format('YYYY-MM-DD')} ~ ${moment(endDate).format('YYYY-MM-DD')}`}
       </div>
     </div>
@@ -90,7 +95,7 @@ const CardTitle = ({
 };
 class PiItem extends Component {
   render() {
-    const { pi } = this.props;
+    const { pi, diff } = this.props;
     const {
       startDate, endDate, code, name, statusCode, sprintCalendarDOList, isLast,
     } = pi;
@@ -106,9 +111,10 @@ class PiItem extends Component {
         }}
       >
         <div className="PiItem-pi">
-          <div className={`PiItem-pi-title BorderLeft ${statusCode}`} style={{ borderColor: style.borderColor, background: style.backgroundColor, color: style.PIColor }}>
+          <div className={`PiItem-pi-title BorderLeft ${diff ? 'BorderRight' : ''} ${statusCode}`} style={{ borderColor: style.borderColor, background: style.backgroundColor, color: style.PIColor }}>
             <Popover
               // autoAdjustOverflow={false}
+              className={`PiItem-pi-piPopover ${statusCode}`}
               getPopupContainer={triggerNode => triggerNode.parentNode}
               content={<CardTitle data={pi} type="pi" />}
               title={null}
@@ -120,11 +126,12 @@ class PiItem extends Component {
             </Popover>
           </div>
           <div className="PiItem-pi-sprints">
-            {sprintCalendarDOList.map(sprint => (
-              <SprintItem borderColor={style.sprintBorder} sprint={sprint} />
-            ))}
+            {sprintCalendarDOList.map((sprint) => {
+              const todayIsBetween = moment().isBetween(sprint.startDate, sprint.endDate);
+              return <SprintItem borderColor={style.sprintBorder} sprint={sprint} todayIsBetween={todayIsBetween} />;
+            })}
             <div className="PiItem-pi-sprint" style={{ flex: ipWeeks, borderColor: style.sprintBorder }}>
-              <div style={{ padding: '0 10px' }}>
+              <div style={{ padding: '0 10px', backgroundColor: '#E5E5E5' }}>
                 {'IP'}
               </div>
             </div>

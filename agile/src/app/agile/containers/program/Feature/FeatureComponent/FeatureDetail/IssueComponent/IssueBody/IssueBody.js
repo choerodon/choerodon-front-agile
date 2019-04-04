@@ -20,7 +20,9 @@ import IssueBranch from './IssueBranch/IssueBranch';
   }
 
   render() {
-    const { store, reloadIssue } = this.props;
+    const {
+      store, reloadIssue,
+    } = this.props;
     const issue = store.getIssue;
     const { issueTypeDTO = {} } = issue;
 
@@ -28,20 +30,23 @@ import IssueBranch from './IssueBranch/IssueBranch';
       <div className="c7n-content-bottom" id="scroll-area" style={{ position: 'relative' }}>
         <section className="c7n-body-editIssue">
           <div className="c7n-content-editIssue">
-            <IssueDetail store={store} />
+            <IssueDetail {...this.props} />
             <IssueDes store={store} />
             <IssueAttachment store={store} />
             {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1
               ? <IssueWiki store={store} /> : ''
             }
-            <IssueWiki store={store} />
             <IssueCommit store={store} reloadIssue={reloadIssue} />
-            <IssueWorkLog store={store} reloadIssue={reloadIssue} />
+            {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1
+              ? <IssueWorkLog store={store} reloadIssue={reloadIssue} /> : ''
+            }
             <IssueLog store={store} />
             {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1
               ? <SubTask store={store} /> : ''
             }
-            <IssueLink store={store} />
+            {issueTypeDTO.code && ['feature'].indexOf(issueTypeDTO.code) !== -1
+              ? <IssueLink store={store} /> : ''
+            }
             {issueTypeDTO.code && ['feature'].indexOf(issueTypeDTO.code) !== -1
               ? <IssueBranch store={store} /> : ''
             }
