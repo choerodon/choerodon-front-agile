@@ -22,7 +22,7 @@ const { Text, Edit } = TextEditToggle;
   }
 
   componentDidMount() {
-    this.loadIssuePriorities();
+    this.loadIssueVersions();
   }
 
   transToArr = (arr, pro, type = 'string') => {
@@ -35,7 +35,7 @@ const { Text, Edit } = TextEditToggle;
     }
   };
 
-  loadIssuePriorities = () => {
+  loadIssueVersions = () => {
     loadVersions([]).then((res) => {
       this.setState({
         originVersions: res,

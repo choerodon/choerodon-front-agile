@@ -32,7 +32,7 @@ import IssueBranch from './IssueBranch/IssueBranch';
           <div className="c7n-content-editIssue">
             <IssueDetail {...this.props} />
             <IssueDes store={store} />
-            <IssueAttachment store={store} />
+            <IssueAttachment store={store} reloadIssue={reloadIssue} />
             {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1
               ? <IssueWiki store={store} /> : ''
             }

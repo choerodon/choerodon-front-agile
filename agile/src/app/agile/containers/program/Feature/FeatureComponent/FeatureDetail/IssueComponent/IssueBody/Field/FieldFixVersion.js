@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Select, Tooltip } from 'choerodon-ui';
+import { Select } from 'choerodon-ui';
 import { injectIntl } from 'react-intl';
 import _ from 'lodash';
 import TextEditToggle from '../../../../../../../../components/TextEditToggle';
@@ -11,7 +11,7 @@ const { Option } = Select;
 const { Text, Edit } = TextEditToggle;
 
 @inject('AppState')
-@observer class FieldVersion extends Component {
+@observer class FieldFixVersion extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -22,7 +22,7 @@ const { Text, Edit } = TextEditToggle;
   }
 
   componentDidMount() {
-    this.loadIssuePriorities();
+    this.loadIssueVersions();
   }
 
   transToArr = (arr, pro, type = 'string') => {
@@ -35,8 +35,8 @@ const { Text, Edit } = TextEditToggle;
     }
   };
 
-  loadIssuePriorities = () => {
-    loadVersions([]).then((res) => {
+  loadIssueVersions = () => {
+    loadVersions(['version_planning', 'released']).then((res) => {
       this.setState({
         originVersions: res,
         selectLoading: false,
@@ -44,7 +44,7 @@ const { Text, Edit } = TextEditToggle;
     });
   };
 
-  updateIssueVersion = () => {
+  updateIssueFixVersion = () => {
     const { newVersion, originVersions } = this.state;
     const {
       store, onUpdate, reloadIssue, AppState, onCreateVersion,
@@ -64,7 +64,7 @@ const { Text, Edit } = TextEditToggle;
           newSign = true;
           versionList.push({
             name: version,
-            relationType: 'influence',
+            relationType: 'fix',
             projectId: AppState.currentMenuType.id,
           });
         }
@@ -73,7 +73,7 @@ const { Text, Edit } = TextEditToggle;
         issueId,
         objectVersionNumber,
         versionIssueRelDTOList: versionList,
-        versionType: 'influence',
+        versionType: 'fix',
       };
       updateIssue(obj)
         .then(() => {
@@ -96,29 +96,42 @@ const { Text, Edit } = TextEditToggle;
     const { store, hasPermission } = this.props;
     const issue = store.getIssue;
     const { versionIssueRelDTOList = [] } = issue;
-    const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
+    const fixVersionsTotal = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
+    const fixVersionsFixed = _.filter(fixVersionsTotal, { statusCode: 'archived' }) || [];
+    const fixVersions = _.filter(fixVersionsTotal, v => v.statusCode !== 'archived') || [];
 
     return (
       <div className="line-start mt-10">
         <div className="c7n-property-wrapper">
-          <Tooltip title="对于非当前版本所发现的缺陷进行版本选择">
-            <span className="c7n-property">
-              {'影响的版本：'}
-            </span>
-          </Tooltip>
+          <span className="c7n-property">
+            {'版本：'}
+          </span>
         </div>
         <div className="c7n-value-wrapper">
+          {
+            fixVersionsFixed.length ? (
+              <div>
+                <span>已归档版本：</span>
+                <span>
+                  {_.map(fixVersionsFixed, 'name').join(' , ')}
+                </span>
+              </div>
+            ) : null
+          }
           <TextEditToggle
-            formKey="version"
-            onSubmit={this.updateIssueVersion}
-            originData={this.transToArr(influenceVersions, 'name', 'array')}
+            formKey="fixVersion"
+            onSubmit={this.updateIssueFixVersion}
+            originData={this.transToArr(fixVersions, 'name', 'array')}
           >
             <Text>
               {
-                influenceVersions.length ? (
+                fixVersionsFixed.length || fixVersions.length ? (
                   <div>
+                    <div style={{ color: '#000' }}>
+                      {_.map(fixVersionsFixed, 'name').join(' , ')}
+                    </div>
                     <p style={{ color: '#3f51b5', wordBreak: 'break-word' }}>
-                      {_.map(influenceVersions, 'name').join(' , ')}
+                      {_.map(fixVersions, 'name').join(' , ')}
                     </p>
                   </div>
                 ) : (
@@ -130,12 +143,12 @@ const { Text, Edit } = TextEditToggle;
             </Text>
             <Edit>
               <Select
-                label="影响的版本"
-                value={this.transToArr(influenceVersions, 'name', 'array')}
+                label="未归档版本"
+                value={this.transToArr(fixVersions, 'name', 'array')}
                 mode={hasPermission ? 'tags' : 'multiple'}
                 loading={selectLoading}
-                getPopupContainer={triggerNode => triggerNode.parentNode}
                 tokenSeparators={[',']}
+                getPopupContainer={triggerNode => triggerNode.parentNode}
                 style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
                 onChange={(value) => {
                   const versions = value.filter(v => v && v.trim()).map((item) => {
@@ -167,4 +180,4 @@ const { Text, Edit } = TextEditToggle;
   }
 }
 
-export default withRouter(injectIntl(FieldVersion));
+export default withRouter(injectIntl(FieldFixVersion));

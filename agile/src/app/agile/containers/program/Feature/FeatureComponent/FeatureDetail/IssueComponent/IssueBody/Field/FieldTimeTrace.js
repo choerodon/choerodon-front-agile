@@ -62,7 +62,7 @@ const { Text, Edit } = TextEditToggle;
                   {workloads + (remainingTime || 0)}
                   {'小时'}
                 </span>
-                <span
+                <div
                   role="none"
                   style={{
                     marginLeft: '8px',
@@ -74,9 +74,12 @@ const { Text, Edit } = TextEditToggle;
                   }}
                 >
                   {'登记工作'}
-                </span>
+                </div>
               </div>
             </Text>
+            <Edit>
+              <div>{remainingTime}</div>
+            </Edit>
           </TextEditToggle>
         </div>
       </div>

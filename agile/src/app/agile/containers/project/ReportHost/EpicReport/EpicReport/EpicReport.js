@@ -427,9 +427,12 @@ class EpicReport extends Component {
       return ES.tableData.filter(v => v.completed === 0);
     }
     if (type === 'unFinishAndunEstimate') {
-      return ES.tableData.filter(v => v.completed === 0
-        && ((v.storyPoints === null && v.issueTypeDTO && v.issueTypeDTO.typeCode === 'story')
-          || (v.remainTime === null && v.issueTypeDTO && v.issueTypeDTO.typeCode === 'task')));
+      if (ES.currentUnit === 'story_point') {
+        return ES.tableData.filter(v => v.completed === 0
+          && (v.storyPoints === null && v.issueTypeDTO && v.issueTypeDTO.typeCode === 'story'));
+      } else {
+        return ES.tableData.filter(v => v.completed === 0 && v.remainTime === null);
+      }
     }
     return [];
   }

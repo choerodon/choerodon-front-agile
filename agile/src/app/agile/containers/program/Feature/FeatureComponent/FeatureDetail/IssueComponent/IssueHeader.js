@@ -1,134 +1,22 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Dropdown, Icon, Select, Input, Menu, Button,
+  Dropdown, Icon, Menu, Button,
 } from 'choerodon-ui';
-import { ReadAndEdit } from '../../../../../../components/CommonComponent';
-import { updateIssue } from '../../../../../../api/NewIssueApi';
 import IssueNumber from './IssueNumber';
-
-const { Option } = Select;
-const { TextArea } = Input;
-
-const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
+import { FieldStoryPoint, FieldText } from './IssueBody/Field';
+import './IssueComponent.scss';
 
 @inject('AppState', 'HeaderStore')
 @observer class SprintHeader extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      remainingTime: undefined,
-      storyPoints: undefined,
     };
   }
 
   componentDidMount() {
-    this.restIssue();
   }
-
-  componentWillReceiveProps(nextProps) {
-    const { store } = nextProps;
-    const issue = store.getIssue;
-    const { remainingTime, storyPoints, summary } = issue;
-    this.setState({
-      remainingTime,
-      storyPoints,
-      summary,
-    });
-  }
-
-  restIssue = () => {
-    const { store } = this.props;
-    const issue = store.getIssue;
-    const { remainingTime, storyPoints, summary } = issue;
-    this.setState({
-      remainingTime,
-      storyPoints,
-      summary,
-    });
-  };
-
-  updateIssueByCode = (pro) => {
-    const { store } = this.props;
-    const issue = store.getIssue;
-    const { state } = this;
-    const { reloadIssue, onUpdate } = this.props;
-    const obj = {
-      issueId: issue.issueId,
-      objectVersionNumber: issue.objectVersionNumber,
-    };
-    if (pro === 'storyPoints' || pro === 'remainingTime') {
-      obj[pro] = state[pro] === '' ? null : state[pro];
-      updateIssue(obj)
-        .then(() => {
-          if (reloadIssue) {
-            reloadIssue();
-          }
-          if (onUpdate) {
-            onUpdate();
-          }
-        });
-    } else {
-      obj[pro] = state[pro] || issue[pro];
-      updateIssue(obj)
-        .then(() => {
-          if (reloadIssue) {
-            reloadIssue();
-          }
-          if (onUpdate) {
-            onUpdate();
-          }
-        });
-    }
-  };
-
-  handleTitleChange = (e) => {
-    this.setState({ summary: e.target.value });
-  };
-
-  handleChangeRemainingTime = (value) => {
-    const { remainingTime } = this.state;
-    // 只允许输入整数，选择时可选0.5
-    if (value === '0.5') {
-      this.setState({
-        remainingTime: '0.5',
-      });
-    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
-      this.setState({
-        remainingTime: String(value).slice(0, 3), // 限制最长三位,
-      });
-    } else if (value.toString().charAt(value.length - 1) === '.') {
-      this.setState({
-        remainingTime: value.slice(0, -1),
-      });
-    } else {
-      this.setState({
-        remainingTime,
-      });
-    }
-  };
-
-  handleChangeStoryPoint = (value) => {
-    const { storyPoints } = this.state;
-    // 只允许输入整数，选择时可选0.5
-    if (value === '0.5') {
-      this.setState({
-        storyPoints: '0.5',
-      });
-    } else if (/^(0|[1-9][0-9]*)(\[0-9]*)?$/.test(value) || value === '') {
-      this.setState({
-        storyPoints: String(value).slice(0, 3), // 限制最长三位,
-      });
-    } else if (value.toString().charAt(value.length - 1) === '.') {
-      this.setState({
-        storyPoints: value.slice(0, -1),
-      });
-    } else {
-      this.setState({
-        storyPoints,
-      });
-    }
-  };
 
   handleClickMenu = (e) => {
     const { store } = this.props;
@@ -154,24 +42,16 @@ const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
     }
   };
 
-  setCurrentRae = (data) => {
-    const { store } = this.props;
-    store.setCurrentRae(data);
-  };
-
   render() {
-    const { remainingTime, storyPoints, summary } = this.state;
     const {
       resetIssue, backUrl, onCancel, loginUserId, hasPermission,
       store, AppState,
     } = this.props;
     const urlParams = AppState.currentMenuType;
-    const currentRae = store.getCurrentRae;
     const issue = store.getIssue;
     const {
-      parentIssueId, typeCode, parentIssueNum, issueNum, summary: originSummary,
-      issueId, createdById, storyPoints: originStoryPoints,
-      remainingTime: originRemainingTime, subIssueDTOList = [],
+      parentIssueId, typeCode, parentIssueNum, issueNum,
+      issueId, createdById, subIssueDTOList = [],
     } = issue;
 
     const getMenu = () => (
@@ -236,7 +116,7 @@ const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
     );
 
     return (
-      <div className="c7n-content-top">
+      <div className="c7n-issue-header">
         <div className="c7n-header-editIssue">
           <div className="c7n-content-editIssue" style={{ overflowY: 'hidden' }}>
             <div
@@ -274,31 +154,7 @@ const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
             </div>
             {/* 主题 */}
             <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start', width: '360px' }}>
-              <ReadAndEdit
-                callback={this.setCurrentRae}
-                thisType="summary"
-                line
-                current={currentRae}
-                origin={originSummary}
-                onOk={this.updateIssueByCode.bind(this, 'summary')}
-                onCancel={this.restIssue.bind(this)}
-                readModeContent={(
-                  <div className="c7n-summary">
-                    {originSummary}
-                  </div>
-                )}
-              >
-                <TextArea
-                  maxLength={44}
-                  value={summary}
-                  size="small"
-                  onChange={this.handleTitleChange.bind(this)}
-                  onPressEnter={() => {
-                    this.updateIssueByCode('summary');
-                    this.setCurrentRae(undefined);
-                  }}
-                />
-              </ReadAndEdit>
+              <FieldText {...this.props} showTitle={false} field={{ code: 'summary', name: '概要' }} />
               <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
                 <Dropdown overlay={getMenu()} trigger={['click']}>
                   <Button icon="more_vert" />
@@ -310,86 +166,14 @@ const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
               {
                 issueId && typeCode === 'story' ? (
                   <div style={{ display: 'flex', marginRight: 25 }}>
-                    <span>故事点：</span>
-                    <div style={{ maxWidth: 130 }}>
-                      <ReadAndEdit
-                        callback={this.setCurrentRae}
-                        thisType="storyPoints"
-                        current={currentRae}
-                        handleEnter
-                        origin={originStoryPoints}
-                        onOk={this.updateIssueByCode.bind(this, 'storyPoints')}
-                        onCancel={this.restIssue.bind(this)}
-                        readModeContent={(
-                          <span>
-                            {originStoryPoints === undefined || originStoryPoints === null ? '无' : `${originStoryPoints} 点`}
-                          </span>
-                        )}
-                      >
-                        <Select
-                          value={storyPoints && storyPoints.toString()}
-                          mode="combobox"
-                          ref={(e) => {
-                            this.componentRef = e;
-                          }}
-                          onPopupFocus={(e) => {
-                            this.componentRef.rcSelect.focus();
-                          }}
-                          tokenSeparators={[',']}
-                          style={{ marginTop: 0, paddingTop: 0 }}
-                          onChange={value => this.handleChangeStoryPoint(value)}
-                        >
-                          {storyPointList.map(sp => (
-                            <Option key={sp.toString()} value={sp}>
-                              {sp}
-                            </Option>
-                          ))}
-                        </Select>
-                      </ReadAndEdit>
-                    </div>
+                    <FieldStoryPoint {...this.props} field={{ code: 'storyPoints', name: '故事点' }} />
                   </div>
                 ) : null
               }
               {
                 issueId && typeCode !== 'issue_epic' ? (
                   <div style={{ display: 'flex' }}>
-                    <span>预估时间：</span>
-                    <div style={{ maxWidth: 150 }}>
-                      <ReadAndEdit
-                        callback={this.setCurrentRae}
-                        thisType="remainingTime"
-                        current={currentRae}
-                        handleEnter
-                        origin={originRemainingTime}
-                        onOk={this.updateIssueByCode.bind(this, 'remainingTime')}
-                        onCancel={this.restIssue.bind(this)}
-                        readModeContent={(
-                          <span>
-                            {originRemainingTime === undefined || originRemainingTime === null ? '无' : `${originRemainingTime} 小时`}
-                          </span>
-                        )}
-                      >
-                        <Select
-                          value={remainingTime && remainingTime.toString()}
-                          mode="combobox"
-                          ref={(e) => {
-                            this.componentRef = e;
-                          }}
-                          onPopupFocus={(e) => {
-                            this.componentRef.rcSelect.focus();
-                          }}
-                          tokenSeparators={[',']}
-                          style={{ marginTop: 0, paddingTop: 0 }}
-                          onChange={value => this.handleChangeRemainingTime(value)}
-                        >
-                          {storyPointList.map(sp => (
-                            <Option key={sp.toString()} value={sp}>
-                              {sp}
-                            </Option>
-                          ))}
-                        </Select>
-                      </ReadAndEdit>
-                    </div>
+                    <FieldStoryPoint {...this.props} field={{ code: 'estimateTime', name: '预估时间' }} />
                   </div>
                 ) : null
               }

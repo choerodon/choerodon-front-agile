@@ -3,7 +3,7 @@ export FieldAssignee from './FieldAssignee';
 export FieldComponent from './FieldComponent';
 export FieldDateTime from './FieldDateTime';
 export FieldEpic from './FieldEpic';
-export FieldEpicName from './FieldEpicName';
+export FieldStoryPoint from './FieldStoryPoint';
 export FieldFixVersion from './FieldFixVersion';
 export FieldLabel from './FieldLabel';
 export FieldPriority from './FieldPriority';

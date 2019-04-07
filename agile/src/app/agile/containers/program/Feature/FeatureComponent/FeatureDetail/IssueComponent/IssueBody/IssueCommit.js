@@ -35,11 +35,14 @@ import { createCommit } from '../../../../../../../api/NewIssueApi';
   };
 
   handleCreateCommit() {
-    const { addCommitDes, origin: { issueId: extra } } = this.state;
+    const { store } = this.props;
+    const issue = store.getIssue;
+    const { issueId } = issue;
+    const { addCommitDes } = this.state;
     if (addCommitDes) {
-      beforeTextUpload(addCommitDes, { issueId: extra, commentText: '' }, this.newCommit, 'commentText');
+      beforeTextUpload(addCommitDes, { issueId, commentText: '' }, this.newCommit, 'commentText');
     } else {
-      this.newCommit({ issueId: extra, commentText: '' });
+      this.newCommit({ issueId, commentText: '' });
     }
   }
 
