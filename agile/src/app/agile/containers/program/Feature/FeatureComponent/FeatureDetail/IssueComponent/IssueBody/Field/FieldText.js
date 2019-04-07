@@ -68,7 +68,9 @@ const { TextArea } = Input;
   };
 
   render() {
-    const { store, field, feature } = this.props;
+    const {
+      store, field, feature, showTitle = true,
+    } = this.props;
     const { code, name } = field;
     const issue = store.getIssue;
     const { featureDTO = {} } = issue;
@@ -76,11 +78,15 @@ const { TextArea } = Input;
 
     return (
       <div className="line-start mt-10">
-        <div className="c7n-property-wrapper">
-          <span className="c7n-property">
-            {`${name}：`}
-          </span>
-        </div>
+        {showTitle
+          ? (
+            <div className="c7n-property-wrapper">
+              <span className="c7n-property">
+                {`${name}：`}
+              </span>
+            </div>
+          ) : null
+        }
         <div className="c7n-value-wrapper">
           <TextEditToggle
             saveRef={(e) => {

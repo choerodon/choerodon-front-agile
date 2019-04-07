@@ -2,11 +2,9 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { Icon, Button } from 'choerodon-ui';
-import { injectIntl, FormattedMessage } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import WYSIWYGEditor from '../../../../../../../components/WYSIWYGEditor';
-import Comment from '../../../../../../../components/EditIssueNarrow/Component/Comment';
 import { text2Delta, delta2Html } from '../../../../../../../common/utils';
-import { createCommit } from '../../../../../../../api/NewIssueApi';
 import { IssueDescription } from '../../../../../../../components/CommonComponent';
 import FullEditor from '../../../../../../../components/FullEditor';
 
@@ -17,18 +15,28 @@ import FullEditor from '../../../../../../../components/FullEditor';
     this.state = {
       editDesShow: false,
       description: '',
+      editDes: '',
     };
   }
 
   componentDidMount() {
+    const { store } = this.props;
+    const { description } = store.getIssue;
+    this.setState({
+      editDes: description,
+    });
   }
 
   updateIssue = () => {
-
+    this.setState({
+      editDesShow: false,
+    });
   };
 
   renderDes() {
-    const { editDesShow, description, editDes } = this.state;
+    const { store } = this.props;
+    const { description } = store.getIssue;
+    const { editDesShow, editDes } = this.state;
     if (editDesShow === undefined) {
       return null;
     }

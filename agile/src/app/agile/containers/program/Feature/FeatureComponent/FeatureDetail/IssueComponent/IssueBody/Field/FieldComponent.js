@@ -5,7 +5,7 @@ import { Select } from 'choerodon-ui';
 import { injectIntl } from 'react-intl';
 import _ from 'lodash';
 import TextEditToggle from '../../../../../../../../components/TextEditToggle';
-import { loadComponents, updateStatus } from '../../../../../../../../api/NewIssueApi';
+import { loadComponents, updateIssue } from '../../../../../../../../api/NewIssueApi';
 
 const { Option } = Select;
 const { Text, Edit } = TextEditToggle;
@@ -17,8 +17,7 @@ const { Text, Edit } = TextEditToggle;
     this.state = {
       originComponents: [],
       selectLoading: true,
-      transformId: undefined,
-      newStatusId: undefined,
+      newComponents: [],
     };
   }
 
@@ -46,29 +45,51 @@ const { Text, Edit } = TextEditToggle;
   };
 
   updateIssueComponents = () => {
-    const { newComponents } = this.state;
-    const { store, onUpdate, reloadIssue } = this.props;
+    const { newComponents, originComponents } = this.state;
+    const {
+      store, onUpdate, reloadIssue, AppState,
+    } = this.props;
     const issue = store.getIssue;
-    const { issueId, objectVersionNumber } = issue;
-    updateStatus(newComponents, issueId, objectVersionNumber, 'program')
-      .then(() => {
-        if (onUpdate) {
-          onUpdate();
+    const { componentIssueRelDTOList = [], issueId, objectVersionNumber } = issue;
+
+    if (JSON.stringify(componentIssueRelDTOList) !== JSON.stringify(newComponents)) {
+      const componentList = [];
+      newComponents.forEach((label) => {
+        const target = _.find(originComponents, { name: label });
+        if (target) {
+          componentList.push(target);
+        } else {
+          componentList.push({
+            name: label,
+            projectId: AppState.currentMenuType.id,
+          });
         }
-        if (reloadIssue) {
-          reloadIssue();
-        }
-        this.setState({
-          transformId: undefined,
-        });
       });
+      const obj = {
+        issueId,
+        objectVersionNumber,
+        componentIssueRelDTOList: componentList,
+      };
+      updateIssue(obj)
+        .then(() => {
+          if (onUpdate) {
+            onUpdate();
+          }
+          if (reloadIssue) {
+            reloadIssue();
+          }
+          this.setState({
+            newComponents: [],
+          });
+        });
+    }
   };
 
   render() {
     const { selectLoading, originComponents } = this.state;
     const { store, hasPermission } = this.props;
     const issue = store.getIssue;
-    const { componentIssueRelDTOList = {}, statusId } = issue;
+    const { componentIssueRelDTOList = [] } = issue;
     return (
       <div className="line-start mt-10">
         <div className="c7n-property-wrapper">
@@ -83,30 +104,37 @@ const { Text, Edit } = TextEditToggle;
             originData={componentIssueRelDTOList.map(component => component.id)}
           >
             <Text>
-              <div style={{ color: '#3f51b5' }}>
-                <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginTop: 2 }}>
-                  {this.transToArr(componentIssueRelDTOList, 'name')}
-                </p>
-              </div>
+              {componentIssueRelDTOList && componentIssueRelDTOList.length
+                ? (
+                  <div>
+                    <p style={{ color: '#3f51b5', wordBreak: 'break-word', marginTop: 2 }}>
+                      {this.transToArr(componentIssueRelDTOList, 'name')}
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    {'无'}
+                  </div>
+                )
+              }
             </Text>
             <Edit>
               <Select
                 loading={selectLoading}
-                ref={(e) => {
-                  this.componentRef = e;
-                }}
                 mode={hasPermission ? 'tags' : 'multiple'}
-                onPopupFocus={(e) => {
-                  this.componentRef.rcSelect.focus();
-                }}
                 getPopupContainer={triggerNode => triggerNode.parentNode}
                 tokenSeparators={[',']}
                 style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
                 onChange={(value) => {
+                  const newComponents = value.filter(v => v && v.trim()).map((item) => {
+                    if (_.find(originComponents, { name: item })) {
+                      return item;
+                    } else {
+                      return item.trim().substr(0, 15);
+                    }
+                  });
                   this.setState({
-                    newComponents: value.filter(v => v && v.trim()).map(
-                      item => item.trim().substr(0, 10),
-                    ),
+                    newComponents,
                   });
                 }}
               >

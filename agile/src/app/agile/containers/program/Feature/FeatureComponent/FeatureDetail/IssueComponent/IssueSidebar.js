@@ -4,6 +4,7 @@ import { Dropdown, Icon, Menu } from 'choerodon-ui';
 import IssueNav from './IssueNav';
 import TypeTag from '../../../../../../components/TypeTag';
 import { updateIssueType, updateIssue } from '../../../../../../api/NewIssueApi';
+import './IssueComponent.scss';
 
 @inject('AppState', 'HeaderStore')
 @observer class SprintHeader extends Component {
@@ -100,12 +101,14 @@ import { updateIssueType, updateIssue } from '../../../../../../api/NewIssueApi'
           boxShadow: '0 5px 5px -3px rgba(0, 0, 0, 0.20), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12)',
           borderRadius: '2px',
         }}
+        className="issue-sidebar-types"
         onClick={this.handleChangeType}
       >
         {
           issueTypeData.map(t => (
             <Menu.Item key={t.typeCode} value={t.id}>
               <TypeTag
+                style={{ margin: 0 }}
                 data={t}
                 showName
               />

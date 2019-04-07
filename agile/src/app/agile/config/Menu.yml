@@ -82,7 +82,7 @@
         Routes: /agile/feature
         sort: 13
         permission:
-          - 'agile-service.art.queryArtList'
+          - 'agile-service.pi.queryBacklogAll'
     - "programKanban":
         icon: table_chart
         category: PROGRAM
@@ -96,14 +96,14 @@
         Routes: /agile/artCalendar
         sort: 15
         permission:
-          - 'agile-service.pi.queryAll'
+          - 'agile-service.art.queryArtCalendar'
     - "pi":
         icon: center_focus_strong
         category: PROGRAM
         Routes: /agile/pi
         sort: 16
         permission:
-          - 'agile-service.pi.queryAll'
+          - 'agile-service.pi-objective.queryPiObjectiveList'
     - "art":
         icon: train
         category: PROGRAM
@@ -117,7 +117,7 @@
         Routes: /agile/programSetting
         sort: 18
         permission:
-          - 'agile-service.art.queryArtList'
+          - 'agile-service.project-info.queryProjectInfoByProjectId'
 
 
 "platform-reports":

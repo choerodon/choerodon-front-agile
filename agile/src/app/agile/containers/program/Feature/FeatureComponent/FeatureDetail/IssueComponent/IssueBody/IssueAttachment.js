@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { Icon } from 'choerodon-ui';
-import { injectIntl, FormattedMessage } from 'react-intl';
+import _ from 'lodash';
+import { injectIntl } from 'react-intl';
 import { UploadButtonNow } from '../../../../../../../components/CommonComponent';
 import { handleFileUpload } from '../../../../../../../common/utils';
 
@@ -11,7 +12,7 @@ import { handleFileUpload } from '../../../../../../../common/utils';
   constructor(props) {
     super(props);
     this.state = {
-      fileList: [],
+      fileList: false,
     };
   }
 
@@ -26,28 +27,41 @@ import { handleFileUpload } from '../../../../../../../common/utils';
     this.setState({ fileList: data });
   };
 
+  refresh = (newFile) => {
+    const { fileList } = this.state;
+    this.setFileList([...fileList, ...newFile]);
+    const { reloadIssue } = this.props;
+    if (reloadIssue) {
+      reloadIssue();
+    }
+  };
+
   /**
    * 上传附件
    * @param arr
    */
   onChangeFileList = (arr) => {
-    const { AppState, origin, refresh } = this.props;
+    const { AppState, store } = this.props;
+    const { issueId } = store.getIssue;
     if (arr.length > 0 && arr.some(one => !one.url)) {
       const config = {
-        issueId: origin.issueId,
+        issueId,
         fileName: arr[0].name || 'AG_ATTACHMENT',
         projectId: AppState.currentMenuType.id,
       };
-      handleFileUpload(arr, refresh, config);
+      handleFileUpload(arr, this.refresh, config);
     }
   };
 
   render() {
     const { fileList } = this.state;
-    const {
-      intl, store,
-    } = this.props;
-
+    const { store } = this.props;
+    const { issueAttachmentDTOList = [] } = store.getIssue;
+    const files = fileList || _.map(issueAttachmentDTOList, issueAttachment => ({
+      uid: issueAttachment.attachmentId,
+      name: issueAttachment.fileName,
+      url: issueAttachment.url,
+    }));
     return (
       <div id="attachment">
         <div className="c7n-title-wrapper">
@@ -65,7 +79,7 @@ import { handleFileUpload } from '../../../../../../../common/utils';
             onRemove={this.setFileList}
             onBeforeUpload={this.setFileList}
             updateNow={this.onChangeFileList}
-            fileList={fileList}
+            fileList={files}
           />
         </div>
       </div>
