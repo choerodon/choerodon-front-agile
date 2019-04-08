@@ -39,7 +39,7 @@ class PIList extends Component {
     const { artId, onGetPIList, onGetArtInfo } = this.props;
     createPI(artId, startDate).then(() => {
       onGetPIList(artId);
-      onGetArtInfo(artId);
+      onGetArtInfo();
       this.setState({
         createPIModalVisible: false,
       });

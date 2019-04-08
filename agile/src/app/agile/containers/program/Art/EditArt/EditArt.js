@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import {
-  Page, Header, Content, axios, stores, 
+  Page, Header, Content, axios, stores,
 } from 'choerodon-front-boot';
 import { isEqual } from 'lodash';
 import {
@@ -90,7 +90,7 @@ class EditArt extends Component {
         interationWeeks,
         ipWeeks,
         piCodeNumber,
-        piCodePrefix,      
+        piCodePrefix,
         startDate,
         rteId,
         name,
@@ -161,13 +161,13 @@ class EditArt extends Component {
     this.setState({
       loading: true,
     });
-    getArtById(id).then((data) => { 
+    getArtById(id).then((data) => {
       const {
         interationCount,
         interationWeeks,
         ipWeeks,
         piCodeNumber,
-        piCodePrefix,      
+        piCodePrefix,
         startDate,
         rteId,
         name,
@@ -192,7 +192,7 @@ class EditArt extends Component {
         formData,
         data,
       }, () => {
-        if (callback) {
+        if (callback && typeof callback === 'function') {
           callback();
         }
       });
@@ -217,7 +217,7 @@ class EditArt extends Component {
 
   handleSave = (newValues) => {
     const { data } = this.state;
-    const artDTO = { ...data, ...formatter(newValues) };    
+    const artDTO = { ...data, ...formatter(newValues) };
     editArt(artDTO).then(() => {
       this.loadArt();
     });
@@ -278,7 +278,7 @@ class EditArt extends Component {
             ee.emitEvent('setCurrentTab');
           });
         });
-        
+
         this.setState({
           startArtModalVisible: false,
         });
@@ -345,7 +345,7 @@ class EditArt extends Component {
                 onOk={this.handleReleaseOk}
                 onCancel={this.handleReleaseCancel}
               />
-              <ArtInfo 
+              <ArtInfo
                 onSubmit={this.handleSave}
                 name={name}
                 startBtnVisible={statusCode === 'todo'}

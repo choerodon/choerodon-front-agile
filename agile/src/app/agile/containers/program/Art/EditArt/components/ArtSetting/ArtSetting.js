@@ -18,7 +18,15 @@ const ArtSetting = ({
   onGetArtInfo,
 }) => (
   <div>
-    <ArtForm onChange={onFormChange} data={data} initValue={initValue} PiList={PiList} onSave={onSave} onGetPIList={onGetPIList} onGetArtInfo={onGetArtInfo} />
+    <ArtForm 
+      onChange={onFormChange}
+      data={data}
+      initValue={initValue}
+      PiList={PiList}
+      onSave={onSave}
+      onGetPIList={onGetPIList}
+      onGetArtInfo={onGetArtInfo}
+    />
   </div>
 );
 
