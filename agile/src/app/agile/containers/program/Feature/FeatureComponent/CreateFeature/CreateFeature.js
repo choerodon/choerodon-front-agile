@@ -53,9 +53,9 @@ class CreateFeature extends Component {
   }
 
   handleOnOk = () => {
-    const { callback, form } = this.props;
+    const { form } = this.props;
     const {
-      selectedIssueType, defaultPriority, storyPoints, delta, fileList,
+      selectedIssueType, defaultPriority, storyPoints, delta,
     } = this.state;
     form.validateFields((err, values) => {
       if (!err) {
@@ -193,6 +193,22 @@ class CreateFeature extends Component {
     const {
       fullEdit, delta, selectLoading, originEpics, selectedIssueType, storyPoints, fileList,
     } = this.state;
+    let featureTypeList = [];
+    if (selectedIssueType) {
+      featureTypeList = [
+        {
+          ...selectedIssueType,
+          colour: '#29B6F6',
+          typeCode: 'business',
+          name: '特性',
+        }, {
+          ...selectedIssueType,
+          colour: '#FFCA28',
+          typeCode: 'enabler',
+          name: '使能',
+        },
+      ];
+    }
     return (
       <Sidebar
         className="c7n-feature-createFeatureSideBar"
@@ -211,42 +227,44 @@ class CreateFeature extends Component {
           <Form>
             {selectedIssueType ? (
               <FormItem label="问题类型" style={{ width: 520, marginBottom: 20 }}>
-                {getFieldDecorator('typeId', {
+                {getFieldDecorator('featureType', {
                   rules: [{ required: true, message: '问题类型为必输项' }],
-                  initialValue: selectedIssueType.id,
+                  initialValue: 'business',
                 })(
                   <Select
                     label="问题类型"
                     getPopupContainer={triggerNode => triggerNode.parentNode}
-                    disabled
                   >
-                    <Option key={selectedIssueType.id} value={selectedIssueType.id}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: '0 2px' }}>
-                        <TypeTag
-                          data={selectedIssueType}
-                          showName
-                        />
-                      </div>
-                    </Option>
+                    {featureTypeList.map(type => (
+                      <Option key={type.typeCode} value={type.typeCode}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: '0 2px' }}>
+                          <TypeTag
+                            data={type}
+                            showName
+                          />
+                        </div>
+                      </Option>
+                    ))
+                    }
                   </Select>,
                 )}
               </FormItem>
             ) : ''
             }
-            <FormItem label="特性类型" style={{ width: 520, marginBottom: 10 }}>
-              {getFieldDecorator('featureType', {
-                rules: [{ required: true, message: '特性类型为必输项' }],
-                initialValue: 'business',
-              })(
-                <RadioDroup
-                  label="特性类型"
-                  style={{ display: 'flex', flexDirection: 'column', marginBottom: 5 }}
-                >
-                  <Radio value="business" style={{ marginBottom: 5 }}>业务</Radio>
-                  <Radio value="enabler">使能</Radio>
-                </RadioDroup>,
-              )}
-            </FormItem>
+            {/* <FormItem label="特性类型" style={{ width: 520, marginBottom: 10 }}> */}
+            {/* {getFieldDecorator('featureType', { */}
+            {/* rules: [{ required: true, message: '特性类型为必输项' }], */}
+            {/* initialValue: 'business', */}
+            {/* })( */}
+            {/* <RadioDroup */}
+            {/* label="特性类型" */}
+            {/* style={{ display: 'flex', flexDirection: 'column', marginBottom: 5 }} */}
+            {/* > */}
+            {/* <Radio value="business" style={{ marginBottom: 5 }}>业务</Radio> */}
+            {/* <Radio value="enabler">使能</Radio> */}
+            {/* </RadioDroup>, */}
+            {/* )} */}
+            {/* </FormItem> */}
             <FormItem label="特性名称" style={{ width: 520, marginBottom: 20 }}>
               {getFieldDecorator('summary', {
                 rules: [{ required: true, message: '特性名称为必输项' }],

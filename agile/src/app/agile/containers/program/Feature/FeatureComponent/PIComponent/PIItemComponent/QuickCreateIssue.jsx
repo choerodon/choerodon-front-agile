@@ -27,7 +27,25 @@ const FormItem = Form.Item;
 
   handleChangeType = ({ key }) => {
     const { issueType } = this.props;
-    const currentSelect = issueType.find(type => type.typeCode === key);
+    let featureTypeList = [];
+    if (issueType && issueType.length && issueType.length === 1) {
+      featureTypeList = [
+        {
+          ...issueType[0],
+          colour: '#29B6F6',
+          typeCode: 'business',
+          name: '特性',
+        }, {
+          ...issueType[0],
+          colour: '#FFCA28',
+          typeCode: 'enabler',
+          name: '使能',
+        },
+      ];
+    } else {
+      featureTypeList = issueType;
+    }
+    const currentSelect = featureTypeList.find(type => type.typeCode === key);
     this.setState({
       currentType: currentSelect,
     });
@@ -63,12 +81,12 @@ const FormItem = Form.Item;
         {
           ...issueType[0],
           colour: '#29B6F6',
-          featureType: 'business',
+          typeCode: 'business',
           name: '特性',
         }, {
           ...issueType[0],
           colour: '#FFCA28',
-          featureType: 'enabler',
+          typeCode: 'enabler',
           name: '使能',
         },
       ];
@@ -86,7 +104,7 @@ const FormItem = Form.Item;
       >
         {
           featureTypeList.map(type => (
-            <Menu.Item key={type.featureType || type.typeCode}>
+            <Menu.Item key={type.typeCode}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <TypeTag
                   data={type}
