@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
-import PiItem from './PiItem';
+import PiItem from '../PiItem';
+import Events from '../Events';
 import './CalendarBody.scss';
 
 const moment = extendMoment(Moment);
@@ -39,10 +40,13 @@ class CalendarBody extends Component {
             ))
           }
         </div>
-        <div className="c7nagile-CalendarBody-pis">
-          {
-            this.renderPIItem()
-          }
+        <div className="c7nagile-CalendarBody-content">
+          <div className="c7nagile-CalendarBody-pis">
+            {
+              this.renderPIItem()
+            }
+          </div>
+          <Events />
         </div>
       </div>
     );

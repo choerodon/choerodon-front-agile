@@ -36,8 +36,7 @@ class CalendarHeader extends Component {
     // const totalDays = range.diff('days');
 
     const years = Array.from(range.by('years'));
-    const weeks = Array.from(range.by('weeks'));
-    // console.log(years, weeks);
+    const weeks = Array.from(range.by('weeks', { excludeEnd: true }));
     const YearFlexs = this.caculateYearFlex(years);
     // console.log(YearFlexs);
     return (

@@ -3,47 +3,34 @@
   height: calc(100% - 80px);
   position: relative;
 
-  .c7nagile-CalendarBody-days {
-    // width: 100%;
+  &-days {
+    min-width: 100%;
+    position: absolute;
     height: 100%;
     display: flex;
     border-bottom: 1px solid #D6D6D6;
   }
 
-  .c7nagile-CalendarBody-day {
-    // &:first-child {
-    //   border-left: none;
-    // }
+  &-day {
     position: relative;
+    border-left: 1px dashed #D6D6D6;
+    flex: 1;
 
-    &:after {
-      content: "";
-      width: 0;
-      border-left: 1px dashed #D6D6D6;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
+    &:last-of-type {
+      border-right: 1px solid #D6D6D6;
     }
 
     &:nth-child(7n+1) {
-      &:after {
-        border-left-style: solid;
-        border-left-color: #D6D6D6;
-      }
+      border-left-style: solid;
+      border-left-color: #D6D6D6;
     }
-
-    flex: 1;
-    min-width: 25px;
   }
 
-  .c7nagile-CalendarBody-day.today {
-    // border-color: #CF3030;
-    // border-left-style: solid;
+  &-day.today {
     position: relative;
   }
 
-  .c7nagile-CalendarBody-day.today:before {
+  &-day.today:before {
     /* 做一个书签效果 */
     position: absolute;
     /* 必须 */
@@ -62,7 +49,7 @@
   }
 
   // 当前日期竖线
-  .c7nagile-CalendarBody-day.today:after {
+  &-day.today:after {
     position: absolute;
     top: 0;
     left: 0;
@@ -73,11 +60,13 @@
     content: '';
   }
 
-  .c7nagile-CalendarBody-pis {
+  &-content {
+    width: 100%;
+  }
+
+  &-pis {
     display: flex;
-    margin-top: 12px;
-    position: absolute;
-    top: 0;
+    padding-top: 12px;
     width: 100%;
   }
 }

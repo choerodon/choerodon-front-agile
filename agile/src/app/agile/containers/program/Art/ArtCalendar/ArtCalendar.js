@@ -2,12 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Page, Header, Content } from 'choerodon-front-boot';
 import { find } from 'lodash';
-import { Progress, Spin } from 'choerodon-ui';
+import { Spin } from 'choerodon-ui';
 import moment from 'moment';
-import { artListLink, getParams } from '../../../../common/utils';
 import { getArtCalendar, getArtsByProjectId } from '../../../../api/ArtApi';
-import CalendarHeader from './CalendarHeader';
-import CalendarBody from './CalendarBody';
+import { CalendarHeader, CalendarBody } from './components';
 import './ArtCalendar.scss';
 import emptyART from '../../../../assets/image/emptyART.svg';
 import EmptyBlock from '../../../../components/EmptyBlock';
@@ -64,7 +62,7 @@ class ArtCalendar extends Component {
 
   getDuring = (data) => {
     const startDate = data.length > 0 ? data[0].startDate : moment();
-    const endDate = data.length > 0 ? data[data.length - 1].endDate : moment().add(1, 'days');
+    const endDate = data.length > 0 ? data[data.length - 1].endDate : moment().add(7, 'days');
     return {
       startDate,
       endDate,
@@ -73,7 +71,7 @@ class ArtCalendar extends Component {
 
   render() {
     const {
-      data, startDate, 
+      data, startDate,
       currentPI, ArtName,
       endDate,
       doingArt,
@@ -90,7 +88,7 @@ class ArtCalendar extends Component {
             {
               doingArt && data ? (
                 <div style={{
-                  display: 'flex', flexDirection: 'column', padding: 0, height: '100%', 
+                  display: 'flex', flexDirection: 'column', padding: 0, height: '100%',
                 }}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -101,10 +99,10 @@ class ArtCalendar extends Component {
                         {artStartDate && moment(artStartDate).format('YYYY-MM-DD')}
                       </span>
                       {currentPI && (
-                      <span>
-                        {'正在进行中的PI：'}
-                        {`${currentPI.code}-${currentPI.name}`}
-                      </span>
+                        <span>
+                          {'正在进行中的PI：'}
+                          {`${currentPI.code}-${currentPI.name}`}
+                        </span>
                       )}
                     </div>
                     <div className="c7nagile-ArtCalendar-scroller">
@@ -121,9 +119,7 @@ class ArtCalendar extends Component {
                       </div>
                     </div>
                   </div>
-              
                 </div>
-                
               ) : (
                 <EmptyBlock
                   style={{ marginTop: 60 }}
