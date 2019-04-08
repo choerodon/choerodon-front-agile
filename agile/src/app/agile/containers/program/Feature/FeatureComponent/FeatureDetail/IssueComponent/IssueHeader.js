@@ -164,14 +164,14 @@ import './IssueComponent.scss';
             {/* 故事点 */}
             <div className="line-start">
               {
-                issueId && typeCode === 'story' ? (
+                issueId && ['story', 'feature'].indexOf(typeCode) !== -1 ? (
                   <div style={{ display: 'flex', marginRight: 25 }}>
                     <FieldStoryPoint {...this.props} field={{ code: 'storyPoints', name: '故事点' }} />
                   </div>
                 ) : null
               }
               {
-                issueId && typeCode !== 'issue_epic' ? (
+                issueId && ['issue_epic'].indexOf(typeCode) === -1 ? (
                   <div style={{ display: 'flex' }}>
                     <FieldStoryPoint {...this.props} field={{ code: 'estimateTime', name: '预估时间' }} />
                   </div>

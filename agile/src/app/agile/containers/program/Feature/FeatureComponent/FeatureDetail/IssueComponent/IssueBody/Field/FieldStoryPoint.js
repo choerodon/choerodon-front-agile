@@ -82,12 +82,12 @@ const defaultList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
 
     return (
       <div className="line-start mt-10">
-        <div className="c7n-property-wrapper" style={{ width: 120 }}>
+        <div className="c7n-property-wrapper">
           <span className="c7n-property">
             {`${name}：`}
           </span>
         </div>
-        <div className="c7n-value-wrapper">
+        <div className="c7n-value-wrapper" style={{ width: 'auto' }}>
           <TextEditToggle
             onSubmit={this.updateIssueField}
           >
