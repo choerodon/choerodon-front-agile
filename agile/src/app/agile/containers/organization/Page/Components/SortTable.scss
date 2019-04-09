@@ -1,0 +1,21 @@
+.c7n-page-detail {
+  tr.drop-over-downward td {
+    background: #d3d3d3 !important;
+  }
+
+  tr.drop-over-upward td {
+    background: #d3d3d3 !important;
+  }
+
+  tr.hover-row td {
+    background: white !important;
+  }
+
+  tr.drop-over-downward td {
+    border-bottom: 2px dashed #1890ff;
+  }
+
+  tr.drop-over-upward td {
+    border-top: 2px dashed #1890ff;
+  }
+}

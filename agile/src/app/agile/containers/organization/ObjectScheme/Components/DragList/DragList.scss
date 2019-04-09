@@ -1,0 +1,61 @@
+.issue-dragList {
+  &-content {
+    background: #ECECEC;
+    padding: 20px;
+    width: 520px;
+    display: flex;
+    justify-content: space-between;
+  }
+  &-card {
+    background: #FFFFFF;
+    border-radius: 4px;
+    width: 480px;
+    & .ant-card-body {
+      height: calc(100% - 55px);
+    }
+    & .ant-card-head-title {
+      line-height: 35px;
+    }
+  }
+  &-des {
+    margin-bottom: 10px;
+  }
+  &-operate {
+    float: right;
+  }
+  &-text {
+    line-height: 24px;
+  }
+  &-addBtn {
+    color: #3F51B5;
+  }
+  &-addItem {
+    padding: 5px 20px;
+    margin: 0 0 5px 0;
+    background: #F7F7F7;
+    height: 34px;
+  }
+  &-input {
+    width: 75%;
+    display: inline-block;
+  }
+  &-add {
+    margin-right: 10px;
+  }
+}
+
+.issue-issueTypeDrag-drop {
+  min-height: 170px;
+  height: 100%;
+}
+
+.issue-issueTypeDrag-drag {
+  height: 20px;
+  margin-right: 10px;
+  vertical-align: top;
+}
+
+.issue-issueTypeDrag-icon {
+  margin-right: 10px;
+  vertical-align: top;
+}

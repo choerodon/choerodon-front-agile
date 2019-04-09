@@ -21,9 +21,11 @@ const ISSUELINKINDEX = asyncRouter(() => import('./project/IssueLink'));
 const USERMAPINDEX = asyncRouter(() => import('./project/userMap'));
 const INERATIONBOARDINDEX = asyncRouter(() => import('./project/IterationBoard'));
 const REPORTBOARD = asyncRouter(() => import('./project/ReportBoard'));
-const WORKCALENDARINDEX = asyncRouter(() => import('./organization/WorkCalendar'));
+const MESSAGENOTIFICATION = asyncRouter(() => import('./project/MessageNotification'));
 
-const MESSAGENOTIFICATION = asyncRouter(() => import('./project/MessageNotification')); 
+const WORKCALENDARINDEX = asyncRouter(() => import('./organization/WorkCalendar'));
+const OBJECTSCHEMEINDEX = asyncRouter(() => import('./organization/ObjectScheme'));
+const PAGEINDEX = asyncRouter(() => import('./organization/Page'));
 
 const ART = asyncRouter(() => import('./program/Art')); 
 const KANBAN = asyncRouter(() => import('./program/Kanban')); 
@@ -31,6 +33,7 @@ const FEATURE = asyncRouter(() => import('./program/Feature'));
 const PIAIMS = asyncRouter(() => import('./program/PI'));
 const PROGRAMSETTING = asyncRouter(() => import('./program/ProgramSetting'));
 const ARTCALENDAR = asyncRouter(() => import('./program/Art/ArtCalendar'));
+
 class AGILEIndex extends React.Component {
   render() {
     const { match } = this.props;
@@ -62,12 +65,13 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/userMap`} component={USERMAPINDEX} />
           {/* 迭代工作台 */}
           <Route path={`${match.url}/iterationBoard/:id`} component={INERATIONBOARDINDEX} />
-
           <Route path={`${match.url}/reportBoard`} component={REPORTBOARD} />
-
           <Route path={`${match.url}/messageNotification`} component={MESSAGENOTIFICATION} />
 
           <Route path={`${match.url}/workCalendar`} component={WORKCALENDARINDEX} />
+          <Route path={`${match.url}/objectScheme`} component={OBJECTSCHEMEINDEX} />
+          <Route path={`${match.url}/page`} component={PAGEINDEX} />
+
           <Route path={`${match.url}/art`} component={ART} />
           <Route path={`${match.url}/kanban`} component={KANBAN} />          
           <Route path={`${match.url}/feature`} component={FEATURE} /> 

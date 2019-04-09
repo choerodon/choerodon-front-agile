@@ -30,7 +30,7 @@ class IssueDetail extends Component {
    */
   refreshIssueDetail() {
     if (this.editIssue) {
-      this.editIssue.refresh();
+      this.editIssue.loadIssueDetail();
     }
   }
 

@@ -22,6 +22,8 @@
 
 "rentsetting": "Organization Settings"
 "rentsetting.workCalendar": "Work Calendar"
+"rentsetting.objectScheme": "Field"
+"rentsetting.page": "Page"
 
 "platform-reports": "Reports"
 "platform-reports.reportboard": "Agile Report"
