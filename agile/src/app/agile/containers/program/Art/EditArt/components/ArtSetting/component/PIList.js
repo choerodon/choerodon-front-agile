@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Icon, Form } from 'choerodon-ui';
-import moment from 'moment';
+import {
+  Button, Icon, Popconfirm, 
+} from 'choerodon-ui';
 import _ from 'lodash';
 import { createPI } from '../../../../../../../api/ArtApi';
 import PIListTable from './PIListTable';
@@ -49,7 +50,9 @@ class PIList extends Component {
   render() {
     const { createPIModalVisible } = this.state;
     // eslint-disable-next-line no-shadow
-    const { name, PiList, data } = this.props;
+    const {
+      name, PiList, data, onDeletePI, 
+    } = this.props;
     const columns = [
       {
         title: 'PI名称',
@@ -72,6 +75,18 @@ class PIList extends Component {
       {
         title: '结束日期',
         dataIndex: 'endDate',
+      },
+      {
+        title: '',
+        render: (record) => {
+          const { statusCode, id } = record;
+          return statusCode === 'todo' 
+            ? (
+              <Popconfirm title="确定删除这个PI吗?" onConfirm={() => { onDeletePI(id); }} okText="确定" cancelText="取消">
+                <Button shape="circle" icon="delete_forever" />
+              </Popconfirm>
+            ) : <Button shape="circle" icon="delete_forever" style={{ visibility: 'hidden' }} />;
+        },
       },
     ];
     return (

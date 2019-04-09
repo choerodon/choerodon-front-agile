@@ -16,6 +16,7 @@ const ArtSetting = ({
   onFormChange,
   onGetPIList,
   onGetArtInfo,
+  onDeletePI,
 }) => (
   <div>
     <ArtForm 
@@ -26,6 +27,7 @@ const ArtSetting = ({
       onSave={onSave}
       onGetPIList={onGetPIList}
       onGetArtInfo={onGetArtInfo}
+      onDeletePI={onDeletePI}
     />
   </div>
 );

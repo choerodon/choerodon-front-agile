@@ -8,6 +8,12 @@ const { AppState } = stores;
 export function getPIList(artId) {
   return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/list?artId=${artId}`);
 }
+/**
+ * 删除PI
+ */
+export function deletePI(piId, artId) {
+  return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/${piId}?artId=${artId}`);
+}
 
 /**
  * 获取单个PI的目标列表

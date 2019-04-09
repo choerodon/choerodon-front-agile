@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 
 import React, { Component } from 'react';
 import {
@@ -14,7 +15,7 @@ import { ee } from './components/ArtSetting';
 import {
   getArtById, editArt, getArtsByProjectId, beforeStop, stopArt, startArt,
 } from '../../../../api/ArtApi';
-import { getPIList } from '../../../../api/PIApi';
+import { getPIList, deletePI } from '../../../../api/PIApi';
 import StartArtModal from './components/StartArtModal';
 import StopArtModal from './components/StopArtModal';
 
@@ -127,7 +128,9 @@ class EditArt extends Component {
   }
 
   getPIList = (artId, callback) => {
-    getPIList(artId).then((res) => {
+    // eslint-disable-next-line react/destructuring-assignment
+    const { id } = this.props.match.params;
+    getPIList(artId || id).then((res) => {
       this.setState({
         PiList: res.content.map(item => (
           Object.assign(item, {
@@ -141,6 +144,13 @@ class EditArt extends Component {
           callback();
         }
       });
+    });
+  }
+
+  handleDeletePI=(piId) => {
+    const { id: artId } = this.props.match.params;
+    deletePI(piId, artId).then(() => {
+      this.getPIList();
     });
   }
 
@@ -359,6 +369,7 @@ class EditArt extends Component {
                 PiList={PiList}
                 onGetPIList={this.getPIList}
                 onGetArtInfo={this.loadArt}
+                onDeletePI={this.handleDeletePI}
                 onFormChange={this.handleFormChange}
                 onSave={this.handleSave}
               />

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Button, Spin, Icon } from 'choerodon-ui';
+import {
+  Button, Spin, Icon, Radio, 
+} from 'choerodon-ui';
 import {
   Header, Page,
 } from 'choerodon-front-boot';
@@ -12,43 +14,28 @@ import CreateFeature from '../FeatureComponent/CreateFeature/CreateFeature';
 import FeatureStore from '../../../../stores/Program/Feature/FeatureStore';
 import Epic from '../FeatureComponent/EpicComponent/Epic';
 import SprintItem from '../FeatureComponent/PIComponent/PIItem';
+import PlanMode from '../FeatureComponent/PlanMode';
+import QueryMode from '../FeatureComponent/QueryMode/QueryMode';
 
+const RadioGroup = Radio.Group;
+const RadioButton = Radio.Button;
 @inject('HeaderStore')
 @observer
 class FeatureList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      visible: false,
-    };
-  }
+state = {
+  visible: false,
+  mode: 'plan',
+}
 
-  componentDidMount() {
-    this.refresh();
-  }
+componentDidMount() {
+  this.refresh();
+}
 
-  componentWillUnmount() {
-    FeatureStore.setEpicVisible(false);
-    FeatureStore.setClickIssueDetail({});
-  }
-
+  
   refresh = () => {
-    Promise.all([
-      FeatureStore.axiosGetIssueTypes(),
-      FeatureStore.axiosGetDefaultPriority(),
-      FeatureStore.getCurrentEpicList(),
-      FeatureStore.getFeatureListData(),
-    ]).then(([issueTypes, defaultPriority, epics, featureList]) => {
-      FeatureStore.initData(issueTypes, defaultPriority, epics, featureList);
-    });
+    
   };
-
-  onEpicClick = () => {
-    FeatureStore.getFeatureListData().then((res) => {
-      FeatureStore.setFeatureData(res);
-    }).catch(() => {
-    });
-  };
+  
 
   handleCreateBtn = () => {
     this.setState({
@@ -69,8 +56,14 @@ class FeatureList extends Component {
     this.refresh();
   };
 
+  handleModeChange=(e) => {
+    this.setState({
+      mode: e.target.value,
+    });
+  }
+
   render() {
-    const { visible } = this.state;
+    const { visible, mode } = this.state;
     const { HeaderStore } = this.props;
 
     return (
@@ -96,20 +89,12 @@ class FeatureList extends Component {
             <Icon type="refresh" />
             {'刷新'}
           </Button>
+          <div style={{ flex: 1, visibility: 'hidden' }} />
+          <RadioGroup className="c7n-pi-showTypeRadioGroup" style={{ marginRight: 24 }} onChange={this.handleModeChange} value={mode}>
+            <RadioButton value="plan">计划模式</RadioButton>
+            <RadioButton value="query">查询模式</RadioButton>
+          </RadioGroup>
         </Header>
-        {/* <div */}
-        {/* className="backlogTools" */}
-        {/* style={{ */}
-        {/* paddingLeft: 24, display: 'flex', alignItems: 'center', */}
-        {/* }} */}
-        {/* > */}
-        {/* <QuickSearch */}
-        {/* onQuickSearchChange={this.onQuickSearchChange} */}
-        {/* resetFilter={BacklogStore.getQuickSearchClean} */}
-        {/* onAssigneeChange={this.onAssigneeChange} */}
-        {/* /> */}
-        {/* <ClearFilter /> */}
-        {/* </div> */}
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div
             className="c7n-backlog"
@@ -117,84 +102,11 @@ class FeatureList extends Component {
               height: HeaderStore.announcementClosed ? 'calc(100vh - 106px)' : 'calc(100vh - 158px)',
             }}
           >
-            <div className="c7n-backlog-side">
-              <p
-                style={{
-                  marginTop: 12,
-                }}
-                role="none"
-                onClick={() => {
-                  FeatureStore.toggleVisible();
-                }}
-              >
-                {'史诗'}
-              </p>
-            </div>
-            <Epic
-              refresh={this.refresh}
-              visible={FeatureStore.getEpicVisible}
-              store={FeatureStore}
-              issueRefresh={() => {
-                this.IssueDetail.refreshIssueDetail();
-              }}
-              onEpicClick={this.onEpicClick}
-            />
-            <Spin spinning={FeatureStore.getSpinIf}>
-              <div className="c7n-backlog-content">
-                <DragDropContext
-                  onDragEnd={(result) => {
-                    FeatureStore.setIsDragging(null);
-                    const { destination, source, draggableId } = result;
-                    if (destination) {
-                      const { droppableId: destinationId, index: destinationIndex } = destination;
-                      const { droppableId: sourceId, index: sourceIndex } = source;
-                      if (destinationId === sourceId && destinationIndex === sourceIndex) {
-                        return;
-                      }
-                      if (result.reason !== 'CANCEL') {
-                        const item = FeatureStore.getIssueMap.get(sourceId)[sourceIndex];
-                        const destinationArr = FeatureStore.getIssueMap.get(destinationId);
-                        let destinationItem;
-                        if (destinationIndex === 0) {
-                          destinationItem = null;
-                        } else if (destinationIndex === FeatureStore.getIssueMap.get(destinationId).length) {
-                          destinationItem = destinationArr[destinationIndex - 1];
-                        } else {
-                          destinationItem = destinationArr[destinationIndex];
-                        }
-                        if (FeatureStore.getMultiSelected.size > 1 && !FeatureStore.getMultiSelected.has(destinationItem)) {
-                          FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi');
-                        } else {
-                          FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single');
-                        }
-                      }
-                    }
-                  }}
-                  onDragStart={(result) => {
-                    const { source } = result;
-                    const { droppableId: sourceId, index: sourceIndex } = source;
-                    const item = FeatureStore.getIssueMap.get(sourceId)[sourceIndex];
-                    FeatureStore.setIsDragging(item.issueId);
-                    FeatureStore.setIssueWithEpic(item);
-                  }}
-                >
-                  <SprintItem
-                    epicVisible={FeatureStore.getEpicVisible}
-                    onRef={(ref) => {
-                      this.sprintItemRef = ref;
-                    }}
-                    refresh={this.refresh}
-                    store={FeatureStore}
-                    type="pi"
-                  />
-                </DragDropContext>
-                <CreateFeature
-                  visible={visible}
-                  onCancel={this.handleCancelBtn}
-                  onOk={this.handleCreateFeature}
-                />
-              </div>
-            </Spin>
+            {mode === 'plan' ? (
+              <PlanMode 
+                issueRefresh={() => { this.IssueDetail.refreshIssueDetail(); }}
+              />
+            ) : <QueryMode />}
             <FeatureDetail
               store={FeatureStore}
               refresh={this.refresh}
@@ -205,6 +117,11 @@ class FeatureList extends Component {
             />
           </div>
         </div>
+        <CreateFeature
+          visible={visible}
+          onCancel={this.handleCancelBtn}
+          onOk={this.handleCreateFeature}
+        />
       </Page>
     );
   }
