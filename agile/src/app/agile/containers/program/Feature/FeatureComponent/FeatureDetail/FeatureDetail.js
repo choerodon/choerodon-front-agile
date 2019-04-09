@@ -15,7 +15,7 @@ class FeatureDetail extends Component {
    */
   refreshIssueDetail() {
     if (this.editIssue) {
-      this.editIssue.refresh();
+      this.editIssue.loadIssueDetail();
     }
   }
 

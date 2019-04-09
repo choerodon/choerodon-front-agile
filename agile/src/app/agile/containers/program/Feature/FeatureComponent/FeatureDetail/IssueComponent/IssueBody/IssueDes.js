@@ -4,9 +4,10 @@ import { withRouter } from 'react-router-dom';
 import { Icon, Button } from 'choerodon-ui';
 import { injectIntl } from 'react-intl';
 import WYSIWYGEditor from '../../../../../../../components/WYSIWYGEditor';
-import { text2Delta, delta2Html } from '../../../../../../../common/utils';
+import { text2Delta, delta2Html, returnBeforeTextUpload } from '../../../../../../../common/utils';
 import { IssueDescription } from '../../../../../../../components/CommonComponent';
 import FullEditor from '../../../../../../../components/FullEditor';
+import { updateIssue } from '../../../../../../../api/NewIssueApi';
 
 @inject('AppState')
 @observer class IssueCommit extends Component {
@@ -16,6 +17,7 @@ import FullEditor from '../../../../../../../components/FullEditor';
       editDesShow: false,
       description: '',
       editDes: '',
+      edit: false,
     };
   }
 
@@ -24,19 +26,46 @@ import FullEditor from '../../../../../../../components/FullEditor';
     const { description } = store.getIssue;
     this.setState({
       editDes: description,
+      description,
     });
   }
 
-  updateIssue = () => {
+  componentWillReceiveProps(nextProps) {
+    const { store } = nextProps;
+    const { description } = store.getIssue;
+    this.setState({
+      description,
+      editDes: description,
+      editDesShow: false,
+    });
+  }
+
+  updateIssueDes = () => {
+    const { editDes } = this.state;
+    const { store, onUpdate, reloadIssue } = this.props;
+    const { issueId, objectVersionNumber } = store.getIssue;
+    const obj = {
+      issueId,
+      objectVersionNumber,
+    };
+    if (editDes) {
+      returnBeforeTextUpload(editDes, obj, updateIssue, 'description')
+        .then(() => {
+          if (onUpdate) {
+            onUpdate();
+          }
+          if (reloadIssue) {
+            reloadIssue();
+          }
+        });
+    }
     this.setState({
       editDesShow: false,
     });
   };
 
   renderDes() {
-    const { store } = this.props;
-    const { description } = store.getIssue;
-    const { editDesShow, editDes } = this.state;
+    const { editDesShow, editDes, description } = this.state;
     if (editDesShow === undefined) {
       return null;
     }
@@ -51,7 +80,7 @@ import FullEditor from '../../../../../../../components/FullEditor';
           <WYSIWYGEditor
             bottomBar
             value={text2Delta(editDes)}
-            style={{ height: '100%', width: '100%' }}
+            style={{ height: '100%', width: '352px' }}
             onChange={(value) => {
               this.setState({ editDes: value });
             }}
@@ -66,14 +95,14 @@ import FullEditor from '../../../../../../../components/FullEditor';
                 editDesShow: false,
                 description: editDes || '',
               });
-              this.updateIssue('editDes');
+              this.updateIssueDes();
             }}
             handleClickOutSide={() => {
               this.setState({
                 editDesShow: false,
                 description: editDes || '',
               });
-              this.updateIssue('editDes');
+              this.updateIssueDes();
             }}
           />
         </div>
@@ -94,17 +123,15 @@ import FullEditor from '../../../../../../../components/FullEditor';
   }
 
   render() {
-    const { edit, editDes } = this.state;
-    const {
-      intl, store, description,
-    } = this.props;
+    const { edit, description, editDes } = this.state;
 
     const callback = (value) => {
       this.setState({
         description: value,
+        editDes: value,
         edit: false,
       }, () => {
-        // this.updateIssue('description');
+        this.updateIssueDes();
       });
     };
 

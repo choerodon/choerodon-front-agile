@@ -143,4 +143,16 @@
         permission: # 菜单内容具有的权限
           - 'agile-service.time-zone-work-calendar.queryTimeZoneWorkCalendar'
           - 'agile-service.time-zone-work-calendar.queryTimeZoneWorkCalendarRefByTimeZoneId'
+    - "objectScheme":
+        icon: aspect_ratio
+        Routes: /agile/objectScheme
+        sort: 11
+        permission:
+          - 'choerodon-foundation-service.object-scheme.pageQuery'
+    - "page":
+        icon: description
+        Routes: /agile/page
+        sort: 12
+        permission:
+          - 'choerodon-foundation-service.page.pageQuery'
 
