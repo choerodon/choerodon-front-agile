@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
@@ -9,7 +9,7 @@ import './CalendarBody.scss';
 const moment = extendMoment(Moment);
 
 
-class CalendarBody extends Component {
+class CalendarBody extends PureComponent {
   renderPIItem = () => {
     const { data } = this.props;
     const itemArr = [];
@@ -46,7 +46,7 @@ class CalendarBody extends Component {
               this.renderPIItem()
             }
           </div>
-          <Events />
+          {/* <Events /> */}
         </div>
       </div>
     );

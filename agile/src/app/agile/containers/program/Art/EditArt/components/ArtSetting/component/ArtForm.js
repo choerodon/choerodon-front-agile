@@ -110,7 +110,7 @@ class ArtForm extends Component {
                   format="YYYY-MM-DD"
                   style={{ width: 500 }}
                   label="开始日期"
-                  disabledDate={current => current < moment(initValue.startDate).endOf('day')}
+                  disabledDate={current => current < moment()}
                 />,
               )}
             </FormItem>

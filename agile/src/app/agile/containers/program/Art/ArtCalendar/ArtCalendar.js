@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Page, Header, Content } from 'choerodon-front-boot';
 import { find } from 'lodash';
-import { Spin } from 'choerodon-ui';
+import { Spin, Button } from 'choerodon-ui';
 import moment from 'moment';
 import { getArtCalendar, getArtsByProjectId } from '../../../../api/ArtApi';
-import { CalendarHeader, CalendarBody } from './components';
+import { CalendarHeader, CalendarBody, CreateEvent } from './components';
 import './ArtCalendar.scss';
 import emptyART from '../../../../assets/image/emptyART.svg';
 import EmptyBlock from '../../../../components/EmptyBlock';
@@ -20,6 +20,8 @@ class ArtCalendar extends Component {
     startDate: null,
     endDate: null,
     loading: true,
+    createEventVisible: false,
+    createEventLoading: false,
   }
 
   componentDidMount() {
@@ -69,20 +71,38 @@ class ArtCalendar extends Component {
     };
   }
 
+  handleCreateEventClick=() => {
+    this.setState({
+      createEventVisible: true,
+    });
+  }
+
+  handleCancelCreateEvent=() => {
+    this.setState({
+      createEventVisible: false,
+    });
+  }
+
   render() {
     const {
-      data, startDate,
-      currentPI, ArtName,
+      data, 
+      startDate,
+      currentPI, 
+      ArtName,
       endDate,
       doingArt,
       loading,
       artStartDate,
+      createEventVisible,
+      createEventLoading,
     } = this.state;
     return (
       <Page className="c7nagile-ArtCalendar">
-        <Header
-          title="ART日历"
-        />
+        <Header title="ART日历">
+          {/* <Button icon="playlist_add" onClick={this.handleCreateEventClick}>
+            创建事件
+          </Button> */}
+        </Header>
         <Content style={{ padding: 0 }}>
           <Spin spinning={loading}>
             {
@@ -132,6 +152,12 @@ class ArtCalendar extends Component {
               )
             }
           </Spin>
+          {/* <CreateEvent 
+            visible={createEventVisible}
+            loading={createEventLoading}
+            onCancel={this.handleCancelCreateEvent}
+            onSubmit={this.handleEventSubmit}
+          /> */}
         </Content>
       </Page>
     );

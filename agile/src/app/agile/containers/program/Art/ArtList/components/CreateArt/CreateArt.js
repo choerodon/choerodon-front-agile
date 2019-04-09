@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
   Form, Input, Modal, DatePicker, Select,
 } from 'choerodon-ui';
+import moment from 'moment';
 import SelectFocusLoad from '../../../../../../components/SelectFocusLoad';
 import './CreateArt.scss';
 
@@ -76,6 +77,7 @@ class CreateArt extends Component {
                 format="YYYY-MM-DD"
                 style={{ width: 500 }}
                 label="开始日期"
+                disabledDate={current => current < moment()}
               />,
             )}
           </FormItem>
