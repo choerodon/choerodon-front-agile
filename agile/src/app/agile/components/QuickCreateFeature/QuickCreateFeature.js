@@ -66,7 +66,7 @@ class QuickCreateFeature extends Component {
         if (onCreate) {
           onCreate();
         }
-      }).catch(() => {
+      }).catch(() => {      
         this.setState({
           loading: false,
         });

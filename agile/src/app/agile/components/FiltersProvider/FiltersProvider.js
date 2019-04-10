@@ -4,6 +4,7 @@ import {
   loadIssueTypes, loadStatusList, loadPriorities, loadLabels, loadComponents, loadVersions, loadEpics, loadSprints, 
 } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
+import { getAllPIList } from '../../api/PIApi';
 
 const requests = {
   issueType: {
@@ -52,6 +53,10 @@ const requests = {
     valueField: 'issueId',
     request: loadEpics, 
   },
+  pi: {
+    formatter: pi => ({ value: pi.id, text: `${pi.code}-${pi.name}` }),
+    request: getAllPIList,     
+  },
 };
 const propTypes = {
   fields: PropTypes.arrayOf(PropTypes.string),
@@ -60,12 +65,18 @@ const defaultProps = {
   fields: [],
 };
 function transform(type, data) {
-  const { isContent, textField, valueField } = requests[type];
+  const {
+    isContent, textField, valueField, formatter, 
+  } = requests[type];
   const list = isContent ? data.content : data;
-  return list.map(item => ({
-    text: item[textField],
-    value: item[valueField].toString(),
-  }));
+  if (formatter) {
+    return list.map(formatter);
+  } else {
+    return list.map(item => ({
+      text: item[textField],
+      value: item[valueField].toString(),
+    }));
+  }
 }
 
 class FiltersProvider extends Component {

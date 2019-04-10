@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Button, Spin, Icon, Radio, 
+  Button, Spin, Icon, Radio,
 } from 'choerodon-ui';
 import {
   Header, Page,
@@ -22,20 +22,27 @@ const RadioButton = Radio.Button;
 @inject('HeaderStore')
 @observer
 class FeatureList extends Component {
-state = {
-  visible: false,
-  mode: 'plan',
-}
+  state = {
+    visible: false,
+    mode: 'plan',
+  }
 
-componentDidMount() {
-  this.refresh();
-}
+  componentDidMount() {
+    this.refresh();
+  }
 
-  
+  saveRef = name => (ref) => {
+    this[name] = ref;
+  }
+
   refresh = () => {
-    
+    if (this.PlanMode) {
+      this.PlanMode.refresh();
+    } else {
+      this.QueryMode.refresh();
+    }
   };
-  
+
 
   handleCreateBtn = () => {
     this.setState({
@@ -56,7 +63,7 @@ componentDidMount() {
     this.refresh();
   };
 
-  handleModeChange=(e) => {
+  handleModeChange = (e) => {
     this.setState({
       mode: e.target.value,
     });
@@ -103,10 +110,11 @@ componentDidMount() {
             }}
           >
             {mode === 'plan' ? (
-              <PlanMode 
+              <PlanMode
                 issueRefresh={() => { this.IssueDetail.refreshIssueDetail(); }}
+                ref={this.saveRef('PlanMode')}
               />
-            ) : <QueryMode />}
+            ) : <QueryMode ref={this.saveRef('QueryMode')} />}
             <FeatureDetail
               store={FeatureStore}
               refresh={this.refresh}

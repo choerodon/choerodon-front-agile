@@ -2,17 +2,18 @@ import React from 'react';
 import QuickCreateFeature from './QuickCreateFeature';
 import QuickCreateFeatureProvider from './QuickCreateFeatureProvider';
 
-const QuickCreateFeatureWithProvider = () => (
+const QuickCreateFeatureWithProvider = props => (
   <QuickCreateFeatureProvider>
     {({
       featureTypeDTO, 
-      defaultPriority,
+      defaultPriority,      
       ...otherProps
     }) => (
       <QuickCreateFeature
         featureTypeDTO={featureTypeDTO}  
         defaultPriority={defaultPriority}
         {...otherProps}
+        {...props}
       />
     )}
   </QuickCreateFeatureProvider>

@@ -8,6 +8,13 @@ const { AppState } = stores;
 export function getPIList(artId) {
   return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/list?artId=${artId}`);
 }
+
+/**
+ * 获取PI列表
+ */
+export function getAllPIList() {
+  return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/all`);
+}
 /**
  * 删除PI
  */
