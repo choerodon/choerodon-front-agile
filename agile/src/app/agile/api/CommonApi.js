@@ -1,4 +1,5 @@
 import { stores, axios } from 'choerodon-front-boot';
+import { getProjectId, getOrganizationId } from '../common/utils';
 
 const { AppState } = stores;
 
@@ -17,4 +18,7 @@ export function getUsers(param) {
 export function getUser(userId) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`iam/v1/projects/${projectId}/users?id=${userId}`);
+}
+export function getProjectsInProgram() {
+  return axios.get(`iam/v1/organizations/${getOrganizationId()}/project_relations/${getProjectId()}`);
 }

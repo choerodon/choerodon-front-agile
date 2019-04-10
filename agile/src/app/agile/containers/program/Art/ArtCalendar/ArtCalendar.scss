@@ -6,6 +6,7 @@
     padding: 0 24px;
     border-bottom: 1px solid #d3d3d3;
   }
+
   &-scroller {
     overflow: auto;
     height: 100%;
@@ -13,15 +14,18 @@
     flex-direction: column;
     margin: 24px;
   }
+
   &-calendar {
+    position: relative;
     min-width: 100%;
     // width: fit-content;兼容性差，display:table可以与之实现相同效果
     display: table;
     height: 100%;
-    border-right: 1px solid #D6D6D6;
   }
+
   .ant-spin-nested-loading {
     height: 100%;
+
     .ant-spin-container {
       height: 100%;
     }

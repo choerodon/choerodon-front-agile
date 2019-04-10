@@ -103,9 +103,9 @@ export function loadStatus(statusId, issueId, typeId, applyType = 'agile') {
     `/issue/v1/projects/${projectId}/schemes/query_transforms?current_status_id=${statusId}&issue_id=${issueId}&issue_type_id=${typeId}&apply_type=${applyType}`,
   );
 }
-export function loadStatusList() {
+export function loadStatusList(applyType = 'agile') {
   const projectId = AppState.currentMenuType.id;
-  return axios.get(`/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=agile`);
+  return axios.get(`/issue/v1/projects/${projectId}/schemes/query_status_by_project_id?apply_type=${applyType}`);
 }
 // 调用issue服务
 export function loadPriorities() {
@@ -113,7 +113,10 @@ export function loadPriorities() {
   const orgId = AppState.currentMenuType.organizationId;
   return axios.get(`/issue/v1/projects/${projectId}/priority/list_by_org`);
 }
-
+export function getDefaultPriority() {
+  const proId = AppState.currentMenuType.id;
+  return axios.get(`/issue/v1/projects/${proId}/priority/default`);
+}
 export function loadIssue(issueId, projectId = AppState.currentMenuType.id) {
   const orgId = AppState.currentMenuType.organizationId;
   return axios.get(`/agile/v1/projects/${projectId}/issues/${issueId}${orgId ? `?organizationId=${orgId}` : ''}`);

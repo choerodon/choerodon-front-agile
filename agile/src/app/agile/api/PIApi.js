@@ -10,6 +10,19 @@ export function getPIList(artId) {
 }
 
 /**
+ * 获取PI列表
+ */
+export function getAllPIList() {
+  return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/all`);
+}
+/**
+ * 删除PI
+ */
+export function deletePI(piId, artId) {
+  return axios.delete(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/${piId}?artId=${artId}`);
+}
+
+/**
  * 获取单个PI的目标列表
  * @param {*} piId 
  */

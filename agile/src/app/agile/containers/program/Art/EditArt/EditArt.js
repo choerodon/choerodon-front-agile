@@ -1,7 +1,8 @@
+/* eslint-disable react/destructuring-assignment */
 
 import React, { Component } from 'react';
 import {
-  Page, Header, Content, axios, stores, 
+  Page, Header, Content, axios, stores,
 } from 'choerodon-front-boot';
 import { isEqual } from 'lodash';
 import {
@@ -14,7 +15,7 @@ import { ee } from './components/ArtSetting';
 import {
   getArtById, editArt, getArtsByProjectId, beforeStop, stopArt, startArt,
 } from '../../../../api/ArtApi';
-import { getPIList } from '../../../../api/PIApi';
+import { getPIList, deletePI } from '../../../../api/PIApi';
 import StartArtModal from './components/StartArtModal';
 import StopArtModal from './components/StopArtModal';
 
@@ -90,7 +91,7 @@ class EditArt extends Component {
         interationWeeks,
         ipWeeks,
         piCodeNumber,
-        piCodePrefix,      
+        piCodePrefix,
         startDate,
         rteId,
         name,
@@ -127,7 +128,9 @@ class EditArt extends Component {
   }
 
   getPIList = (artId, callback) => {
-    getPIList(artId).then((res) => {
+    // eslint-disable-next-line react/destructuring-assignment
+    const { id } = this.props.match.params;
+    getPIList(artId || id).then((res) => {
       this.setState({
         PiList: res.content.map(item => (
           Object.assign(item, {
@@ -141,6 +144,13 @@ class EditArt extends Component {
           callback();
         }
       });
+    });
+  }
+
+  handleDeletePI=(piId) => {
+    const { id: artId } = this.props.match.params;
+    deletePI(piId, artId).then(() => {
+      this.getPIList();
     });
   }
 
@@ -161,13 +171,13 @@ class EditArt extends Component {
     this.setState({
       loading: true,
     });
-    getArtById(id).then((data) => { 
+    getArtById(id).then((data) => {
       const {
         interationCount,
         interationWeeks,
         ipWeeks,
         piCodeNumber,
-        piCodePrefix,      
+        piCodePrefix,
         startDate,
         rteId,
         name,
@@ -192,7 +202,7 @@ class EditArt extends Component {
         formData,
         data,
       }, () => {
-        if (callback) {
+        if (callback && typeof callback === 'function') {
           callback();
         }
       });
@@ -217,7 +227,7 @@ class EditArt extends Component {
 
   handleSave = (newValues) => {
     const { data } = this.state;
-    const artDTO = { ...data, ...formatter(newValues) };    
+    const artDTO = { ...data, ...formatter(newValues) };
     editArt(artDTO).then(() => {
       this.loadArt();
     });
@@ -278,7 +288,7 @@ class EditArt extends Component {
             ee.emitEvent('setCurrentTab');
           });
         });
-        
+
         this.setState({
           startArtModalVisible: false,
         });
@@ -345,7 +355,7 @@ class EditArt extends Component {
                 onOk={this.handleReleaseOk}
                 onCancel={this.handleReleaseCancel}
               />
-              <ArtInfo 
+              <ArtInfo
                 onSubmit={this.handleSave}
                 name={name}
                 startBtnVisible={statusCode === 'todo'}
@@ -359,6 +369,7 @@ class EditArt extends Component {
                 PiList={PiList}
                 onGetPIList={this.getPIList}
                 onGetArtInfo={this.loadArt}
+                onDeletePI={this.handleDeletePI}
                 onFormChange={this.handleFormChange}
                 onSave={this.handleSave}
               />

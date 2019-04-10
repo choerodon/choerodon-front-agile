@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Moment from 'moment';
 import { Popover } from 'choerodon-ui';
 import { extendMoment } from 'moment-range';
-import StatusTag from '../../../../components/StatusTag';
+import StatusTag from '../../../../../../components/StatusTag';
 
 import './PiItem.scss';
 

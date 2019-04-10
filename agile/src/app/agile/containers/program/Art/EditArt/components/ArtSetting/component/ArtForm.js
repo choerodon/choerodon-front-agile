@@ -83,7 +83,7 @@ class ArtForm extends Component {
     const { getFieldDecorator } = this.props.form;
     // eslint-disable-next-line no-shadow
     const {
-      initValue, PiList, onGetPIList, data, onGetArtInfo,
+      initValue, PiList, onGetPIList, data, onGetArtInfo, onDeletePI,
     } = this.props;
     const { currentTab } = this.state;
     return (
@@ -110,7 +110,7 @@ class ArtForm extends Component {
                   format="YYYY-MM-DD"
                   style={{ width: 500 }}
                   label="开始日期"
-                  disabledDate={current => current < moment(initValue.startDate).endOf('day')}
+                  disabledDate={current => current < moment()}
                 />,
               )}
             </FormItem>
@@ -200,7 +200,15 @@ class ArtForm extends Component {
           </TabPane>
           {data.statusCode !== 'todo' && (
           <TabPane tab="PI列表" key="4">
-            <PIList name={initValue.name} data={data} artId={initValue.id} PiList={PiList} onGetPIList={onGetPIList} onGetArtInfo={onGetArtInfo} />
+            <PIList 
+              name={initValue.name}
+              data={data}
+              artId={initValue.id}
+              PiList={PiList}
+              onGetPIList={onGetPIList}
+              onGetArtInfo={onGetArtInfo}
+              onDeletePI={onDeletePI}
+            />
           </TabPane>
           )}
         </Tabs>

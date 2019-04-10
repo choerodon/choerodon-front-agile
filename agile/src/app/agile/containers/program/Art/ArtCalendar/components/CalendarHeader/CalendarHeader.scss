@@ -1,6 +1,9 @@
 .c7nagile-CalendarHeader {
   width: 100%;
   background: #FAFAFA;
+  position: sticky;
+  top: 0;
+  z-index: 9;
 
   .c7nagile-CalendarHeader-years {
     display: flex;
@@ -9,11 +12,14 @@
   }
 
   .c7nagile-CalendarHeader-year {
-    border-left: 1px solid #D6D6D6;
     font-weight: 500;
     font-size: 14px;
     height: 22px;
     line-height: 22px;
+    border-left: 1px solid #D6D6D6;
+    &:last-of-type {
+      border-right: 1px solid #D6D6D6;
+    }
   }
 
   .c7nagile-CalendarHeader-weeks {
@@ -24,22 +30,17 @@
   .c7nagile-CalendarHeader-week {
     flex: 7;
     height: 55px;
-
+    min-width: 175px;
     position: relative;
     font-size: 14px;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    border-left: 1px solid #D6D6D6;
 
-    &:after {
-      content: "";
-      width: 0;
-      border-left: 1px solid #D6D6D6;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
+    &:last-of-type {
+      border-right: 1px solid #D6D6D6;
     }
 
     &-num {

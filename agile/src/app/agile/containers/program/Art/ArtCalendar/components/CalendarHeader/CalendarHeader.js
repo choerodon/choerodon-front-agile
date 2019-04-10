@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
 import './CalendarHeader.scss';
 
 const moment = extendMoment(Moment);
-class CalendarHeader extends Component {
+class CalendarHeader extends PureComponent {
   caculateYearFlex = (years) => {
     if (years.length === 0) {
       return 1;
@@ -36,8 +36,7 @@ class CalendarHeader extends Component {
     // const totalDays = range.diff('days');
 
     const years = Array.from(range.by('years'));
-    const weeks = Array.from(range.by('weeks'));
-    // console.log(years, weeks);
+    const weeks = Array.from(range.by('weeks', { excludeEnd: true }));
     const YearFlexs = this.caculateYearFlex(years);
     // console.log(YearFlexs);
     return (
