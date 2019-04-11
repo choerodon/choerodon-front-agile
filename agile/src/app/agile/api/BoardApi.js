@@ -32,5 +32,5 @@ export function sortColumn(sortDTO) {
  * @returns
  */
 export function deleteColumn(columnId) {
-  return axios.delete(`/agile/v1/projects/${getProjectId()}/board_column/${columnId}`);
+  return axios.delete(`/agile/v1/projects/${getProjectId()}/board_column/program/${columnId}`);
 }

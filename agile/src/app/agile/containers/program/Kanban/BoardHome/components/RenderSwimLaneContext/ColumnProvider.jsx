@@ -3,7 +3,7 @@
 import React from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import ColumnCouldDragOn from './ColumnCouldDragOn';
 import CSSBlackMagic from '../../../../../../components/CSSBlackMagic';
 

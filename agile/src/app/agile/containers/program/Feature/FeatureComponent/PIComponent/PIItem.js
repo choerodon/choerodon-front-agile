@@ -8,7 +8,7 @@ import NoneSprint from './PIItemComponent/NonePI';
 const { confirm } = Modal;
 
 @observer
-class SprintItem extends Component {
+class PIItem extends Component {
   componentDidMount() {
     const { onRef } = this.props;
     onRef(this);
@@ -18,7 +18,7 @@ class SprintItem extends Component {
    *删除冲刺事件
    *
    * @param {*} e
-   * @memberof SprintItem
+   * @memberof PIItem
    */
   handleDeleteSprint = (item, e) => {
     const that = this;
@@ -95,4 +95,4 @@ class SprintItem extends Component {
   }
 }
 
-export default SprintItem;
+export default PIItem;

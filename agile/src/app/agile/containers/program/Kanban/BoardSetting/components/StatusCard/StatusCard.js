@@ -5,7 +5,7 @@ import {
   Radio, Icon, Tooltip, Modal,
 } from 'choerodon-ui';
 import { stores, Permission } from 'choerodon-front-boot';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import EditStatus from '../EditStatus/EditStatus';
 import './StatusCard.scss';
 
@@ -109,16 +109,17 @@ class StatusCard extends Component {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     const {
-      data, index, refresh, draggabled, 
+      data, index, refresh, noPermission, ...otherProps
     } = this.props;
     const { visible, disabled } = this.state;
     return (
       <Draggable
-        isDragDisabled={draggabled}
+        isDragDisabled={noPermission}
         key={data.code}
-        draggableId={`${data.statusId},${data.objectVersionNumber}`}
+        draggableId={`${data.statusId},${data.objectVersionNumber},${data.categoryCode}`}
         index={index}
         type="status"
+        {...otherProps}
       >
         {(provided, snapshot) => (
           <div>

@@ -11,7 +11,7 @@ import { DragDropContext } from 'react-beautiful-dnd';
 // import ClearFilter from '../FeatureComponent/SprintComponent/SprintItemComponent/SprintHeaderComponent/ClearAllFilter';
 import FeatureDetail from '../FeatureComponent/FeatureDetail/FeatureDetail';
 import CreateFeature from '../FeatureComponent/CreateFeature/CreateFeature';
-import FeatureStore from '../../../../stores/Program/Feature/FeatureStore';
+import FeatureStore from '../../../../stores/program/Feature/FeatureStore';
 import Epic from '../FeatureComponent/EpicComponent/Epic';
 import SprintItem from '../FeatureComponent/PIComponent/PIItem';
 import PlanMode from '../FeatureComponent/PlanMode';

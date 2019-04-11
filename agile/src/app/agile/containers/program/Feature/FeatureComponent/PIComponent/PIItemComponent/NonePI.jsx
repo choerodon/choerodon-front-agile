@@ -18,7 +18,7 @@ const data = {
 };
 
 @inject('AppState')
-@observer class NoneSprint extends Component {
+@observer class NonePI extends Component {
   getSourceByType = (source) => {
     const { type } = this.props;
     return data[type] && data[type][source];
@@ -48,4 +48,4 @@ const data = {
   }
 }
 
-export default NoneSprint;
+export default NonePI;

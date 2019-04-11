@@ -10,7 +10,7 @@ import PriorityTag from '../../../../../components/PriorityTag';
 import './PIIssue.scss';
 
 @observer
-class SprintIssue extends Component {
+class PIItem extends Component {
   shouldComponentUpdate(nextProps) {
     if (JSON.stringify(nextProps) === JSON.stringify(this.props)) {
       return false;
@@ -23,7 +23,7 @@ class SprintIssue extends Component {
     return (
       <div className={classnames('c7n-backlog-IssueCard')}>
         <div
-          label="sprintIssue"
+          label="PIItem"
           className={classnames('c7n-backlog-IssueCard-left')}
         >
           <TypeTag
@@ -55,7 +55,7 @@ class SprintIssue extends Component {
             {!_.isNull(item.epicName) && item.epicName ? (
               <Tooltip title={`史诗: ${item.epicName}`}>
                 <span
-                  label="sprintIssue"
+                  label="PIItem"
                   className="c7n-backlog-IssueCard-right-epic container"
                   style={{
                     color: item.color || item.epicColor,
@@ -94,7 +94,7 @@ class SprintIssue extends Component {
             }
             <Tooltip title={`故事点: ${item.storyPoints}`}>
               <div
-                label="sprintIssue"
+                label="PIItem"
                 className={classnames('c7n-backlog-IssueCard-right-storyPoint', {
                   visible: item.storyPoints && item.issueTypeDTO && item.issueTypeDTO.typeCode === 'story',
                 })}
@@ -109,4 +109,4 @@ class SprintIssue extends Component {
   }
 }
 
-export default SprintIssue;
+export default PIItem;

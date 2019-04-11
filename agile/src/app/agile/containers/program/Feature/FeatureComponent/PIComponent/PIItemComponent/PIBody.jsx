@@ -1,70 +1,21 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Droppable } from 'react-beautiful-dnd';
-import QuickCreateIssue from './QuickCreateIssue';
 import IssueList from './IssueList';
 import deBounce from '../Utils';
+import { QuickCreateFeature } from '../../../../../../components/QuickCreateFeature';
 
 const debounceCallback = deBounce(500);
 
 @inject('AppState')
 @observer class PIBody extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  handleCreateIssue(currentType, inputValue) {
-    const {
-      defaultPriority, AppState, piId, store, refresh,
-    } = this.props;
-    // 防抖函数
-    debounceCallback(() => {
-      const req = {
-        priorityCode: `priority-${defaultPriority.id}`,
-        priorityId: defaultPriority.id,
-        projectId: AppState.currentMenuType.id,
-        programId: AppState.currentMenuType.id,
-        featureDTO: {
-          featureType: 'business',
-        },
-        piId: piId * 1,
-        summary: inputValue,
-        issueTypeId: currentType.id,
-        typeCode: currentType.typeCode,
-        /* eslint-disable */
-        ...!isNaN(store.getChosenEpic) ? {
-          epicId: store.getChosenEpic,
-        } : {},
-        parentIssueId: 0,
-      };
-      store.axiosEasyCreateIssue(req).then((res) => {
-        this.setState({
-          expand: false,
-          loading: false,
-        });
-        refresh();
-        // store.createIssue({
-        //   ...res,
-        //   versionIds: res.versionIssueRelDTOList.length ? [res.versionIssueRelDTOList[0].versionId] : [],
-        //   versionNames: res.versionIssueRelDTOList.length ? [res.versionIssueRelDTOList[0].name] : [],
-        // }, sprintId);
-      }).catch((error) => {
-        this.setState({
-          loading: false,
-        });
-      });
-    }, this);
-  }
-
   render() {
     const {
       expand, versionVisible, epicVisible,
       issueCount, piId, emptyIssueComponent,
-      defaultType, issueType, defaultPriority,
+      defaultPriority, featureTypeDTO,
       store, refresh,
     } = this.props;
-
     return (
       <Droppable
         droppableId={piId}
@@ -91,15 +42,20 @@ const debounceCallback = deBounce(500);
             ) : (emptyIssueComponent)
               }
             {provided.placeholder}
-            <QuickCreateIssue
-              defaultPriority={defaultPriority}
-              piId={piId}
-              store={store}
-              issueType={issueType}
-              defaultType={defaultType}
-              refresh={refresh}
-              handleCreateIssue={this.handleCreateIssue}
-            />
+            <div style={{ padding: '10px 0px 10px 33px' }}>
+              <QuickCreateFeature
+                defaultPriority={defaultPriority}
+                piId={piId * 1}     
+                {
+                  // eslint-disable-next-line no-restricted-globals
+                  ...!isNaN(store.getChosenEpic) ? {
+                    epicId: store.getChosenEpic,
+                  } : {}
+                }
+                featureTypeDTO={featureTypeDTO}
+                onCreate={refresh}
+              />
+            </div>
           </div>
         )}
       </Droppable>

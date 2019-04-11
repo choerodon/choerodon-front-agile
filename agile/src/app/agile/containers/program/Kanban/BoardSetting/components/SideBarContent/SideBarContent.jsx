@@ -5,7 +5,7 @@ import {
   Form, Modal, Input, Select, message,
 } from 'choerodon-ui';
 import { find } from 'lodash';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import { STATUS } from '../../../../../../common/Constant';
 
 const FormItem = Form.Item;

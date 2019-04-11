@@ -8,7 +8,7 @@ import {
 } from 'choerodon-front-boot';
 import moment from 'moment';
 
-import PIStore from '../../../../stores/Program/PI/PIStore';
+import PIStore from '../../../../stores/program/PI/PIStore';
 import { 
   getPIAims, deletePIAims, getPIList,
 } from '../../../../api/PIApi';

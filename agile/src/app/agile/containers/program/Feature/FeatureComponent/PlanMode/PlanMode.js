@@ -5,7 +5,7 @@ import {
   Header, Page,
 } from 'choerodon-front-boot';
 import { DragDropContext } from 'react-beautiful-dnd';
-import FeatureStore from '../../../../../stores/Program/Feature/FeatureStore';
+import FeatureStore from '../../../../../stores/program/Feature/FeatureStore';
 import Epic from '../EpicComponent/Epic';
 import SprintItem from '../PIComponent/PIItem';
 // import './FeatureList.scss';

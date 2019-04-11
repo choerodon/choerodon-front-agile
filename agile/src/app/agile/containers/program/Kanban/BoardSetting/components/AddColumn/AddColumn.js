@@ -4,7 +4,7 @@ import { axios, Content, stores } from 'choerodon-front-boot';
 import {
   Form, Modal, Input, Select,
 } from 'choerodon-ui';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import { STATUS } from '../../../../../common/Constant';
 
 const FormItem = Form.Item;

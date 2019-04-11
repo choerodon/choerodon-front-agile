@@ -1,7 +1,8 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { DashBoardNavBar, stores, axios } from 'choerodon-front-boot';
-import { Spin, Tooltip } from 'choerodon-ui';
+import { Spin, Tooltip, Pagination } from 'choerodon-ui';
 import TypeTag from '../../components/TypeTag';
 import PriorityTag from '../../components/PriorityTag';
 import EmptyBlockDashboard from '../../components/EmptyBlockDashboard';
@@ -16,6 +17,11 @@ class Undistributed extends Component {
     super(props);
     this.state = {
       issues: [],
+      pagination: {
+        total: 0,
+        current: 1,
+        pageSize: 6,
+      },
       loading: false,
     };
   }
@@ -24,17 +30,34 @@ class Undistributed extends Component {
     this.loadData();
   }
 
-  loadData() {
+  handlePaginationChange = (page, pageSize) => {
+    this.loadData({
+      current: page,
+      pageSize,
+    });
+  }
+
+  loadData(pagination = this.state.pagination) {
     const projectId = AppState.currentMenuType.id;
     this.setState({ loading: true });
-    axios.get(`/agile/v1/projects/${projectId}/issues/undistributed`)
+    const { current, pageSize } = pagination;
+    axios.get(`/agile/v1/projects/${projectId}/issues/undistributed?size=${pageSize}&page=${current - 1}`)
       .then((res) => {
+        const {
+          content, totalElements, number, size,
+        } = res;
         this.setState({
-          issues: res,
+          issues: content,
+          pagination: {
+            current: number + 1,
+            total: totalElements,
+            pageSize: size,
+          },
           loading: false,
         });
       });
   }
+
 
   renderIssue(issue) {
     return (
@@ -108,12 +131,24 @@ class Undistributed extends Component {
   }
 
   render() {
-    const { issues } = this.state;
+    const { issues, pagination } = this.state;
     const { history } = this.props;
     const urlParams = AppState.currentMenuType;
+    const { current, total, pageSize } = pagination;
     return (
       <div className="c7n-agile-dashboard-undistributed">
         {this.renderContent()}
+   
+        <div style={{ textAlign: 'right', paddingRight: 15 }}>
+          <Pagination
+            hideOnSinglePage 
+            showSizeChanger={false}
+            total={total}
+            current={current}
+            pageSize={pageSize}
+            onChange={this.handlePaginationChange}
+          />
+        </div>
         <DashBoardNavBar>
           <a
             role="none"
