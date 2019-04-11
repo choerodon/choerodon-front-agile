@@ -152,13 +152,13 @@
         Routes: /agile/objectScheme
         sort: 11
         permission:
-          - 'choerodon-foundation-service.object-scheme.pageQuery'
+          - 'foundation-service.object-scheme.pageQuery'
     - "page-organization":
         icon: baseline-file_copy
         Routes: /agile/page
         sort: 12
         permission:
-          - 'choerodon-foundation-service.page.pageQuery'
+          - 'foundation-service.page.pageQuery'
 
 # 项目设置
 "prosetting":
@@ -170,10 +170,10 @@
         Routes: /agile/objectScheme
         sort: 5
         permission:
-          - 'choerodon-foundation-service.project-object-scheme.pageQuery'
+          - 'foundation-service.project-object-scheme.pageQuery'
     - "page-project":
         icon: baseline-file_copy
         Routes: /agile/page
         sort: 6
         permission:
-          - 'choerodon-foundation-service.project-page.pageQuery'
+          - 'foundation-service.project-page.pageQuery'
