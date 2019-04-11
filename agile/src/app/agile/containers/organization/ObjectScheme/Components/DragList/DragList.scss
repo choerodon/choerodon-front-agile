@@ -1,10 +1,11 @@
 .issue-dragList {
   &-content {
-    background: #ECECEC;
     padding: 20px;
     width: 520px;
     display: flex;
     justify-content: space-between;
+    border: 1px solid #E8E8E8;
+    border-radius: 2px;
   }
   &-card {
     background: #FFFFFF;
@@ -12,9 +13,17 @@
     width: 480px;
     & .ant-card-body {
       height: calc(100% - 55px);
+      padding: 10px 0;
+    }
+    & .ant-card-head {
+      border-top: 1px solid #e8e8e8;
+      background: #F5F5F5;
+      border-radius: 0;
+      min-height: 0;
     }
     & .ant-card-head-title {
-      line-height: 35px;
+      line-height: 40px;
+      padding: 0;
     }
   }
   &-des {

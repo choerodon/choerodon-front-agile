@@ -2,10 +2,12 @@ import axios from 'axios';
 import { observable, action, computed } from 'mobx';
 import { store, stores } from 'choerodon-front-boot';
 
-const { AppState } = stores;
-
 @store('PageStore')
 class PageStore {
+  @observable apiGetway = '';
+
+  @observable orgId = '';
+
   @observable page = [];
 
   @observable pageDetail = {
@@ -42,50 +44,52 @@ class PageStore {
     });
   }
 
-  loadPage = (page, size, filter) => {
-    const orgId = AppState.currentMenuType.organizationId;
-    return axios.post(`/foundation/v1/organizations/${orgId}/page?page=${page}&size=${size}`, filter).then((data) => {
-      if (data && !data.failed) {
-        this.setPage(data.content);
-      } else {
-        Choerodon.prompt(data.message);
-      }
-    });
-  };
+  @action initCurrentMenuType(data) {
+    const { type, id, organizationId } = data;
+    this.apiGetway = `/foundation/v1/${type}s/${id}`;
+    this.orgId = organizationId;
+  }
 
-  loadPageDetail = (code) => {
-    const orgId = AppState.currentMenuType.organizationId;
-    return axios.get(`/foundation/v1/organizations/${orgId}/page_field/list?pageCode=${code}`).then((data) => {
-      if (data && !data.failed) {
-        this.setPageDetail(data);
-      } else {
-        Choerodon.prompt(data.message);
-      }
-    });
-  };
+  loadPage = (page, size, filter) => axios.post(
+    `${this.apiGetway}/page?page=${page}&size=${size}&organizationId=${this.orgId}`, filter,
+  ).then((data) => {
+    if (data && !data.failed) {
+      this.setPage(data.content);
+    } else {
+      Choerodon.prompt(data.message);
+    }
+  });
 
-  updateField = (fieldId, code, field) => {
-    const orgId = AppState.currentMenuType.organizationId;
-    return axios.put(`/foundation/v1/organizations/${orgId}/page_field/${fieldId}?pageCode=${code}`, field).then((data) => {
-      if (data && !data.failed) {
-        this.updatePageDetail(data);
-      } else {
-        Choerodon.prompt(data.message);
-      }
-    });
-  };
+  loadPageDetail = code => axios.get(
+    `${this.apiGetway}/page_field/list?pageCode=${code}&organizationId=${this.orgId}`,
+  ).then((data) => {
+    if (data && !data.failed) {
+      this.setPageDetail(data);
+    } else {
+      Choerodon.prompt(data.message);
+    }
+  });
 
-  updateFieldOrder = (code, order) => {
-    const orgId = AppState.currentMenuType.organizationId;
-    return axios.post(`/foundation/v1/organizations/${orgId}/page_field/adjust_order?pageCode=${code}`, order).then((data) => {
-      if (data && !data.failed) {
-        return data;
-      } else {
-        Choerodon.prompt(data.message);
-        return null;
-      }
-    });
-  };
+  updateField = (fieldId, code, field) => axios.put(
+    `${this.apiGetway}/page_field/${fieldId}?pageCode=${code}&organizationId=${this.orgId}`, field,
+  ).then((data) => {
+    if (data && !data.failed) {
+      this.updatePageDetail(data);
+    } else {
+      Choerodon.prompt(data.message);
+    }
+  });
+
+  updateFieldOrder = (code, order) => axios.post(
+    `${this.apiGetway}/page_field/adjust_order?pageCode=${code}&organizationId=${this.orgId}`, order,
+  ).then((data) => {
+    if (data && !data.failed) {
+      return data;
+    } else {
+      Choerodon.prompt(data.message);
+      return null;
+    }
+  });
 }
 
 const pageStore = new PageStore();

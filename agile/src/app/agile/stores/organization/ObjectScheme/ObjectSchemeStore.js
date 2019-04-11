@@ -6,6 +6,10 @@ const { AppState } = stores;
 
 @store('ObjectSchemeStore')
 class ObjectSchemeStore {
+  @observable apiGetway = '';
+
+  @observable orgId = '';
+
   @observable objectScheme = [];
 
   @observable schemeDetail = {
@@ -69,58 +73,60 @@ class ObjectSchemeStore {
     });
   }
 
-  loadObjectScheme = (page, size, filter) => {
-    const orgId = AppState.currentMenuType.organizationId;
-    return axios.post(`/foundation/v1/organizations/${orgId}/object_scheme?page=${page}&size=${size}`, filter).then((data) => {
-      if (data && !data.failed) {
-        this.setObjectScheme(data.content);
-      } else {
-        Choerodon.prompt(data.message);
-      }
-    });
-  };
+  @action initCurrentMenuType(data) {
+    const { type, id, organizationId } = data;
+    this.apiGetway = `/foundation/v1/${type}s/${id}`;
+    this.orgId = organizationId;
+  }
 
-  loadSchemeDetail = (code) => {
-    const orgId = AppState.currentMenuType.organizationId;
-    return axios.get(`/foundation/v1/organizations/${orgId}/object_scheme_field/list?schemeCode=${code}`).then((data) => {
-      if (data && !data.failed) {
-        this.setSchemeDetail(data);
-      } else {
-        Choerodon.prompt(data.message);
-      }
-    });
-  };
+  loadObjectScheme = (page, size, filter) => axios.post(
+    `${this.apiGetway}/object_scheme?page=${page}&size=${size}&organizationId=${this.orgId}`, filter,
+  ).then((data) => {
+    if (data && !data.failed) {
+      this.setObjectScheme(data.content);
+    } else {
+      Choerodon.prompt(data.message);
+    }
+  });
 
-  loadFieldDetail = (orgId, fieldId) => axios.get(`/foundation/v1/organizations/${orgId}/object_scheme_field/${fieldId}`).then((data) => {
+  loadSchemeDetail = code => axios.get(
+    `${this.apiGetway}/object_scheme_field/list?schemeCode=${code}&organizationId=${this.orgId}`,
+  ).then((data) => {
+    if (data && !data.failed) {
+      this.setSchemeDetail(data);
+    } else {
+      Choerodon.prompt(data.message);
+    }
+  });
+
+  loadFieldDetail = fieldId => axios.get(
+    `${this.apiGetway}/object_scheme_field/${fieldId}?organizationId=${this.orgId}`,
+  ).then((data) => {
     if (data) {
       this.setField(data);
     }
     return data;
   });
 
-  loadLookupValue = (code) => {
-    const orgId = AppState.currentMenuType.organizationId;
-    return axios.get(`/foundation/v1/organizations/${orgId}/lookup_values/${code}`);
-  };
+  loadLookupValue = code => axios.get(`/foundation/v1/organizations/${this.orgId}/lookup_values/${code}`);
 
-  createField = (orgId, field) => axios.post(`/foundation/v1/organizations/${orgId}/object_scheme_field`, field);
+  createField = field => axios.post(`${this.apiGetway}/object_scheme_field?organizationId=${this.orgId}`, field);
 
-  deleteField = (orgId, fieldId) => axios.delete(`/foundation/v1/organizations/${orgId}/object_scheme_field/${fieldId}`);
+  deleteField = fieldId => axios.delete(`${this.apiGetway}/object_scheme_field/${fieldId}?organizationId=${this.orgId}`);
 
-  checkName = (orgId, name) => axios.get(`/foundation/v1/organizations/${orgId}/object_scheme_field/check_name?name=${name}`);
+  checkName = name => axios.get(`${this.apiGetway}/object_scheme_field/check_name?name=${name}&organizationId=${this.orgId}`);
 
-  checkCode = (orgId, code) => axios.get(`/foundation/v1/organizations/${orgId}/object_scheme_field/check_code?name=${code}`);
+  checkCode = code => axios.get(`${this.apiGetway}/object_scheme_field/check_code?code=${code}&organizationId=${this.orgId}`);
 
-  updateField = (fieldId, field) => {
-    const orgId = AppState.currentMenuType.organizationId;
-    return axios.put(`/foundation/v1/organizations/${orgId}/object_scheme_field/${fieldId}`, field).then((data) => {
-      if (data && !data.failed) {
-        this.updateSchemeDetail(data);
-      } else {
-        Choerodon.prompt(data.message);
-      }
-    });
-  };
+  updateField = (fieldId, field) => axios.put(
+    `${this.apiGetway}/object_scheme_field/${fieldId}?organizationId=${this.orgId}`, field,
+  ).then((data) => {
+    if (data && !data.failed) {
+      this.updateSchemeDetail(data);
+    } else {
+      Choerodon.prompt(data.message);
+    }
+  });
 }
 
 const objectSchemeStore = new ObjectSchemeStore();

@@ -72,7 +72,6 @@ class CreateField extends Component {
     const {
       store, intl, form, schemeCode,
     } = this.props;
-    const orgId = AppState.currentMenuType.organizationId;
     form.validateFieldsAndScroll((err, data) => {
       if (!err) {
         const postData = data;
@@ -80,7 +79,7 @@ class CreateField extends Component {
         this.setState({
           submitting: true,
         });
-        store.createField(orgId, postData)
+        store.createField(postData)
           .then((field) => {
             Choerodon.prompt(intl.formatMessage({ id: 'createSuccess' }));
             this.setState({
@@ -99,11 +98,10 @@ class CreateField extends Component {
 
   checkName = (rule, value, callback) => {
     const { store, intl } = this.props;
-    const orgId = AppState.currentMenuType.organizationId;
     if (!value) {
       callback();
     } else {
-      store.checkName(orgId, value)
+      store.checkName(value)
         .then((data) => {
           if (data) {
             callback(intl.formatMessage({ id: 'field.name.exist' }));
@@ -118,13 +116,12 @@ class CreateField extends Component {
 
   checkCode = (rule, value, callback) => {
     const { store, intl } = this.props;
-    const orgId = AppState.currentMenuType.organizationId;
     if (!value) {
       callback();
     } else if (!regex.test(value)) {
       callback(intl.formatMessage({ id: 'field.code.rule' }));
     } else {
-      store.checkName(orgId, value)
+      store.checkCode(value)
         .then((data) => {
           if (data) {
             callback(intl.formatMessage({ id: 'field.code.exist' }));

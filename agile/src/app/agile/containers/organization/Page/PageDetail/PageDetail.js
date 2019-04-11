@@ -20,8 +20,19 @@ class PageDetail extends Component {
   }
 
   componentDidMount() {
+    this.initCurrentMenuType();
     this.loadPageDetail();
   }
+
+  componentWillUnmount() {
+    const { PageStore } = this.props;
+    PageStore.setPage([]);
+  }
+
+  initCurrentMenuType = () => {
+    const { PageStore } = this.props;
+    PageStore.initCurrentMenuType(AppState.currentMenuType);
+  };
 
   loadPageDetail = () => {
     const { match } = this.props;
