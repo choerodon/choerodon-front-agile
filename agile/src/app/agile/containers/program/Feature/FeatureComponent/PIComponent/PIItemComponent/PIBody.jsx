@@ -42,7 +42,7 @@ const debounceCallback = deBounce(500);
             ) : (emptyIssueComponent)
               }
             {provided.placeholder}
-            <div style={{ padding: '10px 0px 10px 33px' }}>
+            <div style={{ padding: '10px 0px 10px 33px', background: 'white' }}>
               <QuickCreateFeature
                 defaultPriority={defaultPriority}
                 piId={piId * 1}     
