@@ -239,7 +239,7 @@ class CreateField extends Component {
               })(
                 <Select
                   style={{ width: 520 }}
-                  label={<FormattedMessage id="field.type" />}
+                  label={<FormattedMessage id="field.context" />}
                   dropdownMatchSelectWidth
                   size="default"
                 >

@@ -59,7 +59,7 @@ class ObjectSchemeDetail extends Component {
       width: '25%',
     },
     {
-      title: '显示级别',
+      title: '显示层级',
       dataIndex: 'contextName',
       width: '25%',
     },
