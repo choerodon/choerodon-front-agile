@@ -3,7 +3,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import {
   CardTypeTag, IssueNum, StatusName, Summary,
 } from './CardComponent';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import './StatusIssue.scss';
 
 export default class CardProvider extends Component {

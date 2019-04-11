@@ -5,7 +5,7 @@ import {
   Radio, Icon, Tooltip, Modal,
 } from 'choerodon-ui';
 import { stores, Permission } from 'choerodon-front-boot';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import EditStatus from '../EditStatus/EditStatus';
 import './StatusCard.scss';
 

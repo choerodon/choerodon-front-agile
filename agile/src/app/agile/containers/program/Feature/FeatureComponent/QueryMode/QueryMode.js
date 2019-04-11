@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import FetureTable from '../FeatureTable';
 import { getFeatures } from '../../../../../api/FeatureApi';
-import FeatureStore from '../../../../../stores/Program/Feature/FeatureStore';
+import FeatureStore from '../../../../../stores/program/Feature/FeatureStore';
 
 const filterConvert = (filters) => {
   const searchDTO = {

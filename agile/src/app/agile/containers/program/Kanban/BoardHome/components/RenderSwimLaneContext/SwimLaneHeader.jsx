@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import './SwimLaneHeader.scss';
 import TypeTag from '../../../../../../components/TypeTag';
 import StatusTag from '../../../../../../components/StatusTag';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import UserHead from '../../../../../../components/UserHead';
 
 @observer

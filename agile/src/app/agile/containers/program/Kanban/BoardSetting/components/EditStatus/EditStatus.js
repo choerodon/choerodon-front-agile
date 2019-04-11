@@ -7,7 +7,7 @@ import _ from 'lodash';
 import {
   Form, Modal, Input, Select, 
 } from 'choerodon-ui';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 
 const FormItem = Form.Item;
 const { Sidebar } = Modal;

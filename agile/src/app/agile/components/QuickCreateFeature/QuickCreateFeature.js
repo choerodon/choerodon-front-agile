@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button, Icon, Dropdown, Input, Menu, 
+  Button, Icon, Dropdown, Input, Menu,
 } from 'choerodon-ui';
 import TypeTag from '../TypeTag';
 import { getProjectId } from '../../common/utils';
@@ -12,7 +12,7 @@ const propTypes = {
   defaultPriority: PropTypes.number,
   featureTypeDTO: PropTypes.shape({}),
   piId: PropTypes.number,
-  onCreate: PropTypes.func,   
+  onCreate: PropTypes.func,
 };
 class QuickCreateFeature extends Component {
   state = {
@@ -37,7 +37,7 @@ class QuickCreateFeature extends Component {
   handleCreateFeature = () => {
     const { createIssueValue, currentType } = this.state;
     const {
-      defaultPriority, piId, onCreate, featureTypeDTO,
+      defaultPriority, piId, epicId, onCreate, featureTypeDTO,
     } = this.props;
     if (createIssueValue.trim() !== '') {
       const feature = {
@@ -49,6 +49,7 @@ class QuickCreateFeature extends Component {
           featureType: currentType,
         },
         piId,
+        epicId,
         summary: createIssueValue,
         issueTypeId: featureTypeDTO.id,
         typeCode: featureTypeDTO.typeCode,
@@ -66,7 +67,7 @@ class QuickCreateFeature extends Component {
         if (onCreate) {
           onCreate();
         }
-      }).catch(() => {      
+      }).catch(() => {
         this.setState({
           loading: false,
         });

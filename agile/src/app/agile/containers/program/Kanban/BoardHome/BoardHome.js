@@ -15,7 +15,7 @@ import SwimLane from './components/RenderSwimLaneContext/SwimLane';
 import BoardDataController from './BoardDataController';
 import QuickSearch from '../../../../components/QuickSearch';
 import CSSBlackMagic from '../../../../components/CSSBlackMagic/CSSBlackMagic';
-import KanbanStore from '../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../stores/program/Kanban/KanbanStore';
 import './BoardHome.scss';
 
 const { AppState } = stores;

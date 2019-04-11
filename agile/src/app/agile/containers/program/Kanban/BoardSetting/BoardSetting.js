@@ -9,7 +9,7 @@ import {
 } from 'choerodon-ui';
 import { withRouter } from 'react-router-dom';
 import { ProgramBoardLink } from '../../../../common/utils';
-import KanbanStore from '../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../stores/program/Kanban/KanbanStore';
 import { SwimLanePage, ColumnPage } from './components';
 import './BoardSetting.scss';
 

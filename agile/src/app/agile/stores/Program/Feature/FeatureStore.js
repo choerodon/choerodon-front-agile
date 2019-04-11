@@ -372,10 +372,10 @@ class FeatureStore {
     this.chosenEpic = data;
   }
 
-  @action setFeatureData({ backlogAllFeatures, allPiList }) {
+  @action setFeatureData({ backlogAllFeatures, allPiList = [] } = {}) {
     this.spinIf = false;
     this.issueMap.set('0', backlogAllFeatures);
-    this.backlogData = backlogAllFeatures;
+    this.backlogData = backlogAllFeatures;   
     allPiList.forEach((pi) => {
       this.issueMap.set(pi.id.toString(), pi.subFeatureDTOList || []);
     });

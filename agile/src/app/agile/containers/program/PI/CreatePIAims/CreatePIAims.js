@@ -7,7 +7,7 @@ import {
   stores,
 } from 'choerodon-front-boot';
 import moment from 'moment';
-import PIStore from '../../../../stores/Program/PI/PIStore';
+import PIStore from '../../../../stores/program/PI/PIStore';
 import { createPIAims, getPIList, getPIAims } from '../../../../api/PIApi';
 
 const formatter = 'YYYY-MM-DD';

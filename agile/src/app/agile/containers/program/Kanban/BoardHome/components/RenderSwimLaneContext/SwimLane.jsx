@@ -9,7 +9,7 @@ import RenderSwimLaneContext from './index';
 import ColumnProvider from './ColumnProvider';
 import StatusProvider from './StatusProvider';
 import CardProvider from './CardProvider';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import EpicRenderHeader from './EpicRenderHeader';
 
 

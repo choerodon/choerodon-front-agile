@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import './StatusColumn.scss';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 
 @observer
 class StatusColumn extends Component {

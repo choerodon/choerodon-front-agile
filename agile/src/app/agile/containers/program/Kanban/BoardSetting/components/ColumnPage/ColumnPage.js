@@ -5,7 +5,7 @@ import { Button, Icon } from 'choerodon-ui';
 import { groupBy } from 'lodash';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import SettingColumn from '../SettingColumn/SettingColumn';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import SideBarContent from '../SideBarContent/SideBarContent';
 
 const { AppState } = stores;

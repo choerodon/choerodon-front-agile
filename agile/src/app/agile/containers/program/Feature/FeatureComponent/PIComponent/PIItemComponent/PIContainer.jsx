@@ -62,8 +62,7 @@ const shouldContainTypeCode = ['feature'];
           toggleSprint={this.toggleSprint}
         />
         <PIBody
-          issueType={store.getIssueTypes.filter(type => shouldContainTypeCode.indexOf(type.typeCode) !== -1)}
-          defaultType={store.getIssueTypes.find(type => type.typeCode === 'feature')}
+          featureTypeDTO={store.getIssueTypes.find(type => type.typeCode === 'feature')}
           defaultPriority={store.getDefaultPriority}
           issueCount={!!issueCount}
           expand={expand}
@@ -78,7 +77,9 @@ const shouldContainTypeCode = ['feature'];
   };
 
   renderPI = (pi) => {
-    const { refresh, isCreated, store, index } = this.props;
+    const {
+      refresh, isCreated, store, index, 
+    } = this.props;
     const { expand } = this.state;
     const issueCount = store.getIssueMap.get(pi.id.toString()) ? store.getIssueMap.get(pi.id.toString()).length : 0;
     return (
@@ -104,8 +105,7 @@ const shouldContainTypeCode = ['feature'];
           index={index}
         />
         <PIBody
-          issueType={store.getIssueTypes.filter(type => shouldContainTypeCode.indexOf(type.typeCode) !== -1)}
-          defaultType={store.getIssueTypes.find(type => type.typeCode === 'feature')}
+          featureTypeDTO={store.getIssueTypes.find(type => type.typeCode === 'feature')}         
           defaultPriority={store.getDefaultPriority}
           issueCount={!!issueCount}
           expand={expand}

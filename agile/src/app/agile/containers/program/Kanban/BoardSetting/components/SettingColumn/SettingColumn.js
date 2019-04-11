@@ -6,7 +6,7 @@ import { Icon, Modal } from 'choerodon-ui';
 import StatusCard from '../StatusCard/StatusCard';
 import { STATUS } from '../../../../../../common/Constant';
 import './SettingColumn.scss';
-import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
+import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import EasyEdit from '../../../../../../components/EasyEdit/EasyEdit';
 
 const { AppState } = stores;
