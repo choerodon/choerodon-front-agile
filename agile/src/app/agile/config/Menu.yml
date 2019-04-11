@@ -76,49 +76,53 @@
         sort: 12
         permission:
           - 'agile-service.issue-link-type.updateIssueLinkType'
+
+"program":
+  icon: agile
+  sort: 1
+  project:
     - "feature":
         icon: baseline-vertical_split
         category: PROGRAM
-        Routes: /agile/feature
-        sort: 13
+        Routes: /program/feature
+        sort: 1
         permission:
           - 'agile-service.pi.queryBacklogAll'
     - "programKanban":
         icon: table_chart
         category: PROGRAM
-        Routes: /agile/kanban
-        sort: 14
+        Routes: /program/kanban
+        sort: 2
         permission:
           - 'agile-service.board.queryByOptionsInProgram'
     - "artCalendar":
         icon: insert_invitation
         category: PROGRAM
-        Routes: /agile/artCalendar
-        sort: 15
+        Routes: /program/artCalendar
+        sort: 3
         permission:
           - 'agile-service.art.queryArtCalendar'
     - "pi":
         icon: center_focus_strong
         category: PROGRAM
-        Routes: /agile/pi
-        sort: 16
+        Routes: /program/pi
+        sort: 4
         permission:
           - 'agile-service.pi-objective.queryPiObjectiveList'
     - "art":
         icon: train
         category: PROGRAM
-        Routes: /agile/art
-        sort: 17
+        Routes: /program/art
+        sort: 5
         permission:
           - 'agile-service.art.queryArtList'
     - "programSetting":
         icon: folder_shared
         category: PROGRAM
-        Routes: /agile/programSetting
-        sort: 18
+        Routes: /program/programSetting
+        sort: 6
         permission:
           - 'agile-service.project-info.queryProjectInfoByProjectId'
-
 
 "platform-reports":
   icon: bar_chart
@@ -143,16 +147,33 @@
         permission: # 菜单内容具有的权限
           - 'agile-service.time-zone-work-calendar.queryTimeZoneWorkCalendar'
           - 'agile-service.time-zone-work-calendar.queryTimeZoneWorkCalendarRefByTimeZoneId'
-    - "objectScheme":
-        icon: aspect_ratio
+    - "objectScheme-organization":
+        icon: storage
         Routes: /agile/objectScheme
         sort: 11
         permission:
           - 'choerodon-foundation-service.object-scheme.pageQuery'
-    - "page":
-        icon: description
+    - "page-organization":
+        icon: baseline-file_copy
         Routes: /agile/page
         sort: 12
         permission:
           - 'choerodon-foundation-service.page.pageQuery'
 
+# 项目设置
+"prosetting":
+  icon: IAM
+  sort: 6
+  project:
+    - "objectScheme-project":
+        icon: storage
+        Routes: /agile/objectScheme
+        sort: 5
+        permission:
+          - 'choerodon-foundation-service.project-object-scheme.pageQuery'
+    - "page-project":
+        icon: baseline-file_copy
+        Routes: /agile/page
+        sort: 6
+        permission:
+          - 'choerodon-foundation-service.project-page.pageQuery'

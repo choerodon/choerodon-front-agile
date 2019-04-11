@@ -51,14 +51,19 @@ class ObjectSchemeField extends Component {
   }
 
   componentDidMount() {
+    this.initCurrentMenuType();
     this.loadFieldById();
   }
+
+  initCurrentMenuType = () => {
+    const { ObjectSchemeStore } = this.props;
+    ObjectSchemeStore.initCurrentMenuType(AppState.currentMenuType);
+  };
 
   loadFieldById = () => {
     const { ObjectSchemeStore } = this.props;
     const { id } = this.state;
-    const orgId = AppState.currentMenuType.organizationId;
-    ObjectSchemeStore.loadFieldDetail(orgId, id).then((data) => {
+    ObjectSchemeStore.loadFieldDetail(id).then((data) => {
       if (data) {
         if (singleList.indexOf(data.fieldType) !== -1) {
           // 单选
@@ -206,13 +211,12 @@ class ObjectSchemeField extends Component {
   };
 
   checkName = (rule, value, callback) => {
-    const { ObjectSchemeStore, intl, id } = this.props;
-    const orgId = AppState.currentMenuType.organizationId;
+    const { ObjectSchemeStore, intl } = this.props;
     const name = ObjectSchemeStore.getField ? ObjectSchemeStore.getField.name : false;
     if ((name && value === name) || !value) {
       callback();
     } else {
-      ObjectSchemeStore.checkName(orgId, value, id)
+      ObjectSchemeStore.checkName(value)
         .then((data) => {
           if (data) {
             callback(intl.formatMessage({ id: 'field.name.exist' }));

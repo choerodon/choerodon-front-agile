@@ -23,8 +23,21 @@ class ObjectSchemeDetail extends Component {
   }
 
   componentDidMount() {
+    this.initCurrentMenuType();
     this.loadScheme();
   }
+
+  componentWillUnmount() {
+    const { ObjectSchemeStore } = this.props;
+    ObjectSchemeStore.setSchemeDetail({
+      content: [],
+    });
+  }
+
+  initCurrentMenuType = () => {
+    const { ObjectSchemeStore } = this.props;
+    ObjectSchemeStore.initCurrentMenuType(AppState.currentMenuType);
+  };
 
   loadScheme = () => {
     const { match } = this.props;
@@ -142,8 +155,7 @@ class ObjectSchemeDetail extends Component {
 
   deleteField = (item) => {
     const { ObjectSchemeStore } = this.props;
-    const orgId = AppState.currentMenuType.organizationId;
-    ObjectSchemeStore.deleteField(orgId, item.id).then(() => {
+    ObjectSchemeStore.deleteField(item.id).then(() => {
       this.loadScheme();
     });
   };

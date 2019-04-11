@@ -225,17 +225,7 @@ class DragList extends Component {
         <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
           <div className="issue-dragList-content">
             <Card
-              title={title}
-              extra={(
-                <Button
-                  onClick={this.addItem}
-                  funcType="flat"
-                  className="issue-dragList-addBtn"
-                >
-                  <i className="icon-add icon" />
-                  <FormattedMessage id="add" />
-                </Button>
-              )}
+              title="值"
               bordered={false}
               className="issue-dragList-card"
             >
@@ -384,6 +374,14 @@ class DragList extends Component {
                   </div>
                 )}
               </Droppable>
+              <Button
+                onClick={this.addItem}
+                funcType="flat"
+                className="issue-dragList-addBtn"
+              >
+                <i className="icon-playlist_add icon" />
+                <FormattedMessage id="add" />
+              </Button>
             </Card>
           </div>
         </DragDropContext>
