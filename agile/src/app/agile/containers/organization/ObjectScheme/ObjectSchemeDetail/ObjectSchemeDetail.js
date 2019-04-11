@@ -138,9 +138,8 @@ class ObjectSchemeDetail extends Component {
       content: (
         <div>
           <p style={{ marginBottom: 10 }}>
-            {'确认要删除字段 '}
-            {item.name}
-            {' ？'}
+            <div style={{ marginBottom: 10 }}>{`删除自定义字段：${item.name}`}</div>
+            <div>注意：将会从所有使用的问题中删除此字段，并且字段数据会清空。你确定要删除此字段吗？</div>
           </p>
         </div>
       ),
@@ -150,6 +149,7 @@ class ObjectSchemeDetail extends Component {
       onCancel() {},
       okText: '删除',
       okType: 'danger',
+      width: 512,
     });
   };
 

@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import {
-  Card, Tooltip, Button, Input,
+  Card, Tooltip, Button, Input, Popconfirm,
 } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import './DragList.scss';
@@ -326,9 +326,17 @@ class DragList extends Component {
                                       placement="bottom"
                                       title={<FormattedMessage id="delete" />}
                                     >
-                                      <Button size="small" shape="circle" onClick={() => this.remove(item.tempKey || item.id)}>
-                                        <i className="icon icon-delete" />
-                                      </Button>
+                                      <Popconfirm
+                                        placement="top"
+                                        title={`确认要删除 ${item.value} 吗？`}
+                                        onConfirm={() => this.remove(item.tempKey || item.id)}
+                                        okText="删除"
+                                        cancelText="取消"
+                                      >
+                                        <Button size="small" shape="circle">
+                                          <i className="icon icon-delete" />
+                                        </Button>
+                                      </Popconfirm>
                                     </Tooltip>
                                   </div>
                                 </Fragment>
