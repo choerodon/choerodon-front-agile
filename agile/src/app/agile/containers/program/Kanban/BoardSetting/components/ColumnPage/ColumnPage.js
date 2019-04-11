@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Content, stores, Permission } from 'choerodon-front-boot';
 import { Button, Icon } from 'choerodon-ui';
+import { groupBy } from 'lodash';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import SettingColumn from '../SettingColumn/SettingColumn';
 import KanbanStore from '../../../../../../stores/Program/Kanban/KanbanStore';
@@ -19,6 +20,15 @@ class ColumnPage extends Component {
     };
   }
 
+
+  // draggableId: "551,1"
+  // mode: "FLUID"
+  // source: {droppableId: "todo,2537,null,null", index: 0}
+  // type: "status"
+  handleDragStart = (draging) => {
+    KanbanStore.setCurrentDrag(draging);
+  }
+
   handleAddStatus() {
     this.setState({
       addStatus: true,
@@ -31,6 +41,7 @@ class ColumnPage extends Component {
   }
 
   handleDragEnd(result) {
+    KanbanStore.setCurrentDrag(null);
     if (!result.destination) {
       return;
     }
@@ -39,7 +50,7 @@ class ColumnPage extends Component {
     if (result.destination.droppableId === 'columndrop') {
       const originState2 = JSON.parse(JSON.stringify(KanbanStore.getBoardData));
       const newState2 = JSON.parse(JSON.stringify(KanbanStore.getBoardData));
-      
+
       const [draggableData2] = newState2.splice(result.source.index, 1);
       newState2.splice(result.destination.index, 0, draggableData2);
       KanbanStore.setBoardData(newState2);
@@ -227,12 +238,21 @@ class ColumnPage extends Component {
     }
   }
 
-  renderColumn(data) {
+  renderColumns(data, draging) {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     const result = [];
     const { refresh } = this.props;
+    const groupedColumns = groupBy(data, 'categoryCode');
+    const { draggableId, type: dragType } = draging || {};
+    const statusCategoryCode = draggableId && draggableId.split(',')[2]
     for (let index = 0, len = data.length; index < len; index += 1) {
+      const column = data[index];
+      const { categoryCode } = column;
+      const sameStatusColumn = groupedColumns[categoryCode];
+      const isOnlyOne = groupedColumns[categoryCode].length === 1;
+      // 状态只能拖动到和状态相同的列
+      const statusDropDisabled = dragType === 'status' && statusCategoryCode !== categoryCode;      
       result.push(
         <Permission
           type={type}
@@ -241,8 +261,11 @@ class ColumnPage extends Component {
           service={['agile-service.board.deleteScrumBoard']}
           noAccessChildren={(
             <SettingColumn
-              draggabled
-              data={data[index]}
+              noPermission
+              statusDropDisabled={statusDropDisabled}
+              isOnlyOne={isOnlyOne}
+              sameStatusColumn={sameStatusColumn}
+              data={column}
               refresh={refresh.bind(this)}
               // setLoading={this.props.setLoading.bind}
               index={index}
@@ -251,7 +274,10 @@ class ColumnPage extends Component {
           )}
         >
           <SettingColumn
-            data={data[index]}
+            statusDropDisabled={statusDropDisabled}
+            isOnlyOne={isOnlyOne}
+            sameStatusColumn={sameStatusColumn}
+            data={column}
             refresh={refresh.bind(this)}
             // setLoading={this.props.setLoading.bind}
             index={index}
@@ -278,7 +304,7 @@ class ColumnPage extends Component {
             service={['agile-service.board.deleteScrumBoard']}
             noAccessChildren={(
               <SettingColumn
-                draggabled
+                noPermission
                 data={BoardData[BoardData.length - 1]}
                 refresh={refresh.bind(this)}
                 index={BoardData.length - 1}
@@ -301,6 +327,7 @@ class ColumnPage extends Component {
 
   render() {
     const BoardData = JSON.parse(JSON.stringify(KanbanStore.getBoardData));
+    const draging = KanbanStore.getCurrentDrag;
     const { refresh } = this.props;
     const { addStatus, addColumn } = this.state;
     if (BoardData.length > 0) {
@@ -361,6 +388,7 @@ class ColumnPage extends Component {
             onDragEnd={
               this.handleDragEnd.bind(this)
             }
+            onDragStart={this.handleDragStart}
           >
             <Droppable droppableId="columndrop" direction="horizontal" type="columndrop">
               {(provided, snapshot) => (
@@ -372,7 +400,7 @@ class ColumnPage extends Component {
                   }}
                   {...provided.droppableProps}
                 >
-                  {this.renderColumn(BoardData)}
+                  {this.renderColumns(BoardData, draging)}
                   {provided.placeholder}
                 </div>
               )}

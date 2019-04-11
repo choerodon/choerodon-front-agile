@@ -109,16 +109,17 @@ class StatusCard extends Component {
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     const {
-      data, index, refresh, draggabled, 
+      data, index, refresh, noPermission, ...otherProps
     } = this.props;
     const { visible, disabled } = this.state;
     return (
       <Draggable
-        isDragDisabled={draggabled}
+        isDragDisabled={noPermission}
         key={data.code}
-        draggableId={`${data.statusId},${data.objectVersionNumber}`}
+        draggableId={`${data.statusId},${data.objectVersionNumber},${data.categoryCode}`}
         index={index}
         type="status"
+        {...otherProps}
       >
         {(provided, snapshot) => (
           <div>

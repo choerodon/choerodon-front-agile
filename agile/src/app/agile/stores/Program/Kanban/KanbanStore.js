@@ -198,7 +198,7 @@ class KanbanStore {
 
   @observable prevClick = {};
 
-  @observable currentDrag = null;
+  @observable currentDrag = {};
 
   @observable currentClick = 0;
 

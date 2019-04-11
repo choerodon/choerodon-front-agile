@@ -103,20 +103,21 @@ class SettingColumn extends Component {
     });
   }
 
-  renderStatus() {
-    const { data, draggabled, refresh } = this.props;
-    const list = data.subStatuses;
+  renderStatus(sameStatusCount) {
+    const { data, noPermission, refresh } = this.props;
+    const { categoryCode, subStatuses } = data;
     const result = [];
-    for (let index = 0, len = list.length; index < len; index += 1) {
+    for (let index = 0, len = subStatuses.length; index < len; index += 1) {
+      const status = subStatuses[index];
       result.push(
         <StatusCard
-          draggabled={draggabled}
+          isDragDisabled={categoryCode === status.categoryCode && sameStatusCount === 1}
+          noPermission={noPermission}
           key={`${data.columnId}-${index}`}
           columnId={data.columnId}
-          data={list[index]}
+          data={status}
           index={index}
-          refresh={refresh.bind(this)}
-          // setLoading={this.props.setLoading}
+          refresh={refresh.bind(this)}      
         />,
       );
     }
@@ -126,12 +127,18 @@ class SettingColumn extends Component {
   render() {
     const menu = AppState.currentMenuType;
     const {
-      data, disabled, refresh, index, draggabled,
+      data, disabled, refresh, index, noPermission, isOnlyOne, sameStatusColumn, statusDropDisabled,
     } = this.props;
     const { categoryCode } = data;
     const isPrepare = categoryCode === 'prepare';
     const { visible } = this.state;
     const { type, id: projectId, organizationId: orgId } = menu;
+    let sameStatusCount = 0;
+    if (sameStatusColumn) {
+      sameStatusColumn.forEach((column) => {
+        sameStatusCount += column.subStatuses.filter(status => status.categoryCode === categoryCode).length;
+      });
+    }
 
     if (disabled) {
       return (
@@ -161,15 +168,17 @@ class SettingColumn extends Component {
                     style={{
                       cursor: 'pointer',
                     }}
-                  />         
-                  <Icon
-                    type="delete"
-                    style={{
-                      cursor: 'pointer',
-                    }}
-                    role="none"
-                    onClick={this.handleDeleteColumn.bind(this)}
-                  />           
+                  />
+                  {!isOnlyOne && (
+                    <Icon
+                      type="delete"
+                      style={{
+                        cursor: 'pointer',
+                      }}
+                      role="none"
+                      onClick={this.handleDeleteColumn.bind(this)}
+                    />
+                  )}
                   <Modal
                     title="删除列"
                     visible={visible || false}
@@ -224,6 +233,7 @@ class SettingColumn extends Component {
               <Droppable
                 type="status"
                 droppableId={`${data.categoryCode},${data.columnId}`}
+                isDropDisabled={statusDropDisabled}
               >
                 {(provided, snapshot) => (
                   <div
@@ -234,7 +244,7 @@ class SettingColumn extends Component {
                       minHeight: '84px',
                     }}
                   >
-                    {this.renderStatus()}
+                    {this.renderStatus(sameStatusCount)}
                     {/* {provided.placeholder} */}
                   </div>
                 )}
@@ -246,7 +256,7 @@ class SettingColumn extends Component {
     } else {
       return (
         <Draggable
-          isDragDisabled={draggabled}
+          isDragDisabled={noPermission}
           key={data.columnId}
           index={index}
           draggableId={JSON.stringify({
@@ -280,19 +290,20 @@ class SettingColumn extends Component {
                         type="open_with"
                         style={{
                           cursor: 'move',
-                          display: draggabled && 'none',
+                          display: noPermission && 'none',
                         }}
                         {...provided1.dragHandleProps}
-                      />                     
-                      <Icon
-                        type="delete"
-                        style={{
-                          cursor: 'pointer',
-                          display: draggabled && 'none',
-                        }}
-                        role="none"
-                        onClick={this.handleDeleteColumn.bind(this)}
-                      />             
+                      />
+                      {!isOnlyOne && (
+                        <Icon
+                          type="delete"
+                          style={{
+                            cursor: 'pointer',
+                          }}
+                          role="none"
+                          onClick={this.handleDeleteColumn.bind(this)}
+                        />
+                      )}
                     </div>
                     <Modal
                       title="删除列"
@@ -324,7 +335,7 @@ class SettingColumn extends Component {
                       service={['agile-service.board.deleteScrumBoard']}
                       noAccessChildren={(
                         data.name
-                    )}
+                      )}
                     >
                       <EasyEdit
                         type="input"
@@ -367,7 +378,7 @@ class SettingColumn extends Component {
                                 {'最大值：'}
                                 {typeof data.maxNum === 'number' ? data.maxNum : '没有最大'}
                               </span>
-                            )}
+                              )}
                           >
                             <EasyEdit
                               className="editSpan"
@@ -398,7 +409,7 @@ class SettingColumn extends Component {
                                 {'最小值：'}
                                 {typeof data.minNum === 'number' ? data.minNum : '没有最小'}
                               </span>
-                            )}
+                              )}
                           >
                             <EasyEdit
                               className="editSpan"
@@ -426,6 +437,7 @@ class SettingColumn extends Component {
                   <Droppable
                     type="status"
                     droppableId={`${data.categoryCode},${data.columnId},${data.minNum},${data.maxNum}`}
+                    isDropDisabled={statusDropDisabled}
                   >
                     {(provided, snapshot) => (
                       <div
@@ -436,7 +448,7 @@ class SettingColumn extends Component {
                           height: '100%',
                         }}
                       >
-                        {this.renderStatus()}
+                        {this.renderStatus(sameStatusCount)}
                         {provided.placeholder}
                       </div>
                     )}
