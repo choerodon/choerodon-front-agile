@@ -13,6 +13,9 @@ const en_US = {
   "issue.sub_task": 'SubTask',
   "issue.link_task": 'Issue Link',
   "issue.branch": 'Branch',
+  "issue.branch.create": 'Create Branch',
+  "issue.commit.create": 'Create Commit',
+  "issue.log.create": 'Create Log',
 
   "learnmore": "learn more",
 

@@ -142,7 +142,7 @@ class CreateIssue extends Component {
 
   handleSave = (data) => {
     const { fileList } = this.state;
-    const { onOk } = this.props;
+    const { onOk, form } = this.props;
     const callback = (newFileList) => {
       this.setState({ fileList: newFileList });
     };
@@ -159,9 +159,17 @@ class CreateIssue extends Component {
             handleFileUpload(fileList, callback, config);
           }
         }
+        form.resetFields();
+        this.setState({
+          createLoading: false,
+        });
         onOk(res);
       })
       .catch(() => {
+        form.resetFields();
+        this.setState({
+          createLoading: false,
+        });
         onOk();
       });
   };
@@ -373,13 +381,23 @@ class CreateIssue extends Component {
     });
   };
 
+  handleCancel = () => {
+    const { onCancel, form } = this.props;
+    form.resetFields();
+    this.setState({
+      createLoading: false,
+    });
+    if (onCancel) {
+      onCancel();
+    }
+  };
+
   render() {
     const {
       visible,
-      onCancel,
       form,
     } = this.props;
-    const { getFieldDecorator, setFieldsValue } = form;
+    const { getFieldDecorator } = form;
     const {
       originPriorities, defaultPriority, createLoading, storyPoints, estimatedTime,
       edit, delta, originUsers, selectLoading,
@@ -398,7 +416,7 @@ class CreateIssue extends Component {
         title="创建问题"
         visible={visible || false}
         onOk={this.handleCreateIssue}
-        onCancel={onCancel}
+        onCancel={this.handleCancel}
         okText="创建"
         cancelText="取消"
         confirmLoading={createLoading}

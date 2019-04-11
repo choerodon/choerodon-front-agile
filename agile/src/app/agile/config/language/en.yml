@@ -12,16 +12,23 @@
 'agile.userStoryMap': Story Map
 'agile.iterationBoard': Iteration Board
 'agile.messageNotification': Notification Setting
-'agile.feature': Feature
-'agile.artCalendar': ART Calendar
-'agile.pi': PI Objective
-'agile.art': ART Setting
-'agile.programKanban': Program Kanban
 
-'agile.programSetting': Program Setting
+'program': Program
+'program.feature': Feature
+'program.artCalendar': ART Calendar
+'program.pi': PI Objective
+'program.art': ART Setting
+'program.programKanban': Program Kanban
+'program.programSetting': Program Setting
 
 "rentsetting": "Organization Settings"
 "rentsetting.workCalendar": "Work Calendar"
+"rentsetting.objectScheme-organization": "Field"
+"rentsetting.page-organization": "Page"
+
+"prosetting": "Project Manage"
+"prosetting.objectScheme-project": "Field"
+"prosetting.page-project": "Page"
 
 "platform-reports": "Reports"
 "platform-reports.reportboard": "Agile Report"
