@@ -84,42 +84,42 @@
     - "feature":
         icon: baseline-vertical_split
         category: PROGRAM
-        Routes: /program/feature
+        Routes: /agile/feature
         sort: 1
         permission:
           - 'agile-service.pi.queryBacklogAll'
     - "programKanban":
         icon: table_chart
         category: PROGRAM
-        Routes: /program/kanban
+        Routes: /agile/kanban
         sort: 2
         permission:
           - 'agile-service.board.queryByOptionsInProgram'
     - "artCalendar":
         icon: insert_invitation
         category: PROGRAM
-        Routes: /program/artCalendar
+        Routes: /agile/artCalendar
         sort: 3
         permission:
           - 'agile-service.art.queryArtCalendar'
     - "pi":
         icon: center_focus_strong
         category: PROGRAM
-        Routes: /program/pi
+        Routes: /agile/pi
         sort: 4
         permission:
           - 'agile-service.pi-objective.queryPiObjectiveList'
     - "art":
         icon: train
         category: PROGRAM
-        Routes: /program/art
+        Routes: /agile/art
         sort: 5
         permission:
           - 'agile-service.art.queryArtList'
     - "programSetting":
         icon: folder_shared
         category: PROGRAM
-        Routes: /program/programSetting
+        Routes: /agile/programSetting
         sort: 6
         permission:
           - 'agile-service.project-info.queryProjectInfoByProjectId'
