@@ -220,6 +220,8 @@ class FeatureStore {
 
   @observable piCompleteMessage = {};
 
+  @observable statusList = [];
+
   @action setFeatureList(data) {
     this.featureList = data;
   }
@@ -352,6 +354,18 @@ class FeatureStore {
     return this.allPiList;
   }
 
+  getPIById(piId) {
+    return this.allPiList.find(element => element.id === Number(piId));
+  }
+
+  @computed get getPrepareStatusList() {
+    return this.statusList.filter(status => status.type === 'prepare');
+  }
+
+  @computed get getTodoStatusList() {
+    return this.statusList.filter(status => status.type === 'todo');
+  }
+
   @computed get getIssueMap() {
     return this.issueMap;
   }
@@ -383,6 +397,10 @@ class FeatureStore {
     this.hasActivePI = Boolean(allPiList.find(element => element.statusCode === 'doing'));
   }
 
+  @action setStatusList(statusList) {
+    this.statusList = statusList;
+  }
+
   getFeatureListData = () => {
     const args = {
       advancedSearchArgs: {},
@@ -399,7 +417,7 @@ class FeatureStore {
 
   getCurrentEpicList = () => axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/issues/program/epics`);
 
-  @action initData(issueTypes, defaultPriority, epics, listData) {
+  @action initData(issueTypes, defaultPriority, epics, listData, statusList) {
     if (issueTypes && !issueTypes.failed) {
       this.setIssueTypes(issueTypes);
     }
@@ -408,6 +426,7 @@ class FeatureStore {
     }
     this.setEpics(epics);
     this.setFeatureList(listData);
+    this.setStatusList(statusList);
     this.setFeatureData(listData);
   }
 
@@ -434,7 +453,7 @@ class FeatureStore {
 
   @action dealWithMultiSelect(piId, currentClick, type) {
     const data = this.issueMap.get(piId);
-    const currentIndex = data.findIndex(issue => currentClick.issueId === issue.issueId);
+    const currentIndex = data.findIndex(issue => currentClick.issueId === issue.issueId);   
     if (this.prevClickedIssue && this.prevClickedIssue.piId === currentClick.piId) {
       // 如果以后想利用 ctrl 从多个冲刺中选取 issue，可以把判断条件2直接挪到 shift 上
       // 但是请考虑清楚操作多个数组可能带来的性能开销问题
@@ -525,7 +544,7 @@ class FeatureStore {
     }
   };
 
-  @action moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, issueItem, type) {
+  @action moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, issueItem, type, statusId, statusType) {
     const sourceArr = this.issueMap.get(sourceId);
     // const revertSourceArr = sourceArr.slice();
     const destinationArr = this.issueMap.get(destinationId);
@@ -560,6 +579,8 @@ class FeatureStore {
       issueIds: modifiedArr,
       outsetIssueId: prevIssue ? prevIssue.issueId : 0,
       rankIndex: destinationId * 1 === 0 || (destinationId === sourceId && destinationId !== 0),
+      updateStatusId: statusId,
+      statusCategoryCode: statusType,
     }).then(this.getFeatureListData).then((res) => {
       this.setFeatureData(res);
     });
@@ -572,6 +593,17 @@ class FeatureStore {
     }
     if (type === 'multi') {
       result.push(...this.multiSelected.keys());
+    }
+    return result;
+  };
+
+  getMoveFeatures = (dragItem, type) => {
+    const result = [];
+    if (!this.multiSelected.has(dragItem.issueId) || type === 'single') {
+      result.push(dragItem);
+    }
+    if (type === 'multi') {
+      result.push(...this.multiSelected.values());
     }
     return result;
   };

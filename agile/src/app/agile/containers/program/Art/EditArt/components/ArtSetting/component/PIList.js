@@ -76,25 +76,25 @@ class PIList extends Component {
         title: '结束日期',
         dataIndex: 'endDate',
       },
-      {
-        title: '',
-        render: (record) => {
-          const { statusCode, id } = record;
-          return statusCode === 'todo' 
-            ? (
-              <Popconfirm title="确定删除这个PI吗?" onConfirm={() => { onDeletePI(id); }} okText="确定" cancelText="取消">
-                <Button shape="circle" icon="delete_forever" />
-              </Popconfirm>
-            ) : <Button shape="circle" icon="delete_forever" style={{ visibility: 'hidden' }} />;
-        },
-      },
+      // {
+      //   title: '',
+      //   render: (record) => {
+      //     const { statusCode, id } = record;
+      //     return statusCode === 'todo' 
+      //       ? (
+      //         <Popconfirm title="确定删除这个PI吗?" onConfirm={() => { onDeletePI(id); }} okText="确定" cancelText="取消">
+      //           <Button shape="circle" icon="delete_forever" />
+      //         </Popconfirm>
+      //       ) : <Button shape="circle" icon="delete_forever" style={{ visibility: 'hidden' }} />;
+      //   },
+      // },
     ];
     return (
       <React.Fragment>
-        <Button funcType="flat" type="primary" style={{ marginBottom: 15 }} disabled={data.statusCode === 'stop'} onClick={this.handleCreatePIClick}>
+        {/* <Button funcType="flat" type="primary" style={{ marginBottom: 15 }} disabled={data.statusCode === 'stop'} onClick={this.handleCreatePIClick}>
           <Icon type="playlist_add" />
           <span>创建下一批PI</span>
-        </Button>
+        </Button> */}
         <PIListTable 
           columns={columns}
           dataSource={PiList}

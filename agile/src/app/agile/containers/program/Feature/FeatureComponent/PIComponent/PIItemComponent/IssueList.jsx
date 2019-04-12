@@ -34,7 +34,7 @@ class IssueList extends Component {
           >
             <IssueItem
               key={item.issueId}
-              item={item}
+              item={{ ...item, piId }}
               onClick={this.myOnMouseDown}
               store={store}
             />
