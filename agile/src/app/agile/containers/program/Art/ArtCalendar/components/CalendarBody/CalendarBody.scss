@@ -62,11 +62,13 @@
 
   &-content {
     width: 100%;
+    padding-top: 12px;
+    position: relative;
   }
 
   &-pis {
     display: flex;
-    padding-top: 12px;
     width: 100%;
+    background: #F4F4F4;
   }
 }

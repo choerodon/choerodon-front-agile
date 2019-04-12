@@ -55,7 +55,7 @@ class CreateArt extends Component {
           <FormItem>
             {getFieldDecorator('name', {
               rules: [{
-                required: true, message: '请输入ART名称!',
+                required: true, message: '请输入ART名称',
               }],
             })(
               <Input style={{ width: 500 }} maxLength={30} label="名称" placeholder="请输入ART名称" />,
@@ -77,7 +77,7 @@ class CreateArt extends Component {
                 format="YYYY-MM-DD"
                 style={{ width: 500 }}
                 label="开始日期"
-                disabledDate={current => current < moment()}
+                disabledDate={current => current < moment().subtract(1, 'days')}
               />,
             )}
           </FormItem>

@@ -97,7 +97,7 @@ class ArtList extends Component {
     return (
       <Page className="c7ntest-Issue c7ntest-region">
         <Header
-          title="ART列表"
+          title="ART设置"
         >
           {/* <Button icon="playlist_add" onClick={this.handleCreateArtClick} disabled={createDisabled}> */}
           <Button icon="playlist_add" onClick={this.handleCreateArtClick}>

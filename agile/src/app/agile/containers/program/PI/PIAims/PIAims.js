@@ -4,18 +4,18 @@ import {
   Button, Icon, Table, Radio, Form, Spin, Modal, Select, Divider,
 } from 'choerodon-ui';
 import {
-  stores, Page, Header, Content,  
+  stores, Page, Header, Content,
 } from 'choerodon-front-boot';
 import moment from 'moment';
 
 import PIStore from '../../../../stores/program/PI/PIStore';
-import { 
+import {
   getPIAims, deletePIAims, getPIList,
 } from '../../../../api/PIApi';
 import { getArtsByProjectId } from '../../../../api/ArtApi';
 import ProgramAimsTable from './component/ProgramAimsTable';
 import PIAimsCard from './component/PIAimsCard';
-import EmptyBlock from '../../../../components/EmptyBlock';
+import Empty from '../../../../components/Empty';
 import emptyPI from '../../../../assets/image/emptyPI.svg';
 import CreatePIAims from '../CreatePIAims/CreatePIAims';
 
@@ -112,7 +112,7 @@ class PIAims extends Component {
           {
             isEditing: false,
             editingId: item.id,
-            editingIndex: index,  
+            editingIndex: index,
           }
         )));
       });
@@ -180,7 +180,7 @@ class PIAims extends Component {
           {
             isEditing: false,
             editingId: item.id,
-            editingIndex: index,  
+            editingIndex: index,
           }
         )));
       });
@@ -228,10 +228,10 @@ class PIAims extends Component {
     } = this.state;
     const {
       // eslint-disable-next-line no-shadow
-      PIList, PIAims, PIAimsLoading, editPIVisible, 
+      PIList, PIAims, PIAimsLoading, editPIVisible,
     } = PIStore;
     const selectedPI = selectedPIId && PIList.find(item => item.id === selectedPIId);
-    
+
     return (
       <Page className="c7n-pi-detail">
         <Header title="PI目标">
@@ -256,22 +256,24 @@ class PIAims extends Component {
                     <div style={{ display: 'flex' }}>
                       <div style={{ display: 'flex', alignItems: 'center', marginRight: 10 }}>
                         <span>ART：</span>
-                        <Select onChange={this.handleARTSelectChange} value={artId} dropdownClassName="c7n-pi-artSelect">
-                          {
-                          arts && arts.length > 0 && arts.map(art => (
-                            <Option key={art.id} value={art.id}>{art.name}</Option>
-                          ))
-                        }
-                        </Select>
+                        {arts && arts.length === 1 ? <span>{arts[0].name}</span> : (
+                          <Select onChange={this.handleARTSelectChange} value={artId} dropdownClassName="c7n-pi-artSelect">
+                            {
+                              arts && arts.length > 0 && arts.map(art => (
+                                <Option key={art.id} value={art.id}>{art.name}</Option>
+                              ))
+                            }
+                          </Select>
+                        )}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span>PI：</span>
                         <Select onChange={this.handlePISelectChange} value={selectedPIId} dropdownClassName="c7n-pi-piSelect">
                           {
-                          PIList.map(pi => (
-                            <Option key={pi.id} value={pi.id}>{`${pi.code}-${pi.name}`}</Option>
-                          ))
-                        }
+                            PIList.map(pi => (
+                              <Option key={pi.id} value={pi.id}>{`${pi.code}-${pi.name}`}</Option>
+                            ))
+                          }
                         </Select>
                       </div>
                     </div>
@@ -295,7 +297,7 @@ class PIAims extends Component {
                           onDeletePiAims={this.handledeletePiAims}
                         />
                       ) : (
-                        <PIAimsCard 
+                        <PIAimsCard
                           style={{ margin: '0 24px' }}
                           aimsCategory="program"
                           piName={`${selectedPI.code}-${selectedPI.name}`}
@@ -307,19 +309,18 @@ class PIAims extends Component {
                   </div>
                 </div>
               ) : (
-                <EmptyBlock
-                  style={{ marginTop: 60 }} 
+                <Empty
+                  style={{ marginTop: 60 }}
                   pic={emptyPI}
                   border
-                  textWidth={421}
                   title="设置各个阶段的PI目标"
-                  des="这是您的PI目标列表。您可以创建各个阶段的PI目标，用数字衡量目标的价值，并随时调整。"
+                  description="这是您的PI目标列表。您可以创建各个阶段的PI目标，用数字衡量目标的价值，并随时调整。"
                 />
               )
             }
           </Spin>
-         
-          <CreatePIAims 
+
+          <CreatePIAims
             piId={selectedPIId}
             artId={artId}
           />

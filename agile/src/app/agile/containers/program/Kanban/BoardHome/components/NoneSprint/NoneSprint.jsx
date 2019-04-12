@@ -19,11 +19,11 @@ const NoneSprint = () => (
           marginLeft: 40,
         }}
       >
-        <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有活动的Sprint</p>
+        <p style={{ color: 'rgba(0,0,0,0.65)' }}>没有计划的项目群看板</p>
         <p style={{ fontSize: 20, lineHeight: '34px' }}>
-          {'在'}
-          <span style={{ color: '#3f51b5' }}>待办事项</span>
-          {'中开始Sprint'}
+          {'你可以在'}
+          <span style={{ color: '#3f51b5' }}>特性列表</span>
+          {'中创建特性'}
         </p>
       </div>
     </div>
