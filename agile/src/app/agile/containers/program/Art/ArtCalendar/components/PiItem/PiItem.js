@@ -56,7 +56,7 @@ const SprintItem = ({
     >
       <Popover
         className={`PiItem-pi-sprintPopover ${STATUSCODES[sprint.statusCode]}`}
-        getPopupContainer={triggerNode => triggerNode.parentNode}
+        getPopupContainer={triggerNode => document.getElementsByClassName('c7nagile-ArtCalendar-scroller')[0]}
         content={<CardTitle data={sprint} type="sprint" />}
         title={null}
         placement="bottomLeft"
@@ -115,7 +115,7 @@ class PiItem extends Component {
             <Popover
               // autoAdjustOverflow={false}
               className={`PiItem-pi-piPopover ${statusCode}`}
-              getPopupContainer={triggerNode => triggerNode.parentNode}
+              getPopupContainer={triggerNode => document.getElementsByClassName('c7nagile-ArtCalendar-scroller')[0]}
               content={<CardTitle data={pi} type="pi" />}
               title={null}
               placement="bottomLeft"

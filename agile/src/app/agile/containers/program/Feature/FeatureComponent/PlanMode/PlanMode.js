@@ -60,7 +60,7 @@ class PlanMode extends Component {
         </Select>
       );
       confirm({
-        title: '将特性状态置为:',
+        title: '将特性状态置为',
         content,
         onOk: () => {
           FeatureStore.moveSingleIssue(...otherArgs, statusId, statusType);
