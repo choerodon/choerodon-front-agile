@@ -15,7 +15,7 @@ class Epic extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.epicRefresh();
   }
 
@@ -25,6 +25,12 @@ class Epic extends Component {
       store.initEpicList(epicList, lookupValues);
     });
   };
+
+  refresh=() => {
+    this.epicRefresh();
+    const { issueRefresh } = this.props;
+    issueRefresh();
+  }
 
   /**
    *点击epicItem的事件
@@ -40,7 +46,7 @@ class Epic extends Component {
 
   render() {
     const {
-      store, issueRefresh, refresh, visible,
+      store, refresh, visible, issueRefresh,
     } = this.props;
     const { draggableIds, addEpic } = this.state;
     return visible ? (
@@ -109,7 +115,7 @@ class Epic extends Component {
                       clickEpic={this.handleClickEpic}
                       draggableIds={draggableIds}
                       refresh={refresh}
-                      issueRefresh={issueRefresh}
+                      issueRefresh={this.refresh}
                     />
                     {provided.placeholder}
                   </div>
