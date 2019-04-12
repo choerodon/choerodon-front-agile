@@ -7,8 +7,8 @@ import moment from 'moment';
 import { getArtCalendar, getArtsByProjectId } from '../../../../api/ArtApi';
 import { CalendarHeader, CalendarBody, CreateEvent } from './components';
 import './ArtCalendar.scss';
-import emptyART from '../../../../assets/image/emptyART.svg';
-import EmptyBlock from '../../../../components/EmptyBlock';
+import emptyArtCalendar from '../../../../assets/image/emptyArtCalendar.svg';
+import Empty from '../../../../components/Empty';
 
 class ArtCalendar extends Component {
   state = {
@@ -141,13 +141,12 @@ class ArtCalendar extends Component {
                   </div>
                 </div>
               ) : (
-                <EmptyBlock
+                <Empty
                   style={{ marginTop: 60 }}
-                  pic={emptyART}
+                  pic={emptyArtCalendar}
                   title="计划您的敏捷发布火车"
-                  des="这是您的ART日历。如果您想看到具体的计划，请先设置火车的PI节奏，然后开启火车。"
-                  border
-                  textWidth={421}
+                  description="这是您的ART日历。如果您想看到具体的计划，请先设置火车的PI节奏，然后开启火车。"
+                  border             
                 />
               )
             }

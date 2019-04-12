@@ -25,7 +25,7 @@ const PIAimsCard = ({
         <table style={{ width: '100%' }}>
           <thead>
             <tr>
-              <th className="th" style={{ width: '60%' }}>{piName}</th>
+              <th className="th" style={{ width: '60%' }}>PI目标</th>
               <th style={{ width: '20%' }}>计划BV</th>
               <th style={{ width: '20%' }}>实际BV</th>
             </tr>

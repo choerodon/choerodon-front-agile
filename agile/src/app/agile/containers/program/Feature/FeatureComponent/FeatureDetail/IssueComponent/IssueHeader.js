@@ -171,7 +171,7 @@ import './IssueComponent.scss';
                 ) : null
               }
               {
-                issueId && ['issue_epic'].indexOf(typeCode) === -1 ? (
+                issueId && ['issue_epic'].indexOf(typeCode) !== -1 ? (
                   <div style={{ display: 'flex' }}>
                     <FieldStoryPoint {...this.props} field={{ code: 'estimateTime', name: '预估时间' }} />
                   </div>

@@ -77,7 +77,7 @@ class BoardHome extends Component {
   async getBoard() {
     const boardListData = await KanbanStore.axiosGetBoardList();
     const defaultBoard = boardListData.find(item => item.userDefault) || boardListData[0];
-    if (defaultBoard.boardId) {
+    if (defaultBoard && defaultBoard.boardId) {
       this.refresh(defaultBoard, null, boardListData);
     }
   }
@@ -249,7 +249,7 @@ class BoardHome extends Component {
                 <div className="c7n-board-header" style={HeaderStore.announcementClosed ? {} : { height: 'calc(100vh - 208px)' }}>
                   <StatusColumn />
                 </div>
-                {!KanbanStore.didCurrentSprintExist ? (
+                {!KanbanStore.didCurrentSprintExist || KanbanStore.allDataMap.size === 0 ? (
                   <NoneSprint />
                 ) : (
                   <div

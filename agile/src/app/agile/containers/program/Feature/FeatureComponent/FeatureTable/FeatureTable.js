@@ -34,6 +34,7 @@ const getColumns = filters => ([
     render: (featureType, record) => (
       <div style={{ lineHeight: 0 }}>
         <TypeTag
+          showName
           data={{
             colour: featureType === 'business' ? '#29B6F6' : '#FFCA28',
             icon: 'agile-feature',

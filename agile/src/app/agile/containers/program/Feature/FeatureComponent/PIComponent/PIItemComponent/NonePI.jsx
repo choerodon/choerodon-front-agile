@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import emptyImg from '../../../../../../assets/image/emptySprint.svg';
+import emptyImg from '../../../../../../assets/image/feature-list.svg';
 
 const data = {
   sprint: {

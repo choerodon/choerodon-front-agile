@@ -55,7 +55,7 @@ const renderStartArtModalContent = (props) => {
   } else {
     return (
       <div>
-        <p>
+        <p style={{ marginBottom: 15 }}>
           {
             nonEmpty ? (
               <span>

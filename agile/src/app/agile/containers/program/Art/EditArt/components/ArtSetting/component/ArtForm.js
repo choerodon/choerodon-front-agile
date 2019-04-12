@@ -136,7 +136,7 @@ class ArtForm extends Component {
               <FormItem style={{ marginRight: 20 }}>
                 {getFieldDecorator('interationCount', {
                   rules: [{
-                    required: true, message: '请输入ART中每个PI的迭代数!',
+                    required: true, message: '请输入ART中每个PI的迭代数',
                   }],
                 })(
                   <Select style={{ width: 180 }} label="迭代数" placeholder="请输入ART中每个PI的迭代数">
@@ -181,7 +181,7 @@ class ArtForm extends Component {
             <FormItem>
               {getFieldDecorator('piCodePrefix', {
                 rules: [{
-                  required: true, message: '请输入PI前缀!',
+                  required: true, message: '请输入PI前缀',
                 }],
               })(
                 <Input style={{ width: 500 }} label="PI前缀" placeholder="请输入PI前缀" />,
@@ -190,7 +190,7 @@ class ArtForm extends Component {
             <FormItem>
               {getFieldDecorator('piCodeNumber', {
                 rules: [{
-                  required: true, message: '请输入PI起始编号!',
+                  required: true, message: '请输入PI起始编号',
                 }],
                 normalize: value => (value ? value.toString().replace(/[^\d]/g, '') : value),
               })(
