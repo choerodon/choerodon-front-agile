@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { Modal, Select } from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
+import FeatureStore from '../../../../../stores/program/Feature/FeatureStore';
 
 const { Sidebar } = Modal;
 const { AppState } = stores;
@@ -14,7 +15,14 @@ class ClosePI extends Component {
     super(props);
     this.state = {
       selectChose: '0',
+      targetStatus: null,
     };
+  }
+
+  handleTargetStatusChange=(value) => {
+    this.setState({
+      targetStatus: value,
+    });
   }
 
   /**
@@ -23,16 +31,22 @@ class ClosePI extends Component {
    * @memberof ClosePI
    */
   handleClosePI() {
-    const { selectChose } = this.state;
     const {
       store, data: propData, onCancel, refresh,
     } = this.props;
+    const { selectChose, targetStatus } = this.state;
+    const todoStatusList = FeatureStore.getTodoStatusList;
+    const completeMessage = JSON.stringify(store.getPICompleteMessage) === '{}' ? null : store.getPICompleteMessage;
+    const updateStatusId = targetStatus || todoStatusList[0].id;
+
     const data = {
       programId: AppState.currentMenuType.id,
       id: propData.id,
       artId: propData.artId,
       targetPiId: selectChose,
       objectVersionNumber: propData.objectVersionNumber,
+      updateStatusId,
+      statusCategoryCode: updateStatusId && 'todo',
     };
     store.closePI(data).then(() => {
       onCancel();
@@ -41,11 +55,13 @@ class ClosePI extends Component {
     });
   }
 
+
   render() {
     const {
       data, store, visible, onCancel,
     } = this.props;
     const { selectChose } = this.state;
+    const todoStatusList = FeatureStore.getTodoStatusList;
     const completeMessage = JSON.stringify(store.getPICompleteMessage) === '{}' ? null : store.getPICompleteMessage;
     return visible
       ? (
@@ -92,6 +108,15 @@ class ClosePI extends Component {
               ) : ''}
               <Option value="0">特性列表</Option>
             </Select>
+            <br />            
+            <Select 
+              style={{ marginTop: 24, width: 512 }}
+              label="目标状态"
+              onChange={this.handleTargetStatusChange}
+              defaultValue={todoStatusList[0].id}
+            >
+              {todoStatusList.map(status => <Option value={status.id}>{status.name}</Option>)}
+            </Select>          
           </Content>
         </Sidebar>
       ) : null;

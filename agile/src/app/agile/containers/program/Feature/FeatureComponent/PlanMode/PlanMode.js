@@ -1,16 +1,17 @@
 import React, { Component, Fragment } from 'react';
 import { observer } from 'mobx-react';
-import { Spin } from 'choerodon-ui';
+import { Spin, Select, Modal } from 'choerodon-ui';
 import {
   Header, Page,
 } from 'choerodon-front-boot';
 import { DragDropContext } from 'react-beautiful-dnd';
+import { loadStatusList } from '../../../../../api/NewIssueApi';
 import FeatureStore from '../../../../../stores/program/Feature/FeatureStore';
 import Epic from '../EpicComponent/Epic';
 import SprintItem from '../PIComponent/PIItem';
 // import './FeatureList.scss';
-
-
+const { confirm } = Modal;
+const { Option } = Select;
 @observer
 class PlanMode extends Component {
   componentDidMount() {
@@ -28,8 +29,9 @@ class PlanMode extends Component {
       FeatureStore.axiosGetDefaultPriority(),
       FeatureStore.getCurrentEpicList(),
       FeatureStore.getFeatureListData(),
-    ]).then(([issueTypes, defaultPriority, epics, featureList]) => {
-      FeatureStore.initData(issueTypes, defaultPriority, epics, featureList);
+      loadStatusList('program'),
+    ]).then(([issueTypes, defaultPriority, epics, featureList, statusList]) => {
+      FeatureStore.initData(issueTypes, defaultPriority, epics, featureList, statusList);
     });
   };
 
@@ -39,6 +41,99 @@ class PlanMode extends Component {
     }).catch(() => {
     });
   };
+
+  handleMove = (statusType, statusList, ...otherArgs) => {
+    let statusId = statusList[0] && statusList[0].id;
+    if (statusList.length > 1) {
+      FeatureStore.moveSingleIssue(...otherArgs, statusId, statusType);
+    } else {
+      const options = statusList.map(status => <Option value={status.id}>{status.name}</Option>);
+      const content = (
+        <Select
+          defaultValue={statusId}
+          onChange={(value) => {
+            statusId = value;
+          }}
+        >
+          {options}
+        </Select>
+      );
+      confirm({
+        title: '将特性状态置为:',
+        content,
+        onOk: () => {
+          FeatureStore.moveSingleIssue(...otherArgs, statusId, statusType);
+        },
+      });
+    }
+  }
+
+
+  handleDragEnd = (result) => {
+    FeatureStore.setIsDragging(null);
+    const { destination, source, draggableId } = result;
+    if (destination) {
+      const { droppableId: destinationId, index: destinationIndex } = destination;
+      const { droppableId: sourceId, index: sourceIndex } = source;
+      if (destinationId === sourceId && destinationIndex === sourceIndex) {
+        return;
+      }
+      if (result.reason !== 'CANCEL') {
+        const item = FeatureStore.getIssueMap.get(sourceId)[sourceIndex];
+        const destinationArr = FeatureStore.getIssueMap.get(destinationId);
+        let destinationItem;
+        if (destinationIndex === 0) {
+          destinationItem = null;
+        } else if (destinationIndex === FeatureStore.getIssueMap.get(destinationId).length) {
+          destinationItem = destinationArr[destinationIndex - 1];
+        } else {
+          destinationItem = destinationArr[destinationIndex];
+        }
+        const type = FeatureStore.getMultiSelected.size > 1 && !FeatureStore.getMultiSelected.has(destinationItem) ? 'multi' : 'single';
+        // 相同pi不做状态转换判断
+        if (sourceId === destinationId) {
+          FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+        } else {
+          // 判断目标pi和当前pi的状态
+          const sourcePI = FeatureStore.getPIById(sourceId);
+          const destinationPI = FeatureStore.getPIById(destinationId);
+          const isSourceDoing = sourcePI && sourcePI.statusCode === 'doing';
+          const isDestinationDoing = destinationPI && destinationPI.statusCode === 'doing';
+          // 判断拖动的用例状态
+          const moveFeatures = FeatureStore.getMoveFeatures(item, type);
+          const moveFeaturesStatus = moveFeatures.map(feature => feature.statusMapDTO.type);
+
+          // 从活跃pi拖动到非活跃pi
+          if (isSourceDoing && !isDestinationDoing) {
+            const prepareStatusList = FeatureStore.getPrepareStatusList;
+            this.handleMove('prepare', prepareStatusList, destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+          } else if (!isSourceDoing && isDestinationDoing) {
+            // 从非活跃pi拖动到活跃pi
+            // 如果有prepare，那么就要改状态       
+            if (moveFeaturesStatus.includes('prepare')) {
+              const todoStatusList = FeatureStore.getTodoStatusList;
+              this.handleMove('todo', todoStatusList, destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+            } else {
+              FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+            }
+          } else if (!isSourceDoing && !isDestinationDoing) {
+            // 从pi拖到准备
+            if (sourcePI && !destinationPI) {
+              // 如果有非准备的
+              if (moveFeaturesStatus.some(code => code !== 'prepare')) {
+                const prepareStatusList = FeatureStore.getPrepareStatusList;
+                this.handleMove('prepare', prepareStatusList, destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+              } else {
+                FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+              }
+            } else {
+              FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+            }
+          }          
+        }
+      }
+    }
+  }
 
   render() {
     const { issueFresh } = this.props;
@@ -67,34 +162,7 @@ class PlanMode extends Component {
         <Spin spinning={FeatureStore.getSpinIf}>
           <div className="c7n-backlog-content">
             <DragDropContext
-              onDragEnd={(result) => {
-                FeatureStore.setIsDragging(null);
-                const { destination, source, draggableId } = result;
-                if (destination) {
-                  const { droppableId: destinationId, index: destinationIndex } = destination;
-                  const { droppableId: sourceId, index: sourceIndex } = source;
-                  if (destinationId === sourceId && destinationIndex === sourceIndex) {
-                    return;
-                  }
-                  if (result.reason !== 'CANCEL') {
-                    const item = FeatureStore.getIssueMap.get(sourceId)[sourceIndex];
-                    const destinationArr = FeatureStore.getIssueMap.get(destinationId);
-                    let destinationItem;
-                    if (destinationIndex === 0) {
-                      destinationItem = null;
-                    } else if (destinationIndex === FeatureStore.getIssueMap.get(destinationId).length) {
-                      destinationItem = destinationArr[destinationIndex - 1];
-                    } else {
-                      destinationItem = destinationArr[destinationIndex];
-                    }
-                    if (FeatureStore.getMultiSelected.size > 1 && !FeatureStore.getMultiSelected.has(destinationItem)) {
-                      FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi');
-                    } else {
-                      FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single');
-                    }
-                  }
-                }
-              }}
+              onDragEnd={this.handleDragEnd}
               onDragStart={(result) => {
                 const { source } = result;
                 const { droppableId: sourceId, index: sourceIndex } = source;
@@ -112,7 +180,7 @@ class PlanMode extends Component {
                 store={FeatureStore}
                 type="pi"
               />
-            </DragDropContext>           
+            </DragDropContext>
           </div>
         </Spin>
       </Fragment>
