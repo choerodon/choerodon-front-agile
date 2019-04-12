@@ -24,6 +24,7 @@ class PlanMode extends Component {
   }
 
   refresh = () => {
+    this.Epic.epicRefresh();
     Promise.all([
       FeatureStore.axiosGetIssueTypes(),
       FeatureStore.axiosGetDefaultPriority(),
@@ -60,7 +61,7 @@ class PlanMode extends Component {
         </Select>
       );
       confirm({
-        title: '将特性状态置为:',
+        title: '将特性状态置为',
         content,
         onOk: () => {
           FeatureStore.moveSingleIssue(...otherArgs, statusId, statusType);
@@ -137,7 +138,7 @@ class PlanMode extends Component {
   }
 
   render() {
-    const { issueFresh } = this.props;
+    const { issueRefresh } = this.props;
     return (
       <Fragment>
         <div className="c7n-backlog-side">
@@ -154,10 +155,11 @@ class PlanMode extends Component {
           </p>
         </div>
         <Epic
+          ref={(epic) => { this.Epic = epic; }}
           refresh={this.refresh}
           visible={FeatureStore.getEpicVisible}
           store={FeatureStore}
-          issueRefresh={issueFresh}
+          issueRefresh={issueRefresh}
           onEpicClick={this.onEpicClick}
         />
         <Spin spinning={FeatureStore.getSpinIf}>

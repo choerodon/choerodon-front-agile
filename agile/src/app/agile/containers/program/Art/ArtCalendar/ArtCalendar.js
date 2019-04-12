@@ -43,7 +43,7 @@ class ArtCalendar extends Component {
             this.setState({
               loading: false,
             });
-            const data = res;
+            const data = res.sort((a, b) => a.id - b.id);
             const { startDate, endDate } = this.getDuring(data);
             this.setState({
               data,

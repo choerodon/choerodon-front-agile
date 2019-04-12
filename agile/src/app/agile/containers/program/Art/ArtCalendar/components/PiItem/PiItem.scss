@@ -133,6 +133,7 @@
 }
 
 .PiItem-pi-sprintPopover, .PiItem-pi-piPopover {
+  z-index: 9999;
   .ant-popover-inner-content {
     padding: 24px 15px 15px;
   }

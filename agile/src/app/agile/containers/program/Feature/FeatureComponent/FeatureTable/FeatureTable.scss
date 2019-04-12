@@ -1,6 +1,10 @@
 .c7nagile-FeatureTable {
   padding: 0 24px;
 
+  th {
+    white-space: nowrap;
+  }
+
   .ant-table-filter-bar {
     border-top: none;
   }

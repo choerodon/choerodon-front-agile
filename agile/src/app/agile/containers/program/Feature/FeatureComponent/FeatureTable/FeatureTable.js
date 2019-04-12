@@ -18,8 +18,7 @@ const getColumns = filters => ([
     key: 'issueNum',
     className: 'issueId',
     sorterId: 'issueId',
-    width: 100,
-    fixed: true,
+    width: 100,  
     // filters: [],
     render: text => <IssueNum text={text} />,
   },
@@ -29,7 +28,6 @@ const getColumns = filters => ([
     dataIndex: 'featureType',
     className: 'featureType',
     sorterId: 'featureType',
-    fixed: true,
     width: 100,
     render: (featureType, record) => (
       <div style={{ lineHeight: 0 }}>
@@ -49,8 +47,7 @@ const getColumns = filters => ([
     dataIndex: 'summary',
     className: 'summary',
     key: 'summary',
-    width: 240,
-    fixed: true,
+    width: 240, 
     // filters: [],
     render: text => <Summary text={text} />,
   },
@@ -61,6 +58,7 @@ const getColumns = filters => ([
     sorterId: 'statusList',    
     filters: filters.issueStatus,
     filterMultiple: true,
+    width: 134,
     render: record => <StatusName record={record} />,
   },
   {
@@ -70,6 +68,7 @@ const getColumns = filters => ([
     sorterId: 'epic',
     filters: filters.epic,
     filterMultiple: true,
+    width: 134,
     render: (epic, record) => <Epic color={record.epicColor} name={record.epicName} />,
   },
   {
@@ -79,6 +78,7 @@ const getColumns = filters => ([
     dataIndex: 'piNameDTOList',    
     filters: filters.pi,
     filterMultiple: true,
+    width: 134,
     render: piNameDTOList => Sprint({ objArray: piNameDTOList, name: piNameDTOList.length > 0 && `${piNameDTOList[0].code}-${piNameDTOList[0].name}` }),
   },
   {
@@ -150,7 +150,7 @@ const FeatureTable = ({
               onRow={onRow}
               footer={() => (<QuickCreateFeatureWithProvider onCreate={onCreateFeature} />)}
               scroll={{
-                x: 1500,
+                x: true,
               }}
             />
           </div>

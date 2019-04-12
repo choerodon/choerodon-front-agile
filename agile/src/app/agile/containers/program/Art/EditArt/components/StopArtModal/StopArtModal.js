@@ -13,7 +13,8 @@ let canStop = true;
 // eslint-disable-next-line consistent-return
 const renderStopArtModalContent = (props) => {
   const { stopArtPIInfo, data } = props;
-  canStop = !(stopArtPIInfo && stopArtPIInfo.activePiDTO && Object.keys(stopArtPIInfo.activePiDTO).length > 0);
+  // canStop = !(stopArtPIInfo && stopArtPIInfo.activePiDTO && Object.keys(stopArtPIInfo.activePiDTO).length > 0);
+  canStop = true;
   if (!canStop) {
     return (
       <p>
@@ -35,7 +36,7 @@ const renderStopArtModalContent = (props) => {
         </p>
         <p style={{ marginBottom: 5 }}>
           {'当前进行中的PI：'}
-          <span style={{ color: 'red', fontWeight: 600 }}>无</span>
+          <span style={{ color: 'red', fontWeight: 600 }}>{stopArtPIInfo.activePiDTO ? `${stopArtPIInfo.activePiDTO.code}-${stopArtPIInfo.activePiDTO.name} ` : '无'}</span>
         </p>
         <p style={{ marginBottom: 5 }}>
           {'已完成的PI个数：'}
