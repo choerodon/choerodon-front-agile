@@ -44,12 +44,13 @@ class PlanMode extends Component {
 
   handleMove = (statusType, statusList, ...otherArgs) => {
     let statusId = statusList[0] && statusList[0].id;
-    if (statusList.length > 1) {
+    if (statusList.length === 1) {
       FeatureStore.moveSingleIssue(...otherArgs, statusId, statusType);
     } else {
       const options = statusList.map(status => <Option value={status.id}>{status.name}</Option>);
       const content = (
         <Select
+          style={{ width: '100%' }}
           defaultValue={statusId}
           onChange={(value) => {
             statusId = value;
