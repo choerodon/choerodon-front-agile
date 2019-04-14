@@ -115,7 +115,7 @@ class WYSIWYGEditor extends Component {
     } = this.props;
     const { loading, value } = this.state;
     const newStyle = { ...defaultStyle, ...style };
-    const editHeight = newStyle.height === '100%' ? `calc(100% - ${toolbarHeight || 42})` : (newStyle.height - (toolbarHeight || 0));
+    const editHeight = newStyle.height === '100%' ? `calc(100% - ${toolbarHeight || '42px'})` : (newStyle.height - (toolbarHeight || 42));
     return (
       <div style={{ width: '100%', height: '100%' }}>
         <div style={newStyle} className="react-quill-editor">

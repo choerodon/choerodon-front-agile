@@ -207,7 +207,7 @@ class TextEditToggle extends Component {
           formKey ? (
             <Form layout="vertical">
               {children.map(child => (
-                <FormItem>
+                <FormItem key={child.key}>
                   {getFieldDecorator(formKey, {
                     rules,
                     initialValue: originData,

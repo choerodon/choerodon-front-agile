@@ -1,8 +1,8 @@
 /* eslint-disable react/sort-comp */
 import React, { Component } from 'react';
+import { observer, inject } from 'mobx-react';
 import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
-import _ from 'lodash';
 import { Spin } from 'choerodon-ui';
 import './EditFeature.scss';
 import {
@@ -22,7 +22,7 @@ const { AppState } = stores;
 
 let loginUserId;
 let hasPermission;
-class CreateSprint extends Component {
+@observer class CreateSprint extends Component {
   constructor(props) {
     super(props);
     this.needBlur = true;

@@ -55,6 +55,13 @@ export function loadComponents() {
   );
 }
 
+export function loadFeatures(epicId) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(
+    `/agile/v1/projects/${projectId}/issues/feature/select_data?epicId=${epicId}`,
+  );
+}
+
 export function loadEpics() {
   const projectId = AppState.currentMenuType.id;
   return axios.get(
@@ -279,4 +286,34 @@ export function queryImportHistory() {
 export function cancelImport(id, ovn) {
   const projectId = AppState.currentMenuType.id;
   return axios.put(`/agile/v1/projects/${projectId}/excel/cancel?id=${id}&objectVersionNumber=${ovn}`);
+}
+
+/**
+ * 加载字段配置
+ * @returns {V|*}
+ */
+export function getFields(dto) {
+  const projectId = AppState.currentMenuType.id;
+  const orgId = AppState.currentMenuType.organizationId;
+  return axios.post(`/foundation/v1/projects/${projectId}/field_value/list?organizationId=${orgId}`, dto);
+}
+
+/**
+ * 加载字段配置（包含值）
+ * @returns {V|*}
+ */
+export function getFieldAndValue(id, dto) {
+  const projectId = AppState.currentMenuType.id;
+  const orgId = AppState.currentMenuType.organizationId;
+  return axios.post(`/foundation/v1/projects/${projectId}/field_value/list/${id}?organizationId=${orgId}`, dto);
+}
+
+/**
+ * 更新Issue字段值
+ * @returns {V|*}
+ */
+export function updateField(id, fieldId, code, dto) {
+  const projectId = AppState.currentMenuType.id;
+  const orgId = AppState.currentMenuType.organizationId;
+  return axios.post(`/foundation/v1/projects/${projectId}/field_value/update/${id}?organizationId=${orgId}&fieldId=${fieldId}&schemeCode=${code}`, dto);
 }

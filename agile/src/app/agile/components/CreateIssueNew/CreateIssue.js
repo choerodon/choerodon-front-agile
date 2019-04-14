@@ -7,7 +7,9 @@ import {
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload, randomString } from '../../common/utils';
 import {
-  createIssue, loadLabels, loadPriorities, loadVersions, loadSprints, loadComponents, loadEpics, loadIssuesInLink,
+  createIssue, loadLabels, loadPriorities, loadVersions,
+  loadSprints, loadComponents, loadEpics, loadIssuesInLink,
+  getFields,
 } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
@@ -21,7 +23,6 @@ const { Sidebar } = Modal;
 const { Option } = Select;
 const FormItem = Form.Item;
 let sign = false;
-let hasPermission = false;
 
 const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
 
@@ -81,7 +82,6 @@ class CreateIssue extends Component {
   componentDidMount() {
     this.loadPriorities();
     this.loadIssueTypes();
-    this.loadPermission();
   }
 
   onFilterChangeAssignee(input) {
@@ -191,17 +191,6 @@ class CreateIssue extends Component {
           originIssueTypes: AppState.currentMenuType.category === 'PROGRAM' ? res : res.filter(item => item.typeCode !== 'feature'),
         });
       });
-  };
-
-  loadPermission = () => {
-    axios.post('/iam/v1/permissions/checkPermission', [{
-      code: 'agile-service.project-info.updateProjectInfo',
-      organizationId: AppState.currentMenuType.organizationId,
-      projectId: AppState.currentMenuType.id,
-      resourceType: 'project',
-    }]).then((permission) => {
-      hasPermission = permission.length && permission[0].approve;
-    });
   };
 
   handleChangeStoryPoint = (value) => {
@@ -436,9 +425,16 @@ class CreateIssue extends Component {
                     label="问题类型"
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     onChange={((value) => {
+                      const { typeCode } = originIssueTypes.find(item => item.id === value);
                       this.setState({
-                        newIssueTypeCode: originIssueTypes.find(item => item.id === value).typeCode,
+                        newIssueTypeCode: typeCode,
                       });
+                      const param = {
+                        schemeCode: 'agile_issue',
+                        context: typeCode,
+                        pageCode: 'agile_issue_edit',
+                      };
+                      getFields(param);
                     })}
                   >
                     {originIssueTypes.filter(t => t.typeCode !== 'sub_task').map(type => (
@@ -570,7 +566,6 @@ class CreateIssue extends Component {
                       ))}
                     </Select>
                   </div>
-
                 )
               }
               <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
@@ -697,7 +692,7 @@ class CreateIssue extends Component {
                 })(
                   <Select
                     label="版本"
-                    mode={hasPermission ? 'tags' : 'multiple'}
+                    mode="multiple"
                     loading={selectLoading}
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     tokenSeparators={[',']}
@@ -735,7 +730,7 @@ class CreateIssue extends Component {
                 })(
                   <Select
                     label="模块"
-                    mode={hasPermission ? 'tags' : 'multiple'}
+                    mode="multiple"
                     loading={selectLoading}
                     getPopupContainer={triggerNode => triggerNode.parentNode}
                     tokenSeparators={[',']}
