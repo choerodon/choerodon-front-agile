@@ -76,7 +76,7 @@ class ObjectSchemeDetail extends Component {
         <div>
           <Checkbox
             defaultChecked={record.required}
-            disabled={record.system}
+            disabled={record.system || (AppState.currentMenuType.type === 'project' && !record.projectId)}
             onChange={() => this.onRequiredChange(record)}
           />
         </div>
@@ -88,7 +88,7 @@ class ObjectSchemeDetail extends Component {
       width: '10%',
       render: (componentId, record) => (
         <div>
-          {record.system
+          {record.system || (AppState.currentMenuType.type === 'project' && !record.projectId)
             ? ''
             : (
               <React.Fragment>
