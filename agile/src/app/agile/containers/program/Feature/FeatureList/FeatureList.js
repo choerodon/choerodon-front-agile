@@ -74,7 +74,7 @@ class FeatureList extends Component {
     const { HeaderStore } = this.props;
 
     return (
-      <Page className="c7n-agile-EditArt">
+      <Page>
         <Header
           title="特性列表"
         >
@@ -104,7 +104,7 @@ class FeatureList extends Component {
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div
-            className="c7n-backlog"
+            className="c7n-FeatureList"
             style={{
               height: HeaderStore.announcementClosed ? 'calc(100vh - 106px)' : 'calc(100vh - 158px)',
             }}
