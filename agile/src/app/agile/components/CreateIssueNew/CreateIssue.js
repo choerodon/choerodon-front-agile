@@ -3,7 +3,7 @@ import { stores, axios, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
   Select, Form, Input, Button, Modal, Icon, InputNumber,
-  Checkbox, TimePicker, Row, Col, Radio, DatePicker,
+  Checkbox, TimePicker, Row, Col, Radio, DatePicker, Spin,
 } from 'choerodon-ui';
 import moment from 'moment';
 import { UploadButton } from '../CommonComponent';
@@ -61,6 +61,7 @@ class CreateIssue extends Component {
       createLoading: false,
       fileList: [],
       selectLoading: true,
+      loading: true,
 
       originLabels: [],
       originComponents: [],
@@ -156,9 +157,13 @@ class CreateIssue extends Component {
         const fieldList = [];
         fields.forEach((item) => {
           if (!item.system) {
+            let value = form.getFieldValue(item.fieldCode);
+            if (item.fieldType === 'time' || item.fieldType === 'datetime') {
+              value = value.format('YYYY-MM-DD HH:mm:ss');
+            }
             fieldList.push({
               fieldType: item.fieldType,
-              value: form.getFieldValue(item.fieldCode),
+              value,
               fieldId: item.fieldId,
             });
           }
@@ -205,10 +210,7 @@ class CreateIssue extends Component {
       .then((res) => {
         if (res && res.length) {
           const story = res.filter(item => item.typeCode === 'story');
-          let defaultType = res[0];
-          if (story && story.length) {
-            defaultType = story[0];
-          }
+          const defaultType = (story && story.length) ? res[0] : story[0];
           const param = {
             schemeCode: 'agile_issue',
             context: defaultType.typeCode,
@@ -219,6 +221,7 @@ class CreateIssue extends Component {
               fields,
               originIssueTypes: res,
               defaultTypeId: defaultType.id,
+              loading: false,
             });
           });
         }
@@ -300,7 +303,6 @@ class CreateIssue extends Component {
       storyPoints,
       estimatedTime,
       originLinks,
-      originIssues,
     } = this.state;
     form.validateFields((err, values) => {
       if (!err) {
@@ -349,10 +351,10 @@ class CreateIssue extends Component {
         });
         const issueLinkCreateDTOList = [];
         if (values.linkTypeId) {
-          Object.keys(values.linkTypeId).forEach((link, index) => {
+          Object.keys(values.linkTypeId).forEach((link) => {
             if (values.linkTypeId[link] && values.linkIssues[link]) {
               const currentLinkType = _.find(originLinks, { linkTypeId: values.linkTypeId[link].split('+')[0] * 1 });
-              values.linkIssues[link].forEach((issueId, i, issues) => {                
+              values.linkIssues[link].forEach((issueId) => {
                 if (currentLinkType.inWard === values.linkTypeId[link].split('+')[1]) {
                   issueLinkCreateDTOList.push({
                     linkTypeId: values.linkTypeId[link].split('+')[0] * 1,
@@ -554,7 +556,7 @@ class CreateIssue extends Component {
   };
 
   getFieldComponent = (field) => {
-    const { store, form } = this.props;
+    const { form } = this.props;
     const { getFieldDecorator } = form;
     const { defaultValue, fieldName, fieldCode } = field;
     const {
@@ -886,7 +888,7 @@ class CreateIssue extends Component {
                 ref={(e) => {
                   this.componentRef = e;
                 }}
-                onPopupFocus={(e) => {
+                onPopupFocus={() => {
                   this.componentRef.rcSelect.focus();
                 }}
                 tokenSeparators={[',']}
@@ -913,7 +915,7 @@ class CreateIssue extends Component {
                 ref={(e) => {
                   this.componentRef = e;
                 }}
-                onPopupFocus={(e) => {
+                onPopupFocus={() => {
                   this.componentRef.rcSelect.focus();
                 }}
                 tokenSeparators={[',']}
@@ -977,7 +979,7 @@ class CreateIssue extends Component {
     } = this.props;
     const { getFieldDecorator } = form;
     const {
-      createLoading, edit, delta, selectLoading, fields,
+      createLoading, edit, delta, selectLoading, fields, loading,
       fileList, newIssueTypeCode, issueLinkArr, originIssues, links,
     } = this.state;
     const callback = (value) => {
@@ -1002,7 +1004,7 @@ class CreateIssue extends Component {
           description="请在下面输入问题的详细信息，包含详细描述、人员信息、版本信息、进度预估、优先级等等。您可以通过丰富的任务描述帮助相关人员更快更全面的理解任务，同时更好的把控问题进度。"
           link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/issue/create-issue/"
         >
-          <div>
+          <Spin spinning={loading}>
             <Form layout="vertical">
               {fields && fields.map(field => this.getFieldComponent(field))}
               {
@@ -1129,7 +1131,7 @@ class CreateIssue extends Component {
                 />
               </div>
             </div>
-          </div>
+          </Spin>
           {
             edit ? (
               <FullEditor
@@ -1140,9 +1142,7 @@ class CreateIssue extends Component {
               />
             ) : null
           }
-
         </Content>
-
       </Sidebar>
     );
   }
