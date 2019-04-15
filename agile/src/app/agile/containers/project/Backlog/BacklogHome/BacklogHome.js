@@ -345,13 +345,16 @@ class BacklogHome extends Component {
                 </DragDropContext>
                 <Injecter store={BacklogStore} item="newIssueVisible">
                   {visible => (
-                    <CreateIssue
-                      visible={visible}
-                      onCancel={() => {
-                        BacklogStore.setNewIssueVisible(false);
-                      }}
-                      onOk={this.handleCreateIssue}
-                    />
+                    visible
+                      ? (
+                        <CreateIssue
+                          visible={visible}
+                          onCancel={() => {
+                            BacklogStore.setNewIssueVisible(false);
+                          }}
+                          onOk={this.handleCreateIssue}
+                        />
+                      ) : ''
                   )}
                 </Injecter>
               </div>

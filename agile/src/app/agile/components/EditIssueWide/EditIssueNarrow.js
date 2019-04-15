@@ -69,7 +69,7 @@ let hasPermission;
       loadIssue(id).then((res) => {
         const param = {
           schemeCode: 'agile_issue',
-          context: res.typeCode === 'sub_task' ? 'subtask' : res.typeCode,
+          context: res.typeCode,
           pageCode: 'agile_issue_edit',
         };
         getFieldAndValue(id, param).then((fields) => {

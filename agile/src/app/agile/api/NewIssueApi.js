@@ -312,8 +312,18 @@ export function getFieldAndValue(id, dto) {
  * 更新Issue字段值
  * @returns {V|*}
  */
-export function updateField(id, fieldId, code, dto) {
+export function updateFieldValue(id, fieldId, code, dto) {
   const projectId = AppState.currentMenuType.id;
   const orgId = AppState.currentMenuType.organizationId;
   return axios.post(`/foundation/v1/projects/${projectId}/field_value/update/${id}?organizationId=${orgId}&fieldId=${fieldId}&schemeCode=${code}`, dto);
+}
+
+/**
+ * 新增Issue字段值
+ * @returns {V|*}
+ */
+export function createFieldValue(id, code, dto) {
+  const projectId = AppState.currentMenuType.id;
+  const orgId = AppState.currentMenuType.organizationId;
+  return axios.post(`/foundation/v1/projects/${projectId}/field_value/${id}?organizationId=${orgId}&schemeCode=${code}`, dto);
 }

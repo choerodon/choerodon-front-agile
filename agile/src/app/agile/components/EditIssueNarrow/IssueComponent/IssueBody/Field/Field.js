@@ -7,7 +7,7 @@ import {
 } from 'choerodon-ui';
 import { injectIntl } from 'react-intl';
 import TextEditToggle from '../../../../TextEditToggle';
-import { updateField } from '../../../../../api/NewIssueApi';
+import { updateFieldValue } from '../../../../../api/NewIssueApi';
 import FieldBlank from './FieldBlank';
 
 const { TextArea } = Input;
@@ -69,7 +69,7 @@ const { Text, Edit } = TextEditToggle;
         fieldType,
         value: newValue,
       };
-      updateField(issueId, fieldId, 'agile_issue', obj)
+      updateFieldValue(issueId, fieldId, 'agile_issue', obj)
         .then(() => {
           if (onUpdate) {
             onUpdate();
