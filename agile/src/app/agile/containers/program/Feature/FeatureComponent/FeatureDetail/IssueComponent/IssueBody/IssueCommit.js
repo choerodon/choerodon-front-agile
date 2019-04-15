@@ -23,7 +23,7 @@ import { createCommit } from '../../../../../../../api/NewIssueApi';
 
   newCommit = (commit) => {
     const { reloadIssue } = this.props;
-    createCommit(commit).then((res) => {
+    createCommit(commit).then(() => {
       if (reloadIssue) {
         reloadIssue();
       }
@@ -42,7 +42,11 @@ import { createCommit } from '../../../../../../../api/NewIssueApi';
     if (addCommitDes) {
       beforeTextUpload(addCommitDes, { issueId, commentText: '' }, this.newCommit, 'commentText');
     } else {
-      this.newCommit({ issueId, commentText: '' });
+      // this.newCommit({ issueId, commentText: '' });
+      this.setState({
+        addCommit: false,
+        addCommitDes: '',
+      });
     }
   }
 
@@ -93,10 +97,6 @@ import { createCommit } from '../../../../../../../api/NewIssueApi';
   }
 
   render() {
-    const {
-      intl, store,
-    } = this.props;
-
     return (
       <div id="commit">
         <div className="c7n-title-wrapper">

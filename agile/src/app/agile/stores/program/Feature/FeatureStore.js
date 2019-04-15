@@ -8,33 +8,9 @@ const { AppState } = stores;
 
 @store('FeatureStore')
 class FeatureStore {
-  @observable createBranchShow = false;
-
   @observable commitShow = false;
 
-  @observable mergeRequestShow = false;
-
-  @observable workLogShow = false;
-
-  @observable createSubTaskShow = false;
-
   @observable copyIssueShow = false;
-
-  @observable transformSubIssueShow = false;
-
-  @observable transformFromSubIssueShow = false;
-
-  @observable assigneeShow = false;
-
-  @observable changeParentShow = false;
-
-  @action setCreateBranchShow(data) {
-    this.createBranchShow = data;
-  }
-
-  @computed get getCreateBranchShow() {
-    return this.createBranchShow;
-  }
 
   @action setCommitShow(data) {
     this.commitShow = data;
@@ -42,30 +18,6 @@ class FeatureStore {
 
   @computed get getCommitShow() {
     return this.commitShow;
-  }
-
-  @action setMergeRequestShow(data) {
-    this.mergeRequestShow = data;
-  }
-
-  @computed get getMergeRequestShow() {
-    return this.mergeRequestShow;
-  }
-
-  @action setWorkLogShow(data) {
-    this.workLogShow = data;
-  }
-
-  @computed get getWorkLogShow() {
-    return this.workLogShow;
-  }
-
-  @action setCreateSubTaskShow(data) {
-    this.createSubTaskShow = data;
-  }
-
-  @computed get getCreateSubTaskShow() {
-    return this.createSubTaskShow;
   }
 
   @action setCopyIssueShow(data) {
@@ -76,76 +28,30 @@ class FeatureStore {
     return this.copyIssueShow;
   }
 
-  @action setTransformSubIssueShow(data) {
-    this.transformSubIssueShow = data;
-  }
-
-  @computed get getTransformSubIssueShow() {
-    return this.transformSubIssueShow;
-  }
-
-  @action setTransformFromSubIssueShow(data) {
-    this.transformFromSubIssueShow = data;
-  }
-
-  @computed get getTransformFromSubIssueShow() {
-    return this.transformFromSubIssueShow;
-  }
-
-  @action setAssigneeShow(data) {
-    this.assigneeShow = data;
-  }
-
-  @computed get getAssigneeShow() {
-    return this.assigneeShow;
-  }
-
-  @action setChangeParentShow(data) {
-    this.changeParentShow = data;
-  }
-
-  @computed get getChangeParentShow() {
-    return this.changeParentShow;
-  }
-
   // issue
   @observable issue = {};
 
-  // issue attribute
-  @observable wiki = {};
+  // fields
+  @observable fields = [];
 
-  @observable workLogs = [];
+  @action setIssueFields(issue, fields) {
+    this.fields = fields;
+    this.issue = issue;
+  }
 
-  @observable dataLogs = [];
-
-  @observable linkIssues = [];
-
-  @observable branches = {};
-
-  @action setIssue(data) {
-    this.currentRae = undefined;
-    this.issue = data;
+  @computed get getFields() {
+    return this.fields;
   }
 
   @computed get getIssue() {
     return this.issue;
   }
 
-  @action setWiki(data) {
-    this.wiki = data;
-  }
+  // issue attribute
 
-  @computed get getWiki() {
-    return this.wiki;
-  }
+  @observable dataLogs = [];
 
-  @action setWorkLogs(data) {
-    this.workLogs = data;
-  }
-
-  @computed get getWorkLogs() {
-    return this.workLogs;
-  }
+  @observable linkIssues = [];
 
   @action setDataLogs(data) {
     this.dataLogs = data;
@@ -163,22 +69,10 @@ class FeatureStore {
     return this.linkIssues;
   }
 
-  @action setBranches(data) {
-    this.branches = data;
-  }
-
-  @computed get getBranches() {
-    return this.branches;
-  }
-
-  @action initIssueAttribute(wiki, workLogs, dataLogs, linkIssues, branches) {
-    this.wiki = wiki;
-    this.workLogs = workLogs;
+  @action initIssueAttribute(dataLogs, linkIssues) {
     this.dataLogs = dataLogs;
     this.linkIssues = linkIssues;
-    this.branches = branches;
   }
-
 
   @observable featureList = [];
 

@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Dropdown, Icon, Menu, Button,
+  Dropdown, Icon, Menu, Button, Modal,
 } from 'choerodon-ui';
 import IssueNumber from './IssueNumber';
 import { FieldStoryPoint, FieldText } from './IssueBody/Field';
+import { deleteIssue } from '../../../../../../api/NewIssueApi';
 import './IssueComponent.scss';
+
+const { confirm } = Modal;
 
 @inject('AppState', 'HeaderStore')
 @observer class SprintHeader extends Component {
@@ -17,6 +20,35 @@ import './IssueComponent.scss';
 
   componentDidMount() {
   }
+
+  handleDeleteIssue = (issueId) => {
+    const { store, onDeleteIssue } = this.props;
+    const issue = store.getIssue;
+    const { issueNum } = issue;
+    confirm({
+      width: 560,
+      title: `删除特性${issueNum}`,
+      content:
+        (
+          <div>
+            <p style={{ marginBottom: 10 }}>请确认您要删除这个特性。</p>
+            <p style={{ marginBottom: 10 }}>这个特性将会被彻底删除。包括所有附件和评论。</p>
+            <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
+          </div>
+        ),
+      onOk() {
+        return deleteIssue(issueId)
+          .then((res) => {
+            if (onDeleteIssue) {
+              onDeleteIssue();
+            }
+          });
+      },
+      onCancel() { },
+      okText: '删除',
+      okType: 'danger',
+    });
+  };
 
   handleClickMenu = (e) => {
     const { store } = this.props;

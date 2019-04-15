@@ -52,7 +52,7 @@ const { confirm } = Modal;
       okText: '删除',
       okType: 'danger',
     });
-  }
+  };
 
   handleClickMenu = (e) => {
     const { store } = this.props;
