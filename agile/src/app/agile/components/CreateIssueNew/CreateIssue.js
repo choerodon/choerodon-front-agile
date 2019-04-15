@@ -2,25 +2,29 @@ import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
-  Select, Form, Input, Button, Modal, Icon, Tooltip, InputNumber,
+  Select, Form, Input, Button, Modal, Icon, InputNumber,
+  Checkbox, TimePicker, Row, Col, Radio, DatePicker,
 } from 'choerodon-ui';
+import moment from 'moment';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload, randomString } from '../../common/utils';
 import {
   createIssue, loadLabels, loadPriorities, loadVersions,
   loadSprints, loadComponents, loadEpics, loadIssuesInLink,
-  getFields,
+  getFields, createFieldValue,
 } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import UserHead from '../UserHead';
 import TypeTag from '../TypeTag';
+import FieldBlank from './FieldBlank';
 import './CreateIssue.scss';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
 const { Option } = Select;
+const { TextArea } = Input;
 const FormItem = Form.Item;
 let sign = false;
 
@@ -68,6 +72,7 @@ class CreateIssue extends Component {
       originIssueTypes: [],
 
       defaultPriority: false,
+      defaultTypeId: false,
 
       newIssueTypeCode: '',
       storyPoints: '',
@@ -141,13 +146,24 @@ class CreateIssue extends Component {
   };
 
   handleSave = (data) => {
-    const { fileList } = this.state;
+    const { fileList, fields } = this.state;
     const { onOk, form } = this.props;
     const callback = (newFileList) => {
       this.setState({ fileList: newFileList });
     };
     createIssue(data)
       .then((res) => {
+        const fieldList = [];
+        fields.forEach((item) => {
+          if (!item.system) {
+            fieldList.push({
+              fieldType: item.fieldType,
+              value: form.getFieldValue(item.fieldCode),
+              fieldId: item.fieldId,
+            });
+          }
+        });
+        createFieldValue(res.issueId, 'agile_issue', fieldList);
         if (fileList.length > 0) {
           const config = {
             issueType: res.statusId,
@@ -187,9 +203,25 @@ class CreateIssue extends Component {
   loadIssueTypes = () => {
     axios.get(`/issue/v1/projects/${AppState.currentMenuType.projectId}/schemes/query_issue_types_with_sm_id?apply_type=agile`)
       .then((res) => {
-        this.setState({
-          originIssueTypes: AppState.currentMenuType.category === 'PROGRAM' ? res : res.filter(item => item.typeCode !== 'feature'),
-        });
+        if (res && res.length) {
+          const story = res.filter(item => item.typeCode === 'story');
+          let defaultType = res[0];
+          if (story && story.length) {
+            defaultType = story[0];
+          }
+          const param = {
+            schemeCode: 'agile_issue',
+            context: defaultType.typeCode,
+            pageCode: 'agile_issue_create',
+          };
+          getFields(param).then((fields) => {
+            this.setState({
+              fields,
+              originIssueTypes: res,
+              defaultTypeId: defaultType.id,
+            });
+          });
+        }
       });
   };
 
@@ -381,6 +413,563 @@ class CreateIssue extends Component {
     }
   };
 
+  renderField = (field) => {
+    const {
+      fieldOptions, fieldType, required, fieldName,
+    } = field;
+    if (fieldType === 'radio') {
+      if (fieldOptions && fieldOptions.length > 0) {
+        return (
+          <Radio.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            {fieldOptions && fieldOptions.length > 0
+            && fieldOptions.map(item => (
+              <Radio
+                className="radioStyle"
+                value={item.id}
+                key={item.id}
+              >
+                {item.value}
+              </Radio>
+            ))}
+          </Radio.Group>
+        );
+      } else {
+        return (
+          <FieldBlank />
+        );
+      }
+    } else if (field.fieldType === 'checkbox') {
+      if (fieldOptions && fieldOptions.length > 0) {
+        return (
+          <Checkbox.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <Row>
+              {fieldOptions && fieldOptions.length > 0
+              && fieldOptions.map(item => (
+                <Col
+                  span={24}
+                  key={item.id}
+                >
+                  <Checkbox
+                    value={item.id}
+                    key={item.id}
+                    className="checkboxStyle"
+                  >
+                    {item.value}
+                  </Checkbox>
+                </Col>
+              ))}
+            </Row>
+          </Checkbox.Group>
+        );
+      } else {
+        return (
+          <FieldBlank />
+        );
+      }
+    } else if (field.fieldType === 'time') {
+      return (
+        <TimePicker
+          label={fieldName}
+          className="fieldWith"
+          defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+          allowEmpty={!required}
+        />
+      );
+    } else if (field.fieldType === 'datetime') {
+      return (
+        <DatePicker
+          label={fieldName}
+          format="YYYY-MM-DD HH:mm:ss"
+          className="fieldWith"
+          allowClear={!required}
+        />
+      );
+    } else if (field.fieldType === 'single') {
+      return (
+        <Select
+          label={fieldName}
+          dropdownMatchSelectWidth
+          className="fieldWith"
+          allowClear={!required}
+        >
+          {field.fieldOptions && field.fieldOptions.length > 0
+          && field.fieldOptions.map(item => (
+            <Option
+              value={item.id}
+              key={item.id}
+            >
+              {item.value}
+            </Option>
+          ))}
+        </Select>
+      );
+    } else if (field.fieldType === 'multiple') {
+      return (
+        <Select
+          label={fieldName}
+          dropdownMatchSelectWidth
+          mode="multiple"
+          className="fieldWith"
+        >
+          {field.fieldOptions && field.fieldOptions.length > 0
+          && field.fieldOptions.map(item => (
+            <Option
+              value={item.id}
+              key={item.id}
+            >
+              {item.value}
+            </Option>
+          ))}
+        </Select>
+      );
+    } else if (field.fieldType === 'number') {
+      return (
+        <InputNumber
+          label={fieldName}
+          className="fieldWith"
+          step={field.extraConfig === '1' ? 0.1 : 1}
+        />
+      );
+    } else if (field.fieldType === 'text') {
+      return (
+        <TextArea
+          label={fieldName}
+          className="fieldWith"
+        />
+      );
+    } else {
+      return (
+        <Input
+          label={fieldName}
+          className="fieldWith"
+        />
+      );
+    }
+  };
+
+  getFieldComponent = (field) => {
+    const { store, form } = this.props;
+    const { getFieldDecorator } = form;
+    const { defaultValue, fieldName, fieldCode } = field;
+    const {
+      originIssueTypes, originPriorities, defaultPriority, storyPoints,
+      edit, delta, originUsers, selectLoading, estimatedTime,
+      originEpics, originSprints, originFixVersions, originComponents,
+      originLabels, newIssueTypeCode, defaultTypeId,
+    } = this.state;
+    switch (field.fieldCode) {
+      case 'issueType':
+        return (
+          <FormItem label="问题类型" style={{ width: 520 }}>
+            {getFieldDecorator('typeId', {
+              rules: [{ required: true, message: '问题类型为必输项' }],
+              initialValue: defaultTypeId || '',
+            })(
+              <Select
+                label="问题类型"
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                onChange={((value) => {
+                  const { typeCode } = originIssueTypes.find(item => item.id === value);
+                  this.setState({
+                    newIssueTypeCode: typeCode,
+                  });
+                  const param = {
+                    schemeCode: 'agile_issue',
+                    context: typeCode,
+                    pageCode: 'agile_issue_create',
+                  };
+                  getFields(param).then((res) => {
+                    this.setState({
+                      fields: res,
+                    });
+                  });
+                })}
+              >
+                {originIssueTypes.filter(t => ['sub_task', 'feature'].indexOf(t.typeCode) === -1).map(type => (
+                  <Option key={type.id} value={type.id}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+                      <TypeTag
+                        data={type}
+                        showName
+                      />
+                    </div>
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'assignee':
+        return (
+          <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
+            {getFieldDecorator('assigneedId', {})(
+              <Select
+                label="经办人"
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                loading={selectLoading}
+                filter
+                filterOption={false}
+                allowClear
+                onFilterChange={this.onFilterChangeAssignee.bind(this)}
+              >
+                {originUsers.map(user => (
+                  <Option key={user.id} value={user.id}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
+                      <UserHead
+                        user={{
+                          id: user.id,
+                          loginName: user.loginName,
+                          realName: user.realName,
+                          avatar: user.imageUrl,
+                        }}
+                      />
+                    </div>
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'sprint':
+        return (
+          <FormItem label="冲刺" style={{ width: 520 }}>
+            {getFieldDecorator('sprintId', {})(
+              <Select
+                label="冲刺"
+                allowClear
+                filter
+                filterOption={
+                  (input, option) => option.props.children && option.props.children.toLowerCase().indexOf(
+                    input.toLowerCase(),
+                  ) >= 0
+                }
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                loading={selectLoading}
+                onFilterChange={() => {
+                  this.setState({
+                    selectLoading: true,
+                  });
+                  loadSprints(['sprint_planning', 'started']).then((res) => {
+                    this.setState({
+                      originSprints: res,
+                      selectLoading: false,
+                    });
+                  });
+                }}
+              >
+                {originSprints.map(sprint => (
+                  <Option key={sprint.sprintId} value={sprint.sprintId}>
+                    {sprint.sprintName}
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'priority':
+        return (
+          <FormItem label="优先级" style={{ width: 520 }}>
+            {getFieldDecorator('priorityId', {
+              rules: [{ required: true, message: '优先级为必选项' }],
+              initialValue: defaultPriority ? defaultPriority.id : '',
+            })(
+              <Select
+                label="优先级"
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+              >
+                {originPriorities.filter(p => p.enable).map(priority => (
+                  <Option key={priority.id} value={priority.id}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
+                      <span>{priority.name}</span>
+                    </div>
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'label':
+        return (
+          <FormItem label="标签" style={{ width: 520 }}>
+            {getFieldDecorator('issueLabel', {
+              rules: [{ transform: value => (value ? value.toString() : value) }],
+              normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), // 限制最长10位
+            })(
+              <Select
+                label="标签"
+                mode="tags"
+                loading={selectLoading}
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                tokenSeparators={[',']}
+                onFocus={() => {
+                  this.setState({
+                    selectLoading: true,
+                  });
+                  loadLabels().then((res) => {
+                    this.setState({
+                      originLabels: res,
+                      selectLoading: false,
+                    });
+                  });
+                }}
+              >
+                {originLabels.map(label => (
+                  <Option key={label.labelName} value={label.labelName}>
+                    {label.labelName}
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'fixVersion':
+        return (
+          <FormItem label="版本" style={{ width: 520 }}>
+            {getFieldDecorator('fixVersionIssueRel', {
+              rules: [{ transform: value => (value ? value.toString() : value) }],
+              normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), // 限制最长10位
+            })(
+              <Select
+                label="版本"
+                mode="multiple"
+                loading={selectLoading}
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                tokenSeparators={[',']}
+                onFocus={() => {
+                  this.setState({
+                    selectLoading: true,
+                  });
+                  loadVersions(['version_planning', 'released']).then((res) => {
+                    this.setState({
+                      originFixVersions: res,
+                      selectLoading: false,
+                    });
+                  });
+                }}
+              >
+                {
+                  originFixVersions.map(
+                    version => (
+                      <Option
+                        key={version.name}
+                        value={version.name}
+                      >
+                        {version.name}
+                      </Option>
+                    ),
+                  )}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'epic':
+        return (
+          newIssueTypeCode !== 'issue_epic' && (
+            <FormItem label="史诗" style={{ width: 520 }}>
+              {getFieldDecorator('epicId', {})(
+                <Select
+                  label="史诗"
+                  allowClear
+                  filter
+                  filterOption={
+                    (input, option) => option.props.children && option.props.children.toLowerCase().indexOf(
+                      input.toLowerCase(),
+                    ) >= 0
+                  }
+                  getPopupContainer={triggerNode => triggerNode.parentNode}
+                  loading={selectLoading}
+                  onFilterChange={() => {
+                    this.setState({
+                      selectLoading: true,
+                    });
+                    loadEpics().then((res) => {
+                      this.setState({
+                        originEpics: res,
+                        selectLoading: false,
+                      });
+                    });
+                  }}
+                >
+                  {originEpics.map(
+                    epic => (
+                      <Option
+                        key={epic.issueId}
+                        value={epic.issueId}
+                      >
+                        {epic.epicName}
+                      </Option>
+                    ),
+                  )}
+                </Select>,
+              )}
+            </FormItem>
+          )
+        );
+      case 'component':
+        return (
+          <FormItem label="模块" style={{ width: 520 }}>
+            {getFieldDecorator('componentIssueRel', {
+              rules: [{ transform: value => (value ? value.toString() : value) }],
+              normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), // 限制最长10位
+            })(
+              <Select
+                label="模块"
+                mode="multiple"
+                loading={selectLoading}
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                tokenSeparators={[',']}
+                onFocus={() => {
+                  this.setState({
+                    selectLoading: true,
+                  });
+                  loadComponents().then((res) => {
+                    this.setState({
+                      originComponents: res.content,
+                      selectLoading: false,
+                    });
+                  });
+                }}
+              >
+                {
+                  originComponents.map(
+                    component => (
+                      <Option
+                        key={component.name}
+                        value={component.name}
+                      >
+                        {component.name}
+                      </Option>
+                    ),
+                  )}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'summary':
+        return (
+          <FormItem label="概要" style={{ width: 520 }}>
+            {getFieldDecorator('summary', {
+              rules: [{ required: true, message: '概要为必输项' }],
+            })(
+              <Input label="概要" maxLength={44} />,
+            )}
+          </FormItem>
+        );
+      case 'epicName':
+        return (
+          newIssueTypeCode === 'issue_epic' && (
+            <FormItem label="史诗名称" style={{ width: 520 }}>
+              {getFieldDecorator('epicName', {
+                rules: [{ required: true, message: '史诗名称为必输项' }, {
+                  validator: this.checkEpicNameRepeat,
+                }],
+              })(
+                <Input label="史诗名称" maxLength={10} />,
+              )}
+            </FormItem>
+          )
+        );
+      case 'estimateTime':
+        return (
+          newIssueTypeCode !== 'issue_epic' && (
+            <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
+              <Select
+                label="预估时间"
+                value={estimatedTime && estimatedTime.toString()}
+                mode="combobox"
+                ref={(e) => {
+                  this.componentRef = e;
+                }}
+                onPopupFocus={(e) => {
+                  this.componentRef.rcSelect.focus();
+                }}
+                tokenSeparators={[',']}
+                style={{ marginTop: 0, paddingTop: 0 }}
+                onChange={value => this.handleChangeEstimatedTime(value)}
+              >
+                {storyPointList.map(sp => (
+                  <Option key={sp.toString()} value={sp}>
+                    {sp}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          )
+        );
+      case 'storyPoint':
+        return (
+          newIssueTypeCode === 'story' && (
+            <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
+              <Select
+                label="故事点"
+                value={storyPoints && storyPoints.toString()}
+                mode="combobox"
+                ref={(e) => {
+                  this.componentRef = e;
+                }}
+                onPopupFocus={(e) => {
+                  this.componentRef.rcSelect.focus();
+                }}
+                tokenSeparators={[',']}
+                style={{ marginTop: 0, paddingTop: 0 }}
+                onChange={value => this.handleChangeStoryPoint(value)}
+              >
+                {storyPointList.map(sp => (
+                  <Option key={sp.toString()} value={sp}>
+                    {sp}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          )
+        );
+      case 'description':
+        return (
+          <div style={{ width: 520 }}>
+            <div style={{ display: 'flex', marginBottom: 3, alignItems: 'center' }}>
+              <div style={{ fontWeight: 'bold' }}>描述</div>
+              <div style={{ marginLeft: 80 }}>
+                <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
+                  <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: 12 }} />
+                  <span style={{ color: '#3f51b5' }}>全屏编辑</span>
+                </Button>
+              </div>
+            </div>
+            {
+              !edit && (
+                <div className="clear-p-mw">
+                  <WYSIWYGEditor
+                    value={delta}
+                    style={{ height: 200, width: '100%' }}
+                    onChange={(value) => {
+                      this.setState({ delta: value });
+                    }}
+                  />
+                </div>
+              )
+            }
+          </div>
+        );
+      default:
+        return (
+          <FormItem label={fieldName} style={{ width: 520 }}>
+            {getFieldDecorator(fieldCode, {
+              rules: [{ required: true, message: `${fieldName}为必填项` }],
+              initialValue: defaultValue || undefined,
+            })(
+              this.renderField(field),
+            )}
+          </FormItem>
+        );
+    }
+  };
+
   render() {
     const {
       visible,
@@ -388,10 +977,8 @@ class CreateIssue extends Component {
     } = this.props;
     const { getFieldDecorator } = form;
     const {
-      originPriorities, defaultPriority, createLoading, storyPoints, estimatedTime,
-      edit, delta, originUsers, selectLoading,
-      originEpics, originSprints, originFixVersions, originComponents, originIssueTypes,
-      originLabels, fileList, newIssueTypeCode, issueLinkArr, originIssues, links,
+      createLoading, edit, delta, selectLoading, fields,
+      fileList, newIssueTypeCode, issueLinkArr, originIssues, links,
     } = this.state;
     const callback = (value) => {
       this.setState({
@@ -417,382 +1004,7 @@ class CreateIssue extends Component {
         >
           <div>
             <Form layout="vertical">
-              <FormItem label="问题类型" style={{ width: 520 }}>
-                {getFieldDecorator('typeId', {
-                  rules: [{ required: true, message: '问题类型为必输项' }],
-                })(
-                  <Select
-                    label="问题类型"
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                    onChange={((value) => {
-                      const { typeCode } = originIssueTypes.find(item => item.id === value);
-                      this.setState({
-                        newIssueTypeCode: typeCode,
-                      });
-                      const param = {
-                        schemeCode: 'agile_issue',
-                        context: typeCode,
-                        pageCode: 'agile_issue_edit',
-                      };
-                      getFields(param);
-                    })}
-                  >
-                    {originIssueTypes.filter(t => t.typeCode !== 'sub_task').map(type => (
-                      <Option key={type.id} value={type.id}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-                          <TypeTag
-                            data={type}
-                            showName
-                          />
-                        </div>
-                      </Option>
-                    ))}
-                  </Select>,
-                )}
-              </FormItem>
-              {newIssueTypeCode === 'issue_epic' && (
-                <FormItem label="史诗名称" style={{ width: 520 }}>
-                  {getFieldDecorator('epicName', {
-                    rules: [{ required: true, message: '史诗名称为必输项' }, {
-                      validator: this.checkEpicNameRepeat,
-                    }],
-                  })(
-                    <Input label="史诗名称" maxLength={10} />,
-                  )}
-                </FormItem>
-              )}
-              <FormItem label="概要" style={{ width: 520 }}>
-                {getFieldDecorator('summary', {
-                  rules: [{ required: true, message: '概要为必输项' }],
-                })(
-                  <Input label="概要" maxLength={44} />,
-                )}
-              </FormItem>
-
-              <FormItem label="优先级" style={{ width: 520 }}>
-                {getFieldDecorator('priorityId', {
-                  rules: [{ required: true, message: '优先级为必选项' }],
-                  initialValue: defaultPriority ? defaultPriority.id : '',
-                })(
-                  <Select
-                    label="优先级"
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                  >
-                    {originPriorities.filter(p => p.enable).map(priority => (
-                      <Option key={priority.id} value={priority.id}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
-                          <span>{priority.name}</span>
-                        </div>
-                      </Option>
-                    ))}
-                  </Select>,
-                )}
-              </FormItem>
-
-              <div style={{ width: 520 }}>
-                <div style={{ display: 'flex', marginBottom: 3, alignItems: 'center' }}>
-                  <div style={{ fontWeight: 'bold' }}>描述</div>
-                  <div style={{ marginLeft: 80 }}>
-                    <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
-                      <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: 12 }} />
-                      <span style={{ color: '#3f51b5' }}>全屏编辑</span>
-                    </Button>
-                  </div>
-                </div>
-                {
-                  !edit && (
-                    <div className="clear-p-mw">
-                      <WYSIWYGEditor
-                        value={delta}
-                        style={{ height: 200, width: '100%' }}
-                        onChange={(value) => {
-                          this.setState({ delta: value });
-                        }}
-                      />
-                    </div>
-                  )
-                }
-              </div>
-
-              {
-                // 创建的问题类型为故事时，才显示故事点
-                newIssueTypeCode === 'story' && (
-                  <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
-                    <Select
-                      label="故事点"
-                      value={storyPoints && storyPoints.toString()}
-                      mode="combobox"
-                      ref={(e) => {
-                        this.componentRef = e;
-                      }}
-                      onPopupFocus={(e) => {
-                        this.componentRef.rcSelect.focus();
-                      }}
-                      tokenSeparators={[',']}
-                      style={{ marginTop: 0, paddingTop: 0 }}
-                      onChange={value => this.handleChangeStoryPoint(value)}
-                    >
-                      {storyPointList.map(sp => (
-                        <Option key={sp.toString()} value={sp}>
-                          {sp}
-                        </Option>
-                      ))}
-                    </Select>
-                  </div>
-                )
-              }
-
-              {
-                newIssueTypeCode !== 'issue_epic' && (
-                  <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
-                    <Select
-                      label="预估时间"
-                      value={estimatedTime && estimatedTime.toString()}
-                      mode="combobox"
-                      ref={(e) => {
-                        this.componentRef = e;
-                      }}
-                      onPopupFocus={(e) => {
-                        this.componentRef.rcSelect.focus();
-                      }}
-                      tokenSeparators={[',']}
-                      style={{ marginTop: 0, paddingTop: 0 }}
-                      onChange={value => this.handleChangeEstimatedTime(value)}
-                    >
-                      {storyPointList.map(sp => (
-                        <Option key={sp.toString()} value={sp}>
-                          {sp}
-                        </Option>
-                      ))}
-                    </Select>
-                  </div>
-                )
-              }
-              <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
-                {getFieldDecorator('assigneedId', {})(
-                  <Select
-                    label="经办人"
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                    loading={selectLoading}
-                    filter
-                    filterOption={false}
-                    allowClear
-                    onFilterChange={this.onFilterChangeAssignee.bind(this)}
-                  >
-                    {originUsers.map(user => (
-                      <Option key={user.id} value={user.id}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
-                          <UserHead
-                            user={{
-                              id: user.id,
-                              loginName: user.loginName,
-                              realName: user.realName,
-                              avatar: user.imageUrl,
-                            }}
-                          />
-                        </div>
-                      </Option>
-                    ))}
-                  </Select>,
-                )}
-              </FormItem>
-              <Tooltip title="可自行选择经办人，如不选择，会应用模块的默认经办人逻辑和项目的默认经办人策略">
-                <Icon
-                  type="error"
-                  style={{
-                    fontSize: '16px',
-                    color: 'rgba(0,0,0,0.54)',
-                    marginLeft: 15,
-                    marginTop: 20,
-                  }}
-                />
-              </Tooltip>
-
-              {
-                newIssueTypeCode !== 'issue_epic' && (
-                  <FormItem label="史诗" style={{ width: 520 }}>
-                    {getFieldDecorator('epicId', {})(
-                      <Select
-                        label="史诗"
-                        allowClear
-                        filter
-                        filterOption={
-                          (input, option) => option.props.children && option.props.children.toLowerCase().indexOf(
-                            input.toLowerCase(),
-                          ) >= 0
-                        }
-                        getPopupContainer={triggerNode => triggerNode.parentNode}
-                        loading={selectLoading}
-                        onFilterChange={() => {
-                          this.setState({
-                            selectLoading: true,
-                          });
-                          loadEpics().then((res) => {
-                            this.setState({
-                              originEpics: res,
-                              selectLoading: false,
-                            });
-                          });
-                        }}
-                      >
-                        {originEpics.map(
-                          epic => (
-                            <Option
-                              key={epic.issueId}
-                              value={epic.issueId}
-                            >
-                              {epic.epicName}
-                            </Option>
-                          ),
-                        )}
-                      </Select>,
-                    )}
-                  </FormItem>
-                )
-              }
-
-              <FormItem label="冲刺" style={{ width: 520 }}>
-                {getFieldDecorator('sprintId', {})(
-                  <Select
-                    label="冲刺"
-                    allowClear
-                    filter
-                    filterOption={
-                      (input, option) => option.props.children && option.props.children.toLowerCase().indexOf(
-                        input.toLowerCase(),
-                      ) >= 0
-                    }
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                    loading={selectLoading}
-                    onFilterChange={() => {
-                      this.setState({
-                        selectLoading: true,
-                      });
-                      loadSprints(['sprint_planning', 'started']).then((res) => {
-                        this.setState({
-                          originSprints: res,
-                          selectLoading: false,
-                        });
-                      });
-                    }}
-                  >
-                    {originSprints.map(sprint => (
-                      <Option key={sprint.sprintId} value={sprint.sprintId}>
-                        {sprint.sprintName}
-                      </Option>
-                    ))}
-                  </Select>,
-                )}
-              </FormItem>
-
-              <FormItem label="版本" style={{ width: 520 }}>
-                {getFieldDecorator('fixVersionIssueRel', {
-                  rules: [{ transform: value => (value ? value.toString() : value) }],
-                  normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), // 限制最长10位
-                })(
-                  <Select
-                    label="版本"
-                    mode="multiple"
-                    loading={selectLoading}
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                    tokenSeparators={[',']}
-                    onFocus={() => {
-                      this.setState({
-                        selectLoading: true,
-                      });
-                      loadVersions(['version_planning', 'released']).then((res) => {
-                        this.setState({
-                          originFixVersions: res,
-                          selectLoading: false,
-                        });
-                      });
-                    }}
-                  >
-                    {
-                      originFixVersions.map(
-                        version => (
-                          <Option
-                            key={version.name}
-                            value={version.name}
-                          >
-                            {version.name}
-                          </Option>
-                        ),
-                      )}
-                  </Select>,
-                )}
-              </FormItem>
-
-              <FormItem label="模块" style={{ width: 520 }}>
-                {getFieldDecorator('componentIssueRel', {
-                  rules: [{ transform: value => (value ? value.toString() : value) }],
-                  normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), // 限制最长10位
-                })(
-                  <Select
-                    label="模块"
-                    mode="multiple"
-                    loading={selectLoading}
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                    tokenSeparators={[',']}
-                    onFocus={() => {
-                      this.setState({
-                        selectLoading: true,
-                      });
-                      loadComponents().then((res) => {
-                        this.setState({
-                          originComponents: res.content,
-                          selectLoading: false,
-                        });
-                      });
-                    }}
-                  >
-                    {
-                      originComponents.map(
-                        component => (
-                          <Option
-                            key={component.name}
-                            value={component.name}
-                          >
-                            {component.name}
-                          </Option>
-                        ),
-                      )}
-                  </Select>,
-                )}
-              </FormItem>
-
-              <FormItem label="标签" style={{ width: 520 }}>
-                {getFieldDecorator('issueLabel', {
-                  rules: [{ transform: value => (value ? value.toString() : value) }],
-                  normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), // 限制最长10位
-                })(
-                  <Select
-                    label="标签"
-                    mode="tags"
-                    loading={selectLoading}
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                    tokenSeparators={[',']}
-                    onFocus={() => {
-                      this.setState({
-                        selectLoading: true,
-                      });
-                      loadLabels().then((res) => {
-                        this.setState({
-                          originLabels: res,
-                          selectLoading: false,
-                        });
-                      });
-                    }}
-                  >
-                    {originLabels.map(label => (
-                      <Option key={label.labelName} value={label.labelName}>
-                        {label.labelName}
-                      </Option>
-                    ))}
-                  </Select>,
-                )}
-              </FormItem>
-
+              {fields && fields.map(field => this.getFieldComponent(field))}
               {
                 newIssueTypeCode !== 'issue_epic' && (
                   issueLinkArr && issueLinkArr.length > 0 && (
@@ -905,7 +1117,6 @@ class CreateIssue extends Component {
                 )
               }
             </Form>
-
             <div className="sign-upload" style={{ marginTop: 20 }}>
               <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
                 <div style={{ fontWeight: 'bold' }}>附件</div>
