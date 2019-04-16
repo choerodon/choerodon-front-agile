@@ -560,7 +560,7 @@ class CreateIssue extends Component {
     const { form } = this.props;
     const { getFieldDecorator } = form;
     const {
-      defaultValue, fieldName, fieldCode, fieldType,
+      defaultValue, fieldName, fieldCode, fieldType, required,
     } = field;
     const {
       originIssueTypes, originPriorities, defaultPriority, storyPoints,
@@ -965,7 +965,7 @@ class CreateIssue extends Component {
         return (
           <FormItem label={fieldName} style={{ width: 520 }}>
             {getFieldDecorator(fieldCode, {
-              rules: [{ required: true, message: `${fieldName}为必填项` }],
+              rules: [{ required, message: `${fieldName}为必填项` }],
               initialValue: this.transformValue(fieldType, defaultValue),
             })(
               this.renderField(field),
