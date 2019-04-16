@@ -363,7 +363,9 @@ class CreateFeature extends Component {
   getFieldComponent = (field) => {
     const { form } = this.props;
     const { getFieldDecorator } = form;
-    const { defaultValue, fieldName, fieldCode } = field;
+    const {
+      defaultValue, fieldName, fieldCode, fieldType,
+    } = field;
     const {
       originEpics, delta, selectLoading,
       selectedIssueType, storyPoints, fullEdit,
@@ -545,12 +547,26 @@ class CreateFeature extends Component {
           <FormItem label={fieldName} style={{ width: 520 }}>
             {getFieldDecorator(fieldCode, {
               rules: [{ required: true, message: `${fieldName}为必填项` }],
-              initialValue: defaultValue || undefined,
+              initialValue: this.transformValue(fieldType, defaultValue),
             })(
               this.renderField(field),
             )}
           </FormItem>
         );
+    }
+  };
+
+  transformValue = (fieldType, value) => {
+    if (value) {
+      if (fieldType === 'time' || fieldType === 'datetime') {
+        return value ? moment(value) : undefined;
+      } else if (value instanceof Array) {
+        return value.slice();
+      } else {
+        return value;
+      }
+    } else {
+      return undefined;
     }
   };
 
