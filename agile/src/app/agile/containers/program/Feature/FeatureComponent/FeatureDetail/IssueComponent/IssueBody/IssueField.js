@@ -8,6 +8,8 @@ import {
   FieldEpic, FieldDateTime, FieldComponent, FieldTimeTrace, FieldStoryPoint,
 } from './Field';
 
+const hideFields = ['priority', 'component', 'label', 'fixVersion', 'sprint', 'timeTrace', 'assignee'];
+
 @inject('AppState')
 @observer class IssueField extends Component {
   constructor(props) {
@@ -21,9 +23,7 @@ import {
   }
 
   getFieldComponent = (field) => {
-    const { store } = this.props;
-    const issue = store.getIssue;
-    switch (field.code) {
+    switch (field.fieldCode) {
       case 'assignee':
         return (<FieldAssignee {...this.props} />);
       case 'influenceVersion':
@@ -61,280 +61,25 @@ import {
       case 'storyPoints':
         return (<FieldStoryPoint {...this.props} field={field} />);
       default:
-        return (<Field {...this.props} />);
+        return (<Field {...this.props} field={field} />);
     }
   };
 
   render() {
     const { store } = this.props;
     const issue = store.getIssue;
-    const { issueId, typeCode } = issue;
+    const fields = store.getFields;
+    const { issueId } = issue;
 
-    // 22
-    const create = [
-      {
-        code: 'status',
-        name: '状态',
-        system: true,
-        required: true,
-        type: 'select',
-      }, {
-        code: 'priority',
-        name: '优先级',
-        system: true,
-        required: true,
-      }, {
-        code: 'component',
-        name: '模块',
-        system: true,
-        required: true,
-      }, {
-        code: 'label',
-        name: '标签',
-        system: true,
-        required: true,
-      }, {
-        code: 'influenceVersion',
-        name: '影响的版本',
-        system: true,
-        required: true,
-      }, {
-        code: 'fixVersion',
-        name: '版本',
-        system: true,
-        required: true,
-      }, {
-        code: 'epic',
-        name: '史诗',
-        system: true,
-        required: true,
-      }, {
-        code: 'pi',
-        name: 'PI',
-        system: true,
-        required: true,
-      }, {
-        code: 'sprint',
-        name: '冲刺',
-        system: true,
-        required: true,
-      }, {
-        code: 'epicName',
-        name: '史诗名称',
-        system: true,
-        required: true,
-      }, {
-        code: 'reporter',
-        name: '报告人',
-        system: true,
-        required: true,
-      }, {
-        code: 'assignee',
-        name: '经办人',
-        system: true,
-        required: true,
-      }, {
-        code: 'creationDate',
-        name: '创建时间',
-        system: true,
-        required: true,
-      }, {
-        code: 'lastUpdateDate',
-        name: '更新时间',
-        system: true,
-        required: true,
-      }, {
-        code: 'benfitHypothesis',
-        name: '特性价值',
-        system: true,
-        required: true,
-      }, {
-        code: 'acceptanceCritera',
-        name: '验收标准',
-        system: true,
-        required: true,
-      }, {
-        code: 'timeTrace',
-        name: '时间跟踪',
-        system: true,
-        required: true,
-      }, {
-        code: 'summary',
-        name: '概要',
-        system: true,
-        required: true,
-      }, {
-        code: 'estimateTime',
-        name: '预估时间',
-        system: true,
-        required: true,
-      }, {
-        code: 'storyPoints',
-        name: '故事点',
-        system: true,
-        required: true,
-      }, {
-        code: 'issueType',
-        name: '问题类型',
-        system: true,
-        required: true,
-      }, {
-        code: 'description',
-        name: '描述',
-        system: true,
-        required: true,
-      },
-    ];
-
-    // 20
-    const detail = [
-      {
-        code: 'status',
-        name: '状态',
-        system: true,
-        required: true,
-        type: 'select',
-      }, {
-        code: 'priority',
-        name: '优先级',
-        system: true,
-        required: true,
-      }, {
-        code: 'component',
-        name: '模块',
-        system: true,
-        required: true,
-      }, {
-        code: 'label',
-        name: '标签',
-        system: true,
-        required: true,
-      }, {
-        code: 'influenceVersion',
-        name: '影响的版本',
-        system: true,
-        required: true,
-      }, {
-        code: 'fixVersion',
-        name: '版本',
-        system: true,
-        required: true,
-      }, {
-        code: 'epic',
-        name: '史诗',
-        system: true,
-        required: true,
-      }, {
-        code: 'pi',
-        name: 'PI',
-        system: true,
-        required: true,
-      }, {
-        code: 'sprint',
-        name: '冲刺',
-        system: true,
-        required: true,
-      }, {
-        code: 'epicName',
-        name: '史诗名称',
-        system: true,
-        required: true,
-      }, {
-        code: 'reporter',
-        name: '报告人',
-        system: true,
-        required: true,
-      }, {
-        code: 'assignee',
-        name: '经办人',
-        system: true,
-        required: true,
-      }, {
-        code: 'creationDate',
-        name: '创建时间',
-        system: true,
-        required: true,
-      }, {
-        code: 'lastUpdateDate',
-        name: '更新时间',
-        system: true,
-        required: true,
-      }, {
-        code: 'benfitHypothesis',
-        name: '特性价值',
-        system: true,
-        required: true,
-      }, {
-        code: 'acceptanceCritera',
-        name: '验收标准',
-        system: true,
-        required: true,
-      }, {
-        code: 'timeTrace',
-        name: '时间跟踪',
-        system: true,
-        required: true,
-      }, {
-        code: 'estimateTime',
-        name: '预估时间',
-        system: true,
-        required: true,
-      }, {
-        code: 'storyPoints',
-        name: '故事点',
-        system: true,
-        required: true,
-      },
-    ];
-
-    const featureFields = [
-      {
-        code: 'status',
-        name: '状态',
-        system: true,
-        required: true,
-        type: 'select',
-      }, {
-        code: 'pi',
-        name: 'PI',
-        system: true,
-        required: true,
-      }, {
-        code: 'epic',
-        name: '史诗',
-        system: true,
-        required: true,
-      }, {
-        code: 'reporter',
-        name: '报告人',
-        system: true,
-        required: true,
-      }, {
-        code: 'benfitHypothesis',
-        name: '特性价值',
-        system: true,
-        required: true,
-      }, {
-        code: 'acceptanceCritera',
-        name: '验收标准',
-        system: true,
-        required: true,
-      }, {
-        code: 'creationDate',
-        name: '创建时间',
-        system: true,
-        required: true,
-      }, {
-        code: 'lastUpdateDate',
-        name: '更新时间',
-        system: true,
-        required: true,
-      },
-    ];
-    const fields = typeCode === 'feature' ? featureFields : detail;
     return (
       <div className="c7n-content-wrapper">
-        {issueId ? fields.map(field => (<span key={field.code}>{this.getFieldComponent(field)}</span>)) : ''}
+        {issueId ? fields.filter(item => hideFields.indexOf(item.fieldCode) === -1).map(field => (
+          <span
+            key={field.code}
+          >
+            {this.getFieldComponent(field)}
+          </span>
+        )) : ''}
       </div>
     );
   }

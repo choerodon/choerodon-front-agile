@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Dropdown, Icon, Menu, Button,
+  Dropdown, Icon, Menu, Button, Modal,
 } from 'choerodon-ui';
 import IssueNumber from './IssueNumber';
 import { FieldStoryPoint, FieldText } from './IssueBody/Field';
+import { deleteIssue } from '../../../../../../api/NewIssueApi';
 import './IssueComponent.scss';
+
+const { confirm } = Modal;
 
 @inject('AppState', 'HeaderStore')
 @observer class SprintHeader extends Component {
@@ -17,6 +20,35 @@ import './IssueComponent.scss';
 
   componentDidMount() {
   }
+
+  handleDeleteIssue = (issueId) => {
+    const { store, onDeleteIssue } = this.props;
+    const issue = store.getIssue;
+    const { issueNum } = issue;
+    confirm({
+      width: 560,
+      title: `删除特性${issueNum}`,
+      content:
+        (
+          <div>
+            <p style={{ marginBottom: 10 }}>请确认您要删除这个特性。</p>
+            <p style={{ marginBottom: 10 }}>这个特性将会被彻底删除。包括所有附件和评论。</p>
+            <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
+          </div>
+        ),
+      onOk() {
+        return deleteIssue(issueId)
+          .then((res) => {
+            if (onDeleteIssue) {
+              onDeleteIssue();
+            }
+          });
+      },
+      onCancel() { },
+      okText: '删除',
+      okType: 'danger',
+    });
+  };
 
   handleClickMenu = (e) => {
     const { store } = this.props;
@@ -51,14 +83,11 @@ import './IssueComponent.scss';
     const issue = store.getIssue;
     const {
       parentIssueId, typeCode, parentIssueNum, issueNum,
-      issueId, createdById, subIssueDTOList = [],
+      issueId, createdById,
     } = issue;
 
     const getMenu = () => (
       <Menu onClick={this.handleClickMenu.bind(this)}>
-        <Menu.Item key="0">
-          {'登记工作日志'}
-        </Menu.Item>
         {
           <Menu.Item
             key="1"
@@ -67,51 +96,9 @@ import './IssueComponent.scss';
             {'删除'}
           </Menu.Item>
         }
-        {
-          ['sub_task', 'feature'].indexOf(typeCode) === -1 && (
-            <Menu.Item key="2">
-              {'创建子任务'}
-            </Menu.Item>
-          )
-        }
         <Menu.Item key="3">
           {'复制问题'}
         </Menu.Item>
-        {
-          ['sub_task', 'feature'].indexOf(typeCode) === -1 && subIssueDTOList.length === 0 && (
-            <Menu.Item key="4">
-              {'转化为子任务'}
-            </Menu.Item>
-          )
-        }
-        {
-          typeCode === 'sub_task' && (
-            <Menu.Item key="5">
-              {'转化为任务'}
-            </Menu.Item>
-          )
-        }
-        {
-          typeCode !== 'feature' && (
-            <Menu.Item key="6">
-              {'创建分支'}
-            </Menu.Item>
-          )
-        }
-        {
-          typeCode !== 'feature' && (
-            <Menu.Item key="7">
-              {'分配问题'}
-            </Menu.Item>
-          )
-        }
-        {
-          typeCode === 'sub_task' && (
-            <Menu.Item key="8">
-              {'修改父级'}
-            </Menu.Item>
-          )
-        }
       </Menu>
     );
 

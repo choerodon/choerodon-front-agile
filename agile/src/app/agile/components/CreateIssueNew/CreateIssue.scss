@@ -1,8 +1,9 @@
 .c7n-createIssue {
-  .page-content{
+  .page-content {
     padding-left: 0;
     padding-top: 0;
   }
+
   .ant-form-item {
     margin-bottom: 12px !important;
 
@@ -41,5 +42,15 @@
   .ant-upload-list-item-info {
     padding-right: 20px;
     max-width: 100%;
+  }
+
+  .radioStyle {
+    display: block;
+    height: 30px;
+    line-height: 30px;
+  }
+
+  .fieldWith {
+    width: 520px;
   }
 }

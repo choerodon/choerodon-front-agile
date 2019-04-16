@@ -1,26 +1,31 @@
 import React, { Component } from 'react';
-import { stores, axios } from 'choerodon-front-boot';
+import { stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
   Select, Form, Input, Button, Modal, Icon, InputNumber,
+  Checkbox, TimePicker, Row, Col, Radio, DatePicker, Spin,
 } from 'choerodon-ui';
+import moment from 'moment';
 import { UploadButton } from '../CommonComponent';
 import { handleFileUpload, beforeTextUpload } from '../../common/utils';
 import {
-  loadIssue, loadLabels, loadPriorities, loadVersions, createSubIssue,
+  loadIssue, loadLabels, loadPriorities, loadVersions,
+  createSubIssue, getFields, createFieldValue,
 } from '../../api/NewIssueApi';
 import { getUsers } from '../../api/CommonApi';
 import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import UserHead from '../UserHead';
+import FieldBlank from '../CreateIssueNew/FieldBlank';
 import './CreateSubTask.scss';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
 const { Option } = Select;
+const { TextArea } = Input;
 const FormItem = Form.Item;
+
 let sign = false;
-let hasPermission = false;
 
 const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
 
@@ -50,6 +55,7 @@ class CreateSubIssue extends Component {
       originUsers: [],
       defaultPriorityId: false,
       estimatedTime: '',
+      loading: true,
     };
   }
 
@@ -64,7 +70,7 @@ class CreateSubIssue extends Component {
       });
     });
     this.loadPriority();
-    this.loadPermission();
+    this.loadFields();
   }
 
   onFilterChange(input) {
@@ -88,6 +94,20 @@ class CreateSubIssue extends Component {
     this.setState({ fileList: data });
   };
 
+  loadFields = () => {
+    const param = {
+      schemeCode: 'agile_issue',
+      context: 'sub_task',
+      pageCode: 'agile_issue_create',
+    };
+    getFields(param).then((fields) => {
+      this.setState({
+        fields,
+        loading: false,
+      });
+    });
+  };
+
   loadPriority = () => {
     loadPriorities().then((res) => {
       const defaultPriorities = res.filter(p => p.default);
@@ -95,17 +115,6 @@ class CreateSubIssue extends Component {
         originPriorities: res,
         defaultPriorityId: defaultPriorities.length ? defaultPriorities[0].id : '',
       });
-    });
-  };
-
-  loadPermission = () => {
-    axios.post('/iam/v1/permissions/checkPermission', [{
-      code: 'agile-service.project-info.updateProjectInfo',
-      organizationId: AppState.currentMenuType.organizationId,
-      projectId: AppState.currentMenuType.id,
-      resourceType: 'project',
-    }]).then((permission) => {
-      hasPermission = permission.length && permission[0].approve;
     });
   };
 
@@ -159,7 +168,6 @@ class CreateSubIssue extends Component {
           versionIssueRelDTOList: fixVersionIssueRelDTOList,
           issueTypeId: subIssueType && subIssueType.id,
           remainingTime: estimatedTime,
-          // estimatedTime: values.estimatedTime,
         };
         this.setState({ createLoading: true });
         const deltaOps = delta;
@@ -174,13 +182,28 @@ class CreateSubIssue extends Component {
   };
 
   handleSave = (data) => {
-    const { fileList } = this.state;
-    const { issueId, onOk } = this.props;
+    const { fileList, fields } = this.state;
+    const { issueId, onOk, form } = this.props;
     const callback = (newFileList) => {
       this.setState({ fileList: newFileList });
     };
     createSubIssue(issueId, data)
       .then((res) => {
+        const fieldList = [];
+        fields.forEach((item) => {
+          if (!item.system) {
+            let value = form.getFieldValue(item.fieldCode);
+            if (item.fieldType === 'time' || item.fieldType === 'datetime') {
+              value = value.format('YYYY-MM-DD HH:mm:ss');
+            }
+            fieldList.push({
+              fieldType: item.fieldType,
+              value,
+              fieldId: item.fieldId,
+            });
+          }
+        });
+        createFieldValue(res.issueId, 'agile_issue', fieldList);
         if (fileList.length > 0) {
           const config = {
             issueType: res.statusId,
@@ -194,7 +217,7 @@ class CreateSubIssue extends Component {
         }
         onOk(res);
       })
-      .catch((error) => {
+      .catch(() => {
       });
   };
 
@@ -246,138 +269,173 @@ class CreateSubIssue extends Component {
     });
   };
 
-  render() {
+  renderField = (field) => {
     const {
-      visible, onCancel, form, parentSummary,
-    } = this.props;
+      fieldOptions, fieldType, required, fieldName,
+    } = field;
+    if (fieldType === 'radio') {
+      if (fieldOptions && fieldOptions.length > 0) {
+        return (
+          <Radio.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            {fieldOptions && fieldOptions.length > 0
+            && fieldOptions.map(item => (
+              <Radio
+                className="radioStyle"
+                value={item.id}
+                key={item.id}
+              >
+                {item.value}
+              </Radio>
+            ))}
+          </Radio.Group>
+        );
+      } else {
+        return (
+          <FieldBlank />
+        );
+      }
+    } else if (field.fieldType === 'checkbox') {
+      if (fieldOptions && fieldOptions.length > 0) {
+        return (
+          <Checkbox.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <Row>
+              {fieldOptions && fieldOptions.length > 0
+              && fieldOptions.map(item => (
+                <Col
+                  span={24}
+                  key={item.id}
+                >
+                  <Checkbox
+                    value={item.id}
+                    key={item.id}
+                    className="checkboxStyle"
+                  >
+                    {item.value}
+                  </Checkbox>
+                </Col>
+              ))}
+            </Row>
+          </Checkbox.Group>
+        );
+      } else {
+        return (
+          <FieldBlank />
+        );
+      }
+    } else if (field.fieldType === 'time') {
+      return (
+        <TimePicker
+          label={fieldName}
+          className="fieldWith"
+          defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+          allowEmpty={!required}
+        />
+      );
+    } else if (field.fieldType === 'datetime') {
+      return (
+        <DatePicker
+          label={fieldName}
+          format="YYYY-MM-DD HH:mm:ss"
+          className="fieldWith"
+          allowClear={!required}
+        />
+      );
+    } else if (field.fieldType === 'single') {
+      return (
+        <Select
+          label={fieldName}
+          dropdownMatchSelectWidth
+          className="fieldWith"
+          allowClear={!required}
+        >
+          {field.fieldOptions && field.fieldOptions.length > 0
+          && field.fieldOptions.map(item => (
+            <Option
+              value={item.id}
+              key={item.id}
+            >
+              {item.value}
+            </Option>
+          ))}
+        </Select>
+      );
+    } else if (field.fieldType === 'multiple') {
+      return (
+        <Select
+          label={fieldName}
+          dropdownMatchSelectWidth
+          mode="multiple"
+          className="fieldWith"
+        >
+          {field.fieldOptions && field.fieldOptions.length > 0
+          && field.fieldOptions.map(item => (
+            <Option
+              value={item.id}
+              key={item.id}
+            >
+              {item.value}
+            </Option>
+          ))}
+        </Select>
+      );
+    } else if (field.fieldType === 'number') {
+      return (
+        <InputNumber
+          label={fieldName}
+          className="fieldWith"
+          step={field.extraConfig === '1' ? 0.1 : 1}
+        />
+      );
+    } else if (field.fieldType === 'text') {
+      return (
+        <TextArea
+          label={fieldName}
+          className="fieldWith"
+        />
+      );
+    } else {
+      return (
+        <Input
+          label={fieldName}
+          className="fieldWith"
+        />
+      );
+    }
+  };
+
+  getFieldComponent = (field) => {
+    const { form } = this.props;
     const { getFieldDecorator } = form;
+    const { defaultValue, fieldName, fieldCode } = field;
     const {
-      defaultPriorityId,
-      originPriorities,
-      createLoading,
-      estimatedTime,
+      originPriorities, defaultPriorityId,
+      edit, delta, originUsers, selectLoading, estimatedTime,
+      originFixVersions, originLabels, sprint,
     } = this.state;
-    const callback = (value) => {
-      this.setState({
-        delta: value,
-        edit: false,
-      });
-    };
-
-    return (
-      <Sidebar
-        className="c7n-createSubIssue"
-        title="创建子任务"
-        visible={visible || false}
-        onOk={this.handleCreateIssue}
-        onCancel={onCancel}
-        okText="创建"
-        cancelText="取消"
-        confirmLoading={createLoading}
-      >
-        <div>
-          <h2>
-            {'在项目“'}
-            {AppState.currentMenuType.name}
-            {' ”中创建子任务'}
-          </h2>
-          <p style={{ width: 520, marginBottom: 24 }}>
-            {' 请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。'}
-          </p>
-          <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
-            <Input label="父任务概要" value={parentSummary} disabled />
-          </div>
-          <Form layout="vertical">
-            <FormItem label="子任务概要" style={{ width: 520 }}>
-              {getFieldDecorator('summary', {
-                rules: [{ required: true, message: '子任务概要为必输项' }],
-              })(
-                <Input label="子任务概要" maxLength={44} />,
-              )}
-            </FormItem>
-
-            <FormItem label="优先级" style={{ width: 520 }}>
-              {getFieldDecorator('priorityId', {
-                rules: [{ required: true, message: '优先级为必选项' }],
-                initialValue: defaultPriorityId,
-              })(
-                <Select
-                  label="优先级"
-                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                >
-                  {originPriorities.filter(p => p.enable).map(priority => (
-                    <Option key={priority.id} value={priority.id}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
-                        <span>{priority.name}</span>
-                      </div>
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-
-            <div style={{ width: 520 }}>
-              <div style={{ display: 'flex', marginBottom: 3, alignItems: 'center' }}>
-                <div style={{ fontWeight: 'bold' }}>描述</div>
-                <div style={{ marginLeft: 80 }}>
-                  <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
-                    <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: 12 }} />
-                    <span style={{ color: '#3f51b5' }}>全屏编辑</span>
-                  </Button>
-                </div>
-              </div>
-              {
-                !this.state.edit && (
-                  <div className="clear-p-mw">
-                    <WYSIWYGEditor
-                      value={this.state.delta}
-                      style={{ height: 200, width: '100%' }}
-                      onChange={(value) => {
-                        this.setState({ delta: value });
-                      }}
-                    />
-                  </div>
-                )
-              }
-            </div>
-            {
-              <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
-                <Select
-                  label="预估时间"
-                  value={estimatedTime && estimatedTime.toString()}
-                  mode="combobox"
-                  ref={(e) => {
-                    this.componentRef = e;
-                  }}
-                  onPopupFocus={(e) => {
-                    this.componentRef.rcSelect.focus();
-                  }}
-                  tokenSeparators={[',']}
-                  style={{ marginTop: 0, paddingTop: 0, width: 520 }}
-                  onChange={value => this.handleChangeEstimatedTime(value)}
-                >
-                  {storyPointList.map(sp => (
-                    <Option key={sp.toString()} value={sp}>
-                      {sp}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-             
-            }
-
+    switch (field.fieldCode) {
+      case 'issueType':
+        return '';
+      case 'assignee':
+        return (
+          <React.Fragment>
             <FormItem label="经办人" style={{ width: 520, display: 'inline-block' }}>
               {getFieldDecorator('assigneedId', {})(
                 <Select
                   label="经办人"
                   getPopupContainer={triggerNode => triggerNode.parentNode}
-                  loading={this.state.selectLoading}
+                  loading={selectLoading}
                   filter
                   filterOption={false}
                   allowClear
                   onFilterChange={this.onFilterChange.bind(this)}
                 >
-                  {this.state.originUsers.filter(u => u.enabled).map(user => (
+                  {originUsers.filter(u => u.enabled).map(user => (
                     <Option key={user.id} value={user.id}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
                         <UserHead
@@ -407,75 +465,234 @@ class CreateSubIssue extends Component {
             >
               {'分派给我'}
             </span>
-
-            <FormItem label="冲刺" style={{ width: 520 }}>
-              {getFieldDecorator('sprintId', {
-                initialValue: this.state.sprint.sprintName,
-                rules: [{}],
-              })(
-                <Input label="冲刺" disabled />,
-              )}
-            </FormItem>
-
-            <FormItem label="版本" style={{ width: 520 }}>
-              {getFieldDecorator('fixVersionIssueRel', {
-                rules: [{ transform: value => (value ? value.toString() : value) }],
-                normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), 
-              })(
-                <Select
-                  label="版本"
-                  mode={hasPermission ? 'tags' : 'multiple'}
-                  loading={this.state.selectLoading}
-                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                  tokenSeparators={[',']}
-                  onFocus={() => {
+          </React.Fragment>
+        );
+      case 'sprint':
+        return (
+          <FormItem label="冲刺" style={{ width: 520 }}>
+            {getFieldDecorator('sprintId', {
+              initialValue: sprint.sprintName,
+            })(
+              <Input label="冲刺" disabled />,
+            )}
+          </FormItem>
+        );
+      case 'priority':
+        return (
+          <FormItem label="优先级" style={{ width: 520 }}>
+            {getFieldDecorator('priorityId', {
+              rules: [{ required: true, message: '优先级为必选项' }],
+              initialValue: defaultPriorityId,
+            })(
+              <Select
+                label="优先级"
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+              >
+                {originPriorities.filter(p => p.enable).map(priority => (
+                  <Option key={priority.id} value={priority.id}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', padding: 2 }}>
+                      <span>{priority.name}</span>
+                    </div>
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'label':
+        return (
+          <FormItem label="标签" style={{ width: 520 }}>
+            {getFieldDecorator('issueLink', {
+              rules: [{ transform: value => (value ? value.toString() : value) }],
+              normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value),
+            })(
+              <Select
+                label="标签"
+                mode="tags"
+                loading={selectLoading}
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                tokenSeparators={[',']}
+                onFocus={() => {
+                  this.setState({
+                    selectLoading: true,
+                  });
+                  loadLabels().then((res) => {
                     this.setState({
-                      selectLoading: true,
+                      originLabels: res,
+                      selectLoading: false,
                     });
-                    loadVersions(['version_planning', 'released']).then((res) => {
-                      this.setState({
-                        originFixVersions: res,
-                        selectLoading: false,
-                      });
-                    });
-                  }}
-                >
-                  {this.state.originFixVersions.map(version => <Option key={version.name} value={version.name}>{version.name}</Option>)}
-                </Select>,
-              )}
-            </FormItem> 
-
-            <FormItem label="标签" style={{ width: 520 }}>
-              {getFieldDecorator('issueLink', {
-                rules: [{ transform: value => (value ? value.toString() : value) }],
-                normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value), 
-              })(
-                <Select
-                  label="标签"
-                  mode="tags"
-                  loading={this.state.selectLoading}
-                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                  tokenSeparators={[',']}
-                  onFocus={() => {
+                  });
+                }}
+              >
+                {originLabels.map(label => (
+                  <Option key={label.labelName} value={label.labelName}>
+                    {label.labelName}
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'fixVersion':
+        return (
+          <FormItem label="版本" style={{ width: 520 }}>
+            {getFieldDecorator('fixVersionIssueRel', {
+              rules: [{ transform: value => (value ? value.toString() : value) }],
+              normalize: value => (value ? value.map(s => s.toString().substr(0, 10)) : value),
+            })(
+              <Select
+                label="版本"
+                mode="multiple"
+                loading={selectLoading}
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                tokenSeparators={[',']}
+                onFocus={() => {
+                  this.setState({
+                    selectLoading: true,
+                  });
+                  loadVersions(['version_planning', 'released']).then((res) => {
                     this.setState({
-                      selectLoading: true,
+                      originFixVersions: res,
+                      selectLoading: false,
                     });
-                    loadLabels().then((res) => {
-                      this.setState({
-                        originLabels: res,
-                        selectLoading: false,
-                      });
-                    });
-                  }}
-                >
-                  {this.state.originLabels.map(label => (
-                    <Option key={label.labelName} value={label.labelName}>
-                      {label.labelName}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
+                  });
+                }}
+              >
+                {originFixVersions.map(version => <Option key={version.name} value={version.name}>{version.name}</Option>)}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'epic':
+        return '';
+      case 'component':
+        return '';
+      case 'summary':
+        return (
+          <FormItem label="子任务概要" style={{ width: 520 }}>
+            {getFieldDecorator('summary', {
+              rules: [{ required: true, message: '子任务概要为必输项' }],
+            })(
+              <Input label="子任务概要" maxLength={44} />,
+            )}
+          </FormItem>
+        );
+      case 'epicName':
+        return '';
+      case 'estimateTime':
+        return (
+          <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
+            <Select
+              label="预估时间"
+              value={estimatedTime && estimatedTime.toString()}
+              mode="combobox"
+              ref={(e) => {
+                this.componentRef = e;
+              }}
+              onPopupFocus={() => {
+                this.componentRef.rcSelect.focus();
+              }}
+              tokenSeparators={[',']}
+              style={{ marginTop: 0, paddingTop: 0, width: 520 }}
+              onChange={value => this.handleChangeEstimatedTime(value)}
+            >
+              {storyPointList.map(sp => (
+                <Option key={sp.toString()} value={sp}>
+                  {sp}
+                </Option>
+              ))}
+            </Select>
+          </div>
+        );
+      case 'storyPoint':
+        return '';
+      case 'description':
+        return (
+          <div style={{ width: 520 }}>
+            <div style={{ display: 'flex', marginBottom: 3, alignItems: 'center' }}>
+              <div style={{ fontWeight: 'bold' }}>描述</div>
+              <div style={{ marginLeft: 80 }}>
+                <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ edit: true })} style={{ display: 'flex', alignItems: 'center' }}>
+                  <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: 12 }} />
+                  <span style={{ color: '#3f51b5' }}>全屏编辑</span>
+                </Button>
+              </div>
+            </div>
+            {
+              !edit && (
+                <div className="clear-p-mw">
+                  <WYSIWYGEditor
+                    value={delta}
+                    style={{ height: 200, width: '100%' }}
+                    onChange={(value) => {
+                      this.setState({ delta: value });
+                    }}
+                  />
+                </div>
+              )
+            }
+          </div>
+        );
+      default:
+        return (
+          <FormItem label={fieldName} style={{ width: 520 }}>
+            {getFieldDecorator(fieldCode, {
+              rules: [{ required: true, message: `${fieldName}为必填项` }],
+              initialValue: defaultValue || undefined,
+            })(
+              this.renderField(field),
+            )}
+          </FormItem>
+        );
+    }
+  };
+
+  render() {
+    const {
+      visible, onCancel, parentSummary,
+    } = this.props;
+
+    const {
+      createLoading,
+      fields,
+      edit,
+      delta,
+      fileList,
+      loading,
+    } = this.state;
+
+    const callback = (value) => {
+      this.setState({
+        delta: value,
+        edit: false,
+      });
+    };
+
+    return (
+      <Sidebar
+        className="c7n-createSubIssue"
+        title="创建子任务"
+        visible={visible || false}
+        onOk={this.handleCreateIssue}
+        onCancel={onCancel}
+        okText="创建"
+        cancelText="取消"
+        confirmLoading={createLoading}
+      >
+        <Spin spinning={loading}>
+          <h2>
+            {'在项目“'}
+            {AppState.currentMenuType.name}
+            {' ”中创建子任务'}
+          </h2>
+          <p style={{ width: 520, marginBottom: 24 }}>
+            {' 请在下面输入子任务的详细信息，创建问题的子任务。子任务会与父级问题的冲刺、史诗保持一致，并且子任务的状态会受父级问题的限制。'}
+          </p>
+          <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
+            <Input label="父任务概要" value={parentSummary} disabled />
+          </div>
+          <Form layout="vertical">
+            {fields && fields.map(field => this.getFieldComponent(field))}
           </Form>
           
           <div className="sign-upload" style={{ marginTop: 20 }}>
@@ -486,16 +703,16 @@ class CreateSubIssue extends Component {
               <UploadButton
                 onRemove={this.setFileList}
                 onBeforeUpload={this.setFileList}
-                fileList={this.state.fileList}
+                fileList={fileList}
               />
             </div>
           </div>
-        </div>
+        </Spin>
         {
-          this.state.edit ? (
+          edit ? (
             <FullEditor
-              initValue={this.state.delta}
-              visible={this.state.edit}
+              initValue={delta}
+              visible={edit}
               onCancel={() => this.setState({ edit: false })}
               onOk={callback}
             />

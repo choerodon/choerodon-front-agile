@@ -20,19 +20,21 @@ import LinkList from '../../../../../../../components/EditIssueNarrow/Component/
   }
 
   handleCreateLinkIssue() {
-    const { onUpdate } = this.props;
-    this.reloadIssue();
+    const { onUpdate, reloadIssue } = this.props;
     this.setState({
       createLinkTaskShow: false,
     });
     if (onUpdate) {
       onUpdate();
     }
+    if (reloadIssue) {
+      reloadIssue();
+    }
   }
 
   renderLinkList(link, i) {
-    const { reloadIssue } = this.props;
-    const { origin } = this.state;
+    const { reloadIssue, store } = this.props;
+    const { issueId: id } = store.getIssue;
     return (
       <LinkList
         issue={{
@@ -41,17 +43,18 @@ import LinkList from '../../../../../../../components/EditIssueNarrow/Component/
         }}
         i={i}
         onOpen={(issueId, linkedIssueId) => {
-          reloadIssue(issueId === origin.issueId ? linkedIssueId : issueId);
+          reloadIssue(issueId === id ? linkedIssueId : issueId);
         }}
         onRefresh={() => {
-          reloadIssue(origin.issueId);
+          reloadIssue(id);
         }}
       />
     );
   }
 
   renderLinkIssues() {
-    const { linkIssues } = this.state;
+    const { store } = this.props;
+    const linkIssues = store.getLinkIssues;
     const group = _.groupBy(linkIssues, 'ward');
     return (
       <div className="c7n-tasks">
@@ -71,9 +74,9 @@ import LinkList from '../../../../../../../components/EditIssueNarrow/Component/
 
   render() {
     const { createLinkTaskShow } = this.state;
-    const {
-      intl, store, origin,
-    } = this.props;
+    const { store } = this.props;
+    const issue = store.getIssue;
+    const { issueId } = issue;
 
     return (
       <div id="link_task">
@@ -97,7 +100,7 @@ import LinkList from '../../../../../../../components/EditIssueNarrow/Component/
         {
           createLinkTaskShow ? (
             <CreateLinkTask
-              issueId={origin.issueId}
+              issueId={issueId}
               visible={createLinkTaskShow}
               onCancel={() => this.setState({ createLinkTaskShow: false })}
               onOk={this.handleCreateLinkIssue.bind(this)}

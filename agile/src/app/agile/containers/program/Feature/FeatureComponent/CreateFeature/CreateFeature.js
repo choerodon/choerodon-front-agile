@@ -1,25 +1,28 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { 
-  Select, Input, Icon, Radio, Form, Modal, Button,
+import {
+  Select, Form, Input, Button, Modal, Icon, InputNumber,
+  Checkbox, TimePicker, Row, Col, Radio, DatePicker, Spin,
 } from 'choerodon-ui';
-import { stores, axios, Content } from 'choerodon-front-boot';
+import moment from 'moment';
+import { stores, Content } from 'choerodon-front-boot';
 import WYSIWYGEditor from '../../../../../components/WYSIWYGEditor';
 import FullEditor from '../../../../../components/FullEditor';
 import UploadButton from '../../../../../components/CommonComponent/UploadButton';
 import TypeTag from '../../../../../components/TypeTag';
 import {
-  loadPriorities, loadProgramEpics, loadIssueTypes, createIssue, 
+  loadPriorities, loadProgramEpics, loadIssueTypes, createIssue,
+  createFieldValue, getFields,
 } from '../../../../../api/NewIssueApi';
 import { beforeTextUpload, handleFileUpload } from '../../../../../common/utils';
+import FieldBlank from './FieldBlank';
 import './CreateFeature.scss';
 
 const { AppState } = stores;
-const FormItem = Form.Item;
 const { Sidebar } = Modal;
 const { Option } = Select;
-const RadioDroup = Radio.Group;
 const { TextArea } = Input;
+const FormItem = Form.Item;
 const storyPointList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
 
 @observer
@@ -35,6 +38,7 @@ class CreateFeature extends Component {
       delta: '',
       fileList: [],
       selectLoading: false,
+      loading: true,
     };
   }
 
@@ -50,7 +54,22 @@ class CreateFeature extends Component {
         defaultPriority: res.find(item => item.default) || res[0],
       });
     });
+    this.loadFields();
   }
+
+  loadFields = () => {
+    const param = {
+      schemeCode: 'agile_issue',
+      context: 'feature',
+      pageCode: 'agile_issue_create',
+    };
+    getFields(param).then((fields) => {
+      this.setState({
+        fields,
+        loading: false,
+      });
+    });
+  };
 
   handleOnOk = () => {
     const { form } = this.props;
@@ -89,12 +108,27 @@ class CreateFeature extends Component {
 
   handleCreateFeature = (issueObj) => {
     const { form, onOk } = this.props;
-    const { fileList } = this.state;
+    const { fileList, fields } = this.state;
     const fileUpdateCallback = () => {
       this.setState({ fileList: [] });
     };
       
     createIssue(issueObj, 'program').then((res) => {
+      const fieldList = [];
+      fields.forEach((item) => {
+        if (!item.system) {
+          let value = form.getFieldValue(item.fieldCode);
+          if (item.fieldType === 'time' || item.fieldType === 'datetime') {
+            value = value.format('YYYY-MM-DD HH:mm:ss');
+          }
+          fieldList.push({
+            fieldType: item.fieldType,
+            value,
+            fieldId: item.fieldId,
+          });
+        }
+      });
+      createFieldValue(res.issueId, 'agile_issue', fieldList);
       if (fileList.length > 0) {
         const config = {
           issueType: res.statusId,
@@ -111,7 +145,7 @@ class CreateFeature extends Component {
       if (onOk) {
         onOk();
       }
-    }).catch((e) => {
+    }).catch(() => {
       Choerodon.prompt('创建失败');
     });
   };
@@ -186,13 +220,155 @@ class CreateFeature extends Component {
     this.setState({ fileList: data });
   };
 
-  render() {
-    const { visible } = this.props;
+  renderField = (field) => {
+    const {
+      fieldOptions, fieldType, required, fieldName,
+    } = field;
+    if (fieldType === 'radio') {
+      if (fieldOptions && fieldOptions.length > 0) {
+        return (
+          <Radio.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            {fieldOptions && fieldOptions.length > 0
+            && fieldOptions.map(item => (
+              <Radio
+                className="radioStyle"
+                value={item.id}
+                key={item.id}
+              >
+                {item.value}
+              </Radio>
+            ))}
+          </Radio.Group>
+        );
+      } else {
+        return (
+          <FieldBlank />
+        );
+      }
+    } else if (field.fieldType === 'checkbox') {
+      if (fieldOptions && fieldOptions.length > 0) {
+        return (
+          <Checkbox.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <Row>
+              {fieldOptions && fieldOptions.length > 0
+              && fieldOptions.map(item => (
+                <Col
+                  span={24}
+                  key={item.id}
+                >
+                  <Checkbox
+                    value={item.id}
+                    key={item.id}
+                    className="checkboxStyle"
+                  >
+                    {item.value}
+                  </Checkbox>
+                </Col>
+              ))}
+            </Row>
+          </Checkbox.Group>
+        );
+      } else {
+        return (
+          <FieldBlank />
+        );
+      }
+    } else if (field.fieldType === 'time') {
+      return (
+        <TimePicker
+          label={fieldName}
+          className="fieldWith"
+          defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+          allowEmpty={!required}
+        />
+      );
+    } else if (field.fieldType === 'datetime') {
+      return (
+        <DatePicker
+          label={fieldName}
+          format="YYYY-MM-DD HH:mm:ss"
+          className="fieldWith"
+          allowClear={!required}
+        />
+      );
+    } else if (field.fieldType === 'single') {
+      return (
+        <Select
+          label={fieldName}
+          dropdownMatchSelectWidth
+          className="fieldWith"
+          allowClear={!required}
+        >
+          {field.fieldOptions && field.fieldOptions.length > 0
+          && field.fieldOptions.map(item => (
+            <Option
+              value={item.id}
+              key={item.id}
+            >
+              {item.value}
+            </Option>
+          ))}
+        </Select>
+      );
+    } else if (field.fieldType === 'multiple') {
+      return (
+        <Select
+          label={fieldName}
+          dropdownMatchSelectWidth
+          mode="multiple"
+          className="fieldWith"
+        >
+          {field.fieldOptions && field.fieldOptions.length > 0
+          && field.fieldOptions.map(item => (
+            <Option
+              value={item.id}
+              key={item.id}
+            >
+              {item.value}
+            </Option>
+          ))}
+        </Select>
+      );
+    } else if (field.fieldType === 'number') {
+      return (
+        <InputNumber
+          label={fieldName}
+          className="fieldWith"
+          step={field.extraConfig === '1' ? 0.1 : 1}
+        />
+      );
+    } else if (field.fieldType === 'text') {
+      return (
+        <TextArea
+          label={fieldName}
+          className="fieldWith"
+        />
+      );
+    } else {
+      return (
+        <Input
+          label={fieldName}
+          className="fieldWith"
+        />
+      );
+    }
+  };
+
+  getFieldComponent = (field) => {
     const { form } = this.props;
     const { getFieldDecorator } = form;
+    const { defaultValue, fieldName, fieldCode } = field;
     const {
-      fullEdit, delta, selectLoading, originEpics, selectedIssueType, storyPoints, fileList,
+      originEpics, delta, selectLoading,
+      selectedIssueType, storyPoints, fullEdit,
     } = this.state;
+
     let featureTypeList = [];
     if (selectedIssueType) {
       featureTypeList = [
@@ -209,6 +385,181 @@ class CreateFeature extends Component {
         },
       ];
     }
+
+    switch (field.fieldCode) {
+      case 'issueType':
+        return (
+          selectedIssueType ? (
+            <FormItem label="问题类型" style={{ width: 520, marginBottom: 20 }}>
+              {getFieldDecorator('featureType', {
+                rules: [{ required: true, message: '问题类型为必输项' }],
+                initialValue: 'business',
+              })(
+                <Select
+                  label="问题类型"
+                  getPopupContainer={triggerNode => triggerNode.parentNode}
+                >
+                  {featureTypeList.map(type => (
+                    <Option key={type.typeCode} value={type.typeCode}>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', padding: '0 2px' }}>
+                        <TypeTag
+                          data={type}
+                          showName
+                        />
+                      </div>
+                    </Option>
+                  ))
+                  }
+                </Select>,
+              )}
+            </FormItem>
+          ) : ''
+        );
+      case 'assignee':
+        return '';
+      case 'sprint':
+        return '';
+      case 'priority':
+        return '';
+      case 'label':
+        return '';
+      case 'fixVersion':
+        return '';
+      case 'epic':
+        return (
+          <FormItem label="史诗" style={{ width: 520, marginBottom: 15 }}>
+            {getFieldDecorator('epicId', {})(
+              <Select
+                label="史诗"
+                allowClear
+                filter
+                filterOption={
+                  (input, option) => option.props.children && option.props.children.toLowerCase().indexOf(
+                    input.toLowerCase(),
+                  ) >= 0
+                }
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+                loading={selectLoading}
+                onFilterChange={this.handleEpicFilterChange}
+              >
+                {originEpics.map(
+                  epic => (
+                    <Option
+                      key={epic.issueId}
+                      value={epic.issueId}
+                    >
+                      {epic.epicName}
+                    </Option>
+                  ),
+                )}
+              </Select>,
+            )}
+          </FormItem>
+        );
+      case 'component':
+        return '';
+      case 'summary':
+        return (
+          <FormItem label="特性名称" style={{ width: 520, marginBottom: 20 }}>
+            {getFieldDecorator('summary', {
+              rules: [{ required: true, message: '特性名称为必输项' }],
+            })(
+              <Input label="特性名称" maxLength={44} />,
+            )}
+          </FormItem>
+        );
+      case 'epicName':
+        return '';
+      case 'estimateTime':
+        return '';
+      case 'storyPoint':
+        return (
+          <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
+            <Select
+              label="故事点"
+              value={storyPoints && storyPoints.toString()}
+              mode="combobox"
+              onPopupFocus={() => {
+                this.componentRef.rcSelect.focus();
+              }}
+              tokenSeparators={[',']}
+              style={{ marginTop: 0, paddingTop: 0 }}
+              onChange={value => this.handleChangeStoryPoint(value)}
+            >
+              {storyPointList.map(sp => (
+                <Option key={sp.toString()} value={sp}>
+                  {sp}
+                </Option>
+              ))}
+            </Select>
+          </div>
+        );
+      case 'description':
+        return (
+          <div style={{ width: 520 }}>
+            <div style={{ display: 'flex', marginBottom: 3, alignItems: 'center' }}>
+              <div style={{ fontWeight: 'bold' }}>描述</div>
+              <div style={{ marginLeft: 80 }}>
+                <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ fullEdit: true })} style={{ display: 'flex', alignItems: 'center' }}>
+                  <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: 12 }} />
+                  <span style={{ color: '#3f51b5' }}>全屏编辑</span>
+                </Button>
+              </div>
+            </div>
+            {
+              !fullEdit && (
+                <div className="clear-p-mw">
+                  <WYSIWYGEditor
+                    saveRef={(editor) => { this.editor = editor; }}
+                    value={delta}
+                    style={{ height: 200, width: '100%' }}
+                    onChange={(value) => {
+                      this.setState({ delta: value });
+                    }}
+                  />
+                </div>
+              )
+            }
+          </div>
+        );
+      case 'benfitHypothesis':
+        return (
+          <FormItem style={{ width: 520, marginBottom: 15 }}>
+            {getFieldDecorator('benfitHypothesis', {
+            })(
+              <Input label="特性价值" placeholder="请输入特性价值" maxLength={255} />,
+            )}
+          </FormItem>
+        );
+      case 'acceptanceCritera':
+        return (
+          <FormItem style={{ width: 520 }}>
+            {getFieldDecorator('acceptanceCritera', {
+            })(
+              <Input label="验收标准" placeholder="请输入验收标准" maxLength={255} />,
+            )}
+          </FormItem>
+        );
+      default:
+        return (
+          <FormItem label={fieldName} style={{ width: 520 }}>
+            {getFieldDecorator(fieldCode, {
+              rules: [{ required: true, message: `${fieldName}为必填项` }],
+              initialValue: defaultValue || undefined,
+            })(
+              this.renderField(field),
+            )}
+          </FormItem>
+        );
+    }
+  };
+
+  render() {
+    const { visible } = this.props;
+    const {
+      fullEdit, delta, fields, fileList, loading,
+    } = this.state;
+
     return (
       <Sidebar
         className="c7n-feature-createFeatureSideBar"
@@ -224,165 +575,34 @@ class CreateFeature extends Component {
           description="请在下面输入问题的详细信息，包含详细描述、特性价值、验收标准等等。您可以通过丰富的问题描述帮助相关人员更快更全面的理解任务，同时更好的把控问题进度。"
           link=""
         >
-          <Form>
-            {selectedIssueType ? (
-              <FormItem label="问题类型" style={{ width: 520, marginBottom: 20 }}>
-                {getFieldDecorator('featureType', {
-                  rules: [{ required: true, message: '问题类型为必输项' }],
-                  initialValue: 'business',
-                })(
-                  <Select
-                    label="问题类型"
-                    getPopupContainer={triggerNode => triggerNode.parentNode}
-                  >
-                    {featureTypeList.map(type => (
-                      <Option key={type.typeCode} value={type.typeCode}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', padding: '0 2px' }}>
-                          <TypeTag
-                            data={type}
-                            showName
-                          />
-                        </div>
-                      </Option>
-                    ))
-                    }
-                  </Select>,
-                )}
-              </FormItem>
-            ) : ''
-            }
-            {/* <FormItem label="特性类型" style={{ width: 520, marginBottom: 10 }}> */}
-            {/* {getFieldDecorator('featureType', { */}
-            {/* rules: [{ required: true, message: '特性类型为必输项' }], */}
-            {/* initialValue: 'business', */}
-            {/* })( */}
-            {/* <RadioDroup */}
-            {/* label="特性类型" */}
-            {/* style={{ display: 'flex', flexDirection: 'column', marginBottom: 5 }} */}
-            {/* > */}
-            {/* <Radio value="business" style={{ marginBottom: 5 }}>业务</Radio> */}
-            {/* <Radio value="enabler">使能</Radio> */}
-            {/* </RadioDroup>, */}
-            {/* )} */}
-            {/* </FormItem> */}
-            <FormItem label="特性名称" style={{ width: 520, marginBottom: 20 }}>
-              {getFieldDecorator('summary', {
-                rules: [{ required: true, message: '特性名称为必输项' }],
-              })(
-                <Input label="特性名称" maxLength={44} />,
-              )}
-            </FormItem>
+          <Spin spinning={loading}>
+            <Form>
+              {fields && fields.map(field => this.getFieldComponent(field))}
+            </Form>
 
-            <div style={{ width: 520 }}>
-              <div style={{ display: 'flex', marginBottom: 3, alignItems: 'center' }}>
-                <div style={{ fontWeight: 'bold' }}>描述</div>
-                <div style={{ marginLeft: 80 }}>
-                  <Button className="leftBtn" funcType="flat" onClick={() => this.setState({ fullEdit: true })} style={{ display: 'flex', alignItems: 'center' }}>
-                    <Icon type="zoom_out_map" style={{ color: '#3f51b5', fontSize: '18px', marginRight: 12 }} />
-                    <span style={{ color: '#3f51b5' }}>全屏编辑</span>
-                  </Button>
-                </div>
+            <div className="c7n-feature-signUpload" style={{ marginTop: 20, height: 33 }}>
+              <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
+                <div style={{ fontWeight: 'bold' }}>附件</div>
               </div>
-              {
-                !fullEdit && (
-                  <div className="clear-p-mw">
-                    <WYSIWYGEditor
-                      saveRef={(editor) => { this.editor = editor; }}
-                      value={delta}
-                      style={{ height: 200, width: '100%' }}
-                      onChange={(value) => {
-                        this.setState({ delta: value });
-                      }}
-                    />
-                  </div>
-                )
-              }
+              <div style={{ marginTop: -38 }}>
+                <UploadButton
+                  onRemove={this.setFileList}
+                  onBeforeUpload={this.setFileList}
+                  fileList={fileList}
+                />
+              </div>
             </div>
-            
-            <FormItem label="史诗" style={{ width: 520, marginBottom: 15 }}>
-              {getFieldDecorator('epicId', {})(
-                <Select
-                  label="史诗"
-                  allowClear
-                  filter
-                  filterOption={
-                    (input, option) => option.props.children && option.props.children.toLowerCase().indexOf(
-                      input.toLowerCase(),
-                    ) >= 0
-                }
-                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                  loading={selectLoading}
-                  onFilterChange={this.handleEpicFilterChange}
-                >
-                  {originEpics.map(
-                    epic => (
-                      <Option
-                        key={epic.issueId}
-                        value={epic.issueId}
-                      >
-                        {epic.epicName}
-                      </Option>
-                    ),
-                  )}
-                </Select>,
-              )}
-            </FormItem>
-
-            <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
-              <Select
-                label="故事点"
-                value={storyPoints && storyPoints.toString()}
-                mode="combobox"
-                onPopupFocus={(e) => {
-                  this.componentRef.rcSelect.focus();
-                }}
-                tokenSeparators={[',']}
-                style={{ marginTop: 0, paddingTop: 0 }}
-                onChange={value => this.handleChangeStoryPoint(value)}
-              >
-                {storyPointList.map(sp => (
-                  <Option key={sp.toString()} value={sp}>
-                    {sp}
-                  </Option>
-                ))}
-              </Select>
-            </div>
-            <FormItem style={{ width: 520, marginBottom: 15 }}>
-              {getFieldDecorator('benfitHypothesis', {
-              })(
-                <Input label="特性价值" placeholder="请输入特性价值" maxLength={44} />,
-              )}
-            </FormItem>
-            <FormItem style={{ width: 520 }}>
-              {getFieldDecorator('acceptanceCritera', {
-              })(
-                <Input label="验收标准" placeholder="请输入验收标准" maxLength={44} />,
-              )}
-            </FormItem>
-          </Form>
-        
-          <div className="c7n-feature-signUpload" style={{ marginTop: 20, height: 33 }}>
-            <div style={{ display: 'flex', marginBottom: '13px', alignItems: 'center' }}>
-              <div style={{ fontWeight: 'bold' }}>附件</div>
-            </div>
-            <div style={{ marginTop: -38 }}>
-              <UploadButton
-                onRemove={this.setFileList}
-                onBeforeUpload={this.setFileList}
-                fileList={fileList}
-              />
-            </div>
-          </div>
-          {
-            fullEdit ? (
-              <FullEditor
-                initValue={delta}
-                visible={fullEdit}
-                onCancel={this.handleFullEditonCancel}
-                onOk={this.handleFullEditOnOk}
-              />
-            ) : null
-          }
+            {
+              fullEdit ? (
+                <FullEditor
+                  initValue={delta}
+                  visible={fullEdit}
+                  onCancel={this.handleFullEditonCancel}
+                  onOk={this.handleFullEditOnOk}
+                />
+              ) : null
+            }
+          </Spin>
         </Content>
       </Sidebar>
     );

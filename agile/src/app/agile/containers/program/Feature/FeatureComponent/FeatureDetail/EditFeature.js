@@ -1,22 +1,18 @@
 /* eslint-disable react/sort-comp */
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import { Spin } from 'choerodon-ui';
 import './EditFeature.scss';
 import {
-  loadBranchs, loadDatalogs, loadLinkIssues,
-  loadIssue, loadWorklogs, loadWikies,
+  loadDatalogs, loadLinkIssues, loadIssue, getFieldAndValue,
 } from '../../../../../api/NewIssueApi';
 import CopyIssue from '../../../../../components/CopyIssue';
-import TransformSubIssue from '../../../../../components/TransformSubIssue';
-import TransformFromSubIssue from '../../../../../components/TransformFromSubIssue';
-import Assignee from '../../../../../components/Assignee';
-import ChangeParent from '../../../../../components/ChangeParent';
 import IssueSidebar from './IssueComponent/IssueSidebar';
 import IssueHeader from './IssueComponent/IssueHeader';
 import IssueBody from './IssueComponent/IssueBody/IssueBody';
+import VisibleStore from '../../../../../stores/common/visible/VisibleStore';
 
 const { AppState } = stores;
 
@@ -25,17 +21,8 @@ let hasPermission;
 @observer class CreateSprint extends Component {
   constructor(props) {
     super(props);
-    this.needBlur = true;
-    this.componentRef = React.createRef();
     this.state = {
       issueLoading: false,
-      assigneeShow: false,
-      changeParentShow: false,
-      copyIssueShow: false,
-      transformSubIssueShow: false,
-      origin: {},
-      assigneeId: undefined,
-      linkIssues: [],
     };
   }
 
@@ -75,26 +62,40 @@ let hasPermission;
       issueLoading: true,
     }, () => {
       loadIssue(id).then((res) => {
-        store.setIssue(res);
-        this.setState({
-          issueLoading: false,
+        const param = {
+          schemeCode: 'agile_issue',
+          context: res.typeCode,
+          pageCode: 'agile_issue_edit',
+        };
+        getFieldAndValue(id, param).then((fields) => {
+          this.setState({
+            issueLoading: false,
+          });
+          store.setIssueFields(res, fields);
         });
       });
       axios.all([
-        loadWikies(id),
-        loadWorklogs(id),
         loadDatalogs(id),
         loadLinkIssues(id),
-        loadBranchs(id),
       ])
-        .then(axios.spread((wiki, workLogs, dataLogs, linkIssues, branches) => {
-          store.initIssueAttribute(wiki, workLogs, dataLogs, linkIssues, branches);
+        .then(axios.spread((dataLogs, linkIssues) => {
+          store.initIssueAttribute(dataLogs, linkIssues);
         }));
     });
   };
 
+  handleCopyIssue = () => {
+    const { onUpdate, reloadIssue } = this.props;
+    VisibleStore.setCopyIssueShow(false);
+    if (onUpdate) {
+      onUpdate();
+    }
+    if (reloadIssue) {
+      reloadIssue();
+    }
+  };
+
   render() {
-    this.needBlur = true;
     const {
       store,
       backUrl,
@@ -103,16 +104,15 @@ let hasPermission;
       onUpdate,
     } = this.props;
     const {
-      assigneeId,
-      assigneeShow,
-      changeParentShow,
-      copyIssueShow,
-      linkIssues,
-      origin,
       issueLoading,
-      transformSubIssueShow,
-      transformFromSubIssueShow,
     } = this.state;
+
+    const issue = store.getIssue;
+    const { issueId, issueNum, summary } = issue;
+    const linkIssues = store.getLinkIssues;
+    const {
+      getCopyIssueShow: copyIssueShow,
+    } = VisibleStore;
 
     return (
       <div className="choerodon-modal-editIssue" style={style}>
@@ -162,76 +162,14 @@ let hasPermission;
         {
           copyIssueShow ? (
             <CopyIssue
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              issue={origin}
+              issueId={issueId}
+              issueNum={issueNum}
+              issue={issue}
               issueLink={linkIssues}
-              issueSummary={origin.summary}
+              issueSummary={summary}
               visible={copyIssueShow}
-              onCancel={() => this.setState({ copyIssueShow: false })}
+              onCancel={() => VisibleStore.setCopyIssueShow(false)}
               onOk={this.handleCopyIssue.bind(this)}
-            />
-          ) : null
-        }
-        {
-          transformSubIssueShow ? (
-            <TransformSubIssue
-              visible={transformSubIssueShow}
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              ovn={origin.objectVersionNumber}
-              onCancel={() => this.setState({ transformSubIssueShow: false })}
-              onOk={this.handleTransformSubIssue.bind(this)}
-              store={store}
-            />
-          ) : null
-        }
-        {
-          transformFromSubIssueShow ? (
-            <TransformFromSubIssue
-              visible={transformFromSubIssueShow}
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              ovn={origin.objectVersionNumber}
-              onCancel={() => this.setState({ transformFromSubIssueShow: false })}
-              onOk={this.handleTransformFromSubIssue.bind(this)}
-              store={store}
-            />
-          ) : null
-        }
-
-        {
-          assigneeShow ? (
-            <Assignee
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              visible={assigneeShow}
-              assigneeId={assigneeId}
-              objectVersionNumber={origin.objectVersionNumber}
-              onOk={() => {
-                this.setState({ assigneeShow: false });
-                this.reloadIssue();
-              }}
-              onCancel={() => {
-                this.setState({ assigneeShow: false });
-              }}
-            />
-          ) : null
-        }
-        {
-          changeParentShow ? (
-            <ChangeParent
-              issueId={origin.issueId}
-              issueNum={origin.issueNum}
-              visible={changeParentShow}
-              objectVersionNumber={origin.objectVersionNumber}
-              onOk={() => {
-                this.setState({ changeParentShow: false });
-                this.reloadIssue();
-              }}
-              onCancel={() => {
-                this.setState({ changeParentShow: false });
-              }}
             />
           ) : null
         }

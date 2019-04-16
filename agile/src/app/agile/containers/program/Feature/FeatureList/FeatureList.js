@@ -1,19 +1,15 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Button, Spin, Icon, Radio,
+  Button, Icon, Radio,
 } from 'choerodon-ui';
 import {
   Header, Page,
 } from 'choerodon-front-boot';
 import './FeatureList.scss';
-import { DragDropContext } from 'react-beautiful-dnd';
-// import ClearFilter from '../FeatureComponent/SprintComponent/SprintItemComponent/SprintHeaderComponent/ClearAllFilter';
 import FeatureDetail from '../FeatureComponent/FeatureDetail/FeatureDetail';
 import CreateFeature from '../FeatureComponent/CreateFeature/CreateFeature';
 import FeatureStore from '../../../../stores/program/Feature/FeatureStore';
-import Epic from '../FeatureComponent/EpicComponent/Epic';
-import SprintItem from '../FeatureComponent/PIComponent/PIItem';
 import PlanMode from '../FeatureComponent/PlanMode';
 import QueryMode from '../FeatureComponent/QueryMode/QueryMode';
 
@@ -25,7 +21,7 @@ class FeatureList extends Component {
   state = {
     visible: false,
     mode: 'plan',
-  }
+  };
 
   componentDidMount() {
     this.refresh();
@@ -33,7 +29,7 @@ class FeatureList extends Component {
 
   saveRef = name => (ref) => {
     this[name] = ref;
-  }
+  };
 
   refresh = () => {
     if (this.PlanMode) {
@@ -67,7 +63,7 @@ class FeatureList extends Component {
     this.setState({
       mode: e.target.value,
     });
-  }
+  };
 
   render() {
     const { visible, mode } = this.state;
@@ -125,11 +121,15 @@ class FeatureList extends Component {
             />
           </div>
         </div>
-        <CreateFeature
-          visible={visible}
-          onCancel={this.handleCancelBtn}
-          onOk={this.handleCreateFeature}
-        />
+        {visible
+          ? (
+            <CreateFeature
+              visible={visible}
+              onCancel={this.handleCancelBtn}
+              onOk={this.handleCreateFeature}
+            />
+          ) : ''
+        }
       </Page>
     );
   }

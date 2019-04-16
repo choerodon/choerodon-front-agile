@@ -32,7 +32,6 @@ import LinkList from '../../Component/LinkList';
     }
   }
 
-
   renderLinkList(link, i) {
     const { reloadIssue, store } = this.props;
     const { issueId: id } = store.getIssue;

@@ -23,7 +23,7 @@ import { createCommit } from '../../../../api/NewIssueApi';
 
   newCommit = (commit) => {
     const { reloadIssue } = this.props;
-    createCommit(commit).then((res) => {
+    createCommit(commit).then(() => {
       if (reloadIssue) {
         reloadIssue();
       }
@@ -97,10 +97,6 @@ import { createCommit } from '../../../../api/NewIssueApi';
   }
 
   render() {
-    const {
-      intl, store,
-    } = this.props;
-
     return (
       <div id="commit">
         <div className="c7n-title-wrapper">
