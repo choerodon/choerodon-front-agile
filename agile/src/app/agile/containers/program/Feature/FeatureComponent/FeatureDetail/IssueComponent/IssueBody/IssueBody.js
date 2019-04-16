@@ -3,13 +3,9 @@ import { observer, inject } from 'mobx-react';
 import IssueDetail from './IssueDetail';
 import IssueDes from './IssueDes';
 import IssueAttachment from './IssueAttachment';
-import IssueWiki from './IssueWiki';
 import IssueCommit from './IssueCommit';
-import IssueWorkLog from './IssueWorkLog';
 import IssueLog from './IssueLog';
-import SubTask from './SubTask';
 import IssueLink from './IssueLink';
-import IssueBranch from './IssueBranch/IssueBranch';
 
 @inject('AppState', 'HeaderStore')
 @observer class IssueBody extends Component {
@@ -33,22 +29,10 @@ import IssueBranch from './IssueBranch/IssueBranch';
             <IssueDetail {...this.props} />
             <IssueDes store={store} />
             <IssueAttachment store={store} reloadIssue={reloadIssue} />
-            {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1
-              ? <IssueWiki store={store} /> : ''
-            }
             <IssueCommit store={store} reloadIssue={reloadIssue} />
-            {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1
-              ? <IssueWorkLog store={store} reloadIssue={reloadIssue} /> : ''
-            }
             <IssueLog store={store} />
-            {issueTypeDTO.code && ['sub_task', 'feature'].indexOf(issueTypeDTO.code) !== -1
-              ? <SubTask store={store} /> : ''
-            }
             {issueTypeDTO.code && ['feature'].indexOf(issueTypeDTO.code) !== -1
-              ? <IssueLink store={store} /> : ''
-            }
-            {issueTypeDTO.code && ['feature'].indexOf(issueTypeDTO.code) !== -1
-              ? <IssueBranch store={store} /> : ''
+              ? <IssueLink store={store} reloadIssue={reloadIssue} /> : ''
             }
           </div>
         </section>

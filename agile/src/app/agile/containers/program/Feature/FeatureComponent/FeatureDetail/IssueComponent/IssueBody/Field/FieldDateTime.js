@@ -19,20 +19,20 @@ const { Text, Edit } = TextEditToggle;
 
   render() {
     const { store, field } = this.props;
-    const { code, name } = field;
+    const { code, fieldName } = field;
     const issue = store.getIssue;
     const { [code]: value } = issue;
     return (
       <div className="line-start mt-10">
         <div className="c7n-property-wrapper">
           <span className="c7n-property">
-            {`${name}：`}
+            {`${fieldName}：`}
           </span>
         </div>
         <div className="c7n-value-wrapper">
           <TextEditToggle
             disabled
-            originData={name}
+            originData={fieldName}
           >
             <Text>
               <DatetimeAgo

@@ -21,7 +21,6 @@ import {
   }
 
   getFieldComponent = (field) => {
-    const { store } = this.props;
     switch (field.fieldCode) {
       case 'assignee':
         return (<FieldAssignee {...this.props} />);
