@@ -106,6 +106,8 @@ class BacklogStore {
 
   @observable epicList = [];
 
+  @observable featureList = [];
+
   @observable epicMap = observable.map();
 
   @observable selectedIssueId = [];
@@ -139,6 +141,8 @@ class BacklogStore {
   @observable chosenVersion = 'all';
 
   @observable chosenEpic = 'all';
+
+  @observable chosenFeature = 'all';
 
   @observable onlyMe = false;
 
@@ -475,8 +479,25 @@ class BacklogStore {
     this.chosenEpic = data;
   }
 
+  @computed get getChosenFeature() {
+    return this.chosenFeature;
+  }
+
+  @action setChosenFeature(data) {
+    if (data === 'all') {
+      this.filterSelected = false;
+    }
+    this.spinIf = true;
+    this.addToFeatureFilter(data);
+    this.chosenFeature = data;
+  }
+
   @action setEpicData(data) {
     this.epicList = data;
+  }
+
+  @action setFeatureData(data) {
+    this.featureList = data;
   }
 
   axiosGetEpic() {
@@ -752,12 +773,10 @@ class BacklogStore {
       } else {
         return destinationArr[destinationIndex - 1];
       }
+    } else if (destinationIndex === 0 && destinationArr.length) {
+      return destinationArr[destinationIndex];
     } else {
-      if (destinationIndex === 0 && destinationArr.length) {
-        return destinationArr[destinationIndex];
-      } else {
-        return destinationArr[destinationIndex - 1];
-      }
+      return destinationArr[destinationIndex - 1];
     }
   };
 
@@ -831,6 +850,10 @@ class BacklogStore {
 
   @computed get getEpicData() {
     return this.epicList;
+  }
+
+  @computed get getFeatureData() {
+    return this.featureList;
   }
 
   @action updateEpic(epic) {
@@ -929,6 +952,20 @@ class BacklogStore {
     } else {
       delete this.filter.advancedSearchArgs.noEpic;
       delete this.filter.advancedSearchArgs.epicId;
+    }
+  }
+
+  @action addToFeatureFilter(data) {
+    this.filterSelected = true;
+    if (data === 'unset') {
+      delete this.filter.advancedSearchArgs.featureId;
+      this.filter.advancedSearchArgs.noFeature = 'true';
+    } else if (typeof data === 'number') {
+      delete this.filter.advancedSearchArgs.noFeature;
+      this.filter.advancedSearchArgs.featureId = data;
+    } else {
+      delete this.filter.advancedSearchArgs.noFeature;
+      delete this.filter.advancedSearchArgs.featureId;
     }
   }
 
