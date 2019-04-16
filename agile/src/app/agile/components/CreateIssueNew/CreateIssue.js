@@ -210,7 +210,7 @@ class CreateIssue extends Component {
       .then((res) => {
         if (res && res.length) {
           const story = res.filter(item => item.typeCode === 'story');
-          const defaultType = (story && story.length) ? res[0] : story[0];
+          const defaultType = (story && story.length) ? story[0] : res[0];
           const param = {
             schemeCode: 'agile_issue',
             context: defaultType.typeCode,
@@ -222,6 +222,7 @@ class CreateIssue extends Component {
               originIssueTypes: res,
               defaultTypeId: defaultType.id,
               loading: false,
+              newIssueTypeCode: defaultType.typeCode,
             });
           });
         }
