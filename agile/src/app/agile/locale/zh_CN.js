@@ -45,7 +45,7 @@ const zh_CN = {
 
   'field.create': '添加自定义字段',
   'field.edit': '编辑自定义字段',
-  'field.context': '显示层级',
+  'field.context': '显示范围',
   'field.code.rule': '编码只允许数字、字母及下划线',
   'field.code.exist': '编码已经存在',
   'field.name.exist': '名称已经存在',
@@ -73,7 +73,7 @@ const zh_CN = {
 
   'dragList.invalid': '禁用',
   'dragList.active': '启用',
-  'dragList.placeholder': '请输入名称',
+  'dragList.placeholder': '请输入选项值',
 
   "learnmore": "了解更多",
   'branch.branch': '分支',

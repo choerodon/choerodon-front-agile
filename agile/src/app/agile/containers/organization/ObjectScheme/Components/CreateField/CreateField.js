@@ -165,7 +165,7 @@ class CreateField extends Component {
                 rules: [{
                   required: true,
                   whitespace: true,
-                  message: '显示层级为必填项！',
+                  message: '显示范围为必填项！',
                 }, {
                   validator: this.checkCode,
                 }],
@@ -184,7 +184,7 @@ class CreateField extends Component {
                 rules: [{
                   required: true,
                   whitespace: true,
-                  message: '显示层级为必填项！',
+                  message: '显示范围为必填项！',
                 }, {
                   validator: this.checkName,
                 }],
@@ -202,7 +202,7 @@ class CreateField extends Component {
               {getFieldDecorator('fieldType', {
                 rules: [{
                   required: true,
-                  message: '显示层级为必填项！',
+                  message: '显示范围为必填项！',
                 }],
               })(
                 <Select
@@ -234,7 +234,7 @@ class CreateField extends Component {
               {getFieldDecorator('context', {
                 rules: [{
                   required: true,
-                  message: '显示层级为必填项！',
+                  message: '显示范围为必填项！',
                 }],
               })(
                 <Select
