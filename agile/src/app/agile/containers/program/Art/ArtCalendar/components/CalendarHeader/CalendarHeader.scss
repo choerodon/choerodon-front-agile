@@ -5,13 +5,13 @@
   top: 0;
   z-index: 9;
 
-  .c7nagile-CalendarHeader-years {
+  &-years {
     display: flex;
     border-top: 1px solid #D6D6D6;
     border-bottom: 1px solid #D6D6D6;
   }
 
-  .c7nagile-CalendarHeader-year {
+  &-year {
     font-weight: 500;
     font-size: 14px;
     height: 22px;
@@ -22,12 +22,12 @@
     }
   }
 
-  .c7nagile-CalendarHeader-weeks {
+  &-weeks {
     display: flex;
     border-bottom: 1px solid #D6D6D6;
   }
 
-  .c7nagile-CalendarHeader-week {
+  &-week {
     flex: 7;
     height: 55px;
     min-width: 175px;

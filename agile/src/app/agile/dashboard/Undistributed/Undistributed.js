@@ -20,7 +20,7 @@ class Undistributed extends Component {
       pagination: {
         total: 0,
         current: 1,
-        pageSize: 6,
+        pageSize: 5,
       },
       loading: false,
     };

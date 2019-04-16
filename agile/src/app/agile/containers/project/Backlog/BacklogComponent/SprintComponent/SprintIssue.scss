@@ -13,11 +13,13 @@
   display: flex;
   //justify-content: space-between;
   flex-wrap: wrap;
+  align-items: center;
+
   &-left {
     display: flex;
     flex: 9;
-    margin-bottom: 2px;
     min-width: 220px;
+
     &-summaryContainer {
       margin-left: 8px;
       height: 20px;
@@ -26,10 +28,12 @@
       display: flex;
       text-overflow: ellipsis;
     }
+
     &-issueNum {
       white-space: nowrap;
       margin: 0 4px;
     }
+
     &-issueSummary {
       white-space: nowrap;
       overflow: hidden;
@@ -37,42 +41,49 @@
       text-overflow: ellipsis;
     }
   }
+
   .line-two-left {
     display: flex;
   }
+
   .line-two-right {
     display: flex;
   }
+
   &-right {
     display: flex;
     justify-content: flex-end;
     min-width: 360px;
     flex: 1;
-    margin-bottom: 2px;
+
     .container {
       border-radius: 2px;
       color: #0000005c;
       height: 20px;
       display: block;
       padding: 0 3px;
-      max-width: 50px;
+      max-width: 80px;
       margin: 0 6px;
       text-align: center;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+
     &-version {
       border: 1px solid #0000005c;
     }
+
     &-epic {
       border: 1px solid #f953ba;
       margin-right: 12px;
     }
+
     &-status {
       margin-left: 12px;
       margin-right: 8px;
     }
+
     &-storyPoint {
       // 以后要用到的话，可以把这边直接提取出来
       visibility: hidden;
@@ -87,9 +98,11 @@
       color: #000000a6;
       margin-left: 12px;
     }
+
     .story-container {
       // 提取到这边
     }
+
     .visible {
       visibility: visible !important;
     }

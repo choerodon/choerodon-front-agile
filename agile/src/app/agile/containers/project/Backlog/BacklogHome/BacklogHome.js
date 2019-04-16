@@ -8,6 +8,7 @@ import {
 } from 'choerodon-ui';
 import Version from '../BacklogComponent/VersionComponent/Version';
 import Epic from '../BacklogComponent/EpicComponent/Epic';
+import Feature from '../BacklogComponent/FeatureComponent/Feature';
 import IssueDetail from '../BacklogComponent/IssueDetailComponent/IssueDetail';
 import CreateIssue from '../../../../components/CreateIssueNew';
 import './BacklogHome.scss';
@@ -279,6 +280,17 @@ class BacklogHome extends Component {
               >
                 {'史诗'}
               </p>
+              <p
+                style={{
+                  marginTop: 12,
+                }}
+                role="none"
+                onClick={() => {
+                  this.toggleCurrentVisible('feature');
+                }}
+              >
+                {'特性'}
+              </p>
             </div>
             <Version
               store={BacklogStore}
@@ -289,6 +301,13 @@ class BacklogHome extends Component {
               }}
             />
             <Epic
+              refresh={this.refresh}
+              visible={BacklogStore.getCurrentVisible}
+              issueRefresh={() => {
+                this.IssueDetail.refreshIssueDetail();
+              }}
+            />
+            <Feature
               refresh={this.refresh}
               visible={BacklogStore.getCurrentVisible}
               issueRefresh={() => {

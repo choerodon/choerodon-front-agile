@@ -29,18 +29,32 @@ const getColumns = filters => ([
     className: 'featureType',
     sorterId: 'featureType',
     width: 100,
-    render: (featureType, record) => (
-      <div style={{ lineHeight: 0 }}>
-        <TypeTag
-          showName
-          data={{
-            colour: featureType === 'business' ? '#29B6F6' : '#FFCA28',
-            icon: 'agile-feature',
-            name: featureType === 'business' ? '特性' : '使能',
-          }}
-        />
-      </div>
-    ),
+    render: (featureType, record) => {
+      const { typeCode } = record;
+      return (
+        <div style={{ lineHeight: 0 }}>
+          {typeCode === 'feature' ? (
+            <TypeTag
+              showName
+              data={{
+                colour: featureType === 'business' ? '#29B6F6' : '#FFCA28',
+                icon: 'agile-feature',
+                name: featureType === 'business' ? '特性' : '使能',
+              }}
+            />
+          ) : (
+            <TypeTag
+              showName
+              data={{
+                colour: '#FFCA28',
+                icon: 'agile-feature',
+                name: '史诗',
+              }}
+            />
+          )}
+        </div>
+      );
+    },
   },
   {
     title: '概要',
