@@ -56,7 +56,7 @@ import {
       case 'epicName':
         return (<FieldText {...this.props} field={field} />);
       case 'estimateTime':
-      case 'storyPoint':
+      case 'storyPoints':
         return (<FieldStoryPoint {...this.props} field={field} />);
       default:
         return (<Field {...this.props} field={field} />);

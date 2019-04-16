@@ -4,7 +4,9 @@ import { withRouter } from 'react-router-dom';
 import { Select } from 'choerodon-ui';
 import { injectIntl } from 'react-intl';
 import TextEditToggle from '../../../../TextEditToggle';
-import { loadEpics, updateIssue, loadFeatures } from '../../../../../api/NewIssueApi';
+import { loadEpics, updateIssue } from '../../../../../api/NewIssueApi';
+import { getFeaturesByEpic } from '../../../../../api/FeatureApi';
+import { getProjectsInProgram } from '../../../../../api/CommonApi';
 
 const { Option } = Select;
 const { Text, Edit } = TextEditToggle;
@@ -19,6 +21,7 @@ const { Text, Edit } = TextEditToggle;
       selectLoading: true,
       newEpicId: undefined,
       newFeatureId: undefined,
+      isInProgram: false,
     };
   }
 
@@ -36,10 +39,13 @@ const { Text, Edit } = TextEditToggle;
         selectLoading: false,
       });
     });
-    loadFeatures(epicId || 0).then((res) => {
-      this.setState({
-        originFeatures: res,
-        selectLoading: false,
+    getProjectsInProgram().then((res) => {
+      getFeaturesByEpic(epicId).then((data) => {
+        this.setState({
+          originFeatures: data,
+          selectLoading: false,
+          isInProgram: Boolean(res),
+        });
       });
     });
   };
@@ -71,7 +77,7 @@ const { Text, Edit } = TextEditToggle;
     const { newFeatureId, originFeatures } = this.state;
     const { store, onUpdate, reloadIssue } = this.props;
     const issue = store.getIssue;
-    const { featureId, issueId, objectVersionNumber } = issue;
+    const { featureId = 1, issueId, objectVersionNumber } = issue;
     if (featureId !== newFeatureId) {
       const feature = originFeatures.filter(item => item.issueId === newFeatureId);
       const obj = {
@@ -93,7 +99,9 @@ const { Text, Edit } = TextEditToggle;
   };
 
   render() {
-    const { selectLoading, originEpics, originFeatures } = this.state;
+    const {
+      selectLoading, originEpics, originFeatures, isInProgram,
+    } = this.state;
     const { store } = this.props;
     const issue = store.getIssue;
     const {
@@ -102,7 +110,7 @@ const { Text, Edit } = TextEditToggle;
     } = issue;
     return (
       <React.Fragment>
-        {typeCode === 'story'
+        {typeCode === 'story' && isInProgram
           ? (
             <div className="line-start mt-10">
               <div className="c7n-property-wrapper">
@@ -114,7 +122,7 @@ const { Text, Edit } = TextEditToggle;
                 <TextEditToggle
                   formKey="epic"
                   onSubmit={this.updateIssueFeature}
-                  originData={featureName || []}
+                  originData={featureId || []}
                 >
                   <Text>
                     {featureName ? (
@@ -171,7 +179,7 @@ const { Text, Edit } = TextEditToggle;
               formKey="epic"
               onSubmit={this.updateIssueEpic}
               originData={epicId || []}
-              disabled={!!featureId}
+              disabled={!!featureName}
             >
               <Text>
                 {

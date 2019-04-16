@@ -190,7 +190,11 @@ const { confirm } = Modal;
             </div>
             {/* 主题 */}
             <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
-              <FieldText {...this.props} showTitle={false} field={{ code: 'summary', name: '概要' }} />
+              <FieldText
+                {...this.props}
+                showTitle={false}
+                field={{ fieldCode: 'summary', fieldName: '概要', textStyle: { fontSize: 20, fontWeight: 500, width: '100%' } }}
+              />
               <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
                 <Dropdown overlay={getMenu()} trigger={['click']}>
                   <Button icon="more_vert" />
@@ -202,14 +206,14 @@ const { confirm } = Modal;
               {
                 issueId && ['story', 'feature'].indexOf(typeCode) !== -1 ? (
                   <div style={{ display: 'flex', marginRight: 25 }}>
-                    <FieldStoryPoint {...this.props} field={{ code: 'storyPoints', name: '故事点' }} />
+                    <FieldStoryPoint {...this.props} field={{ fieldCode: 'storyPoints', fieldName: '故事点' }} />
                   </div>
                 ) : null
               }
               {
                 issueId && ['issue_epic', 'feature'].indexOf(typeCode) === -1 ? (
                   <div style={{ display: 'flex' }}>
-                    <FieldStoryPoint {...this.props} field={{ code: 'estimateTime', name: '预估时间' }} />
+                    <FieldStoryPoint {...this.props} field={{ fieldCode: 'estimateTime', fieldName: '预估时间' }} />
                   </div>
                 ) : null
               }

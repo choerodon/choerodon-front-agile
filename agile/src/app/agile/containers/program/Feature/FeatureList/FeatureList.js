@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {
-  Button, Icon, Radio,
+  Button, Icon, Radio, Checkbox,
 } from 'choerodon-ui';
 import {
   Header, Page,
@@ -21,6 +21,7 @@ class FeatureList extends Component {
   state = {
     visible: false,
     mode: 'plan',
+    display: false,
   };
 
   componentDidMount() {
@@ -65,8 +66,14 @@ class FeatureList extends Component {
     });
   };
 
+  onCheckChange = (e) => {
+    this.setState({
+      display: e.target.checked,
+    });
+  };
+
   render() {
-    const { visible, mode } = this.state;
+    const { visible, mode, display } = this.state;
     const { HeaderStore } = this.props;
 
     return (
@@ -92,6 +99,7 @@ class FeatureList extends Component {
             <Icon type="refresh" />
             {'刷新'}
           </Button>
+          <Checkbox style={{ marginLeft: 20, color: '#3f51b5' }} onChange={this.onCheckChange}>显示未开始PI</Checkbox>
           <div style={{ flex: 1, visibility: 'hidden' }} />
           <RadioGroup className="c7n-pi-showTypeRadioGroup" style={{ marginRight: 24 }} onChange={this.handleModeChange} value={mode}>
             <RadioButton value="plan">计划模式</RadioButton>
@@ -107,6 +115,7 @@ class FeatureList extends Component {
           >
             {mode === 'plan' ? (
               <PlanMode
+                display={display}
                 issueRefresh={() => { this.IssueDetail.refreshIssueDetail(); }}
                 ref={this.saveRef('PlanMode')}
               />
