@@ -138,7 +138,7 @@ class PlanMode extends Component {
   }
 
   render() {
-    const { issueRefresh } = this.props;
+    const { issueRefresh, display } = this.props;
     return (
       <Fragment>
         <div className="c7n-backlog-side">
@@ -175,6 +175,7 @@ class PlanMode extends Component {
               }}
             >
               <SprintItem
+                display={display}
                 epicVisible={FeatureStore.getEpicVisible}
                 onRef={(ref) => {
                   this.sprintItemRef = ref;

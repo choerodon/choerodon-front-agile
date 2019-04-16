@@ -606,7 +606,7 @@ class CreateSubIssue extends Component {
             </Select>
           </div>
         );
-      case 'storyPoint':
+      case 'storyPoints':
         return '';
       case 'description':
         return (

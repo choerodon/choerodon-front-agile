@@ -474,7 +474,7 @@ class CreateFeature extends Component {
         return '';
       case 'estimateTime':
         return '';
-      case 'storyPoint':
+      case 'storyPoints':
         return (
           <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
             <Select

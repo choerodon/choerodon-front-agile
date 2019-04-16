@@ -45,13 +45,6 @@ class PIItem extends Component {
           className={classnames('c7n-backlog-IssueCard-right')}
         >
           <div className={classnames('line-two-left')}>
-            {item.versionNames && item.versionNames.length > 0 ? (
-              <Tooltip title={`版本: ${item.versionNames.join(', ')}`}>
-                <span className="c7n-backlog-IssueCard-right-version container">
-                  {item.versionNames.join(', ')}
-                </span>
-              </Tooltip>
-            ) : ''}
             {!_.isNull(item.epicName) && item.epicName ? (
               <Tooltip title={`史诗: ${item.epicName}`}>
                 <span
@@ -85,18 +78,11 @@ class PIItem extends Component {
                 />
               </div>
             </Tooltip>
-            {item.priorityDTO
-              ? (
-                <Tooltip title={`优先级: ${item.priorityDTO ? item.priorityDTO.name : ''}`}>
-                  <PriorityTag priority={item.priorityDTO} />
-                </Tooltip>
-              ) : ''
-            }
             <Tooltip title={`故事点: ${item.storyPoints}`}>
               <div
                 label="PIItem"
                 className={classnames('c7n-backlog-IssueCard-right-storyPoint', {
-                  visible: item.storyPoints && item.issueTypeDTO && item.issueTypeDTO.typeCode === 'story',
+                  visible: item.storyPoints,
                 })}
               >
                 {item.storyPoints}

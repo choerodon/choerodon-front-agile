@@ -56,13 +56,6 @@ export function loadComponents() {
   );
 }
 
-export function loadFeatures(epicId) {
-  const projectId = AppState.currentMenuType.id;
-  return axios.get(
-    `/agile/v1/projects/${projectId}/issues/feature/select_data?epicId=${epicId}&organizationId=${getOrganizationId()}`,
-  );
-}
-
 export function loadEpics() {
   const projectId = AppState.currentMenuType.id;
   return axios.get(

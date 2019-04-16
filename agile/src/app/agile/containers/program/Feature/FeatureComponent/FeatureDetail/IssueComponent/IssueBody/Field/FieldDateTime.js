@@ -19,9 +19,9 @@ const { Text, Edit } = TextEditToggle;
 
   render() {
     const { store, field } = this.props;
-    const { code, fieldName } = field;
+    const { fieldCode, fieldName } = field;
     const issue = store.getIssue;
-    const { [code]: value } = issue;
+    const { [fieldCode]: value } = issue;
     return (
       <div className="line-start mt-10">
         <div className="c7n-property-wrapper">

@@ -907,7 +907,7 @@ class CreateIssue extends Component {
             </div>
           )
         );
-      case 'storyPoint':
+      case 'storyPoints':
         return (
           newIssueTypeCode === 'story' && (
             <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
