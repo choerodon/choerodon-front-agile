@@ -5,6 +5,7 @@ import {
 } from 'choerodon-ui';
 import moment from 'moment';
 import SelectFocusLoad from '../../../../../../components/SelectFocusLoad';
+import { checkArtName } from '../../../../../../api/ArtApi';
 import './CreateArt.scss';
 
 const FormItem = Form.Item;
@@ -24,6 +25,16 @@ class CreateArt extends Component {
     if (!prevProps.visible && visible) {
       form.resetFields();
     }
+  }
+
+  checkArtNameRepeat=(rule, value, callback) => {
+    checkArtName(value).then((res) => {
+      if (res) {
+        callback('Art名称重复');
+      } else {
+        callback();
+      }
+    });
   }
 
   handleOk = () => {
@@ -56,6 +67,8 @@ class CreateArt extends Component {
             {getFieldDecorator('name', {
               rules: [{
                 required: true, message: '请输入ART名称',
+              }, {
+                validator: this.checkArtNameRepeat,
               }],
             })(
               <Input style={{ width: 500 }} maxLength={30} label="名称" placeholder="请输入ART名称" />,

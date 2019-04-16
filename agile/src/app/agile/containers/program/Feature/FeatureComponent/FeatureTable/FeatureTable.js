@@ -23,14 +23,14 @@ const getColumns = filters => ([
     render: text => <IssueNum text={text} />,
   },
   {
-    title: '特性类型',
+    title: '类型',
     key: 'featureType',
     dataIndex: 'featureType',
     className: 'featureType',
     sorterId: 'featureType',
     width: 100,
     render: (featureType, record) => {
-      const { typeCode } = record;
+      const { typeCode, issueTypeDTO } = record;
       return (
         <div style={{ lineHeight: 0 }}>
           {typeCode === 'feature' ? (
@@ -45,11 +45,7 @@ const getColumns = filters => ([
           ) : (
             <TypeTag
               showName
-              data={{
-                colour: '#FFCA28',
-                icon: 'agile-feature',
-                name: '史诗',
-              }}
+              data={issueTypeDTO}
             />
           )}
         </div>
