@@ -262,6 +262,7 @@ class DragList extends Component {
                                       onChange={this.onInputChange}
                                       underline={false}
                                       placeholder={intl.formatMessage({ id: 'dragList.placeholder' })}
+                                      maxLength={20}
                                     />
                                   </span>
                                   <Button

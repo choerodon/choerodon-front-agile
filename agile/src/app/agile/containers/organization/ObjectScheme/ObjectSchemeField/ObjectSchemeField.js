@@ -124,7 +124,7 @@ class ObjectSchemeField extends Component {
         const postData = {
           ...field,
           name: data.name,
-          defaultValue: String(data.defaultValue),
+          defaultValue: String(data.defaultValue || ''),
           extraConfig: !!data.check,
         };
         if (singleList.indexOf(field.fieldType) !== -1) {
