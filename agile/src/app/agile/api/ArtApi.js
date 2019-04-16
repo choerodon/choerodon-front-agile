@@ -7,6 +7,10 @@ export function getArtsByProjectId() {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/agile/v1/projects/${projectId}/art/list`);
 }
+export function checkArtName(name) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/projects/${projectId}/art/check_name?artName=${name}`);
+}
 export function createArt(data) {
   const projectId = AppState.currentMenuType.id;
   return axios.post(`/agile/v1/projects/${projectId}/art`, data);
