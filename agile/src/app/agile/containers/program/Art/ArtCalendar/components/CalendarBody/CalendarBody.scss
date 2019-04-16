@@ -12,52 +12,57 @@
   }
 
   &-day {
-    position: relative;
-    border-left: 1px dashed #D6D6D6;
     flex: 1;
+    position: relative;
 
-    &:last-of-type {
-      border-right: 1px solid #D6D6D6;
+    &:after {
+      content: "";
+      width: 0;
+      border-left: 1px dashed #D6D6D6;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
     &:nth-child(7n+1) {
-      border-left-style: solid;
-      border-left-color: #D6D6D6;
+      &:after {
+        border-left-style: solid;
+        border-left-color: #D6D6D6;
+      }
     }
-  }
 
-  &-day.today {
-    position: relative;
-  }
+    &.today {
+      &:before {
+        /* 做一个书签效果 */
+        position: absolute;
+        /* 必须 */
+        top: 0;
+        left: 0;
+        z-index: 1;
+        height: 0;
+        padding-right: 1px;
+        font-weight: bold;
+        line-height: 0;
+        color: #000;
+        border: 6px solid #CF3030;
+        border-right-color: transparent;
+        /* 右边框透明，变成空缺的角 */
+        content: '';
+      }
 
-  &-day.today:before {
-    /* 做一个书签效果 */
-    position: absolute;
-    /* 必须 */
-    top: 0;
-    left: 0;
-    z-index: 1;
-    height: 0;
-    padding-right: 1px;
-    font-weight: bold;
-    line-height: 0;
-    color: #000;
-    border: 6px solid #CF3030;
-    border-right-color: transparent;
-    /* 右边框透明，变成空缺的角 */
-    content: '';
-  }
-
-  // 当前日期竖线
-  &-day.today:after {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    height: 100%;
-    width: 0;
-    border-left: 1px solid #CF3030;
-    content: '';
+      // 当前日期竖线
+      &:after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        height: 100%;
+        width: 0;
+        border-left: 1px solid #CF3030;
+        content: '';
+      }
+    }
   }
 
   &-content {

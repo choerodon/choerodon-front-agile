@@ -68,7 +68,7 @@ import {
   render() {
     const { store } = this.props;
     const issue = store.getIssue;
-    const { issueId } = issue;
+    const { issueId, typeCode } = issue;
 
     // 22
     const create = [
@@ -331,10 +331,10 @@ import {
         required: true,
       },
     ];
-
+    const fields = typeCode === 'feature' ? featureFields : detail;
     return (
       <div className="c7n-content-wrapper">
-        {issueId ? featureFields.map(field => (<span key={field.code}>{this.getFieldComponent(field)}</span>)) : ''}
+        {issueId ? fields.map(field => (<span key={field.code}>{this.getFieldComponent(field)}</span>)) : ''}
       </div>
     );
   }

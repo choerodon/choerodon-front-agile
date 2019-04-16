@@ -343,6 +343,7 @@ class AdvancedSearch extends Component {
                 <div className="c7n-createRange">
                   <RangePicker
                     format="YYYY-MM-DD hh:mm:ss"
+                    defaultPickerValue={[moment().subtract(1, 'months'), moment()]}
                     disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
                     allowClear
                     onChange={this.handleCreateDateRangeChange}
