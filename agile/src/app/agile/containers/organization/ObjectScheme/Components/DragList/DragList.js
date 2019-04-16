@@ -218,7 +218,7 @@ class DragList extends Component {
     const { addItemVisible, tempKey, saveDisabled } = this.state;
 
     return (
-      <div>
+      <div className="issue-dragList">
         <div className="issue-dragList-des">
           {tips}
         </div>
@@ -328,7 +328,7 @@ class DragList extends Component {
                                     >
                                       <Popconfirm
                                         placement="top"
-                                        title={`确认要删除 ${item.value} 吗？`}
+                                        title={`确认要删除 ${item.value} 吗？问题上该字段值也会被清空。`}
                                         onConfirm={() => this.remove(item.tempKey || item.id)}
                                         okText="删除"
                                         cancelText="取消"

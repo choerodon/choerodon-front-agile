@@ -129,7 +129,7 @@ class ObjectSchemeField extends Component {
         };
         if (singleList.indexOf(field.fieldType) !== -1) {
           postData.fieldOptions = fieldOptions.map((o) => {
-            if (o.tempKey === data.defaultValue || o.id === data.defaultValue) {
+            if (data.defaultValue && (o.tempKey === data.defaultValue || o.id === data.defaultValue)) {
               return { ...o, isDefault: true };
             } else {
               return { ...o, isDefault: false };

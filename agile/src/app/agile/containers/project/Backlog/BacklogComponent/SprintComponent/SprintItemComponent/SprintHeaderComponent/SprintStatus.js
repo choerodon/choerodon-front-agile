@@ -26,10 +26,6 @@ import StartSprint from '../../StartSprint';
     </Menu>
   );
 
-  componentWillUpdate(nextProps, nextState, nextContext) {
-
-  }
-
   render() {
     const {
       handleDeleteSprint, statusCode, data, store, refresh, sprintId,
@@ -51,7 +47,7 @@ import StartSprint from '../../StartSprint';
                   e.stopPropagation();
                   store.axiosGetSprintCompleteMessage(sprintId).then((res) => {
                     store.setSprintCompleteMessage(res);
-                  }).catch((error) => {
+                  }).catch(() => {
                   });
                   this.setState({
                     finishSprintVisible: true,
@@ -83,16 +79,20 @@ import StartSprint from '../../StartSprint';
                     store.axiosGetWorkSetting(year);
                     store.axiosGetOpenSprintDetail(data.sprintId).then((res) => {
                       store.setOpenSprintDetail(res);
-                    }).catch((error) => {
+                    }).catch(() => {
                     });
                   }
                 }}
               >
                 {'开启冲刺'}
               </p>
-              <Dropdown overlay={this.menu(handleDeleteSprint)} trigger={['click']}>
-                <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
-              </Dropdown>
+              {data.piId
+                ? '' : (
+                  <Dropdown overlay={this.menu(handleDeleteSprint)} trigger={['click']}>
+                    <Icon style={{ cursor: 'pointer', marginLeft: 5 }} type="more_vert" />
+                  </Dropdown>
+                )
+              }
             </div>
           </React.Fragment>
         )}

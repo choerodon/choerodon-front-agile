@@ -99,14 +99,6 @@ const { confirm } = Modal;
     });
   };
 
-  handleFinishSprint = () => {
-
-  }
-
-  handleStartSprint = () => {
-
-  }
-
   handleDeleteSprint = ({ key }) => {
     // const that = this;
     const { data, refresh } = this.props;

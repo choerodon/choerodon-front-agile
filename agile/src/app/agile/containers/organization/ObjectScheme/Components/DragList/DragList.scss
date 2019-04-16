@@ -8,7 +8,7 @@
     border-radius: 2px;
   }
   &-card {
-    background: #FFFFFF;
+    background: #FFF;
     border-radius: 4px;
     width: 480px;
     & .ant-card-body {
@@ -50,6 +50,10 @@
   }
   &-add {
     margin-right: 10px;
+  }
+
+  .ant-popover {
+    width: 350px;
   }
 }
 
