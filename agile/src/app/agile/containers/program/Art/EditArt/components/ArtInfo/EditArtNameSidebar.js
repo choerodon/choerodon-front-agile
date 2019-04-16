@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom';
 import {
   Modal, Form, Input,
 } from 'choerodon-ui';
+import { checkArtName } from '../../../../../../api/ArtApi';
 
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
@@ -25,6 +26,21 @@ class EditArtNameSidebar extends Component {
       onCancel();
     }
 
+    checkArtNameRepeat=(rule, value, callback) => {
+      const { name } = this.props;
+      if (value === name) {
+        callback();
+      } else {
+        checkArtName(value).then((res) => {
+          if (res) {
+            callback('Art名称重复');
+          } else {
+            callback();
+          }
+        });
+      }
+    }
+
     render() {
       const { visible, name, form: { getFieldDecorator } } = this.props;
       return (
@@ -41,7 +57,9 @@ class EditArtNameSidebar extends Component {
             <FormItem style={{ width: 500 }}>
               {
                 getFieldDecorator('ArtName', {
-                  rules: [{ required: true, message: '请输入ART名称' }],
+                  rules: [{ required: true, message: '请输入ART名称' }, {
+                    validator: this.checkArtNameRepeat,
+                  }],
                   initialValue: name,
                 })(
                   <Input maxLength={15} label="ART名称" placeholder="请输入ART名称" />,
