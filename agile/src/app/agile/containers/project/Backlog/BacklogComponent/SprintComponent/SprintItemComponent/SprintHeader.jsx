@@ -153,6 +153,7 @@ const { confirm } = Modal;
                 sprintName={sprintName}
                 toggleSprint={toggleSprint}
                 handleBlurName={this.handleBlurName}
+                data={data}
               />
               <SprintVisibleIssue
                 issueCount={issueCount}
