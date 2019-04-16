@@ -184,8 +184,7 @@ class StartSprint extends Component {
         >
           <p className="c7n-closeSprint-message">
             <span>{!_.isNull(completeMessage) ? completeMessage.issueCount : ''}</span>
-            {' '}
-个问题 将包含在此Sprint中
+            {' 个问题 将包含在此Sprint中'}
           </p>
           <Form style={{ width: 512, marginTop: 24 }}>
             <FormItem>
@@ -196,7 +195,7 @@ class StartSprint extends Component {
                   message: '冲刺名称是必填的',
                 }],
               })(
-                <Input label="Sprint名称" maxLength={30} />,
+                <Input label="Sprint名称" maxLength={30} disabled={!!data.piId} />,
               )}
             </FormItem>
             <FormItem>

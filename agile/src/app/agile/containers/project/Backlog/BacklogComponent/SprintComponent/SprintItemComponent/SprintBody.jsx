@@ -11,7 +11,9 @@ const debounceCallback = deBounce(500);
 @inject('AppState')
 @observer class SprintBody extends Component {
   handleCreateIssue(currentType, inputValue) {
-    const { defaultPriority, AppState, sprintId } = this.props;
+    const {
+      defaultPriority, AppState, sprintId, defaultType,
+    } = this.props;
     // 防抖函数
     debounceCallback(() => {
       const req = {
@@ -20,8 +22,8 @@ const debounceCallback = deBounce(500);
         projectId: AppState.currentMenuType.id,
         sprintId: sprintId * 1,
         summary: inputValue,
-        issueTypeId: currentType.id,
-        typeCode: currentType.typeCode,
+        issueTypeId: currentType ? currentType.id : defaultType.id,
+        typeCode: currentType ? currentType.typeCode : defaultType.typeCode,
         /* eslint-disable */
         ...!isNaN(BacklogStore.getChosenEpic) ? {
           epicId: BacklogStore.getChosenEpic,
@@ -62,7 +64,6 @@ const debounceCallback = deBounce(500);
       expand, versionVisible, epicVisible,
       issueCount, sprintId, EmptyIssueComponent,
       defaultType, issueType, defaultPriority,
-      isCreated,
     } = this.props;
 
     return (

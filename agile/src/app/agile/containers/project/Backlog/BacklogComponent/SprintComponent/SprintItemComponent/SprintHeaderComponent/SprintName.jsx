@@ -13,7 +13,7 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
 
   render() {
     const {
-      expand, sprintName, toggleSprint, type,
+      expand, sprintName, toggleSprint, type, data,
     } = this.props;
     return (
       <div className="c7n-backlog-sprintName">
@@ -30,6 +30,7 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
             type="input"
             defaultValue={sprintName}
             enterOrBlur={this.handleChange}
+            disabled={!!data.piId}
           >
             <span
               style={{ marginLeft: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}

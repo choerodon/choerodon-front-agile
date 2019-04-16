@@ -85,6 +85,7 @@ class DragList extends Component {
   addItem = () => {
     this.setState({
       addItemVisible: true,
+      tempKey: false,
     }, () => {
       const input = document.getElementById('dragList-input');
       if (input) {
@@ -96,6 +97,7 @@ class DragList extends Component {
   editItem = (tempKey) => {
     this.setState({
       tempKey,
+      addItemVisible: false,
     }, () => {
       const input = document.getElementById('dragList-input');
       if (input) {
@@ -356,6 +358,7 @@ class DragList extends Component {
                               onChange={this.onInputChange}
                               underline={false}
                               placeholder={intl.formatMessage({ id: 'dragList.placeholder' })}
+                              maxLength={20}
                             />
                           </span>
                           <Button
