@@ -1,4 +1,5 @@
 import { stores, axios } from 'choerodon-front-boot';
+import { getProjectId, getOrganizationId } from '../common/utils';
 
 const { AppState } = stores;
 
@@ -58,7 +59,7 @@ export function loadComponents() {
 export function loadFeatures(epicId) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(
-    `/agile/v1/projects/${projectId}/issues/feature/select_data?epicId=${epicId}`,
+    `/agile/v1/projects/${projectId}/issues/feature/select_data?epicId=${epicId}&organizationId=${getOrganizationId()}`,
   );
 }
 

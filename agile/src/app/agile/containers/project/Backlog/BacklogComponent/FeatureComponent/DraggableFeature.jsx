@@ -12,7 +12,7 @@ import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 const { AppState } = stores;
 // @inject('AppState')
 @observer
-class DraggableEpic extends Component {
+class DraggableFeature extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,19 +21,11 @@ class DraggableEpic extends Component {
     };
   }
 
-  // shouldComponentUpdate(nextProps, nextState, nextContext) {
-  //   if (JSON.stringify(nextProps) === JSON.stringify(this.props)) {
-  //     return false;
-  //   } else {
-  //     return true;
-  //   }
-  // }
-
   /**
    *menu的点击事件
    *
    * @param {*} e
-   * @memberof EpicItem
+   * @memberof FeatureItem
    */
   clickMenu = (e) => {
     const { item } = this.props;
@@ -53,7 +45,7 @@ class DraggableEpic extends Component {
    *每个epic 右侧下拉选择项的menu
    *
    * @returns
-   * @memberof EpicItem
+   * @memberof FeatureItem
    */
   getmenu = () => {
     const { item, refresh } = this.props;
@@ -76,7 +68,7 @@ class DraggableEpic extends Component {
                     objectVersionNumber: item.objectVersionNumber,
                   };
                   BacklogStore.axiosUpdateIssue(inputData).then((res) => {
-                    BacklogStore.updateEpic(res);
+                    BacklogStore.updateFeature(res);
                     refresh();
                   }).catch((error) => {
                   });
@@ -96,7 +88,7 @@ class DraggableEpic extends Component {
    *epic名称保存事件
    *
    * @param {*} e
-   * @memberof EpicItem
+   * @memberof FeatureItem
    */
   handleSave = (e) => {
     const { item, index, refresh } = this.props;
@@ -121,7 +113,7 @@ class DraggableEpic extends Component {
               epicName: value,
             };
             BacklogStore.axiosUpdateIssue(req).then((res) => {
-              BacklogStore.updateEpic(res);
+              BacklogStore.updateFeature(res);
               refresh();
             }).catch((error) => {
             });
@@ -150,7 +142,7 @@ class DraggableEpic extends Component {
         {...draggableProvided.draggableProps}
         {...draggableProvided.dragHandleProps}
         className={classnames('c7n-backlog-epicItems', {
-          onClickEpic: BacklogStore.getChosenEpic === item.issueId,
+          onClickFeature: BacklogStore.getChosenFeature === item.issueId,
         })}
         role="none"
       >
@@ -164,9 +156,9 @@ class DraggableEpic extends Component {
           />
           <div style={{ width: '100%' }}>
             <div className="c7n-backlog-epicItemsHead">
-              {editName ? (
+              {/* {editName ? (
                 <Input
-                  className="editEpicName"
+                  className="editFeatureName"
                   autoFocus
                   defaultValue={item.epicName}
                   onPressEnter={this.handleSave}
@@ -178,8 +170,8 @@ class DraggableEpic extends Component {
                 />
               ) : (
                 <p>{item.epicName}</p>
-              )}
-              <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
+              )} */}
+              {/* <Dropdown onClick={e => e.stopPropagation()} overlay={this.getmenu()} trigger={['click']}>
                 <Icon
                   style={{
                     width: 12,
@@ -193,7 +185,8 @@ class DraggableEpic extends Component {
                   }}
                   type="arrow_drop_down"
                 />
-              </Dropdown>
+              </Dropdown> */}
+              <p>{item.summary}</p>
             </div>
             <div
               className="c7n-backlog-epicItemProgress"
@@ -215,22 +208,22 @@ class DraggableEpic extends Component {
         </div>
         {expand ? (
           <div style={{ paddingLeft: 12 }}>
-            <p className="c7n-backlog-epicItemDes">
+            {/* <p className="c7n-backlog-epicItemDes">
               {_.isNull(item.summary) ? '没有描述' : item.summary}
-            </p>
+            </p> */}
             <p className="c7n-backlog-epicItemDetail">计数详情</p>
             <div className="c7n-backlog-epicItemParams">
               <div className="c7n-backlog-epicItemParam">
                 <p className="c7n-backlog-epicItemParamKey">问题数</p>
-                <p className="c7n-backlog-epicItemNotStoryPoint">{item.issueCount}</p>
+                <p className="c7n-backlog-epicItemNotStoryPoint">{item.storyCount}</p>
               </div>
               <div className="c7n-backlog-epicItemParam">
                 <p className="c7n-backlog-epicItemParamKey">已完成数</p>
-                <p className="c7n-backlog-epicItemNotStoryPoint">{item.doneIssueCount}</p>
+                <p className="c7n-backlog-epicItemNotStoryPoint">{item.storyCompletedCount}</p>
               </div>
               <div className="c7n-backlog-epicItemParam">
                 <p className="c7n-backlog-epicItemParamKey">未预估数</p>
-                <p className="c7n-backlog-epicItemNotStoryPoint">{item.notEstimate}</p>
+                <p className="c7n-backlog-epicItemNotStoryPoint">{item.unEstimateStoryCount}</p>
               </div>
               <div className="c7n-backlog-epicItemParam">
                 <p className="c7n-backlog-epicItemParamKey">故事点数</p>
@@ -238,7 +231,7 @@ class DraggableEpic extends Component {
                   className="c7n-backlog-epicItemParamValue"
                   style={{ minWidth: 31, color: 'rgba(0,0,0,0.65)' }}
                 >
-                  {item.totalEstimate}
+                  {item.totalStoryPoints}
                 </p>
               </div>
             </div>
@@ -249,4 +242,4 @@ class DraggableEpic extends Component {
   }
 }
 
-export default DraggableEpic;
+export default DraggableFeature;

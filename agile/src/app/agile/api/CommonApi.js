@@ -20,5 +20,5 @@ export function getUser(userId) {
   return axios.get(`iam/v1/projects/${projectId}/users?id=${userId}`);
 }
 export function getProjectsInProgram() {
-  return axios.get(`iam/v1/organizations/${getOrganizationId()}/project_relations/${getProjectId()}`);
+  return axios.get(`iam/v1/organizations/${getOrganizationId()}/projects/${getProjectId()}/program`);
 }

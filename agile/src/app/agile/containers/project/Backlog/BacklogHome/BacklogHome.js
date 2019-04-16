@@ -16,6 +16,8 @@ import SprintItem from '../BacklogComponent/SprintComponent/SprintItem';
 import QuickSearch from '../../../../components/QuickSearch';
 import Injecter from '../../../../components/Injecter';
 import ClearFilter from '../BacklogComponent/SprintComponent/SprintItemComponent/SprintHeaderComponent/ClearAllFilter';
+import { getFeaturesInProject } from '../../../../api/FeatureApi';
+import { getProjectsInProgram } from '../../../../api/CommonApi';
 
 const { AppState } = stores;
 
@@ -28,11 +30,17 @@ class BacklogHome extends Component {
       spinIf: false,
       versionVisible: false,
       epicVisible: false,
+      isInProgram: false,
     };
   }
 
   componentDidMount() {
     this.refresh();
+    getProjectsInProgram().then((res) => {
+      this.setState({
+        isInProgram: Boolean(res),
+      });
+    });
   }
 
   componentWillUnmount() {
@@ -84,6 +92,18 @@ class BacklogHome extends Component {
     });
   };
 
+  /**
+   * 加载特性
+   */
+  loadFeature = () => {
+    const { BacklogStore } = this.props;
+
+    getFeaturesInProject().then((data) => {
+      BacklogStore.setFeatureData(data);
+    }).catch((error3) => {
+    });
+  };
+
   paramConverter = (url) => {
     const reg = /[^?&]([^=&#]+)=([^&#]*)/g;
     const retObj = {};
@@ -105,8 +125,10 @@ class BacklogHome extends Component {
     this.getSprint(isCreate, issue);
     if (BacklogStore.getCurrentVisible === 'version') {
       this.loadVersion();
-    } else {
+    } else if (BacklogStore.getCurrentVisible === 'epic') {
       this.loadEpic();
+    } else {
+      this.loadFeature();
     }
   };
 
@@ -207,6 +229,7 @@ class BacklogHome extends Component {
 
   render() {
     const { BacklogStore, HeaderStore } = this.props;
+    const { isInProgram } = this.state;
     return (
       <Page
         service={[
@@ -280,6 +303,7 @@ class BacklogHome extends Component {
               >
                 {'史诗'}
               </p>
+              {isInProgram && (
               <p
                 style={{
                   marginTop: 12,
@@ -291,6 +315,7 @@ class BacklogHome extends Component {
               >
                 {'特性'}
               </p>
+              )}
             </div>
             <Version
               store={BacklogStore}

@@ -114,10 +114,10 @@ const { Text, Edit } = TextEditToggle;
                 <TextEditToggle
                   formKey="epic"
                   onSubmit={this.updateIssueFeature}
-                  originData={featureId || []}
+                  originData={featureName || []}
                 >
                   <Text>
-                    {featureId ? (
+                    {featureName ? (
                       <div
                         style={{
                           color: epicColor,
