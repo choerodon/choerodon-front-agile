@@ -247,10 +247,12 @@ class BacklogHome extends Component {
             <Icon type="playlist_add icon" />
             <span>创建问题</span>
           </Button>
+          {!isInProgram && (
           <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint}>
             <Icon type="queue" />
             {'创建冲刺'}
           </Button>
+          )}
           <Button
             className="leftBtn2"
             functyp="flat"
