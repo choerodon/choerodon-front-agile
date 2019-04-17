@@ -6,6 +6,7 @@ import {
   Field, FieldAssignee, FieldVersion, FieldStatus, FieldSprint, FieldText,
   FieldReporter, FieldPriority, FieldLabel, FieldFixVersion, FieldPI,
   FieldEpic, FieldDateTime, FieldComponent, FieldTimeTrace, FieldStoryPoint,
+  FieldInput, FieldSummary,
 } from './Field';
 
 const hideFields = ['priority', 'component', 'label', 'fixVersion', 'sprint', 'timeTrace', 'assignee'];
@@ -55,8 +56,9 @@ const hideFields = ['priority', 'component', 'label', 'fixVersion', 'sprint', 't
       case 'acceptanceCritera':
         return (<FieldText {...this.props} field={field} feature />);
       case 'summary':
+        return (<FieldSummary {...this.props} field={field} />);
       case 'epicName':
-        return (<FieldText {...this.props} field={field} />);
+        return (<FieldInput {...this.props} field={field} />);
       case 'estimateTime':
       case 'storyPoints':
         return (<FieldStoryPoint {...this.props} field={field} />);

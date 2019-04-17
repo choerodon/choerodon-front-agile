@@ -175,6 +175,7 @@ let hasPermission;
           ) : null
         }
         <IssueSidebar
+          type="wide"
           store={store}
           reloadIssue={this.loadIssueDetail}
           onUpdate={onUpdate}
@@ -188,6 +189,7 @@ let hasPermission;
             loginUserId={loginUserId}
             hasPermission={hasPermission}
             onUpdate={onUpdate}
+            type="wide"
           />
           <IssueBody
             store={store}

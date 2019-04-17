@@ -241,6 +241,10 @@
     .c7n-content-wrapper {
       padding-left: 26px;
 
+      .upload-button {
+        width: 100%;
+      }
+
       .c7n-property-wrapper {
         width: 100px;
         flex-shrink: 0;
@@ -265,13 +269,6 @@
         flex-wrap: wrap;
         min-width: initial;
       }
-
-      .c7n-value-component-wrapper{
-        .wordLimitTip{
-          
-        }
-      }
-      
     }
   }
 
