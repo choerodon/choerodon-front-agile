@@ -4,7 +4,7 @@ import { observer, inject } from 'mobx-react';
 import { Page, Header, stores } from 'choerodon-front-boot';
 import { DragDropContext } from 'react-beautiful-dnd';
 import {
-  Button, Spin, message, Icon,
+  Button, Spin, Checkbox, Icon,
 } from 'choerodon-ui';
 import Version from '../BacklogComponent/VersionComponent/Version';
 import Epic from '../BacklogComponent/EpicComponent/Epic';
@@ -31,6 +31,7 @@ class BacklogHome extends Component {
       versionVisible: false,
       epicVisible: false,
       isInProgram: false,
+      display: false,
     };
   }
 
@@ -227,9 +228,15 @@ class BacklogHome extends Component {
     }
   };
 
+  onCheckChange = (e) => {
+    this.setState({
+      display: e.target.checked,
+    });
+  };
+
   render() {
     const { BacklogStore, HeaderStore } = this.props;
-    const { isInProgram } = this.state;
+    const { isInProgram, display } = this.state;
     return (
       <Page
         service={[
@@ -264,6 +271,7 @@ class BacklogHome extends Component {
             <Icon type="refresh" />
             {'刷新'}
           </Button>
+          <Checkbox style={{ marginLeft: 20, color: '#3f51b5' }} onChange={this.onCheckChange}>显示未开始冲刺</Checkbox>
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div
@@ -381,6 +389,7 @@ class BacklogHome extends Component {
                   }}
                 >
                   <SprintItem
+                    display={display}
                     epicVisible={BacklogStore.getEpicVisible}
                     versionVisible={BacklogStore.getVersionVisible}
                     onRef={(ref) => {

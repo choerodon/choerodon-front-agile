@@ -27,10 +27,10 @@ const { TextArea } = Input;
     const {
       store, onUpdate, reloadIssue, field, feature,
     } = this.props;
-    const { code } = field;
+    const { fieldCode } = field;
     const issue = store.getIssue;
     const {
-      issueId, objectVersionNumber, [code]: value, featureDTO = {},
+      issueId, objectVersionNumber, [fieldCode]: value, featureDTO = {},
     } = issue;
     const { id, objectVersionNumber: featureObjNum } = featureDTO;
     if (value !== newValue.trim()) {
@@ -43,14 +43,14 @@ const { TextArea } = Input;
             id,
             issueId,
             objectVersionNumber: featureObjNum,
-            [code]: newValue.trim(),
+            [fieldCode]: newValue.trim(),
           },
         };
       } else if (newValue.trim()) {
         obj = {
           issueId,
           objectVersionNumber,
-          [code]: newValue.trim(),
+          [fieldCode]: newValue.trim(),
         };
       }
       if (obj) {
@@ -71,10 +71,10 @@ const { TextArea } = Input;
     const {
       store, field, feature, showTitle = true,
     } = this.props;
-    const { code, name } = field;
+    const { fieldCode, fieldName, textStyle } = field;
     const issue = store.getIssue;
     const { featureDTO = {} } = issue;
-    const value = feature ? featureDTO[code] : issue[code];
+    const value = feature ? featureDTO[fieldCode] : issue[fieldCode];
 
     return (
       <div className="line-start mt-10">
@@ -82,7 +82,7 @@ const { TextArea } = Input;
           ? (
             <div className="c7n-property-wrapper">
               <span className="c7n-property">
-                {`${name}：`}
+                {`${fieldName}：`}
               </span>
             </div>
           ) : null
@@ -92,20 +92,20 @@ const { TextArea } = Input;
             saveRef={(e) => {
               this.TextEditToggle = e;
             }}
-            formKey={code}
+            formKey={fieldCode}
             onSubmit={this.updateIssueField}
             originData={value}
           >
             <Text>
-              <div>
+              <div style={{ ...textStyle, maxWidth: feature ? 200 : '', wordBreak: 'break-all' }}>
                 {value || '无'}
               </div>
             </Text>
             <Edit>
               <TextArea
+                style={{ minWidth: 200 }}
                 autosize
-                maxLength={44}
-                size="small"
+                maxLength={feature ? 100 : 44}
                 onChange={(e) => {
                   this.setState({
                     newValue: e.target.value,

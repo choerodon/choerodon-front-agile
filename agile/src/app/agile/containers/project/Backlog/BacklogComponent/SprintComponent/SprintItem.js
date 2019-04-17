@@ -59,7 +59,7 @@ class SprintItem extends Component {
   };
 
   render() {
-    const { refresh } = this.props;
+    const { refresh, display } = this.props;
     const arr = BacklogStore.getSprintData;
     return (
       <div
@@ -75,7 +75,7 @@ class SprintItem extends Component {
       >
         {
           arr.length
-            ? arr.map(sprintItem => (
+            ? arr.filter(s => display || s.statusCode === 'doing').map(sprintItem => (
               <SprintContainer
                 isCreated={sprintItem.isCreated}
                 refresh={refresh}

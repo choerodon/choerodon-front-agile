@@ -9,3 +9,7 @@ export function getFeatures(pagination, searchDTO) {
 export function getFeaturesInProject() {
   return axios.get(`/agile/v1/projects/${getProjectId()}/issues/features?organizationId=${getOrganizationId()}`);
 }
+
+export function getFeaturesByEpic(epicId) {
+  return axios.get(`/agile/v1/projects/${getProjectId()}/issues/feature/select_data?organizationId=${getOrganizationId()}${epicId ? `&epicId=${epicId}` : ''}`);
+}

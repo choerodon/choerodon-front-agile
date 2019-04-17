@@ -126,6 +126,7 @@ const FormItem = Form.Item;
                         onClick={() => {
                           this.setState({
                             expand: false,
+                            loading: false,
                           });
                         }}
                       >

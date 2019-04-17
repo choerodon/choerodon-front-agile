@@ -55,7 +55,9 @@ class PIItem extends Component {
   };
 
   render() {
-    const { refresh, store, type } = this.props;
+    const {
+      refresh, store, type, display,
+    } = this.props;
     const arr = type === 'pi' ? store.getPiList : store.getSprintData;
     return (
       <div
@@ -71,7 +73,7 @@ class PIItem extends Component {
       >
         {
           arr.length
-            ? arr.map((item, index) => (
+            ? arr.filter(s => display || s.statusCode === 'doing').map((item, index) => (
               <SprintContainer
                 isCreated={item.isCreated}
                 refresh={refresh}

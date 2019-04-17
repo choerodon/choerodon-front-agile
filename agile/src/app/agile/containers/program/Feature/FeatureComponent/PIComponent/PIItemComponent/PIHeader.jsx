@@ -71,10 +71,14 @@ import '../PI.scss';
               <SprintVisibleIssue
                 issueCount={issueCount}
               />
-              <PILastDays
-                startDate={startDate}
-                endDate={endDate}
-              />
+              {data.statusCode === 'doing'
+                ? (
+                  <PILastDays
+                    startDate={startDate}
+                    endDate={endDate}
+                  />
+                ) : null
+              }
             </div>
           </div>
           <div style={{ flex: 9 }}>
