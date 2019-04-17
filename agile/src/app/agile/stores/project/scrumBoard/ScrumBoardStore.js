@@ -689,7 +689,7 @@ class ScrumBoardStore {
   }
 
   axiosAddColumn(categoryCode, data) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column?categoryCode=${categoryCode}`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column?categoryCode=${categoryCode}&applyType=agile`, data);
   }
 
   axiosAddStatus(data) {
