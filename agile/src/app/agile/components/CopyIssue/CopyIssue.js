@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import { stores, axios, Content } from 'choerodon-front-boot';
 import _ from 'lodash';
@@ -18,17 +19,14 @@ class CopyIssue extends Component {
     };
   }
 
-  handleCopyIssue = (applyType = 'agile') => {
-    const { copyFeature } = this.props;
-    if (copyFeature) {
-      applyType = 'program';
-    }
+  handleCopyIssue = () => {
+    const { applyType = 'agile' } = this.props;
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const projectId = AppState.currentMenuType.id;
         const orgId = AppState.currentMenuType.organizationId;
         const {
-          visible, onCancel, onOk, issueId, issueNum, 
+          issueId,
         } = this.props;
         const {
           issueSummary, copySubIssue, copyLinkIssue, sprint, 
@@ -55,7 +53,7 @@ class CopyIssue extends Component {
 
   render() {
     const {
-      visible, onCancel, onOk, issueId, issueNum, issueSummary, 
+      visible, onCancel, issueNum, issueSummary,
     } = this.props;
     const { getFieldDecorator } = this.props.form;
   
@@ -64,7 +62,7 @@ class CopyIssue extends Component {
         className="c7n-copyIssue"
         title={`复制问题${issueNum}`}
         visible={visible || false}
-        onOk={this.handleCopyIssue.bind(this, 'agile')}
+        onOk={this.handleCopyIssue}
         onCancel={onCancel}
         okText="复制"
         cancelText="取消"
