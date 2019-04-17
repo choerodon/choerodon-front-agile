@@ -6,6 +6,10 @@
   flex: 1;
   position: relative;
 
+  .ant-select-selection-selected-value {
+    max-width: 100px;
+  }
+
   p {
     margin-bottom: 0;
   }
@@ -385,6 +389,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
+    width: 310px;
   }
 
   .c7n-avatar {

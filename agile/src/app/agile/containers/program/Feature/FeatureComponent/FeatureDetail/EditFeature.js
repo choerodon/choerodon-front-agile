@@ -86,14 +86,12 @@ let hasPermission;
   };
 
   handleCopyIssue = () => {
-    const { onUpdate, reloadIssue } = this.props;
+    const { onUpdate } = this.props;
     VisibleStore.setCopyIssueShow(false);
     if (onUpdate) {
       onUpdate();
     }
-    if (reloadIssue) {
-      reloadIssue();
-    }
+    this.loadIssueDetail();
   };
 
   render() {

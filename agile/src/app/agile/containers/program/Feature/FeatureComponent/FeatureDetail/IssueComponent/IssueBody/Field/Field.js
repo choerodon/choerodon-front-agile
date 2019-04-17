@@ -209,6 +209,7 @@ const { Text, Edit } = TextEditToggle;
     } else if (field.fieldType === 'text') {
       return (
         <TextArea
+          autosize
           className="fieldWith"
           onChange={e => this.handleChange(e)}
         />

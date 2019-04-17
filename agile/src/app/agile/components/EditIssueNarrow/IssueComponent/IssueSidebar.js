@@ -20,48 +20,24 @@ import './IssueComponent.scss';
     } = this.props;
     const issue = store.getIssue;
     const {
-      issueTypeDTO = {}, issueId, objectVersionNumber, summary, featureDTO = {},
+      issueId, objectVersionNumber, summary,
     } = issue;
-    const { id, objectVersionNumber: featureObjNum } = featureDTO;
-    const { typeCode } = issueTypeDTO;
-    if (typeCode === 'feature') {
-      const issueUpdateDTO = {
-        issueId,
-        objectVersionNumber,
-        featureDTO: {
-          id,
-          issueId,
-          objectVersionNumber: featureObjNum,
-          featureType: type.item.props.value,
-        },
-      };
-      updateIssue(issueUpdateDTO)
-        .then(() => {
-          if (reloadIssue) {
-            reloadIssue();
-          }
-          if (onUpdate) {
-            onUpdate();
-          }
-        });
-    } else {
-      const issueUpdateTypeDTO = {
-        epicName: type.key === 'issue_epic' ? summary : undefined,
-        issueId,
-        objectVersionNumber,
-        typeCode: type.key,
-        issueTypeId: type.item.props.value,
-      };
-      updateIssueType(issueUpdateTypeDTO)
-        .then(() => {
-          if (reloadIssue) {
-            reloadIssue();
-          }
-          if (onUpdate) {
-            onUpdate();
-          }
-        });
-    }
+    const issueUpdateTypeDTO = {
+      epicName: type.key === 'issue_epic' ? summary : undefined,
+      issueId,
+      objectVersionNumber,
+      typeCode: type.key,
+      issueTypeId: type.item.props.value,
+    };
+    updateIssueType(issueUpdateTypeDTO)
+      .then(() => {
+        if (reloadIssue) {
+          reloadIssue(issueId);
+        }
+        if (onUpdate) {
+          onUpdate();
+        }
+      });
   };
 
   render() {
@@ -69,29 +45,15 @@ import './IssueComponent.scss';
       store, type = 'narrow',
     } = this.props;
 
-    let issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
+    const issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
     const issue = store.getIssue;
-    const { issueTypeDTO = {}, featureDTO = {} } = issue;
-    const { typeCode } = issueTypeDTO;
-    const { featureType } = featureDTO || {};
-    let currentIssueType = issueTypeDTO;
-    if (typeCode === 'feature') {
-      issueTypeData = [
-        {
-          ...issueTypeDTO,
-          colour: '#29B6F6',
-          featureType: 'business',
-          name: '特性',
-          id: 'business',
-        }, {
-          ...issueTypeDTO,
-          colour: '#FFCA28',
-          featureType: 'enabler',
-          name: '使能',
-          id: 'enabler',
-        },
-      ];
-      currentIssueType = featureType === 'business' ? issueTypeData[0] : issueTypeData[1];
+    const { issueTypeId, typeCode } = issue;
+    let issueTypes = [];
+    const currentType = issueTypeData.find(t => t.id === issueTypeId);
+    if (currentType) {
+      issueTypes = issueTypeData.filter(t => (t.stateMachineId === currentType.stateMachineId
+        && t.typeCode !== typeCode && t.typeCode !== 'sub_task' && t.typeCode !== 'feature'
+      ));
     }
 
     const typeList = (
@@ -105,7 +67,7 @@ import './IssueComponent.scss';
         onClick={this.handleChangeType}
       >
         {
-          issueTypeData.map(t => (
+          issueTypes.map(t => (
             <Menu.Item key={t.typeCode} value={t.id}>
               <TypeTag
                 style={{ margin: 0 }}
@@ -122,12 +84,12 @@ import './IssueComponent.scss';
       <div className="c7n-nav">
         {/* 转换类型 */}
         <div>
-          <Dropdown overlay={typeList} trigger={['click']} disabled={issueTypeDTO.typeCode === 'sub_task'}>
+          <Dropdown overlay={typeList} trigger={['click']} disabled={typeCode === 'sub_task'}>
             <div
               className={type === 'narrow' ? 'issue-nav-narrow' : 'issue-nav-wide'}
             >
               <TypeTag
-                data={currentIssueType}
+                data={currentType}
               />
               <Icon
                 type="arrow_drop_down"
@@ -137,7 +99,7 @@ import './IssueComponent.scss';
           </Dropdown>
         </div>
         {/* 锚点 */}
-        <IssueNav typeCode={issueTypeDTO.typeCode} />
+        <IssueNav typeCode={typeCode} />
       </div>
     );
   }

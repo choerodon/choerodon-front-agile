@@ -51,9 +51,9 @@ const { Text, Edit } = TextEditToggle;
     } = this.props;
     const issue = store.getIssue;
     const { versionIssueRelDTOList = [], issueId, objectVersionNumber } = issue;
-    const influenceVersions = _.filter(versionIssueRelDTOList, { relationType: 'influence' }) || [];
+    const fixVersions = _.filter(versionIssueRelDTOList, { relationType: 'fix' }) || [];
 
-    if (JSON.stringify(influenceVersions) !== JSON.stringify(newVersion)) {
+    if (JSON.stringify(fixVersions) !== JSON.stringify(newVersion)) {
       const versionList = [];
       let newSign = false;
       newVersion.forEach((version) => {
@@ -81,7 +81,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
           // 新建版本，刷新版本侧边栏
           if (newSign && onCreateVersion) {
@@ -144,8 +144,7 @@ const { Text, Edit } = TextEditToggle;
             <Edit>
               <Select
                 label="未归档版本"
-                value={this.transToArr(fixVersions, 'name', 'array')}
-                mode={hasPermission ? 'tags' : 'multiple'}
+                mode="multiple"
                 loading={selectLoading}
                 tokenSeparators={[',']}
                 getPopupContainer={triggerNode => triggerNode.parentNode}

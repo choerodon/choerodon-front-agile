@@ -50,7 +50,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }

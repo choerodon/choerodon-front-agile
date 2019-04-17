@@ -185,7 +185,7 @@ const STATUS_SHOW = {
               onOk={() => {
                 VisibleStore.setCreateBranchShow(false);
                 if (reloadIssue) {
-                  reloadIssue();
+                  reloadIssue(issueId);
                 }
               }}
               onCancel={() => VisibleStore.setCreateBranchShow(false)}

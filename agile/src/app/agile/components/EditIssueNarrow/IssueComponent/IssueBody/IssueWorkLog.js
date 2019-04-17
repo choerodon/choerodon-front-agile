@@ -18,7 +18,7 @@ import VisibleStore from '../../../../stores/common/visible/VisibleStore';
   }
 
   renderLogs() {
-    const { store, reloadIssue } = this.props;
+    const { store, reloadIssue, hasPermission } = this.props;
     const worklogs = store.getWorkLogs || [];
     return (
       <div>

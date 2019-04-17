@@ -55,7 +55,7 @@ class ScrumBoardStore {
   }
 
   @computed get getWorkLogs() {
-    return this.workLogs;
+    return this.workLogs.slice();
   }
 
   @action setDataLogs(data) {

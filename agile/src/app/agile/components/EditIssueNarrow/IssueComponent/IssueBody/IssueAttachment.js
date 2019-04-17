@@ -32,7 +32,7 @@ import { handleFileUpload } from '../../../../common/utils';
     this.setFileList([...fileList, ...newFile]);
     const { reloadIssue } = this.props;
     if (reloadIssue) {
-      reloadIssue();
+      reloadIssue(issueId);
     }
   };
 
