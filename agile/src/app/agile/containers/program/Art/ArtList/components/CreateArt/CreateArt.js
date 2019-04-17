@@ -94,24 +94,6 @@ class CreateArt extends Component {
               />,
             )}
           </FormItem>
-          {/* PI先默认创建三个 */}
-          {/* <FormItem> */}
-          {/* { */}
-          {/* getFieldDecorator('piCount', { */}
-          {/* rules: [{ */}
-          {/* required: true, */}
-          {/* message: '请选择PI生成个数', */}
-          {/* }], */}
-          {/* })( */}
-          {/* <Select style={{ width: 500, marginBottom: 15 }} label="PI生成个数"> */}
-          {/* { */}
-          {/* [3, 4, 5, 6, 7, 8].map(value => <Option key={value} value={value}>{value}</Option>) */}
-          {/* } */}
-          {/* </Select>, */}
-          {/* ) */}
-          {/* } */}
-          {/* </FormItem> */}
-
         </Form>
       </Sidebar>
     );
