@@ -9,37 +9,6 @@ import { loadBoardData, sortColumn, deleteColumn } from '../../../api/BoardApi';
 const { AppState } = stores;
 
 class KanbanStore {
-  // issue详情
-  @observable commitShow = false;
-
-  @observable copyIssueShow = false;
-
-  @observable assigneeShow = false;
-
-  @action setCommitShow(data) {
-    this.commitShow = data;
-  }
-
-  @computed get getCommitShow() {
-    return this.commitShow;
-  }
-
-  @action setCopyIssueShow(data) {
-    this.copyIssueShow = data;
-  }
-
-  @computed get getCopyIssueShow() {
-    return this.copyIssueShow;
-  }
-
-  @action setAssigneeShow(data) {
-    this.assigneeShow = data;
-  }
-
-  @computed get getAssigneeShow() {
-    return this.assigneeShow;
-  }
-
   // issue
   @observable issue = {};
 
