@@ -20,7 +20,7 @@ const { Text, Edit } = TextEditToggle;
     const { store } = this.props;
     const issue = store.getIssue;
     const { activePi = {} } = issue;
-    const name = activePi ? activePi.name : undefined;
+    const { name, code } = activePi || {};
     return (
       <div className="line-start mt-10">
         <div className="c7n-property-wrapper">
@@ -33,13 +33,13 @@ const { Text, Edit } = TextEditToggle;
             disabled
             // formKey="pi"
             // onSubmit={this.updateIssuePI}
-            originData={name}
+            originData={`${code}-${name}`}
           >
             <Text>
               {
                 name ? (
                   <div>
-                    {name}
+                    {`${code}-${name}`}
                   </div>
                 ) : (
                   <div>
@@ -49,7 +49,7 @@ const { Text, Edit } = TextEditToggle;
               }
             </Text>
             <Edit>
-              <span>{name}</span>
+              <span>{`${code}-${name}`}</span>
             </Edit>
           </TextEditToggle>
         </div>

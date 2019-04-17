@@ -10,33 +10,11 @@ const { AppState } = stores;
 
 class KanbanStore {
   // issue详情
-  @observable createBranchShow = false;
-
   @observable commitShow = false;
-
-  @observable mergeRequestShow = false;
-
-  @observable workLogShow = false;
-
-  @observable createSubTaskShow = false;
 
   @observable copyIssueShow = false;
 
-  @observable transformSubIssueShow = false;
-
-  @observable transformFromSubIssueShow = false;
-
   @observable assigneeShow = false;
-
-  @observable changeParentShow = false;
-
-  @action setCreateBranchShow(data) {
-    this.createBranchShow = data;
-  }
-
-  @computed get getCreateBranchShow() {
-    return this.createBranchShow;
-  }
 
   @action setCommitShow(data) {
     this.commitShow = data;
@@ -44,30 +22,6 @@ class KanbanStore {
 
   @computed get getCommitShow() {
     return this.commitShow;
-  }
-
-  @action setMergeRequestShow(data) {
-    this.mergeRequestShow = data;
-  }
-
-  @computed get getMergeRequestShow() {
-    return this.mergeRequestShow;
-  }
-
-  @action setWorkLogShow(data) {
-    this.workLogShow = data;
-  }
-
-  @computed get getWorkLogShow() {
-    return this.workLogShow;
-  }
-
-  @action setCreateSubTaskShow(data) {
-    this.createSubTaskShow = data;
-  }
-
-  @computed get getCreateSubTaskShow() {
-    return this.createSubTaskShow;
   }
 
   @action setCopyIssueShow(data) {
@@ -78,22 +32,6 @@ class KanbanStore {
     return this.copyIssueShow;
   }
 
-  @action setTransformSubIssueShow(data) {
-    this.transformSubIssueShow = data;
-  }
-
-  @computed get getTransformSubIssueShow() {
-    return this.transformSubIssueShow;
-  }
-
-  @action setTransformFromSubIssueShow(data) {
-    this.transformFromSubIssueShow = data;
-  }
-
-  @computed get getTransformFromSubIssueShow() {
-    return this.transformFromSubIssueShow;
-  }
-
   @action setAssigneeShow(data) {
     this.assigneeShow = data;
   }
@@ -102,36 +40,31 @@ class KanbanStore {
     return this.assigneeShow;
   }
 
-  @action setChangeParentShow(data) {
-    this.changeParentShow = data;
-  }
-
-  @computed get getChangeParentShow() {
-    return this.changeParentShow;
-  }
-
   // issue
   @observable issue = {};
 
-  // issue attribute
-  @observable wiki = {};
+  // fields
+  @observable fields = [];
 
-  @observable workLogs = [];
+  @action setIssueFields(issue, fields) {
+    this.fields = fields;
+    this.issue = issue;
+  }
 
-  @observable dataLogs = [];
-
-  @observable linkIssues = [];
-
-  @observable branches = {};
-
-  @action setIssue(data) {
-    this.currentRae = undefined;
-    this.issue = data;
+  @computed get getFields() {
+    return this.fields;
   }
 
   @computed get getIssue() {
     return this.issue;
   }
+
+  // issue attribute
+  @observable wiki = {};
+
+  @observable dataLogs = [];
+
+  @observable linkIssues = [];
 
   @action setWiki(data) {
     this.wiki = data;
@@ -139,14 +72,6 @@ class KanbanStore {
 
   @computed get getWiki() {
     return this.wiki;
-  }
-
-  @action setWorkLogs(data) {
-    this.workLogs = data;
-  }
-
-  @computed get getWorkLogs() {
-    return this.workLogs;
   }
 
   @action setDataLogs(data) {
@@ -165,20 +90,10 @@ class KanbanStore {
     return this.linkIssues;
   }
 
-  @action setBranches(data) {
-    this.branches = data;
-  }
-
-  @computed get getBranches() {
-    return this.branches;
-  }
-
-  @action initIssueAttribute(wiki, workLogs, dataLogs, linkIssues, branches) {
+  @action initIssueAttribute(wiki, dataLogs, linkIssues) {
     this.wiki = wiki;
-    this.workLogs = workLogs;
     this.dataLogs = dataLogs;
     this.linkIssues = linkIssues;
-    this.branches = branches;
   }
 
   @observable quickSearchObj = {
