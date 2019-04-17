@@ -103,6 +103,7 @@ let hasPermission;
       onCancel,
       style,
       onUpdate,
+      onDeleteIssue,
     } = this.props;
     const {
       issueLoading,
@@ -151,6 +152,7 @@ let hasPermission;
             loginUserId={loginUserId}
             hasPermission={hasPermission}
             onUpdate={onUpdate}
+            onDeleteIssue={onDeleteIssue}
           />
           <IssueBody
             store={store}
@@ -171,6 +173,7 @@ let hasPermission;
               visible={copyIssueShow}
               onCancel={() => VisibleStore.setCopyIssueShow(false)}
               onOk={this.handleCopyIssue.bind(this)}
+              applyType="program"
             />
           ) : null
         }

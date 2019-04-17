@@ -20,11 +20,6 @@ const ArtTable = ({
   onEditArtClick,
 }) => {
   const columns = [{
-    title: '编号',
-    dataIndex: 'code',
-    key: 'code',
-    render: (code, record) => `#${code}-${record.id}`,
-  }, {
     title: '名称',
     dataIndex: 'name',
     key: 'name',

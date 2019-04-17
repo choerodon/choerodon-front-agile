@@ -84,7 +84,7 @@ const { Text, Edit } = TextEditToggle;
         issueId,
         objectVersionNumber,
         featureId: newFeatureId || 0,
-        epicId: (feature && feature.epicId) || 0,
+        epicId: (feature && feature[0].epicId) || 0,
       };
       updateIssue(obj)
         .then(() => {

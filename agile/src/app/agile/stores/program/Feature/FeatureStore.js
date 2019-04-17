@@ -8,26 +8,6 @@ const { AppState } = stores;
 
 @store('FeatureStore')
 class FeatureStore {
-  @observable commitShow = false;
-
-  @observable copyIssueShow = false;
-
-  @action setCommitShow(data) {
-    this.commitShow = data;
-  }
-
-  @computed get getCommitShow() {
-    return this.commitShow;
-  }
-
-  @action setCopyIssueShow(data) {
-    this.copyIssueShow = data;
-  }
-
-  @computed get getCopyIssueShow() {
-    return this.copyIssueShow;
-  }
-
   // issue
   @observable issue = {};
 
@@ -48,10 +28,19 @@ class FeatureStore {
   }
 
   // issue attribute
+  @observable wiki = {};
 
   @observable dataLogs = [];
 
   @observable linkIssues = [];
+
+  @action setWiki(data) {
+    this.wiki = data;
+  }
+
+  @computed get getWiki() {
+    return this.wiki;
+  }
 
   @action setDataLogs(data) {
     this.dataLogs = data;
@@ -69,7 +58,8 @@ class FeatureStore {
     return this.linkIssues;
   }
 
-  @action initIssueAttribute(dataLogs, linkIssues) {
+  @action initIssueAttribute(wiki, dataLogs, linkIssues) {
+    this.wiki = wiki;
     this.dataLogs = dataLogs;
     this.linkIssues = linkIssues;
   }

@@ -6,6 +6,7 @@ import IssueAttachment from './IssueAttachment';
 import IssueCommit from './IssueCommit';
 import IssueLog from './IssueLog';
 import IssueLink from './IssueLink';
+import IssueWiki from './IssueWiki';
 
 @inject('AppState', 'HeaderStore')
 @observer class IssueBody extends Component {
@@ -29,11 +30,12 @@ import IssueLink from './IssueLink';
             <IssueDetail {...this.props} />
             <IssueDes store={store} />
             <IssueAttachment store={store} reloadIssue={reloadIssue} />
+            {issueTypeDTO.typeCode && issueTypeDTO.typeCode === 'issue_epic'
+              ? <IssueWiki store={store} /> : ''
+            }
             <IssueCommit store={store} reloadIssue={reloadIssue} />
             <IssueLog store={store} />
-            {issueTypeDTO.code && ['feature'].indexOf(issueTypeDTO.code) !== -1
-              ? <IssueLink store={store} reloadIssue={reloadIssue} /> : ''
-            }
+            {/* <IssueLink store={store} reloadIssue={reloadIssue} /> */}
           </div>
         </section>
       </div>
