@@ -79,6 +79,14 @@ class ArtForm extends Component {
     });
   }
 
+  checkPiCodePrefix=(rule, value, callback) => {
+    if (/^[a-z]*?$/i.test(value)) {
+      callback();
+    } else {
+      callback('前缀只允许字母');
+    }
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     // eslint-disable-next-line no-shadow
@@ -182,9 +190,11 @@ class ArtForm extends Component {
               {getFieldDecorator('piCodePrefix', {
                 rules: [{
                   required: true, message: '请输入PI前缀',
+                }, {
+                  validator: this.checkPiCodePrefix,
                 }],
               })(
-                <Input style={{ width: 500 }} label="PI前缀" placeholder="请输入PI前缀" />,
+                <Input style={{ width: 500 }} label="PI前缀" maxLength={10} placeholder="请输入PI前缀" />,
               )}
             </FormItem>
             <FormItem>

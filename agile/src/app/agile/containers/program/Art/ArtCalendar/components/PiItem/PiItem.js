@@ -100,6 +100,8 @@ class PiItem extends Component {
       startDate, endDate, code, name, statusCode, sprintCalendarDOList, isLast,
     } = pi;
     const flex = moment.range(startDate, endDate).diff('days');
+    const ipStartDate = sprintCalendarDOList && sprintCalendarDOList.length > 0 ? sprintCalendarDOList[sprintCalendarDOList.length - 1].endDate : moment();
+    const ipEndDate = endDate;
     const ipWeeks = sprintCalendarDOList && sprintCalendarDOList.length > 0 ? moment.range(sprintCalendarDOList[sprintCalendarDOList.length - 1].endDate, endDate).diff('days') : 0;
 
     const style = STATUS[statusCode];
@@ -131,9 +133,27 @@ class PiItem extends Component {
               return <SprintItem borderColor={style.sprintBorder} sprint={sprint} todayIsBetween={todayIsBetween} />;
             })}
             <div className="PiItem-pi-sprint" style={{ flex: ipWeeks, borderColor: style.sprintBorder }}>
-              <div style={{ padding: '0 10px', backgroundColor: '#E5E5E5' }}>
-                {'IP'}
-              </div>
+              <Popover
+                className="PiItem-pi-sprintPopover"
+                getPopupContainer={triggerNode => document.getElementsByClassName('c7nagile-ArtCalendar-scroller')[0]}
+                content={(
+                  <CardTitle
+                    data={{
+                      type: 'sprint',
+                      sprintName: 'IP',
+                      startDate: ipStartDate,
+                      endDate: ipEndDate,
+                    }}
+                    type="sprint"
+                  />
+                )}
+                title={null}
+                placement="bottomLeft"
+              >
+                <div style={{ padding: '0 10px', backgroundColor: '#E5E5E5' }}>
+                  {'IP'}
+                </div>
+              </Popover>
             </div>
           </div>
         </div>
@@ -141,9 +161,9 @@ class PiItem extends Component {
     );
   }
 }
-
+    
 PiItem.propTypes = {
 
 };
-
+        
 export default PiItem;
