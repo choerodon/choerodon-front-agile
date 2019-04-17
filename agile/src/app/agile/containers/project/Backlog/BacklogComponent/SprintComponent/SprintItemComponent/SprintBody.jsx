@@ -5,9 +5,46 @@ import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore'
 import QuickCreateIssue from './QuickCreateIssue';
 import IssueList from './IssueList';
 import { deBounce } from '../Utils';
+import { getFeaturesInProject } from '../../../../../../api/FeatureApi';
 
 const debounceCallback = deBounce(500);
+/**
+   * 加载版本数据
+   */
+const loadVersion = () => {
+  BacklogStore.axiosGetVersion().then((data2) => {
+    const newVersion = [...data2];
+    for (let index = 0, len = newVersion.length; index < len; index += 1) {
+      newVersion[index].expand = false;
+    }
+    BacklogStore.setVersionData(newVersion);
+  }).catch((error) => {
+  });
+};
 
+/**
+   * 加载史诗
+   */
+const loadEpic = () => { 
+  BacklogStore.axiosGetEpic().then((data3) => {
+    const newEpic = [...data3];
+    for (let index = 0, len = newEpic.length; index < len; index += 1) {
+      newEpic[index].expand = false;
+    }
+    BacklogStore.setEpicData(newEpic);
+  }).catch((error3) => {
+  });
+};
+
+/**
+   * 加载特性
+   */
+const loadFeature = () => {
+  getFeaturesInProject().then((data) => {
+    BacklogStore.setFeatureData(data);
+  }).catch((error3) => {
+  });
+};
 @inject('AppState')
 @observer class SprintBody extends Component {
   handleCreateIssue(currentType, inputValue) {
@@ -42,6 +79,13 @@ const debounceCallback = deBounce(500);
           expand: false,
           loading: false,
         });
+        if (BacklogStore.getCurrentVisible === 'version') {
+          loadVersion();
+        } else if (BacklogStore.getCurrentVisible === 'epic') {
+          loadEpic();
+        } else {
+          loadFeature();
+        }
         BacklogStore.axiosGetSprint().then((sprintDate) => {
           BacklogStore.createIssue({
             ...res,
