@@ -60,7 +60,7 @@ const { TextArea } = Input;
               onUpdate();
             }
             if (reloadIssue) {
-              reloadIssue();
+              reloadIssue(issueId);
             }
           });
       }

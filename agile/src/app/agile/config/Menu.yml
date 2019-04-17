@@ -162,7 +162,7 @@
         Routes: /agile/programSetting
         sort: 6
         permission:
-          - 'agile-service.project-info.queryProjectInfoByProjectId'
+          - 'agile-service.project-info.updateProjectInfo'
 
 "platform-reports":
   icon: bar_chart

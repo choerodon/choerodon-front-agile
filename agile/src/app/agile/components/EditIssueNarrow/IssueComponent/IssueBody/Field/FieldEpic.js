@@ -29,6 +29,10 @@ const { Text, Edit } = TextEditToggle;
     this.init();
   }
 
+  componentWillReceiveProps() {
+    this.init();
+  }
+
   init = () => {
     const { store } = this.props;
     const issue = store.getIssue;
@@ -74,7 +78,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }
@@ -97,7 +101,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }

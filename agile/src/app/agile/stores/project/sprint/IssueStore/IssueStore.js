@@ -68,7 +68,7 @@ class SprintCommonStore {
   }
 
   @computed get getWorkLogs() {
-    return this.workLogs;
+    return this.workLogs.slice();
   }
 
   @action setDataLogs(data) {

@@ -18,7 +18,7 @@ const loadVersion = () => {
       newVersion[index].expand = false;
     }
     BacklogStore.setVersionData(newVersion);
-  }).catch((error) => {
+  }).catch(() => {
   });
 };
 
@@ -32,7 +32,7 @@ const loadEpic = () => {
       newEpic[index].expand = false;
     }
     BacklogStore.setEpicData(newEpic);
-  }).catch((error3) => {
+  }).catch(() => {
   });
 };
 
@@ -42,7 +42,7 @@ const loadEpic = () => {
 const loadFeature = () => {
   getFeaturesInProject().then((data) => {
     BacklogStore.setFeatureData(data);
-  }).catch((error3) => {
+  }).catch(() => {
   });
 };
 @inject('AppState')
@@ -80,11 +80,11 @@ const loadFeature = () => {
           loading: false,
         });
         if (BacklogStore.getCurrentVisible === 'version') {
-          this.loadVersion();
+          loadVersion();
         } else if (BacklogStore.getCurrentVisible === 'epic') {
-          this.loadEpic();
+          loadEpic();
         } else if (BacklogStore.getCurrentVisible === 'feature') {
-          this.loadFeature();
+          loadFeature();
         }
         BacklogStore.axiosGetSprint().then((sprintDate) => {
           BacklogStore.createIssue({

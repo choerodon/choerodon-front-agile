@@ -359,7 +359,7 @@ class ColumnPage extends Component {
     return (
 
       <Content
-        description="分栏可以添加、删除、重新排序和重命名。列是基于全局状态和可移动的列与列之间。最小和最大限制可设置为每个已映射的列中。"
+        description="分栏可以添加、删除、重新排序和重命名。列是基于全局状态和可移动的列与列之间。注意：项目群中状态只能拖放到对应类别的列中。"
         style={{
           padding: 0,
           overflow: 'unset',

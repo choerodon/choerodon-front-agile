@@ -59,7 +59,7 @@ const hideFields = ['priority', 'component', 'label', 'fixVersion', 'sprint', 't
         return (<FieldSummary {...this.props} field={field} />);
       case 'epicName':
         return (<FieldInput {...this.props} field={field} />);
-      case 'estimateTime':
+      case 'remainingTime':
       case 'storyPoints':
         return (<FieldStoryPoint {...this.props} field={field} />);
       default:

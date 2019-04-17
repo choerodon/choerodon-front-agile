@@ -38,7 +38,7 @@ import IssueBranch from './IssueBranch';
              }
             <IssueCommit store={store} reloadIssue={reloadIssue} />
             {issueTypeDTO.typeCode && ['sub_task', 'feature'].indexOf(issueTypeDTO.typeCode) === -1
-              ? <IssueWorkLog store={store} reloadIssue={reloadIssue} /> : ''
+              ? <IssueWorkLog {...this.props} store={store} reloadIssue={reloadIssue} /> : ''
              }
             <IssueLog store={store} />
             {issueTypeDTO.typeCode && ['sub_task', 'feature'].indexOf(issueTypeDTO.typeCode) === -1

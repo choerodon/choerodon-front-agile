@@ -13,7 +13,7 @@ const propTypes = {
 const STATUS = {
   todo: '未开启',
   doing: '进行中',
-  stop: '停用',
+  stop: '停止',
 };
 const ArtTable = ({
   dataSource,

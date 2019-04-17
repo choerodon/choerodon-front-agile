@@ -8,7 +8,9 @@
   p {
     margin-bottom: 0;
   }
-
+  .ant-select-selection-selected-value {
+    max-width: 100px;
+  }
   .c7n-nav {
     width: 40px;
     height: 100%;

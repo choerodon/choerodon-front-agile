@@ -61,6 +61,16 @@ class SprintItem extends Component {
   render() {
     const { refresh, display } = this.props;
     const arr = BacklogStore.getSprintData;
+    let displayList = arr.length ? arr : [];
+    if (!display && arr.length) {
+      const start = arr.filter(s => s.statusCode === 'started');
+      if (start.length === 0) {
+        displayList = [arr[0]];
+      } else {
+        displayList = start;
+      }
+    }
+
     return (
       <div
         role="none"
@@ -74,8 +84,8 @@ class SprintItem extends Component {
         }}
       >
         {
-          arr.length
-            ? arr.filter(s => display || s.statusCode === 'started').map(sprintItem => (
+          displayList.length
+            ? displayList.map(sprintItem => (
               <SprintContainer
                 isCreated={sprintItem.isCreated}
                 refresh={refresh}

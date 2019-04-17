@@ -194,7 +194,7 @@ class QuickCreateFeature extends Component {
                 });
               }}
             >
-                创建问题
+                创建特性
             </Button>
           )
         }

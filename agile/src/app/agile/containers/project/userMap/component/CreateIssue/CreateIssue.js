@@ -9,7 +9,7 @@ import clickOutSide from '../../../../../components/CommonComponent/ClickOutSide
 import { createIssue } from '../../../../../api/NewIssueApi';
 
 const { TextArea } = Input;
-const filterIssueTypeCode = ['issue_epic', 'sub_task'];
+const filterIssueTypeCode = ['issue_epic', 'sub_task', 'feature'];
 
 class CreateIssue extends Component {
   constructor(props) {

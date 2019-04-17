@@ -20,6 +20,23 @@ const defaultList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
   }
 
   componentDidMount() {
+    const { store, field } = this.props;
+    const issue = store.getIssue;
+    const { fieldCode } = field;
+    const { [fieldCode]: value } = issue;
+    this.setState({
+      newValue: value ? String(value) : undefined,
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { store, field } = nextProps;
+    const issue = store.getIssue;
+    const { fieldCode } = field;
+    const { [fieldCode]: value } = issue;
+    this.setState({
+      newValue: value ? String(value) : undefined,
+    });
   }
 
   handleChange = (value) => {
@@ -67,7 +84,7 @@ const defaultList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }

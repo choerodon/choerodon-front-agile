@@ -124,7 +124,6 @@ class BacklogHome extends Component {
     const { BacklogStore } = this.props;
     BacklogStore.setSpinIf(true);
     this.getSprint(isCreate, issue);
-    console.log(BacklogStore.getCurrentVisible);
     if (BacklogStore.getCurrentVisible === 'version') {
       this.loadVersion();
     } else if (BacklogStore.getCurrentVisible === 'epic') {

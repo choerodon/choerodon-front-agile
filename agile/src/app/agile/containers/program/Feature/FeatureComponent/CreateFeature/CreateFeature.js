@@ -14,6 +14,7 @@ import {
   loadPriorities, loadProgramEpics, loadIssueTypes, createIssue,
   createFieldValue, getFields,
 } from '../../../../../api/NewIssueApi';
+import { getPIList } from '../../../../../api/PIApi';
 import { beforeTextUpload, handleFileUpload } from '../../../../../common/utils';
 import FieldBlank from './FieldBlank';
 import './CreateFeature.scss';
@@ -39,6 +40,7 @@ class CreateFeature extends Component {
       fileList: [],
       selectLoading: false,
       loading: true,
+      PIList: [],
     };
   }
 
@@ -55,6 +57,11 @@ class CreateFeature extends Component {
       });
     });
     this.loadFields();
+    getPIList().then((res) => {
+      this.setState({
+        PIList: res,
+      });
+    });
   }
 
   loadFields = () => {
@@ -87,6 +94,7 @@ class CreateFeature extends Component {
           priorityId: defaultPriority.id,
           priorityCode: `priority-${defaultPriority.id}`,
           epicId: values.epicId || 0,
+          piId: values.pi || 0,
           parentIssueId: 0,
           storyPoints,
           featureDTO: {
@@ -346,6 +354,7 @@ class CreateFeature extends Component {
     } else if (field.fieldType === 'text') {
       return (
         <TextArea
+          autosize
           label={fieldName}
           className="fieldWith"
         />
@@ -367,7 +376,7 @@ class CreateFeature extends Component {
       defaultValue, fieldName, fieldCode, fieldType, required,
     } = field;
     const {
-      originEpics, delta, selectLoading,
+      originEpics, delta, selectLoading, PIList,
       selectedIssueType, storyPoints, fullEdit,
     } = this.state;
 
@@ -539,6 +548,24 @@ class CreateFeature extends Component {
             {getFieldDecorator('acceptanceCritera', {
             })(
               <Input label="验收标准" placeholder="请输入验收标准" maxLength={255} />,
+            )}
+          </FormItem>
+        );
+      case 'pi':
+        return (
+          <FormItem label="PI" style={{ width: 520, marginBottom: 20 }}>
+            {getFieldDecorator('pi')(
+              <Select
+                label="PI"
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+              >
+                {PIList.map(pi => (
+                  <Option key={pi.id} value={pi.id}>
+                    {pi.name}
+                  </Option>
+                ))
+                }
+              </Select>,
             )}
           </FormItem>
         );
