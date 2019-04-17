@@ -147,9 +147,10 @@ class FilterManage extends Component {
                                   initialValue: filter.name,
                                 })(
                                   <Input
+                                    autoFocus
                                     className="c7n-filterNameInput"
                                     maxLength={10}
-                                    onBlur={this.handleFNIBlurOrPressEnter.bind(this, filter, `filterName_${filter.filterId}`)}
+                                    // onBlur={this.handleFNIBlurOrPressEnter.bind(this, filter, `filterName_${filter.filterId}`)}
                                     onPressEnter={this.handleFNIBlurOrPressEnter.bind(this, filter, `filterName_${filter.filterId}`)}
                                   />,
                                 )}

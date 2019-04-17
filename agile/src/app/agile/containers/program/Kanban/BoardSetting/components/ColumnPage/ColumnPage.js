@@ -40,6 +40,18 @@ class ColumnPage extends Component {
     }
   }
 
+  // judgeCanDrag=(result) => {
+  //   const groupedColumns = groupBy(KanbanStore.getBoardData, 'categoryCode');
+  //   const { destination: { droppableId }, draggableId } = result;
+  //   const statusCode = draggableId.split(',')[2];
+  //   const sameStatusColumn = groupedColumns[statusCode];
+  //   const isOnlyOne = groupedColumns[statusCode].length === 1;
+  //   if (isOnlyOne) {
+  //     return '只剩一个状态';
+  //   }
+  //   return null;
+  // }
+
   handleDragEnd(result) {
     KanbanStore.setCurrentDrag(null);
     if (!result.destination) {
@@ -69,9 +81,16 @@ class ColumnPage extends Component {
         KanbanStore.setBoardData(originState2);
       });
     } else {
+      // const message = this.judgeCanDrag(result);
+      // if (message) {
+      //   Choerodon.prompt(message);
+      //   return;
+      // }
       // 移动状态
       const originState = JSON.parse(JSON.stringify(KanbanStore.getBoardData));
       const newState = JSON.parse(JSON.stringify(KanbanStore.getBoardData));
+
+
       let draggableData = {};
       let columnIndex;
       for (let index = 0, len = newState.length; index < len; index += 1) {

@@ -103,7 +103,7 @@ class ArtForm extends Component {
                   required: true,
                   message: '请选择日期!',
                 }],
-                normalize: value => moment(value),
+                normalize: value => value && moment(value),
               })(
                 <DatePicker
                   allowClear={false}
