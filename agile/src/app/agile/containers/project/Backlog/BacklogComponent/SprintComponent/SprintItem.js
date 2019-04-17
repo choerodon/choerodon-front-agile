@@ -75,7 +75,7 @@ class SprintItem extends Component {
       >
         {
           arr.length
-            ? arr.filter(s => display || s.statusCode === 'doing').map(sprintItem => (
+            ? arr.filter(s => display || s.statusCode === 'started').map(sprintItem => (
               <SprintContainer
                 isCreated={sprintItem.isCreated}
                 refresh={refresh}

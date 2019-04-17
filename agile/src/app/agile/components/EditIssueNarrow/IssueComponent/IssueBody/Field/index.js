@@ -14,3 +14,5 @@ export FieldTimeTrace from './FieldTimeTrace';
 export FieldVersion from './FieldVersion';
 export FieldPI from './FieldPI';
 export FieldText from './FieldText';
+export FieldSummary from './FieldSummary';
+export FieldInput from './FieldInput';

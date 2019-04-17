@@ -44,7 +44,7 @@ import IssueBranch from './IssueBranch';
             {issueTypeDTO.typeCode && ['sub_task', 'feature'].indexOf(issueTypeDTO.typeCode) === -1
               ? <SubTask store={store} reloadIssue={reloadIssue} /> : ''
              }
-            {issueTypeDTO.typeCode && ['feature'].indexOf(issueTypeDTO.typeCode) === -1
+            {issueTypeDTO.typeCode && ['feature', 'sub_task'].indexOf(issueTypeDTO.typeCode) === -1
               ? <IssueLink store={store} reloadIssue={reloadIssue} /> : ''
              }
             {issueTypeDTO.typeCode && ['feature'].indexOf(issueTypeDTO.typeCode) === -1

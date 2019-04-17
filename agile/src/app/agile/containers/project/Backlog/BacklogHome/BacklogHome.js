@@ -129,7 +129,7 @@ class BacklogHome extends Component {
       this.loadVersion();
     } else if (BacklogStore.getCurrentVisible === 'epic') {
       this.loadEpic();
-    } else {
+    } else if (BacklogStore.getCurrentVisible === 'feature') {
       this.loadFeature();
     }
   };
@@ -237,6 +237,7 @@ class BacklogHome extends Component {
 
   render() {
     const { BacklogStore, HeaderStore } = this.props;
+    const arr = BacklogStore.getSprintData;
     const { isInProgram, display } = this.state;
     return (
       <Page
@@ -272,7 +273,13 @@ class BacklogHome extends Component {
             <Icon type="refresh" />
             {'刷新'}
           </Button>
-          <Checkbox style={{ marginLeft: 20, color: '#3f51b5' }} onChange={this.onCheckChange}>显示未开始冲刺</Checkbox>
+          <Checkbox
+            disabled={!arr.length}
+            style={{ marginLeft: 20, color: '#3f51b5' }}
+            onChange={this.onCheckChange}
+          >
+            显示未开始冲刺
+          </Checkbox>
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div

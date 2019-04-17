@@ -12,9 +12,11 @@ import { withRouter } from 'react-router-dom';
 
   handleClickParent = () => {
     const {
-      parentIssueId, resetIssue,
+      parentIssueId, resetIssue, reloadIssue,
     } = this.props;
-    this.firstLoadIssue(parentIssueId);
+    if (reloadIssue) {
+      reloadIssue(parentIssueId);
+    }
     if (resetIssue) {
       resetIssue(parentIssueId);
     }
@@ -22,15 +24,15 @@ import { withRouter } from 'react-router-dom';
 
   handleClickIssueNum = () => {
     const {
-      history, urlParams, backUrl,
+      history, urlParams, backUrl, issueNum, issueId,
     } = this.props;
-    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${origin.issueNum}&paramIssueId=${origin.issueId}&paramUrl=${backUrl || 'backlog'}`);
+    history.push(`/agile/issue?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}&paramName=${issueNum}&paramIssueId=${issueId}&paramUrl=${backUrl || 'backlog'}`);
     return false;
   };
 
   render() {
     const {
-      typeCode, parentIssueNum, issueNum,
+      typeCode, parentIssueNum, issueNum, type,
     } = this.props;
 
     return (
@@ -50,7 +52,7 @@ import { withRouter } from 'react-router-dom';
           ) : null
         }
         {
-          typeCode === 'sub_task' ? (
+          type === 'wide' || typeCode === 'sub_task' ? (
             <span>
               {issueNum}
             </span>

@@ -66,7 +66,7 @@ import './IssueComponent.scss';
 
   render() {
     const {
-      store,
+      store, type = 'narrow',
     } = this.props;
 
     let issueTypeData = store.getIssueTypes ? store.getIssueTypes : [];
@@ -124,13 +124,7 @@ import './IssueComponent.scss';
         <div>
           <Dropdown overlay={typeList} trigger={['click']} disabled={issueTypeDTO.typeCode === 'sub_task'}>
             <div
-              style={{
-                height: 50,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              className={type === 'narrow' ? 'issue-nav-narrow' : 'issue-nav-wide'}
             >
               <TypeTag
                 data={currentIssueType}

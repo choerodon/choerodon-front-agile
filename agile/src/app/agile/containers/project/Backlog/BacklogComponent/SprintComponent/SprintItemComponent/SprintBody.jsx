@@ -80,11 +80,11 @@ const loadFeature = () => {
           loading: false,
         });
         if (BacklogStore.getCurrentVisible === 'version') {
-          loadVersion();
+          this.loadVersion();
         } else if (BacklogStore.getCurrentVisible === 'epic') {
-          loadEpic();
-        } else {
-          loadFeature();
+          this.loadEpic();
+        } else if (BacklogStore.getCurrentVisible === 'feature') {
+          this.loadFeature();
         }
         BacklogStore.axiosGetSprint().then((sprintDate) => {
           BacklogStore.createIssue({

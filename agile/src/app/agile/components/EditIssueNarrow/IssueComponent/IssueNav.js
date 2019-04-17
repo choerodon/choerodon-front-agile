@@ -84,9 +84,13 @@ let sign = true;
   }
 
   isInLook = (ele) => {
-    const a = ele.offsetTop;
-    const target = document.getElementById('scroll-area');
-    return a + ele.offsetHeight > target.scrollTop;
+    if (ele) {
+      const a = ele.offsetTop;
+      const target = document.getElementById('scroll-area');
+      return a + ele.offsetHeight > target.scrollTop;
+    } else {
+      return false;
+    }
   };
 
   getCurrentNav = () => {
