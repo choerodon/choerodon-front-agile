@@ -124,7 +124,7 @@ class WYSIWYGEditor extends Component {
             theme="snow"
             modules={modules}
             formats={formats}
-            style={{ height: editHeight }}
+            style={{ height: editHeight, width: '100%' }}
             placeholder={placeholder || '描述'}
             defaultValue={value}
             onChange={this.handleChange}
