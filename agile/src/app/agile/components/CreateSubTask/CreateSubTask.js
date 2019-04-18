@@ -124,7 +124,7 @@ class CreateSubIssue extends Component {
       store, form, issueId,
     } = this.props;
     const { originLabels, originFixVersions } = this.state;
-    form.validateFields((err, values) => {
+    form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const subIssueType = store.getIssueTypes && store.getIssueTypes.find(t => t.typeCode === 'sub_task');
         const exitLabels = originLabels;
@@ -582,7 +582,7 @@ class CreateSubIssue extends Component {
         );
       case 'epicName':
         return '';
-      case 'estimateTime':
+      case 'remainingTime':
         return (
           <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
             <Select

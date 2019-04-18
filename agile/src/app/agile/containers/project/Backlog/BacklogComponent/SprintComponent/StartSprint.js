@@ -153,6 +153,7 @@ class StartSprint extends Component {
       startDate,
       endDate,
     } = this.state;
+    const { piId, startDate: start, endDate: end } = data;
     const {
       saturdayWork,
       sundayWork,
@@ -205,95 +206,143 @@ class StartSprint extends Component {
                 <TextArea label="目标" autoSize maxLength={30} />,
               )}
             </FormItem>
-            <FormItem>
-              {getFieldDecorator('duration', {
-                initialValue: '0',
-              })(
-                <Select
-                  label="周期"
-                  onChange={(value) => {
-                    if (parseInt(value, 10) > 0) {
-                      if (!getFieldValue('startDate')) {
+            {!piId
+              ? (
+                <FormItem>
+                  {getFieldDecorator('duration', {
+                    initialValue: '0',
+                  })(
+                    <Select
+                      label="周期"
+                      onChange={(value) => {
+                        if (parseInt(value, 10) > 0) {
+                          if (!getFieldValue('startDate')) {
+                            setFieldsValue({
+                              startDate: moment(),
+                            });
+                            this.setState({
+                              startDate: moment(),
+                            });
+                          }
+                          setFieldsValue({
+                            endDate: moment(getFieldValue('startDate')).add(parseInt(value, 10), 'w'),
+                          });
+                          this.setState({
+                            endDate: moment(getFieldValue('startDate')).add(parseInt(value, 10), 'w'),
+                          });
+                        }
+                      }}
+                    >
+                      <Option value="0">自定义</Option>
+                      <Option value="1">1周</Option>
+                      <Option value="2">2周</Option>
+                      <Option value="4">4周</Option>
+                    </Select>,
+                  )}
+                </FormItem>
+              ) : ''
+            }
+            {!piId
+              ? (
+                <FormItem>
+                  {getFieldDecorator('startDate', {
+                    rules: [{
+                      required: true,
+                      message: '开始日期是必填的',
+                    }],
+                  })(
+                    <DatePicker
+                      style={{ width: '100%' }}
+                      label="开始日期"
+                      showTime
+                      format="YYYY-MM-DD HH:mm:ss"
+                      disabledDate={endDate
+                        ? current => current > moment(endDate) || current < moment().subtract(1, 'days') : current => current < moment().subtract(1, 'days')}
+                      onChange={(date, dateString) => {
                         setFieldsValue({
-                          startDate: moment(),
+                          startDate: date,
                         });
                         this.setState({
-                          startDate: moment(),
+                          startDate: date,
                         });
-                      }
-                      setFieldsValue({
-                        endDate: moment(getFieldValue('startDate')).add(parseInt(value, 10), 'w'),
-                      });
-                      this.setState({
-                        endDate: moment(getFieldValue('startDate')).add(parseInt(value, 10), 'w'),
-                      });
-                    }
-                  }}
-                >
-                  <Option value="0">自定义</Option>
-                  <Option value="1">1周</Option>
-                  <Option value="2">2周</Option>
-                  <Option value="4">4周</Option>
-                </Select>,
-              )}
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator('startDate', {
-                rules: [{
-                  required: true,
-                  message: '开始日期是必填的',
-                }],
-              })(
-                <DatePicker
-                  style={{ width: '100%' }}
-                  label="开始日期"
-                  showTime
-                  format="YYYY-MM-DD HH:mm:ss"
-                  disabledDate={endDate
-                    ? current => current > moment(endDate) || current < moment().subtract(1, 'days') : current => current < moment().subtract(1, 'days')}
-                  onChange={(date, dateString) => {
-                    setFieldsValue({
-                      startDate: date,
-                    });
-                    this.setState({
-                      startDate: date,
-                    });
-                    if (parseInt(getFieldValue('duration'), 10) > 0) {
-                      setFieldsValue({
-                        endDate: moment(getFieldValue('startDate')).add(parseInt(getFieldValue('duration'), 10), 'w'),
-                      });
-                      this.setState({
-                        endDate: moment(getFieldValue('startDate')).add(parseInt(getFieldValue('duration'), 10), 'w'),
-                      });
-                    }
-                  }}
-                />,
-              )}
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator('endDate', {
-                rules: [{
-                  required: true,
-                  message: '结束日期是必填的',
-                }],
-              })(
-                <DatePicker
-                  style={{ width: '100%' }}
-                  label="结束日期"
-                  format="YYYY-MM-DD HH:mm:ss"
-                  disabled={parseInt(getFieldValue('duration'), 10) > 0}
-                  showTime
-                  onChange={(date) => {
-                    this.setState({
-                      endDate: date,
-                    });
-                  }}
-                  disabledDate={startDate
-                    ? current => current < moment(startDate) || current < moment().subtract(1, 'days')
-                    : current => current < moment().subtract(1, 'days')}
-                />,
-              )}
-            </FormItem>
+                        if (parseInt(getFieldValue('duration'), 10) > 0) {
+                          setFieldsValue({
+                            endDate: moment(getFieldValue('startDate')).add(parseInt(getFieldValue('duration'), 10), 'w'),
+                          });
+                          this.setState({
+                            endDate: moment(getFieldValue('startDate')).add(parseInt(getFieldValue('duration'), 10), 'w'),
+                          });
+                        }
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ) : (
+                <FormItem>
+                  {getFieldDecorator('startDate', {
+                    rules: [{
+                      required: true,
+                      message: '开始日期是必填的',
+                    }],
+                    initialValue: moment(start),
+                  })(
+                    <DatePicker
+                      style={{ width: '100%' }}
+                      label="开始日期"
+                      showTime
+                      format="YYYY-MM-DD HH:mm:ss"
+                      disabled
+                    />,
+                  )}
+                </FormItem>
+              )
+            }
+            {!piId
+              ? (
+                <FormItem>
+                  {getFieldDecorator('endDate', {
+                    rules: [{
+                      required: true,
+                      message: '结束日期是必填的',
+                    }],
+                  })(
+                    <DatePicker
+                      style={{ width: '100%' }}
+                      label="结束日期"
+                      format="YYYY-MM-DD HH:mm:ss"
+                      disabled={parseInt(getFieldValue('duration'), 10) > 0}
+                      showTime
+                      onChange={(date) => {
+                        this.setState({
+                          endDate: date,
+                        });
+                      }}
+                      disabledDate={startDate
+                        ? current => current < moment(startDate) || current < moment().subtract(1, 'days')
+                        : current => current < moment().subtract(1, 'days')}
+                    />,
+                  )}
+                </FormItem>
+              ) : (
+                <FormItem>
+                  {getFieldDecorator('endDate', {
+                    rules: [{
+                      required: true,
+                      message: '结束日期是必填的',
+                    }],
+                    initialValue: moment(end),
+                  })(
+                    <DatePicker
+                      style={{ width: '100%' }}
+                      label="结束日期"
+                      format="YYYY-MM-DD HH:mm:ss"
+                      disabled
+                      showTime
+                    />,
+                  )}
+                </FormItem>
+              )
+            }
           </Form>
           {startDate && endDate
             ? (
@@ -323,7 +372,34 @@ class StartSprint extends Component {
                   ) : null
               }
               </div>
-            ) : null
+            ) : (
+              <div>
+                <div style={{ marginBottom: 20 }}>
+                  <span style={{ marginRight: 20 }}>
+                    {`此Sprint中有${this.getWorkDays(start, end)}个工作日`}
+                  </span>
+                  <Icon type="settings" style={{ verticalAlign: 'top' }} />
+                  <a onClick={this.showWorkCalendar} role="none">
+                    设置当前冲刺工作日
+                  </a>
+                </div>
+                {showCalendar
+                  ? (
+                    <WorkCalendar
+                      startDate={moment(start).format(format)}
+                      endDate={moment(end).format(format)}
+                      mode="BacklogComponent"
+                      saturdayWork={saturdayWork}
+                      sundayWork={sundayWork}
+                      useHoliday={useHoliday}
+                      selectDays={selectDays}
+                      holidayRefs={holidayRefs}
+                      onWorkDateChange={this.onWorkDateChange}
+                    />
+                  ) : null
+                }
+              </div>
+            )
           }
         </Content>
       </Sidebar>
