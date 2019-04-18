@@ -561,7 +561,7 @@ class CreateFeature extends Component {
               >
                 {PIList.map(pi => (
                   <Option key={pi.id} value={pi.id}>
-                    {pi.name}
+                    {`${pi.code}-${pi.name}`}
                   </Option>
                 ))
                 }
