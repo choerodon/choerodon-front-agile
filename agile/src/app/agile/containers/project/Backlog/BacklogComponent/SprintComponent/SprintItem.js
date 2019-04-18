@@ -62,7 +62,7 @@ class SprintItem extends Component {
     const { refresh, display, isInProgram } = this.props;
     const arr = BacklogStore.getSprintData;
     // 冲刺按id正序，活跃冲刺排在最上面
-    let displayList = arr.length ? arr.sort((a, b) => a.sprintId < b.sprintId) : [];
+    let displayList = arr.length ? arr.sort((a, b) => a.sprintId - b.sprintId) : [];
     displayList = [
       ...displayList.filter(item => item.statusCode === 'started'),
       ...displayList.filter(item => item.statusCode !== 'started'),
@@ -75,7 +75,7 @@ class SprintItem extends Component {
         displayList = start;
       }
     }
-    debugger;
+
     return (
       <div
         role="none"
