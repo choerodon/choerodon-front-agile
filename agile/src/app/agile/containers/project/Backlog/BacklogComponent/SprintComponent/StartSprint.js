@@ -344,7 +344,7 @@ class StartSprint extends Component {
               )
             }
           </Form>
-          {startDate && endDate
+          {!piId && startDate && endDate
             ? (
               <div>
                 <div style={{ marginBottom: 20 }}>
@@ -372,7 +372,10 @@ class StartSprint extends Component {
                   ) : null
               }
               </div>
-            ) : (
+            ) : ''
+          }
+          {piId
+            ? (
               <div>
                 <div style={{ marginBottom: 20 }}>
                   <span style={{ marginRight: 20 }}>
@@ -399,7 +402,7 @@ class StartSprint extends Component {
                   ) : null
                 }
               </div>
-            )
+            ) : ''
           }
         </Content>
       </Sidebar>
