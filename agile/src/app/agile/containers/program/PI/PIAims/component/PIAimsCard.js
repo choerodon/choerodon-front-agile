@@ -39,7 +39,7 @@ const PIAimsCard = ({
                       display: 'flex', flexShrink: 0, marginTop: 8, marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: `${aimsCategory === 'program' ? '#4D90FE' : '#00BFA5'}`, 
                     }}
                     />
-                    {item.name}
+                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>                    
                   </td>
                   <td valign="top">{item.planBv ? item.planBv : '-'}</td>
                   <td valign="top">{item.actualBv ? item.actualBv : '-'}</td>
@@ -71,7 +71,7 @@ const PIAimsCard = ({
                               display: 'flex', flexShrink: 0, marginTop: 8, marginRight: 10, width: 5, height: 5, borderRadius: '50%', background: '#9B9B9B', 
                             }}
                             />
-                            {item.name}
+                            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div> 
                           </td>
                           <td valign="top">{item.planBv ? item.planBv : '-'}</td>
                           <td valign="top">{item.actualBv ? item.actualBv : '-'}</td>

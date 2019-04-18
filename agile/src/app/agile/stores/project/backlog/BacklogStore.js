@@ -1023,6 +1023,7 @@ class BacklogStore {
     if (moreChecked.length) {
       this.filterSelected = true;
     }
+    // 如果一个都没选，则不显示清空
     if (!onlyMeChecked && !onlyStoryChecked && !moreChecked.length) {
       this.filterSelected = false;
     }
