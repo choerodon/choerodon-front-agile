@@ -196,7 +196,7 @@ class CreateBranch extends Component {
                     })
                       .then((res) => {
                         this.setState({
-                          tags: res.content,
+                          tags: res.content || [],
                           tagsSize: res.numberOfElements,
                           // tagsShowMore: res.totalPages !== 1,
                           tagsObj: res,
@@ -231,7 +231,7 @@ class CreateBranch extends Component {
                               })
                                 .then((res) => {
                                   this.setState({
-                                    branchs: res.content,
+                                    branchs: res.content || [],
                                     branchsSize: res.numberOfElements,
                                     // branchsShowMore: res.totalPages !== 1,
                                     branchsObj: res,
@@ -272,7 +272,7 @@ class CreateBranch extends Component {
                               })
                                 .then((res) => {
                                   this.setState({
-                                    tags: res.content,
+                                    tags: res.content || [],
                                     tagsSize: res.numberOfElements,
                                     // tagsShowMore: res.totalPages !== 1,
                                     tagsObj: res,
