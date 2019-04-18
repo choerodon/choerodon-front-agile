@@ -8,7 +8,7 @@ import './QuickSearch.scss';
 import BacklogStore from '../../stores/project/backlog/BacklogStore';
 
 const { Option, OptGroup } = Select;
-const ee = new EventEmitter();
+const QuickSearchEvent = new EventEmitter();
 @inject('AppState')
 @observer
 class QuickSearch extends Component {
@@ -27,7 +27,8 @@ class QuickSearch extends Component {
    * 2. 请求项目经办人信息
    */
   componentDidMount() {
-    ee.addListener('clearQuickSearchSelect', this.clearQuickSearch);
+    QuickSearchEvent.addListener('clearQuickSearchSelect', this.clearQuickSearch);
+    QuickSearchEvent.addListener('setSelectQuickSearch', this.setSelectQuickSearch);
     const { AppState } = this.props;
     const axiosGetFilter = axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all`, {
       contents: [
@@ -106,6 +107,12 @@ class QuickSearch extends Component {
     });
   }
 
+  setSelectQuickSearch=(selectQuickSearch) => {
+    this.setState({
+      selectQuickSearch,
+    });
+    this.handleQuickSearchChange(selectQuickSearch);
+  }
 
   render() {
     // 防抖函数
@@ -119,6 +126,7 @@ class QuickSearch extends Component {
       quickSearchArray,
       selectQuickSearch,
     } = this.state;
+
     // showRealQuickSearch 用于在待办事项中销毁组件
     // 具体查看 Backlog/BacklogComponent/SprintComponent/SprintItem.js 中 clearFilter 方法
     return (
@@ -211,5 +219,5 @@ class QuickSearch extends Component {
   }
 }
 
-export { ee };
+export { QuickSearchEvent };
 export default QuickSearch;

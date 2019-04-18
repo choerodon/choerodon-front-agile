@@ -13,7 +13,7 @@ import IssueDetail from '../BacklogComponent/IssueDetailComponent/IssueDetail';
 import CreateIssue from '../../../../components/CreateIssueNew';
 import './BacklogHome.scss';
 import SprintItem from '../BacklogComponent/SprintComponent/SprintItem';
-import QuickSearch from '../../../../components/QuickSearch';
+import QuickSearch, { QuickSearchEvent } from '../../../../components/QuickSearch';
 import Injecter from '../../../../components/Injecter';
 import ClearFilter from '../BacklogComponent/SprintComponent/SprintItemComponent/SprintHeaderComponent/ClearAllFilter';
 import { getFeaturesInProject } from '../../../../api/FeatureApi';
@@ -224,6 +224,9 @@ class BacklogHome extends Component {
     if (BacklogStore.getCurrentVisible === type) {
       BacklogStore.toggleVisible(null);
     } else {
+      if (type === 'feature') {
+        QuickSearchEvent.emit('setSelectQuickSearch', [{ key: -2, label: '仅故事' }]);   
+      }
       BacklogStore.toggleVisible(type);
     }
   };
