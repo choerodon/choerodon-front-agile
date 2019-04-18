@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+/*eslint-disable */
+import React, { Component, Fragment } from 'react';
 import {
-  Modal, Radio, Select, message, Icon, 
+  Modal, Radio, Select, message, Icon,
 } from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
 
-const confirm = Modal.confirm;
+const { confirm } = Modal;
 const RadioGroup = Radio.Group;
 const { Option } = Select;
 const { AppState } = stores;
@@ -18,7 +19,6 @@ class DeleteLink extends Component {
       relatedComponentId: undefined,
       originComponents: [],
       loading: false,
-      confirmShow: false,
     };
   }
 
@@ -49,7 +49,7 @@ class DeleteLink extends Component {
       });
   }
 
-  deleteComponent() {
+  deleteComponent = () => {
     let relatedComponentId;
     if (this.state.radio === 1) {
       relatedComponentId = 0;
@@ -87,62 +87,63 @@ class DeleteLink extends Component {
   }
 
   renderDelete() {
-    const radioStyle = {
-      display: 'block',
-      height: '20px',
-      lineHeight: '20px',
-      fontSize: '12px',
-    };
+    const { radio, relatedComponentId, originComponents } = this.state;
     return (
-      <div style={{ margin: '0 0 32px 20px' }}>
-        <RadioGroup label="" onChange={this.onRadioChange} value={this.state.radio}>
-          <Radio style={radioStyle} value={1}>不关联到别的链接</Radio>
-          <Radio style={radioStyle} value={2}>
-            <span>关联到其他链接</span>
-            <Select
-              disabled={this.state.radio !== 2}
-              style={{ width: 300, marginLeft: 18 }}
-              value={this.state.relatedComponentId}
-              onChange={this.handleRelatedComponentChange.bind(this)}
-            >
-              {this.state.originComponents.map(component => (
-                <Option key={component.linkTypeId} value={component.linkTypeId}>
-                  {component.linkName}
-                </Option>
-              ))}
-            </Select>
+      <Fragment>
+        <RadioGroup label="" onChange={this.onRadioChange} value={radio}>
+          <Radio style={{ display: 'block' }} value={1}>删除链接</Radio>
+          <Radio style={{ display: 'block', marginTop: 5 }} value={2}>
+            删除链接，相关问题关联到其他链接            
           </Radio>
         </RadioGroup>
-      </div>
+        {radio === 2 && (
+        <Select
+          label="链接"
+          placeholder="请选择一个新的链接"      
+          style={{ width: '100%' }}          
+          value={relatedComponentId}
+          onChange={this.handleRelatedComponentChange.bind(this)}
+        >
+          {originComponents.map(component => (
+            <Option key={component.linkTypeId} value={component.linkTypeId}>
+              {component.linkName}
+            </Option>
+          ))}
+        </Select>
+        )}
+      </Fragment>
     );
   }
 
   render() {
+    const { link, loading } = this.state;
+    const { visible, onCancel } = this.props;
     return (
       <Modal
-        width={600}
-        title={`删除链接：${this.state.link.linkName}`}
-        visible={this.props.visible || false}
-        confirmLoading={this.state.loading}
-        onOk={this.deleteComponent.bind(this)}
-        onCancel={this.props.onCancel.bind(this)}
+        title="删除链接"
+        visible={visible || false}
+        confirmLoading={loading}
+        onOk={this.deleteComponent}
+        onCancel={onCancel}
         okText="删除"
         okType="danger"
       >
-        <div style={{ margin: '20px 0', position: 'relative' }}>
-          <Icon style={{ color: '#d50000', position: 'absolute', fontSize: '16px' }} type="error" />
-          <div style={{ marginLeft: 20, width: 400 }}>
-
-
-
-
-
-
-
-            删除后相关联的任务都会消失，是否要直接删除或者更换。
-</div>
+        <div style={{ padding: '20px 0' }}>
+          <div>
+            删除链接:
+            <span style={{ margin: '0 10px', fontWeight: 500 }}>{link.linkName}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', margin: '10px 0' }}>
+            <Icon
+              style={{
+                color: '#d50000', fontSize: '16px', marginRight: 5, marginTop: 2,
+              }}
+              type="error"
+            />
+            将会从所有相关的任务中删除此链接，相关的问题可以选择关联到其他链接，或者不关联。
+          </div>         
+          <div>{this.renderDelete()}</div>
         </div>
-        {this.renderDelete()}
       </Modal>
     );
   }

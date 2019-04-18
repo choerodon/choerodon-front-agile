@@ -130,7 +130,7 @@ class DeleteComponent extends Component {
     const hasIssue = component.issueCount;
     return (
       <Modal
-        title={`删除模块：${component.name}`}
+        title={`删除模块`}
         visible={this.props.visible || false}
         confirmLoading={this.state.loading}
         onOk={this.deleteComponent.bind(this)}
