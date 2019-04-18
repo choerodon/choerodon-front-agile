@@ -7,6 +7,14 @@ export function getArtsByProjectId() {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/agile/v1/projects/${projectId}/art/list`);
 }
+export function getArtList() {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/projects/${projectId}/art/all`);
+}
+export function getActiveArt() {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/projects/${projectId}/art/active`);
+}
 export function checkArtName(name) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/agile/v1/projects/${projectId}/art/check_name?artName=${name}`);

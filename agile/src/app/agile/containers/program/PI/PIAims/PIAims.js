@@ -12,7 +12,7 @@ import PIStore from '../../../../stores/program/PI/PIStore';
 import {
   getPIAims, deletePIAims, getPIList,
 } from '../../../../api/PIApi';
-import { getArtsByProjectId } from '../../../../api/ArtApi';
+import { getArtList } from '../../../../api/ArtApi';
 import ProgramAimsTable from './component/ProgramAimsTable';
 import PIAimsCard from './component/PIAimsCard';
 import Empty from '../../../../components/Empty';
@@ -73,9 +73,9 @@ class PIAims extends Component {
 
   componentDidMount() {
     PIStore.setPIAimsLoading(true);
-    getArtsByProjectId().then((res) => {
-      const doingStopArt = res.content.filter(item => item.statusCode === 'doing' || item.statusCode === 'stop');
-      const doingArt = res.content.find(item => item.statusCode === 'doing');
+    getArtList().then((res) => {
+      const doingStopArt = res.filter(item => item.statusCode === 'doing' || item.statusCode === 'stop');
+      const doingArt = res.find(item => item.statusCode === 'doing');
       const artId = doingArt ? doingArt.id : (doingStopArt[0] && doingStopArt[0].id);
       this.setState({
         artId,

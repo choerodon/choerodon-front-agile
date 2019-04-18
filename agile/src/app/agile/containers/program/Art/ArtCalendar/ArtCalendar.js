@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { Page, Header, Content } from 'choerodon-front-boot';
 import { find } from 'lodash';
-import { Spin, Button } from 'choerodon-ui';
+import { Spin } from 'choerodon-ui';
 import moment from 'moment';
-import { getArtCalendar, getArtsByProjectId } from '../../../../api/ArtApi';
-import { CalendarHeader, CalendarBody, CreateEvent } from './components';
+import { getArtCalendar, getActiveArt } from '../../../../api/ArtApi';
+import { CalendarHeader, CalendarBody } from './components';
 import './ArtCalendar.scss';
 import emptyArtCalendar from '../../../../assets/image/emptyArtCalendar.svg';
 import Empty from '../../../../components/Empty';
@@ -32,8 +31,7 @@ class ArtCalendar extends Component {
     this.setState({
       loading: true,
     });
-    getArtsByProjectId().then((artList) => {
-      const doingArt = artList.content.find(item => item.statusCode === 'doing');
+    getActiveArt().then((doingArt) => {
       this.setState({
         doingArt,
         artStartDate: doingArt && doingArt.startDate,
