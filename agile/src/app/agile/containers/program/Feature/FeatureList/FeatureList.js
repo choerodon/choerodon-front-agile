@@ -74,7 +74,7 @@ class FeatureList extends Component {
 
   handleExportClick = () => {
     this.QueryMode.exportFeatures();
-  }
+  };
 
   render() {
     const { visible, mode, display } = this.state;
