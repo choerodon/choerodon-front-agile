@@ -44,6 +44,16 @@ class Link extends Component {
     this.loadLinks(pagination.current - 1, pagination.pageSize);
   }
 
+  handleTableChange = (pagination, filters, sorter, barFilters) => {
+    this.setState({
+      pagination,
+      filterName: filters.linkName && filters.linkName[0],
+      barFilters,
+    }, () => {
+      this.loadLinks(pagination.current - 1, pagination.pageSize);
+    });
+  }
+
   showLinkType(record) {
     this.setState({
       editLinkShow: true,
@@ -80,8 +90,8 @@ class Link extends Component {
           links: res.content,
           loading: false,
           pagination: {
-            current: 1,
-            pageSize: 10,
+            current: res.number + 1,
+            pageSize: res.size,
             total: res.totalElements,
           },
         });
@@ -89,15 +99,6 @@ class Link extends Component {
       .catch((error) => {});
   }
 
-  handleTableChange = (pagination, filters, sorter, barFilters) => {
-    this.setState({
-      pagination,
-      filterName: filters.linkName && filters.linkName[0],
-      barFilters,
-    }, () => {
-      this.loadLinks(pagination.current - 1, pagination.pageSize);
-    });
-  }
 
   render() {
     const menu = AppState.currentMenuType;
