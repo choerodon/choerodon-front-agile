@@ -20,7 +20,9 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
   };
 
   render() {
-    const { statusCode, startDate, endDate } = this.props;
+    const {
+      statusCode, startDate, endDate, disabled,
+    } = this.props;
     return statusCode === 'started' ? (
       <div
         onClick={this.onClick}
@@ -32,6 +34,7 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
         role="none"
       >
         <EasyEdit
+          disabled={disabled}
           type="date"
           time
           defaultValue={startDate ? moment(startDate, 'YYYY-MM-DD HH-mm-ss') : ''}
@@ -50,6 +53,7 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
         </EasyEdit>
         <p>~</p>
         <EasyEdit
+          disabled={disabled}
           type="date"
           time
           defaultValue={endDate ? moment(endDate, 'YYYY-MM-DD HH-mm-ss') : ''}

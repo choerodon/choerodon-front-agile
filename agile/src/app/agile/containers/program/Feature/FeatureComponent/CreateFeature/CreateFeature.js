@@ -14,7 +14,7 @@ import {
   loadPriorities, loadProgramEpics, loadIssueTypes, createIssue,
   createFieldValue, getFields,
 } from '../../../../../api/NewIssueApi';
-import { getPIList } from '../../../../../api/PIApi';
+import { getPISelect } from '../../../../../api/PIApi';
 import { beforeTextUpload, handleFileUpload } from '../../../../../common/utils';
 import FieldBlank from './FieldBlank';
 import './CreateFeature.scss';
@@ -57,7 +57,7 @@ class CreateFeature extends Component {
       });
     });
     this.loadFields();
-    getPIList().then((res) => {
+    getPISelect().then((res) => {
       this.setState({
         PIList: res,
       });
@@ -83,7 +83,7 @@ class CreateFeature extends Component {
     const {
       selectedIssueType, defaultPriority, storyPoints, delta,
     } = this.state;
-    form.validateFields((err, values) => {
+    form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const issueObj = {
           projectId: AppState.currentMenuType.id,
@@ -481,7 +481,7 @@ class CreateFeature extends Component {
         );
       case 'epicName':
         return '';
-      case 'estimateTime':
+      case 'remainingTime':
         return '';
       case 'storyPoints':
         return (

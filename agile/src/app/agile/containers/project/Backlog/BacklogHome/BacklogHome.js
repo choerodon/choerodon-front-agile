@@ -275,13 +275,17 @@ class BacklogHome extends Component {
             <Icon type="refresh" />
             {'刷新'}
           </Button>
-          <Checkbox
-            disabled={!arr.length}
-            style={{ marginLeft: 20, color: '#3f51b5' }}
-            onChange={this.onCheckChange}
-          >
-            显示未开始冲刺
-          </Checkbox>
+          {isInProgram
+            ? (
+              <Checkbox
+                disabled={!arr.length}
+                style={{ marginLeft: 20, color: '#3f51b5' }}
+                onChange={this.onCheckChange}
+              >
+                显示未开始冲刺
+              </Checkbox>
+            ) : ''
+          }
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div
@@ -400,6 +404,7 @@ class BacklogHome extends Component {
                 >
                   <SprintItem
                     display={display}
+                    isInProgram={isInProgram}
                     epicVisible={BacklogStore.getEpicVisible}
                     versionVisible={BacklogStore.getVersionVisible}
                     onRef={(ref) => {
