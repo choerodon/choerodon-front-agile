@@ -87,7 +87,7 @@ const { confirm } = Modal;
     const issue = store.getIssue;
     const {
       parentIssueId, typeCode, parentIssueNum, issueNum,
-      issueId, createdById, subIssueDTOList = [],
+      issueId, createdBy, subIssueDTOList = [],
     } = issue;
 
     const getMenu = () => (
@@ -98,7 +98,7 @@ const { confirm } = Modal;
         {
           <Menu.Item
             key="1"
-            disabled={loginUserId !== createdById && !hasPermission}
+            disabled={loginUserId !== createdBy && !hasPermission}
           >
             {'删除'}
           </Menu.Item>

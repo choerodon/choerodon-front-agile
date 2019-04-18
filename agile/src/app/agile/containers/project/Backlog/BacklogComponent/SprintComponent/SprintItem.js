@@ -59,10 +59,10 @@ class SprintItem extends Component {
   };
 
   render() {
-    const { refresh, display } = this.props;
+    const { refresh, display, isInProgram } = this.props;
     const arr = BacklogStore.getSprintData;
     let displayList = arr.length ? arr : [];
-    if (!display && arr.length) {
+    if (isInProgram && !display && arr.length) {
       const start = arr.filter(s => s.statusCode === 'started');
       if (start.length === 0) {
         displayList = [arr[0]];

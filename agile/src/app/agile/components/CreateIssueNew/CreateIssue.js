@@ -305,7 +305,7 @@ class CreateIssue extends Component {
       estimatedTime,
       originLinks,
     } = this.state;
-    form.validateFields((err, values) => {
+    form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const { typeCode } = originIssueTypes.find(t => t.id === values.typeId);
         const exitComponents = originComponents;
@@ -881,7 +881,7 @@ class CreateIssue extends Component {
             </FormItem>
           )
         );
-      case 'estimateTime':
+      case 'remainingTime':
         return (
           newIssueTypeCode !== 'issue_epic' && (
             <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>

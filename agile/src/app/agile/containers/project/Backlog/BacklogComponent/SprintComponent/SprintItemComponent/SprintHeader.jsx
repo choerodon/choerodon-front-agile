@@ -138,6 +138,7 @@ const { confirm } = Modal;
     const {
       data, expand, toggleSprint, sprintId, issueCount, refresh,
     } = this.props;
+    const { piId } = data;
     const {
       sprintName, startDate, endDate, sprintGoal,
     } = this.state;
@@ -195,6 +196,7 @@ const { confirm } = Modal;
           }}
         >
           <SprintDateRange
+            disabled={piId}
             statusCode={data.statusCode}
             startDate={startDate}
             endDate={endDate}

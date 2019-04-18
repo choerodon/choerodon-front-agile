@@ -132,7 +132,7 @@ class ArtForm extends Component {
                 })(
                   <Select style={{ width: 500, marginBottom: 15 }} label="PI生成个数">
                     {
-                      [1, 2, 3, 4, 5, 6, 7, 8].map(value => <Option key={value} value={value}>{value}</Option>)
+                      [3, 4, 5, 6, 7, 8].map(value => <Option key={value} value={value}>{value}</Option>)
                     }
                   </Select>,
                 )
