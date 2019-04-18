@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 import {
   Modal, Form, Input, Select, message, 
@@ -150,7 +151,7 @@ class AddComponent extends Component {
             </FormItem>
             <FormItem style={{ marginBottom: 5 }}>
               {getFieldDecorator('description', {})(
-                <TextArea label="模块描述" autosize maxLength={30} />,
+                <Input label="模块描述" maxLength={30} />,
               )}
             </FormItem>
             <FormItem>

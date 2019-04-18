@@ -1023,6 +1023,9 @@ class BacklogStore {
     if (moreChecked.length) {
       this.filterSelected = true;
     }
+    if (!onlyMeChecked && !onlyStoryChecked && !moreChecked.length) {
+      this.filterSelected = false;
+    }
   }
 
   @action toggleIssueDrag(data) {
