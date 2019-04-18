@@ -18,7 +18,7 @@ class Feature extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount() {    
     this.featureRefresh();
   }
 
@@ -35,7 +35,7 @@ class Feature extends Component {
    * @param {*} type
    * @memberof 
    */
-  handleClickFeature =(type) => {
+  handleClickFeature = (type) => {
     BacklogStore.setChosenFeature(type);
     BacklogStore.axiosGetSprint().then((res) => {
       BacklogStore.setSprintData(res);
@@ -116,37 +116,37 @@ class Feature extends Component {
               onClick={() => {
                 this.handleClickFeature('unset');
               }}
-              // onMouseEnter={(e) => {
-              //   if (BacklogStore.isDragging) {
-              //     BacklogStore.toggleIssueDrag(true);
-              //     e.currentTarget.style.border = '2px dashed green';
-              //   }
-              // }}
-              // onMouseLeave={(e) => {
-              //   if (BacklogStore.isDragging) {
-              //     BacklogStore.toggleIssueDrag(false);
-              //     e.currentTarget.style.border = 'none';
-              //   }
-              // }}
-              // onMouseUp={(e) => {
-              //   if (BacklogStore.getIsDragging) {
-              //     BacklogStore.toggleIssueDrag(false);
-              //     e.currentTarget.style.border = 'none';
-              //     BacklogStore.axiosUpdateIssuesToEpic(
-              //       0, BacklogStore.getIssueWithEpicOrVersion,
-              //     ).then(() => {
-              //       issueRefresh();
-              //       refresh();
-              //     }).catch(() => {
-              //       issueRefresh();
-              //       refresh();
-              //     });
-              //   }
-              // }}
+            // onMouseEnter={(e) => {
+            //   if (BacklogStore.isDragging) {
+            //     BacklogStore.toggleIssueDrag(true);
+            //     e.currentTarget.style.border = '2px dashed green';
+            //   }
+            // }}
+            // onMouseLeave={(e) => {
+            //   if (BacklogStore.isDragging) {
+            //     BacklogStore.toggleIssueDrag(false);
+            //     e.currentTarget.style.border = 'none';
+            //   }
+            // }}
+            // onMouseUp={(e) => {
+            //   if (BacklogStore.getIsDragging) {
+            //     BacklogStore.toggleIssueDrag(false);
+            //     e.currentTarget.style.border = 'none';
+            //     BacklogStore.axiosUpdateIssuesToEpic(
+            //       0, BacklogStore.getIssueWithEpicOrVersion,
+            //     ).then(() => {
+            //       issueRefresh();
+            //       refresh();
+            //     }).catch(() => {
+            //       issueRefresh();
+            //       refresh();
+            //     });
+            //   }
+            // }}
             >
               未指定特性的问题
             </div>
-          </div>         
+          </div>
         </div>
       </div>
     ) : null;

@@ -8,7 +8,7 @@ import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import { createIssue, loadPriorities } from '../../../../api/NewIssueApi';
 import TypeTag from '../../../../components/TypeTag';
 import IssueFilterControler from '../IssueFilterControler';
-import { ee } from '../../../../components/QuickSearch';
+import { QuickSearchEvent } from '../../../../components/QuickSearch';
 
 const { AppState } = stores;
 @observer
@@ -67,7 +67,7 @@ class QuickCreateIssue extends Component {
               IssueStore.setLoading(true);
               IssueStore.resetFilterSelect(this.filterControler, true);
               // quickSearch.clearQuickSearch();
-              ee.emitEvent('clearQuickSearchSelect');
+              QuickSearchEvent.emitEvent('clearQuickSearchSelect');
               this.filterControler.refresh('refresh').then((resRefresh) => {
                 IssueStore.refreshTrigger(resRefresh);
               });
