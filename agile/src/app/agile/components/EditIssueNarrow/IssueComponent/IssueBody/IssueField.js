@@ -6,6 +6,7 @@ import {
   Field, FieldAssignee, FieldVersion, FieldStatus, FieldSprint, FieldText,
   FieldReporter, FieldPriority, FieldLabel, FieldFixVersion, FieldPI,
   FieldEpic, FieldDateTime, FieldComponent, FieldTimeTrace, FieldStoryPoint,
+  FieldSummary, FieldInput,
 } from './Field';
 
 @inject('AppState')
@@ -53,9 +54,10 @@ import {
       case 'acceptanceCritera':
         return (<FieldText {...this.props} field={field} feature />);
       case 'summary':
+        return (<FieldSummary {...this.props} field={field} />);
       case 'epicName':
-        return (<FieldText {...this.props} field={field} />);
-      case 'estimateTime':
+        return (<FieldInput {...this.props} field={field} />);
+      case 'remainingTime':
       case 'storyPoints':
         return (<FieldStoryPoint {...this.props} field={field} />);
       default:

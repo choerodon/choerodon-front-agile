@@ -29,6 +29,10 @@ const { Text, Edit } = TextEditToggle;
     this.init();
   }
 
+  componentWillReceiveProps() {
+    this.init();
+  }
+
   init = () => {
     const { store } = this.props;
     const issue = store.getIssue;
@@ -40,7 +44,7 @@ const { Text, Edit } = TextEditToggle;
       });
     });
     getProjectsInProgram().then((res) => {
-      getFeaturesByEpic(epicId).then((data) => {
+      getFeaturesByEpic().then((data) => {
         this.setState({
           originFeatures: data,
           selectLoading: false,
@@ -51,7 +55,7 @@ const { Text, Edit } = TextEditToggle;
   };
 
   updateIssueEpic = () => {
-    const { newEpicId } = this.state;
+    const { newEpicId, isInProgram } = this.state;
     const { store, onUpdate, reloadIssue } = this.props;
     const issue = store.getIssue;
     const { epicId, issueId, objectVersionNumber } = issue;
@@ -63,28 +67,33 @@ const { Text, Edit } = TextEditToggle;
       };
       updateIssue(obj)
         .then(() => {
+          if (isInProgram) {
+            getFeaturesByEpic().then((data) => {
+              this.setState({
+                originFeatures: data,
+              });
+            });
+          }
           if (onUpdate) {
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }
   };
 
   updateIssueFeature = () => {
-    const { newFeatureId, originFeatures } = this.state;
+    const { newFeatureId } = this.state;
     const { store, onUpdate, reloadIssue } = this.props;
     const issue = store.getIssue;
     const { featureId = 1, issueId, objectVersionNumber } = issue;
     if (featureId !== newFeatureId) {
-      const feature = originFeatures.filter(item => item.issueId === newFeatureId);
       const obj = {
         issueId,
         objectVersionNumber,
         featureId: newFeatureId || 0,
-        epicId: (feature && feature[0].epicId) || 0,
       };
       updateIssue(obj)
         .then(() => {
@@ -92,7 +101,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }
@@ -179,7 +188,7 @@ const { Text, Edit } = TextEditToggle;
               formKey="epic"
               onSubmit={this.updateIssueEpic}
               originData={epicId || []}
-              disabled={!!featureName}
+              // disabled={!!featureName}
             >
               <Text>
                 {

@@ -55,7 +55,7 @@ import { updateIssue } from '../../../../api/NewIssueApi';
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }

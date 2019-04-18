@@ -81,7 +81,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
           // 新建版本，刷新版本侧边栏
           if (newSign && onCreateVersion) {
@@ -132,7 +132,7 @@ const { Text, Edit } = TextEditToggle;
               <Select
                 label="影响的版本"
                 value={this.transToArr(influenceVersions, 'name', 'array')}
-                mode={hasPermission ? 'tags' : 'multiple'}
+                mode="multiple"
                 loading={selectLoading}
                 getPopupContainer={triggerNode => triggerNode.parentNode}
                 tokenSeparators={[',']}

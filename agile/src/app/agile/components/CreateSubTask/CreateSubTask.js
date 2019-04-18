@@ -395,6 +395,7 @@ class CreateSubIssue extends Component {
     } else if (field.fieldType === 'text') {
       return (
         <TextArea
+          autosize
           label={fieldName}
           className="fieldWith"
         />

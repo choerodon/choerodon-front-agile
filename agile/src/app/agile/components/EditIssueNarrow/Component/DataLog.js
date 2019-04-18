@@ -18,6 +18,7 @@ const PROP = {
   'Epic Link': '史诗',
   assignee: '经办人',
   reporter: '报告人',
+  Pi: 'PI',
 };
 const PROP_SIMPLE = {
   Component: '模块',
@@ -62,7 +63,7 @@ class DataLog extends Component {
       return '更新';
     } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
-      if (['Epic Link', 'issuetype', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'issuetype', 'Sprint', 'Pi', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return '将';
       }
       if (['description', 'WorklogId', 'Comment', 'timespent'].includes(field)) {
@@ -81,7 +82,7 @@ class DataLog extends Component {
       }
     } else if ((oldValue || oldValue === 0) && (!newValue && newValue !== 0)) {
       // yyy -> null
-      if (['Epic Link', 'Sprint', 'assignee', 'reporter', 'labels', 'Component', 'Fix Version', 'Epic Child', 'resolution'].includes(field)) {
+      if (['Epic Link', 'Sprint', 'Pi', 'assignee', 'reporter', 'labels', 'Component', 'Fix Version', 'Epic Child', 'resolution'].includes(field)) {
         return '移除';
       }
       if (['Story Points', 'timeestimate'].includes(field)) {
@@ -159,7 +160,7 @@ class DataLog extends Component {
       return '';
     } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
-      if (['Epic Link', 'issuetype', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'issuetype', 'Sprint', 'Pi', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return '由';
       } else {
         return '';
@@ -206,7 +207,7 @@ class DataLog extends Component {
       return '';
     } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
-      if (['Epic Link', 'issuetype', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'issuetype', 'Sprint', 'Pi', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return ` 【${oldString}】 `;
       }
       if (['description', 'WorklogId', 'Rank', 'Comment'].includes(field)) {
@@ -266,13 +267,13 @@ class DataLog extends Component {
     } = datalog;
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
-      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'Sprint', 'Pi', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
         return '为';
       }
       return '';
     } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
-      if (['Epic Link', 'issuetype', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'issuetype', 'Sprint', 'Pi', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter'].includes(field)) {
         return '改变为';
       }
       return '';
@@ -313,7 +314,7 @@ class DataLog extends Component {
     };
     if ((!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
       // null -> xxx
-      if (['Epic Link', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
+      if (['Epic Link', 'Sprint', 'Pi', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'assignee', 'reporter'].includes(field)) {
         return ` 【${newString}】 `;
       }
       if (['description', 'WorklogId', 'Rank', 'Comment', 'timespent'].includes(field)) {
@@ -331,7 +332,7 @@ class DataLog extends Component {
       }
     } else if ((oldValue || oldValue === 0) && (newValue || newValue === 0)) {
       // xxx -> yyy
-      if (['Epic Link', 'issuetype', 'Sprint', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter', 'labels', 'Component', 'Fix Version', 'Epic Child'].includes(field)) {
+      if (['Epic Link', 'issuetype', 'Sprint', 'Pi', 'Story Points', 'timeestimate', 'summary', 'Epic Name', 'priority', 'assignee', 'reporter', 'labels', 'Component', 'Fix Version', 'Epic Child'].includes(field)) {
         return ` 【${newString}】 `;
       }
       if (['description', 'Attachment', 'WorklogId', 'Rank', 'Comment', 'timespent'].includes(field)) {

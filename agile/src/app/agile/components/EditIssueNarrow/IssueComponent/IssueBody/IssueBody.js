@@ -38,13 +38,13 @@ import IssueBranch from './IssueBranch';
              }
             <IssueCommit store={store} reloadIssue={reloadIssue} />
             {issueTypeDTO.typeCode && ['sub_task', 'feature'].indexOf(issueTypeDTO.typeCode) === -1
-              ? <IssueWorkLog store={store} reloadIssue={reloadIssue} /> : ''
+              ? <IssueWorkLog {...this.props} store={store} reloadIssue={reloadIssue} /> : ''
              }
             <IssueLog store={store} />
             {issueTypeDTO.typeCode && ['sub_task', 'feature'].indexOf(issueTypeDTO.typeCode) === -1
               ? <SubTask store={store} reloadIssue={reloadIssue} /> : ''
              }
-            {issueTypeDTO.typeCode && ['feature'].indexOf(issueTypeDTO.typeCode) === -1
+            {issueTypeDTO.typeCode && ['feature', 'sub_task'].indexOf(issueTypeDTO.typeCode) === -1
               ? <IssueLink store={store} reloadIssue={reloadIssue} /> : ''
              }
             {issueTypeDTO.typeCode && ['feature'].indexOf(issueTypeDTO.typeCode) === -1

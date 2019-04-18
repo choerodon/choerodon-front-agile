@@ -177,6 +177,9 @@ export function Epic({ color, name }) {
     lineHeight: '20px',
     padding: '0 8px',
     display: 'inline-block',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   };
   return name ? <span style={style}>{name}</span> : null;
 }

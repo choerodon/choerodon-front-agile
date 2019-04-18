@@ -93,36 +93,30 @@ let hasPermission;
   };
 
   handleCopyIssue = () => {
-    const { onUpdate, reloadIssue } = this.props;
+    const { onUpdate } = this.props;
     VisibleStore.setCopyIssueShow(false);
     if (onUpdate) {
       onUpdate();
     }
-    if (reloadIssue) {
-      reloadIssue();
-    }
+    this.loadIssueDetail();
   };
 
   handleTransformSubIssue() {
-    const { onUpdate, reloadIssue } = this.props;
+    const { onUpdate } = this.props;
     VisibleStore.setTransformSubIssueShow(false);
     if (onUpdate) {
       onUpdate();
     }
-    if (reloadIssue) {
-      reloadIssue();
-    }
+    this.loadIssueDetail();
   }
 
   handleTransformFromSubIssue() {
-    const { onUpdate, reloadIssue } = this.props;
+    const { onUpdate } = this.props;
     VisibleStore.setTransformFromSubIssueShow(false);
     if (onUpdate) {
       onUpdate();
     }
-    if (reloadIssue) {
-      reloadIssue();
-    }
+    this.loadIssueDetail();
   }
 
   render() {
@@ -248,9 +242,7 @@ let hasPermission;
               objectVersionNumber={objectVersionNumber}
               onOk={() => {
                 VisibleStore.setAssigneeShow(false);
-                if (reloadIssue) {
-                  reloadIssue();
-                }
+                this.loadIssueDetail(issueId);
               }}
               onCancel={() => {
                 VisibleStore.setAssigneeShow(false);
@@ -267,9 +259,7 @@ let hasPermission;
               objectVersionNumber={objectVersionNumber}
               onOk={() => {
                 VisibleStore.setChangeParentShow(false);
-                if (reloadIssue) {
-                  reloadIssue();
-                }
+                this.loadIssueDetail(issueId);
               }}
               onCancel={() => {
                 VisibleStore.setChangeParentShow(false);

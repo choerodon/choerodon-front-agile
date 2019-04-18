@@ -3,14 +3,13 @@ import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { Input } from 'choerodon-ui';
 import { injectIntl } from 'react-intl';
-import TextEditToggle from '../../../../TextEditToggle';
-import { updateIssue } from '../../../../../api/NewIssueApi';
+import TextEditToggle from '../../../../../../../../components/TextEditToggle';
+import { updateIssue } from '../../../../../../../../api/NewIssueApi';
 
 const { Text, Edit } = TextEditToggle;
-const { TextArea } = Input;
 
 @inject('AppState')
-@observer class FieldText extends Component {
+@observer class FieldInput extends Component {
   constructor(props) {
     super(props);
     this.TextEditToggle = undefined;
@@ -71,7 +70,7 @@ const { TextArea } = Input;
     const {
       store, field, feature, showTitle = true,
     } = this.props;
-    const { fieldCode, fieldName, textStyle } = field;
+    const { fieldCode, fieldName } = field;
     const issue = store.getIssue;
     const { featureDTO = {} } = issue;
     const value = feature ? featureDTO[fieldCode] : issue[fieldCode];
@@ -97,15 +96,14 @@ const { TextArea } = Input;
             originData={value}
           >
             <Text>
-              <div style={{ ...textStyle, maxWidth: feature ? 200 : '', wordBreak: 'break-all' }}>
+              <div style={{ wordBreak: 'break-all' }}>
                 {value || '无'}
               </div>
             </Text>
             <Edit>
-              <TextArea
-                style={{ minWidth: 200 }}
+              <Input
                 autosize
-                maxLength={feature ? 100 : 44}
+                maxLength="10"
                 size="small"
                 onChange={(e) => {
                   this.setState({
@@ -127,4 +125,4 @@ const { TextArea } = Input;
   }
 }
 
-export default withRouter(injectIntl(FieldText));
+export default withRouter(injectIntl(FieldInput));
