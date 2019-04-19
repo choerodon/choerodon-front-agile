@@ -7,7 +7,7 @@ import '../../PI.scss';
   render() {
     const { issueCount } = this.props;
     return (
-      <p className="c7n-backlog-sprintQuestion">
+      <p className="c7n-feature-sprintQuestion">
         {
           `${issueCount}个特性`
         }

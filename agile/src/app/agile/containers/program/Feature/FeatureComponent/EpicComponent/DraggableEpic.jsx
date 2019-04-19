@@ -55,12 +55,12 @@ class DraggableEpic extends Component {
       <Menu onClick={this.clickMenu.bind(this)}>
         <div style={{ padding: '5px 12px' }}>
           {'颜色'}
-          <div className="c7n-backlog-epicColor">
+          <div className="c7n-feature-epicColor">
             {store.getColorLookupValue.map(color => (
               <div
                 key={color.name}
                 style={{ background: color.name }}
-                className="c7n-backlog-epicColorItem"
+                className="c7n-feature-epicColorItem"
                 role="none"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -145,13 +145,13 @@ class DraggableEpic extends Component {
         ref={draggableProvided.innerRef}
         {...draggableProvided.draggableProps}
         {...draggableProvided.dragHandleProps}
-        className={classnames('c7n-backlog-epicItems', {
+        className={classnames('c7n-feature-epicItems', {
           onClickEpic: store.getChosenEpic === item.issueId,
         })}
         role="none"
       >
         <div
-          className="c7n-backlog-epicItemTitle"
+          className="c7n-feature-epicItemTitle"
         >
           <Icon
             type={expand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}
@@ -159,7 +159,7 @@ class DraggableEpic extends Component {
             onClick={this.toggleExpand}
           />
           <div style={{ width: '100%' }}>
-            <div className="c7n-backlog-epicItemsHead">
+            <div className="c7n-feature-epicItemsHead">
               {editName ? (
                 <Input
                   className="editEpicName"
@@ -192,16 +192,16 @@ class DraggableEpic extends Component {
               </Dropdown>
             </div>
             <div
-              className="c7n-backlog-epicItemProgress"
+              className="c7n-feature-epicItemProgress"
             >
               <div
-                className="c7n-backlog-epicItemDone"
+                className="c7n-feature-epicItemDone"
                 style={{
                   flex: item.doneIssueCount,
                 }}
               />
               <div
-                className="c7n-backlog-epicItemTodo"
+                className="c7n-feature-epicItemTodo"
                 style={{
                   flex: item.issueCount ? item.issueCount - item.doneIssueCount : 1,
                 }}
@@ -211,27 +211,27 @@ class DraggableEpic extends Component {
         </div>
         {expand ? (
           <div style={{ paddingLeft: 12 }}>
-            <p className="c7n-backlog-epicItemDes">
+            <p className="c7n-feature-epicItemDes">
               {_.isNull(item.summary) ? '没有描述' : item.summary}
             </p>
-            <p className="c7n-backlog-epicItemDetail">计数详情</p>
-            <div className="c7n-backlog-epicItemParams">
-              <div className="c7n-backlog-epicItemParam">
-                <p className="c7n-backlog-epicItemParamKey">问题数</p>
-                <p className="c7n-backlog-epicItemNotStoryPoint">{item.issueCount}</p>
+            <p className="c7n-feature-epicItemDetail">计数详情</p>
+            <div className="c7n-feature-epicItemParams">
+              <div className="c7n-feature-epicItemParam">
+                <p className="c7n-feature-epicItemParamKey">问题数</p>
+                <p className="c7n-feature-epicItemNotStoryPoint">{item.issueCount}</p>
               </div>
-              <div className="c7n-backlog-epicItemParam">
-                <p className="c7n-backlog-epicItemParamKey">已完成数</p>
-                <p className="c7n-backlog-epicItemNotStoryPoint">{item.doneIssueCount}</p>
+              <div className="c7n-feature-epicItemParam">
+                <p className="c7n-feature-epicItemParamKey">已完成数</p>
+                <p className="c7n-feature-epicItemNotStoryPoint">{item.doneIssueCount}</p>
               </div>
-              <div className="c7n-backlog-epicItemParam">
-                <p className="c7n-backlog-epicItemParamKey">未预估数</p>
-                <p className="c7n-backlog-epicItemNotStoryPoint">{item.notEstimate}</p>
+              <div className="c7n-feature-epicItemParam">
+                <p className="c7n-feature-epicItemParamKey">未预估数</p>
+                <p className="c7n-feature-epicItemNotStoryPoint">{item.notEstimate}</p>
               </div>
-              <div className="c7n-backlog-epicItemParam">
-                <p className="c7n-backlog-epicItemParamKey">故事点数</p>
+              <div className="c7n-feature-epicItemParam">
+                <p className="c7n-feature-epicItemParamKey">故事点数</p>
                 <p
-                  className="c7n-backlog-epicItemParamValue"
+                  className="c7n-feature-epicItemParamValue"
                   style={{ minWidth: 31, color: 'rgba(0,0,0,0.65)' }}
                 >
                   {item.totalEstimate}

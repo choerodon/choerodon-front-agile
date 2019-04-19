@@ -7,7 +7,7 @@ export default class PICount extends Component {
     const { issueId, store } = this.props;
     return store.getIsDragging === issueId && store.getMultiSelected.size > 0 ? (
       <span
-        className="c7n-backlog-sprintCount"
+        className="c7n-feature-sprintCount"
         label="sprintIssue"
       >
         {store.getMultiSelected.size}

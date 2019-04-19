@@ -14,7 +14,7 @@ class SideBorder extends Component {
     const { item, clickIssue } = this.props;
     return (
       <div
-        className="c7n-backlog-issueSideBorder"
+        className="c7n-feature-issueSideBorder"
         style={{
           display: clickIssue === item.issueId ? 'block' : 'none',
         }}

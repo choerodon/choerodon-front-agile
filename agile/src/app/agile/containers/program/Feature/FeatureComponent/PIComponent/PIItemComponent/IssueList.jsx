@@ -27,7 +27,7 @@ class IssueList extends Component {
         {provided => (
           <div
             key={item.issueId}
-            className="c7n-backlog-sprintIssue"
+            className="c7n-feature-sprintIssue"
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}

@@ -18,7 +18,7 @@ class IssueItem extends Component {
     } = this.props;
     return (
       <div
-        className={classnames('c7n-backlog-sprintIssueItem', {
+        className={classnames('c7n-feature-sprintIssueItem', {
           'issue-selected': store.getMultiSelected.get(item.issueId),
         })}
         key={item.issueId}

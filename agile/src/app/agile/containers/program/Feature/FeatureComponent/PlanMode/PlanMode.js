@@ -141,7 +141,7 @@ class PlanMode extends Component {
     const { issueRefresh, display } = this.props;
     return (
       <Fragment>
-        <div className="c7n-backlog-side">
+        <div className="c7n-feature-side">
           <p
             style={{
               marginTop: 12,
@@ -163,7 +163,7 @@ class PlanMode extends Component {
           onEpicClick={this.onEpicClick}
         />
         <Spin spinning={FeatureStore.getSpinIf}>
-          <div className="c7n-backlog-content">
+          <div className="c7n-feature-content">
             <DragDropContext
               onDragEnd={this.handleDragEnd}
               onDragStart={(result) => {

@@ -13,7 +13,7 @@ import { Tooltip } from 'choerodon-ui';
         style={{
           display: statusCode === 'started' ? 'flex' : 'none',
         }}
-        className="c7n-backlog-sprintGoalSide"
+        className="c7n-feature-sprintGoalSide"
       >
         <Tooltip title={`待处理故事点: ${todoStoryPoint}`}>
           <div style={{ backgroundColor: '#FFB100' }}>{todoStoryPoint || 0}</div>
