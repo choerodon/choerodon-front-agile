@@ -169,7 +169,7 @@ const { Text, Edit } = TextEditToggle;
           onChange={e => this.handleChange(e)}
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.map(item => (
+          && field.fieldOptions.filter(option => option.enabled || option.id === value).map(item => (
             <Option
               value={item.id}
               key={item.id}
@@ -188,7 +188,7 @@ const { Text, Edit } = TextEditToggle;
           onChange={e => this.handleChange(e)}
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.map(item => (
+          && field.fieldOptions.filter(option => option.enabled || (value && value.indexOf(option.id) !== -1)).map(item => (
             <Option
               value={item.id}
               key={item.id}

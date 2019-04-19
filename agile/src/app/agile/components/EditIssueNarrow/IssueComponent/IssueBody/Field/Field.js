@@ -188,7 +188,7 @@ const { Text, Edit } = TextEditToggle;
           onChange={e => this.handleChange(e)}
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.filter(option => option.enabled || value.indexOf(option.id) !== -1).map(item => (
+          && field.fieldOptions.filter(option => option.enabled || (value && value.indexOf(option.id) !== -1)).map(item => (
             <Option
               value={item.id}
               key={item.id}
@@ -237,7 +237,7 @@ const { Text, Edit } = TextEditToggle;
   render() {
     const { field } = this.props;
     const {
-      fieldCode, fieldName, value, fieldType, valueStr, required,
+      fieldCode, fieldName, value, fieldType, valueStr,
     } = field;
 
     return (

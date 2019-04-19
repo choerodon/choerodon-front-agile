@@ -25,21 +25,17 @@ class Comment extends Component {
   componentDidMount() {
   }
 
-  confirm(commentId, e) {
-    this.handleDeleteCommit(commentId);
-  }
-
-  cancel(e) {
-  }
-
-  handleDeleteCommit(commentId) {
+  handleDeleteCommit = (commentId) => {
+    const { onDeleteComment } = this.props;
     deleteCommit(commentId)
       .then((res) => {
-        this.props.onDeleteComment();
+        if (onDeleteComment) {
+          onDeleteComment();
+        }
       });
-  }
+  };
 
-  handleUpdateComment(comment) {
+  handleUpdateComment = (comment) => {
     const { commentId, objectVersionNumber } = comment;
     const extra = {
       commentId,
@@ -52,7 +48,7 @@ class Comment extends Component {
       extra.commentText = '';
       this.updateComment(extra);
     }
-  }
+  };
 
   updateComment = (comment) => {
     updateCommit(comment).then((res) => {
@@ -122,7 +118,7 @@ class Comment extends Component {
               }}
               color="#3f51b5"
             />
-            <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginLeft: 15 }}>
+            <div style={{ color: 'rgba(0, 0, 0, 0.65)', marginLeft: 15 }}>
               <DatetimeAgo
                 date={commit.lastUpdateDate}
               />
@@ -143,23 +139,17 @@ class Comment extends Component {
             <Popconfirm
               title="确认要删除该评论吗?"
               placement="left"
-              onConfirm={this.confirm.bind(this, commit.commentId)}
+              onConfirm={() => this.handleDeleteCommit(commit.commentId)}
               onCancel={this.cancel}
               okText="删除"
               cancelText="取消"
               okType="danger"
             >
               <Icon
-                // role="none"
+                role="none"
                 type="delete_forever mlr-3 pointer"
-                // onClick={() => this.handleDeleteCommit(commit.commentId)}
               />
             </Popconfirm>
-            {/* <Icon
-              role="none"
-              type="delete_forever mlr-3 pointer"
-              onClick={() => this.handleDeleteCommit(commit.commentId)}
-            /> */}
           </div>
         </div>
         {
