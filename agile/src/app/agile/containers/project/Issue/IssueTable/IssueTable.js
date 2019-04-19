@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Table, Tooltip } from 'choerodon-ui';
 import { observer } from 'mobx-react';
 import { trace } from 'mobx';
-import _ from 'lodash';
+import { findIndex, map } from 'lodash';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import IssueFilterControler from '../IssueFilterControler';
 import {
@@ -20,15 +20,31 @@ class IssueTable extends Component {
     this.filterControler = new IssueFilterControler();
   }
 
-  componentDidMount() {
-    this.getAssigneeDistributed();
+  componentDidMount() {    
+    this.getAssigneeDistributed();   
+    this.setSelectRow(); 
   }
+  
 
   componentWillUnmount() {
     IssueStore.setClickedRow({
       selectedIssue: {},
       expand: false,
     });
+  }
+  
+  setSelectRow=() => {
+    const selectedIssue = IssueStore.getSelectedIssue;   
+    if (selectedIssue && selectedIssue.issueId) {
+      const issues = IssueStore.getIssues;
+      const index = findIndex(issues, { issueId: selectedIssue.issueId });
+      if (index > -1) {
+        const target = document.getElementsByClassName('ant-table-row')[index];
+        if (target) {
+          target.click();
+        }
+      }
+    }
   }
 
   /**
@@ -40,7 +56,13 @@ class IssueTable extends Component {
     Object.keys(filters).forEach((key) => {
       // 根据对应的 key 传入对应的 mode
       switch (key) {
-        // case 'statusId':
+        case 'issueNum':
+          setArgs('searchArgs', {
+            [key]: filters[key][0],
+          });
+          // 地址栏有id和名称时，会同时发送id和名称，在筛选变动时，清掉id，防止影响后续筛选
+          setArgs('otherArgs', { issueIds: [] });
+          break;
         // case 'priorityId':
         // case 'issueTypeId':
         //   setArgs('advArgs', filters);
@@ -50,6 +72,7 @@ class IssueTable extends Component {
         case 'version':
         case 'epic':
         case 'sprint':
+          // eslint-disable-next-line no-case-declarations
           const { fieldSelected, fieldInput } = this.convertSelectOrInput(filters);
           setArgs('otherArgs', fieldSelected);
           setArgs('searchArgs', fieldInput);
@@ -186,7 +209,7 @@ class IssueTable extends Component {
           fieldFilteredValue = ['未分配'];
         } else {
           const FieldColumnFilter = IssueStore.getColumnFilter.get(field);
-          const otherFieldFilteredValue = FieldColumnFilter && _.map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value').concat(fieldValue.find(value => value === '0') ? ['未分配'] : []);
+          const otherFieldFilteredValue = FieldColumnFilter && map(FieldColumnFilter.filter(item => fieldValue.find(id => JSON.parse(item.value).id === id.toString())), 'value').concat(fieldValue.find(value => value === '0') ? ['未分配'] : []);
           fieldFilteredValue = !searchArgsField ? otherFieldFilteredValue : [...otherFieldFilteredValue, searchArgsField];
         }
       } else {
@@ -197,6 +220,28 @@ class IssueTable extends Component {
     }
 
     return fieldFilteredValue;
+  }
+
+  handleRowClick = (record, e) => {
+    const editFilterInfo = IssueStore.getEditFilterInfo;
+    // 点击时设置当前点击元素 style
+    if (previousClick) {
+      // 如果上一次点击过，就清空 previousClick 中保存的 style
+      previousClick.style.background = '';
+      previousClick.style.borderLeft = '';
+    } else {
+      e.currentTarget.scrollIntoView(true);
+    }
+    e.currentTarget.style.background = 'rgba(140, 158, 255, 0.08)';
+    e.currentTarget.style.borderLeft = '3px solid #3f51b5';
+    // 将这次的点击元素设置为 previousClick 供下次使用
+    previousClick = e.currentTarget;
+    IssueStore.setClickedRow({
+      selectedIssue: record,
+      expand: true,
+    });
+    IssueStore.setFilterListVisible(false);
+    IssueStore.setEditFilterInfo(map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
   }
 
   shouldColumnShow = (column) => {
@@ -220,7 +265,7 @@ class IssueTable extends Component {
     const componentFilterValue = this.getFieldFilteredValue('component');
     const epicFilterValue = this.getFieldFilteredValue('epic');
     const labelFilterValue = this.getFieldFilteredValue('label');
-    const editFilterInfo = IssueStore.getEditFilterInfo;
+
     const columns = this.manageVisible([
       {
         title: '问题编号',
@@ -473,26 +518,7 @@ class IssueTable extends Component {
         scroll={{ x: true }}
         onColumnFilterChange={this.handleColumnFilterChange}
         onRow={record => ({
-          onClick: (e) => {
-            // 点击时设置当前点击元素 style
-            if (previousClick) {
-              // 如果上一次点击过，就清空 previousClick 中保存的 style
-              previousClick.style.background = '';
-              previousClick.style.borderLeft = '';
-            } else {
-              e.currentTarget.scrollIntoView(true);
-            }
-            e.currentTarget.style.background = 'rgba(140, 158, 255, 0.08)';
-            e.currentTarget.style.borderLeft = '3px solid #3f51b5';
-            // 将这次的点击元素设置为 previousClick 供下次使用
-            previousClick = e.currentTarget;
-            IssueStore.setClickedRow({
-              selectedIssue: record,
-              expand: true,
-            });
-            IssueStore.setFilterListVisible(false);
-            IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
-          },
+          onClick: this.handleRowClick.bind(this, record),
           onBlur: (e) => {
             // 点击隐藏详情时无法触发 onClick，所以需要利用 onBlur 触发
             e.currentTarget.style.background = '';

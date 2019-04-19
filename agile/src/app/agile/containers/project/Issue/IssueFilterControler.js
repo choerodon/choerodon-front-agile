@@ -95,7 +95,9 @@ export default class IssueFilterControler {
     // 单个任务跳转 => otherArgs 设置 issueId，将任务设定为展开模式
     if (paramIssueId) {
       // filter.searchArgs.issueNum = paramName;
+      // 地址栏有id和名称时，会同时发送id和名称, 以达到精确搜索
       filter.searchArgs.issueNum = `${IssueStore.getProjectInfo.projectCode}-${paramName.split('-')[paramName.split('-').length - 1]}`;
+      filter.otherArgs.issueIds = [paramIssueId];
       paramIssueSelected = true;
     }
 

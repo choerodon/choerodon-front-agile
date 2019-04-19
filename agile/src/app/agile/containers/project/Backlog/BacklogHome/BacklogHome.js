@@ -225,7 +225,7 @@ class BacklogHome extends Component {
       BacklogStore.toggleVisible(null);
     } else {
       if (type === 'feature') {
-        QuickSearchEvent.emit('setSelectQuickSearch', [{ key: -2, label: '仅故事' }]);   
+        QuickSearchEvent.emit('setSelectQuickSearch', [{ key: -2, label: '仅故事' }]);
       }
       BacklogStore.toggleVisible(type);
     }
@@ -259,10 +259,10 @@ class BacklogHome extends Component {
             <span>创建问题</span>
           </Button>
           {!isInProgram && (
-          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint}>
-            <Icon type="queue" />
-            {'创建冲刺'}
-          </Button>
+            <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint}>
+              <Icon type="queue" />
+              {'创建冲刺'}
+            </Button>
           )}
           <Button
             className="leftBtn2"
@@ -328,17 +328,17 @@ class BacklogHome extends Component {
                 {'史诗'}
               </p>
               {isInProgram && (
-              <p
-                style={{
-                  marginTop: 12,
-                }}
-                role="none"
-                onClick={() => {
-                  this.toggleCurrentVisible('feature');
-                }}
-              >
-                {'特性'}
-              </p>
+                <p
+                  style={{
+                    marginTop: 12,
+                  }}
+                  role="none"
+                  onClick={() => {
+                    this.toggleCurrentVisible('feature');
+                  }}
+                >
+                  {'特性'}
+                </p>
               )}
             </div>
             <Version
@@ -356,13 +356,15 @@ class BacklogHome extends Component {
                 this.IssueDetail.refreshIssueDetail();
               }}
             />
-            <Feature
-              refresh={this.refresh}
-              visible={BacklogStore.getCurrentVisible}
-              issueRefresh={() => {
-                this.IssueDetail.refreshIssueDetail();
-              }}
-            />
+            {isInProgram && (
+              <Feature
+                refresh={this.refresh}
+                visible={BacklogStore.getCurrentVisible}
+                issueRefresh={() => {
+                  this.IssueDetail.refreshIssueDetail();
+                }}
+              />
+            )}
             <Spin spinning={BacklogStore.getSpinIf}>
               <div className="c7n-backlog-content">
                 <DragDropContext

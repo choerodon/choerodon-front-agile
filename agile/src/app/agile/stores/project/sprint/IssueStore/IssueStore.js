@@ -770,6 +770,7 @@ class SprintCommonStore {
       epic: [],
       label: [],
       version: [],
+      issueIds: [],
     }, [], {
       summary: '',
       issueNum: '',
