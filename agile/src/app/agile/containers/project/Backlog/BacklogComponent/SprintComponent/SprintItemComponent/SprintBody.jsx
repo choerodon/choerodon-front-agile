@@ -6,6 +6,7 @@ import QuickCreateIssue from './QuickCreateIssue';
 import IssueList from './IssueList';
 import { deBounce } from '../Utils';
 import { getFeaturesInProject } from '../../../../../../api/FeatureApi';
+import { createIssueField } from '../../../../../../api/NewIssueApi';
 
 const debounceCallback = deBounce(500);
 /**
@@ -79,6 +80,12 @@ const loadFeature = () => {
           expand: false,
           loading: false,
         });
+        const dto = {
+          schemeCode: 'agile_issue',
+          context: res.typeCode,
+          pageCode: 'agile_issue_create',
+        };
+        createIssueField(res.issueId, dto);
         if (BacklogStore.getCurrentVisible === 'version') {
           loadVersion();
         } else if (BacklogStore.getCurrentVisible === 'epic') {

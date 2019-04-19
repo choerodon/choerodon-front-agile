@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Modal, Form, Select, Icon, Input,
+  Modal, Form, Input,
 } from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
-import TypeTag from '../../../../../components/TypeTag';
+import { createIssueField } from '../../../../../api/NewIssueApi';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
-const { Option } = Select.Option;
 const { TextArea } = Input;
 
 @Form.create({})
@@ -31,7 +30,7 @@ class CreateEpic extends Component {
    */
   handleCreateEpic =(e) => {
     const {
-      form, store, onCancel, refresh,
+      form, onCancel, refresh,
     } = this.props;
     const issueTypes = BacklogStore.getIssueTypes || [];
     const defaultPriorityId = BacklogStore.getDefaultPriority ? BacklogStore.getDefaultPriority.id : '';
@@ -52,6 +51,12 @@ class CreateEpic extends Component {
           loading: true,
         });
         BacklogStore.axiosEasyCreateIssue(req).then((res) => {
+          const dto = {
+            schemeCode: 'agile_issue',
+            context: res.typeCode,
+            pageCode: 'agile_issue_create',
+          };
+          createIssueField(res.issueId, dto);
           this.setState({
             loading: false,
           });
