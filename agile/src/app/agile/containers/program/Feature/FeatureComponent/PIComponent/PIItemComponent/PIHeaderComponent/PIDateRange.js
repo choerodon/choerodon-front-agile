@@ -8,7 +8,7 @@ import { observer, inject } from 'mobx-react';
     const { startDate, endDate } = this.props;
     return (
       <div
-        className="c7n-backlog-sprintData"
+        className="c7n-feature-sprintData"
         style={{
           display: 'flex',
           flexWrap: 'wrap',

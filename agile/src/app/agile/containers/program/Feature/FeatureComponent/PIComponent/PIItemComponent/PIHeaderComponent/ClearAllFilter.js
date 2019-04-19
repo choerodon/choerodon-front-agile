@@ -13,7 +13,7 @@ import BacklogStore from '../../../../../../../stores/project/backlog/BacklogSto
   render() {
     return (
       <p
-        className={classnames('c7n-backlog-clearFilter')}
+        className={classnames('c7n-feature-clearFilter')}
         style={{
           display: !BacklogStore.hasFilter ? 'none' : 'block',
           margin: 0,

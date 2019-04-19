@@ -12,9 +12,9 @@ import '../PI.scss';
     } = this.props;
 
     return (
-      <div className="c7n-backlog-sprintTop">
-        <div className="c7n-backlog-springTitle">
-          <div className="c7n-backlog-sprintTitleSide">
+      <div className="c7n-feature-sprintTop">
+        <div className="c7n-feature-springTitle">
+          <div className="c7n-feature-sprintTitleSide">
             <SprintName
               type="backlog"
               expand={expand}

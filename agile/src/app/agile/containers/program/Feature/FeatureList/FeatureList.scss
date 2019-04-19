@@ -1,4 +1,4 @@
-.c7n-backlogTools {
+.c7n-featureTools {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
@@ -7,14 +7,14 @@
   flex-shrink: 0;
   align-items: center;
 
-  .c7n-backlogTools-left {
+  .c7n-featureTools-left {
     display: flex;
     flex-grow: 1;
     align-items: center;
     flex-wrap: wrap;
     overflow: hidden;
   }
-  .c7n-backlogTools-right {
+  .c7n-featureTools-right {
     display: flex;
   }
 }
@@ -38,7 +38,7 @@
   p {
     margin-bottom: 0;
   }
-  .c7n-backlog-side {
+  .c7n-feature-side {
     width: 24px;
     border-right: 1px solid #d3d3d3;
 
@@ -56,7 +56,7 @@
   display: flex;
 }
 
-.c7n-backlog-filter {
+.c7n-feature-filter {
   cursor: pointer;
   padding: 3px 8px;
   margin-right: 18px;
@@ -76,7 +76,7 @@
   }
 }
 
-.c7n-backlog-content {
+.c7n-feature-content {
   //position: absolute;
   //left: 24px;
   overflow-x: hidden;
@@ -86,7 +86,7 @@
   width: 100%;
 }
 
-.c7n-backlog-clearFilter {
+.c7n-feature-clearFilter {
   margin-left: 18px;
   font-size: 13px;
   line-height: 20px;

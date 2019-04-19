@@ -50,11 +50,11 @@ class Epic extends Component {
     } = this.props;
     const { draggableIds, addEpic } = this.state;
     return visible ? (
-      <div className="c7n-backlog-epic">
-        <div className="c7n-backlog-epicContent">
-          <div className="c7n-backlog-epicTitle">
+      <div className="c7n-feature-epic">
+        <div className="c7n-feature-epicContent">
+          <div className="c7n-feature-epicTitle">
             <p style={{ fontWeight: 'bold' }}>史诗</p>
-            <div className="c7n-backlog-epicRight">
+            <div className="c7n-feature-epicRight">
               <p
                 style={{ color: '#3F51B5', cursor: 'pointer', whiteSpace: 'nowrap' }}
                 role="none"
@@ -79,9 +79,9 @@ class Epic extends Component {
               />
             </div>
           </div>
-          <div className="c7n-backlog-epicChoice">
+          <div className="c7n-feature-epicChoice">
             <div
-              className="c7n-backlog-epicItems-first"
+              className="c7n-feature-epicItems-first"
               style={{
                 color: '#3F51B5',
                 background: store.getChosenEpic === 'all' ? 'rgba(140, 158, 255, 0.08)' : '',
@@ -123,7 +123,7 @@ class Epic extends Component {
               </Droppable>
             </DragDropContext>
             <div
-              className="c7n-backlog-epicItems-last"
+              className="c7n-feature-epicItems-last"
               style={{
                 background: store.getChosenEpic === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
               }}
