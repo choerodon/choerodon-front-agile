@@ -27,9 +27,8 @@ import { handleFileUpload } from '../../../../../../../common/utils';
     this.setState({ fileList: data });
   };
 
-  refresh = (newFile) => {
-    const { fileList } = this.state;
-    this.setFileList([...fileList, ...newFile]);
+  refresh = () => {
+    this.setFileList(false);
     const { reloadIssue } = this.props;
     if (reloadIssue) {
       reloadIssue();
