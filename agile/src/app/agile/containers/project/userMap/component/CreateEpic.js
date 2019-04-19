@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Modal, Form, Input } from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
+import { createIssueField } from '../../../../api/NewIssueApi';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
@@ -39,6 +40,12 @@ class CreateEpic extends Component {
         });
         axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/issues?applyType=agile`, data)
           .then((res) => {
+            const dto = {
+              schemeCode: 'agile_issue',
+              context: res.typeCode,
+              pageCode: 'agile_issue_create',
+            };
+            createIssueField(res.issueId, dto);
             this.setState({
               loading: false,
             });

@@ -10,6 +10,13 @@ export function createIssue(issueObj, applyType = 'agile', projectId = AppState.
   };
   return axios.post(`/agile/v1/projects/${projectId}/issues?applyType=${applyType}`, issue);
 }
+
+export function createIssueField(issueId, dto) {
+  const projectId = AppState.currentMenuType.id;
+  const orgId = AppState.currentMenuType.organizationId;
+  return axios.post(`/foundation/v1/projects/${projectId}/field_value/quick_create/${issueId}?organizationId=${orgId}`, dto);
+}
+
 export function loadIssueTypes(applyType) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/issue/v1/projects/${projectId}/schemes/query_issue_types_with_sm_id?apply_type=${applyType || 'agile'}`);

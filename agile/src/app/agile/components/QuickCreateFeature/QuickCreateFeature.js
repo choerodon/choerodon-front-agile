@@ -4,9 +4,12 @@ import {
   Button, Icon, Dropdown, Input, Menu,
 } from 'choerodon-ui';
 import TypeTag from '../TypeTag';
+import { deBounce } from './Utils';
 import { getProjectId } from '../../common/utils';
-import { createIssue } from '../../api/NewIssueApi';
+import { createIssue, createIssueField } from '../../api/NewIssueApi';
 import './QuickCreateFeature.scss';
+
+const debounceCallback = deBounce(500);
 
 const propTypes = {
   defaultPriority: PropTypes.number,
@@ -39,41 +42,48 @@ class QuickCreateFeature extends Component {
     const {
       defaultPriority, piId, epicId, onCreate, featureTypeDTO,
     } = this.props;
-    if (createIssueValue.trim() !== '') {
-      const feature = {
-        priorityCode: `priority-${defaultPriority.id}`,
-        priorityId: defaultPriority.id,
-        projectId: getProjectId(),
-        programId: getProjectId(),
-        featureDTO: {
-          featureType: currentType,
-        },
-        piId,
-        epicId,
-        summary: createIssueValue,
-        issueTypeId: featureTypeDTO.id,
-        typeCode: featureTypeDTO.typeCode,
-        parentIssueId: 0,
-      };
-      this.setState({
-        loading: true,
-      });
-      // console.log(feature);
-      createIssue(feature, 'program').then(() => {
+    debounceCallback(() => {
+      if (createIssueValue.trim() !== '') {
+        const feature = {
+          priorityCode: `priority-${defaultPriority.id}`,
+          priorityId: defaultPriority.id,
+          projectId: getProjectId(),
+          programId: getProjectId(),
+          featureDTO: {
+            featureType: currentType,
+          },
+          piId,
+          epicId,
+          summary: createIssueValue,
+          issueTypeId: featureTypeDTO.id,
+          typeCode: featureTypeDTO.typeCode,
+          parentIssueId: 0,
+        };
         this.setState({
-          loading: false,
-          create: false,
+          loading: true,
         });
-        if (onCreate) {
-          onCreate();
-        }
-      }).catch(() => {
-        this.setState({
-          loading: false,
+        createIssue(feature, 'program').then((res) => {
+          this.setState({
+            loading: false,
+            create: false,
+          });
+          const dto = {
+            schemeCode: 'agile_issue',
+            context: res.typeCode,
+            pageCode: 'agile_issue_create',
+          };
+          createIssueField(res.issueId, dto);
+          if (onCreate) {
+            onCreate();
+          }
+        }).catch(() => {
+          this.setState({
+            loading: false,
+          });
         });
-      });
-    }
-  }
+      }
+    }, this);
+  };
 
   render() {
     const {

@@ -4,6 +4,7 @@ import {
   Modal, Form, Input,
 } from 'choerodon-ui';
 import { Content, stores, axios } from 'choerodon-front-boot';
+import { createIssueField } from '../../../../../api/NewIssueApi';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
@@ -50,6 +51,12 @@ class CreateEpic extends Component {
           loading: true,
         });
         store.axiosEasyCreateIssue(req).then((res) => {
+          const dto = {
+            schemeCode: 'agile_issue',
+            context: res.typeCode,
+            pageCode: 'agile_issue_create',
+          };
+          createIssueField(res.issueId, dto);
           this.setState({
             loading: false,
           });
