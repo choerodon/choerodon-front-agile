@@ -451,11 +451,11 @@ class DataLog extends Component {
                                 <img src={datalog.imageUrl} alt="" style={{ width: '100%' }} />
                               ) : (
                                 <span style={{
-                                    width: 62, height: 62, lineHeight: '62px', textAlign: 'center', color: '#6473c3',
-                                  }}
-                                  >
-                                    {this.getFirst(datalog.name)}
-                                  </span>
+                                  width: 62, height: 62, lineHeight: '62px', textAlign: 'center', color: '#6473c3',
+                                }}
+                                >
+                                  {this.getFirst(datalog.name)}
+                                </span>
                               )
                             }
                           </div>
