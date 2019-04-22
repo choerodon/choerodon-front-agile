@@ -4,11 +4,13 @@ import {
 } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import {
-  Form, Input, Button, Icon, 
+  Form, Input, Button, Icon, Tabs, Table,
 } from 'choerodon-ui';
+import moment from 'moment';
 
 const { AppState } = stores;
 const FormItem = Form.Item;
+const { TabPane } = Tabs;
 
 class ProgramSetting extends Component {
   constructor(props) {
@@ -17,6 +19,8 @@ class ProgramSetting extends Component {
       loading: false,
       shortName: undefined,
       origin: undefined,
+      currentTab: '1',
+      proData: [],
     };
   }
 
@@ -34,6 +38,12 @@ class ProgramSetting extends Component {
         });
         form.setFieldsValue({
           shortName: res.projectCode,
+        });
+      });
+    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/program_info/team`)
+      .then((res) => {
+        this.setState({
+          proData: res,
         });
       });
   }
@@ -73,9 +83,32 @@ class ProgramSetting extends Component {
     });
   };
 
+  handleTabChange = (currentTab) => {
+    this.setState({
+      currentTab,
+    });
+  };
+
+  getColumns = () => [{
+    title: '团队项目名称',
+    dataIndex: 'projName',
+    key: 'projName',
+  }, {
+    title: '人数',
+    dataIndex: 'userCount',
+    key: 'userCount',
+  }, {
+    title: '加入时间',
+    dataIndex: 'startDate',
+    key: 'startDate',
+    render: startDate => <span>{moment(startDate).format('YYYY-MM-DD')}</span>,
+  }];
+
   render() {
     const { form: { getFieldDecorator } } = this.props;
-    const { shortName, loading } = this.state;
+    const {
+      shortName, loading, currentTab, proData,
+    } = this.state;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
@@ -90,45 +123,57 @@ class ProgramSetting extends Component {
             <span>刷新</span>
           </Button>
         </Header>
-        <Content
-          title="项目设置"
-          description="根据项目需求，你可以修改项目编码。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/setup/project-setting/"
-        >
-          <div style={{ marginTop: 8 }}>
-            <Form layout="vertical">
-              <FormItem label="项目编码" style={{ width: 512 }}>
-                {getFieldDecorator('shortName', {
-                  rules: [{ required: true, message: '项目编码必填' }],
-                  initialValue: shortName,
-                })(
-                  <Input
-                    label="项目编码"
-                    maxLength={5}
-                  />,
-                )}
-              </FormItem>
-            </Form>
-            <div style={{ padding: '12px 0', borderTop: '1px solid rgba(0, 0, 0, 0.12)' }}>
-              <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.project-info.updateProjectInfo']}>
-                <Button
-                  type="primary"
-                  funcType="raised"
-                  loading={loading}
-                  onClick={() => this.handleUpdateProgramSetting()}
-                >
-                  {'保存'}
-                </Button>
-              </Permission>
-              <Button
-                funcType="raised"
-                style={{ marginLeft: 12 }}
-                onClick={() => this.getProgramSetting()}
-              >
-                {'取消'}
-              </Button>
-            </div>
-          </div>
+        <Content>
+          <Tabs defaultActiveKey="1" activeKey={currentTab} onChange={this.handleTabChange}>
+            <TabPane tab="项目编码" key="1">
+              根据项目需求，你可以修改项目编码。
+              <div style={{ marginTop: 20 }}>
+                <Form layout="vertical">
+                  <FormItem label="项目编码" style={{ width: 512 }}>
+                    {getFieldDecorator('shortName', {
+                      rules: [{ required: true, message: '项目编码必填' }],
+                      initialValue: shortName,
+                    })(
+                      <Input
+                        label="项目编码"
+                        maxLength={5}
+                      />,
+                    )}
+                  </FormItem>
+                </Form>
+                <div style={{ padding: '12px 0', borderTop: '1px solid rgba(0, 0, 0, 0.12)' }}>
+                  <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.project-info.updateProjectInfo']}>
+                    <Button
+                      type="primary"
+                      funcType="raised"
+                      loading={loading}
+                      onClick={() => this.handleUpdateProgramSetting()}
+                    >
+                      {'保存'}
+                    </Button>
+                  </Permission>
+                  <Button
+                    funcType="raised"
+                    style={{ marginLeft: 12 }}
+                    onClick={() => this.getProgramSetting()}
+                  >
+                    {'取消'}
+                  </Button>
+                </div>
+              </div>
+            </TabPane>
+            <TabPane tab="ART设置" key="2">
+              列表显示项目群关联的团队项目信息。
+              <div style={{ width: 520, marginTop: 20 }}>
+                <Table
+                  columns={this.getColumns()}
+                  dataSource={proData}
+                  filterBar={false}
+                  pagination={false}
+                />
+              </div>
+            </TabPane>
+          </Tabs>
         </Content>
       </Page>
     );

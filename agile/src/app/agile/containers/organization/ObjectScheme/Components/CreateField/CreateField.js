@@ -242,6 +242,7 @@ class CreateField extends Component {
                   label={<FormattedMessage id="field.context" />}
                   dropdownMatchSelectWidth
                   size="default"
+                  mode="multiple"
                 >
                   {fieldContext.map(ctx => (
                     <Option

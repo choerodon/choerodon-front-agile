@@ -25,21 +25,21 @@ class UserHead extends Component {
 
   render() {
     const {
-      user, color, size, hiddenText, style, type,
+      user, color, size, hiddenText, style, type, tooltip = true,
     } = this.props;
     const s = size || 18;
     return (
-      <div
-        className="c7n-userHead"
-        style={{
-          ...style,
-          display: user.id ? 'flex' : 'none',
-          maxWidth: 108,
-        }}
-      >
-        {
-          type === 'datalog' ? (
-            <Tooltip title={`${user.loginName || ''}${user.realName || ''}`}>
+      <Tooltip title={tooltip ? `${user.loginName || ''}${user.realName || ''}` : ''}>
+        <div
+          className="c7n-userHead"
+          style={{
+            ...style,
+            display: user.id ? 'flex' : 'none',
+            maxWidth: 108,
+          }}
+        >
+          {
+            type === 'datalog' ? (
               <div
                 style={{
                   width: 40,
@@ -70,9 +70,7 @@ class UserHead extends Component {
                   )
                 }
               </div>
-            </Tooltip>
-          ) : (
-            <Tooltip title={`${user.loginName || ''}${user.realName || ''}`}>
+            ) : (
               <div
                 style={{
                   width: s,
@@ -102,27 +100,26 @@ class UserHead extends Component {
                   )
                 }
               </div>
-            </Tooltip>
-          )
-        }
-        {
-          hiddenText ? null : (
-            <span
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                fontSize: '13px',
-                lineHeight: '20px',
-                color: color || 'rgba(0, 0, 0, 0.65)',
-              }}
-            >
-              {`${user.realName || ''}`}
-            </span>
-          )
-        }
-
-      </div>
+            )
+          }
+          {
+            hiddenText ? null : (
+              <span
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  fontSize: '13px',
+                  lineHeight: '20px',
+                  color: color || 'rgba(0, 0, 0, 0.65)',
+                }}
+              >
+                {`${user.realName || ''}`}
+              </span>
+            )
+          }
+        </div>
+      </Tooltip>
     );
   }
 }

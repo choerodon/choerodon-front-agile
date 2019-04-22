@@ -27,7 +27,7 @@ export default class Assignee extends Component {
               style={{ marginLeft: 8 }}
               user={{
                 id: assigneeId,
-                loginName: assigneeName,
+                loginName: '',
                 realName: assigneeName,
                 avatar: imageUrl,
               }}
