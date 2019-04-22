@@ -8,6 +8,7 @@
   "scripts": {
     "start": "choerodon-front-boot start --config ../config.js",
     "build": "choerodon-front-boot build --config ../config.js",
+    "linux_build": "node --max_old_space_size=2048 node_modules/choerodon-front-boot/bin/choerodon-front-boot-build --config ./config.js",
     "lint": "npm run lint:es && npm run lint:style",
     "lint:es": "eslint src/**/*.js ../config.js",
     "lint:style": "stylelint src/**/*.scss --syntax scss",
