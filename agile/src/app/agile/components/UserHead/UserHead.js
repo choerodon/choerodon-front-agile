@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tooltip } from 'choerodon-ui';
 
 class UserHead extends Component {
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     const { user } = this.props;
     if (nextProps.user.id === user.id) {
       return false;
