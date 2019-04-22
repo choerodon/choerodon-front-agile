@@ -85,13 +85,16 @@ const { Text, Edit } = TextEditToggle;
     const { selectLoading, originUsers } = this.state;
     const { store, loginUserId, hasPermission } = this.props;
     const issue = store.getIssue;
-    const { reporterId, reporterName, reporterImageUrl } = issue;
+    const {
+      reporterId, reporterName, reporterImageUrl,
+      reporterRealName, reporterLoginName,
+    } = issue;
     const targetUser = _.find(originUsers, { id: reporterId, enabled: true });
     if (!targetUser && reporterId) {
       originUsers.unshift({
         id: reporterId,
-        loginName: '',
-        realName: reporterName,
+        loginName: reporterLoginName,
+        realName: reporterRealName,
         imageUrl: reporterImageUrl,
         enabled: true,
       });
@@ -118,8 +121,8 @@ const { Text, Edit } = TextEditToggle;
                   <UserHead
                     user={{
                       id: reporterId,
-                      loginName: '',
-                      realName: reporterName,
+                      loginName: reporterLoginName,
+                      realName: reporterRealName,
                       avatar: reporterImageUrl,
                     }}
                   />

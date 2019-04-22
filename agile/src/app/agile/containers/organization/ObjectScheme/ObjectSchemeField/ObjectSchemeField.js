@@ -47,17 +47,30 @@ class ObjectSchemeField extends Component {
       isCheck: false,
       dateDisable: false,
       spinning: true,
+      fieldContext: [],
     };
   }
 
   componentDidMount() {
     this.initCurrentMenuType();
+    this.loadContext();
     this.loadFieldById();
   }
 
   initCurrentMenuType = () => {
     const { ObjectSchemeStore } = this.props;
     ObjectSchemeStore.initCurrentMenuType(AppState.currentMenuType);
+  };
+
+  loadContext = () => {
+    const { ObjectSchemeStore } = this.props;
+    ObjectSchemeStore.loadLookupValue('object_scheme_field_context').then((res) => {
+      if (!res.failed) {
+        this.setState({
+          fieldContext: res.lookupValues,
+        });
+      }
+    });
   };
 
   loadFieldById = () => {
@@ -124,6 +137,7 @@ class ObjectSchemeField extends Component {
         const postData = {
           ...field,
           name: data.name,
+          context: data.context,
           defaultValue: String(data.defaultValue || ''),
           extraConfig: !!data.check,
         };
@@ -238,7 +252,8 @@ class ObjectSchemeField extends Component {
     } = menu;
     const field = ObjectSchemeStore.getField;
     const {
-      fieldOptions, submitting, defaultValue, isCheck, dateDisable, spinning,
+      fieldOptions, submitting, defaultValue, isCheck,
+      dateDisable, spinning, fieldContext,
     } = this.state;
 
     return (
@@ -281,6 +296,35 @@ class ObjectSchemeField extends Component {
                     disabled
                     label={<FormattedMessage id="field.type" />}
                   />,
+                )}
+              </FormItem>
+              <FormItem
+                {...formItemLayout}
+                className="issue-sidebar-form"
+              >
+                {getFieldDecorator('context', {
+                  rules: [{
+                    required: true,
+                    message: '显示范围为必填项！',
+                  }],
+                  initialValue: field.context && field.context.slice(),
+                })(
+                  <Select
+                    style={{ width: 520 }}
+                    label={<FormattedMessage id="field.context" />}
+                    dropdownMatchSelectWidth
+                    size="default"
+                    mode="multiple"
+                  >
+                    {fieldContext.map(ctx => (
+                      <Option
+                        value={ctx.valueCode}
+                        key={ctx.valueCode}
+                      >
+                        {ctx.name}
+                      </Option>
+                    ))}
+                  </Select>,
                 )}
               </FormItem>
               {
