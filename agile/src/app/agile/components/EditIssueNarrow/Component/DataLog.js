@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Popconfirm, Popover } from 'choerodon-ui';
-import { AppState } from 'choerodon-front-boot';
+import { Icon, Popover } from 'choerodon-ui';
 import UserHead from '../../UserHead';
 import { DatetimeAgo } from '../../CommonComponent';
 import './DataLog.scss';
@@ -44,7 +43,6 @@ class DataLog extends Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      user: {},
     };
   }
 
@@ -132,21 +130,15 @@ class DataLog extends Component {
         }
         return '移除';
       }
+      return '';
     }
   }
 
   getMode2(datalog) {
-    const {
-      field, oldString, oldValue, newString, newValue,
-    } = datalog;
+    const { field } = datalog;
     if (field === 'status') {
       return '';
     }
-
-    // if (field === 'Sprint' && (!oldValue && oldValue !== 0) && (newValue || newValue === 0)) {
-    //   return <span style={{ color: '#000' }}>了一个</span>;
-    // }
-
     return ` 【${PROP[field] || PROP_SIMPLE[field]}】 `;
   }
 
@@ -194,6 +186,7 @@ class DataLog extends Component {
       if (field === 'labels') {
         return '';
       }
+      return '';
     }
   }
 
@@ -257,6 +250,7 @@ class DataLog extends Component {
         }
         return ` 【${oldString}】 `;
       }
+      return '';
     }
   }
 
@@ -391,7 +385,7 @@ class DataLog extends Component {
 
   render() {
     const {
-      datalog, i, origin, user, callback, expand,
+      datalog, i, origin, expand,
     } = this.props;
     return (
       <div>

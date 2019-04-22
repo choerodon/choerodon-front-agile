@@ -2,14 +2,7 @@ import React, { Component } from 'react';
 import { Icon, Popconfirm, Tooltip } from 'choerodon-ui';
 import { stores, Permission } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
-import _ from 'lodash';
-import WYSIWYGEditor from '../../WYSIWYGEditor';
-import { IssueDescription } from '../../CommonComponent';
-import {
-  delta2Html, text2Delta, beforeTextUpload, formatDate, 
-} from '../../../common/utils';
-import IssueStore from '../../../stores/project/sprint/IssueStore';
-import { deleteIssue, updateCommit } from '../../../api/NewIssueApi';
+import { deleteIssue } from '../../../api/NewIssueApi';
 import PriorityTag from '../../PriorityTag';
 import StatusTag from '../../StatusTag';
 import TypeTag from '../../TypeTag';
@@ -22,18 +15,29 @@ class IssueList extends Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      paramOpenIssueId: undefined,
     };
   }
 
-  confirm(issueId, e) {
-    this.handleDeleteIssue(issueId);
+  componentDidMount() {
+    const { location: { search }, onOpen } = this.props;
+    const theRequest = this.GetRequest(search);
+    const { paramIssueId, paramOpenIssueId } = theRequest;
+    if (paramOpenIssueId && paramIssueId && paramOpenIssueId !== paramIssueId) {
+      onOpen(paramOpenIssueId);
+    }
   }
 
+  confirm = (issueId) => {
+    this.handleDeleteIssue(issueId);
+  };
+
   handleDeleteIssue(issueId) {
+    const { onRefresh } = this.props;
     deleteIssue(issueId)
-      .then((res) => {
-        this.props.onRefresh();
+      .then(() => {
+        if (onRefresh) {
+          onRefresh();
+        }
       });
   }
 
@@ -49,26 +53,10 @@ class IssueList extends Component {
     return theRequest;
   }
 
-  componentDidMount() {
-    const { location: { search } } = this.props;
-    const theRequest = this.GetRequest(search);
-    const { paramIssueId, paramOpenIssueId } = theRequest;
-    this.setState({
-      paramOpenIssueId,
-    });
-    if (paramOpenIssueId && paramIssueId && paramOpenIssueId !== paramIssueId) {
-      this.props.onOpen(paramOpenIssueId);
-    }
-  }
-
-  componentWillUnmount() {
-    this.setState({
-      paramOpenIssueId: undefined,
-    });
-  }
-
   render() {
-    const { issue, i, showAssignee } = this.props;
+    const {
+      issue, i, showAssignee, onOpen,
+    } = this.props;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
     return (
@@ -98,7 +86,7 @@ class IssueList extends Component {
               }}
               role="none"
               onClick={() => {
-                this.props.onOpen(issue.issueId);
+                onOpen(issue.issueId);
               }}
             >
               {`${issue.summary}`}
