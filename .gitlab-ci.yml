@@ -1,21 +1,20 @@
+image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/cibase:0.8.1
 stages:
+  - package
   - build
-  - release
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 build:
-  image: registry-vpc.cn-shanghai.aliyuncs.com/choerodon-tools/cifront:0.8.0
-  stage: build
+  stage: package
   script:
     - node_module agile
-    - node_build build
+    - node_build linux_build
     - cd $CI_PROJECT_DIR
     - kaniko -c $CI_PROJECT_DIR -f $CI_PROJECT_DIR/Dockerfile -d ${DOCKER_REGISTRY}/${GROUP_NAME}/${PROJECT_NAME}:${CI_COMMIT_TAG}
 
 release:
-  image: registry-vpc.cn-shanghai.aliyuncs.com/choerodon-tools/cibase:0.8.0
   stage: release
   script:
     - chart_build
@@ -38,7 +37,7 @@ release:
 
     function node_build(){
         chmod -R 777 node_modules
-        npm run ${1:-"build"}
+        npm run ${1:-"build"} -registry https://nexus.choerodon.com.cn/repository/choerodon-npm/  --sass-binary-site=http://npm.taobao.org/mirrors/node-sass --loglevel verbose
         find dist -name '*.js' | xargs sed -i "s/localhost:version/$CI_COMMIT_TAG/g"
     }
 
