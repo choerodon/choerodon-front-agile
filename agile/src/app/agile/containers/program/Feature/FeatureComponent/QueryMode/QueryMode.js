@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import FetureTable from '../FeatureTable';
+import FileSaver from 'file-saver';
+import { stores } from 'choerodon-front-boot';
+import FeatureTable from '../FeatureTable';
 import SearchArea from '../SearchArea';
-import { getFeatures } from '../../../../../api/FeatureApi';
+import { getFeatures, exportFeatures } from '../../../../../api/FeatureApi';
 import FeatureStore from '../../../../../stores/program/Feature/FeatureStore';
 import { getMyFilters } from '../../../../../api/NewIssueApi';
 
+const { AppState } = stores;
 const getDefaultSearchDTO = () => ({
   advancedSearchArgs: {
     assigneeIds: [],
@@ -96,6 +99,16 @@ class QueryMode extends Component {
     });
   }
 
+  exportFeatures = () => {
+    const { searchDTO } = this.state;
+    exportFeatures(searchDTO).then((data) => {
+      const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const fileName = `${AppState.currentMenuType.name}.xlsx`;
+      FileSaver.saveAs(blob, fileName);
+      Choerodon.prompt('导出成功');
+    });
+  }
+
   handleCreateMyFilterCancel = () => {
     this.setState({
       createMyFilterVisible: false,
@@ -157,6 +170,9 @@ class QueryMode extends Component {
       page: current - 1,
       size: pageSize,
     }, searchDTO).then((res) => {
+      if (res.failed) {
+        return;
+      }
       const {
         content: issues, size, number, totalElements,
       } = res;
@@ -228,11 +244,11 @@ class QueryMode extends Component {
           onClearFilter={this.handleClearFilter}
           onCancel={this.handleCreateMyFilterCancel}
           onCreate={this.handleCreateMyFilter}
-          onSaveClick={this.handleSaveClick}      
+          onSaveClick={this.handleSaveClick}
           onManageClick={this.handleManageClick}
           onClose={this.handleManageClose}
         />
-        <FetureTable
+        <FeatureTable
           loading={loading}
           dataSource={issues}
           pagination={pagination}

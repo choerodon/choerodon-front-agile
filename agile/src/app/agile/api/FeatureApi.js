@@ -13,3 +13,6 @@ export function getFeaturesInProject() {
 export function getFeaturesByEpic(epicId) {
   return axios.get(`/agile/v1/projects/${getProjectId()}/issues/feature/select_data?organizationId=${getOrganizationId()}${epicId ? `&epicId=${epicId}` : ''}`);
 }
+export function exportFeatures(search) {
+  return axios.post(`/zuul/agile/v1/projects/${getProjectId()}/issues/program/export?organizationId=${getOrganizationId()}`, search, { responseType: 'arraybuffer' });
+}

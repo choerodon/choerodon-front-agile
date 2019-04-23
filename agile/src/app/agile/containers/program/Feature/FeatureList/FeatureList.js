@@ -72,6 +72,10 @@ class FeatureList extends Component {
     });
   };
 
+  handleExportClick = () => {
+    this.QueryMode.exportFeatures();
+  }
+
   render() {
     const { visible, mode, display } = this.state;
     const { HeaderStore } = this.props;
@@ -100,6 +104,11 @@ class FeatureList extends Component {
             <Icon type="refresh" />
             {'刷新'}
           </Button>
+          {mode === 'query' && (
+            <Button icon="get_app" onClick={this.handleExportClick}>
+              <span>导出</span>
+            </Button>
+          )}
           {mode === 'plan' && (
             <Checkbox
               disabled={!pi.length}

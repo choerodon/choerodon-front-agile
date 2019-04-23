@@ -19,7 +19,7 @@ const getColumns = filters => ([
     className: 'issueId',
     sorterId: 'issueId',
     width: 100,  
-    // filters: [],
+    filters: [],
     render: text => <IssueNum text={text} />,
   },
   {
