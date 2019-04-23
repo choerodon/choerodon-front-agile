@@ -187,7 +187,7 @@ class QueryMode extends Component {
     const searchDTO = filterConvert({ ...this.advancedFilters, ...this.tableFilters });
     this.loadFeatures({ pagination, searchDTO });
     this.setState({
-      selectedFilter: null,
+      selectedFilter: undefined,
       searchDTO,
     });
   }
