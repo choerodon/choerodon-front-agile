@@ -7,6 +7,7 @@ import { inject } from 'mobx-react';
 import {
   asyncRouter, asyncLocaleProvider, stores, nomatch, 
 } from 'choerodon-front-boot';
+import './Agile.scss';
 
 const Home = asyncRouter(() => import('./Home'));
 const RELEASEINDEX = asyncRouter(() => import('./project/Release'));

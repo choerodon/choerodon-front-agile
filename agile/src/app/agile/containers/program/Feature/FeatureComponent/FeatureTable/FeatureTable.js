@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, memo } from 'react';
 import PropTypes from 'prop-types';
 import {
   Table,
@@ -147,7 +147,7 @@ const FeatureTable = ({
   onRow,
   onCreateFeature,
 }) => (
-  <FiltersProvider fields={[{ key: 'issueStatus', args: ['program'] }, 'epic', 'pi']}>
+  <FiltersProvider fields={[{ key: 'issueStatus', args: ['program'] }, 'epic', 'pi', 'priority']}>
     {
         filters => (
           <div className="c7nagile-FeatureTable">
@@ -172,4 +172,4 @@ FeatureTable.propTypes = {
 
 };
 
-export default FeatureTable;
+export default memo(FeatureTable);

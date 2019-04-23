@@ -7,12 +7,12 @@ export function getSelf() {
   return axios.get('/iam/v1/users/self');
 }
 
-export function getUsers(param) {
+export function getUsers(param, userId) {
   const projectId = AppState.currentMenuType.id;
   if (param) {
-    return axios.get(`/iam/v1/projects/${projectId}/users?param=${param}`);
+    return axios.get(`/iam/v1/projects/${projectId}/users?param=${param}${userId ? `&id=${userId}` : ''}`);
   }
-  return axios.get(`/iam/v1/projects/${projectId}/users?size=40`);
+  return axios.get(`/iam/v1/projects/${projectId}/users?size=5${userId ? `&id=${userId}` : ''}`);
 }
 
 export function getUser(userId) {
