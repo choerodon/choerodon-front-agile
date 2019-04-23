@@ -185,18 +185,14 @@ class ComponentHome extends Component {
         width: '15%',
         render: (managerId, record) => (
           <div style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
-            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={record.managerName}>
-              <div>
-                <UserHead
-                  user={{
-                    id: record.managerId,
-                    loginName: '',
-                    realName: record.managerName,
-                    avatar: record.imageUrl,
-                  }}
-                />
-              </div>
-            </Tooltip>
+            <UserHead
+              user={{
+                id: record.managerId,
+                loginName: record.managerLoginName,
+                realName: record.managerRealName,
+                avatar: record.imageUrl,
+              }}
+            />
           </div>
         ),
         filters: [],
