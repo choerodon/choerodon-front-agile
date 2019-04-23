@@ -82,11 +82,11 @@ const { Text, Edit } = TextEditToggle;
   };
 
   render() {
-    const { selectLoading, originUsers, newAssigneeId } = this.state;
+    const { selectLoading, originUsers } = this.state;
     const { store } = this.props;
     const issue = store.getIssue;
     const {
-      assigneeId, assigneeName, assigneeImageUrl,
+      assigneeId, assigneeImageUrl,
       assigneeLoginName, assigneeRealName,
     } = issue;
     const targetUser = _.find(originUsers, { id: assigneeId, enabled: true });

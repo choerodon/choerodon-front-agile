@@ -33,7 +33,8 @@ export default class SwimLaneHeader extends Component {
   }
 
   renderStoryComponent = ({
-    issueTypeDTO, issueNum, categoryCode, statusName, summary, assigneeId, assigneeName, imageUrl,
+    issueTypeDTO, issueNum, categoryCode, statusName, summary, assigneeId,
+    assigneeName, imageUrl, assigneeLoginName, assigneeRealName,
   }) => {
     const { parentIssue } = this.props;
     return (
@@ -66,8 +67,8 @@ export default class SwimLaneHeader extends Component {
           size={24}
           user={{
             id: assigneeId,
-            loginName: assigneeName,
-            realName: assigneeName,
+            loginName: assigneeLoginName,
+            realName: assigneeRealName,
             avatar: imageUrl,
           }}
         />
@@ -87,15 +88,17 @@ export default class SwimLaneHeader extends Component {
     );
   };
 
-  renderAssigneeComponent = ({ assigneeName, assigneeAvatarUrl, assigneeId }) => (
+  renderAssigneeComponent = ({
+    assigneeName, assigneeAvatarUrl, assigneeId, assigneeLoginName, assigneeRealName,
+  }) => (
     <React.Fragment>
       <UserHead
         hiddenText
         size={24}
         user={{
           id: assigneeId,
-          loginName: assigneeName,
-          realName: assigneeName,
+          loginName: assigneeLoginName,
+          realName: assigneeRealName,
           avatar: assigneeAvatarUrl,
         }}
       />

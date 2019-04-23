@@ -339,18 +339,14 @@ class ReleaseDetail extends Component {
         dataIndex: 'assigneeName',
         key: 'assigneeName',
         render: (text, record) => (text ? (
-          <Tooltip mouseEnterDelay={0.5} title={`经办人： ${text}`}>
-            <div>
-              <UserHead
-                user={{
-                  id: record.assigneeId,
-                  loginName: '',
-                  realName: text,
-                  avatar: record.assigneeImageUrl,
-                }}
-              />
-            </div>
-          </Tooltip>
+          <UserHead
+            user={{
+              id: record.assigneeId,
+              loginName: record.assigneeLoginName,
+              realName: record.assigneeRealName,
+              avatar: record.assigneeImageUrl,
+            }}
+          />
 
         ) : ''),
         filters: filterMap.get('assigneeName'),

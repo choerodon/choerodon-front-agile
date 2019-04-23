@@ -82,7 +82,7 @@ const { Text, Edit } = TextEditToggle;
   };
 
   render() {
-    const { selectLoading, originUsers, newAssigneeId } = this.state;
+    const { selectLoading, originUsers } = this.state;
     const { store } = this.props;
     const issue = store.getIssue;
     const { assigneeId, assigneeName, assigneeImageUrl } = issue;

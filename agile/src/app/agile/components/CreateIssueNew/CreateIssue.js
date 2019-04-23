@@ -428,7 +428,7 @@ class CreateIssue extends Component {
             className="fieldWith"
           >
             {fieldOptions && fieldOptions.length > 0
-            && fieldOptions.map(item => (
+            && fieldOptions.filter(option => option.enabled).map(item => (
               <Radio
                 className="radioStyle"
                 value={item.id}
@@ -453,7 +453,7 @@ class CreateIssue extends Component {
           >
             <Row>
               {fieldOptions && fieldOptions.length > 0
-              && fieldOptions.map(item => (
+              && fieldOptions.filter(option => option.enabled).map(item => (
                 <Col
                   span={24}
                   key={item.id}
@@ -502,7 +502,7 @@ class CreateIssue extends Component {
           allowClear={!required}
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.map(item => (
+          && field.fieldOptions.filter(option => option.enabled).map(item => (
             <Option
               value={item.id}
               key={item.id}
@@ -521,7 +521,7 @@ class CreateIssue extends Component {
           className="fieldWith"
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.map(item => (
+          && field.fieldOptions.filter(option => option.enabled).map(item => (
             <Option
               value={item.id}
               key={item.id}

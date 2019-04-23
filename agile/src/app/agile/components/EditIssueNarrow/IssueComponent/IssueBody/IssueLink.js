@@ -28,7 +28,7 @@ import LinkList from '../../Component/LinkList';
       onUpdate();
     }
     if (reloadIssue) {
-      reloadIssue(issueId);
+      reloadIssue();
     }
   }
 
