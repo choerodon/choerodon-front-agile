@@ -81,23 +81,23 @@ class EditFieldConfiguration extends Component {
           (text && text.length > 0 ? (
             <ul className="notificationTypeList">
               {
-                      text.slice(0, 20).map((item) => {
-                        if (item !== '用户') {
-                          if (item === '当前处理人') {
-                            return <li>经办人</li>;
-                          }
-                          return (
-                            <li>{item}</li>
-                          );
-                        } else if (item === '用户') {
-                          return (
-                            <li>
-                              {`用户: ${users && users.length && users[index].length > 0 ? users[index].map(o => o.name).join(', ') : '-'}`}
-                            </li>
-                          );
-                        }
-                      })
-                   }
+                  text.slice(0, 20).map((item) => {
+                    if (item !== '用户') {
+                      if (item === '当前处理人') {
+                        return <li>经办人</li>;
+                      }
+                      return (
+                        <li>{item}</li>
+                      );
+                    } else if (item === '用户') {
+                      return (
+                        <li>
+                          {`用户: ${users && users.length && users[index].length > 0 ? users[index].map(o => o.name).join(', ') : '-'}`}
+                        </li>
+                      );
+                    }
+                  })
+               }
             </ul>
           ) : '-')
         )

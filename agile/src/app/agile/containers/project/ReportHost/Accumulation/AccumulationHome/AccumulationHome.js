@@ -103,7 +103,7 @@ class AccumulationHome extends Component {
       AccumulationStore.setColumnData(data2);
       AccumulationStore.axiosGetProjectInfo().then((res) => {
         AccumulationStore.setProjectInfo(res);
-        AccumulationStore.setStartDate(moment(res.creationDate.split(' ')[0]));
+        AccumulationStore.setStartDate(moment().subtract(2, 'months'));
         AccumulationStore.setEndDate(moment());
         if (type) {
           // eslint-disable-next-line no-return-assign
@@ -122,7 +122,7 @@ class AccumulationHome extends Component {
     const columnData = AccumulationStore.getColumnData;
     const endDate = AccumulationStore.getEndDate && `${AccumulationStore.getEndDate.format('YYYY-MM-DD')} 23:59:59`;
     const filterList = AccumulationStore.getFilterList;
-    const startDate = AccumulationStore.getStartDate && AccumulationStore.getStartDate.format('YYYY-MM-DD HH:mm:ss');
+    const startDate = AccumulationStore.getStartDate && AccumulationStore.getStartDate.format('YYYY-MM-DD 00:00:00');
     const columnIds = [];
     const quickFilterIds = [];
     let boardId;

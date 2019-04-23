@@ -395,7 +395,7 @@ class ReleaseDetail extends Component {
               </p>
               <p>
                 <Tooltip title={item.name} placement="bottom">
-                  <span>{item.name}</span>
+                  <span>{item.realName ? item.realName : item.name}</span>
                 </Tooltip>
               </p>
             </div>
@@ -411,7 +411,7 @@ class ReleaseDetail extends Component {
                 </p>
                 <p>
                   <Tooltip title={item.name} placement="bottom">
-                    <span>{item.name}</span>
+                    <span>{item.realName ? item.realName : item.name}</span>
                   </Tooltip>
                 </p>
               </div>
@@ -623,7 +623,7 @@ class ReleaseDetail extends Component {
                             <td style={{ width: '158px' }}>
                               <div className="pie-legend-icon" style={{ background: colors[index] }} />
                               <Tooltip title={item && item.name}>
-                                <div className="pie-legend-text">{item.name ? item.name : '未分配'}</div>
+                                <div className="pie-legend-text">{item.name ? (item.realName && item.realName || item.name) : '未分配'}</div>
                               </Tooltip>
                             </td>
                             <td style={{ width: '62px' }}>
