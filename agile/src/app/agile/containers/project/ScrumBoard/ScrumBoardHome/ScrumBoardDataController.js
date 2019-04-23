@@ -137,6 +137,8 @@ export default class ScrumBoardDataController {
       assigneeId,
       assigneeAvatarUrl: flattenedArr.filter(issue => issue.assigneeId === assigneeId)[0].imageUrl,
       assigneeName: flattenedArr.filter(issue => issue.assigneeId === assigneeId)[0].assigneeName,
+      assigneeRealName: flattenedArr.filter(issue => issue.assigneeId === assigneeId)[0].assigneeRealName,
+      assigneeLoginName: flattenedArr.filter(issue => issue.assigneeId === assigneeId)[0].assigneeLoginName,
       subIssueData: flattenedArr.filter(issue => issue.assigneeId === assigneeId),
     }));
     const issueWithAssigneeMap = issueWithAssigneeArr.map(assigneeObj => [assigneeObj.assigneeId, assigneeObj]);

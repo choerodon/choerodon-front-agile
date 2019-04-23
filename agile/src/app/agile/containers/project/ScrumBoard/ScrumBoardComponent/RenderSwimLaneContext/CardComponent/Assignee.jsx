@@ -1,4 +1,3 @@
-import { Tooltip } from 'choerodon-ui';
 import React, { Component } from 'react';
 import UserHead from '../../../../../../components/UserHead/UserHead';
 
@@ -10,25 +9,28 @@ import UserHead from '../../../../../../components/UserHead/UserHead';
  * @param imageUrl
  */
 export default class Assignee extends Component {
-  shouldComponentUpdate(nextProps, nextState, nextContext) {
+  shouldComponentUpdate(nextProps) {
     const { assigneeName, assigneeId, imageUrl } = this.props;
     return nextProps.assigneeName !== assigneeName || nextProps.assigneeId !== assigneeId || nextProps.imageUrl !== imageUrl;
   }
 
   render() {
-    const { assigneeName, assigneeId, imageUrl } = this.props;
+    const {
+      assigneeId, imageUrl,
+      assigneeRealName, assigneeLoginName,
+    } = this.props;
     return (
-      <Tooltip title={assigneeName ? `经办人: ${assigneeName}` : ''}>
+      <div>
         {
-          assigneeName ? (
+          assigneeId ? (
             <UserHead
               hiddenText
               size={32}
               style={{ marginLeft: 8 }}
               user={{
                 id: assigneeId,
-                loginName: '',
-                realName: assigneeName,
+                loginName: assigneeLoginName,
+                realName: assigneeRealName,
                 avatar: imageUrl,
               }}
             />
@@ -43,7 +45,7 @@ export default class Assignee extends Component {
             />
           )
         }
-      </Tooltip>
+      </div>
     );
   }
 }

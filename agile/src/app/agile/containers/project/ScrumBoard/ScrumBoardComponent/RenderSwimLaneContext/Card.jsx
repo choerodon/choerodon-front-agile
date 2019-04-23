@@ -1,7 +1,4 @@
 import React, { Component } from 'react';
-import { Icon, Tooltip, Rate } from 'choerodon-ui';
-import classnames from 'classnames';
-import { observer } from 'mobx-react';
 import { Draggable } from 'react-beautiful-dnd';
 import {
   CardTypeTag, IssueNum, StayDay, StatusName, Priority, Assignee, Summary,
@@ -9,7 +6,7 @@ import {
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
 import './StatusIssue.scss';
 
-export default class CardProvider extends React.Component {
+export default class CardProvider extends Component {
   constructor(props) {
     super(props);
     this.ref = {};
@@ -111,7 +108,8 @@ export default class CardProvider extends React.Component {
                       </div>
                     </div>
                     <Assignee
-                      assigneeName={issue.assigneeName}
+                      assigneeLoginName={issue.assigneeLoginName}
+                      assigneeRealName={issue.assigneeRealName}
                       assigneeId={issue.assigneeId}
                       imageUrl={issue.imageUrl}
                     />
