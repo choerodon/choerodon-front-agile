@@ -5,7 +5,7 @@ import {
 } from 'choerodon-ui';
 import { stores, axios } from 'choerodon-front-boot';
 import moment from 'moment';
-import { find, difference } from 'lodash';
+import { find, difference, unionBy } from 'lodash';
 import SelectFocusLoad from '../../../../../components/SelectFocusLoad';
 import './AdvancedSearch.scss';
 
@@ -17,8 +17,8 @@ const SelectStyle = {
 };
 
 class AdvancedSearch extends PureComponent {
-  saveList = (type, List) => {
-    this[type] = List;
+  saveList = (type, idField, List) => {
+    this[type] = unionBy(this[type], List, idField);
   }
 
   checkFilterEmpty = () => {
@@ -103,6 +103,7 @@ class AdvancedSearch extends PureComponent {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Select
             allowClear
+            className="SelectTheme primary"
             style={SelectStyle}
             dropdownMatchSelectWidth={false}
             placeholder="我的筛选"
@@ -150,7 +151,7 @@ class AdvancedSearch extends PureComponent {
             style={SelectStyle}
             dropdownMatchSelectWidth={false}
             placeholder="状态"
-            saveList={this.saveList.bind(this, 'statusList')}
+            saveList={this.saveList.bind(this, 'statusList', 'id')}
             maxTagCount={0}
             optionLabelProp="name"
             maxTagPlaceholder={ommittedValues => `${ommittedValues.map(value => find(this.statusList, { id: value }).name).join(', ')}`}
@@ -195,7 +196,7 @@ class AdvancedSearch extends PureComponent {
             style={SelectStyle}
             dropdownMatchSelectWidth={false}
             placeholder="经办人"
-            saveList={this.saveList.bind(this, 'assigneeList')}
+            saveList={this.saveList.bind(this, 'assigneeList', 'id')}
             maxTagCount={0}
             maxTagPlaceholder={ommittedValues => `${ommittedValues.map(value => find(this.assigneeList, { id: value }).realName).join(', ')}`}
             onChange={this.handleSelectChange.bind(this, 'assigneeIds')}

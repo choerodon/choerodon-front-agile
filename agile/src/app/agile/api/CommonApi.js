@@ -12,7 +12,7 @@ export function getUsers(param, userId) {
   if (param) {
     return axios.get(`/iam/v1/projects/${projectId}/users?param=${param}${userId ? `&id=${userId}` : ''}`);
   }
-  return axios.get(`/iam/v1/projects/${projectId}/users?size=5${userId ? `&id=${userId}` : ''}`);
+  return axios.get(`/iam/v1/projects/${projectId}/users?size=40${userId ? `&id=${userId}` : ''}`);
 }
 
 export function getUser(userId) {

@@ -53,11 +53,18 @@
     transition: 0s;
   }
 
+  &.primary {
+    .ant-select-selection__placeholder {
+      color: #3f51b5;
+    }
+  }
+
   // antd Select 组件覆盖
-  .ant-select-selection--multiple {
+  .ant-select-selection {
 
     // cursor: pointer;
     padding: 0 0 5px 5px;
+
     .ant-select-search.ant-select-search--inline {
       display: none;
     }
@@ -67,9 +74,12 @@
       display: flex;
       align-items: center;
       margin-bottom: 0;
+      margin-top: 4px;
       padding: 0 !important;
 
-      ul {
+      // 单选多选内容框
+      ul,
+      .ant-select-selection-selected-value {
         width: calc(100% - 50px);
         overflow: hidden;
       }
@@ -84,6 +94,7 @@
       //     margin-bottom: 0;
       //   }
       .ant-select-clear {
+        flex-shrink: 0;
         position: static !important;
       }
 
