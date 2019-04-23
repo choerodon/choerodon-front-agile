@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Select } from 'choerodon-ui';
 import PropTypes from 'prop-types';
 import Types from './Types';
@@ -10,61 +10,97 @@ class SelectFocusLoad extends Component {
   state = {
     loading: false,
     List: [],
+    extraList: [],
   }
 
   componentDidMount() {
-    this.avoidShowError();    
+    this.avoidShowError();   
+    this.loadData(); 
   }
   
   componentDidUpdate(prevProps, prevState) {
     // eslint-disable-next-line react/destructuring-assignment
-    if (prevProps.value !== this.props.value) {
+    if ((prevProps.loading && !this.props.loading) || prevProps.value !== this.props.value) {
       this.avoidShowError();
     }
   }
 
+  getType=() => {
+    const { type } = this.props;  
+    const Type = { ...Types[type], ...this.props };
+    return Type;
+  }
+
   // 防止取值不在option列表中，比如user
   avoidShowError=() => {
-    const { type } = this.props;  
-    const Type = Types[type];
+    const Type = this.getType();
     if (Type.avoidShowError) {
       const { List } = this.state;
-      Type.avoidShowError(this.props, List).then((newList) => {
-        if (newList) {
+      Type.avoidShowError(this.props, List).then((extraList) => {        
+        if (extraList) {
           this.setState({
-            List: newList,
+            extraList,
           });
         }
       });
     }
   }
 
+  loadData=() => {
+    const {
+      afterLoad, loadWhenMount, 
+    } = this.props;  
+    const Type = this.getType();
+    const {
+      request,   
+    } = Type;
+    if (loadWhenMount) {
+      this.setState({
+        loading: true,
+      });
+      request().then((Data) => {
+        this.setState({
+          List: Data,
+          loading: false,
+        });
+        if (afterLoad) {
+          afterLoad(Data);
+        }
+      });
+    }
+  }
+
   render() {
-    const { loading, List } = this.state;
-    const { type, onChange } = this.props;  
-    const Type = Types[type];
-    const { render, request } = Type;
-    const Options = List.map(render);
+    const { loading, List, extraList } = this.state;
+    const { saveList, children } = this.props;  
+    const Type = this.getType();
+    const { render, request, props } = Type;
+    const totalList = [...List, ...extraList];
+    if (saveList) {
+      saveList(totalList);
+    }
+    const Options = totalList.map(render).concat(React.Children.toArray(children));   
     return (
       <Select
         filter       
         filterOption={false}
         loading={loading}   
-        style={{ width: 200 }}
+        // style={{ width: 200 }}
         onFilterChange={(value) => {
           this.setState({
             loading: true,
           });
           request(value).then((Data) => {
             this.setState({
-              List: Data.content,
+              List: Data,
               loading: false,
             });
-          });
+          });    
         }}
+        {...props}
         {...this.props}
       >
-        {Options}
+        {Options}        
       </Select>
     );
   }

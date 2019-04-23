@@ -5,9 +5,12 @@ import {
 } from 'choerodon-ui';
 import { stores, axios } from 'choerodon-front-boot';
 import moment from 'moment';
-import _ from 'lodash';
+import {
+  find, map, filter, unionBy, 
+} from 'lodash';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
 import IssueFilterControler from '../IssueFilterControler';
+import SelectFocusLoad from '../../../../components/SelectFocusLoad';
 
 const { Option } = Select;
 const { AppState } = stores;
@@ -71,9 +74,9 @@ class AdvancedSearch extends Component {
     handleIssueTypeSelectChange = (value) => {
       const selectedStatus = IssueStore.getSelectedStatus;
       const selectedPriority = IssueStore.getSelectedPriority;
-      IssueStore.setSelectedIssueType(_.map(value, 'key'));
+      IssueStore.setSelectedIssueType(map(value, 'key'));
       this.filterControler = new IssueFilterControler();
-      this.filterControler.advancedSearchArgsFilterUpdate(_.map(value, 'key'), selectedStatus, selectedPriority);
+      this.filterControler.advancedSearchArgsFilterUpdate(map(value, 'key'), selectedStatus, selectedPriority);
       IssueStore.judgeConditionWithFilter();
       IssueStore.judgeFilterConditionIsEmpty();
       IssueStore.updateIssues(this.filterControler);
@@ -82,9 +85,9 @@ class AdvancedSearch extends Component {
     handleStatusSelectChange = (value) => {
       const selectedIssueType = IssueStore.getSelectedIssueType;
       const selectedPriority = IssueStore.getSelectedPriority;
-      IssueStore.setSelectedStatus(_.map(value, 'key'));
+      IssueStore.setSelectedStatus(map(value, 'key'));
       this.filterControler = new IssueFilterControler();
-      this.filterControler.advancedSearchArgsFilterUpdate(selectedIssueType, _.map(value, 'key'), selectedPriority);
+      this.filterControler.advancedSearchArgsFilterUpdate(selectedIssueType, map(value, 'key'), selectedPriority);
       IssueStore.judgeConditionWithFilter();
       IssueStore.judgeFilterConditionIsEmpty();
       IssueStore.updateIssues(this.filterControler);
@@ -93,9 +96,9 @@ class AdvancedSearch extends Component {
     handlePrioritySelectChange = (value) => {
       const selectedIssueType = IssueStore.getSelectedIssueType;
       const selectedStatus = IssueStore.getSelectedStatus;
-      IssueStore.setSelectedPriority(_.map(value, 'key'));
+      IssueStore.setSelectedPriority(map(value, 'key'));
       this.filterControler = new IssueFilterControler();
-      this.filterControler.advancedSearchArgsFilterUpdate(selectedIssueType, selectedStatus, _.map(value, 'key'));
+      this.filterControler.advancedSearchArgsFilterUpdate(selectedIssueType, selectedStatus, map(value, 'key'));
       IssueStore.judgeConditionWithFilter();
       IssueStore.judgeFilterConditionIsEmpty();
       IssueStore.updateIssues(this.filterControler);
@@ -103,10 +106,10 @@ class AdvancedSearch extends Component {
   
     handleAssigneeSelectChange = (value) => {
       this.filterControler = new IssueFilterControler();
-      IssueStore.setSelectedAssignee(_.map(value, 'key'));
-      if (value.find(item => item.key === 'none')) {
+      IssueStore.setSelectedAssignee(value);
+      if (value.find(item => item === 'none')) {
         this.filterControler.assigneeFilterUpdate([]);
-        this.filterControler.cache.get('userFilter').otherArgs.assigneeId = ['0'].concat(_.map(_.filter(value, item => item.key !== 'none'), 'key'));
+        this.filterControler.cache.get('userFilter').otherArgs.assigneeId = ['0'].concat(filter(value, item => item !== 'none'));
         // IssueStore.setFilterMap(this.filterControler.cache);
       } else {
         if (!this.filterControler.cache.get('userFilter').otherArgs) {
@@ -114,7 +117,7 @@ class AdvancedSearch extends Component {
         }
         this.filterControler.cache.get('userFilter').otherArgs.assigneeId = [];
         // IssueStore.setFilterMap(this.filterControler.cache);
-        this.filterControler.assigneeFilterUpdate(_.map(value, 'key'));
+        this.filterControler.assigneeFilterUpdate(value);
       }
       IssueStore.judgeFilterConditionIsEmpty();
       IssueStore.judgeConditionWithFilter();
@@ -157,8 +160,7 @@ class AdvancedSearch extends Component {
       const projectInfo = IssueStore.getProjectInfo;
       const issueTypes = AppState.currentMenuType.category === 'PROGRAM' ? IssueStore.getIssueTypes : IssueStore.getIssueTypes.filter(item => item.typeCode !== 'feature');
       const statusLists = IssueStore.getIssueStatus;
-      const prioritys = IssueStore.getIssuePriority;
-      const users = IssueStore.getUsers;
+      const prioritys = IssueStore.getIssuePriority;      
       const selectedIssueType = IssueStore.getSelectedIssueType;
       const selectedStatus = IssueStore.getSelectedStatus;
       const selectedPriority = IssueStore.getSelectedPriority;
@@ -212,10 +214,10 @@ class AdvancedSearch extends Component {
               maxTagCount={0}
               maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
               onChange={this.handleIssueTypeSelectChange}
-              value={_.map(selectedIssueType, key => (
+              value={map(selectedIssueType, key => (
                 {
                   key,
-                  name: _.map(issueTypes, item => item.id === key).name,
+                  name: map(issueTypes, item => item.id === key).name,
                 }
               ))}
               getPopupContainer={triggerNode => triggerNode.parentNode}
@@ -239,10 +241,10 @@ class AdvancedSearch extends Component {
               maxTagCount={0}
               maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
               onChange={this.handleStatusSelectChange}
-              value={_.map(selectedStatus, key => (
+              value={map(selectedStatus, key => (
                 {
                   key,
-                  name: _.map(statusLists, item => item.id === key).name,
+                  name: map(statusLists, item => item.id === key).name,
                 }
               ))}
               getPopupContainer={triggerNode => triggerNode.parentNode}
@@ -266,10 +268,10 @@ class AdvancedSearch extends Component {
               maxTagCount={0}
               maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
               onChange={this.handlePrioritySelectChange}
-              value={_.map(selectedPriority, key => (
+              value={map(selectedPriority, key => (
                 {
                   key,
-                  name: _.map(prioritys, item => item.id === key).name,
+                  name: map(prioritys, item => item.id === key).name,
                 }
               ))}
               getPopupContainer={triggerNode => triggerNode.parentNode}
@@ -281,68 +283,35 @@ class AdvancedSearch extends Component {
               }
             </Select>
 
-            <Select
+            <SelectFocusLoad
+              type="user"
+              loadWhenMount
               key="assigneeSelect"
               className="assigneeSelect"
               mode="multiple"
-              allowClear
+              allowClear         
               dropdownClassName="assigneeSelect-dropdown"
               dropdownMatchSelectWidth={false}
-              placeholder="经办人"
-              labelInValue
+              placeholder="经办人"              
+              saveList={(users) => { this.users = unionBy(this.users, users, 'id'); }}
               maxTagCount={0}
-              maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
+              maxTagPlaceholder={ommittedValues => `${ommittedValues.map(value => find(this.users, { id: value }) && find(this.users, { id: value }).realName).join(', ')}`}
               filter
-              optionFilterProp="children"
-              onFilterChange={(value) => {
-                if (value) {
-                  debounceCallback(() => {
-                    axios.get(`/iam/v1/projects/${AppState.currentMenuType.id}/users?size=40&param=${value}`).then((res) => {
-                      // Set 用于查询是否有 id 重复的，没有重复才往里加
-                      const temp = new Set(users.map(item => item.id));
-                      res.content.filter(item => item.enabled).forEach((item) => {
-                        if (!temp.has(item.id)) {
-                          // users.push({
-                          //   id: item.id,
-                          //   realName: item.realName,
-                          // });
-                          users.push(item);
-                        }
-                      });
-                     
-                      IssueStore.setUsers(users);
-                    });
-                  }, this);
-                }
-              }}
+              optionFilterProp="children"      
               onChange={this.handleAssigneeSelectChange}
-              value={_.map(selectedAssignee, (key) => {
-                if (key === 'none') {
-                  return ({
-                    key,
-                    label: '未分配',
-                  });
-                } else {
-                  return ({
-                    key,
-                    label: _.map(users, item => item.id === key) && _.find(users, item => item.id === key).realName,
-                  });
-                }
-              })}
+              value={selectedAssignee}
               getPopupContainer={triggerNode => triggerNode.parentNode}
+              render={user => <Option value={user.id}>{user.realName}</Option>}
             >
-              {
-                users.length && users.map(item => (
-                  <Option key={item.id} value={item.id} title={item.realName}>{item.realName}</Option>
-                ))
-              }
-            </Select>
+              <Option value="none">未分配</Option>
+            </SelectFocusLoad>
             
             {
               (moment(createStartDate).format('YYYY-MM-DD') === moment(projectInfo.creationDate).format('YYYY-MM-DD') || createStartDate === '') && (moment(createEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') || createEndDate === '') ? (
                 <div className="c7n-createRange">
                   <RangePicker
                     format="YYYY-MM-DD hh:mm:ss"
+                    defaultPickerValue={[moment().subtract(1, 'months'), moment()]}
                     disabledDate={current => current && (current > moment().endOf('day') || current < moment(projectInfo.creationDate).startOf('day'))}
                     allowClear
                     onChange={this.handleCreateDateRangeChange}
@@ -375,7 +344,7 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(false);
                   IssueStore.setFilterListVisible(false);
-                  IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
+                  IssueStore.setEditFilterInfo(map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
                   IssueStore.resetFilterSelect(filterControler);
                   IssueStore.setClickedRow({
                     expand: false,
@@ -396,7 +365,7 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(true);
                   IssueStore.setFilterListVisible(false);
-                  IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
+                  IssueStore.setEditFilterInfo(map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
                 }}
               >
                 {'保存筛选'}
@@ -410,7 +379,7 @@ class AdvancedSearch extends Component {
                 onClick={() => {
                   IssueStore.setSaveFilterVisible(false);
                   IssueStore.setFilterListVisible(!filterListVisible);
-                  IssueStore.setEditFilterInfo(_.map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
+                  IssueStore.setEditFilterInfo(map(editFilterInfo, item => Object.assign(item, { isEditing: false })));
                 }}
               >
                 {'筛选管理'}
