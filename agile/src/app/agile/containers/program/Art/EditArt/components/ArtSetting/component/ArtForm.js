@@ -129,8 +129,9 @@ class ArtForm extends Component {
                     required: true,
                     message: '请选择PI生成个数',
                   }],
+                  initialValue: 3,
                 })(
-                  <Select style={{ width: 500, marginBottom: 15 }} label="PI生成个数">
+                  <Select style={{ width: 500, marginBottom: 15 }} label="PI生成个数" disabled>
                     {
                       [3, 4, 5, 6, 7, 8].map(value => <Option key={value} value={value}>{value}</Option>)
                     }
@@ -149,7 +150,7 @@ class ArtForm extends Component {
                 })(
                   <Select style={{ width: 180 }} label="迭代数" placeholder="请输入ART中每个PI的迭代数">
                     {
-                      [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
+                      [2, 3, 4].map(value => <Option value={value}>{value}</Option>)
                     }
                   </Select>,
 
@@ -173,10 +174,11 @@ class ArtForm extends Component {
             <FormItem>
               {getFieldDecorator('ipWeeks', {
                 rules: [{
-                  required: true, message: '请选择日期!',
+                  required: true, message: '请选择IP时长!',
                 }],
+                initialValue: 1,
               })(
-                <Select style={{ width: 500 }} label="IP时长（周）" placeholder="请选择IP时长">
+                <Select style={{ width: 500 }} label="IP时长（周）" placeholder="请选择IP时长" disabled>
                   {
                     [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
                   }

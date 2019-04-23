@@ -340,7 +340,8 @@ class IssueTable extends Component {
         // filteredValue: assigneeFilterValue,
         render: (text, record) => (
           <Assignee
-            text={text}
+            loginName={record.assigneeLoginName}
+            realName={record.assigneeRealName}
             id={record.assigneeId}
             img={record.assigneeImageUrl}
           />
@@ -388,7 +389,8 @@ class IssueTable extends Component {
         hidden: true,
         render: (text, record) => (
           <Assignee
-            text={text}
+            loginName={record.reporterLoginName}
+            realName={record.reporterRealName}
             id={record.reporterId}
             img={record.reporterImageUrl}
           />

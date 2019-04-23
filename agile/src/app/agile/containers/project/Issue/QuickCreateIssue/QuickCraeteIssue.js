@@ -5,7 +5,7 @@ import {
 } from 'choerodon-ui';
 import { axios, stores } from 'choerodon-front-boot';
 import IssueStore from '../../../../stores/project/sprint/IssueStore';
-import { createIssue, loadPriorities } from '../../../../api/NewIssueApi';
+import { createIssue, loadPriorities, createIssueField } from '../../../../api/NewIssueApi';
 import TypeTag from '../../../../components/TypeTag';
 import IssueFilterControler from '../IssueFilterControler';
 import { QuickSearchEvent } from '../../../../components/QuickSearch';
@@ -62,6 +62,12 @@ class QuickCreateIssue extends Component {
           });
           createIssue(data)
             .then((response) => {
+              const dto = {
+                schemeCode: 'agile_issue',
+                context: response.typeCode,
+                pageCode: 'agile_issue_create',
+              };
+              createIssueField(response.issueId, dto);
               this.filterControler = new IssueFilterControler();
               this.filterControler.resetCacheMap();
               IssueStore.setLoading(true);

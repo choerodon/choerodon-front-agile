@@ -59,6 +59,7 @@ import AssigneeModal from './AssigneeModal';
             >
               <div style={{ display: 'none' }}>Magic</div>
               <UserHead
+                tooltip={false}
                 hiddenText
                 size={24}
                 style={{

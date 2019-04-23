@@ -89,7 +89,7 @@ class EditArt extends Component {
       const {
         interationCount,
         interationWeeks,
-        ipWeeks,
+        ipWeeks = 1,
         piCodeNumber,
         piCodePrefix,
         startDate,
@@ -101,7 +101,7 @@ class EditArt extends Component {
       const formData = {
         interationCount,
         interationWeeks,
-        ipWeeks,
+        ipWeeks: ipWeeks || 1,
         piCodeNumber,
         piCodePrefix,
         rteId,
@@ -175,7 +175,7 @@ class EditArt extends Component {
       const {
         interationCount,
         interationWeeks,
-        ipWeeks,
+        ipWeeks = 1,
         piCodeNumber,
         piCodePrefix,
         startDate,
@@ -187,7 +187,7 @@ class EditArt extends Component {
       const formData = {
         interationCount,
         interationWeeks,
-        ipWeeks,
+        ipWeeks: ipWeeks || 1,
         piCodeNumber,
         piCodePrefix,
         rteId,

@@ -29,6 +29,7 @@ import VisibleStore from '../../../../stores/common/visible/VisibleStore';
     const { issueId: id } = store.getIssue;
     return (
       <IssueList
+        showAssignee
         key={issue.issueId}
         issue={{
           ...issue,

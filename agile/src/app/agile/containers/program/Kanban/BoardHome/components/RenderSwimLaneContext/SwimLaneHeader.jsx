@@ -68,7 +68,7 @@ export default class SwimLaneHeader extends Component {
           size={24}
           user={{
             id: assigneeId,
-            loginName: assigneeName,
+            loginName: '',
             realName: assigneeName,
             avatar: imageUrl,
           }}
@@ -96,7 +96,7 @@ export default class SwimLaneHeader extends Component {
         size={24}
         user={{
           id: assigneeId,
-          loginName: assigneeName,
+          loginName: '',
           realName: assigneeName,
           avatar: assigneeAvatarUrl,
         }}
