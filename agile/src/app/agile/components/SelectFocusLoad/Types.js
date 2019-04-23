@@ -3,8 +3,11 @@ import { Select } from 'choerodon-ui';
 import { find } from 'lodash';
 import User from '../User';
 import { getUsers, getUser } from '../../api/CommonApi';
-import { loadEpics, loadProgramEpics, loadIssueTypes } from '../../api/NewIssueApi';
+import {
+  loadEpics, loadProgramEpics, loadIssueTypes, loadStatusList, 
+} from '../../api/NewIssueApi';
 import TypeTag from '../TypeTag';
+import StatusTag from '../StatusTag';
 
 const { Option } = Select;
 
@@ -18,24 +21,43 @@ export default {
     ),
     avoidShowError: (props, List) => new Promise((resolve) => {
       const { value } = props;
-      const UserList = [...List];
-
-      if (value && !find(UserList, { id: value })) {
-        getUser(value).then((res) => {
+      const extraList = [];
+      const values = value instanceof Array ? value : [value];
+      const requestQue = [];
+      values.forEach((a) => {
+        if (a && !find(List, { id: a })) {
+          requestQue.push(getUser(a));
+        }
+      }); 
+      Promise.all(requestQue).then((users) => {
+        users.forEach((res) => {
           if (res.content && res.content.length > 0) {
-            UserList.push(res.content[0]);
-            resolve(UserList);
-          } else {
-            resolve(null);
+            extraList.push(res.content[0]);
           }
-        }).catch((err) => {
-          console.log(err);
-          resolve(null);
         });
-      } else {
-        resolve(null);
-      }
+        resolve(extraList);
+      }).catch((err) => {        
+        resolve(extraList);
+      });
     }),
+  },
+  status_program: {
+    request: () => new Promise(resolve => loadStatusList('program').then((statusList) => {      
+      resolve(statusList);
+    })),
+    render: status => (
+      <Option
+        key={status.id}
+        value={status.id}
+        name={status.name}
+      >
+        <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+          <StatusTag
+            data={status}            
+          />
+        </div>
+      </Option>
+    ),
   },
   epic: {
     props: {
@@ -72,7 +94,7 @@ export default {
         {epic.epicName}
       </Option>
     ),
-  },  
+  },
   issue_type_program: {
     props: {
       filterOption:
@@ -81,14 +103,15 @@ export default {
             input.toLowerCase(),
           ) >= 0,
     },
-    request: () => new Promise(resolve => loadIssueTypes('program').then((issueTypes) => { 
-      const defaultType = find(issueTypes, { typeCode: 'feature' }).id; 
-      resolve(issueTypes, defaultType); 
+    request: () => new Promise(resolve => loadIssueTypes('program').then((issueTypes) => {
+      const defaultType = find(issueTypes, { typeCode: 'feature' }).id;
+      resolve(issueTypes, defaultType);
     })),
     render: issueType => (
       <Option
         key={issueType.id}
         value={issueType.id}
+        name={issueType.name}
       >
         <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
           <TypeTag
