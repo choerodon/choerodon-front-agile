@@ -188,7 +188,7 @@ class ObjectSchemeField extends Component {
     });
   };
 
-  onTreeCreate = (value) => {
+  onTreeCreate = (code, value) => {
     const { fieldOptions } = this.state;
     this.setState({
       fieldOptions: [
@@ -196,6 +196,7 @@ class ObjectSchemeField extends Component {
         {
           enabled: true,
           status: 'add',
+          code,
           value,
           tempKey: randomString(5),
         },
