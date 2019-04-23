@@ -34,6 +34,7 @@ const FEATURE = asyncRouter(() => import('./program/Feature'));
 const PIAIMS = asyncRouter(() => import('./program/PI'));
 const PROGRAMSETTING = asyncRouter(() => import('./program/ProgramSetting'));
 const ARTCALENDAR = asyncRouter(() => import('./program/Art/ArtCalendar'));
+const ROADMAP = asyncRouter(() => import('./program/RoadMap'));
 
 class AGILEIndex extends React.Component {
   render() {
@@ -79,6 +80,7 @@ class AGILEIndex extends React.Component {
           <Route path={`${match.url}/pi`} component={PIAIMS} />
           <Route path={`${match.url}/programSetting`} component={PROGRAMSETTING} /> 
           <Route path={`${match.url}/artCalendar`} component={ARTCALENDAR} /> 
+          <Route path={`${match.url}/roadMap`} component={ROADMAP} /> 
 
           <Route path="*" component={nomatch} />
         </Switch>
