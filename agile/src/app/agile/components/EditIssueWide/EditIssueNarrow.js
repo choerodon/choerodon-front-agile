@@ -196,6 +196,7 @@ let hasPermission;
             type="wide"
           />
           <IssueBody
+            isWide
             store={store}
             reloadIssue={this.loadIssueDetail}
             onUpdate={onUpdate}
