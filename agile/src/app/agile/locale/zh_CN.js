@@ -74,6 +74,7 @@ const zh_CN = {
   'dragList.invalid': '禁用',
   'dragList.active': '启用',
   'dragList.placeholder': '请输入选项值',
+  'dragList.placeholder.code': '请输入选项编码',
 
   "learnmore": "了解更多",
   'branch.branch': '分支',

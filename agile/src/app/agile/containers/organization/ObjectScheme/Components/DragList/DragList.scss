@@ -34,6 +34,8 @@
     float: right;
   }
   &-text {
+    width: 35%;
+    display: inline-block;
     line-height: 24px;
   }
   &-addBtn {
@@ -46,7 +48,7 @@
     height: 34px;
   }
   &-input {
-    width: 75%;
+    width: 35%;
     display: inline-block;
   }
   &-add {
