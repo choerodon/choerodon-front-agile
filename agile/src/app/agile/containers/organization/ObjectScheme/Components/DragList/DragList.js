@@ -260,8 +260,8 @@ class DragList extends Component {
             <Card
               title={(
                 <span>
-                  <span style={{ display: 'inline-block', width: '34%' }}>编码</span>
-                  <span>值</span>
+                  <span style={{ display: 'inline-block', width: '34%' }}>值</span>
+                  <span>显示值</span>
                 </span>
               )}
               bordered={false}
