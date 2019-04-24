@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import EditIssue from './EditFeature';
+import './FeatureDetail.scss';
 
 @inject('AppState')
 @observer
