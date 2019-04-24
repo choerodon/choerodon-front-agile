@@ -108,11 +108,11 @@ class CreateField extends Component {
   };
 
   checkName = (rule, value, callback) => {
-    const { store, intl } = this.props;
+    const { store, intl, schemeCode } = this.props;
     if (!value) {
       callback();
     } else {
-      store.checkName(value)
+      store.checkName(value, schemeCode)
         .then((data) => {
           if (data) {
             callback(intl.formatMessage({ id: 'field.name.exist' }));
@@ -126,7 +126,7 @@ class CreateField extends Component {
   };
 
   checkCode = (rule, value, callback) => {
-    const { store, intl } = this.props;
+    const { store, intl, schemeCode } = this.props;
     if (!value) {
       callback();
     } else if (!regex.test(value)) {
@@ -134,7 +134,7 @@ class CreateField extends Component {
     } else {
       const { type } = AppState.currentMenuType;
       const prefix = type === 'project' ? 'pro_' : 'org_';
-      store.checkCode(`${prefix}${value}`)
+      store.checkCode(`${prefix}${value}`, schemeCode)
         .then((data) => {
           if (data) {
             callback(intl.formatMessage({ id: 'field.code.exist' }));
