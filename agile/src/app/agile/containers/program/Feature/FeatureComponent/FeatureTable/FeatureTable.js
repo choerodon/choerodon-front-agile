@@ -11,6 +11,15 @@ import TypeTag from '../../../../../components/TypeTag';
 import { QuickCreateFeatureWithProvider } from '../../../../../components/QuickCreateFeature';
 import './FeatureTable.scss';
 
+const shouldColumnShow = (tableShowColumns, column) => {
+  if (column.title === '' || !column.key) {
+    return true;
+  }
+  return tableShowColumns.length === 0 ? true : tableShowColumns.includes(column.key);
+};
+
+const manageVisible = (tableShowColumns, columns) => columns.map(column => (shouldColumnShow(tableShowColumns, column) ? { ...column, hidden: false } : { ...column, hidden: true }));
+
 const getColumns = filters => ([
   {
     title: '编号',
@@ -143,6 +152,8 @@ const FeatureTable = ({
   loading,
   dataSource,
   pagination,
+  tableShowColumns,
+  onColumnFilterChange,
   onChange,
   onRow,
   onCreateFeature,
@@ -153,10 +164,11 @@ const FeatureTable = ({
           <div className="c7nagile-FeatureTable">
             <Table
               loading={loading}
-              columns={getColumns(filters)}
+              columns={manageVisible(tableShowColumns, getColumns(filters))}
               pagination={pagination}
               dataSource={dataSource}
               onChange={onChange}
+              onColumnFilterChange={onColumnFilterChange}
               onRow={onRow}
               footer={() => (<QuickCreateFeatureWithProvider onCreate={onCreateFeature} />)}
               scroll={{

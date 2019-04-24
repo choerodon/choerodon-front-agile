@@ -4,6 +4,7 @@ import FileSaver from 'file-saver';
 import { stores } from 'choerodon-front-boot';
 import FeatureTable from '../FeatureTable';
 import SearchArea from '../SearchArea';
+import ExportIssue from '../ExportIssue';
 import { getFeatures, exportFeatures } from '../../../../../api/FeatureApi';
 import FeatureStore from '../../../../../stores/program/Feature/FeatureStore';
 import { getMyFilters } from '../../../../../api/NewIssueApi';
@@ -66,6 +67,15 @@ class QueryMode extends Component {
       total: 0,
       pageSize: 10,
     },
+    tableShowColumns: [
+      'issueNum',
+      'featureType',
+      'summary',
+      'statusList',
+      'epicList',
+      'piList',
+      'lastUpdateDate',
+    ],
     searchDTO: getDefaultSearchDTO(),
     issues: [],
     myFilters: [],
@@ -73,6 +83,7 @@ class QueryMode extends Component {
     filterManageVisible: false,
     filterManageLoading: false,
     selectedFilter: undefined,
+    exportIssueVisible: false,
   }
 
   advancedFilters = {}
@@ -108,12 +119,14 @@ class QueryMode extends Component {
   }
 
   exportFeatures = () => {
-    const { searchDTO } = this.state;
-    exportFeatures(searchDTO).then((data) => {
-      const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const fileName = `${AppState.currentMenuType.name}.xlsx`;
-      FileSaver.saveAs(blob, fileName);
-      Choerodon.prompt('导出成功');
+    this.setState({
+      exportIssueVisible: true,
+    });
+  }
+
+  handleCancelExport=() => {
+    this.setState({
+      exportIssueVisible: false,
     });
   }
 
@@ -243,10 +256,19 @@ class QueryMode extends Component {
     this.loadMyFilters();
   }
 
+  // table列选择时触发
+  handleColumnFilterChange = (info) => {
+    const { selectedKeys } = info;
+    this.setState({
+      tableShowColumns: selectedKeys,
+    });
+  }
+
   render() {
     const {
       pagination, loading, issues, searchDTO, myFilters, selectedFilter, 
       createMyFilterVisible, filterManageVisible, filterManageLoading,
+      tableShowColumns, exportIssueVisible,
     } = this.state;
     return (
       <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
@@ -272,9 +294,17 @@ class QueryMode extends Component {
           loading={loading}
           dataSource={issues}
           pagination={pagination}
+          tableShowColumns={tableShowColumns}
+          onColumnFilterChange={this.handleColumnFilterChange}
           onChange={this.handleTableChange}
           onRow={this.handleRow}
           onCreateFeature={this.handleCreateFeature}
+        />
+        <ExportIssue 
+          visible={exportIssueVisible}
+          searchDTO={searchDTO}
+          tableShowColumns={tableShowColumns}
+          onCancel={this.handleCancelExport}
         />
       </div>
     );
