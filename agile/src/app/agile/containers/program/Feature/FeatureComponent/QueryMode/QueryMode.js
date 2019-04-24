@@ -14,6 +14,7 @@ const getDefaultSearchDTO = () => ({
   advancedSearchArgs: {
     assigneeIds: [],
     statusList: [],
+    issueTypeList: [],
     reporterList: [],
     epicList: [],
   },
@@ -21,16 +22,15 @@ const getDefaultSearchDTO = () => ({
   otherArgs: {
     piList: [],
   },
-  searchArgs: {},
-  // searchArgs: {
+  searchArgs: {
   //   assignee: '',
   //   component: '',
   //   epic: '',
-  //   issueNum: '',
-  //   sprint: '',
-  //   summary: '',
+    issueNum: '',
+    //   sprint: '',
+    summary: '',
   //   version: '',
-  // },
+  },
 });
 const filterConvert = (filters) => {
   const searchDTO = getDefaultSearchDTO();
@@ -43,6 +43,7 @@ const filterConvert = (filters) => {
     switch (key) {
       case 'assigneeIds':
       case 'statusList':
+      case 'issueTypeList':
       case 'reporterList':
       case 'epicList':
         setArgs('advancedSearchArgs', { [key]: filters[key] });
@@ -294,6 +295,7 @@ class QueryMode extends Component {
           loading={loading}
           dataSource={issues}
           pagination={pagination}
+          searchDTO={searchDTO}
           tableShowColumns={tableShowColumns}
           onColumnFilterChange={this.handleColumnFilterChange}
           onChange={this.handleTableChange}

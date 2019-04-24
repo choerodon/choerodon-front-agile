@@ -1,4 +1,4 @@
-import React, { Component, memo } from 'react';
+import React, { Component, memo, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {
   Table,
@@ -20,7 +20,7 @@ const shouldColumnShow = (tableShowColumns, column) => {
 
 const manageVisible = (tableShowColumns, columns) => columns.map(column => (shouldColumnShow(tableShowColumns, column) ? { ...column, hidden: false } : { ...column, hidden: true }));
 
-const getColumns = filters => ([
+const getColumns = (filters, getFilteredValue) => ([
   {
     title: '编号',
     dataIndex: 'issueNum',
@@ -29,6 +29,7 @@ const getColumns = filters => ([
     sorterId: 'issueId',
     width: 100,  
     filters: [],
+    filteredValue: getFilteredValue('issueNum'),
     render: text => <IssueNum text={text} />,
   },
   {
@@ -148,23 +149,52 @@ const getColumns = filters => ([
   },
 ]);
 
-const FeatureTable = ({
-  loading,
-  dataSource,
-  pagination,
-  tableShowColumns,
-  onColumnFilterChange,
-  onChange,
-  onRow,
-  onCreateFeature,
-}) => (
-  <FiltersProvider fields={['epic', 'pi', 'priority']}>
-    {
+class FeatureTable extends PureComponent {
+  getFilteredValue=(key) => {
+    const { searchDTO } = this.props;
+    let field = '';
+    switch (key) {
+      case 'assigneeIds':
+      case 'statusList':
+      case 'issueTypeList':
+      case 'reporterList':
+      case 'epicList':
+        field = 'advancedSearchArgs';
+        break;
+      case 'piList':
+        field = 'otherArgs';        
+        break;
+      default:
+        field = 'searchArgs';
+        break;
+    }
+    const value = searchDTO[field][key];
+    if (value && value.length > 0) {
+      return value instanceof Array ? value : [value];
+    } else {
+      return [];
+    }
+  }
+
+  render() {
+    const {
+      loading,
+      dataSource,
+      pagination,
+      tableShowColumns,
+      onColumnFilterChange,
+      onChange,
+      onRow,
+      onCreateFeature, 
+    } = this.props; 
+    return (
+      <FiltersProvider fields={['epic', 'pi', 'priority']}>
+        {
         filters => (
           <div className="c7nagile-FeatureTable">
             <Table
               loading={loading}
-              columns={manageVisible(tableShowColumns, getColumns(filters))}
+              columns={manageVisible(tableShowColumns, getColumns(filters, this.getFilteredValue))}
               pagination={pagination}
               dataSource={dataSource}
               onChange={onChange}
@@ -177,9 +207,10 @@ const FeatureTable = ({
             />
           </div>
         )}
-  </FiltersProvider>
-);
-
+      </FiltersProvider>
+    );
+  }
+}
 FeatureTable.propTypes = {
 
 };

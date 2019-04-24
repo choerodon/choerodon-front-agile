@@ -27,7 +27,7 @@ class AdvancedSearch extends PureComponent {
     const searches = { ...advancedSearchArgs, ...otherArgs, ...searchArgs };
     return !Object.keys(searches).some((key) => {
       const item = searches[key];
-      return item.length !== 0;
+      return item && item.length !== 0;
     });
   }
 
@@ -36,7 +36,7 @@ class AdvancedSearch extends PureComponent {
     const searches = { ...advancedSearchArgs, ...otherArgs, ...searchArgs };
     const keys = Object.keys(searches).filter((key) => {
       const item = searches[key];
-      return item.length !== 0;
+      return item && item.length !== 0;
     });
     const obj = {};
     keys.forEach((key) => {
@@ -120,26 +120,23 @@ class AdvancedSearch extends PureComponent {
             }
           </Select>
 
-          <Select
+          <SelectFocusLoad
+            type="issue_type_program_simple"
             className="SelectTheme"
             mode="multiple"
             allowClear
+            filter={false}
+            loadWhenMount
             style={SelectStyle}
             dropdownMatchSelectWidth={false}
-            placeholder="问题类型"
-            labelInValue
+            placeholder="问题类型"     
+            saveList={this.saveList.bind(this, 'issueTypeList', 'id')}       
             maxTagCount={0}
-            maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
-            onChange={this.handleIssueTypeSelectChange}
-
+            maxTagPlaceholder={ommittedValues => `${ommittedValues.map(value => find(this.issueTypeList, { id: value }).name).join(', ')}`}
+            onChange={this.handleSelectChange.bind(this, 'issueTypeList')}
+            value={SelectValue.issueTypeList}
             getPopupContainer={triggerNode => triggerNode.parentNode}
-          >
-            {/* {
-                issueTypes.length && issueTypes.map(item => (
-                  <Option key={item.id} value={item.id} title={item.name}>{item.name}</Option>
-                ))
-              } */}
-          </Select>
+          />
 
           <SelectFocusLoad
             className="SelectTheme"
@@ -160,33 +157,7 @@ class AdvancedSearch extends PureComponent {
             render={status => <Option value={status.id}>{status.name}</Option>}
             getPopupContainer={triggerNode => triggerNode.parentNode}
           />
-
-          <Select
-            className="SelectTheme"
-            mode="multiple"
-            style={SelectStyle}
-            dropdownMatchSelectWidth={false}
-            allowClear
-            placeholder="优先级"
-            labelInValue
-            maxTagCount={0}
-            maxTagPlaceholder={ommittedValues => `${ommittedValues.map(item => item.label).join(', ')}`}
-            onChange={this.handleSelectChange}
-            // value={_.map(selectedPriority, key => (
-            //   {
-            //     key,
-            //     name: _.map(prioritys, item => item.id === key).name,
-            //   }
-            // ))}
-            getPopupContainer={triggerNode => triggerNode.parentNode}
-          >
-            {/* {
-                prioritys.length && prioritys.map(item => (
-                  <Option key={item.id} value={item.id} title={item.name}>{item.name}</Option>
-                ))
-              } */}
-          </Select>
-
+          
           <SelectFocusLoad
             className="SelectTheme"
             type="user"
