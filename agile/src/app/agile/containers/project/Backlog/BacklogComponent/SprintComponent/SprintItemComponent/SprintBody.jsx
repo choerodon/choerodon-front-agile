@@ -76,6 +76,7 @@ const loadFeature = () => {
         parentIssueId: 0,
       };
       BacklogStore.axiosEasyCreateIssue(req).then((res) => {
+        BacklogStore.clickedOnce(sprintId, res);
         this.setState({
           expand: false,
           loading: false,

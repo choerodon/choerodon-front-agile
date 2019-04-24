@@ -75,7 +75,7 @@ class ObjectSchemeDetail extends Component {
       render: (required, record) => (
         <div>
           <Checkbox
-            defaultChecked={record.required}
+            checked={record.required}
             disabled={record.system || (AppState.currentMenuType.type === 'project' && !record.projectId)}
             onChange={() => this.onRequiredChange(record)}
           />
@@ -205,6 +205,10 @@ class ObjectSchemeDetail extends Component {
           >
             <Icon type="playlist_add icon" />
             <span>添加字段</span>
+          </Button>
+          <Button funcType="flat" onClick={this.loadScheme}>
+            <Icon type="refresh icon" />
+            <span>刷新</span>
           </Button>
         </Header>
         <Content

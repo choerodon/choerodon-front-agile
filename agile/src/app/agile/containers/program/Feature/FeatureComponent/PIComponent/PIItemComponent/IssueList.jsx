@@ -7,22 +7,22 @@ import IssueItem from './IssueItem';
 class IssueList extends Component {
   myOnMouseDown = (e, item) => {
     e.stopPropagation();
-    const { sprintId, store, piId } = this.props;
+    const { store, piId } = this.props;
     if (!(e.shiftKey && (e.ctrlKey || e.metaKey))) {
       if (e.shiftKey) {
-        store.dealWithMultiSelect(sprintId || piId, item, 'shift');
+        store.dealWithMultiSelect(piId, item, 'shift');
       } else if (e.ctrlKey || e.metaKey) {
-        store.dealWithMultiSelect(sprintId || piId, item, 'ctrl');
+        store.dealWithMultiSelect(piId, item, 'ctrl');
       } else {
-        store.clickedOnce(sprintId || piId, item);
+        store.clickedOnce(piId, item);
       }
     }
   };
 
   render() {
-    const { sprintId, piId, store } = this.props;
+    const { piId, store } = this.props;
 
-    return store.getIssueMap.get(sprintId || piId).map((item, index) => (
+    return store.getIssueMap.get(piId).map((item, index) => (
       <Draggable key={item.issueId} draggableId={item.issueId} index={index}>
         {provided => (
           <div

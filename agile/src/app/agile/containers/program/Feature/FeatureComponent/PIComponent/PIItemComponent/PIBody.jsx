@@ -45,6 +45,7 @@ const debounceCallback = deBounce(500);
             <div style={{ padding: '10px 0px 10px 33px', background: 'white' }}>
               <QuickCreateFeature
                 defaultPriority={defaultPriority}
+                store={store}
                 piId={piId * 1}     
                 {
                   // eslint-disable-next-line no-restricted-globals

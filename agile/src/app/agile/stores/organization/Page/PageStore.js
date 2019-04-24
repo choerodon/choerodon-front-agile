@@ -76,7 +76,7 @@ class PageStore {
     if (data && !data.failed) {
       this.updatePageDetail(data);
     } else {
-      Choerodon.prompt(data.message);
+      Choerodon.prompt('请刷新后重试！');
     }
   });
 
@@ -86,7 +86,7 @@ class PageStore {
     if (data && !data.failed) {
       return data;
     } else {
-      Choerodon.prompt(data.message);
+      Choerodon.prompt('请刷新后重试！');
       return null;
     }
   });

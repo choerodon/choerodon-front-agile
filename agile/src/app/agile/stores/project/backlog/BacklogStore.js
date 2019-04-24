@@ -809,8 +809,10 @@ class BacklogStore {
         this.issueMap.set(destinationId, destinationArr);
       }
     }
-    this.multiSelected = observable.map();
-    axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/issues/to_sprint/${destinationId}`, {
+    // this.multiSelected = observable.map();
+    // this.clickIssueDetail = {};
+    this.onBlurClick();
+    return axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/issues/to_sprint/${destinationId}`, {
       before: destinationIndex === 0,
       issueIds: modifiedArr,
       outsetIssueId: prevIssue ? prevIssue.issueId : 0,
@@ -1039,7 +1041,13 @@ class BacklogStore {
 
   @action onBlurClick() {
     this.multiSelected = observable.map();
-    // this.clickIssueDetail = {};
+    if (this.clickIssueDetail && this.clickIssueDetail.issueId) {
+      this.multiSelected.set(this.clickIssueDetail.issueId, this.clickIssueDetail);
+    }
+  }
+
+  @action clearMultiSelected() {
+    this.multiSelected = observable.map();
   }
 
   @action setCreatedSprint(data) {
