@@ -227,18 +227,19 @@ class ObjectSchemeField extends Component {
 
   checkName = (rule, value, callback) => {
     const { ObjectSchemeStore, intl } = this.props;
+    const field = ObjectSchemeStore.getField;
     const name = ObjectSchemeStore.getField ? ObjectSchemeStore.getField.name : false;
     if ((name && value === name) || !value) {
       callback();
     } else {
-      ObjectSchemeStore.checkName(value)
+      ObjectSchemeStore.checkName(value, field.schemeCode)
         .then((data) => {
           if (data) {
             callback(intl.formatMessage({ id: 'field.name.exist' }));
           } else {
             callback();
           }
-        }).catch((error) => {
+        }).catch(() => {
           callback();
         });
     }
