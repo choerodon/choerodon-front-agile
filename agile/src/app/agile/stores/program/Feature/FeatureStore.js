@@ -347,7 +347,7 @@ class FeatureStore {
         this.dealWithCtrl(data, currentIndex, currentClick);
       }
     } else {
-      this.clickedOnce(currentClick, currentIndex);
+      this.clickedOnce(piId, currentIndex);
     }
   }
 
@@ -399,7 +399,14 @@ class FeatureStore {
 
   @action onBlurClick() {
     this.multiSelected = observable.map();
+    if (this.clickIssueDetail && this.clickIssueDetail.issueId) {
+      this.multiSelected.set(this.clickIssueDetail.issueId, this.clickIssueDetail);
+    }
     // this.clickIssueDetail = {};
+  }
+
+  @action clearMultiSelected() {
+    this.multiSelected = observable.map();
   }
 
   @computed get getClickIssueDetail() {
@@ -457,8 +464,10 @@ class FeatureStore {
         this.issueMap.set(destinationId, destinationArr);
       }
     }
-    this.multiSelected = observable.map();
-    axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/pi/to_pi/${destinationId}`, {
+    // this.multiSelected = observable.map();
+    // this.clickIssueDetail = {};
+    this.onBlurClick();
+    return axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/pi/to_pi/${destinationId}`, {
       before: destinationIndex === 0,
       issueIds: modifiedArr,
       outsetIssueId: prevIssue ? prevIssue.issueId : 0,

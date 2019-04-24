@@ -36,6 +36,7 @@ class FeatureDetail extends Component {
             issueId={store.getClickIssueId}
             onCancel={() => {
               store.setClickIssueDetail({});
+              store.clearMultiSelected();
             }}
             onDeleteIssue={() => {
               store.setClickIssueDetail({});

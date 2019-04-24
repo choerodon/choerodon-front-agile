@@ -72,7 +72,10 @@ class QuickCreateFeature extends Component {
             context: res.typeCode,
             pageCode: 'agile_issue_create',
           };
-          createIssueField(res.issueId, dto);
+          const { store } = this.props;
+          createIssueField(res.issueId, dto).then(() => {
+            store.clickedOnce(String(piId), res);
+          });
           if (onCreate) {
             onCreate();
           }

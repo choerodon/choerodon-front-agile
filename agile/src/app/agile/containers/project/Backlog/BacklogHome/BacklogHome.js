@@ -47,6 +47,7 @@ class BacklogHome extends Component {
   componentWillUnmount() {
     const { BacklogStore } = this.props;
     BacklogStore.resetData();
+    BacklogStore.clearMultiSelected();
   }
 
   /**
@@ -389,9 +390,17 @@ class BacklogHome extends Component {
                           destinationItem = destinationArr[destinationIndex];
                         }
                         if (BacklogStore.getMultiSelected.size > 1 && !BacklogStore.getMultiSelected.has(destinationItem)) {
-                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi');
+                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi').then(() => {
+                            if (this.IssueDetail) {
+                              this.IssueDetail.refreshIssueDetail();
+                            }
+                          });
                         } else {
-                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single');
+                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single').then(() => {
+                            if (this.IssueDetail) {
+                              this.IssueDetail.refreshIssueDetail();
+                            }
+                          });
                         }
                       }
                     }

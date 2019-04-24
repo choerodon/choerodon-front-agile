@@ -61,7 +61,7 @@ class ObjectSchemeStore {
 
   @action updateSchemeDetail(field) {
     this.schemeDetail.content = this.schemeDetail.content.map((item) => {
-      if (field.fieldId === item.fieldId) {
+      if (field.id === item.id) {
         return {
           ...item,
           objectVersionNumber: field.objectVersionNumber,
@@ -124,7 +124,7 @@ class ObjectSchemeStore {
     if (data && !data.failed) {
       this.updateSchemeDetail(data);
     } else {
-      Choerodon.prompt(data.message);
+      Choerodon.prompt('请刷新后重试！');
     }
   });
 }
