@@ -246,7 +246,7 @@ class DragList extends Component {
 
   render() {
     const {
-      data, title, tips, intl,
+      data, tips, intl,
     } = this.props;
     const { addItemVisible, tempKey, saveDisabled } = this.state;
 
@@ -260,15 +260,15 @@ class DragList extends Component {
             <Card
               title={(
                 <span>
-                  <span style={{ display: 'inline-block', width: '34%' }}>值</span>
-                  <span>编码</span>
+                  <span style={{ display: 'inline-block', width: '34%' }}>编码</span>
+                  <span>值</span>
                 </span>
               )}
               bordered={false}
               className="issue-dragList-card"
             >
               <Droppable droppableId="droppable">
-                {(provided, snapshot) => (
+                {provided => (
                   <div
                     ref={provided.innerRef}
                     className="issue-issueTypeDrag-drop"
