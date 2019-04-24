@@ -149,6 +149,10 @@ class Issue extends Component {
     );
   };
 
+  onHideIssue = () => {
+    this.issueTable.onHideIssue();
+  };
+
   // ExpandCssControler => 用于向 IssueTable 注入 CSS 样式
   render() {
     // 清除整页滚动条
@@ -224,9 +228,10 @@ class Issue extends Component {
               }}
             >
               
-              <IssueTable filterControler={this.filterControler} />
+              <IssueTable filterControler={this.filterControler} ref={this.saveRef('issueTable')} />
             </div>
             <ExpandWideCard
+              onHideIssue={this.onHideIssue}
               issueRefresh={this.Refresh}
             />
           </div>

@@ -222,6 +222,13 @@ class IssueTable extends Component {
     return fieldFilteredValue;
   }
 
+  onHideIssue = () => {
+    if (previousClick) {
+      previousClick.style.background = '';
+      previousClick.style.borderLeft = '';
+    }
+  };
+
   handleRowClick = (record, e) => {
     const editFilterInfo = IssueStore.getEditFilterInfo;
     // 点击时设置当前点击元素 style
@@ -523,8 +530,8 @@ class IssueTable extends Component {
           onClick: this.handleRowClick.bind(this, record),
           onBlur: (e) => {
             // 点击隐藏详情时无法触发 onClick，所以需要利用 onBlur 触发
-            e.currentTarget.style.background = '';
-            e.currentTarget.style.borderLeft = '';
+            // e.currentTarget.style.background = '';
+            // e.currentTarget.style.borderLeft = '';
           },
         })
         }

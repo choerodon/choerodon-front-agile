@@ -162,7 +162,7 @@ class ProgramSetting extends Component {
                 </div>
               </div>
             </TabPane>
-            <TabPane tab="ART设置" key="2">
+            <TabPane tab="项目信息" key="2">
               列表显示项目群关联的团队项目信息。
               <div style={{ width: 520, marginTop: 20 }}>
                 <Table

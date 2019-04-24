@@ -15,7 +15,7 @@ class ExpandWideCard extends Component {
   };
 
   render() {
-    const { HeaderStore } = this.props;
+    const { HeaderStore, onHideIssue } = this.props;
     return IssueStore.getExpand ? (
       <div
         style={{
@@ -31,6 +31,7 @@ class ExpandWideCard extends Component {
           store={IssueStore}
           issueId={IssueStore.getSelectedIssue && IssueStore.getSelectedIssue.issueId}
           onCancel={() => {
+            onHideIssue();
             IssueStore.setClickedRow({
               expand: false,
               selectedIssue: {},
