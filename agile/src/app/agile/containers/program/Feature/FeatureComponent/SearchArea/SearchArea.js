@@ -11,7 +11,8 @@ class SearchArea extends PureComponent {
     const {
       searchDTO, onAdvancedSearchChange, 
       onClearFilter, selectedFilter, 
-      createMyFilterVisible, myFilters, filterManageVisible, onCancel, onCreate, onSaveClick, onSelectMyFilter, onManageClick, onClose,
+      createMyFilterVisible, myFilters, filterManageVisible, onCancel, onCreate, 
+      onSaveClick, onSelectMyFilter, onManageClick, onClose, onDelete, onUpdate, filterManageLoading,
     } = this.props;
 
     return (
@@ -25,7 +26,7 @@ class SearchArea extends PureComponent {
         <AdvancedSearch
           searchDTO={searchDTO}
           myFilters={myFilters}
-          selectedFilter={selectedFilter} 
+          selectedFilter={selectedFilter}
           onAdvancedSearchChange={onAdvancedSearchChange}
           onSaveClick={onSaveClick}
           onSelectMyFilter={onSelectMyFilter}
@@ -36,8 +37,11 @@ class SearchArea extends PureComponent {
           filterManageVisible 
           && (
           <FilterManage 
+            loading={filterManageLoading}
             myFilters={myFilters}
             onClose={onClose}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
           />
           )
         }

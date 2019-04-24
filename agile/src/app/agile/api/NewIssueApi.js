@@ -342,3 +342,11 @@ export function checkMyFilterName(filterName) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/agile/v1/projects/${projectId}/personal_filter/check_name?userId=${AppState.userInfo.id}&name=${filterName}`);
 }
+export function updateMyFilter(filterId, updateData) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.put(`/agile/v1/projects/${projectId}/personal_filter/${filterId}`, updateData);
+}
+export function deleteMyFilter(filterId) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.delete(`/agile/v1/projects/${projectId}/personal_filter/${filterId}`);
+}

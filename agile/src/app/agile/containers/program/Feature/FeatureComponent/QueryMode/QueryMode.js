@@ -71,6 +71,7 @@ class QueryMode extends Component {
     myFilters: [],
     createMyFilterVisible: false,
     filterManageVisible: false,
+    filterManageLoading: false,
     selectedFilter: undefined,
   }
 
@@ -92,9 +93,16 @@ class QueryMode extends Component {
   }
 
   loadMyFilters = () => {
+    const { filterManageVisible } = this.state;
+    if (filterManageVisible) {
+      this.setState({
+        filterManageLoading: true,
+      });
+    }
     getMyFilters().then((myFilters) => {
       this.setState({
         myFilters,
+        filterManageLoading: false,
       });
     });
   }
@@ -227,15 +235,25 @@ class QueryMode extends Component {
     this.reSearch();
   }
 
+  handleMyFilterUpdate=() => {
+    this.loadMyFilters();
+  }
+
+  handleMyFilterDelete=() => {
+    this.loadMyFilters();
+  }
+
   render() {
     const {
-      pagination, loading, issues, searchDTO, myFilters, selectedFilter, createMyFilterVisible, filterManageVisible,
+      pagination, loading, issues, searchDTO, myFilters, selectedFilter, 
+      createMyFilterVisible, filterManageVisible, filterManageLoading,
     } = this.state;
     return (
       <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
         <SearchArea
           createMyFilterVisible={createMyFilterVisible}
           filterManageVisible={filterManageVisible}
+          filterManageLoading={filterManageLoading}
           myFilters={myFilters}
           searchDTO={searchDTO}
           selectedFilter={selectedFilter}
@@ -247,6 +265,8 @@ class QueryMode extends Component {
           onSaveClick={this.handleSaveClick}
           onManageClick={this.handleManageClick}
           onClose={this.handleManageClose}
+          onUpdate={this.handleMyFilterUpdate}
+          onDelete={this.handleMyFilterDelete}          
         />
         <FeatureTable
           loading={loading}

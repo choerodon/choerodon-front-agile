@@ -66,8 +66,8 @@ const getColumns = filters => ([
     key: 'statusList',
     className: 'status',
     sorterId: 'statusList',    
-    filters: filters.issueStatus,
-    filterMultiple: true,
+    // filters: filters.issueStatus,
+    // filterMultiple: true,
     width: 134,
     render: record => <StatusName record={record} />,
   },
@@ -147,7 +147,7 @@ const FeatureTable = ({
   onRow,
   onCreateFeature,
 }) => (
-  <FiltersProvider fields={[{ key: 'issueStatus', args: ['program'] }, 'epic', 'pi', 'priority']}>
+  <FiltersProvider fields={['epic', 'pi', 'priority']}>
     {
         filters => (
           <div className="c7nagile-FeatureTable">

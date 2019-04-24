@@ -10,7 +10,28 @@
   }
 
   i {
-    margin: 0 10px;
+    margin: 0 5px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 0;
+    flex: 1;
+
+    .ant-form-item-control {
+      display: flex;
+
+      .ant-form-item-children {
+        flex: 1;
+
+        .ant-input-wrapper {
+          margin-bottom: -1px;
+        }
+      }
+
+      .ant-form-explain {
+        margin-top: 3px;
+      }
+    }
   }
 
   .ant-input-underline {

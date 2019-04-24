@@ -247,7 +247,7 @@ class AdvancedSearch extends PureComponent {
             )
           }
           {
-            !filterExist && (
+            !isFilterEmpty && !filterExist && (
               <Button
                 funcType="raised"
                 style={{ color: '#fff', background: '#3F51B5', marginRight: 10 }}
