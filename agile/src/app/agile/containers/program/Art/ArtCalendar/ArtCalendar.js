@@ -36,7 +36,7 @@ class ArtCalendar extends Component {
         doingArt,
         artStartDate: doingArt && doingArt.startDate,
       }, () => {
-        if (doingArt) {
+        if (doingArt && doingArt.id) {
           getArtCalendar(doingArt.id).then((res) => {
             this.setState({
               loading: false,
