@@ -811,7 +811,9 @@ class ScrumBoardStore {
   }
 
   @action setWorkDate(data) {
-    this.calanderCouldUse = true;
+    if (data.sprintId) {
+      this.calanderCouldUse = true;
+    }
     this.workDate = data;
   }
 
