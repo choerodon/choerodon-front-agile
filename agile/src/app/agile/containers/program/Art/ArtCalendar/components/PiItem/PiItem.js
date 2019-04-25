@@ -97,12 +97,12 @@ class PiItem extends Component {
   render() {
     const { pi, diff } = this.props;
     const {
-      startDate, endDate, code, name, statusCode, sprintCalendarDOList, isLast,
+      startDate, endDate, code, name, statusCode, sprintCalendarDTOList, isLast,
     } = pi;
     const flex = moment.range(startDate, endDate).diff('days');
-    const ipStartDate = sprintCalendarDOList && sprintCalendarDOList.length > 0 ? sprintCalendarDOList[sprintCalendarDOList.length - 1].endDate : moment();
+    const ipStartDate = sprintCalendarDTOList && sprintCalendarDTOList.length > 0 ? sprintCalendarDTOList[sprintCalendarDTOList.length - 1].endDate : moment();
     const ipEndDate = endDate;
-    const ipWeeks = sprintCalendarDOList && sprintCalendarDOList.length > 0 ? moment.range(sprintCalendarDOList[sprintCalendarDOList.length - 1].endDate, endDate).diff('days') : 0;
+    const ipWeeks = sprintCalendarDTOList && sprintCalendarDTOList.length > 0 ? moment.range(sprintCalendarDTOList[sprintCalendarDTOList.length - 1].endDate, endDate).diff('days') : 0;
 
     const style = STATUS[statusCode];
     return (
@@ -128,7 +128,7 @@ class PiItem extends Component {
             </Popover>
           </div>
           <div className="PiItem-pi-sprints">
-            {sprintCalendarDOList.map((sprint) => {
+            {sprintCalendarDTOList.map((sprint) => {
               const todayIsBetween = moment().isBetween(sprint.startDate, sprint.endDate);
               return <SprintItem borderColor={style.sprintBorder} sprint={sprint} todayIsBetween={todayIsBetween} />;
             })}
