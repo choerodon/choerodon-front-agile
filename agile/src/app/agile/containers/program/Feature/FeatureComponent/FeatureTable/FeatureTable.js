@@ -68,7 +68,8 @@ const getColumns = (filters, getFilteredValue) => ([
     className: 'summary',
     key: 'summary',
     width: 240, 
-    // filters: [],
+    filters: [],
+    filteredValue: getFilteredValue('summary'),
     render: text => <Summary text={text} />,
   },
   {
