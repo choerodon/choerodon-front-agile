@@ -79,7 +79,7 @@ class ArtForm extends Component {
     });
   }
 
-  checkPiCodePrefix=(rule, value, callback) => {
+  checkPiCodePrefix = (rule, value, callback) => {
     if (/^[a-z]*?$/i.test(value)) {
       callback();
     } else {
@@ -164,13 +164,13 @@ class ArtForm extends Component {
                 })(
                   <Select style={{ width: 300 }} label="迭代时长（周）" placeholder="请选择每个迭代的工作周数">
                     {
-                  [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
-                }
+                      [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
+                    }
                   </Select>,
                 )}
               </FormItem>
             </div>
-           
+
             <FormItem>
               {getFieldDecorator('ipWeeks', {
                 rules: [{
@@ -204,24 +204,24 @@ class ArtForm extends Component {
                 rules: [{
                   required: true, message: '请输入PI起始编号',
                 }],
-                normalize: value => (value ? value.toString().replace(/[^\d]/g, '') : value),
+                normalize: value => (value ? value.toString().replace(/[^\d]|^0/g, '') : value),
               })(
                 <Input style={{ width: 500 }} label="PI起始编号" maxLength={3} placeholder="请输入PI起始编号" />,
               )}
             </FormItem>
           </TabPane>
           {data.statusCode !== 'todo' && (
-          <TabPane tab="PI列表" key="4">
-            <PIList 
-              name={initValue.name}
-              data={data}
-              artId={initValue.id}
-              PiList={PiList}
-              onGetPIList={onGetPIList}
-              onGetArtInfo={onGetArtInfo}
-              onDeletePI={onDeletePI}
-            />
-          </TabPane>
+            <TabPane tab="PI列表" key="4">
+              <PIList
+                name={initValue.name}
+                data={data}
+                artId={initValue.id}
+                PiList={PiList}
+                onGetPIList={onGetPIList}
+                onGetArtInfo={onGetArtInfo}
+                onDeletePI={onDeletePI}
+              />
+            </TabPane>
           )}
         </Tabs>
         <Divider />
