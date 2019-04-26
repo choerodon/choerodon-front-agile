@@ -16,7 +16,6 @@ import {
 } from '../../../../../api/NewIssueApi';
 import { getPISelect } from '../../../../../api/PIApi';
 import { beforeTextUpload, handleFileUpload } from '../../../../../common/utils';
-import FieldBlank from './FieldBlank';
 import './CreateFeature.scss';
 
 const { AppState } = stores;
@@ -253,7 +252,12 @@ class CreateFeature extends Component {
         );
       } else {
         return (
-          <FieldBlank />
+          <Radio.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <span style={{ color: '#D50000' }}>暂无选项，请联系管理员</span>
+          </Radio.Group>
         );
       }
     } else if (field.fieldType === 'checkbox') {
@@ -284,7 +288,12 @@ class CreateFeature extends Component {
         );
       } else {
         return (
-          <FieldBlank />
+          <Checkbox.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <span style={{ color: '#D50000' }}>暂无选项，请联系管理员</span>
+          </Checkbox.Group>
         );
       }
     } else if (field.fieldType === 'time') {
