@@ -13,6 +13,12 @@
 'agile.iterationBoard': Iteration Board
 'agile.messageNotification': Notification Setting
 
+'agile.feature': Feature
+'agile.artCalendar': ART Calendar
+'agile.pi': PI Objective
+'agile.art': ART Setting
+'agile.programSetting': Program Setting
+
 'program': Program
 'program.feature': Feature
 'program.artCalendar': ART Calendar
