@@ -70,7 +70,7 @@ class Search extends Component {
           filterName: '',
         }).then((res) => {
           this.setState({
-            filters: res.content,
+            filters: res,
           });
         });
       })
@@ -81,7 +81,7 @@ class Search extends Component {
           filterName: '',
         }).then((ress) => {
           this.setState({
-            filters: ress.content,
+            filters: ress,
           });
         });
       });
@@ -118,7 +118,7 @@ class Search extends Component {
     })
       .then((res) => {
         this.setState({
-          filters: res.content,
+          filters: res,
           loading: false,
         });
       })
