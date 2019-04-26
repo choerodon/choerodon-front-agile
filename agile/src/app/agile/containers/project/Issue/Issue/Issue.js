@@ -213,7 +213,7 @@ class Issue extends Component {
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', flex: 1, overflowY: 'scroll' }}>
+          <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
             
             <ExpandCssControler />
             
@@ -223,8 +223,7 @@ class Issue extends Component {
                 display: 'block',
                 position: 'relative',
                 padding: '0px 18px',
-                height: '100%',
-                // overflowY: 'auto',
+                overflowY: 'scroll',
               }}
             >
               
