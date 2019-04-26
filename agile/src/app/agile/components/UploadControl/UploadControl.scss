@@ -8,6 +8,10 @@
   }
   .ant-upload-list-item {
     display: inline-block;
+    .icon-close {
+      transform: none;
+      font-size: 14px;
+    }
   }
   .ant-upload-list-item-info {
     padding-right: 20px;

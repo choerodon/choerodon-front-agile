@@ -446,6 +446,10 @@
     margin-right: 6px;
     background: #f3f3f3;
     border-radius: 2px;
+    .icon-close {
+      transform: none;
+      font-size: 14px;
+    }
   }
 
   .ant-upload-list-item-info {
