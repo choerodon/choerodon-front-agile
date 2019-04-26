@@ -13,13 +13,16 @@ const { AppState } = stores;
 //   .post(`/agile/v1/projects/${AppState.currentMenuType.id}/component?no_issue_test=true`);
 // }
 
-export function loadComponents(filters, componentId) {
+export function loadComponents(pagination, filters, componentId) {
+  const { current, pageSize } = pagination;
+  const page = current - 1;
+  const size = pageSize;
   if (componentId) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/component/query_all?componentId=${componentId}&no_issue_test=true`, filters);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/component/query_all?componentId=${componentId}&page=${page}&size=${size}&no_issue_test=true`, filters);
   }
   // return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}
   // /component?no_issue_test=true`);
-  return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/component/query_all?no_issue_test=true`, filters);
+  return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/component/query_all?no_issue_test=true&page=${page}&size=${size}`, filters);
 }
 
 export function createComponent(obj) {
