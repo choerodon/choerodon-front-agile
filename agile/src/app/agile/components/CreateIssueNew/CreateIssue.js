@@ -18,7 +18,6 @@ import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import UserHead from '../UserHead';
 import TypeTag from '../TypeTag';
-import FieldBlank from './FieldBlank';
 import './CreateIssue.scss';
 
 const { AppState } = stores;
@@ -441,7 +440,12 @@ class CreateIssue extends Component {
         );
       } else {
         return (
-          <FieldBlank />
+          <Radio.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <span style={{ color: '#D50000' }}>暂无选项，请联系管理员</span>
+          </Radio.Group>
         );
       }
     } else if (field.fieldType === 'checkbox') {
@@ -472,7 +476,12 @@ class CreateIssue extends Component {
         );
       } else {
         return (
-          <FieldBlank />
+          <Checkbox.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <span style={{ color: '#D50000' }}>暂无选项，请联系管理员</span>
+          </Checkbox.Group>
         );
       }
     } else if (field.fieldType === 'time') {
