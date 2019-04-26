@@ -896,7 +896,7 @@ class BacklogStore {
   }
 
   @action setVersionData(data) {
-    this.versionData = data;
+    this.versionData = data.sort((a, b) => b.sequence - a.sequence);
   }
 
   @computed get getVersionData() {
@@ -924,10 +924,10 @@ class BacklogStore {
     const req = {
       beforeSequence: destinationIndex !== 0 ? this.versionData[destinationIndex - 1].sequence : null,
       afterSequence: destinationIndex !== (this.versionData.length - 1) ? this.versionData[destinationIndex + 1].sequence : null,
-      epicId: versionId,
+      versionId,
       objectVersionNumber,
     };
-    this.handleEpicDrap(req).then(
+    this.handleVersionDrap(req).then(
       action('fetchSuccess', (res) => {
         if (!res.message) {
           this.versionData[destinationIndex] = {

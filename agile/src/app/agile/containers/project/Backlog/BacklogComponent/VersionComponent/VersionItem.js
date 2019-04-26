@@ -1,3 +1,4 @@
+/* eslint-disable react/sort-comp */
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import _ from 'lodash';
@@ -36,20 +37,6 @@ class VersionItem extends Component {
     );
   }
 
-  /**
-   *点击单个menu的事件
-   *
-   * @param {*} e
-   * @memberof VersionItem
-   */
-  clickMenu(e) {
-    e.domEvent.stopPropagation();
-    if (e.key === '0') {
-      this.setState({
-        editName: true,
-      });
-    }
-  }
 
   /**
    *更新描述
@@ -166,6 +153,21 @@ class VersionItem extends Component {
     handleClickVersion(type);
   };
 
+  /**
+   *点击单个menu的事件
+   *
+   * @param {*} e
+   * @memberof VersionItem
+   */
+  clickMenu(e) {
+    e.domEvent.stopPropagation();
+    if (e.key === '0') {
+      this.setState({
+        editName: true,
+      });
+    }
+  }
+
   render() {
     // const { data: item } = this.props;
     const {
@@ -205,7 +207,7 @@ class VersionItem extends Component {
           }
         }}
       >
-        <Draggable draggableId={`epicItem-${item.issueId}`} key={item.issueId} index={index}>
+        <Draggable draggableId={`epicItem-${item.versionId}`} key={item.versionId} index={index}>
           {(draggableProvided, draggableSnapshot) => (
             <DraggableVersion
               item={item}
