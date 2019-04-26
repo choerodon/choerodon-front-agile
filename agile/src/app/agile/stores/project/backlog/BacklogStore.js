@@ -878,11 +878,9 @@ class BacklogStore {
     this.handleEpicDrap(req).then(
       action('fetchSuccess', (res) => {
         if (!res.message) {
-          this.epicList[destinationIndex] = {
-            ...movedItem,
-            epicSequence: res.epicSequence,
-            objectVersionNumber: res.objectVersionNumber,
-          };
+          this.axiosGetEpic().then((epics) => {
+            this.setEpicData(epics);
+          });          
         } else {
           this.epicList.splice(destinationIndex, 1);
           this.epicList.splice(sourceIndex, 0, movedItem);
@@ -928,13 +926,11 @@ class BacklogStore {
       objectVersionNumber,
     };
     this.handleVersionDrap(req).then(
-      action('fetchSuccess', (res) => {
+      action('fetchSuccess', (res) => {        
         if (!res.message) {
-          this.versionData[destinationIndex] = {
-            ...movedItem,
-            sequence: res.sequence,
-            objectVersionNumber: res.objectVersionNumber,
-          };
+          this.axiosGetVersion().then((versions) => {
+            this.setVersionData(versions);
+          });
         } else {
           this.versionData.splice(destinationIndex, 1);
           this.versionData.splice(sourceIndex, 0, movedItem);
