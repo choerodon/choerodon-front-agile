@@ -60,7 +60,7 @@ class BacklogHome extends Component {
     BacklogStore.axiosGetIssueTypes();
     BacklogStore.axiosGetDefaultPriority();
     Promise.all([BacklogStore.axiosGetQuickSearchList(), BacklogStore.axiosGetIssueTypes(), BacklogStore.axiosGetDefaultPriority(), BacklogStore.axiosGetSprint()]).then(([quickSearch, issueTypes, priorityArr, backlogData]) => {
-      BacklogStore.initBacklogData(quickSearch.content, issueTypes, priorityArr, backlogData);
+      BacklogStore.initBacklogData(quickSearch, issueTypes, priorityArr, backlogData);
     });
   };
 
